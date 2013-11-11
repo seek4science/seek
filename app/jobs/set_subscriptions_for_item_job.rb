@@ -1,4 +1,10 @@
 class SetSubscriptionsForItemJob < Struct.new(:subscribable_type,:subscribable_id, :project_ids)
+
+  def before(job)
+    #make sure the SMTP configuration is in sync with current SEEK settings
+    Seek::Config.smtp_propagate
+  end
+
   def perform
     subscribable = subscribable_type.constantize.find_by_id(subscribable_id)
     if subscribable
