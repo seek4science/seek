@@ -13,6 +13,7 @@ module Seek
 
     module InstanceMethods
       def resize_image size='900'
+        size = filter_size size
         if !cache_exists?(size) # look in file system cache before attempting db access
                                 # resize (keeping image side ratio), encode and cache the picture
           self.operate do |image|
