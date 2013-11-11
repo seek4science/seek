@@ -1089,4 +1089,14 @@ end
     end
 
   end
+
+  test "preview assay with associated hidden items" do
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    private_df = Factory(:data_file,:policy=>Factory(:private_policy))
+    assay.data_file_masters << private_df
+    assay.save!
+    login_as Factory(:person)
+    xhr(:get, :preview,{:id=>assay.id})
+    assert_response :success
+  end
 end
