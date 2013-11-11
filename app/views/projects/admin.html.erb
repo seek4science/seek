@@ -1,8 +1,8 @@
 <%= javascript_include_tag 'sharing.js'%>
-<h1>Administer Project: <%= link_to h(@project.name), project_path(@project) -%></h1>
+<h1>Administer <%= t('project') %>: <%= link_to h(@project.name), project_path(@project) -%></h1>
 
 <div class="show_basic">
-  <% form_for(@project) do |f| -%>
+  <%= form_for(@project) do |f| -%>
 
     <%= javascript_include_tag "projects.js" %>
   
@@ -10,33 +10,42 @@
   
     <%= f.error_messages %>
 
-    <% if admin_logged_in?%>
-        <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
-        <br/>
-        <%= render :partial=>"assets/sharing_form"%>
-    <%end%>
+    <h2>Participating Institutions</h2>
 
-    <h2 style="margin-top: 2em;">Participating Institutions</h2>
-
-    <div style="width: 95%; text-align: left;">
-      <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making your selection from the list below.") -%>
-      <%= f.label :institution_ids, "Please select the institutions that participate in this project", :style => "line-height: 2;" -%><br/>
+    <div>
+      <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making youpotr selection from the list below.") -%>
+      <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}", :style => "line-height: 2;" -%><br/>
       <%
          institution_list = []
          if admin_logged_in?
-            institution_list |= Institution.find(:all)
+           institution_list |= Institution.all
          elsif project_manager_logged_in?
            if Seek::Config.is_virtualliver
-             institution_list |= Institution.find(:all)
+             institution_list |= Institution.all
            else
-            institution_list |= (Institution.find(:all).select{|i| i.projects.empty?} + @project.institutions).uniq
+            institution_list |= (Institution.all.select{|i| i.projects.empty?} + @project.institutions).uniq
            end
          end
       %>
       <%= f.collection_select :institution_ids, institution_list, :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
     </div>
 
-    <p style="margin-top: 2em; text-align: center;">
+    <% if admin_logged_in? && Seek::Config.jerm_enabled %>
+        <br/>
+        <div id="details_for_jerm" class="fold" >
+          <div class="foldTitle">
+            <%= help_icon("These are details you will need if you have created and wish to use a <b>JERM harvester</b> for this project, to register assets from a remote site.") -%>
+            JERM details
+          </div>
+          <div class="foldContent" style="display:none;">
+              <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
+              <br/>
+              <%= render :partial=>"assets/sharing_form"%>
+          </div>
+        </div>
+    <%end%>
+
+    <p>
       <%= f.submit("Update", :disable_with=>"Updating...") -%>
       or <%= link_to 'Cancel', project_path(@project.id) -%>
     </p>

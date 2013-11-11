@@ -2,11 +2,10 @@ require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
   
-  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :taggings, :tags, :publications, :assets, :organisms
-  
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users,  :publications, :assets, :organisms
   #checks that the dependent work_groups are destoryed when the project s
   def test_delete_work_groups_when_project_deleted
-    n_wg=WorkGroup.find(:all).size
+    n_wg=WorkGroup.all.size
     p=Project.find(2)
     assert_equal 1,p.work_groups.size
         
@@ -14,9 +13,62 @@ class ProjectTest < ActiveSupport::TestCase
     p.save!
     p.destroy
     
-    assert_equal n_wg-1,WorkGroup.find(:all).size
-    wg=WorkGroup.find(:all).first
+    assert_equal n_wg-1,WorkGroup.all.size
+    wg=WorkGroup.all.first
     assert_same 1,wg.project_id
+  end
+
+  test "to_rdf" do
+    object = Factory :project, :web_page=>"http://www.sysmo-db.org",
+                     :organisms=>[Factory(:organism), Factory(:organism)]
+    Factory :data_file,:projects=>[object]
+    Factory :data_file,:projects=>[object]
+    Factory :model,:projects=>[object]
+    Factory :sop,:projects=>[object]
+    Factory :presentation, :projects=>[object]
+    i = Factory :investigation, :projects=>[object]
+    s = Factory :study, :investigation=>i
+    Factory :assay, :study=>s
+    wg = Factory :work_group,:project=>object
+    Factory :group_membership,:work_group=>wg,:person=>Factory(:person)
+
+    object.reload
+    assert !object.people.empty?
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/projects/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
+  test "rdf with empty URI resource" do
+    object = Factory :project, :web_page=>"http://google.com"
+
+    homepage_predicate = RDF::URI.new "http://xmlns.com/foaf/0.1/homepage"
+    found = false
+    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
+      reader.each_statement do |statement|
+        if statement.predicate == homepage_predicate
+          found = true
+          assert statement.valid?, "statement is not valid"
+          assert_equal RDF::URI.new("http://google.com"),statement.object
+        end
+      end
+    end
+    assert found,"Didn't find homepage predicate"
+
+    object.web_page=""
+    found = false
+    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
+      reader.each_statement do |statement|
+        if statement.predicate == homepage_predicate
+          found = true
+
+          assert statement.valid?, "statement is not valid"
+        end
+      end
+    end
+    assert !found,"The homepage statement should have been skipped"
   end
 
   def test_avatar_key
@@ -37,7 +89,7 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_ordered_by_name
-    assert Project.find(:all).sort_by {|p| p.name.downcase} == Project.find(:all) || Project.all.sort_by {|p| p.name} == Project.all
+    assert Project.all.sort_by {|p| p.name.downcase} == Project.default_order || Project.all.sort_by {|p| p.name} == Project.default_order
   end
 
   def test_title_alias_for_name
@@ -239,6 +291,14 @@ class ProjectTest < ActiveSupport::TestCase
     uuid = x.attributes["uuid"]
     x.save
     assert_equal x.uuid, uuid
+  end
+
+  test "Should order Latest list of projects by updated_at" do
+    project1 = Factory(:project, :name => 'C', :updated_at => 2.days.ago)
+    project2 = Factory(:project, :name => 'B', :updated_at => 1.days.ago)
+
+    latest_projects = Project.paginate_after_fetch([project1,project2], :page=>'latest')
+    assert_equal project2, latest_projects.first
   end
 
 

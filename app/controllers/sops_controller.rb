@@ -11,22 +11,25 @@ class SopsController < ApplicationController
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show, :download]
 
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
 
   def new_version
     if (handle_data nil)      
       comments=params[:revision_comment]
 
-      conditions = @sop.experimental_conditions
+
       respond_to do |format|
         if @sop.save_as_new_version(comments)
 
           create_content_blobs
 
           #Duplicate experimental conditions
+          conditions = @sop.find_version(@sop.version - 1).experimental_conditions
           conditions.each do |con|
-            new_con = con.clone
+            new_con = con.dup
             new_con.sop_version = @sop.version
             new_con.save
           end
@@ -51,13 +54,13 @@ class SopsController < ApplicationController
     # update timestamp in the current SOP record 
     # (this will also trigger timestamp update in the corresponding Asset)
     if @sop.instance_of?(Sop)
-      @sop.last_used_at = Time.now
-      @sop.save_without_timestamping
+      @sop.just_used
     end  
     
     respond_to do |format|
       format.html
       format.xml
+      format.rdf { render :template=>'rdf/show'}
       format.svg { render :text=>to_svg(@sop,params[:deep]=='true',@sop)}
       format.dot { render :text=>to_dot(@sop,params[:deep]=='true',@sop)}
       format.png { render :text=>to_png(@sop,params[:deep]=='true',@sop)}
@@ -102,14 +105,13 @@ class SopsController < ApplicationController
           #Add creators
           AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
           
-          flash[:notice] = 'SOP was successfully uploaded and saved.'
+          flash[:notice] = "#{t('sop')} was successfully uploaded and saved."
           format.html { redirect_to sop_path(@sop) }
           Assay.find(assay_ids).each do |assay|
             if assay.can_edit?
               assay.relate(@sop)
             end
           end
-          deliver_request_publish_approval params[:sharing], @sop
         else
           format.html { 
             render :action => "new" 
@@ -150,7 +152,7 @@ class SopsController < ApplicationController
         #update authors
         AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
         
-        flash[:notice] = 'SOP metadata was successfully updated.'
+        flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|
@@ -166,7 +168,6 @@ class SopsController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
-        deliver_request_publish_approval params[:sharing], @sop
       else
         format.html { 
           render :action => "edit" 
@@ -203,7 +204,7 @@ class SopsController < ApplicationController
     resource = Sop.find(params[:id])
     details = params[:details]
     
-    Mailer.deliver_request_resource(current_user,resource,details,base_host)
+    Mailer.request_resource(current_user,resource,details,base_host).deliver
     
     render :update do |page|
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."

@@ -7,17 +7,16 @@
 
   <%= list_item_attribute "Date at sampling", text_or_not_specified(resource.sampling_date.nil? ? nil : date_as_string(resource.sampling_date)) -%>
 
-  <%= list_item_attribute "Organism",organism_and_strain(resource.specimen.strain) -%>
+  <%= list_item_attribute "Provider name",text_or_not_specified(resource.provider_name) -%>
+  <%= list_item_attribute "Provider's sample ID",text_or_not_specified(resource.provider_id) -%>
 </div>
 
 <div class="list_item_right_column">
-  <%= list_item_authorized_list resource.data_file_masters,"Data files", true, 50, true %>
-  <%= list_item_authorized_list resource.sop_masters,"SOPs", true, 50, true %>
+  <%= list_item_attribute "Organism", resource.specimen.strain.organism.title, organism_path(resource.specimen.strain.organism) -%>
+  <%= list_item_authorized_list (resource.specimen.strain.is_dummy? ? [] : [resource.specimen.strain]),"Strain", true, 50, true %>
 
-  <%= list_item_attribute "Provider name",text_or_not_specified(resource.provider_name) -%>
-  <%= list_item_attribute "Provider's sample ID",text_or_not_specified(resource.provider_id) -%>
-
-
+  <%= list_item_authorized_list resource.data_file_masters,t('data_file').pluralize, true, 50, true %>
+  <%= list_item_authorized_list resource.sop_masters,t('sop').pluralize, true, 50, true %>
 </div>
 
 <div class="list_item_whole_width">

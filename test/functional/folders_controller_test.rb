@@ -21,12 +21,12 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test "delete" do
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
-    folder = Factory :project_folder,:project=>@project
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy)
+    folder = Factory :project_folder,:project_id=>@project.id
     folder.add_assets(sop)
     child = folder.add_child("fred")
     child.save!
-    unsorted_folder = Factory :project_folder,:project=>@project,:incoming=>true
+    unsorted_folder = Factory :project_folder,:project_id=>@project.id,:incoming=>true
 
     assert_difference("ProjectFolder.count",-2) do
       delete :destroy, :id => folder.id,:project_id=>@project.id
@@ -40,12 +40,12 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test "cannot delete if not deletable" do
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
-    folder = Factory :project_folder,:project=>@project,:deletable=>false
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy)
+    folder = Factory :project_folder,:project_id=>@project.id,:deletable=>false
     folder.add_assets(sop)
     child = folder.add_child("fred")
     child.save!
-    unsorted_folder = Factory :project_folder,:project=>@project,:incoming=>true
+    unsorted_folder = Factory :project_folder,:project_id=>@project.id,:incoming=>true
 
     assert_no_difference("ProjectFolder.count") do
       delete :destroy, :id => folder.id,:project_id=>@project.id
@@ -63,12 +63,12 @@ class FoldersControllerTest < ActionController::TestCase
 
   test "cannot delete other project" do
     project = Factory :project
-    sop = Factory :sop, :projects=>[project],:policy=>Factory(:public_policy)
-    folder = Factory :project_folder,:project=>project
+    sop = Factory :sop, :project_ids=>[project.id],:policy=>Factory(:public_policy)
+    folder = Factory :project_folder,:project_id=>project.id
     folder.add_assets(sop)
     child = folder.add_child("fred")
     child.save!
-    unsorted_folder = Factory :project_folder,:project=>project,:incoming=>true
+    unsorted_folder = Factory :project_folder,:project_id=>project.id,:incoming=>true
 
     assert_no_difference("ProjectFolder.count") do
       delete :destroy, :id => folder,:project_id=>project.id
@@ -83,9 +83,9 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test "defaults created and old items assigned" do
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
-    private_sop  = Factory :sop, :projects=>[@project],:policy=>Factory(:private_policy)
-    sop2 = Factory :sop, :projects=>[Factory(:project)],:policy=>Factory(:public_policy)
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy)
+    private_sop  = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:private_policy)
+    sop2 = Factory :sop, :project_ids=>[Factory(:project).id],:policy=>Factory(:public_policy)
     assert ProjectFolder.root_folders(@project).empty?
 
     assert_difference("ProjectFolderAsset.count",2) do
@@ -122,12 +122,12 @@ class FoldersControllerTest < ActionController::TestCase
   test "should not show when logged out" do
     logout
     get :index,:project_id=>@project.id
-    assert_redirected_to login_path
+    assert_redirected_to root_path
   end
 
   test "ajax request for folder contents" do
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
-    folder = Factory :project_folder, :project=>@project
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
+    folder = Factory :project_folder, :project_id=>@project.id
     folder.add_assets(sop)
     folder.save!
 
@@ -162,8 +162,8 @@ class FoldersControllerTest < ActionController::TestCase
 
   test "ajax request for folder contents rejected from non project member" do
     login_as Factory(:user)
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
-    folder = Factory :project_folder, :project=>@project
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
+    folder = Factory :project_folder, :project_id=>@project.id
     folder.add_assets(sop)
     folder.save!
 
@@ -173,9 +173,9 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test "move between folders" do
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
-    folder = Factory :project_folder, :project=>@project
-    other_folder = Factory :project_folder, :project=>@project
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
+    folder = Factory :project_folder, :project_id=>@project.id
+    other_folder = Factory :project_folder, :project_id=>@project.id
     folder.add_assets(sop)
     folder.save!
     xhr(:post,:move_asset_to,{:asset_id=>sop.id,:asset_type=>"Sop",:id=>folder.id,:dest_folder_id=>other_folder.id,:project_id=>folder.project.id})
@@ -192,8 +192,8 @@ class FoldersControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay,:contributor=>@member.person,:policy=>Factory(:public_policy)
     assay.study.investigation.projects=[@project]
     assay.study.investigation.save!
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
-    folder = Factory :project_folder, :project=>@project
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy)
+    folder = Factory :project_folder, :project_id=>@project.id
     folder.add_assets(sop)
     folder.save!
 
@@ -216,7 +216,7 @@ class FoldersControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay,:contributor=>@member.person,:policy=>Factory(:public_policy)
     assay.study.investigation.projects=[@project]
     assay.study.investigation.save!
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy)
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy)
     assay.relate(sop)
     folder = Seek::AssayFolder.new assay,@project
     assert_difference("AssayAsset.count",-1) do
@@ -229,9 +229,9 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test "cannot move to other project folder" do
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
-    folder = Factory :project_folder, :project=>@project
-    other_folder = Factory :project_folder, :project=>Factory(:project)
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
+    folder = Factory :project_folder, :project_id=>@project.id
+    other_folder = Factory :project_folder, :project_id=>Factory(:project).id
     folder.add_assets(sop)
     folder.save!
     xhr(:post,:move_asset_to,{:asset_id=>sop.id,:asset_type=>"Sop",:id=>folder.id,:dest_folder_id=>other_folder.id,:project_id=>folder.project.id})
@@ -253,9 +253,9 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test "authorization on assets" do
-    sop = Factory :sop, :projects=>[@project],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
-    hidden_sop = Factory :sop,:projects=>[@project],:policy=>Factory(:private_policy),:description=>"viu2q6ng3iZ0ppS5X679pPo11LfF62pS"
-    folder = Factory :project_folder, :project=>@project
+    sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy),:description=>"Ryz9z3Z9h70wzJ243we6k8RO5xI5f3UF"
+    hidden_sop = Factory :sop,:project_ids=>[@project.id],:policy=>Factory(:private_policy),:description=>"viu2q6ng3iZ0ppS5X679pPo11LfF62pS"
+    folder = Factory :project_folder, :project_id=>@project.id
 
     disable_authorization_checks do
       folder.add_assets([sop,hidden_sop])
@@ -280,7 +280,7 @@ class FoldersControllerTest < ActionController::TestCase
   test 'breadcrumb for project folder' do
     get :index,:project_id=>@project.id
     assert_response :success
-    assert_select 'div.breadcrumbs', :text => /Home > Projects Index > #{@project.title} > Folders Index/, :count => 1 do
+    assert_select 'div.breadcrumbs', :text => /Home > #{I18n.t('project').pluralize} Index > #{@project.title} > Folders Index/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", projects_url, :count => 1
       assert_select "a[href=?]", project_url(@project), :count => 1

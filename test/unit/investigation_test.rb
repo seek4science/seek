@@ -2,7 +2,7 @@ require 'test_helper'
 
 class InvestigationTest < ActiveSupport::TestCase
   
-  fixtures :all
+  fixtures :investigations,:projects,:studies,:assays,:assay_assets, :permissions,:policies
 
   test "associations" do
     inv=investigations(:metabolomics_investigation)
@@ -14,6 +14,26 @@ class InvestigationTest < ActiveSupport::TestCase
     assert_equal Investigation.find(:all).sort_by {|i| i.updated_at.to_i * -1},Investigation.find(:all)
   end
 
+  test "publications through the study assays" do
+
+    assay1 = Factory :assay
+    assay2 = Factory :assay
+
+    pub1 = Factory :publication, :title=>"pub 1"
+    pub2 = Factory :publication, :title=>"pub 2"
+    pub3 = Factory :publication, :title=>"pub 3"
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub1
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub3
+
+    inv = Factory(:investigation, :studies=>[Factory(:study,:assays=>[assay1]),Factory(:study,:assays=>[assay2])])
+
+    assert_equal 3,inv.related_publications.size
+    assert_equal [pub1,pub2,pub3],inv.related_publications.sort_by(&:id)
+  end
+
   test "assays through association" do
     inv=investigations(:metabolomics_investigation)
     assays=inv.assays
@@ -23,7 +43,16 @@ class InvestigationTest < ActiveSupport::TestCase
     assert assays.include?(assays(:metabolomics_assay))
     assert assays.include?(assays(:metabolomics_assay2))
     assert assays.include?(assays(:metabolomics_assay3))
-  end  
+  end
+
+  test "to_rdf" do
+    object = Factory :investigation, :description=>"Big investigation",:studies=>[Factory(:study), Factory(:study)]
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/investigations/#{object.id}"), reader.statements.first.subject
+    end
+  end
   
   #the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
   test "title trimmed" do
@@ -49,17 +78,21 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test "unauthorized users can't delete" do
-    investigation = Factory :investigation
-    assert !investigation.can_delete?(Factory(:user))
+    User.with_current_user Factory(:user) do
+      investigation = Factory :investigation, :policy=>Factory(:private_policy)
+      assert !investigation.can_delete?(Factory(:user))
+    end
   end
 
   test 'authorized user can delete' do
-    investigation = Factory :investigation, :studies => [], :contributor => Factory(:user)
-    assert investigation.can_delete?(investigation.contributor)
+    User.with_current_user Factory(:user) do
+      investigation = Factory :investigation, :studies => [], :policy=>Factory(:private_policy)
+      assert investigation.can_delete?(investigation.contributor)
+    end
   end
 
   test "authorized user cant delete with study" do
-    investigation = Factory :investigation, :studies => [Factory :study], :contributor => Factory(:user)
+    investigation = Factory :investigation, :studies => [Factory(:study)], :contributor => Factory(:user)
     assert !investigation.can_delete?(investigation.contributor)
   end
   

@@ -13,14 +13,14 @@ class PostsController < ApplicationController
     [:user_id, :forum_id, :topic_id].each { |attr| conditions << Post.send(:sanitize_sql, ["#{Post.table_name}.#{attr} = ?", params[attr]]) if params[attr] }
     conditions = conditions.empty? ? nil : conditions.collect { |c| "(#{c})" }.join(' AND ')
     @posts = Post.paginate @@query_options.merge(:conditions => conditions, :page => params[:page], :count => {:select => "#{Post.table_name}.id"}, :order => post_order)
-    @users = User.find(:all, :select => 'distinct *', :conditions => ['id in (?)', @posts.collect(&:user_id).uniq]).index_by(&:id)
+    @users = User.where(['id in (?)', @posts.collect(&:user_id).uniq]).uniq.index_by(&:id)
     render_posts_or_xml
   end
 
   def search		
     conditions = params[:q].blank? ? nil : Post.send(:sanitize_sql, ["LOWER(#{Post.table_name}.body) LIKE ?", "%#{params[:q]}%"])
     @posts = Post.paginate @@query_options.merge(:conditions => conditions, :page => params[:page], :count => {:select => "#{Post.table_name}.id"}, :order => post_order)
-    @users = User.find(:all, :select => 'distinct *', :conditions => ['id in (?)', @posts.collect(&:user_id).uniq]).index_by(&:id)
+    @users = User.where(['id in (?)', @posts.collect(&:user_id).uniq]).uniq.index_by(&:id)
     render_posts_or_xml :index
   end
 
@@ -64,7 +64,7 @@ class PostsController < ApplicationController
     if params[:forum_attachment]
       params[:forum_attachment][:post_id] = @post.id  
       unless ForumAttachment.create(params[:forum_attachment])
-        @post.errors.add_to_base("Attachment could not be uploaded.")
+        @post.errors[:base] << "Attachment could not be uploaded."
         raise ActiveRecord::RecordInvalid
       end
     end

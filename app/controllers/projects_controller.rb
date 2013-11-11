@@ -1,8 +1,7 @@
-require 'white_list_helper'
-
 class ProjectsController < ApplicationController
   include WhiteListHelper
   include IndexPager
+  include CommonSweepers
   
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report, :view_items_in_tab,:resource_in_tab]
@@ -58,6 +57,7 @@ class ProjectsController < ApplicationController
     @project = Project.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
+      format.rdf { render :template=>'rdf/show'}
       format.xml
     end
   end
@@ -134,7 +134,7 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       if @project.save
-        flash[:notice] = 'Project was successfully created.'
+        flash[:notice] = "#{t('project')} was successfully created."
          format.html { redirect_to(@project) }
         format.xml  { render :xml => @project, :status => :created, :location => @project }
       else
@@ -158,8 +158,9 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       if @project.update_attributes(params[:project])
+        expire_resource_list_item_content
 
-        flash[:notice] = 'Project was successfully updated.'
+        flash[:notice] = "#{t('project')} was successfully updated."
         format.html { redirect_to(@project) }
         format.xml  { head :ok }
       else
@@ -216,7 +217,7 @@ class ProjectsController < ApplicationController
         if success
           render :json => {:status => 200, :institution_list => institution_list }
         else
-          render :json => {:status => 404, :error => "Couldn't find Project with ID #{project_id}."}
+          render :json => {:status => 404, :error => "Couldn't find #{t('project')} with ID #{project_id}."}
         end
       }
     end
@@ -235,7 +236,7 @@ class ProjectsController < ApplicationController
   def member_of_this_project
     @project = Project.find(params[:id])
     if @project.nil? || !@project.has_member?(current_user)
-      flash[:error]="You are not a member of this project, so cannot access this page."
+      flash[:error]="You are not a member of this #{t('project')}, so cannot access this page."
       redirect_to project_path(@project)
       false
     else

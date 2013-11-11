@@ -265,4 +265,14 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
 
   end
+
+  test "create_initial_jobs should not create jobs when they exist" do
+    assert !SendPeriodicEmailsJob.daily_exists?
+    assert_difference("Delayed::Job.count",1) do
+      Delayed::Job.enqueue SendPeriodicEmailsJob.new('daily')
+    end
+    assert_equal 1, Delayed::Job.count
+    SendPeriodicEmailsJob.create_initial_jobs()
+    assert_equal 3, Delayed::Job.count
+  end
 end

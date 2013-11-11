@@ -105,7 +105,7 @@ module Seek
       end
 
       if template_sheet.nil? && samples_sheet.nil?
-        @errors << "This data file does not match the given template."
+          @errors << "This #{t('data_file')} does not match the given template."
         raise  @errors
       end
 
@@ -236,13 +236,13 @@ module Seek
       @study.investigation = @investigation
       study.save!
 
-      assay_class = AssayClass.find_by_title("Experimental Assay")
-      assay_class = AssayClass.create :title => "Experimental Assay" unless assay_class
+        assay_class = AssayClass.find_by_title(I18n.t('assays.experimental_assay'))
+        assay_class = AssayClass.create :title => I18n.t('assays.experimental_assay') unless assay_class
       assay_type =  AssayType.find_by_title(assay_type_title)
       assay_type = AssayType.create :title=> assay_type_title unless assay_type
 
-      assay_title = filename.nil? ? "dummy assay" : filename.split(".").first
-      @assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == User.current_user.person.id}
+        assay_title = filename.nil? ? "dummy #{t('assays.assay').downcase}" : filename.split(".").first
+      @assay = Assay.all.detect{|a|a.title == assay_title  && a.study_id == study.id  && a.assay_class_id == assay_class.try(:id)  && a.assay_type == assay_type  && a.owner_id == User.current_user.person.id}
       unless @assay
         @assay = Assay.new :title => assay_title
         @assay.policy = Policy.private_policy
@@ -676,6 +676,9 @@ module Seek
             o.nil? ? nil : o.to_f
           end
 
+          #rails 3
+           #treatment = Treatment.where(["treatment_protocol = ? and unit_id = ? and substance = ? and cast(concentration as char) = ?", treatment_protocol, unit.id, substance, concentration]).first
+
           treatment = Treatment.find(:first, :conditions => ["unit_id <=> ? and treatment_protocol <=> ? and treatment_type_id <=> ? and cast(start_value as char) <=> ? and cast(end_value as char) <=> ? and
               cast(standard_deviation as char) <=> ? and comments <=> ? and cast(incubation_time as char) <=> ? and incubation_time_unit_id <=> ? and compound_id <=> ? and specimen_id <=> ?",
               unit, protocol, treatment_type, nil_or_float(start_value), nil_or_float(end_value), nil_or_float(standard_deviation), comments, nil_or_float(incubation_time), incubation_time_unit, compound, specimen])
@@ -808,7 +811,7 @@ module Seek
               specimen.age == age &&
               specimen.age_unit == age_unit
               sleep(1)
-              new_sp = specimen.clone
+              new_sp = specimen.dup
               now = Time.now
               new_sp.title = "#{specimen_title}-#{now}"
               new_sp.contributor = User.current_user
@@ -816,15 +819,15 @@ module Seek
               new_sp.created_at = now
               new_sp.policy = @file.policy.deep_copy
               new_sp.save!
-              @warnings << "Warning: specimen with the name '#{specimen_title}' is already created in SEEK.<br/>"
-              @warnings << "It is renamed and saved as '#{new_sp.title}'.<br/>"
-              @warnings << "You may rename it and upload the file as new version!<br/>"
+              @warnings << "Warning: #{t('biosamples.sample_parent_term')} with the name '#{specimen_title}' in row #{row} is already created in SEEK.<br/>".html_safe
+              @warnings << "It is renamed and saved as '#{new_sp.title}'.<br/>".html_safe
+              @warnings << "You may rename it and upload the file as new version!<br/>".html_safe
               Rails.logger.warn @warnings
               specimen = new_sp
           else
             if !specimen.can_view?(User.current_user)
-              @warnings << "Warning: specimen with the name '#{specimen_title}' is already created in SEEK.<br/>"
-              @warnings << "But you are not authorized to view it. You can contact '#{specimen.contributor.person.name} for authorizations'<br/>"
+                @warnings << "Warning: #{t('biosamples.sample_parent_term')} with the name '#{specimen_title}' in row #{row_num} is already created in SEEK.<br/>".html_safe
+                @warnings << "But you are not authorized to view it. You can contact '#{specimen.contributor.person.name} for authorizations'<br/>".html_safe
             end
           end
         end
@@ -838,7 +841,7 @@ module Seek
           modification = Modification.new :title => genotype_modification, :symbol => genotype_modification unless modification
           modification.save!
 
-          genotype =  Genotype.find(:first, :conditions => ["gene_id = ? and modification_id = ? and specimen_id = ?", gene.id, modification.id, specimen.id])
+            genotype =  Genotype.where(["gene_id = ? and modification_id = ? and specimen_id = ? and strain_id = ?", gene.id, modification.id, specimen.id, strain.id]).first
           genotype  = Genotype.new :gene_id => gene.id, :modification_id => modification.id, :specimen_id => specimen.id unless genotype
           genotype.save!
         end
@@ -958,20 +961,21 @@ module Seek
               sleep(1);
               sample.title =  "#{sample_title}-#{Time.now}"
               sample.save!
-              Rails.logger.warn "sample update-branch"
-              Rails.logger.warn "#{sample.specimen} == #{specimen} ? #{sample.specimen == specimen}"
-              Rails.logger.warn "#{sample.sample_type} == #{sample_type} ? #{sample.sample_type == sample_type}"
-              Rails.logger.warn "(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "") ? #{(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "")}"
-              Rails.logger.warn "#{sample.donation_date} == #{Time.zone.parse(donation_date).utc} ? #{sample.donation_date == Time.zone.parse(donation_date).utc}"
-              Rails.logger.warn "#{sample.institution} == #{institution} ? #{sample.institution == institution}"
-              Rails.logger.warn "#{sample.comments} == #{comments} ? #{sample.comments == comments}"
-            @warnings << "Warning: sample with the name '#{sample_title}' is already created in SEEK."
-            @warnings << "It is renamed and saved as '#{sample.title}'.<br/>"
-            @warnings << "You may rename it and upload the file as new version!<br/>"
+              Rails.logger.warn "sample update-branch".html_safe
+
+              Rails.logger.warn "#{sample.specimen} == #{specimen} ? #{sample.specimen == specimen}".html_safe
+              Rails.logger.warn "#{sample.sample_type} == #{sample_type} ? #{sample.sample_type == sample_type}".html_safe
+              Rails.logger.warn "(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "") ? #{(sample.tissue_and_cell_types.member?(tissue_and_cell_type) || tissue_and_cell_type_title == "")}".html_safe
+              Rails.logger.warn "#{sample.donation_date} == #{Time.zone.parse(donation_date).utc} ? #{sample.donation_date == Time.zone.parse(donation_date).utc}".html_safe
+              Rails.logger.warn "#{sample.institution} == #{institution} ? #{sample.institution == institution}".html_safe
+              Rails.logger.warn "#{sample.comments} == #{comments} ? #{sample.comments == comments}".html_safe
+            @warnings << "Warning: sample with the name '#{sample_title}' is already created in SEEK.".html_safe
+            @warnings << "It is renamed and saved as '#{sample.title}'.<br/>".html_safe
+            @warnings << "You may rename it and upload the file as new version!<br/>".html_safe
           else
             if !sample.can_view?(User.current_user)
-              @warnings << "Warning: specimen with the name '#{sample_title}' is already created in SEEK.<br/>"
-              @warnings << "But you are not authorized to view it. You can contact '#{sample.contributor.person.name} for authorizations'<br/>"
+                @warnings << "Warning: Sample with the name '#{sample_title}' in row #{row} is already created in SEEK.<br/>".html_safe
+                @warnings << "But you are not authorized to view it. You can contact '#{sample.contributor.person.name} for authorizations'<br/>".html_safe
             end
           end
 
@@ -984,7 +988,7 @@ module Seek
           assay.save!
         end
       else
-        Rails.logger.warn "no assay defined for samples"
+            Rails.logger.warn "no #{t('assays.assay').downcase} defined for samples"
         @file.lock!
         unless @file.samples.include?(sample)
           @file.samples << sample

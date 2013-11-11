@@ -2,11 +2,11 @@ require 'grouped_pagination'
 
 class Person < ActiveRecord::Base
 
-  acts_as_yellow_pages
-  default_scope :order => "last_name, first_name"
+  include Seek::Rdf::RdfGeneration
+  include Seek::Taggable
 
-  #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
-  named_scope :active, :order=> "avatar_id is null, updated_at DESC"
+  acts_as_yellow_pages
+  scope :default_order, order("last_name, first_name")
 
   before_save :first_person_admin
   before_destroy :clean_up_and_assign_permissions
@@ -16,34 +16,10 @@ class Person < ActiveRecord::Base
 
   after_save :queue_update_auth_table
 
-  def queue_update_auth_table
-    if changes.include?("roles_mask")
-      AuthLookupUpdateJob.add_items_to_queue self
-    end
-  end
-
-  include Seek::Taggable
-
-  def receive_notifications
-    registered? and super
-  end
-  
-  def registered?
-    !user.nil?
-  end
-
-  def person
-    self
-  end
-
-  #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
-  #load the configuration for the pagination
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
-
   validates_presence_of :email
 
   #FIXME: consolidate these regular expressions into 1 holding class
-  validates_format_of :email,:with=>RFC822::EmailAddress
+  validates_format_of :email,:with => RFC822::EMAIL
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
 
   validates_uniqueness_of :email,:case_sensitive => false
@@ -57,7 +33,7 @@ class Person < ActiveRecord::Base
 
   has_many :work_groups, :through=>:group_memberships, :before_add => [:subscribe_to_work_group_project, :touch_work_group_project],
   :before_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
-
+  has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"
   def subscribe_to_work_group_project wg
 
     #subscribe direct project
@@ -85,8 +61,10 @@ class Person < ActiveRecord::Base
     wg.project.touch
   end
 
-  has_many :studies, :foreign_key => :person_responsible_id
   has_many :assays,:foreign_key => :owner_id
+  has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
+
+  validate :orcid_id_must_be_valid_or_blank
 
   has_one :user, :dependent=>:destroy
 
@@ -97,15 +75,19 @@ class Person < ActiveRecord::Base
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
-  searchable do
+  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :first_name, :last_name,:description, :searchable_tags,:locations, :project_roles
     text :disciplines do
       disciplines.map{|d| d.title}
     end
   end if Seek::Config.solr_enabled
 
-  named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
-  named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
+  scope :with_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NOT NULL"
+  scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
+  scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
+
+  #FIXME: change userless_people to use this scope - unit tests
+  scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
 
   alias_attribute :webpage,:web_page
 
@@ -113,6 +95,8 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions,:dependent => :destroy
+
+  requires_can_manage :roles_mask
 
   ROLES = %w[admin pal project_manager asset_manager gatekeeper]
   ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
@@ -148,6 +132,49 @@ class Person < ActiveRecord::Base
     self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
   end
 
+  def queue_update_auth_table
+    if changes.include?("roles_mask")
+      AuthLookupUpdateJob.add_items_to_queue self
+    end
+  end
+
+  #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
+  def self.active
+    Person.unscoped.order("avatar_id is null, updated_at DESC")
+  end
+
+  def receive_notifications
+    registered? and super
+  end
+
+  def registered?
+    !user.nil?
+  end
+
+  def person
+    self
+  end
+
+  def email_uri
+    URI.escape("mailto:"+email)
+  end
+
+  def studies
+    result = studies_for_person
+    if user
+      result = (result | user.studies).compact
+    end
+    result
+  end
+
+  def investigations
+    result = investigations_for_person
+    if user
+      result = (result | user.investigations).compact
+    end
+    result
+  end
+
   def roles
     ROLES.reject do |r|
       ((roles_mask || 0) & 2**ROLES.index(r)).zero?
@@ -175,11 +202,10 @@ class Person < ActiveRecord::Base
       user_items
     end
   end
-  #FIXME: change userless_people to use this scope - unit tests
-  named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
+
 
   def self.userless_people
-    p=Person.find(:all)
+    p=Person.all
     return p.select{|person| person.user.nil?}
   end
 
@@ -196,7 +222,7 @@ class Person < ActiveRecord::Base
 
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json
-    all_people = Person.find(:all, :order => "ID asc")
+    all_people = Person.order("ID asc")
     names_emails = all_people.collect{ |p| {"id" => p.id,
         "name" => (p.first_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a first name\n----\n"); "(NO FIRST NAME)") : h(p.first_name)) + " " +
                   (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : h(p.last_name)),
@@ -345,8 +371,7 @@ class Person < ActiveRecord::Base
     new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
   end
 
-  does_not_require_can_edit :roles_mask
-  requires_can_manage :roles_mask
+
 
   def can_manage? user = User.current_user
     try_block{user.is_admin?}
@@ -400,7 +425,7 @@ class Person < ActiveRecord::Base
 
   #remove the permissions which are set on this person
   def remove_permissions
-    permissions = Permission.find(:all, :conditions => ["contributor_type =? and contributor_id=?", 'Person', id])
+    permissions = Permission.where(["contributor_type =? and contributor_id=?", 'Person', id])
     permissions.each do |p|
       p.destroy
     end
@@ -441,11 +466,44 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def is_gatekeeper_of? item
+    is_gatekeeper? && !(item.projects & projects).empty?
+  end
+
+  def is_asset_manager_of? item
+    is_asset_manager? && !(item.projects & projects).empty?
+  end
+  
+
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
     self.is_admin = true if Person.count==0
+  end
+
+  def orcid_id_must_be_valid_or_blank
+    valid = true
+    unless orcid.blank? #blank or nil is OK
+
+      id = orcid
+      id = orcid.gsub("http://orcid.org/","") if orcid.start_with?("http://orcid.org")
+      #check structure with regular expression
+      if id =~ /[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9,X]{4}/
+        id = id.gsub("-","")
+
+        #calculating the checksum according to ISO/IEC 7064:2003, MOD 11-2 ; see - http://support.orcid.org/knowledgebase/articles/116780-structure-of-the-orcid-identifier
+        total=0
+        (0...15).each{|x| total = (total + id[x].to_i) * 2}
+        remainder = total % 11
+        result = (12 - remainder) % 11
+        result = result == 10 ? "X" : result.to_s
+        valid = id[15] == result
+      else
+        valid = false
+      end
+      errors.add("Orcid identifier"," isn't a valid ORCID identifier.") unless valid
+    end
   end
 
 end

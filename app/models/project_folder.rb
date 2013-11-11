@@ -1,14 +1,15 @@
 class ProjectFolder < ActiveRecord::Base
   before_destroy :deletable?
+  before_destroy :unsort_assets_and_remove_children
 
   belongs_to :project
   belongs_to :parent,:class_name=>"ProjectFolder",:foreign_key=>:parent_id
   has_many :children,:class_name=>"ProjectFolder",:foreign_key=>:parent_id, :order=>:title, :after_add=>:update_child
   has_many :project_folder_assets, :dependent=>:destroy
 
-  before_destroy :unsort_assets_and_remove_children
 
-  named_scope :root_folders, lambda { |project| {
+
+  scope :root_folders, lambda { |project| {
     :conditions=>{:project_id=>project.id,:parent_id=>nil},:order=>"LOWER(title)"
     }
   }
@@ -35,14 +36,14 @@ class ProjectFolder < ActiveRecord::Base
   end
 
   def self.new_items_folder project
-    ProjectFolder.find(:first,:conditions=>{:project_id=>project.id,:incoming=>true})
+    ProjectFolder.where(:project_id=>project.id,:incoming=>true).first
   end
 
   #constucts the default project folders for a given project from a yaml file, by default using Rails.root/config/default_data/default_project_folders.yml
   def self.initialize_default_folders project, yaml_path=File.join(Rails.root,"config","default_data","default_project_folders.yml")
-    raise Exception.new("This project already has folders defined") unless ProjectFolder.root_folders(project).empty?
+    raise Exception.new("This #{I18n.t('project')} already has folders defined") unless ProjectFolder.root_folders(project).empty?
 
-    yaml=YAML::load_file yaml_path
+    yaml = YAML.load(ERB.new(File.read(yaml_path)).result)
     folders={}
 
     #create individual folder items
@@ -66,7 +67,7 @@ class ProjectFolder < ActiveRecord::Base
           unless folder.nil?
             parent.children << folder
           else
-            Rails.logger.error("Default project folder for key #{child} not found")
+            Rails.logger.error("Default #{I18n.t('project')} folder for key #{child} not found")
           end
         end
         parent.save!
@@ -96,7 +97,7 @@ class ProjectFolder < ActiveRecord::Base
     assets=Array(assets)
     if (project_id == source_folder.project_id)
       assets.each do |asset|
-        link = ProjectFolderAsset.find(:first,:conditions=>{:asset_id=>asset.id,:asset_type=>asset.class.name,:project_folder_id=>source_folder.id})
+        link = ProjectFolderAsset.where(:asset_id=>asset.id,:asset_type=>asset.class.name,:project_folder_id=>source_folder.id).first
         link.project_folder=self
         link.save!
       end
@@ -105,7 +106,7 @@ class ProjectFolder < ActiveRecord::Base
 
   #temporary method to destroy folders for a project, useful whilst developing
   def self.nuke project
-    folders = ProjectFolder.find(:all,:conditions=>{:project_id=>project.id})
+    folders = ProjectFolder.all(:conditions=>{:project_id=>project.id})
     folder_assets = ProjectFolderAsset.all.select{|pfa| pfa.project_folder.nil? || pfa.project_folder.try(:project_id)==project.id}
     folder_assets.each {|a| a.destroy}
     folders.each {|f| f.deletable=true ; f.destroy}

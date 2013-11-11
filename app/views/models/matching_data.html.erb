@@ -1,52 +1,16 @@
-<%= javascript_include_tag 'flot/excanvas.min.js' -%>
-<%= javascript_include_tag 'jquery-1.5.1.min.js' -%>
-<%= javascript_include_tag 'flot/jquery.flot.js' -%>
-<%= javascript_include_tag 'flot/curvedLines.js' -%>
 
-<%= stylesheet_link_tag "match_making" -%>
+<%= javascript_include_tag 'jquery-1.5.1.min.js','jquery-ui-1.8.14.custom.min.js', 'spreadsheet_explorer.js','spreadsheet_explorer_plot.js',
+                           'flot/excanvas.js','flot/jquery.flot.js', 'flot/curvedLines.js',:cache=>"match_maker_cached" %>
 
-<%
-   data_files = @matching_data_files.collect do |mdf|
-     DataFile.find(mdf.primary_key)
-   end
-   authorized_data_files = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user)
-   authorized_data_file_ids = authorized_data_files.collect(&:id)
-   authorized_matching_data_files = @matching_data_files.select { |mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i) }
+<%= stylesheet_link_tag "match_making",'spreadsheet_explorer','jquery-ui-1.8.14.custom' -%>
 
-   limit ||= 19
-   limit_matching_data_files = authorized_matching_data_files[0..limit]
-   extra_count = authorized_matching_data_files.size - limit
-%>
 
 <div class="contribution_title">
-  <h1>Data that may be of interest to <%= link_to h(@model.title), @model -%></h1>
+  <h1><%= t('data_file').pluralize %> that contain data that may be relevant to <%= link_to h(@model.title), @model -%></h1>
 </div>
 
 <div class="show_basic">
-  There are totally <span style="font-weight:bold"><%= @matching_data_files.count -%></span> data files matched,
-  <span style="font-weight:bold"><%= @matching_data_files.count - authorized_matching_data_files.count %></span> are
-  hidden
 
-  <%= render :partial => "matching_data_item", :locals => {:matching_data_items => limit_matching_data_files} -%>
+    <%= render :partial => "matching_data_item", :locals => {:matching_data_items => @matching_data_items} -%>
 
-  <ul class="matching_data_items">
-    <% unless extra_count < 1 %>
-        <li class="matching_data_item">
-          <%= link_to_remote "View all "+(authorized_matching_data_files.size).to_s+" matched items", :html => {:id => "view_matched_data_files_and_extra", :style => "display:block"},
-                             :url => url_for(:controller => 'models', :action => 'view_matched_data_files'),
-                             :with => "'primary_keys=' + '#{authorized_matching_data_files.collect(&:primary_key).join(",")}'
-                                    + '&scores=' + '#{authorized_matching_data_files.collect(&:score).join(",")}'
-                                    + '&search_terms=' + '#{authorized_matching_data_files.collect(&:search_terms).collect { |t| t.join('*') }.join(',')}'",
-                             :before => "show_large_ajax_loader('matching_data_ajax_loader')"
-          -%>
-          <%= link_to_remote "View " + limit_matching_data_files.size.to_s + " matched items", :html => {:id => "view_matched_data_files", :style => "display:none"},
-                             :url => url_for(:controller => 'models', :action => 'view_matched_data_files'),
-                             :with => "'primary_keys=' + '#{limit_matching_data_files.collect(&:primary_key).join(",")}'
-                         + '&scores=' + '#{limit_matching_data_files.collect(&:score).join(",")}'
-                         + '&search_terms=' + '#{limit_matching_data_files.collect(&:search_terms).collect { |t| t.join('*') }.join(',')}'",
-                             :before => "show_large_ajax_loader('matching_data_ajax_loader')"
-          -%>
-        </li>
-    <% end %>
-  </ul>
 </div>

@@ -1,0 +1,95 @@
+<%= javascript_include_tag "resource.js"%>
+<%
+   is_new_file = params[:is_new_file]
+   resource_name = params[:resource_name]
+%>
+<style>
+  #preview_permissions ul.people_list {
+      max-height: 10em;
+      overflow-y: auto;
+  }
+  #preview_permissions ul.people_list li.name {
+      color: #ff8c00;
+  }
+  #preview_permissions p.private {
+      color: red;
+      font-weight: bold;
+  }
+  #preview_permissions p.shared {
+      font-weight: bold;
+  }
+  #preview_permissions p.public{
+      color: green;
+      font-weight: bold;
+  }
+  #preview_permissions p.additional_text{
+      font-style:italic;
+      color:gray;
+  }
+
+  #preview_permissions p.gatekeeper_notice{
+      color:red;
+  }
+</style>
+<%
+   permissions = policy.permissions
+   privileged_people_array = privileged_people.blank? ? [] : privileged_people.values.flatten.uniq
+   #Dont show the additional fine-grained sharing permissions for a person if this person belongs to privileged people, coz this person will be showed in privileged people part
+   permissions = permissions.select{|p| !privileged_people_array.include?(p.contributor)}
+
+%>
+
+<div class="redbox_contents" id="preview_permissions" style="width:600px;">
+    <div class="body">
+    <h2>You will share this <%= resource_name.humanize %> with:</h2>
+
+          <% if policy.sharing_scope == Policy::PRIVATE %>
+              <p class="private">You keep this <%= resource_name.humanize %> private (only visible to you)</p>
+          <% elsif policy.sharing_scope == Policy::ALL_SYSMO_USERS %>
+              <p class="shared">All the <%= t('project') %> members within the network <%= ((policy.access_type == Policy::NO_ACCESS) ? 'have ' : 'can ') + Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
+          <% elsif policy.sharing_scope == Policy::EVERYONE  %>
+              <p class='public'>All visitors (including anonymous visitors with no login) can <%= Policy.get_access_type_wording(policy.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%></p>
+              <% if !updated_can_publish_immediately %>
+                  <% if send_request_publish_approval %>
+                    <p class="gatekeeper_notice">(An email will be sent to the Gatekeepers of the <%= t('project').pluralize %> associated with this <%= resource_name.humanize %> to ask for publishing approval. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</p>
+                  <% else %>
+                    <p class="gatekeeper_notice">(You requested the publishing approval from the Gatekeepers of the <%= t('project').pluralize %> associated with this <%= resource_name.humanize %>, and it is waiting for the decision. This <%= resource_name.humanize %> will not be published until one of the Gatekeepers has granted approval)</p>
+                  <% end %>
+              <% end %>
+          <% end %>
+
+
+      <% if !permissions.empty? %>
+          <h2>Additional fine-grained sharing permissions:</h2>
+          <% permissions.each do |p| %>
+            <%
+                contributor = p.contributor
+                group_name = (p.contributor_type == 'WorkGroup') ? (h(contributor.project.name) + ' @ ' + h(contributor.institution.name)) : h(contributor.name)
+                prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
+            %>
+
+            <p><%=  prefix_text + group_name %> <%=  (((p.access_type == Policy::NO_ACCESS) || (p.access_type == Policy::DETERMINED_BY_GROUP)) ? 'have ' : 'can ') + Policy.get_access_type_wording(p.access_type, try_block{resource_name.camelize.constantize.new()}).downcase -%> </p>
+          <% end %>
+      <% end %>
+
+      <% if !privileged_people.blank? %>
+          <h2>Privileged people:</h2>
+          <% privileged_people.each do |key, value|
+            value.each do |v| %>
+                  <% if key == 'contributor' %>
+                      <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::MANAGING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as an uploader </p>
+                  <% elsif key == 'creators' %>
+                      <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::EDITING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as a creator </p>
+                  <% elsif key == 'asset_managers'%>
+                      <p><%= v.name %> can <%= Policy.get_access_type_wording(Policy::MANAGING, try_block{resource_name.camelize.constantize.new()}).downcase -%> as an asset manager </p>
+                  <% end %>
+              <% end %>
+          <% end %>
+      <% end %>
+
+    <div align="center" style="margin-top: 1em">
+      <input type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
+      <input type=button value='Cancel' onclick="RedBox.close()">
+    </div>
+  </div>
+</div>

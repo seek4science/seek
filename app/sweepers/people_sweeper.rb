@@ -25,7 +25,4 @@ class PeopleSweeper < ActionController::Caching::Sweeper
 
   end
 
-  private
-
-
 end

@@ -21,11 +21,11 @@ class SpreadsheetAnnotationsController < ApplicationController
 
         if(@annotation.save)
           respond_to do |format|
-            format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }}
+            format.js { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations }}
           end
         else
           respond_to do |format|
-            format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => @annotation.errors} }
+            format.js { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => @annotation.errors} }
           end
         end
       else
@@ -87,7 +87,7 @@ class SpreadsheetAnnotationsController < ApplicationController
         flash[:error] = "You are not permitted to annotate this spreadsheet."
         redirect_to data_file_path(df)
       elsif (!@annotation.nil? && (@annotation.source != current_user))
-        @annotation.errors.add_to_base("You may not edit or remove other users' annotations.")
+        @annotation.errors[:base] << "You may not edit or remove other users' annotations."
       end
     else
       respond_to do |format|

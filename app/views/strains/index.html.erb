@@ -4,9 +4,9 @@
     </ul>
 <% end %>
 
-<% if @strains.public_methods.include?("page_totals") %>
+<% if @strains.public_methods.include?(:page_totals) %>
     <!-- only do the page links if the collection supports it -->
-    <%= render :partial => "layouts/paginate_alphabetical", :locals => {:pages => @strains.pages, :page_totals=>@strains.page_totals, :current_page=>@strains.page} -%>
+    <%= render :partial => "general/paginate_alphabetical", :locals => {:pages => @strains.pages, :page_totals=>@strains.page_totals, :current_page=>@strains.page} -%>
 <% end %>
 
 
@@ -15,8 +15,8 @@
 </div>
 
 
-<% if @strains.page == "latest" && Strain.find(:all).length > Seek::Config.limit_latest %>
-    <%= render :partial => "layouts/paginate_see_all" %>
+<% if @strains.page == "latest" && Strain.count > Seek::Config.limit_latest %>
+    <%= render :partial => "general/paginate_see_all" %>
 <% end %>
 
 

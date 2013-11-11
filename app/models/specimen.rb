@@ -1,5 +1,4 @@
 require 'grouped_pagination'
-require 'acts_as_authorized'
 require 'subscribable'
 require 'acts_as_scalable'
 class Specimen < ActiveRecord::Base
@@ -14,8 +13,8 @@ class Specimen < ActiveRecord::Base
   before_save  :clear_garbage
   attr_accessor :from_biosamples
 
-  has_many :genotypes,:dependent => :nullify
-  has_many :phenotypes,:dependent => :nullify
+  has_many :genotypes
+  has_many :phenotypes
   accepts_nested_attributes_for :genotypes, :allow_destroy => true
   accepts_nested_attributes_for :phenotypes, :allow_destroy => true
 
@@ -38,9 +37,9 @@ class Specimen < ActiveRecord::Base
   alias_attribute :description, :comments
 
   HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:born => 'culture starting date', :culture_growth_type => 'culture type'}
-  HUMANIZED_COLUMNS[:title] = "#{Seek::Config.sample_parent_term.capitalize} title"
-  HUMANIZED_COLUMNS[:lab_internal_number] = "#{Seek::Config.sample_parent_term.capitalize} lab internal identifier"
-  HUMANIZED_COLUMNS[:provider_id] = "provider's #{Seek::Config.sample_parent_term} identifier"
+  HUMANIZED_COLUMNS[:title] = "#{(I18n.t 'biosamples.sample_parent_term').capitalize} title"
+  HUMANIZED_COLUMNS[:lab_internal_number] = "#{(I18n.t 'biosamples.sample_parent_term').capitalize} lab internal identifier"
+  HUMANIZED_COLUMNS[:provider_id] = "provider's #{(I18n.t 'biosamples.sample_parent_term')} identifier"
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :title,:lab_internal_number, :contributor,:strain
@@ -51,16 +50,19 @@ class Specimen < ActiveRecord::Base
 
   AGE_UNITS = ["second","minute","hour","day","week","month","year"]
 
-  def self.sop_sql()
+  def sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' + 'INNER JOIN sop_specimens ' +
   'ON sop_specimens.sop_id = sop_versions.sop_id ' +
   'WHERE (sop_specimens.sop_version = sop_versions.version ' +
-  'AND sop_specimens.specimen_id = #{self.id})'
+  "AND sop_specimens.specimen_id = #{self.id})"
   end
 
-  has_many :sops,:class_name => "Sop::Version",:finder_sql => self.sop_sql()
+  has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
   has_many :sop_masters,:class_name => "SopSpecimen"
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+
+  scope :default_order, order("title")
+
+  grouped_pagination
 
   def build_sop_masters sop_ids
     # map string ids to int ids for ["1","2"].include? 1 == false
@@ -134,7 +136,7 @@ class Specimen < ActiveRecord::Base
       age.nil? ? "" : "#{age}(#{age_unit}s)"
   end
 
-  def can_delete? user=User.current_user
+  def state_allows_delete? user=User.current_user
     samples.empty? && super
   end
 
@@ -174,7 +176,7 @@ class Specimen < ActiveRecord::Base
   end
 
   def clone_with_associations
-    new_object= self.clone
+    new_object= self.dup
     new_object.policy = self.policy.deep_copy
     new_object.sop_masters = self.try(:sop_masters)
     new_object.creators = self.try(:creators)
@@ -186,7 +188,7 @@ class Specimen < ActiveRecord::Base
   end
 
 
-  def self.human_attribute_name(attribute)
+  def self.human_attribute_name(attribute, options = {})
     HUMANIZED_COLUMNS[attribute.to_sym] || super
   end
 
@@ -212,11 +214,17 @@ class Specimen < ActiveRecord::Base
     genotypes.each do |g|
       if g.strain.nil?
         g.destroy
+      else
+        g.specimen_id = nil
+        g.save
       end
     end
     phenotypes.each do |p|
       if p.strain.nil?
         p.destroy
+      else
+        p.specimen_id = nil
+        p.save
       end
     end
   end

@@ -1,15 +1,15 @@
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_data_file_path, "Upload a data file", nil, "Upload a data file" %></li>
+        <li><%= image_tag_for_key "new", new_data_file_path, "Upload a #{t('data_file')}", nil, "Upload a #{t('data_file')}" %></li>
     </ul>
 <% end %>
 
-<% if @data_files.public_methods.include?("page_totals") %>
+<% if @data_files.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @data_files.pages, :page_totals=>@data_files.page_totals,:current_page=>@data_files.page } -%>
+  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @data_files.pages, :page_totals=>@data_files.page_totals,:current_page=>@data_files.page } -%>
 <% end %>
 <%= render :partial => "assets/resource_list", :locals => { :collection => @data_files, :authorization_for_showing_already_done=>true } %>
 
-<% if @data_files.page == "latest" && DataFile.find(:all).length > Seek::Config.limit_latest%>
-   <%= render :partial => "layouts/paginate_see_all"%>
+<% if @data_files.page == "latest" && DataFile.count > Seek::Config.limit_latest%>
+   <%= render :partial => "general/paginate_see_all"%>
 <% end %>

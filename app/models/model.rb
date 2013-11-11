@@ -1,10 +1,11 @@
 require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
-require 'grouped_pagination'
 require 'title_trimmer'
 
 class Model < ActiveRecord::Base
+
+  include Seek::Rdf::RdfGeneration
 
   title_trimmer
 
@@ -15,6 +16,8 @@ class Model < ActiveRecord::Base
 
   acts_as_asset
   acts_as_trashable
+
+  scope :default_order, order("title")
 
   include Seek::Models::ModelExtraction
 
@@ -31,7 +34,7 @@ class Model < ActiveRecord::Base
   has_many :model_images
   belongs_to :model_image
 
-  has_many :content_blobs, :as => :asset, :foreign_key => :asset_id,:conditions => 'asset_version= #{self.version}'
+  has_many :content_blobs, :as => :asset, :foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 
   belongs_to :organism
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
@@ -51,7 +54,7 @@ class Model < ActiveRecord::Base
     belongs_to :model_format
 
     def content_blobs
-      ContentBlob.find(:all, :conditions => ["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
+      ContentBlob.where(["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
     end
 
   end
@@ -113,13 +116,16 @@ class Model < ActiveRecord::Base
       fields = [:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields, :searchable_tags]
 
       search_terms.each do |key|
-        DataFile.search do |query|
-          query.keywords key, :fields=>fields
-        end.hits.each do |hit|
-          unless hit.score.nil?
-            results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)
-            results[hit.primary_key].search_terms << key
-            results[hit.primary_key].score += (0.75 + hit.score)
+        key = Seek::Search::SearchTermFilter.filter(key)
+        unless key.blank?
+          DataFile.search do |query|
+            query.keywords key, :fields=>fields
+          end.hits.each do |hit|
+            unless hit.score.nil?
+              results[hit.primary_key]||=DataFileMatchResult.new([],0,hit.primary_key)
+              results[hit.primary_key].search_terms << key
+              results[hit.primary_key].score += (0.75 + hit.score)
+            end
           end
         end
       end

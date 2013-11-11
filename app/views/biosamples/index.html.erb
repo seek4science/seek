@@ -13,12 +13,12 @@
 
 <%
    select_truncate_length=120
-   all_organisms = Organism.find(:all, :order => :title)
+   all_organisms = Organism.order(:title)
    default_selected_organisms = try_block { current_user.person.projects.first.organism_ids }.blank? ? [0] : try_block { current_user.person.projects.first.organism_ids }
 -%>
 
 <div class="contribution_title">
-     <h1>Browse organisms, strains, <%= Seek::Config.sample_parent_term%>s and samples</h1>
+     <h1>Browse Organisms, Strains, <%= I18n.t('biosamples.sample_parent_term').pluralize %> and Samples</h1>
 </div>
 
 <br/>
@@ -27,7 +27,7 @@
     Organism
   </div>
   <div class="foldContent">
-    <p class="none_text">Please select the organisms to browse the associated strains</p>
+    <p class="none_text">Please select the Organisms to browse the associated Strains</p>
     <%= select_tag "strain[organism_ids]",
                    options_for_select([["Select Organisms ...", 0]]|all_organisms.collect { |o| [truncate(h(o.title), :length => select_truncate_length), o.id] }, :selected => default_selected_organisms),
                  {:onchange=> organism_selection_onchange_function,
@@ -71,11 +71,17 @@
         }
         ;
         if (table_name == 'strain_table') {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_large_ajax_loader('existing_specimens')");%>
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'},
+                           :method => :get,
+                           :with => "'strain_ids=' + getSelectedStrains()",
+                           :before=>"show_large_ajax_loader('existing_specimens')");%>
             show_existing_specimens();
             hide_existing_samples();
         } else if (table_name == 'specimen_table') {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()",:before=>"show_large_ajax_loader('existing_samples')");%>
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'},
+                           :method => :get,
+                           :with => "'specimen_ids=' + getSelectedSpecimens()",
+                           :before=>"show_large_ajax_loader('existing_samples')");%>
             show_existing_samples();
         }
     }
@@ -89,11 +95,17 @@
         }
         ;
         if (table_name == 'strain_table') {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()", :before=>"show_large_ajax_loader('existing_specimens')");%>
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'},
+                           :method => :get,
+                           :with => "'strain_ids=' + getSelectedStrains()",
+                           :before=>"show_large_ajax_loader('existing_specimens')");%>
             show_existing_specimens();
             hide_existing_samples();
         } else if (table_name == 'specimen_table') {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()", :before=>"show_large_ajax_loader('existing_samples')");%>
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'},
+                           :method => :get,
+                           :with => "'specimen_ids=' + getSelectedSpecimens()",
+                           :before=>"show_large_ajax_loader('existing_samples')");%>
         }
     }
 
@@ -143,7 +155,9 @@
                 }
                 //if the first column is updated, refresh the table
                 else {
-                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'},
+                                   :method => :get,
+                                   :with => "'strain_ids=' + getSelectedStrains()");%>
                     show_existing_specimens();
                     hide_existing_samples();
                     break;
@@ -163,7 +177,9 @@
                 }
                 //if the first column is updated, refresh the table
                 else {
-                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
+                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'},
+                                   :method => :get,
+                                   :with => "'specimen_ids=' + getSelectedSpecimens()");%>
                     show_existing_samples();
                     break;
                 }
@@ -216,12 +232,16 @@
                 }
             }
             else {
-            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()");%>
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'},
+                               :method => :get,
+                               :with => "'strain_ids=' + getSelectedStrains()");%>
                 show_existing_specimens();
             }
         } else {
             if(getSelectedStrains().include(strain_id) || is_dummy_strain=="true" ) {
-                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'}, :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')");%>
+                <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'},
+                                   :method => :get,
+                                   :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')");%>
                 show_existing_specimens();
             }
         }
@@ -247,11 +267,15 @@
                 }
             }
             else {
-            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
+            <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'},
+                               :method => :get,
+                               :with => "'specimen_ids=' + getSelectedSpecimens()");%>
                 show_existing_samples();
             }
         } else {
-        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'}, :with => "'specimen_ids=' + getSelectedSpecimens()");%>
+        <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_samples'},
+                           :method => :get,
+                           :with => "'specimen_ids=' + getSelectedSpecimens()");%>
             show_existing_samples();
         }
       }

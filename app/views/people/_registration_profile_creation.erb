@@ -33,8 +33,8 @@
 
 <h1>New profile</h1>
 <p class="box_infotext" style="text-align:center">
-  You should only create a new profile if you could not find yourself listed under your project.<br/>
-  If you are a member of a <%= Seek::Config.project_name %> project and have not yet checked if your profile exists, then you should
+  You should only create a new profile if you could not find yourself listed under your <%= t('project') %>.<br/>
+  If you are a member of a <%= Seek::Config.project_name %> <%= t('project') %> and have not yet checked if your profile exists, then you should
   <b><%= link_to_function "select an existing profile" do |page|
       page.visual_effect :toggle_blind, "profile_selection"
       page.visual_effect :toggle_blind, "profile_creation"
@@ -42,7 +42,7 @@
   <br/><br/>
   
 </p>
-<% form_for @person do |f| %>
+<%= form_for @person do |f| %>
   <h2>Personal Information & Contact Details</h2>
   <%= f.error_messages %>
   <table style="width: 100%;" class="box_simple">
@@ -94,7 +94,7 @@
 
 
     <br/>
-    <h2>Projects & Institutions</h2>
+    <h2><%= t('project').pluralize %> & Institutions</h2>
         <div class="yui-g box_simple">
         <center>
           <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
@@ -105,7 +105,7 @@
             -%>
             <div id='other_projects' style='display: none'>
               <br/>
-              <span style="font-weight:bold;float: left">Other projects:</span> <br/> <%= text_field_tag :other_projects, nil, {:style => "width: 100%", :value => params['other_projects']} %>
+              <span style="font-weight:bold;float: left">Other <%= t('project').pluralize %>:</span> <br/> <%= text_field_tag :other_projects, nil, {:style => "width: 100%", :value => params['other_projects']} %>
             </div>
           </div>
         </center>

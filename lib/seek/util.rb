@@ -25,7 +25,7 @@ module Seek
     def self.persistent_classes
       @@persistent_classes ||= begin
         ensure_models_loaded
-        Object.subclasses_of(ActiveRecord::Base)
+        ActiveRecord::Base.descendants
       end
     end
 
@@ -54,6 +54,14 @@ module Seek
         end.sort_by(&:name)
       end
 
+    end
+
+    def self.rdf_capable_types
+      @@rdf_capable_types ||= begin
+        persistent_classes.select do |c|
+          c.included_modules.include?(Seek::Rdf::RdfGeneration)
+        end
+      end
     end
 
     def self.breadcrumb_types

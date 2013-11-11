@@ -12,11 +12,11 @@
      path_to_object = sop_path(@sop).concat("/#{controller_name}/#{object.id}")
    end
 %>
-<% remote_form_for entity, object,
+<%= form_for_with_callbacks object,
   :url=> path_to_object,
   :before=>"$('update_#{object.id}').disabled=true;",
   :loaded=>"$('update_#{object.id}').disabled=false;",
-  :html=>{:method=>:put, :id => "edit_condition_or_factor_#{object.id}_form", :style => "display:none"} do |f| -%>
+  :html=>{:method=>:put, :id => "edit_condition_or_factor_#{object.id}_form", :style => "display:none", :remote => true} do |f| -%>
 
 
   <div class="conditions_or_factors" >
@@ -39,8 +39,8 @@
         <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('edit_condition_or_factor_#{object.id}_form', '#{object.id}')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% elsif entity == "experimental_condition" %>
-        <td><%=  f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('edit_condition_or_factor_#{object.id}_form', '#{object.id}')"} %></td>
-        <td><%=  f.collection_select :unit_id, Unit.find(:all).sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
+        <td><%=  f.collection_select :measured_item_id, MeasuredItem.all.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('edit_condition_or_factor_#{object.id}_form', '#{object.id}')"} %></td>
+        <td><%=  f.collection_select :unit_id, Unit.all.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% end %>
 
       <td><%= f.text_field :start_value,:size=>4 %></td>

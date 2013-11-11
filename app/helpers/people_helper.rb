@@ -16,7 +16,16 @@ module PeopleHelper
     person.roles.each do |role|
       icons << image("#{role}",:alt=>"#{role}",:title=>tooltip_title_attrib(role.humanize), :style=>"vertical-align: middle")
     end
-    icons
+    icons.html_safe
+  end
+
+  def orcid_identifier person
+    id = person.orcid
+    unless id.blank?
+      id = "http://orcid.org/"+id unless id.start_with?("http://orcid.org/")
+      id = link_to(id,id,:target=>"_blank").html_safe
+    end
+    id.blank? ? text_or_not_specified(id) : id
   end
 
   def discipline_list person
@@ -29,7 +38,7 @@ module PeopleHelper
     else
       text="<span class='none_text'>None specified</span>"
     end
-    return text
+    return text.html_safe
   end
 
   def project_role_list person
@@ -42,7 +51,7 @@ module PeopleHelper
     else
       text="<span class='none_text'>None specified</span>"
     end
-    return text
+    return text.html_safe
   end
   
 end

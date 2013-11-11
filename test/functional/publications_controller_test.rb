@@ -7,6 +7,7 @@ class PublicationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
   
   def setup
     login_as(:quentin)
@@ -37,7 +38,7 @@ class PublicationsControllerTest < ActionController::TestCase
     mock_pubmed(:email=>"",:id=>1,:content_file=>"pubmed_1.xml")
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 1,:projects=>[projects(:sysmo_project)]},:assay_ids=>[assay.id.to_s]
+      post :create, :publication => {:pubmed_id => 1,:project_ids=>[projects(:sysmo_project).id]},:assay_ids=>[assay.id.to_s]
       p assigns(:publication).errors.full_messages
     end
 
@@ -51,7 +52,7 @@ class PublicationsControllerTest < ActionController::TestCase
     login_as(:model_owner) #can edit assay
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 1,:projects=>[projects(:sysmo_project)] },:assay_ids=>[assay.id.to_s]
+      post :create, :publication => {:pubmed_id => 1,:project_ids=>[projects(:sysmo_project).id] },:assay_ids=>[assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -63,7 +64,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should create doi publication" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1371/journal.pone.0004803",:content_file=>"cross_ref3.xml")
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "10.1371/journal.pone.0004803", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -72,7 +73,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should create doi publication with doi prefix" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1371/journal.pone.0004803",:content_file=>"cross_ref3.xml")
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "DOI: 10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "DOI: 10.1371/journal.pone.0004803", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
@@ -81,7 +82,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     #formatted slightly different
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => " doi:10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => " doi:10.1371/journal.pone.0004803", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
@@ -90,7 +91,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     #also test with spaces around
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "  10.1371/journal.pone.0004803  ", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "  10.1371/journal.pone.0004803  ", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -256,7 +257,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
   
   test "should disassociate authors" do
-    mock_pubmed(:email=>"",:id=>5,:content_file=>"pubmed_5.xml", :tool => 'seek')
+    mock_pubmed(:email=>"",:id=>5,:content_file=>"pubmed_5.xml",:tool=>"seek")
     p = publications(:one)
     p.publication_authors << PublicationAuthor.new(:publication => p, :first_name => people(:quentin_person).first_name, :last_name => people(:quentin_person).last_name, :person => people(:quentin_person))
     p.publication_authors << PublicationAuthor.new(:publication => p, :first_name => people(:aaron_person).first_name, :last_name => people(:aaron_person).last_name, :person => people(:aaron_person))
@@ -305,14 +306,14 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek profiles" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)]}
+      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :project_ids=>[projects(:sysmo_project).id]}
     end
     publication = assigns(:publication)
     original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
                         "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
 
     authors = publication.publication_authors
-    assert original_authors, authors
+    assert_equal original_authors, authors
 
     seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
     seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
@@ -334,7 +335,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     publication.reload
     authors = publication.publication_authors
-    assert original_authors, authors
+    assert_equal original_authors, authors
 
     #Disassociate seek-authors
     assert_difference('publication.non_seek_authors.count', 2) do
@@ -345,14 +346,15 @@ class PublicationsControllerTest < ActionController::TestCase
 
     publication.reload
     authors = publication.publication_authors
-    assert original_authors, authors
+    assert_equal original_authors, authors
   end
 
   test "should display the right author order after some authors are associate with seek-profiles" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
+    assert assigns(:publication)
     publication = assigns(:publication)
     original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
                         "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
@@ -371,6 +373,24 @@ class PublicationsControllerTest < ActionController::TestCase
     joined_original_authors = original_authors.join(', ')
     get :show, :id => publication.id
     assert_select 'p', :text => /#{joined_original_authors}/
+  end
+
+  test 'should update page pagination when changing the setting from admin' do
+    assert_equal 'latest', Seek::Config.default_pages[:publications]
+    get :index
+    assert_response :success
+    assert_select "li.current_page" do
+      assert_select "a[href=?]", publications_path(:page => 'latest')
+    end
+
+    #change the setting
+    Seek::Config.default_pages[:publications] = 'all'
+    get :index
+    assert_response :success
+
+    assert_select "li.current_page" do
+      assert_select "a[href=?]", publications_path(:page => 'all')
+    end
   end
 
   def mock_crossref options

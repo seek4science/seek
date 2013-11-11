@@ -1,7 +1,7 @@
 module BiosamplesHelper
   def create_strain_popup_link
      return link_to_remote_redbox(image_tag("famfamfam_silk/add.png") + 'Create new strain',
-      { :url => url_for(:controller => 'biosamples', :action => 'create_strain_popup') ,
+      { :url => create_strain_popup_biosamples_path ,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'strain_id=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')",
         :condition => "checkSelectOneStrain()"
@@ -14,26 +14,26 @@ module BiosamplesHelper
 
   
    def create_sample_popup_link
-     link_to image("new") + "Create new sample", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{Seek::Config.sample_parent_term}')) {return(true);} else {return(false);}"}
+     link_to image("new") + "Create new sample", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{I18n.t "biosamples.sample_parent_term"}')) {return(true);} else {return(false);}"}
    end
 
   def edit_strain_popup_link strain
     if strain.can_manage?
       return link_to_remote_redbox(image_tag("famfamfam_silk/wrench.png"),
-                                   {:url => url_for(:controller => 'biosamples', :action => 'edit_strain_popup'),
+                                   {:url => edit_strain_popup_biosamples_path,
                                     :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
                                     :with => "'strain_id=' + #{strain.id}"
                                    },
                                    :title => "Manage this strain")
     elsif strain.can_edit?
       return link_to_remote_redbox(image_tag("famfamfam_silk/page_white_edit.png"),
-                                   {:url => url_for(:controller => 'biosamples', :action => 'edit_strain_popup'),
+                                   {:url => edit_strain_popup_biosamples_path,
                                     :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
                                     :with => "'strain_id=' + #{strain.id}"
                                    },
                                    :title => "Edit this strain")
     else
-      explanation = "You are unable to edit this Strain"
+      explanation = "You are not authorized to edit this Strain"
       return image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
     end
   end
@@ -45,8 +45,8 @@ module BiosamplesHelper
      (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => strain_checkbox_onchange_function)   ,
      link_to(strain.title, strain), text_or_not_specified(strain.genotype_info), text_or_not_specified(strain.phenotype_info), strain.id, text_or_not_specified(strain.synonym), text_or_not_specified(creator_link), text_or_not_specified(strain.parent_strain),
      (if strain.can_delete?
-        link_to_remote image("destroy", :alt => "Delete", :title => "Delete this strain"), :url => {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
-                             :confirm => "Are you sure you want to delete this strain?", :method => :delete
+        link_to image("destroy", :alt => "Delete", :title => "Delete this strain"), {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
+                             :confirm => "Are you sure you want to delete this strain?", :method => :delete, :remote => true
       else
         explanation=unable_to_delete_text strain
         image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
@@ -56,10 +56,12 @@ module BiosamplesHelper
   
   def organism_selection_onchange_function
      function =  remote_function(:url=>{:action=>"existing_strains", :controller=>"biosamples"},
+                                                      :method => :get,
                                                       :with=>"'organism_ids='+$F('strain_organism_ids')",
                                                       :before=>"show_large_ajax_loader('existing_strains')")+ ";"
      function += remote_function(:url => {:controller => 'biosamples',
                                           :action => 'existing_specimens'},
+                                          :method => :get,
                                           :with => "'strain_ids=' + getSelectedStrains() + '&organism_ids='+$F('strain_organism_ids')",
                                           :before=>"show_large_ajax_loader('existing_specimens')") + ";"  if Seek::Config.is_virtualliver
      function +=  "check_show_existing_items('strain_organism_ids', 'existing_strains', '');"
@@ -69,17 +71,18 @@ module BiosamplesHelper
        function += "hide_existing_specimens();"
      end
      function += "hide_existing_samples();return(false);"
-     function
+     function.html_safe
    end
 
   def strain_checkbox_onchange_function
         function = remote_function(:url => {:controller => 'biosamples',
                                             :action => 'existing_specimens'},
+                                            :method => :get,
                                             :with => "'strain_ids=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')",
                                             :before=>"show_large_ajax_loader('existing_specimens')")+ ";"
         function += "show_existing_specimens();hide_existing_samples();" unless Seek::Config.is_virtualliver
         function += "return(false);"
-        function
+        function.html_safe
   end   
 
   def specimen_row_data specimen
@@ -90,20 +93,19 @@ module BiosamplesHelper
     end
     creators << specimen.other_creators unless specimen.other_creators.blank?
 
-    explanation = "You are unable to delete this #{Seek::Config.sample_parent_term}. "
-    explanation += unable_to_delete_text specimen  unless specimen.samples.blank?
+    explanation = unable_to_delete_text specimen
     disabled_delete_icon = image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
 
-    delete_icon = specimen.can_delete? ? (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this #{Seek::Config.sample_parent_term}"),
-                         :url => {:action => "destroy", :controller => 'biosamples', :id => specimen.id, :class => 'specimen', :id_column_position => id_column},
-                         :confirm => "Are you sure you want to delete this #{Seek::Config.sample_parent_term}?", :method => :delete) : disabled_delete_icon
+    delete_icon = specimen.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this #{I18n.t 'biosamples.sample_parent_term'}"),
+                         {:action => "destroy", :controller => 'biosamples', :id => specimen.id, :class => 'specimen', :id_column_position => id_column},
+                         :confirm => "Are you sure you want to delete this #{I18n.t 'biosamples.sample_parent_term'}?", :method => :delete, :remote => true) : disabled_delete_icon
     update_icon = nil
     if specimen.can_manage?
-      update_icon = link_to image("manage"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Manage this #{Seek::Config.sample_parent_term}", :target => '_blank'}
+      update_icon = link_to image("manage"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Manage this #{I18n.t 'biosamples.sample_parent_term'}", :target => '_blank'}
     elsif specimen.can_edit?
-      update_icon = link_to image("edit"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Edit this #{Seek::Config.sample_parent_term}", :target => '_blank'}
+      update_icon = link_to image("edit"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Edit this #{I18n.t 'biosamples.sample_parent_term'}", :target => '_blank'}
     else
-      explanation = "You are unable to edit this #{Seek::Config.sample_parent_term}."
+      explanation = "You are not authorized to edit this #{I18n.t 'biosamples.sample_parent_term'}."
       update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
     end
     strain = specimen.strain
@@ -113,6 +115,7 @@ module BiosamplesHelper
       [strain_info,
        (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
                                                                                                                      :action => 'existing_samples'},
+                                                                                                                    :method => :get,
                                                                                                                     :with => "'specimen_ids=' + getSelectedSpecimens()",
                                                                                                                     :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
        link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
@@ -121,6 +124,7 @@ module BiosamplesHelper
       [strain_info,
            (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
                                                                                                                          :action => 'existing_samples'},
+                                                                                                                        :method => :get,
                                                                                                                         :with => "'specimen_ids=' + getSelectedSpecimens()",
                                                                                                                         :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
            link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(specimen.genotype_info),text_or_not_specified(specimen.phenotype_info),text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
@@ -128,20 +132,19 @@ module BiosamplesHelper
   end
 
   def sample_row_data sample
-    explanation = "You are unable to delete this Sample. "
-    explanation += unable_to_delete_text sample  unless sample.assays.blank?
+    explanation = unable_to_delete_text sample
     disabled_delete_icon =  image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
 
-    delete_icon = sample.can_delete? ? (link_to_remote image("destroy", :alt => "Delete", :title => "Delete this sample"),
-                             :url => {:action => "destroy", :controller => 'biosamples', :id => sample.id, :class => 'sample', :id_column_position => 6},
-                             :confirm => "Are you sure you want to delete this sample?", :method => :delete) : disabled_delete_icon
+    delete_icon = sample.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this sample"),
+                             {:action => "destroy", :controller => 'biosamples', :id => sample.id, :class => 'sample', :id_column_position => 6},
+                             :confirm => "Are you sure you want to delete this sample?", :method => :delete, :remote => true) : disabled_delete_icon
     update_icon = nil
     if sample.can_manage?
       update_icon = link_to image("manage"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Manage this sample", :target => '_blank'}
     elsif sample.can_edit?
       update_icon = link_to image("edit"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Edit this sample", :target => '_blank'}
     else
-      explanation = "You are unable to edit this Sample"
+      explanation = "You are not authorized to edit this Sample"
       update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
     end
 

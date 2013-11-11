@@ -17,11 +17,11 @@
    end
 %>
 
-<% remote_form_for entity, object,
+<%= form_for_with_callbacks object,
   :url=> path_to_object,
   :before=>"$('#{entity}_submit').disabled=true;",
   :loaded=>"$('#{entity}_submit').disabled=false;",
-  :html=>{:method=>:post, :id => "add_condition_or_factor_form"} do |f| -%>
+  :html=>{:method=>:post, :id => "add_condition_or_factor_form", :remote => true } do |f| -%>
 
 
   <div class="conditions_or_factors" >
@@ -44,8 +44,8 @@
         <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% elsif entity == 'experimental_condition' %>
-        <td><%= f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
-        <td><%=  f.collection_select :unit_id, Unit.find(:all).sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
+        <td><%= f.collection_select :measured_item_id, MeasuredItem.all.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
+        <td><%=  f.collection_select :unit_id, Unit.all.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% end %>
 
       <td><%= f.text_field :start_value,:size=>4 %></td>
@@ -69,12 +69,12 @@
   </div>
 
   <div class='border_top'>
-    <%= f.submit "Add", :style => "width:50px;font-weight:bold;" -%>
+    <%= f.submit "Add", :id => "#{entity}_submit", :style => "width:50px;font-weight:bold;" -%>
   </div>
  </div>
 <% end -%>
 
-<% form_remote_tag :url => path_to_create_from_existing do -%>
+<%= form_tag(path_to_create_from_existing, {:remote => true}) do -%>
    <% fses_or_ecs = fses_or_ecs_of_project asset_object, controller_name
       unless fses_or_ecs.blank? %>
          <div class="conditions_or_factors" >

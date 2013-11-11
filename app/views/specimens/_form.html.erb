@@ -6,7 +6,7 @@
 
 <%= f.error_messages %>
 
-<h2><%= Seek::Config.sample_parent_term.capitalize -%> details</h2>
+<h2><%= (I18n.t 'biosamples.sample_parent_term').capitalize -%> details</h2>
 
 <%
    specimen ||=@specimen
@@ -22,7 +22,7 @@
      parent_id_prefix = "specimen"
    end
 
-   all_institutions = Institution.find(:all, :order => :name)
+   all_institutions = Institution.order(:name)
    existing_creators = []
    if action == :new
      existing_creators = [current_user.person]
@@ -32,7 +32,7 @@
 %>
 
 <p>
-  <%= f.label "#{Seek::Config.sample_parent_term.capitalize} title:" -%><span class="required">*</span><br/>
+  <%= f.label "#{(I18n.t 'biosamples.sample_parent_term').capitalize} title:" -%><span class="required">*</span><br/>
   <%= f.text_field :title, :style => "width:350px;" -%>
 </p>
 
@@ -51,7 +51,7 @@
                   </span><br/>
 
   <%= f.select :institution_id,
-               options_for_select([["Please Select ...", 0]]|all_institutions.collect { |o| [h(o.name), o.id] }, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)), {}, :style => "width:350px;" %>
+               options_for_select([["Please Select ...", 0]]|all_institutions.collect { |o| [h(o.name), o.id] }, current_user.try(:person).try(:institutions).try(:first).try(:id)), {}, :style => "width:350px;" %>
 </p>
 <% unless Seek::Config.is_virtualliver %>
 <p>
@@ -76,7 +76,7 @@
 </p>
 
 <p>
-  <%= f.label "Provider's #{Seek::Config.sample_parent_term} identifier:" -%> <br/>
+  <%= f.label "Provider's #{I18n.t 'biosamples.sample_parent_term'} identifier:" -%> <br/>
   <%= f.text_field :provider_id, :style => "width:350px;" -%>
 </p>
 

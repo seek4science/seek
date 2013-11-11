@@ -1,29 +1,19 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
-class ApplicationController < ActionController::Base
-  require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'application_controller')
   include Recaptcha::Verify
 
-  skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
+require 'authenticated_system'
+
+class ApplicationController < ActionController::Base
+  include Seek::Errors::ControllerErrorHandling
 
   self.mod_porter_secret = PORTER_SECRET
 
   include CommonSweepers
 
-  include ExceptionNotifiable
-  self.error_layout="errors"
-  self.silent_exceptions = []
-  self.rails_error_classes = {
-  ActiveRecord::RecordNotFound => "404",
-  ::ActionController::UnknownController => "404",
-  ::ActionController::UnknownAction => "404",
-  ::ActionController::RoutingError => "404",
-  ::ActionView::MissingTemplate => "406",
-  ::ActionView::TemplateError => "500"
-  }
-  local_addresses.clear
 
-  exception_data :additional_exception_notifier_data
+
+  before_filter :log_extra_exception_data
 
   after_filter :log_event
 
@@ -60,10 +50,6 @@ class ApplicationController < ActionController::Base
     params[:xml].each {|k,v| params[k] = v} if request.format.xml? and params[:xml]
   end
 
-  layout "main"
-
-  protect_from_forgery
-
   def set_no_layout
     self.class.layout nil
   end
@@ -76,13 +62,6 @@ class ApplicationController < ActionController::Base
     return  "http://#{base_host}"
   end
   helper_method :application_root
-
-
-  def self.fast_auto_complete_for(object, method, options = {})
-    define_method("auto_complete_for_#{object}_#{method}") do
-      render :json => object.to_s.camelize.constantize.find(:all).map(&method).to_json
-    end
-  end
 
   #Overridden from restful_authentication
   #Does a second check that there is a profile assigned to the user, and if not goes to the profile
@@ -105,7 +84,7 @@ class ApplicationController < ActionController::Base
 
   def is_current_user_auth
     begin
-      @user = User.find(params[:id], :conditions => ["id = ?", current_user.try(:id)])
+      @user = User.where(["id = ?", current_user.try(:id)]).find(params[:id])
     rescue ActiveRecord::RecordNotFound
       error("User not found (id not authorized)", "is invalid (not owner)")
       return false
@@ -127,7 +106,7 @@ class ApplicationController < ActionController::Base
 
   def is_admin_or_is_project_manager
     unless User.admin_logged_in? || User.project_manager_logged_in?
-      error("You do not have the permission", "Not admin or project manager")
+      error("You do not have the permission", "Not admin or #{t('project')} manager")
       return false
     end
   end
@@ -155,12 +134,12 @@ class ApplicationController < ActionController::Base
       if !resource_type.blank?
         clazz = resource_type.constantize
         resources = clazz.find_all_by_id(resource_ids)
-        if clazz.respond_to?(:authorized_partial_asset_collection)
-          resources = clazz.authorized_partial_asset_collection(resources,"view")
+        if clazz.respond_to?(:authorize_asset_collection)
+          resources = clazz.authorize_asset_collection(resources,"view")
         else
           resources = resources.select &:can_view?
         end
-
+        resources.sort!{|item,item2| item2.updated_at <=> item.updated_at}
         page.replace_html "#{resource_type}_list_items_container",
                           :partial => "assets/resource_list",
                           :locals => {:collection => resources,
@@ -246,30 +225,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def check_allowed_to_manage_types
-    unless Seek::Config.type_managers_enabled
-      error("Type management disabled", "...")
-      return false
-    end
-
-    if User.current_user.can_manage_types?
-      return true
-    else
-      case Seek::Config.type_managers
-        when "admins"
-          error("Admin rights required to manage types", "...")
-          return false
-
-        when "pals"
-          error("Admin or PAL rights required to manage types", "...")
-          return false
-
-        when "none"
-          error("Type management disabled", "...")
-          return false
-      end
-    end
-  end
 
   def currently_logged_in
     current_user.person
@@ -327,11 +282,7 @@ class ApplicationController < ActionController::Base
         'delete'
 
       when 'manage'
-        'manage'
-
-      when 'preview_publish', 'publish'
-        'publish'
-
+          'manage'
       else
         nil
     end
@@ -364,9 +315,11 @@ class ApplicationController < ActionController::Base
               when 'manage'   then redirect_to object
               when 'edit'     then redirect_to object
               when 'download' then redirect_to object
+              when 'delete' then redirect_to object
               else                 redirect_to eval "#{self.controller_name}_path"
             end
           end
+          format.rdf { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
           format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
           format.json { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
         end
@@ -379,6 +332,9 @@ class ApplicationController < ActionController::Base
         else
           flash[:error] = "You are not authorized to view #{name.humanize}"
         end
+        format.rdf { render  :text=>"Not found",:status => :not_found }
+        format.xml { render  :text=>"<error>404 Not found</error>",:status => :not_found }
+        format.json { render :text=>"Not found", :status => :not_found }
         format.html { redirect_to eval "#{self.controller_name}_path" }
       end
       return false
@@ -394,10 +350,6 @@ class ApplicationController < ActionController::Base
       false
     end
   end
-  # See ActionController::Base for details
-  # Uncomment this to filter the contents of submitted sensitive data parameters
-  # from your application log (in this case, all fields with names like "password"). 
-  filter_parameter_logging :password
 
   def log_event
     User.with_current_user current_user do
@@ -410,6 +362,7 @@ class ApplicationController < ActionController::Base
 
       #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
       return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
+
 
       case c
         when "sessions"
@@ -436,7 +389,7 @@ class ApplicationController < ActionController::Base
           a = "create" if a == "upload_for_tool"
           a = "update" if a == "new_version"
           a = "inline_view" if a == "explore"
-          if ["show", "create", "update", "destroy", "download","inline_view"].include?(a)
+          if ["show", "create", "update", "destroy", "download", "inline_view"].include?(a)
             check_log_exists(a, c, object)
             ActivityLog.create(:action => a,
                                :culprit => current_user,
@@ -476,9 +429,9 @@ class ApplicationController < ActionController::Base
                                :data => activity_loggable.title)
           end
       end
-      expire_activity_fragment_cache(c,a)
-    end
 
+      expire_activity_fragment_cache(c, a)
+    end
   end
 
   def expire_activity_fragment_cache(controller,action)
@@ -502,11 +455,11 @@ class ApplicationController < ActionController::Base
 
   def check_log_exists action,controllername,object
     if action=="create"
-      a=ActivityLog.find(:first,:conditions=>{
+      a=ActivityLog.where(
           :activity_loggable_type=>object.class.name,
           :activity_loggable_id=>object.id,
           :controller_name=>controllername,
-          :action=>"create"})
+          :action=>"create").first
       
       logger.error("ERROR: Duplicate create activity log about to be created for #{object.class.name}:#{object.id}") unless a.nil?
     end
@@ -547,10 +500,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def additional_exception_notifier_data
-    {
-        :current_logged_in_user=>current_user
-    }
+  def log_extra_exception_data
+      request.env["exception_notifier.exception_data"] = {
+          :current_logged_in_user=>current_user
+      }
   end
 
 

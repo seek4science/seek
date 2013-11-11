@@ -10,6 +10,32 @@ class StrainTest < ActiveSupport::TestCase
     User.current_user = Factory(:user)
   end
 
+  test "to_rdf" do
+    object = Factory(:strain, :organism=>Factory(:organism, :bioportal_concept=>Factory(:bioportal_concept)),:provider_id=>"Dxxu1")
+    Factory :assay_organism, :strain=>object, :organism=>object.organism
+
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count >= 1
+      assert_equal RDF::URI.new("http://localhost:3000/strains/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
+  test "assays" do
+    ao = Factory(:assay_organism)
+    strain = ao.strain
+    assert_equal [ao.assay],strain.assays
+  end
+
+  test "ncbi uri" do
+    strain = Factory(:strain, :organism=>Factory(:organism, :bioportal_concept=>Factory(:bioportal_concept)))
+    assert_equal "http://purl.obolibrary.org/obo/NCBITaxon_2287",strain.ncbi_uri
+
+    strain = Factory(:organism)
+
+    assert_nil strain.ncbi_uri
+  end
+
   test "without default" do
     Strain.destroy_all
     org = Factory :organism

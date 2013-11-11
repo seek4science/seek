@@ -37,7 +37,7 @@ module Seek
           filepath=content_blob.filepath
 
           #this is necessary to get the correct filename and especially extension, which JWS relies on
-          tmpfile = Tempfile.new(content_blob.original_filename)
+          tmpfile = Tempfile.new([content_blob.original_filename,File.extname(content_blob.original_filename)])
           FileUtils.cp(filepath, tmpfile.path)
 
           if (content_blob.is_sbml?)

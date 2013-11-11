@@ -4,7 +4,7 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
-<title>UPGRADING - Sysmo-SEEK Technical and API Documentation</title>
+<title>UPGRADING - SEEK Technical Guide</title>
 
 <link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
 
@@ -49,15 +49,31 @@
 
   <ul>
   
+    <li class="file"><a href="../doc/ADMINISTRATION.html">ADMINISTRATION</a>
+  
     <li class="file"><a href="../doc/BACKUPS.html">BACKUPS</a>
+  
+    <li class="file"><a href="../doc/CONTACTING_US.html">CONTACTING_US</a>
+  
+    <li class="file"><a href="../doc/CONTRIBUTING_TO_SEEK.html">CONTRIBUTING_TO_SEEK</a>
   
     <li class="file"><a href="../doc/CREDITS.html">CREDITS</a>
   
+    <li class="file"><a href="../doc/EARLIER-UPGRADES.html">EARLIER-UPGRADES</a>
+  
     <li class="file"><a href="../doc/INSTALL.html">INSTALL</a>
   
-    <li class="file"><a href="../doc/README_FOR_APP.html">README_FOR_APP</a>
+    <li class="file"><a href="../doc/INSTALL-PRODUCTION.html">INSTALL-PRODUCTION</a>
+  
+    <li class="file"><a href="../doc/OTHER-DISTRIBUTIONS.html">OTHER-DISTRIBUTIONS</a>
+  
+    <li class="file"><a href="../doc/README.html">README</a>
+  
+    <li class="file"><a href="../doc/SETTING-UP-VIRTUOSO.html">SETTING-UP-VIRTUOSO</a>
   
     <li class="file"><a href="../doc/UPGRADING.html">UPGRADING</a>
+  
+    <li class="file"><a href="../doc/UPGRADING-TO-0-18.html">UPGRADING-TO-0-18</a>
   
   </ul>
 </nav>
@@ -66,6 +82,22 @@
   <h3 class="section-header">Class and Module Index</h3>
 
   <ul class="link-list">
+  
+    <li><a href="../Seek.html">Seek</a>
+  
+    <li><a href="../Seek/Rdf.html">Seek::Rdf</a>
+  
+    <li><a href="../Seek/Rdf/RdfFileStorage.html">Seek::Rdf::RdfFileStorage</a>
+  
+    <li><a href="../Seek/Rdf/RdfGeneration.html">Seek::Rdf::RdfGeneration</a>
+  
+    <li><a href="../Seek/Rdf/RdfRepository.html">Seek::Rdf::RdfRepository</a>
+  
+    <li><a href="../Seek/Rdf/RdfRepositoryStorage.html">Seek::Rdf::RdfRepositoryStorage</a>
+  
+    <li><a href="../Seek/Rdf/VirtuosoRepository.html">Seek::Rdf::VirtuosoRepository</a>
+  
+    <li><a href="../Seek/Rdf/VirtuosoRepository/Config.html">Seek::Rdf::VirtuosoRepository::Config</a>
   
   </ul>
 </nav>
@@ -77,22 +109,22 @@
   
 <h1 id="label-Upgrading+SEEK">Upgrading SEEK</h1>
 
-<p>If you have an existing SEEK installation, and you haven’t done so
-already, please take a moment to fill out our very short,optional <a
+<p>If you have an existing SEEK installation, and you haven’t done so already,
+please take a moment to fill out our very short,optional <a
 href="http://www.sysmo-db.org/seek-registration">SEEK Registration
 Form</a>. Doing so will be very useful to us in the future when we try and
 raise further funding to develop and support SEEK and the associated tools.</p>
 
 <p><strong>Always backup your SEEK data before starting to upgrade!!</strong>
-- see the <a href="../files/doc/BACKUPS.html">Backup Guide</a>.</p>
+- see the <a href="BACKUPS.html">Backup Guide</a>.</p>
 
 <p>This guide assumes that SEEK has been installed following the <a
-href="../files/doc/INSTALL.html">Installation Guide</a> guide. It assumes
-it is a production server that is being updated, and that commands are run
-from the root directory of the SEEK application.</p>
+href="INSTALL.html">Installation Guide</a> guide. It assumes it is a
+production server that is being updated, and that commands are run from the
+root directory of the SEEK application.</p>
 
-<p>If your current installation is not linked to to the SEEK GoogleCode
-mercurial repository, it can still easily be updated by taking the next
+<p>If your current installation is not linked to to the SEEK BitBucket
+Mercurial repository, it can still easily be updated by taking the next
 stable tag, reconfiguring the database configuration to point at your
 existing database, and copying across the <em>filestore/</em> directory.
 The upgrade steps can then be followed, with the Mercurial (hg) steps
@@ -100,7 +132,10 @@ omitted.</p>
 
 <h2 id="label-Identifying+your+version">Identifying your version</h2>
 
-<p>You can tell which version you have installed by looking at the
+<p>The version of SEEK you are running is shown at the bottom left, within the
+footer, when viewing pages in SEEK.</p>
+
+<p>You can also tell which version you have installed by looking at the
 <em>config/version.yml</em> file, so for example version 0.13.2 looks
 something like:</p>
 
@@ -112,104 +147,48 @@ patch: 2</pre>
 
 <p><strong>If upgrading from a version earlier than v0.11.x please contact our
 GoogleGroup at <a
-href="http://groups.google.com/group/seek-development">groups.google.com/group/seek-development</a></strong></p>
+href="http://groups.google.com/group/seek-developers">groups.google.com/group/seek-developers</a></strong></p>
 
 <p>When upgrading between versions greater than v0.11.x you need to upgrade to
 each released minor version in order incrementally (i.e. 0.13.x -&gt;
 0.14.x -&gt; 0.15.x -&gt; 0.16.x, you can skip patch versions such as
-0.13.3). The released versions are listed below:</p>
-<ul><li>
-<p>0.11.x</p>
-</li><li>
-<p>0.13.2</p>
-</li><li>
-<p>0.13.3</p>
-</li><li>
-<p>0.14.0</p>
-</li><li>
-<p>0.14.1</p>
-</li><li>
-<p>0.15.0</p>
-</li><li>
-<p>0.15.1</p>
-</li><li>
-<p>0.15.2</p>
-</li><li>
-<p>0.15.3</p>
-</li><li>
-<p>0.15.4</p>
-</li><li>
-<p>0.16.0</p>
-</li><li>
-<p>0.16.1</p>
-</li><li>
-<p>0.16.2</p>
-</li><li>
-<p>0.16.3</p>
-</li></ul>
+0.13.3).</p>
 
-<p><em>(Note there was no 0.12.x version released externally, this was an
-internal release)</em></p>
+<p>Each version has a tag in mercurial, which has the format of <em>v</em>
+prefix followed by the version - e.g. v0.11.1, v0.13.2, v0.17.1</p>
 
-<p>Each version has a tag in mercurial that is the version preceeded by a
-<em>v</em> - e.g. v0.11.1, v0.13.2, v0.14.0</p>
+<p><strong>When upgrading between minor versions (i.e. from 0.11.x to
+0.13.x)</strong> it is necessary to run a seek:upgrade rake task to perform
+upgrade changes and import any new data. The upgrade task may require an
+internet connection, and sometimes can take some time to run, so please be
+patient. There are instructions for upgrading between each minor version
+listed below, but they will generally follow the same pattern. Upgrading to
+version 0.18 is an exception and involves some additional steps - due to
+the upgrade of the required versions of Rails and Ruby.</p>
 
-<p>When upgrading between minor versions (i.e. from 0.11.x to 0.13.x) it is
-necessary to run a seek:upgrade rake task to perform upgrade changes and
-import any new data. The upgrade task may require an internet connection,
-and sometimes can take some time to run, so please be patient. There are
-instructions for upgrading between each minor version listed below, but
-they will generally follow the same pattern.</p>
+<p><strong>When upgrading between patch versions (i.e between 0.16.0 and
+0.16.3)</strong> it should only be necessary to run <em>bundle install</em>
+and the <em>db:migrate</em> rake task. Using seek:upgrade should still
+work, but could take a lot of unnecessary time. There is more details and
+an example towards the end of the this page.</p>
 
-<p>When upgrading between patch versions (i.e between 0.13.0 and 0.13.2) it
-should only be necessary to a db:migrate rake task. Using seek:upgrade
-should still work, but could take a lot of unnecessary time.</p>
+<h2 id="label-Steps+to+upgrade+from+0.17.x+to+0.18.x">Steps to upgrade from 0.17.x to 0.18.x</h2>
 
-<h2 id="label-Steps+to+upgrade+from+0.15.x+to+0.16.x">Steps to upgrade from 0.15.x to 0.16.x</h2>
+<p>The changes for Version 0.18 included upgrading Ruby to version 1.9.3 and
+Rails to version 3.2 - this means the upgrade process is a little bit more
+involved that usual. For this reason we have a seperate page detailing this
+upgrade.</p>
 
-<p>First there are additional dependencies you will need, which on Ubuntu
-10.04/12.04 can be installed with:</p>
+<p>Please visit <a href="UPGRADING-TO-0-18.html">Upgrading to 0.18</a> for
+details of how to do this upgrade.</p>
 
-<pre>sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
+<h2 id="label-Steps+to+upgrade+from+0.16.x+to+0.17.x">Steps to upgrade from 0.16.x to 0.17.x</h2>
 
-<p>Open Office is a background service which is called by convert_office
-plugin, to convert some document types (ms office documents, open office
-documents, etc.) into pdf document.</p>
-
-<p>The command to start open office in headless mode and as the background
-process:</p>
-
-<pre>nohup soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
-
-<p>If you run on production server, using apache and phusion passenger, you
-will need to run the Open Office service under www-data user. To do this it
-will need to create a working directory in /var/www. The name of the
-directory changes between versions, but will be called something similar to
-libreoffice or .openoffice.org2. The easiest way to create this directory
-is to make a note of the permissions for /var/www, then make it writable to
-www-data, start the service, and then put the permissions on /var/www back
-to what they were originally.</p>
-
-<pre>sudo chown www-data:www-data /var/www</pre>
-
-<p>Then to start the service manually you use:</p>
-
-<pre>nohup sudo -H -u www-data soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
-
-<p>The 8100 port is used by default, if you’d like to run on another port,
-you need also to synchronize the changed port with the default soffice_port
-setting for convert_office plugin in config/environment.rb</p>
-
-<p>We recommend the OpenOffice service is setup using an init.d script,
-following the same procedures for delayed job using the script found at: <a
-href="https://gist.github.com/3787679">gist.github.com/3787679</a></p>
-
-<p>Other than this, the remaining steps are the same standard steps are
-previous versions:</p>
+<p>Upgrading follows the standard steps:</p>
 
 <pre>RAILS_ENV=production ./script/delayed_job stop
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
-hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.3
+hg pull https://bitbucket.org/seek4science/seek -r v0.17.1
 hg update
 hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
@@ -221,112 +200,6 @@ bundle exec rake tmp:clear RAILS_ENV=production
 bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
 RAILS_ENV=production ./script/delayed_job start
 touch tmp/restart.txt</pre>
-
-<h2 id="label-Steps+to+upgrade+from+0.14.x+to+0.15.x">Steps to upgrade from 0.14.x to 0.15.x</h2>
-
-<p>SEEK 0.15 upgraded Rails to the latest 2 version,2.3.14. This requires an
-update of Rubygems to 1.6.2. You can update rubygems directly by running</p>
-
-<pre>gem update --system 1.6.2</pre>
-
-<p>or install from scratch by reading the <a href="INSTALL.html">INSTALL</a>
-guide. You can also use <a href="https://rvm.io/">RVM</a>. SEEK 0.15 also
-runs fine on the latest Rubygems (currently 1.8.24) but you will get some
-deprecation warnings. You can check you have the correct version of
-rubygems by running</p>
-
-<pre>gem -v</pre>
-
-<p>Then you will need to install additional dependency:</p>
-
-<pre>sudo apt-get install git</pre>
-
-<p>Once Rubygems has been updated and additional dependency has been
-installed, the upgrade is the typical:</p>
-
-<pre>RAILS_ENV=production ./script/delayed_job stop
-bundle exec rake sunspot:solr:stop RAILS_ENV=production
-hg pull https://sysmo-db.googlecode.com/hg/ -r v0.15.4
-hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
-hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
-bundle install --deployment
-bundle exec rake seek:upgrade RAILS_ENV=production
-bundle exec rake tmp:assets:clear RAILS_ENV=production
-bundle exec rake tmp:clear RAILS_ENV=production
-
-bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
-RAILS_ENV=production ./script/delayed_job start
-touch tmp/restart.txt</pre>
-
-<h2 id="label-Steps+to+upgrade+from+0.13.x+to+0.14.x">Steps to upgrade from 0.13.x to 0.14.x</h2>
-
-<p>These are the fairly standard steps when upgrading between minor versions.
-Note, the seek:upgrade task can take a while if there are many people and
-assets in your SEEK, as it needs to populate some tables for the default
-subscriptions (for email notifications).</p>
-
-<pre>RAILS_ENV=production ./script/delayed_job stop
-bundle exec rake sunspot:solr:stop RAILS_ENV=production
-hg pull https://sysmo-db.googlecode.com/hg/ -r v0.14.1
-hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
-hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
-bundle install --deployment
-bundle exec rake seek:upgrade RAILS_ENV=production
-bundle exec rake tmp:assets:clear RAILS_ENV=production
-bundle exec rake tmp:clear RAILS_ENV=production
-
-bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
-RAILS_ENV=production ./script/delayed_job start
-touch tmp/restart.txt</pre>
-
-<h2 id="label-Steps+to+upgrade+from+0.11.x+to+0.13.x">Steps to upgrade from 0.11.x to 0.13.x</h2>
-
-<p>There follows the commands required to upgrade. Anything after # are notes
-and do not need to be included in the command run. There are a few
-additional steps for this upgrade due to the switch from Solr to Sunspot as
-the search system, and the introduction of Delayed Job for background
-processing.</p>
-
-<p>First there is an additional dependency you will need, which on Ubuntu
-10.04 or Debian can be installed with:</p>
-
-<pre>sudo apt-get install libxslt-dev</pre>
-
-<p>on Ubuntu 12.04 this will be:</p>
-
-<pre>sudo apt-get install libxslt1-dev</pre>
-
-<p>then the following steps will update the SEEK server:</p>
-
-<pre>bundle exec rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
-hg pull https://sysmo-db.googlecode.com/hg/ -r v0.13.3
-hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
-hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
-bundle install --deployment
-bundle exec rake seek:upgrade RAILS_ENV=production
-bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
-bundle exec rake sunspot:solr:reindex RAILS_ENV=production  # to reindex
-bundle exec rake tmp:assets:clear RAILS_ENV=production
-bundle exec rake tmp:clear RAILS_ENV=production</pre>
-
-<p>SEEK v0.13.x now uses a Ruby tool called <a
-href="https://github.com/tobi/delayed_job">Delayed Job</a> to handle
-background processing which now needs to be started using:</p>
-
-<pre>RAILS_ENV=production ./script/delayed_job start</pre>
-
-<p>And now SEEK should be ready to restart. If running together with Passenger
-Phusion as described in the install guide this is simply a case of:</p>
-
-<pre>touch tmp/restart.txt</pre>
-
-<p>If you auto start solr with an init.d/ script - this will need updating to
-reflect the change to sunspot:solr:start. The updated script should look
-something like: <a
-href="https://gist.github.com/3143434">gist.github.com/3143434</a></p>
 
 <h2 id="label-Steps+to+upgrade+between+patches+%28e.g.+between+0.16.0+to+0.16.3%29">Steps to upgrade between patches (e.g. between 0.16.0 to 0.16.3)</h2>
 
@@ -336,7 +209,7 @@ versions unless otherwise stated. You can upgrade directly from one patch
 version to another, skipping the intermediate versions (so you can upgrade
 directly 0.16.0 to 0.16.3 without first having to upgrade to 0.16.1)</p>
 
-<pre>hg pull https://sysmo-db.googlecode.com/hg/ -r v0.16.3
+<pre>hg pull https://bitbucket.org/seek4science/seek -r v0.16.3
 hg update
 hg merge # if necessary
 hg commit -m &quot;merged&quot; # if necessary
@@ -350,13 +223,18 @@ RAILS_ENV=production ./script/delayed_job start
 
 touch tmp/restart.txt</pre>
 
+<h2 id="label-Earlier+upgrade+notes">Earlier upgrade notes</h2>
+
+<p>For details of how to upgrade to 0.16.x and for earlier versions please
+visit <a href="EARLIER-UPGRADES.html">Upgrades to 0.16 and earlier</a></p>
+
 </div>
 
 
 
 <footer id="validator-badges">
   <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
-  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.2.
   <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
 </footer>
 

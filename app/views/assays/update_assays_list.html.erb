@@ -7,13 +7,13 @@
     text = "<%= @assay.title %>";
     value = "<%= @assay.id %>";
     if (!window.opener) {
-        alert("New assay was created but its parent window was closed.");
+        alert("New <%= t('assays.assay') %> was created but its parent window was closed.");
         window.close();
     }
     assay_list_id = window.opener.document.getElementById("possible_assays");
     assay_list_id.appendChild(new Option(text, value));
     assay_list_id.selectedIndex = assay_list_id.options.length - 1;
     assay_list_id.onchange();
-    alert("New assay was created! You can add it now.");
+    alert("New <%= t('assays.assay') %> was created! You can add it now.");
     window.close();
 </script>

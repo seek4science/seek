@@ -1,5 +1,8 @@
-require 'acts_as_authorized'
-class Study < ActiveRecord::Base  
+
+class Study < ActiveRecord::Base
+
+  include Seek::Rdf::RdfGeneration
+
   acts_as_isa
 
   attr_accessor :new_link_from_assay
@@ -28,7 +31,7 @@ class Study < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   #FIXME: see comment in Assay about reversing these
-  ["data_file","sop","model"].each do |type|
+  ["data_file","sop","model","publication"].each do |type|
     eval <<-END_EVAL
       def #{type}_masters
         assays.collect{|a| a.send(:#{type}_masters)}.flatten.uniq
@@ -45,12 +48,12 @@ class Study < ActiveRecord::Base
     END_EVAL
   end
 
-  def can_delete? *args
+  def state_allows_delete? *args
     assays.empty? && super
   end
 
   def clone_with_associations
-    new_object= self.clone
+    new_object= self.dup
     new_object.policy = self.policy.deep_copy
     new_object.scale_ids = self.scale_ids
 

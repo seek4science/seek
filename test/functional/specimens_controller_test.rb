@@ -6,6 +6,7 @@ class SpecimensControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
 
   def setup
     login_as :owner_of_fully_public_policy
@@ -57,8 +58,8 @@ class SpecimensControllerTest < ActionController::TestCase
                                   :organism_id=>Factory(:organism).id,
                                   :lab_internal_number =>"Do232",
                                   :contributor => Factory(:user),
-                                  :institution => Factory(:institution),
-                                  :strain => Factory(:strain),
+                                  :institution_id => Factory(:institution).id,
+                                  :strain_id => Factory(:strain).id,
                                   :project_ids => [Factory(:project).id]}, :sharing=>valid_sharing
 
     end
@@ -141,7 +142,7 @@ class SpecimensControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to specimens_path
+    assert_redirected_to s
   end
   test "should not destroy specimen related to an existing sample" do
     sample = Factory :sample
@@ -151,7 +152,7 @@ class SpecimensControllerTest < ActionController::TestCase
       delete :destroy, :id => specimen.id
     end
     assert flash[:error]
-    assert_redirected_to specimens_path
+    assert_redirected_to specimen
   end
 
   test "should create specimen with strings for confluency passage viability and purity" do
@@ -178,7 +179,7 @@ class SpecimensControllerTest < ActionController::TestCase
       get :show, :id => Factory(:specimen,
                                 :title => "running mouse NO2 with no institution",
                                 :policy => policies(:editing_for_all_sysmo_users_policy),
-                                :institution => nil)
+                              :institution_id=>nil)
       assert_response :success
       assert_not_nil assigns(:specimen)
     end
@@ -221,7 +222,7 @@ test "should update genotypes and phenotypes" do
   test "specimen-sop association when sop has multiple versions" do
     sop = Factory :sop, :contributor => User.current_user
     sop_version_2 = Factory(:sop_version, :sop => sop)
-    assert 2, sop.versions.count
+    assert_equal 2, sop.versions.count
     assert_equal sop.latest_version, sop_version_2
 
     assert_difference("Specimen.count") do
@@ -230,7 +231,7 @@ test "should update genotypes and phenotypes" do
                                   :lab_internal_number => "Do232",
                                   :contributor => User.current_user,
                                   :institution_id => Factory(:institution).id,
-                                  :strain => Factory(:strain),
+                                  :strain_id => Factory(:strain).id,
                                   :project_ids => [Factory(:project).id]},
                     :specimen_sop_ids => [sop.id],
                     :sharing => valid_sharing

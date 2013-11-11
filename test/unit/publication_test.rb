@@ -18,6 +18,19 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal 1, publication.events.count
   end
 
+  test "to_rdf" do
+    object = Factory :publication
+    Factory :relationship, :subject=>Factory(:assay), :other_object=>object, :predicate=>Relationship::RELATED_TO_PUBLICATION
+    object.reload
+
+    rdf = object.to_rdf
+
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count >= 1
+      assert_equal RDF::URI.new("http://localhost:3000/publications/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
   test "content blob search terms" do
     p = Factory :publication
     assert_equal [],p.content_blob_search_terms
@@ -46,6 +59,7 @@ class PublicationTest < ActiveSupport::TestCase
     mock_pubmed(:email=>"fred@email.com",:id=>1,:content_file=>"pubmed_1.xml")
     query = PubmedQuery.new("seek","fred@email.com")
     result = query.fetch(21533085)
+
     assert_equal Date.parse("20 April 2011"),result.date_published
 
     result = query.fetch(1)
@@ -104,6 +118,7 @@ class PublicationTest < ActiveSupport::TestCase
     mock_crossref(:email=>"fred@email.com",:doi=>"10.1371/journal.pcbi.1002352",:content_file=>"cross_ref2.xml")
     query=DoiQuery.new("fred@email.com")
     result = query.fetch("10.1371/journal.pcbi.1002352")
+    assert result.error.nil?, "There should not be an error"
     assert !result.authors.collect{|auth| auth.last_name}.include?("Papin")
     assert_equal 5,result.authors.size
     assert_nil result.error
@@ -123,7 +138,7 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "sort by published_date" do
-    assert_equal Publication.find(:all).sort_by { |p| p.published_date}.reverse, Publication.find(:all)
+    assert_equal Publication.find(:all).sort_by { |p| p.published_date}.reverse, Publication.default_order
   end
 
   test "title trimmed" do

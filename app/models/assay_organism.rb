@@ -7,4 +7,8 @@ class AssayOrganism < ActiveRecord::Base
 
   validates_presence_of :assay
   validates_presence_of :organism
+
+  include Seek::Rdf::ReactToAssociatedChange
+  update_rdf_on_change :assay
+
 end

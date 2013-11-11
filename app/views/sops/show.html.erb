@@ -1,6 +1,6 @@
 <%= javascript_include_tag "resource" -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@sop} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@sop} %>
 
 <ul class="sectionIcons">
     <%= asset_buttons @sop,@display_sop.version -%>
@@ -11,7 +11,7 @@
 
   <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@sop} -%>
 
-  <div class="main_content_left_box_narrower">
+  <div class="main_content_left_box">
 
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
   
@@ -22,22 +22,11 @@
 
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sop} %>
 
-      <p>
-        <b>Description:</b>
-        <% unless @display_sop.description.blank? -%>
-          <div class="box_standout" id="description">
-            <%= simple_format(auto_link(white_list(@display_sop.description),:all,:rel=>'nofollow')) -%>
-          </div>
-      <% else -%>
-          <p class="none_text">
-            No description
-          </p>
-      <% end -%>
-      </p>
+      <%= item_description @display_sop.description -%>
     </div>
   </div>
 
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop } %>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop, :versioned_resource=>@display_sop } %>
 
   <div style="clear:both;padding-top:1em;">
     <p>
@@ -51,9 +40,7 @@
     <br/>
 
     <%# get, classify and authorize all assets for this project -%>
-    <%= render :partial=>"layouts/items_related_to",:object => @sop %>
-    <br/>
-    <%= render :partial => "layouts/usage_info", :locals => { :resource => @sop } -%>
+    <%= render :partial=>"general/items_related_to",:object => @sop %>
   </div>
 
 </div>

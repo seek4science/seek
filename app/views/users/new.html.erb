@@ -11,7 +11,7 @@
       Please contact us if you have any queries about our terms or our privacy policy.
       <br/><br/>
       If you have previously provided a login and password but didn't select or create a profile, then your details have already been stored
-      and you should <b><%= link_to "login", login_url %></b> to continue the registration process.
+      and you should Login to continue the registration process.
     </p>
 
     <% if User.count == 0 -%>
@@ -28,7 +28,7 @@
 
     <h2>Please provide your details <%= help_icon("Please note that fields marked with an asterisk are compulsory.") %></h2>
 
-    <% form_tag users_path do -%>
+    <%= form_tag users_path do -%>
       <div id="login_details">
         <p>          
             <b><font style="color: #FF0000;">*</font> Login name</b>

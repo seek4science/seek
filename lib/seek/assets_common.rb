@@ -1,3 +1,5 @@
+require 'seek/annotation_common'
+
 module Seek
   module AssetsCommon
     require 'net/ftp'

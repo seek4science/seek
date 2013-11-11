@@ -1,5 +1,5 @@
 <% @authorized_assays = @assay_type.get_child_assays.select(&:can_view?) %>
-<h1>Assay type '<%= h @assay_type.title.capitalize %>'</h1>
+<h1><%= t('assays.assay') %> type '<%= h @assay_type.title.capitalize %>'</h1>
 
 <div class="ontology_nav">
 
@@ -17,7 +17,7 @@
   <br/>
 
 
-  <%= image("current",{:title=>"Current assay type",:alt=>"Current assay type",:style=>"vertical-align:middle"}) -%>
+  <%= image("current",{:title=>"Current #{t('assays.assay').downcase} type",:alt=>"Current #{t('assays.assay').downcase} type",:style=>"vertical-align:middle"}) -%>
   <%= h @assay_type.title.capitalize -%>
   <br/>
 
@@ -34,7 +34,7 @@
 
 </div>
 
-<h2>Related assays</h2>
+<h2>Related <%= t('assays.assay').downcase.pluralize %></h2>
 <div class="list_items_container">
   <%= render :partial => "assets/resource_list_item", :collection=>@authorized_assays -%>
 </div>

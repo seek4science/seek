@@ -7,7 +7,10 @@ class EventsController < ApplicationController
   before_filter :check_events_enabled
 
   include IndexPager
-  include Seek::Publishing
+
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
   
   def show
@@ -51,8 +54,7 @@ class EventsController < ApplicationController
 
     respond_to do | format |
       if @event.save
-        deliver_request_publish_approval params[:sharing], @event
-        flash.now[:notice] = 'Event was successfully saved.' if flash.now[:notice].nil?
+        flash.now[:notice] = "#{t('event')} was successfully saved." if flash.now[:notice].nil?
         format.html { redirect_to @event }
       else
         @new = true
@@ -83,8 +85,7 @@ class EventsController < ApplicationController
 
     respond_to do | format |
       if @event.save
-        deliver_request_publish_approval params[:sharing], @event
-        flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
+        flash.now[:notice] = "#{t('event')} was updated successfully." if flash.now[:notice].nil?
         format.html { redirect_to @event }
       else
         @new = false
@@ -112,7 +113,7 @@ class EventsController < ApplicationController
   def check_events_enabled
     if !Seek::Config.events_enabled
       respond_to do |format|
-        flash[:error]="Events are currently disabled"
+        flash[:error]="#{t('event').pluralize} are currently disabled"
         format.html { redirect_to root_path }
       end
       return false

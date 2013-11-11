@@ -1,6 +1,6 @@
-# This extends the AnnotationAttribute model defined in the Annotations plugin.
+# This extends the AnnotationAttribute model defined in the Annotations gem.
 
-require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'models', 'text_value')
+require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','models','text_value')
 
 class TextValue < ActiveRecord::Base
 

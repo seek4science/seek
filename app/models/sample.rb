@@ -1,10 +1,11 @@
 require 'grouped_pagination'
-require 'acts_as_authorized'
+
 require "acts_as_scalable"
 class Sample < ActiveRecord::Base
  include Subscribable
 
   acts_as_scalable if Seek::Config.is_virtualliver
+  include Seek::Rdf::RdfGeneration
 
   acts_as_authorized
   acts_as_favouritable
@@ -25,7 +26,7 @@ class Sample < ActiveRecord::Base
 
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
-  has_many :assets,:through => :sample_assets
+
   has_many :sample_assets,:dependent => :destroy
  
    validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
@@ -38,22 +39,22 @@ class Sample < ActiveRecord::Base
   'INNER JOIN sample_sops ' +
   'ON sample_sops.sop_id = sop_versions.sop_id ' +
   'WHERE (sample_sops.sop_version = sop_versions.version ' +
-  'AND sample_sops.sample_id = #{self.id})'
+  "AND sample_sops.sample_id = #{self.id})"
   end
 
-  def self.asset_sql(asset_class)
+  def asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
     'SELECT ' + asset_class_underscored + '_versions.* FROM ' + asset_class_underscored + '_versions ' +
     'INNER JOIN sample_assets ' +
     'ON sample_assets.asset_id= '+ asset_class_underscored + '_id ' +
     'AND sample_assets.asset_type=\'' + asset_class + '\' ' +
     'WHERE (sample_assets.version= ' + asset_class_underscored + '_versions.version ' +
-    'AND sample_assets.sample_id= #{self.id})'
+    "AND sample_assets.sample_id= #{self.id})"
   end
 
-  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => self.asset_sql("DataFile")
-  has_many :models, :class_name => "Model::Version", :finder_sql => self.asset_sql("Model")
-  has_many :sops, :class_name => "Sop::Version", :finder_sql => self.asset_sql("Sop")
+  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
+  has_many :models, :class_name => "Model::Version", :finder_sql => Poc.new{self.asset_sql("Model")}
+  has_many :sops, :class_name => "Sop::Version", :finder_sql => Poc.new{self.asset_sql("Sop")}
 
   has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
   has_many :model_masters, :through => :sample_assets, :source => :asset, :source_type => 'Model'
@@ -68,7 +69,9 @@ class Sample < ActiveRecord::Base
   validates_presence_of :donation_date, :if => "Seek::Config.is_virtualliver"
 
 
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+ scope :default_order, order("title")
+
+ grouped_pagination
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 
@@ -84,7 +87,7 @@ class Sample < ActiveRecord::Base
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :searchable_terms
     text :creators do
-      creators.compact.map(&:name).join(' ')
+      creators.compact.map(&:name)
     end
   end if Seek::Config.solr_enabled
 
@@ -108,7 +111,7 @@ class Sample < ActiveRecord::Base
     text
   end
 
- def can_delete? *args
+ def state_allows_delete? *args
    assays.empty? && super
  end
 
@@ -175,7 +178,7 @@ class Sample < ActiveRecord::Base
  end
 
  def clone_with_associations
-   new_object= self.clone
+   new_object= self.dup
    new_object.policy = self.policy.deep_copy
    new_object.data_file_masters = self.data_file_masters.select(&:can_view?)
    new_object.model_masters = self.model_masters.select(&:can_view?)  
@@ -186,7 +189,7 @@ class Sample < ActiveRecord::Base
    return new_object
   end
 
-  def self.human_attribute_name(attribute)
+  def self.human_attribute_name(attribute, options = {})
     HUMANIZED_COLUMNS[attribute.to_sym] || super
   end
 
@@ -208,7 +211,7 @@ class Sample < ActiveRecord::Base
   end
 
   def specimen_info
-    specimen.nil? ? '' : Seek::Config.sample_parent_term.capitalize + ': ' + specimen.title
+    specimen.nil? ? '' : (I18n.t 'biosamples.sample_parent_term').capitalize + ': ' + specimen.title
   end
 
   def age_at_sampling_info

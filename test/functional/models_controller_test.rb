@@ -7,15 +7,17 @@ class ModelsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
   
   def setup
     login_as(:model_owner)
   end
 
   def rest_api_test_object
-    @object=Factory :model_2_files, :contributor=>User.current_user, :policy=>Factory(:private_policy)
+    @object=Factory :model_2_files, :contributor=>User.current_user, :policy=>Factory(:private_policy),:organism=>Factory(:organism)
+
   end
-  
+
   test "should get index" do
     get :index
     assert_response :success
@@ -130,7 +132,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, :page => "all"
     assert_response :success
-    assert_equal assigns(:models).sort_by(&:id), Model.authorized_partial_asset_collection(assigns(:models), "view", users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
+    assert_equal assigns(:models).sort_by(&:id), Model.authorize_asset_collection(assigns(:models), "view", users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
   end
 
   test "should contain only model assays " do
@@ -147,7 +149,7 @@ class ModelsControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select 'select#possible_assays' do
-      assert_select "option", :text=>/Select Assay .../,:count=>1
+      assert_select "option", :text=>/Select #{I18n.t('assays.assay')} .../,:count=>1
       assert_select "option", :text=>/Modelling Assay/,:count=>1
       assert_select "option", :text=>/Metabolomics Assay/,:count=>0
     end
@@ -158,9 +160,9 @@ class ModelsControllerTest < ActionController::TestCase
     get :new
     assert_response :success
 
-    assert_select 'div.foldTitle',:text=>/Modelling Analyses/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following Modelling Analyses are associated with this Model:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable Modelling Analysis to associate with this Model./
+    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
   end
 
   test "correct title and text for associating a modelling analysis for edit" do
@@ -169,9 +171,9 @@ class ModelsControllerTest < ActionController::TestCase
     get :edit, :id=>model.id
     assert_response :success
 
-    assert_select 'div.foldTitle',:text=>/Modelling Analyses/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following Modelling Analyses are associated with this Model:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable Modelling Analysis to associate with this Model./
+    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
   end
 
   test "fail gracefullly when trying to access a missing model" do
@@ -180,10 +182,19 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
   
-  test "should get new" do
+  test "should get new as non admin" do
     get :new    
     assert_response :success
-    assert_select "h1",:text=>"New Model"
+    assert_select "h1",:text=>"New #{I18n.t('model')}"
+
+    #non admins can't edit types
+    assert_select "span#delete_model_type_icon",:count=>0
+  end
+
+  test "should get new as admin" do
+    login_as(Factory(:admin).user)
+    get :new
+    assert_response :success
   end
 
   test "should get new populated from params" do
@@ -198,7 +209,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should correctly handle bad data url" do
-    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:projects=>[projects(:sysmo_project)]}
+    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :model => model, :sharing=>valid_sharing
@@ -361,6 +372,28 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
 
+  def test_missing_sharing_should_default_to_private
+    assert_difference('Model.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+      end
+    end
+    assert_redirected_to model_path(assigns(:model))
+    assert_equal users(:model_owner),assigns(:model).contributor
+    assert assigns(:model)
+    
+    model=assigns(:model)
+    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
+    assert_equal private_policy.sharing_scope,model.policy.sharing_scope
+    assert_equal private_policy.access_type,model.policy.access_type
+    assert_equal private_policy.use_whitelist,model.policy.use_whitelist
+    assert_equal private_policy.use_blacklist,model.policy.use_blacklist
+    assert model.policy.permissions.empty?
+    
+    #check it doesn't create an error when retrieving the index
+    get :index
+    assert_response :success    
+  end
   
   test "should create model with url" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
@@ -462,9 +495,9 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"1 item is associated with this Model:"
+      assert_select "p > strong",:text=>"1 item is associated with this #{I18n.t('model')}:"
       assert_select "ul.fileinfo_list" do
-        assert_select "li.fileinfo" do
+        assert_select "li.fileinfo_container" do
             assert_select "p > b",:text=>/Filename:/
             assert_select "p",:text=>/cronwright\.xml/
             assert_select "p > b",:text=>/Format:/
@@ -488,9 +521,9 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"2 items are associated with this Model:"
+      assert_select "p > strong",:text=>"2 items are associated with this #{I18n.t('model')}:"
       assert_select "ul.fileinfo_list" do
-        assert_select "li.fileinfo",:count=>2 do
+        assert_select "li.fileinfo_container",:count=>2 do
           assert_select "p > b",:text=>/Filename:/,:count=>2
           assert_select "p",:text=>/cronwright\.xml/
           assert_select "p",:text=>/rightfield\.xls/
@@ -512,7 +545,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select "p.import_details",:text=>/This Model was originally imported from/ do
+    assert_select "p.import_details",:text=>/This #{I18n.t('model')} was originally imported from/ do
       assert_select "strong",:text=>"Some place"
       assert_select "a[href=?][target='_blank']","http://somewhere/model.xml",:text=>"http://somewhere/model.xml"
     end
@@ -530,7 +563,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should get edit" do
     get :edit, :id => models(:teusink)
     assert_response :success
-    assert_select "h1",:text=>/Editing Model/
+    assert_select "h1",:text=>/Editing #{I18n.t('model')}/
   end
   
   test "publications included in form for model" do
@@ -568,176 +601,13 @@ class ModelsControllerTest < ActionController::TestCase
     assert_redirected_to models_path
   end
   
-  test "should add model type" do
-    login_as(:quentin)
-    assert_difference('ModelType.count',1) do
-      post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
-    end
-    
-    assert_response :success
-    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
-    
-  end
-  
-  test "should add model type as pal" do
-    login_as(:pal_user)
-    assert_difference('ModelType.count',1) do
-      post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
-    end
-    
-    assert_response :success
-    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
-    
-  end
-  
-  test "should not add model type as non pal" do
-    login_as(:aaron)
-    assert_no_difference('ModelType.count') do
-      post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
-    end
-    
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
-    
-  end
-  
-  test "should not add duplicate model type" do
-    login_as(:quentin)
-    m=model_types(:ODE)
-    assert_no_difference('ModelType.count') do
-      post :create_model_metadata, :attribute=>"model_type",:model_type=>m.title
-    end
-    
-  end
-  
-  test "should add model format" do
-    login_as(:quentin)
-    assert_difference('ModelFormat.count',1) do
-      post :create_model_metadata, :attribute=>"model_format",:model_format=>"fred"
-    end
-    
-    assert_response :success
-    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
-    
-  end
-  
-  test "should add model format as pal" do
-    login_as(:pal_user)
-    assert_difference('ModelFormat.count',1) do
-      post :create_model_metadata, :attribute=>"model_format",:model_format=>"fred"
-    end
-    
-    assert_response :success
-    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
-    
-  end
-  
-  test "should not add model format as non pal" do
-    login_as(:aaron)
-    assert_no_difference('ModelFormat.count') do
-      post :create_model_metadata, :attribute=>"model_format",:model_format=>"fred"
-    end
-    
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
-    
-  end
-  
-  test "should not add duplicate model format" do
-    login_as(:quentin)
-    m=model_formats(:SBML)
-    assert_no_difference('ModelFormat.count') do
-      post :create_model_metadata, :attribute=>"model_format",:model_format=>m.title
-    end
-    
-  end
-  
-  test "should update model format" do
-    login_as(:quentin)
-    m=model_formats(:SBML)
-    
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
-    
-    assert_no_difference('ModelFormat.count') do
-      put :update_model_metadata, :attribute=>"model_format",:updated_model_format=>"fred",:updated_model_format_id=>m.id
-    end
-    
-    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
-  end
-  
-  test "should update model format as pal" do
-    login_as(:pal_user)
-    m=model_formats(:SBML)
-    
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
-    
-    assert_no_difference('ModelFormat.count') do
-      put :update_model_metadata, :attribute=>"model_format",:updated_model_format=>"fred",:updated_model_format_id=>m.id
-    end
-    
-    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
-  end
-  
-  test "should not update model format as non pal" do
-    login_as(:aaron)
-    m=model_formats(:SBML)
-    
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
-    
-    assert_no_difference('ModelFormat.count') do
-      put :update_model_metadata, :attribute=>"model_format",:updated_model_format=>"fred",:updated_model_format_id=>m.id
-    end
-    
-    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
-  end
-  
-  test "should update model type" do
-    login_as(:quentin)
-    m=model_types(:ODE)
-    
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
-    
-    assert_no_difference('ModelFormat.count') do
-      put :update_model_metadata, :attribute=>"model_type",:updated_model_type=>"fred",:updated_model_type_id=>m.id
-    end
-    
-    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
-  end
-  
-  test "should update model type as pal" do
-    login_as(:pal_user)
-    m=model_types(:ODE)
-    
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
-    
-    assert_no_difference('ModelFormat.count') do
-      put :update_model_metadata, :attribute=>"model_type",:updated_model_type=>"fred",:updated_model_type_id=>m.id
-    end
-    
-    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
-  end
-  
-  test "should not update model type as non pal" do
-    login_as(:aaron)
-    m=model_types(:ODE)
-    
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
-    
-    assert_no_difference('ModelFormat.count') do
-      put :update_model_metadata, :attribute=>"model_type",:updated_model_type=>"fred",:updated_model_type_id=>m.id
-    end
-    
-    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
-  end
-  
   def test_should_show_version
     m = models(:model_with_format_and_type)
     m.save! #to force creation of initial version (fixtures don't include it)
-    # new version will not change description
-    #old_desc=m.description
-    #old_desc_regexp=Regexp.new(old_desc)
 
     #create new version
     post :new_version, :id=>m, :model=>{},:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
-    assert_redirected_to model_path(assigns(:m))
+    assert_redirected_to model_path(assigns(:model))
     m = Model.find(m.id)
     assert_equal 2, m.versions.size
     assert_equal 2, m.version
@@ -866,7 +736,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
-    model={ :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:projects=>[projects(:moses_project)]}
+    model={ :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:project_ids=>[projects(:moses_project).id]}
     post :create, :model => model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor
@@ -961,7 +831,7 @@ class ModelsControllerTest < ActionController::TestCase
     model=models(:teusink_with_project_without_gatekeeper)
     assert model.can_manage?,"The sop must be manageable for this test to succeed"
     post :publish,:id=>model
-    assert_response :success
+    assert_response :redirect
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
   end
@@ -971,23 +841,16 @@ class ModelsControllerTest < ActionController::TestCase
     model=models(:teusink_with_project_without_gatekeeper)
     assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
     post :publish,:id=>model
-    assert_redirected_to model
+    assert_redirected_to :root
     assert_not_nil flash[:error]
     assert_nil flash[:notice]
-  end
-
-  test "get preview_publish" do
-    model=models(:teusink_with_project_without_gatekeeper)
-    assert model.can_manage?,"The sop must be manageable for this test to succeed"
-    get :preview_publish, :id=>model
-    assert_response :success
   end
 
   test "removing an asset should not break show pages for items that have attribution relationships referencing it" do
     model = Factory :model, :contributor => User.current_user
     disable_authorization_checks do
       attribution = Factory :model
-      model.relationships.create :object => attribution, :predicate => Relationship::ATTRIBUTED_TO
+      model.relationships.create :other_object => attribution, :predicate => Relationship::ATTRIBUTED_TO
       model.save!
       attribution.destroy
     end
@@ -997,15 +860,6 @@ class ModelsControllerTest < ActionController::TestCase
 
     model.reload
     assert model.relationships.empty?
-  end
-
-  test "cannot get preview_publish when not manageable" do
-    login_as(:quentin)
-    model=models(:teusink_with_project_without_gatekeeper)
-    assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
-    get :preview_publish, :id=>model
-    assert_redirected_to model
-    assert flash[:error]
   end
 
   test "should set the other creators " do
@@ -1030,7 +884,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(model.contributor)
     get :show, :id=>model.id
     assert_response :success
-    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :text=>"Visualise Model with Cytoscape Web"
+    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :text=>"Visualise #{I18n.t('model')} with Cytoscape Web"
   end
 
   test "should not display cytoscape button for supported models" do
@@ -1054,7 +908,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(model.contributor)
       get :show, :id=>model.id
       assert_response :success
-      assert_select "a", :text => /Simulate Model on Sycamore/
+      assert_select "a", :text => /Simulate #{I18n.t('model')} on Sycamore/
     end
   end
 
@@ -1070,10 +924,10 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "should not submit_to_sycamore if sycamore is disable" do
     with_config_value :sycamore_enabled,false do
-    model = Factory :teusink_model
-    login_as(model.contributor)
-    post :submit_to_sycamore, :id => model.id, :version => model.version
-    assert @response.body.include?('Interaction with Sycamore is currently disabled')
+      model = Factory :teusink_model
+      login_as(model.contributor)
+      post :submit_to_sycamore, :id => model.id, :version => model.version
+      assert @response.body.include?('Interaction with Sycamore is currently disabled')
     end
   end
 
@@ -1084,7 +938,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert !model.can_download?
 
       post :submit_to_sycamore, :id => model.id, :version => model.version
-      assert @response.body.include?('You are not allowed to simulate this model with Sycamore')
+      assert @response.body.include?("You are not allowed to simulate this #{I18n.t('model')} with Sycamore")
     end
   end
 
@@ -1117,13 +971,83 @@ class ModelsControllerTest < ActionController::TestCase
     assert content_blobs.collect(&:original_filename).include?(retained_content_blob.original_filename)
   end
 
+  test "should display find matching data button for sbml model" do
+    with_config_value :solr_enabled,true do
+      m = Factory(:teusink_model)
+      login_as(m.contributor.user)
+      get :show,:id=>m
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
+    end
+  end
+
+  test "should display find matching data button for jws dat model" do
+    with_config_value :solr_enabled,true do
+      m = Factory(:teusink_jws_model)
+      login_as(m.contributor.user)
+      get :show,:id=>m
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
+    end
+  end
+
+  test "should not display find matching data button for non smbml or dat model" do
+    with_config_value :solr_enabled,true do
+      m = Factory(:non_sbml_xml_model)
+      login_as(m.contributor.user)
+      get :show,:id=>m
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
+    end
+  end
+
+  test "only show the matching data button for the latest version" do
+    m = Factory(:teusink_jws_model, :policy => Factory(:public_policy))
+
+    m.save_as_new_version
+    Factory(:teusink_jws_model_content_blob, :asset => m, :asset_version => m.version)
+    m.reload
+    login_as(m.contributor.user)
+    assert_equal 2,m.version
+    with_config_value :solr_enabled,true do
+      get :show,:id=>m,:version=>2
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('data_file').pluralize}/
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
+
+      get :show,:id=>m,:version=>1
+      assert_response :success
+      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:count=>0
+      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
+    end
+  end
+
+  test "should have -View content- button on the model containing one inline viewable file" do
+    one_file_model = Factory(:doc_model, :policy => Factory(:all_sysmo_downloadable_policy))
+    assert_equal 1, one_file_model.content_blobs.count
+    assert one_file_model.content_blobs.first.is_content_viewable?
+    get :show, :id => one_file_model.id
+    assert_response :success
+    assert_select 'a', :text => /View content/, :count => 1
+
+    multiple_files_model = Factory(:model,
+                                   :content_blobs => [Factory(:doc_content_blob), Factory(:content_blob)],
+                                   :policy => Factory(:all_sysmo_downloadable_policy))
+    assert_equal 2, multiple_files_model.content_blobs.count
+    assert multiple_files_model.content_blobs.first.is_content_viewable?
+    get :show, :id => multiple_files_model.id
+    assert_response :success
+    assert_select 'a', :text => /View content/, :count => 0
+  end
+
   def valid_model
-    { :title=>"Test",:projects=>[projects(:sysmo_project)]}
+    { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
   end
 
   def valid_model_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
-    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
+    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project_ids=>[projects(:sysmo_project).id]}
   end
   
 end

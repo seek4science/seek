@@ -5,6 +5,7 @@ class SamplesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
   # Called before every test method runs. Can be used
   # to set up fixture information.
 
@@ -72,7 +73,7 @@ class SamplesControllerTest < ActionController::TestCase
     specimen = Factory(:specimen, :contributor => User.current_user)
     assert_difference("Sample.count") do
       post :create, :sample => {:title => "test",
-                                :projects=>[Factory(:project)],
+                                :project_ids=>[Factory(:project).id],
                                 :lab_internal_number =>"Do232",
                                 :donation_date => Date.today,
                                 :specimen_id => specimen.id }, :sharing => valid_sharing
@@ -93,13 +94,13 @@ class SamplesControllerTest < ActionController::TestCase
         post :create,
             :sharing => valid_sharing,
             :specimen_sop_ids=>[sop.id],
-            :organism=>Factory(:organism),
+            :organism_id=>Factory(:organism).id,
             :creators=>[[creator.name,creator.id]].to_json,
             :specimen=>{:other_creators=>"jesus jones"},
             :sample => {
             :title => "test",
             :contributor=>User.current_user,
-            :projects=>[proj1,proj2],
+            :project_ids=>[proj1.id,proj2.id],
             :lab_internal_number =>"Do232",
             :donation_date => Date.today,
             :specimen_attributes => {:strain_id => Factory(:strain).id,
@@ -137,7 +138,8 @@ class SamplesControllerTest < ActionController::TestCase
                  :sample => {
                      :title => "test",
                      :contributor=>User.current_user,
-                     :projects=>[Factory(:project)],
+
+                     :project_ids=>[Factory(:project).id],
                      :lab_internal_number =>"Do232",
                      :donation_date => Date.today,
                      :specimen_attributes => {
@@ -164,11 +166,12 @@ class SamplesControllerTest < ActionController::TestCase
     new_phenotype_description = "new phenotype"
     assert_difference(["Sample.count","Specimen.count"]) do
           post :create,
-               :organism => Factory(:organism),
+               :organism_id => Factory(:organism).id,
                :sample => {
                    :title => "test",
-                   :contributor => User.current_user,
-                   :projects => [Factory(:project)],
+                   :contributor=>User.current_user,
+
+                   :project_ids => [Factory(:project).id],
                    :lab_internal_number => "Do232",
                    :donation_date => Date.today,
                    :specimen_attributes => {
@@ -255,7 +258,7 @@ class SamplesControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to samples_path
+    assert_redirected_to s
   end
 
   test "only current user can delete sample" do
@@ -268,16 +271,16 @@ class SamplesControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to samples_path
+    assert_redirected_to s
   end
 
   test "should not destroy sample related to an existing assay" do
-    s = Factory :sample, :assays => [Factory :experimental_assay], :contributor => Factory(:user)
+    s = Factory :sample, :assays => [Factory(:experimental_assay)], :contributor => Factory(:user)
     assert_no_difference("Sample.count") do
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to samples_path
+    assert_redirected_to s
   end
 
   test "should not show organism and strain information of a sample if there is no organism" do
@@ -297,7 +300,7 @@ class SamplesControllerTest < ActionController::TestCase
                                 :lab_internal_number =>"Do232",
                                 :donation_date => Date.today,
                                  :project_ids =>[Factory(:project).id],
-                                :specimen => Factory(:specimen, :contributor => User.current_user)},
+                                :specimen_id => Factory(:specimen, :contributor => User.current_user).id},
              :sharing => valid_sharing,
              :sample_data_file_ids => [Factory(:data_file,:title=>"testDF",:contributor=>User.current_user).id],
              :sample_model_ids => [Factory(:model,:title=>"testModel",:contributor=>User.current_user).id],
@@ -312,18 +315,22 @@ class SamplesControllerTest < ActionController::TestCase
 
 
 test "should show organism and strain information of a sample if there is organism" do
-    s = Factory :sample, :contributor => User.current_user
-    get :show, :id => s.id
+    specimen = Factory(:specimen, :contributor => User.current_user)
+    sample = Factory :sample, :specimen_id => specimen.id, :contributor => User.current_user
+    assert_equal true, sample.specimen.can_view?
 
+    get :show, :id => sample.id
     assert_response :success
     assert_not_nil assigns(:sample)
-    assert_select 'p a[href=?]', organism_path(s.specimen.strain.organism), :count => 1
+    assert_select 'p a[href=?]', organism_path(sample.specimen.strain.organism), :count => 2 # one in the related cell cuture
   end
 
   test 'should have specimen comment and gender fields in the specimen/sample show page' do
     as_not_virtualliver do
       s = Factory :sample, :contributor => User.current_user
       get :show, :id => s.id
+
+    get :show, :id => sample.id
       assert_response :success
       assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
     assert_select "label", :text => /Gender/, :count => 1
@@ -345,8 +352,11 @@ test "should show organism and strain information of a sample if there is organi
   end
 
   test 'should have sample Comment in the specimen/sample show page' do
-      s = Factory :sample, :contributor => User.current_user
-      get :show, :id => s.id
+      specimen = Factory(:specimen, :contributor => User.current_user)
+      sample = Factory :sample, :specimen_id => specimen.id, :contributor => User.current_user
+      assert_equal true, sample.specimen.can_view?
+
+      get :show, :id => sample.id
       assert_response :success
       assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
   end
@@ -401,7 +411,7 @@ test "should show organism and strain information of a sample if there is organi
   test "sample-sop association when sop has multiple versions" do
     sop = Factory :sop, :contributor => User.current_user
     sop_version_2 = Factory(:sop_version, :sop => sop)
-    assert 2, sop.versions.count
+    assert_equal 2, sop.versions.count
     assert_equal sop.latest_version, sop_version_2
 
     assert_difference("Sample.count") do
@@ -409,7 +419,7 @@ test "should show organism and strain information of a sample if there is organi
                                 :lab_internal_number => "Do232",
                                 :donation_date => Date.today,
                                 :project_ids => [Factory(:project).id],
-                                :specimen => Factory(:specimen, :contributor => User.current_user)},
+                                :specimen_id => Factory(:specimen, :contributor => User.current_user).id},
            :sample_sop_ids => [sop.id],
            :sharing => valid_sharing
 

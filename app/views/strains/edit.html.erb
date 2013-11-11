@@ -1,6 +1,6 @@
 <div class="show_basic" style="width:850px;">
   <h1>Edit Strain</h1>
-  <% form_for(@strain) do |f| %>
+  <%= form_for(@strain) do |f| %>
     <%= render :partial => "form", :locals => { :f => f, :action=>"edit"} -%>
   <% end %>
 </div>

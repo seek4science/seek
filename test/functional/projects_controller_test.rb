@@ -5,11 +5,12 @@ class ProjectsControllerTest < ActionController::TestCase
 
 	include AuthenticatedTestHelper
 	include RestTestCases
+  include RdfTestCases
 
 	fixtures :all
 
 	def setup
-		login_as(:quentin)
+		login_as(Factory(:admin).user)
   end
 
   def rest_api_test_object
@@ -18,7 +19,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def test_title
 		get :index
-		assert_select "title",:text=>/The Sysmo SEEK Projects.*/, :count=>1
+		assert_select "title",:text=>/The Sysmo SEEK #{I18n.t('project').pluralize}.*/, :count=>1
 	end
 
 	def test_should_get_index
@@ -217,7 +218,7 @@ test 'should get index for non-project member, should for non-login user' do
 	def test_user_can_edit_project
 		login_as(:can_edit)
 		get :show, :id=>projects(:three)
-		assert_select "a",:text=>/Edit Project/,:count=>1
+		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
 		get :edit, :id=>projects(:three)
 		assert_response :success
@@ -229,7 +230,7 @@ test 'should get index for non-project member, should for non-login user' do
 	def test_user_project_manager
 		login_as(:project_manager)
 		get :show, :id=>projects(:three)
-		assert_select "a",:text=>/Edit Project/,:count=>1
+		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
 		get :edit, :id=>projects(:three)
 		assert_response :success
@@ -241,7 +242,7 @@ test 'should get index for non-project member, should for non-login user' do
 	def test_user_cant_edit_project
 		login_as(:cant_edit)
 		get :show, :id=>projects(:three)
-		assert_select "a",:text=>/Edit Project/,:count=>0
+		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>0
 
 		get :edit, :id=>projects(:three)
 		assert_response :redirect
@@ -251,7 +252,7 @@ test 'should get index for non-project member, should for non-login user' do
 
 	def test_admin_can_edit
 		get :show, :id=>projects(:one)
-		assert_select "a",:text=>/Edit Project/,:count=>1
+		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
 		get :edit, :id=>projects(:one)
 		assert_response :success
@@ -264,7 +265,7 @@ test 'should get index for non-project member, should for non-login user' do
     user = Factory :user
     project = user.person.projects.first
     login_as(user)
-    sop = Factory :sop,:description=>"http://news.bbc.co.uk",:projects=>[project],:contributor=>user
+    sop = Factory :sop,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
     assert_response :success
 
@@ -279,7 +280,7 @@ test 'should get index for non-project member, should for non-login user' do
     user = Factory :user
     project = user.person.projects.first
     login_as(user)
-    df = Factory :data_file,:description=>"http://news.bbc.co.uk",:projects=>[project],:contributor=>user
+    df = Factory :data_file,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
     assert_response :success
     get :resource_in_tab, {:resource_ids => [df.id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
@@ -292,7 +293,7 @@ test 'should get index for non-project member, should for non-login user' do
     user = Factory :user
     project = user.person.projects.first
     login_as(user)
-    model = Factory :model,:description=>"http://news.bbc.co.uk",:projects=>[project],:contributor=>user
+    model = Factory :model,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
     get :resource_in_tab, {:resource_ids => [model.id].join(","), :resource_type => "Model", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     assert_select "div.list_item  div.list_item_desc" do
@@ -327,7 +328,7 @@ test 'should get index for non-project member, should for non-login user' do
     login_as project_manager.user
     get :show,:id=>project_manager.projects.first
 		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "label",:text=>"Project Managers:",:count=>1
+			assert_select "label",:text=>"#{I18n.t('project')} Managers:",:count=>1
 			assert_select "a",:count=>1
 			assert_select "a[href=?]",person_path(project_manager),:text=>project_manager.name,:count=>1
 		end
@@ -387,7 +388,7 @@ test 'should get index for non-project member, should for non-login user' do
 		assert_select "div.box_about_actor p.pals" do
 			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No PALs for this project",:count=>1
+			assert_select "span.none_text",:text=>"No PALs for this #{I18n.t('project')}",:count=>1
 		end
   end
 
@@ -400,7 +401,7 @@ test 'should get index for non-project member, should for non-login user' do
 		assert_select "div.box_about_actor p.asset_managers" do
 			assert_select "label",:text=>"Asset Managers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Asset Managers for this project",:count=>1
+			assert_select "span.none_text",:text=>"No Asset Managers for this #{I18n.t('project')}",:count=>1
 		end
   end
 
@@ -411,9 +412,9 @@ test 'should get index for non-project member, should for non-login user' do
     login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "label",:text=>"Project Managers:",:count=>1
+			assert_select "label",:text=>"#{I18n.t('project')} Managers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Project Managers for this project",:count=>1
+			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Managers for this #{I18n.t('project')}",:count=>1
 		end
 	end
 
@@ -426,7 +427,7 @@ test 'should get index for non-project member, should for non-login user' do
 		assert_select "div.box_about_actor p.gatekeepers" do
 			assert_select "label",:text=>"Gatekeepers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Gatekeepers for this project",:count=>1
+			assert_select "span.none_text",:text=>"No Gatekeepers for this #{I18n.t('project')}",:count=>1
 		end
 	end
 
@@ -465,7 +466,7 @@ test 'should get index for non-project member, should for non-login user' do
 		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>1
+				assert_select "a[href=?]",admin_project_path(project),:text=>/#{I18n.t('project')} administration/,:count=>1
 			end
 		end
 	end
@@ -500,7 +501,7 @@ test 'should get index for non-project member, should for non-login user' do
 
     get :show, :id => project
     assert_response :success
-    assert_select "a", :text => /Project administration/, :count => 1
+    assert_select "a", :text => /#{I18n.t('project')} administration/, :count => 1
 
     get :admin, :id => project
     assert_response :success
@@ -532,6 +533,24 @@ test 'should get index for non-project member, should for non-login user' do
     assert_not_nil flash[:error]
     a_project.reload
     assert !(a_project.institutions.include?new_institution)
+  end
+
+  test "jerm details not shown if disabled" do
+    project = Factory(:project)
+    with_config_value :jerm_enabled,false do
+      get :admin, :id=>project.id
+      assert_response :success
+      assert_select "div#details_for_jerm", :count=>0
+    end
+  end
+
+  test "jerm details shown is enabled" do
+    project = Factory(:project)
+    with_config_value :jerm_enabled,true do
+      get :admin, :id=>project.id
+      assert_response :success
+      assert_select "div#details_for_jerm", :count=>1
+    end
   end
 
   test 'project manager can only see the new institutions (which are not yet in any projects) and the institutions this project' do
@@ -610,20 +629,22 @@ test 'should get index for non-project member, should for non-login user' do
   end
 
   test 'project manager can not administer jerm detail' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    assert_nil project.site_root_uri
-    assert_nil project.site_username
-    assert_nil project.site_password
+    with_config_value :jerm_enabled,true do
+      project_manager = Factory(:project_manager)
+      project = project_manager.projects.first
+      assert_nil project.site_root_uri
+      assert_nil project.site_username
+      assert_nil project.site_password
 
-    login_as(project_manager.user)
-		put :update, :id => project.id, :project => {:site_root_uri => 'test', :site_username => 'test', :site_password => 'test'}
+      login_as(project_manager.user)
+      put :update, :id => project.id, :project => {:site_root_uri => 'test', :site_username => 'test', :site_password => 'test'}
 
-    project.reload
-    assert_redirected_to project
-		assert_nil project.site_root_uri
-    assert_nil project.site_username
-    assert_nil project.site_password
+      project.reload
+      assert_redirected_to project
+      assert_nil project.site_root_uri
+      assert_nil project.site_username
+      assert_nil project.site_password
+    end
   end
 
   test "unassign institution out of project" do
@@ -658,7 +679,7 @@ test 'should get index for non-project member, should for non-login user' do
                  :title=>"a data file",
                  :contributor=>User.current_user,
                  :policy=>Factory(:public_policy),
-                 :projects => [project]
+                 :project_ids => [project.id]
 
     login_as(Factory(:user))
     get :view_items_in_tab,{:resource_type=>"DataFile",:resource_ids=>[df.id].join(",")}

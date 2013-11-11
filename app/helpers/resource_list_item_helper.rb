@@ -19,7 +19,7 @@ module ResourceListItemHelper
     elsif resource.class.name.downcase=="event"
       ""
     else
-      "layouts/avatars"
+      "avatars/list_item_avatars"
     end
   end
 
@@ -55,9 +55,9 @@ module ResourceListItemHelper
       end
       html << "</div>"
     end
-    visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource.policy) : ""
+    visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ""
     result = result.gsub("#item_visibility",visibility)
-    result
+    result.html_safe
   end
 
   def list_item_tag_list resource
@@ -87,22 +87,24 @@ module ResourceListItemHelper
         html << value + (i == items.last ? "" : ", ")
       end
     end
-    return html + "</p>"
+    html = html + "</p>"
+    html.html_safe
   end
 
   def list_item_authorized_list *args
-   "<p class=\"list_item_attribute\">#{authorized_list *args}</p>"
+   "<p class=\"list_item_attribute\">#{authorized_list *args}</p>".html_safe
   end
 
   def list_item_attribute attribute, value, url=nil, url_options={}
     unless url.nil?
-      value = link_to value, url, url_options
+      value = link_to h(value), url, url_options
     end
-    return "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
+    html = "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
+    html.html_safe
   end
 
-  def list_item_authorized_attribute attribute, object, url='undefined', method = :title
-    url = object if url == 'undefined'
+  def list_item_authorized_attribute attribute, object, url=nil, method = :title
+    url = object if url.nil?
     not_authorized_text = object.try(:title_is_public?) ? object.title : "Not available"
     list_item_optional_attribute attribute, object.try(:can_view?) ? object.send(method) : nil, url, not_authorized_text
   end
@@ -115,7 +117,8 @@ module ResourceListItemHelper
         value = link_to value, url
       end
     end
-    return missing_value_text.nil? ? "" : "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
+    html = missing_value_text.nil? ? "" : "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
+    html.html_safe
   end
 
   def list_item_timestamp resource
@@ -124,24 +127,24 @@ module ResourceListItemHelper
       html << "&nbsp;&nbsp;&nbsp<b>Last updated:</b> " + date_as_string(resource.updated_at,true)
     end
     html << "</p>"
-    return html
+    return html.html_safe
   end
 
   def list_profile_registered_timestamp resource
     html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Registered:</b> <label>" + (resource.try(:user).try(:created_at).nil? ? "Not yet registered" : date_as_string(resource.try(:user).try(:created_at)))
     html << "</label></p>"
-    return html
+    return html.html_safe
   end
 
   def list_item_description text, auto_link=true, length=500
-    html = "<div class=\"list_item_desc\">"
+    html = "<div class='list_item_desc curved'>"
     html << text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
     html << "</div>"
-    return html
+    html.html_safe
   end
 
   def list_item_contributor resource
-    return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{jerm_harvester_name}</p>" if resource.contributor.nil?
+    return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{jerm_harvester_name}</p>".html_safe if resource.contributor.nil?
     list_item_authorized_attribute 'Uploader', resource.contributor.person
   end
 
@@ -153,6 +156,7 @@ module ResourceListItemHelper
       html = (attribute ? "<p class=\"list_item_attribute\"><b>#{attribute}</b>:</p>" : "") + "<div class=\"list_item_desc\">"
       html << trunc_text
       html << "</div>"
+      html.html_safe
     else
       html = "<script type=\"text/javascript\">\n"
       html << "fullResourceListItemExpandableText[#{text.object_id}] = '#{escape_javascript(full_text)}';\n"
@@ -165,31 +169,43 @@ module ResourceListItemHelper
       html << trunc_text
       html << "</div>"
       html << "</div>"
+      html.html_safe
     end
   end
 
-  def list_item_visibility policy
+  def list_item_visibility item,css_class="visibility_icon"
     title = ""
     html  = ""
+    policy = item.policy
+
     case policy.sharing_scope
-      when 0
-        title = "Private"
-        html << image('lock', :title=>title, :class => "visibility_icon")
-      when 1
-        title = "Custom Policy"
-        html << image('manage', :title=>title, :class => "visibility_icon")
-      when 2
-        title = "Visible to all #{Seek::Config.project_name} projects"
-        html << image('open', :title=>title, :class => "visibility_icon")
-      when 3
-        title = "Visible to all registered users"
-        html << image('open', :title=>title, :class => "visibility_icon")
-      when 4
-        title = "Visible to everyone"
-        html << image('world', :title=>title, :class => "visibility_icon")
+      when Policy::PRIVATE
+        if policy.permissions.empty?
+          title = "Private"
+          html << image('lock', :title=>title, :class => css_class)
+        else
+          title = "Custom policy"
+          html << image('manage', :title=>title, :class => css_class)
+        end
+      when Policy::ALL_SYSMO_USERS
+        if policy.access_type > 0
+          title = "Visible to all #{Seek::Config.project_name} #{t('project').pluralize}"
+          html << image('open', :title=>title, :class => css_class)
+        else
+          title = "Visible to the #{t('project').pluralize} associated with this item"
+          html << image('open', :title=>title, :class => css_class)
+        end
+      when Policy::EVERYONE
+        if !item.is_downloadable? || (item.is_downloadable? && policy.access_type >= Policy::ACCESSIBLE)
+          title = "Was published"
+          html << image('world', :title=>title, :class => css_class)
+        else
+          title = "Visible to everyone, but not accessible"
+          html << image('partial_world', :title=>title, :class => css_class)
+        end
     end
     html << ""
-    html
+    html.html_safe
   end
 
 end

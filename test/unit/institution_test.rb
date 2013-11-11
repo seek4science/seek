@@ -18,7 +18,17 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_ordered_by_name
-    assert Institution.find(:all).sort_by {|i| i.name.downcase} == Institution.find(:all) || Institution.all.sort_by {|i|i.name} == Institution.all
+    assert Institution.find(:all).sort_by {|i| i.name.downcase} == Institution.default_order || Institution.all.sort_by {|i|i.name} == Institution.default_order
+  end
+
+  test "to_rdf" do
+    object = Factory :institution
+    rdf = object.to_rdf
+
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count >= 1
+      assert_equal RDF::URI.new("http://localhost:3000/institutions/#{object.id}"), reader.statements.first.subject
+    end
   end
 
   def test_avatar_key

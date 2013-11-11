@@ -47,12 +47,12 @@ class UsersController < ApplicationController
     if logged_in? && !current_user.active?
       current_user.activate      
       if (current_user.person.projects.empty? && User.count>1)
-        Mailer.deliver_welcome_no_projects current_user, base_host      
+        Mailer.welcome_no_projects(current_user, base_host).deliver
         logout_user
         flash[:notice] = "Signup complete! However, you will need to wait for an administrator to associate you with your project(s) before you can login."        
         redirect_to new_session_path
       else
-        Mailer.deliver_welcome current_user, base_host      
+        Mailer.welcome(current_user, base_host).deliver
         flash[:notice] = "Signup complete!"
         redirect_to current_user.person
       end
@@ -101,7 +101,7 @@ class UsersController < ApplicationController
           user.reset_password_code_until = 1.day.from_now
           user.reset_password_code =  Digest::SHA1.hexdigest( "#{user.email}#{Time.now.to_s.split(//).sort_by {rand}.join}" )
           user.save!
-          Mailer.deliver_forgot_password(user, base_host)
+          Mailer.forgot_password(user, base_host).deliver
           flash[:notice] = "Instructions on how to reset your password have been sent to #{user.person.email}"
           format.html { render :action => "forgot_password" }
         else
@@ -116,15 +116,19 @@ class UsersController < ApplicationController
   
   def edit
     @user = User.find(params[:id])
-    render :action=>:edit, :layout=>"main"
+    render :action=>:edit
   end
   
   def update    
     @user = User.find(params[:id])
-    
-    person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?        
-    
+    person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?
     @user.person=person if !person.nil?
+
+    if params[:user]
+      [:id, :person_id].each do |column_name|
+        params[:user].delete(column_name)
+      end
+    end
     
     @user.attributes=params[:user]    
 
@@ -133,7 +137,7 @@ class UsersController < ApplicationController
       if @user.save
         #user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
-          Mailer.deliver_signup(@user,base_host)
+          Mailer.signup(@user,base_host).deliver
           flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
           logout_user
           format.html { redirect_to :action=>"activation_required" }
@@ -158,7 +162,7 @@ class UsersController < ApplicationController
       self.current_user = user
     end
     
-    redirect_to :controller => 'home', :action => 'index'
+    redirect_to :controller => 'homes', :action => 'index'
   end
 
   def hide_guide_box

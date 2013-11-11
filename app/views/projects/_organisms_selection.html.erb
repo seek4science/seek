@@ -7,7 +7,7 @@
           <td>
             <div id="assay_list_collection">
               <%= f.label :available_organisms %><br/>
-              <%= select_tag :possible_organisms,options_for_select( Organism.find(:all,:order=>:title).collect{|d| [h("#{d.title}"),d.id]} ),:style => "width: 15em;" %>
+              <%= select_tag :possible_organisms,options_for_select( Organism.order(:title).collect{|d| [h("#{d.title}"),d.id]} ),:style => "width: 15em;" %>
               <b><%= link_to_function "Add","addSelectedOrganism(); return(false);" %></b>
             </div>
           </td>

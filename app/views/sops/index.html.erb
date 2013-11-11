@@ -1,17 +1,17 @@
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_sop_path, "Upload a SOP", nil, "Upload a SOP" %></li>
+        <li><%= image_tag_for_key "new", new_sop_path, "Upload a #{t('sop')}", nil, "Upload a #{t('sop')}" %></li>
         <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
     </ul>
 <% end %>
 
-<% if @sops.public_methods.include?("page_totals") %>
+<% if @sops.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @sops.pages, :page_totals=>@sops.page_totals,:current_page=>@sops.page } -%>
+  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @sops.pages, :page_totals=>@sops.page_totals,:current_page=>@sops.page } -%>
 <% end %>
 
 <%= render :partial => "assets/resource_list", :locals => { :collection => @sops, :authorization_for_showing_already_done=>true } %>
 
-<% if @sops.page == "latest" && Sop.find(:all).length > Seek::Config.limit_latest%>
-    <%= render :partial => "layouts/paginate_see_all"%>
+<% if @sops.page == "latest" && Sop.count > Seek::Config.limit_latest%>
+    <%= render :partial => "general/paginate_see_all"%>
 <% end %>

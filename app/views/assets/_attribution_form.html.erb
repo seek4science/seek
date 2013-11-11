@@ -10,13 +10,13 @@
 <%= hidden_field_tag "attributions", "" -%>
 
 <% case resource_type.downcase; when "sop" -%>
-  <% resource_type_attributed_to_types = "SOPs" -%>
+  <% resource_type_attributed_to_types = t('sop').pluralize -%>
   <% when "model" -%>
-  <% resource_type_attributed_to_types = "Models" -%>
+  <% resource_type_attributed_to_types = t('model').pluralize -%>
   <% when "datafile" -%>
-  <% resource_type_attributed_to_types = "Data files" -%>
+  <% resource_type_attributed_to_types = t('data_file').pluralize -%>
   <% when "presentation" -%>
-  <% resource_type_attributed_to_types = "Presentations" -%>
+  <% resource_type_attributed_to_types = t('presentation').pluralize -%>
 <% else -%>
   <% resource_type_attributed_to_types = "THIS MUST BE A NEW TYPE OF RESOURCE FOR WHICH ATTRIBUTIONS ARE INTRODUCED - ADD IT HERE" -%>
 <% end -%>
@@ -71,7 +71,7 @@
 	  
 
       <script type="text/javascript">
-        var suggestion_list = <%= attribution_suggestions -%>;
+        var suggestion_list = <%= attribution_suggestions.html_safe  -%>;
         var prepopulate_with = [];
 
         var attributions_autocompleter = new Autocompleter.LocalAdvanced(

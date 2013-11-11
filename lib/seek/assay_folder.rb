@@ -11,7 +11,7 @@ module Seek
       end
 
     def initialize assay,project
-      raise Exception.new("Project does not match those related to the assay") unless assay.projects.include?(project)
+      raise Exception.new("#{t('project')} does not match those related to the #{t('assays.assay').downcase}") unless assay.projects.include?(project)
       @assay = assay
       @project = project
       @parent=nil
@@ -53,7 +53,7 @@ module Seek
       assets = Array(assets)
       assets.each do |asset|
         if asset.is_a?(Publication)
-          Relationship.create :subject=>assay,:object=>asset,:predicate=>Relationship::RELATED_TO_PUBLICATION
+          Relationship.create :subject=>assay,:other_object=>asset,:predicate=>Relationship::RELATED_TO_PUBLICATION
         else
           assay.relate(asset)
         end
@@ -67,7 +67,7 @@ module Seek
         aa.destroy if assets.include?(aa.asset)
       end
       assay.relationships.each do |rel|
-        rel.destroy if assets.include?(rel.object)
+        rel.destroy if assets.include?(rel.other_object)
       end
     end
 

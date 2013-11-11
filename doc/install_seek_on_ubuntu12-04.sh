@@ -6,7 +6,7 @@
 
 SEEK_PATH="/home/$(whoami)" 
 SEEK_DIRECTORY="seek"
-REPOSITORY="https://sysmo-db.googlecode.com/hg/ -r v0.16.0"
+REPOSITORY="https://bitbucket.org/seek4science/seek -r v0.17.1"
 
 txtgrn=$(tput setaf 2) # Green
 txtrst=$(tput sgr0) # Text reset
@@ -21,6 +21,7 @@ echo "${txtgrn} Installing prequisites ${txtrst}"
 sudo apt-get update
 sudo apt-get install wget git mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
 sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
+sudo apt-get install poppler-utils libreoffice
 
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Installing rubygems ${txtrst}"
@@ -50,12 +51,15 @@ fi
 
 echo "${txtgrn} *********************************** ${txtrst}"
 echo "${txtgrn} Cloning SEEK from $REPOSITORY ${txtrst}"
-sudo hg clone "$REPOSITORY" "$SEEK_DIRECTORY"
+sudo hg clone $REPOSITORY $SEEK_DIRECTORY
 
 sudo chown -R $(whoami):$(whoami) $SEEK_PATH/$SEEK_DIRECTORY
 
 sudo gem install -d bundler rake
-sudo chown -R $(whoami):$(whoami) /home/$(whoami)/.gem
+
+if [ -d /home/$(whoami)/.gem ]; then
+    sudo chown -R $(whoami):$(whoami) /home/$(whoami)/.gem
+fi
 
 cd "$SEEK_DIRECTORY"
 bundle install

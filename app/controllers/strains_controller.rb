@@ -5,7 +5,10 @@ class StrainsController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
 
   before_filter :get_strains_for_organism,:only=>[:existing_strains_for_assay_organism]
-  include Seek::Publishing
+
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
 
   def new
@@ -17,7 +20,6 @@ class StrainsController < ApplicationController
     @strain.policy.set_attributes_with_sharing params[:sharing], @strain.projects
     update_annotations @strain
     if @strain.save
-      deliver_request_publish_approval params[:sharing], @strain
       respond_to do |format|
         flash[:notice] = 'Strain was successfully created.'
         format.html { redirect_to(@strain) }
@@ -31,6 +33,14 @@ class StrainsController < ApplicationController
     end
   end
 
+  def show
+    respond_to do |format|
+      format.rdf { render :template=>'rdf/show'}
+      format.xml
+      format.html
+    end
+  end
+
   def update
     update_annotations @strain
     if params[:sharing]
@@ -38,7 +48,6 @@ class StrainsController < ApplicationController
     end
     @strain.attributes = params[:strain]
     if @strain.save
-      deliver_request_publish_approval params[:sharing], @strain
       respond_to do |format|
         flash[:notice] = 'Strain was successfully updated.'
         format.html { redirect_to(@strain) }

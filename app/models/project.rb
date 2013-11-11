@@ -4,16 +4,18 @@ require 'title_trimmer'
 
 class Project < ActiveRecord::Base
 
+  include Seek::Rdf::RdfGeneration
+  include Seek::Rdf::ReactToAssociatedChange
+
   acts_as_yellow_pages
   include SimpleCrypt
 
 
   title_trimmer
-  
-  validates_uniqueness_of :name
 
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize) #shouldn't need "Other" tab for project
-  
+  scope :default_order, order('name')
+
+  validates_uniqueness_of :name
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
@@ -63,7 +65,7 @@ class Project < ActiveRecord::Base
   alias_attribute :webpage, :web_page
   alias_attribute :internal_webpage, :wiki_page
 
-  has_and_belongs_to_many :organisms
+  has_and_belongs_to_many :organisms, :before_add=>:update_rdf_on_associated_change, :before_remove=>:update_rdf_on_associated_change
   has_many :project_subscriptions,:dependent => :destroy
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
@@ -144,14 +146,14 @@ class Project < ActiveRecord::Base
 
   # Returns a list of projects that contain people that do not have users assigned to them
   def self.with_userless_people
-    p=Project.find(:all, :include=>:work_groups)
+    p=Project.all(:include=>:work_groups)
     return p.select { |proj| proj.includes_userless_people? }
   end
   
   
   # get a listing of institutions for this project
   def get_institutions_listing
-    workgroups_for_project = WorkGroup.find(:all, :conditions => {:project_id => self.id})
+    workgroups_for_project = WorkGroup.where(:project_id => self.id)
     return workgroups_for_project.collect { |w| [w.institution.name, w.institution.id, w.id] }
   end
 
@@ -162,13 +164,15 @@ class Project < ActiveRecord::Base
   def set_credentials
     unless site_username.nil? && site_password.nil?
       cred={:username=>site_username,:password=>site_password}
-      self.site_credentials=encrypt(cred,generate_key(GLOBAL_PASSPHRASE))
+      cred=encrypt(cred,generate_key(GLOBAL_PASSPHRASE))
+      self.site_credentials=Base64.encode64(cred).encode('utf-8')
     end
   end
 
   def decrypt_credentials
     begin
-      cred=decrypt(site_credentials,generate_key(GLOBAL_PASSPHRASE))
+      decoded = Base64.decode64 site_credentials
+      cred=decrypt(decoded,generate_key(GLOBAL_PASSPHRASE))
       self.site_password=cred[:password]
       self.site_username=cred[:username]
     rescue

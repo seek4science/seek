@@ -1,5 +1,5 @@
 require 'libxml'
-require 'fastercsv'
+require 'csv'
 require 'simple-spreadsheet-extractor'
 require 'open-uri'
 
@@ -7,8 +7,8 @@ class DataFuseController < ApplicationController
   include Seek::MimeTypes
   include Seek::Models::ModelExtraction
   include SysMODB::SpreadsheetExtractor
-  include Seek::JWS::DataFuse
-  
+  include Seek::JWS::DataFuseMethods
+
   before_filter :login_required
   before_filter :is_user_admin_auth
 
@@ -26,7 +26,7 @@ class DataFuseController < ApplicationController
       if data_file.try :can_download?
         page.replace_html element, :partial=>"data_fuse/csv_view", :locals=>{:csv=>csv}
       else
-        page.replace_html element, :text=>"Data File not found, or not authorized to examine"
+        page.replace_html element, :text=>"#{t('data_file')} not found, or not authorized to examine"
       end
     end
 
@@ -92,7 +92,7 @@ class DataFuseController < ApplicationController
     raise Exception.new("Unauthorized") unless @model.can_download?
 
     resolve_model_parameter_keys parameter_keys,csv
-    
+
   end
 
   def submit
@@ -135,7 +135,7 @@ class DataFuseController < ApplicationController
 
         page.replace_html element, :partial=>"data_fuse/parameter_keys", :locals=>{:keys=>ps}
       else
-        page.replace_html element, :text=>"Model not found, or not authorized to examine"
+        page.replace_html element, :text=>"#{t('model')} not found, or not authorized to examine"
       end
     end
   end
@@ -154,7 +154,7 @@ class DataFuseController < ApplicationController
     matched_keys = []
     matching_csv = []
 
-    FasterCSV.parse(csv).each do |row|
+    CSV.parse(csv).each do |row|
       matched_row = []
       row.each_with_index do |v, i|
         if matching_columns[i]
@@ -170,7 +170,7 @@ class DataFuseController < ApplicationController
       matching_csv << matched_row unless matched_row.empty?
     end
 
-    result = FasterCSV.generate do |out|
+    result = CSV.generate do |out|
       matching_csv.each do |row|
         out << row
       end

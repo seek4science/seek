@@ -10,10 +10,10 @@
 
 <div style="margin: 2em">
   <div style="float:left; width: 48%">
-    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Attachments (<span id='attachments_count'>#{@help_document.attachments.size}</span>)", :partial => 'attachments'} %>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Attachments (<span id='attachments_count'>#{@help_document.attachments.size}</span>)".html_safe, :partial => 'attachments'} %>
   </div>
   <div style="float:right; width: 51%">
-    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Images (<span id='images_count'>#{@help_document.images.size}</span>)", :partial => 'images'} %>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Images (<span id='images_count'>#{@help_document.images.size}</span>)".html_safe, :partial => 'images'} %>
   </div>
   <br style="clear:both"/>
 </div>

@@ -92,8 +92,8 @@ class BioSamplesControllerTest < ActionController::TestCase
     get :existing_samples, :specimen_ids => specimen_ids
     assert_response :success
     assert_select "table#sample_table tbody" do
-      assert_select 'tr td', :text => Seek::Config.sample_parent_term.capitalize + ': ' + specimen1.title, :count => samples_of_specimen1.length
-      assert_select 'tr td', :text => Seek::Config.sample_parent_term.capitalize + ': ' + specimen2.title, :count => samples_of_specimen2.length
+      assert_select 'tr td', :text => (I18n.t 'biosamples.sample_parent_term').capitalize + ': ' + specimen1.title, :count => samples_of_specimen1.length
+      assert_select 'tr td', :text => (I18n.t 'biosamples.sample_parent_term').capitalize + ': ' + specimen2.title, :count => samples_of_specimen2.length
       samples.each do |sample|
         assert_select 'tr td', :text => sample.id, :count => 1
       end
@@ -103,7 +103,7 @@ class BioSamplesControllerTest < ActionController::TestCase
 
   test 'should create strain with name and organism' do
     organism = organisms(:yeast)
-    strain = {:title => 'test', :organism => organism, :project_ids => [Factory(:project).id]}
+    strain = {:title => 'test', :organism_id => organism.id, :project_ids => [Factory(:project).id]}
     assert_difference ('Strain.count') do
       post :create_strain, :strain => strain
     end
@@ -113,7 +113,7 @@ class BioSamplesControllerTest < ActionController::TestCase
   test 'should not be able to create strain without login' do
     logout
     organism = organisms(:yeast)
-    strain = {:title => 'test', :organism => organism}
+    strain = {:title => 'test', :organism_id => organism.id}
     assert_no_difference ('Strain.count') do
       post :create_strain, :strain => strain
     end
@@ -132,7 +132,7 @@ class BioSamplesControllerTest < ActionController::TestCase
     xml_http_request(:get, :strains_of_selected_organism, {:organism_id => organism.id})
 
     received_data = ActiveSupport::JSON.decode(@response.body)
-    assert 200, received_data['status']
+    assert_equal 200, received_data['status']
     received_strains = received_data["strains"]
     assert_equal 3, received_strains.count
     assert received_strains.include?([new_strain.id, new_strain.info])
@@ -169,30 +169,6 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_select "table#strain_table tbody tr td", :text => 'default', :count => 0
     assert_select "table#strain_table tbody tr td", :text => 'TRS99', :count => 1
     assert_select "table#strain_table tbody tr td", :text => 'ZX81', :count => 1
-  end
-
-  test 'should not allow to create specimen_sample which associates with the un-viewable strain' do
-    assert_no_difference("Sample.count") do
-      assert_no_difference("Specimen.count") do
-        post :create_specimen_sample, :sample => {:title => "test",
-                                                  :projects => [Factory(:project)],
-                                                  :lab_internal_number => "Do232"},
-             :specimen => {:title => 'test',
-                           :lab_internal_number => 'lab123',
-                           :strain => Factory(:strain, :policy => Factory(:private_policy))
-             }
-      end
-    end
-  end
-
-  test 'should not allow to create sample which associates with the un-viewable specimen' do
-      assert_no_difference("Sample.count") do
-        post :create_specimen_sample, :sample => {:title => "test",
-                                                  :projects => [Factory(:project)],
-                                                  :lab_internal_number => "Do232"},
-             :specimen => Factory(:specimen, :policy => Factory(:private_policy))
-
-      end
   end
 
   test "should update strain" do

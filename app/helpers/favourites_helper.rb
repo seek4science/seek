@@ -9,11 +9,11 @@ module FavouritesHelper
     end
 
     uuid=UUIDTools::UUID.random_create.to_s.split("-")[0..2].join
-    return "drag_#{model_name}_#{object.id.to_s}_#{version}_#{uuid}"
+    return "drag_#{model_name}_#{object.id.to_s}_#{version}_#{uuid}".html_safe
   end
 
   def fav_line_tag favourite
-    fav_image_tag(favourite) + "<span class='fav_title'>#{h(favourite.resource.title)}</span>"
+    fav_image_tag(favourite) + "<span class='fav_title'>#{h(favourite.resource.title)}</span>".html_safe
   end
   
   def fav_image_tag favourite
@@ -48,7 +48,7 @@ module FavouritesHelper
 
     html = link_to_draggable(html, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(item)))
     html = "<div class='favouritable_icon'>#{html}</div>"
-    return html
+    html.html_safe
   end 
   
   private

@@ -20,7 +20,7 @@
          label = "View content"
        end
     %>
-    <%= li_start %>
+        <%= li_start.html_safe %>
     <% if is_inline_viewable %>
         <% if content_blob.is_image? %>
             <%#param code is used for temporary link %>
@@ -38,7 +38,7 @@
                "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(" , ") %>
         <span class='disabled_icon disabled' onclick='javascript:alert("<%=explanation%>")' title='<%= tooltip_title_attrib(explanation) %>' > <%=  image('show', {:alt=>"View Content",:class=>"disabled"}) %>  View Content </span>
     <% end %>
-    <%= li_end %>
+    <%= li_end.html_safe %>
 <% end %>
 
 <script type="text/javascript">

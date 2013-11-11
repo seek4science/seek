@@ -1,10 +1,10 @@
-require 'fastercsv'
+require 'csv'
 
 module DataFuseHelper
 
   def csv_to_google_data csv
     res = ""
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows.each_with_index do |row,i|
       if i==0
         type='string'
@@ -22,16 +22,16 @@ module DataFuseHelper
       end
 
     end
-    res
+    res.html_safe
   end
 
   def tsv_to_flot_data tsv
-    rows = FasterCSV.parse(tsv,:col_sep=>"\t")
+    rows = CSV.parse(tsv,:col_sep=>"\t")
     rows_to_flot_data(rows)
   end
 
   def csv_to_flot_data csv
-    rows = FasterCSV.parse(csv)
+    rows = CSV.parse(csv)
     rows_to_flot_data(rows)
   end
 

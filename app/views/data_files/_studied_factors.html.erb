@@ -15,7 +15,7 @@
         <%= render :partial=>"studied_factors/condition_or_factor_row",:collection=>@display_data_file.studied_factors, :locals=>{:asset => 'data_file', :show_delete=>false} %>
       </ul>
     <% else -%>
-      <span class="none_text">No factors studied for this Data file.</span>
+      <span class="none_text">No factors studied for this <%= t('data_file') %>.</span>
     <% end -%>
   </div>
 

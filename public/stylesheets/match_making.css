@@ -1,20 +1,20 @@
-ul.matching_data_items {
-    margin-top: 1em;
-    margin-right: 2em;
+div.matching_items {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-right: 1em;
+    margin-left: 1em;
     width: auto;
 }
 
-li.matching_data_item {
+div.matching_item {
     background-color: #efefef;
     border: #999 1px solid;
-    padding-left: 1em;
-    margin-top: 1em;
-    width: 100%;
-    padding-top: 0.5em;
-    padding-bottom: 0.75em;
+    margin-top: 6px;
+    width: 97%;
+    padding: 0.5em 1em 0.75em;
 }
 
-li.matching_data_item ul.plots li.plot {
+div.matching_item ul.plots li.plot {
     background-color: white;
     border: #999 1px solid;
 }
@@ -23,10 +23,6 @@ li.matching_data_item ul.plots li.plot {
     font-size: smaller;
     color: #444;
     margin-left: 2em;
-}
-
-.description {
-    width: 90%;
 }
 
 ul.plots li.plot {

@@ -37,16 +37,16 @@ module TagsHelper
     tags.map do |t|
       divider=tags.last==t ? "" : "<span class='spacer'>,</span> ".html_safe
       link_for_ann(t,options)+divider
-    end
+    end.join("").html_safe
   end
 
   #defines the tag box, with AJAX tag entry and removal
   def item_tags_and_tag_entry
     #only show the tag box if a user is logged in
     return unless current_user
-    %!<div id="tags_box" class="contribution_section_box">
+    %!<div id="tags_box" class="contribution_section_box curved with_shadow">
       #{render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..."}
-    </div>!
+    </div>!.html_safe
   end
 
 end

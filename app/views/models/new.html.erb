@@ -1,7 +1,7 @@
 <%= javascript_include_tag "sharing.js","models.js", "assays.js","attribution.js","resource.js" -%>
-<h1>New Model</h1>
+<h1>New <%= t('model') %></h1>
 <div class="show_basic">
-    <% form_tag({:action => :create}, :multipart => true) do -%>
+    <%= form_tag({:action => :create}, :multipart => true) do -%>
     <div class="asset_form">
         <%= error_messages_for :model -%>
         <%= render :partial => "form_import_details" -%>
@@ -20,18 +20,13 @@
             <%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
 
-      <p>
-            <div class="fold">
-                <div class="foldTitle">
-                    Other information 
-                </div>
-                <div class="foldContent">
+        <p>
+
+
                   <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => true } -%>
                     <%= render :partial=>"model_metadata" -%>
-                </div>
-            </div>
-        </p>
 
+        </p>
 
         <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
           <p>
@@ -42,7 +37,7 @@
        
 
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
-        <%= fields_for(@model) {|f| f.fancy_multiselect :samples}  -%>
+        <%= fields_for(@model) {|f| f.fancy_multiselect (:samples, {:hidden=> @model.samples.blank?  ? true : false, :other_projects_checkbox => true}) }-%>
 
         <p>
           <%= preview_permission_popup_link(@model)-%>

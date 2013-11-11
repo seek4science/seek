@@ -4,7 +4,7 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
-<title>INSTALL - Sysmo-SEEK Technical and API Documentation</title>
+<title>INSTALL - SEEK Technical Guide</title>
 
 <link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
 
@@ -49,15 +49,31 @@
 
   <ul>
   
+    <li class="file"><a href="../doc/ADMINISTRATION.html">ADMINISTRATION</a>
+  
     <li class="file"><a href="../doc/BACKUPS.html">BACKUPS</a>
+  
+    <li class="file"><a href="../doc/CONTACTING_US.html">CONTACTING_US</a>
+  
+    <li class="file"><a href="../doc/CONTRIBUTING_TO_SEEK.html">CONTRIBUTING_TO_SEEK</a>
   
     <li class="file"><a href="../doc/CREDITS.html">CREDITS</a>
   
+    <li class="file"><a href="../doc/EARLIER-UPGRADES.html">EARLIER-UPGRADES</a>
+  
     <li class="file"><a href="../doc/INSTALL.html">INSTALL</a>
   
-    <li class="file"><a href="../doc/README_FOR_APP.html">README_FOR_APP</a>
+    <li class="file"><a href="../doc/INSTALL-PRODUCTION.html">INSTALL-PRODUCTION</a>
+  
+    <li class="file"><a href="../doc/OTHER-DISTRIBUTIONS.html">OTHER-DISTRIBUTIONS</a>
+  
+    <li class="file"><a href="../doc/README.html">README</a>
+  
+    <li class="file"><a href="../doc/SETTING-UP-VIRTUOSO.html">SETTING-UP-VIRTUOSO</a>
   
     <li class="file"><a href="../doc/UPGRADING.html">UPGRADING</a>
+  
+    <li class="file"><a href="../doc/UPGRADING-TO-0-18.html">UPGRADING-TO-0-18</a>
   
   </ul>
 </nav>
@@ -66,6 +82,22 @@
   <h3 class="section-header">Class and Module Index</h3>
 
   <ul class="link-list">
+  
+    <li><a href="../Seek.html">Seek</a>
+  
+    <li><a href="../Seek/Rdf.html">Seek::Rdf</a>
+  
+    <li><a href="../Seek/Rdf/RdfFileStorage.html">Seek::Rdf::RdfFileStorage</a>
+  
+    <li><a href="../Seek/Rdf/RdfGeneration.html">Seek::Rdf::RdfGeneration</a>
+  
+    <li><a href="../Seek/Rdf/RdfRepository.html">Seek::Rdf::RdfRepository</a>
+  
+    <li><a href="../Seek/Rdf/RdfRepositoryStorage.html">Seek::Rdf::RdfRepositoryStorage</a>
+  
+    <li><a href="../Seek/Rdf/VirtuosoRepository.html">Seek::Rdf::VirtuosoRepository</a>
+  
+    <li><a href="../Seek/Rdf/VirtuosoRepository/Config.html">Seek::Rdf::VirtuosoRepository::Config</a>
   
   </ul>
 </nav>
@@ -77,465 +109,254 @@
   
 <h1 id="label-Installing+SEEK">Installing SEEK</h1>
 
+<h2 id="label-Introduction">Introduction</h2>
+
 <p>If you have installed SEEK, please take a moment to fill out our very
 short,optional <a href="http://www.sysmo-db.org/seek-registration">SEEK
 Registration Form</a></p>
+
+<p>If you have any problems or questions, you should contact us. The following
+link will give you details on how to <a href="CONTACTING_US.html">Contact
+Us</a></p>
 
 <p>SEEK is based upon the Ruby on Rails platform. Although the information on
 this page should provide you with everything you need to get a basic
 installation of SEEK up and running, some background reading on Ruby on
 Rails would be beneficial if it is new to you. Documentation and resources
 describing Ruby on Rails can be found at <a
-href="http://rubyonrails.org/documentation.">rubyonrails.org/documentation.</a>
-Since SEEK uses v2.3.15 of Rails, <a
-href="http://guides.rubyonrails.org/v2.3.11/">guides.rubyonrails.org/v2.3.11/</a>
-and <a
-href="http://api.rubyonrails.org/v2.3.11">api.rubyonrails.org/v2.3.11</a>
-may be useful as well.</p>
+href="http://rubyonrails.org/documentation">rubyonrails.org/documentation</a>
+.</p>
 
-<p>We recommend that you run SEEK on a Linux system. All of the examples here
-describe installing on an Ubuntu (10.04 LTS) or Debian system, but should
-be easily transferrable to other Linux systems such as Fedora. There is a
-script for CentOS that was contributed to us by Mark Woodbridge (Imperial
-College, London) available at <a
-href="https://gist.github.com/2127663">gist.github.com/2127663</a></p>
+<p>SEEK is based on the 3.2 version of Rails, and requires Ruby 1.9.3.</p>
+
+<p>We recommend that you run SEEK on a Linux system. This guide is based on an
+Ubuntu (12.04 LTS) system. However, running on other Linux distributions
+the main difference is the name of the required packages that have to be
+installed for that distribution, other than that the steps will be the
+same. If you want to install on different distribution or version please
+visit <a href="OTHER-DISTRIBUTIONS.html">Other Distributions</a> and see if
+it is listed there.</p>
+
+<p>You will need to have <em>sudo</em> access on the machine you are
+installing SEEK, or be able to login as root. You will also need an active
+internet connection throughout the installation process.</p>
 
 <p>Although possible, installing and running Ruby on Rails on a Windows system
 is troublesome and is not covered here.</p>
 
-<h2 id="label-Prerequesites">Prerequesites</h2>
+<h2 id="label-Installing+packages">Installing packages</h2>
 
-<p>SEEK requires Ruby version 1.8.7.</p>
+<p>These are the packages required to run SEEK with Ubuntu 12.04 (Desktop or
+Server). For other distributions or versions please visit our <a
+href="OTHER-DISTRIBUTIONS.html">Other Distributions</a> notes.</p>
 
-<p>The steps in the next section outline the commands required to install all
-the required packages for Ubuntu or Debian.</p>
+<p>You should run an update first</p>
 
-<p>MySQL server needs to be installed installed, along the development package
-(required to compile the MySQL rubygem). We use the Ubuntu/Debian packages
-<em>mysql-server</em> and <em>libmysqlclient15-dev</em></p>
+<pre>sudo apt-get update
+sudo apt-get upgrade</pre>
 
-<p>The ImageMagick libraries need to be installed, as these are required by
-the rmagic gem. We use the The Ubuntu/Debian package
-<em>libmagick++9-dev</em></p>
+<p>Now install the packages:</p>
 
-<p>You will need a minimal build environment, as some of the ruby gems require
-compilation. The Ubuntu/Debian package <em>build-essentials</em> should be
-sufficient</p>
+<pre>sudo apt-get install mysql-server</pre>
 
-<p>SEEK uses Lucene as its search engine, and this requires that java is
-installed. Sun/Oracle Java is no longer available as a standard package
-Ubuntu, but OpenJDK should work fine. You can also download and install
-from <a
-href="http://www.oracle.com/technetwork/java/javase/overview/index.html">Oracle</a>.</p>
+<p>Pay attention to what you use for the ‘MySQL root’ password when requested
+- you will need this later.</p>
 
-<p>Before starting, its a good idea to get up to date:</p>
+<p>The remaining packages are:</p>
 
-<pre>sudo apt-get update &amp;&amp; sudo apt-get -y upgrade</pre>
+<pre>sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git libreadline-dev
+sudo apt-get install libxml++2.6-dev openjdk-7-jdk graphviz libsqlite3-dev sqlite3
+sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev</pre>
 
-<p>The following commands will install the core required packages:</p>
+<p>Installing these packages now will make installing Ruby 1.9.3 easier later
+on:</p>
 
-<p>for Ubuntu Precise 12.04 (LTS):</p>
+<pre>sudo apt-get install gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev</pre>
 
-<pre>sudo apt-get install wget git mercurial ruby ri1.8 libruby1.8 ruby-dev mysql-server libssl-dev build-essential openssh-server
-sudo apt-get install libmysqlclient-dev libmagick++-dev libxslt1-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
-sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
+<h2 id="label-Development+or+Production%3F">Development or Production?</h2>
 
-<p>for Ubuntu Lucid 10.04 (LTS):</p>
+<p>The following steps are suitable for either setting up SEEK for
+development, or in a production environment. However, when setting up a
+production environment there are some minor differences - please visit <a
+href="INSTALL-PRODUCTION.html">Installing SEEK for Production</a></p>
 
-<pre>sudo apt-get install wget git mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
-sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
-sudo apt-get install poppler-utils tesseract-ocr openoffice.org openoffice.org-java-common</pre>
+<h2 id="label-Setting+up+Ruby+and+RubyGems+with+RVM">Setting up Ruby and RubyGems with RVM</h2>
 
-<p>If setting up for production deployment using the <a
-href="http://www.modrails.com/">Passenger Phusion (modrails)</a> module you
-can save a step later by also using:</p>
+<p>We strongly encourage that you use <a href="https://rvm.io/">RVM</a> for
+managing your Ruby and RubyGems version. Although you can use the version
+that comes with your linux distribution, it is more difficult to control
+the version you use and keep up to date.</p>
 
-<pre>sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev</pre>
+<p>To install RVM follow the steps at <a
+href="https://rvm.io/rvm/install">rvm.io/rvm/install</a> . The current
+basic installation method is to run:</p>
 
-<p>You now need to install Rubygems version 1.6.2. (SEEK does work with the
-latest version of Rubygems, but you do get some deprecation warning
-messages from the Rails code). Rather than install through apt-get, we
-recommend downloading and installing from the rubygems website: <a
-href="http://rubygems.org/pages/download.">rubygems.org/pages/download.</a>
-The following commands should install rubygems for you on a Ubuntu/Debian
-system.</p>
+<pre>\curl -L https://get.rvm.io | bash</pre>
 
-<pre>cd /tmp
-wget http://production.cf.rubygems.org/rubygems/rubygems-1.6.2.tgz
-tar zfxv rubygems-1.6.2.tgz
-cd rubygems-1.6.2/
-sudo ruby ./setup.rb
-cd /usr/bin/
-sudo ln -s gem1.8 gem
-cd -</pre>
+<p>to save restarting your shell run:</p>
 
-<p>Note - we also recommend the use of <a href="https://rvm.io/">Ruby Version
-Manager (RVM)</a> for managing your version of Ruby and Rubygems. Follow
-the link to find out more about RVM, and how to install and use it.</p>
+<pre>source ~/.rvm/scripts/rvm</pre>
 
-<h2 id="label-Getting+the+source+code">Getting the source code</h2>
+<p>now install Ruby 1.9.3</p>
 
-<p>On a production server we would recommend installing into the directory
-<em>/srv/rails/</em> and installing as the user www-data. There is also
-more information later on how to setup Apache and <a
-href="http://www.modrails.com/">Passenger Phusion (modrails)</a>.</p>
+<pre>rvm install ruby-1.9.3</pre>
 
-<p>Our source code is stored within the <a
-href="http://code.google.com/p/sysmo-db/">Sysmo-DB Google Code
-Repository</a>, using <a href="http://mercurial.selenic.com/">Mercurial</a>
-as the version control system.</p>
+<p>you may be asked for your password so that some additional packages can be
+installed. You will then need to wait for Ruby to be downloaded and
+compiled.</p>
 
-<p>For a stable version, you should check out according to a stable tag. Our
-current stable tag is <em>0.16.3</em>, so to retrieve this version you
-should use:</p>
+<p>This version of SEEK has been developed and tested using Rubygems version
+1.8.25. This is the version installed with Ruby 1.9.3 at the time of
+writing this, but to be sure run:</p>
 
-<pre>hg clone https://sysmo-db.googlecode.com/hg/ -r v0.16.3 seek</pre>
+<pre>rvm rubygems 1.8.25</pre>
 
-<p>This will create a <em>seek</em> directory that contains the application.</p>
+<p>Now you just need to create the <em>Gemset</em> for SEEK. RVM allows what
+it calls <em>Gemsets</em> to seperate the gems installed, in isolation from
+each other, for different applications. To create the gemset run:</p>
 
-<p><a href="http://gembundler.com/">Bundler</a> is used to manage gems, so to
-install the required gems you first need to install the bundler gem:</p>
+<pre>rvm gemset create seek</pre>
 
-<pre>sudo gem install -d bundler rake</pre>
+<h2 id="label-Getting+SEEK">Getting SEEK</h2>
 
-<p>Then from within the seek directory run</p>
+<p>Now you are ready for installing SEEK. To fetch the latest version of SEEK
+<em>(v0.18.3)</em> change to the directory you want to install it and then
+run:</p>
 
-<pre>bundle install</pre>
+<pre>hg clone https://bitbucket.org/seek4science/seek -r v0.18.3 seek
+cd seek/</pre>
 
-<p>If you are requested for a root or sudo password, but you do not have this
-level of access then you should use</p>
+<p>Now to install the ruby gems SEEK needs:</p>
 
-<pre>bundle install --deployment</pre>
+<pre>gem install bundler
+bundle install  --deployment</pre>
 
-<h2 id="label-The+RAILS_ENV+environment+variable">The RAILS_ENV environment variable</h2>
+<h2 id="label-Setting+up+the+Database">Setting up the Database</h2>
 
-<p>If you are setting up SEEK as a production environment, rather than for
-development, you should set the RAILS_ENV variable before proceeding</p>
+<p>You first need to setup the database configuration file. You need to copy a
+default version of this and then edit it:</p>
 
-<pre>export RAILS_ENV=production</pre>
+<pre>cp config/database.default.yml config/database.yml
+nano config/database.yml</pre>
 
-<h2 id="label-Configuring+the+database">Configuring the database</h2>
+<p><strong>IMPORTANT:</strong> you should at least change the default username
+and password. Change this for each environment
+(development,production,test).</p>
 
-<p>Copy config/database.default.yml to config/database.yml and edit
-accordingly - either MySQL or SQLite3 should work (you will need to install
-the <em>sqlite3-dev</em> package and the <em>sqlite3-ruby</em> gem)</p>
-
-<p>To add users to the MySQL database, first login to the database as an
-administrator (root by default) and issue a GRANT command along the lines
-of the example below (for clarity, this uses a username of
-<em>mysqluser</em> and password <em>mysqlpassword</em>. <strong>You are
-obviously recommended to use a different username and password</strong> on
-a server exposed to the internet).</p>
+<p>Now you need to grant permissions for the user and password you just used
+(changing the example below appropriately). You will need the root password
+you created for mySQL when installing the package. e.g:</p>
 
 <pre>&gt; mysql -uroot -p
 Enter password:
 Welcome to the MySQL monitor.  Commands end with ; or \g.
 Your MySQL connection id is 1522
-Server version: 5.1.37-1ubuntu5.1 (Ubuntu)
+Server version: 5.5.32-0ubuntu0.12.04.1 (Ubuntu)
 
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
 mysql&gt; CREATE USER 'mysqluser'@'localhost' IDENTIFIED BY 'mysqlpassword';
 mysql&gt; GRANT ALL PRIVILEGES ON *.* TO 'mysqluser'@'localhost' WITH GRANT OPTION;</pre>
 
-<p>Run the rake database setup task, this creates the database, loads the
-schema and seeds the database with any default data</p>
+<p>Now to create the database for SEEK and seed it with the default data, run:</p>
 
 <pre>bundle exec rake db:setup</pre>
 
-<h2 id="label-Starting+Delayed-Job+%28Background+processing%29">Starting Delayed-Job (Background processing)</h2>
+<p>You can now start SEEK for the first time, just to test things are working</p>
 
-<p>Some background processing is handled using a tool called <em>Delayed
-Job</em>, and it is essential this is running for SEEK to behave correctly.</p>
+<pre>bundle exec rails server</pre>
 
-<p>To start delayed job run the script</p>
+<p>… and visit <a href="http://localhost:3000">localhost:3000</a> and a SEEK
+page should load.</p>
 
-<pre>./script/delayed_job start</pre>
+<p>However, before continuing, stop SEEK with CTRL+C and start up some
+services.</p>
 
-<p>or for production:</p>
+<h2 id="label-Starting+the+SEEK+services">Starting the SEEK services</h2>
 
-<pre>RAILS_ENV=production ./script/delayed_job start</pre>
+<p>This describes a quick way to start up the services SEEK needs. If setting
+up a production server, following these steps is fine to check things are
+working. However, you should also read the <a
+href="INSTALL-PRODUCTION.html">Installation for Production</a> guide for
+automating these services.</p>
 
-<p>For production servers, we recommend setting up an init.d script to
-automatically start and stop delayed_job. An example script can be found
-at: <a href="https://gist.github.com/3169625">gist.github.com/3169625</a>
-Put this script in /etc/init.d/, called maybe seek-delayed-job, and edit
-the APP_PATH accordingly. Then run</p>
+<h3 id="label-Starting+and+Stopping+the+Search+Service">Starting and Stopping the Search Service</h3>
 
-<pre>sudo update-rc.d seek-delayed-job defaults</pre>
-
-<p>You can then start and stop delayed job using:</p>
-
-<pre>sudo service seek-delayed-job start</pre>
-
-<p>and</p>
-
-<pre>sudo service seek-delayed-job stop</pre>
-
-<h2 id="label-Starting+Open+Office">Starting Open Office</h2>
-
-<p>Open Office is a background service which is called by convert_office
-plugin, to convert some document types (ms office documents, open office
-documents, etc.) into pdf document.</p>
-
-<p>If you are just running SEEK as your current user, rather than setup as a
-production server, you can start the Open Office service with:</p>
-
-<pre>soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
-
-<p>Note that Ubuntu 10.04 uses single hyphen for the options:</p>
-
-<pre>soffice -headless -accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
-
-<p>The 8100 port is used by default, if you’d like to run on another port,
-you need also to synchronize the changed port with the default soffice_port
-setting for convert_office plugin in config/environment.rb</p>
-
-<p>If you run on production server, using Apache and Passenger Phusion, you
-will need to run the Open Office service under www-data user. To do this it
-will need to create a working directory in /var/www. The name of the
-directory changes between versions, but will be called something similar to
-libreoffice or .openoffice.org2. The easiest way to create this directory
-is to make a note of the permissions for /var/www, then make it writable to
-www-data, start the service, and then put the permissions on /var/www back
-to what they were originally.</p>
-
-<pre>sudo chown www-data:www-data /var/www</pre>
-
-<p>Then to start the service manually you use:</p>
-
-<pre>nohup sudo -H -u www-data soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
-
-<p>remember on Ubuntu 10.04 only single hyphens are used for the options.</p>
-
-<p>We recommend the OpenOffice service is setup using an init.d script,
-following the same procedures for delayed job using the script found at: <a
-href="https://gist.github.com/3787679">gist.github.com/3787679</a></p>
-
-<h2 id="label-Starting+the+server">Starting the server</h2>
-
-<p>To test you have things setup you can now start the server with the
-command:</p>
-
-<pre>./script/server</pre>
-
-<p>If running in production mode, you should start the server with</p>
-
-<pre>./script/server -e production</pre>
-
-<p>However, we recommend you follow the instructions lower down for setting up
-SEEK to run together with Apache (or Nginx) using Passenger Phusion.</p>
-
-<h2 id="label-Creating+the+Admin+user">Creating the Admin user</h2>
-
-<p>Once the server is running you should visit the page <a
-href="http://localhost:3000">localhost:3000</a></p>
-
-<p>If there are no users present in the system (and there should not be at
-this stage) you will be requested to provide login details, and some basic
-information about your profile (you can always come back and modify the
-profile information and your password. You cannot modify your login name).</p>
-
-<p>Once created this user will become the admin user of the system.</p>
-
-<h2 id="label-Registering+SEEK">Registering SEEK</h2>
-
-<p>Now you have installed SEEK, and if you didn’t during the installation
-process, please take a moment to fill out our very short,optional <a
-href="http://www.sysmo-db.org/seek-registration">SEEK Registration
-Form</a>. Doing so will be very useful to us in the future when we try and
-raise funding in the future, as it provides evidence of SEEK adoption.</p>
-
-<h2 id="label-Administering+the+system">Administering the system</h2>
-
-<p>Once logged in as an administrator, you will notice a link on the
-right-hand side of the tabs/search bar “Admin Enabled”. Selecting this
-will provide you with some admin facilities for creating new projects,
-institutions and profiles; defining additional administrators; or modifying
-the behaviour of SEEK.</p>
-
-<p>Some of the key settings required for a new installation are described in
-the following sections.</p>
-
-<h2 id="label-Enabling+search+and+starting+the+Sunspot+SOLR+server">Enabling search and starting the Sunspot SOLR server</h2>
-
-<p>Search can be enabled in the admin setting under Admin settings, Site
-configuration, Enable/disable features - under “Search enabled”.
-<strong>You will need to restart the server after changing this setting.
-You will also need to restart the Delayed Job service.</strong></p>
-
-<p>To start the search server you need to run:</p>
+<p>SEEK search is based upon the <a
+href="http://lucene.apache.org/solr/">Apache Lucene Solr</a> service. To
+start this service run:</p>
 
 <pre>bundle exec rake sunspot:solr:start</pre>
 
-<p>and to reindex any existing data that created before search was enabled:</p>
+<p>and to stop run:</p>
 
-<pre>bundle exec rake sunspot:solr:reindex</pre>
+<pre>bundle exec rake sunspot:solr:stop</pre>
 
-<p>If you want Sunspot SOLR to start automatically whenever you restart the
-machine SEEK is running on, you probably want to create an init.d/ script.
-A script we use is available at <a
-href="https://gist.github.com/3143434">gist.github.com/3143434</a> (the
-APP_PATH may need changing for you)</p>
+<p>Optionally, there is also a configuration file in config/sunspot.yml for
+configuring the port that Solr runs on - which is important if running
+multiple SEEK installations on the same machine.</p>
 
-<p>On Ubuntu or Debian, after putting the script in init.d/ you should run
-(assuming you called the file seek-solr)</p>
+<p>To trigger some of the default data to be indexed for search you should
+run:</p>
 
-<pre>sudo update-rc.d seek-solr defaults</pre>
+<pre>bundle exec rake seek:reindex_all</pre>
 
-<p>You can then start the service with</p>
+<p>This task can also be used at any time if there is need to force all
+content to be reindexed (such as after a period of running SEEK with search
+turned off).</p>
 
-<pre>service seek-solr start</pre>
+<h3 id="label-Starting+and+Stopping+the+Background+Service">Starting and Stopping the Background Service</h3>
 
-<p>.. and stop with</p>
+<p>SEEK uses <a href="https://github.com/collectiveidea/delayed_job">Delayed
+Job</a> to process various jobs. It is important this service is running.</p>
 
-<pre>service seek-solr stop</pre>
+<p>To start delayed job run:</p>
 
-<h2 id="label-Configuring+BioPortal">Configuring BioPortal</h2>
+<pre>./script/delayed_job start</pre>
 
-<p><a href="http://bioportal.bioontology.org/">BioPortal</a> is a service used
-in SEEK for supporting and searching ontologies, which we communicate with
-via its API. However, the API requires an api-key that we are unable to
-distribute with SEEK. To be able to link organisms with NCBI terms, or
-search for organisms when defining new ones, an api-key has to be setup. We
-also have future plans for more widespread uses of ontologies - such as for
-the Assay and Technology types, and for tagging with semantic terms.</p>
+<p>and to stop run:</p>
 
-<p>To get an api-key you first need to register with BioPortal at <a
-href="http://bioportal.bioontology.org/accounts/new">bioportal.bioontology.org/accounts/new</a>,
-and once registred and logged in your api-key should be shown under Account
-details. More information is available at <a
-href="http://www.bioontology.org/wiki/index.php/BioPortal_REST_services.">www.bioontology.org/wiki/index.php/BioPortal_REST_services.</a></p>
+<pre>./script/delayed_job stop</pre>
 
-<p>In SEEK, you apply the BioPortal api-key under the Admin-&gt;Site
-Configuration-&gt;Additional Settings.</p>
+<h3 id="label-Starting+and+Stopping+the+SOFFICE+service">Starting and Stopping the SOFFICE service</h3>
 
-<h2 id="label-Configuring+DOI+and+PubMed+search">Configuring DOI and PubMed search</h2>
+<p>SEEK uses the soffice service provided by <a
+href="https://www.libreoffice.org/">LibreOffice</a> to convert various
+document formats to PDF and Text - to allow them to be viewed in a web
+browser, and to make them indexable to the search. To start soffice run:</p>
 
-<p>To be able to support adding publications using a <a
-href="http://www.ncbi.nlm.nih.gov/pubmed">PubMed</a> ID or DOI to your SEEK
-installation, you need to do 2 things.</p>
-<ul><li>
-<p>For PubMed you simply need to add your email address under Admin-&gt;Site
-Configuration-&gt;Additional Settings</p>
-</li><li>
-<p>For DOI - you need to register your email address with <a
-href="http://www.crossref.org/">CrossRef</a> at <a
-href="http://www.crossref.org/requestaccount/">www.crossref.org/requestaccount/</a>
-and then provide that email to SEEK under Admin-&gt;Site
-Configuration-&gt;Additional Settings</p>
-</li></ul>
+<pre>soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1 &amp;</pre>
 
-<h2 id="label-Configuring+Email">Configuring Email</h2>
+<p>and to stop it run:</p>
 
-<p>By default email is disabled, but if you are able to you can configure it
-to enable SEEK to send emails - such are emails about changes within your
-project, notification emails, feedback emails and notifications about
-errors. You can configure email under Admin-&gt;Site
-configuration-&gt;Enable/disable features. Part way down that page there is
-a checkbox “Email enabled” that you should select. This reveals some
-SMTP settings that you need to fill out. Any that are not needed can be
-left blank. The meaning of the settings are:</p>
-<ul><li>
-<p>Address - the address (name or IP address) of the SMTP server used to
-deliver outgoing mail</p>
-</li><li>
-<p>Port - the port that your mail server receives mail</p>
-</li><li>
-<p>Domain - if you need to specify a HELO domain, you can do it here.</p>
-</li><li>
-<p>Authentication - if your mail server requires authentication, you need to
-specify the authentication type here. This can be <em>plain</em> (will send
-the password in the clear), <em>login</em> (will send password Base64
-encoded) or in rare cases <em>cram_md5</em></p>
-</li><li>
-<p>Auto STARTTLS enabled - enable this is your mail server requires Tranport
-Layer Security, and you get STARTTLS errors when testing your configuration</p>
-</li><li>
-<p>User name -  if your mail server requires authentication, set the username
-in this setting.</p>
-</li><li>
-<p>Password - if your mail server requires authentication, set the password in
-this setting</p>
-</li></ul>
+<pre>killall -15 soffice</pre>
 
-<p>There is a box beneath here that you can use to test your settings. Also,
-if you wish to receive emails about errors that occur - then you can check
-the box for Exception notification enabled, and supply a list of email
-addresses below (comma or space seperated).</p>
+<h2 id="label-Starting+SEEK">Starting SEEK</h2>
 
-<h2 id="label-Setting+up+Passenger+Phusion+and+Apache+for+production+servers.">Setting up Passenger Phusion and Apache for production servers.</h2>
+<p>You can now start up SEEK again running:</p>
 
-<p>This section is only relevant if setting up a production deployment, and
-assumes that seek has been deployed to /srv/rails/seek as the user
-www-data, and that you have used RAILS_ENV=production whilst setting up.
-Most of these steps are already very well documented at <a
-href="http://www.modrails.com/install.html">Passenger Phusion Install
-Guide</a> and the installation is a guided process.</p>
+<pre>bundle exec rails server</pre>
 
-<p>If you have not done so already, then beforehand install some additional
-libaries using:</p>
+<h2 id="label-Creating+an+Administrator">Creating an Administrator</h2>
 
-<pre>sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev</pre>
+<p>When you first visit SEEK at <a
+href="http://localhost3000">localhost3000</a> with no users present, you
+will be prompted to create a new user. This user will be the administrator
+of SEEK (you can change to or add other users in the future). Create a
+username and password, and then fill out your profile, and you will be
+ready to use SEEK.</p>
 
-<p>Next install the passenger gem</p>
+<p>You will be prompted to fill out our very short Registration form.
+<strong>Please do if you haven’t done so already</strong>, as this greatly
+assists the future support and funding of SEEK.</p>
 
-<pre>sudo gem install passenger</pre>
+<h2 id="label-Final+steps">Final steps</h2>
 
-<p>Next run the following command to compile and install the modrails Apache
-modules, and follow the instructions it provides</p>
+<p>If you are setting up SEEK for production use, please now return to our <a
+href="INSTALL-PRODUCTION.html">Installing SEEK for Production Guide</a>.</p>
 
-<pre class="ruby"><span class="ruby-identifier">sudo</span> <span class="ruby-identifier">passenger</span><span class="ruby-operator">-</span><span class="ruby-identifier">install</span><span class="ruby-operator">-</span><span class="ruby-identifier">apache2</span><span class="ruby-operator">-</span><span class="ruby-keyword">module</span>
-</pre>
-
-<p>If you’ve followed the instructions, you will have added something like
-the following (the version numbers may differ) to your
-<em>/etc/apache/http.conf</em></p>
-
-<pre>LoadModule passenger_module /usr/lib/ruby/gems/1.8/gems/passenger-3.0.7/ext/apache2/mod_passenger.so
-PassengerRoot /usr/lib/ruby/gems/1.8/gems/passenger-3.0.7
-PassengerRuby /usr/bin/ruby1.8</pre>
-
-<p>and configured a virtual host (probably in
-<em>/etc/apache2/sites-enabled/default</em>) that looks something like:</p>
-
-<pre>&lt;VirtualHost *:80&gt;
-   ServerName www.yourhost.com
-   DocumentRoot /srv/rails/seek/public
-      &lt;Directory /srv/rails/seek/public&gt;
-       AllowOverride all
-       Options -MultiViews            
-    &lt;/Directory&gt;
- &lt;/VirtualHost&gt;</pre>
-
-<p>When setting up a production server, it is recommended that init.d/ scripts
-are added for delayed job, sunspot, and open office. See the delayed job,
-open office and Sunspot sections above for instructions on how to do this.</p>
-
-<h2 id="label-Rebranding+SysMO+SEEK+for+other+projects">Rebranding SysMO SEEK for other projects</h2>
-
-<p>If you are running SEEK for a project other than SysMO you can change
-various text elements under Admin-&gt;Site Configuration-&gt;Site branding.</p>
-
-<p>To insert your application/project name into the help documents for SEEK,
-and to remove the logos/links to SEEK’s ‘related projects and
-friends’ use</p>
-
-<pre>bundle exec rake seek:rebrand</pre>
-
-<p>If you only want to change the help documents, you can instead use</p>
-
-<pre>bundle exec rake seek:rebrand_help_docs</pre>
-
-<h2 id="label-Backing+up">Backing up</h2>
-
-<p>Please read our <a href="../files/doc/BACKUPS.html">Backup Guide</a> for
-suggestions on how to backup a SEEK installation.</p>
-
-<h2 id="label-Contacting+us+and+other+developers">Contacting us and other developers</h2>
-
-<p>There is a public Google Group available for SEEK development at <a
-href="http://groups.google.com/group/seek-development">groups.google.com/group/seek-development</a></p>
+<p>You should also now read our <a href="ADMINISTRATION.html">Administration
+Guide</a> for details of some basic tasks and settings.</p>
 
 </div>
 
@@ -543,7 +364,7 @@ href="http://groups.google.com/group/seek-development">groups.google.com/group/s
 
 <footer id="validator-badges">
   <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
-  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.2.
   <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
 </footer>
 

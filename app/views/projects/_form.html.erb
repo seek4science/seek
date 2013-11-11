@@ -2,7 +2,7 @@
 
 <%= f.error_messages %>
   
-<h2>Project Details</h2>
+<h2><%= t('project') %> Details</h2>
 
 <div style="text-align: center;">
 	<div style="width: 95%;">
@@ -21,7 +21,7 @@
 
 		<p>
 		  <%= f.label :description -%><br/>
-		  <%= f.text_area :description, :style => "width: 85%;", :rows => 5 -%>
+		  <%= f.text_area :description, :style => "width: 85%;", :rows => 10 -%>
 		</p>
       <% if Project.is_hierarchical? -%>
       <p>
@@ -32,12 +32,12 @@
 	</div>
 </div>
 
-<h2>Organisms Relevant To This Project</h2>
+<h2>Organisms Relevant To This <%= t('project') %></h2>
 <%= render :partial=>"projects/organisms_selection", :locals=>{:f=>f} -%>
   
 <%# show avatar selection only when the project exists AND when current user is allowed to edit it -%>
 <% if project && (mine?(project) || project.can_be_edited_by?(current_user)) -%>
-  <h2 style="margin-top: 1.5em;">Project Picture</h2>
+  <h2 style="margin-top: 1.5em;"><%= t('project') %> Picture</h2>
 	<%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => project, :form_instance => f } -%>
 <% end -%>
 

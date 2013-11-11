@@ -1,12 +1,13 @@
 <%
-  all_organisms = Organism.find(:all,:order=>:title)
+  all_organisms = Organism.order(:title)
 -%>
 <script type="text/javascript">
     strain_form("<%=strain.try(:id)-%>", "<%=strain.try(:organism_id)-%>", 'create', '<%=url_for(:controller => 'biosamples', :action => 'strain_form')-%>');
 </script>
-<% remote_form_for 'biosamples', :url => url_for(:controller => 'biosamples', :action => 'create_strain'),
-  :condition=>"validateStrainFields('create')",
-  :html=>{:method=>:post} do -%>
+<%= form_for 'biosamples',
+             :url => url_for(:controller => 'biosamples', :action => 'create_strain'),
+             :condition => "validateStrainFields('create')",
+             :html => {:method => :post, :remote => true} do -%>
 <div id="redbox_contents_div" class="redbox_contents" style="width:800px;">
 	<div class="head">
 		<%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>

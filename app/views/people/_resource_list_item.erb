@@ -19,7 +19,7 @@
     </div>
 
     <div class="list_item_right_column">
-      <%= list_item_simple_list resource.projects, "Projects" %>
+      <%= list_item_simple_list resource.projects, t('project').pluralize %>
       <%= list_item_simple_list resource.institutions, "Institutions" %>
       <%= list_item_simple_list(resource.tools, "Tools") {|i| link_for_ann(i, :type=>:tool)} %>
 
@@ -32,6 +32,5 @@
 
     <div class="list_item_whole_width">
       <%= list_item_description resource.description %>
-      <%# list_profile_registered_timestamp resource if admin_logged_in?%>
     </div>
 <% end -%>

@@ -132,13 +132,13 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
     AuthLookupUpdateQueue.destroy_all
     sample.title = Time.now.to_s
-    #seems to also add the specimen, possibly because of the allow_nested_attributes. Its unnecessary, but isn't a problem
-    assert_difference("AuthLookupUpdateQueue.count", 2) do
+
+    assert_difference("AuthLookupUpdateQueue.count", 1) do
       disable_authorization_checks do
         sample.save!
       end
     end
-    assert_equal [sample,sample.specimen], AuthLookupUpdateQueue.all(:order=>:id).collect{|a| a.item}
+    assert_equal [sample], AuthLookupUpdateQueue.all(:order=>:id).collect{|a| a.item}
   end
 
   test "updates to queue for specimen" do

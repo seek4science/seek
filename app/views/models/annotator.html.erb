@@ -18,8 +18,8 @@
               </div>
          <% end -%>
 
-    <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
-            <%= jws_annotator_hidden_fields @params_hash -%>
+    <%= form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
+            <%= "#{jws_annotator_hidden_fields @params_hash}".html_safe -%>
             <%= hidden_field_tag :following_action, "" -%>
             <%= hidden_field_tag :nameToSearch, "" -%>
 

@@ -1,6 +1,9 @@
-require 'acts_as_authorized'
+
 
 class Assay < ActiveRecord::Base
+
+  include Seek::Rdf::RdfGeneration
+
   acts_as_isa
   acts_as_taggable
 
@@ -38,27 +41,27 @@ class Assay < ActiveRecord::Base
 
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
   
-  def self.asset_sql(asset_class)
+  def asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
     'SELECT '+ asset_class_underscored +'_versions.* FROM ' + asset_class_underscored + '_versions ' +
     'INNER JOIN assay_assets ' + 
     'ON assay_assets.asset_id = ' + asset_class_underscored + '_id ' + 
     'AND assay_assets.asset_type = \'' + asset_class + '\' ' + 
     'WHERE (assay_assets.version = ' + asset_class_underscored + '_versions.version ' +
-    'AND assay_assets.assay_id = #{self.id})' 
+    "AND assay_assets.assay_id = #{self.id})"
   end
 
   #FIXME: These should be reversed, with the concrete version becoming the primary case, and versioned assets becoming secondary
   # i.e. - so data_files returnes [DataFile], and data_file_masters is replaced with versioned_data_files, returning [DataFile::Version]
-  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => self.asset_sql("DataFile")
-  has_many :sops, :class_name => "Sop::Version", :finder_sql => self.asset_sql("Sop")
-  has_many :models, :class_name => "Model::Version", :finder_sql => self.asset_sql("Model")
+  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
+  has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new{self.asset_sql("Sop")}
+  has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
   
   has_many :data_file_masters, :through => :assay_assets, :source => :asset, :source_type => "DataFile"
   has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :model_masters, :through => :assay_assets, :source => :asset, :source_type => "Model"
 
-  ["data_file","sop"].each do |type|
+  ["data_file","sop","publication"].each do |type|
     eval <<-END_EVAL
       #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
       def related_#{type.pluralize}
@@ -77,6 +80,7 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
+  validate :no_sample_for_modelling_assay
 
   #a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
@@ -105,8 +109,8 @@ class Assay < ActiveRecord::Base
     "#{title} (#{type})"
   end
 
-  def can_delete? *args
-    super && assets.empty? && related_publications.empty?
+  def state_allows_delete? *args
+    assets.empty? && related_publications.empty? && super
   end
 
   #returns true if this is a modelling class of assay
@@ -151,6 +155,7 @@ class Assay < ActiveRecord::Base
     assay_organism.assay = self
     assay_organism.organism = organism
     strain=nil
+
     if (!strain_title.blank?)
       strain=organism.strains.find_by_title(strain_title)
     end
@@ -190,8 +195,8 @@ class Assay < ActiveRecord::Base
     data_file_masters + model_masters + sop_masters
   end
   
-  def related_publications
-    self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
+  def publication_masters
+    self.relationships.select {|a| a.other_object_type == "Publication"}.collect { |a| a.other_object }
   end
 
   def related_asset_ids asset_type
@@ -204,7 +209,7 @@ class Assay < ActiveRecord::Base
   end
 
   def clone_with_associations
-    new_object= self.clone
+    new_object= self.dup
     new_object.policy = self.policy.deep_copy
     new_object.sop_masters = self.try(:sop_masters)
 
@@ -215,9 +220,9 @@ class Assay < ActiveRecord::Base
     return new_object
   end
 
-  def validate
+  def no_sample_for_modelling_assay
     #FIXME: allows at the moment until fixtures and factories are updated: JIRA: SYSMO-734
-    errors.add_to_base "You cannot associate a modelling analysis with a sample" if is_modelling? && !samples.empty? && !Seek::Config.is_virtualliver
+    errors[:base] << "You cannot associate a #{I18n.t('assays.modelling_analysis')} with a sample" if is_modelling? && !samples.empty? && !Seek::Config.is_virtualliver
   end
 
   def organism_terms

@@ -1,6 +1,7 @@
 class PeopleController < ApplicationController
 
   include Seek::AnnotationCommon
+  include Seek::Publishing::PublishingCommon
 
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
@@ -12,6 +13,7 @@ class PeopleController < ApplicationController
   before_filter :administerable_by_user, :only => [:admin, :administer_update]
   skip_before_filter :project_membership_required, :only => [:create, :new]
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
+  skip_after_filter :request_publish_approval,:log_publishing, :only => [:create,:update]
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   include Seek::BreadCrumbs
@@ -32,12 +34,12 @@ class PeopleController < ApplicationController
     if (params[:discipline_id])
       @discipline=Discipline.find(params[:discipline_id])
       #FIXME: strips out the disciplines that don't match
-      @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id])
+      @people=Person.where(["disciplines.id=?",@discipline.id]).includes(:disciplines)
       #need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
       @people.each(&:reload)
     elsif (params[:project_role_id])
       @project_role=ProjectRole.find(params[:project_role_id])
-      @people=Person.find(:all,:include=>[:group_memberships])
+      @people=Person.includes(:group_memberships)
       #FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
       @people=@people.select{|p| !(p.group_memberships & @project_role.group_memberships).empty?}
     end
@@ -48,8 +50,12 @@ class PeopleController < ApplicationController
       else
         @people = Person.all
       end
-      @people = apply_filters(@people).select(&:can_view?).reject {|p| p.projects.empty? }
-      @people=Person.paginate_after_fetch(@people, :page=>params[:page])
+      @people=@people.select{|p| !p.group_memberships.empty?}
+      @people = apply_filters(@people).select(&:can_view?)#.select{|p| !p.group_memberships.empty?}
+      @people=Person.paginate_after_fetch(@people,
+                                          :page=>(params[:page] || Seek::Config.default_page('people')),
+                                          :reorder=>false,
+                                          :latest_limit => Seek::Config.limit_latest)
     else
       @people = @people.select(&:can_view?).reject {|p| p.projects.empty?}
     end
@@ -65,6 +71,7 @@ class PeopleController < ApplicationController
   def show                
     respond_to do |format|
       format.html # show.html.erb
+      format.rdf { render :template=>'rdf/show'}
       format.xml
     end
   end
@@ -163,23 +170,23 @@ class PeopleController < ApplicationController
         #send notification email to admin and project managers, if a new member is registering as a new person
         if Seek::Config.email_enabled && registration && is_sysmo_member
           #send mail to admin
-          Mailer.deliver_contact_admin_new_user_no_profile(member_details, current_user, base_host)
+          Mailer.contact_admin_new_user_no_profile(member_details, current_user, base_host).deliver
 
           #send mail to project managers
           project_managers = project_managers_of_selected_projects params[:projects]
           project_managers.each do |project_manager|
-            Mailer.deliver_contact_project_manager_new_user_no_profile(project_manager, member_details, current_user, base_host)
+            Mailer.contact_project_manager_new_user_no_profile(project_manager, member_details, current_user, base_host).deliver
           end
         end
         if (!current_user.active?)
-          Mailer.deliver_signup(current_user, base_host)
+          Mailer.signup(current_user, base_host).deliver
           flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
           logout_user
           format.html { redirect_to :controller => "users", :action => "activation_required" }
         else
           flash[:notice] = 'Person was successfully created.'
           if @person.only_first_admin_person?
-            format.html { redirect_to registration_form_path(:during_setup=>"true") }
+            format.html { redirect_to registration_form_admin_path(:during_setup=>"true") }
           else
             format.html { redirect_to(@person) }
           end
@@ -245,7 +252,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.update_attributes(params[:person])
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
-
+        @person.touch
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
@@ -371,9 +378,9 @@ class PeopleController < ApplicationController
         params[projects_or_institutions].each do |project_or_institution|
           project_or_institution_details= project_or_institution.split(',')
           if project_or_institution_details[0] == 'Others'
-             details.concat("Other #{projects_or_institutions}: #{params["other_#{projects_or_institutions}"]}; ")
+             details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
           else
-             details.concat("#{projects_or_institutions.singularize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
+             details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
           end
         end
     end
@@ -408,7 +415,7 @@ class PeopleController < ApplicationController
             flag = false if !project_manager_projects.include? project
           end
           if flag == false
-            error("Project manager can not assign person to the projects that they are not in", "Is invalid")
+          error("#{t('project')} manager can not assign person to the #{t('project').pluralize} that they are not in","Is invalid")
           end
           return flag
         end

@@ -1,3 +1,4 @@
+#encoding: utf-8
 module AssayTypesHelper
   
   #Displays the ontology with links to edit and remove each node, if requested.
@@ -8,11 +9,7 @@ module AssayTypesHelper
     roots.each do |root|
       list = list + indented_child_options(root,0,show_edit,show_delete,selected_id)
     end
-    
-    list.collect do |item|
-      item + "\n"
-    end
-
+    list.join("\n").html_safe
   end
   
   #Displays the ontology node with appropriate indentation, as well as optional
@@ -22,12 +19,12 @@ module AssayTypesHelper
     
     unless parent.children.empty?
       parent.children.sort{|a,b| a.title.downcase <=> b.title.downcase}.each do |child|
-        result << "<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + (link_to child.title, child) + " " +
+        result << ("<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + (link_to child.title, child) + " " +
                     (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style=>"vertical-align:middle"}) : "") + " " +
-                    (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"),child, :confirm => 
-                      "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
-                      :method => :delete, :style=>"vertical-align:middle") : "<span style=\"color: #666666;\">(#{child.assays.size} assays)</span>") : "") +
-                    "</li>"
+                    (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"),child, :confirm =>
+                      "Are you sure you want to remove this #{child.class.name.underscore.humanize}?  This cannot be undone.",
+                      :method => :delete, :style=>"vertical-align:middle") : "<span style=\"color: #666666;\">(#{child.assays.size} #{t('assays.assay').downcase.pluralize})</span>") : "") +
+                    "</li>")
         result = result + indented_child_options(child,depth+1,show_edit,show_delete,selected_id) if child.has_children?
       end
     end

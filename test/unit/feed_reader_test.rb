@@ -25,7 +25,7 @@ class FeedReaderTest < ActiveSupport::TestCase
 
     feed_to_use = stub_guardian
     path = Seek::FeedReader.cache_path(feed_to_use)
-    assert_equal File.join(Dir.tmpdir,"seek-cache","atom-feeds",CGI::escape(feed_to_use)),path
+    assert_equal File.join(Rails.root,"tmp","testing-seek-cache","atom-feeds",CGI::escape(feed_to_use)),path
     FileUtils.rm path if File.exists?(path)
 
     Seek::Config.project_news_feed_urls="#{feed_to_use}"
@@ -41,7 +41,7 @@ class FeedReaderTest < ActiveSupport::TestCase
   end
 
   test "clear cache" do
-    dir = File.join(Dir.tmpdir,"seek-cache","atom-feeds")
+    dir = File.join(Rails.root,"tmp","testing-seek-cache","atom-feeds")
 
     FileUtils.mkdir_p dir unless File.exists?(dir)
 
@@ -55,6 +55,7 @@ class FeedReaderTest < ActiveSupport::TestCase
   end
 
   test "handles error and ignores bad feed" do
+    XML::Error.set_handler(&XML::Error::QUIET_HANDLER)
     stub_request(:get,"http://dodgy.atom.feed").to_return(:status=>200,:body=>"<badly><formed></xml>")
     Seek::Config.project_news_feed_urls="http://dodgy.atom.feed"
     Seek::Config.project_news_number_of_entries = 5

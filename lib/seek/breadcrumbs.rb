@@ -18,7 +18,7 @@ module Seek
         add_index_breadcrumb "projects"
         add_show_breadcrumb @project
       elsif controller_name == 'avatars'
-        add_index_breadcrumb @avatar_for.pluralize
+        add_index_breadcrumb @avatar_for.pluralize.downcase
         add_show_breadcrumb @avatar_owner_instance
         add_edit_breadcrumb @avatar_owner_instance
       end
@@ -26,25 +26,33 @@ module Seek
       #Index
       controller_name == 'studied_factors' ? add_index_breadcrumb(controller_name, 'Factors studied Index') : add_index_breadcrumb(controller_name)
       resource = eval("@"+controller_name.singularize) || try_block{controller_name.singularize.camelize.constantize.find_by_id(params[:id])}
+
       add_show_breadcrumb resource if (resource && resource.respond_to?(:new_record?) && !resource.new_record?)
 
       unless action_name == 'index' || action_name == 'show'
         if action_name == 'new_object_based_on_existing_one'
           add_breadcrumb "New #{controller_name.humanize.singularize.downcase} based on this one", url_for(:controller => controller_name, :action => action_name, :id => resource.try(:id))
         else
-          add_breadcrumb "#{action_name.capitalize.humanize}", url_for(:controller => controller_name, :action => action_name, :id => resource.try(:id))
+          if resource.nil?
+            url = url_for(:controller => controller_name, :action => action_name)
+          else
+            url = url_for(:controller => controller_name, :action => action_name, :id => resource.try(:id))
+          end
+          add_breadcrumb "#{action_name.capitalize.humanize}", url
         end
       end
     end
 
     def add_index_breadcrumb controller_name, breadcrumb_name=nil
-      breadcrumb_name ||= "#{controller_name.humanize} Index"
+      breadcrumb_name ||= "#{controller_name.singularize.humanize.pluralize} Index"
       add_breadcrumb breadcrumb_name, url_for(:controller => controller_name, :action => 'index')
     end
 
     def add_show_breadcrumb resource, breadcrumb_name=nil
-      breadcrumb_name ||= "#{resource.respond_to?(:title) ? h(resource.title) : resource.id}"
-      add_breadcrumb breadcrumb_name, url_for(:controller => resource.class.name.underscore.pluralize, :action => 'show', :id => resource.id)
+      unless resource.is_a?(ProjectFolder)
+        breadcrumb_name ||= "#{resource.respond_to?(:title) ? resource.title : resource.id}"
+        add_breadcrumb breadcrumb_name, url_for(:controller => resource.class.name.underscore.pluralize, :action => 'show', :id => resource.id)
+      end
     end
 
     def add_edit_breadcrumb resource, breadcrumb_name=nil

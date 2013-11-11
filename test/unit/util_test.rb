@@ -9,4 +9,10 @@ class UtilTest < ActiveSupport::TestCase
   test "authorized types" do
     assert_equal [Assay, DataFile, Event, Investigation, Model, Presentation, Publication, Sample, Sop, Specimen, Strain, Study],Seek::Util.authorized_types
   end
+
+  test "rdf capable types" do
+    types = Seek::Util.rdf_capable_types
+    assert types.include?(DataFile)
+    assert !types.include?(Policy)
+  end
 end

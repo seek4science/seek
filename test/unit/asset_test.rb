@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'time_test_helper'
 
 class AssetTest < ActiveSupport::TestCase
   fixtures :all
@@ -13,6 +14,29 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal nil,model.contributor
     model = Model.find(model.id)
     assert_equal nil,model.contributor
+  end
+
+  test "latest version?" do
+    d = Factory(:xlsx_spreadsheet_datafile, :policy => Factory(:public_policy))
+
+    d.save_as_new_version
+    Factory(:xlsx_content_blob, :asset => d, :asset_version => d.version)
+    d.reload
+    assert_equal 2,d.version
+    assert_equal 2,d.versions.size
+    assert !d.versions[0].latest_version?
+    assert d.versions[1].latest_version?
+  end
+
+  test "just used" do
+    model = Factory :model
+    t = 1.day.ago
+    assert_not_equal t.to_s,model.last_used_at.to_s
+    pretend_now_is(t) do
+      model.just_used
+    end
+    assert_equal t.to_s,model.last_used_at.to_s
+
   end
 
   test "assay type titles" do
@@ -82,6 +106,21 @@ class AssetTest < ActiveSupport::TestCase
 
     model = Model.new
     assert !model.contains_downloadable_items?
+
+    #test for versions
+    model = Factory :teusink_model
+
+    disable_authorization_checks do
+      model.save_as_new_version
+      model.reload
+      model.content_blobs=[Factory.create(:content_blob, :url=>"http://webpage.com",:asset => model,:asset_version=>model.version)]
+      model.save!
+      model.reload
+    end
+
+    assert_equal(2,model.versions.count)
+    assert model.find_version(1).contains_downloadable_items?
+    assert !model.find_version(2).contains_downloadable_items?
 
   end
 
@@ -167,44 +206,6 @@ class AssetTest < ActiveSupport::TestCase
     assert result["Sop"].include?(sop_version1)    
     assert result["Model"].include?(model_version2)
     assert result["DataFile"].include?(data_file)
-  end
-
-  test "is_published?" do
-    User.with_current_user Factory(:user) do
-      public_sop=Factory(:sop,:policy=>Factory(:public_policy,:access_type=>Policy::ACCESSIBLE))
-      private_model=Factory(:model,:policy=>Factory(:public_policy,:access_type=>Policy::VISIBLE))
-      public_datafile=Factory(:data_file,:policy=>Factory(:public_policy))
-      registered_only_assay=Factory(:assay,:policy=>Factory(:public_policy, :sharing_scope=>Policy::ALL_SYSMO_USERS))
-
-      assert public_sop.is_published?
-      assert !private_model.is_published?
-      assert public_datafile.is_published?
-      assert !registered_only_assay.is_published?
-    end
-  end
-
-  test "publish" do
-    user = Factory(:user)
-    private_model=Factory(:model,:contributor=>user,:policy=>Factory(:public_policy,:access_type=>Policy::VISIBLE))
-    User.with_current_user user do
-      assert private_model.can_manage?,"Should be able to manage this model for the test to work"
-      assert private_model.publish!
-    end
-    private_model.reload
-    assert_equal Policy::ACCESSIBLE,private_model.policy.access_type
-    assert_equal Policy::EVERYONE,private_model.policy.sharing_scope
-
-  end
-
-  test "is publishable" do
-    assert Factory(:sop).is_publishable?
-    assert Factory(:model).is_publishable?
-    assert Factory(:data_file).is_publishable?
-    assert !Factory(:assay).is_publishable?
-    assert !Factory(:investigation).is_publishable?
-    assert !Factory(:study).is_publishable?
-    assert !Factory(:event).is_publishable?
-    assert !Factory(:publication).is_publishable?
   end
 
   test "managers" do

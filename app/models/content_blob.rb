@@ -12,8 +12,6 @@ class ContentBlob < ActiveRecord::Base
   include Seek::MimeTypes
 
   belongs_to :asset, :polymorphic => true
-
-  DATA_STORAGE_PATH = "filestore/content_blobs/"
   
   #the actual data value stored in memory. If this could be large, then using :tmp_io_object is preferred
   attr_writer :data
@@ -115,22 +113,27 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def filepath format='dat',uuid_to_use=nil
-    return "#{storage_directory}/#{storage_filename(format,uuid_to_use)}"
-  end
-
-  def storage_directory
-    if Rails.env == "test"
-      path = ContentBlob.test_storage_location
+    if format=="dat"
+     File.join(data_storage_directory,storage_filename(format,uuid_to_use))
     else
-      path = "#{Rails.root}/#{DATA_STORAGE_PATH}/#{Rails.env}"
+      File.join(converted_storage_directory,storage_filename(format,uuid_to_use))
     end
-    FileUtils.mkdir_p(path)
-    return path
   end
 
-  #The location contentblobs are stored when Rails.env='test' - this is only used for unit/functional testing purposes.
-  def self.test_storage_location
-    "#{Rails.root}/tmp/test_content_blobs"
+  def data_storage_directory
+    path = Seek::Config.asset_filestore_path
+    unless File.exist?(path)
+      FileUtils.mkdir_p path
+    end
+    path
+  end
+
+  def converted_storage_directory
+    path = Seek::Config.converted_filestore_path
+    unless File.exist?(path)
+      FileUtils.mkdir_p path
+    end
+    path
   end
 
   def dump_data_to_file        
@@ -142,8 +145,6 @@ class ContentBlob < ActiveRecord::Base
       dump_data_object_to_file
     end    
   end
-
-
 
   private
 
@@ -173,7 +174,7 @@ class ContentBlob < ActiveRecord::Base
     data_to_save ||= self.data_old
     
     if !data_to_save.nil?
-      File.open(filepath,"w+") do |f|      
+      File.open(filepath,"wb+") do |f|
         f.write(data_to_save)    
       end
     end
@@ -192,7 +193,7 @@ class ContentBlob < ActiveRecord::Base
         logger.info "Falling back to ruby copy because of: #{e.message}"
         @tmp_io_object.rewind
 
-        File.open(filepath, "w+") do |f|
+        File.open(filepath, "wb+") do |f|
           buffer=""
           while @tmp_io_object.read(16384, buffer)
             f << buffer

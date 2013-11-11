@@ -1,13 +1,13 @@
 module ProjectsHelper
   def project_select_choices
     res=[]
-    Project.find(:all).collect { |p| res << [p.name, p.id] }
+    Project.all.collect { |p| res << [p.name, p.id] }
     return res
   end
 
   def projects_link_list projects, sorted=true
     projects=projects.select { |p| !p.nil? } #remove nil items
-    return "<span class='none_text'>Not defined</span>" if projects.empty?
+    return "<span class='none_text'>Not defined</span>".html_safe if projects.empty?
 
     result=""
     projects=projects.sort { |a, b| a.title<=>b.title } if sorted
@@ -15,39 +15,43 @@ module ProjectsHelper
       result += link_to h(proj.title), proj
       result += " | " unless projects.last==proj
     end
-    return result
+    return result.html_safe
   end
 
   def pals_link_list project
     if project.pals.empty?
-      "<span class='none_text'>No PALs for this project</span>";
+      html = "<span class='none_text'>No PALs for this #{t('project')}</span>";
     else
-      project.pals.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = project.pals.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
+    html.html_safe
   end
 
   def asset_managers_link_list project
     if project.asset_managers.empty?
-      "<span class='none_text'>No Asset Managers for this project</span>";
+      html = "<span class='none_text'>No Asset Managers for this #{t('project')}</span>";
     else
-      project.asset_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = project.asset_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
+    html.html_safe
   end
 
   def project_managers_link_list project
     if project.project_managers.empty?
-      "<span class='none_text'>No Project Managers for this project</span>";
+      html = "<span class='none_text'>No #{t('project')} Managers for this #{t('project')}</span>";
     else
-      project.project_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = project.project_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
+    html.html_safe
   end
 
   def gatekeepers_link_list project
     if project.gatekeepers.empty?
-      "<span class='none_text'>No Gatekeepers for this project</span>";
+      html = "<span class='none_text'>No Gatekeepers for this #{t('project')}</span>";
     else
-      project.gatekeepers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = project.gatekeepers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
+    html.html_safe
   end
 
   def project_coordinators_link_list project
@@ -58,11 +62,12 @@ module ProjectsHelper
     end
   end
   def project_mailing_list project
-      if project.people.empty?
-        "<span class='none_text'>No people in this project</span>";
-      else
-        "<span>" + project.people.sort_by(&:last_name).select(&:can_view?).map{|p|link_to(h(p.name), p) + " (" + p.email + ")"}.join(";<br/>") + "</span>";
-      end
+    if project.people.empty?
+      html = "<span class='none_text'>No people in this #{t('project')}</span>";
+    else
+      html = "<span>" + project.people.sort_by(&:last_name).select(&:can_view?).map{|p|link_to(h(p.name), p) + " (" + p.email + ")"}.join(";<br/>") + "</span>";
+    end
+    html.html_safe
   end
 
   def tree_editor_display type, show_edit=true, show_delete=true, selected_id=nil, related_resource_type="Person",selective_display=false, foldable=false

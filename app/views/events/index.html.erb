@@ -1,15 +1,15 @@
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_event_path, "Announce an Event", nil, "Announce an Event" %></li>
+        <li><%= image_tag_for_key "new", new_event_path, "Announce an #{t('event')}", nil, "Announce an #{t('event')}" %></li>
     </ul>
 <% end %>
 
-<% if @events.public_methods.include?("page_totals") %>
+<% if @events.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @events.pages, :page_totals=>@events.page_totals,:current_page=>@events.page } -%>
+  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @events.pages, :page_totals=>@events.page_totals,:current_page=>@events.page } -%>
 <% end %>
 <%= render :partial => "assets/resource_list", :locals => { :collection => @events, :authorization_for_showing_already_done=>true } %>
 
-<% if @events.page == "latest" && Event.find(:all).length > Seek::Config.limit_latest %>
-    <%= render :partial => "layouts/paginate_see_all"%>
+<% if @events.page == "latest" && Event.count > Seek::Config.limit_latest %>
+    <%= render :partial => "general/paginate_see_all"%>
 <% end %>

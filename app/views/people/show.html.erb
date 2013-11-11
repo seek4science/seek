@@ -1,6 +1,6 @@
 <% drag_id=model_to_drag_id @person %>
 
-<%= render :partial => "layouts/item_title", :locals=>{:item=>@person} %>
+<%= render :partial => "general/item_title", :locals=>{:item=>@person} %>
 
 <ul class="sectionIcons">
   <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
@@ -24,10 +24,17 @@
         <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
       </li>
   <% end -%>
+
+  <% if mine?(@person) -%>
+      <li>
+        <% tooltip_text = "Publish your owned assets in one click. A preview will be given before publishing" %>
+        <%= image_tag_for_key "publish", batch_publishing_preview_person_path(@person), "Publish your assets", {:title => tooltip_title_attrib(tooltip_text)}, "Publish your assets" -%>
+      </li>
+  <% end %>
 </ul>
 
 <div class="show_basic">
-  <div class="main_content_left_box_narrower">
+  <div class="main_content_left_box">
     <div class="box_about_actor">
       <%= render :partial=>"profile_information" -%>
 
@@ -35,7 +42,7 @@
 
     </div>
   </div>
-  <div class="main_content_right_box_wider">
+  <div class="main_content_right_box">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => {:object => @person, :drag_id => drag_id} -%>
     <%= render :partial=>"personal_tags", :locals=>{:person=>@person} %>
   </div>
@@ -45,28 +52,28 @@
     <%= render :partial=>"people/project_roles", :locals=>{:editable=>false} %>
     <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <%= render :partial=>"layouts/items_related_to", :object => @person %>
+    <%= render :partial=>"general/items_related_to", :object => @person %>
     <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
     <%# this is because it's not needed then: admins can see everything anyway -%>
     <% if admin_logged_in? -%>
         <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
         <ul>
 
-          <%= "<li>This person is a <b>#{Seek::Config.dm_project_name} PAL</b></li>" if @person.is_pal? %>
+          <%= "<li>This person is a <b>#{Seek::Config.dm_project_name} PAL</b></li>".html_safe if @person.is_pal? %>
 
 
-          <%= "<li>This person is a <b>project manager</b></li>" if @person.is_project_manager? %>
+          <%= "<li>This person is a <b>#{t('project')} Manager</b></li>".html_safe if @person.is_project_manager? %>
 
-          <%= "<li>This person is an <b>asset manager</b></li>" if @person.is_asset_manager? %>
-          <%= "<li>This person is a <b>gatekeeper</b></li>" if @person.is_gatekeeper? %>
+          <%= "<li>This person is an <b>Asset Manager</b></li>".html_safe if @person.is_asset_manager? %>
+          <%= "<li>This person is a <b>Gatekeeper</b></li>".html_safe if @person.is_gatekeeper? %>
 
           <li>
-            Editing <b>projects</b>, where this person is
-            involved: <%= @person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
+            Editing <b><%= t('project').pluralize %></b>, where this person is
+            involved: <%= (@person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>").html_safe -%>
           </li>
           <li>
             Editing <b>institutions</b>, where this person works
-            with: <%= @person.can_edit_institutions? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
+            with: <%= (@person.can_edit_institutions? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>").html_safe -%>
           </li>
         </ul>
     <% end -%>

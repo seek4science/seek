@@ -2,6 +2,8 @@
 # and open the template in the editor.
 
 module ImagesHelper
+
+  include Seek::MimeTypes
   
   def info_icon_with_tooltip(info_text, delay=200)
     return image("info",
@@ -15,11 +17,9 @@ module ImagesHelper
     image_tag filename,options
   end
 
-  def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false, size=nil)
+  def image_tag_for_key(key, url=nil, alt=nil, html_options={}, label=key.humanize, remote=false, size=nil)
 
-    if (label == 'Destroy')
-      label = 'Delete';
-    end
+    label = 'Delete' if label == 'Destroy'
     
     return nil unless (filename = icon_filename_for_key(key.downcase))
 
@@ -28,19 +28,20 @@ module ImagesHelper
     img_tag = image_tag(filename, image_options)
 
     inner = img_tag;
-    inner = "#{img_tag} #{label}" unless label.blank?
+    inner = "#{img_tag} #{label}".html_safe unless label.blank?
     
     if (url)
       if (remote==:function)
-        inner = link_to_function inner, url, url_options
+        inner = link_to_function inner, url, html_options
       elsif (remote)
-        inner = link_to_remote(inner, url, url_options);
+        inner = link_to(inner, url, html_options.merge(:remote => true))
       else
-        inner = link_to(inner, url, url_options)
+        inner = link_to(inner, url, html_options)
       end
     end
     
-    return '<span class="icon">' + inner + '</span>';
+    tag = '<span class="icon">' + inner + '</span>'
+    tag.html_safe
   end
 
   def resource_avatar resource,html_options={}
@@ -71,7 +72,9 @@ module ImagesHelper
       when "multi_add"
       "famfamfam_silk/table_add.png"
       when "download"
-      "redmond_studio/arrow-down_16.png"
+        "crystal_project/16x16/actions/build.png"
+      when "big_download"
+        "crystal_project/32x32/actions/build.png"
       when "show"
       "famfamfam_silk/zoom.png"
       when "zoom_in"
@@ -262,6 +265,8 @@ module ImagesHelper
       "misc_icons/feed_icon.png"
       when "impersonate"
       "famfamfam_silk/group_go.png"
+      when "partial_world"
+        "misc_icons/partial_world.png"
       when "world"
       "famfamfam_silk/world.png"
       when "file_large"
@@ -279,7 +284,7 @@ module ImagesHelper
       when "specimen", "specimens"
         "misc_icons/green_virus-64x64.png"
       when "publish"
-       "crystal_project/22x22/actions/up.png"
+        "famfamfam_silk/world_add.png"
       when "spreadsheet"
       "famfamfam_silk/table.png"
       when "spreadsheet_annotation"

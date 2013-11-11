@@ -9,8 +9,8 @@ class ConfigTest < ActiveSupport::TestCase
   test "events enabled" do
     assert_equal true ,Seek::Config.events_enabled
   end
-  test "jerm_enabled" do
-    assert_equal true ,Seek::Config.jerm_enabled
+  test "jerm_disabled" do
+    assert_equal false ,Seek::Config.jerm_enabled
   end
   test "solr enabled" do
     assert_equal false ,Seek::Config.solr_enabled
@@ -38,6 +38,39 @@ class ConfigTest < ActiveSupport::TestCase
 
     with_config_value :external_search_enabled,false do
       assert !Seek::Config.external_search_enabled
+    end
+
+  end
+
+  test "filestore_location" do
+    cb = Factory :content_blob
+
+    assert_equal "tmp/testing-filestore",Seek::Config.filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/assets",Seek::Config.asset_filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/model_images", Seek::Config.model_image_filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/avatars", Seek::Config.avatar_filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/rdf", Seek::Config.rdf_filestore_path
+
+    assert_equal "#{Rails.root}/tmp/testing-filestore/assets/#{cb.uuid}.dat",cb.filepath
+    assert_equal "#{Rails.root}/tmp/testing-filestore/model_images",ModelImage.image_directory
+    assert_equal "#{Rails.root}/tmp/testing-filestore/model_images/original",ModelImage.original_path
+
+    assert_equal "#{Rails.root}/tmp/testing-filestore/tmp",Seek::Config.temporary_filestore_path
+    assert_equal "#{Rails.root}/tmp/testing-filestore/tmp/converted",Seek::Config.converted_filestore_path
+
+    assert_equal "#{Rails.root}/tmp/testing-filestore/avatars",Avatar.image_directory
+
+    with_config_value :filestore_path,"/tmp/fish" do
+      assert_equal "/tmp/fish/assets",Seek::Config.asset_filestore_path
+      assert_equal "/tmp/fish/model_images", Seek::Config.model_image_filestore_path
+      assert_equal "/tmp/fish/avatars", Seek::Config.avatar_filestore_path
+
+      assert_equal "/tmp/fish/assets/#{cb.uuid}.dat",cb.filepath
+
+      assert_equal "/tmp/fish/tmp",Seek::Config.temporary_filestore_path
+      assert_equal "/tmp/fish/tmp/converted",Seek::Config.converted_filestore_path
+      assert_equal "/tmp/fish/rdf", Seek::Config.rdf_filestore_path
+
     end
 
   end
@@ -254,4 +287,11 @@ class ConfigTest < ActiveSupport::TestCase
   test "recaptcha enabled" do
     assert_equal true, Seek::Config.recaptcha_enabled
   end
+
+  test 'propagate bioportal api key' do
+      assert_equal "fish",Organism.bioportal_api_key
+      Seek::Config.bioportal_api_key = "frog"
+      assert_equal "frog",Organism.bioportal_api_key
+  end
+
 end

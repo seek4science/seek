@@ -19,12 +19,12 @@ class SessionsControllerTest < ActionController::TestCase
 
   test "sessions#index redirects to session#new" do
     get :index
-    assert_redirected_to login_url
+    assert_redirected_to root_path
   end
 
-  test "session#show redirects to session#new" do
+  test "session#show redirects to root page" do
     get :show
-    assert_redirected_to login_url
+    assert_redirected_to root_path
   end
 
   def test_index_not_logged_in
@@ -32,7 +32,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert_response :success
 
     User.destroy_all #remove all users
-    assert 0,User.count
+    assert_equal 0,User.count
     get :new
     assert_response :redirect
     assert_redirected_to signup_url
@@ -100,7 +100,7 @@ class SessionsControllerTest < ActionController::TestCase
 
   def test_should_fail_cookie_login
     users(:quentin).remember_me
-    @request.cookies["auth_token"] = auth_token('invalid_auth_token')
+    @request.cookies["auth_token"] = 'invalid_auth_token'
     get :new
     assert !@controller.send(:logged_in?)
   end
@@ -148,11 +148,8 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   protected
-    def auth_token(token)
-      CGI::Cookie.new('name' => 'auth_token', 'value' => token)
-    end
-    
+
     def cookie_for(user)
-      auth_token users(user).remember_token
+      users(user).remember_token
     end
 end

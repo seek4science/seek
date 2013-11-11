@@ -11,7 +11,7 @@ class MimeTypesHelperTest < ActionView::TestCase
   DOCX=%w{application/vnd.openxmlformats-officedocument.wordprocessingml.document}
   PPT=%w{application/vnd.ms-powerpoint}
   PDF=%w{application/pdf}
-  IMAGE=%w{image/gif image/jpeg image/png image/jpg image/bmp image/svg+xml}
+  IMAGE=%w{image/gif image/jpeg image/png image/bmp image/svg+xml}
   TEXT=%w{text/plain}
   CSV=%w{text/x-comma-separated-values}
   XML=%w{text/xml}
@@ -45,91 +45,91 @@ class MimeTypesHelperTest < ActionView::TestCase
 
   def test_common_types
     EXCEL.each do |type|
-      assert_equal "xls",mime_extension(type)
+      assert mime_extensions(type).include?("xls")
       assert_equal "Spreadsheet",mime_nice_name(type)
       assert_equal icon_filename_for_key("xls_file"),mime_icon_url(type)
     end 
     
     EXCELX.each do |type|
-      assert_equal "xlsx",mime_extension(type)
+      assert mime_extensions(type).include?("xlsx")
       assert_equal "Spreadsheet",mime_nice_name(type)
       assert_equal icon_filename_for_key("xls_file"),mime_icon_url(type)
     end 
     
     DOC.each do |type|
-      assert_equal "doc",mime_extension(type)
+      assert mime_extensions(type).include?("doc")
       assert_equal "Word document",mime_nice_name(type)
       assert_equal icon_filename_for_key("doc_file"),mime_icon_url(type)
     end 
     
     DOCX.each do |type|
-      assert_equal "docx",mime_extension(type)
+      assert mime_extensions(type).include?("docx")
       assert_equal "Word document",mime_nice_name(type)
       assert_equal icon_filename_for_key("doc_file"),mime_icon_url(type)
     end 
     
     PPT.each do |type|
-      assert_equal "ppt",mime_extension(type)
+      assert mime_extensions(type).include?("ppt")
       assert_equal "PowerPoint presentation",mime_nice_name(type)
       assert_equal icon_filename_for_key("ppt_file"),mime_icon_url(type)
     end 
     
     PDF.each do |type|
-      assert_equal "pdf",mime_extension(type)
+      assert mime_extensions(type).include?("pdf")
       assert_equal "PDF document",mime_nice_name(type)
       assert_equal icon_filename_for_key("pdf_file"),mime_icon_url(type)
     end 
     
     TEXT.each do |type|
-      assert_equal "txt",mime_extension(type)
+      assert mime_extensions(type).include?("txt")
       assert_equal "Plain text file",mime_nice_name(type)
       assert_equal icon_filename_for_key("txt_file"),mime_icon_url(type)
     end
     
     CSV.each do |type|
-      assert_equal "csv",mime_extension(type)
+      assert mime_extensions(type).include?('csv')
       assert_equal "Comma-seperated-values file",mime_nice_name(type)
       assert_equal icon_filename_for_key("misc_file"),mime_icon_url(type)
     end
 
     XML.each do |type|
-      assert_equal "xml", mime_extension(type)
+      assert mime_extensions(type).include?("xml")
       assert_equal "XML document", mime_nice_name(type)
       assert_equal icon_filename_for_key("xml_file"), mime_icon_url(type)
     end
 
     ODP.each do |type|
-      assert_equal "odp", mime_extension(type)
+      assert mime_extensions(type).include?("odp")
       assert_equal "PowerPoint presentation", mime_nice_name(type)
       assert_equal icon_filename_for_key("ppt_file"), mime_icon_url(type)
     end
 
     FODP.each do |type|
-      assert_equal "fodp", mime_extension(type)
+      assert mime_extensions(type).include?("fodp")
       assert_equal "PowerPoint presentation", mime_nice_name(type)
       assert_equal icon_filename_for_key("ppt_file"), mime_icon_url(type)
     end
 
     ODT.each do |type|
-      assert_equal "odt", mime_extension(type)
+      assert mime_extensions(type).include?("odt")
       assert_equal "Word document", mime_nice_name(type)
       assert_equal icon_filename_for_key("doc_file"), mime_icon_url(type)
     end
 
     FODT.each do |type|
-      assert_equal "fodt", mime_extension(type)
+      assert mime_extensions(type).include?("fodt")
       assert_equal "Word document", mime_nice_name(type)
       assert_equal icon_filename_for_key("doc_file"), mime_icon_url(type)
     end
 
     RTF.each do |type|
-      assert_equal "rtf", mime_extension(type)
+      assert mime_extensions(type).include?("rtf")
       assert_equal "Document file", mime_nice_name(type)
       assert_equal icon_filename_for_key("rtf_file"), mime_icon_url(type)
     end
 
     HTML.each do |type|
-      assert_equal "html", mime_extension(type)
+      assert mime_extensions(type).include?("html")
       assert_equal "Website", mime_nice_name(type)
       assert_equal icon_filename_for_key("html_file"), mime_icon_url(type)
     end

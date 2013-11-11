@@ -39,7 +39,7 @@ module Jerm
     def populate resource            
       begin
         if resource.uri.blank?
-          response={:response=>:fail,:message=>"No URL to data file described"}
+          response={:response=>:fail,:message=>"No URL to #{t('data_file')} described"}
         elsif !exists?(resource)
           response=add_as_new(resource)
         else
@@ -68,7 +68,7 @@ module Jerm
       if find_by_uri(resource.uri).nil?
         #Check the file doesn't exist
         #FIXME: Checks project here and again in the embeddedpopulator later on.
-        project = Project.find(:first,:conditions=>['name = ?',resource.project]) #get project
+        project = Project.where(:conditions=>['name = ?',resource.project]).first #get project
         if project.nil?
           return false
         end

@@ -1,10 +1,12 @@
 require 'test_helper'
+require 'tmpdir'
 
 class AssayTest < ActiveSupport::TestCase
   fixtures :all
 
 
   test "shouldnt edit the assay" do
+    ActiveRecord::Fixtures
     non_admin = Factory :user,:person=> Factory(:person,:is_admin=>false)
     user = non_admin #users(:aaron)
     assay = assays(:modelling_assay_with_data_and_relationship)
@@ -16,6 +18,30 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 2,assay.sops.size
     assert assay.sops.include?(sops(:my_first_sop).versions.first)
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
+  end
+
+  test "to_rdf" do
+    assay = Factory :assay, :assay_type=>Factory(:assay_type), :technology_type=>Factory(:technology_type)
+    Factory :assay_organism, :assay=>assay, :organism=>Factory(:organism)
+    pub = Factory :publication
+    Factory :relationship, :subject=>assay, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
+    Factory :assay_asset, :assay=>assay
+    assay.reload
+    assert_equal 1,assay.assets.size
+    rdf = assay.to_rdf
+
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
+    end
+
+    #try with assay & tech type with nil term
+    assay = Factory :assay, :organisms=>[Factory(:organism)], :assay_type=>Factory(:assay_type, :term_uri=>nil), :technology_type=>Factory(:technology_type,:term_uri=>nil)
+    rdf = assay.to_rdf
+
+    #try with no assay or tech type
+    assay = Factory :assay, :technology_type=>nil
+    rdf = assay.to_rdf
   end
 
   test "is_asset?" do

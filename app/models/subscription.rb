@@ -1,13 +1,13 @@
-require 'acts_as_authorized'
+
 class Subscription < ActiveRecord::Base
-  belongs_to :person, :required_access => false
-  belongs_to :subscribable, :required_access => false, :polymorphic => true
+  belongs_to :person #, :required_access => false
+  belongs_to :subscribable, :polymorphic => true #,:required_access => false
   belongs_to :project_subscription
 
   validates_presence_of :person
   validates_presence_of :subscribable
 
-  named_scope :for_subscribable, lambda {|item|
+  scope :for_subscribable, lambda {|item|
     {
         :conditions=>["subscribable_id=? and subscribable_type=?",item.id,item.class.name]
     }

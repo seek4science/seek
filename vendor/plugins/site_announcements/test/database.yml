@@ -1,3 +1,0 @@
-sqlite:
-  :adapter: sqlite
-  :dbfile: vendor/plugins/yaffle/test/test.db

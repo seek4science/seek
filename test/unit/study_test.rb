@@ -21,6 +21,15 @@ class StudyTest < ActiveSupport::TestCase
 
   end
 
+  test "to_rdf" do
+    object = Factory :study, :description=>"My famous study", :assays=>[Factory(:assay),Factory(:assay)]
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/studies/#{object.id}"), reader.statements.first.subject
+    end
+  end
+
   test "sort by updated_at" do
     assert_equal Study.find(:all).sort_by { |s| s.updated_at.to_i * -1 }, Study.find(:all)
   end
@@ -33,8 +42,34 @@ class StudyTest < ActiveSupport::TestCase
     assert !study.can_delete?(project_member.user)
     assert study.can_delete?(study.contributor.user)
 
-    study=Factory :study, :contributor => Factory(:person), :assays => [Factory :assay]
+    study=Factory :study, :contributor => Factory(:person), :assays => [Factory(:assay)]
     assert !study.can_delete?(study.contributor)
+  end
+
+  test "publications through assays" do
+    assay1 = Factory :assay
+    assay2 = Factory :assay
+
+    pub1 = Factory :publication, :title=>"pub 1"
+    pub2 = Factory :publication, :title=>"pub 2"
+    pub3 = Factory :publication, :title=>"pub 3"
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub1
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub3
+
+    study = Factory(:study,:assays=>[assay1,assay2])
+
+    assay1.reload
+    assay2.reload
+    assert_equal 2,assay1.related_publications.size
+    assert_equal 2,assay2.related_publications.size
+
+
+    assert_equal 2,study.assays.size
+    assert_equal 3,study.related_publications.size
+    assert_equal [pub1,pub2,pub3],study.related_publications.sort_by(&:id)
   end
 
   test "sops through assays" do

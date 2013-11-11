@@ -22,8 +22,8 @@ module Seek
       begin
         unless File.exists?(pdf_filepath)
           #copy dat file to original file extension in order to convert to pdf on this file
-          file_extension = mime_extension(content_type)
-          tmp_file = Tempfile.new storage_filename(file_extension)
+          file_extension = mime_extensions(content_type).first
+          tmp_file = Tempfile.new(['','.'+ file_extension])
           copied_filepath = tmp_file.path
 
           FileUtils.cp dat_filepath, copied_filepath
@@ -40,10 +40,8 @@ module Seek
       end
     end
 
-    private
-
     def extract_text_from_pdf
-      output_directory = storage_directory
+      output_directory = converted_storage_directory
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
 
@@ -64,11 +62,13 @@ module Seek
       end
     end
 
+    private
+
     def split_content content,delimiter="\n"
       content.split(delimiter).select{|str| !str.blank?}
     end
 
-    #filters special characters \n \f
+    #filters special characters, keeping alphanumeric characts and newlines
     def filter_text_content content
       content.gsub(/[^0-9a-z \n]/i, '')
     end

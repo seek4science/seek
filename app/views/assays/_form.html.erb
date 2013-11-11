@@ -1,8 +1,8 @@
 <%= javascript_include_tag 'strain.js' -%>
 <%
  select_truncate_length=120
-@assay_text=@assay.is_modelling? ? "analysis" : "assay"
-@assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "assay type"
+@assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.assay')}"
+@assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
 %>
 <%= javascript_include_tag "assays.js"  %>
 <%= javascript_include_tag "sharing.js", "resource.js"%>
@@ -35,9 +35,9 @@
   <% if @assay.study.blank? or @assay.study.can_view? %>
   <p>
     <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
-    <%= f.label :study -%>
+    <%= t('study') -%>
     <span class="required">*</span>
-     <%= link_to h(" New Study?"),new_study_path(:new_link_from_assay=>true),:popup => true%> <br/>
+     <%= link_to h(" New #{t('study')}?"),new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %> <br/>
     <% investigations = Investigation.all.select &:can_view? -%>
     <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>" : "" %>
     <% investigations.each do |i| %>
@@ -51,7 +51,7 @@
         <% end %>
     <% end %>
     <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" style="width:100%">
-      <%= options %>
+        <%= options.html_safe %>
     </select>
   </p>
   <%end%>
@@ -115,7 +115,7 @@
 
 <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
 
-<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Assay",
+<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
                                                                         :related_publications => @assay.related_publications} -%>
 
 <% end -%>
@@ -149,44 +149,6 @@
     var elem = document.getElementById("full_study_title");
     elem.style.display = 'none';
   }
-  
-  function changeTypes(){
-    var value = $("assay_class_select").value;
-    var assayTypeRoot = "";
-    var technologyTypeRoot = "";
-    //Get the ID of the Modelling Assay class
-    var modellingAssayClassID = <%= AssayClass.find_by_title("Modelling Assay").try(:id) || 0 -%>;
-    var experimentalAssayClassID = <%= AssayClass.find_by_title("Experimental Assay").try(:id) || 0 -%>;
-    if (value == modellingAssayClassID){
-      //Get the IDs of the Type roots to switch the select box to.
-      assayTypeRoot = <%= AssayType.find_by_title("modelling assay types").try(:id) || 0 -%>;
-      technologyTypeRoot = <%= TechnologyType.find_by_title("modelling technology").try(:id) || 0 -%>;
-      $('associate_model_form').style.display = '';
-      $('data_file_relationship_type_section').style.display = '';
-    }
-    else if (value == experimentalAssayClassID){
-      //Get the IDs of the Type roots to switch the select box to.
-      assayTypeRoot = <%= AssayType.find_by_title("assay types").try(:id) || 0 -%>;
-      technologyTypeRoot = <%= TechnologyType.find_by_title("technology").try(:id) || 0 -%>;
-      $('associate_model_form').style.display = 'none';
-      $('data_file_relationship_type_section').style.display = 'none';
-    }
-    //Change AssayType form
-    var assayTypeSelect = $("assay_assay_type_id");
-    for (var i=0;i < assayTypeSelect.options.length;i++) {
-      if (assayTypeSelect.options[i].value == assayTypeRoot)
-        assayTypeSelect.options[i].selected = true;
-      else 
-        assayTypeSelect.options[i].selected = false;
-    }
-    //Change TechnologyType form
-    var techTypeSelect = $("assay_technology_type_id");
-    for ( i=0;i < techTypeSelect.options.length;i++) {
-      if (techTypeSelect.options[i].value == technologyTypeRoot)
-        techTypeSelect.options[i].selected = true;
-      else 
-        techTypeSelect.options[i].selected = false;
-    }
 
   }
 
@@ -205,8 +167,6 @@
       } else {
           Effect.Appear('add_samples_form');
       }
-  }
-
   function check_show_organism_form() {
       if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
           Effect.Fade('add_organism_form');

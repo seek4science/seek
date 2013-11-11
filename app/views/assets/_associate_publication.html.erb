@@ -13,7 +13,7 @@
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
-        all_publications = Publication.find(:all)
+        all_publications = Publication.all.sort_by(&:title)
         project_publications=all_publications.select{|df| current_user.person.member_of?(df.projects)}
         select_truncate_length=120
       -%>
@@ -28,6 +28,7 @@
         <%= select_tag :possible_publications,
           options_for_select([["Select Publication ...",0]]|project_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
           {:style=>"width:90%",:onchange=>remote_function(
+                  :method=>:get,
             :url=>{:action=>"preview",:controller=>"publications",:element=>"publication_preview"},
             :with=>"'id='+this.value",
             :before=>"show_ajax_loader('publication_preview')"
@@ -38,7 +39,7 @@
         
         <br/>
 
-        <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other projects?
+        <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other <%= t('project').pluralize %>?
       </div>
 	  <br/>
       <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link" %>

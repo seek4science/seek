@@ -3,12 +3,13 @@
 <%= error_messages_for('publication', :message => nil) %>
 
 <div class="show_basic">
-  <% form_remote_tag(:url=>url_for(:action=>:fetch_preview, :controller=>:publications), 
-                     :update => {:success => 'publication_preview_container', :failure => 'publication_error'}, 
-                     :success => "Element.show('publication_preview_container'); Element.hide('publication_error'); new Effect.Highlight('publication_preview_container', { duration: 1.0 });",
-                     :failure => "Element.show('publication_error'); Element.hide('publication_preview_container');new Effect.Highlight('publication_error', { duration: 1.0, startcolor: '#FF5555' });", 
-                     :loading => "Element.hide('publication_preview_container');Element.show('spinner');$('fetch_button').disabled=true;",
-                     :complete => "Element.hide('spinner');$('fetch_button').disabled=false;") do %>
+  <%= form_tag_with_callbacks(fetch_preview_publications_path,
+               {:remote=>true,
+                :id=>"fetch_publication",
+                :success => "Element.show('publication_preview_container'); Element.hide('publication_error'); new Effect.Highlight('publication_preview_container', { duration: 1.0 });",
+                :failure => "Element.show('publication_error'); Element.hide('publication_preview_container');new Effect.Highlight('publication_error', { duration: 1.0, startcolor: '#FF5555' });",
+                :loading => "Element.hide('publication_preview_container');Element.show('spinner');$('fetch_button').disabled=true;",
+                :complete => "Element.hide('spinner');$('fetch_button').disabled=false;"}) do %>
     <p>
       Choose whether to search by PubMed ID or DOI using the dropdown menu below, then enter the document identifier into the text box and click "Fetch".<br/>
       If SEEK successfully retrieves your publication, click "Register" to process to the next step.
@@ -21,7 +22,7 @@
     </p>
 
     <p>
-        Please select the projects this publication is related to. You must select a project, and it must be a project
+        Please select the <%= t('project').pluralize %> this publication is related to. You must select a <%= t('project') %>, and it must be a <%= t('project') %>
         you are a member of.
     </p>
     <%= fields_for(@publication) {|f|  f.hidden_field :parent_name } -%>

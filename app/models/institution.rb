@@ -3,12 +3,14 @@ require 'title_trimmer'
 
 class Institution < ActiveRecord::Base
 
+  include Seek::Rdf::RdfGeneration
+
   title_trimmer
 
   acts_as_yellow_pages
 
-  #load the configuration for the pagination
-  grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+  scope :default_order, order("name")
+
   validates_uniqueness_of :name
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
@@ -37,8 +39,7 @@ class Institution < ActiveRecord::Base
 
   # get a listing of all known institutions
   def self.get_all_institutions_listing
-    institutions = Institution.find(:all)
-    return institutions.collect { |i| [i.name, i.id] }
+    Institution.all.collect { |i| [i.name, i.id] }
   end  
   
 end

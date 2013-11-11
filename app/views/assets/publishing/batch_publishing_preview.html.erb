@@ -1,0 +1,44 @@
+<%= javascript_include_tag 'publishing' %>
+<%= stylesheet_link_tag "publishing" %>
+
+<div class="show_basic">
+  <%= show_title "Batch publishing of your items" %>
+
+  <div class="box_infotext">
+    <p>
+      Publishing means that you will be making the item visible, and where applicable downloadable, to other people
+      visiting the <%= Seek::Config.application_name -%>.
+    </p>
+
+    <p>
+      This view presents you with the list of items that you have permission to publish, but have not yet been.
+    </p>
+
+    <p>
+      You can select an item to be published by <b>checking</b> the <span class="published"><b>Publish</b></span>
+      checkbox beside that item.
+    </p>
+
+  </div>
+  <br/>
+
+  <%= form_tag({:action => :check_related_items},:method=>:post)  do -%>
+      <% if @assets.empty? %>
+          <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
+      <% else %>
+          <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
+                <h2><%= text_for_resource items.first %>(s)</h2>
+                <% items.each do |item| %>
+                  <%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options"} -%>
+                  <br/>
+                <% end %>
+          <% end %>
+          <br/>
+
+          <%= submit_tag "Next", :disable_with=>"Next"-%>
+          Or
+          <%= link_to "Cancel", person_path(params[:id].to_i)-%>
+      <% end -%>
+  <% end -%>
+
+</div>

@@ -1,10 +1,11 @@
 module Seek
   module ContentBlobCommon
-
     def handle_download disposition='attachment'
       if @content_blob.url.blank?
         if @content_blob.file_exists?
           send_file @content_blob.filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type || "application/octet-stream", :disposition => disposition
+          #added for the benefit of the tests after rails3 upgrade - but doubt it is required
+          headers["Content-Length"]=@content_blob.filesize.to_s
         else
           redirect_on_error @asset_version,"Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
         end

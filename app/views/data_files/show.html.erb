@@ -1,4 +1,4 @@
-<%= javascript_include_tag "resource" -%> <% #sharing.js","associate_events.js","assays.js","attribution.js", "application", "resource.js", "prototype", "scriptaculous", "autocompleter_advanced", "tabber-minimized" -%>
+<%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 <% if @data_file.is_with_sample?
    bio_samples = @data_file.bio_samples_population nil, false
@@ -6,10 +6,15 @@
   end
 -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file } -%>
+<%= render :partial => "general/item_title",:locals=>{:item=>@data_file } -%>
 
 <ul class="sectionIcons">
 <%= asset_buttons @data_file,@display_data_file.version -%>
+  <% if Seek::Config.solr_enabled && @display_data_file.latest_version? && @data_file.contains_extractable_spreadsheet? -%>
+      <li>
+        <%= image_tag_for_key("search",matching_models_data_file_path(@data_file),nil,nil,"Find related #{t('model').pluralize}") -%>
+      </li>
+  <% end -%>
 </ul>
 <br/>
 
@@ -17,10 +22,7 @@
 
   <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 
-  <div id="matching_models" style="display:none;text-align:center";></div>
-  <div id="matching_results" style="display:none;height:55em;overflow-y: scroll;"></div>
-
-  <div class="main_content_left_box_narrower">
+  <div class="main_content_left_box">
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
 
@@ -28,22 +30,11 @@
 
       <br/>
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
-      <p>
-        <b>Description:</b>
-        <% unless @display_data_file.description.blank? -%>
-          <div class="box_standout" id="description">
-            <%= simple_format(auto_link(white_list(@display_data_file.description),:all,:rel=>'nofollow')) -%>
-          </div>
-        <% else -%>
-          <p class="none_text">
-            No description.
-          </p>
-        <% end -%>
-      </p>
+      <%= item_description @display_data_file.description -%>
     </div>
   </div>
 
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file } -%>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } -%>
   
   <div style="clear:both;">
     <p>
@@ -78,12 +69,12 @@
                    end
                  -%>
                 <% if is_empty -%>
-                    <span class="none_text">No treatments were found in the data file, or it does not match a known template.</span>
+                    <span class="none_text">No treatments were found in the <%= t('data_file') %>, or it does not match a known template.</span>
                 <% else -%>
                     <%= treatment_table -%>
                 <% end -%>
         <% else -%>
-            <span id="treatments" class="none_text">You do not have permission to view the treatments for this file.</span>
+            <span id="treatments" class="none_text">You do not have permission to view the treatments for this <%= t('data_file') %>.</span>
         <% end -%>
       </div>
     </div>
@@ -126,8 +117,6 @@
     <% end -%>
   <% end -%>
   </div>
-  <%= render :partial=>"layouts/items_related_to",:object => @data_file -%>
-  <br/>
-  <%= render :partial => "layouts/usage_info", :locals => { :resource => @data_file } -%>
+  <%= render :partial=>"general/items_related_to",:object => @data_file -%>
 
 </div>

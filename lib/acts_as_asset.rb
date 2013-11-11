@@ -8,7 +8,8 @@
 # * Copyright (c) 2007 University of Manchester and the University of Southampton.
 # * See license.txt for details.
 # ********************************************************************************
-require 'acts_as_authorized'
+require 'seek/permissions/acts_as_authorized'
+#require 'grouped_pagination'
 
 module Acts #:nodoc:
   module Asset #:nodoc:
@@ -38,8 +39,6 @@ module Acts #:nodoc:
         attr_writer :original_filename,:content_type
         does_not_require_can_edit :last_used_at
 
-        default_scope :order => "#{self.table_name}.updated_at DESC"
-
         validates_presence_of :title
 
         acts_as_scalable if Seek::Config.is_virtualliver
@@ -57,7 +56,7 @@ module Acts #:nodoc:
 
         has_many :inverse_relationships,
                  :class_name => 'Relationship',
-                 :as => :object,
+                 :as => :other_object,
                  :dependent => :destroy
 
         has_many :assay_assets, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
@@ -81,7 +80,7 @@ module Acts #:nodoc:
 
         after_create :add_new_to_folder
 
-        grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+        grouped_pagination
 
         class_eval do
           extend Acts::Asset::SingletonMethods
@@ -118,12 +117,6 @@ module Acts #:nodoc:
         self.creators
       end
 
-      # this method will take attributions' association and return a collection of resources,
-      # to which the current resource is attributed
-      def attributions
-        self.relationships.select { |a| a.predicate == Relationship::ATTRIBUTED_TO }
-      end
-
       def add_new_to_folder
         projects.each do |project|
           pf = ProjectFolder.new_items_folder project
@@ -133,16 +126,21 @@ module Acts #:nodoc:
         end
       end
 
+      #sets the last_used_at time to the current time
+      def just_used
+        update_column(:last_used_at, Time.now)
+      end
+
       def folders
         project_folder_assets.collect{|pfa| pfa.project_folder}
       end
 
       def attributions_objects
-        self.attributions.collect { |a| a.object }
+        self.attributions.collect { |a| a.other_object }
       end
 
       def related_publications
-        self.relationships.select { |a| a.object_type == "Publication" }.collect { |a| a.object }
+        self.relationships.select { |a| a.other_object_type == "Publication" }.collect { |a| a.other_object }
       end
 
       def cache_remote_content_blob
@@ -183,12 +181,20 @@ module Acts #:nodoc:
         project_assays
       end
 
+      def assay_types
+        assays.collect{|a| a.assay_type}
+      end
+
+      def technology_types
+        assays.collect{|a| a.technology_type}
+      end
+
       def assay_type_titles
-        assays.collect{|a| a.assay_type.try(:title)}.compact
+        assay_types.collect{|at| at.try(:title)}.compact
       end
 
       def technology_type_titles
-        assays.collect{|a| a.technology_type.try(:title)}.compact
+        technology_types.collect{|tt| tt.try(:title)}.compact
       end
 
       #the search terms coming from the content-blob(s)

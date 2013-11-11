@@ -2,9 +2,9 @@
 
 <% current_user_authorized_to_manage = @sop.can_manage? -%>
 
-<h1>Editing SOP: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
+<h1>Editing <%= t('sop') %>: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
 <div class="show_basic">
-    <% form_for(@sop) do |f| %>
+    <%= form_for(@sop) do |f| %>
     <div class="asset_form">
         <%= f.error_messages %>
         <p>

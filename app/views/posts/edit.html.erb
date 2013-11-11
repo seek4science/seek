@@ -6,7 +6,7 @@
       :class => "utility", :method => :delete, :confirm => 'Delete this post forever?'[:delete_post_conf]) %>
 
 <%= error_messages_for :topic %>
-<% form_for :post, :html => { :method => :put }, 
+<%= form_for :post, :html => { :method => :put },
      :url  => post_path(:forum_id => params[:forum_id], :topic_id => params[:topic_id], :id => @post, :page => params[:page]) do |f| -%>
 <p id="post_body"><%= f.text_area :body %></p>
 

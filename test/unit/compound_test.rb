@@ -7,6 +7,34 @@ class CompoundTest < ActiveSupport::TestCase
     assert compound.save!
   end
 
+  test "to rdf" do
+    compound = Factory :compound
+    mapping1 = Mapping.new(:sabiork_id => 1, :chebi_id => '1000', :kegg_id => 'C2000')
+    mapping2 = Mapping.new(:sabiork_id => 2, :chebi_id => '1001', :kegg_id => 'C2001')
+    mapping_link1 = MappingLink.new(:substance => compound, :mapping => mapping1)
+    mapping_link2 = MappingLink.new(:substance => compound, :mapping => mapping2)
+    compound.mapping_links = [mapping_link1, mapping_link2]
+    compound.reload
+    rdf = compound.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/compounds/#{compound.id}"), reader.statements.first.subject
+    end
+  end
+
+  test "chebi ids and sabiork_ids" do
+    compound = Factory(:compound)
+    mapping1 = Mapping.new(:sabiork_id => 1, :chebi_id => 'CHEBI:1000', :kegg_id => 'C2000')
+    mapping2 = Mapping.new(:sabiork_id => 2, :chebi_id => 'CHEBI:1001', :kegg_id => 'C2001')
+    mapping_link1 = MappingLink.new(:substance => compound, :mapping => mapping1)
+    mapping_link2 = MappingLink.new(:substance => compound, :mapping => mapping2)
+    compound.mapping_links = [mapping_link1, mapping_link2]
+    compound.reload
+    assert_equal 2,compound.mapping_links.size
+    assert_equal ["CHEBI:1000","CHEBI:1001"],compound.chebi_ids.sort
+    assert_equal [1,2],compound.sabiork_ids.sort
+  end
+
   test "should create the association compound has_many mappings, through mapping_links table" do
     compound = Compound.new(:name => 'water')
 
@@ -29,7 +57,7 @@ class CompoundTest < ActiveSupport::TestCase
     compound.synonyms = [synonyms1, synonyms2]
     assert compound.save!
     assert_not_nil compound.synonyms
-    assert compound.synonyms.count, 2
+    assert_equal compound.synonyms.count, 2
   end
 
   test 'should create the association compound has_many studied_factors, through studied_factor_links table ' do

@@ -1,7 +1,7 @@
 <% unless resource.nil? -%>
   <div>
     <p class="title">
-      <%= h resource.title -%>
+      <%= list_item_title resource -%>
     </p>
     
     <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true} -%>

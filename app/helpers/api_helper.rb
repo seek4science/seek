@@ -95,9 +95,8 @@ module ApiHelper
           end              
         end
       end
-      
-      #return "#{item_type_name} - #{display_name(item, false)}"
-      return "#{display_name(item, false)}"
+
+      "#{display_name(item, false)}"
     end
   end
   
@@ -109,17 +108,17 @@ module ApiHelper
     return result
   end
   
-  def dc_xml_tag(builder, term, value, *attributes)
-    builder.tag! "dc:#{term}", value, attributes
+  def dc_xml_tag(builder, term, value)
+    builder.tag! "dc:#{term}", value
   end
   
-  def dcterms_xml_tag(builder, term, value, *attributes)
+  def dcterms_xml_tag(builder, term, value)
     # For dates...
     if [ :created, :modified, "created", "modified" ].include?(term)
       value = value.iso8601
     end
-    
-    builder.tag! "dcterms:#{term}", value, attributes
+
+    builder.tag! "dcterms:#{term}", value
   end
   
   def core_xml builder,object

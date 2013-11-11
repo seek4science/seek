@@ -1,5 +1,5 @@
 <% if logged_in? and current_user.person.member?%>
-<div class="contribution_version_box">
+<div class="contribution_version_box curved">
   <div class="contribution_version_selector_box">
     <table>
       <tbody>
@@ -40,13 +40,13 @@
         <% unless displayed_resource.version == 1 -%>
             <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
             <span>
-              <%= link_to_function "revision comments "+image("expand"),  :id => 'revision_comments_expand_image' do |page|
+              <%= link_to_function ("revision comments "+image("expand")).html_safe,  :id => 'revision_comments_expand_image' do |page|
                 page.visual_effect(:toggle_appear, "revision_comments", :duration => 0.5)
                 page["revision_comments_expand_image"].toggle
                 page["revision_comments_collapse_image"].toggle
               end
               -%>
-              <%= link_to_function "revision comments "+image("collapse"), :id => 'revision_comments_collapse_image', :style => "display:none" do |page|
+              <%= link_to_function ("revision comments "+image("collapse")).html_safe, :id => 'revision_comments_collapse_image', :style => "display:none" do |page|
                 page.visual_effect(:toggle_appear, "revision_comments", :duration => 0.5)
                 page["revision_comments_expand_image"].toggle
                 page["revision_comments_collapse_image"].toggle

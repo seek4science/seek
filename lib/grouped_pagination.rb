@@ -1,3 +1,4 @@
+#encoding: utf-8
 =begin
 Inspired by http://www.hennessynet.com/blog/?p=70
 but as a seperate mixin, rather than built into the will_paginate plugin
@@ -22,8 +23,8 @@ module GroupedPagination
       @pages = options[:pages] || ("A".."Z").to_a + ["?"]
       @field = options[:field] || "first_letter"
       @latest_limit = options[:latest_limit] || Seek::Config.limit_latest
-      @default_page = options[:default_page] || 'all'
-      
+      @default_page = options[:default_page] || Seek::Config.default_page(self.name.underscore.pluralize) || 'all'
+
       before_save :update_first_letter
       
       include GroupedPagination::InstanceMethods
@@ -33,8 +34,12 @@ module GroupedPagination
     def paginate_after_fetch(collection, *args)
       options=args.pop unless args.nil?
       options ||= {}
+      reorder = options[:reorder].nil? ? true : options[:reorder]
+
+      @latest_limit = options[:latest_limit] || @latest_limit
+      @default_page = options[:default_page] || @default_page
       
-      default_page = options[:default_page] || @default_page
+      default_page = @default_page
       default_page = @pages.first if default_page == "first"      
       
       page = options[:page] || default_page            
@@ -43,8 +48,11 @@ module GroupedPagination
       if page == "all"
         records=collection
       elsif page == "latest"
-        records=collection.sort{|x,y| y.updated_at <=> x.updated_at}[0...@latest_limit]
-        records = records.sort_by {|r| collection.index r}
+        if reorder
+          records=collection.sort{|x,y| y.updated_at <=> x.updated_at}[0...@latest_limit]
+        else
+          records=collection[0...@latest_limit]
+        end
       elsif @pages.include?(page)           
         records=collection.select {|i| i.first_letter == page}        
       end
@@ -78,7 +86,7 @@ module GroupedPagination
       conditions << optional_conditions if optional_conditions
       conditions=merge_conditions(*conditions)
       return conditions
-    end    
+    end
     
     def paginate(*args)
       options=args.pop unless args.nil?
@@ -91,14 +99,14 @@ module GroupedPagination
     
       records=[]
       if page == "all"
-        records=self.find(:all)
+        records=self.default_order
       elsif page == "latest"
-        records=self.find(:all,:order=>'created_at DESC', :limit=>@latest_limit)
+        records=self.unscoped.order("updated_at DESC").limit(@latest_limit)
       elsif @pages.include?(page)
         conditions = merge_optional_conditions(options[:conditions], page)
-        query_options = [:conditions=>conditions]
-        query_options[0].merge!(options.except(:conditions,:page,:default_page))                
-        records=self.find(:all,*query_options)        
+        query_options = {:conditions=>conditions}
+        query_options.merge!(options.except(:conditions,:page,:default_page))
+        records=self.unscoped.where(query_options[:conditions]).order(query_options[:order])
       end
       
       page_totals={}
@@ -121,6 +129,20 @@ module GroupedPagination
       end
       
       result
+    end
+
+    private
+    def merge_conditions(*conditions)
+      segments = []
+
+      conditions.each do |condition|
+        unless condition.blank?
+          sql = sanitize_sql(condition)
+          segments << sql unless sql.blank?
+        end
+      end
+
+      "(#{segments.join(') AND (')})" unless segments.empty?
     end
     
   end

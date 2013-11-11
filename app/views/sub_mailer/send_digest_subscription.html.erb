@@ -2,7 +2,7 @@ Dear <%= @person.name%>,
 <br/>
 <br/>
 <% if @frequency == 'immediately' %>
-The following resources have just been created/updated in <%= Seek::Config.application_title %>:
+The following resources have just been created or updated in <%= Seek::Config.application_title %>:
 <% else %>
     <%
        if @frequency == 'daily'
@@ -11,7 +11,7 @@ The following resources have just been created/updated in <%= Seek::Config.appli
          frequency = @frequency.chomp('ly')
        end
     %>
-    For the projects you have subscribed to receive notifications, the following resources have been created or updated in <%= Seek::Config.application_title %> during the past <%= frequency %>:
+    For the <%= t('project').pluralize %> you have subscribed to receive notifications, the following resources have been created or updated in <%= Seek::Config.application_title %> during the past <%= frequency %>:
 <% end %>
 <br/>
 <br/>
@@ -24,7 +24,7 @@ The following resources have just been created/updated in <%= Seek::Config.appli
               width: 100%;">
 
       <tr>
-        <th align="left">Project Names</th>
+        <th align="left"><%= t('project') %> Names</th>
         <th align="left">Resource Type</th>
         <th align="left">Resource Name</th>
         <th align="left">Person</th>

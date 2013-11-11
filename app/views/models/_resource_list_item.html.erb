@@ -3,9 +3,9 @@
 <div class="list_item_left_column">
 <%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>
 
-<%= list_item_optional_attribute "Model type", resource.model_type.try(:title) %>
+<%= list_item_optional_attribute "#{t('model')} type", resource.model_type.try(:title) %>
 
-<%= list_item_optional_attribute "Model format", resource.model_format.try(:title) %>
+<%= list_item_optional_attribute "#{t('model')} format", resource.model_format.try(:title) %>
 
 </div>
 

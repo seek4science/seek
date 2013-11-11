@@ -8,7 +8,9 @@ class StudiesController < ApplicationController
 
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
 
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
@@ -17,7 +19,7 @@ class StudiesController < ApplicationController
 
     unless @study.investigation.can_edit?
        @study.investigation = nil
-      flash.now[:notice] = 'The investigation of the existing study cannot be viewed, please specify your own investigation!'
+      flash.now[:notice] = "The #{t('investigation')} of the existing #{t('study')} cannot be viewed, please specify your own #{t('investigation')}!"
     end
 
     render :action => "new"
@@ -35,13 +37,13 @@ class StudiesController < ApplicationController
       if investigation.can_edit?
         @study.investigation = investigation
       else
-        flash.now[:error] = "You do not have permission to associate the new study with the investigation '#{investigation.title}'."
+        flash.now[:error] = "You do not have permission to associate the new #{t('study')} with the #{t('investigation')} '#{investigation.title}'."
       end
     end
     investigations = Investigation.all.select &:can_view?
     respond_to do |format|
       if investigations.blank?
-       flash.now[:notice] = "No investigation available, you have to create a new one before creating your study!"
+       flash.now[:notice] = "No #{t('investigation')} available, you have to create a new one before creating your Study!"
       end
       format.html
     end
@@ -81,8 +83,7 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.save
-        deliver_request_publish_approval params[:sharing], @study
-        flash[:notice] = 'Study was successfully updated.'
+        flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
         format.xml  { head :ok }
       else
@@ -98,6 +99,7 @@ class StudiesController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+      format.rdf { render :template=>'rdf/show'}
       format.svg { render :text=>to_svg(@study.investigation,params[:deep]=='true',@study)}
       format.dot { render :text=>to_dot(@study.investigation,params[:deep]=='true',@study)}
       format.png { render :text=>to_png(@study.investigation,params[:deep]=='true',@study)}
@@ -112,14 +114,13 @@ class StudiesController < ApplicationController
 
 
   if @study.save
-    deliver_request_publish_approval params[:sharing], @study
     if @study.new_link_from_assay=="true"
       render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
     else
       respond_to do |format|
-        flash[:notice] = 'The study was successfully created.<br/>'
+        flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
         if @study.create_from_asset=="true"
-          flash.now[:notice] << "Now you can create new assay by clicking 'add an assay' button"
+          flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
           format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
         else
         format.html { redirect_to study_path(@study) }
@@ -160,7 +161,7 @@ class StudiesController < ApplicationController
       end
       if !valid
         unless valid
-          error("Cannot add an assay already associated with a Study", "is invalid (invalid Assay)")
+          error("Cannot add an #{t('assays.assay')} already associated with a Study", "is invalid (invalid #{t('assays.assay')})")
           return false
         end
       end

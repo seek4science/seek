@@ -1,5 +1,3 @@
-require 'white_list_helper'
-
 class PoliciesController < ApplicationController
   include WhiteListHelper
   
@@ -57,14 +55,13 @@ class PoliciesController < ApplicationController
         elsif supported && !authorized
           render :json => {:status => 403, :error => "You are not authorized to view policy for that #{entity_type}."}
         else
-          render :json => {:status => 400, :error => "Requests for default project policies are only supported at the moment."}
+          render :json => {:status => 400, :error => "Requests for default #{t('project')} policies are only supported at the moment."}
         end
       }
     end
   end
 
   def preview_permissions
-      set_no_layout
       policy = sharing_params_to_policy
       current_person = User.current_user.try(:person)
       contributor_person = (params['is_new_file'] == 'false') ?  User.find_by_id(params['contributor_id'].to_i).try(:person) : current_person
@@ -73,7 +70,7 @@ class PoliciesController < ApplicationController
 
       resource_class = params[:resource_name].camelize.constantize
       resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
-      cloned_resource = resource.clone
+      cloned_resource = resource.dup
       cloned_resource= resource_with_assigned_projects cloned_resource,params[:project_ids]
       cloned_resource.policy = policy
       cloned_resource.creators = creators if cloned_resource.respond_to?:creators
@@ -91,21 +88,26 @@ class PoliciesController < ApplicationController
       privileged_people['asset_managers'] = asset_managers unless asset_managers.empty?
 
       respond_to do |format|
-        format.html { render :template=>"layouts/preview_permissions", :locals => {:policy => policy, :privileged_people => privileged_people, :updated_can_publish => updated_can_publish(resource)}}
+        format.html { render :partial => "permissions/preview_permissions",
+                             :locals => {:policy => policy, :privileged_people => privileged_people,
+                                         :updated_can_publish_immediately => updated_can_publish_immediately(resource),
+                                         :send_request_publish_approval => !resource.is_waiting_approval?(current_user)}}
       end
   end
 
-  #To check where the can_publish? changes when changing the projects associated with the resource
-  def updated_can_publish resource, project_ids=params[:project_ids]
-    cloned_resource = resource.clone
+  #To check wherether you can publish immediately or need to go through gatekeeper's approval when changing the projects associated with the resource
+  def updated_can_publish_immediately resource, project_ids=params[:project_ids]
+    cloned_resource = resource.dup
     cloned_resource.policy = resource.policy.deep_copy
     cloned_resource = resource_with_assigned_projects cloned_resource,project_ids
     if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
-      updated_can_publish = true
+      updated_can_publish_immediately = true
+    elsif cloned_resource.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(cloned_resource)
+      updated_can_publish_immediately = false
     else
-      updated_can_publish = cloned_resource.can_publish?
+      updated_can_publish_immediately = true
     end
-    updated_can_publish
+    updated_can_publish_immediately
   end
 
   protected
@@ -114,7 +116,7 @@ class PoliciesController < ApplicationController
     resource.projects.each do |project|
       asset_managers |= project.asset_managers
     end
-    asset_managers.reject!{|am| !resource.perform_auth(am.user, 'manage') }
+    asset_managers.reject!{|am| !resource.can_manage?(am.user) }
     asset_managers
   end
 

@@ -1,61 +1,54 @@
-<div id='matching_data_ajax_loader'>
-  <ul class="matching_data_items">
-    <% matching_data_items.each do |matching_data_item| %>
-        <%
-           data_file = DataFile.find(matching_data_item.primary_key)
-           plots = data_file.latest_version.spreadsheet_annotations.select { |a| a.attribute.name=="plot_data" }
-        %>
-        <li class="matching_data_item">
-          <div class="title">
-            <%= list_item_title data_file -%>
-            <span class="score">
-     - matched by <b><%= matching_data_item.search_terms.join(", ") -%></b>
-        ( <%= matching_data_item.score -%> )
-    </span>
-          </div>
-          <%= list_item_contributor data_file -%>
+<div class="matching_items">
 
-          <div class="box_standout description">
-            <%= text_or_not_specified(data_file.description, :description => true, :length => 500) -%>
-          </div>
-          <div class="explore">
-            <% if can_download_asset?(data_file, params[:code]) -%>
-                <% if data_file.contains_extractable_spreadsheet? %>
-                    <%= link_to "Explore", polymorphic_path(data_file, :action => :explore, :code=>params[:code]), :target => "blank" -%>
-                <% end %>
-            <% end %>
-          </div>
+  <% matching_data_items.each do |matching_data_item| %>
+      <%
+         data_file = DataFile.find(matching_data_item.primary_key)
+         plots = data_file.latest_version.spreadsheet_annotations.select { |a| a.attribute.name=="plot_data" }
+      %>
+      <div class="matching_item">
 
-          <div>
-            <ul class="plots">
-              <% plots.each do |plot| -%>
-                  <%
-                     div_id = "plot_#{UUIDTools::UUID.random_create.to_s}"
-                     data = tsv_to_flot_data plot.value.text
-                  %>
+        <%= list_item_title data_file -%>
+        <span class="score">
+                - matched by <b><%= matching_data_item.search_terms.join(", ") -%></b>
+          <%= "( #{matching_data_item.score} )" if Rails.env=="development" %>
 
-                  <li id="<%= div_id -%>" class="plot"></li>
-                  <script type="text/javascript">
-                      jQuery.noConflict();
-                      var $j = jQuery;
-                      $j(function () {
-                          var json_data = <%= data -%>;
+            </span>
 
-                          var options = { series:{
-                              curvedLines:{
-                                  active:true
-                              }
-                          }
-                          };
+        <%= list_item_contributor data_file -%>
 
-                          $j.plot($j("#<%= div_id -%>"), json_data, options);
-                      });
-                  </script>
-              <% end -%>
-              <li style="clear:both;">&nbsp;</li>
-            </ul>
-          </div>
-        </li>
-        <% end %>
-        </ul>
+        <div class="box_standout">
+          <%= text_or_not_specified(data_file.description, :description => true, :length => 500) -%>
         </div>
+
+        <ul class="plots">
+          <% plots.each do |plot| -%>
+              <%
+                 div_id = "plot_#{UUIDTools::UUID.random_create.to_s}"
+                 data = tsv_to_flot_data plot.value.text
+              %>
+
+              <li id="<%= div_id -%>" class="plot"></li>
+              <script type="text/javascript">
+                  jQuery.noConflict();
+                  var $j = jQuery;
+                  $j(function () {
+                      var json_data = <%= data.html_safe -%>;
+
+                      var options = { series:{
+                          curvedLines:{
+                              active:true
+                          }
+                      }
+                      };
+
+                      $j.plot($j("#<%= div_id -%>"), json_data, options);
+                  });
+              </script>
+          <% end -%>
+
+        </ul>
+        <div style="clear:both">&nbsp;</div>
+      </div>
+  <% end %>
+
+</div>

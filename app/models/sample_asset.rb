@@ -5,6 +5,8 @@ class SampleAsset < ActiveRecord::Base
   # check whether asset is of latest version
   before_save :check_version
 
+  include Seek::Rdf::ReactToAssociatedChange
+  update_rdf_on_change :asset
 
   def versioned_asset
       if version
@@ -19,4 +21,5 @@ class SampleAsset < ActiveRecord::Base
        self.version = asset.version
      end
   end
+
 end

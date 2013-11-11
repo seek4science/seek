@@ -1,5 +1,4 @@
 require 'acts_as_asset'
-require 'grouped_pagination'
 require 'explicit_versioning'
 require 'acts_as_versioned_resource'
 
@@ -14,14 +13,16 @@ class Presentation < ActiveRecord::Base
 
    acts_as_asset
 
+   scope :default_order, order("title")
+
    after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
-   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => 'asset_version= #{self.version}'
+   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 
    explicit_versioning(:version_column => "version") do
      acts_as_versioned_resource
      acts_as_favouritable
-     has_one :content_blob,:primary_key => :presentation_id,:foreign_key => :asset_id,:conditions => 'content_blobs.asset_version= #{self.version} and content_blobs.asset_type = "#{self.parent.class.name}"'
+     has_one :content_blob,:primary_key => :presentation_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version, parent.class.name]}
   end
 
    if Seek::Config.events_enabled
@@ -63,12 +64,11 @@ class Presentation < ActiveRecord::Base
     true
   end
 
-  def validate
-   # errors.add_to_base "Your file is not in PDF format!" unless content_type=="application/pdf"
-
-  end
-
   def use_mime_type_for_avatar?
     true
+  end
+
+  def is_in_isa_publishable?
+    false
   end
 end

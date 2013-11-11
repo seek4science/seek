@@ -6,7 +6,9 @@ class InvestigationsController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth,:only=>[:edit, :update, :destroy, :show]
 
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
@@ -31,6 +33,7 @@ class InvestigationsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+      format.rdf { render :template=>'rdf/show' }
       format.svg { render :text=>to_svg(@investigation,params[:deep]=='true')}
       format.dot { render :text=>to_dot(@investigation,params[:deep]=='true')}
       format.png { render :text=>to_png(@investigation,params[:deep]=='true')}
@@ -42,14 +45,13 @@ class InvestigationsController < ApplicationController
     @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
 
     if @investigation.save
-      deliver_request_publish_approval params[:sharing], @investigation
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
         respond_to do |format|
-          flash[:notice] = 'The Investigation was successfully created.'
+          flash[:notice] = "The #{t('investigation')} was successfully created."
           if @investigation.create_from_asset=="true"
-             flash.now[:notice] << "<br/> Now you can create new study for your assay by clicking 'add a study' button"
+             flash.now[:notice] << "<br/> Now you can create new #{t('study')} for your #{t('assays.assay')} by clicking -Add a #{t('study')}- button".html_safe
             format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
           else
             format.html { redirect_to investigation_path(@investigation) }
@@ -97,8 +99,7 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.save
-        deliver_request_publish_approval params[:sharing], @investigation
-        flash[:notice] = 'Investigation was successfully updated.'
+        flash[:notice] = "#{t('investigation')} was successfully updated."
         format.html { redirect_to(@investigation) }
         format.xml  { head :ok }
       else

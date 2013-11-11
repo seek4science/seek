@@ -10,12 +10,16 @@
 
 
 class Relationship < ActiveRecord::Base
-  validates_presence_of :subject_id, :object_id
+
+  validates_presence_of :subject_id, :other_object_id
   
   belongs_to :subject , :polymorphic => true
-  belongs_to :object, :polymorphic => true
-  
-  
+  belongs_to :other_object, :polymorphic => true
+
+  include Seek::Rdf::ReactToAssociatedChange
+  update_rdf_on_change :subject
+
+
   # **********************************************************************
   # A set of constants to define the predicates which are currently in use
   
@@ -43,6 +47,8 @@ class Relationship < ActiveRecord::Base
          received_attributions = (attributions_from_params.blank? ? [] : attributions_from_params)
       end
 
+
+
       # build a more convenient hash structure with attribution parameters
       # (this will be classified by resource type)
       new_attributions = {}
@@ -56,7 +62,7 @@ class Relationship < ActiveRecord::Base
       # first delete any old attributions that are no longer valid
       changes_made = false
       resource.relationships.each do |a|
-        if (a.predicate==predicate) && !(new_attributions["#{a.object_type}"] && new_attributions["#{a.object_type}"].include?(a.object_id))
+      if (a.predicate==predicate) && !(new_attributions["#{a.other_object_type}"] && new_attributions["#{a.other_object_type}"].include?(a.other_object_id))
           a.destroy
           changes_made = true
         end
@@ -68,8 +74,8 @@ class Relationship < ActiveRecord::Base
       # add any remaining new attributions
       new_attributions.each_key do |attributable_type|
         new_attributions["#{attributable_type}"].each do |attributable_id|
-        unless (found = Relationship.find(:first, :conditions => { :subject_type => resource.class.name, :subject_id => resource.id, :predicate => predicate, :object_type => attributable_type, :object_id => attributable_id }))
-            Relationship.create(:subject_type => resource.class.name, :subject_id => resource.id, :predicate => predicate, :object_type => attributable_type, :object_id => attributable_id)
+        unless (found = Relationship.where(:subject_type => resource.class.name, :subject_id => resource.id, :predicate => predicate, :other_object_type => attributable_type, :other_object_id => attributable_id ).first)
+          Relationship.create(:subject_type => resource.class.name, :subject_id => resource.id, :predicate => predicate, :other_object_type => attributable_type, :other_object_id => attributable_id)
           end
         end
       end

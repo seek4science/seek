@@ -1,0 +1,28 @@
+<div class="admin_tasks">
+  <h3>Announcements</h3>
+  <ul>
+    <li><%= link_to "Make an announcement", new_site_announcement_path -%></li>
+  </ul>
+  
+  <h3>Create</h3>
+  <ul>  
+    <li><%= link_to "Create an institution", new_institution_path %></li>
+	<li><%= link_to "Create an organism", new_organism_path %></li>
+    <li><%= link_to "Create a #{t('project').downcase}", new_project_path %></li>
+    <li><%= link_to "Create a profile", new_person_path %></li>	
+  </ul>
+  
+  <h3>Manage</h3>
+  <ul>
+    <li><%= link_to "Manage tags", tags_admin_path %></li>
+    <li><%= link_to "Manage projects", url_for(:action=>"manage", :controller=>"projects") %></li>
+    <li><%= link_to "Manage compounds", url_for(:action=>"index", :controller=>"compounds") %></li>
+  </ul>
+  <% if Seek::Config.jerm_enabled -%>
+      <h3>JERM</h3>
+      <ul>
+        <li><%= link_to "Run a harvester", jerm_path %> </li>
+      </ul>
+  <% end -%>
+
+ </div>

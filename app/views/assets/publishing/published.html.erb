@@ -1,0 +1,64 @@
+<%= stylesheet_link_tag "publishing" %>
+<%
+   published_items = []
+   waiting_for_publish_items = []
+   notified_items = []
+   if params[:published_items]
+     published_items |= params[:published_items].collect do |param|
+       item_class,item_id = param.split(',')
+       item_class.constantize.find_by_id(item_id)
+     end.compact.select(&:can_view?)
+   end
+   if params[:waiting_for_publish_items]
+     waiting_for_publish_items |= params[:waiting_for_publish_items].collect do |param|
+       item_class,item_id = param.split(',')
+       item_class.constantize.find_by_id(item_id)
+     end.compact.select(&:can_view?)
+   end
+   if params[:notified_items]
+     notified_items |= params[:notified_items].collect do |param|
+       item_class,item_id = param.split(',')
+       item_class.constantize.find_by_id(item_id)
+     end.compact.select(&:can_view?)
+   end
+
+%>
+<div class="show_basic">
+
+  <%= show_title "Publishing complete" -%>
+
+  <% unless waiting_for_publish_items.empty? -%>
+      <h2>A Gatekeeper has been notified of your wish to publish the following items:</h2>
+      <ul class="publishing_options" id="publish_requested">
+        <% waiting_for_publish_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <% end -%>
+      </ul>
+  <% end -%>
+
+  <h2>The following items were published:</h2>
+  <ul class="publishing_options" id="published">
+    <% if published_items.empty? -%><li class="none_text">No items</li><% end -%>
+    <% published_items.each do |item| -%>
+        <li class="type_and_title">
+          <%= text_for_resource item -%>: <%= link_to item.title, item -%>
+        </li>
+    <% end -%>
+  </ul>
+
+  <% if !notified_items.empty? -%>
+      <h2>Items for which notifications to publish were sent the owners:</h2>
+      <ul class="publishing_options" id="notified">
+        <% notified_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+            <% if Seek::Config.email_enabled %>
+                <li style="padding-left:2em;">Notification has been sent to: <%= item.managers.collect { |m| link_to(m.title, m) }.join(", ") -%></li>
+            <% else %>
+                <li style="padding-left:2em;">Notification can't be sent to: <%= item.managers.collect { |m| link_to(m.title, m) }.join(", ") -%>, because email is disabled
+                </li>
+            <% end %>
+        <% end -%>
+      </ul>
+  <% end -%>
+
+</div>

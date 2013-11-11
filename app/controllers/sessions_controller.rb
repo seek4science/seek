@@ -16,11 +16,11 @@ class SessionsController < ApplicationController
   end
 
   def index    
-    redirect_to login_url
+    redirect_to root_path
   end
 
   def show
-    redirect_to login_url
+    redirect_to root_path
   end
 
   def create   
@@ -42,7 +42,7 @@ class SessionsController < ApplicationController
         redirect_back
       end
     rescue RedirectBackError
-      redirect :controller => :home, :action => :index
+      redirect :controller => :homes, :action => :index
     end
   end
 

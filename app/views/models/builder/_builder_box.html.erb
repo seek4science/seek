@@ -22,7 +22,7 @@
           var <%= javascript_var -%> =
           new ResizeableTextbox('<%= key -%>');
           container =<%= javascript_var -%>;
-          container.SetText("<%= @params_hash[key] -%>");
+          container.SetText("<%= @params_hash[key].html_safe -%>");
           container.GetContainer().style.left = '10px';
           container.GetContainer().style.top = '10px';
           container.SetCurrentWidth(600);

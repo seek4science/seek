@@ -7,6 +7,7 @@ class PeopleControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include ApplicationHelper
+  include RdfTestCases
 
   def setup
     login_as(:quentin)
@@ -63,7 +64,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Person.find(assigns(:person).id)
     assert person.is_admin?
     assert person.only_first_admin_person?
-    assert_redirected_to registration_form_path(:during_setup=>"true")
+    assert_redirected_to registration_form_admin_path(:during_setup=>"true")
   end
 
 
@@ -423,7 +424,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     user = Factory(:user, :person => person)
     #create a datafile that this person is the contributor
-    data_file = Factory(:data_file, :contributor => user, :projects => [project])
+    data_file = Factory(:data_file, :contributor => user, :project_ids => [project.id])
     #create pi
     role = ProjectRole.find_by_name('PI')
     pi = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
@@ -453,7 +454,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     user = Factory(:user, :person => person)
     #create a datafile that this person is the contributor and with the same project
-    data_file = Factory(:data_file, :contributor => user, :projects => [project])
+    data_file = Factory(:data_file, :contributor => user, :project_ids => [project.id])
     #create pal
     role = ProjectRole.find_by_name('Sysmo-DB Pal')
     pal = Factory(:person_in_project, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
@@ -571,9 +572,9 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should show that the person is asset manager for admin' do
     person = Factory(:person)
     person.is_asset_manager = true
-    person.save
+    person.save!
     get :show, :id => person
-    assert_select "li", :text => /This person is an asset manager/, :count => 1
+    assert_select "li", :text => /This person is an Asset Manager/, :count => 1
   end
 
   test 'should not show that the person is asset manager for non-admin' do
@@ -582,7 +583,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.save
     login_as(:aaron)
     get :show, :id => person
-    assert_select "li", :text => /This person is an asset manager/, :count => 0
+    assert_select "li", :text => /This person is an Asset Manager/, :count => 0
   end
 
   def test_project_manager_can_administer_others
@@ -979,7 +980,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.is_gatekeeper = true
     person.save
     get :show, :id => person
-    assert_select "li", :text => /This person is a gatekeeper/, :count => 1
+    assert_select "li", :text => /This person is a Gatekeeper/, :count => 1
   end
 
   test 'should not show that the person is gatekeeper for non-admin' do
@@ -988,7 +989,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.save
     login_as(:aaron)
     get :show, :id => person
-    assert_select "li", :text => /This person is a gatekeeper/, :count => 0
+    assert_select "li", :text => /This person is a Gatekeeper/, :count => 0
   end
 
   test 'should have gatekeeper icon on person show page' do
@@ -1013,8 +1014,8 @@ class PeopleControllerTest < ActionController::TestCase
     Seek::Config.email_enabled=true
 
     proj = Factory(:project)
-    sop = Factory(:sop, :projects => [proj], :policy => Factory(:public_policy))
-    df = Factory(:data_file, :projects => [proj], :policy => Factory(:public_policy))
+    sop = Factory(:sop, :project_ids => [proj.id], :policy => Factory(:public_policy))
+    df = Factory(:data_file, :project_ids => [proj.id], :policy => Factory(:public_policy))
 
     #subscribe to project
     current_person=User.current_user.person
@@ -1076,8 +1077,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_equal 1, work_groups.count
       assert a_person.project_subscriptions.collect(&:project).include?(projects.first)
 
-
-      s=Factory(:subscribable, :projects => projects)
+      s=Factory(:subscribable, :project_ids => projects.collect(&:id))
       SetSubscriptionsForItemJob.new(s.class.name, s.id, projects.collect(&:id)).perform
       assert s.subscribed?(a_person)
 
@@ -1121,5 +1121,37 @@ class PeopleControllerTest < ActionController::TestCase
         assert_response :success
         assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
       end
+
+  test 'should update page limit_latest when changing the setting from admin' do
+    assert_equal 'latest', Seek::Config.default_pages[:people]
+    assert_not_equal 5, Seek::Config.limit_latest
+
+    Seek::Config.limit_latest = 5
+    get :index
+    assert_response :success
+    assert_select "li.current_page" do
+      assert_select "a[href=?]", people_path(:page => 'latest')
+    end
+    assert_select "div.list_item_title", :count => 5
+  end
+
+  test "people not in projects should not be shown in index"  do
+    person_not_in_project=Factory(:brand_new_person,:first_name=>"Person Not In Project")
+    person_in_project=Factory(:person,:first_name=>"Person in Project")
+    assert person_not_in_project.projects.empty?
+    assert !person_in_project.projects.empty?
+    get :index
+    assert_response :success
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item_content  a[href=?]",person_path(person_in_project),:text=>/#{person_in_project.name}/,:count=>1
+      assert_select "div.list_item_content  a[href=?]",person_path(person_not_in_project),:text=>/#{person_not_in_project.name}/,:count=>0
+    end
+
+    get :index,:page=>"P"
+    assert_response :success
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item_content  a[href=?]",person_path(person_in_project),:text=>/#{person_in_project.name}/,:count=>1
+      assert_select "div.list_item_content  a[href=?]",person_path(person_not_in_project),:text=>/#{person_not_in_project.name}/,:count=>0
+    end
   end
 end

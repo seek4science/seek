@@ -2,33 +2,33 @@
 
 <% truncate_length_for_boxes = 22 -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@project} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@project} %>
 
 <ul class="sectionIcons">
   <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(@project) -%>
-    <li><%= image_tag_for_key('organise', project_folders_path(@project), "Organise", nil, "Organise") -%></li>
+    <li><%= image_tag_for_key('organise', project_folders_path(@project.id), "Organise", nil, "Organise") -%></li>
   <% end -%>
 <% if mine?(@project) || @project.try(:can_be_edited_by?, current_user) -%>
 
-    <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit Project Details", nil, 'Edit Project Details') -%></li>
+    <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
 
     <% if @project.try(:can_be_administered_by?, current_user) -%>
-      <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", nil, "Project administration" -%></li>
+      <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", nil, "#{t('project')} administration" -%></li>
      <% end -%>
     <% if admin_logged_in? -%>
-      <li><%= image_tag_for_key "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete }, "Delete Project" -%></li>
+      <li><%= image_tag_for_key "destroy", project_path(@project), "Delete #{t('project')}", { :confirm => 'Are you sure?', :method => :delete }, "Delete #{t('project')}" -%></li>
     <% end -%>
 
 <% end -%>
   <% if @project.try(:has_member?,current_user) -%>
-      <% tooltip_text="This will present you with a short report about the items that have been shared outside of your project" %>
+      <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
       <li><%= image_tag_for_key "report", asset_report_project_path(@project), "Asset report", {:title=>tooltip_title_attrib(tooltip_text)}, "Asset report" -%></li>
   <% end -%>
 </ul>
 
 <div class="show_basic">
 
-  <div class="main_content_left_box_narrower">
+  <div class="main_content_left_box">
 
     <div class="box_about_actor">      
         <p>
@@ -63,7 +63,7 @@
         </p>
 
         <p class="project_managers">
-          <label>Project Managers:</label>
+          <label><%= t('project') %> Managers:</label>
           <%= project_managers_link_list @project -%>
         </p>
 
@@ -76,7 +76,7 @@
 
     </div>
   </div>
-  <div class="main_content_right_box_wider">
+  <div class="main_content_right_box">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
   </div>
 
@@ -93,7 +93,7 @@
   </div>
   <br/>
    <div style="clear:both;">
-          <b>Project Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
+          <b><%= t('project') %> Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
           <div id="project_mailing_list" style="display: none;">
             <%= project_mailing_list @project %>
           </div>
@@ -101,15 +101,10 @@
   <% end %>
 
   <div style="clear:both;">
-    <p style="margin-top: 1em;">
-      <b>About the project:</b>
-      <div id="description" class="box_standout">
-        <%= text_or_not_specified(@project.description, :description=>true,:auto_link=>true) %>
-      </div>
-    </p>
+    <%=  item_description @project.description,:label=>"About this #{t('project')}" %>
 
     <%# get, classify and authorize all assets for this project -%>
-    <%= render :partial=>"layouts/items_related_to",:object => @project %>
+    <%= render :partial=>"general/items_related_to",:object => @project %>
     
   </div>
   

@@ -7,6 +7,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
   
   def setup
     login_as(:quentin)
@@ -18,13 +19,36 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select "title",:text=>/The Sysmo SEEK Investigations.*/, :count=>1
+    assert_select "title",:text=>/The Sysmo SEEK #{I18n.t('investigation').pluralize}.*/i, :count=>1
   end
 
   test "should show index" do
     get :index
     assert_response :success
     assert_not_nil assigns(:investigations)
+  end
+
+  test "should show aggregated publications linked to assay" do
+    assay1 = Factory :assay,:policy => Factory(:public_policy)
+    assay2 = Factory :assay,:policy => Factory(:public_policy)
+
+    pub1 = Factory :publication, :title=>"pub 1"
+    pub2 = Factory :publication, :title=>"pub 2"
+    pub3 = Factory :publication, :title=>"pub 3"
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub1
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub3
+
+    study = Factory(:study,:assays=>[assay1,assay2],:policy => Factory(:public_policy))
+
+    get :show,:id=>study.investigation.id
+    assert_response :success
+
+    assert_select "div.tabbertab" do
+      assert_select "h3",:text=>"Publications (3)",:count=>1
+    end
   end
 
   test "should show draggable icon in index" do
@@ -86,7 +110,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test "should create" do
     login_as(Factory :user)
     assert_difference("Investigation.count") do
-      put :create, :investigation=> Factory.attributes_for(:investigation, :projects => [User.current_user.person.projects.first]), :sharing => valid_sharing
+      put :create, :investigation=> Factory.attributes_for(:investigation, :project_ids => [User.current_user.person.projects.first.id]), :sharing => valid_sharing
     end
     assert assigns(:investigation)
     assert !assigns(:investigation).new_record?
@@ -96,7 +120,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(Factory :user)
 
     assert_no_difference("Investigation.count") do
-      put :create, :investigation=> {:projects => [User.current_user.person.projects.first]}
+      put :create, :investigation=> {:project_ids => [User.current_user.person.projects.first.id]}
     end
     assert_template :new
     
@@ -106,15 +130,29 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   end
 
+  test "should fall back to form when no projects validation fails" do
+    login_as(Factory :user)
+
+    assert_no_difference("Investigation.count") do
+      put :create, :investigation=> {:title=>"investigation with no projects"}
+    end
+    assert_template :new
+
+    assert assigns(:investigation)
+    assert !assigns(:investigation).valid?
+    assert !assigns(:investigation).errors.empty?
+
+  end
+
   test "no edit button in show for unauthorized user" do
     login_as(Factory(:user))
     get :show, :id=>Factory(:investigation, :policy => Factory(:private_policy))
-    assert_select "a",:text=>/Edit investigation/,:count=>0
+    assert_select "a",:text=>/Edit #{I18n.t('investigation')}/i,:count=>0
   end
 
   test "edit button in show for authorized user" do
     get :show, :id=>investigations(:metabolomics_investigation)
-    assert_select "a[href=?]",edit_investigation_path(investigations(:metabolomics_investigation)),:text=>/Edit investigation/,:count=>1
+    assert_select "a[href=?]",edit_investigation_path(investigations(:metabolomics_investigation)),:text=>/Edit #{I18n.t('investigation')}/i,:count=>1
   end
 
   test "no add study button for person that can edit" do
@@ -122,13 +160,13 @@ class InvestigationsControllerTest < ActionController::TestCase
     inv = investigations(:metabolomics_investigation)
     assert !inv.can_edit?,"Aaron should not be able to edit this investigation"
     get :show, :id=>inv
-    assert_select "a",:text=>/Add a study/,:count=>0
+    assert_select "a",:text=>/Add a #{I18n.t('study')}/i,:count=>0
   end
 
   test "add study button for person that can edit" do
     inv = investigations(:metabolomics_investigation)
     get :show, :id=>inv
-    assert_select "a[href=?]",new_study_path(:investigation_id=>inv),:text=>/Add a study/,:count=>1
+    assert_select "a[href=?]",new_study_path(:investigation_id=>inv),:text=>/Add a #{I18n.t('study')}/i,:count=>1
   end
 
 
@@ -164,32 +202,33 @@ class InvestigationsControllerTest < ActionController::TestCase
       delete :destroy, :id => i.id
     end
     assert flash[:error]
-    assert_redirected_to investigations_path    
+    assert_redirected_to i
   end
 
   test "should not destroy investigation with a study" do
+    investigation = investigations(:metabolomics_investigation)
     assert_no_difference("Investigation.count") do
-      delete :destroy, :id => investigations(:metabolomics_investigation).id
+      delete :destroy, :id => investigation.id
     end
     assert flash[:error]
-    assert_redirected_to investigations_path    
+    assert_redirected_to investigation
   end
 
   test "option to delete investigation without study" do    
     get :show,:id=>Factory(:investigation, :contributor => User.current_user).id
-    assert_select "a",:text=>/Delete Investigation/,:count=>1
+    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/,:count=>1
   end
 
   test "no option to delete investigation with study" do
     get :show,:id=>investigations(:metabolomics_investigation).id
-    assert_select "a",:text=>/Delete Investigation/,:count=>0
+    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/i,:count=>0
   end
 
   test "no option to delete investigation when unauthorized" do
     i = Factory :investigation, :policy => Factory(:private_policy)
     login_as Factory(:user)
     get :show,:id=>i.id
-    assert_select "a",:text=>/Delete Investigation/,:count=>0
+    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/i,:count=>0
   end
 
   def test_should_add_nofollow_to_links_in_show_page
@@ -197,6 +236,14 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_select "div#description" do
       assert_select "a[rel=nofollow]"
     end
+  end
+
+  test "private investigation not accessible publicly" do
+    i = Factory :investigation, :policy => Factory(:private_policy)
+    logout
+    get :show,:id=>i.id
+    assert_redirected_to investigations_path
+    assert_not_nil flash[:error]
   end
 
   test "filtering by project" do

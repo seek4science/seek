@@ -7,13 +7,15 @@ rm -rf tmp/cache
 rm -rf tmp/model_images
 rm -rf tmp/fleximage
 rm -rf tmp/test_content_blobs
+rm -rf tmp/rdf
 rm -rf filestore/
+
 
 #rvm handling is based on example at http://pivotallabs.com/users/mbarinek/blog/articles/1450-rails-3-with-rvm-and-cruise-control
 
-desired_ruby=ruby-1.8.7
-project_name=seek016
-rubygems=1.6.2
+desired_ruby=ruby-1.9.3
+project_name=seek018
+rubygems=1.8.25
 
 # remove annoying "warning: Insecure world writable dir"
 function remove_annoying_warning() {
@@ -56,9 +58,9 @@ bundle check || bundle install || exit 1
 remove_annoying_warning
 
 # finally, run rake
-nice -n 1 bundle exec rake cruise2
+bundle exec rake cruise
 
 #comment out above and uncomment this line to get more verbose test information
-#bundle exec rake cruise2 TESTOPTS="-v"
+#bundle exec rake cruise TESTOPTS="-v"
 
 

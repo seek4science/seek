@@ -13,11 +13,11 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
   end
 
   def self.exists? project_subscription_id
-    Delayed::Job.find(:first, :conditions => ['handler = ? AND locked_at IS ? AND failed_at IS ?', ProjectSubscriptionJob.new(project_subscription_id).to_yaml, nil, nil]) != nil
+    Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?', ProjectSubscriptionJob.new(project_subscription_id).to_yaml, nil, nil]).first != nil
   end
 
   def self.create_job project_subscription_id, t=15.seconds.from_now, priority=DEFAULT_PRIORITY
-    Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), priority, t) unless exists? project_subscription_id
+    Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), :priority=>priority, :run_at=>t) unless exists? project_subscription_id
   end
 
   #all direct assets in the project, but related_#{asset_type} includes also assets from descendants

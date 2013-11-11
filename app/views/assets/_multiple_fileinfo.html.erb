@@ -59,7 +59,7 @@
 <ul id="file_large_view"  class='fileinfo_list' style="display: none">
 
   <% multiple_fileinfo.content_blobs.each do |blob| -%>
-      <li class='fileinfo'>
+      <li class='fileinfo_container curved with_shadow'>
         <%= render :partial => "assets/fileinfo", :object => blob -%>
       </li>
   <% end -%>

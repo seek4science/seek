@@ -5,7 +5,7 @@ new_with_errors=new_resources.select{|r| !r.error.nil?}
 new_resources=new_resources - new_with_errors
 duplicate_resources=fetch_results.select{|r| r.duplicate} %>
 <%= "Harvested #{fetch_results.size} results" %>
-<% form_remote_tag :url=>url_for(:controller => "jerm", :action => "insert_results"),:before=>"harvester_initiated();" do -%>
+<%= form_tag_with_callbacks( {url_for(:controller => "jerm", :action => "insert_results")},{:id=>"fetch_jerm_results",:before=>"harvester_initiated();", :remote => true}) do -%>
 <%= hidden_field_tag :project,@project.id %>
 <h2>New</h2>
 <table class="jerm_results">
@@ -110,7 +110,7 @@ duplicate_resources=fetch_results.select{|r| r.duplicate} %>
 <div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
     <%= white_list flash[:error] %>
     <p>
-        It is possible that the project needs configuring: <%= link_to "Configure #{h(@project.name)}",admin_project_path(@project) %>
+        It is possible that the <%= t('project') %> needs configuring: <%= link_to "Configure #{h(@project.name)}",admin_project_path(@project) %>
     </p>
 </div>
 <% end -%>

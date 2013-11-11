@@ -2,10 +2,12 @@ class SamplesController < ApplicationController
 
   include IndexPager
   before_filter :find_assets, :only => [:index]
-  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy,:preview]
   before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
 
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
@@ -14,32 +16,40 @@ class SamplesController < ApplicationController
 
     unless @sample.specimen.can_view?
       @sample.specimen = nil
-      flash.now[:notice] = "The specimen of the existing sample cannot be viewed, please specify your own specimen! <br/> "
+      flash.now[:notice] = "The #{t('biosamples.sample_parent_term')} of the existing Sample cannot be viewed, please specify your own #{t('biosamples.sample_parent_term')}! <br/> "
     else
       flash.now[:notice] = ""
     end
 
     @existing_sample.data_file_masters.each do |df|
        if !df.can_view?
-       flash.now[:notice] << "Some or all data files of the existing sample cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
     @existing_sample.model_masters.each do |m|
        if !m.can_view?
-       flash.now[:notice] << "Some or all models of the existing sample cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
     @existing_sample.sop_masters.each do |s|
        if !s.can_view?
-       flash.now[:notice] << "Some or all sops of the existing sample cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
 
     render :action=>"new"
 
+  end
+
+  def show
+    respond_to do |format|
+      format.html
+      format.xml
+      format.rdf { render :template=>'rdf/show'}
+    end
   end
 
   def new
@@ -91,8 +101,11 @@ class SamplesController < ApplicationController
     sop_ids = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
     if @sample.save
-      deliver_request_publish_approval params[:sharing], @sample
-      deliver_request_publish_approval params[:sharing], @sample.specimen
+      #send publishing request for specimen
+      if !@sample.specimen.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
+        deliver_request_publish_approval [@sample.specimen]
+      end
+
         tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
           @sample.associate_tissue_and_cell_type(t_id, t_title)
@@ -136,7 +149,6 @@ class SamplesController < ApplicationController
 
 
       if @sample.save
-        deliver_request_publish_approval params[:sharing], @sample
         #TODO CONFIG improve configurability. Configuration currently is deduced from other parameters
         if tissue_and_cell_types.blank?
           @sample.tissue_and_cell_types= tissue_and_cell_types
@@ -173,7 +185,7 @@ class SamplesController < ApplicationController
     join_class_string = ['Sop', resource.class.name].sort.join
     join_class = join_class_string.constantize
     to_remove.each do |id|
-      joins = join_class.find(:all, :conditions=>{"#{resource.class.name.downcase}_id".to_sym=>resource.id,:sop_id=>id})
+      joins = join_class.where({"#{resource.class.name.downcase}_id".to_sym=>resource.id,:sop_id=>id})
       joins.each{|j| j.destroy}
     end
     (new_sop_ids - existing_ids).each do |id|
@@ -190,6 +202,20 @@ class SamplesController < ApplicationController
       else
         flash.now[:error] = "Unable to delete sample" if !@sample.specimen.nil?
         format.html { render :action => "show" }
+      end
+    end
+  end
+
+  def preview
+
+    element=params[:element]
+    sample=Sample.find_by_id(params[:id])
+
+    render :update do |page|
+      if sample.try :can_view?
+        page.replace_html element,:partial=>"samples/resource_preview",:locals=>{:resource=>sample}
+      else
+        page.replace_html element,:text=>"Nothing is selected to preview."
       end
     end
   end

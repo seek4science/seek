@@ -2,14 +2,13 @@
     <li>
       <% if object.subscribed? %>
           <%= image_tag_for_key 'unsubscribe', object.current_users_subscription, nil, {:method => :delete}-%>
-      <% else
-             form_for Subscription.new(:subscribable => object, :person => current_user.person), :html => {:style => 'display:inline;'} do |f| %>
+      <% else %>
+             <%=form_for Subscription.new(:subscribable => object, :person => current_user.person), :html => {:style => 'display:inline;'} do |f| %>
               <%= f.hidden_field :subscribable_id -%>
               <%= f.hidden_field :subscribable_type -%>
               <%= f.hidden_field :person_id -%>
               <%= image_tag_for_key "subscribe", "$(this).up('form').submit()", nil, {}, 'Subscribe', :function %>
-          <% end
-         end
-          %>
+          <% end %>
+      <% end %>
     </li>
 <% end %>

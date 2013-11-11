@@ -1,0 +1,98 @@
+
+
+<%= javascript_include_tag 'dropMenu.js' %>
+
+
+<div>
+<table cellspacing="0" cellpadding="0" id="menu" class="dm">
+  <tr>
+    <td>
+      <a class="item1" href="javascript:void(0)">Yellow Pages</a>
+
+      <div class="section">
+        <%= tab_definition :controllers=>["people"] -%>
+
+        <!-- Projects tab -->
+        <%= tab_definition :controllers=>["projects"], :title=>t('project').pluralize -%>
+
+        <!-- Institutions tab -->
+        <%= tab_definition :controllers=>["institutions"] -%>
+      </div>
+    </td>
+    <td>
+      <div class="tab_gap_before">
+        <a class="item1" href="javascript:void(0)">Experiments</a>
+
+
+        <div class="section">
+          <!-- Investigations tab -->
+          <%= tab_definition :controllers=>["investigations"], :title=>t('investigation').pluralize -%>
+
+          <!-- Studies tab -->
+          <%= tab_definition :controllers=>["studies"], :title=>t('study').pluralize -%>
+
+          <!-- Assays tab -->
+          <%= tab_definition :controllers=>["assays"], :title=>t('assays.assay').pluralize -%>
+        </div>
+      </div>
+    </td>
+
+    <td>
+      <div class="tab_gap_before">
+        <a class="item1" href="javascript:void(0)">Items</a>
+
+
+        <div class="section">
+          <!-- Data tab -->
+          <%= tab_definition :controllers=>["data_files"], :title=>t('data_file').pluralize -%>
+
+          <!-- Models tab -->
+          <%= tab_definition :controllers=>["models"], :title=>t('model').pluralize -%>
+
+          <!-- SOPs tab -->
+          <%= tab_definition :controllers=>["sops"], :title=>t('sop').pluralize -%>
+
+          <!-- Publications tab -->
+          <%= tab_definition :controllers=>["publications"]-%>
+
+          <!-- Presentations tab -->
+          <%= tab_definition :controllers=>["presentations"], :title=>t('presentation').pluralize -%>
+
+          <!-- biosamples tab -->
+          <%= tab_definition :controllers=>["biosamples"]-%>
+
+        </div>
+      </div>
+    </td>
+    <td>
+      <div class="tab_gap_before">
+        <a class="item1" href="javascript:void(0)">Activities</a>
+
+        <div class="section">
+          <!-- Events tab -->
+          <%= tab_definition :controllers => ["events"] ,:title=>t('event').pluralize if Seek::Config.events_enabled -%>
+          <!-- Forums tab -->
+          <%= tab_definition :controllers => ["forums"] if logged_in? -%>
+        </div>
+
+      </div>
+    </td>
+    <td>
+      <div class="tab_gap_before">
+        <%= link_to "Content Statistics", statistics_path,{:class =>"item1",:target=>"_blank"} if logged_in?%>
+      </div>
+    </td>
+    <td>
+      <div class="tab_gap_before">
+        <%= link_to "Help", {:controller => "help_documents", :action=>"index"}, {:class =>"item1"} %>
+      </div>
+    </td>
+  </tr>
+</table>
+</div>
+
+<script type="text/javascript">
+    var dm = new DropMenu1('menu');
+    dm.init();
+</script>
+

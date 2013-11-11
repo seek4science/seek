@@ -7,13 +7,13 @@
 <%= f.error_messages %>
 
 <% if @sample.new_record? && @sample.specimen.try(:new_record?)%>
-    <% f.fields_for :specimen do |specimen_f| %>
+    <%= f.fields_for :specimen do |specimen_f| %>
         <%= render :partial => "specimens/form", :locals => {:f => specimen_f, :specimen => @sample.specimen, :action => action}%>
     <% end %>
 <% else %>
     <p>
-       <%= f.label "Choose a #{Seek::Config.sample_parent_term}" %> <span class="required">*</span><br/>
-      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view').sort_by(&:title), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
+       <%= f.label "Choose a #{I18n.t 'biosamples.sample_parent_term'}" %> <span class="required">*</span><br/>
+      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
       </p>
 <% end %>
 <h2>Sample Details</h2>

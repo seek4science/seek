@@ -3,7 +3,6 @@ class OrganismsController < ApplicationController
   before_filter :login_required,:except=>[:show,:index,:visualise]
   before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create,:destroy]
   before_filter :find_organism,:only=>[:show,:edit,:more_ajax,:visualise,:destroy]
-  layout "main",:except=>:visualise
   
   cache_sweeper :organisms_sweeper,:only=>[:update,:create,:destroy]
 
@@ -13,6 +12,7 @@ class OrganismsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+      format.rdf { render :template=>'rdf/show'}
     end
   end
   
@@ -36,6 +36,7 @@ class OrganismsController < ApplicationController
   end
 
   def visualise
+    @no_sidebar=true
     respond_to do |format|
       format.html
     end

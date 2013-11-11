@@ -27,7 +27,7 @@ module FoldersHelper
       js << folder_node_creation_javascript(folder.children,var)
     end
 
-    js
+    js.html_safe
   end
 
   #returns the last opened folder_id for the given project according to the decoded cookie :folder_browsed_json

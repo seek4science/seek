@@ -64,11 +64,20 @@
 
 <% if @folder.editable? -%>
     <div id='new_child' style='display:none;'>
-      <% form_remote_tag :url=>{:action=>:create_folder, :id=>@folder.id}, :html=>{:id=>:create_child_form} do -%>
+      <div id="error_text" class='error_div' style="display:none;"></div>
+      <%= form_tag_with_callbacks(create_folder_project_folder_path(@project,@folder),
+                                  {
+                                          :id=>:create_child_form,
+                                          :update=>{:failure=>:error_text},
+                                          :loading=>"$('add_folder_button').disabled=true;",
+                                          :complete=>"$('add_folder_button').disabled=false;",
+                                          :success=>"location.reload();",
+                                          :failure=>"$('error_text').show();",
+                                          :remote=>true}) do -%>
               <%= label_tag "Create a new sub-folder:" -%>
               <%= hidden_field_tag :project_id, @folder.project.id -%>
               <%= text_field_tag :title -%>
-              <%= submit_tag(:create, :onclick=>"javascript: create_child();") -%>
+              <%= submit_tag(:create, :id=>"add_folder_button") -%>
           <% end -%>
 
         </div>

@@ -9,19 +9,15 @@ class SopTest < ActiveSupport::TestCase
     assert_equal p,s.projects.first
   end
 
-  test "sort by updated_at" do
-    last = 9999999999999 #safe until the year 318857 !
+  test "to_rdf" do
+    object = Factory :sop, :description=>"An excellent SOP", :projects=>[Factory(:project),Factory(:project)], :assay_ids=>[Factory(:assay).id]
+    Factory :assets_creator,:asset=>object,:creator=>Factory(:person)
 
-    Sop.record_timestamps = false
-    Factory(:sop,:title=>"8 day old SOP",:updated_at=>8.day.ago)
-    Factory(:sop,:title=>"20 day old SOP",:updated_at=>20.days.ago)
-    Sop.record_timestamps = true
-    
-    sops = Sop.find(:all)
+    rdf = object.to_rdf
 
-    sops.each do |sop|
-      assert sop.updated_at.to_i <= last
-      last=sop.updated_at.to_i
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/sops/#{object.id}"), reader.statements.first.subject
     end
   end
 
@@ -86,8 +82,8 @@ class SopTest < ActiveSupport::TestCase
 
     sop=Sop.find(sop.id)
 
-    assert 1,sop.version
-    assert 1,sop.versions.size
+    assert_equal 1,sop.version
+    assert_equal 1,sop.versions.size
     assert_equal sop,sop.versions.last.sop
     assert_equal sop.title,sop.versions.first.title
 
@@ -187,12 +183,12 @@ class SopTest < ActiveSupport::TestCase
     assert_not_nil Sop.find_by_title 'is it restorable?'
   end
 
-  test 'failing to delete due to can_delete does not create trash' do
+  test 'failing to delete due to can_delete still creates trash' do
     sop = Factory :sop, :policy => Factory(:private_policy)
     assert_no_difference("Sop.count") do
       sop.destroy
     end
-    assert_nil Sop.restore_trash(sop.id)
+    assert_not_nil Sop.restore_trash(sop.id)
   end
 
   test "test uuid generated" do

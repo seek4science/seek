@@ -1,5 +1,8 @@
 
-class Investigation < ActiveRecord::Base    
+class Investigation < ActiveRecord::Base
+
+  include Seek::Rdf::RdfGeneration
+
   acts_as_isa
   acts_as_authorized
 
@@ -17,12 +20,12 @@ class Investigation < ActiveRecord::Base
     text :description,:title
   end if Seek::Config.solr_enabled
 
-  def can_delete? *args
+  def state_allows_delete? *args
     studies.empty? && super
   end
   
   #FIXME: see comment in Assay about reversing these
-  ["data_file","sop","model"].each do |type|
+  ["data_file","sop","model","publication"].each do |type|
     eval <<-END_EVAL
       def #{type}_masters
         studies.collect{|study| study.send(:#{type}_masters)}.flatten.uniq
@@ -44,7 +47,7 @@ class Investigation < ActiveRecord::Base
   end
 
   def clone_with_associations
-    new_object= self.clone
+    new_object= self.dup
     new_object.policy = self.policy.deep_copy
     new_object.project_ids= self.project_ids
     new_object.scale_ids = self.scale_ids

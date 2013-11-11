@@ -9,10 +9,11 @@ class DataFileTest < ActiveSupport::TestCase
     datafile=Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy),:contributor=> datafile_owner
     assert_equal datafile_owner,datafile.contributor
     unless datafile.content_blob.nil?
-      datafile.content_blob = nil
+      datafile.content_blob.destroy
     end
 
     blob=Factory.create(:content_blob,:original_filename=>"df.ppt", :content_type=>"application/ppt",:asset => datafile,:asset_version=>datafile.version)#content_blobs(:picture_blob)
+    datafile.reload
     assert_equal blob,datafile.content_blob
   end
 
@@ -100,6 +101,19 @@ class DataFileTest < ActiveSupport::TestCase
     assert asset.valid?
   end
 
+  test "version created on save" do
+    User.current_user = Factory(:user)
+    df = DataFile.new(:title=>"testing versions",:projects=>[Factory(:project)])
+    assert df.valid?
+    df.save!
+    df = DataFile.find(df.id)
+    assert_equal 1, df.version
+
+    assert_not_nil df.find_version(1)
+    assert_equal df.find_version(1),df.latest_version
+    assert_equal df.contributor,df.latest_version.contributor
+  end
+
   def test_avatar_key
 
     assert_nil data_files(:picture).avatar_key
@@ -180,13 +194,13 @@ class DataFileTest < ActiveSupport::TestCase
     assert_not_nil DataFile.find_by_title 'is it restorable?'
   end
 
-  test 'failing to delete due to can_delete does not create trash' do
+  test 'failing to delete (due to can_not_delete) still creates trash' do
     df = Factory :data_file, :policy => Factory(:private_policy), :contributor => Factory(:user)
     User.with_current_user Factory(:user) do
       assert_no_difference("DataFile.count") do
         df.destroy
       end
-      assert_nil DataFile.restore_trash(df.id)
+      assert_not_nil DataFile.restore_trash(df.id)
     end
   end
 
@@ -198,10 +212,12 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "title_trimmed" do
-    df= Factory :data_file ,:policy=>Factory(:policy,:sharing_scope=>Policy::ALL_SYSMO_USERS,:access_type=>Policy::EDITING) #data_files(:picture)
-    df.title=" should be trimmed"
-    df.save!
-    assert_equal "should be trimmed",df.title
+    User.with_current_user Factory(:user) do
+      df= Factory :data_file ,:policy=>Factory(:policy,:sharing_scope=>Policy::ALL_SYSMO_USERS,:access_type=>Policy::EDITING) #data_files(:picture)
+      df.title=" should be trimmed"
+      df.save!
+      assert_equal "should be trimmed",df.title
+    end
   end
 
   test "uuid doesn't change" do
@@ -237,59 +253,22 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal unupdated_title, df.reload.title
   end
 
-  test "convert to presentation" do
-    user = Factory :user
-    attribution_df = Factory :data_file
-    User.with_current_user(user) {
-      data_file = Factory :data_file,:contributor=>user,:version=>2,
-                          :assay_ids=>[Factory(:modelling_assay).id,Factory(:experimental_assay).id]
-      Factory :content_blob,:asset=>data_file
-      Factory :attribution,:subject=>data_file,:object=>attribution_df
-      Factory :relationship,:subject=>data_file,:object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
-      data_file.creators = [Factory(:person),Factory(:person)]
-      Factory :annotation,:attribute_name=>"tag",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tag").id
-      data_file.events = [Factory(:event)]
+  test "to rdf" do
+    df=Factory :data_file, :assay_ids=>[Factory(:assay,:technology_type=>Factory(:technology_type)).id,Factory(:assay).id]
+    pub = Factory :publication
+    Factory :relationship,:subject=>df,:predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
+    df.reload
+    rdf = df.to_rdf
+    assert_not_nil rdf
+    #just checks it is valid rdf/xml and contains some statements for now
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 0
+      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
       Factory :scaling, :person=> Factory(:person),:scalable=>data_file, :scale => Factory(:scale) if data_file.is_scalable?
-      data_file.save!
-
-      data_file.reload
-
       #I want to compare data_file.scales to data_file_converted.scales later. If I don't load data_file.scales now,
       #then it will try to load them when I do the comparison. Since that will be after I've updated the database from converting, it would return [].
       #to avoid this, I will preload scales and similar through_associations now.
-      through_associations_to_test_later = [:creators, :assays]
       through_associations_to_test_later << :scales  if data_file.is_scalable?
-      through_associations_to_test_later.each {|a| data_file.send(a).send(:load_target)}
-
-      presentation = Factory.build :presentation,:contributor=>user
-
-      data_file_converted = data_file.to_presentation
-      data_file_converted = data_file_converted.reload
-
-
-      assert_equal presentation.class.name, data_file_converted.class.name
-      assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.reject{|k|k=='id'}.sort! #???
-
-      #data_file.reload
-      #data file still has some associations that are assigned to data_file_converted, as it is NOT reloaded
-      assert_equal data_file.version, data_file_converted.version
-      assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
-      assert_equal data_file.policy.access_type, data_file_converted.policy.access_type
-      assert_equal data_file.policy.use_whitelist, data_file_converted.policy.use_whitelist
-      assert_equal data_file.policy.use_blacklist, data_file_converted.policy.use_blacklist
-      assert_equal data_file.policy.permissions, data_file_converted.policy.permissions
-      assert data_file.policy.id != data_file_converted.policy.id
-      assert_equal data_file.content_blob, data_file_converted.content_blob
-
-      assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
-      assert_equal data_file.projects,data_file_converted.projects
-      assert_equal data_file.attributions , data_file_converted.attributions
-      assert_equal data_file.related_publications, data_file_converted.related_publications
-      assert_equal data_file.creators, data_file_converted.creators
-      assert_equal data_file.annotations, data_file_converted.annotations
-      assert_equal data_file.project_ids,data_file_converted.project_ids
-      assert_equal data_file.assays,data_file_converted.assays
-      assert_equal data_file.event_ids, data_file_converted.event_ids
       assert_equal data_file.scalings,data_file_converted.scalings if data_file.is_scalable?
       assert_equal data_file.scales,data_file_converted.scales  if data_file.is_scalable?
       assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
@@ -426,17 +405,21 @@ class DataFileTest < ActiveSupport::TestCase
       end
   end
  test "cache_remote_content" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://mockedlocation.com/picture.png"
+    user = Factory :user
+    User.with_current_user(user) do
+      mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://mockedlocation.com/picture.png"
 
-    data_file = Factory :data_file, :content_blob=>ContentBlob.new(:url=>"http://mockedlocation.com/picture.png",:original_filename=>"picture.png")
+      data_file = Factory :data_file, :content_blob=>ContentBlob.new(:url=>"http://mockedlocation.com/picture.png",:original_filename=>"picture.png")
 
-    data_file.save!
+      data_file.save!
 
-    assert !data_file.content_blob.file_exists?
+      assert !data_file.content_blob.file_exists?
 
-    data_file.cache_remote_content_blob
+      data_file.cache_remote_content_blob
 
-    assert data_file.content_blob.file_exists?
+      assert data_file.content_blob.file_exists?
+    end
+
 
   end
 

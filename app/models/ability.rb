@@ -37,21 +37,18 @@ class Ability
 
   end
 
-  #access manager can manage the assets belonging to their project, except the entire private assets
+  #asset manager can manage the assets belonging to their project
   def asset_manager asset_manager
      can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
-        if ((item.respond_to?(:projects) && asset_manager.try(:projects)) and !(item.projects & asset_manager.projects).empty?) && item.respond_to?(:policy)
-          true
-        else
-          false
-        end
+        asset_manager.is_asset_manager_of?(item)
      end
   end
 
+  #gatekeeper can publish the assets belonging to their project if as well can manage or the item is waiting for his approval
   def gatekeeper gatekeeper
     can :publish, :all do |item|
-      if item.respond_to?(:projects) && gatekeeper.try(:projects) && item.respond_to?(:policy)
-       !(item.projects & gatekeeper.projects).empty? && item.can_manage?(gatekeeper.try(:user))
+      if gatekeeper.is_gatekeeper_of?(item) && !item.is_published?
+       item.can_manage?(gatekeeper.user) || item.is_waiting_approval?(nil,1.year.ago)
       else
         false
       end

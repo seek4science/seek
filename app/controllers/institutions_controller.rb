@@ -1,9 +1,7 @@
-require 'white_list_helper'
-
 class InstitutionsController < ApplicationController
   include WhiteListHelper
-  
   include IndexPager
+  include CommonSweepers
   
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :only => [:destroy]
@@ -20,6 +18,7 @@ class InstitutionsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
+      format.rdf { render :template=>'rdf/show'}
       format.xml
     end
   end
@@ -82,6 +81,7 @@ class InstitutionsController < ApplicationController
 
     respond_to do |format|
       if @institution.update_attributes(params[:institution])
+        expire_resource_list_item_content
         flash[:notice] = 'Institution was successfully updated.'
         format.html { redirect_to(@institution) }
         format.xml  { head :ok }

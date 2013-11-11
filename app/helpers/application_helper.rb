@@ -1,10 +1,12 @@
 # Methods added to this helper will be available to all templates in the application.
-require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'helpers', 'application_helper')
+#require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','helpers','application_helper')
+require 'savage_beast/application_helper'
+require 'app_version'
+
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
   include Recaptcha::ClientHelper
-
   def date_as_string date,show_time_of_day=false
     date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
     if date.blank?
@@ -13,11 +15,15 @@ module ApplicationHelper
       str = date.localtime.strftime("#{date.day.ordinalize} %B %Y")
       str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
     end
-    str
+    str.html_safe
+  end
+
+  def show_title title
+    render :partial=>"general/item_title", :locals=>{:title=>title}
   end
 
   def version_text
-    "(v.#{APP_VERSION.to_s})"
+    "(v.#{SEEK::Application::APP_VERSION.to_s})"
   end
 
   def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
@@ -50,15 +56,22 @@ module ApplicationHelper
 
 
         if count_hidden_items && !hidden_items.empty?
-          html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_items.size} hidden #{hidden_items.size > 1 ? "items" :"item"}</span>"
-          contributor_links = hidden_item_contributor_links hidden_items
-          if !contributor_links.empty?
-            html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
-          end
+          text = items.size > 0 ? " and " : ""
+          text << "#{hidden_items.size} hidden #{hidden_items.size > 1 ? 'items' :'item'}"
+          html << hidden_items_html(hidden_items,text)
         end
 
     end
-    html
+    html.html_safe
+  end
+
+  def hidden_items_html hidden_items, text='hidden item'
+    html = "<span class=\"none_text\">#{text}</span>"
+    contributor_links = hidden_item_contributor_links hidden_items
+    if !contributor_links.empty?
+      html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
+    end
+    html.html_safe
   end
 
   def hidden_item_contributor_links hidden_items
@@ -77,7 +90,7 @@ module ApplicationHelper
   end
 
   def tabbar
-    Seek::Config.is_virtualliver ? render(:partial=>"layouts/tabnav_dropdown") : render(:partial=>"layouts/tabnav")
+    Seek::Config.is_virtualliver ? render(:partial=>"general/tabnav_dropdown") : render(:partial=>"general/menutabs")
   end
 
   #joins the list with seperator and the last item with an 'and'
@@ -106,7 +119,7 @@ module ApplicationHelper
     attributes += " class='tab_gap_before'" if options[:gap_before]
 
     link=link_to options[:title], options[:path]
-    "<li #{attributes}>#{link}</li>"
+    "<li #{attributes}>#{link}</li>".html_safe
   end
 
   #returns true if the current user is associated with a profile that is marked as a PAL
@@ -136,7 +149,7 @@ module ApplicationHelper
     Seek::Util.user_creatable_types.each do |c|
       name=c.name.underscore
       path = eval "new_#{name}_path"
-      data_file_with_sample_path = eval "new_data_file_path(:page_title=>'Data File with Sample Parsing',:is_with_sample=>true)"
+      data_file_with_sample_path = eval "new_data_file_path(:page_title=>'#{t("data_file")} with Sample Parsing',:is_with_sample=>true)"
       if c==Seek::Util.user_creatable_types.first
         script << "if "
       else
@@ -150,12 +163,13 @@ module ApplicationHelper
     end
     script << "}\n"
     script << "</script>"
+    script.html_safe
   end
 
   #selection of assets for new asset gadget
   def new_creatable_selection_list
     creatable_options = Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, c.name.underscore] }
-    creatable_options << ["Data file with sample", "data_file_with_sample"] if Seek::Config.sample_parser_enabled
+    creatable_options << ["#{t('data_file')} with sample", "data_file_with_sample"] if Seek::Config.sample_parser_enabled
     creatable_options
   end
 
@@ -164,7 +178,7 @@ module ApplicationHelper
   end
   
   def empty_list_li_text list
-    return "<li><div class='none_text'> None specified</div></li>" if is_nil_or_empty?(list)
+    return "<li><div class='none_text'> None specified</div></li>".html_safe if is_nil_or_empty?(list)
   end  
 
   def model_title_or_not_specified model
@@ -175,8 +189,9 @@ module ApplicationHelper
   def text_or_not_specified text, options = {}
     text=text.to_s if text.kind_of?(Numeric)
     if text.nil? or text.chomp.empty?
-      not_specified_text=options[:none_text] || "Not specified"
-      not_specified_text="No description specified" if options[:description]==true
+      not_specified_text||=options[:none_text]
+      not_specified_text||="No description specified" if options[:description]==true
+      not_specified_text||="Not specified"
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
       text.capitalize! if options[:capitalize]            
@@ -191,7 +206,7 @@ module ApplicationHelper
       res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
       res = "&nbsp;" + flag_icon(text) + link_to(res,country_path(res)) if options[:link_as_country]==true 
     end
-    return res
+    res.html_safe
   end
 
   def tooltip_title_attrib(text, delay=200)
@@ -213,7 +228,7 @@ module ApplicationHelper
     list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += "</li>"
     
-    return list_item
+    return list_item.html_safe
   end
   
   
@@ -231,16 +246,10 @@ module ApplicationHelper
       if avatar
         result = avatar(contributor_person, size, false, contributor_url, contributor_name, false)
         result += "<p style='margin: 0; text-align: center;'>#{contributor_name_link}#{you_string}</p>"
-        return result
+        return result.html_safe
       else
-        return (contributor_name_link + you_string)
+        return (contributor_name_link + you_string).html_safe
       end
-      # other types might be supported
-      # elsif contributortype.to_s == "Network"
-      #network = Network.find(:first, :select => "id, title", :conditions => ["id = ?", contributorid])
-      #return nil unless network
-      #
-      #return title(network)
     else
       return nil
     end
@@ -292,11 +301,11 @@ module ApplicationHelper
       :title => link_options[:title] || "",
       :onclick => "if (!#{can_click_var}) {#{can_click_var}=true;return(false);} else {return true;}",
       :onMouseUp => "setTimeout('#{can_click_var} = true;', 200);")
-    html << draggable_element(link_options[:id],
+      html << draggable_element(link_options[:id],
       :revert => drag_options[:revert] || true,
       :ghosting => drag_options[:ghosting] || false,
       :change => "function(element){#{can_click_var} = false;}")
-    return html
+    return html.html_safe
   end
 
   def page_title controller_name, action_name
@@ -330,7 +339,7 @@ module ApplicationHelper
 
     # Print end page if anchors are enabled
     html << yield(pagingEnum.last_page) if always_show_anchors and not last == pagingEnum.last_page
-    html
+    html.html_safe
   end
 
   def favourite_group_popup_link_action_new resource_type=nil
@@ -360,7 +369,7 @@ module ApplicationHelper
   end
   
   def workgroup_member_review_popup_link resource_type=nil
-    return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>", 
+    return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>".html_safe,
       { :url => review_work_group_url("type", "id", "access_type"),
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
@@ -388,7 +397,7 @@ module ApplicationHelper
   def preview_permission_popup_link resource
     resource_name = resource.class.name.underscore
     resource_id = resource.id
-    url = url_for(:controller => 'policies', :action => 'preview_permissions')
+    url = preview_permissions_policies_path
     is_new_file = resource.new_record?
     contributor_id = resource.contributing_user.try(:id)
     return link_to_remote_redbox("preview permission",
@@ -443,7 +452,8 @@ module ApplicationHelper
       truncated_result += "\n"
     end    
     #Need some kind of whitespace before elipses or auto-link breaks
-    truncated_result.strip + (truncated ? "\n..." : "")
+    html = truncated_result.strip + (truncated ? "\n..." : "")
+    html.html_safe
   end    
   
   def get_object_title(item)
@@ -462,11 +472,12 @@ module ApplicationHelper
   end
 
   def show_or_hide_block visible=true
-    "display:" + (visible ? 'block' : 'none')
+    html = "display:" + (visible ? 'block' : 'none')
+    html.html_safe
   end
 
   def toggle_appear_javascript block_id
-    "Effect.toggle('#{block_id}','slide',{duration:0.5})"
+    "Effect.toggle('#{block_id}','slide',{duration:0.5})".html_safe
   end
 
   def toggle_appear_with_image_javascript block_id
@@ -549,21 +560,27 @@ module ApplicationHelper
   end
 
   def resource_tab_item_name resource_type,pluralize=true
-    if resource_type.include?"DataFile"
-      pluralize ? resource_type.titleize.pluralize : resource_type.titleize
-    elsif resource_type == "Sop"
-      pluralize ? "SOPs" : "SOP"
-    elsif resource_type == "Specimen"
-      pluralize ? Seek::Config.sample_parent_term.capitalize.pluralize : Seek::Config.sample_parent_term.capitalize
+    resource_type = resource_type.singularize
+    if resource_type == "Speciman"
+      result = t('biosamples.sample_parent_term')
+    elsif resource_type == "Assay"
+      result = t('assays.assay')
     else
-      pluralize ? resource_type.pluralize : resource_type
+      translated_resource_type = translate_resource_type(resource_type)
+      result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
     end
+    pluralize ? result.pluralize : result
   end
+
+  def translate_resource_type resource_type
+    t("#{resource_type.underscore}")
+  end
+
   def add_return_to_search
     referer = request.headers["Referer"].try(:normalize_trailing_slash)
     search_path = search_url.normalize_trailing_slash
     root_path = root_url.normalize_trailing_slash
-    request_uri = request.headers['REQUEST_URI'].try(:normalize_trailing_slash)
+    request_uri = request.fullpath.try(:normalize_trailing_slash)
     if !request_uri.include?(root_path)
       request_uri = root_path.chop + request_uri
     end
@@ -581,8 +598,39 @@ module ApplicationHelper
       #link_to_function 'Return to search', "window.history.back();"
     end
   end
+  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it or you are not authorized.",
+                         Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
+                         Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it or you are not authorized." ,
+                         Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
+                         Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
+                         Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized."
+  }
+
+  def delete_icon model_item, user
+    item_name = text_for_resource model_item
+    if model_item.can_delete?(user)
+      html = "<li>"+image_tag_for_key('destroy',url_for(model_item),"Delete #{item_name}", {:confirm=>"Are you sure?",:method=>:delete },"Delete #{item_name}") + "</li>"
+      return html.html_safe
+    elsif model_item.can_manage?(user)
+      explanation=unable_to_delete_text model_item
+      html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span></li>"
+      return html.html_safe
+    end
+  end
+
+  def unable_to_delete_text model_item
+    text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
+    return text.html_safe
+  end
+
+
+
   private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}
+  PAGE_TITLES={"home"=>"Home", "projects"=>I18n.t('project').pluralize,"institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search",
+               "assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>I18n.t('sop').pluralize,"models"=>I18n.t('model').pluralize,"data_files"=>I18n.t('data_file').pluralize,
+               "publications"=>"Publications","investigations"=>I18n.t('investigation').pluralize,"studies"=>I18n.t('study').pluralize,
+               "specimens"=>I18n.t('biosamples.sample_parent_term').pluralize,"samples"=>"Samples","strains"=>"Strains","organisms"=>"Organisms","biosamples"=>"Biosamples",
+               "presentations"=>I18n.t('presentation').pluralize,"events"=>I18n.t('event').pluralize,"help_documents"=>"Help"}
 end
 
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder

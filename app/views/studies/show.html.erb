@@ -1,27 +1,27 @@
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@study} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@study} %>
 
 <ul class="sectionIcons">
     <%= render :partial => "subscriptions/subscribe", :locals => {:object => @study} %>
     <% if @study.can_manage? -%>
-      <li><%= image_tag_for_key('manage', edit_study_path, nil, nil, "Manage study") -%></li>
+      <li><%= image_tag_for_key('manage', edit_study_path, nil, nil, "Manage #{t('study')}") -%></li>
     <% elsif @study.can_edit?-%>
-      <li><%= image_tag_for_key('edit', edit_study_path, "Edit study", nil, 'Edit study') -%></li>
+      <li><%= image_tag_for_key('edit', edit_study_path, "Edit #{t('study')}", nil, "Edit #{t('study')}") -%></li>
     <% end -%>
 
     <% if @study.can_edit? -%>
         <li>
-          <%= image_tag_for_key('new', new_assay_path(:study_id=>@study,:create_from_asset=>@study.create_from_asset), "Add an assay", nil, 'Add an assay') -%>
+          <%= image_tag_for_key('new', new_assay_path(:study_id=>@study,:create_from_asset=>@study.create_from_asset), "Add an #{t('assays.assay')}", nil, "Add an #{t('assays.assay')}") -%>
         </li>
     <% end -%>
 
-  <%= delete_ISA_icon @study,current_user -%>
+  <%= delete_icon @study,current_user -%>
     <% if logged_in? and current_user.person.member? %>
-      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"studies",:id=>@study.id), nil, nil, 'New study based on this one') %></li>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"studies",:id=>@study.id), nil, nil, "New #{t('study')} based on this one") %></li>
     <% end %>
 </ul>
 
 <div class="show_basic">
-  <div class="main_content_left_box_narrower">
+  <div class="main_content_left_box">
   <p class="id">
     <label>ID: </label>
     <%= @study.id -%>
@@ -31,7 +31,7 @@
 
     <div class="investigation">
       <p>
-        <label>Investigation:</label>
+        <label><%= t('investigation') %>:</label>
         <%= link_to h(@study.investigation.title),@study.investigation %>
       </p>
     </div>
@@ -53,28 +53,19 @@
       <%= text_or_not_specified(@study.experimentalists) %>
     </p>
 
-    <p>
-      <b>Description:</b>
-      <div id="description" class="box_standout">
-        <%= text_or_not_specified(@study.description, :description=>true,:auto_link=>true) %>
-      </div>
-    </p>
+    <%= item_description @study.description -%>
 
   </div>
   </div>
   <div class="main_content_right_box_wider">
       <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @study}-%>
   </div>
-  <div class="main_content_right_box_wider">
-    <%= render :partial=>"assets/resource_authors_box",:locals => { :resource => @study, :creators => [@study.contributing_user.try(:person)] } %>
-   </div>
+<%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => [@study.contributing_user.try(:person)] } %>
 
   <div style="clear:both;">
     <%= embedded_isa_svg(@study.investigation,false,@study) -%>
   </div>
 
-  <%= render :partial=>"layouts/items_related_to", :object => @study %>
-  <br/>
-  <%= render :partial => "layouts/usage_info", :locals => { :resource => @study } -%>
+  <%= render :partial=>"general/items_related_to", :object => @study %>
 
 </div>

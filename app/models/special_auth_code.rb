@@ -1,15 +1,10 @@
 class SpecialAuthCode < ActiveRecord::Base
   belongs_to :asset, :polymorphic => true
   default_scope :conditions => ['expiration_date > ?', Date.today]
-
+  enforce_authorization_on_association :asset,:manage
   after_initialize :defaults
 
-  named_scope :unexpired, :conditions => ['expiration_date > ?', Time.now]
-
-  def can_edit?(u=User.current_user)
-    asset.can_manage?(u)
-  end
-  alias_method :can_manage?, :can_edit?
+  scope :unexpired, :conditions => ['expiration_date > ?', Time.now]
 
   def defaults
     self.code = SecureRandom.base64(30) if code.blank?

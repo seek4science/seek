@@ -31,14 +31,14 @@ class TopicsController < ApplicationController
         # authors of topics don't get counted towards total hits
         @topic.hit! unless logged_in? and @topic.user == current_user
         @posts = @topic.posts.paginate :page => params[:page]
-        User.find(:all, :conditions => ['id IN (?)', @posts.collect { |p| p.user_id }.uniq]) unless @posts.blank?
+        User.where(['id IN (?)', @posts.collect { |p| p.user_id }.uniq]) unless @posts.blank?
         @post   = Post.new
       end
       format.xml do
         render :xml => @topic.to_xml
       end
       format.rss do
-        @posts = @topic.posts.find(:all, :order => 'created_at desc', :limit => 25)
+        @posts = @topic.posts.order('created_at desc').limit(25)
         render :action => 'show', :layout => false
       end
     end
@@ -48,9 +48,9 @@ class TopicsController < ApplicationController
     topic_saved, post_saved = false, false
 		# this is icky - move the topic/first post workings into the topic model?
     Topic.transaction do
-	    @topic  = @forum.topics.build(params[:topic])
+	    @topic  = @forum.topics.build(:title => params[:topic][:title])
       assign_protected
-      @post       = @topic.posts.build(params[:topic])
+      @post       = @topic.posts.build(:body => params[:topic][:body])
       @post.topic = @topic
       @post.user  = current_user
       # only save topic if post is valid so in the view topic will be a new record if there was an error
@@ -82,7 +82,7 @@ class TopicsController < ApplicationController
   end
   
   def update
-    @topic.attributes = params[:topic]
+    @topic.title = params[:topic][:title]
     assign_protected
     @topic.save!
     respond_to do |format|

@@ -34,10 +34,10 @@ class PersonalTagsTest < ActionController::TestCase
     spade=Factory :tool,:value=>"spade",:source=>p,:annotatable=>p
     fishing_tool=Factory :tool,:value=>"fishing",:source=>p,:annotatable=>p
 
-    get :show,:id=>p
+    get :show,:id=>p.id
     assert_response :success
 
-    assert_select "div#expertise" do
+    assert_select "div" do
       assert_select "p#expertise" do
         assert_select "a[href=?]",show_ann_path(fishing_exp.value),:text=>"fishing",:count=>1
         assert_select "a[href=?]",show_ann_path(bowling.value),:text=>"bowling",:count=>1

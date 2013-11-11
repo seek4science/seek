@@ -2,7 +2,6 @@ require "test_helper"
 
 class SpecimenTest < ActiveSupport::TestCase
 
-
   test "validation" do
 
       specimen = Factory :specimen, :title => "DonorNumber"
@@ -32,6 +31,19 @@ class SpecimenTest < ActiveSupport::TestCase
       specimen.reload
       specimen.strain = nil
       assert !specimen.valid?
+  end
+
+  test "to rdf" do
+    object = Factory :specimen, :contributor=>Factory(:person), :lab_internal_number=>"Asda",:sample_ids=>[Factory(:sample).id],
+                     :strain=>Factory(:strain),:comments=>"blah blah",:culture_growth_type=>Factory(:culture_growth_type)
+
+    object.reload
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/specimens/#{object.id}"), reader.statements.first.subject
+    end
+
   end
 
   test "age with unit" do
@@ -67,13 +79,13 @@ class SpecimenTest < ActiveSupport::TestCase
     specimen = Factory :specimen
     User.current_user = specimen.contributor
     specimen.genotypes_attributes = {0 => {:gene_attributes => {:title => 'test gene'}, :modification_attributes => {:title => 'test modification'}}, 1 => {:gene_attributes => {:title => 'test gene2'}, :modification_attributes => {:title => 'test modification2'}}}
-    assert specimen.genotypes.count, 2
+
     assert specimen.genotypes.detect {|g| g.gene.title == 'test gene' && g.modification.title == 'test modification'}
     assert specimen.genotypes.detect {|g| g.gene.title == 'test gene2' && g.modification.title == 'test modification2'}
 
     assert specimen.save
-    specimen.reload
-    assert specimen.genotypes.count, 2
+    specimen = Specimen.find(specimen.id)
+    assert_equal 2, specimen.genotypes.count
     assert specimen.genotypes.detect {|g| g.gene.title == 'test gene' && g.modification.title == 'test modification'}
     assert specimen.genotypes.detect {|g| g.gene.title == 'test gene2' && g.modification.title == 'test modification2'}
 
@@ -83,13 +95,13 @@ class SpecimenTest < ActiveSupport::TestCase
     specimen = Factory :specimen
     User.current_user = specimen.contributor
     specimen.phenotypes_attributes = {0 => {:description => 'test phenotype'}, 1 => {:description => 'test phenotype2'}}
-    assert specimen.phenotypes.count, 2
+
     assert specimen.phenotypes.detect {|p| p.description == 'test phenotype'}
     assert specimen.phenotypes.detect {|p| p.description == 'test phenotype2'}
 
     assert specimen.save
     specimen.reload
-    assert specimen.phenotypes.count, 2
+    assert_equal 2, specimen.phenotypes.count
     assert specimen.phenotypes.detect {|p| p.description == 'test phenotype'}
     assert specimen.phenotypes.detect {|p| p.description == 'test phenotype2'}
   end
@@ -99,9 +111,9 @@ class SpecimenTest < ActiveSupport::TestCase
     phenotype = Factory(:phenotype, :specimen => nil, :strain => nil)
     specimen = Factory(:specimen, :genotypes => [genotype], :phenotypes => [phenotype])
     disable_authorization_checks{specimen.destroy}
-    assert_equal nil, Strain.find_by_id(specimen.id)
-    assert_equal nil, Genotype.find_by_id(genotype.id)
-    assert_equal nil, Phenotype.find_by_id(phenotype.id)
+    assert_nil Strain.find_by_id(specimen.id)
+    assert_nil Genotype.find_by_id(genotype.id)
+    assert_nil Phenotype.find_by_id(phenotype.id)
   end
 
   test 'when destroying specimen, should not destroy genotypes/phenotypes that are linked to strain' do
@@ -109,10 +121,10 @@ class SpecimenTest < ActiveSupport::TestCase
       genotype2 = Factory(:genotype, :specimen => nil, :strain => nil)
       phenotype1 = Factory(:phenotype, :specimen => nil, :strain => nil)
       phenotype2 = Factory(:phenotype, :specimen => nil, :strain => nil)
-      strain = Factory(:strain, :genotypes => [genotype1,genotype2], :phenotypes => [phenotype1,phenotype2])
-      specimen = Factory(:specimen,:genotypes => [genotype1], :phenotypes => [phenotype1])
-      disable_authorization_checks{strain.destroy}
-      assert_equal nil, Strain.find_by_id(strain.id)
+      strain = Factory(:strain, :genotypes => [genotype1], :phenotypes => [phenotype1] )
+      specimen = Factory(:specimen, :genotypes => [genotype1,genotype2], :phenotypes => [phenotype1,phenotype2])
+      disable_authorization_checks{specimen.destroy}
+      assert_equal nil, Specimen.find_by_id(specimen.id)
       assert_equal nil, Genotype.find_by_id(genotype2.id)
       assert_equal nil, Phenotype.find_by_id(phenotype2.id)
       assert_not_nil Genotype.find_by_id(genotype1.id)
@@ -139,7 +151,7 @@ class SpecimenTest < ActiveSupport::TestCase
       specimen = Factory :specimen, :contributor => User.current_user
       sop = Factory :sop, :contributor => User.current_user
       sop_version_2 = Factory(:sop_version, :sop => sop)
-      assert 2, sop.versions.count
+      assert_equal 2, sop.versions.count
       assert_equal sop_version_2, sop.latest_version
 
       specimen.build_sop_masters [sop.id]

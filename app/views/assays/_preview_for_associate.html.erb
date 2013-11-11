@@ -1,5 +1,5 @@
 <%
-   @assay_text=resource.is_modelling? ? "Analysis" : "Assay"
+   @assay_text=resource.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
 %>
 
 <%= list_item_title resource %>
@@ -12,11 +12,11 @@
       <%= list_item_attribute "Technology type", h(resource.technology_type.title.capitalize), resource.technology_type %>
   <% end -%>
 
-  <%= list_item_optional_attribute "Investigation", h(resource.investigation.try(:title)), resource.investigation %>
+  <%= list_item_optional_attribute t('investigation'), h(resource.investigation.try(:title)), resource.investigation %>
 
-  <%= list_item_optional_attribute "Study", h(resource.study.try(:title)), resource.study %>
+  <%= list_item_optional_attribute t('study'), h(resource.study.try(:title)), resource.study %>
 
-  <%= list_item_authorized_list(resource.models, "Models", true, 50, true) if resource.is_modelling? %>
+  <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
 
 
 
@@ -27,7 +27,7 @@
 
   <%= list_item_simple_list(resource.assay_organisms, "Organism") { |ao| assay_organism_list_item(ao) } %>
 
-  <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
+  <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
 
-  <%= list_item_authorized_list resource.data_files, "Data files", true, 50, true %>
+  <%= list_item_authorized_list resource.data_files, t('data_file').pluralize, true, 50, true %>
 

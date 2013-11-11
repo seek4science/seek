@@ -3,34 +3,31 @@
 %>
 <div class="list_item_content noavatar">
     <div class="list_item_title">
-     <%= "<p> #{resource.title}</p>" %>
+     <%= "<p> #{h(resource.title)}</p>".html_safe %>
     </div>
 
     <div class="list_item_left_column">
-
-
         <p class='list_item_attribute'>
-
-        <%= "<b> Original Authors: </b> " + resource.authors.join(", ") %>
+        <%= "<b> Original Authors: </b> #{resource.authors.join(", ")}".html_safe %>
         </p>
     </div>
 
     <div class="list_item_right_column">
         <p class='list_item_attribute'>
-            <%= "<b> Publication Date: </b> " + date_as_string(resource.date_published) %>
+            <%= "<b> Publication Date: </b> #{date_as_string(resource.date_published)}".html_safe %>
         </p>
         <p class='list_item_attribute'>
-          <%= "<b> Last Modified: </b>" + date_as_string(resource.last_modification_date, true) %>
+          <%= "<b> Last Modified: </b> #{date_as_string(resource.last_modification_date, true)}".html_safe  %>
         </p>
     </div>
 
 
     <div class="list_item_whole_width">
       <p class='list_item_attribute'>
-        <%= "<b> URL of Original: </b> " + link_to(biomodel_link, "http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}",:target=>"_blank") %>
+        <%= "<b> URL of Original: </b> #{link_to(biomodel_link, 'http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}',:target=>'_blank')}".html_safe %>
       </p>
       <p class='list_item_attribute'>
-        <%= "<b> Abstract: </b> " + list_item_description(resource.abstract,true,1000) %>
+        <%= "<b> Abstract: </b> #{list_item_description(resource.abstract,true,1000)}".html_safe  %>
       </p>
     </div>
 </div>

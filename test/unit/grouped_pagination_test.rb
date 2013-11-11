@@ -1,3 +1,4 @@
+#encoding: utf-8
 require 'test_helper'
 
 class GroupedPaginationTest < ActiveSupport::TestCase
@@ -225,6 +226,70 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     @specimens=Specimen.paginate
     assert_equal @specimens.page, Seek::Config.default_pages[:specimens]
 
+  end
+
+  test 'order by updated_at for -latest- pagination for all item types' do
+    item_types = [:person, :project, :institution, :investigation, :study, :assay, :data_file, :model, :sop, :presentation, :publication,:event, :strain, :specimen, :sample ]
+    item_types.each do |type|
+      item1 = Factory(type, :updated_at => 2.second.ago)
+      item2 = Factory(type, :updated_at => 1.second.ago)
+
+      klass = type.to_s.camelize.constantize
+      latest_items = klass.paginate_after_fetch(klass.default_order, :page=>'latest')
+      assert latest_items.index(item2) < latest_items.index(item1)
+    end
+  end
+
+  test 'order by published_date for publications, for -all- and -alphabet- pagnation' do
+    publication1 = Factory(:publication, :title => 'AB', :published_date => 2.days.ago)
+    publication2 = Factory(:publication, :title => 'AC', :published_date => 1.days.ago)
+
+    all_items = Publication.paginate_after_fetch(Publication.default_order, :page=>'all')
+    assert all_items.index(publication2) < all_items.index(publication1)
+
+    pageA_items = Publication.paginate_after_fetch(Publication.default_order, :page=>'A')
+    assert pageA_items.index(publication2) < pageA_items.index(publication1)
+  end
+
+  test 'order by start_date for events, for -all- and -alphabet- pagnation' do
+    event1 = Factory(:event, :title => 'AB', :start_date => 2.days.ago)
+    event2 = Factory(:event, :title => 'AC', :start_date => 1.days.ago)
+
+    all_items = Event.paginate_after_fetch(Event.default_order, :page=>'all')
+    assert all_items.index(event2) < all_items.index(event1)
+
+    pageA_items = Event.paginate_after_fetch(Event.default_order, :page=>'A')
+    assert pageA_items.index(event2) < pageA_items.index(event1)
+  end
+
+  test 'order by name for projects and institutions, for -all- and -alphabet- pagnation' do
+    yellow_pages = [:project, :institution]
+    yellow_pages.each do |type|
+      item1 = Factory(type, :name => 'AB', :updated_at => 2.days.ago)
+      item2 = Factory(type, :name => 'AC', :updated_at => 1.days.ago)
+
+      klass = type.to_s.camelize.constantize
+      all_items = klass.paginate_after_fetch(klass.default_order, :page=>'all')
+      assert all_items.index(item1) < all_items.index(item2)
+
+      pageA_items = klass.paginate_after_fetch(klass.default_order, :page=>'A')
+      assert pageA_items.index(item1) < pageA_items.index(item2)
+    end
+  end
+
+  test 'order by title for the rest of item types,  for -all- and -alphabet- pagnation' do
+    item_types = [:investigation, :study, :assay, :data_file, :model, :sop, :presentation, :strain, :specimen, :sample]
+    item_types.each do |type|
+      item1 = Factory(type, :title => 'AB', :updated_at => 2.days.ago)
+      item2 = Factory(type, :title => 'AC', :updated_at => 1.days.ago)
+
+      klass = type.to_s.camelize.constantize
+      all_items = klass.paginate_after_fetch(klass.default_order, :page=>'all')
+      assert all_items.index(item1) < all_items.index(item2)
+
+      pageA_items = klass.paginate_after_fetch(klass.default_order, :page=>'A')
+      assert pageA_items.index(item1) < pageA_items.index(item2)
+    end
   end
 
 end

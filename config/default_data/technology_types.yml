@@ -1,122 +1,265 @@
 technology:
   title: technology
-  children: binding,chromatography, culture_growth,electrophoresis,imaging,Mass_Spectrometry,microarray,PCR,structural_methods
+  children: binding,chemostat_measurements,chromatography, culture_growth,electrophoresis,enzymatic_activity_measurements,flow_cytometry,imaging,mathematical_model_type,Mass_Spectrometry,microarray,molecule_labelling,PCR,sequencing,structural_methods
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#TechnologyType
+
+enzymatic_activity_measurements:
+  title: enzymatic activity measurements
+  children: initial_rate_experiment, progressive_curve_experiment
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Enzymatic_activity_measurements
+
+flow_cytometry:
+  title: flow cytometry
+  children: FACS
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Flow_cytometry
+
+FACS:
+  title: FACS
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#FACS
+
+intial_rate_experiment:
+  title: initial rate experiment
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Initial_rate_experiment
+
+progressive_curve_experiment:
+  title: progressive curve experiment
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Progressive_curve_experiment
 
 binding:
   title: binding
   children: 2-hybrid_system,surface_plasmon_resonance
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#binding
 
 2-hybrid_system:
   title: 2-hybrid system
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#2-hybrid_system
 
 surface_plasmon_resonance:
   title: surface plasmon resonance
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#surface_plasmon_resonance
+
+chemostat_measurements:
+  title: chemostat measurements
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Chemostat_measurements
 
 chromatography:
   title: chromatography
-  children: gas_chromatography,HPLC,UPLC
+  children: gas_chromatography,gel_filtration, affinity_chromatography, HPLC,UPLC
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#chromatography
 
 gas_chromatography:
   title: gas chromatography
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#gas_chromatography
+
+affinity_chromatography:
+  title: affinity chromatography
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Affinity_chromatography
+
+gel_filtration:
+  title: gel filtration
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Gel_filtration
+
 
 HPLC:
   title: HPLC
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#HPLC
 
 UPLC:
   title: UPLC
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#UPLC
 
 electrophoresis:
   title: electrophoresis
   children: capillary_electrophoresis,gel_electrophoresis
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#electrophoresis
 
 capillary_electrophoresis:
   title: capillary electrophoresis
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#capillary_electrophoresis
 
 gel_electrophoresis:
   title: gel electrophoresis
   children: 2D_gel_electrophoresis,SDS_PAGE
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#gel_electrophoresis
 
 2D_gel_electrophoresis:
   title: 2D gel electrophoresis
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#2D_gel_electrophoresis
   
 SDS_PAGE:
   title: SDS PAGE
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#SDS_PAGE
 
 imaging:
   title: imaging
   children: FRAP
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#imaging
 
 FRAP:
   title: FRAP
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#FRAP
+
+mathematical_model_type:
+  title: mathematical model type
+  children: algebraic_equation, linear_equation, ordinary_differential_equation, partial_differential_equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Mathematical_model_type
+
+algebraic_equation:
+  title: algebraic equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Algebraic_equation
+
+linear_equation:
+  title: Linear equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Linear equation
+
+ordinary_differential_equation:
+  title: ordinary differential equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Ordinary_differential_equation
+
+partial_differential_equation:
+  title: partial differential equation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Partial_differential_equation
 
 Mass_Spectrometry:
   title: mass spectrometry
   children: Accelerator_Mass_Spectrometry,Gas_Chromatography_Mass_Spectrometry,Inductively_Coupled_Plasma_Mass_Spectrometry,Ion_Mobility_Spectrometry_Mass_Spectrometry,Isotope_Ratio_Mass_Spectrometry,liquid_chromatography-tandem_mass_spectrometry,liquid_chromatography_Mass_Spectrometry,MALDI_TOF,SELDI_TOF,Tandem_Mass_Spectrometry
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#mass_Spectrometry
 
 Accelerator_Mass_Spectrometry:
   title: accelerator mass spectrometry
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Accelerator_Mass_Spectrometry
 
 Gas_Chromatography_Mass_Spectrometry:
   title: gas chromatography mass spectrometry
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Gas_Chromatography_Mass_Spectrometry
 
 Inductively_Coupled_Plasma_Mass_Spectrometry:
   title: inductively coupled plasma mass spectrometry
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Inductively_Coupled_Plasma_Mass_Spectrometry
 
 Ion_Mobility_Spectrometry_Mass_Spectrometry:
   title: ion mobility spectrometry mass spectrometry
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Ion_Mobility_Spectrometry_Mass_Spectrometry
 
 Isotope_Ratio_Mass_Spectrometry:
   title: isotope ratio mass spectrometry
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Isotope_Ratio_Mass_Spectrometry
 
 liquid_chromatography-tandem_mass_spectrometry:
   title: liquid chromatography-tandem mass spectrometry
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#liquid_chromatography-tandem_mass_spectrometry
 
 liquid_chromatography_Mass_Spectrometry:
   title: liquid chromatography mass spectrometry
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#liquid_chromatography_Mass_Spectrometry
 
 MALDI_TOF:
   title: MALDI TOF
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#MALDI_TOF
 
 SELDI_TOF:
   title: SELDI TOF
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#SELDI_TOF
 
 Tandem_Mass_Spectrometry:
   title: tandem mass spectrometry
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Tandem_Mass_Spectrometry
 
 
 microarray:
   title: microarray
-  children: cDNA_microarray,ChIP-on-chip,custom_Array,DNA_Methylation,miRNA_microarray
+  children: ChIP-on-chip,custom_Array,DNA_Methylation,exon_array,snp_array,tiling_array,miRNA_microarray,small_molecule_microarray
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#microarray
 
-cDNA_microarray:
-  title: cDNA microarray
+small_molecule_microarray:
+  title: small molecule microarray
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Small_molecule_microarray
+
+#cDNA_microarray:
+#  title: cDNA microarray
+#  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#
 
 ChIP-on-chip:
   title: ChIP-on-chip
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#ChIP-on-chip
 
 custom_Array:
   title: custom array
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#custom_Array
 
 DNA_Methylation:
   title: DNA methylation
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#DNA_Methylation
+
+exon_array:
+  title: Exon array
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Exon_array
+
+snp_array:
+  title: SNP array
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#SNP_array
+
+tiling_array:
+  title: tiling array
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Tiling_array
 
 miRNA_microarray:
   title: miRNA microarray
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#miRNA_microarray
+
+molecule_labelling:
+  title: molecule labelling
+  children: bait_protein_tagging,radioactive_labelling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Molecule_labelling
+
+bait_protein_tagging:
+  title: bait protein tagging
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Bait_protein_tagging
+
+radioactive_labelling:
+  title: radioactive labelling
+  children: 13c_radiolabelling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Radioactive_labelling
+
+13c_radiolabelling:
+  title: 13c radiolabelling
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#13c_radiolabelling
 
 PCR:
   title: PCR
   children: qPCR,qRT-PCR
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#PCR
 
 qPCR:
   title: qPCR
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#qPCR
 
 qRT-PCR:
   title: qRT-PCR
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#qRT-PCR
 
+sequencing:
+  title: sequencing
+  children: chip_seq, next_generation_sequencing,rna_seq
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Sequencing
+
+chip_seq:
+  title: chip-seq
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Chip-Seq
+
+rna_seq:
+  title: RNA-seq
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+
+next_generation_sequencing:
+  title: next generation sequencing
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#Next_generation_sequencing
 
 structural_methods:
   title: structural methods
   children: NMR
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#structural_methods
 
 NMR:
   title: NMR
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#NMR

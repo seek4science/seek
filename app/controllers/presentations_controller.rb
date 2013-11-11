@@ -12,7 +12,9 @@ class PresentationsController < ApplicationController
   before_filter :find_and_auth, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show, :download]
 
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
 
   def new_version
@@ -81,7 +83,7 @@ class PresentationsController < ApplicationController
           if !@presentation.parent_name.blank?
             render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@presentation, :parent_name=>@presentation.parent_name}
           else
-            flash[:notice] = 'Presentation was successfully uploaded and saved.'
+            flash[:notice] = '#{t('presentation')} was successfully uploaded and saved.'
             respond_to do |format|
               format.html { redirect_to presentation_path(@presentation) }
             end
@@ -91,7 +93,6 @@ class PresentationsController < ApplicationController
               assay.relate(@presentation)
             end
           end
-          deliver_request_publish_approval params[:sharing], @presentation
         else
           respond_to do |format|
             format.html {
@@ -113,10 +114,7 @@ class PresentationsController < ApplicationController
     # store timestamp of the previous last usage
     @last_used_before_now = @presentation.last_used_at
 
-    # update timestamp in the current Presentation record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @presentation.last_used_at = Time.now
-    @presentation.save_without_timestamping
+    @presentation.just_used
 
     respond_to do |format|
       format.html # show.html.erb
@@ -168,7 +166,7 @@ class PresentationsController < ApplicationController
         #update creators
         AssetsCreator.add_or_update_creator_list(@presentation, params[:creators])
 
-        flash[:notice] = 'Presentation metadata was successfully updated.'
+        flash[:notice] = "#{t('presentation')} metadata was successfully updated."
         format.html { redirect_to presentation_path(@presentation) }
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|
@@ -183,7 +181,6 @@ class PresentationsController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
-        deliver_request_publish_approval params[:sharing], @presentation
       else
         format.html {
           render :action => "edit"

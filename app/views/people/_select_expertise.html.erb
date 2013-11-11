@@ -7,4 +7,4 @@
     all_tags,item_tags = fetch_tags_for_item @person,"expertise"
 %>
 
-<%= render :partial=>"layouts/select_tags",:locals=>{:all_tags=>all_tags, :item_tags=>item_tags, :name=>"expertise", :no_tags_message=>"Type the areas you have expertise in" } -%>
+<%= render :partial=>"tags/select_tags",:locals=>{:all_tags=>all_tags, :item_tags=>item_tags, :name=>"expertise", :no_tags_message=>"Type the areas you have expertise in" } -%>

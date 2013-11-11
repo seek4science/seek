@@ -47,10 +47,10 @@ module Acts #:nodoc:
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
       def attributions_objects
-        self.parent.attributions.collect { |a| a.object }
+        self.parent.attributions.collect { |a| a.other_object }
       end
 
-      Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
+      Seek::Permissions::AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
           def can_#{action}? user = User.current_user
             self.parent.can_perform? '#{action}', user
@@ -71,7 +71,7 @@ module Acts #:nodoc:
         blobs = []
         blobs << self.content_blob if self.respond_to?(:content_blob)
         blobs = blobs | self.content_blobs if self.respond_to?(:content_blobs)
-        !blobs.compact.select { |blob| !blob.is_webpage? }.empty?
+        !blobs.compact.select{|blob| !blob.is_webpage?}.empty?
       end
 
       #returns a list of the people that can manage this file

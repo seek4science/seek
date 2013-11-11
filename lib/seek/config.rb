@@ -1,3 +1,6 @@
+require 'simple_crypt'
+
+
 module Seek
 
   # Fallback attribute, which if defined will be the result if the stored/default value for a setting is nil
@@ -64,9 +67,23 @@ module Seek
     def smtp_propagate
       smtp_hash = self.smtp
       password =  self.smtp_settings 'password'
-      smtp_hash.merge! :password => password
+      smtp_hash.merge! "password" => password
 
-      ActionMailer::Base.smtp_settings = smtp_hash
+      new_hash = {}
+      smtp_hash.keys.each do |key|
+        new_hash[key.to_sym]=smtp_hash[key]
+      end
+
+      ActionMailer::Base.smtp_settings = new_hash
+    end
+
+    def bioportal_api_key_propagate
+      affected = ActiveRecord::Base.descendants.select do |cl|
+        cl.respond_to?(:bioportal_api_key=)
+      end
+      affected.each do |cl|
+        cl.bioportal_api_key = bioportal_api_key
+      end
     end
 
     def google_analytics_enabled_propagate
@@ -85,22 +102,33 @@ module Seek
 
     def piwik_analytics_enabled_propagate
       if self.piwik_analytics_enabled
-          PiwikAnalytics::Config.id_site = self.piwik_analytics_id_site
-          PiwikAnalytics::Config.url = self.piwik_analytics_url
-          PiwikAnalytics::Config.use_async = true
+          PiwikAnalytics::configuration.id_site = self.piwik_analytics_id_site
+          PiwikAnalytics::configuration.url = self.piwik_analytics_url
+          PiwikAnalytics::configuration.use_async = true
+          PiwikAnalytics::configuration.disabled=false
+      else
+        PiwikAnalytics::configuration.disabled=true
       end
     end
 
+    def exception_notification_recipients_propagate
+      configure_exception_notification
+    end
+
     def exception_notification_enabled_propagate
-      if self.exception_notification_enabled
-        ExceptionNotifier.render_only            = false
-        ExceptionNotifier.send_email_error_codes = %W( 400 406 403 405 410 500 501 503 )
-        ExceptionNotifier.sender_address         = [self.noreply_sender]
-        ExceptionNotifier.email_prefix           = "[ #{self.application_title} ERROR ] "
-        ExceptionNotifier.exception_recipients   = self.exception_notification_recipients.split %r([, ])
+      configure_exception_notification
+    end
+
+    def configure_exception_notification
+      if exception_notification_enabled && !Rails.application.config.consider_all_requests_local
+        SEEK::Application.config.middleware.use ExceptionNotifier,
+          :sender_address         => [self.noreply_sender],
+          :email_prefix           => "[ #{self.application_title} ERROR ] ",
+          :exception_recipients   => self.exception_notification_recipients.nil? ? [] : self.exception_notification_recipients.split(%r([, ]))
       else
-        ExceptionNotifier.render_only = true
+        SEEK::Application.config.middleware.delete ExceptionNotifier
       end
+
     end
 
     def open_id_authentication_store_propagate
@@ -116,9 +144,9 @@ module Seek
     end
 
     def propagate_all
-      prop_methods=self.methods.select{|m| m.end_with?("_propagate")}
+      prop_methods=self.methods.select{|m| m.to_s.end_with?("_propagate")}
       prop_methods.each do |m|
-        eval m
+        eval m.to_s
       end
     end
 
@@ -127,6 +155,38 @@ module Seek
   #Custom accessors for settings that are not a simple mapping
   module CustomAccessors
     include SimpleCrypt
+
+    def rdf_filestore_path
+      append_filestore_path "rdf"
+    end
+    def temporary_filestore_path
+      append_filestore_path "tmp"
+    end
+
+    def converted_filestore_path
+      File.join(temporary_filestore_path,"converted")
+    end
+
+    def asset_filestore_path
+      append_filestore_path "assets"
+    end
+
+    def avatar_filestore_path
+      append_filestore_path "avatars"
+    end
+
+    def model_image_filestore_path
+      append_filestore_path "model_images"
+    end
+
+    def append_filestore_path inner_dir
+      path = filestore_path
+      unless path.start_with? "/"
+        path = File.join(Rails.root,path)
+      end
+      File.join(path,inner_dir)
+    end
+
 
     def smtp_settings field
       value = self.smtp[field.to_sym]
@@ -239,7 +299,7 @@ module Seek
     extend CustomAccessors
 
     #Basic settings
-    settings = [:home_description, :public_seek_enabled, :events_enabled, :bioportal_api_key, :jerm_enabled, :email_enabled, :no_reply, :jws_enabled,
+    settings = [:home_description, :home_feeds_cache_timeout,:public_seek_enabled, :events_enabled, :bioportal_api_key, :jerm_enabled, :email_enabled, :no_reply, :jws_enabled,
       :jws_online_root, :hide_details_enabled, :activation_required_enabled, :project_name, :smtp, :default_pages, :project_type, :project_link, :header_image_enabled, :header_image,
       :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,:site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :solr_enabled,
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
@@ -248,7 +308,7 @@ module Seek
       :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver, :sabiork_ws_base_url, :publish_button_enabled,
       :seek_video_link, :scales, :delete_asset_version_enabled, :recaptcha_enabled,#putting vl settings on their own line to simplify merges
       :admin_impersonation_enabled, :auth_lookup_enabled, :strategic_eager_loading,:sample_parent_term,:specimen_culture_starting_date,:sample_age,:specimen_creators, :sample_parser_enabled,
-      :project_browser_enabled, :experimental_features_enabled, :external_search_enabled,:pdf_conversion_enabled]
+      :project_browser_enabled, :experimental_features_enabled, :external_search_enabled,:pdf_conversion_enabled,:filestore_path]
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"
@@ -257,6 +317,7 @@ module Seek
     setting :piwik_analytics_id_site, :convert=>"to_i"
     setting :project_news_number_of_entries, :convert=>'to_i'
     setting :community_news_number_of_entries, :convert=>'to_i'
+    setting :home_feeds_cache_timeout, :convert=>"to_i"
 
     settings.each do |sym|
       setting sym

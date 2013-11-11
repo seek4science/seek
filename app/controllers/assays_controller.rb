@@ -8,7 +8,9 @@ class AssaysController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
 
    def new_object_based_on_existing_one
@@ -19,24 +21,24 @@ class AssaysController < ApplicationController
 
     unless @assay.study.can_edit?
       @assay.study = nil
-      flash.now[:notice] = "The study of the existing assay cannot be viewed, please specify your own study! <br/>"
+      flash.now[:notice] = "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>".html_safe
     end
 
     @existing_assay.data_file_masters.each do |d|
       if !d.can_view?
-       flash.now[:notice] << "Some or all data files of the existing assay cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end
     @existing_assay.sop_masters.each do |s|
        if !s.can_view?
-       flash.now[:notice] << "Some or all sops of the existing assay cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end
     @existing_assay.model_masters.each do |m|
        if !m.can_view?
-       flash.now[:notice] << "Some or all models of the existing assay cannot be viewed, you may specify your own! <br/>"
+       flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
         break
       end
     end
@@ -59,10 +61,10 @@ class AssaysController < ApplicationController
     end
     respond_to do |format|
       if investigations.blank?
-         flash.now[:notice] = "No study and investigation available, you have to create a new investigation first before creating your study and assay!"
+         flash.now[:notice] = "No #{t('study')} and #{t('investigation')} available, you have to create a new #{t('investigation')} first before creating your #{t('study')} and #{t('assays.assay')}!"
       else
         if studies.flatten.blank?
-          flash.now[:notice] = "No study available, you have to create a new study before creating your assay!"
+          flash.now[:notice] = "No #{t('study')} available, you have to create a new #{t('study')} before creating your #{t('assays.assay')}!"
         end
       end
 
@@ -86,13 +88,7 @@ class AssaysController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:model_ids] || []
 
-
-#    organism_ids= organisms.collect{|o|o.split(",").first}.to_a
-#    @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
-#    @assay.assay_organisms.each do |ao|
-#      ao.mark_for_destruction
-#    end
-     organisms.each do |text|
+     Array(organisms).each do |text|
       o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
       @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
@@ -106,16 +102,16 @@ class AssaysController < ApplicationController
 
 
       if @assay.save
-        data_file_ids.each do |text|
+        Array(data_file_ids).each do |text|
           a_id, r_type = text.split(",")
           d = DataFile.find(a_id)
           @assay.relate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
         end
-        model_ids.each do |a_id|
+        Array(model_ids).each do |a_id|
           m = Model.find(a_id)
           @assay.relate(m) if m.can_view?
         end
-        sop_ids.each do |a_id|
+        Array(sop_ids).each do |a_id|
           s = Sop.find(a_id)
           @assay.relate(s) if s.can_view?
         end
@@ -125,14 +121,11 @@ class AssaysController < ApplicationController
 
         #required to trigger the after_save callback after the assets have been associated
         @assay.save
-
-        deliver_request_publish_approval params[:sharing], @assay
-
         if @assay.create_from_asset =="true"
           render :action=>:update_assays_list
         else
           respond_to do |format|
-          flash[:notice] = 'Assay was successfully created.'
+          flash[:notice] = "#{t('assays.assay')} was successfully created."
           format.html { redirect_to(@assay) }
           format.xml { render :xml => @assay, :status => :created, :location => @assay }
           end
@@ -158,12 +151,7 @@ class AssaysController < ApplicationController
     publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
     @assay.assay_organisms = []
-#    organism_ids= organisms.collect{|o|o.split(",").first}.to_a
-#    @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
-#    @assay.assay_organisms.each do |ao|
-#      ao.mark_for_destruction
-#    end
-    organisms.each do |text|
+    Array(organisms).each do |text|
           o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
@@ -180,16 +168,16 @@ class AssaysController < ApplicationController
 
     respond_to do |format|
       if @assay.save
-        data_file_ids.each do |text|
+        Array(data_file_ids).each do |text|
           a_id, r_type = text.split(",")
           d = DataFile.find(a_id)
           assay_assets_to_keep << @assay.relate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
         end
-        model_ids.each do |a_id|
+        Array(model_ids).each do |a_id|
           m = Model.find(a_id)
           assay_assets_to_keep << @assay.relate(m) if m.can_view?
         end
-        sop_ids.each do |a_id|
+        Array(sop_ids).each do |a_id|
           s = Sop.find(a_id)
           assay_assets_to_keep << @assay.relate(s) if s.can_view?
         end
@@ -203,9 +191,8 @@ class AssaysController < ApplicationController
         #FIXME: required to update timestamp. :touch=>true on AssayAsset association breaks acts_as_trashable
         @assay.updated_at=Time.now
         @assay.save!
-        deliver_request_publish_approval params[:sharing], @assay
 
-        flash[:notice] = 'Assay was successfully updated.'
+        flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
         format.xml { head :ok }
       else
@@ -220,6 +207,7 @@ class AssaysController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+      format.rdf { render :template=>'rdf/show'}
       format.svg { render :text=>to_svg(@assay.study, params[:deep]=='true', @assay) }
       format.dot { render :text=>to_dot(@assay.study, params[:deep]=='true', @assay) }
       format.png { render :text=>to_png(@assay.study, params[:deep]=='true', @assay) }

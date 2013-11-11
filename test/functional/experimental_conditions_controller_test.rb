@@ -29,7 +29,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop=sops(:editable_sop)
     mi = measured_items(:concentration)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit_id => unit.id}
     compound_name = 'ATP'
     compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(compound_name)
 
@@ -60,7 +60,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop=sops(:editable_sop)
     mi = measured_items(:concentration)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit_id => unit.id}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -71,7 +71,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop=sops(:editable_sop)
     mi = measured_items(:time)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit_id => unit.id}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -84,7 +84,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit_id => unit.id}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version, :substance_autocompleter_selected_ids => ["#{cp.id.to_s},Compound"]
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -98,7 +98,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     syn = synonyms(:glucose_synonym)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit_id => unit.id}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version, :substance_autocompleter_selected_ids => ["#{syn.id.to_s},Synonym"]
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -185,7 +185,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop = sops(:editable_sop)
     mi = measured_items(:time)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => "1,5" , :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => "1,5" , :unit_id => unit.id}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version
     ec = assigns(:experimental_condition)
     assert_nil ec
@@ -213,7 +213,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
       i +=1
     end
 
-    post :create_from_existing, :sop_id => sop.id, :version => sop.latest_version, "checkbox_#{ec_array.first.id}" => ec_array.first.id, "checkbox_#{ec_array[1].id}" => ec_array[1].id, "checkbox_#{ec_array[2].id}" => ec_array[2].id
+    post :create_from_existing, :sop_id => sop.id, :version => sop.latest_version.version, "checkbox_#{ec_array.first.id}" => ec_array.first.id, "checkbox_#{ec_array[1].id}" => ec_array[1].id, "checkbox_#{ec_array[2].id}" => ec_array[2].id
 
     sop.reload
     assert_equal sop.experimental_conditions.count, 3

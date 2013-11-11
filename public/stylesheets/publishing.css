@@ -1,0 +1,20 @@
+ul.publishing_options {
+    padding-left: 1em;
+}
+
+ul.publishing_options li.type_and_title {
+    font-weight:bolder;
+}
+
+ul.publishing_options li.type_and_title img.icon_visibility {
+    margin-left:2em;
+}
+
+ul.publishing_options li.secondary {
+
+}
+
+.published {
+    color: limegreen;
+}
+

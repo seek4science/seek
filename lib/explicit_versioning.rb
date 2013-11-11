@@ -54,9 +54,13 @@ module Jits
             def versions
               parent.versions
             end
+
+            def latest_version?
+              parent.latest_version == self
+            end
           end
 
-          versioned_class.set_table_name versioned_table_name
+          versioned_class.table_name = versioned_table_name
           versioned_class.belongs_to self.to_s.demodulize.underscore.to_sym,
             :class_name  => "::#{self.to_s}",
             :foreign_key => versioned_foreign_key
@@ -286,17 +290,17 @@ module Jits
             end
 
             # Set version column accordingly.
-            if orig_model.is_a?(self.class.versioned_class)
-              new_model[new_model.class.inheritance_column] = orig_model[self.class.versioned_inheritance_column]
-            elsif new_model.is_a?(self.class.versioned_class)
-              new_model[self.class.versioned_inheritance_column] = orig_model[orig_model.class.inheritance_column]
-            end
+            #if orig_model.is_a?(self.class.versioned_class)
+            #  new_model[new_model.class.inheritance_column] = orig_model[self.class.versioned_inheritance_column]
+            #elsif new_model.is_a?(self.class.versioned_class)
+            #  new_model[self.class.versioned_inheritance_column] = orig_model[orig_model.class.inheritance_column]
+            #end
           end
 
           # Gets the next available version for the current record, or 1 for a new record
           def next_version
             return 1 if new_record? || versions.empty?
-            (versions.calculate(:max, :version) || 0) + 1
+            (versions.maximum(:version) || 0) + 1
           end
 
           # Returns an array of attribute keys that are versioned.  See non_versioned_columns

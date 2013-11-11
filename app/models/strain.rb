@@ -1,20 +1,25 @@
 require 'grouped_pagination'
-require 'acts_as_authorized'
+require 'acts_as_cached_tree'
 
 class Strain < ActiveRecord::Base
+  include Seek::Rdf::RdfGeneration
+
   belongs_to :organism
-  has_many :genotypes, :dependent =>  :nullify
-  has_many :phenotypes, :dependent =>  :nullify
+  has_many :genotypes
+  has_many :phenotypes
   accepts_nested_attributes_for :genotypes,:allow_destroy=>true
   accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
   has_many :specimens
 
+  has_many :assay_organisms
+  has_many :assays,:through=>:assay_organisms
+
   before_destroy :destroy_genotypes_phenotypes
-  named_scope :by_title
+  scope :by_title
 
   validates_presence_of :title, :organism
 
-  named_scope :without_default,:conditions=>{:is_dummy=>false}
+  scope :without_default,where(:is_dummy=>false)
 
   include ActsAsCachedTree
   include Subscribable
@@ -26,7 +31,9 @@ class Strain < ActiveRecord::Base
 
   validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
 
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+  scope :default_order, order("title")
+
+  grouped_pagination
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
       text :searchable_terms
@@ -53,13 +60,21 @@ class Strain < ActiveRecord::Base
     title=="default" && is_dummy==true
   end
 
+  def ncbi_uri
+    unless organism.bioportal_concept.nil? || organism.bioportal_concept.concept_uri.blank?
+      "http://purl.obolibrary.org/obo/"+organism.bioportal_concept.concept_uri.gsub(":","_")
+    else
+      nil
+    end
+  end
+
   def is_default?
     title=="default" && is_dummy==true
   end
 
   def self.default_strain_for_organism organism
     organism = Organism.find(organism) unless organism.is_a?(Organism)
-    strain = Strain.find(:first,:conditions=>{:organism_id=>organism.id,:is_dummy=>true})
+    strain = Strain.where(:organism_id=>organism.id,:is_dummy=>true).first
     if strain.nil?
       gene = Gene.find_by_title('wild-type') || Gene.create(:title => 'wild-type')
       genotype = Genotype.new(:gene => gene)
@@ -97,8 +112,8 @@ class Strain < ActiveRecord::Base
     parent_strain.nil? ? '' : (parent_strain.title + "(Seek ID=#{parent_strain.id})")
   end
 
-  def can_delete? *args
-    super && (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?))
+  def state_allows_delete? *args
+    (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?)) && super
   end
 
   def destroy_genotypes_phenotypes
@@ -107,11 +122,17 @@ class Strain < ActiveRecord::Base
     genotypes.each do |g|
       if g.specimen.nil?
         g.destroy
+      else
+        g.strain_id = nil
+        g.save
       end
     end
     phenotypes.each do |p|
       if p.specimen.nil?
         p.destroy
+      else
+        p.strain_id = nil
+        p.save
       end
     end
   end

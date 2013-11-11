@@ -165,10 +165,12 @@ end
 
   Factory.define(:technology_type, :class=>TechnologyType) do |f|
     f.sequence(:title) {|n| "A TechnologyType#{n}"}
+    f.sequence(:term_uri) {|n| "http://technology_types/term##{n}"}
   end
 
   Factory.define(:assay_type) do |f|
     f.sequence(:title) {|n| "An AssayType#{n}"}
+    f.sequence(:term_uri) {|n| "http://assay_types/term##{n}"}
   end
 
   #Assay
@@ -182,12 +184,12 @@ end
   end
 
   Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
-    f.title 'Modelling Assay'
+    f.title I18n.t('assays.modelling_analysis')
     f.key 'MODEL'
   end
 
   Factory.define(:experimental_assay_class, :class => AssayClass) do |f|
-    f.title 'Experimental Assay'
+    f.title I18n.t('assays.experimental_assay')
     f.key 'EXP'
   end
 
@@ -202,10 +204,15 @@ end
   Factory.define(:experimental_assay, :parent => :assay_base) do |f|
     f.association :assay_class, :factory => :experimental_assay_class
     f.association :technology_type
-    f.samples {[Factory.build :sample]}
+    f.samples {[Factory.build(:sample)]}
   end
 
     Factory.define(:assay, :parent => :modelling_assay) {}
+
+  Factory.define :assay_asset do |f|
+    f.association :assay
+    f.association :asset,:factory=>:data_file
+  end
 
   #Study
   Factory.define(:study) do |f|
@@ -242,6 +249,13 @@ Factory.define(:tissue_and_cell_type) do |f|
 end
 
 
+  #Assay organism
+  Factory.define(:assay_organism) do |f|
+    f.association :assay
+    f.association :strain
+    f.association :organism
+  end
+
   #Specimen
   Factory.define(:specimen) do |f|
     f.sequence(:title) { |n| "Specimen#{n}" }
@@ -262,12 +276,7 @@ end
     f.association :specimen
   f.association :policy, :factory => :private_policy
   end
-#Assay organism
-Factory.define(:assay_organism) do |f|
-  f.association :assay
-  f.association :strain
-  f.association :organism
-end
+
 
   #Data File
   Factory.define(:data_file) do |f|
@@ -381,6 +390,12 @@ end
     end
   end
 
+  Factory.define(:doc_model, :parent=>:model) do |f|
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:doc_content_blob, :asset=>model,:asset_version=>model.version)]
+    end
+  end
+
   #Publication
   Factory.define(:publication) do |f|
     f.sequence(:title) {|n| "A Publication #{n}"}
@@ -393,7 +408,7 @@ end
   #Presentation
   Factory.define(:presentation) do |f|
     f.sequence(:title) { |n| "A Presentation #{n}" }
-    f.projects { [Factory.build :project] }
+    f.projects { [Factory.build(:project)] }
     # f.data_url "http://www.virtual-liver.de/images/logo.png"
     f.association :contributor, :factory => :user
   f.association :policy, :factory => :private_policy
@@ -495,6 +510,11 @@ end
 
   Factory.define(:organism) do |f|
     f.title "An Organism"
+  end
+
+  Factory.define(:bioportal_concept) do |f|
+    f.ontology_id 1132
+    f.concept_uri "NCBITaxon:2287"
   end
 
   Factory.define(:event) do |f|
@@ -715,7 +735,7 @@ end
 
   Factory.define(:relationship) do |f|
     f.association :subject, :factory => :model
-    f.association :object, :factory => :model
+    f.association :other_object, :factory => :model
     f.predicate Relationship::ATTRIBUTED_TO
   end
 
@@ -801,7 +821,6 @@ end
     f.cell_range "A1:B3"
     f.association :worksheet
   end
-
 
   Factory.define :genotype do |f|
     f.association :gene, :factory => :gene

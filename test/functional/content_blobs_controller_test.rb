@@ -47,6 +47,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+
+
   test "should find_and_auth_content_blob for download" do
     sop1 = Factory(:pdf_sop, :policy => Factory(:all_sysmo_downloadable_policy))
     sop2 = Factory(:pdf_sop, :policy => Factory(:private_policy))
@@ -80,6 +82,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     get :get_pdf, {:sop_id => ms_word_sop.id, :id => ms_word_sop.content_blob.id}
     assert_response :success
+
+    assert_equal "attachment; filename=\"ms_word_test.pdf\"",@response.header['Content-Disposition']
+    assert_equal "application/pdf",@response.header['Content-Type']
+    assert_equal "9240",@response.header['Content-Length']
+
     assert File.exists?(ms_word_sop.content_blob.filepath)
     assert File.exists?(pdf_path)
   end
@@ -97,7 +104,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :get_pdf, {:sop_id => pdf_sop.id, :id => pdf_sop.content_blob.id}
 
     assert_response :success
-    #the file is fetched on fly, instead of saving locally
+
+    assert_equal "attachment; filename=\"a_pdf_file.pdf\"",@response.header['Content-Disposition']
+    assert_equal "application/pdf",@response.header['Content-Type']
+    assert_equal "8827",@response.header['Content-Length']
+
     assert !File.exists?(pdf_sop.content_blob.filepath)
     assert !File.exists?(pdf_sop.content_blob.filepath('pdf'))
   end
@@ -113,9 +124,26 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     get :get_pdf, {:sop_id => doc_sop.id, :id => doc_sop.content_blob.id}
     assert_response :success
-    #the file is fetched on fly, instead of saving locally
+    assert_equal "attachment; filename=\"ms_word_test.pdf\"",@response.header['Content-Disposition']
+    assert_equal "application/pdf",@response.header['Content-Type']
+    assert_equal "9240",@response.header['Content-Length']
+
     assert !File.exists?(doc_sop.content_blob.filepath)
-    assert !File.exists?(doc_sop.content_blob.filepath('pdf'))
+    assert File.exists?(doc_sop.content_blob.filepath('pdf')),"the converted file should remain"
+  end
+
+  test "should gracefully handle view_pdf for non existing asset" do
+    sop = Factory(:sop,
+                  :policy => Factory(:all_sysmo_downloadable_policy),
+                  :content_blob => Factory(:doc_content_blob,
+                                           :data => nil,
+                                           :url => "http://somewhere.com/piccy.doc",
+                                           :uuid => UUIDTools::UUID.random_create.to_s))
+    blob = sop.content_blob
+    get :get_pdf, :sop_id=>999,:id=>blob.id
+    assert_redirected_to root_path
+    assert_not_nil flash[:error]
+
   end
 
   test "report error when file unavailable for download" do

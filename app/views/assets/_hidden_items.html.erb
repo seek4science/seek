@@ -7,5 +7,5 @@
    contributor_links = hidden_item_contributor_links(hidden_items)
 %>
 <% if !contributor_links.empty? %>
-    <span class="none_text">(Please contact: <%= contributor_links.join(', ') %>)</span>
+    <span class="none_text">(Please contact: <%= contributor_links.join(', ').html_safe %>)</span>
 <% end %>

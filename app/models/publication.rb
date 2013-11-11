@@ -4,7 +4,7 @@ require 'title_trimmer'
 require 'libxml'
 
 class Publication < ActiveRecord::Base
-
+  include Seek::Rdf::RdfGeneration
   title_trimmer
 
   #searchable must come before acts_as_asset is called
@@ -54,7 +54,7 @@ class Publication < ActiveRecord::Base
 
   has_many :backwards_relationships,
     :class_name => 'Relationship',
-    :as => :object,
+    :as => :other_object,
     :dependent => :destroy
 
 
@@ -82,8 +82,6 @@ class Publication < ActiveRecord::Base
   end
 
 
-  #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
-  default_scope :order => "#{self.table_name}.published_date DESC"
   def self.sort publications
     publications.sort_by &:published_date
   end
@@ -174,12 +172,12 @@ class Publication < ActiveRecord::Base
 
   def check_identifier_present
     if doi.blank? && pubmed_id.blank?
-      self.errors.add_to_base("Please specify either a PubMed ID or DOI")
+      self.errors[:base] << "Please specify either a PubMed ID or DOI"
       return false
     end
 
     if !doi.blank? && !pubmed_id.blank?
-      self.errors.add_to_base("Can't have both a PubMed ID and a DOI")
+      self.errors[:base] << "Can't have both a PubMed ID and a DOI"
       return false
     end
 
@@ -193,7 +191,7 @@ class Publication < ActiveRecord::Base
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
         if !matching_projects.empty?
-          self.errors.add_to_base("You cannot register the same DOI within the same project")
+          self.errors[:base] << "You cannot register the same DOI within the same project"
           return false
         end
       end
@@ -203,7 +201,7 @@ class Publication < ActiveRecord::Base
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
         if !matching_projects.empty?
-          self.errors.add_to_base("You cannot register the same PubMed ID within the same project")
+          self.errors[:base] << "You cannot register the same PubMed ID within the same project"
           return false
         end
       end
@@ -216,7 +214,7 @@ class Publication < ActiveRecord::Base
     if !existing.empty?
       matching_projects = existing.collect(&:projects).flatten.uniq & projects
       if !matching_projects.empty?
-        self.errors.add_to_base("You cannot register the same Title within the same project")
+        self.errors[:base] << "You cannot register the same Title within the same project"
         return false
       end
     end

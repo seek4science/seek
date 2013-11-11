@@ -1,7 +1,7 @@
 module Subscribable
   def self.included klass
     klass.class_eval do
-      has_many :subscriptions, :required_access_to_owner => false, :as => :subscribable, :dependent => :destroy, :autosave => true, :before_add => proc {|item, sub| sub.subscribable = item}
+      has_many :subscriptions, :as => :subscribable, :dependent => :destroy, :autosave => true, :before_add => proc {|item, sub| sub.subscribable = item} #,:required_access_to_owner => false,
       after_create :set_subscription_job if self.subscribable?
       after_update :update_subscription_job_if_study_or_assay if self.subscribable?
       extend ClassMethods
@@ -37,7 +37,7 @@ module Subscribable
     if Seek::Config.email_enabled && subscribers_are_notified_of?(activity_log.action)
       subscriptions.each do |subscription|
         if !subscription.person.user.nil? && subscription.person.receive_notifications? && subscription.immediately? && can_view?(subscription.person.user)
-          SubMailer.deliver_send_immediate_subscription subscription.person, activity_log
+          SubMailer.send_immediate_subscription(subscription.person, activity_log).deliver
         end
       end
     end
@@ -73,13 +73,13 @@ module Subscribable
   def remove_subscriptions projects
     unless projects.empty?
       project_subscription_ids = projects.collect{|project| project.project_subscriptions}.flatten.collect(&:id)
-      subscriptions = Subscription.find(:all, :conditions => ['subscribable_type=? AND subscribable_id=? AND project_subscription_id IN (?)', self.class.name, self.id, project_subscription_ids])
+      subscriptions = Subscription.where(['subscribable_type=? AND subscribable_id=? AND project_subscription_id IN (?)', self.class.name, self.id, project_subscription_ids])
       #remove also subcriptions for studies and assays association with this investigation
       if self.kind_of?(Investigation)
         study_ids = self.studies.collect(&:id)
         assay_ids = self.assays.collect(&:id)
-        subscriptions |= Subscription.find(:all, :conditions => ['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Study', study_ids, project_subscription_ids])
-        subscriptions |= Subscription.find(:all, :conditions => ['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Assay', assay_ids, project_subscription_ids])
+        subscriptions |= Subscription.where(['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Study', study_ids, project_subscription_ids])
+        subscriptions |= Subscription.where(['subscribable_type=? AND subscribable_id IN (?) AND project_subscription_id IN (?)', 'Assay', assay_ids, project_subscription_ids])
       end
       subscriptions.each{|s| s.destroy}
     end

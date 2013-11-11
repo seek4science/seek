@@ -1,6 +1,7 @@
 require 'title_trimmer'
 require 'grouped_pagination'
 
+
 module Acts #:nodoc:
   module Isa #:nodoc:
     def self.included(mod)
@@ -16,8 +17,8 @@ module Acts #:nodoc:
         acts_as_favouritable
 
         acts_as_scalable if Seek::Config.is_virtualliver
+        scope :default_order, order("title")
 
-        default_scope :order => "#{self.table_name}.updated_at DESC"
 
         title_trimmer
 
@@ -31,7 +32,7 @@ module Acts #:nodoc:
 
         has_many :activity_logs, :as => :activity_loggable
 
-        grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+        grouped_pagination
 
         acts_as_uniquely_identifiable
 

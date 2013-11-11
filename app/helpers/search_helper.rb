@@ -1,8 +1,10 @@
+require 'seek/external_search'
+
 module SearchHelper
   include Seek::ExternalSearch
   def search_type_options
     search_type_options = ["All", "Institutions", "People", "Projects"]
-    search_type_options |= Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize.pluralize),c.name.underscore.pluralize] }
+    search_type_options |= Seek::Util.user_creatable_types.collect{|c| [(c.name.underscore.humanize == "Sop" ? t('sop') : c.name.underscore.humanize.pluralize),c.name.underscore.pluralize] }
     return search_type_options
   end
     
@@ -18,8 +20,8 @@ module SearchHelper
     text << search_adaptor_names.collect{|name| "<b>#{name}</b>"}.join(",")
     text << "<br/>"
     text << "This means the search will take longer, but will include results from other sites"
+    text.html_safe
   end
-
   def get_resource_hash scale, external_resource_hash
     internal_resource_hash = {}
     if external_resource_hash.blank?

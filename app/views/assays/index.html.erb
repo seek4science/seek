@@ -1,18 +1,18 @@
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_assay_path, "New assay", nil, "New assay" %></li>
+        <li><%= image_tag_for_key "new", new_assay_path, "New #{t('assays.assay').downcase}", nil, "New #{t('assays.assay').downcase}" %></li>
     </ul>
 <% end %>
 
-<% if @assays.public_methods.include?("page_totals") %>
+<% if @assays.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @assays.pages, :page_totals=>@assays.page_totals,:current_page=>@assays.page } -%>
+  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @assays.pages, :page_totals=>@assays.page_totals,:current_page=>@assays.page } -%>
 <% end %>
 
 <div class="list_items_container">
   <%= render :partial => "assets/resource_list_item", :collection=>@assays %>
 </div>
 
-<% if @assays.page == "latest" && Assay.find(:all).length > Seek::Config.limit_latest%>
-    <%= render :partial => "layouts/paginate_see_all"%>
+<% if @assays.page == "latest" && Assay.all.length > Seek::Config.limit_latest%>
+    <%= render :partial => "general/paginate_see_all"%>
 <% end %>

@@ -15,17 +15,16 @@
 	<% if @saved_file -%>
 		<%= image_tag_for_key('back', builder_model_path(@model,:version=>@display_model.version,:saved_file=>@saved_file), nil, nil, "Back to JWS One Stop") -%>
 	<% else -%>
-		<%= image_tag_for_key('back', model_path(@model,:version=>@display_model.version), nil, nil, "Back to Model") -%>
+		<%= image_tag_for_key('back', model_path(@model,:version=>@display_model.version), nil, nil, "Back to #{t('model')}") -%>
 	<% end -%>
 	</li>
 </ul>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@model,:title_postfix=>" - JWS Online Model Simulation"} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@model,:title_postfix=>" - JWS Online #{t('model')} Simulation"} %>
 
 <br/>
 
-
 <div id="jws_simulator_wrapper">
-    <iframe src="<%= simulator_url -%>" id="jws_simulator" width="100%" height="100%" frameborder=0>You need a Frames Capable browser to view this content.</iframe>
+    <iframe src="<%= simulator_url.html_safe -%>" id="jws_simulator" width="100%" height="100%" frameborder=0>You need a Frames Capable browser to view this content.</iframe>
 </div>
 

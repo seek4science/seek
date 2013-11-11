@@ -2,7 +2,7 @@
 
 <div class="list_item_left_column">
   <%= list_item_attribute "ID", resource.id %>
-  <%= list_item_attribute "Investigation", h(resource.investigation.title), resource.investigation %>
+  <%= list_item_attribute t('investigation'), h(resource.investigation.title), resource.investigation %>
 </div>
 
 
@@ -12,7 +12,7 @@
 </div>
 
 <div class="list_item_whole_width">
-  <%= list_item_authorized_list resource.assays, "Assay" %>
+  <%= list_item_authorized_list resource.assays, t('assays.assay').pluralize %>
   <%= list_item_scale_list resource %>
   <%= list_item_description h(resource.description) %>
 

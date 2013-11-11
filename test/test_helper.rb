@@ -1,13 +1,18 @@
 ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-require 'test_help'
-require 'test_benchmark'
+require 'rails/test_help'
+
+require "minitest/reporters"
+MiniTest::Reporters.use! MiniTest::Reporters::DefaultReporter.new
+
 require 'rest_test_cases'
+require 'rdf_test_cases'
 require 'ruby-prof'
 require 'factory_girl'
 require 'webmock/test_unit'
 require 'action_view/test_case'
 require 'tmpdir'
+require 'authenticated_test_helper'
 
 
 FactoryGirl.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
@@ -63,10 +68,21 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
+  setup :clear_rails_cache
+  teardown :clear_current_user
 
-  setup do
+  def skip_jws_tests?
+    true
+  end
+
+  def clear_rails_cache
     Rails.cache.clear
   end
+
+  def clear_current_user
+    User.current_user = nil
+  end
+
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded
@@ -147,6 +163,17 @@ class ActiveSupport::TestCase
     path
   end
 
+  def assert_emails n
+    assert_difference "ActionMailer::Base.deliveries.size", n do
+      yield
+    end
+  end
+
+  def assert_no_emails
+    assert_no_difference "ActionMailer::Base.deliveries.size" do
+      yield
+    end
+  end
   #debugging
 
   #saves the @response.body to a temp file, and prints out the file path
@@ -157,7 +184,6 @@ class ActiveSupport::TestCase
       f.flush
       f.close
       puts "Written @response.body to #{f.path}"
-
   end
   
 end

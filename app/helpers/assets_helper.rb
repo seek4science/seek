@@ -1,4 +1,5 @@
 module AssetsHelper
+  include ApplicationHelper
 
   def request_request_label resource
     icon_filename=icon_filename_for_key("message")
@@ -9,11 +10,16 @@ module AssetsHelper
   def filesize_as_text content_blob
     size=content_blob.nil? ? 0 : content_blob.filesize
     if size.nil?
-      "<span class='none_text'>Unknown</span>"
+      html = "<span class='none_text'>Unknown</span>"
     else
       size = size/1000.0
-      "%.1f KB" % size
+      html = "%.1f KB" % size
     end
+    html.html_safe
+  end
+
+  def item_description item_description,options={}
+    render :partial=>"assets/item_description",:object=>item_description,:locals=>options
   end
 
   #returns all the classes for models that return true for is_asset?
@@ -30,12 +36,17 @@ module AssetsHelper
   def text_for_resource resource_or_text
     if resource_or_text.is_a?(String)
       text = resource_or_text
-    elsif resource_or_text.kind_of?(Specimen)
-      text = Seek::Config.sample_parent_term
-    elsif resource_or_text.is_a?(Assay)
-      text = resource_or_text.is_modelling? ? "Modelling Analysis" : "Assay"
     else
-      text = resource_or_text.class.name
+      resource_type = resource_or_text.class.name
+      if resource_or_text.is_a?(Assay)
+        text = resource_or_text.is_modelling? ? t("assays.modelling_analysis") : t("assays.assay")
+      elsif resource_or_text.is_a?(Specimen)
+        text = t('biosamples.sample_parent_term')
+      elsif !translate_resource_type(resource_type).include?("translation missing")
+        text = translate_resource_type(resource_type)
+      else
+        text = resource_type
+      end
     end
     text.underscore.humanize
   end
@@ -55,7 +66,7 @@ module AssetsHelper
       options << "> #{v.version.to_s} #{versioned_resource.describe_version(v.version)} </option>"
     end
     select_tag(:resource_versions,
-               options,
+               options.html_safe,
                :disabled=>disabled,
                :onchange=>"showResourceVersion($('show_version_form'));"
     ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
@@ -81,7 +92,7 @@ module AssetsHelper
       end
       icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     end
-    icon
+    icon.html_safe
   end
 
   def get_original_model_name(model)
@@ -127,9 +138,60 @@ module AssetsHelper
     return path
   end
 
-  def get_all_related_items resource
+  #Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
+  def get_related_resources(resource, limit=nil)
     name = resource.class.name.split("::")[0]
 
+    related = collect_related_items(resource)
+
+    #Authorize
+    authorize_related_items(related)
+
+    order_related_items(related)
+    
+    #Limit items viewable, and put the excess count in extra_count
+    related.each_key do |key|
+      if limit && related[key][:items].size > limit && ["Project", "Investigation", "Study", "Assay", "Person", "Specimen", "Sample"].include?(resource.class.name)
+        related[key][:extra_count] = related[key][:items].size - limit
+        related[key][:items] = related[key][:items][0...limit]
+      end
+    end
+
+    return related
+    end
+
+  def order_related_items(related)
+    related.each do |key, res|
+      res[:items].sort!{|item,item2| item2.updated_at <=> item.updated_at}
+    end
+  end
+
+  def authorize_related_items(related)
+    related.each do |key, res|
+      res[:items].uniq!
+      res[:items].compact!
+      unless res[:items].empty?
+        total_count = res[:items].size
+        if key == 'Project' || key == 'Institution'
+          res[:hidden_count] = 0
+        elsif key == 'Person'
+          if Seek::Config.is_virtualliver && User.current_user.nil?
+            res[:items] = []
+            res[:hidden_count] = total_count
+          else
+            res[:hidden_count] = 0
+          end
+        else
+          total = res[:items]
+          res[:items] = key.constantize.authorize_asset_collection res[:items], 'view', User.current_user
+          res[:hidden_count] = total_count - res[:items].size
+          res[:hidden_items] = total - res[:items]
+        end
+      end
+    end
+  end
+
+  def collect_related_items(resource)
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
                "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {}}
 
@@ -152,52 +214,13 @@ module AssetsHelper
       elsif resource.respond_to? method_name
         related[type][:items] = resource.send method_name
       elsif resource.respond_to? "related_#{method_name.singularize}"
-        related[type][:items] = [resource.send "related_#{method_name.singularize}"]
+        related[type][:items] = [resource.send("related_#{method_name.singularize}")]
       elsif resource.respond_to? method_name.singularize
-        related[type][:items] = [resource.send method_name.singularize]
+        related[type][:items] = [resource.send(method_name.singularize)]
       end
     end
     related
   end
-  #Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
-  def get_related_resources(resource, limit=nil)
-
-    related = get_all_related_items resource
-
-    #Authorize
-    related.each do |key, res|
-      res[:items].uniq!
-      res[:items].compact!
-      unless res[:items].empty?
-        total_count = res[:items].size
-        if key == 'Project' || key == 'Institution'
-          res[:hidden_count] = 0
-        elsif key == 'Person'
-          if Seek::Config.is_virtualliver && User.current_user.nil?
-            res[:items] = []
-            res[:hidden_count] = total_count
-          else
-            res[:hidden_count] = 0
-          end
-        else
-          total = res[:items]
-          res[:items] = key.constantize.authorized_partial_asset_collection res[:items],'view',User.current_user
-          res[:hidden_count] = total_count - res[:items].size
-          res[:hidden_items] = total - res[:items]
-        end
-      end
-    end
-    
-    #Limit items viewable, and put the excess count in extra_count
-    related.each_key do |key|
-      if limit && related[key][:items].size > limit && ["Project", "Investigation", "Study", "Assay", "Person", "Specimen", "Sample"].include?(resource.class.name)
-        related[key][:extra_count] = related[key][:items].size - limit
-        related[key][:items] = related[key][:items][0...limit]
-      end
-    end
-
-    return related
-    end
 
   def filter_url(resource_type, context_resource)
     #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"

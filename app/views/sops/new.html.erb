@@ -1,7 +1,7 @@
 <%= javascript_include_tag "sharing.js", "assays.js","attribution.js","resource.js" -%>
-<h1>New SOP</h1>
+<h1>New <%= t('sop') %></h1>
 <div class="show_basic">
-    <% form_tag({:action => :create}, :multipart => true) do -%>
+    <%= form_tag({:action => :create}, :multipart => true) do -%>
     <div class="asset_form">
         <%= error_messages_for :sop -%>
         <%= render :partial=>"assets/upload_box" -%>

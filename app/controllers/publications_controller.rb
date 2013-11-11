@@ -1,3 +1,4 @@
+#encoding: utf-8
 class PublicationsController < ApplicationController
   
   include IndexPager
@@ -31,6 +32,7 @@ class PublicationsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml
+      format.rdf { render :template=>'rdf/show'}
       format.svg { render :text=>to_svg(@publication,params[:deep]=='false',@publication)}
       format.dot { render :text=>to_dot(@publication,params[:deep]=='false',@publication)}
       format.png { render :text=>to_png(@publication,params[:deep]=='false',@publication)}
@@ -107,7 +109,7 @@ class PublicationsController < ApplicationController
           end
         end
       else
-        @publication.errors.add_to_base("Multiple authors cannot be associated with the same SEEK person.")
+      @publication.errors[:base] << "Multiple authors cannot be associated with the same SEEK person."
         valid = false
       end
     end
@@ -196,13 +198,17 @@ class PublicationsController < ApplicationController
         end
       end
 
-      respond_to do |format|
-        format.html { render :partial => "publications/publication_error", :locals => {:publication => @publication, :error_text => @error_text}, :status => 500 }
+      render :update do |page|
+        page[:publication_preview_container].hide
+        page[:publication_error].show
+        page[:publication_error].replace_html(render(:partial => "publications/publication_error", :locals => {:publication => @publication, :error_text => @error_text}, :status => 500 ))
       end
 
     else
-      respond_to do |format|
-        format.html { render :partial => "publications/publication_preview", :locals => {:publication => @publication, :authors => result.authors} }
+      render :update do |page|
+        page[:publication_error].hide
+        page[:publication_preview_container].show
+        page[:publication_preview_container].replace_html(render(:partial => "publications/publication_preview", :locals => {:publication => @publication, :authors => result.authors}))
       end
     end
 
@@ -331,13 +337,13 @@ class PublicationsController < ApplicationController
     asset_ids.each do |id|
       asset = asset_type.constantize.find_by_id(id)
       if asset && asset.send("can_#{required_action}?")
-        unless Relationship.find(:first, :conditions => { :subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id })
-          Relationship.create(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :object_type => "Publication", :object_id => @publication.id)
+        unless Relationship.where(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object_type => "Publication", :other_object_id => @publication.id).first
+          Relationship.create(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object_type => "Publication", :other_object_id => @publication.id)
         end
       end
     end
     #Destroy asset relationship that aren't needed
-    associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,asset_type])
+    associate_relationships = Relationship.where(["other_object_id = ? and subject_type = ?",@publication.id,asset_type]).all
     associate_relationships.each do |associate_relationship|
       asset = associate_relationship.subject
       if asset.send("can_#{required_action}?") && !asset_ids.include?(asset.id.to_s)

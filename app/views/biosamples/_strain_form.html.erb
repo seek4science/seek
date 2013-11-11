@@ -53,7 +53,7 @@
 
   <div class="yui-g">
     <% form_action = action=="create"? 'create_strain' : 'update_strain' %>
-    <%form_for :strain, strain, :url => url_for(:controller => 'biosamples', :action => form_action) do |strain_form| %>
+    <%= form_for strain, :url => url_for(:controller => 'biosamples', :action => form_action) do |strain_form| %>
 
         <%= render :partial => "strains/genotype_form",:locals => {:item=>strain,  :f=>strain_form,:action=>action} %>
         <%= render :partial => "strains/phenotype_form",:locals => {:item=>strain, :f=>strain_form,:action=>action} %>

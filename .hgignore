@@ -2,10 +2,13 @@ syntax: glob
 .redcar/
 .idea/
 
+data.sql
+
 db/*.sqlite3
 config/database.yml
 config/initializers/seek_local.rb
 config/environment_local.rb
+config/virtuoso_settings.yml
 
 *.DS_Store
 log/*.log*
@@ -23,8 +26,11 @@ tmp/model_images/*
 tmp/restart.txt
 tmp/profile-*
 tmp/test_content_blobs/*
+tmp/rdf/
 tmp/*.csv
 tmp/zip-files
+tmp/testing-filestore
+tmp/testing-seek-cache
 *.tmp*
 *~
 

@@ -27,13 +27,13 @@
   <p>
     You can register a <%= asset_name -%> by either directly uploading files, or registering URLs to either another page or remote file. Please test each URL before submitting.
     You can register multiple items for this <%= asset_name -%>.
-    <%= link_to_function "More info "+image("expand"), :id => 'more_info_expand_image' do |page|
+    <%= link_to_function ("More info "+image("expand")).html_safe, :id => 'more_info_expand_image' do |page|
       page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
       page["more_info_expand_image"].toggle
       page["more_info_collapse_image"].toggle
     end
     -%>
-    <%= link_to_function "More info "+image("collapse"), :id => 'more_info_collapse_image', :style => "display:none" do |page|
+    <%= link_to_function ("More info "+image("collapse")).html_safe, :id => 'more_info_collapse_image', :style => "display:none" do |page|
       page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
       page["more_info_expand_image"].toggle
       page["more_info_collapse_image"].toggle
@@ -83,7 +83,7 @@
             <b>File to upload:</b>
             <span class="required">*</span>
             <br/>
-                <% fields_for @content_blob do |content_blob| -%>
+                <%= fields_for @content_blob do |content_blob| -%>
                     <input id="content_blob_data" type="file">
                 <% end %>
           </p>
@@ -98,13 +98,13 @@
             <%= text_field_tag "content_blob[data_url]", resource.data_url, :size => 35 %>
                 <span style="display:inline-block;">
                     <%= link_to_function (image("new") + "Add"), "addToList()" %>
-                    <%= link_to_remote image("test", :title=>"Test", :alt=>"Test")+" Test",
+                    <%= link_to_with_callbacks image("test", :title=>"Test", :alt=>"Test")+" Test",
                                        {:url=>{:action=>:test_asset_url, :symb=>"content_blob"},
                                        :method=>:post,
                                        :type => :synchronous,
                                        :with=>"multi_selector.current_url_element.serialize()",
                                        :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
-                                        {:id => 'test'}-%>
+                                        {:id => 'test', :remote => true}-%>
                 </span>
 
                 <p style="clear:both;">
@@ -141,7 +141,7 @@
       </p>
       <% if new_version && previous_version_image_file = resource.latest_version.model_image.try(:original_filename) -%>
           <p>
-            The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %> </span> will be used if you dont specify model image file
+            The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %> </span> will be used if you dont specify the image file
             <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
           </p>
       <% end -%>
@@ -212,7 +212,7 @@
             <% content_blobs.each do |cb| %>
                 var element = document.createElement('input');
                 element.name = "content_blobs[id][<%= cb.id%>]";
-                element.value = "<%= cb.url || cb.original_filename %>";
+                element.value = "<%= cb.original_filename || cb.url %>";
                 element.type = 'hidden';
                 var current_element = multi_selector.current_element;
                 current_element.parentNode.insertBefore(element, current_element);

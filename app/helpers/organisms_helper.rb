@@ -6,20 +6,16 @@ module OrganismsHelper
     if model_or_tag.instance_of?(Organism)
       link_to h(model_or_tag.title.capitalize),model_or_tag
     end
-
-
-
-
   end
   
   def organisms_link_list organisms
     link_list=""
-    link_list="<span class='non_text'>No Organisms specified</span>" if organisms.empty?
+    link_list="<span class='none_text'>No Organisms specified</span>" if organisms.empty?
     organisms.each do |o|
       link_list << organism_link_to(o)
       link_list << ", " unless o==organisms.last   
     end
-    return link_list    
+    link_list.html_safe
   end
   
   def link_to_ncbi_taxonomy_browser organism,text,html_options={}
@@ -35,7 +31,8 @@ module OrganismsHelper
       image_tag_for_key('destroy', organism_path(organism), "Delete Organism", { :confirm => 'Are you sure?', :method => :delete }, "Delete Organism")
     else
       explanation="Unable to delete an Organism that is associated with other items."
-      "<span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete Organism</span>"
+      html = "<span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete Organism</span>"
+      html.html_safe
     end    
   end
 
@@ -51,18 +48,20 @@ module OrganismsHelper
         result += ", " unless os==organism_and_strains.last
       end
     end
-    result
+    result.html_safe
   end
 
   def organism_and_strain strain,organism=strain.organism, none_text="Not specified"
     result = ""
     if organism
       result << link_to(h(organism.title), organism)
-      if strain && !strain.is_dummy?
-        result << " : <span class='strain_info'>#{h(strain.info)}</span>"
+      if strain && !strain.is_dummy? && strain.can_view?
+        result << " : <span class='strain_info'>#{link_to h(strain.info), strain}</span>"
+      elsif strain && !strain.is_dummy? && !strain.can_view?
+        result << hidden_items_html([strain], " : hidden strain")
       end
     end
-    result.empty? ? "<span class='none_text'>#{none_text}</span>" : result
+    result.empty? ? "<span class='none_text'>#{none_text}</span>".html_safe : result.html_safe
   end
   
   

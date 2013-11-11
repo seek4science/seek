@@ -144,7 +144,7 @@ class ExperimentalConditionsController < ApplicationController
       end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
-        flash[:error] = "Couldn't find the SOP or you are not authorized to view it"
+        flash[:error] = "Couldn't find the #{t('sop')} or you are not authorized to view it"
         format.html { redirect_to sops_path }
       end
       return false

@@ -40,7 +40,7 @@ module Seek
     #returns a 2 dimensional array each outer element containing the [term,score]
     #for the 'limit' most frequent search terms since 'time'
     def search_queries_since time=500.years.ago,limit=5
-      terms = ActivityLog.find(:all,:conditions=>["controller_name = ? and created_at > ?","search",time]).collect{|al| al.data[:search_query]}
+      terms = ActivityLog.where(["controller_name = ? and created_at > ?","search",time]).collect{|al| al.data[:search_query]}
       scores = {}
       terms.each do |term|
         if scores.keys.include? term

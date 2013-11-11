@@ -1,7 +1,7 @@
 experimental_assay_class:
-  title: Experimental Assay
+  title: <%= I18n.t('assays.experimental_assay') %>
   key: EXP
   
 modelling_assay_class:  
-  title: Modelling Assay
+  title: <%= I18n.t('assays.modelling_analysis') %>
   key: MODEL

@@ -34,16 +34,16 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
 
   def self.exists? frequency, ignore_locked=false
     if ignore_locked
-      Delayed::Job.find(:first,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',SendPeriodicEmailsJob.new("#{frequency}").to_yaml,nil,nil]) != nil
+      Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?',SendPeriodicEmailsJob.new("#{frequency}").to_yaml,nil,nil]).first != nil
     else
-      Delayed::Job.find(:first,:conditions=>['handler = ? AND failed_at IS ?',SendPeriodicEmailsJob.new("#{frequency}").to_yaml,nil]) != nil
+      Delayed::Job.where(['handler = ? AND failed_at IS ?',SendPeriodicEmailsJob.new("#{frequency}").to_yaml,nil]).first != nil
     end
 
   end
 
 
   def self.create_job frequency,t, priority=DEFAULT_PRIORITY, ignore_locked=false
-      Delayed::Job.enqueue(SendPeriodicEmailsJob.new(frequency),priority,t) unless exists?(frequency,ignore_locked)
+      Delayed::Job.enqueue(SendPeriodicEmailsJob.new(frequency),:priority=>priority,:run_at=>t) unless exists?(frequency,ignore_locked)
   end
 
   def send_subscription_mails logs, frequency
@@ -66,7 +66,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
           activity_logs = logs_for_visible_items.select do |log|
             !person.subscriptions.for_subscribable(log.activity_loggable).select{ |s| s.frequency == frequency }.empty?
           end
-          SubMailer.deliver_send_digest_subscription person, activity_logs, frequency unless activity_logs.blank?
+          SubMailer.send_digest_subscription(person, activity_logs, frequency).deliver unless activity_logs.blank?
         rescue Exception => e
           Delayed::Job.logger.error("Error sending subscription emails to person #{person.id} - #{e.message}")
         end
@@ -84,7 +84,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
   end
 
   def activity_logs_since time_point
-    ActivityLog.find(:all, :conditions => ['created_at>=? and action in (?) and controller_name!=?', time_point, ['create', 'update'], 'sessions'])
+    ActivityLog.where(['created_at>=? and action in (?) and controller_name!=?', time_point, ['create', 'update'], 'sessions'])
   end
 
   # puts the initial jobs on the queue for each period - daily, weekly, monthly - if they do not exist already

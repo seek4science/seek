@@ -2,13 +2,19 @@
 <%= javascript_include_tag 'jquery-1.5.1.min.js','jquery-ui-1.8.14.custom.min.js', 'spreadsheet_explorer.js','spreadsheet_explorer_plot.js',
                            'flot/excanvas.js','flot/jquery.flot.js', 'flot/curvedLines.js',:cache=>"explorer_cached" %>
 
-<h1>Exploring Data File</h1>
+<ul class="sectionIcons">
+  <li>
+    <%= image_tag_for_key('arrow_left', data_file_path(@data_file), "Return to #{t('data_file')}", nil, "Return to #{t('data_file')}") -%>
+  </li>
+</ul>
+
+<h1>Exploring <%= t('data_file') %></h1>
 
 <div style="margin-left: auto; margin-right: auto; width: 98%;">
   <div id="spreadsheet_errors"></div>
   
-  <input size="10" id="selection_data"></input>
-  <input size="60" id="cell_info" readonly="readonly"></input>
+  <input size="10" id="selection_data">
+  <input size="60" id="cell_info" readonly="readonly">
 
   <div class="spreadsheet_controls">
     <%= link_to image('spreadsheet') + " List Annotations", "#", :onclick =>"$j('div.spreadsheet_popup').hide(); $j('div#annotation_overview').show();return false;",

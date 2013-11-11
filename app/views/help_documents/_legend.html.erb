@@ -23,8 +23,8 @@ Help-page link:
 [example]
 '
 
-help_code = help_text.gsub("\n","<br/>")
-help_result = escape_javascript(RedCloth.new(help_text.gsub("\n","\r\n").gsub(/\[([-a-zA-Z0-9]+)\]/) {|match| HelpDocument.friendly_redcloth_link($1)}, [ :hard_breaks ]).to_html)
+help_code = help_text.gsub("\n","<br/>").html_safe
+help_result = escape_javascript(RedCloth.new(help_text.gsub("\n","\r\n").gsub(/\[([-a-zA-Z0-9]+)\]/) {|match| HelpDocument.friendly_redcloth_link($1)}, [ :hard_breaks ]).to_html).html_safe
 
 %>
 <script type="text/javascript">

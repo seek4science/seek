@@ -2,7 +2,7 @@
   <div class="head">
     <%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
     <span style="vertical-align:middle;">
-      New Investigation
+      New <%= t('investigation') %>
     </span>
   </div>
   <center>
@@ -10,7 +10,7 @@
 
       <div id="errorExplanation" class="errorExplanation" style="display:none;"></div>
 
-      Creating a new investigation for the project <b>'<%= h(@investigation.projects.first.name) %>'</b>
+      Creating a new <%= t('investigation') %> for the <%= t('project') %> <b>'<%= h(@investigation.projects.first.name) %>'</b>
 
       <%= hidden_field_tag :project_id,@investigation.projects.first.id %>
 

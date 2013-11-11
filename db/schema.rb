@@ -1,10 +1,12 @@
-# This file is auto-generated from the current state of the database. Instead of editing this file, 
-# please use the migrations feature of Active Record to incrementally modify your database, and
-# then regenerate this schema definition.
+# encoding: UTF-8
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
 #
-# Note that this schema.rb definition is the authoritative source for your database schema. If you need
-# to create the application database on another system, you should be using db:schema:load, not running
-# all the migrations from scratch. The latter is a flawed and unsustainable approach (the more migrations
+# Note that this schema.rb definition is the authoritative source for your
+# database schema. If you need to create the application database on another
+# system, you should be using db:schema:load, not running all the migrations
+# from scratch. The latter is a flawed and unsustainable approach (the more migrations
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
 # It's strongly recommended to check this file into your version control system.
@@ -143,6 +145,7 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
     t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "term_uri"
   end
 
   create_table "assay_types_edges", :id => false, :force => true do |t|
@@ -317,7 +320,7 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -356,6 +359,7 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
     t.string   "locked_by"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "queue"
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
@@ -701,7 +705,7 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -802,6 +806,7 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
     t.boolean  "can_edit_projects",                   :default => false
     t.boolean  "can_edit_institutions",               :default => false
     t.integer  "roles_mask"
+    t.string   "orcid"
   end
 
   create_table "permissions", :force => true do |t|
@@ -1066,11 +1071,11 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
   end
 
   create_table "relationships", :force => true do |t|
-    t.string   "subject_type", :null => false
-    t.integer  "subject_id",   :null => false
-    t.string   "predicate",    :null => false
-    t.string   "object_type",  :null => false
-    t.integer  "object_id",    :null => false
+    t.string   "subject_type",      :null => false
+    t.integer  "subject_id",        :null => false
+    t.string   "predicate",         :null => false
+    t.string   "other_object_type", :null => false
+    t.integer  "other_object_id",   :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1083,6 +1088,7 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
     t.integer  "publish_state"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "comment"
   end
 
   create_table "sample_assets", :force => true do |t|
@@ -1249,7 +1255,7 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1443,6 +1449,7 @@ ActiveRecord::Schema.define(:version => 20131015144138) do
     t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "term_uri"
   end
 
   create_table "technology_types_edges", :id => false, :force => true do |t|

@@ -4,7 +4,7 @@
 <html>
 
     <head>
-        <title>Model Visualization with Cytoscape Web</title>
+        <title><%= t('model') %> Visualization with Cytoscape Web</title>
         <script type="text/javascript">
           // id of Cytoscape Web container div
                 var div_id = "cytoscapeweb";
@@ -22,7 +22,7 @@
                var dataValidation = {};
                window.onload = function() {
                 // convert xgmml file content to a string
-                var network_xgmml = <%= @graph %> ;
+                var network_xgmml = <%= @graph.html_safe %> ;
                 // initialization options
 
                 // callback when Cytoscape Web has finished drawing

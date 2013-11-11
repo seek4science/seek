@@ -93,7 +93,7 @@
 			
 			
 			<script type="text/javascript">
-				var people_list = <%= Person.get_all_as_json -%>;
+				var people_list = <%= Person.get_all_as_json.html_safe -%>;
 				var prepopulate_with = [];
 			
 				var f_group_autocompleter = new Autocompleter.LocalAdvanced(
@@ -112,7 +112,8 @@
 				
 				// ---------------------------------------------------------
 				// prepopulate list of people in the group on page load
-				<% @f_group.favourite_group_memberships.each do |memb| -%>
+                currentFavouriteGroupSettings = {}
+                <% @f_group.favourite_group_memberships.each do |memb| -%>
 				  currentFavouriteGroupSettings[<%= memb.person_id -%>] = <%= memb.access_type -%>;
 				<% end -%>
 				updateGroupMembers();

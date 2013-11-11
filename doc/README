@@ -1,0 +1,26 @@
+
+
+= SYSMO-SEEK
+
+Please visit the {SEEK}[http://www.seek4science.org] for more information about SEEK and Sysmo-DB in general.
+
+== Installation
+
+Please read the {Install Guide}[link:files/doc/INSTALL.html] for details on how to setup SEEK for the first time.
+
+== Backups
+
+Please read the {Backup Guide}[link:files/doc/BACKUPS.html] for recommendations on how to backup SEEK.
+
+== Upgrading
+
+Please read the {Upgrade Guide}[link:files/doc/UPGRADING.html] for details on how to upgrade your installed SEEK from a previous version.
+
+== Credits
+
+Please read the CREDITS[link:files/doc/CREDITS.html] document.
+
+
+Author::    Stuart Owen  (mailto:stuart.owen@manchester.ac.uk)
+Copyright:: Copyright (c) 2013 The University of Manchester UK &  HITS gGmbH
+License::   New BSD Licence[http://www.opensource.org/licenses/bsd-license.php]

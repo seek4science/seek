@@ -1,6 +1,6 @@
 <% truncate_length_for_boxes = 22 -%>
 
-<%= render :partial => "layouts/item_title", :locals=>{:item=>@strain} %>
+<%= render :partial => "general/item_title", :locals=>{:item=>@strain} %>
 
 <ul class="sectionIcons">
   <%= render :partial => "subscriptions/subscribe", :locals => {:object => @strain} %>
@@ -9,17 +9,11 @@
   <% elsif @strain.can_edit? %>
       <li><%= image_tag_for_key('edit', edit_strain_path(@strain), "Edit Strain", nil, 'Edit Strain') %></li>
   <% end %>
-  <% if @strain.can_delete? %>
-      <li><%= image_tag_for_key "destroy", strain_path(@strain), "Delete Strain", {:confirm => 'Are you sure?', :method => :delete}, "Delete Strain" -%></li>
-  <!--show disabled delete button if current_user can manage but can not delete-->
-  <% elsif !@strain.can_delete? && @strain.can_manage? %>
-      <% explanation=unable_to_delete_text @strain %>
-      <li><%= image_tag_for_key "destroy", strain_path(@strain) , "Delete Strain", {:title=>"#{tooltip_title_attrib(explanation)}", :class=>"disabled", :onclick => "alert(\"#{explanation}\")"}, "Delete Strain", :function -%></li>
-  <% end %>
+  <%= delete_icon(@strain, current_user)-%>
 </ul>
 
 <div class="show_basic">
-    <div class="main_content_left_box_narrower">
+    <div class="main_content_left_box">
       <p>
         <label>Name:</label>
         <%= @strain.title %>
@@ -55,7 +49,7 @@
       </p>
 
     </div>
-    <div class="main_content_right_box_wider">
+    <div class="main_content_right_box">
       <% #dont show creator box with JERM avatar for strain without contributor, as there are strains without contributor and are not harvested %>
       <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @strain, :creators => [@strain.contributor.try(:person)]} unless @strain.contributor.try(:person).nil? -%>
       <%= item_tags_and_tag_entry -%>
@@ -64,9 +58,7 @@
 
   <div style="clear:both">
     <br/>
-    <%= render :partial=>"layouts/items_related_to", :object => @strain %>
-    <br/>
-    <%= render :partial => "layouts/usage_info", :locals => { :resource => @strain } -%>
+    <%= render :partial=>"general/items_related_to", :object => @strain %>
   </div>
 
 </div>

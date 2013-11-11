@@ -25,23 +25,23 @@ module ModelsHelper
   }
 
   def model_environment_text model
-    model.recommended_environment ? h(model.recommended_environment.title) : "<span class='none_text'>Not specified</span>"
+    model.recommended_environment ? h(model.recommended_environment.title) : "<span class='none_text'>Not specified</span>".html_safe
   end
 
 
   def execute_model_label
     icon_filename=icon_filename_for_key("execute")
-
-    '<span class="icon">' + image_tag(icon_filename,:alt=>"Run",:title=>"Run") + ' Run model</span>';
+    html = '<span class="icon">' + image_tag(icon_filename,:alt=>"Run",:title=>"Run") + ' Run model</span>';
+    html.html_safe
   end
 
   def model_type_text model_type
-    return "<span class='none_text'>Not specified</span>" if model_type.nil?
+    return "<span class='none_text'>Not specified</span>".html_safe if model_type.nil?
     h(model_type.title)
   end
 
   def model_format_text model_format
-    return "<span class='none_text'>Not specified</span>" if model_format.nil?
+    return "<span class='none_text'>Not specified</span>".html_safe if model_format.nil?
     h(model_format.title)
   end
   

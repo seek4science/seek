@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'savage_beast/user_init'
 
 class User < ActiveRecord::Base
   acts_as_annotation_source
@@ -7,7 +8,6 @@ class User < ActiveRecord::Base
   acts_as_tagger
     
   belongs_to :person
-  #validates_associated :person
 
   has_many :sops, :as=>:contributor
   has_many :data_files, :as=>:contributor
@@ -21,10 +21,7 @@ class User < ActiveRecord::Base
 
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
-  attr_accessor :password
-
-  #validates_presence_of     :login, :email - removed requirement on email
-  #validates_length_of       :email,    :within => 3..100
+  attr_accessor :password, :password_confirmation
   
   validates_presence_of     :login,                      :unless => :using_openid?
   validates_presence_of     :password,                   :if => :password_required?, :unless => :using_openid?
@@ -32,20 +29,21 @@ class User < ActiveRecord::Base
   validates_length_of       :password, :within => 4..40, :if => :password_required?, :unless => :using_openid?
   validates_confirmation_of :password,                   :if => :password_required?, :unless => :using_openid?
   validates_length_of       :login,    :within => 3..40, :unless => :using_openid?
-  
   validates_uniqueness_of   :login, :case_sensitive => false
   validates_uniqueness_of   :openid, :case_sensitive => false, :allow_nil => true
   
   before_save :encrypt_password
-  before_create :make_activation_code 
+  before_create :make_activation_code
+
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
   attr_accessible :login, :email, :password, :password_confirmation, :openid
+
     
   has_many :favourite_groups, :dependent => :destroy
   
-  named_scope :not_activated,:conditions=>['activation_code IS NOT NULL']
-  named_scope :without_profile,:conditions=>['person_id IS NULL']  
+  scope :not_activated,where('activation_code IS NOT NULL')
+  scope :without_profile,where('person_id IS NULL')
   
   acts_as_uniquely_identifiable
 
@@ -67,31 +65,6 @@ class User < ActiveRecord::Base
 
   def user
     self
-  end
-
-  def can_manage_types?
-    unless Seek::Config.type_managers_enabled
-      return false
-    end
-
-    case Seek::Config.type_managers
-      when "admins"
-      if User.admin_logged_in?
-        return true
-      else
-        return false
-      end
-      when "pals"
-      if User.admin_logged_in? || User.pal_logged_in?
-        return true
-      else
-        return false
-      end
-      when "users"
-      return true
-      when "none"
-      return false
-    end
   end
 
   def self.admin_logged_in?
@@ -125,7 +98,7 @@ class User < ActiveRecord::Base
     @activated = true
     self.activated_at = Time.now.utc
     self.activation_code = nil
-    save(false)
+    save(:validate=>false)
   end
 
   def assets
@@ -139,7 +112,7 @@ class User < ActiveRecord::Base
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   def self.authenticate(login, password)
-    u = find :first, :conditions => ['login = ?', login] # need to get the salt
+    u = User.where(['login = ?', login]).first # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
 
@@ -173,13 +146,13 @@ class User < ActiveRecord::Base
   def remember_me_until(time)
     self.remember_token_expires_at = time
     self.remember_token            = encrypt("#{email}--#{remember_token_expires_at}")
-    save(false)
+    save(:validate=>false)
   end
 
   def forget_me
     self.remember_token_expires_at = nil
     self.remember_token            = nil
-    save(false)
+    save(:validate=>false)
   end
 
   # Returns true if the user has just been activated.
@@ -194,12 +167,12 @@ class User < ActiveRecord::Base
   
   # returns a 'whitelist' favourite group for the user (or 'nil' if not found)
   def get_whitelist
-    return FavouriteGroup.find(:first, :conditions => { :user_id => self.id, :name => FavouriteGroup::WHITELIST_NAME } )
+    return FavouriteGroup.where(:user_id => self.id, :name => FavouriteGroup::WHITELIST_NAME).first
   end
   
   # returns a 'blacklist' favourite group for the user (or 'nil' if not found)
   def get_blacklist
-    return FavouriteGroup.find(:first, :conditions => { :user_id => self.id, :name => FavouriteGroup::BLACKLIST_NAME } )
+    return FavouriteGroup.where(:user_id => self.id, :name => FavouriteGroup::BLACKLIST_NAME).first
   end
 
   #required for savage beast plugin

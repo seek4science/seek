@@ -3,7 +3,7 @@
     <b>Preview for: <%= @help_document.title -%></b>
     <%= render :partial => 'help_document', :object => @help_document %>
   <% end %>
-  <% form_for @help_document, :url => {:action => action } do |f| %>
+  <%= form_for @help_document, :url => {:action => action } do |f| %>
   
     <%= f.error_messages %><br/>
     

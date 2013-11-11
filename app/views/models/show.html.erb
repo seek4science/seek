@@ -2,7 +2,7 @@
 <%= javascript_include_tag "resource" ,"zoom/lightbox"-%>
 <%= stylesheet_link_tag "lightbox" %>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@model} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@model} %>
 
 <ul class="sectionIcons">
   <%= asset_buttons @model, @display_model.version -%>
@@ -17,23 +17,23 @@
           <% end -%>
           <% if can_download_asset?(@model, params[:code]) -%>
               <li>
-                <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate Model on JWS") -%>
+                <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate #{t('model')} on JWS") -%>
               </li>
           <% end -%>
       <% end -%>
   <% end -%>
 
 
-  <% if Seek::Config.experimental_features_enabled && Seek::Config.solr_enabled && @display_model.contains_sbml? -%>
+  <% if Seek::Config.solr_enabled && @display_model.latest_version? && (@model.contains_sbml? || @model.contains_jws_dat?) -%>
       <li>
-        <%= image_tag_for_key("search",matching_data_model_path(@model,:version=>@display_model.version),nil,nil,"Find related data") -%>
+        <%= image_tag_for_key("search",matching_data_model_path(@model),nil,nil,"Find related #{t('data_file').pluralize}") -%>
       </li>
   <% end -%>
 
   <% if cytoscapeweb_supported?(@display_model) %>
            <% if can_download_asset?(@model, params[:code]) -%>
                <li>
-                 <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank"}, "Visualise Model with Cytoscape Web") -%>
+                 <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank"}, "Visualise #{t('model')} with Cytoscape Web") -%>
                </li>
            <% end -%>
    <% end %>
@@ -44,10 +44,10 @@
        if excutable_content_blob.is_in_simulatable_size_limit? && can_download_asset?(@model, params[:code]) -%>
         <ul class='sectionIcons'>
           <li>
-            <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form') do -%>
+            <%= form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form', :target => '_blank') do -%>
                 <%= hidden_field_tag 'sbml_model' -%>
                 <%= hidden_field_tag 'sender', 'seek' -%>
-                <%= link_to_remote image('execute') + "Simulate Model on Sycamore", :url => {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version} -%>
+                <%= link_to image('execute') + "Simulate #{t('model')} on Sycamore", {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version}, :remote => true, :method => :post -%>
             <% end -%>
 
           </li>
@@ -61,7 +61,7 @@
 
   <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
 
-    <div class="main_content_left_box_narrower">
+    <div class="main_content_left_box">
 
         <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
@@ -76,11 +76,11 @@
                 <% end -%>
             </p>
             <p>
-                <b>Model type:</b>
+                <b><%= t('model') %> type:</b>
                 <%= model_type_text @display_model.model_type %>
             </p>
             <p>
-                <b>Model format:</b>
+                <b><%= t('model') %> format:</b>
                 <%= model_format_text @display_model.model_format %>
             </p>
             <p>
@@ -94,18 +94,8 @@
 
             <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @model} %>
 
-            <p>
-                <b>Description:</b>
-                <% unless @display_model.description.blank? -%>
-                <div class="box_standout" id="description">
-                    <%= simple_format(auto_link(white_list(@display_model.description),:all,:rel=>'nofollow')) -%>
-                </div>
-                <% else -%>
-                <p class="none_text">
-                    No description.
-                </p>
-                <% end -%>
-            </p>
+            <%= item_description @display_model.description -%>
+
             <%= render :partial=>"import_details", :object=>@display_model %>
             <p>
                 <%= embedded_isa_svg(@model, true, @model) -%>
@@ -115,12 +105,10 @@
 
     </div>
 
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model,:versioned_resource=>@display_model } %>
 
     <div style="clear:both;padding-top:1em;">
-      <%= render :partial => "layouts/items_related_to", :object => @model %>
-      <br/>
-      <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
+      <%= render :partial => "general/items_related_to", :object => @model %>
     </div>
 </div>
 

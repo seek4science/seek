@@ -13,7 +13,7 @@
 		<%# if a collection has more than "main_section_length" items an "expand" link is provided which opens up the rest of the items -%>
 		<% if collection.length > main_section_length -%>
 		  <p id="more_link_<%= collection_name -%>" style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-				<%= link_to_function("More" + expand_image("0.3em")) do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
+				<%= link_to_function "More".html_safe + expand_image("0.3em") do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
 			</p>
 			
 			<div style="display: none; margin: 0; padding: 0;" id="more_items_<%= collection_name -%>">
@@ -24,7 +24,7 @@
 		    </ul>
 				
 			  <p id="less_link_<%= collection_name -%>" style="display: none; font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-					<%= link_to_function("Less" + collapse_image("0.3em")) do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
+					<%= link_to_function "Less".html_safe + collapse_image("0.3em") do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
 				</p>
 			</div>
 		<% end -%>

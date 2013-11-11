@@ -5,6 +5,6 @@
             Organism:
         </label>
         <br/>
-        <%= select model_class.name.underscore.to_sym,:organism_id,Organism.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%>
+        <%= select model_class.name.underscore.to_sym,:organism_id,Organism.order(:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%>
     </div>
 </div>

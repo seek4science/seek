@@ -14,7 +14,7 @@
        <%= render :partial=>"studied_factors/condition_or_factor_row",:collection=>@sop.experimental_conditions, :locals=>{:asset => 'sop', :show_delete=>false} %>
     </ul>
   <% else -%>
-    <span class="none_text">There are no experimental conditions for this Sop.</span>
+    <span class="none_text">There are no experimental conditions for this <%= t('sop') %>.</span>
   <% end -%>
 
   <div style="clear:both;">&nbsp;</div>

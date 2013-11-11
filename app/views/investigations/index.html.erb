@@ -1,18 +1,18 @@
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_investigation_path, "New investigation", nil, "New investigation" %></li>
+        <li><%= image_tag_for_key "new", new_investigation_path, "New #{t('investigation')}", nil, "New #{t('investigation')}" %></li>
     </ul>
 <% end %>
 
-<% if @investigations.public_methods.include?("page_totals") %>
+<% if @investigations.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @investigations.pages, :page_totals=>@investigations.page_totals,:current_page=>@investigations.page } -%>
+  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @investigations.pages, :page_totals=>@investigations.page_totals,:current_page=>@investigations.page } -%>
 <% end %>
 
 <div class="list_items_container">
   <%= render :partial => "assets/resource_list_item", :collection=>@investigations %>
 </div>
 
-<% if @investigations.page == "latest" && Investigation.find(:all).length > Seek::Config.limit_latest%>
-    <%= render :partial => "layouts/paginate_see_all"%>
+<% if @investigations.page == "latest" && Investigation.count > Seek::Config.limit_latest%>
+    <%= render :partial => "general/paginate_see_all"%>
 <% end %>

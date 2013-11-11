@@ -12,7 +12,7 @@
 </style>
 <ul class="sectionIcons">
     <li>
-        <%= image_tag_for_key('back', model_path(@model,:version=>@display_model.version), nil, nil, "Back to model") -%>
+        <%= image_tag_for_key('back', model_path(@model,:version=>@display_model.version), nil, nil, "Back to #{t('model')}") -%>
     </li>
 </ul>
 <%= render :partial=>"models/builder/header" -%>
@@ -25,7 +25,7 @@
         <br/>
         <br/>
         <!-- Save new version action --><h6>Save as new version</h6>
-        Model format: <%= select_tag "model_format","<option value='sbml'>SBML</option><option value='dat'>JWS Dat</option>" -%>
+        <%= t('model') %> format: <%= select_tag "model_format","<option value='sbml'>SBML</option><option value='dat'>JWS Dat</option>".html_safe -%>
         <br/>
         <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="create_panel_cookies();save_new_version_extra_options();"/>
         <br/>
@@ -50,7 +50,7 @@
         <% recognised_errors = @error_keys.collect{|k| jws_key_to_text(k)}.compact -%>
         <% if recognised_errors.empty? -%>
 			<div class="jws_success">
-	            Model validated successfully.
+              <%= t('model') %> validated successfully.
 	        </div>
 		<% else -%>
 	        <div class="jws_errors">
@@ -62,19 +62,19 @@
 	        </script>
         <% end -%>
         
-        <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
+        <%= form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
         <input type="hidden" name="new_version_comments" id="new_version_comments" value=""/><input type="hidden" name="new_version_filename" id="new_version_filename" value=""/><input type="hidden" name="following_action" id="following_action" value=""/><input type="hidden" name="saved_model_format" id="saved_model_format" value=""/><input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
         <br/>
         <br/>
         <div>
           <%= render :partial=>"models/builder/builder_box",
                        :locals=>{
-                               :title=>"Model name",:prefix=>"name",:key=>"modelname",:javascript_var=>"rtmodelname",
+                               :title=>"#{t('model')} name",:prefix=>"name",:key=>"modelname",:javascript_var=>"rtmodelname",
                                :help_button=>{
-                                       :title=>"Examples for model names are: model1, westerhoff2010",
-                                       :text=>"Model name help",
+                                       :title=>"Examples for #{t('model')} names are: model1, westerhoff2010",
+                                       :text=>"#{t('model')} name help",
                                        :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpName.html",
-                                       :link_title=>"model name help window"
+                                       :link_title=>"#{t('model')} name help window"
                                }
                        } -%>
             <%= render :partial=>"models/builder/hidden_attribution_annotation_fields",:locals=>{:annotations=>@attribution_annotations} -%>
@@ -92,7 +92,7 @@
                         <!-- reactions script -->
                         <script type="text/javascript">
                             var rtreaction = new ResizeableTextbox('reaction');
-                            rtreaction.SetText("<%= @params_hash['reaction'] -%>");
+                            rtreaction.SetText("<%= @params_hash['reaction'].html_safe -%>");
                             rtreaction.GetContainer().style.left = '10px';
                             rtreaction.GetContainer().style.top = '10px';
                             rtreaction.SetCurrentWidth(600);
@@ -101,7 +101,7 @@
                             rtreaction.SetMaxHeight(800);
                         </script>
                         <p>
-                            <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('<%= Seek::Config.jws_online_root -%>/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
+                            <button title="Examples of <%= t('model') %> reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('<%= Seek::Config.jws_online_root -%>/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Reactions help
                             </button>
                             <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />&nbsp;<input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
@@ -130,7 +130,7 @@
                         <!-- equations script -->
                         <script type="text/javascript"> 
 						var rtkinetics = new ResizeableTextbox('kinetics');
-						rtkinetics.SetText("<%= @params_hash['kinetics'] -%>");
+						rtkinetics.SetText("<%= @params_hash['kinetics'].html_safe -%>");
 						rtkinetics.GetContainer().style.left = '10px';
 						rtkinetics.GetContainer().style.top = '10px';
 						rtkinetics.SetCurrentWidth(600);
@@ -164,7 +164,7 @@
                                        :title=>"Example of variable initialisations:<br> x[0] = 1<br> g6p[0] = 1.4 ",
                                        :text=>"Inital values help",
                                        :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpInitVals.html",
-                                       :link_title=>"model parameter values help window"
+                                       :link_title=>"#{t('model')} parameter values help window"
                                }
                        } -%>
 
@@ -175,7 +175,7 @@
                                        :title=>"Example of parameter initialisations:<br> k1 = 1<br> k2 = 3 ",
                                        :text=>"Parameters help",
                                        :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpParameters.html",
-                                       :link_title=>"model parameter values help window"
+                                       :link_title=>"#{t('model')} parameter values help window"
                                }
                        } -%>
 
@@ -186,7 +186,7 @@
                                        :title=>"Examples of assignment rules are:<br>totalP := P1[t]+P2[t]<br> a := a[t]+Sin[t] ",
                                        :text=>"Assignment rules help",
                                        :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpAssignmentRules.html",
-                                       :link_title=>"model assignments rules help window"
+                                       :link_title=>"#{t('model')} assignments rules help window"
                                }
                        } -%>
 
@@ -197,7 +197,7 @@
                                        :title=>"Examples of functions are:<br> mmKin[vm_,s_,kms_] := vm*s/(s+kms)<br>aFree[tot_]:=tot-a[t]",
                                        :text=>"Functions help",
                                        :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpFunctions.html",
-                                       :link_title=>"model functions help window"
+                                       :link_title=>"#{t('model')} functions help window"
                                }
                        } -%>
 
@@ -208,7 +208,7 @@
                                        :title=>"Examples of events are:<br> ?",
                                        :text=>"Events help",
                                        :link_url=>"#{Seek::Config.jws_online_root}/webMathematica//Examples/JWSconstructor_panels/text/helpEvents.html",
-                                       :link_title=>"model events help window"
+                                       :link_title=>"#{t('model')} events help window"
                                }
                        } -%>
             

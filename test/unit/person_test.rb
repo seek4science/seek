@@ -21,10 +21,59 @@ class PersonTest < ActiveSupport::TestCase
   #checks the updated_at doesn't get artificially changed between created and reloading
   def test_updated_at
     person = Factory(:person, :updated_at=>1.week.ago)
+
     updated_at = person.updated_at
     person = Person.find(person.id)
     assert_equal updated_at.to_s,person.updated_at.to_s
   end
+
+  test "to_rdf" do
+    object = Factory :person, :skype_name=>"skypee",:email=>"sdkfhsd22fkhfsd@sdkfsdkhfkhsdf.com"
+    Factory(:study,:contributor=>object)
+    Factory(:investigation,:contributor=>object)
+    Factory(:assay,:contributor=>object)
+    Factory(:assay,:contributor=>object)
+    Factory(:assets_creator,:creator=>object)
+    Factory(:assets_creator,:asset=>Factory(:sop),:creator=>object)
+    object.web_page="http://google.com"
+
+    disable_authorization_checks do
+      object.save!
+    end
+    object.reload
+    rdf = object.to_rdf
+
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/people/#{object.id}"), reader.statements.first.subject
+      assert reader.has_triple? ["http://localhost:3000/people/#{object.id}",RDF::FOAF.mbox_sha1sum,"b507549e01d249ee5ed98bd40e4d86d1470a13b8"]
+    end
+  end
+
+  test "orcid id validation" do
+    p = Factory :person
+    p.orcid = nil
+    assert p.valid?
+    p.orcid = "sdff-1111-1111-1111"
+    assert !p.valid?
+    p.orcid = "1111111111111111"
+    assert !p.valid?
+    p.orcid = "0000-0002-1694-2339"
+    assert !p.valid?,"checksum doesn't match"
+    p.orcid = "0000-0002-1694-233X"
+    assert p.valid?
+    p.orcid = "http://orcid.org/0000-0002-1694-233X"
+    assert p.valid?
+    p.orcid = "http://orcid.org/0000-0003-2130-0865"
+    assert p.valid?
+  end
+
+
+  test "email uri" do
+    p = Factory :person, :email=>"sfkh^sd@weoruweoru.com"
+    assert_equal "mailto:sfkh%5Esd@weoruweoru.com",p.email_uri
+  end
+
 
   test "only first admin person" do
     Person.delete_all
@@ -132,13 +181,24 @@ class PersonTest < ActiveSupport::TestCase
     assert dups.include?(people(:duplicate_2))
   end
   
-  def test_without_group
-    without_group=Person.without_group
-    without_group.each do |p|
-      assert_equal 0,p.group_memberships.size
-    end
-    assert !without_group.include?(people(:quentin_person))
-    assert without_group.include?(people(:person_without_group))
+  test "without group" do
+    no_group = Factory(:brand_new_person)
+    in_group = Factory(:person)
+    assert no_group.projects.empty?
+    assert !in_group.projects.empty?
+    all = Person.without_group
+    assert !all.include?(in_group)
+    assert all.include?(no_group)
+  end
+
+  test "with group" do
+    no_group = Factory(:brand_new_person)
+    in_group = Factory(:person)
+    assert no_group.projects.empty?
+    assert !in_group.projects.empty?
+    all = Person.with_group
+    assert all.include?(in_group)
+    assert !all.include?(no_group)
   end
   
   def test_expertise
@@ -451,7 +511,7 @@ class PersonTest < ActiveSupport::TestCase
     end
     p=Person.find(p.id)
     assert_not_nil p.notifiee_info
-    assert true,p.receive_notifications?    
+    assert p.receive_notifications?
   end
   
   def test_dependent_notifiee_info_is_destroyed_with_person
@@ -584,11 +644,31 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test "get the correct investigations and studides" do
+    p = Factory(:person)
+    u = p.user
+
+    inv1 = Factory(:investigation, :contributor=>p)
+    inv2 = Factory(:investigation, :contributor=>u)
+
+    study1 = Factory(:study, :contributor=>p)
+    study2 = Factory(:study, :contributor=>u)
+    p = Person.find(p.id)
+
+    assert_equal [study1,study2],p.studies.sort_by(&:id)
+
+    assert_equal [inv1,inv2],p.investigations.sort_by(&:id)
+
+  end
+
   test 'non-admin can not change the roles of a person' do
-    User.with_current_user Factory(:person).user do
-      person = Factory(:person)
+    person = Factory(:person)
+    User.with_current_user person.user do
+
       person.roles = ['admin', 'pal']
-      person.save
+      assert person.can_edit?
+      assert !person.save
+      assert !person.errors.empty?
       person.reload
       assert_equal [], person.roles
     end
@@ -652,6 +732,39 @@ class PersonTest < ActiveSupport::TestCase
 
       assert !person.is_gatekeeper?
     end
+  end
+
+  test 'is_asset_manager?' do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.is_asset_manager = true
+      person.save!
+
+      assert person.is_asset_manager?
+
+      person.is_asset_manager=false
+      person.save!
+
+      assert !person.is_asset_manager?
+    end
+  end
+
+  test 'is_asset_manager_of?' do
+    asset_manager = Factory(:asset_manager)
+    sop = Factory(:sop)
+    assert !asset_manager.is_asset_manager_of?(sop)
+
+    disable_authorization_checks{sop.projects = asset_manager.projects}
+    assert asset_manager.is_asset_manager_of?(sop)
+  end
+
+  test 'is_gatekeeper_of?' do
+    gatekeeper = Factory(:gatekeeper)
+    sop = Factory(:sop)
+    assert !gatekeeper.is_gatekeeper_of?(sop)
+
+    disable_authorization_checks{sop.projects = gatekeeper.projects}
+    assert gatekeeper.is_gatekeeper_of?(sop)
   end
 
   test 'replace admins, pals named_scope by a static function' do

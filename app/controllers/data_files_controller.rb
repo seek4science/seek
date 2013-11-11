@@ -18,7 +18,9 @@ class DataFilesController < ApplicationController
   before_filter :xml_login_only, :only => [:upload_for_tool,:upload_from_email]
 
   #has to come after the other filters
-  include Seek::Publishing
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
 
 
@@ -36,10 +38,10 @@ class DataFilesController < ApplicationController
         end
 
         ActivityLog.create :action=>"create",:culprit=>User.current_user,:activity_loggable=>@presentation,:controller_name=>controller_name.downcase
-        flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
+        flash[:notice]="#{t('data_file')} '#{@presentation.title}' is successfully converted to #{t('presentation')}"
         format.html { redirect_to presentation_path(@presentation) }
       else
-        flash[:error] = "Data File failed to convert to Presentation!!"
+        flash[:error] = "#{t('data_file')} failed to convert to #{t('presentation')}!!"
         format.html {
           redirect_to data_file_path @data_file
         }
@@ -59,13 +61,13 @@ class DataFilesController < ApplicationController
     if (handle_data nil)          
       comments=params[:revision_comment]
 
-      factors = @data_file.studied_factors
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
           create_content_blobs
           #Duplicate studied factors
+          factors = @data_file.find_version(@data_file.version-1).studied_factors
           factors.each do |f|
-            new_f = f.clone
+            new_f = f.dup
             new_f.data_file_version = @data_file.version
             new_f.save
           end
@@ -128,9 +130,9 @@ class DataFilesController < ApplicationController
         @data_file.creators = [current_user.person]
         create_content_blobs
         #send email to the file uploader and receiver
-        Mailer.deliver_file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host)
+        Mailer.file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host).deliver
 
-        flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
+        flash.now[:notice] ="#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         render :text => flash.now[:notice]
       else
         errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
@@ -151,7 +153,7 @@ class DataFilesController < ApplicationController
             @data_file.creators = [User.current_user.person]
             create_content_blobs
 
-            flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
+            flash.now[:notice] ="#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             render :text => flash.now[:notice]
           else
             errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
@@ -193,7 +195,7 @@ class DataFilesController < ApplicationController
           render :partial => "assets/back_to_fancy_parent", :locals => {:child => @data_file, :parent_name => @data_file.parent_name, :is_not_fancy => true}
         else
           respond_to do |format|
-            flash[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+            flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             #parse the data file if it is with sample data
             if @data_file.is_with_sample
               bio_samples = @data_file.bio_samples_population params[:institution_id]
@@ -219,8 +221,6 @@ class DataFilesController < ApplicationController
             format.html { redirect_to data_file_path(@data_file) }
           end
         end
-        deliver_request_publish_approval params[:sharing], @data_file
-
       else
         respond_to do |format|
           format.html {
@@ -238,18 +238,15 @@ class DataFilesController < ApplicationController
   def show
     # store timestamp of the previous last usage
     @last_used_before_now = @data_file.last_used_at
-    
-    # update timestamp in the current Data file record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @data_file.last_used_at = Time.now
-    @data_file.save_without_timestamping
+
+    @data_file.just_used
 
     #Rails.logger.warn "template in data_files_controller/show : #{params[:parsing_template]}"
 
     respond_to do |format|
       format.html #{render :locals => {:template => params[:parsing_template]}}# show.html.erb
       format.xml
-      format.rdf { render :text=>@data_file.to_rdf }
+      format.rdf { render :template=>'rdf/show'}
       format.svg { render :text=>to_svg(@data_file,params[:deep]=='true',@data_file)}
       format.dot { render :text=>to_dot(@data_file,params[:deep]=='true',@data_file)}
       format.png { render :text=>to_png(@data_file,params[:deep]=='true',@data_file)}
@@ -296,7 +293,7 @@ class DataFilesController < ApplicationController
         #update creators
         AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
 
-        flash[:notice] = 'Data file metadata was successfully updated.'
+        flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
 
 
@@ -318,8 +315,6 @@ class DataFilesController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
-        deliver_request_publish_approval params[:sharing], @data_file
-
       else
         format.html {
           render :action => "edit"
@@ -333,7 +328,7 @@ class DataFilesController < ApplicationController
     sheet = params[:sheet] || 1
     trim = params[:trim]
     trim ||= false
-    if ["xls","xlsx"].include?(mime_extension(@data_file.content_blob.content_type))
+    if !(["xls","xlsx"] & (mime_extensions(@data_file.content_blob.content_type))).empty?
 
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
@@ -365,7 +360,7 @@ class DataFilesController < ApplicationController
     resource = DataFile.find(params[:id])
     details = params[:details]
     
-    Mailer.deliver_request_resource(current_user,resource,details,base_host)
+    Mailer.request_resource(current_user,resource,details,base_host).deliver
     
     render :update do |page|
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
@@ -402,22 +397,16 @@ class DataFilesController < ApplicationController
   
   def matching_models
     #FIXME: should use the correct version
-    matching_models = @data_file.matching_models
+    @matching_model_items = @data_file.matching_models
+    #filter authorization
+    ids = @matching_model_items.collect &:primary_key
+    models = Model.find_all_by_id(ids)
+    authorised_ids = Model.authorize_asset_collection(models,"view").collect &:id
+    @matching_model_items = @matching_model_items.select{|mdf| authorised_ids.include?(mdf.primary_key.to_i)}
 
-    render :update do |page|
-      page.visual_effect :toggle_blind,"matching_models"
-      page.visual_effect :toggle_blind,'matching_results'
-      html = ""
-      matching_models.each do |match|
-        model = Model.find(match.primary_key)
-        if (model.can_view?)
-          html << "<div>"
-          html << "<div class='matchmake_result'>Matched with <b>#{match.search_terms.join(', ')}</b></div>"
-          html << render(:partial=>"layouts/resource_list_item", :object=>model)
-          html << "</div>"
-        end
-      end
-      page.replace_html "matching_results",:text=>html
+    flash.now[:notice]="#{@matching_model_items.count} #{t('model').pluralize}  were found that may be relevant to this #{t('data_file')} "
+    respond_to do |format|
+      format.html
     end
   end
   

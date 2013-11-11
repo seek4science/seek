@@ -19,7 +19,7 @@ class AttributionsTest < ActionController::TestCase
     assert !users(:owner_of_my_first_sop).person.projects.empty?
     assert users(:owner_of_my_first_sop).person.projects.include?(projects(:myexperiment_project))
     assert_difference ['Sop.count', 'Relationship.count'] do
-      post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:projects=>[projects(:myexperiment_project)]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
+      post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
     end
     assert_redirected_to sop_path(assigns(:sop))
   end
@@ -29,7 +29,7 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP and verify that both SOP and attribution get created
     # (two identical attributions will be posted, but only one needs to be created)
     assert_difference ['Sop.count', 'Relationship.count'] do
-      post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:projects=>[projects(:myexperiment_project)]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 1]])
+      post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 1]])
     end
     assert_redirected_to sop_path(assigns(:sop))
   end
@@ -38,14 +38,14 @@ class AttributionsTest < ActionController::TestCase
   def test_should_remove_attribution_on_update
     # create a SOP / attribution first
     assert_difference ['Sop.count', 'Relationship.count'] do
-      post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:projects=>[projects(:myexperiment_project)]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
+      post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
     end
     assert_redirected_to sop_path(assigns(:sop))
     
     # update the SOP, but supply no data about attributions - these should be removed
     assert_no_difference('Sop.count') do
       assert_difference('Relationship.count', -1) do
-        put :update, :id => assigns(:sop).id, :sop => {:title => "edited_title",:projects=>[projects(:myexperiment_project)]}, :sharing => valid_sharing,:attributions=>[] # NB! no attributions supplied - should remove if any existed for the sop
+        put :update, :id => assigns(:sop).id, :sop => {:title => "edited_title",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing,:attributions=>nil # NB! no attributions supplied - should remove if any existed for the sop
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -56,7 +56,7 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP and verify that both SOP and attributions get created
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
-        post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:projects=>[projects(:myexperiment_project)]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 111], ["Sop", 222]])
+        post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 111], ["Sop", 222]])
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -71,9 +71,9 @@ class AttributionsTest < ActionController::TestCase
     end
     
     # double-check to see that no attributions for this sop remain
-    destroyed_sop_attributions = Relationship.find(:all, :conditions => { :subject_id => sop_instance.id,
-                                                                          :subject_type => sop_instance.class.name,
-                                                                          :predicate => Relationship::ATTRIBUTED_TO })
+    destroyed_sop_attributions = Relationship.where :subject_id => sop_instance.id,
+                                                    :subject_type => sop_instance.class.name,
+                                                    :predicate => Relationship::ATTRIBUTED_TO
     assert_equal [], destroyed_sop_attributions
   end
   
@@ -82,7 +82,7 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP / attributions first
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
-        post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:projects=>[projects(:myexperiment_project)]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 2]])
+        post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 2]])
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -92,7 +92,7 @@ class AttributionsTest < ActionController::TestCase
     sop_instance = Sop.find(sop_id)
     
     assert_equal 2, sop_instance.attributions.length
-    if sop_instance.attributions[0].object_id == 1
+    if sop_instance.attributions[0].other_object_id == 1
       attr_to_sop_one = sop_instance.attributions[0]
       attr_to_sop_two = sop_instance.attributions[1]
     else
@@ -114,9 +114,9 @@ class AttributionsTest < ActionController::TestCase
     # --- Verify that synchronisation was performed correctly ---
     
     # attribution that was supposed to be deleted was really destroyed
-    deleted_attr_to_sop_one = Relationship.find(:first, :conditions => { :subject_id => attr_to_sop_one.subject_id, :subject_type => attr_to_sop_one.subject_type,
-                                                                         :predicate => attr_to_sop_one.predicate, :object_id => attr_to_sop_one.object_id,
-                                                                         :object_type => attr_to_sop_one.object_type } )
+    deleted_attr_to_sop_one = Relationship.where({ :subject_id => attr_to_sop_one.subject_id, :subject_type => attr_to_sop_one.subject_type,
+                                                                         :predicate => attr_to_sop_one.predicate, :other_object_id => attr_to_sop_one.other_object_id,
+                                                                         :other_object_type => attr_to_sop_one.other_object_type } ).first
     assert_equal nil, deleted_attr_to_sop_one
     
     
@@ -124,19 +124,19 @@ class AttributionsTest < ActionController::TestCase
     # this will then indicate that it was identified to be existing and was properly
     # handled by keeping intact instead of removing and re-creating new record with the
     # same attribution data
-    remaining_attr_to_sop_two = Relationship.find(:first, :conditions => { :subject_id => attr_to_sop_two.subject_id, :subject_type => attr_to_sop_two.subject_type,
-                                                                           :predicate => attr_to_sop_two.predicate, :object_id => attr_to_sop_two.object_id,
-                                                                           :object_type => attr_to_sop_two.object_type } )
+    remaining_attr_to_sop_two = Relationship.where({ :subject_id => attr_to_sop_two.subject_id, :subject_type => attr_to_sop_two.subject_type,
+                                                                           :predicate => attr_to_sop_two.predicate, :other_object_id => attr_to_sop_two.other_object_id,
+                                                                           :other_object_type => attr_to_sop_two.other_object_type } ).first
     assert_equal attr_to_sop_two.id, remaining_attr_to_sop_two.id
     
     
     # make sure that new attribution was created correctly
     # (we have already checked that the total number of attributions after running the test
     #  is correct - one removed, one added, one left unchanged: total - unchanged)
-    new_attr = Relationship.find(:first, :conditions => { :subject_id => sop_id, :subject_type => sop_instance.class.name,
-                                                          :predicate => Relationship::ATTRIBUTED_TO, :object_id => 44,
-                                                          :object_type => "Sop" } )
-    assert (!new_attr.nil?), "new attribution should't be nil - nil means that it wasn't created"
+    new_attr = Relationship.where({ :subject_id => sop_id, :subject_type => sop_instance.class.name,
+                                                          :predicate => Relationship::ATTRIBUTED_TO, :other_object_id => 44,
+                                                          :other_object_type => "Sop" } ).first
+    assert (!new_attr.nil?), "new attribution shouldn't be nil - nil means that it wasn't created"
   end
 
   test "should display attributions" do
@@ -145,10 +145,10 @@ class AttributionsTest < ActionController::TestCase
     sop1 = Factory :sop,:policy=>(Factory :public_policy),:contributor=>u
     sop2 = Factory :sop,:policy=>(Factory :public_policy),:contributor=>u
     sop3 = Factory :sop,:policy=>(Factory :public_policy),:contributor=>u
-    Relationship.create :subject=>sop1,:object=>sop2,:predicate=>Relationship::ATTRIBUTED_TO
+    Relationship.create :subject=>sop1,:other_object=>sop2,:predicate=>Relationship::ATTRIBUTED_TO
     sop1.reload
     sop2.reload
-    assert_equal [sop2],sop1.attributions.collect{|r| r.object}
+    assert_equal [sop2],sop1.attributions.collect{|r| r.other_object}
     assert_equal [sop2],sop1.attributions_objects
 
     get :show,:id=>sop1

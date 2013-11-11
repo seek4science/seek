@@ -7,6 +7,7 @@ class SopsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
 
   def setup
     login_as(:quentin)
@@ -73,12 +74,12 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, :id => sop
     assert_response :success
-    assert_select "#request_resource_button > a",:text=>/Request SOP/,:count=>1
+    assert_select "#request_resource_button > a",:text=>/Request #{I18n.t('sop')}/,:count=>1
 
     logout
     get :show, :id => sop
     assert_response :success
-    assert_select "#request_resource_button > a",:text=>/Request SOP/,:count=>0
+    assert_select "#request_resource_button > a",:text=>/Request #{I18n.t('sop')}/,:count=>0
   end
 
   test "fail gracefullly when trying to access a missing sop" do
@@ -102,7 +103,7 @@ class SopsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select "title", :text=>/The Sysmo SEEK SOPs.*/, :count=>1
+    assert_select "title", :text=>/The Sysmo SEEK #{I18n.t('sop').pluralize}.*/, :count=>1
   end
 
   test "should get index" do
@@ -115,7 +116,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, :page => "all"
     assert_response :success
-    assert_equal assigns(:sops).sort_by(&:id), Sop.authorized_partial_asset_collection(assigns(:sops), "view", users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
+    assert_equal assigns(:sops).sort_by(&:id), Sop.authorize_asset_collection(assigns(:sops), "view", users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
   end
 
   test "should not show private sop to logged out user" do
@@ -124,7 +125,7 @@ class SopsControllerTest < ActionController::TestCase
     get :show, :id=>sop
     assert_redirected_to sops_path
     assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this SOP, you may need to login first.",flash[:error]
+    assert_equal "You are not authorized to view this #{I18n.t('sop')}, you may need to login first.",flash[:error]
   end
 
   test "should not show private sop to another user" do
@@ -132,17 +133,17 @@ class SopsControllerTest < ActionController::TestCase
     get :show, :id=>sop
     assert_redirected_to sops_path
     assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this SOP.",flash[:error]
+    assert_equal "You are not authorized to view this #{I18n.t('sop')}.",flash[:error]
   end
 
   test "should get new" do
     get :new
     assert_response :success
-    assert_select "h1", :text=>"New SOP"
+    assert_select "h1", :text=>"New #{I18n.t('sop')}"
   end
 
   test "should correctly handle bad data url" do
-    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
+    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -151,7 +152,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
 
     #not even a valid url
-    sop={:title=>"Test", :data_url=>"s  df::sd:dfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
+    sop={:title=>"Test", :data_url=>"s  df::sd:dfds.com/sdf.png",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -161,7 +162,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should not create invalid sop" do
-    sop={:title=>"Test",:projects=>[projects(:sysmo_project)]}
+    sop={:title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -307,10 +308,10 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     get :edit, :id => sops(:my_first_sop)
     assert_response :success
-    assert_select "h1", :text=>/Editing SOP/
+    assert_select "h1", :text=>/Editing #{I18n.t('sop')}/
 
     #this is to check the SOP is all upper case in the sharing form
-    assert_select "label",:text=>/Keep this SOP private/
+    assert_select "label",:text=>/Keep this #{I18n.t('sop')} private/
   end
 
   test "publications excluded in form for sops" do
@@ -373,7 +374,7 @@ class SopsControllerTest < ActionController::TestCase
 
     #create new version
     post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/little_file_v2.txt',Mime::TEXT)}
-    assert_redirected_to sop_path(assigns(:s))
+    assert_redirected_to sop_path(assigns(:sop))
 
     s=Sop.find(s.id)
     assert_equal 2, s.versions.size
@@ -451,31 +452,38 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_duplicate_conditions_for_new_version
-    s=sops(:editable_sop)
-    condition1 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
+    s=Factory :sop,:contributor=>User.current_user
+    condition1 = ExperimentalCondition.create(:unit_id => units(:gram).id, :measured_item_id => measured_items(:weight).id,
                                               :start_value => 1, :sop_id => s.id, :sop_version => s.version)
+    condition1.save!
+    s.reload
+    assert_equal 1,s.experimental_conditions.count
     assert_difference("Sop::Version.count", 1) do
-      post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+     assert_difference("ExperimentalCondition.count",1) do
+        post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+     end
     end
 
-    assert_not_equal 0, s.find_version(1).experimental_conditions.count
-    assert_not_equal 0, s.find_version(2).experimental_conditions.count
+    assert_equal 1, s.find_version(1).experimental_conditions.count
+    assert_equal 1, s.find_version(2).experimental_conditions.count
     assert_not_equal s.find_version(1).experimental_conditions, s.find_version(2).experimental_conditions
   end
 
   def test_adding_new_conditions_to_different_versions
     s =sops(:editable_sop)
-    condition1 = ExperimentalCondition.create(:unit => units(:gram), :measured_item => measured_items(:weight),
+    condition1 = ExperimentalCondition.create(:unit_id => units(:gram).id, :measured_item => measured_items(:weight),
                                               :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
-      post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+      assert_difference("ExperimentalCondition.count",1) do
+        post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+      end
     end
 
     s.find_version(2).experimental_conditions.each { |e| e.destroy }
     assert_equal condition1, s.find_version(1).experimental_conditions.first
     assert_equal 0, s.find_version(2).experimental_conditions.count
 
-    condition2 = ExperimentalCondition.create(:unit => units(:gram), :measured_item => measured_items(:weight),
+    condition2 = ExperimentalCondition.create(:unit_id => units(:gram).id, :measured_item => measured_items(:weight),
                                               :start_value => 2, :sop_id => s.id, :sop_version => 2)
 
     assert_not_equal 0, s.find_version(2).experimental_conditions.count
@@ -585,34 +593,18 @@ class SopsControllerTest < ActionController::TestCase
     sop=sops(:sop_with_project_without_gatekeeper)
     assert sop.can_manage?,"The sop must be manageable for this test to succeed"
     post :publish,:id=>sop
-    assert_response :success
+    assert_response :redirect
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
   end
 
-  test "do not publish if not can_manage?" do
+  test "do not isa_publish if not can_manage?" do
     sop=sops(:sop_with_project_without_gatekeeper)
     assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
     post :publish,:id=>sop
-    assert_redirected_to sop
+    assert_redirected_to :root
     assert_not_nil flash[:error]
     assert_nil flash[:notice]
-  end
-
-  test "get preview_publish" do
-    login_as(:owner_of_my_first_sop)
-    sop=sops(:sop_with_project_without_gatekeeper)
-    assert sop.can_manage?,"The sop must be manageable for this test to succeed"
-    get :preview_publish, :id=>sop
-    assert_response :success
-  end
-
-  test "cannot get preview_publish when not manageable" do
-    sop=sops(:my_first_sop)
-    assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
-    get :preview_publish, :id=>sop
-    assert_redirected_to sop
-    assert flash[:error]
   end
 
   test 'should show <Not specified> for  other creators if no other creators' do
@@ -625,7 +617,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'breadcrumb for sop index' do
     get :index
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > SOPs Index/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
     end
   end
@@ -634,7 +626,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = sops(:sop_with_fully_public_policy)
     get :show, :id => sop
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > SOPs Index > #{sop.title}/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index > #{sop.title}/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
        assert_select "a[href=?]", sops_url, :count => 1
     end
@@ -645,7 +637,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?
     get :edit, :id => sop
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > SOPs Index > #{sop.title} > Edit/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index > #{sop.title} > Edit/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", sops_url, :count => 1
       assert_select "a[href=?]", sop_url(sop), :count => 1
@@ -655,7 +647,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'breadcrumb for creating new sop' do
     get :new
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > SOPs Index > New/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index > New/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", sops_url, :count => 1
     end
@@ -664,7 +656,7 @@ class SopsControllerTest < ActionController::TestCase
   test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
     as_not_virtualliver do
       gatekeeper = Factory(:gatekeeper)
-      post :create, :sop => {:title => 'test', :projects => gatekeeper.projects, :data => fixture_file_upload('files/file_picture.png')}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+    post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id), :data => fixture_file_upload('files/file_picture.png')}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
       sop = assigns(:sop)
       assert_redirected_to (sop)
       policy = sop.policy
@@ -679,7 +671,7 @@ class SopsControllerTest < ActionController::TestCase
   test "should not change the policy if the item is requested to be published, when managing sop" do
       gatekeeper = Factory(:gatekeeper)
       policy = Factory(:policy, :sharing_scope => Policy::PRIVATE, :permissions => [Factory(:permission)])
-      sop = Factory(:sop, :projects => gatekeeper.projects, :policy => policy)
+      sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id), :policy => policy)
       login_as(sop.contributor)
       assert sop.can_manage?
       put :update, :id => sop.id, :sop =>{}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
@@ -783,15 +775,72 @@ class SopsControllerTest < ActionController::TestCase
     assert ActiveRecord::Base.connection.select_all(sql).empty?
   end
 
+  test 'send publish approval request' do
+    gatekeeper = Factory(:gatekeeper)
+    sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id))
+
+    #request publish
+    login_as(sop.contributor)
+    assert sop.can_publish?
+    assert_emails 1 do
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+    end
+  end
+
+  test 'dont send publish approval request if can_publish' do
+    gatekeeper = Factory(:gatekeeper)
+    sop = Factory(:sop, :contributor => gatekeeper.user, :project_ids => gatekeeper.projects.collect(&:id))
+
+    #request publish
+    login_as(sop.contributor)
+    assert !sop.is_published?
+    assert sop.can_publish?
+    assert_emails 0 do
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+    end
+  end
+
+  test 'dont send publish approval request again if it was already sent by this person' do
+    gatekeeper = Factory(:gatekeeper)
+    sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id))
+
+    #request publish
+    login_as(sop.contributor)
+    assert sop.can_publish?
+    #send the first time
+    assert_emails 1 do
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+    end
+    #dont send again
+    assert_emails 0 do
+      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+    end
+  end
+
+  test "view_items_in_tab" do
+    other_user = Factory :user
+    sop = Factory :sop,:title=>"a sop",:contributor=>User.current_user,:policy=>Factory(:public_policy)
+    private_sop = Factory :sop,:title=>"a private sop",:contributor=>other_user,:policy=>Factory(:private_policy)
+    xml_http_request :get, :view_items_in_tab,:resource_type=>"Sop",:resource_ids=>[sop.id,private_sop.id,1000].join(",")
+    assert_response :success
+
+    assert @response.body.include?("a sop")
+    assert !@response.body.include?("a private sop")
+
+    #try with no parameters
+    xml_http_request :get, :view_items_in_tab
+    assert_response :success
+  end
+
   private
 
   def valid_sop_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
-    {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
+    {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project_ids=>[projects(:sysmo_project).id]}
   end
 
   def valid_sop
-    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:projects=>[projects(:sysmo_project)]}
+    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[projects(:sysmo_project).id]}
   end
 
 end

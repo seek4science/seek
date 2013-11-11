@@ -21,6 +21,14 @@
                         <br/>
                         <%= f.text_field :email, :style => "width: 100%;" %>
                     </p>
+                    <p>
+                      <label>ORCID Identifier
+                        <%= help_icon("<b>ORCID</b> is an open, non-profit, community-based effort to provide a registry of unique researcher identifiers and a transparent method of linking research activities and outputs to these identifiers.<br/><b>An ORCID identifier looks like http://orcid.org/XXXX-XXXX-XXXX-XXXX</b><br/>To find out more and get your ORCID ID please visit http://orcid.org") -%>
+                      </label>
+                      <br/>
+                      <%= f.text_field :orcid, :style => "width: 100%;" %>
+                    </p>
+
                 </div>
             </center>
         </td>
@@ -49,7 +57,7 @@
 </table>
 <h2>Description about myself</h2>
 <p>
-    <%= f.text_area :description, :class=>"description", :rows => 8, :style => "width: 100%;" -%>
+    <%= f.text_area :description, :class=>"description", :rows => 10, :style => "width: 100%;" -%>
 </p>
 <br/>
 <% if person -%>

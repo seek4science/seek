@@ -14,11 +14,11 @@
 <h1>Data Fuse Prototype</h1>
 
 <div class="show_basic">
-  <% form_tag({:action=>:assets_selected},:method=>:post) do -%>
-  <h2>Model (SBML)</h2>
+  <%= form_tag({:action=>:assets_selected},:method=>:post) do -%>
+  <h2><%= t('model') %> (SBML)</h2>
 
   <%= select_tag :model_id,
-      options_for_select([["Select Model file ...",0]]|@models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+      options_for_select([["Select #{t('model')} file ...",0]]|@models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
           {:style=>"width:55em;",:class=>"data_fuse_select",:onchange=>remote_function(
             :url=>{:action=>"preview_model",:element=>"model_preview"},
             :with=>"'id='+this.value",
@@ -37,13 +37,13 @@
   -%>
 
   <div id="model_preview" class="list_item">
-    <h3>Selected Model</h3>
-     <span class="none_text">No model selected</span>
+    <h3>Selected <%= t('model') %></h3>
+     <span class="none_text">No <%= t('model') %> selected</span>
   </div>
 
   <div id="parameter_keys" class="list_item">
         <h3>Available Parameter keys</h3>
-        <span class="none_text">No model selected</span>
+        <span class="none_text">No <%= t('model') %> selected</span>
   </div>
 
   <div style="clear:both;"></div>

@@ -2,6 +2,9 @@ class AssetsCreator < ActiveRecord::Base
   
   belongs_to :asset, :polymorphic => true
   belongs_to :creator, :class_name => 'Person'
+
+  include Seek::Rdf::ReactToAssociatedChange
+  update_rdf_on_change :asset
   
   def self.add_or_update_creator_list(resource, creator_params)
     # added this branching on .nil? because of the danger of loosing all creators for a model (for example) if due to an incomplete post request creator_params is nil
@@ -33,4 +36,5 @@ class AssetsCreator < ActiveRecord::Base
       end
     end
   end
+
 end

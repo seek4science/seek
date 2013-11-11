@@ -10,14 +10,14 @@ class AuthLookupUpdateJob
     process_queue
 
     if AuthLookupUpdateQueue.count>0 && !AuthLookupUpdateJob.exists?
-      Delayed::Job.enqueue(AuthLookupUpdateJob.new,0,1.seconds.from_now)
+      Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>0, :run_at=>1.seconds.from_now)
     end
   end
 
   def process_queue
     #including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to tha happy coincidence
     #that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
-    todo = AuthLookupUpdateQueue.all(:limit=>BATCHSIZE,:order=>"priority,item_type,id").collect do |queued|
+    todo = AuthLookupUpdateQueue.order("priority,item_type,id").limit(BATCHSIZE).collect do |queued|
       todo = queued.item
       queued.destroy
       todo
@@ -83,7 +83,7 @@ class AuthLookupUpdateJob
           # for users some additional simple code is required.
           AuthLookupUpdateQueue.create(:item=>item, :priority=>queuepriority) unless AuthLookupUpdateQueue.exists?(item)
         end
-        Delayed::Job.enqueue(AuthLookupUpdateJob.new, priority, t) unless AuthLookupUpdateJob.count>10
+        Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>priority, :run_at=>t) unless AuthLookupUpdateJob.count>10
       end
     end
   end
@@ -94,9 +94,9 @@ class AuthLookupUpdateJob
 
   def self.count ignore_locked=true
     if ignore_locked
-      Delayed::Job.find(:all,:conditions=>['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]).count
+      Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]).count
     else
-      Delayed::Job.find(:all,:conditions=>['handler = ? AND failed_at IS ?',@@my_yaml,nil]).count
+      Delayed::Job.where(['handler = ? AND failed_at IS ?',@@my_yaml,nil]).count
     end
   end
 

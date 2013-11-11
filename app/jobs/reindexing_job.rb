@@ -6,7 +6,7 @@ class ReindexingJob
   DEFAULT_PRIORITY=2
 
   def perform
-    todo = ReindexingQueue.all(:limit => BATCHSIZE, :order => :id).collect do |queued|
+    todo = ReindexingQueue.order("id ASC").limit(BATCHSIZE).collect do |queued|
       todo = queued.item
       queued.destroy
       todo
@@ -21,7 +21,7 @@ class ReindexingJob
       end
     end
     if ReindexingQueue.count>0 && !ReindexingJob.exists?
-      Delayed::Job.enqueue(ReindexingJob.new, DEFAULT_PRIORITY, 1.seconds.from_now)
+      Delayed::Job.enqueue(ReindexingJob.new, :priority=>DEFAULT_PRIORITY, :run_at=>1.seconds.from_now)
     end
   end
 
@@ -33,11 +33,11 @@ class ReindexingJob
         ReindexingQueue.create :item => item
       end
     end
-    Delayed::Job.enqueue(ReindexingJob.new, priority, t) unless ReindexingJob.exists?
+    Delayed::Job.enqueue(ReindexingJob.new, :priority=>priority, :run_at=>t) unless ReindexingJob.exists?
 
   end
 
   def self.exists?
-    Delayed::Job.find(:first, :conditions => ['handler = ? AND locked_at IS ?', @@my_yaml, nil]) != nil
+    Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ? ', @@my_yaml, nil, nil]).first != nil
   end
 end

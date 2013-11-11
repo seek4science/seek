@@ -1,16 +1,15 @@
-require 'acts_as_authorized'
+
 require 'grouped_pagination'
-require 'only_writes_unique'
+#require 'only_writes_unique'
 
 class Event < ActiveRecord::Base
-  has_and_belongs_to_many :data_files, :unique => true
-  has_and_belongs_to_many :publications, :unique => true
-  has_and_belongs_to_many :presentations, :unique => true
+  has_and_belongs_to_many :data_files , :uniq => true
+  has_and_belongs_to_many :publications , :uniq => true
+  has_and_belongs_to_many :presentations , :uniq => true
 
   include Subscribable
 
-  #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
-  default_scope :order => "#{self.table_name}.start_date DESC"
+  scope :default_order, order("start_date DESC")
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :address,:city,:country,:url,:description,:title
@@ -25,7 +24,7 @@ class Event < ActiveRecord::Base
   acts_as_favouritable
 
   #load the configuration for the pagination
-  grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+  grouped_pagination
 
   #FIXME: Move to Libs
   Array.class_eval do

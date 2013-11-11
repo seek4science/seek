@@ -8,8 +8,6 @@ class ModelsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon
   include AssetsCommonExtension
-
-  before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
@@ -18,8 +16,9 @@ class ModelsController < ApplicationController
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
   before_filter :experimental_features, :only=>[:matching_data]
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
 
-  include Seek::Publishing
   include Seek::BreadCrumbs
 
   @@model_builder = Seek::JWS::Builder.new
@@ -33,7 +32,7 @@ class ModelsController < ApplicationController
       xgmml_doc = head + body
 
       xgmml_file =  "model_#{@model.id}_version_#{@display_model.version}_export.xgmml"
-      tmp_file= Tempfile.new("#{xgmml_file}","#{RAILS_ROOT}/tmp/")
+      tmp_file= Tempfile.new("#{xgmml_file}","#{Rails.root}/tmp/")
       File.open(tmp_file.path,"w") do |tmp|
         tmp.write xgmml_doc
       end
@@ -43,7 +42,7 @@ class ModelsController < ApplicationController
   end
 
   def visualise
-    raise Exception.new("This model does not support Cytoscape") unless @display_model.contains_xgmml?
+    raise Exception.new("This #{t('model')} does not support Cytoscape") unless @display_model.contains_xgmml?
      # for xgmml file
      doc = find_xgmml_doc @display_model
      # convert " to \" and newline to \n
@@ -106,7 +105,7 @@ class ModelsController < ApplicationController
         flash[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to model_path(@model,:version=>@display_model.version)}
       elsif !supported
-        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        flash[:error]="This #{t('model')} is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
         format.html { redirect_to model_path(@model,:version=>@display_model.version)}        
       else
         format.html
@@ -161,7 +160,8 @@ class ModelsController < ApplicationController
         format.html { render :action=>"builder" }
       elsif @error_keys.empty? && following_action == "simulate"
         @modelname=@saved_file
-        format.html {render :simulate,:layout=>"jws_simulate"}
+        @no_sidebar=true
+        format.html {render :simulate}
       elsif @error_keys.empty? && following_action == "annotate"
         format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
@@ -182,7 +182,7 @@ class ModelsController < ApplicationController
     if !Seek::Config.sycamore_enabled
       error_message = "Interaction with Sycamore is currently disabled"
     elsif !@model.can_download? && (params[:code].nil? || (params[:code] && !@model.auth_by_code?(params[:code])))
-      error_message = "You are not allowed to simulate this model with Sycamore"
+      error_message = "You are not allowed to simulate this #{t('model')} with Sycamore"
     end
     render :update do |page|
       if error_message.blank?
@@ -201,7 +201,7 @@ class ModelsController < ApplicationController
         @modelname = Seek::JWS::Simulator.new.simulate(@display_model.jws_supported_content_blobs.first)
       end
     rescue Exception=>e
-      Rails.logger.error("Problem simulating model on JWS Online #{e}")
+      Rails.logger.error("Problem simulating #{t('model')} on JWS Online #{e}")
       raise e unless Rails.env=="production"
       error=e
     end
@@ -211,10 +211,11 @@ class ModelsController < ApplicationController
         flash[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to(@model, :version=>@display_model.version) }
       elsif !@display_model.is_jws_supported?
-        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        flash[:error]="This #{t('model')} is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
         format.html { redirect_to(@model, :version=>@display_model.version) }
       else
-         format.html { render :simulate,:layout=>"jws_simulate" }
+        @no_sidebar=true
+         format.html { render :simulate }
       end
     end
   end
@@ -244,7 +245,7 @@ class ModelsController < ApplicationController
     end
     
     render :update do |page|
-      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
+      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
       page.replace_html "model_type_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_type_info').style.color='#{info_colour}';"
@@ -269,133 +270,14 @@ class ModelsController < ApplicationController
     end
     
     render :update do |page|
-      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
+      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
       page.replace_html "model_format_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_format_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_format_info"      
     end    
   end
-  
-  def create_model_metadata
-    attribute=params[:attribute]
-    if attribute=="model_type"
-      create_model_type params
-    elsif attribute=="model_format"
-      create_model_format params
-    end
-  end
-  
-  def update_model_type params
-    title=white_list(params[:updated_model_type])
-    id=params[:updated_model_type_id]
-    success=false
-    model_type_with_matching_title=ModelType.find(:first,:conditions=>{:title=>title})
-    if model_type_with_matching_title.nil? || model_type_with_matching_title.id.to_s==id
-      m=ModelType.find(id)
-      m.title=title
-      if m.save
-        msg="OK. Model type changed to #{title}."
-        success=true
-      else
-        msg="ERROR - There was a problem changing to #{title}"
-      end
-    else
-      msg="ERROR - Another model type with #{title} already exists"
-    end
-    
-    render :update do |page|
-      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
-      page.replace_html "model_type_info","#{msg}<br/>"
-      info_colour= success ? "green" : "red"
-      page << "$('model_type_info').style.color='#{info_colour}';"
-      page.visual_effect :appear, "model_type_info"
-    end
-    
-  end
-    
-  def create_model_type params
-    title=white_list(params[:model_type])
-    success=false
-    if ModelType.find(:first,:conditions=>{:title=>title}).nil?
-      new_model_type=ModelType.new(:title=>title)
-      if new_model_type.save
-        msg="OK. Model type #{title} added."
-        success=true
-      else
-        msg="ERROR - There was a problem adding #{title}"
-      end
-    else
-      msg="ERROR - Model type #{title} already exists"
-    end
-    
-    
-    render :update do |page|
-      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
-      page.replace_html "model_type_info","#{msg}<br/>"
-      info_colour= success ? "green" : "red"
-      page << "$('model_type_info').style.color='#{info_colour}';"
-      page.visual_effect :appear, "model_type_info"
-      page << "model_types_for_deletion.push(#{new_model_type.id});" if success
-      
-    end
-  end
-  
-  def create_model_format params
-    title=white_list(params[:model_format])
-    success=false
-    if ModelFormat.find(:first,:conditions=>{:title=>title}).nil?
-      new_model_format=ModelFormat.new(:title=>title)
-      if new_model_format.save
-        msg="OK. Model format #{title} added."
-        success=true
-      else
-        msg="ERROR - There was a problem adding #{title}"
-      end
-    else
-      msg="ERROR - Another model format #{title} already exists"
-    end
-    
-    
-    render :update do |page|
-      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
-      page.replace_html "model_format_info","#{msg}<br/>"
-      info_colour= success ? "green" : "red"
-      page << "$('model_format_info').style.color='#{info_colour}';"
-      page.visual_effect :appear, "model_format_info"
-      page << "model_formats_for_deletion.push(#{new_model_format.id});" if success
-      
-    end
-  end
-  
-  def update_model_format params
-    title=white_list(params[:updated_model_format])
-    id=params[:updated_model_format_id]
-    success=false    
-    model_format_with_matching_title=ModelFormat.find(:first,:conditions=>{:title=>title})
-    if model_format_with_matching_title.nil? || model_format_with_matching_title.id.to_s==id
-      m=ModelFormat.find(id)
-      m.title=title
-      if m.save
-        msg="OK. Model format changed to #{title}."
-        success=true
-      else
-        msg="ERROR - There was a problem changing to #{title}"
-      end
-    else
-      msg="ERROR - Another model format with #{title} already exists"
-    end
-    
-    render :update do |page|
-      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
-      page.replace_html "model_format_info","#{msg}<br/>"
-      info_colour= success ? "green" : "red"
-      page << "$('model_format_info').style.color='#{info_colour}';"
-      page.visual_effect :appear, "model_format_info"
-    end
-    
-  end
-  
+
   
   # GET /models/1
   # GET /models/1.xml
@@ -404,14 +286,12 @@ class ModelsController < ApplicationController
     @last_used_before_now = @model.last_used_at
 
 
-    # update timestamp in the current Model record
-    # (this will also trigger timestamp update in the corresponding Asset)
-    @model.last_used_at = Time.now
-    @model.save_without_timestamping
+    @model.just_used
     
     respond_to do |format|
       format.html # show.html.erb
       format.xml
+      format.rdf { render :template=>'rdf/show'}
       format.svg { render :text=>to_svg(@model,params[:deep]=='true',@model)}
       format.dot { render :text=>to_dot(@model,params[:deep]=='true',@model)}
       format.png { render :text=>to_png(@model,params[:deep]=='true',@model)}
@@ -462,14 +342,13 @@ class ModelsController < ApplicationController
           #Add creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
           
-          flash[:notice] = 'Model was successfully uploaded and saved.'
+          flash[:notice] = "#{t('model')} was successfully uploaded and saved."
           format.html { redirect_to model_path(@model) }
           Assay.find(assay_ids).each do |assay|
             if assay.can_edit?
               assay.relate(@model)
             end
           end
-          deliver_request_publish_approval params[:sharing], @model
         else
           format.html {
             render :action => "new"
@@ -516,7 +395,7 @@ class ModelsController < ApplicationController
           #update creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
 
-          flash[:notice] = 'Model metadata was successfully updated.'
+          flash[:notice] = "#{t('model')} metadata was successfully updated."
           format.html { redirect_to model_path(@model) }
           # Update new assay_asset
           Assay.find(assay_ids).each do |assay|
@@ -531,7 +410,6 @@ class ModelsController < ApplicationController
               AssayAsset.destroy(assay_asset.id)
             end
           end
-        deliver_request_publish_approval params[:sharing], @model
         else
           format.html {
             render :action => "edit"
@@ -569,7 +447,7 @@ class ModelsController < ApplicationController
     resource = Model.find(params[:id])
     details = params[:details]
     
-    Mailer.deliver_request_resource(current_user,resource,details,base_host)
+    Mailer.request_resource(current_user,resource,details,base_host).deliver
     
     render :update do |page|
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
@@ -578,34 +456,21 @@ class ModelsController < ApplicationController
 
   def matching_data
     #FIXME: should use the correct version
-    @matching_data_files = @model.matching_data_files
+    @matching_data_items = @model.matching_data_files
+
+    #filter authorization
+    ids = @matching_data_items.collect &:primary_key
+    data_files = DataFile.find_all_by_id(ids)
+    authorised_ids = DataFile.authorize_asset_collection(data_files,"view").collect &:id
+    @matching_data_items = @matching_data_items.select{|mdf| authorised_ids.include?(mdf.primary_key.to_i)}
+
+    flash.now[:notice]="#{@matching_data_items.count} #{t('data_file').pluralize} found that may be relevant to this #{t('model')}"
     respond_to do |format|
       format.html
     end
   end
 
-  def view_matched_data_files
-    primary_keys = params[:primary_keys].split(',')
-    scores = params[:scores].split(',')
-    search_terms_collection = params[:search_terms].split(',')
-    matched_data_files = []
-    primary_keys.each_with_index do |primary_key, index|
-      search_terms = search_terms_collection[index].split("*")
-      matched_data_files << Model::DataFileMatchResult.new(search_terms,scores[index].to_i,primary_key.to_i)
-    end
-    #authorize
-    data_files = matched_data_files.collect do |mdf|
-      DataFile.find(mdf.primary_key)
-    end
-    authorized_data_file_ids = DataFile.authorized_partial_asset_collection(data_files, 'view', current_user).collect(&:id)
-    authorized_matching_data_files =  matched_data_files.select{|mdf| authorized_data_file_ids.include?(mdf.primary_key.to_i)}
 
-    render :update do |page|
-      page.replace_html "matching_data_ajax_loader", :partial => "models/matching_data_item", :locals=>{:matching_data_items => authorized_matching_data_files}
-      page.visual_effect :toggle_blind, "view_matched_data_files", :duration => 0.05
-      page.visual_effect :toggle_blind, "view_matched_data_files_and_extra", :duration => 0.05
-    end
-  end
 
   protected
 
@@ -667,7 +532,7 @@ class ModelsController < ApplicationController
 
  def create_model_image model_object, params_model_image
    build_model_image model_object, params_model_image
-   model_object.save(false)
+    model_object.save(:validate=>false)
    latest_version = model_object.latest_version
    latest_version.model_image_id = model_object.model_image_id
    latest_version.save

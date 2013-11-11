@@ -16,19 +16,21 @@
 <% end %>
 <% images.each do |i| %>
   <div class="image_thumbnail">
-    <% link_to(i.public_filename, :target => "blank") do %>
+    <%= link_to(i.public_filename, :target => "blank") do %>
       <div class="thumb">
         <%= image_tag(i.public_filename(:thumb), :class => "thumb") -%>
       </div>
     <% end %>
     <br/>
     <%= link_to(image('new', :title => "Insert image", :alt => "Insert image"), "#", :onclick => "insertAtCursor('help_document_body',\"!#{i.public_filename}!\"); return false;") %>
-    <%= link_to_remote(image('destroy', :title => "Delete image", :alt => "Delete image"), 
-                       :update => "images_list", 
-                       :url => help_document_help_image_path(@help_document, i),
+    <%= link_to_with_callbacks(image('destroy', :title => "Delete image", :alt => "Delete image"),
+                      {:update => "images_list",
+                       :url => help_document_help_image_path(@help_document,i),
+                       :with=>"'help_document_id=' + '#{@help_document.identifier}'",
                        :confirm => 'Are you sure you wish to delete this image?', 
                        :method => :delete,
-                       :loading => "Element.show('image_spinner_#{i.id}')") %>
+                       :loading => "Element.show('image_spinner_#{i.id}')"},
+                      {:remote => true}) %>
     <%= image_tag "ajax-loader.gif", :id => "image_spinner_#{i.id}", :style => 'display:none;' -%>
   </div>
 <% end %>

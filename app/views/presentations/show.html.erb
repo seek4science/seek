@@ -1,7 +1,7 @@
 <%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@presentation} %>
 
 <ul class="sectionIcons">
     <%= asset_buttons @presentation,@display_presentation.version -%>
@@ -12,7 +12,7 @@
 
   <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
 
-  <div class="main_content_left_box_narrower">
+  <div class="main_content_left_box">
 
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
 
@@ -22,22 +22,11 @@
 
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @presentation} %>
 
-      <p>
-        <b>Description:</b>
-        <% unless @display_presentation.description.blank? -%>
-          <div class="box_standout" id="description">
-            <%= simple_format(auto_link(white_list(@display_presentation.description),:all,:rel=>'nofollow')) -%>
-          </div>
-      <% else -%>
-          <p class="none_text">
-            No description
-          </p>
-      <% end -%>
-      </p>
+      <%= item_description @display_presentation.description -%>
     </div>
   </div>
 
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @presentation } %>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @presentation, :versioned_resource=>@display_presentation } %>
 
   <div style="clear:both;padding-top:1em;">
     <p>
@@ -47,10 +36,8 @@
 
     <br/>
 
-    <%# get, classify and authorize all assets for this project -%>
-    <%= render :partial=>"layouts/items_related_to",:object => @presentation %>
-    <br/>
-    <%= render :partial => "layouts/usage_info", :locals => { :resource => @presentation } -%>
+    <%= render :partial=>"general/items_related_to",:object => @presentation %>
+
   </div>
 
 </div>

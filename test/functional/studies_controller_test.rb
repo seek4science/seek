@@ -7,6 +7,7 @@ class StudiesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
 
   def setup
     login_as Factory(:admin).user
@@ -24,6 +25,29 @@ class StudiesControllerTest < ActionController::TestCase
     assert !assigns(:studies).empty?
   end
 
+  test "should show aggregated publications linked to assay" do
+    assay1 = Factory :assay,:policy => Factory(:public_policy)
+    assay2 = Factory :assay,:policy => Factory(:public_policy)
+
+    pub1 = Factory :publication, :title=>"pub 1"
+    pub2 = Factory :publication, :title=>"pub 2"
+    pub3 = Factory :publication, :title=>"pub 3"
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub1
+    Factory :relationship, :subject=>assay1, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
+    Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub3
+
+    study = Factory(:study,:assays=>[assay1,assay2],:policy => Factory(:public_policy))
+
+    get :show,:id=>study.id
+    assert_response :success
+
+    assert_select "div.tabbertab" do
+      assert_select "h3",:text=>"Publications (3)",:count=>1
+    end
+  end
+
   test "should show draggable icon in index" do
     get :index
     assert_response :success
@@ -35,7 +59,7 @@ class StudiesControllerTest < ActionController::TestCase
   
   def test_title
     get :index
-    assert_select "title",:text=>/The Sysmo SEEK Studies.*/, :count=>1
+    assert_select "title",:text=>/The Sysmo SEEK #{I18n.t('study').pluralize}.*/i, :count=>1
   end
 
   test "should get show" do
@@ -120,7 +144,8 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should create" do
     assert_difference("Study.count") do
-      post :create,:study=>{:title=>"test",:investigation=>investigations(:metabolomics_investigation)}, :sharing=>valid_sharing
+      post :create,:study=>{:title=>"test",:investigation_id=>investigations(:metabolomics_investigation).id},sharing=>valid_sharing
+
     end
     s=assigns(:study)
     assert_redirected_to study_path(s)
@@ -189,12 +214,12 @@ class StudiesControllerTest < ActionController::TestCase
     login_as Factory(:user)
     study = Factory :study, :policy => Factory(:private_policy)
     get :show, :id=>study
-    assert_select "a",:text=>/Edit study/,:count=>0
+    assert_select "a",:text=>/Edit #{I18n.t('study')}/i,:count=>0
   end
 
   test "edit button in show for person in project" do
     get :show, :id=>studies(:metabolomics_study)
-    assert_select "a",:text=>/Edit study/,:count=>1
+    assert_select "a",:text=>/Edit #{I18n.t('study')}/i,:count=>1
   end
 
 
@@ -221,19 +246,21 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "study non project member cannot delete even if no assays" do
     login_as(:aaron)
+    study = studies(:study_with_no_assays)
     assert_no_difference('Study.count') do
-      delete :destroy, :id => studies(:study_with_no_assays).id
+      delete :destroy, :id => study.id
     end
     assert flash[:error]
-    assert_redirected_to studies_path
+    assert_redirected_to study
   end
   
-  test "study project member cannot delete if assays associated" do    
+  test "study project member cannot delete if assays associated" do
+    study = studies(:metabolomics_study)
     assert_no_difference('Study.count') do
-      delete :destroy, :id => studies(:metabolomics_study).id
+      delete :destroy, :id => study.id
     end
     assert flash[:error]
-    assert_redirected_to studies_path
+    assert_redirected_to study
   end
   
   def test_should_add_nofollow_to_links_in_show_page
@@ -256,9 +283,9 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.tabbertab" do
-      assert_select "h3", :text => "Assays (1)", :count => 1
-      assert_select "h3", :text => "SOPs (2)", :count => 1
-      assert_select "h3", :text => "Data Files (2)", :count => 1
+      assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
+      assert_select "h3",:text=>"#{I18n.t('sop').pluralize} (2)",:count=>1
+      assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (2)",:count=>1
     end
     get :resource_in_tab, {:resource_ids => study.assays.map(&:id).join(","), :resource_type => "Assay", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     assert_select "div.list_item" do
@@ -299,7 +326,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>s
     assert_response :success
     assert_select "div.tabbertab" do
-      assert_select "h3",:text=>"Investigations (1)",:count=>1
+      assert_select "h3",:text=>"#{I18n.t('investigation').pluralize} (1)",:count=>1
     end
   end
   
@@ -319,7 +346,7 @@ class StudiesControllerTest < ActionController::TestCase
   test 'edit study with selected projects scope policy' do
     proj = User.current_user.person.projects.first
     study = Factory(:study, :contributor => User.current_user.person,
-                    :investigation => Factory(:investigation, :projects => [proj]),
+                    :investigation => Factory(:investigation, :project_ids => [proj.id]),
                     :policy => Factory(:policy,
                                        :sharing_scope => Policy::ALL_SYSMO_USERS,
                                        :access_type => Policy::NO_ACCESS,

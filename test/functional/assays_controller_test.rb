@@ -8,6 +8,7 @@ class AssaysControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include SharingFormTestHelper
+  include RdfTestCases
 
   def setup
     login_as(:quentin)
@@ -35,8 +36,8 @@ class AssaysControllerTest < ActionController::TestCase
     user = Factory :user
     project=user.person.projects.first
     login_as user
-    sop = Factory :sop, :contributor=>user.person,:projects=>[project]
-    data_file = Factory :data_file, :contributor=>user.person,:projects=>[project]
+    sop = Factory :sop, :contributor=>user.person,:project_ids=>[project.id]
+    data_file = Factory :data_file, :contributor=>user.person,:project_ids=>[project.id]
     get :new, :class=>"experimental"
     assert_response :success
 
@@ -65,13 +66,13 @@ class AssaysControllerTest < ActionController::TestCase
     hidden = Factory(:experimental_assay, :policy => Factory(:private_policy)) #ensure at least one hidden assay exists
     get :index, :page=>"all", :format=>"xml"
     assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id), Assay.authorized_partial_asset_collection(assigns(:assays), "view", users(:aaron)).sort_by(&:id), "assays haven't been authorized"
+    assert_equal assigns(:assays).sort_by(&:id), Assay.authorize_asset_collection(assigns(:assays), "view", users(:aaron)).sort_by(&:id), "#{t('assays.assay').downcase.pluralize} haven't been authorized"
     assert !assigns(:assays).include?(hidden)
   end
 
   def test_title
     get :index
-    assert_select "title", :text=>/The Sysmo SEEK Assays.*/, :count=>1
+    assert_select "title", :text=>/#{Seek::Config.application_title} #{I18n.t('assays.assay')}s.*/i, :count=>1
   end
 
   test "should show index" do
@@ -256,7 +257,7 @@ class AssaysControllerTest < ActionController::TestCase
     a=assays(:assay_with_no_study_or_files)
     s=studies(:metabolomics_study)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>a, :assay=>{:study=>s}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>a, :assay=>{:study_id=>s}, :assay_sample_ids=>[Factory(:sample).id]
     end
 
     assert_redirected_to assay_path(a)
@@ -268,13 +269,14 @@ class AssaysControllerTest < ActionController::TestCase
 
 test "should create experimental assay with or without sample" do
     #THIS TEST MAY BECOME INVALID ONCE IT IS DECIDED HOW ASSAYS LINK TO SAMPLES OR ORGANISMS
+
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
                                :technology_type_id=>technology_types(:gas_chromatography).id,
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
-                               :assay_class=>assay_classes(:experimental_assay_class),
+                               :assay_class_id=>assay_classes(:experimental_assay_class).id}
                                :owner => Factory(:person)}, :sharing => valid_sharing
       end
     end
@@ -289,7 +291,7 @@ test "should create experimental assay with or without sample" do
                                :technology_type_id=>technology_types(:gas_chromatography).id,
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
-                               :assay_class=>assay_classes(:experimental_assay_class),
+                               :assay_class_id=>assay_classes(:experimental_assay_class).id,
                                :owner => Factory(:person),
                                :sample_ids=>[sample.id]
         }, :sharing => valid_sharing
@@ -297,6 +299,7 @@ test "should create experimental assay with or without sample" do
       end
     end
     a=assigns(:assay)
+    assert_equal User.current_user.person,a.owner
     assert_redirected_to assay_path(a)
     assert_equal [sample],a.samples
     #assert_equal organisms(:yeast),a.organism
@@ -312,23 +315,28 @@ end
                              :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:experimental_assay_class),
+                             :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :owner => Factory(:person),
                              :samples => [Factory(:sample)]}, :assay_organism_ids =>[Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,tissue_and_cell_type.id,tissue_and_cell_type.title].to_s, :sharing => valid_sharing
     end
-
+    organism = Factory(:organism,:title=>"Frog")
+    strain = Factory(:strain, :title=>"UUU", :organism=>organism)
+    growth_type = Factory(:culture_growth_type, :title=>"batch")
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :technology_type_id=>technology_types(:gas_chromatography).id,
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:experimental_assay_class),
-                             :owner => Factory(:person),
-                             :samples => [Factory(:sample)]},
-           :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s, :sharing => valid_sharing
+                             :assay_class_id=>assay_classes(:experimental_assay_class).id,
+                             :sample_ids => [Factory(:sample)] ,      
+                             :owner => Factory(:person)},
+                             :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")    
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
+    assert a.organisms.include?(organism)
+    assert a.strains.include?(strain)
+    assert_equal 1,a.assay_organisms.count
   end
 
   test "should create modelling assay with/without organisms" do
@@ -337,19 +345,24 @@ end
       post :create, :assay=>{:title=>"test",
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:modelling_assay_class),
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
                              :owner => Factory(:person)}, :sharing => valid_sharing
     end
-
+    organism = Factory(:organism,:title=>"Frog")
+    strain = Factory(:strain, :title=>"UUU", :organism=>organism)
+    growth_type = Factory(:culture_growth_type, :title=>"batch")
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class=>assay_classes(:modelling_assay_class),
-                             :owner => Factory(:person)},
-           :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s, :sharing => valid_sharing
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id,    
+                                                       :owner => Factory(:person)},
+           :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
     end
     a=assigns(:assay)
+    assert_equal 1, a.assay_organisms.count
+    assert a.organisms.include?(organism)
+    assert a.strains.include?(strain)
     assert_redirected_to assay_path(a)
     #create assay with samples and organisms
     assert_difference('ActivityLog.count') do
@@ -358,8 +371,9 @@ end
         :technology_type_id=>technology_types(:gas_chromatography).id,
         :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
-        :assay_class=>assay_classes(:experimental_assay_class),
+        :assay_class_id=>assay_classes(:experimental_assay_class).id,
         :owner => Factory(:person),
+
         :sample_ids=>[Factory(:sample).id]
       },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(",").to_a, :sharing => valid_sharing
     end
@@ -376,7 +390,8 @@ end
                                  :technology_type_id => technology_types(:gas_chromatography).id,
                                  :assay_type_id => assay_types(:metabolomics).id,
                                  :study_id => studies(:metabolomics_study).id,
-                                 :assay_class => assay_classes(:modelling_assay_class),
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
+                             :sample_ids=>[sample1.id,sample2.id].join(",")
                              :owner => person,
                                  :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
                                  :sharing => valid_sharing
@@ -419,7 +434,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should not delete assay when not project pal" do
@@ -432,7 +447,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should list correct organisms" do
@@ -443,6 +458,7 @@ end
 
     get :show,:id=>a.id
     assert_response :success
+
     assert_select "p#organism" do
       assert_select "a[href=?]",organism_path(o1),:text=>"Frog"
     end
@@ -457,7 +473,6 @@ end
           assert_select "a[href=?]",organism_path(o2),:text=>"Slug"
           assert_select "span.strain_info",:text=>str.info
         end
-
   end
 
   test "should show edit when not logged in" do
@@ -469,6 +484,54 @@ end
     a = Factory :modelling_assay,:contributor=>Factory(:person),:policy=>Factory(:editing_public_policy)
     get :edit,:id=>a
     assert_response :success
+  end
+
+  test "should not show delete button if not authorized to delete but can edit" do
+    person = Factory :person
+    a = Factory :assay,:contributor=>person,:policy=>Factory(:public_policy,:access_type=>Policy::EDITING)
+    assert !a.can_manage?
+    assert a.can_view?
+    get :show,:id=>a.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "li" do
+        assert_select "span",:text=>/Delete/,:count=>0
+      end
+    end
+  end
+
+  test "should show delete button in disable state if authorized to delete but has associated items" do
+    person = Factory :person
+    a = Factory :assay,:contributor=>person,:policy=>Factory(:public_policy)
+    df = Factory :data_file, :contributor=>person,:policy=>Factory(:public_policy)
+    Factory :assay_asset,:assay=>a,:asset=>df
+    a.reload
+    assert a.can_manage?
+    assert_equal 1,a.assets.count
+    assert !a.can_delete?
+    get :show,:id=>a.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "li" do
+        assert_select "span.disabled_icon",:text=>/Delete/,:count=>1
+      end
+    end
+  end
+
+  test "should show delete button in enabled state if authorized delete and has no associated items" do
+    person = Factory :person
+    a = Factory :assay,:contributor=>person,:policy=>Factory(:public_policy)
+
+    assert a.can_manage?
+    assert a.can_delete?
+    get :show,:id=>a.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "li" do
+        assert_select "span",:text=>/Delete/,:count=>1
+        assert_select "span.disabled_icon",:text=>/Delete/,:count=>0
+      end
+    end
   end
 
   test "should not edit assay when not project pal" do
@@ -496,7 +559,7 @@ end
       end
     end
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should not delete assay with model" do
@@ -509,7 +572,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should not delete assay with publication" do
@@ -522,7 +585,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should not delete assay with sops" do
@@ -535,7 +598,7 @@ end
     end
 
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "get new presents options for class" do
@@ -543,9 +606,9 @@ end
     get :new
     assert_response :success
     assert_select "a[href=?]", new_assay_path(:class=>:experimental), :count=>1
-    assert_select "a", :text=>/An experimental assay/i, :count=>1
+    assert_select "a", :text=>/An #{I18n.t('assays.experimental_assay')}/i, :count=>1
     assert_select "a[href=?]", new_assay_path(:class=>:modelling), :count=>1
-    assert_select "a", :text=>/A modelling analysis/i, :count=>1
+    assert_select "a", :text=>/A #{I18n.t('assays.modelling_analysis')}/i, :count=>1
   end
 
   test "get new with class doesnt present options for class" do
@@ -553,16 +616,16 @@ end
     get :new, :class=>"experimental"
     assert_response :success
     assert_select "a[href=?]", new_assay_path(:class=>:experimental), :count=>0
-    assert_select "a", :text=>/An experimental assay/i, :count=>0
+    assert_select "a", :text=>/An #{I18n.t('assays.experimental_assay')}/i, :count=>0
     assert_select "a[href=?]", new_assay_path(:class=>:modelling), :count=>0
-    assert_select "a", :text=>/A modelling analysis/i, :count=>0
+    assert_select "a", :text=>/A #{I18n.t('assays.modelling_analysis')}/i, :count=>0
 
     get :new, :class=>"modelling"
     assert_response :success
     assert_select "a[href=?]", new_assay_path(:class=>:experimental), :count=>0
-    assert_select "a", :text=>/An experimental assay/i, :count=>0
+    assert_select "a", :text=>/An #{I18n.t('assays.experimental_assay')}/i, :count=>0
     assert_select "a[href=?]", new_assay_path(:class=>:modelling), :count=>0
-    assert_select "a", :text=>/A modelling analysis/i, :count=>0
+    assert_select "a", :text=>/A #{I18n.t('assays.modelling_analysis')}/i, :count=>0
   end
 
   test "data file list should only include those from project" do
@@ -718,8 +781,8 @@ end
 
     # tabs lazy loading: only first tab with items, and other tabs only item types and counts are shown.
     assert_select "div.tabbertab" do
-      assert_select "h3", :text => "SOPs (2)", :count => 1
-      assert_select "h3", :text => "Data Files (2)", :count => 1
+      assert_select "h3", :text=>"#{I18n.t('sop').pluralize} (2)", :count=>1
+      assert_select "h3", :text=>"#{I18n.t('data_file').pluralize} (2)", :count=>1
     end
 
     #Other items are only shown when the tab is clicked
@@ -764,7 +827,7 @@ end
               :technology_type_id=>technology_types(:gas_chromatography).id,
               :assay_type_id=>assay_types(:metabolomics).id,
               :study_id=>studies(:metabolomics_study).id,
-              :assay_class=>assay_classes(:modelling_assay_class)
+              :assay_class_id=>assay_classes(:modelling_assay_class).id
           },
                :assay_sop_ids=>["#{sop.id}"],
                :model_ids=>["#{model.id}"],
@@ -808,7 +871,7 @@ end
               :technology_type_id=>technology_types(:gas_chromatography).id,
               :assay_type_id=>assay_types(:metabolomics).id,
               :study_id=>study.id,
-              :assay_class=>assay_classes(:modelling_assay_class)
+              :assay_class_id=>assay_classes(:modelling_assay_class).id
           },
                :assay_sop_ids=>["#{sop.id}"],
                :model_ids=>["#{model.id}"],
@@ -851,7 +914,7 @@ end
       assert_no_difference("Assay.count", "Should not have added assay because the title is blank") do
         assert_no_difference("AssayAsset.count", "Should not have added assay assets because the assay validation failed") do
           #title is blank, so should fail validation
-          put :update, :id=>assay, :assay=>{:title=>"", :assay_class=>assay_classes(:modelling_assay_class)},
+          put :update, :id=>assay, :assay=>{:title=>"", :assay_class_id=>assay_classes(:modelling_assay_class).id},
               :assay_sop_ids=>["#{sop.id}"],
               :model_ids=>["#{model.id}"],
               :data_file_ids=>["#{datafile.id},#{rel.title}"]
@@ -924,7 +987,7 @@ end
   test 'edit assay with selected projects scope policy' do
     proj = User.current_user.person.projects.first
     assay = Factory(:assay, :contributor => User.current_user.person,
-                    :study => Factory(:study, :investigation => Factory(:investigation, :projects => [proj])),
+                    :study => Factory(:study, :investigation => Factory(:investigation, :project_ids => [proj.id])),
                     :policy => Factory(:policy,
                                        :sharing_scope => Policy::ALL_SYSMO_USERS,
                                        :access_type => Policy::NO_ACCESS,
@@ -935,7 +998,7 @@ end
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     login_as(:quentin)
     a = {:title=>"test", :technology_type_id=>technology_types(:gas_chromatography).id, :assay_type_id=>assay_types(:metabolomics).id,
-         :study_id=>studies(:metabolomics_study).id, :assay_class=>assay_classes(:experimental_assay_class), :sample_ids=>[Factory(:sample).id]}
+         :study_id=>studies(:metabolomics_study).id, :assay_class_id=>assay_classes(:experimental_assay_class).id, :sample_ids=>[Factory(:sample).id]}
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
         post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
@@ -962,7 +1025,7 @@ end
                    :policy => Factory(:private_policy),
                    :contributor => User.current_user.person,
                    :study => (Factory(:study, :investigation => (Factory(:investigation,
-                                                                         :projects => [Factory(:project), Factory(:project)])))))
+                                                                         :project_ids => [Factory(:project).id, Factory(:project).id])))))
 
     assert assay.can_manage?
     assert_equal Policy::PRIVATE, assay.policy.sharing_scope

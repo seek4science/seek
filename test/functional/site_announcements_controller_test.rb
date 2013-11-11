@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SiteAnnouncementsControllerTest < ActionController::TestCase
   
-  fixtures :users,:people,:site_announcements
+  fixtures :users,:people,:site_announcements,:notifiee_infos
 
   include AuthenticatedTestHelper
 
@@ -49,8 +49,18 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test "should email registered users" do
+    NotifieeInfo.delete_all
+    i=0
+    while i < 5
+      Factory(:notifiee_info, :id => (i+1))
+      i+=1
+    end
+
     assert_emails(Person.registered.select {|p| p.notifiee_info.try :receive_notifications?}.count) do
       post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
+      site_announcement = assigns(:site_announcement)
+      assert SendAnnouncementEmailsJob.exists?(site_announcement.id,1)
+      SendAnnouncementEmailsJob.new(site_announcement.id, 1).perform
     end
   end
 
@@ -131,5 +141,27 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select "ul.announcement_list li.announcement span.announcement_title", :text => /a headline announcement/, :count => 1
+  end
+
+  test "should only show feeds when feed_only passed" do
+    get :index,:feed_only=>true
+    assert_response :success
+    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => "a headline announcement", :count => 0
+    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => "a headline announcement also in feed", :count => 1
+  end
+
+  test 'handle notification_settings' do
+    #valid key
+    key = notifiee_infos(:fred_info).unique_key
+    get :notification_settings, :key => key
+    assert_response :success
+    assert_nil flash[:error]
+    assert_select "input[checked=checked][id=receive_notifications]"
+
+    #invalid key
+    key = 'random'
+    get :notification_settings, :key => key
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
   end
 end

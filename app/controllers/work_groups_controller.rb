@@ -1,5 +1,3 @@
-require 'white_list_helper'
-
 class WorkGroupsController < ApplicationController
   include WhiteListHelper
   
@@ -13,7 +11,7 @@ class WorkGroupsController < ApplicationController
   # GET /groups
   # GET /groups.xml
   def index
-    @groups = WorkGroup.find(:all)
+    @groups = WorkGroup.all
 
     respond_to do |format|
       format.html # index.html.erb

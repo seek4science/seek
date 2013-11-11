@@ -181,7 +181,7 @@ namespace :seek do
   task :create_default_subscriptions => :environment do
     Person.all.each do |p|
       set_default_subscriptions  p
-      disable_authorization_checks { p.save(false) }
+      disable_authorization_checks {p.save(:validate=>false)}
     end
   end
   
@@ -228,7 +228,36 @@ namespace :seek do
 
   desc "Initialize background jobs for sending subscription periodic emails"
   task(:send_periodic_subscription_emails=>:environment) do
-      SendPeriodicEmailsJob.create_initial_jobs
+    SendPeriodicEmailsJob.create_initial_jobs
+  end
+
+  desc "Add new unit"
+  task(:add_unit=>:environment) do
+    puts "You are about to add new unit, please provide the following information. The one marked with * is mandatory"
+    puts "(If you add time unit, please give the value of comment: time)"
+    puts "title*:"
+    title = STDIN.gets.chomp
+    puts "symbol*:"
+    symbol = STDIN.gets.chomp
+    puts "comment:"
+    comment = STDIN.gets.chomp
+    puts "order position:"
+    order = STDIN.gets.chomp
+    #if order is provided, update the order of some current units before adding new unit
+    if !order.blank?
+      order = order.to_i
+      units = Unit.all.select{|u| u.order >= order}
+      units.each do |u|
+         u.order += 1
+         u.save
+      end
+    #otherwise take the last_order + 1
+    else
+      last_order = Unit.all.sort_by(&:order).last.order
+      order =  last_order + 1
+    end
+    Unit.create(:title => title, :symbol => symbol, :order => order, :comment => comment)
+    puts "New unit is added"
   end
   
   desc "warm authorization memcache"

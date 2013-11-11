@@ -114,7 +114,7 @@ module DotGenerator
     end
 
     def tooltip
-      item_type.upcase + ": " + label
+      item_type.humanize.upcase + ": " + label
     end
 
     def label
@@ -220,6 +220,16 @@ module DotGenerator
     post_process_svg(`dot -Tsvg #{tmpfile.path}`)
   end
 
+  def to_svg_for_publishing root_item, deep=false, current_item=nil, selected_items=[]
+    @selected_items = selected_items
+    tmpfile = Tempfile.new("#{root_item.class.name}_dot")
+    file = File.new(tmpfile.path, 'w')
+    file.puts to_dot(root_item, deep, current_item)
+    file.close
+
+    post_process_svg_for_publishing(`dot -Tsvg #{tmpfile.path}`)
+  end
+
   def to_png root_item, deep=false, current_item=nil
     tmpfile = Tempfile.new("#{root_item.class.name}_dot")
     file = File.new(tmpfile.path, 'w')
@@ -288,6 +298,92 @@ module DotGenerator
     end
 
     svg
+  end
+
+  #fixes a problem with missing units, which causes Firefox to incorrectly display.
+  #this will fail if the font-size set is not a whole integer
+  def post_process_svg_for_publishing svg
+    svg = svg.gsub(".00;", ".00px;")
+    orig_header = svg.match(/<svg([^>]*)>/).to_s #remember header with namespace
+
+    parser = LibXML::XML::Parser.string(svg)
+    document = parser.parse
+    document.root.namespaces.default_prefix = 'svg'
+
+    object_types = ["Sop", "Model", "DataFile", "Study", "Assay", "Investigation"]
+    document.find("svg:g//svg:g").each do |graphic_object|
+      title = graphic_object.find_first("svg:title").content
+      #node
+      unless title.include?("--")
+        object_class, object_id = title.split("_")
+        #only keeps the nodes of the items in the object_types
+        if object_types.include?(object_class)
+          object = eval("#{object_class}.find(#{object_id})")
+          a = graphic_object.find_first(".//svg:a")
+
+          polygon = a.find_first(".//svg:polygon")
+
+          points = polygon.attributes["points"]
+          points = points.split(" ")
+          x2 = nil
+          y2 = nil
+          if points.size == 5
+            x2, y2 = points[1].split(",")
+          else
+            x2, y2 = points[4].split(",")
+          end
+
+          process_polygon_frame_color(polygon,object)
+
+          rect_node_background_color ||= object.can_publish? ? 'white' : 'gray'
+          rect_node = LibXML::XML::Node.new("rect onclick=\"switchColor(this.id)\" id=\"#{object_class}_#{object_id}\" class=\"#{object_class}_#{object_id}\" width=\"18\" height=\"18\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: #{rect_node_background_color};stroke:rgb(120,120,120);\"")
+          graphic_object<<(rect_node)
+
+          a.find(".//svg:text").collect do |node|
+            text_position_x =node.attributes['x'].to_i
+            text_position_x +=10
+            node.attributes['x'] = text_position_x.to_s
+          end
+        else
+          graphic_object.remove!
+        end
+      #edge
+      else
+        edge1_title, edge2_title = title.split("--")
+        object1_class, object1_id = edge1_title.split("_")
+        object2_class, object2_id = edge2_title.split("_")
+        #only keeps the nodes of the items in the object_types
+        unless object_types.include?(object1_class) && object_types.include?(object2_class)
+          graphic_object.remove!
+        end
+      end
+    end
+
+    svg_el = document.find_first("//svg:svg")
+    svg = document.to_s
+
+    if (Rails.env == 'test')
+      #strip out the <?xml ..?> as the test parser doesn't like this and spits out millions of warnings
+      svg = svg.gsub(/<\?xml.*\?>/,"")
+    end
+
+    svg
+  end
+
+  def process_polygon_frame_color(polygon,object)
+    if !polygon.attributes['style'].blank?
+      style = polygon.attributes['style']
+      filled_color = style.split(';').select{|fc| fc.match('fill:')}.first
+      polygon.attributes['style']=filled_color
+    end
+    if @selected_items.include?(object)
+      polygon.attributes['stroke'] = 'darkgreen'
+      polygon.attributes['stroke-width'] = "3"
+      rect_node_background_color = 'darkgreen'
+    else
+      polygon.attributes['stroke'] = 'black'
+      polygon.attributes['stroke-width'] = "1"
+    end
   end
 end
 

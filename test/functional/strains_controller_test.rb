@@ -5,13 +5,14 @@ class StrainsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include RdfTestCases
 
   def setup
     login_as :owner_of_fully_public_policy
   end
 
   def rest_api_test_object
-    @object = Factory(:strain)
+    @object = Factory(:strain, :organism_id=>Factory(:organism, :bioportal_concept=>Factory(:bioportal_concept)).id)
   end
 
   test "should get index" do
@@ -30,7 +31,6 @@ class StrainsControllerTest < ActionController::TestCase
     assert_difference("Strain.count") do
       post :create, :strain => {:title => "strain 1",
                                 :organism_id => Factory(:organism).id,
-                                :contributor => Factory(:user),
                                 :project_ids => [Factory(:project).id]}
 
     end
@@ -124,7 +124,7 @@ class StrainsControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to strains_path
+    assert_redirected_to s
   end
 
   test "should not destroy strain related to an existing specimen" do
@@ -135,7 +135,7 @@ class StrainsControllerTest < ActionController::TestCase
       delete :destroy, :id => strain.id
     end
     assert flash[:error]
-    assert_redirected_to strains_path
+    assert_redirected_to strain
   end
 
   test "should update genotypes and phenotypes" do
@@ -179,8 +179,8 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, :strain => {:id => strain.id}, :sharing => {:sharing_scope => Policy::EVERYONE, :access_type_4 => Policy::EDITING}
-    assert_redirected_to strains_path
+    put :update, :id => strain.id, :sharing => {:sharing_scope => Policy::EVERYONE, :access_type_4 => Policy::EDITING}
+    assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
     assert_equal Policy::ALL_SYSMO_USERS, updated_strain.policy.sharing_scope
@@ -193,8 +193,8 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, :strain => {:id => strain.id}, :sharing => {:permissions => {:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {user.person.id => {"access_type" => Policy::MANAGING}}})}}
-    assert_redirected_to strains_path
+    put :update, :id => strain.id, :sharing => {:permissions => {:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {user.person.id => {"access_type" => Policy::MANAGING}}})}}
+    assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
     assert updated_strain.policy.permissions.empty?

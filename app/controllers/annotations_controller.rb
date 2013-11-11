@@ -1,8 +1,8 @@
 # app/controllers/annotations_controller.rb
 #
-# This extends the AnnotationsController controller defined in the Annotations plugin.
+# This extends the AnnotationsController controller defined in the Annotations gem.
 
-require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'annotations_controller')
+#require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','controllers','annotations_controller')
 
 class AnnotationsController < ApplicationController
   include Annotations
@@ -17,9 +17,6 @@ class AnnotationsController < ApplicationController
         annotatable=annotation.annotatable
         @other_tagging_assets << annotatable unless @other_tagging_assets.include?(annotatable)
       end
-
-
-      #TextValue.find(:all, @original_tag.value_id).each do
 
       if @other_tagging_assets.empty?
         flash.now[:notice]="No objects (or none that you are authorized to view) are tagged with '<b>#{annotation.value.text}</b>'."

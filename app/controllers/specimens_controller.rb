@@ -5,7 +5,10 @@ class SpecimensController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
 
   include IndexPager
-  include Seek::Publishing
+
+  include Seek::Publishing::GatekeeperPublish
+  include Seek::Publishing::PublishingCommon
+
   include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
@@ -14,7 +17,7 @@ class SpecimensController < ApplicationController
 
      @existing_specimen.sop_masters.each do |s|
        if !s.sop.can_view?
-       flash.now[:notice] = "Some or all sops of the existing specimen cannot be viewed, you may specify your own!"
+       flash.now[:notice] = "Some or all #{t('sop').pluralize} of the existing #{t('biosamples.sample_parent_term')} cannot be viewed, you may specify your own!"
         break
       end
      end
@@ -29,6 +32,14 @@ class SpecimensController < ApplicationController
     respond_to do |format|
 
       format.html # new.html.erb
+    end
+  end
+
+  def show
+    respond_to do |format|
+      format.xml
+      format.html
+      format.rdf { render :template=>'rdf/show'}
     end
   end
 
@@ -47,14 +58,13 @@ class SpecimensController < ApplicationController
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
     if @specimen.save
-      deliver_request_publish_approval params[:sharing], @specimen
       if @specimen.from_biosamples=='true'
         #reload to get updated nested attributes,e.g. genotypes/phenotypes
         @specimen.reload
         render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'create', :object => @specimen}
       else
         respond_to do |format|
-          flash[:notice] = 'Specimen was successfully created.'
+          flash[:notice] = "#{t('biosamples.sample_parent_term')} was successfully created."
           format.html { redirect_to(@specimen) }
           format.xml  { head :ok }
         end
@@ -91,15 +101,13 @@ class SpecimensController < ApplicationController
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
     if @specimen.save
-      deliver_request_publish_approval params[:sharing], @specimen
-
       if @specimen.from_biosamples=='true'
         #reload to get updated nested attributes,e.g. genotypes/phenotypes
         @specimen.reload
         render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @specimen}
       else
         respond_to do |format|
-          flash[:notice] = 'Specimen was successfully updated.'
+          flash[:notice] = "#{t('biosamples.sample_parent_term')} was successfully updated."
           format.html { redirect_to(@specimen) }
           format.xml { head :ok }
         end

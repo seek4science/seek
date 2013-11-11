@@ -1,0 +1,43 @@
+<%= javascript_include_tag "jquery-1.5.1.min.js", "jscrollpane/jquery.jscrollpane.min", "jscrollpane/jquery.mousewheel"%>
+<script type="text/javascript">
+    jQuery.noConflict();
+    var $j = jQuery;
+</script>
+
+<%= stylesheet_link_tag "homepage","jscrollpane/jquery.jscrollpane" -%>
+
+<% if SiteAnnouncement.headline_announcement -%>
+    <div class="box_standout headline_announcement">
+      <%= site_annoucements_headline %>
+    </div>
+<% end -%>
+
+<%= render :partial=>"guide_box" -%>
+
+<div class="top_home_panel with_shadow curved">
+  <% link_to_demo = link_to h("demos here"),Seek::Config.seek_video_link,:popup => true %>
+  <%= home_description_text -%>
+</div>
+
+
+<%= render :partial=>"home_news_feeds" -%>
+
+<br/>
+
+<%= render :partial=>"home_activity_notifications" -%>
+
+<script type="text/javascript">
+    $j(function()
+    {
+        $j('.homepanel_list').jScrollPane();
+        $j('.jspDrag').hide();
+        $j('.jspScrollable').mouseenter(function(){
+            $j(this).find('.jspDrag').stop(true, true).fadeIn('slow');
+        });
+        $j('.jspScrollable').mouseleave(function(){
+            $j(this).find('.jspDrag').stop(true, true).fadeOut('slow');
+        });
+    });
+</script>
+
+

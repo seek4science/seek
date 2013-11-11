@@ -44,6 +44,18 @@ class SampleTest < ActiveSupport::TestCase
     assert !s.valid?
   end
 
+  test "to rdf" do
+    object = Factory :sample, :contributor=>Factory(:person),:assay_ids=>[Factory(:assay).id], :provider_id=>"r2d2",
+                     :sampling_date=>1.day.ago, :donation_date=>2.days.ago, :specimen=>Factory(:specimen)
+
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/samples/#{object.id}"), reader.statements.first.subject
+    end
+
+  end
+
   test "sample-asset associations" do
     User.with_current_user Factory(:user) do
       sample = Factory :sample, :contributor => User.current_user
@@ -78,4 +90,5 @@ class SampleTest < ActiveSupport::TestCase
       assert_equal [data_file], sample.related_data_files
     end
   end
+
 end

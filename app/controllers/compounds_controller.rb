@@ -54,6 +54,13 @@ class CompoundsController < ApplicationController
         end
    end
 
+   def show
+     @compound = Compound.find(params[:id])
+     respond_to do |format|
+       format.rdf { render :template=>'rdf/show'}
+     end
+   end
+
    def update
       @compound = Compound.find(params[:id])
       compound_name =  params["#{@compound.id}_title"]
@@ -154,7 +161,7 @@ class CompoundsController < ApplicationController
   private  
 
   def find_all_compounds
-     @compounds=Compound.find(:all,:order=>:name)
+     @compounds=Compound.order(:name)
   end
 
 end

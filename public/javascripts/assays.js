@@ -61,7 +61,7 @@ function addSelectedSop() {
         updateSops();
     }
     else {
-    alert('The following Sop had already been added:\n\n' +
+    alert('The following item had already been added:\n\n' +
         title);
     }
 
@@ -143,7 +143,7 @@ function addSelectedDataFile() {
         updateDataFiles();
     }
     else {
-        alert('The following Data file had already been added:\n\n' +
+        alert('The following item had already been added:\n\n' +
             title);
     }
 }
@@ -216,7 +216,7 @@ function addSelectedModel() {
         updateModels();
     }
     else {
-        alert('The following Model had already been added:\n\n' +
+        alert('The following item had already been added:\n\n' +
             title);
     }
 }
@@ -308,7 +308,7 @@ function addSelectedAssay() {
         updateAssays();
     }
     else {
-        alert('The following Data file had already been added:\n\n' +
+        alert('The following item had already been added:\n\n' +
             title);
     }
 }

@@ -30,9 +30,9 @@ class SearchController < ApplicationController
 
 
     if @results.empty?
-      flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'."
+      flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'.".html_safe
     else
-      flash.now[:notice]="#{@results.size} #{@results.size==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content."
+      flash.now[:notice]="#{@results.size} #{@results.size==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
     end
 
     @include_external_search = params[:include_external_search]=="1"
@@ -50,20 +50,9 @@ class SearchController < ApplicationController
     @search_type = params[:search_type]
     type=@search_type.downcase unless @search_type.nil?
 
-    @search_query = @search_query.gsub("*", "")
-    @search_query = @search_query.gsub("?", "")
-
-    @search_query.strip!
-
-    #if you use colon in query, solr understands that field_name:value, so if you put the colon at the end of the search query, solr will throw exception
-    #remove the : if the string ends with :
-    if @search_query.ends_with? ':'
-      flash.now[:error]="You cannot end a query with a colon, so this was removed"
-      @search_query.chop!
-    end
+    @search_query = Seek::Search::SearchTermFilter.filter @search_query
 
     downcase_query = @search_query.downcase
-    downcase_query.gsub!(":", "")
 
     @results=[]
 

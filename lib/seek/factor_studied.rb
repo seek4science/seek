@@ -197,7 +197,7 @@ module Seek
   end
 
   def new_or_update_mapping sabiork_id, chebi_id=nil, kegg_id=nil
-     mappings = Mapping.find(:all, :conditions => ['sabiork_id = ? AND chebi_id = ? AND kegg_id = ?', sabiork_id, chebi_id, kegg_id])
+     mappings = Mapping.where(['sabiork_id = ? AND chebi_id = ? AND kegg_id = ?', sabiork_id, chebi_id, kegg_id])
      mapping = mappings.blank? ? Mapping.new(:sabiork_id => sabiork_id, :chebi_id => chebi_id, :kegg_id => kegg_id) :  mappings.first
      mapping
   end

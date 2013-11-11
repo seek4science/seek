@@ -147,7 +147,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
   test "initialise defaults" do
 
     project = Factory :project
-    default_file = File.join Rails.root,"test","fixtures","files","default_project_folders.yml"
+    default_file = File.join Rails.root,"test","fixtures","files","default_project_folders"
 
     root_folders=nil
     assert_difference("ProjectFolder.count",7) do
@@ -216,7 +216,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
   test "unsorted items folder" do
     project = Factory :project
-    default_file = File.join Rails.root,"test","fixtures","files","default_project_folders.yml"
+    default_file = File.join Rails.root,"test","fixtures","files","default_project_folders"
 
     ProjectFolder.initialize_default_folders project,default_file
 

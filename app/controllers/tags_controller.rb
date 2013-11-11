@@ -11,9 +11,9 @@ class TagsController < ApplicationController
     @tagged_objects = select_authorised @tag.annotations.with_attribute_name(acceptable_attributes).collect{|a| a.annotatable}.uniq
 
     if @tagged_objects.empty?
-      flash.now[:notice]="No objects (or none that you are authorized to view) are tagged with '<b>#{@tag.text}</b>'."
+      flash.now[:notice]="No objects (or none that you are authorized to view) are tagged with '<b>#{h(@tag.text)}</b>'.".html_safe
     else
-      flash.now[:notice]="#{@tagged_objects.size} #{@tagged_objects.size==1 ? 'item' : 'items'} tagged with '<b>#{@tag.text}</b>'."
+      flash.now[:notice]="#{@tagged_objects.size} #{'item'.pluralize(@tagged_objects.size)} tagged with '<b>#{h(@tag.text)}</b>'.".html_safe
     end
     respond_to do |format|
       format.html # show.html.erb

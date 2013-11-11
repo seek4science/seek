@@ -1,12 +1,12 @@
 require 'acts_as_ontology_view_helper'
 
 module AssaysHelper
-  
-  include Stu::Acts::Ontology::ActsAsOntologyViewHelper  
+
+  include Stu::Acts::Ontology::ActsAsOntologyViewHelper
 
   #assays that haven't already been associated with a study
   def assays_available_for_study_association
-    Assay.find(:all,:conditions=>['study_id IS NULL'])
+    Assay.where(['study_id IS NULL'])
   end
 
   #only data files authorised for show, and belonging to projects matching current_user
@@ -17,9 +17,9 @@ module AssaysHelper
   end
 
   def assay_organism_list_item assay_organism
-    result = link_to h(assay_organism.organism.title),assay_organism.organism
+    result = link_to h(assay_organism.organism.title), assay_organism.organism
     if assay_organism.strain
-       result += " : "
+      result += " : "
        result += link_to h(assay_organism.strain.title),assay_organism.organism,{:class => "assay_strain_info"}
     end
 
@@ -31,10 +31,8 @@ module AssaysHelper
     if assay_organism.culture_growth_type
       result += " (#{assay_organism.culture_growth_type.title})"
     end
-    return result
+    return result.html_safe
   end
-
-
 
 
 
@@ -43,7 +41,7 @@ module AssaysHelper
   end
 
 
-  def list_assay_samples_and_organisms attribute,assay_samples,assay_organisms, none_text="Not Specified"
+  def list_assay_samples_and_organisms attribute, assay_samples, assay_organisms, none_text="Not Specified"
 
     result= "<p class=\"list_item_attribute\"> <b>#{attribute}</b>: "
 
@@ -58,7 +56,7 @@ module AssaysHelper
       culture_growth_type = as.specimen.culture_growth_type
 
       if organism
-      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
       end
 
       if strain
@@ -87,10 +85,10 @@ module AssaysHelper
     result += append_assay_organisms_list(assay_organisms)
     result += "</p>"
 
-    return result
+    return result.html_safe
   end
 
-  def list_assay_samples attribute,assay_samples, none_text="Not Specified"
+  def list_assay_samples attribute, assay_samples, none_text="Not Specified"
 
     result= "<p class=\"list_item_attribute\"> <b>#{attribute}</b>: "
 
@@ -105,7 +103,7 @@ module AssaysHelper
 
 
       if organism
-      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
       end
 
       if strain
@@ -134,7 +132,7 @@ module AssaysHelper
     end
 
     result += "</p>"
-    return result
+    return result.html_safe
   end
 
   def append_assay_organisms_list assay_organisms
@@ -179,12 +177,12 @@ module AssaysHelper
 
         one_group_tissue_and_cell_types = tissue_and_cell_types[group_index]
 
-        if organism
-            result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
-        end
+      if organism
+        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
+      end
 
-        if strain
-          result += " : "
+      if strain
+        result += " : "
           result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
         end
         if one_group_tissue_and_cell_types
@@ -197,15 +195,15 @@ module AssaysHelper
               result += "]" if tt == one_group_tissue_and_cell_types.last
             end
           end
-        end
-
-        if culture_growth_type
-          result += " (#{culture_growth_type.title})"
-        end
-        result += ",<br/>" unless group_index==group_count
       end
 
-    return result
+      if culture_growth_type
+        result += " (#{culture_growth_type.title})"
+      end
+        result += ",<br/>" unless group_index==group_count
+    end
+
+    return result.html_safe
   end
 
 end

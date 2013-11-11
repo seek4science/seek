@@ -1,0 +1,9 @@
+Hi Admin,
+
+The new user <%= @person.name %> just signed up and indicated that they were not listed as a <%= Seek::Config.project_name %> <%= t('project') %> member.
+He/She left the following details about their <%= t('project') %>:
+
+"<%= @details %>"
+
+For the person details: <%= person_url(@person, :host=>@host) %>, whose email address is <%= @person.email %> .
+-- end --

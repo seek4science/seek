@@ -1,18 +1,18 @@
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_study_path, "New study", nil, "New study" %></li>
+        <li><%= image_tag_for_key "new", new_study_path, "New #{t('study')}", nil, "New #{t('study')}" %></li>
     </ul>
 <% end %>
 
-<% if @studies.public_methods.include?("page_totals") %>
+<% if @studies.public_methods.include?(:page_totals) %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @studies.pages, :page_totals=>@studies.page_totals,:current_page=>@studies.page } -%>
+  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @studies.pages, :page_totals=>@studies.page_totals,:current_page=>@studies.page } -%>
 <% end %>
 
 <div class="list_items_container">
   <%= render :partial => "assets/resource_list_item", :collection=>@studies %>
 </div>
 
-<% if @studies.page == "latest" && Study.find(:all).length > Seek::Config.limit_latest%>
-    <%= render :partial => "layouts/paginate_see_all"%>
+<% if @studies.page == "latest" && Study.count > Seek::Config.limit_latest%>
+    <%= render :partial => "general/paginate_see_all"%>
 <% end %>

@@ -37,7 +37,7 @@
               <%= '{count} topics'[(count=forum.topics.size)==1 ? :topic_count : :topics_count, number_with_delimiter(count)] %>,
               <%= '{count} posts'[(count=forum.posts.size)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %>
             </div>
-            <p class="desc"><%= forum.description_html %>
+            <p class="desc"><%= forum.description_html.html_safe %>
             </p>
           </td>
           <td class="c3">
@@ -47,7 +47,7 @@
           <td class="inv lp">
             <% if forum.recent_post %>
               <%= time_ago_in_words(forum.recent_post.created_at) %> ago<br />
-              <%= 'by {user}'[:by_user,"<strong>#{h(forum.recent_post.user.display_name)}</strong>"] %>
+              <%= "by {user}"[:by_user,("<strong>#{h(forum.recent_post.user.display_name)}</strong>")].html_safe %>
               <span>(<%= link_to 'view'[], forum_topic_path(:forum_id => forum, :id => forum.recent_post.topic_id, :page => forum.recent_post.topic.last_page, :anchor => forum.recent_post.dom_id) %>)</span>
             <% end %>
           </td>

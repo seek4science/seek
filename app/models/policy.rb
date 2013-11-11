@@ -20,7 +20,7 @@ class Policy < ActiveRecord::Base
     begin
       Kernel.Float(raw_value)
     rescue ArgumentError, TypeError
-      record.errors.add_to_base "Sharing policy is invalid" unless value.is_a? Integer
+      record.errors[:base] << "Sharing policy is invalid" unless value.is_a? Integer
     end
   end
 
@@ -34,7 +34,7 @@ class Policy < ActiveRecord::Base
 
   def assets
     Seek::Util.authorized_types.collect do |type|
-      type.find(:all,:conditions=>{:policy_id=>id})
+      type.where(:policy_id=>id)
     end.flatten.uniq
   end
   
@@ -71,9 +71,10 @@ class Policy < ActiveRecord::Base
   
   #makes a copy of the policy, and its associated permissions.
   def deep_copy
-    copy=self.clone
-    self.permissions.each {|p| copy.permissions << p.clone}
-    return copy
+    copy=self.dup
+    copied_permissions = self.permissions.collect {|p| p.dup}
+    copied_permissions.each {|p| copy.permissions << p}
+    copy
   end
 
   #checks that there are permissions for the provided contributor, for the access_type (or higher)
@@ -148,7 +149,7 @@ class Policy < ActiveRecord::Base
         # now add any remaining new memberships
         contributor_types.try :each do |contributor_type|
           new_permission_data[contributor_type.to_s].try :each do |p|
-            if policy.new_record? or !Permission.find :first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}
+            if policy.new_record? or !Permission.where(:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id).first
               p = policy.permissions.build :contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"]
             end
           end
@@ -316,13 +317,11 @@ class Policy < ActiveRecord::Base
         #group people by access_type
         grouped_people_by_access_type.merge!(filtered_people.group_by{|person| person[2]})
 
-        if !is_entirely_private? grouped_people_by_access_type, contributor
-          asset_manager_array = asset_managers.collect{|am| [am.id, "#{am.name}", Policy::MANAGING] unless am.blank?}
-          if grouped_people_by_access_type[Policy::MANAGING].blank?
-            grouped_people_by_access_type[Policy::MANAGING] = asset_manager_array
-          else
-            grouped_people_by_access_type[Policy::MANAGING] |= asset_manager_array
-          end
+        asset_manager_array = asset_managers.collect { |am| [am.id, "#{am.name}", Policy::MANAGING] unless am.blank? }
+        if grouped_people_by_access_type[Policy::MANAGING].blank?
+          grouped_people_by_access_type[Policy::MANAGING] = asset_manager_array
+        else
+          grouped_people_by_access_type[Policy::MANAGING] |= asset_manager_array
         end
 
         #concat the roles to a person name
@@ -409,9 +408,9 @@ class Policy < ActiveRecord::Base
   #review people in black list, white list and normal workgroup
   def get_people_in_FG contributor, fg_id=nil, is_white_list=nil, is_black_list=nil
     if is_white_list
-      f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__whitelist__", contributor.user.id]).first
+      f_group = FavouriteGroup.where(["name = ? AND user_id = ?", "__whitelist__", contributor.user.id]).first
     elsif is_black_list
-      f_group = FavouriteGroup.find(:all, :conditions => ["name = ? AND user_id = ?", "__blacklist__", contributor.user.id]).first
+      f_group = FavouriteGroup.where(["name = ? AND user_id = ?", "__blacklist__", contributor.user.id]).first
     else
       f_group = FavouriteGroup.find_by_id(fg_id)
     end
@@ -453,7 +452,7 @@ class Policy < ActiveRecord::Base
   #review people in network
   def get_people_in_network access_type
     people_in_network = [] #id, name, access_type
-    projects = Project.find(:all)
+    projects = Project.all
     projects.each do |project|
       project.people.each do |person|
         unless person.blank?
