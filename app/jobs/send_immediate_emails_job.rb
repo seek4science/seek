@@ -1,6 +1,11 @@
 class SendImmediateEmailsJob < Struct.new(:activity_log_id)
   DEFAULT_PRIORITY=3
 
+  def before(job)
+    #make sure the SMTP configuration is in sync with current SEEK settings
+    Seek::Config.smtp_propagate
+  end
+
   def perform
     activity_log = ActivityLog.find_by_id(activity_log_id)
     if activity_log
