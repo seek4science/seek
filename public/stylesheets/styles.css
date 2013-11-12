@@ -2028,7 +2028,7 @@ div.data_model_relationship span.relationship_type {
 ul#header {
     width:100%;
 
-    margin:1em 0.25em 0em;
+    margin:0.75em 0.25em 0em;
     text-align: center;
     padding-bottom:1em;
 }
@@ -2044,20 +2044,14 @@ ul#header > li#seek_logo {
 ul#header > li#header_text {
     width:67%;
 }
-ul#header > li#header_text.logged_in {
-    width:57%;
-}
 
 ul#header > li#image_block {
     float:right;
 }
 
-ul#header > li#image_block.logged_in a.logo_link {
-    display:block;
-    text-align: right;
-}
+
 ul#header > li#image_block.logged_in img {
-    max-height:40px;
+    max-height:50px;
 }
 
 #header_text_main {
@@ -2074,7 +2068,11 @@ ul#my_profile_menu {
     margin-top: 0.5em;
 }
 
-
+div#logged_in_as {
+    float:right;
+    top: -2.5em;
+    position: relative;
+}
 
 div#logged_in_as img {
     vertical-align: middle;
