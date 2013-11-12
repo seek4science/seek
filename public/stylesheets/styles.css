@@ -1006,12 +1006,7 @@ div.list_item_whole_width{
     width: 100%;
 }
 
-div#logged_in_as {
-    float:right;
-    top: 1px;
-    margin-left: 10px;
-    text-align:left;
-}
+
 
 div.hidden_list_item {
     width: 95%;
@@ -2040,8 +2035,8 @@ ul#header {
 ul#header > li {
     display:inline-block;
     list-style-type: none;
-    position: relative;
 }
+
 ul#header > li#seek_logo {
     float:left;
 }
@@ -2049,9 +2044,20 @@ ul#header > li#seek_logo {
 ul#header > li#header_text {
     width:67%;
 }
+ul#header > li#header_text.logged_in {
+    width:57%;
+}
+
 ul#header > li#image_block {
     float:right;
+}
+
+ul#header > li#image_block.logged_in a.logo_link {
+    display:block;
     text-align: right;
+}
+ul#header > li#image_block.logged_in img {
+    max-height:40px;
 }
 
 #header_text_main {
@@ -2064,10 +2070,12 @@ ul#header > li#image_block {
 }
 
 ul#my_profile_menu {
-    float:right;
     right: 1em;
     margin-top: 0.5em;
 }
+
+
+
 div#logged_in_as img {
     vertical-align: middle;
     margin-right:0.5em;

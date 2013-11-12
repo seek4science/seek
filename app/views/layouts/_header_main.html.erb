@@ -1,5 +1,8 @@
 
-<%= render :partial => "general/my_profile" %>
+<%
+logged_in_class = logged_in_and_registered? ? "class=logged_in" : ""
+%>
+
 <% cache "header_#{logged_in_and_registered?}" do -%>
 
     <ul id="header">
@@ -7,17 +10,21 @@
         <%= link_to image_tag("seek-logo-smaller.png", :alt => "SEEK", :title => "SEEK"),
                     root_path %>
       </li>
-      <li id="header_text">
+
+      <li id="header_text" <%= logged_in_class -%>>
         <%= render :partial => "layouts/header_text_main" -%>
       </li>
-      <% unless logged_in_and_registered? %>
-      <li id="image_block">
 
+      <li id="image_block" <%= logged_in_class -%>>
+        <% if logged_in_and_registered? %>
+            <%= link_to image_tag(Seek::Config.header_image, :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title),Seek::Config.header_image_link,:class=>"logo_link" %>
+            <%= render :partial => "general/my_profile" %>
+        <% else %>
         <% if Seek::Config.header_image_enabled %><%= link_to image_tag(Seek::Config.header_image, :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title),
                                                               Seek::Config.header_image_link %>
         <% end %>
+        <% end %>
       </li>
-      <% end %>
     </ul>
 
 <% end -%>
