@@ -32,16 +32,16 @@
       </li>
       <% if @person.is_in_any_gatekept_projects? %>
           <li>
-            <%= image_tag_for_key "waiting", waiting_approval_assets_person_path(@person), "Your assets waiting for approval",
-                                  {:title => "The list of assets that you requested for the gatekeeper's approval to make published"},
-                                  "Your assets waiting for approval" -%>
+            <%= image_tag_for_key "waiting", waiting_approval_assets_person_path(@person), "Assets awaiting approval",
+                                  {:title => tooltip_title_attrib("The assets you have requested to publish, but are awaiting Gatekeeper approval")},
+                                  "Assets awaiting approval" -%>
           </li>
       <% end %>
       <% if @person.is_gatekeeper_of_any_project? %>
           <li>
-            <%= image_tag_for_key "waiting", requested_approval_assets_person_path(@person), "Waiting approval assets",
-                                  {:title => "The list of assets that were requested for your approval to make published"},
-                                  "Waiting approval assets" -%>
+            <%= image_tag_for_key "waiting", requested_approval_assets_person_path(@person), "Assets you are Gatekeeping",
+                                  {:title => tooltip_title_attrib("The assets people have requested to publish, but are still awaiting your approval")},
+                                  "Assets you are Gatekeeping" -%>
           </li>
       <% end %>
   <% end %>

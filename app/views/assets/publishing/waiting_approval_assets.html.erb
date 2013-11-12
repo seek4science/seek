@@ -1,24 +1,4 @@
-<style type="text/css">
-    span.published {
-        font-size: 18px;
-        font-weight: bold;
-        color: green;
-    }
 
-    ul.item_waiting_for_approval {
-        padding-left: 1em;
-        margin-top: 2em;
-        margin-bottom: 2em;
-    }
-
-    ul.item_waiting_for_approval li.type_and_title {
-        font-weight: bolder;
-    }
-
-    img.icon_visibility {
-        margin-left: 2em;
-    }
-</style>
 
 <div class="show_basic">
   <br/>
@@ -26,24 +6,24 @@
   <div class="box_infotext">
     <ul style="padding-left:1em;">
       <li>
-        The <b>Gatekeeper</b> is a person that needs to approve items before they are finally published.
+        The <b>Gatekeeper</b> is a person in your project that needs to approve items before they are finally published.
       </li>
       <li>
-        When you request to make an item published, an email will be sent to that person, and they will either approve
-        or reject the publication. Once this has happened, you will be notified back via an email.
+        If you requested to publish an item, an email will have be sent to that person, asking them to either approve
+        or reject the publication.
       </li>
       <li>
-        Following is the list of items that you have requested to make published, but are still waiting for gatekeeper's approval.
+        The following is a list of the items that you have requested to make published, but are still waiting for the approval from a Gatekeeper in your project.
       </li>
     </ul>
   </div>
 
   <br/>
   <% if @waiting_approval_assets.empty? %>
-      <span class="published">You have no items waiting for gatekeeper's approval</span>
+      <span class="published">You have no items waiting for the approval from your projects Gatekeeper</span>
       <br/>
   <% else %>
-      <h2>You have requested to make the following items published and they are still wating for gatekeeper's approval:</h2>
+      <h2>You have requested to publish the following items, and they are awaiting approval from a Gatekeeper:</h2>
       <% isa_order = ['Investigation', 'Study', 'Assay'] %>
       <% @waiting_approval_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
           <ul class="item_waiting_for_approval">
@@ -57,9 +37,9 @@
                  log = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND user_id=?",
                                                  asset.class.name, asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL, current_user.id]).last
               %>
-              <%= date_as_string(log.created_at) %>
+              <%= date_as_string(log.created_at,true) %>
               <br/>
-              Being approved by:&nbsp;
+              Waiting to be approved by:&nbsp;
               <% gatekeeper_links = asset.gatekeepers.collect { |gatekeeper| link_to(gatekeeper.name, gatekeeper) }.join(' or ').html_safe %>
               <%= gatekeeper_links %>
             </li>

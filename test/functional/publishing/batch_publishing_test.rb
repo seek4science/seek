@@ -152,12 +152,12 @@ class BatchPublishingTest < ActionController::TestCase
 
     get :show, :id => another_person
     assert_response :success
-    assert_select "a", :text => /Your assets waiting for approval/, :count => 0
+    assert_select "a", :text => /Assets awaiting approval/, :count => 0
 
     #yourself
     get :show, :id => User.current_user.person
     assert_response :success
-    assert_select "a[href=?]", waiting_approval_assets_person_path, :text => /Your assets waiting for approval/
+    assert_select "a[href=?]", waiting_approval_assets_person_path, :text => /Assets awaiting approval/
   end
 
   test 'authorization for waiting_approval_assets' do
