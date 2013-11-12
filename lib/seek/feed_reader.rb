@@ -1,4 +1,4 @@
-require 'atom'
+require 'feedzirra'
 
 module Seek
   class FeedReader
@@ -59,9 +59,10 @@ module Seek
         #trim the url element
         feed_url.strip!
 
-        src = select_feed_source feed_url
-        feed = Atom::Feed.load_feed(src)
-        cache_feed(feed_url,feed.to_xml) unless src.is_a?(File)
+        #src = select_feed_source feed_url
+        #read_path = src.is_a?(File) ? src.path : src.to_s
+        feed = Feedzirra::Feed.fetch_and_parse(feed_url)
+        #cache_feed(feed_url) unless src.is_a?(File)
 
         feed
       end
@@ -72,9 +73,9 @@ module Seek
     # The cache is never used when running in DEVELOPMENT environment
     def self.select_feed_source feed_url
       source = URI.parse(feed_url)
-      unless Rails.env=="development"
+      #unless Rails.env=="development"
         source = check_cache(feed_url) || source
-      end
+      #end
       source
     end
 
@@ -87,10 +88,11 @@ module Seek
       end
     end
 
-    def self.cache_feed url,xml
+    def self.cache_feed url
+      xml = RestClient.get url,{:accept=>:xml}
       path=cache_path(url)
       f=open(path,"w+")
-      f.write(xml)
+      f.write(xml.force_encoding("UTF-8"))
       f.close
     end
 
@@ -105,13 +107,13 @@ module Seek
              class << entry
                attr_accessor :feed_title
              end
-             entry.feed_title = feed.title || feed.subtitle
+             entry.feed_title = feed.title
            end
 
            filtered_entries |= entries.take(number_of_entries) if entries
           end
       end
-      filtered_entries.sort {|a,b| (try_block{b.updated} || try_block{b.published} || try_block{b.last_modified} || 10.year.ago) <=> (try_block{a.updated} || try_block{a.published} || try_block{a.last_modified} || 10.year.ago)}.take(number_of_entries)
+      filtered_entries.sort {|a,b| (b.try(:updated) || b.try(:published) || b.try(:last_modified) || 10.year.ago) <=> (a.try(:updated) || a.try(:published) || a.try(:last_modified) || 10.year.ago)}.take(number_of_entries)
 
     end
 

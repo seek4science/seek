@@ -206,6 +206,7 @@ GEM
     country-select (1.1.1)
     crack (0.4.0)
       safe_yaml (~> 0.9.0)
+    curb (0.8.5)
     daemon_controller (1.1.4)
     daemons (1.1.9)
     delayed_job (3.0.5)
@@ -222,6 +223,13 @@ GEM
       actionmailer (>= 3.0.4)
     factory_girl (2.6.4)
       activesupport (>= 2.3.9)
+    feedzirra (0.0.24)
+      activesupport (>= 2.3.8)
+      builder (>= 2.1.2)
+      curb (>= 0.2.3)
+      loofah (>= 0.3.1)
+      nokogiri (> 0.0.0)
+      sax-machine (>= 0.0.12)
     ffi (1.9.0)
     fssm (0.2.10)
     gyoku (0.4.6)
@@ -244,6 +252,8 @@ GEM
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
       rb-kqueue (>= 0.2)
+    loofah (1.2.1)
+      nokogiri (>= 1.4.4)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -314,8 +324,6 @@ GEM
       thor (>= 0.14.6, < 2.0)
     raindrops (0.11.0)
     rake (10.1.0)
-    ratom (0.6.9)
-      libxml-ruby (>= 1.1.2)
     rb-fsevent (0.9.3)
     rb-inotify (0.9.0)
       ffi (>= 0.5.0)
@@ -353,6 +361,8 @@ GEM
       nokogiri (>= 1.4.0)
       nori (~> 1.1.0)
       wasabi (~> 2.5.0)
+    sax-machine (0.1.0)
+      nokogiri (> 0.0.0)
     simple-spreadsheet-extractor (0.12.3)
       libxml-ruby (= 2.6.0)
       libxml-ruby (= 2.6.0)
@@ -423,6 +433,7 @@ DEPENDENCIES
   equivalent-xml
   exception_notification (= 3.0.1)
   factory_girl (= 2.6.4)
+  feedzirra
   fleximage!
   fssm
   gibberish!
@@ -450,7 +461,6 @@ DEPENDENCIES
   rails (= 3.2.14)
   rails-dev-boost!
   rails_autolink
-  ratom (= 0.6.9)
   rdf (>= 0.3.8)
   rdf-rdfxml (>= 0.3.8)
   rdf-virtuoso!
