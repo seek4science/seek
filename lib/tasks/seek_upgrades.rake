@@ -10,6 +10,7 @@ namespace :seek do
   task :upgrade_version_tasks=>[
             :environment,
             :update_admin_assigned_roles,
+            :update_top_level_assay_type_titles,
             :repopulate_auth_lookup_tables
   ]
 
@@ -52,6 +53,18 @@ namespace :seek do
       end
 
     end
+  end
+
+  task(:update_top_level_assay_type_titles=>:environment) do
+    exp_id = AssayType.experimental_assay_type_id
+    assay_type = AssayType.find(exp_id)
+    assay_type.title="generic experimental assay"
+    assay_type.save!
+
+    mod_id = AssayType.modelling_assay_type_id
+    assay_type = AssayType.find(mod_id)
+    assay_type.title="generic modelling analysis"
+    assay_type.save!
   end
 
 end
