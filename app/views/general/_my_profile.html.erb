@@ -15,16 +15,16 @@
       <%= image_tag(icon_filename_for_key('arrow_down_small'), :onclick => "toggleDynamicMenu('my_profile_menu');") %>
 
       <ul id="my_profile_menu" class='dynamic_menu with_smaller_shadow' style="display:none;">
-        <li class="my_profile_menu_header">&nbsp;</li>
+        <li class="my_profile_menu_header">Your details:</li>
         <li class='dynamic_menu_li' onclick="javascript:location.href='<%= person_path(current_person) -%>';">Your
           profile
         </li>
-        <% if current_person.is_admin? %>
-            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= admin_path -%>';">Server admin</li>
-        <% end %>
-        <li class='dynamic_menu_li' onclick="javascript:location.href='<%= feedback_home_path -%>';">Provide
-          feedback
+        <li class='dynamic_menu_li' onclick="javascript:location.href='<%= edit_person_path(current_person) -%>';">Edit
+          profile
         </li>
+        <li class='dynamic_menu_li' onclick="javascript:location.href='<%= edit_user_path(current_user) -%>';">Change password
+        </li>
+
         <% unless !include_projects || current_person.projects.empty? %>
             <li class="my_profile_menu_header">
               Your projects:
@@ -33,7 +33,14 @@
                 <li class='dynamic_menu_li' onclick="javascript:location.href='<%= project_path(project) %>';"><%= project.title %></li>
             <% end %>
         <% end %>
+        <% if current_person.is_admin? %>
+            <li class="my_profile_menu_break">&nbsp;</li>
+            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= admin_path -%>';">Administer server</li>
+        <% end %>
         <li class="my_profile_menu_break">&nbsp;</li>
+        <li class='dynamic_menu_li' onclick="javascript:location.href='<%= feedback_home_path -%>';">Provide
+          feedback
+        </li>
         <li class='dynamic_menu_li' onclick="javascript:if (confirm('Are you sure you wish to logout?')){location.href='<%= logout_path -%>';};">Logout</li>
       </ul>
     </div>

@@ -2088,7 +2088,7 @@ ul#my_profile_menu > li.dynamic_menu_li {
 }
 
 ul#my_profile_menu:before {
-    border-color: transparent transparent #ccc;
+    border-color: transparent transparent #ddd;
     border-style: solid;
     border-width: 0 10px 10px;
     content: "";
@@ -2100,7 +2100,7 @@ ul#my_profile_menu:before {
     width: 0;
 }
 ul#my_profile_menu > li.my_profile_menu_header {
-    background-color: #ccc;
+    background-color: #ddd;
 }
 ul#my_profile_menu > li.my_profile_menu_break {
     border-top: 1px solid #ddd;
