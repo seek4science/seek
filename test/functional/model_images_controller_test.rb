@@ -31,4 +31,13 @@ class ModelImagesControllerTest < ActionController::TestCase
     assert_equal "You can only view images for #{I18n.t('model').pluralize} you can access",flash[:error]
   end
 
+  test "get the maximum size for the image" do
+    model = Factory(:model_with_image,:policy=>Factory(:public_policy))
+    get :show,:model_id=>model.id,:id=>model.model_image.id, :size=>"5000x5000"
+    assert_response :success
+    assert_equal "image/jpeg",@response.header["Content-Type"]
+    assert_equal "inline; filename=\"#{model.model_image.id}.jpg\"",@response.header["Content-Disposition"]
+    #maximum width of 1500 pixels
+    assert_equal "80376",@response.header["Content-Length"]
+  end
 end
