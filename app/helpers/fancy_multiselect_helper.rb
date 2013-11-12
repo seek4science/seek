@@ -47,11 +47,12 @@ module FancyMultiselectHelper
 
   module OtherProjectsCheckbox
     def fancy_multiselect object, association, options = {}
-      if options[:project_possibilities]
+      if options[:project_possibilities]  &&  options[:other_projects_checkbox]
         type = object.class.name.underscore
+        default_checked = Seek::Config.is_virtualliver ? true : false
         check_box_and_alternative_list = <<-HTML
           <br/>
-          #{check_box_tag "include_other_project_#{association}", nil, false, {:onchange => "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');", :style => "margin-top:0.5em;"}} Associate #{association.to_s.humanize} from other projects?
+          #{check_box_tag "include_other_project_#{association}", nil, default_checked, {:onchange => "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');", :style => "margin-top:0.5em;"}} Associate #{association.to_s.humanize} from other projects?
           #{select_tag "alternative_#{association.to_s.singularize}_ids", options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|options[:project_possibilities].collect { |o| [truncate(h(o.title), :length => 120), o.id] }), {:style => 'display:none;'}}
         HTML
 
@@ -59,7 +60,11 @@ module FancyMultiselectHelper
         options[:association_step_content] = options[:association_step_content] + check_box_and_alternative_list
         swap_project_possibilities_into_dropdown_js = <<-JS
           <script type="text/javascript">
+              var include_other_projects_checkbox = document.getElementById("include_other_project_#{association}");
+              if (include_other_projects_checkbox.checked == false){
               swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');
+              }
+
           </script>
         JS
         super + swap_project_possibilities_into_dropdown_js
