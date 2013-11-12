@@ -27,22 +27,16 @@ class HomesControllerTest < ActionController::TestCase
   test "shouldn't display feedback link when not logged in" do
     get :index
     assert_response :success
-    assert_select "span#account_menu_section", :count=>0
-
-    assert_select "li" do
-        assert_select "a[href=?]",feedback_home_path,:text=>I18n.t("menu.feedback"),:count=>0
-    end
-
+    assert_select "ul#my_profile_menu",:count=>0
+    assert_select "li.dynamic_menu_li",:text=>/Provide feedback/, :count=>0
   end
 
   test "should display feedback link when logged in" do
     login_as(Factory(:user))
     get :index
     assert_response :success
-    assert_select "span#account_menu_section" do
-      assert_select "li" do
-        assert_select "a[href=?]",feedback_home_path,:text=>I18n.t("menu.feedback")
-      end
+    assert_select "ul#my_profile_menu" do
+      assert_select "li.dynamic_menu_li",:text=>/Provide feedback/, :count=>1
     end
   end
 
@@ -68,11 +62,8 @@ class HomesControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index
     assert_response :success
-    assert_response :success
-    assert_select "span#account_menu_section" do
-      assert_select "li" do
-        assert_select "a",:text=>I18n.t("menu.admin"),:count=>0
-      end
+    assert_select "ul#my_profile_menu" do
+      assert_select "li.dynamic_menu_li",:text=>"Server admin", :count=>0
     end
   end
 
@@ -80,10 +71,8 @@ class HomesControllerTest < ActionController::TestCase
     login_as(:quentin)
     get :index
     assert_response :success
-    assert_select "span#account_menu_section" do
-      assert_select "li" do
-        assert_select "a",:text=>I18n.t("menu.admin")
-      end
+    assert_select "ul#my_profile_menu" do
+      assert_select "li.dynamic_menu_li",:text=>"Server admin", :count=>1
     end
   end
 

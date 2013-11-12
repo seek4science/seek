@@ -35,12 +35,10 @@
         <% end %>
         <% if current_person.is_admin? %>
             <li class="my_profile_menu_break">&nbsp;</li>
-            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= admin_path -%>';">Administer server</li>
+            <li class='dynamic_menu_li' onclick="javascript:location.href='<%= admin_path -%>';">Server admin</li>
         <% end %>
         <li class="my_profile_menu_break">&nbsp;</li>
-        <li class='dynamic_menu_li' onclick="javascript:location.href='<%= feedback_home_path -%>';">Provide
-          feedback
-        </li>
+        <li class='dynamic_menu_li' onclick="javascript:location.href='<%= feedback_home_path -%>';">Provide feedback</li>
         <li class='dynamic_menu_li' onclick="javascript:if (confirm('Are you sure you wish to logout?')){location.href='<%= logout_path -%>';};">Logout</li>
       </ul>
     </div>
