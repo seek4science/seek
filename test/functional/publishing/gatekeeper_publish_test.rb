@@ -62,7 +62,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     assert ResourcePublishLog.requested_approval_assets_for(@gatekeeper).empty?
     get :requested_approval_assets, :id => @gatekeeper
-    assert_select "span", :text => "You have no items waiting for your approval"
+    assert_select "span[class=?]","published", text:"There are no items waiting for your approval"
 
     user = Factory(:user)
     df = Factory(:data_file, :projects => @gatekeeper.projects)
