@@ -63,7 +63,7 @@ module Seek
         #read_path = src.is_a?(File) ? src.path : src.to_s
         feed = Feedzirra::Feed.fetch_and_parse(feed_url)
         #cache_feed(feed_url) unless src.is_a?(File)
-
+        raise "Error reading feed for #{feed_url}" if feed==0
         feed
       end
     end
