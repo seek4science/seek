@@ -45,6 +45,8 @@ namespace :seek do
           begin
             p.roles = roles
             p.save!
+          rescue Exception=>e
+            puts "Error saving #{p.name} - #{p.id}: #{e.message}"
           ensure
             Person.record_timestamps = true
           end
