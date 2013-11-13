@@ -12,7 +12,7 @@ gem 'rack-openid'
 gem 'libxml-ruby',"2.6.0",:require=>"libxml"
 gem 'uuidtools',"2.1.1"
 gem "RedCloth","4.2.9"
-gem 'simple-spreadsheet-extractor',"0.13.0"
+gem 'simple-spreadsheet-extractor',"0.13.1"
 gem "rmagick","2.12.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
