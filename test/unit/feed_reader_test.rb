@@ -22,36 +22,20 @@ class FeedReaderTest < ActiveSupport::TestCase
   end
 
   test "check caching" do
-
+    Seek::FeedReader.clear_cache
     feed_to_use = uri_to_guardian_feed
-    path = Seek::FeedReader.cache_path(feed_to_use)
-    assert_equal File.join(Rails.root,"tmp","testing-seek-cache","atom-feeds",CGI::escape(feed_to_use)),path
-    FileUtils.rm path if File.exists?(path)
+
+    key = Seek::FeedReader.cache_key(feed_to_use)
+    assert_equal "8e3b9d473f42bcfebb3ce0c8a13ca8ac",key
+    assert !Rails.cache.exist?(key)
 
     Seek::Config.project_news_feed_urls="#{feed_to_use}"
     Seek::FeedReader.fetch_entries_for :project_news
 
-    assert File.exists?(path)
+    assert Rails.cache.exist?(key)
 
-    #check it doesn't overwrite each time
-    time = File.mtime(path)
-    sleep(2)
-    Seek::FeedReader.fetch_entries_for :project_news
-    assert_equal time,File.mtime(path)
-  end
-
-  test "clear cache" do
-    dir = File.join(Rails.root,"tmp","testing-seek-cache","atom-feeds")
-
-    FileUtils.mkdir_p dir unless File.exists?(dir)
-
-    #stick a file in there to make sure it handles directory with files in
-    f=open(File.join(dir,"test-file"),"w+")
-    f.write("some info")
-    f.close
-    
     Seek::FeedReader.clear_cache
-    assert !File.exists?(dir)
+    assert !Rails.cache.exist?(key),"cache should have been cleared"
   end
 
   test "handles error and ignores bad feed" do
