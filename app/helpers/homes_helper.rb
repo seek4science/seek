@@ -102,10 +102,10 @@ module HomesHelper
       html=''
       unless entry.blank?
           #get the link of the entry
-          entry_link = try_block{entry.links.alternate.href}
+          entry_link = entry.url
           entry_title = entry.title || "Unknown title"
           feed_title = entry.feed_title || "Unknown publisher"
-          entry_date = try_block{entry.updated} || try_block{entry.published} || try_block{entry.last_modified}
+          entry_date = entry.try(:updated) || entry.try(:published) || entry.try(:last_modified)
           entry_summary = truncate(strip_tags(entry.summary || entry.content),:length=>500)
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
 

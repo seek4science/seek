@@ -4,6 +4,7 @@ source 'http://gems.github.com'
 gem "rails", "3.2.14"
 gem "rdoc"
 
+gem "feedzirra"
 gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
@@ -16,7 +17,6 @@ gem "rmagick","2.12.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
-gem 'ratom',"0.6.9"
 gem 'rubyzip',"0.9.9"
 gem 'bio'
 gem 'sunspot_rails'

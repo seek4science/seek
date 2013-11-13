@@ -1,4 +1,4 @@
-require 'atom'
+require 'feedzirra'
 
 module Seek
   class FeedReader
@@ -13,7 +13,9 @@ module Seek
 
       feeds = urls.split(",").select{|url| !url.blank?}.collect do |url|
         begin
-          get_feed(url)
+          Rails.cache.fetch(cache_key(url),:expires_in=>Seek::Config.home_feeds_cache_timeout.minutes) do
+            get_feed(url)
+          end
         rescue => e
           Rails.logger.warn("Problem with feed: #{url} - #{e.message}")
           nil
@@ -25,73 +27,32 @@ module Seek
       
     end
 
-    #the cache file for a given feed url
-    def self.cache_path(url)
-      File.join(cache_dir,CGI::escape(url))
-    end
-
-    #the directory used to contain the cached files
-    def self.cache_dir
-      if Rails.env=="test"
-        dir = File.join(Rails.root,"tmp","testing-seek-cache","atom-feeds")
-      else
-        dir = File.join(Rails.root,"tmp","cache","atom-feeds")
-      end
-      FileUtils.mkdir_p dir if !File.exists?(dir)
-      dir
-    end
-
     #deletes the cache directory, along with any files in it
     def self.clear_cache
-      FileUtils.rm_rf cache_dir
+      urls = Seek::Config.project_news_feed_urls.split(",").select{|url| !url.blank?}
+      urls = urls | Seek::Config.community_news_feed_urls.split(",").select{|url| !url.blank?}
+      urls.each do |url|
+        Rails.cache.delete(cache_key(url))
+      end
     end
 
-    def self.cache_timeout
-      t = Seek::Config.home_feeds_cache_timeout
-      t.minutes.ago
+    def self.cache_key feed_url
+      #use md5 to keep the key short - highly unlikely to be a collision
+      Digest::MD5.hexdigest("news-feed=#{feed_url.strip}")
     end
   
     private
+
 
     def self.get_feed feed_url
 
       unless feed_url.blank?
         #trim the url element
         feed_url.strip!
-
-        src = select_feed_source feed_url
-        feed = Atom::Feed.load_feed(src)
-        cache_feed(feed_url,feed.to_xml) unless src.is_a?(File)
-
+        feed = Feedzirra::Feed.fetch_and_parse(feed_url)
+        raise "Error reading feed for #{feed_url}" if feed==0
         feed
       end
-    end
-
-    # Selects either an IO object the a cached version of the feed, or a URI object
-    # This is determined by whether upon whether the cached copy is more than #cached_timeout old (currently defaults to 2 minutes)
-    # The cache is never used when running in DEVELOPMENT environment
-    def self.select_feed_source feed_url
-      source = URI.parse(feed_url)
-      unless Rails.env=="development"
-        source = check_cache(feed_url) || source
-      end
-      source
-    end
-
-    def self.check_cache url
-      path=cache_path(url)
-      if File.exists?(path) && File.mtime(path) > cache_timeout
-        open(path)
-      else
-        nil
-      end
-    end
-
-    def self.cache_feed url,xml
-      path=cache_path(url)
-      f=open(path,"w+")
-      f.write(xml)
-      f.close
     end
 
     def self.filter_feeds_entries_with_chronological_order feeds, number_of_entries=10
@@ -105,13 +66,13 @@ module Seek
              class << entry
                attr_accessor :feed_title
              end
-             entry.feed_title = feed.title || feed.subtitle
+             entry.feed_title = feed.title
            end
 
            filtered_entries |= entries.take(number_of_entries) if entries
           end
       end
-      filtered_entries.sort {|a,b| (try_block{b.updated} || try_block{b.published} || try_block{b.last_modified} || 10.year.ago) <=> (try_block{a.updated} || try_block{a.published} || try_block{a.last_modified} || 10.year.ago)}.take(number_of_entries)
+      filtered_entries.sort {|a,b| (b.try(:updated) || b.try(:published) || b.try(:last_modified) || 10.year.ago) <=> (a.try(:updated) || a.try(:published) || a.try(:last_modified) || 10.year.ago)}.take(number_of_entries)
 
     end
 
