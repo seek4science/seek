@@ -171,7 +171,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_select "div[class=?][style='display:none']",/yui-u home_panel.*/, :count => 1
   end
 
-  test "feed reader should handle feed title as subtitle" do
+  test "feed reader should handle missing feed title" do
 
     Seek::Config.project_news_enabled=true
     Seek::Config.project_news_feed_urls = uri_to_feed("simple_feed_with_subtitle.xml")
@@ -182,7 +182,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "li.homepanel_item" do
-      assert_select "div.feedinfo",:text=>/Latest news/,:count=>4
+      assert_select "div.feedinfo",:text=>/Unknown publisher/,:count=>4
     end
   end
 
