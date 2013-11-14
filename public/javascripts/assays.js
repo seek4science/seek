@@ -56,13 +56,17 @@ function addSelectedSop() {
     title=selected_option.text;
     id=selected_option.value;
 
-    if(checkNotInList(id,sops_assets)) {
-        addSop(title,id);
-        updateSops();
-    }
-    else {
-    alert('The following Sop had already been added:\n\n' +
-        title);
+    i = $('possible_sops').selectedIndex;
+    selected_id = $('possible_sops').options[i].value;
+    if(selected_id != '0') {
+        if(checkNotInList(id,sops_assets)) {
+            addSop(title,id);
+            updateSops();
+        }
+        else {
+        alert('The following Sop had already been added:\n\n' +
+            title);
+        }
     }
 
 
@@ -138,13 +142,17 @@ function addSelectedDataFile() {
         relationshipType="None"
     }
 
-    if(checkNotInList(id,data_files_assets)) {
-        addDataFile(title,id,relationshipType);
-        updateDataFiles();
-    }
-    else {
-        alert('The following Data file had already been added:\n\n' +
-            title);
+    i = $('possible_data_files').selectedIndex;
+    selected_id = $('possible_data_files').options[i].value;
+    if(selected_id != '0') {
+        if(checkNotInList(id,data_files_assets)) {
+            addDataFile(title,id,relationshipType);
+            updateDataFiles();
+        }
+        else {
+            alert('The following Data file had already been added:\n\n' +
+                title);
+        }
     }
 }
 
@@ -211,13 +219,17 @@ function addSelectedModel() {
     title=selected_option.text;
     id=selected_option.value;
 
-    if(checkNotInList(id,models_assets)) {
-        addModel(title,id);
-        updateModels();
-    }
-    else {
-        alert('The following Model had already been added:\n\n' +
-            title);
+    i = $('possible_models').selectedIndex;
+    selected_id = $('possible_models').options[i].value;
+    if(selected_id != '0') {
+        if(checkNotInList(id,models_assets)) {
+            addModel(title,id);
+            updateModels();
+        }
+        else {
+            alert('The following Model had already been added:\n\n' +
+                title);
+        }
     }
 }
 
@@ -303,13 +315,17 @@ function addSelectedAssay() {
         relationshipType="None"
     }
 
-    if(checkNotInList(id,assays_array)) {
-        addAssay(title,id,relationshipType);
-        updateAssays();
-    }
-    else {
-        alert('The following Data file had already been added:\n\n' +
-            title);
+    i = $('possible_assays').selectedIndex;
+    selected_id = $('possible_assays').options[i].value;
+    if(selected_id != '0') {
+        if(checkNotInList(id,assays_array)) {
+            addAssay(title,id,relationshipType);
+            updateAssays();
+        }
+        else {
+            alert('The following Data file had already been added:\n\n' +
+                title);
+        }
     }
 }
 

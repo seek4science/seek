@@ -43,7 +43,7 @@
         <% if show_relationships -%>
             <%= select_tag :possible_assays,
               options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-              {:style=>"width:90%",:onchange=>remote_function(
+              {:style=>"width:90%",:onchange=>"addSelectedAssay();"+remote_function(
                 :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
                 :with=>"'id='+this.value",
                 :before=>"show_ajax_loader('assay_preview')"
@@ -59,7 +59,7 @@
         <% else %>
             <%= select_tag :possible_assays,
                   options_for_select([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-                  {:style=>"width:90%",:onchange=>remote_function(
+                  {:style=>"width:90%",:onchange=>"addSelectedAssay();"+remote_function(
                     :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
                     :with=>"'id='+this.value",
                     :before=>"show_ajax_loader('assay_preview')"
@@ -72,7 +72,6 @@
       </div>
 
 	  <br/>
-      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedAssay(); return(false);", :id=>"add_assay_link", :class=>"block_link" %>
 
       <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
     </div>

@@ -35,7 +35,7 @@
           <%= select_tag :possible_tissue_and_cell_types,
                          options_for_select([["Select Tissue or Cell Type ...", 0]]|all_tissue_and_cell_types.collect { |o| [truncate(h(o.title), :length=>select_truncate_length), o.id] }),
                          {:style=>"width:90%",
-                          :onchange=> "$('tissue_and_cell_type').clear();return(false);"} -%>
+                          :onchange=> "$('tissue_and_cell_type').clear();addSelectedTissueOrCellType();return(false);"} -%>
 
 
           <br/>

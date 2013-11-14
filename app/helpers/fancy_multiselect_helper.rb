@@ -36,12 +36,11 @@ module FancyMultiselectHelper
       options[:possibilities_options] = {} unless options[:possibilities_options]
       onchange = options[:possibilities_options][:onchange] || ''
       collection_id = options[:name].to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
-      possibilities_id = "possible_#{collection_id}"
-      button_id = "add_to_#{collection_id}_link"
-      hide_add_link_when_default_is_selected_js = "($F('#{possibilities_id}') == 0) ? $('#{button_id}').hide() : $('#{button_id}').show();"
-      onchange += hide_add_link_when_default_is_selected_js
+      possibilities_collection_id = "possible_#{collection_id}"
+      assign_Selected_Item_js = "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}'));"
+          onchange += assign_Selected_Item_js
       options[:possibilities_options][:onchange] = onchange
-      super(object, association, options) + "\n<script type='text/javascript'>#{hide_add_link_when_default_is_selected_js}</script>\n"
+      super(object, association, options) + "\n<script type='text/javascript'>#{assign_Selected_Item_js}</script>\n"
     end
   end
 

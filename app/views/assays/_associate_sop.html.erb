@@ -25,7 +25,7 @@
       <div class="association_step">  
         <%= select_tag :possible_sops,
                        options_for_select([["Select SOP ...", 0]]|project_sops.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
-                       {:style=>"width:90%",:onchange=>remote_function(
+                       {:style=>"width:90%",:onchange=>"addSelectedSop();"+remote_function(
                                :url=>{:action=>"preview", :controller=>"sops",:element=>"sop_preview"},
                                :with=>"'id='+this.value",
                                :before=>"show_ajax_loader('sop_preview')"
@@ -39,7 +39,6 @@
         <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate SOPs from other projects?
       </div>
 	  <br/>
-      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedSop(); return(false);", :id=>"add_sop_link", :class=>"block_link" %>
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'sop'} %>
   

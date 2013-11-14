@@ -41,6 +41,8 @@
         It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
         value of the parameter will be ["","1","2","3"]. This is compatible with the rails
         association association_ids= methods, which reject 'blank' values automatically.%>
+        <%# :onchange => "new Ajax.Request('/events/preview?element=events_preview', {asynchronous:true, evalScripts:true, parameters:'id='+this.value + '&authenticity_token=' + encodeURIComponent('ftAQdGnNhrPfDX2jSokg7MkAaW0DcJWP6Fn6juj0uEw=')});" + "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}'))" + "($F('possible_event_project_ids') == 0) ? $('add_to_event_project_ids_link').hide() : $('add_to_event_project_ids_link').show();" %>
+        <%# :onchange => "($F('possible_event_project_ids') == 0) ? $('add_to_event_project_ids_link').hide() : $('add_to_event_project_ids_link').show();" %>
         <%= hidden_field_tag "#{name}[]", "" %>
 
         <%= select_tag name,
@@ -50,7 +52,6 @@
       </div>
 
 		<br/>
-        <%= link_to_function "#{image('new')} #{button_text}", "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}'))", :id=>"add_to_#{collection_id}_link", :class=>"block_link" %>
 
       <script type="text/javascript">
           Event.observe(window, 'load', function () {

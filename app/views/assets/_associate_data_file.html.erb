@@ -27,9 +27,15 @@
         <p style="color: #666666;">
             You may select an existing Data File or <%= link_to h("upload a new Data File here"), new_data_file_path(:parent_name=>controller_name.underscore.singularize),:popup => true%>  for the <%= resource_text -%>.
         </p>
+
+        <% if show_relationships -%>
+            <%= label_tag "How was the data used in this #{resource_text}" %><br/>
+            <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
+        <% end -%>
+
         <%= select_tag :possible_data_files,
           options_for_select([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-          {:style=>"width:90%",:onchange=>remote_function(
+          {:style=>"width:90%",:onchange=>"addSelectedDataFile();"+remote_function(
             :url=>{:action=>"preview",:controller=>"data_files",:element=>"data_file_preview"},
             :with=>"'id='+this.value",
             :before=>"show_ajax_loader('data_file_preview')"
@@ -37,18 +43,11 @@
         } -%>
         
         <%= select_tag :data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-        
-        <% if show_relationships -%>
-          <br/>
-          <%= label_tag "How was the data used in this #{resource_text}" %><br/>
-          <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
-        <% end -%>
-        
+
         <br/>
         <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate Data files from other projects?
       </div>
 	  <br/>
-      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link" %>
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'data_file'} %>
