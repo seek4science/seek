@@ -79,13 +79,13 @@
         <p>
           <label>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
-            - Members of projects associated with this <%= @resource_type -%>:
+            - All <%= Seek::Config.project_title %> members:
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
                  <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource) || default_projects_access_type) -%>
              </select>
              <br/>
-            <span style="margin-left:10em;">... and all other project members:</span>
+            <span style="margin-left:10em;">... members of projects associated with this <%= @resource_type -%>:</span>
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
                :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => (@resource.respond_to?(:policy) && @resource.policy.try(:sharing_scope)==Policy::ALL_SYSMO_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] } -%>
              <%= additional_advanced_permissions_included @resource, Policy::ALL_SYSMO_USERS -%>
