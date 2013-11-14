@@ -35,6 +35,7 @@
         <% end %>
       </div>
 
+    <input name="person[work_group_ids][]" type="hidden" value/>
       <select id="person_work_group_ids" multiple="multiple" name="person[work_group_ids][]" style="display:none;">
         <%= option_groups_from_collection_for_select work_group_groups,
                                                      :options, :project_name, :id, :institution_name, person.work_groups.map { |wg| wg.id }
