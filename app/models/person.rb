@@ -24,10 +24,10 @@ class Person < ActiveRecord::Base
 
   include Seek::Taggable
 
-  def receive_notifications
-    registered? and super
+  def receive_notifications?
+    member? and super
   end
-  
+
   def registered?
     !user.nil?
   end
