@@ -66,7 +66,8 @@ module Seek
         eval <<-END_EVAL
           def #{role}s
             mask = mask_for_role('#{role}')
-            self.where(roles_mask: mask)
+            clause = "roles_mask & " + mask.to_s + " > 0"
+            self.where(clause)
           end
 
           def mask_for_#{role}

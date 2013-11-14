@@ -2,6 +2,10 @@ require 'test_helper'
 
 class AdminDefinedRolesTest < ActiveSupport::TestCase
 
+  def setup
+    User.current_user = Factory(:admin).user
+  end
+
   test "cannot add a role with a project the person is not a member of" do
     person = Factory(:person)
     project1 = person.projects.first
@@ -460,38 +464,49 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       admin = Factory(:admin)
       normal = Factory(:person)
       pal = Factory(:pal)
-      assert !pal.projects.empty?
-      assert pal.is_pal?(pal.projects.first)
+      pal2 = Factory(:project_manager)
+      pal2.is_pal=true,pal2.projects.first
+      pal2.save!
 
       pals = Person.pals
 
       assert pals.include?(pal)
+      assert pals.include?(pal2)
       assert !pals.include?(normal)
   end
 
   test 'Person.admins' do
     admin = Factory(:admin)
+    admin2 = Factory(:project_manager)
+    admin2.is_admin=true
+    admin2.save!
     normal = Factory(:person)
 
     admins = Person.admins
     assert admins.include?(admin)
+    assert admins.include?(admin2)
     assert !admins.include?(normal)
   end
 
   test "Person.gatekeepers" do
-    admin = Factory(:admin)
     normal = Factory(:person)
     gatekeeper = Factory(:gatekeeper)
+    gatekeeper2 = Factory(:project_manager)
+    gatekeeper2.is_gatekeeper=true,gatekeeper2.projects.first
+    gatekeeper2.save!
 
     gatekeepers = Person.gatekeepers
     assert gatekeepers.include?(gatekeeper)
+    assert gatekeepers.include?(gatekeeper2)
     assert !gatekeepers.include?(normal)
   end
 
   test "Person.asset_managers" do
-    admin = Factory(:admin)
     normal = Factory(:person)
     asset_manager = Factory(:asset_manager)
+    asset_manager2 = Factory(:project_manager)
+    asset_manager2.is_asset_manager=true,asset_manager2.projects.first
+    asset_manager2.save!
 
     asset_managers = Person.asset_managers
     assert asset_managers.include?(asset_manager)
@@ -499,12 +514,15 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   end
 
   test "Person.project_managers" do
-    admin = Factory(:admin)
     normal = Factory(:person)
     project_manager = Factory(:project_manager)
+    project_manager2 = Factory(:gatekeeper)
+    project_manager2.is_project_manager=true,project_manager2.projects.first
+    project_manager2.save!
 
     project_managers = Person.project_managers
     assert project_managers.include?(project_manager)
+    assert project_managers.include?(project_manager2)
     assert !project_managers.include?(normal)
   end
 
