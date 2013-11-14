@@ -257,28 +257,36 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_select "div.tabbertab" do
       assert_select "h3", :text => "Assays (1)", :count => 1
-      assert_select "h3", :text => "SOPs (1+1)", :count => 1
-      assert_select "h3", :text => "Data Files (1+1)", :count => 1
+      assert_select "h3", :text => "SOPs (2)", :count => 1
+      assert_select "h3", :text => "Data Files (2)", :count => 1
+    end
+    get :resource_in_tab, {:resource_ids => study.assays.map(&:id).join(","), :resource_type => "Assay", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    assert_select "div.list_item" do
+          #the Assay resource_list_item
+          assert_select "p.list_item_attribute a[title=?]", sops(:sop_with_fully_public_policy).title, :count => 1
+          assert_select "p.list_item_attribute a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
+          assert_select "p.list_item_attribute a[title=?]", sops(:sop_with_private_policy_and_custom_sharing).title, :count => 0
+          assert_select "p.list_item_attribute a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+
+          assert_select "p.list_item_attribute a[title=?]", data_files(:downloadable_data_file).title, :count => 1
+          assert_select "p.list_item_attribute a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
+          assert_select "p.list_item_attribute a[title=?]", data_files(:private_data_file).title, :count => 0
+          assert_select "p.list_item_attribute a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
     end
 
+    get :resource_in_tab, {:resource_ids => study.related_sops.map(&:id).join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+
     assert_select "div.list_item" do
-      #the Assay resource_list_item
-      assert_select "p.list_item_attribute a[title=?]", sops(:sop_with_fully_public_policy).title, :count => 1
-      assert_select "p.list_item_attribute a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
-      assert_select "p.list_item_attribute a[title=?]", sops(:sop_with_private_policy_and_custom_sharing).title, :count => 0
-      assert_select "p.list_item_attribute a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+         # Sops resource_list_item
+         assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
+         assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
+         assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+         assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+    end
+    get :resource_in_tab, {:resource_ids => study.related_data_files.map(&:id).join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
-      assert_select "p.list_item_attribute a[title=?]", data_files(:downloadable_data_file).title, :count => 1
-      assert_select "p.list_item_attribute a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
-      assert_select "p.list_item_attribute a[title=?]", data_files(:private_data_file).title, :count => 0
-      assert_select "p.list_item_attribute a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-
-      #the Sops and DataFiles resource_list_item
-      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
-      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
-      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-
+    assert_select "div.list_item" do
+      #DataFiles resource_list_item
       assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
       assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
       assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0

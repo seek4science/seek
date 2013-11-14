@@ -52,9 +52,13 @@ class SamplesControllerTest < ActionController::TestCase
 
     get :show, :id=>s
     assert_response :success
+    assert_select "div.tabbertab" do
+      assert_select "h3", :text=>/Cell cultures/ ,:count => 1
+    end
+    get :resource_in_tab, {:resource_ids => [s.specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
-    assert_select "div#specimens" do
-      assert_select "h3", :text=>/Cell cultures/
+    assert_select "div.list_item" do
+      assert_select "div.list_item_title a[href=?]", specimen_path(s.specimen), :text=>s.specimen.title,:count => 1
     end
   end
 
