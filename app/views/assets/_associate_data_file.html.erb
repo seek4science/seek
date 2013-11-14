@@ -21,7 +21,7 @@
         The following Data files are involved in this <%= resource_text -%>:
       </p>
       <div id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5">
-        <span class="none_text" id="data_files">None</span>
+        <span class="none_text" id="data_files">Loading ...</span>
       </div>
       <div class="association_step">
         <p style="color: #666666;">
@@ -56,7 +56,6 @@
 </div>
   
 <script type="text/javascript">
-    toggle_data_file_list()
     function toggle_data_file_list() {
         var checked = $('include_other_project_data_files').checked;
         var selection_box = $('possible_data_files');
@@ -133,6 +132,6 @@
       $('add_data_file_link').show();
     }
   }
-
+  toggle_data_file_list()
   check_show_add_data_file();
 </script>

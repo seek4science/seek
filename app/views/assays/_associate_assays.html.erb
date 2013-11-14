@@ -34,7 +34,7 @@
         The following <%= assay_class_text -%> are associated with this <%= resource_text -%>:
       </p>
       <div id="assay_to_list" class="box_editing_inner" style="line-height: 1.5">
-        <span class="none_text" id="assay_files">None</span>
+        <span class="none_text" id="assay_files">Loading ...</span>
       </div>
       <div class="association_step">
         <p style="color: #666666;">
@@ -83,7 +83,6 @@
   
 
 <script type="text/javascript">
-    toggle_assay_list()
     function selected_assay(){
        i = $('possible_assays').selectedIndex;
        id = $('possible_assays').options[i].value;
@@ -167,6 +166,6 @@
 
 
   updateAssays();
-
+  toggle_assay_list()
   check_show_add_assay();
 </script>

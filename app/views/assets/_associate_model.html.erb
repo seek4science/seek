@@ -18,7 +18,7 @@
         The following Models are involved in this <%= resource_text -%>:
       </p>
       <div id="model_to_list" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="models">None</span>
+        <span class="none_text" id="models">Loading ...</span>
       </div>
       <br/>
       <div id="add_model_elements">
@@ -45,7 +45,6 @@
 </div>
 
 <script type="text/javascript">
-    toggle_model_list()
     function toggle_model_list() {
         var checked = $('include_other_project_models').checked;
         var selection_box = $('possible_models');
@@ -116,6 +115,6 @@
       $('add_model_link').show();
     }
   }
-
+  toggle_model_list()
   check_show_add_model();
 </script>
