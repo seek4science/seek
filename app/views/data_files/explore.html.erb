@@ -31,17 +31,19 @@
           :title => "Cancel the current selection", :class => "spreadsheet_button requires_selection" %>
   </div>
   
-  <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
-  
   <div class="spreadsheet_viewer" id="spreadsheet_outer_frame">
     <%= render :partial => "spreadsheets/annotation_form" %>
     <%= render :partial => "spreadsheets/export" %>
     <%= render :partial => "spreadsheets/plot" %>
     
     <div id="annotations">
-      <%= render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
+      <%= render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @display_data_file.spreadsheet_annotations } %>
     </div>
-    
-    <%= render :partial => "spreadsheets/spreadsheet", :locals => {:workbook => @spreadsheet }%>
+
+    <% cache "explore_#{@display_data_file.content_blob.cache_key}" do -%>
+        <% spreadsheet = @display_data_file.spreadsheet%>
+        <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => spreadsheet.styles} %>
+        <%= render :partial => "spreadsheets/spreadsheet", :locals => {:workbook => spreadsheet }%>
+    <% end %>
   </div>
 </div>
