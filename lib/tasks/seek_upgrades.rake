@@ -40,6 +40,7 @@ namespace :seek do
           puts "Updating #{p.name} for - '#{role}' - adding to #{p.projects.count} projects"
           roles << [role,p.projects]
         end
+        roles << ["admin"] if p.is_admin?
         unless roles.empty?
           Person.record_timestamps = false
           begin
