@@ -1155,7 +1155,8 @@ class PeopleControllerTest < ActionController::TestCase
 
       assert_redirected_to a_person
       a_person.reload
-      assert a_person.work_groups.empty?
+      assert_empty a_person.work_groups
+      assert_empty a_person.projects
       assert !a_person.project_subscriptions.collect(&:project).include?(projects.first)
       s.reload
       assert !s.subscribed?(a_person)
@@ -1222,6 +1223,5 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select "div.list_item_content  a[href=?]",person_path(person_not_in_project),:text=>/#{person_not_in_project.name}/,:count=>0
     end
   end
-
 
 end
