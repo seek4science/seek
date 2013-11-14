@@ -18,7 +18,7 @@
         The following Models are involved in this <%= resource_text -%>:
       </p>
       <div id="model_to_list" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="models">Loading...</span>
+        <span class="none_text" id="models">None</span>
       </div>
       <br/>
       <div id="add_model_elements">
@@ -35,7 +35,7 @@
           <%= select_tag :model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
           <br/>
-          <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate Models from other projects?
+          <%= check_box_tag :include_other_project_models, nil, true, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate Models from other projects?
         </div>
 		<br/>
       </div>
@@ -45,6 +45,7 @@
 </div>
 
 <script type="text/javascript">
+    toggle_model_list()
     function toggle_model_list() {
         var checked = $('include_other_project_models').checked;
         var selection_box = $('possible_models');

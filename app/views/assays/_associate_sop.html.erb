@@ -19,7 +19,7 @@
       </p>
   
       <div id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="sops">Loading...</span>
+        <span class="none_text" id="sops">None</span>
       </div>
       
       <div class="association_step">  
@@ -36,7 +36,7 @@
         
         <br/>
 
-        <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate SOPs from other projects?
+        <%= check_box_tag :include_other_project_sops, nil, true, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate SOPs from other projects?
       </div>
 	  <br/>
     </div>
@@ -46,6 +46,7 @@
 </div>
 
 <script type="text/javascript">
+    toggle_sop_list()
     function toggle_sop_list() {
             var checked = $('include_other_project_sops').checked;
             var option;

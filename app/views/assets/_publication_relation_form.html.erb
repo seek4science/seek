@@ -15,7 +15,7 @@
                 The following Publications are related to this <%= resource_type -%>:
             </p>
             <div id="publication_to_list" class="box_editing_inner" style="line-height: 1.5">
-                <span class="none_text" id="publications">Loading...</span>
+                <span class="none_text" id="publications">None</span>
             </div>
             <div class="association_step">
                 <%= select_tag :possible_publications,
@@ -32,7 +32,7 @@
                 <%= select_tag :publication_relationship_type, options_for_select([["None",0]]) %>
                 <% end -%>
                 <br/>
-              <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other projects?
+              <%= check_box_tag :include_other_project_publications, nil, true, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other projects?
             </div>
 			<br/>
         </div>
@@ -40,6 +40,7 @@
     </div>
 </div>
 <script type="text/javascript">
+    toggle_publication_list()
     function toggle_publication_list() {
             var checked = $('include_other_project_publications').checked;
             var selection_box = $('possible_publications');

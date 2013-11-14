@@ -34,7 +34,7 @@
         The following <%= assay_class_text -%> are associated with this <%= resource_text -%>:
       </p>
       <div id="assay_to_list" class="box_editing_inner" style="line-height: 1.5">
-        <span class="none_text" id="assay_files">Loading...</span>
+        <span class="none_text" id="assay_files">None</span>
       </div>
       <div class="association_step">
         <p style="color: #666666;">
@@ -73,7 +73,7 @@
 
 	  <br/>
 
-      <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
+      <%= check_box_tag :include_other_project_assays, nil, true, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>
@@ -83,7 +83,8 @@
   
 
 <script type="text/javascript">
-  function selected_assay(){
+    toggle_assay_list()
+    function selected_assay(){
        i = $('possible_assays').selectedIndex;
        id = $('possible_assays').options[i].value;
        for (var j = 0; j < id_rel_array.length; j++) {
