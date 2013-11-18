@@ -20,7 +20,7 @@ SEEK::Application.configure do
   config.action_controller.perform_caching = false
 
 config.action_controller.perform_caching             = true
-config.action_controller.cache_store = [:file_store, "#{RAILS_ROOT}/tmp/cache"]
+config.action_controller.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
 
   # Raise exceptions instead of rendering exception templates
   config.action_dispatch.show_exceptions = false

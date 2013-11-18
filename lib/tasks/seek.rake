@@ -37,7 +37,7 @@ namespace :seek do
   task(:tissue_and_cell_types=>:environment) do
     revert_fixtures_identify
     TissueAndCellType.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "tissue_and_cell_types")
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "tissue_and_cell_types")
   end
 
 
