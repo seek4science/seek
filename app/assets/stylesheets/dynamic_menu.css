@@ -3,7 +3,6 @@ ul.dynamic_menu {
     z-index: 2;
     background-color: white;
     list-style-type:none;
-    left: 1em;
     width: 10em;
     margin-top: -0.4em;
     border: solid #AAA 1px;
@@ -13,6 +12,6 @@ ul.dynamic_menu>li {
     text-align: left;
     padding-left: 0.5em;
 }
-ul.dynamic_menu>li:hover {
-    background-color: #307af5;
+ul.dynamic_menu>li.dynamic_menu_li:hover {
+    background-color: #6da0f5;
 }

@@ -43,7 +43,7 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     test_user = Factory(:user)
     datafile = Factory(:data_file, :projects => test_user.person.projects, :policy => Factory(:private_policy))
     assert !datafile.can_view?(test_user)
-    assert datafile.can_see_hidden_item?test_user.person
+    assert datafile.can_see_hidden_item? test_user.person
   end
 
   test "people in different project can_not_see_hidden_item" do

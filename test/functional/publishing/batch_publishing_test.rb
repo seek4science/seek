@@ -144,15 +144,20 @@ class BatchPublishingTest < ActionController::TestCase
   #The following tests are for generating your asset list that you requested to make published are still waiting for approval
   test "should have the -Your assets waiting for approval- button only on your profile" do
     #not yourself
-    a_person = Factory(:person)
-    get :show, :id => a_person
+    gatekeeper = Factory(:gatekeeper)
+    me = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>gatekeeper.group_memberships.first.work_group)])
+    another_person = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>gatekeeper.group_memberships.first.work_group)])
+
+    login_as(me)
+
+    get :show, :id => another_person
     assert_response :success
-    assert_select "a", :text => /Your assets waiting for approval/, :count => 0
+    assert_select "a", :text => /Assets awaiting approval/, :count => 0
 
     #yourself
     get :show, :id => User.current_user.person
     assert_response :success
-    assert_select "a[href=?]", waiting_approval_assets_person_path, :text => /Your assets waiting for approval/
+    assert_select "a[href=?]", waiting_approval_assets_person_path, :text => /Assets awaiting approval/
   end
 
   test 'authorization for waiting_approval_assets' do

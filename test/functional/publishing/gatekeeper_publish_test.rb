@@ -17,18 +17,18 @@ class GatekeeperPublishTest < ActionController::TestCase
   test 'only gatekeeper can see -Waiting approval assets- button on their profile' do
     get :show, :id => @current_person
     assert_response :success
-    assert_select "a", :text => /Waiting approval assets/, :count => 0
+    assert_select "a", :text => /Assets you are Gatekeeping/, :count => 0
 
     get :show, :id => @gatekeeper
     assert_response :success
-    assert_select "a", :text => /Waiting approval assets/, :count => 0
+    assert_select "a", :text => /Assets you are Gatekeeping/, :count => 0
 
     logout
     login_as(@gatekeeper.user)
     get :show, :id => @gatekeeper
     assert_response :success
 
-    assert_select "a[href=?]", requested_approval_assets_person_path(@gatekeeper), :text => /Waiting approval assets/, :count => 1
+    assert_select "a[href=?]", requested_approval_assets_person_path(@gatekeeper), :text => /Assets you are Gatekeeping/, :count => 1
   end
 
   test 'gatekeeper authorization for requested_approval_assets' do
@@ -62,7 +62,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     assert ResourcePublishLog.requested_approval_assets_for(@gatekeeper).empty?
     get :requested_approval_assets, :id => @gatekeeper
-    assert_select "span", :text => "You have no items waiting for your approval"
+    assert_select "span[class=?]","published", text:"There are no items waiting for your approval"
 
     user = Factory(:user)
     df = Factory(:data_file, :projects => @gatekeeper.projects)

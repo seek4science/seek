@@ -1,6 +1,9 @@
 module Seek
   module ActsAsFleximageExtension
 
+    MAX_SIZE = 1500
+    STANDARD_SIZE = 900
+
     def self.included(mod)
       mod.extend(ClassMethods)
     end
@@ -12,7 +15,8 @@ module Seek
     end
 
     module InstanceMethods
-      def resize_image size='900'
+      def resize_image size=STANDARD_SIZE
+        size = filter_size size
         if !cache_exists?(size) # look in file system cache before attempting db access
                                 # resize (keeping image side ratio), encode and cache the picture
           self.operate do |image|
@@ -60,7 +64,7 @@ module Seek
 
       def filter_size size
         size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
-        max_size=1500
+        max_size=MAX_SIZE
         matches = size.match /([0-9]+)x([0-9]+).*/
         if matches
           width = matches[1].to_i
@@ -75,7 +79,7 @@ module Seek
             width = max_size if width>max_size
             return "#{width}"
           else
-            return "900"
+            return STANDARD_SIZE
           end
         end
       end
