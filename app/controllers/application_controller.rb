@@ -468,6 +468,13 @@ class ApplicationController < ActionController::Base
       }
   end
 
+  def models_enabled?
+    unless Seek::Config.models_enabled
+      flash[:error] = "Models are disabled"
+      redirect_to :root
+    end
+  end
+
   def biosamples_enabled?
     unless Seek::Config.biosamples_enabled
       flash[:error] = "Biosamples are disabled"
