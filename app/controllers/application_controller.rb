@@ -5,6 +5,7 @@ require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
   include Seek::Errors::ControllerErrorHandling
+  include Seek::EnabledFeaturesFilter
 
   self.mod_porter_secret = PORTER_SECRET
 
@@ -468,26 +469,7 @@ class ApplicationController < ActionController::Base
       }
   end
 
-  def models_enabled?
-    unless Seek::Config.models_enabled
-      flash[:error] = "Models are disabled"
-      redirect_to :root
-    end
-  end
 
-  def biosamples_enabled?
-    unless Seek::Config.biosamples_enabled
-      flash[:error] = "Biosamples are disabled"
-      redirect_to :root
-    end
-  end
-
-  def organisms_enabled?
-    unless Seek::Config.organisms_enabled
-      flash[:error] = "Organisms are disabled"
-      redirect_to :root
-    end
-  end
 
 end
 

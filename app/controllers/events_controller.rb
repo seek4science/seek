@@ -4,7 +4,7 @@ class EventsController < ApplicationController
 
   before_filter :find_assets
 
-  before_filter :check_events_enabled
+  before_filter :events_enabled?
 
   include IndexPager
 
@@ -106,18 +106,5 @@ class EventsController < ApplicationController
     end
     end
   
-  private
-
-  #filter to check if events are enabled using the EVENTS_ENABLED configuration flag
-  def check_events_enabled
-    if !Seek::Config.events_enabled
-      respond_to do |format|
-        flash[:error]="#{t('event').pluralize} are currently disabled"
-        format.html { redirect_to root_path }
-      end
-      return false
-    end
-    true
-  end
 
 end
