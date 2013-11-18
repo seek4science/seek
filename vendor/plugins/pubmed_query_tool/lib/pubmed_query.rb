@@ -162,8 +162,9 @@ class PubmedQuery
       citation_iso_abbreviation = article.find_first('.//ISOAbbreviation')? article.find_first('.//ISOAbbreviation').content : ""
       citation_volume = article.find_first('.//Volume')? article.find_first('.//Volume').content : ""
       citation_issue = article.find_first('.//Issue')? "(" + article.find_first('.//Issue').content + ")" : ""
-      citation_med_line_pgn = article.find_first('.//MedlinePgn')? article.find_first('.//MedlinePgn').content : ""
-      params[:citation] = citation_iso_abbreviation + " " + citation_volume + citation_issue + ": "  + citation_med_line_pgn
+      citation_med_line_pgn = article.find_first('.//MedlinePgn').content
+      if citation_med_line_pgn != "" then citation_med_line_pgn=": " + citation_med_line_pgn end
+      params[:citation] = citation_iso_abbreviation + " " + citation_volume + citation_issue + citation_med_line_pgn
 
       return PubmedRecord.new(params)
     rescue
