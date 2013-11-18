@@ -12,7 +12,7 @@
         <%= image_tag "ajax-loader-large.gif" -%>
       </center>
     </div>
-    <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
+    <div <%= "id= #{tabs_id}" if tabs_id -%> class="tabber" style="display:none;">
       <%
          sorted_result_keys = resource_hash.keys.sort_by do |key|
            ASSET_ORDER.index(key)

@@ -265,7 +265,7 @@ SEEK::Application.routes.draw do
   resources :presentations do
     collection do
       get :preview
-      get :view_items_in_tab
+      get :view_items_in_tab  
       post :test_asset_url
     end
     member do
@@ -294,7 +294,7 @@ SEEK::Application.routes.draw do
     collection do
       get :build
       get :preview
-      get :view_items_in_tab
+      get :view_items_in_tab  
       post :test_asset_url
     end
     member do
@@ -338,7 +338,7 @@ SEEK::Application.routes.draw do
   resources :sops do
     collection do
       get :preview
-      get :view_items_in_tab
+      get :view_items_in_tab  
       post :test_asset_url
     end
     member do
@@ -372,7 +372,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :fetch_preview
-      get :view_items_in_tab
+      get :view_items_in_tab  
     end
     member do
       post :update_annotations_ajax
@@ -383,7 +383,7 @@ SEEK::Application.routes.draw do
   resources :events do
     collection do
       get :preview
-      get :view_items_in_tab
+      get :view_items_in_tab  
     end
   end
 
@@ -407,15 +407,11 @@ SEEK::Application.routes.draw do
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
-      get :view_items_in_tab
+      get :view_items_in_tab  
     end
     member do
       post :update_annotations_ajax
     end
-    
- resources :tissue_and_cell_types
- resources :scales
-
   end
 
   resources :biosamples do
@@ -444,6 +440,8 @@ SEEK::Application.routes.draw do
 
   end
 
+  resources :tissue_and_cell_types
+  resources :scales
 
   ### MISC MATCHES ###
 
@@ -483,7 +481,13 @@ SEEK::Application.routes.draw do
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
 
   # Statistics
-  match '/statictics' => 'statictics#index', :as=>:statistics
+  match '/statictics' => 'statictics#index', :as => :statistics
+
+  #feedback
+  match '/home/feedback' => 'homes#feedback', :as=> :feedback, :via=>:get
+
+  #tabber lazy load
+  match 'application/resource_in_tab' => 'application#resource_in_tab'
 
   get "errors/error_422"
 

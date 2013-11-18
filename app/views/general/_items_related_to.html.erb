@@ -1,6 +1,6 @@
 <% item = items_related_to %>
 <%  resource_hash = {}
-   all_related_items_hash = get_all_related_items(item)
+   all_related_items_hash = collect_related_items(item)
     all_related_items_hash.each_key do |resource_type|
       all_related_items_hash[resource_type][:items].uniq!
       all_related_items_hash[resource_type][:items].compact!
