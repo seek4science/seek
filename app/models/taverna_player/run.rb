@@ -28,6 +28,11 @@ module TavernaPlayer
       name
     end
 
+    # Needed to show the "download" option in the sharing/permissions form
+    def is_downloadable?
+      true
+    end
+
     private
 
     # SEEK moans if projects aren't set before save... but they don't actually get persisted by this method for some reason.
