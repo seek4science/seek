@@ -40,6 +40,7 @@ SEEK::Application.configure do
   Seek::Config.default :pdf_conversion_enabled,true
   Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
+  Seek::Config.default :biosamples_enabled, true
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2

@@ -25,7 +25,7 @@
         
 		<%= fields_for(@sop) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
-        <%= fields_for(@sop) { |f|  f.fancy_multiselect :samples, {:hidden=> @sop.samples.blank?  ? true : false, :other_projects_checkbox => true}} -%>
+      <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@sop} %>
         <p>
           <%= preview_permission_popup_link(@sop)-%>
           <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "validateResourceFields(true,'sop',true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>

@@ -468,6 +468,13 @@ class ApplicationController < ActionController::Base
       }
   end
 
+  def biosamples_enabled?
+    unless Seek::Config.biosamples_enabled
+      flash[:error] = "Biosamples is disabled"
+      redirect_to :root
+    end
+  end
+
 end
 
 
