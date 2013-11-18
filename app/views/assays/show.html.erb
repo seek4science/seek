@@ -34,12 +34,14 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
           </label>
           <%= @assay.id -%>
       </p>
+      <% if Seek::Config.modelling_analysis_enabled %>
       <p class="id">
           <label>
               Class: 
           </label>
           <%= @assay.assay_class.title -%>
       </p>
+      <% end %>
       <% if @assay.owner.can_view? %>
           <p class="id">
               <label>

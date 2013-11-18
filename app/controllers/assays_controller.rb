@@ -50,6 +50,10 @@ class AssaysController < ApplicationController
     study = Study.find(params[:study_id]) if params[:study_id]
     @assay.study = study if params[:study_id] if study.try :can_edit?
     @assay_class=params[:class]
+
+    #jump straight to experimental if modelling analysis is disabled
+    @assay_class ||= "experimental" unless Seek::Config.modelling_analysis_enabled
+
     @assay.assay_class=AssayClass.for_type(@assay_class) unless @assay_class.nil?
 
     investigations = Investigation.all.select &:can_view?
