@@ -6,7 +6,6 @@ require 'active_record/fixtures'
 
 
 require 'csv'
-require 'fastercsv'
 
 namespace :seek do
 

@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 module ProjectsHelper
   def project_select_choices
     res=[]

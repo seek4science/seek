@@ -1,8 +1,8 @@
+#encoding: utf-8
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'uuidtools'
-require 'fastercsv'
 
 
 namespace :seek do

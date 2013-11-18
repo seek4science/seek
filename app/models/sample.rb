@@ -53,8 +53,8 @@ class Sample < ActiveRecord::Base
   end
 
   has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
-  has_many :models, :class_name => "Model::Version", :finder_sql => Poc.new{self.asset_sql("Model")}
-  has_many :sops, :class_name => "Sop::Version", :finder_sql => Poc.new{self.asset_sql("Sop")}
+  has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
+  has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new{self.asset_sql("Sop")}
 
   has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
   has_many :model_masters, :through => :sample_assets, :source => :asset, :source_type => 'Model'

@@ -83,7 +83,7 @@ class PresentationsController < ApplicationController
           if !@presentation.parent_name.blank?
             render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@presentation, :parent_name=>@presentation.parent_name}
           else
-            flash[:notice] = '#{t('presentation')} was successfully uploaded and saved.'
+            flash[:notice] =  "#{t('presentation')} was successfully uploaded and saved."
             respond_to do |format|
               format.html { redirect_to presentation_path(@presentation) }
             end

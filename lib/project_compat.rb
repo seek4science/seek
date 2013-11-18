@@ -14,7 +14,6 @@ module ProjectCompat
             self.projects.collect { |proj| [proj]+proj.descendants }.flatten.uniq
           end
       end
-  end
 
   def react_to_project_addition project
     SetSubscriptionsForItemJob.create_job(self.class.name, self.id, [project.id]) if (!self.new_record? && self.subscribable?)
@@ -24,5 +23,8 @@ module ProjectCompat
   def react_to_project_removal project
     RemoveSubscriptionsForItemJob.create_job(self.class.name, self.id, [project.id]) if self.subscribable?
     self.create_rdf_generation_job(true) if self.respond_to?(:create_rdf_generation_job)
+  end
+
+   end
   end
 end
