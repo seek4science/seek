@@ -1,6 +1,8 @@
 class StrainsController < ApplicationController
   include IndexPager
   include Seek::AnnotationCommon
+
+  before_filter :organisms_enabled?
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
 

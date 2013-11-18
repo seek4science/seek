@@ -5,6 +5,7 @@ require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
   include Seek::Errors::ControllerErrorHandling
+  include Seek::EnabledFeaturesFilter
 
   self.mod_porter_secret = PORTER_SECRET
 
@@ -467,6 +468,8 @@ class ApplicationController < ActionController::Base
           :current_logged_in_user=>current_user
       }
   end
+
+
 
 end
 

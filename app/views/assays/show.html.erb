@@ -34,12 +34,14 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
           </label>
           <%= @assay.id -%>
       </p>
+      <% if Seek::Config.modelling_analysis_enabled %>
       <p class="id">
           <label>
               Class: 
           </label>
           <%= @assay.assay_class.title -%>
       </p>
+      <% end %>
       <% if @assay.owner.can_view? %>
           <p class="id">
               <label>
@@ -69,11 +71,12 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
       </p>
       <% end -%>
 
-
-      <p id="organism">
-          <b>Organisms: </b>
-          <%= list_organisms_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
-      </p>
+      <% if Seek::Config.organisms_enabled %>
+        <p id="organism">
+              <b>Organisms: </b>
+            <%= list_organisms_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
+        </p>
+      <% end %>
      <% if show_scales? -%>
          <%= render :partial=>"scales/asset_scales_list",:object=>@assay -%>
      <% end %>

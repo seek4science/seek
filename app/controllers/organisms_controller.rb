@@ -1,5 +1,6 @@
 class OrganismsController < ApplicationController
 
+  before_filter :organisms_enabled?
   before_filter :find_requested_item, :only=>[:show,:edit,:more_ajax,:visualise,:destroy, :update]
   before_filter :login_required,:except=>[:show,:index,:visualise]
   before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create,:destroy]

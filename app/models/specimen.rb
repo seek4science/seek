@@ -140,7 +140,7 @@ class Specimen < ActiveRecord::Base
   end
 
   def self.user_creatable?
-    true
+    Seek::Config.biosamples_enabled
   end
 
   def clear_garbage

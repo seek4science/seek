@@ -20,10 +20,10 @@ module MenuHelper
 
         {:title=>t("menu.assets"),:sections=>[
             {:controller=>"data_files",:title=>t("data_file").pluralize},
-            {:controller=>"models", :title=>t("model").pluralize},
+            {:controller=>"models", :title=>t("model").pluralize,:hide=>!Seek::Config.models_enabled},
             {:controller=>"sops", :title=>t("sop").pluralize},
             {:controller=>"publications", :title=>"Publications"},
-            {:controller=>"biosamples",:title=>"Biosamples"}
+            {:controller=>"biosamples",:title=>"Biosamples",:hide=>!Seek::Config.biosamples_enabled}
         ]},
         {:title=>t("menu.activities"),:sections=>[
             {:controller=>"presentations",:title=>t("presentation").pluralize},
@@ -31,6 +31,7 @@ module MenuHelper
             {:controller=>"forums", :title => "Forums", :hide => !Seek::Config.forum_enabled}
         ]},
         ]
+
     if show_scales?
       scales_menu = {:title=>t("scale").pluralize,:sections=>[]}
       scales_menu[:sections] << {:path=>scales_path,:title=>"Browse #{t("scale").pluralize}"}

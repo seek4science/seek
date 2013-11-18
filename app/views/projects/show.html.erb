@@ -42,11 +42,12 @@
             <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
           </p>
         <% end %>
-
-        <p>
-          <label>Organisms:</label>
-          <%= organisms_link_list @project.organisms -%>
-        </p>
+        <% if Seek::Config.organisms_enabled %>
+            <p>
+                <label>Organisms:</label>
+                <%= organisms_link_list @project.organisms -%>
+            </p>
+        <% end %>
 
         <p class="pals">
           <label><%= Seek::Config.dm_project_name %> PALs:</label>
