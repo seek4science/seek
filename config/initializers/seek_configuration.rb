@@ -42,6 +42,7 @@ SEEK::Application.configure do
   Seek::Config.default :filestore_path,"filestore"
   Seek::Config.default :biosamples_enabled, true
   Seek::Config.default :modelling_analysis_enabled,true
+  Seek::Config.default :organisms_enabled,true
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2

@@ -139,6 +139,6 @@ class Strain < ActiveRecord::Base
 
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
   def self.user_creatable?
-    true
+    Seek::Config.organisms_enabled
   end
 end

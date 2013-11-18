@@ -470,7 +470,14 @@ class ApplicationController < ActionController::Base
 
   def biosamples_enabled?
     unless Seek::Config.biosamples_enabled
-      flash[:error] = "Biosamples is disabled"
+      flash[:error] = "Biosamples are disabled"
+      redirect_to :root
+    end
+  end
+
+  def organisms_enabled?
+    unless Seek::Config.organisms_enabled
+      flash[:error] = "Organisms are disabled"
       redirect_to :root
     end
   end

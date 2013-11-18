@@ -311,7 +311,7 @@ module Seek
       :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver, :sabiork_ws_base_url, :publish_button_enabled,
       :admin_impersonation_enabled, :auth_lookup_enabled,:sample_parser_enabled,
       :project_browser_enabled, :experimental_features_enabled, :external_search_enabled,:pdf_conversion_enabled,:forum_enabled,:filestore_path,
-      :biosamples_enabled,:modelling_analysis_enabled,
+      :biosamples_enabled,:modelling_analysis_enabled,:organisms_enabled,
       :datacite_username,:datacite_password_enc,:datacite_url]
 
     #Settings that require a conversion to integer
