@@ -24,12 +24,7 @@ class AdminsController < ApplicationController
     current_admins.each{|ca| ca.is_admin = false}
     admins.each{|a| a.is_admin = true}
     (admins | current_admins).each do |admin|
-      class << admin
-        def record_timestamps
-          false
-        end
-      end
-      admin.save
+      admin.save!
     end
     redirect_to :action=>:show
   end

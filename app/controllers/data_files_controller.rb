@@ -367,11 +367,6 @@ class DataFilesController < ApplicationController
   
   def explore
     if @display_data_file.contains_extractable_spreadsheet?
-      #Generate Ruby spreadsheet model from XML
-      @spreadsheet = @display_data_file.spreadsheet
-
-      #FIXME: Annotations need to be specific to version
-      @spreadsheet.annotations = @display_data_file.spreadsheet_annotations
       respond_to do |format|
         format.html
       end
