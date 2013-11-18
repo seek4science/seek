@@ -1,13 +1,20 @@
+<% per_page = 25 %>
+
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
   <% unless sheet.rows.empty? %>
-    <a index="<%= sheet_index -%>" class="sheet_tab <%= "selected_tab" if workbook.sheets.first == sheet -%>" href="#"><%= h(sheet.name) -%></a>
+    <a index="<%= sheet_index + 1 -%>" class="sheet_tab <%= "selected_tab" if workbook.sheets.first == sheet -%>" href="#"><%= h(sheet.name) -%></a>
   <% end %>
 <% end %>
 
 <div class="spreadsheet_container" onselectstart="return false;">
   <!--- Sheets --->
-  <% workbook.sheets.each_with_index do |sheet,sheet_index| -%>
-    <% unless sheet.rows.empty? %>
+  <% workbook.sheets.each_with_index do |sheet,index| -%>
+      <% sheet_index = index + 1 %>
+      <% unless sheet.rows.empty? %>
+          <%
+             rows = sheet.rows.compact
+             wp_rows = generate_paginate_rows(rows, sheet_index, per_page)
+          %>
       <div style="display:none" class="sheet_container" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
         <div class="corner_heading">&nbsp;</div>
         <div class="col_headings <%= "odd_heading" if sheet.last_col % 2 == 0 -%>">
@@ -22,7 +29,8 @@
 
         <div>
           <div class="row_headings <%= "odd_heading" if sheet.last_row % 2 == 0 -%>" style="float:left">
-            <% 1.upto(sheet.last_row) do |r| -%>
+            <% wp_rows.each do |row| -%>
+                <% r = row.index  %>
               <div <%= (sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%> class="row_heading <%= "odd_heading" if r % 2 == 1 -%>"><%= r -%></div>
             <% end -%>
             <div style="height: 20px">&nbsp;</div>
@@ -37,7 +45,8 @@
               </colgroup>
 
               <!--- Rows --->
-              <% 1.upto(sheet.last_row) do |r| -%>
+              <% wp_rows.each do |row| -%>
+                <% r = row.index  %>
                 <% height =(sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%>
                 <tr <%= height -%>>
                   <!--- Cells --->
@@ -57,12 +66,18 @@
           <br style="clear:both"/>
         </div>
       </div>
+
+      <%= will_paginate(wp_rows,
+                        :id => "paginate_sheet_#{sheet_index.to_s}",
+                        :params => {:sheet => sheet_index },
+                        :style => "display:none; margin-top:1em") %>
+
     <% end -%>
   <% end -%>
 </div>
 
 <script type = "text/javascript">
   //"activate" the first worksheet
-  activateSheet(0);
+  activateSheet(<%= params[:sheet] || 1 %>);
 </script>
       

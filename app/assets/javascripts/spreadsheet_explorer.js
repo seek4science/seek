@@ -498,59 +498,67 @@ function select_cells(startCol, startRow, endCol, endRow) {
 }
 
 function activateSheet(sheet, sheetTab) {
-  if(sheetTab == null)
-    sheetTab = $j("a.sheet_tab:eq(" + sheet +")");
+    if (sheetTab == null) {
+        var i = sheet - 1;
+        sheetTab = $j("a.sheet_tab:eq(" + i + ")");
+    }
 
-  var sheetIndex = sheetTab.attr("index");
+    var sheetIndex = sheetTab.attr("index");
 
 
-  //Clean up
-  //Hide annotations
-  $j('div.annotation').hide();
-  $j('#annotation_container').hide();
+    //Clean up
+    //Hide annotations
+    $j('div.annotation').hide();
+    $j('#annotation_container').hide();
 
-  //Deselect previous tab
-  $j('a.selected_tab').removeClass('selected_tab');
+    //Deselect previous tab
+    $j('a.selected_tab').removeClass('selected_tab');
 
-  //Disable old table + sheet
-  $j('.active_sheet').removeClass('active_sheet');
+    //Disable old table + sheet
+    $j('.active_sheet').removeClass('active_sheet');
 
-  //Hide sheets
-  $j('div.sheet_container').hide();
+    //Hide sheets
+    $j('div.sheet_container').hide();
 
-  //Select the tab
-  sheetTab.addClass('selected_tab');
+    //Hide paginates
+    $j('div.pagination').hide();
 
-  //Show the sheet
-  $j("div.sheet_container#spreadsheet_" + sheetIndex).show();
+    //Select the tab
+    sheetTab.addClass('selected_tab');
 
-  var activeSheet = $j("div.sheet#spreadsheet_" + sheetIndex);
+    //Show the sheet
+    $j("div.sheet_container#spreadsheet_" + sheetIndex).show();
 
-  //Show the div + set sheet active
-  activeSheet.addClass('active_sheet');
+    //Show the sheet paginate
+    $j("div#paginate_sheet_" + sheetIndex).show();
 
-  //Reset scrollbars
-  activeSheet.scrollTop(0).scrollLeft(0);
+    var activeSheet = $j("div.sheet#spreadsheet_" + sheetIndex);
 
-  //Set table active
-  activeSheet.children("table.sheet").addClass('active_sheet');
+    //Show the div + set sheet active
+    activeSheet.addClass('active_sheet');
 
-  deselect_cells();
+    //Reset scrollbars
+    activeSheet.scrollTop(0).scrollLeft(0);
 
-  //Record current sheet in annotation form
-  $j('input#annotation_sheet_id').attr("value",sheetIndex);
+    //Set table active
+    activeSheet.children("table.sheet").addClass('active_sheet');
 
-  //Reset variables
-  isMouseDown = false,
-      startRow = 0,
-      startCol = 0,
-      endRow = 0,
-      endCol = 0;
+    deselect_cells();
+
+    //Record current sheet in annotation form
+    $j('input#annotation_sheet_id').attr("value", sheetIndex);
+
+    //Reset variables
+    isMouseDown = false,
+        startRow = 0,
+        startCol = 0,
+        endRow = 0,
+        endCol = 0;
 
     //FIXME: for some reason, calling this twice solves a problem where the column and column header widths are mis-aligned
     adjust_container_dimensions();
     adjust_container_dimensions();
-  return false;
+    return false;
 }
 
 function copy_cells()
