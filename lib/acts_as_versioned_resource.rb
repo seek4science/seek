@@ -137,6 +137,10 @@ module Acts #:nodoc:
         parent.annotations if parent.respond_to? :annotations
       end
 
+      def can_see_hidden_item? person
+        parent.can_see_hidden_item?(person)
+      end
+
     end
   end
 end
