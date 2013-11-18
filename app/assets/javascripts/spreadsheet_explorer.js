@@ -358,16 +358,42 @@ function createAnnotationStub(ann)
       .append($j("<td>"+content+"</td>"))
       .append($j("<td>"+ann.dateCreated+"</td>"))
       .click( function (){
-        jumpToAnnotation(ann.id, ann.sheetNumber, ann.cellRange);
-        $j('#annotation_overview').hide();
+         goToSheetPage(ann);
       });
 
   return stub;
 }
 
+function goToSheetPage(annotation){
+    var paginateForSheet = $('paginate_sheet_' + (annotation.sheetNumber+1));
+    if (paginateForSheet != null)
+    {
+        //calculate the page
+        var page = Math.floor(annotation.startRow/perPage) + 1;
+        var links = paginateForSheet.getElementsByTagName('a');
+        var link;
+        for (var i=0; i<links.length; i++){
+            if (links[i].text == page.toString()){
+                link = links[i];
+            }
+        }
+        if (link != null){
+            link.href = link.href.concat('&annotation_id=' + annotation.id);
+            clickLink(link);
+        }else{
+            jumpToAnnotation(annotation.id, annotation.sheetNumber+1, annotation.cellRange);
+            $j('#annotation_overview').hide();
+        }
+
+    }else{
+        jumpToAnnotation(annotation.id, annotation.sheetNumber+1, annotation.cellRange);
+        $j('#annotation_overview').hide();
+    }
+}
+
 function bindAnnotation(ann) {
   $j("table.sheet:eq("+ann.sheetNumber+") tr").slice(ann.startRow-1,ann.endRow).each(function() {
-            
+
     $j(this).children("td.cell").slice(ann.startCol-1,ann.endCol).addClass("annotated_cell")
           .click(function () {show_annotation(ann.id,
               $j(this).position().left + $j(this).outerWidth(),
@@ -546,7 +572,7 @@ function activateSheet(sheet, sheetTab) {
     deselect_cells();
 
     //Record current sheet in annotation form
-    $j('input#annotation_sheet_id').attr("value", sheetIndex);
+    $j('input#annotation_sheet_id').attr("value", sheetIndex -1);
 
     //Reset variables
     isMouseDown = false,
