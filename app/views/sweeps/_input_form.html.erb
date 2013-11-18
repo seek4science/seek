@@ -19,7 +19,9 @@
      # Show the (editable) data port value from the previous run the sweep is based on or an example value, if exists.
      # Otherwise, just show an empty input field for the value.
      if sweep_based_on_run
-       if sweep_iteration.blank? || (sweep_iteration == 1) # For the first iteration or if it is not an iteration - show values, for others just blank input fields
+       # For the first iteration or if it is not an iteration - show values, for others just blank input fields
+       # Don't try this if it was run with a file input!
+       if (sweep_iteration.blank? || (sweep_iteration == 1)) && run_input.file_file_name.blank?
          value = run_input.try(:value)
        else
          value = nil
