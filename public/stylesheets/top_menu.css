@@ -79,7 +79,7 @@ ul#section_menu_items > li > a:hover {
 }
 
 #search_box {
-    float: right;
+    vertical-align: middle;
     margin-right: 2em;
     width:auto;
     color:white;

@@ -887,6 +887,7 @@ img.badge {
 }
 
 #topbar {
+    text-align: center;
     height: 20px;
     background-image: url('../images/searchfade-repeat.png');
     background-repeat: repeat-x;
@@ -1792,10 +1793,6 @@ ul.modifications {
     width: 20em;
 }
 
-
-#search_box input[type="text"] {
-    width: 20em;
-}
 
 
 ul.modification_row {

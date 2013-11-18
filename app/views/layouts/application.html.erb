@@ -35,6 +35,13 @@
 <body id="body">
 
 <div id="doc3" class="yui-t2">
+  <% if logged_in_and_registered? %>
+        <div id="logged_in_as">
+          <span style="float:left;padding-top: 2px;">Logged in as</span>
+          <%= image_tag_for_key "user", current_user.person, current_user.person.name, {}, current_user.person.name -%>
+          | <%= image_tag_for_key "logout", logout_path, "Logout", {}, "Logout" -%>
+        </div>
+    <% end %>
 
   <div id="header">
     <%= render :partial=>"layouts/header_main" %>
