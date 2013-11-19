@@ -77,6 +77,8 @@ class Publication < ActiveRecord::Base
 
   alias :seek_authors :creators
 
+  scope :default_order, order("published_date DESC")
+
   def non_seek_authors
     publication_authors.find_all_by_person_id nil
   end
