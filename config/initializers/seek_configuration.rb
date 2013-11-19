@@ -31,6 +31,7 @@ SEEK::Application.configure do
   Seek::Config.default :community_news_feed_urls,''
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
+  Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :sample_parser_enabled,false
@@ -45,6 +46,9 @@ SEEK::Application.configure do
   Seek::Config.default :organisms_enabled,true
   Seek::Config.default :models_enabled,true
   Seek::Config.default :guide_box_enabled,true
+  Seek::Config.default :treatments_enabled,true
+  Seek::Config.default :factors_studied_enabled,true
+  Seek::Config.default :experimental_conditions_enabled,true
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2
