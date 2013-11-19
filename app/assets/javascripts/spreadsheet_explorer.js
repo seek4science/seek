@@ -470,7 +470,7 @@ function select_range(range) {
     select_cells(startCol, startRow, endCol, endRow);
 
   //Scroll to selected cells
-  var row = $j("table.active_sheet tr").slice(startRow-1,endRow).first();
+  var row = $j("table.active_sheet tr").slice((startRow-1)%perPage,endRow%perPage).first();
   var cell = row.children("td.cell").slice(startCol-1,endCol).first();
 
   $j('div.active_sheet').scrollTop(row.position().top + $j('div.active_sheet').scrollTop() - 500);
