@@ -10,7 +10,7 @@
   end
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
-    f.work_groups {[Factory.build :work_group]}
+    f.work_groups {[Factory.build(:work_group)]}
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|

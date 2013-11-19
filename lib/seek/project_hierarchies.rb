@@ -20,7 +20,10 @@ module Seek
 
         after_update :touch_for_hierarchy_updates
         #when I have a new ancestor, subscribe to items in that project
-        write_inheritable_array :before_add_for_ancestors, [:add_indirect_subscriptions]
+        #write_inheritable_array :before_add_for_ancestors, [:add_indirect_subscriptions]
+        self.class_attribute :before_add_for_ancestors
+
+        self.before_add_for_ancestors = Array.wrap(:add_indirect_subscriptions)
 
         def create_ancestor_workgroups institution
           parent.institutions << institution unless parent.nil? || parent.institutions.include?(institution)
@@ -43,7 +46,7 @@ module Seek
         end
 
         def add_indirect_subscriptions ancestor
-          subscribers = project_subscriptions.scoped(:include => :person).map(&:person)
+          subscribers = project_subscriptions.includes(:person).map(&:person)
           possibly_new_items = ancestor.subscribable_items #might already have subscriptions to these some other way
           subscribers.each do |p|
             possibly_new_items.each { |i| i.subscribe(p); disable_authorization_checks { i.save(false) } if i.changed_for_autosave? }
@@ -128,6 +131,12 @@ module Seek
 
   end
   module CallBackMethods
+     # dynamically add before_add callback to associations
+    def before_add rel, callback
+      a = reflect_on_association(rel)
+      send(a.macro, rel, a.options.merge(:before_add => callback))
+    end
+
     # dynamically add after_add callback to associations
     def after_add rel, callback
       a = reflect_on_association(rel)

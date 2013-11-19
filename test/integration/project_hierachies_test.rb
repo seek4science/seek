@@ -1,6 +1,6 @@
 require 'test_helper'
 class ProjectHierarchiesTest < ActiveSupport::TestCase
-  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :taggings, :tags, :publications, :assets, :organisms
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users,  :publications, :assets, :organisms
 
   def setup
     User.current_user = Factory(:user)
@@ -81,7 +81,7 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
       parent_proj = Factory(:project, :title => "test parent")
       proj = Factory(:project, :parent_id => parent_proj.id)
       assert_equal proj.parent, parent_proj
-      assert true, parent_proj.descendants.include?(proj)
+      assert_equal true, parent_proj.descendants.include?(proj)
       parent_proj_changed = Factory(:project, :title => "changed test parent")
       proj.parent = parent_proj_changed
       proj.save!
@@ -98,7 +98,7 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
       project.save!
 
       institutions.each do |ins|
-        assert true, parent_proj.institutions.include?(ins)
+        assert_equal true, parent_proj.institutions.include?(ins)
       end
     end
 
@@ -107,10 +107,10 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
       proj = Factory :project, :parent => parent_proj
 
       Project::RELATED_RESOURCE_TYPES.each do |type|
-        proj.send "#{type.underscore.pluralize}=".to_sym, [Factory type.underscore.to_sym] unless ["Study", "Assay"].include?(type)
+        proj.send "#{type.underscore.pluralize}=".to_sym, [Factory(type.underscore.to_sym)] unless ["Study", "Assay"].include?(type)
 
         proj.send("#{type.underscore.pluralize}".to_sym).each do |resource|
-          assert true, parent_proj.send("related_#{type.underscore.pluralize}".to_sym).include?(resource)
+          assert_equal true, parent_proj.send("related_#{type.underscore.pluralize}".to_sym).include?(resource)
         end
       end
     end
