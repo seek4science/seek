@@ -31,6 +31,7 @@ SEEK::Application.configure do
   Seek::Config.default :community_news_feed_urls,''
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
+  Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :sample_parser_enabled,false
