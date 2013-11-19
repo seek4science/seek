@@ -31,7 +31,7 @@
         Outputs
       </div>
       <div class="foldContent">
-        <% if run.finished? && run.outputs.any? %>
+        <% if @run.finished? && @run.outputs.any? %>
           <%= render :partial => "outputs", :locals => {:run => @run} %>
         <% end %>
       </div>
