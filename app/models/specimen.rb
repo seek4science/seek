@@ -3,6 +3,7 @@ require 'subscribable'
 require 'acts_as_scalable'
 class Specimen < ActiveRecord::Base
   include Subscribable
+  include Seek::Rdf::RdfGeneration
 
    acts_as_scalable if Seek::Config.is_virtualliver
 
