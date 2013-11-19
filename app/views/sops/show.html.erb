@@ -36,13 +36,14 @@
   </div>
 
   <div style="clear:both;">
-    <p>
-        <h2>
-          Experimental Conditions
-        </h2>
-    </p>
-    <%= render :partial=>"sops/simple_experimental_conditions_list" %>
-    <br/>
+    <% if Seek::Config.experimental_conditions_enabled %>
+        <p>
+            <h2>
+              Experimental Conditions
+            </h2>
+        </p>
+        <%= render :partial=>"sops/simple_experimental_conditions_list" %>
+    <% end %>
 
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"general/items_related_to",:object => @sop %>
