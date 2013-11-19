@@ -72,6 +72,7 @@ class AdminsController < ApplicationController
     Seek::Config.piwik_analytics_url= params[:piwik_analytics_url]
 
     Seek::Config.set_smtp_settings 'port', params[:port] if only_integer params[:port], 'port'
+    Seek::Util.clear_cached
     update_redirect_to (only_integer params[:port], "port"),'features_enabled'
   end
 
