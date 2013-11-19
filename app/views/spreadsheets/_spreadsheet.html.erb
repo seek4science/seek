@@ -78,10 +78,11 @@
 
 <script type = "text/javascript">
   var perPage = 25;
+  window.onload=function(){
   //"activate" the first worksheet
-  activateSheet(<%= params[:sheet] || 1 %>);
-
-  displayAnnotation();
+    activateSheet(<%= params[:sheet] || 1 %>);
+    displayAnnotation();
+  }
 
   function displayAnnotation(){
       <% a = Annotation.find_by_id(params[:annotation_id]) %>
