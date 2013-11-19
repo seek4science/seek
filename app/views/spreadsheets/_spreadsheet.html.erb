@@ -69,7 +69,7 @@
 
       <%= will_paginate(wp_rows,
                         :id => "paginate_sheet_#{sheet_index.to_s}",
-                        :params => {:sheet => sheet_index },
+                        :params => {:sheet => sheet_index, :annotation_id => nil},
                         :style => "display:none; margin-top:1em") %>
 
     <% end -%>
