@@ -209,12 +209,12 @@ class Policy < ActiveRecord::Base
         return "Individual access rights for each member"
       when Policy::NO_ACCESS
         return "No access"
-      when Policy::VISIBLE
+      when Policy::VISIBLE # Not used
         return resource.try(:is_downloadable?) ? "View summary only" : "View summary"
       when Policy::ACCESSIBLE
-        return resource.try(:is_downloadable?) ? "View summary and get contents" : "View summary"
+        return "View and download"
       when Policy::EDITING
-        return resource.try(:is_downloadable?) ? "View and edit summary and contents" : "View and edit summary"
+        return "View, download and edit"
       when Policy::MANAGING
         return "Manage"
       else
