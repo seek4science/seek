@@ -135,6 +135,11 @@ for automating these services.
 
 === Starting and Stopping the Search Service
 
+For a new installation, by default search is disabled. Before running the service you may need to enable search in the Administration setting.
+The SEEK server needs restarting whenever search is enabled or disabled.
+
+<b>If search is enabled and the following service is not running, you will get errors when adding or updating information in SEEK.</b>
+
 SEEK search is based upon the {Apache Lucene Solr}[http://lucene.apache.org/solr/] service. To start this service run:
 
   bundle exec rake sunspot:solr:start
@@ -146,11 +151,10 @@ and to stop run:
 Optionally, there is also a configuration file in config/sunspot.yml for configuring the port that Solr runs on - which is important if running multiple SEEK
 installations on the same machine.
 
-To trigger some of the default data to be indexed for search you should run:
+The following task can also be at any time if there is need to force all content to be reindexed (such as after a period of running SEEK with search turned off).
 
   bundle exec rake seek:reindex_all
 
-This task can also be used at any time if there is need to force all content to be reindexed (such as after a period of running SEEK with search turned off).
 
 === Starting and Stopping the Background Service
 
