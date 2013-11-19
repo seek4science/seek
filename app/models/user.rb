@@ -209,6 +209,31 @@ class User < ActiveRecord::Base
     !person.nil? && person.can_edit_institutions?
   end
 
+  def can_manage_types?
+    unless Seek::Config.type_managers_enabled
+      return false
+    end
+
+    case Seek::Config.type_managers
+      when "admins"
+        if User.admin_logged_in?
+          return true
+        else
+          return false
+        end
+      when "pals"
+        if User.admin_logged_in? || User.pal_logged_in?
+          return true
+        else
+          return false
+        end
+      when "users"
+        return true
+      when "none"
+        return false
+    end
+  end
+
   def self.with_current_user user
     previous = self.current_user
     self.current_user = user
