@@ -70,7 +70,7 @@ module Seek
     end  
     
     def distinct_culprits_since time=500.years.ago
-      ActivityLog.count(:all,:select=>"distinct culprit_id",:conditions=>["created_at > ?",time])
+      ActivityLog.where(["created_at > ?",time]).select("distinct culprit_id").count
     end
 
   end
