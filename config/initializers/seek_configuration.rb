@@ -10,7 +10,7 @@ SEEK::Application.configure do
   Seek::Config.default :email_enabled,false
   Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
   Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
-  Seek::Config.default :solr_enabled,true
+  Seek::Config.default :solr_enabled,false
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"http://jjj.mib.ac.uk/"
   Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
@@ -31,6 +31,7 @@ SEEK::Application.configure do
   Seek::Config.default :community_news_feed_urls,''
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
+  Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :sample_parser_enabled,false
@@ -40,6 +41,15 @@ SEEK::Application.configure do
   Seek::Config.default :pdf_conversion_enabled,true
   Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
+  Seek::Config.default :biosamples_enabled, true
+  Seek::Config.default :modelling_analysis_enabled,true
+  Seek::Config.default :organisms_enabled,true
+  Seek::Config.default :models_enabled,true
+  Seek::Config.default :guide_box_enabled,true
+  Seek::Config.default :treatments_enabled,true
+  Seek::Config.default :factors_studied_enabled,true
+  Seek::Config.default :experimental_conditions_enabled,true
+  Seek::Config.default :documentation_enabled,true
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2

@@ -43,7 +43,7 @@ class SearchController < ApplicationController
 
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
-          sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event, Sample, Specimen]
+          sources = Seek::Util.searchable_types
           sources.delete(Specimen) if !Seek::Config.is_virtualliver
           sources.each do |source|
             search_result = source.search do |query|

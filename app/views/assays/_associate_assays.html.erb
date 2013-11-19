@@ -1,4 +1,6 @@
 <%
+    return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
+
     show_relationships = resource.is_a?(DataFile)
     resource_text ||= text_for_resource(resource)
     all_assays=authorised_assays
@@ -15,8 +17,13 @@
       single_assay_class_text = t 'assays.modelling_analysis'
       assay_class_text = single_assay_class_text.pluralize
     else
-      assay_class_text = "#{t('assays.experimental_assay').pluralize} and #{t('assays.modelling_analysis').pluralize}"
-      single_assay_class_text = "#{t('assays.experimental_assay')} or #{t('assays.modelling_analysis')}"
+      if Seek::Config.modelling_analysis_enabled
+        assay_class_text = "#{t('assays.experimental_assay').pluralize} and #{t('assays.modelling_analysis').pluralize}"
+        single_assay_class_text = "#{t('assays.experimental_assay')} or #{t('assays.modelling_analysis')}"
+      else
+        assay_class_text = "#{t('assays.experimental_assay').pluralize}"
+        single_assay_class_text = "#{t('assays.experimental_assay')}"
+      end
     end
 %>
 

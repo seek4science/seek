@@ -302,16 +302,19 @@ module Seek
     extend CustomAccessors
 
     #Basic settings
-    settings = [:home_description, :home_feeds_cache_timeout, :public_seek_enabled, :events_enabled, :bioportal_api_key, :jerm_enabled, :email_enabled, :no_reply, :jws_enabled,
-      :jws_online_root, :hide_details_enabled, :activation_required_enabled, :project_name, :smtp, :default_pages, :project_type, :project_link, :header_image_enabled, :header_image,
+    settings = [:home_description, :home_feeds_cache_timeout, :public_seek_enabled, :bioportal_api_key, :no_reply,
+      :jws_online_root, :hide_details_enabled, :activation_required_enabled, :project_name, :smtp, :default_pages, :project_type, :project_link, :header_image,
       :pubmed_api_email, :crossref_api_email,:site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :solr_enabled,
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
       :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
-      :google_analytics_tracker_id,:piwik_analytics_enabled,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
-      :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver, :sabiork_ws_base_url, :publish_button_enabled,
-      :admin_impersonation_enabled, :auth_lookup_enabled,:sample_parser_enabled,
-      :project_browser_enabled, :experimental_features_enabled, :external_search_enabled,:pdf_conversion_enabled,:forum_enabled,:filestore_path,
+      :google_analytics_tracker_id,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
+      :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver, :sabiork_ws_base_url,:filestore_path,
+      :tagline_prefix,
+      :biosamples_enabled,:events_enabled,:modelling_analysis_enabled,:organisms_enabled,:models_enabled,:forum_enabled,:jerm_enabled,:email_enabled,:jws_enabled,:external_search_enabled,:piwik_analytics_enabled,
+      :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,
+      :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,
       :datacite_username,:datacite_password_enc,:datacite_url]
+
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"

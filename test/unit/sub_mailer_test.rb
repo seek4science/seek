@@ -33,7 +33,7 @@ class SubMailerTest < ActionMailer::TestCase
     assert email.body.include?("Resources Updated:")
     assert email.body.include?("Date Created")
     assert email.body.include?("Date Updated")
-    assert email.body.include?("25th December 2012 at 13:15")
+    assert email.body.include?("25th Dec 2012 at 13:15")
 
   end
 

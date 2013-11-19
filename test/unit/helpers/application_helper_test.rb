@@ -18,11 +18,11 @@ class ApplicationHelperTest < ActionView::TestCase
 
     date = Date.new(2012,2,1)
     text = date_as_string(date,false,true)
-    assert_equal "1st February 2012",text
+    assert_equal "1st Feb 2012",text
 
     date = Date.new(2012,1,2)
     text = date_as_string(date,false,true)
-    assert_equal "2nd January 2012",text
+    assert_equal "2nd Jan 2012",text
   end
 
   test "should handle nil date" do
@@ -53,13 +53,13 @@ class ApplicationHelperTest < ActionView::TestCase
 
   test "date_as_string with Date or DateTime" do
     date = DateTime.parse("2011-10-28")
-    assert_equal "28th October 2011",date_as_string(date)
+    assert_equal "28th Oct 2011",date_as_string(date)
 
     date = Date.new(2011,10,28)
-    assert_equal "28th October 2011",date_as_string(date)
+    assert_equal "28th Oct 2011",date_as_string(date)
 
     date = Time.parse("2011-10-28")
-    assert_equal "28th October 2011",date_as_string(date)
+    assert_equal "28th Oct 2011",date_as_string(date)
   end
 
   test "date_as_string with nil date" do

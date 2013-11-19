@@ -35,7 +35,7 @@
 
         <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
-        <%= fields_for(@model) {|f| f.fancy_multiselect(:samples, {:hidden=> @model.samples.blank?  ? true : false, :other_projects_checkbox => true})} -%>
+        <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@model} %>
 
         <p>
           <%= preview_permission_popup_link(@model)-%>
