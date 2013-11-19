@@ -1,13 +1,9 @@
-<% if run.finished? && run.outputs.any? %>
+<% result_output_port_names = run.workflow.output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::RESULT) }.collect { |i| i.name } -%>
+<% run_result_outputs = run.outputs.select { |output| result_output_port_names.include?(output.name) } %>
+<%= render :partial => "output_list", :locals => { :ports => run_result_outputs, :title => "Results", :run => run } -%>
 
-  <% result_output_port_names = run.workflow.output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::RESULT) }.collect { |i| i.name } -%>
-  <% run_result_outputs = run.outputs.select { |output| result_output_port_names.include?(output.name) } %>
-  <%= render :partial => "output_list", :locals => { :ports => run_result_outputs, :title => "Results", :run => run } -%>
-
-  <!-- Error/log output port names from the workflow -->
-  <% error_log_output_port_names = run.workflow.output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }.collect { |i| i.name } -%>
-  <!-- Figure out error/log outputs from the run -->
-  <% run_error_log_outputs = run.outputs.select { |output| error_log_output_port_names.include?(output.name) } %>
-  <%= render :partial => "output_list", :locals => { :ports => run_error_log_outputs, :title => "Errors/Logs", :run => run } -%>
-<% end %>
-
+<!-- Error/log output port names from the workflow -->
+<% error_log_output_port_names = run.workflow.output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }.collect { |i| i.name } -%>
+<!-- Figure out error/log outputs from the run -->
+<% run_error_log_outputs = run.outputs.select { |output| error_log_output_port_names.include?(output.name) } %>
+<%= render :partial => "output_list", :locals => { :ports => run_error_log_outputs, :title => "Errors/Logs", :run => run } -%>
