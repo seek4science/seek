@@ -392,17 +392,32 @@ function goToSheetPage(annotation){
 }
 
 function bindAnnotation(ann) {
-  $j("table.sheet:eq("+ann.sheetNumber+") tr").slice(ann.startRow-1,ann.endRow).each(function() {
+    var current_page = currentPage(ann.sheetNumber+1);
+    //if no pagination, or the annotation belongs to the cell of current page, then bind it to the page
+    if ((current_page == null) || ((current_page-1)*perPage < ann.startRow &&  ann.startRow <= current_page*perPage)){
+        $j("table.sheet:eq("+ann.sheetNumber+") tr").slice(ann.startRow-1,ann.endRow).each(function() {
 
-    $j(this).children("td.cell").slice(ann.startCol-1,ann.endCol).addClass("annotated_cell")
-          .click(function () {show_annotation(ann.id,
-              $j(this).position().left + $j(this).outerWidth(),
-              $j(this).position().top);}
-          );
-  });
+            $j(this).children("td.cell").slice(ann.startCol-1,ann.endCol).addClass("annotated_cell")
+                .click(function () {show_annotation(ann.id,
+                    $j(this).position().left + $j(this).outerWidth(),
+                    $j(this).position().top);}
+            );
+        });
+    }
 }
 
+//to identify the current page for a specific sheet
+function currentPage(sheetNumber){
+    var paginateForSheet = $('paginate_sheet_' + (sheetNumber));
+    if (paginateForSheet != null)
+    {
+        var current_page = paginateForSheet.getElementsByClassName('current')[0].innerText;
+        return Number(current_page);
+    }else{
+        return null;
+    }
 
+}
 
 function toggle_annotation_form(annotation_id) {
   var elem = 'div#annotation_' + annotation_id
