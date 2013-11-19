@@ -38,7 +38,7 @@
     <% if logged_in? && current_user.person %>
       <li><%= workflow_filter  current_user.person.name, params, :uploader_id, current_user.id -%> (you)</li>
     <% end %>
-  <% User.all.each do |user| %>
+  <% User.all.select { |u| u.person }.each do |user| %>
     <% unless user == current_user %>
       <li><%= workflow_filter  user.person.name, params, :uploader_id, user.id -%></li>
     <% end %>
