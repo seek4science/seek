@@ -38,7 +38,7 @@ module MenuHelper
       definitions << scales_menu
     end
 
-    definitions << {:title=>t("menu.documentation"),:spacer=>true, :sections=>[
+    definitions << {:title=>t("menu.documentation"),:spacer=>true, :hide=>!Seek::Config.documentation_enabled,:sections=>[
         {:controller=>"help_documents",:title=>t("menu.help")},
         {:path=>"/help/faq",:title=>t("menu.faq")},
         {:path=>"/help/templates",:title=>t("menu.jerm_templates")},
@@ -49,8 +49,7 @@ module MenuHelper
 
   def top_level_menu_tabs definitions
     selected_tab = current_top_level_tab(definitions)
-    definitions.collect do |menu|
-
+    definitions.select{|d| !d[:hide]}.collect do |menu|
       attributes = ""
       attributes << "id = 'selected_tabnav'" if selected_tab == menu
       attributes << " class='spacer_before'" if menu[:spacer]
