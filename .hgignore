@@ -45,6 +45,8 @@ public/help_images/*
 public/javascripts/*_cached.js
 public/stylesheets/*_cached.css
 
+public/assets/
+
 .bundle/config
 
 vendor/plugins/annotations/.git
