@@ -507,22 +507,25 @@ function select_cells(startCol, startRow, endCol, endRow) {
     maxCol = startCol;
   }
 
+  var relativeMinRow = minRow % perPage;
+  var relativeMaxRow = maxRow % perPage;
+
   //Deselect any cells and headings
   $j(".selected_cell").removeClass("selected_cell");
   $j(".selected_heading").removeClass("selected_heading");
 
   //"Select" dragged cells
-  $j("table.active_sheet tr").slice(minRow-1,maxRow).each(function() {
-    $j(this).children("td.cell:not(.selected_cell)").slice(minCol-1,maxCol).addClass("selected_cell");
+  $j("table.active_sheet tr").slice(relativeMinRow-1,relativeMaxRow).each(function() {
+      $j(this).children("td.cell:not(.selected_cell)").slice(minCol-1,maxCol).addClass("selected_cell");
   });
 
   //"Select" dragged cells' column headings
   $j("div.active_sheet").parent().parent().find("div.col_headings div.col_heading").slice(minCol-1,maxCol).addClass("selected_heading");
 
   //"Select" dragged cells' row headings
-  $j("div.active_sheet").parent().find("div.row_headings div.row_heading").slice(minRow-1,maxRow).addClass("selected_heading");
+  $j("div.active_sheet").parent().find("div.row_headings div.row_heading").slice(relativeMinRow-1,relativeMaxRow).addClass("selected_heading");
 
-  //Update the selection display e.g A3:B2
+    //Update the selection display e.g A3:B2
   var selection = "";
   selection += (num2alpha(minCol).toString() + minRow.toString());
 
