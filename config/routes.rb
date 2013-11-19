@@ -118,6 +118,7 @@ SEEK::Application.routes.draw do
       get :select
       get :get_work_group
       get :view_items_in_tab
+      get :resource_in_tab
       post :userless_project_selected_ajax
     end
     member do
@@ -141,6 +142,7 @@ SEEK::Application.routes.draw do
     collection do
       get :request_institutions
       get :view_items_in_tab
+      get :resource_in_tab
       get :manage
     end
     member do
@@ -172,6 +174,7 @@ SEEK::Application.routes.draw do
     collection do
       get :request_all
       get :view_items_in_tab
+      get :resource_in_tab
     end
     resources :avatars do
       member do
@@ -185,6 +188,7 @@ SEEK::Application.routes.draw do
   resources :investigations do
     collection do
       get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       get :approve_or_reject_publish
@@ -196,6 +200,7 @@ SEEK::Application.routes.draw do
     collection do
       post :investigation_selected_ajax
       get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       get :approve_or_reject_publish
@@ -208,6 +213,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       get :approve_or_reject_publish
@@ -233,6 +239,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       get :view_items_in_tab
+      get :resource_in_tab
       post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
@@ -272,7 +279,8 @@ SEEK::Application.routes.draw do
   resources :presentations do
     collection do
       get :preview
-      get :view_items_in_tab  
+      get :view_items_in_tab
+      get :resource_in_tab
       post :test_asset_url
     end
     member do
@@ -301,7 +309,8 @@ SEEK::Application.routes.draw do
     collection do
       get :build
       get :preview
-      get :view_items_in_tab  
+      get :view_items_in_tab
+      get :resource_in_tab
       post :test_asset_url
     end
     member do
@@ -345,7 +354,8 @@ SEEK::Application.routes.draw do
   resources :sops do
     collection do
       get :preview
-      get :view_items_in_tab  
+      get :view_items_in_tab
+      get :resource_in_tab
       post :test_asset_url
     end
     member do
@@ -379,7 +389,8 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :fetch_preview
-      get :view_items_in_tab  
+      get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -390,7 +401,8 @@ SEEK::Application.routes.draw do
   resources :events do
     collection do
       get :preview
-      get :view_items_in_tab  
+      get :view_items_in_tab
+      get :resource_in_tab
     end
   end
 
@@ -414,7 +426,8 @@ SEEK::Application.routes.draw do
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
-      get :view_items_in_tab  
+      get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -440,6 +453,7 @@ SEEK::Application.routes.draw do
     collection do
       post :search_ajax
       get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       get :visualise
