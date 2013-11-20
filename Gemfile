@@ -77,7 +77,6 @@ gem 'unicorn-rails'
 
 gem 'taverna-t2flow'
 gem "taverna-player", :git => "git://github.com/myGrid/taverna-player", :branch => "master"
-gem "t2-server", :git => "git://github.com/myGrid/t2-server-gem", :branch => "next"
 
 group :development do
   gem "sqlite3","1.3.7"

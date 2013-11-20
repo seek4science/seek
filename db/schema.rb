@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131028132930) do
+ActiveRecord::Schema.define(:version => 20131120102955) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1477,16 +1477,17 @@ ActiveRecord::Schema.define(:version => 20131028132930) do
   end
 
   create_table "taverna_player_interactions", :force => true do |t|
-    t.boolean  "replied",                          :default => false
+    t.boolean  "replied",                        :default => false
     t.integer  "run_id"
-    t.datetime "created_at",                                          :null => false
-    t.datetime "updated_at",                                          :null => false
-    t.boolean  "displayed",                        :default => false
+    t.datetime "created_at",                                        :null => false
+    t.datetime "updated_at",                                        :null => false
+    t.boolean  "displayed",                      :default => false
     t.string   "unique_id"
     t.text     "page"
     t.string   "feed_reply"
-    t.text     "output_value", :limit => 16777215
+    t.text     "data",       :limit => 16777215
     t.string   "serial"
+    t.string   "page_uri"
   end
 
   add_index "taverna_player_interactions", ["run_id"], :name => "index_taverna_player_interactions_on_run_id"
@@ -1534,8 +1535,6 @@ ActiveRecord::Schema.define(:version => 20131028132930) do
     t.integer  "results_file_size"
     t.datetime "results_updated_at"
     t.boolean  "embedded",                          :default => false
-    t.string   "proxy_notifications"
-    t.string   "proxy_interactions"
     t.boolean  "stop",                              :default => false
     t.string   "log_file_name"
     t.string   "log_content_type"
@@ -1552,6 +1551,7 @@ ActiveRecord::Schema.define(:version => 20131028132930) do
     t.string   "uuid"
     t.string   "first_letter",         :limit => 1
     t.text     "description"
+    t.integer  "user_id"
   end
 
   add_index "taverna_player_runs", ["run_id"], :name => "index_taverna_player_runs_on_run_id"

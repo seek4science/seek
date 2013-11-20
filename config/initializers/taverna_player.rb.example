@@ -1,9 +1,6 @@
 # Taverna Player configuration
 
 TavernaPlayer.setup do |config|
-  # Set this to the name of the server on which Taverna Player is running.
-  config.player_hostname = "http://localhost:3000"
-
   # This should be set to the name of the workflow model class in the main
   # application and the listed methods should also be mapped if necessary.
   # config.workflow_model_proxy("Workflow")
