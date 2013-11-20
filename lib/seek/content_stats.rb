@@ -6,8 +6,8 @@ module Seek
     class ProjectStats
       attr_accessor :project,:sops,:data_files,:models,:publications,:people,:assays,:studies,:investigations,:presentations, :user
       
-      def initialize user
-        @user=user
+      def initialize
+        @user = User.first
       end
       
       def data_files_size
@@ -62,10 +62,10 @@ module Seek
       end
     end
 
-    def self.generate user
+    def self.generate
       result=[]
       Project.all.each do |project|
-        project_stats=ProjectStats.new(user)
+        project_stats=ProjectStats.new
         project_stats.project=project
         project_stats.people=project.people
         AUTHORISED_TYPES.each do |type|
