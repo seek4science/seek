@@ -24,6 +24,7 @@
 
   <%= form_for @sweep, :html => {:multipart => true} do |sweep_form| %>
       <%= sweep_form.hidden_field :workflow_id, :value => @workflow.id %>
+      <%= hidden_field_tag :run_id, params[:run_id] %>
       <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
 
       <div style="text-align: left; padding: 20px 0px 20px 0px;">
