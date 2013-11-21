@@ -1,4 +1,4 @@
-<% per_page = 25 %>
+<% per_page = params[:per_page].try(:to_i) || 50 %>
 
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
   <% unless sheet.rows.empty? %>
@@ -69,15 +69,23 @@
 
       <%= will_paginate(wp_rows,
                         :id => "paginate_sheet_#{sheet_index.to_s}",
-                        :params => {:sheet => sheet_index, :annotation_id => nil},
+                        :params => {:sheet => sheet_index, :per_page => per_page, :annotation_id => nil},
                         :style => "display:none; margin-top:1em") %>
 
     <% end -%>
   <% end -%>
 </div>
+<br/>
+Display <%= text_field_tag :per_page, per_page, :size => 4 %> rows per page
+<input type='button' value='Change' onclick='changeRowsPerPage()'/>
 
 <script type = "text/javascript">
-  var perPage = 25;
+  var perPage = 50
+
+  <% if params[:per_page] %>
+      perPage = <%= params[:per_page] %>;
+  <% end %>
+
   window.onload=function(){
   //"activate" the first worksheet
     activateSheet(<%= params[:sheet] || 1 %>);
@@ -91,6 +99,5 @@
         jumpToAnnotation(ann.id, ann.sheetNumber+1, ann.cellRange);
       <% end %>
   }
-
 </script>
       

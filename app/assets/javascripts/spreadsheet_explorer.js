@@ -395,7 +395,7 @@ function bindAnnotation(ann) {
     var current_page = currentPage(ann.sheetNumber+1);
     //if no pagination, or the annotation belongs to the cell of current page, then bind it to the page
     if ((current_page == null) || ((current_page-1)*perPage < ann.startRow &&  ann.startRow <= current_page*perPage)){
-        $j("table.sheet:eq("+ann.sheetNumber+") tr").slice(ann.startRow-1,ann.endRow).each(function() {
+        $j("table.sheet:eq("+ann.sheetNumber+") tr").slice((ann.startRow-1)%perPage,ann.endRow%perPage).each(function() {
 
             $j(this).children("td.cell").slice(ann.startCol-1,ann.endCol).addClass("annotated_cell")
                 .click(function () {show_annotation(ann.id,
@@ -624,4 +624,24 @@ function copy_cells()
   $j("textarea#export_data").val(text);
   $j("div.spreadsheet_popup").hide();
   $j("div#export_form").show();
+}
+
+function changeRowsPerPage(){
+    var current_href = window.location.href;
+    var update_per_page = $('per_page').value;
+    var update_href = '';
+    if (current_href.match('per_page') == null){
+        update_href = current_href.concat('&per_page='+update_per_page);
+    }else{
+        var href_array = current_href.split('&');
+        update_href = update_href.concat(href_array[0]);
+        for (var i=1;i<href_array.length;i++){
+            if(href_array[i].match('per_page' == null)){
+                update_href = update_href.concat('&' + href_array[i]);
+            }else{
+                update_href = update_href.concat('&per_page='+update_per_page);
+            }
+        }
+    }
+    window.location.href = update_href;
 }
