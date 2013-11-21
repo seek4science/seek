@@ -22,4 +22,10 @@ module RunsHelper
     end
   end
 
+  def mime_type_options(original)
+    types = [["text/plain", "text/plain"], ["text/csv", "text/csv"]]
+    types.prepend([original, original]) unless types.any? { |a| a[0] == original }
+    options_for_select([[p.metadata[:type], p.metadata[:type]], ["text/csv", "text/csv"]])
+  end
+
 end

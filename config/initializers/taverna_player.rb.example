@@ -71,7 +71,7 @@ TavernaPlayer.setup do |config|
   # It takes the run model object as its parameter.
   #config.post_run_callback = Proc.new { |run| puts "Finished: #{run.name}" }
   #config.post_run_callback = "player_post_run_callback"
-  #config.post_run_callback = :player_post_run_callback
+  config.post_run_callback = :fix_run_output_mime_types
 
   # The run-cancelled callback is called if the run is cancelled by the user.
   # It takes the run model object as its parameter.
@@ -94,7 +94,7 @@ TavernaPlayer.setup do |config|
 
   # Renderers for each type of output (referenced by MIME type) must then be
   # registered. All the renderers shown below are supplied as defaults.
-  #config.output_renderers do |renderers|
+  config.output_renderers do |renderers|
     # Set a default renderer for if there is a workflow type that browsers
     # can't otherwise handle.
     #renderers.default(:cannot_inline)
@@ -112,11 +112,12 @@ TavernaPlayer.setup do |config|
     #renderers.add("image/png", :show_image)
     #renderers.add("image/gif", :show_image)
     #renderers.add("image/bmp", :show_image)
+    renderers.add("text/csv", :format_csv)
 
     # This is the workflow error type and you should have a special renderer
     # for it.
     #renderers.add("application/x-error", :workflow_error)
-  #end
+  end
 end
 
 # Example workflow run callbacks defined in the initializer.

@@ -29,6 +29,7 @@
         <%= t.name -%>
       </th>
     <% end %>
+    <th class="port-type">MIME Type (optional)</th>
   </tr>
   <%= f.fields_for(:output_ports) do |o| %>
     <tr>
@@ -43,6 +44,9 @@
           </label>
         </td>
       <% end %>
+      <td class="port-type">
+        <%= o.text_field :mime_type -%>
+      </td>
     </tr>
   <% end %>
 </table>

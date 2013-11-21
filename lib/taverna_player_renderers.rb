@@ -29,6 +29,28 @@ def format_xml(content, type)
   raw(CodeRay.scan(out, :xml).div(:css => :class, :line_numbers => :table))
 end
 
+def format_csv(content, type)
+  csv = CSV.parse(content)
+
+  html = '<table class="csv">'
+  html << '<tr>'
+  csv[0].each do |header|
+    html << "<td>#{header}</td>"
+  end
+  html << '</tr>'
+  csv[1..-1].each do |row|
+
+    html << '<tr>'
+    row.each do |cell|
+      html << "<td>#{cell}</td>"
+    end
+    html << '</tr>'
+  end
+  html << '</table>'
+
+  raw(html)
+end
+
 def show_image(content, type)
   # Can't use image_tag() here because the image doesn't really exist (it's in
   # a zip file, really) and this confuses the Rails asset pipeline.

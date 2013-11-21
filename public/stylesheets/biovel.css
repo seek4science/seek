@@ -360,3 +360,7 @@ ul.runs_and_sweeps_list li > a > img {
   vertical-align: text-top;
   margin-right: 10px;
 }
+
+table.csv {
+  border-collapse: collapse
+}
