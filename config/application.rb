@@ -34,6 +34,7 @@ module SEEK
                                   batch_upload.js
                                   bioportal_form_complete.js
                                   biosample.js
+                                  cytoscape_isa_graph.js
                                   detect_browser.js
                                   fancy_multiselect.js
                                   folds.js
@@ -90,6 +91,7 @@ module SEEK
                                   spreadsheet_explorer.css
                                   calendar_date_select/default.css
                                   cytoscape.js-2.0.2/index.css
+                                  cytoscape_isa_graph.css
                                   data_tables.css
                                   jquery-ui-1.8.14.custom.css
                                   jscrollpane/jquery.jscrollpane.css
