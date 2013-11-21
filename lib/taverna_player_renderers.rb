@@ -30,19 +30,28 @@ def format_xml(content, type)
 end
 
 def format_csv(content, type)
+  if content.is_a?(URI)
+    m = content.to_s.match("/runs/([0-9]+)/output/(.+)")
+    puts content.to_s
+    puts m.inspect
+    run = TavernaPlayer::Run.find(m[1].to_i)
+    output_name = m[2]
+    Zip::ZipFile.open(run.results.path) do |zip|
+      content = zip.read(output_name).force_encoding('utf-8')
+    end
+  end
+
   csv = CSV.parse(content)
 
   html = '<table class="csv">'
-  html << '<tr>'
-  csv[0].each do |header|
-    html << "<td>#{header}</td>"
-  end
-  html << '</tr>'
-  csv[1..-1].each do |row|
-
+  csv.each do |row|
     html << '<tr>'
     row.each do |cell|
-      html << "<td>#{cell}</td>"
+      if cell && cell.size > 50
+        html << "<td>#{cell[0...50]}...</td>"
+      else
+        html << "<td>#{cell}</td>"
+      end
     end
     html << '</tr>'
   end
