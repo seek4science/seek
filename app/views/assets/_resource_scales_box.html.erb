@@ -5,7 +5,11 @@
     Scales
   </p>
   <br/>
-  <%= show_item_scales resource-%>
+  <%if resource.scales.blank?%>
+      <span class='none_text'>Not Specified</span>
+  <% else %>
+      <%= show_item_scales resource-%>
+  <% end %>
 
 </div>
 <% end -%>
