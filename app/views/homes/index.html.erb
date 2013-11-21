@@ -1,12 +1,12 @@
 <div id="home">
 
-  <% if SiteAnnouncement.headline_announcement and !current_user.nil? -%>
-    <p class="box_standout headline_announcement">
-      <%= site_annoucements_headline %>
-    </p>
-  <% end -%>
+  <% if Seek::Config.is_virtualliver %>
+      <%= render :partial=> "vln_home_contents" -%>
+  <% else %>
+      <%= render :partial=>"home_contents" -%>
+  <% end %>
 
-  <%= render :partial=>"alternative_home_vl" -%>
+
 
 </div>
 
