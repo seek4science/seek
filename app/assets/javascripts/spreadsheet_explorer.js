@@ -625,3 +625,23 @@ function copy_cells()
   $j("div.spreadsheet_popup").hide();
   $j("div#export_form").show();
 }
+
+function changeRowsPerPage(){
+    var current_href = window.location.href;
+    var update_per_page = $('per_page').value;
+    var update_href = '';
+    if (current_href.match('per_page') == null){
+        update_href = current_href.concat('&per_page='+update_per_page);
+    }else{
+        var href_array = current_href.split('&');
+        update_href = update_href.concat(href_array[0]);
+        for (var i=1;i<href_array.length;i++){
+            if(href_array[i].match('per_page' == null)){
+                update_href = update_href.concat('&' + href_array[i]);
+            }else{
+                update_href = update_href.concat('&per_page='+update_per_page);
+            }
+        }
+    }
+    window.location.href = update_href;
+}
