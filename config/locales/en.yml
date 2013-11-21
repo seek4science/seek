@@ -37,6 +37,8 @@ en:
   #Project
   project: "Project"
 
+  #Feedback
+  feedback: "Provide Feedback"
 
   menu:
     yellow_pages: "Yellow pages"
