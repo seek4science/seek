@@ -636,7 +636,7 @@ function changeRowsPerPage(){
         var href_array = current_href.split('&');
         update_href = update_href.concat(href_array[0]);
         for (var i=1;i<href_array.length;i++){
-            if(href_array[i].match('per_page' == null)){
+            if(href_array[i].match('per_page') == null){
                 update_href = update_href.concat('&' + href_array[i]);
             }else{
                 update_href = update_href.concat('&per_page='+update_per_page);
