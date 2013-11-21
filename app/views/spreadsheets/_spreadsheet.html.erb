@@ -1,4 +1,10 @@
-<% per_page = params[:per_page].try(:to_i) || 50 %>
+<%
+   default_rows_per_page = 200
+   if workbook.sheets.count > 3
+     default_rows_per_page = 100
+   end
+%>
+<% per_page = params[:per_page].try(:to_i) || default_rows_per_page %>
 
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
   <% unless sheet.rows.empty? %>
@@ -80,7 +86,7 @@ Display <%= text_field_tag :per_page, per_page, :size => 4 %> rows per page
 <input type='button' value='Change' onclick='changeRowsPerPage()'/>
 
 <script type = "text/javascript">
-  var perPage = 50
+  var perPage = <%= default_rows_per_page %>;
 
   <% if params[:per_page] %>
       perPage = <%= params[:per_page] %>;
