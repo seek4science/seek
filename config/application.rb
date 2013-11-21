@@ -81,7 +81,6 @@ module SEEK
                                   homepage.css
                                   isa_graph.css
                                   jws/index.css
-                                  local.css
                                   match_making.css
                                   project_folders.css
                                   publishing.css

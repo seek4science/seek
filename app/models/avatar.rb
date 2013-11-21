@@ -48,5 +48,27 @@ class Avatar < ActiveRecord::Base
   def selected?
     owner.avatar_id && owner.avatar_id.to_i == id.to_i
   end
+
+  def public_asset_url size=""
+
+    size = "#{size}x#{size}" if size.kind_of?(Numeric)
+
+    size = filter_size(size)
+    resize_image(size)
+
+    public_avatars_dir = File.join(Rails.configuration.assets.prefix,"avatar-images")
+
+    assets_dir = File.join(Rails.root,"public",public_avatars_dir)
+    unless File.exists?(assets_dir)
+      FileUtils.mkdir_p assets_dir
+    end
+
+    avatar_filename = "#{self.id}-#{size}.#{self.class.image_storage_format}"
+    filepath = File.join(assets_dir,avatar_filename)
+    unless File.exists?(filepath)
+      FileUtils.copy(full_cache_path(size),filepath)
+    end
+    File.join(public_avatars_dir,avatar_filename)
+  end
   
 end

@@ -24,15 +24,11 @@ SEEK::Application.configure do
   # Generate digests for assets URLs
   config.assets.digest = true
 
-  #The X-Sendfile header is a directive to the web server to ignore the response from the application,
-  #and instead serve a specified file from disk
-  #config.action_dispatch.x_sendfile_header = "X-Sendfile"
-
   # Defaults to nil and saved in location specified by config.assets.prefix
   # config.assets.manifest = YOUR_PATH
 
   # Specifies the header that your server uses for sending files
-  # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
+  config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
