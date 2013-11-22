@@ -61,7 +61,7 @@ module AvatarsHelper
   end
 
   def avatar_url(avatar_for_instance, avatar_id, size=nil)
-    serve_from_public = true
+    serve_from_public = Rails.configuration.assets.enabled
     if serve_from_public
       avatar_for_instance.avatar.public_asset_url(size)
     else
