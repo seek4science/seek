@@ -2,15 +2,8 @@
 <%= javascript_include_tag 'jquery-1.5.1.min','jquery-ui-1.8.14.custom.min', 'spreadsheet_explorer','spreadsheet_explorer_plot',
                            'flot/index' %>
 
-<ul class="sectionIcons">
-  <li>
-    <%= image_tag_for_key('arrow_left', data_file_path(@data_file), "Return to #{t('data_file')}", nil, "Return to #{t('data_file')}") -%>
-  </li>
-</ul>
 
-<h1>Exploring <%= t('data_file') %></h1>
-
-<div style="margin-left: auto; margin-right: auto; width: 98%;">
+<div style="margin-left: auto; margin-right: auto; margin-top: 2em; width: 98%;">
   <div id="spreadsheet_errors"></div>
   
   <input size="10" id="selection_data">
