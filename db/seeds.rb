@@ -1,4 +1,36 @@
+#encoding: utf-8
 # Seeds the database with BioVeL-specific data
+
+# Seeds projects
+Project.delete_all
+project = Project.create(:name => 'BioVeL')
+puts 'Seeded the BioVeL project.'
+
+# Seeds institutions
+Institution.delete_all
+
+institutions = [{:name => 'University of Manchester', :country => 'United Kingdom'},
+{:name => 'Cardiff University', :country => 'United Kingdom'},
+{:name => 'Centro de Referência em Informação Ambiental', :country => 'Brazil'},
+{:name => 'Foundation for Research on Biodiversity', :country => 'France'},
+{:name => 'Fraunhofer-Gesellschaft Institute IAIS', :country => 'Germany'},
+{:name => 'Berlin Botanical Gardens and Botanical Museum', :country => 'Germany'},
+{:name => 'Hungarian Academy of Sciences Institute of Ecology and Botany', :country => 'Hungary'},
+{:name => 'Max Planck Society, MPI for Marine Microbiology', :country => 'Germany'},
+{:name => 'National Institute of Nuclear Physics', :country => 'Italy'},
+{:name => 'National Research Council: Institute for Biomedical Technologies and Institute of Biomembrane and Bioenergetics', :country => 'Italy'},
+{:name => 'Netherlands Centre for Biodiversity ', :country => 'The Netherlands'},
+{:name => 'Stichting European Grid Initiative', :country => 'The Netherlands'},
+{:name => 'University of Amsterdam', :country => 'The Netherlands'},
+{:name => 'University of Eastern Finland', :country => 'Finland'},
+{:name => 'University of Gothenburg', :country => 'Sweden'}]
+
+institutions.each do |inst|
+  institution = Institution.create(:name => inst[:name], :country => inst[:country])
+  WorkGroup.create(:project => project, :institution => institution)
+end
+
+puts 'Seeded 15 BioVeL project\'s institutions.'
 
 # Seeds workflow categories
 workflow_categories = [WorkflowCategory::TAXONOMIC_REFINEMENT, WorkflowCategory::ENM, WorkflowCategory::METAGENOMICS,
