@@ -101,7 +101,7 @@ module Seek
             end
             #Pad rows
             if row_index < min_rows
-              for i in (row_index..min_rows)
+              for i in ((row_index + 1)..min_rows)
                 row = Row.new(i, 1000.to_s)
                 sheet.rows << row
               end
