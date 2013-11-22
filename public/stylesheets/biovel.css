@@ -265,6 +265,7 @@ table.display tr td:first-child {
     width: 200px;
     margin-left: -60px;
     background: white;
+    z-index: 999999;
 }
 
 #workflow_runs_table_wrapper {
