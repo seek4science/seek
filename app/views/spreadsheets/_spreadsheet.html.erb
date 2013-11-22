@@ -4,7 +4,7 @@
      default_per_page = 100
    end
 %>
-<% per_page = params[:per_page].try(:to_i) || default_per_page %>
+<% per_page = params[:page_rows].try(:to_i) || default_per_page %>
 
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
   <% unless sheet.rows.empty? %>
@@ -75,7 +75,7 @@
 
       <%= will_paginate(wp_rows,
                         :id => "paginate_sheet_#{sheet_index.to_s}",
-                        :params => {:sheet => sheet_index, :per_page => per_page, :annotation_id => nil},
+                        :params => {:sheet => sheet_index, :page_rows => per_page, :annotation_id => nil},
                         :style => "display:none; margin-top:1em") %>
 
     <% end -%>
@@ -88,12 +88,12 @@ Display <%= text_field_tag :per_page, per_page, :size => 4 %> rows per page
 <script type = "text/javascript">
   var perPage = <%= default_per_page %>;
 
-  <% if params[:per_page] %>
-      perPage = <%= params[:per_page] %>;
+  <% if params[:page_rows] %>
+      perPage = <%= params[:page_rows] %>;
   <% end %>
 
   window.onload=function(){
-  //"activate" the first worksheet
+  //"activate" the worksheet
     activateSheet(<%= params[:sheet] || 1 %>);
     displayAnnotation();
   }
