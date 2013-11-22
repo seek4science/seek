@@ -15,3 +15,13 @@
 //= require publication
 //= require top_menu
 //= require dynamic_menu
+//= require batch_upload
+//= require assays
+//= require models
+//= require sharing
+//= require associate_events
+//= require attribution
+//= require resource
+//= require studied_factor
+//= require fancy_multiselect
+//= require parseuri
