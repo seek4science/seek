@@ -27,3 +27,4 @@
 //= require parseuri
 //= require folds
 //= require tabber-minimized
+//= require detect_browser
