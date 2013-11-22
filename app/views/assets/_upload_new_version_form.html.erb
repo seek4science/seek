@@ -1,5 +1,3 @@
-<%= javascript_include_tag 'resource'%>
-
 <% if logged_in? && current_user.person.member? -%>
 <div id="upload_new_version_form" style="display:none">
     <%= form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
