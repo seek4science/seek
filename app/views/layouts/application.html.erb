@@ -93,9 +93,11 @@
 
 </div>
 
-<%# NB! These javascript include should be here - otherwise folds / tabs will not be displayed on any pages. -%>
-<%= javascript_include_tag "folds" %>
-<%= javascript_include_tag "tabber-minimized" %>
+<% unless is_front_page? %>
+    <script type="text/javascript">
+        initialiseFolds();
+    </script>
+<% end %>
 
 <%= piwik_tracking_tag %>
 </body>
