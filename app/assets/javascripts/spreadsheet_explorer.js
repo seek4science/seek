@@ -646,16 +646,27 @@ function changeRowsPerPage(){
     if (current_href.match('page_rows') == null){
         update_href = current_href.concat('&page_rows='+update_per_page);
     }else{
-        var href_array = current_href.split('&');
+        var href_array = current_href.split('?');
         update_href = update_href.concat(href_array[0]);
-        for (var i=1;i<href_array.length;i++){
-            if(href_array[i].match('page_rows') == null){
-                update_href = update_href.concat('&' + href_array[i]);
+        var param_array = [];
+        if (href_array[1] != null){
+            param_array = href_array[1].split('&');
+            update_href = update_href.concat('?');
+        }
+
+        for (var i=0;i<param_array.length;i++){
+            if(param_array[i].match('page_rows') == null){
+                update_href = update_href.concat('&' + param_array[i]);
             }else{
                 update_href = update_href.concat('&page_rows='+update_per_page);
             }
+            //go to the first page
+            if(param_array[i].match('page=') != null){
+                update_href = update_href.concat('&page=1');
+            }
         }
     }
+
     window.location.href = update_href;
 }
 
