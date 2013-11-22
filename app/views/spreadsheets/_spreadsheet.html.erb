@@ -18,8 +18,7 @@
       <% sheet_index = index + 1 %>
       <% unless sheet.rows.empty? %>
           <%
-             rows = sheet.rows.compact
-             wp_rows = generate_paginate_rows(rows, sheet_index, per_page)
+             wp_rows = generate_paginate_rows(sheet.rows, sheet_index, per_page)
           %>
       <div style="display:none" class="sheet_container" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
         <div class="corner_heading">&nbsp;</div>
