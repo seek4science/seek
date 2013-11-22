@@ -4,6 +4,7 @@
 //= require prototype_ujs
 //= require effects
 //= require dragdrop
+//= require boxover
 //= require scriptaculous
 //= require controls
 //= require builder
