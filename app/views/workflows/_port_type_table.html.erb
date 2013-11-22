@@ -7,7 +7,9 @@
       </th>
     <% end %>
   </tr>
-  <%= f.fields_for(:input_ports) do |i| %>
+  <% input_ports = @workflow.input_ports.sort{|a, b| a.name <=> b.name} -%>
+  <% output_ports = @workflow.output_ports.sort{|a, b| a.name <=> b.name} -%>
+  <%= f.fields_for(:input_ports, input_ports) do |i| %>
     <tr>
       <td class="port-name"><%= i.object.name %></td>
       <%= i.hidden_field(:name) %>
@@ -31,7 +33,7 @@
     <% end %>
     <th class="port-type">MIME Type (optional)</th>
   </tr>
-  <%= f.fields_for(:output_ports) do |o| %>
+  <%= f.fields_for(:output_ports, output_ports) do |o| %>
     <tr>
       <td class="port-name"><%= o.object.name %></td>
       <%= o.hidden_field(:name) %>
