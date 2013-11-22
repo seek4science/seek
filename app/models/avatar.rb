@@ -50,8 +50,12 @@ class Avatar < ActiveRecord::Base
   end
 
   #provides a url to the avatar to be served from public/assets/ - resizing and copying the avatar across if necessary
-  def public_asset_url size=""
+  def public_asset_url size=nil
+    size ||= 200
 
+    if size=="large"
+      size = LARGE_SIZE
+    end
     size = "#{size}x#{size}" if size.kind_of?(Numeric)
 
     size = filter_size(size)
