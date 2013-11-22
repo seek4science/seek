@@ -66,5 +66,7 @@ module SEEK
 
     config.action_view.sanitized_allowed_attributes = ['rel']
 
+    config.middleware.use Rack::Deflater
+
   end
 end
