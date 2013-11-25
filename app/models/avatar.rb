@@ -2,7 +2,7 @@
 # (hence will be unique, no matter what kind of owner -- person/project/institution -- we have)
 
 # DECLARING WHAT "LARGE" AVATAR IS
-LARGE_SIZE = "1000x1000"
+LARGE_SIZE = "500"
 
 
 class Avatar < ActiveRecord::Base
