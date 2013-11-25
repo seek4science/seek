@@ -124,7 +124,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "data files tab should be selected" do
     get :index
     if !Seek::Config.is_virtualliver
-     #VLN uses drop-down menu, while SysMO uses tabs
+     #VLN uses drop down menu, while SysMO uses tabs
     assert_select "ul.tabnav" do
       assert_select "li#selected_tabnav" do
         assert_select "a[href=?]",data_files_path,:text=>I18n.t('data_file').pluralize
@@ -172,7 +172,7 @@ end
     assert_not_nil assigns(:data_files)
   end
 
-  test 'should not show index for non-project member, should show for non-login user' do
+  test 'should not show index for non project member, should show for non login user' do
     login_as(:registered_user_with_no_projects)
     get :index
     assert_response :redirect
@@ -203,7 +203,7 @@ end
     end
   end
 
-  test 'non-project member and non-login user cannot edit datafile with public policy and editable' do
+  test 'non project member and non login user cannot edit datafile with public policy and editable' do
     login_as(:registered_user_with_no_projects)
     data_file = Factory(:data_file, :policy => Factory(:public_policy, :access_type => Policy::EDITING))
 
@@ -355,7 +355,7 @@ end
     assert_response :success
     assert @response.body.include?('The URL was accessed successfully')
     #https
-    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'https://seek.sysmo-db.org/'}})
+    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'https://seek.sysmo db.org/'}})
     assert_response :success
     assert @response.body.include?('The URL was accessed successfully')
   end
@@ -530,15 +530,15 @@ end
   end
 
   test "should add link to a webpage" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
     if Seek::Config.is_virtualliver
-      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)], :external_link => "1"}
+      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
     else
-      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}
+      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}
     end
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}, :sharing=>valid_sharing
+        post :create, :data_file => params_data_file, :sharing=>valid_sharing
       end
     end
 
@@ -554,16 +554,16 @@ end
   end
 
   test "should add link to a webpage from windows browser" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
     if Seek::Config.is_virtualliver
-      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)], :external_link => "1"}
+      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
     else
-      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:projects=>[projects(:sysmo_project)]}
+      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}
     end
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         @request.env['HTTP_USER_AGENT']="Windows"
-        post :create, :data_file => { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}, :sharing=>valid_sharing
+        post :create, :data_file => params_data_file, :sharing=>valid_sharing
       end
     end
 
@@ -579,7 +579,7 @@ end
   end
 
   test "should show wepage as a link" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
     if Seek::Config.is_virtualliver
       df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
     else
@@ -599,7 +599,7 @@ end
   end
 
   test "should not show website link for viewable but inaccessible data but should show request button" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
     df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com"),:policy=>Factory(:all_sysmo_viewable_policy)
     user = Factory :user
     assert df.can_view?(user)
@@ -651,7 +651,7 @@ end
   end
 
   test "dont show download button or count for website/external_link data file" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
     if Seek::Config.is_virtualliver
       df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
     else
@@ -701,9 +701,9 @@ end
     al=ActivityLog.last
     assert_equal "download",al.action
     assert_equal df,al.activity_loggable
-    assert_equal "attachment; filename=\"rightfield.xls\"",@response.header['Content-Disposition']
-    assert_equal "application/excel",@response.header['Content-Type']
-    assert_equal "9216",@response.header['Content-Length']
+    assert_equal "attachment; filename=\"rightfield.xls\"",@response.header['Content Disposition']
+    assert_equal "application/excel",@response.header['Content Type']
+    assert_equal "9216",@response.header['Content Length']
   end
 
   test "should download" do
@@ -711,9 +711,9 @@ end
       get :download, :id => Factory(:small_test_spreadsheet_datafile,:policy=>Factory(:public_policy), :contributor=>User.current_user).id
     end
     assert_response :success
-    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"",@response.header['Content-Disposition']
-    assert_equal "application/excel",@response.header['Content-Type']
-    assert_equal "7168",@response.header['Content-Length']
+    assert_equal "attachment; filename=\"small test spreadsheet.xls\"",@response.header['Content Disposition']
+    assert_equal "application/excel",@response.header['Content Type']
+    assert_equal "7168",@response.header['Content Length']
   end
 
   test "should download from url" do
@@ -833,7 +833,7 @@ end
 
     get :download, :id => df, :disposition => 'inline'
     assert_response :success
-    assert @response.header['Content-Disposition'].include?('inline')
+    assert @response.header['Content Disposition'].include?('inline')
   end
 
   test "should handle normal attachment download" do
@@ -844,7 +844,7 @@ end
 
     get :download, :id => df
     assert_response :success
-    assert @response.header['Content-Disposition'].include?('attachment')
+    assert @response.header['Content Disposition'].include?('attachment')
   end
   
   test "shouldn't download" do
@@ -964,7 +964,7 @@ end
   
   test "should destroy DataFile" do
     assert_difference('ActivityLog.count') do
-      assert_difference('DataFile.count', -1) do
+      assert_difference('DataFile.count',  -1) do
         assert_no_difference("ContentBlob.count") do
           delete :destroy, :id => data_files(:editable_data_file).id
         end
@@ -989,7 +989,7 @@ end
       # the latest version is 3
       assert_equal 3, df.version
 
-      assert_difference("df.versions.length", -1) do
+      assert_difference("df.versions.length",  -1) do
         put :destroy_version, :id=>df, :version => 3
         df.reload
       end
@@ -1524,7 +1524,7 @@ end
     assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
   end
 
-  test 'should show the other creators in -uploader and creators- box' do
+  test 'should show the other creators in  uploader and creators  box' do
     data_file=data_files(:picture)
     data_file.other_creators = 'another creator'
     data_file.save
@@ -1622,12 +1622,53 @@ end
 
 
 
+    test "can move to presentations" do
+     data_file = Factory :data_file, :contributor => User.current_user
+     assert_difference("DataFile.count",  -1) do
+       assert_difference("Presentation.count") do
+         post :convert_to_presentation, :id => data_file
+       end
+     end
+     assert assigns(:presentation)
+     assert_redirected_to assigns(:presentation)
+   end
+ 
+   test "converting to presentation logs creation activity" do
+     data_file = Factory :data_file,:contributor=>User.current_user
+     assert_difference("ActivityLog.count") do
+           post :convert_to_presentation, :id=>data_file
+     end
+     assert assigns(:presentation)
+     presentation = assigns(:presentation)
+ 
+     #needs to mimic the logging of a presentation being created
+     al = ActivityLog.last
+     assert_equal "create",al.action
+     assert_equal User.current_user,al.culprit
+     assert_equal presentation,al.activity_loggable
+     assert_equal "data_files",al.controller_name
+   end
+ 
+   test "converted presentations have correct attributions" do
+     data_file = Factory :data_file,:contributor=>User.current_user
+     disable_authorization_checks {data_file.relationships.create :other_object => Factory(:data_file), :subject => data_file, :predicate => Relationship::ATTRIBUTED_TO}
+     df_attributions = data_file.attributions_objects
+     assert_difference("DataFile.count",  -1) do
+       assert_difference("Presentation.count") do
+         post :convert_to_presentation, :id=>data_file.id
+       end
+     end
+ 
+     assert_equal df_attributions, assigns(:presentation).attributions_objects
+     assert !assigns(:presentation).attributions_objects.empty?
+   end
+
 
   private
 
   def mock_http
     file="#{Rails.root}/test/fixtures/files/file_picture.png"
-    stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
+    stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content Type' => 'image/png'})
     stub_request(:head, "http://mockedlocation.com/a-piccy.png")
 
     stub_request(:any, "http://mocked301.com").to_return(:status=>301)
@@ -1638,7 +1679,7 @@ end
 
   def mock_https
     file="#{Rails.root}/test/fixtures/files/file_picture.png"
-    stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
+    stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content Type' => 'image/png'})
     stub_request(:head, "https://mockedlocation.com/a-piccy.png")
 
     stub_request(:any, "https://mocked301.com").to_return(:status=>301)
@@ -1656,7 +1697,7 @@ end
   end
 
   def valid_data_file_with_https_url
-    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/a-piccy.png",:projects=>[projects(:sysmo_project)]}
+    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/a-piccy.png",:project_ids=>[projects(:sysmo_project).id]}
   end
 
   def valid_data_file_with_https_url
