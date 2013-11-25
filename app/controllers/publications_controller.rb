@@ -5,8 +5,9 @@ class PublicationsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon
   
-  require 'pubmed_query_tool'
-  
+  include PubmedQueryToolExtension
+  include DoiQueryToolExtension
+
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
