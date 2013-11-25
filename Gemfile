@@ -76,6 +76,8 @@ gem 'passenger'
 gem "unicorn-rails"
 gem "recaptcha", '0.3.1'
 
+gem 'rb-readline', '~> 0.4.2'
+
 group :development do
   gem "sqlite3","1.3.7"
   gem "pry"
