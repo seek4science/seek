@@ -94,6 +94,19 @@ module TavernaPlayer
       @runs = @runs & Run.all_authorized_for('view', current_user)
     end
 
+    # Overrides the method from TavernaPlayer::Concerns::Controllers::RunsController
+    # to check for non-existing runs and failing gracefully instead of throwing 404 Not found.
+    def find_run
+      if Run.where(:id => params[:id]).blank?
+        respond_to do |format|
+          flash[:error] = 'The run you are looking for does not exist.'
+          format.html { redirect_to runs_path}
+        end
+      else
+        @run = Run.find(params[:id])
+      end
+    end
+
     # Returns a list of simple Run objects and Sweep objects
     def add_sweeps
       @runs = @runs.group_by { |run| run.sweep }

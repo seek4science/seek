@@ -275,7 +275,7 @@ class ApplicationController < ActionController::Base
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
         if eval("@#{name}").nil?
-          flash[:error] = "The #{name.humanize} does not exist!"
+          flash[:error] = "The #{name.humanize.downcase} does not exist!"
         else
           flash[:error] = "You are not authorized to view #{name.humanize}"
         end

@@ -12,15 +12,15 @@
   <%= csrf_meta_tag %>
 
   <%= javascript_include_tag 'savage_beast/application.js' -%>
-  <%= javascript_include_tag 'prototype.js','prototype_ujs.js', 'effects.js', 'dragdrop.js', 'boxover.js',
+  <%= javascript_include_tag 'prototype.js', 'prototype_ujs.js', 'effects.js', 'dragdrop.js', 'boxover.js',
                              'scriptaculous.js', 'controls.js', 'redbox.js', 'builder.js', 'application.js',
-                             'tagging.js', 'autocompleter_advanced.js', 'publication.js','top_menu.js',
-                             'dynamic_menu.js', :cache=>'js_cached' %>
+                             'tagging.js', 'autocompleter_advanced.js', 'publication.js', 'top_menu.js',
+                             'dynamic_menu.js', :cache => 'js_cached' %>
 
 
   <%= stylesheets = ['reset-fonts-grids', 'base-min', 'my_exp', 'folds', 'gadgets', 'acts_as_taggable_stylesheet',
                      'styles', 'favourites', 'fast_auto_complete', 'redbox', 'autocompleter_advanced',
-                     'alphabetical_pagination', 'savage_beast/forums', 'site_announcements', 'tabnav','top_menu',
+                     'alphabetical_pagination', 'savage_beast/forums', 'site_announcements', 'tabnav', 'top_menu',
                      'dynamic_menu', 'data_tables', 'biovel', 'easytabs', 'biovel_colours']
       stylesheets = stylesheets << 'local' if File.exists?('public/stylesheets/local.css')
       stylesheets << {:cache => 'css_cached'}
@@ -32,7 +32,8 @@
           $(element).innerHTML =<%= ("'" + image_tag("ajax-loader.gif") + "'").html_safe -%>;
       }
       function show_large_ajax_loader(element) {
-          $(element).innerHTML =<%= ("'" + image_tag("ajax-loader-large.gif") + "'").html_safe -%>
+          $(element).innerHTML =
+          <%= ("'" + image_tag("ajax-loader-large.gif") + "'").html_safe -%>
       }
   </script>
 
@@ -51,12 +52,13 @@
       </ul>
       <ul class="menutabs clearfix" style="float: right; margin-right: 20px">
         <% if logged_in? && current_user.person %>
-          <%= navigation_link current_user.person.name, main_app.person_path(current_user.person), nil, false -%>
-          <%= navigation_link('Admin', main_app.admin_path, nil, false) if admin_logged_in? -%>
-          <%= navigation_link 'Log out', main_app.logout_path, nil, false -%>
+            <%= navigation_link current_user.person.name, main_app.person_path(current_user.person), nil, false -%>
+            <%= navigation_link('Admin', main_app.admin_path, nil, false) if admin_logged_in? -%>
+            <%= navigation_link('Contact', main_app.contact_path, nil, false) -%>
+            <%= navigation_link 'Log out', main_app.logout_path, nil, false -%>
         <% else %>
-          <li><a href="#" onclick="$('menubar-login-form').toggle();">Log in / Register</a></li>
-          <div id="menubar-login-form" style="display: none"><%= render :partial => "gadgets/sign_in" %></div>
+            <li><a href="#" onclick="$('menubar-login-form').toggle();">Log in / Register</a></li>
+            <div id="menubar-login-form" style="display: none"><%= render :partial => "gadgets/sign_in" %></div>
         <% end %>
       </ul>
     </div>
@@ -78,13 +80,13 @@
         <%# applying styling to error / notice messages -%>
         <% if flash[:error] %>
             <div id="error_flash" class="box_standout curved with_smaller_shadow" style="color: red; margin: 0.8em 0.8em; line-height: 1.4;">
-              <%= link_to_function image_tag("close.gif", :style => "float: right;"),"new Effect.toggle('error_flash','slide',{duration:0.3});" %>
+              <%= link_to_function image_tag("close.gif", :style => "float: right;"), "new Effect.toggle('error_flash','slide',{duration:0.3});" %>
               <%= flash[:error] %>
             </div>
         <% end %>
         <% if flash[:notice] %>
             <div id="notice_flash" class="box_standout curved with_smaller_shadow" style="color: green; margin: 0.8em 0.8em; line-height: 1.4;">
-              <%= link_to_function image_tag("close.gif", :style => "float: right;"),"new Effect.toggle('notice_flash','slide',{duration:0.3});" %>
+              <%= link_to_function image_tag("close.gif", :style => "float: right;"), "new Effect.toggle('notice_flash','slide',{duration:0.3});" %>
               <%= flash[:notice] %>
             </div>
         <% end %>
@@ -101,15 +103,15 @@
 
   <div id="ft">
     <div>
-      <%= render :partial=>"layouts/biovel_footer" %>
+      <%= render :partial => "layouts/biovel_footer" %>
     </div>
   </div>
 
 <%# NB! These javascript include should be here - otherwise folds / tabs will not be displayed on any pages. -%>
-<%= javascript_include_tag "folds.js" %>
-<%= javascript_include_tag "tabber-minimized.js" %>
+  <%= javascript_include_tag "folds.js" %>
+  <%= javascript_include_tag "tabber-minimized.js" %>
 
-<%= piwik_tracking_tag %>
+  <%= piwik_tracking_tag %>
 </div>
 </body>
 </html>
