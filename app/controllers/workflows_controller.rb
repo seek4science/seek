@@ -39,7 +39,7 @@ class WorkflowsController < ApplicationController
       if current_user.person.member?
         format.html # new.html.erb
       else
-        flash[:error] = "You are not authorized to upload new Workflows. Only members of known projects, institutions or work groups are allowed to create new content."
+        flash[:error] = "You are not authorized to upload new workflows. Only members of known projects, institutions or work groups are allowed to create new content."
         format.html { redirect_to workflows_path }
       end
     end
