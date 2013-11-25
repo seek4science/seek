@@ -204,7 +204,7 @@ end
   Factory.define(:experimental_assay, :parent => :assay_base) do |f|
     f.association :assay_class, :factory => :experimental_assay_class
     f.association :technology_type
-    f.samples {[Factory.build(:sample)]}
+    f.samples {[Factory.build(:sample, :policy => Factory(:public_policy))]}
   end
 
     Factory.define(:assay, :parent => :modelling_assay) {}
@@ -273,8 +273,8 @@ end
     f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
     f.projects {[Factory.build(:project)]}
     f.donation_date Date.today
-    f.association :specimen
-  f.association :policy, :factory => :private_policy
+    f.specimen { Factory(:specimen, :policy => Factory(:public_policy))}
+    f.association :policy, :factory => :private_policy
   end
 
 
@@ -826,7 +826,7 @@ end
     f.association :gene, :factory => :gene
     f.association :modification, :factory => :modification
     f.association :strain, :factory => :strain
-    f.association :specimen,:factory => :specimen
+    f.specimen { Factory(:specimen, :policy => Factory(:public_policy))}
   end
 
   Factory.define :gene do |f|
@@ -840,7 +840,7 @@ end
   Factory.define :phenotype do |f|
     f.sequence(:description) {|n| "phenotype #{n}"}
     f.association :strain, :factory => :strain
-    f.association :specimen,:factory => :specimen
+    f.specimen { Factory(:specimen, :policy => Factory(:public_policy))}
   end
 
   Factory.define :publication_author do |f|
