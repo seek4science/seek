@@ -54,7 +54,7 @@
         <% if logged_in? && current_user.person %>
             <%= navigation_link current_user.person.name, main_app.person_path(current_user.person), nil, false -%>
             <%= navigation_link('Admin', main_app.admin_path, nil, false) if admin_logged_in? -%>
-            <%= navigation_link('Contact us', main_app.contact_path, nil, false) -%>
+            <%= navigation_link('Contact', main_app.contact_path, nil, false) -%>
             <%= navigation_link 'Log out', main_app.logout_path, nil, false -%>
         <% else %>
             <li><a href="#" onclick="$('menubar-login-form').toggle();">Log in / Register</a></li>
