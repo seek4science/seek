@@ -2,6 +2,6 @@
 
 <% if logged_in? and current_user.person.member? %>
     <div class="show_basic">
-        <%= render :partial => "admin/content_stats", :locals => {:stats => Seek::ContentStats.generate(current_user)} -%>
+        <%= render :partial => "admin/content_stats", :locals => {:stats => Seek::ContentStats.generate} -%>
     </div>
 <% end %>
