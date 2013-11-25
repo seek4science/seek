@@ -1,12 +1,9 @@
 <%
    workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || ""
-   workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow)
-   params[:sweep_length] ||= '3'
+   workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow).sort_by {|i| i.name.downcase }
    data_inputs = workflow_inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }
    data_input_names = data_inputs.collect { |input| input.name }
    parameter_inputs = workflow_inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER }
-   params[:sweep_data_input_name] ||= data_inputs[0].name # Data input port to iterate over in a sweep
-   sweepable_input = data_inputs.detect{|input| input.name == params[:sweep_data_input_name]}
 %>
 <script type="text/javascript">
   var inputs = <%= input_json_hash(data_inputs) -%>;
