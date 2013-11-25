@@ -39,12 +39,17 @@ class HomesControllerTest < ActionController::TestCase
     login_as(Factory(:user))
     get :index
     assert_response :success
-    assert_select "span#account_menu_section" do
-      assert_select "li" do
-        assert_select "a[href=?]",feedback_home_path,:text=>I18n.t("menu.feedback")
+    if Seek::Config.is_virtualliver
+      assert_select "a[href=?]",feedback_home_path,:text=>I18n.t("feedback_bar"),:count=>1
+    else
+      assert_select "span#account_menu_section" do
+        assert_select "li" do
+          assert_select "a[href=?]",feedback_home_path,:text=>I18n.t("menu.feedback")
+        end
       end
     end
   end
+
 
   test "should get feedback form" do
     with_config_value :recaptcha_enabled, false do
@@ -61,7 +66,7 @@ class HomesControllerTest < ActionController::TestCase
 
   test "should send feedback for anonymous user" do
     logout
-    assert_emails(1) do
+    assert_emails(0) do
       post :send_feedback, :anon => false, :details => 'test feedback', :subject => 'test feedback'
     end
   end
@@ -138,27 +143,19 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
-  test "should display home description" do
-    Seek::Config.home_description="Blah blah blah - http://www.google.com"
-    logout
-    get :index
-    assert_response :success
 
-    assert_select "div.top_home_panel", :text=>/Blah blah blah/, :count=>1
-    assert_select "div.top_home_panel a[href=?]", "http://www.google.com", :count=>1
-
-  end
 
 
   test "should handle index html" do
-    assert_routing("/",{:controller=>"home",:action=>"index"})
-    assert_recognizes({:controller=>"home",:action=>"index"},"/index.html")
-    assert_recognizes({:controller=>"home",:action=>"index"},"/index")
+    assert_routing("/",{:controller=>"homes",:action=>"index"})
+    assert_recognizes({:controller=>"homes",:action=>"index"},"/index.html")
+    assert_recognizes({:controller=>"homes",:action=>"index"},"/index")
   end
 
 
 
   if Seek::Config.is_virtualliver
+
 
     test "ids of scales list should be the same as scales defined in Seek::Config.scales" do
       get :index
@@ -202,6 +199,16 @@ class HomesControllerTest < ActionController::TestCase
     end
 
   else
+    test "should display home description" do
+           Seek::Config.home_description="Blah blah blah - http://www.google.com"
+           logout
+           get :index
+           assert_response :success
+
+           assert_select "div.top_home_panel", :text=>/Blah blah blah/, :count=>1
+           assert_select "div.top_home_panel a[href=?]", "http://www.google.com", :count=>1
+
+         end
     test "should display home description" do
         Seek::Config.home_description="Blah blah blah - http://www.google.com"
         logout
@@ -285,7 +292,7 @@ class HomesControllerTest < ActionController::TestCase
           assert_select 'div#community_news ul>li', 7
         end
       end
-  end
+
 
   test 'should show recently added and downloaded items with the filter can_view?' do
     login_as(:aaron)
@@ -349,13 +356,14 @@ class HomesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "div#recently_added ul>li>a[href=?]",presentation_path(presentation),:text=>/A new presentation/
   end
-
+end
   test "should show headline announcement" do
     login_as :aaron
     ann=Factory :headline_announcement
 
     get :index
     assert_response :success
+
     assert_select "div.headline_announcement", :count=>1
 
     #now expire it
@@ -397,5 +405,5 @@ class HomesControllerTest < ActionController::TestCase
       end
     end
   end
-  
 end
+

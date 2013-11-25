@@ -140,7 +140,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     assert !SiteAnnouncement.all.select(&:is_headline).empty?
     get :index
     assert_response :success
-    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => /a headline announcement/, :count => 1
+    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => /a headline announcement/, :count => 2
   end
 
   test "should only show feeds when feed_only passed" do

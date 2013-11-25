@@ -276,8 +276,7 @@ test "should create experimental assay with or without sample" do
                                :technology_type_id=>technology_types(:gas_chromatography).id,
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
-                               :assay_class_id=>assay_classes(:experimental_assay_class).id}
-                               :owner => Factory(:person)}, :sharing => valid_sharing
+                               :assay_class_id=>assay_classes(:experimental_assay_class).id}, :sharing => valid_sharing
       end
     end
     a=assigns(:assay)
@@ -292,7 +291,6 @@ test "should create experimental assay with or without sample" do
                                :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                               :owner => Factory(:person),
                                :sample_ids=>[sample.id]
         }, :sharing => valid_sharing
 
@@ -316,8 +314,7 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :owner => Factory(:person),
-                             :samples => [Factory(:sample)]}, :assay_organism_ids =>[Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,tissue_and_cell_type.id,tissue_and_cell_type.title].to_s, :sharing => valid_sharing
+                             :sample_ids => [Factory(:sample).id]}, :assay_organism_ids =>[Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,tissue_and_cell_type.id,tissue_and_cell_type.title].join(",") , :sharing => valid_sharing
     end
     organism = Factory(:organism,:title=>"Frog")
     strain = Factory(:strain, :title=>"UUU", :organism=>organism)
@@ -328,9 +325,8 @@ end
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :sample_ids => [Factory(:sample)] ,      
-                             :owner => Factory(:person)},
-                             :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")    
+                             :sample_ids => [Factory(:sample)] },
+                             :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(","), :sharing => valid_sharing
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
@@ -345,8 +341,7 @@ end
       post :create, :assay=>{:title=>"test",
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :owner => Factory(:person)}, :sharing => valid_sharing
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id}, :sharing => valid_sharing
     end
     organism = Factory(:organism,:title=>"Frog")
     strain = Factory(:strain, :title=>"UUU", :organism=>organism)
@@ -355,9 +350,8 @@ end
       post :create, :assay=>{:title=>"test",
                              :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class_id=>assay_classes(:modelling_assay_class).id,    
-                                                       :owner => Factory(:person)},
-           :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id},
+           :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(","), :sharing => valid_sharing
     end
     a=assigns(:assay)
     assert_equal 1, a.assay_organisms.count
@@ -372,10 +366,8 @@ end
         :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
         :assay_class_id=>assay_classes(:experimental_assay_class).id,
-        :owner => Factory(:person),
-
         :sample_ids=>[Factory(:sample).id]
-      },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(",").to_a, :sharing => valid_sharing
+      },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(","), :sharing => valid_sharing
     end
     end
     a=assigns(:assay)
@@ -391,9 +383,8 @@ end
                                  :assay_type_id => assay_types(:metabolomics).id,
                                  :study_id => studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :sample_ids=>[sample1.id,sample2.id].join(",")
-                             :owner => person,
-                                 :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
+                             :sample_ids=>[Factory(:sample).id, Factory(:sample).id].join(",")
+                                 },
                                  :sharing => valid_sharing
       end
     end
@@ -404,8 +395,7 @@ end
                                  :technology_type_id => technology_types(:gas_chromatography).id,
                                  :assay_type_id => assay_types(:metabolomics).id,
                                  :study_id => studies(:metabolomics_study).id,
-                                 :assay_class => assay_classes(:modelling_assay_class),
-                                 :owner => person,
+                                 :assay_class_id => assay_classes(:modelling_assay_class).id,
                                  :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
                                  :sharing => valid_sharing
       end

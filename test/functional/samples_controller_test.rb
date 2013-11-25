@@ -54,7 +54,7 @@ class SamplesControllerTest < ActionController::TestCase
     get :show, :id=>s
     assert_response :success
     assert_select "div.tabbertab" do
-      assert_select "h3", :text=>/Cell cultures/ ,:count => 1
+      assert_select "h3", :text=>/#{I18n.t('biosamples.sample_parent_term')}s/ ,:count => 1
     end
     get :resource_in_tab, {:resource_ids => [s.specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
@@ -99,12 +99,11 @@ class SamplesControllerTest < ActionController::TestCase
             :specimen=>{:other_creators=>"jesus jones"},
             :sample => {
             :title => "test",
-            :contributor=>User.current_user,
             :project_ids=>[proj1.id,proj2.id],
             :lab_internal_number =>"Do232",
             :donation_date => Date.today,
             :specimen_attributes => {:strain_id => Factory(:strain).id,
-                          :institution => Factory(:institution),
+                          :institution_id => Factory(:institution).id,
                           :lab_internal_number=>"Lab number",
                           :title=>"Donor number",
                           :institution_id =>Factory(:institution).id
@@ -137,8 +136,6 @@ class SamplesControllerTest < ActionController::TestCase
                :sharing => valid_sharing,
                  :sample => {
                      :title => "test",
-                     :contributor=>User.current_user,
-
                      :project_ids=>[Factory(:project).id],
                      :lab_internal_number =>"Do232",
                      :donation_date => Date.today,
@@ -169,8 +166,6 @@ class SamplesControllerTest < ActionController::TestCase
                :organism_id => Factory(:organism).id,
                :sample => {
                    :title => "test",
-                   :contributor=>User.current_user,
-
                    :project_ids => [Factory(:project).id],
                    :lab_internal_number => "Do232",
                    :donation_date => Date.today,
@@ -322,16 +317,21 @@ test "should show organism and strain information of a sample if there is organi
     get :show, :id => sample.id
     assert_response :success
     assert_not_nil assigns(:sample)
-    assert_select 'p a[href=?]', organism_path(sample.specimen.strain.organism), :count => 2 # one in the related cell cuture
+
+    #lazy load related cell cultures /speicmens
+    get :resource_in_tab, {:resource_ids => [specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+
+
+    assert_select 'p a[href=?]', organism_path(sample.specimen.strain.organism), :count => 1 # one in the show page of sample
+    assert_select 'p a[href=?]', h(organism_path(sample.specimen.strain.organism)), :count => 1 # one in the related cell cuture/specimen tab, but need to escape ""
   end
 
   test 'should have specimen comment and gender fields in the specimen/sample show page' do
     as_not_virtualliver do
       s = Factory :sample, :contributor => User.current_user
       get :show, :id => s.id
-
-    get :show, :id => sample.id
       assert_response :success
+
       assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
     assert_select "label", :text => /Gender/, :count => 1
     end

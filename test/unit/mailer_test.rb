@@ -188,7 +188,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "contact_admin_new_user_no_profile" do
-    recipients = ["Quentin Jones <quentin@email.com>","\r\nProject Manager <project_manager@email.com>"]
+    recipients = ["Quentin Jones <quentin@email.com>","Project Manager <project_manager@email.com>"]
     @expected.subject = 'SEEK member signed up'
     @expected.to =  recipients
     @expected.from = "no-reply@sysmo-db.org"

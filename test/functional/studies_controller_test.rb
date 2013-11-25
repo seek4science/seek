@@ -144,7 +144,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should create" do
     assert_difference("Study.count") do
-      post :create,:study=>{:title=>"test",:investigation_id=>investigations(:metabolomics_investigation).id},sharing=>valid_sharing
+      post :create,:study=>{:title=>"test",:investigation_id=>investigations(:metabolomics_investigation).id}, :sharing=>valid_sharing
 
     end
     s=assigns(:study)

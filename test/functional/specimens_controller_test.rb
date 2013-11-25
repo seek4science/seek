@@ -57,7 +57,6 @@ class SpecimensControllerTest < ActionController::TestCase
       post :create, :specimen => {:title => "running mouse NO.1",
                                   :organism_id=>Factory(:organism).id,
                                   :lab_internal_number =>"Do232",
-                                  :contributor => Factory(:user),
                                   :institution_id => Factory(:institution).id,
                                   :strain_id => Factory(:strain).id,
                                   :project_ids => [Factory(:project).id]}, :sharing=>valid_sharing
@@ -160,7 +159,8 @@ class SpecimensControllerTest < ActionController::TestCase
       attrs = [:confluency, :passage, :viability, :purity, :institution_id]
       specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test",
                                        :viability => "Test", :purity => "Test",
-                                       :institution_id => Factory(:institution).id
+                                       :institution_id => Factory(:institution).id,
+                                       :project_ids => [Factory(:project).id]
 
       specimen[:strain_id]=Factory(:strain).id
       post :create, :specimen => specimen, :sharing => valid_sharing
@@ -229,7 +229,6 @@ test "should update genotypes and phenotypes" do
       post :create, :specimen => {:title => "running mouse NO.1",
                                   :organism_id => Factory(:organism).id,
                                   :lab_internal_number => "Do232",
-                                  :contributor => User.current_user,
                                   :institution_id => Factory(:institution).id,
                                   :strain_id => Factory(:strain).id,
                                   :project_ids => [Factory(:project).id]},
@@ -254,9 +253,8 @@ test "should update genotypes and phenotypes" do
 
     sop = Factory(:sop, :policy => Factory(:public_policy))
     #attributes_for method only predefine some attributes (associations are excluded)) that are defined in factories.rb
-    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
+    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test", :project_ids => [Factory(:project).id]
     specimen[:strain_id] = Factory(:strain).id
-
     specimen[:institution_id] = Factory(:institution).id if Seek::Config.is_virtualliver
 
     post :create, :specimen => specimen, :specimen_sop_ids => [sop.id],:sharing => valid_sharing

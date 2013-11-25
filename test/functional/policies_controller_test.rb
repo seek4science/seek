@@ -102,8 +102,8 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
 
     assert_select "p",:text=>"(You requested the publishing approval from the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>1
-      end
   end
+
 
   test 'should not show notice message when an item can be published right away' do
       post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "true", :resource_name => 'sop', :project_ids => Factory(:project).id.to_s
@@ -134,7 +134,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
         updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(sample, Factory(:project).id.to_s)
         assert updated_can_publish_immediately
-    end
+  end
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
     as_not_virtualliver do

@@ -312,7 +312,7 @@ class PublicationsControllerTest < ActionController::TestCase
     original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
                         "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
 
-    authors = publication.publication_authors
+    authors = publication.publication_authors.collect{|pa| pa.first_name + ' ' + pa.last_name} #publication_authors are ordered by author_index by default
     assert_equal original_authors, authors
 
     seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
@@ -334,7 +334,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     publication.reload
-    authors = publication.publication_authors
+    authors = publication.publication_authors.map{|pa| pa.first_name + ' ' + pa.last_name}
     assert_equal original_authors, authors
 
     #Disassociate seek-authors
@@ -345,7 +345,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     publication.reload
-    authors = publication.publication_authors
+    authors =  publication.publication_authors.map{|pa| pa.first_name + ' ' + pa.last_name}
     assert_equal original_authors, authors
   end
 
@@ -359,8 +359,14 @@ class PublicationsControllerTest < ActionController::TestCase
     original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
                         "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
 
+
+
     seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
     seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
+
+    # seek_authors are links
+    original_authors[12] = %!<a href="/people/#{seek_author1.id}">#{publication.non_seek_authors[12].first_name + " " + publication.non_seek_authors[12].last_name}</a>!
+    original_authors[15] = %!<a href="/people/#{seek_author2.id}">#{publication.non_seek_authors[15].first_name + " " + publication.non_seek_authors[15].last_name}</a>!
 
     #Associate a non-seek author to a seek person
     assert_difference('publication.non_seek_authors.count', -2) do
@@ -370,9 +376,12 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     publication.reload
+
+
     joined_original_authors = original_authors.join(', ')
     get :show, :id => publication.id
-    assert_select 'p', :text => /#{joined_original_authors}/
+
+    assert_equal true, @response.body.include?(h(joined_original_authors))
   end
 
   test 'should update page pagination when changing the setting from admin' do

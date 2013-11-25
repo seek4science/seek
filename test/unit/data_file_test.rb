@@ -103,8 +103,8 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "version created on save" do
     User.current_user = Factory(:user)
-    df = DataFile.new(:title=>"testing versions",:projects=>[Factory(:project)])
-    assert df.valid?
+    df = DataFile.new(:title=>"testing versions",:projects=>[Factory(:project)],:policy => Factory(:private_policy))
+    assert_equal true,  df.valid?
     df.save!
     df = DataFile.find(df.id)
     assert_equal 1, df.version
@@ -254,9 +254,9 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "to rdf" do
-    df=Factory :data_file, :assay_ids=>[Factory(:assay,:technology_type=>Factory(:technology_type)).id,Factory(:assay).id]
+    df=Factory :data_file, :assay_ids => [Factory(:assay, :technology_type => Factory(:technology_type)).id, Factory(:assay).id]
     pub = Factory :publication
-    Factory :relationship,:subject=>df,:predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
+    Factory :relationship, :subject => df, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object => pub
     df.reload
     rdf = df.to_rdf
     assert_not_nil rdf
@@ -264,18 +264,69 @@ class DataFileTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 0
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
-      Factory :scaling, :person=> Factory(:person),:scalable=>data_file, :scale => Factory(:scale) if data_file.is_scalable?
-      #I want to compare data_file.scales to data_file_converted.scales later. If I don't load data_file.scales now,
-      #then it will try to load them when I do the comparison. Since that will be after I've updated the database from converting, it would return [].
-      #to avoid this, I will preload scales and similar through_associations now.
-      through_associations_to_test_later << :scales  if data_file.is_scalable?
-      assert_equal data_file.scalings,data_file_converted.scalings if data_file.is_scalable?
-      assert_equal data_file.scales,data_file_converted.scales  if data_file.is_scalable?
-      assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
 
-    }
+    end
   end
 
+  test "convert to presentation" do
+      user = Factory :user
+      attribution_df = Factory :data_file
+      User.with_current_user(user) {
+        data_file = Factory :data_file,:contributor=>user,:version=>2,
+                            :assay_ids=>[Factory(:modelling_assay).id,Factory(:experimental_assay).id]
+        Factory :content_blob,:asset=>data_file
+        Factory :attribution,:subject=>data_file,:other_object=>attribution_df
+        Factory :relationship,:subject=>data_file,:other_object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
+        data_file.creators = [Factory(:person),Factory(:person)]
+        Factory :annotation,:attribute_name=>"tag",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tag").id
+        data_file.events = [Factory(:event)]
+        Factory :scaling, :person=> Factory(:person),:scalable=>data_file, :scale => Factory(:scale) if data_file.is_scalable?
+        data_file.save!
+
+        data_file.reload
+
+        #I want to compare data_file.scales to data_file_converted.scales later. If I don't load data_file.scales now,
+        #then it will try to load them when I do the comparison. Since that will be after I've updated the database from converting, it would return [].
+        #to avoid this, I will preload scales and similar through_associations now.
+        through_associations_to_test_later = [:creators, :assays]
+        through_associations_to_test_later << :scales  if data_file.is_scalable?
+        through_associations_to_test_later.each {|a| data_file.send(a).send(:load_target)}
+
+        presentation = Factory.build :presentation,:contributor=>user
+
+        data_file_converted = data_file.to_presentation
+        data_file_converted = data_file_converted.reload
+
+
+        assert_equal presentation.class.name, data_file_converted.class.name
+        assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.sort!
+
+        #data_file.reload
+        #data file still has some associations that are assigned to data_file_converted, as it is NOT reloaded
+        assert_equal data_file.version, data_file_converted.version
+        assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
+        assert_equal data_file.policy.access_type, data_file_converted.policy.access_type
+        assert_equal data_file.policy.use_whitelist, data_file_converted.policy.use_whitelist
+        assert_equal data_file.policy.use_blacklist, data_file_converted.policy.use_blacklist
+        assert_equal data_file.policy.permissions, data_file_converted.policy.permissions
+        assert data_file.policy.id != data_file_converted.policy.id
+        assert_equal data_file.content_blob, data_file_converted.content_blob
+
+        assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
+        assert_equal data_file.projects,data_file_converted.projects
+        assert_equal data_file.attributions , data_file_converted.attributions
+        assert_equal data_file.related_publications, data_file_converted.related_publications
+        assert_equal data_file.creators, data_file_converted.creators
+        assert_equal data_file.annotations, data_file_converted.annotations
+        assert_equal data_file.project_ids,data_file_converted.project_ids
+        assert_equal data_file.assays,data_file_converted.assays
+        assert_equal data_file.event_ids, data_file_converted.event_ids
+        assert_equal data_file.scalings,data_file_converted.scalings if data_file.is_scalable?
+        assert_equal data_file.scales,data_file_converted.scales  if data_file.is_scalable?
+        #assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
+
+      }
+    end
   test "convert to presentation when linked to project folder" do
     user = Factory :user
     project = user.person.projects.first
@@ -308,8 +359,8 @@ class DataFileTest < ActiveSupport::TestCase
         data_file_converted.reload
         data_file.reload
 
-        assert [], data_file.annotations
-        assert [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
+        assert_equal [], data_file.annotations
+        assert_equal [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
         assert_equal 1, data_file_converted.annotations.count
         assert_equal 0, data_file_converted.annotations.first.versions.count
         assert 'fish', data_file_converted.annotations.first.value.text
@@ -320,8 +371,8 @@ class DataFileTest < ActiveSupport::TestCase
       user = Factory :user
       User.with_current_user(user) {
         data_file = Factory :data_file,:contributor=>user
-        Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
-        Factory :annotation, :annotatable => data_file, :source=>user,:value=>"cat"
+       tag =  Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
+       annotation =  Factory :annotation, :annotatable => data_file, :source=>user,:value=>"cat"
 
         assert_equal 2, data_file.annotations.count
         assert_equal 0, data_file.annotations.first.versions.count
@@ -333,8 +384,9 @@ class DataFileTest < ActiveSupport::TestCase
         data_file_converted.reload
         data_file.reload
 
-        assert [], data_file.annotations
-        assert [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
+        assert_equal [annotation], data_file.annotations
+        assert_equal [tag], data_file_converted.annotations
+        assert_equal [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
         assert_equal 1, data_file_converted.annotations.count
         assert_equal 0, data_file_converted.annotations.first.versions.count
         assert 'fish', data_file_converted.annotations.first.value.text

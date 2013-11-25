@@ -371,8 +371,18 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal user, model.contributor
   end
   
+  test "default policy is nil when sharing is missing in VLN"  do
+    skip("test default policy is nil when sharing is missing in VLN") if !Seek::Config.is_virtualliver
+    assert_difference('Model.count', 0) do
+          assert_difference('ContentBlob.count', 0) do
+            post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+          end
+    end
+  end
 
   def test_missing_sharing_should_default_to_private
+    skip("default policy is nil when sharing is missing in VLN") if Seek::Config.is_virtualliver
+
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
