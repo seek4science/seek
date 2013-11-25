@@ -376,6 +376,11 @@ ul.sweep_input_selection label {
   display: block;
   width: 20em;
   border-radius: 5px;
+  cursor: pointer;
+}
+
+ul.sweep_input_selection label:hover {
+  background: white;
 }
 
 ul.sweep_input_selection li input {

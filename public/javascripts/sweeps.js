@@ -85,8 +85,21 @@ $j(document).ready(function () {
           )
       );
     }
-    // Disable the form submit if there is no sweepable inputs
-    $j('input:checkbox:checked.sweep_inputs')
+    // Re-arrange the input lists to make sure they're consistent
+    $j('#fixed_data').each(function () {
+      var run_inputs = $j(this).children('.run_input');
+      run_inputs.detach().sort(function(a,b) {
+        return inputs[$j(a).data('input-name')].input_number - inputs[$j(b).data('input-name')].input_number;
+      });
+      $j(this).append(run_inputs);
+    });
+    $j('#sweep_data .iteration').each(function () {
+      var run_inputs = $j(this).children('.run_input');
+      run_inputs.detach().sort(function(a,b) {
+        return inputs[$j(a).data('input-name')].input_number - inputs[$j(b).data('input-name')].input_number;
+      });
+      $j(this).append(run_inputs);
+    });
   });
 
   $j('#submit_button').click(function (e) {
