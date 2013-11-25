@@ -261,6 +261,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :gatekeeper_decide
       post :new_version
+      post :destroy_version
     end
     resources :studied_factors do
       collection do
@@ -295,6 +296,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :gatekeeper_decide
       post :new_version
+      post :destroy_version
     end
     resources :content_blobs do
       member do
@@ -333,6 +335,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :execute
       post :request_resource
+      post :destroy_version
     end
     resources :model_images do
       collection do
@@ -370,6 +373,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :gatekeeper_decide
       post :new_version
+      post :destroy_version
     end
     resources :experimental_conditions do
       collection do
@@ -420,6 +424,7 @@ SEEK::Application.routes.draw do
   resources :samples do
     collection do
       get :preview
+      get :resource_in_tab
     end
   end
 
@@ -464,6 +469,7 @@ SEEK::Application.routes.draw do
   resources :tissue_and_cell_types
   resources :scales
 
+  resources :statistics, :only => [:index]
   ### MISC MATCHES ###
 
   match '/search/' => 'search#index', :as => :search
@@ -501,8 +507,6 @@ SEEK::Application.routes.draw do
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
 
-  # Statistics
-  match '/statictics' => 'statictics#index', :as => :statistics
 
   #feedback
   match '/home/feedback' => 'homes#feedback', :as=> :feedback, :via=>:get
