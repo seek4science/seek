@@ -58,10 +58,11 @@ module ProjectsHelper
 
   def project_coordinators_link_list project
     if project.project_coordinators.empty?
-      "<span class='none_text'>No project coordinators for this project</span>";
+      html=  "<span class='none_text'>No project coordinators for this project</span>";
     else
-      project.project_coordinators.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = project.project_coordinators.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
+    html.html_safe
   end
   def project_mailing_list project
     if project.people.empty?
@@ -124,10 +125,7 @@ module ProjectsHelper
       list << "</div>"
 
     end
-    list.collect do |item|
-      item + "\n"
-    end
-
+    list.join("\n").html_safe
   end
 
   #Displays the tree node with appropriate indentation, as well as optional
