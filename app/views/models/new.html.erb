@@ -30,14 +30,16 @@
 
         <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
           <p>
-            <%= fancy_multiselect @model, :scales, {:possibilities => sort_scales(Scale.all)} if @model.is_scalable?-%>
+            <%= fancy_multiselect(@model, :scales, {:possibilities => sort_scales(Scale.all)} )if @model.is_scalable?-%>
           </p>
 
         <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
        
 
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
-        <%= fields_for(@model) {|f| f.fancy_multiselect (:samples, {:hidden=> @model.samples.blank?  ? true : false, :other_projects_checkbox => true}) }-%>
+      <%= fields_for(@model) do |f|
+        f.fancy_multiselect(:samples, {:hidden => @model.samples.blank? ? true : false, :other_projects_checkbox => true})
+      end -%>
 
         <p>
           <%= preview_permission_popup_link(@model)-%>
