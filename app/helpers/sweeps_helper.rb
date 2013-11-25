@@ -58,5 +58,17 @@ module SweepsHelper
     return rows
   end
 
+  # Returns a hash of input data, indexed by the inputs name
+  def input_json_hash(inputs)
+    input_hash = {}
+    inputs.each_with_index do |i, index|
+      input_hash[i.name] = { :input_number => index,
+                             :name => i.name,
+                             :description => i.description,
+                             :example_value => i.example_value }
+    end
+    input_hash.to_json.html_safe
+  end
+
 end
 

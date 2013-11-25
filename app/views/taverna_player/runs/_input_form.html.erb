@@ -1,3 +1,4 @@
+<div class="run_input" data-input-name="<%= input[:name]-%>">
 <% locked ||= false %>
 
 <% input_data = form.object.new_record? ? nil : form.object.inputs.select { |i| i.name == input[:name] }.last %>
@@ -43,3 +44,4 @@
     <div style="clear:both"></div>
   <% end %>
 <% end %>
+</div>

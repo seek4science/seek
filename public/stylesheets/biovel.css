@@ -365,3 +365,19 @@ ul.runs_and_sweeps_list li > a > img {
 table.csv {
   border-collapse: collapse
 }
+
+ul.sweep_input_selection li {
+  margin: 5px 5px 10px 5px;
+}
+
+ul.sweep_input_selection label {
+  background: #FFFFCC;
+  padding: 5px;
+  display: block;
+  width: 20em;
+  border-radius: 5px;
+}
+
+ul.sweep_input_selection li input {
+  vertical-align: middle;
+}
