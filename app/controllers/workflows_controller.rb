@@ -51,12 +51,23 @@ class WorkflowsController < ApplicationController
 
   def create
     if handle_data
+
       @workflow = Workflow.new params[:workflow]
       @workflow.policy.set_attributes_with_sharing params[:sharing], @workflow.projects
       if @workflow.save
         update_annotations @workflow
 
         create_content_blobs
+
+        # Check if the uploaded file contains a Taverna workflow
+        if !taverna_workflow?(@workflow.content_blob.data_io_object)
+          @workflow.destroy
+          respond_to do |format|
+            flash[:error] = 'The uploaded file does not appear to be a Taverna workflow.'
+            format.html {redirect_to new_workflow_path}
+          end
+          return
+        end
 
         # Pull title and from t2flow
         extract_workflow_metadata
@@ -160,6 +171,15 @@ class WorkflowsController < ApplicationController
       respond_to do |format|
         if @workflow.save_as_new_version(comments)
           create_content_blobs
+
+          # Check if the uploaded file contains a Taverna workflow
+          if !taverna_workflow?(@workflow.content_blob.data_io_object)
+            @workflow.destroy
+            flash[:error] = 'The uploaded file does not appear to be a Taverna workflow.'
+            format.html {redirect_to :back}
+            return
+          end
+
           extract_workflow_metadata
 
           flash[:notice] = "New version uploaded - now on version #{@workflow.version}"
@@ -194,6 +214,15 @@ class WorkflowsController < ApplicationController
 
   private
 
+  # Checks if the uploaded file looks like a Taverna workflow
+  def taverna_workflow?(file)
+    first_couple_of_bytes = IO.read(file, 100) # returns string
+    if first_couple_of_bytes.include?('http://taverna.sf.net/2008/xml/t2flow') # This looks like a Taverna workflow
+      return true
+    else
+      return false
+    end
+  end
 
   def extract_workflow_metadata
     @t2flow = T2Flow::Parser.new.parse(@workflow.content_blob.data_io_object.read)
