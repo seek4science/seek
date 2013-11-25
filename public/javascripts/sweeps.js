@@ -11,8 +11,11 @@ var sweep_prefixes = {
 
 function remove_iteration(el) {
   if($j('.iteration').size() > 1) {
-    $j(el).parents('.iteration').remove();
-    renumber_iterations();
+    if(confirm("Are you sure you want to remove this iteration?\n\n"+
+               "Any data entered for this iteration will be cleared.")) {
+      $j(el).parents('.iteration').remove();
+      renumber_iterations();
+    }
   } else {
     alert("You must have at least one iteration.");
   }
@@ -75,15 +78,20 @@ $j(document).ready(function () {
       // Remove it from the fixed data section
       $j('#fixed_data .run_input[data-input-name='+ name +']').remove();
     } else { // It was removed
-      // Remove the input from existing iterations
-      $j('#sweep_data .iteration .run_input[data-input-name='+ name +']').remove();
-      // Add the new input to the fixed data section
-      $j('#fixed_data').append(
-          fill_template(
-              fill_template(input_template, fixed_prefixes),
-              inputs[name]
-          )
-      );
+      if(confirm("Are you sure you no longer want to sweep over '" + name + "'?\n\n"+
+                 "Any data you have entered for this input will be cleared")) {
+        // Remove the input from existing iterations
+        $j('#sweep_data .iteration .run_input[data-input-name='+ name +']').remove();
+        // Add the new input to the fixed data section
+        $j('#fixed_data').append(
+            fill_template(
+                fill_template(input_template, fixed_prefixes),
+                inputs[name]
+            )
+        );
+      } else {
+        return false;
+      }
     }
     // Re-arrange the input lists to make sure they're consistent
     $j('#fixed_data').each(function () {
