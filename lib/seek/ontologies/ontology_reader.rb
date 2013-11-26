@@ -20,10 +20,10 @@ module Seek
       #the result is cached usign Rails.cache, according the root uri and the ontology path
       def class_hierarchy
         parent_uri = default_parent_class_uri
-        Rails.cache.fetch("cls-#{parent_uri}-#{ontology_path}") do
+        #Rails.cache.fetch("cls-#{parent_uri}-#{ontology_path}") do
           subclasses = subclasses_for(parent_uri)
           OntologyClass.new parent_uri,nil,nil,subclasses
-        end
+        #end
       end
 
       private
@@ -44,10 +44,20 @@ module Seek
         @ontology = RDF::Graph.load(path, :format => :rdfxml)
       end
 
+      #constucts the path based upon #ontology_file. if ontology_file is not a valid uri, it is turned into a file path
+      #relative to config/ontologies/
       def ontology_path
-        File.join(Rails.root,"config","ontologies",ontology_file_name)
-        #TODO: also needs to handle a URL such at that below
-        #"https://raw.github.com/SysMO-DB/JERMOntology/master/JERM_alpha1.6.rdf"
+        file = ontology_file
+        if valid_uri_schemes.include?(Addressable::URI.parse(file).scheme)
+          file
+        else
+          File.join(Rails.root,"config","ontologies",ontology_file)
+        end
+      end
+
+      #the schems for a uri that can be used to treat it as a URI, otherwise a filename is assumed
+      def valid_uri_schemes
+        ["http","https","file"]
       end
 
     end
