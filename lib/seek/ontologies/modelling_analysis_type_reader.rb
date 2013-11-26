@@ -7,7 +7,7 @@ module Seek
         RDF::URI.new("http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type")
       end
 
-      def ontology_file_name
+      def ontology_file
         #TODO: this will become configurable
         "JERM.rdf"
       end

@@ -22,7 +22,7 @@ module Seek
         parent_uri = default_parent_class_uri
         #Rails.cache.fetch("cls-#{parent_uri}-#{ontology_path}") do
           subclasses = subclasses_for(parent_uri)
-          OntologyClass.new parent_uri,nil,nil,subclasses
+          build_ontology_class parent_uri,nil,nil,subclasses
         #end
       end
 
@@ -35,9 +35,26 @@ module Seek
         query.execute(self.ontology).collect do |solution|
           uri = solution[:types]
           subclasses = subclasses_for(uri)
-          OntologyClass.new(uri, nil, nil, subclasses)
+          build_ontology_class uri,nil,nil,subclasses
         end
       end
+
+      def build_ontology_class uri,label=nil,description=nil,subclasses=[]
+        label ||= fetch_label_for(uri)
+        description ||= fetch_description_for(uri)
+        OntologyClass.new(uri, label, description, subclasses)
+      end
+
+      def fetch_label_for uri
+        result = ontology.query(:subject=>uri,:predicate=>RDF::RDFS.label).first
+        result.nil? ? result : result.object.to_s
+      end
+
+      def fetch_description_for uri
+        result = ontology.query(:subject=>uri,:predicate=>RDF::DC11.description).first
+        result.nil? ? result : result.object.to_s
+      end
+
 
       def load_ontology
         path = ontology_path
