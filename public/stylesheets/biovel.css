@@ -362,8 +362,19 @@ ul.runs_and_sweeps_list li > a > img {
   margin-right: 10px;
 }
 
-table.csv {
+div.csv {
+  overflow-x: scroll;
+  max-height: 800px;
+  border: 1px solid #666;
+}
+
+div.csv table {
   border-collapse: collapse
+}
+
+div.csv table td {
+  border: 1px solid #ccc;
+  padding: 2px 5px;
 }
 
 ul.sweep_input_selection li {
@@ -385,4 +396,10 @@ ul.sweep_input_selection label:hover {
 
 ul.sweep_input_selection li input {
   vertical-align: middle;
+}
+
+div.output, div.input {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
 }

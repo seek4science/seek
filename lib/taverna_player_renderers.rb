@@ -43,7 +43,7 @@ def format_csv(content, type)
 
   csv = CSV.parse(content)
 
-  html = '<table class="csv">'
+  html = '<div class="csv"><table>'
   csv.each do |row|
     html << '<tr>'
     row.each do |cell|
@@ -55,7 +55,7 @@ def format_csv(content, type)
     end
     html << '</tr>'
   end
-  html << '</table>'
+  html << '</table></div>'
 
   raw(html)
 end
