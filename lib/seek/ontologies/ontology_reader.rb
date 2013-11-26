@@ -20,13 +20,21 @@ module Seek
       #the result is cached usign Rails.cache, according the root uri and the ontology path
       def class_hierarchy
         parent_uri = default_parent_class_uri
-        #Rails.cache.fetch("cls-#{parent_uri}-#{ontology_path}") do
+        Rails.cache.fetch(cache_key) do
           subclasses = subclasses_for(parent_uri)
           build_ontology_class parent_uri,nil,nil,subclasses
-        #end
+        end
+      end
+
+      def clear_cache
+        Rails.cache.delete(cache_key)
       end
 
       private
+
+      def cache_key
+        Digest::MD5.hexdigest("cls-#{default_parent_class_uri}-#{ontology_path}")
+      end
 
       def subclasses_for uri
         query = RDF::Query.new :types => {
