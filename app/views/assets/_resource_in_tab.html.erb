@@ -21,24 +21,24 @@
            tab_content_view_some = scale_title + '_' + resource_type + '_view_some'
         %>
         <%= link_to "View all "+(authorized_resources.size).to_s+" items",
-                           :html => {:style => (view_type=='view_all' ? "display:none" : "display:block")},
-                           :url => url_for(:action => 'resource_in_tab'),
+
+                           {:url => url_for(:action => 'resource_in_tab'),
                            :condition => "check_tab_content('#{tab_content_view_all}', '#{tab_content_view_some}')",
                            :with => "'resource_type=' + '#{resource_type}' + '&resource_ids=' + '#{resources.collect(&:id).join(",")}' + '&scale_title=' + '#{scale_title}' + '&view_type=' + 'view_all'",
                            :before => "$('#{tab_content_view_some}').hide();
                                            $('#{tab_content_view_all}').show();
-                                           show_large_ajax_loader('#{tab_content_view_all}');",
-                           :remote=> true
+                                           show_large_ajax_loader('#{tab_content_view_all}');"},
+                           {:style => (view_type=='view_all' ? "display:none" : "display:block"), :remote=> true}
+
         -%>
         <%= link_to "View " + limit.to_s + " items",
-                           :html => {:style => (view_type=='view_some' ? "display:none" : "display:block")},
-                           :url => url_for(:action => 'resource_in_tab'),
+                           {:url => url_for(:action => 'resource_in_tab'),
                            :condition => "check_tab_content('#{tab_content_view_some}', '#{tab_content_view_all}')",
                            :with => "'resource_type=' + '#{resource_type}' + '&resource_ids=' + '#{resources.collect(&:id).join(",")}' + '&scale_title=' + '#{scale_title}' + '&view_type=' + 'view_some'",
                            :before => "$('#{tab_content_view_all}').hide();
                                            $('#{tab_content_view_some}').show();
-                                           show_large_ajax_loader('#{tab_content_view_some}');",
-                           :remote => true
+                                           show_large_ajax_loader('#{tab_content_view_some}');"},
+                           {:style => (view_type=='view_some' ? "display:none" : "display:block"), :remote=> true}
         -%>
       </div>
       <br style="clear:both"/>

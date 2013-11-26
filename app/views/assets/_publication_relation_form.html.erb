@@ -41,7 +41,9 @@
     </div>
 </div>
 <script type="text/javascript">
-    toggle_publication_list()
+    updatePublications();
+    toggle_publication_list();
+
     function toggle_publication_list() {
             var checked = $('include_other_project_publications').checked;
             var selection_box = $('possible_publications');
@@ -101,8 +103,7 @@
       <% end -%>
     <% end -%>
     
-      updatePublications();
-    
+
       function check_show_add_publication() {
         i=$('possible_publications').selectedIndex;
         selected_id=$('possible_publications').options[i].value;
