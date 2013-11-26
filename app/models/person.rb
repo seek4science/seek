@@ -144,7 +144,7 @@ class Person < ActiveRecord::Base
   end
 
   def receive_notifications
-    registered? and super
+    member? and super
   end
 
   def registered?

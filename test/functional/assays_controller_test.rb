@@ -1094,5 +1094,16 @@ end
         assert_select "a[href=?]", data_file_path(df), :text => df.title
         assert_select "a[href=?]", model_path(model), :text => model.title, :count => 0
         assert_select "a[href=?]", sop_path(sop), :text => sop.title
-   end
+  end
+
+  test "preview assay with associated hidden items" do
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    private_df = Factory(:data_file,:policy=>Factory(:private_policy))
+    assay.data_file_masters << private_df
+    assay.save!
+    login_as Factory(:user)
+    xhr(:get, :preview,{:id=>assay.id})
+    assert_response :success
+  end
+
 end

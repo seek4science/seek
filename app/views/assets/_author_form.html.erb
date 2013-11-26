@@ -52,14 +52,11 @@
                 <input type="text" size="1" tabindex="" id="creator_autocomplete_input" />
               </div>
             </div>
-            <div id="creator_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
+            <div id="creator_autocomplete_populate" class="clearfix autocomplete typeahead_list" onclick="addCreators(); return(false);" style="width: 403px; height: auto; overflow-y: hidden;display:none">
               <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
             </div>
           </td>
         </tr>
-		<tr>
-			<td><%= link_to_function (image("new") + " Add contributor"), "addCreators(); return(false);", :id=>"add_creator", :class=>"block_link" %></td>
-		</tr>
       </table>
 
       <script type="text/javascript">

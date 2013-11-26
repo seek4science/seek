@@ -46,7 +46,7 @@
 
       <p>
         Please type titles of <%= resource_type_attributed_to_types -%> into the box below - suggestions will be displayed as you type.
-        Select resources that you want to attribute to and click "Add" to add selected items to the list.
+        Select resources that you want to attribute to.
       </p>
 
       <table id="facebook" class="clearfix">
@@ -59,14 +59,11 @@
                 <input type="text" size="1" tabindex="" id="attributions_autocomplete_input" />
               </div>
             </div>
-            <div id="attributions_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
+            <div id="attributions_autocomplete_populate" class="clearfix autocomplete typeahead_list" onclick="addAttributions(); return(false);" style="width: 403px; height: auto; overflow-y: hidden;display:none">
               <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
             </div>
           </td>          
         </tr>
-		<tr>
-			<td><%= link_to_function (image("new") + " Add attribution"), "addAttributions(); return(false);", :id=>"add_attrubution", :class=>"block_link" %></td>
-		</tr>
       </table>
 	  
 

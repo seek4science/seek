@@ -16,13 +16,17 @@ module DoiQueryToolExtension
     def parse_xml_with_extension(article)
           doi_record = parse_xml_without_extension(article)
           begin
-            citation_iso_abbreviation = article.find_first('.//ISOAbbreviation') ? article.find_first('.//ISOAbbreviation').content : ""
-            citation_year = article.find_first('.//PubDate/Year') ? article.find_first('.//PubDate/Year').content : ""
-            citation_month = article.find_first('.//Month') ? article.find_first('.//Month').content : ""
-            citation_volume = article.find_first('.//Volume') ? article.find_first('.//Volume').content : ""
-            citation_issue = article.find_first('.//Issue') ? "(" + article.find_first('.//Issue').content + ")" : ""
-            citation_med_line_pgn = article.find_first('.//MedlinePgn') ? article.find_first('.//MedlinePgn').content : ""
-            doi_record.citation = citation_iso_abbreviation + " " + citation_year + " " + citation_month + ", " + citation_volume + citation_issue + " : " + citation_med_line_pgn
+            if article.find_first('//journal_metadata/abbrev_title')
+              citation_iso_abbrev = article.find_first('//journal_metadata/abbrev_title').content
+            elsif article.find_first('//title')
+              citation_iso_abbrev = article.find_first('//title').content
+            else
+              citation_iso_abbrev = ""
+            end
+            citation_volume = article.find_first('.//volume') ? article.find_first('.//volume').content : ""
+            citation_issue = article.find_first('.//issue') ? "(" + article.find_first('.//issue').content + ")" : ""
+            citation_first_page = article.find_first('.//first_page') ? " : " + article.find_first('.//first_page').content : ""
+            doi_record.citation = citation_iso_abbrev + " " + citation_volume + citation_issue + citation_first_page
 
             return doi_record
           rescue Exception => e

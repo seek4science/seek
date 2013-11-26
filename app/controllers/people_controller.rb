@@ -15,9 +15,18 @@ class PeopleController < ApplicationController
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
   skip_after_filter :request_publish_approval,:log_publishing, :only => [:create,:update]
 
+  after_filter :reset_notifications, :only => [:administer_update]
+
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   include Seek::BreadCrumbs
 
+  def reset_notifications
+    # disable sending notifications for non_project members
+    if !@person.member? && @person.notifiee_info.receive_notifications
+      @person.notifiee_info.receive_notifications = false
+      @person.notifiee_info.save
+    end
+  end
   def auto_complete_for_tools_name
     render :json => Person.tool_counts.map(&:name).to_json
   end
@@ -251,6 +260,12 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       if @person.update_attributes(params[:person])
+
+        #clear subscriptions for non_project members
+        if @person.projects.empty?
+             @person.project_subscriptions = []
+             @person.subscriptions = []
+        end
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
         flash[:notice] = 'Person was successfully updated.'

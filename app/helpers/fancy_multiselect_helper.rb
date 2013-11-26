@@ -37,23 +37,22 @@ module FancyMultiselectHelper
       options[:possibilities_options] = {} unless options[:possibilities_options]
       onchange = options[:possibilities_options][:onchange] || ''
       collection_id = options[:name].to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
-      possibilities_id = "possible_#{collection_id}"
-      button_id = "add_to_#{collection_id}_link"
-      hide_add_link_when_default_is_selected_js = "($F('#{possibilities_id}') == 0) ? $('#{button_id}').hide() : $('#{button_id}').show();".html_safe
-      onchange += hide_add_link_when_default_is_selected_js
+      possibilities_collection_id = "possible_#{collection_id}"
+      assign_Selected_Item_js = "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}'));"
+          onchange += assign_Selected_Item_js
       options[:possibilities_options][:onchange] = onchange.html_safe
-      super(object, association, options) + "\n<script type='text/javascript'>#{hide_add_link_when_default_is_selected_js}</script>\n".html_safe
+      super(object, association, options) + "\n<script type='text/javascript'>#{assign_Selected_Item_js}</script>\n"
     end
   end
 
   module OtherProjectsCheckbox
     def fancy_multiselect object, association, options = {}
-      if options[:project_possibilities]
+      if options[:project_possibilities]  &&  options[:other_projects_checkbox]
         type = object.class.name.underscore
-
+        default_checked = Seek::Config.is_virtualliver ? true : false
         check_box_and_alternative_list = "".html_safe
         check_box_and_alternative_list << "<br/>".html_safe
-        check_box_and_alternative_list << check_box_tag("include_other_project_#{association}", nil, false,
+          #{check_box_tag "include_other_project_#{association}", nil, default_checked, {:onchange => "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');", :style => "margin-top:0.5em;"}} Associate #{association.to_s.humanize} from other projects?
                                                 {:onchange => "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');".html_safe,
                                                 :style => "margin-top:0.5em;"}).html_safe
         check_box_and_alternative_list <<  "Associate #{association.to_s.singularize.humanize.pluralize} from other #{t('project').pluralize}?".html_safe
@@ -64,9 +63,13 @@ module FancyMultiselectHelper
         options[:association_step_content] = (options[:association_step_content] + check_box_and_alternative_list).html_safe
 
         swap_project_possibilities_into_dropdown_js = "".html_safe
-        swap_project_possibilities_into_dropdown_js << "<script type='text/javascript'>".html_safe
-        swap_project_possibilities_into_dropdown_js << "swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');".html_safe
+            swap_project_possibilities_into_dropdown_js  <<  "var include_other_projects_checkbox = document.getElementById("include_other_project_#{association}");".html_safe
+             swap_project_possibilities_into_dropdown_js  <<  "if (include_other_projects_checkbox.checked == false){
+              swapSelectListContents('possible_#{type}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');
+              }".html_safe
+
         swap_project_possibilities_into_dropdown_js << "</script>".html_safe
+
 
         super + swap_project_possibilities_into_dropdown_js
       else

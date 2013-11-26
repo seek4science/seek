@@ -19,13 +19,17 @@ function addSelectedPublication() {
         relationshipType="None"
     }
 
-    if(checkNotInList(id,publication_array)) {
-        addPublication(title,id,relationshipType);
-        updatePublications();
-    }
-    else {
-        alert('The following publication has already been added:\n\n' +
-            title);
+    i = $('possible_publications').selectedIndex;
+    selected_id = $('possible_publications').options[i].value;
+    if(selected_id != '0') {
+        if(checkNotInList(id,publication_array)) {
+            addPublication(title,id,relationshipType);
+            updatePublications();
+        }
+        else {
+            alert('The following publication has already been added:\n\n' +
+                title);
+        }
     }
 }
 
