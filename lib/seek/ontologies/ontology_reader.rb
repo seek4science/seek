@@ -37,11 +37,8 @@ module Seek
       end
 
       def subclasses_for uri
-        query = RDF::Query.new :types => {
-            RDF::RDFS.subClassOf => uri
-        }
-        query.execute(self.ontology).collect do |solution|
-          uri = solution[:types]
+        ontology.query(:predicate=>RDF::RDFS.subClassOf,:object=>uri).collect do |solution|
+          uri = solution.subject
           subclasses = subclasses_for(uri)
           build_ontology_class uri,nil,nil,subclasses
         end
