@@ -15,14 +15,14 @@ module Seek
         @ontology
       end
 
-      #fetches the class hierarchy with the root node defined by the method #default_base_class_uri in the implementing class
+      #fetches the class hierarchy with the root node defined by the method #default_parent_class_uri in the implementing class
       #returns an #OntologyClass representing the root node, which itself contains the subclasses as #OntologyClass
       #the result is cached usign Rails.cache, according the root uri and the ontology path
       def class_hierarchy
-        base_uri = default_base_class_uri
-        Rails.cache.fetch("cls-#{base_uri}-#{ontology_path}") do
-          subclasses = subclasses_for(base_uri)
-          OntologyClass.new base_uri,nil,nil,subclasses
+        parent_uri = default_parent_class_uri
+        Rails.cache.fetch("cls-#{parent_uri}-#{ontology_path}") do
+          subclasses = subclasses_for(parent_uri)
+          OntologyClass.new parent_uri,nil,nil,subclasses
         end
       end
 

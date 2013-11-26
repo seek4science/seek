@@ -5,7 +5,7 @@ module Seek
 
     class TechnologyTypeReader < OntologyReader
 
-      def default_base_class_uri
+      def default_parent_class_uri
         #TODO: this will become configurable
         RDF::URI.new("http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type")
       end
