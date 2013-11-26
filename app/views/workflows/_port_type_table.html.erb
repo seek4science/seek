@@ -7,8 +7,8 @@
       </th>
     <% end %>
   </tr>
-  <% input_ports = @workflow.input_ports.sort{|a, b| a.name <=> b.name} -%>
-  <% output_ports = @workflow.output_ports.sort{|a, b| a.name <=> b.name} -%>
+  <% input_ports = @workflow.input_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} -%>
+  <% output_ports = @workflow.output_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} -%>
   <%= f.fields_for(:input_ports, input_ports) do |i| %>
     <tr>
       <td class="port-name"><%= i.object.name %></td>

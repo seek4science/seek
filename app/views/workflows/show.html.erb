@@ -25,8 +25,8 @@
 
   <% workflow_model = @display_workflow.t2flow %>
   <% processors = workflow_model.all_processors || [] -%>
-  <% inputs = @workflow.input_ports.sort{|a, b| a.name <=> b.name} || [] -%>
-  <% outputs = @workflow.output_ports.sort{|a, b| a.name <=> b.name} || [] -%>
+  <% inputs = @workflow.input_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
+  <% outputs = @workflow.output_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
 
   <!-- Inputs -->
   <div class="fold">
