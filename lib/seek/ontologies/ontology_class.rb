@@ -19,6 +19,24 @@ module Seek
         @label
       end
 
+      #returns an array of all the classes, inluding this and traversal of the subclasses
+      def flatten_hierarchy c=self
+        result = [c]
+        c.subclasses.each do |s|
+          result += flatten_hierarchy(s)
+        end
+        result
+      end
+
+      #returns a hash of all the classes from the hierachy, including all subclasses, with the key being the URI as a string
+      def hash_by_uri
+        result = {}
+        flatten_hierarchy.each do |c|
+          result[c.uri.to_s]=c
+        end
+        result
+      end
+
       private
 
       def validate_uri

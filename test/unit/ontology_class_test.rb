@@ -33,6 +33,32 @@ class OntologyClassTest < ActiveSupport::TestCase
 
   end
 
+  test "flattened" do
+    o1 = Seek::Ontologies::OntologyClass.new RDF::URI.new("http://o1")
+    o2 = Seek::Ontologies::OntologyClass.new RDF::URI.new("http://o2")
+    o3 = Seek::Ontologies::OntologyClass.new(RDF::URI.new("http://o3"),nil,nil,[o1,o2])
+    o4 = Seek::Ontologies::OntologyClass.new(RDF::URI.new("http://o4"),nil,nil,[o3])
+
+    list = o4.flatten_hierarchy
+    assert_equal 4,list.count
+    assert_include list,o1
+    assert_include list,o2
+    assert_include list,o3
+    assert_include list,o4
+  end
+
+  test "hash_by_uri" do
+    o1 = Seek::Ontologies::OntologyClass.new RDF::URI.new("http://o1")
+    o2 = Seek::Ontologies::OntologyClass.new RDF::URI.new("http://o2")
+    o3 = Seek::Ontologies::OntologyClass.new(RDF::URI.new("http://o3"),nil,nil,[o1,o2])
+    o4 = Seek::Ontologies::OntologyClass.new(RDF::URI.new("http://o4"),nil,nil,[o3])
+    hash = o4.hash_by_uri
+
+    assert_equal 4,hash.keys.count
+    assert_equal o2,hash[o2.uri.to_s]
+    assert_equal o4,hash[o4.uri.to_s]
+  end
+
   test "uri as string" do
     o = Seek::Ontologies::OntologyClass.new "http://fish#bob"
     assert o.uri.kind_of?(RDF::URI)
