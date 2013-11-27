@@ -30,10 +30,8 @@ def format_xml(content, type)
 end
 
 def format_csv(content, type)
-  if content.is_a?(URI)
-    m = content.to_s.match("/runs/([0-9]+)/output/(.+)")
-    puts content.to_s
-    puts m.inspect
+  m = content.match("/runs/([0-9]+)/output/(.+)")
+  unless m.nil?
     run = TavernaPlayer::Run.find(m[1].to_i)
     output_name = m[2]
     Zip::ZipFile.open(run.results.path) do |zip|

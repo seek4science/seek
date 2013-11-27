@@ -28,24 +28,4 @@ module RunsHelper
     options_for_select([[p.metadata[:type], p.metadata[:type]], ["text/csv", "text/csv"]])
   end
 
-  def show_output(run, output)
-    if output.depth == 0
-      if output.value.blank?
-        content = URI(run_path(output.run_id) + "/output/#{output.name}")
-      else
-        if output.metadata[:size] < 255
-          content = output.value
-        else
-          Zip::ZipFile.open(run.results.path) do |zip|
-            content = zip.read(output.name)
-          end
-        end
-      end
-      raw(TavernaPlayer.output_renderer.render(content, output.metadata[:type]))
-    else
-      parse_port_list(run, output)
-    end
-  end
-
-
 end
