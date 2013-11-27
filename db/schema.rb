@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131024130645) do
+ActiveRecord::Schema.define(:version => 20131127140231) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(:version => 20131024130645) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -167,11 +167,13 @@ ActiveRecord::Schema.define(:version => 20131024130645) do
     t.integer  "technology_type_id"
     t.integer  "study_id"
     t.integer  "owner_id"
-    t.string   "first_letter",       :limit => 1
+    t.string   "first_letter",        :limit => 1
     t.integer  "assay_class_id"
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "institution_id"
+    t.string   "assay_type_uri"
+    t.string   "technology_type_uri"
   end
 
   create_table "assays_samples", :id => false, :force => true do |t|
@@ -675,7 +677,6 @@ ActiveRecord::Schema.define(:version => 20131024130645) do
     t.datetime "updated_at"
     t.integer  "image_width"
     t.integer  "image_height"
-    t.integer  "model_version"
   end
 
   create_table "model_types", :force => true do |t|
@@ -704,9 +705,9 @@ ActiveRecord::Schema.define(:version => 20131024130645) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
+    t.integer  "model_image_id"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -735,9 +736,9 @@ ActiveRecord::Schema.define(:version => 20131024130645) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
+    t.integer  "model_image_id"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
@@ -1151,9 +1152,9 @@ ActiveRecord::Schema.define(:version => 20131024130645) do
     t.string   "provider_name"
     t.float    "age_at_sampling"
     t.string   "uuid"
+    t.integer  "age_at_sampling_unit_id"
     t.string   "sample_type"
     t.string   "treatment"
-    t.integer  "age_at_sampling_unit_id"
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
@@ -1471,10 +1472,10 @@ ActiveRecord::Schema.define(:version => 20131024130645) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                            :null => false
-    t.integer  "version",                                  :null => false
+    t.integer  "text_value_id",                          :null => false
+    t.integer  "version",                                :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1484,7 +1485,7 @@ ActiveRecord::Schema.define(:version => 20131024130645) do
   create_table "text_values", :force => true do |t|
     t.integer  "version"
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
