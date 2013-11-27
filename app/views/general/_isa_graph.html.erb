@@ -14,6 +14,7 @@
 </div>
 <div class="yui-u node_info curved with_smaller_shadow" id="node_info">
 </div>
+<span id="ruler" style="visibility: hidden"></span>
 
 <script type="text/javascript">
     jQuery.noConflict();
@@ -32,6 +33,7 @@
         var default_node_width = 175;
         var default_node_height = 35;
         var default_font_size = 11;
+        var default_color = '#323232';
 
         $j('#cy').cytoscape({
             layout: {
@@ -52,7 +54,7 @@
                         'text-outline-width': 1,
                         'text-outline-color': 'data(faveColor)',
                         'background-color': 'data(faveColor)',
-                        'color': '#323232',
+                        'color':default_color,
                         'width':default_node_width,
                         'height':default_node_height,
                         'font-size':default_font_size
@@ -82,8 +84,12 @@
 
                     nodes.on('click', function(e){
                         var node = e.cyTarget;
-                        animateNode(node);
-                        displayNodeInfo(node);
+                        if(node.selected() == true){
+                            clickLabelLink(node, e.originalEvent);
+                        }else{
+                            animateNode(node);
+                            displayNodeInfo(node);
+                        }
                     });
 
                     //animate the current asset node
@@ -92,6 +98,7 @@
                     var asset_node_id = asset_type + '_' + asset_id;
                     var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
                     animateNode(asset_node);
+                    displayNodeInfo(asset_node);
 
                     resizeGraph();
                 }else{
