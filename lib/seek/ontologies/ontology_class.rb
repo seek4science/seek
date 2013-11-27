@@ -28,7 +28,7 @@ module Seek
       end
 
       def extract_label_from_uri
-        @uri.fragment.humanize.downcase
+        @uri.fragment.humanize
       end
     end
   end

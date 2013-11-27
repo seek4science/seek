@@ -20,6 +20,7 @@ module Seek
       #the result is cached usign Rails.cache, according the root uri and the ontology path
       def class_hierarchy
         parent_uri = default_parent_class_uri
+        OntologyClass # so that the class is loaded before it is needed from the cache
         Rails.cache.fetch(cache_key) do
           subclasses = subclasses_for(parent_uri)
           build_ontology_class parent_uri,nil,nil,subclasses
