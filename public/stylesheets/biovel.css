@@ -403,3 +403,8 @@ div.output, div.input {
   margin: 5px;
   border: 1px solid #ccc;
 }
+
+div.main_content_left_box {
+  float: left;
+  width: 79%;
+}

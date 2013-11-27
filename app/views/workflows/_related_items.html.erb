@@ -1,6 +1,9 @@
 <% related_items = workflow.runs.where(:sweep_id => nil) + workflow.sweeps %>
 <% related_items = related_items.select {|i| i.can_view? }.sort_by(&:created_at).reverse %>
-<% unless related_items.empty? %>
-  <h2>Related runs</h2>
+
+<h2>Related runs</h2>
+<% if related_items.empty? %>
+  <span class="none_text" style="margin-left: 10px">None</span>
+<% else %>
   <%= render :partial => 'taverna_player/runs/runs_and_sweeps_list', :locals => { :items => related_items } %>
 <% end %>
