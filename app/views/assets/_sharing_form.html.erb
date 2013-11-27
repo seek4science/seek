@@ -19,7 +19,7 @@
 <div class="fold" id="sharing_form">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") -%>
+    <%= help_icon("Specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type.downcase}.") -%>
     Sharing
   </div>
 
@@ -27,7 +27,7 @@
 
     <div class="box_infotext">
       <p>
-        Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type -%>.
+        Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type.downcase -%>.
         <%= link_to_function(("More info " + expand_image).html_safe, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3)) -%>
       </p>
       <div id="more_sharing_info" class="box_simple" style="display: none;">        
@@ -68,7 +68,7 @@
             <input type="hidden" id='access_type_select_<%= Policy::PRIVATE -%>' name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
             <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
                                                                                   value="<%= Policy::PRIVATE -%>" type="radio" />
-            - Keep this <%= @resource_type -%> private (only visible to you)
+            - Keep this <%= @resource_type.downcase -%> private (only visible to you)
           </label>
           <%= additional_advanced_permissions_included @resource, Policy::PRIVATE -%>
         </p>
@@ -79,13 +79,13 @@
         <p>
           <label>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
-            - Members of <%= t('project').pluralize %> associated with this <%= @resource_type -%>:
+            - Members of <%= t('project').pluralize.downcase %> associated with this <%= @resource_type.downcase -%>:
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
                  <%= policy_selection_options([Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource) || default_projects_access_type) -%>
              </select>
              <br/>
-            <span style="margin-left:10em;">... and all other <%= t('project') %> members:</span>
+            <span style="margin-left:10em;">... and all other <%= t('project').downcase %> members:</span>
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
                :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => (@resource.respond_to?(:policy) && @resource.policy.try(:sharing_scope)==Policy::ALL_SYSMO_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::ACCESSIBLE,Policy::EDITING] } -%>
              <%= additional_advanced_permissions_included @resource, Policy::ALL_SYSMO_USERS -%>
@@ -135,7 +135,7 @@
         <div id="specific_sharing" style="display:block; margin-top: 1em;">
           <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
             <p style="color: #666666;">
-              So far you have selected to share this <%= @resource_type -%> with:
+              So far you have selected to share this <%= @resource_type.downcase -%> with:
             </p>
 
             <p id="shared_with_list" class="box_editing_inner" style="line-height: 1.5;">

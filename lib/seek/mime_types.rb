@@ -4,7 +4,7 @@ module Seek
     MIME_MAP = {
         "application/excel" => {:name => "Spreadsheet", :icon_key => "xls_file", :extensions=>["xls"]},
         "application/msword" => {:name => "Word document", :icon_key => "doc_file", :extensions=>["doc"]},
-        "application/octet-stream" => {:name => "Binary file type", :icon_key => "misc_file", :extensions=>[""]},
+        "application/octet-stream" => {:name => "Binary file", :icon_key => "misc_file", :extensions=>[""]},
         "application/pdf" => {:name => "PDF document", :icon_key => "pdf_file", :extensions=>["pdf"]},
         "application/vnd.excel" => {:name=>"Spreadsheet", :icon_key=>"xls_file", :extensions=>["xls"]},
         "application/msexcel" => {:name => "Spreadsheet", :icon_key => "xls_file", :extensions=>["xls"]},
@@ -30,8 +30,9 @@ module Seek
         "application/vnd.oasis.opendocument.text" => {:name => "Word document", :icon_key => "doc_file", :extensions=>["odt"]},
         "application/vnd.oasis.opendocument.text-flat-xml" => {:name => "Word document", :icon_key => "doc_file", :extensions=>["fodt"]},
         "application/vnd.oasis.opendocument.spreadsheet" => {:name => "Spreadsheet", :icon_key => "xls_file", :extensions=>["ods"]},
-        "application/rtf" => {:name => "Document file", :icon_key => "rtf_file", :extensions=>["rtf"]},
-        "text/html" => {:name=>"Website",:icon_key=>"html_file",:extensions=>["html"]}
+        "application/rtf" => {:name => "RTF document", :icon_key => "rtf_file", :extensions=>["rtf"]},
+        "text/html" => {:name=>"HTML document",:icon_key=>"html_file",:extensions=>["html"]},
+        'application/json' => {:name=>"JSON document",:icon_key=>"misc_file",:extensions=>["json"]}
     }
 
     #Get a nice, human readable name for the MIME type

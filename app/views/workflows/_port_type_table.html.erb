@@ -2,53 +2,68 @@
   <tr>
     <th class="port-name">Inputs</th>
     <% WorkflowInputPortType.all.each do |t| %>
-      <th class="port-type">
-        <%= t.name -%>
-      </th>
+        <th class="port-type">
+          <%= t.name -%>
+        </th>
     <% end %>
+    <th class="port-type">Type</th>
   </tr>
-  <% input_ports = @workflow.input_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} -%>
-  <% output_ports = @workflow.output_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} -%>
-  <%= f.fields_for(:input_ports, input_ports) do |i| %>
-    <tr>
-      <td class="port-name"><%= i.object.name %></td>
-      <%= i.hidden_field(:name) %>
-      <%= i.hidden_field(:description) %>
-      <%= i.hidden_field(:example_value) %>
-      <% WorkflowInputPortType.all.each do |t| %>
-        <td class="port-type">
-          <label>
-            <%= i.radio_button(:port_type_id, t.id) %>
-          </label>
-        </td>
+  <% input_ports = @workflow.input_ports.sort { |a, b| a.name.downcase <=> b.name.downcase } -%>
+  <% output_ports = @workflow.output_ports.sort { |a, b| a.name.downcase <=> b.name.downcase } -%>
+  <% if input_ports.blank? %>
+      <tr><td class="port-type"><p class="none_text">None</p></td><td colspan="3"> </td></tr>
+  <% else %>
+      <%= f.fields_for(:input_ports, input_ports) do |i| %>
+          <tr>
+            <td class="port-name"><%= i.object.name %></td>
+            <%= i.hidden_field(:name) %>
+            <%= i.hidden_field(:description) %>
+            <%= i.hidden_field(:example_value) %>
+            <% WorkflowInputPortType.all.each do |t| %>
+                <td class="port-type">
+                  <label>
+                    <%= i.radio_button(:port_type_id, t.id) %>
+                  </label>
+                </td>
+            <% end %>
+            <td class="port-type">
+              <%= i.select(:mime_type, options_for_select($mime_types_list, :selected => (i.object.mime_type.blank? ? '' : i.object.mime_type))) -%>
+            </td>
+          </tr>
       <% end %>
-    </tr>
   <% end %>
   <tr>
     <th class="port-name">Outputs</th>
     <% WorkflowOutputPortType.all.each do |t| %>
-      <th class="port-type">
-        <%= t.name -%>
-      </th>
+        <th class="port-type">
+          <%= t.name -%>
+        </th>
     <% end %>
-    <th class="port-type">MIME Type (optional)</th>
+    <th class="port-type">Type</th>
   </tr>
-  <%= f.fields_for(:output_ports, output_ports) do |o| %>
-    <tr>
-      <td class="port-name"><%= o.object.name %></td>
-      <%= o.hidden_field(:name) %>
-      <%= o.hidden_field(:description) %>
-      <%= o.hidden_field(:example_value) %>
-      <% WorkflowOutputPortType.all.each do |t| %>
-        <td class="port-type">
-          <label>
-            <%= o.radio_button(:port_type_id, t.id) %>
-          </label>
-        </td>
+  <% if output_ports.blank? %>
+      <tr>
+        <td class="port-type"><p class="none_text">None</p></td>
+        <td colspan="3"></td>
+      </tr>
+  <% else %>
+      <%= f.fields_for(:output_ports, output_ports) do |o| %>
+          <tr>
+            <td class="port-name"><%= o.object.name %></td>
+            <%= o.hidden_field(:name) %>
+            <%= o.hidden_field(:description) %>
+            <%= o.hidden_field(:example_value) %>
+            <% WorkflowOutputPortType.all.each do |t| %>
+                <td class="port-type">
+                  <label>
+                    <%= o.radio_button(:port_type_id, t.id) %>
+                  </label>
+                </td>
+            <% end %>
+            <td class="port-type">
+              <%= o.select(:mime_type, options_for_select($mime_types_list, :selected => (o.object.mime_type.blank? ? '' : o.object.mime_type))) -%>
+            </td>
+          </tr>
       <% end %>
-      <td class="port-type">
-        <%= o.text_field :mime_type -%>
-      </td>
-    </tr>
   <% end %>
 </table>

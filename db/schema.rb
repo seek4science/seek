@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131121115947) do
+ActiveRecord::Schema.define(:version => 20131126101335) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1710,6 +1710,7 @@ ActiveRecord::Schema.define(:version => 20131121115947) do
     t.integer "example_data_file_id"
     t.integer "workflow_id"
     t.integer "workflow_version"
+    t.string  "mime_type"
   end
 
   create_table "workflow_output_port_types", :force => true do |t|

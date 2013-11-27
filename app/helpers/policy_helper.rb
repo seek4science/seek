@@ -29,7 +29,7 @@ module PolicyHelper
 
   def policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name)
     html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
-    html << "<p class='private'>You keep this #{resource_name.humanize} private (only visible to you)</p>"
+    html << "<p class='private'>You keep this #{resource_name.humanize.downcase} private (only visible to you)</p>"
     html << process_permissions(permissions, resource_name)
     html.html_safe
   end
