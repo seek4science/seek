@@ -72,7 +72,7 @@ class OntologyClassTest < ActiveSupport::TestCase
 
   test "label if missing" do
     o = Seek::Ontologies::OntologyClass.new RDF::URI.new("http://fish#bob_monkhouse")
-    assert_equal "bob monkhouse",o.label
+    assert_equal "Bob monkhouse",o.label
   end
 
 end
