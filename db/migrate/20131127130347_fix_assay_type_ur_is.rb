@@ -14,9 +14,9 @@ class FixAssayTypeUrIs < ActiveRecord::Migration
 
       update_sql = "UPDATE assay_types SET term_uri='#{uri.to_s}' WHERE id=#{id};"
       begin
-        ActiveRecord::Base.connection.execute(sql)
+        ActiveRecord::Base.connection.execute(update_sql)
       rescue
-        pp "There was a problem with executing:\n\t#{sql}"
+        pp "There was a problem with executing:\n\t#{update_sql}"
       end
     end
 
