@@ -201,7 +201,7 @@ class PeopleController < ApplicationController
         end
 
       else
-        format.html { render :action => redirect_action }
+        format.html { redirect_to :action => redirect_action }
         format.xml { render :xml => @person.errors, :status => :unprocessable_entity }
       end
     end
