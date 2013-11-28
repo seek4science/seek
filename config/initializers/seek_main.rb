@@ -42,6 +42,9 @@ require 'background_reindexing'
 require 'subscribable'
 require 'seek/permissions/publishing_permissions'
 
+require 'doi_query_tool_extension'
+require 'pubmed_query_tool_extension'
+
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
