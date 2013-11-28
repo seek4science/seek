@@ -14,7 +14,7 @@ module Seek
 
       def label
         if @label.nil?
-          @label = extract_label_from_uri
+          @label = extract_label_from_uri_fragment
         end
         @label
       end
@@ -28,13 +28,23 @@ module Seek
         result
       end
 
-      #returns a hash of all the classes from the hierachy, including all subclasses, with the key being the URI as a string
+      #returns a hash of all the classes from the hierarchy, including all subclasses, with the key being the URI as a string
       def hash_by_uri
         result = {}
         flatten_hierarchy.each do |c|
           result[c.uri.to_s]=c
         end
         result
+      end
+
+      #returns a hash of all the classes from the hierarchy, including all subclasses, with the key being the lowercase label
+      def hash_by_label
+        result = {}
+        flatten_hierarchy.each do |c|
+          result[c.label.downcase]=c
+        end
+        result
+
       end
 
       private
@@ -45,8 +55,8 @@ module Seek
         raise Exception.new("URI must be provided, as either as a string or RDF::URI type") unless @uri.kind_of?(RDF::URI)
       end
 
-      def extract_label_from_uri
-        @uri.fragment.humanize
+      def extract_label_from_uri_fragment
+        (@uri.fragment || "").humanize
       end
     end
   end

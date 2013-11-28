@@ -59,6 +59,22 @@ class OntologyClassTest < ActiveSupport::TestCase
     assert_equal o4,hash[o4.uri.to_s]
   end
 
+  test "hash by label" do
+    o1 = Seek::Ontologies::OntologyClass.new RDF::URI.new("http://o1"),"o1"
+    o2 = Seek::Ontologies::OntologyClass.new RDF::URI.new("http://o2")
+    o3 = Seek::Ontologies::OntologyClass.new(RDF::URI.new("http://o3"),"O3",nil,[o1,o2])
+    o4 = Seek::Ontologies::OntologyClass.new(RDF::URI.new("http://o4"),"o4",nil,[o3])
+
+    hash = o4.hash_by_label
+
+    assert_equal 4,hash.keys.count
+    assert_equal o1,hash["o1"]
+
+    #key should be downcased
+    assert_equal o3,hash["o3"]
+    assert_nil hash["O3"]
+  end
+
   test "uri as string" do
     o = Seek::Ontologies::OntologyClass.new "http://fish#bob"
     assert o.uri.kind_of?(RDF::URI)
