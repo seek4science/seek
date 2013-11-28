@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131127140231) do
+ActiveRecord::Schema.define(:version => 20131128162518) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -167,13 +167,15 @@ ActiveRecord::Schema.define(:version => 20131127140231) do
     t.integer  "technology_type_id"
     t.integer  "study_id"
     t.integer  "owner_id"
-    t.string   "first_letter",        :limit => 1
+    t.string   "first_letter",          :limit => 1
     t.integer  "assay_class_id"
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "institution_id"
     t.string   "assay_type_uri"
     t.string   "technology_type_uri"
+    t.string   "technology_type_label"
+    t.string   "assay_type_label"
   end
 
   create_table "assays_samples", :id => false, :force => true do |t|

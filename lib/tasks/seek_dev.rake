@@ -199,8 +199,6 @@ namespace :seek_dev do
             else
               puts "URI is unrecognised for #{type.id} but can be resolved from the label, if underscores are replaced with spaces - label is #{label}".yellow
             end
-
-
           else
             puts "URI is unrecognised for #{type.id} but can be resolved from the label - label is #{label}".green
           end
@@ -236,8 +234,6 @@ namespace :seek_dev do
             else
               puts "URI is unrecognised for #{type.id} but can be resolved from the label, if underscores are replaced with spaces - label is #{label}".yellow
             end
-
-
           else
             puts "URI is unrecognised for #{type.id} but can be resolved from the label - label is #{label}".green
           end
