@@ -241,4 +241,19 @@ desc "pre-populate investigations with projects in VLN SEEK "
     end
   end
 
+  desc "repopulate missing book titles for publications"
+  task(:repopulate_missing_publication_book_titles => :environment) do
+    disable_authorization_checks do
+      Publication.all.select { |p| p.publication_type ==3 && p.journal.blank? }.each do |pub|
+        if pub.doi
+          query = DoiQuery.new(Seek::Config.crossref_api_email)
+          result = query.fetch(pub.doi)
+          unless result.nil? || !result.error.nil?
+            pub.extract_doi_metadata(result)
+            pub.save
+          end
+        end
+      end
+    end
+  end
 end

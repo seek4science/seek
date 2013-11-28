@@ -16,6 +16,9 @@ module DoiQueryToolExtension
     def parse_xml_with_extension(article)
           doi_record = parse_xml_without_extension(article)
           begin
+            #bug fix for empty/missing book title
+            doi_record.journal ||= article.find_first("//book_metadata/titles/title").try(&:content)
+            # add citation
             if article.find_first('//journal_metadata/abbrev_title')
               citation_iso_abbrev = article.find_first('//journal_metadata/abbrev_title').content
             elsif article.find_first('//title')
