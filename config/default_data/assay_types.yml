@@ -20,7 +20,7 @@ genomics:
 
 comparative_genomics:
   title: comparative genomics
-  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#comparative genomics
+  term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#comparative_genomics
 
 DNA_sequencing:
   title: DNA sequencing
