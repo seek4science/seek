@@ -178,8 +178,8 @@ function labelPosition(node){
 
 function mouseOnLabel(node, mouse_event){
     var label_pos = labelPosition(node);
-    var mouse_posX = mouse_event.x;
-    var mouse_posY = mouse_event.y;
+    var mouse_posX = mouse_event.clientX;
+    var mouse_posY = mouse_event.clientY;
     var mouse_on_label = mouse_posX > label_pos.minX && mouse_posX < label_pos.maxX && mouse_posY > label_pos.minY && mouse_posY < label_pos.maxY;
     return mouse_on_label;
 }
