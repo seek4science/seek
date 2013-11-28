@@ -4,9 +4,6 @@ class PublicationsController < ApplicationController
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
-  
-  include PubmedQueryToolExtension
-  include DoiQueryToolExtension
 
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
