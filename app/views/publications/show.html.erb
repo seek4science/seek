@@ -54,7 +54,7 @@
               else
                 author.first_name + " " + author.last_name
               end
-            end.join(', ') %>
+            end.join(', ').html_safe %>
         <% end %>
       </p>
 
