@@ -8,7 +8,7 @@
     <% ports.each do |p| -%>
       <tr>
         <td>
-          <h3><%= p.name %></h3>
+          <h3><%= p.name %> <%= "<span class='mime_type'>(#{p.mime_type})</span>".html_safe unless p.mime_type.blank? %></h3>
 
           <p>
             <%= ('<strong>Description: </strong>' + (p.description || '')).html_safe %>
