@@ -381,7 +381,7 @@ class PublicationsControllerTest < ActionController::TestCase
     joined_original_authors = original_authors.join(', ')
     get :show, :id => publication.id
 
-    assert_equal true, @response.body.include?(h(joined_original_authors))
+    assert_equal true, @response.body.include?(joined_original_authors)
   end
 
   test 'should update page pagination when changing the setting from admin' do
