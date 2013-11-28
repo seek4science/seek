@@ -9,7 +9,7 @@ config/database.yml
 config/initializers/seek_local.rb
 config/environment_local.rb
 config/virtuoso_settings.yml
-config/initializers/taverna_player.rb
+config/initializers/taverna_server.rb
 
 *.DS_Store
 log/*.log*
