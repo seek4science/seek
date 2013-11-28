@@ -31,6 +31,8 @@ function animateNode(node){
     // set font style here for better animation (instead of in animate function).
     node.css('font-size', 14);
     node.css('font-weight', 'bolder');
+    node.css('color', '#0000e5');
+    node.select();
 }
 
 function displayNodeInfo(node){
@@ -140,6 +142,8 @@ function normalizingNodes(nodes){
     nodes.css('height',default_node_height);
     nodes.css('font-size',default_font_size);
     nodes.css('font-weight', 'normal');
+    nodes.css('color',default_color);
+    nodes.unselect();
 }
 
 function resizeGraph(){
@@ -147,5 +151,42 @@ function resizeGraph(){
     if (cy.zoom() > 1){
         cy.reset();
         cy.center();
+    }
+}
+
+function labelPosition(node){
+    var label_pos = new Object();
+    var graph_pos = $j('#cy')[0].getBoundingClientRect();
+    var node_posX = node.renderedPosition().x + graph_pos.left;
+    var node_posY = node.renderedPosition().y + graph_pos.top;
+    var font_size = node.renderedCss()['font-size'];
+    var label = node.data().name;
+    var ruler = $j('#ruler')[0];
+    ruler.style.fontSize = font_size;
+    ruler.style.fontWeight = 'bolder';
+    ruler.innerHTML = label;
+    var zoom_level = cy.zoom();
+    var label_width = ruler.offsetWidth + 2*zoom_level;
+    var label_height = ruler.offsetHeight;
+    label_pos.minX = node_posX - label_width/2;
+    label_pos.maxX = node_posX + label_width/2;
+    label_pos.minY = node_posY - label_height/2;
+    label_pos.maxY = node_posY + label_height/2;
+    return label_pos;
+}
+
+function mouseOnLabel(node, mouse_event){
+    var label_pos = labelPosition(node);
+    var mouse_posX = mouse_event.x;
+    var mouse_posY = mouse_event.y;
+    var mouse_on_label = mouse_posX > label_pos.minX && mouse_posX < label_pos.maxX && mouse_posY > label_pos.minY && mouse_posY < label_pos.maxY;
+    return mouse_on_label;
+}
+
+function clickLabelLink(node, mouse_event){
+    if (mouseOnLabel(node, mouse_event)){
+        var link = document.createElement('a');
+        link.href = node.data().link.split('"')[1];
+        clickLink(link);
     }
 }
