@@ -2,6 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'uuidtools'
+require 'colorize'
 
 namespace :seek_dev do
   desc 'A simple task for quickly setting up a project and institution, and assigned the first user to it. This is useful for quickly setting up the database when testing. Need to create a default user before running this task'
@@ -168,6 +169,81 @@ namespace :seek_dev do
     FileUtils.copy("db/#{dir}/synonyms.yml", 'config/default_data/')
     puts "Cleaning up"
     FileUtils.rm_r("db/#{dir}/")
+  end
+
+  task :analyse_assay_types => :environment do
+    uri_hash = Seek::Ontologies::AssayTypeReader.new.class_hierarchy.hash_by_uri
+    uri_hash = uri_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.new.class_hierarchy.hash_by_uri)
+
+    label_hash = Seek::Ontologies::AssayTypeReader.new.class_hierarchy.hash_by_label
+    label_hash = label_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.new.class_hierarchy.hash_by_label)
+
+    AssayType.all.each do |type|
+      uri = type.term_uri
+      label = type.title
+      if label.nil? && uri.nil?
+        puts "assay type #{type.id} has no label or uri".red
+      end
+      if uri.nil?
+        if label_hash[label.downcase].nil?
+          puts "URI is nil for #{type.id} and cannot be resolved from the label - label is #{label}".red
+        else
+          puts "URI is nil for #{type.id} but can be resolved from the label - label is #{label}".green
+        end
+      end
+      unless uri.nil?
+        if uri_hash[uri].nil?
+          if label_hash[label.downcase].nil?
+            if label_hash[label.gsub("_"," ").downcase].nil?
+              puts "URI is unrecognised for #{type.id} and cannot be resolved from the label - label is #{label}".red
+            else
+              puts "URI is unrecognised for #{type.id} but can be resolved from the label, if underscores are replaced with spaces - label is #{label}".yellow
+            end
+
+
+          else
+            puts "URI is unrecognised for #{type.id} but can be resolved from the label - label is #{label}".green
+          end
+        end
+      end
+    end
+  end
+
+  task :analyse_technology_types => :environment do
+    uri_hash = Seek::Ontologies::TechnologyTypeReader.new.class_hierarchy.hash_by_uri
+
+
+    label_hash = Seek::Ontologies::TechnologyTypeReader.new.class_hierarchy.hash_by_label
+
+    TechnologyType.all.each do |type|
+      uri = type.term_uri
+      label = type.title
+      if label.nil? && uri.nil?
+        puts "technology type #{type.id} has no label or uri".red
+      end
+      if uri.nil?
+        if label_hash[label.downcase].nil?
+          puts "URI is nil for #{type.id} and cannot be resolved from the label - label is #{label}".red
+        else
+          puts "URI is nil for #{type.id} but can be resolved from the label - label is #{label}".green
+        end
+      end
+      unless uri.nil?
+        if uri_hash[uri].nil?
+          if label_hash[label.downcase].nil?
+            if label_hash[label.gsub("_"," ").downcase].nil?
+              puts "URI is unrecognised for #{type.id} and cannot be resolved from the label - label is #{label}".red
+            else
+              puts "URI is unrecognised for #{type.id} but can be resolved from the label, if underscores are replaced with spaces - label is #{label}".yellow
+            end
+
+
+          else
+            puts "URI is unrecognised for #{type.id} but can be resolved from the label - label is #{label}".green
+          end
+        end
+      end
+    end
   end
 
 end

@@ -50,6 +50,7 @@ gem 'rfc-822'
 gem 'nokogiri',"1.5.9"
 gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
 gem 'cocaine'
+gem 'colorize'
 
 
 #Linked to SysMO Git repositories
