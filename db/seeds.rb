@@ -2,13 +2,10 @@
 # Seeds the database with BioVeL-specific data
 
 # Seeds projects
-Project.delete_all
-project = Project.create(:name => 'BioVeL')
+project = Project.find_by_name('BioVeL') || Project.create(:name => 'BioVeL')
 puts 'Seeded the BioVeL project.'
 
 # Seeds institutions
-Institution.delete_all
-
 institutions = [{:name => 'University of Manchester', :country => 'United Kingdom'},
 {:name => 'Cardiff University', :country => 'United Kingdom'},
 {:name => 'Centro de Referência em Informação Ambiental', :country => 'Brazil'},
@@ -26,8 +23,11 @@ institutions = [{:name => 'University of Manchester', :country => 'United Kingdo
 {:name => 'University of Gothenburg', :country => 'Sweden'}]
 
 institutions.each do |inst|
-  institution = Institution.create(:name => inst[:name], :country => inst[:country])
-  WorkGroup.create(:project => project, :institution => institution)
+  institution = Institution.where(:name => inst[:name], :country => inst[:country]).first ||
+                Institution.create(:name => inst[:name], :country => inst[:country])
+  unless WorkGroup.where(:project_id => project.id, :institution_id => institution.id).exists?
+    WorkGroup.create(:project_id => project.id, :institution_id => institution.id)
+  end
 end
 
 puts 'Seeded 15 BioVeL project\'s institutions.'
