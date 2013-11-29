@@ -31,7 +31,8 @@ function animateNode(node){
     // set font style here for better animation (instead of in animate function).
     node.css('font-size', 14);
     node.css('font-weight', 'bolder');
-    node.css('color', '#0000e5');
+    if (node.data().name != 'Hidden item')
+        node.css('color', '#0000e5');
     node.select();
 }
 
