@@ -186,7 +186,7 @@ namespace :seek_dev do
       end
       if uri.nil?
         if label_hash[label.downcase].nil?
-          puts "URI is nil for #{type.id} and cannot be resolved from the label - label is #{label}".red
+          puts "URI is nil for #{type.id} and cannot be resolved from the label - label is #{label} (#{type.assays.count} assays)".red
         else
           puts "URI is nil for #{type.id} but can be resolved from the label - label is #{label}".green
         end
@@ -195,7 +195,7 @@ namespace :seek_dev do
         if uri_hash[uri].nil?
           if label_hash[label.downcase].nil?
             if label_hash[label.gsub("_"," ").downcase].nil?
-              puts "URI is unrecognised for #{type.id} and cannot be resolved from the label - label is #{label}".red
+              puts "URI is unrecognised for #{type.id} and cannot be resolved from the label - label is #{label} (#{type.assays.count} assays)".red
             else
               puts "URI is unrecognised for #{type.id} but can be resolved from the label, if underscores are replaced with spaces - label is #{label}".yellow
             end
@@ -221,7 +221,7 @@ namespace :seek_dev do
       end
       if uri.nil?
         if label_hash[label.downcase].nil?
-          puts "URI is nil for #{type.id} and cannot be resolved from the label - label is #{label}".red
+          puts "URI is nil for #{type.id} and cannot be resolved from the label - label is #{label} (#{type.assays.count} assays)".red
         else
           puts "URI is nil for #{type.id} but can be resolved from the label - label is #{label}".green
         end
@@ -230,7 +230,7 @@ namespace :seek_dev do
         if uri_hash[uri].nil?
           if label_hash[label.downcase].nil?
             if label_hash[label.gsub("_"," ").downcase].nil?
-              puts "URI is unrecognised for #{type.id} and cannot be resolved from the label - label is #{label}".red
+              puts "URI is unrecognised for #{type.id} and cannot be resolved from the label - label is #{label} (#{type.assays.count} assays)".red
             else
               puts "URI is unrecognised for #{type.id} but can be resolved from the label, if underscores are replaced with spaces - label is #{label}".yellow
             end
@@ -241,5 +241,86 @@ namespace :seek_dev do
       end
     end
   end
+
+  task :analyse_assays_and_their_types => :environment do
+    assay_type_uri_hash = Seek::Ontologies::AssayTypeReader.new.class_hierarchy.hash_by_uri
+    assay_type_uri_hash = assay_type_uri_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.new.class_hierarchy.hash_by_uri)
+
+    assay_type_label_hash = Seek::Ontologies::AssayTypeReader.new.class_hierarchy.hash_by_label
+    assay_type_label_hash = assay_type_label_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.new.class_hierarchy.hash_by_label)
+
+    technology_type_uri_hash = Seek::Ontologies::TechnologyTypeReader.new.class_hierarchy.hash_by_uri
+    technology_type_label_hash = Seek::Ontologies::TechnologyTypeReader.new.class_hierarchy.hash_by_label
+
+    assay_type_label_known_mapping = ["generic experimental assay","generic modelling analysis","modelling analysis type"]
+    technology_type_label_known_mapping = ["technology","enzymatic activity experiments"]
+
+    Assay.all.each do |assay|
+      id = assay.id
+      assay_type_label = assay.assay_type_label
+      assay_type_uri = assay.assay_type_uri
+      technology_type_uri = assay.technology_type_uri
+      technology_type_label = assay.technology_type_label
+
+      technology_type_label = technology_type_label.downcase.gsub("_"," ") unless technology_type_label.nil?
+      assay_type_label = assay_type_label.downcase.gsub("_"," ") unless assay_type_label.nil?
+
+      if assay_type_label.blank? && assay_type_uri.blank?
+        puts "No assay type uri or label defined, will be reset to the root class - #{id}".green
+      elsif assay_type_uri.blank? || assay_type_uri_hash[assay_type_uri].nil?
+        if assay_type_label_known_mapping.include?(assay_type_label)
+          puts "Invalid assay type uri and but the label is recognised as a known mapping to fix '#{assay_type_label}' - #{id}".green
+        elsif assay_type_label_hash[assay_type_label].nil?
+          if technology_type_label_hash[assay_type_label].nil?
+            if technology_type_uri_hash[assay_type_uri].nil?
+              puts "Invalid assay type uri and it cannot be resolved by the label '#{assay_type_label}' - #{id}".red
+              puts "\t uri is #{assay_type_uri}".red
+            else
+              puts "Invalid assay type uri and it cannot be resolved by the label '#{assay_type_label}', but does match a technology type uri  - #{id}".orange
+              puts "\t the assay type uri is #{assay_type_uri}"
+              puts "\t this assays technology type label is currently #{technology_type_label}".orange
+            end
+
+          else
+            puts "Invalid assay type uri and it cannot be resolved by the label, but does match a technology type '#{assay_type_label}' - #{id}".orange
+            puts "\t this assays technology type label is currently #{technology_type_label}".orange
+          end
+        else
+          puts "Invalid assay type uri but it can be resolved by the label '#{assay_type_label}' - #{id}".green
+        end
+      end
+
+      unless assay.is_modelling?
+        if technology_type_label.blank? && technology_type_uri.blank?
+          puts "No technology type uri or label defined, will be reset to the root class - #{id}".green
+
+        elsif technology_type_uri.blank? || technology_type_uri_hash[technology_type_uri].nil?
+          if technology_type_label_known_mapping.include?(technology_type_label)
+            puts "Invalid technology type uri and but the label is recognised as a known mapping to fix '#{technology_type_label}' - #{id}".green
+          elsif technology_type_label_hash[technology_type_label].nil?
+            if assay_type_label_hash[technology_type_label].nil?
+              if assay_type_uri_hash[technology_type_uri].nil?
+                puts "Invalid technology type uri and it cannot be resolved by the label '#{technology_type_label}' - #{id}".red
+                puts "\t uri is #{technology_type_uri}".red
+              else
+                puts "Invalid technology type uri and it cannot be resolved by the label '#{technology_type_label}', but does match a assay type uri  - #{id}".orange
+                puts "\t the technology type uri is #{technology_type_uri}"
+                puts "\t this assays assay type label is currently #{assay_type_label}".orange
+              end
+
+            else
+              puts "Invalid technology type uri and it cannot be resolved by the label, but does match an assay type '#{technology_type_label}' - #{id}".orange
+              puts "\t this assays assay type label is currently #{assay_type_label}".orange
+            end
+          else
+            puts "Invalid technology type uri but it can be resolved by the label '#{technology_type_label}' - #{id}".green
+          end
+        end
+      end
+
+
+    end
+  end
+
 
 end
