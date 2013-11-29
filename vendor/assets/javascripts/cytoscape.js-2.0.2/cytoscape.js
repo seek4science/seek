@@ -14067,8 +14067,8 @@ var cytoscape;
 	CanvasRenderer.prototype.roundRectangleIntersectLine = function(
 		x, y, nodeX, nodeY, width, height, padding) {
 		
-		var cornerRadius = this.getRoundRectangleRadius(width, height);
-	  
+		var cornerRadius = 0;
+
 		var halfWidth = width / 2;
 		var halfHeight = height / 2;
 		

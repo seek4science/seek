@@ -12,7 +12,7 @@
   
   <%= list_item_optional_attribute publication_type_text(publication.publication_type), h(publication.journal) %>
   
-  <%= list_item_attribute "Date Published", publication.published_date.try(:strftime, '%d/%m/%Y') %>
+  <%= list_item_attribute "Date Published", date_as_string(publication.published_date) %>
 
 </div>
 <div style="clear:both;"></div>

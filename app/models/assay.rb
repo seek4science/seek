@@ -38,7 +38,7 @@ class Assay < ActiveRecord::Base
   has_many :assay_assets, :dependent => :destroy
 
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
-  
+
   def asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
     'SELECT '+ asset_class_underscored +'_versions.* FROM ' + asset_class_underscored + '_versions ' +

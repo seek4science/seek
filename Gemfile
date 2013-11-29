@@ -28,8 +28,9 @@ gem "delayed_job_active_record"
 gem "daemons"
 gem "cancan"
 gem "in_place_editing"
-gem "rdf",">=0.3.8"
-gem "rdf-rdfxml",">=0.3.8"
+gem "linkeddata"
+#gem "rdf",">=0.3.8"
+#gem "rdf-rdfxml",">=0.3.8"
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
 gem 'docsplit'
@@ -49,6 +50,7 @@ gem 'rfc-822'
 gem 'nokogiri',"1.5.9"
 gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
 gem 'cocaine'
+gem 'colorize'
 
 
 #Linked to SysMO Git repositories

@@ -61,9 +61,14 @@ module AvatarsHelper
   end
 
   def avatar_url(avatar_for_instance, avatar_id, size=nil)
-    serve_from_public = true
+    serve_from_public = Rails.configuration.assets.enabled
     if serve_from_public
-      avatar_for_instance.avatar.public_asset_url(size)
+      avatar = Avatar.find(avatar_id)
+      if avatar_for_instance.avatars.include?(avatar)
+        avatar.public_asset_url(size)
+      else
+        raise "Avatar does not belong to instance"
+      end
     else
       basic_url = eval("#{avatar_for_instance.class.name.downcase}_avatar_path(#{avatar_for_instance.id}, #{avatar_id})")
 
