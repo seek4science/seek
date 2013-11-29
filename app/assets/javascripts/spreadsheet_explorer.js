@@ -679,6 +679,8 @@ function changeRowsPerPage(){
     window.location.href = update_href;
 }
 
+// In the case of having pagination.
+// To get the rows relatively to the page. E.g. minRow = 14, perPage = 10 => relativeMinRow = 4
 function relativeRows(minRow, maxRow, sheetNumber){
     var current_page = null;
     if (sheetNumber != null)
@@ -697,6 +699,7 @@ function relativeRows(minRow, maxRow, sheetNumber){
         maxRowPage -=1
     }
 
+    //This is for the case of having minRow and maxRow in different pages.
     if (current_page != null && minRowPage < maxRowPage ){
         if (current_page == minRowPage){
             relativeMaxRow = perPage;
