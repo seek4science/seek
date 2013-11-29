@@ -8,7 +8,7 @@ module TavernaPlayer
 
     before_validation :set_projects_before_validation
     after_create :set_projects
-    after_create :fix_output_port_mime_types
+    after_create :fix_run_input_ports_mime_types
 
     validates_presence_of :name
 
@@ -48,16 +48,21 @@ module TavernaPlayer
       end
     end
 
-    def fix_output_port_mime_types
-      self.outputs.each do |output|
-        port = workflow.output_ports.detect {|o| o.name == output.name }
-        puts "PORT #{port.id}"
+
+    def fix_run_input_ports_mime_types
+      self.inputs.each do |input|
+        input.metadata = {:size => nil, :type => ''} if input.metadata.nil?
+        port = self.workflow.input_ports.detect { |i| i.name == input.name }
         if port && !port.mime_type.blank?
-          puts "PORT EXISTS WITH MIME_TYPE"
-          output.metadata[:type] = port.mime_type
-          output.save
+          if input.depth == 0
+            input.metadata[:type] = port.mime_type
+          else
+            input.metadata[:type] = recursively_set_mime_type(input.metadata[:type], input.depth, port.mime_type)
+          end
+          input.save
         end
       end
     end
+
   end
 end

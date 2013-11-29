@@ -4,7 +4,13 @@
 <% unless ports.blank? -%>
   <% ports.each do |p| -%>
     <div class="input">
-      <h3><%= p.name %></h3>
+      <%
+         mime_type = ''
+         if !p.metadata.blank? && !p.metadata[:type].blank?
+           mime_type = p.depth == 0 ? p.metadata[:type] : "(list of depth #{p.depth})"
+         end
+      %>
+      <h3><%= p.name %> <%= "<span class='mime_type'>(#{mime_type})</span>".html_safe unless mime_type.blank? %></h3>
 
       <p>
         <strong>Value:</strong>
