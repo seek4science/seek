@@ -13,7 +13,7 @@ module RunsHelper
 
       action_buttons = render(:partial => "taverna_player/runs/delete_or_cancel_button", :locals => { :run => run, :redirect_to => redirect_to })
       [link_to("#{image(run.is_a?(Sweep) ? 'sweep_run' : 'simple_run')} #{run.name}".html_safe, run.is_a?(Sweep) ? main_app.sweep_path(run) : taverna_player.run_path(run)),
-       link_to(workflow.title, main_app.workflow_path(workflow)),#, :version => run.workflow_version)),
+       workflow.can_view? ? link_to(workflow.title, main_app.workflow_path(workflow)) : workflow.title,
        workflow.category.name,
        "#{run.state} #{(run.complete? ? '' : image_tag('ajax-loader.gif', :style => "vertical-align: middle"))}".html_safe,
        created_at,

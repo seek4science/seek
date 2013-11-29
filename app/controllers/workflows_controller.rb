@@ -11,6 +11,7 @@ class WorkflowsController < ApplicationController
   before_filter :find_and_filter_workflows, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :preview ]
   before_filter :find_display_asset, :only=>[:show, :download, :run]
+  before_filter :check_runs_before_destroy, :only => :destroy
 
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
@@ -263,6 +264,13 @@ class WorkflowsController < ApplicationController
     end
 
     @workflows
+  end
+
+  def check_runs_before_destroy
+    unless @workflow.runs.empty?
+      flash[:error] = "There are #{@workflow.runs.count} runs associated with this workflow and so it may not be deleted."
+      redirect_to @workflow
+    end
   end
 
 end
