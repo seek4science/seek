@@ -1313,6 +1313,15 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "tr", :count => 10
       assert_select "td#cell_B2", :text => "A link to BBC", :count=>1
     end
+
+    assert_select "div#spreadsheet_2" do
+      assert_select "div.row_heading", :count => 10
+      (1..10).each do |i|
+        assert_select "div.row_heading", :text => "#{i}", :count => 1
+      end
+
+      assert_select "tr", :count => 10
+    end
   end
 
   test "correctly displays number of rows in spreadsheet explorer" do
