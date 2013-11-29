@@ -647,6 +647,9 @@ function copy_cells()
 
 function changeRowsPerPage(){
     var current_href = window.location.href;
+    if (current_href.endsWith('#'))
+        current_href = current_href.substring(0,current_href.length-1);
+
     var update_per_page = $('per_page').value;
     var update_href = '';
     if (current_href.match('page_rows') == null){
