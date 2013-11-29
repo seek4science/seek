@@ -7,9 +7,9 @@ module SpreadsheetHelper
   def generate_paginate_rows(rows, sheet_index, per_page)
     #need to record the index of the nil row, for later use
     rows_with_index = []
-    rows.each_with_index do |row, index|
+    rows.drop(1).each_with_index do |row, index|
        if row.nil?
-         rows_with_index << Row.new(index)
+         rows_with_index << Row.new(index+1)
        else
          rows_with_index << row
        end
