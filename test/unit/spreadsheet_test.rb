@@ -21,7 +21,7 @@ class SpreadsheetTest < ActiveSupport::TestCase
 
     assert_equal 3, spreadsheet.sheets.first.actual_rows.size
 
-    assert_equal 11, spreadsheet.sheets[1].actual_rows.size
+    assert_equal 10, spreadsheet.sheets[1].actual_rows.size
 
     assert_equal 4, spreadsheet.sheets[1].actual_rows.first.actual_cells.size
 

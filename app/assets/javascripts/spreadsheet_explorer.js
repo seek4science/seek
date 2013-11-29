@@ -398,9 +398,15 @@ function bindAnnotation(ann) {
     var relative_rows = relativeRows(ann.startRow, ann.endRow, ann.sheetNumber+1);
     var relativeMinRow = relative_rows[0];
     var relativeMaxRow = relative_rows[1];
+    var startPage =  parseInt(ann.startRow/perPage) + 1;
+    if (ann.startRow % perPage == 0)
+        startPage -=1
+    var endPage = parseInt(ann.endRow/perPage) + 1;
+    if (ann.endRow % perPage == 0)
+        endPage -=1
 
     //if no pagination, or the annotation belongs to the cell of current page, then bind it to the page
-    var annotation_of_current_page = current_page > parseInt(ann.startRow/perPage) && current_page <= parseInt(ann.endRow/perPage) + 1 ;
+    var annotation_of_current_page = current_page >= startPage && current_page <= endPage;
 
     if ((current_page == null) || annotation_of_current_page){
         $j("table.sheet:eq("+ann.sheetNumber+") tr").slice((relativeMinRow-1),relativeMaxRow).each(function() {
@@ -641,6 +647,9 @@ function copy_cells()
 
 function changeRowsPerPage(){
     var current_href = window.location.href;
+    if (current_href.endsWith('#'))
+        current_href = current_href.substring(0,current_href.length-1);
+
     var update_per_page = $('per_page').value;
     var update_href = '';
     if (current_href.match('page_rows') == null){
@@ -670,15 +679,27 @@ function changeRowsPerPage(){
     window.location.href = update_href;
 }
 
+// In the case of having pagination.
+// To get the rows relatively to the page. E.g. minRow = 14, perPage = 10 => relativeMinRow = 4
 function relativeRows(minRow, maxRow, sheetNumber){
     var current_page = null;
     if (sheetNumber != null)
         current_page = currentPage(sheetNumber);
+
     var relativeMinRow = minRow % perPage;
     var relativeMaxRow = maxRow % perPage;
     var minRowPage = parseInt(minRow/perPage) + 1;
     var maxRowPage = parseInt(maxRow/perPage) + 1;
+    if (relativeMinRow == 0){
+        relativeMinRow = perPage;
+        minRowPage -=1
+    }
+    if (relativeMaxRow == 0){
+        relativeMaxRow = perPage;
+        maxRowPage -=1
+    }
 
+    //This is for the case of having minRow and maxRow in different pages.
     if (current_page != null && minRowPage < maxRowPage ){
         if (current_page == minRowPage){
             relativeMaxRow = perPage;
