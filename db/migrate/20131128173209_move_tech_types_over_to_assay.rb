@@ -17,7 +17,6 @@ class MoveTechTypesOverToAssay < ActiveRecord::Migration
           update_sql = "update assays set technology_type_label=#{ActiveRecord::Base.connection.quote(label)}, technology_type_uri=#{ActiveRecord::Base.connection.quote(uri)} where id=#{assay_id};"
           begin
             ActiveRecord::Base.connection.execute(update_sql)
-              pp update_sql
           rescue Exception=>e
             puts "Error [#{e.message}] running sql - #{update_sql}"
           end
