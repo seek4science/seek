@@ -1296,6 +1296,70 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "td a[href=?][target=_blank]","http://bbc.co.uk/news",:count=>1
   end
 
+  test "correctly displays rows in spreadsheet explorer" do
+    df = Factory(:data_file,
+                 :policy=>Factory(:public_policy),
+                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,:data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+
+    get :explore, :id=>df
+    assert_response :success
+
+    assert_select "div#spreadsheet_1" do
+      assert_select "div.row_heading", :count => 10
+      (1..10).each do |i|
+        assert_select "div.row_heading", :text => "#{i}", :count => 1
+      end
+
+      assert_select "tr", :count => 10
+      assert_select "td#cell_B2", :text => "A link to BBC", :count=>1
+    end
+  end
+
+  test "correctly displays number of rows in spreadsheet explorer" do
+    df = Factory(:data_file,
+                 :policy=>Factory(:public_policy),
+                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,
+                                        :data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+
+    get :explore, :id=>df, :page_rows => 5
+    assert_response :success
+    assert_select "div#spreadsheet_1" do
+      assert_select "div.row_heading", :count => 5
+      assert_select "tr", :count => 5
+    end
+  end
+
+  test "correctly displays pagination in spreadsheet explorer" do
+    df = Factory(:data_file,
+                 :policy=>Factory(:public_policy),
+                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,
+                                        :data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+
+    get :explore, :id=>df, :page_rows => 5
+    assert_response :success
+
+    assert_select "div#paginate_sheet_1" do
+      assert_select "span.previous_page.disabled", :text => /Previous/, :count => 1
+      assert_select "em.current", :text => "1", :count => 1
+      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=1", :text => "2", :count => 1
+      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=1", :text => /Next/, :count => 1
+    end
+
+    assert_select "div#paginate_sheet_2" do
+      assert_select "span.previous_page.disabled", :text => /Previous/, :count => 1
+      assert_select "em.current", :text => "1", :count => 1
+      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=2", :text => "2", :count => 1
+      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=2", :text => /Next/, :count => 1
+    end
+
+    assert_select "div#paginate_sheet_3" do
+      assert_select "span.previous_page.disabled", :text => /Previous/, :count => 1
+      assert_select "em.current", :text => "1", :count => 1
+      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=3", :text => "2", :count => 1
+      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=3", :text => /Next/, :count => 1
+    end
+  end
+
   test "uploader can publish the item when projects associated with the item have no gatekeeper" do
     uploader = Factory(:user)
     data_file = Factory(:data_file, :contributor => uploader)
