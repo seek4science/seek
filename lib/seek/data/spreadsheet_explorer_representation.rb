@@ -63,7 +63,7 @@ module Seek
             sheet = Sheet.new(s["name"])
             workbook.sheets << sheet
             #Load into memory
-            min_rows = 10
+            min_rows = 35
             min_cols = 10
             #Grab columns
             columns = s.find("./ss:columns/ss:column")
@@ -105,7 +105,7 @@ module Seek
                 row = Row.new(i, 1000.to_s)
                 sheet.rows << row
               end
-              min_rows = 10
+              min_rows = 35
             else
               min_rows = row_index
             end
