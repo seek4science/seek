@@ -6,6 +6,9 @@ module Seek
 
       include SysMODB::SpreadsheetExtractor
 
+      MIN_ROWS = 35
+      MIN_COLS = 10
+
       def spreadsheet_annotations
         content_blob.worksheets.collect {|w| w.cell_ranges.collect {|c| c.annotations}}.flatten
       end
@@ -63,8 +66,8 @@ module Seek
             sheet = Sheet.new(s["name"])
             workbook.sheets << sheet
             #Load into memory
-            min_rows = 35
-            min_cols = 10
+            min_rows = MIN_ROWS
+            min_cols = MIN_COLS
             #Grab columns
             columns = s.find("./ss:columns/ss:column")
             col_index = 0
@@ -105,7 +108,7 @@ module Seek
                 row = Row.new(i, 1000.to_s)
                 sheet.rows << row
               end
-              min_rows = 35
+              min_rows = MIN_ROWS
             else
               min_rows = row_index
             end
