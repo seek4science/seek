@@ -326,6 +326,7 @@ class ApplicationController < ActionController::Base
         params.delete :sharing unless object.can_manage?(current_user)
       else
         respond_to do |format|
+          store_location
           #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
           if User.current_user.nil?
             flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."

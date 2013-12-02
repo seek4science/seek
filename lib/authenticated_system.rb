@@ -80,6 +80,10 @@ module AuthenticatedSystem
   def store_location
     session[:return_to] = request.fullpath
   end
+
+  def clear_return_to
+    session.delete(:return_to)
+  end
   
   # Redirect to the URI stored by the most recent store_location call or
   # to the passed default.
