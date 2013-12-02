@@ -35,6 +35,21 @@
     border-color: #77aa11;
 }
 
+
+#modal-interaction-dialog {
+    background-color: #FFFFCC;
+}
+.modal-interaction-heading {
+    padding: 15px;
+    background-color: #b1e10f;
+    color: #333333;
+    border-color: #77aa11;
+}
+.modal-interaction-body {
+    background-color: #ffffff;
+}
+
+
 body, html {
     background: #FAFAFA;
     margin: 0;
