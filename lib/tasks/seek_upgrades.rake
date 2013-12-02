@@ -11,7 +11,8 @@ namespace :seek do
             :environment,
             :update_admin_assigned_roles,
             :update_top_level_assay_type_titles,
-            :repopulate_auth_lookup_tables
+            :repopulate_auth_lookup_tables,
+            :increase_sheet_empty_rows
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -70,6 +71,18 @@ namespace :seek do
     assay_type = AssayType.find(mod_id)
     assay_type.title="generic modelling analysis"
     assay_type.save!
+  end
+
+  desc("Increase the min rows from 10 to 35")
+  task(:increase_sheet_empty_rows => :environment) do
+    worksheets = Worksheet.all.compact
+    min_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS
+    worksheets.each do |ws|
+      if ws.last_row < min_rows
+        ws.last_row = min_rows
+        ws.save
+      end
+    end
   end
 
 end
