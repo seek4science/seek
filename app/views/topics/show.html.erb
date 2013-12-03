@@ -7,7 +7,7 @@
     <h6><%= 'Voices'[:voices_title] %></h6>
     <p>
       <% @topic.voices.each do | user | %>
-        <%= link_to h(user.display_name), person_path(user.person) %><br/>
+        <%= link_to user.display_name, person_path(user.person) %><br/>
       <% end %>
     </p>
   <% end # right content -%>
@@ -27,7 +27,7 @@
 
   <div class="crumbs">
     <%= link_to "Forums"[:forums_title], forums_path %> <span class="arrow">&rarr;</span>
-    <%= link_to h(@topic.forum.name), forum_path(@topic.forum) %>
+    <%= link_to @topic.forum.name, forum_path(@topic.forum) %>
     <%
     page=session[:forum_page] ? session[:forum_page][@topic.forum.id] : nil
     if page and page!=1 %>
@@ -178,6 +178,6 @@
 
     <div class="crumbs" style="margin-top:1.1em;">
       <%= link_to "Forums"[:forums_title], forums_path %> <span class="arrow">&rarr;</span>
-      <%= link_to h(@topic.forum.name), forum_path(@topic.forum) %> <span class="arrow">&rarr;</span>
+      <%= link_to @topic.forum.name, forum_path(@topic.forum) %> <span class="arrow">&rarr;</span>
     </div>
   </div>

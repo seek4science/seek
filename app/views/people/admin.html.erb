@@ -1,6 +1,6 @@
 <%= javascript_include_tag "people" %>
 
-<h1>Administer Person: <%= link_to h(@person.name), person_path(@person) -%></h1>
+<h1>Administer Person: <%= link_to @person.name, person_path(@person) -%></h1>
 
 <div class="show_basic">
   <%= form_for @person, :url => {:action => 'administer_update', :id => @person.id} do |f| -%>

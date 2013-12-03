@@ -47,7 +47,7 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
               <label>
                   Owner:
               </label>
-              <%= link_to h(@assay.owner.name),@assay.owner -%>
+              <%= link_to @assay.owner.name,@assay.owner -%>
           </p>
       <% end %>
 
@@ -62,12 +62,12 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
       </p>
       <p id="assay_type">
           <b><%= assay_type_text -%>:</b>
-          <%= link_to h(@assay.assay_type.title.capitalize), @assay.assay_type -%>
+          <%= link_to @assay.assay_type.title.capitalize, @assay.assay_type -%>
       </p>
       <% unless @assay.is_modelling? -%>
       <p id="technology_type">
           <b>Technology type: </b>
-          <%= link_to h(try_block{@assay.technology_type.title.capitalize}), @assay.technology_type -%>
+          <%= link_to try_block{@assay.technology_type.title.capitalize}, @assay.technology_type -%>
       </p>
       <% end -%>
 

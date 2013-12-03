@@ -12,7 +12,7 @@ module ProjectsHelper
     result=""
     projects=projects.sort{|a,b| a.title<=>b.title} if sorted
     projects.each do |proj|
-      result += link_to h(proj.title),proj
+      result += link_to proj.title,proj
       result += " | " unless projects.last==proj
     end
     return result.html_safe

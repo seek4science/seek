@@ -61,7 +61,7 @@ module ApplicationHelper
       items = items.sort_by { |i| get_object_title(i) } if sort
       title_only_items = title_only_items.sort_by { |i| get_object_title(i) } if sort
 
-      list = items.collect { |i| link_to h(truncate(i.title, :length => max_length)), show_resource_path(i), :title => get_object_title(i) }
+      list = items.collect { |i| link_to truncate(i.title, :length => max_length), show_resource_path(i), :title => get_object_title(i) }
       list = list + title_only_items.collect { |i| h(truncate(i.title, :length => max_length)) }
       html << list.join(', ')
 

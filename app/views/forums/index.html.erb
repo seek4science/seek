@@ -32,7 +32,7 @@
             <% end %>
           </td>
           <td class="vat c2">
-            <%= link_to h(forum.name), forum_path(forum), :class => "title" %>
+            <%= link_to forum.name, forum_path(forum), :class => "title" %>
             <div class="posts">
               <%= '{count} topics'[(count=forum.topics.size)==1 ? :topic_count : :topics_count, number_with_delimiter(count)] %>,
               <%= '{count} posts'[(count=forum.posts.size)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %>

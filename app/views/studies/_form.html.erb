@@ -30,7 +30,7 @@
 
     <p>
       <%= t('investigation') %><span class="required">*</span>
-      <%=link_to h("New #{t('investigation')}?"),new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
+      <%=link_to "New #{t('investigation')}?",new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
       <div id="investigation_collection">
         <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
       </div>
