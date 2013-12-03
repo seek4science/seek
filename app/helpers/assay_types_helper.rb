@@ -39,7 +39,7 @@ module AssayTypesHelper
     roots=type.to_tree.sort{|a,b| a.title.downcase <=> b.title.downcase}
     options=[]
     roots.each do |root|
-      options << [root.title,root.id]
+      options << [h(root.title),root.id]
       options = options + child_multiple_select_options(root,1)
     end
     
@@ -64,7 +64,7 @@ module AssayTypesHelper
     
     unless parent.children.empty?
       parent.children.sort{|a,b| a.title.downcase <=> b.title.downcase}.each do |child|
-        result << ["---"*depth + child.title,child.id]
+        result << ["---"*depth + h(child.title),child.id]
         result = result + child_multiple_select_options(child,depth+1) if child.has_children?
       end
     end

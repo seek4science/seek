@@ -1,6 +1,6 @@
 <script type="text/javascript">
     function initialize_<%= name -%>() {
-        var list = <%= all_annotations.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.text}}.to_json.html_safe -%>;
+        var list = <%= all_annotations.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>h(t.text)}}.to_json.html_safe -%>;
         var prepopulate_with = <%= item_annotations.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json.html_safe -%>;
         var autocompleter_id = '<%= name -%>_autocompleter';
         var autocompleter = new Autocompleter.LocalAdvanced(

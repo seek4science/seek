@@ -191,7 +191,7 @@ module HomesHelper
           tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{item[:created_at]}</p>")
           html << "<li class='homepanel_item'>"
           html << "#{icon} "
-          html << link_to(h(item[:title]), item[:url], :title => tooltip)
+          html << link_to(item[:title], item[:url], :title => tooltip)
           html << "<div class='feedinfo none_text'>"
           html << "<span>#{item[:type]} - #{action} #{time_ago_in_words(item[:created_at])} ago</span>"
           html << "</div>"

@@ -576,13 +576,13 @@ module Seek
               new_sp.projects = specimen.projects
               new_sp.created_at = now;
               new_sp.save!
-              @warnings << "Warning: #{t('biosamples.sample_parent_term')} with the name '#{specimen_title}' in row #{row} is already created in SEEK.<br/>".html_safe
-              @warnings << "It is renamed and saved as '#{new_sp.title}'.<br/>".html_safe
+              @warnings << "Warning: #{t('biosamples.sample_parent_term')} with the name '#{h(specimen_title)}' in row #{row} is already created in SEEK.<br/>".html_safe
+              @warnings << "It is renamed and saved as '#{h(new_sp.title)}'.<br/>".html_safe
               @warnings << "You may rename it and upload the file as new version!<br/>".html_safe
             else
               if !specimen.can_view?(User.current_user)
-                @warnings << "Warning: #{t('biosamples.sample_parent_term')} with the name '#{specimen_title}' in row #{row_num} is already created in SEEK.<br/>".html_safe
-                @warnings << "But you are not authorized to view it. You can contact '#{specimen.contributor.person.name} for authorizations'<br/>".html_safe
+                @warnings << "Warning: #{t('biosamples.sample_parent_term')} with the name '#{h(specimen_title)}' in row #{row_num} is already created in SEEK.<br/>".html_safe
+                @warnings << "But you are not authorized to view it. You can contact '#{h(specimen.contributor.person.name)} for authorizations'<br/>".html_safe
               end
             end
           end

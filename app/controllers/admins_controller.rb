@@ -226,7 +226,7 @@ class AdminsController < ApplicationController
       redirect_to :action=>:tags
     else
       @tag=TextValue.find(params[:id])
-      @all_tags_as_json=TextValue.all.collect{|t| {'id'=>t.id, 'name'=>t.text}}.to_json
+      @all_tags_as_json=TextValue.all.collect{|t| {'id'=>t.id, 'name'=>h(t.text)}}.to_json
       respond_to do |format|
         format.html
       end
