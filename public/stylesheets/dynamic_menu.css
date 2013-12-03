@@ -7,6 +7,7 @@ ul.dynamic_menu {
     width: 10em;
     margin-top: -0.4em;
     border: solid #AAA 1px;
+    cursor: pointer;  /* make the cursor like hovering over an <a> element */
 }
 ul.dynamic_menu>li {
     list-style: none;

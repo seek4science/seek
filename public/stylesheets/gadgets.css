@@ -227,6 +227,23 @@ input.gadget_button {
     margin-bottom:0.4em;
     padding-left: 1em;
     padding-right: 1em;
+    cursor: pointer;  /* make the cursor like hovering over an <a> element */
 
 }
 
+input.gadget_button_menu {
+    background-image: url(/images/folds/unfold.png);
+    background-color: transparent; /* make the button transparent */
+    background-repeat: no-repeat;  /* make the background image appear only once */
+    background-position: 3px 7px;  /* equivalent to 'top left' */
+    background-color: #307af5;
+    height: 2em;
+    border: thin #dcdcdc;
+    border-radius: 2px;
+    color: white;
+    margin-top:0.4em;
+    margin-bottom:0.4em;
+    padding-left: 1.5em;
+    padding-right: 1em;
+    cursor: pointer;  /* make the cursor like hovering over an <a> element */
+}
