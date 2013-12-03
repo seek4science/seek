@@ -71,13 +71,14 @@
 
   <div id="upload_type_selection">
     <ul id="switch_upload_buttons">
-      <li>
+      <table>
+      <td>
         <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class=>"block_link_active", :id=>"upload_from_file_button", :title=>tooltip_title_attrib('Add from a local file') -%>
-      </li>
-      <li>
+        <br>
         <%= link_to_function image("internet_large"), "from_url_selected(); return (false);", :class=>"block_link", :id=>"upload_from_url_button", :title=>tooltip_title_attrib('Add from a remote URL') -%>
-      </li>
-      <li id="upload_options">
+      </td>
+      <td>
+      <div id="upload_options">
         <div id="upload_from_file">
           <p>
             <b>File to upload:</b>
@@ -91,6 +92,7 @@
         </div>
         <div id="upload_from_url" style="display:none;">
           <p>
+            <br>
             <b>URL:</b>
             <span class="required">*</span>
 
@@ -117,8 +119,10 @@
               <span id="test_url_result_icon"></span>
               <span id="test_url_msg" style="display:none;"></span>
             </p>
-          </div>
-      </li>
+        </div>
+      </div>
+      </td>
+      </table>
     </ul>
   </div>
 
@@ -135,6 +139,7 @@
     <% resource_name = resource.class.name.underscore %>
     <%= hidden_field_tag("#{resource_name}_id", resource.id) -%>
       <p>
+        <br/>
         <b>Image file: </b>
         <br/>
         <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
