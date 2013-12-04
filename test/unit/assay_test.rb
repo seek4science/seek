@@ -28,7 +28,6 @@ class AssayTest < ActiveSupport::TestCase
     assay.reload
     assert_equal 1,assay.assets.size
     rdf = assay.to_rdf
-    pp rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
@@ -37,7 +36,6 @@ class AssayTest < ActiveSupport::TestCase
     #try modelling, with tech type nil
     assay = Factory :modelling_assay, :organisms=>[Factory(:organism)], :technology_type_uri=>nil
     rdf = assay.to_rdf
-    pp rdf
   end
 
   test "is_asset?" do
