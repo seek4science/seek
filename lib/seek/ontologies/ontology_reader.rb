@@ -40,7 +40,8 @@ module Seek
       end
 
       def cache_key
-        Digest::MD5.hexdigest("cls-#{default_parent_class_uri}-#{ontology_path}-#{Rails.env}")
+        key = Digest::MD5.hexdigest("#{default_parent_class_uri}-#{ontology_path}-#{Rails.env}")
+        "onto-hierarchy-#{key}"
       end
 
       def subclasses_for uri

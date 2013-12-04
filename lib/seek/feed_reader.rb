@@ -38,7 +38,8 @@ module Seek
 
     def self.cache_key feed_url
       #use md5 to keep the key short - highly unlikely to be a collision
-      Digest::MD5.hexdigest("news-feed=#{feed_url.strip}")
+      key = Digest::MD5.hexdigest(feed_url.strip)
+      "news-feed-#{key}"
     end
   
     private
