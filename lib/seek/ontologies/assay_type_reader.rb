@@ -12,7 +12,7 @@ module Seek
 
       def ontology_file
         #TODO: this will become configurable
-        "JERM.rdf"
+        "JERM-RDFXML.owl"
       end
 
     end
