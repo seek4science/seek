@@ -841,6 +841,24 @@ class SopsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should not loose permisions when managing a sop" do
+    policy = Factory(:private_policy)
+    a_person = Factory(:person)
+    permission = Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING)
+    policy.permissions = [permission]
+    policy.save
+    sop = Factory :sop, :contributor => User.current_user, :policy => policy
+    assert sop.can_manage?
+
+    put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE,
+                                             "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS,
+                                             :permissions =>{:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {a_person.id =>  {"access_type" =>  Policy::MANAGING}}})}
+                                            }
+
+    assert_redirected_to sop
+    assert_equal 1, sop.reload.policy.permissions.count
+  end
+
   private
 
   def valid_sop_with_url

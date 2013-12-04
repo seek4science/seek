@@ -1,3 +1,3 @@
 <% if Seek::Config.biosamples_enabled %>
-    <%= fields_for(resource) {|f| f.fancy_multiselect :samples, {:hidden=> resource.samples.blank?  ? true : false, :other_projects_checkbox => true}}  -%>
+    <%#= fields_for(resource) {|f| f.fancy_multiselect :samples, {:hidden=> resource.samples.blank?  ? true : false, :other_projects_checkbox => true}}  -%>
 <% end %>
