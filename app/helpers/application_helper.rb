@@ -61,7 +61,7 @@ module ApplicationHelper
       items = items.sort_by { |i| get_object_title(i) } if sort
       title_only_items = title_only_items.sort_by { |i| get_object_title(i) } if sort
 
-      list = items.collect { |i| link_to h(truncate(i.title, :length => max_length)), show_resource_path(i), :title => get_object_title(i) }
+      list = items.collect { |i| link_to truncate(i.title, :length => max_length), show_resource_path(i), :title => get_object_title(i) }
       list = list + title_only_items.collect { |i| h(truncate(i.title, :length => max_length)) }
       html << list.join(', ')
 
@@ -93,7 +93,7 @@ module ApplicationHelper
       contributor_person = hi.contributing_user.person
       if current_user.try(:person) && hi.can_see_hidden_item?(current_user.person) && contributor_person.can_view?
         contributor_name = contributor_person.name
-        contributor_link = "<a href='#{person_path(contributor_person)}'>#{contributor_name}</a>"
+        contributor_link = "<a href='#{person_path(contributor_person)}'>#{h(contributor_name)}</a>"
         contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
       end
     end
@@ -206,7 +206,7 @@ module ApplicationHelper
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
       text.capitalize! if options[:capitalize]            
-      res=text
+      res = text.html_safe? ? text : h(text)
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length])  if options[:length]
       res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true  
@@ -235,7 +235,7 @@ module ApplicationHelper
     else
       list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
     end
-    item_caption = " " + h(caption.blank? ? item.name : caption)
+    item_caption = " " + (caption.blank? ? item.name : caption)
     list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += "</li>"
     

@@ -26,7 +26,7 @@
     <% @items_for_publishing.each do |item| %>
         <% if !item.assays.empty? %>
             <li class="type_and_title">
-              <b><%= text_for_resource item -%>:</b>&nbsp;<%= link_to h(item.title), item, :target => "_blank" -%>
+              <b><%= text_for_resource item -%>:</b>&nbsp;<%= link_to item.title, item, :target => "_blank" -%>
             </li>
         <% end %>
     <% end %>

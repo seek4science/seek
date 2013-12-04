@@ -1,4 +1,4 @@
-<h1>Administer <%= t('project') %>: <%= link_to h(@project.name), project_path(@project) -%></h1>
+<h1>Administer <%= t('project') %>: <%= link_to @project.name, project_path(@project) -%></h1>
 
 <div class="show_basic">
   <%= form_for(@project) do |f| -%>

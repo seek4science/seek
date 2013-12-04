@@ -4,10 +4,10 @@ module SpecimensHelper
     result=""
     result ="<span class='none_text'>#{none_text}</span>".html_safe if organism.nil?
     if organism
-      result = link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      result = link_to organism.title,organism,{:class => "assay_organism_info"}
 
       if strain && !strain.is_dummy? && strain.can_view?
-        result += " : <span class='strain_info'>#{link_to h(strain.info), strain}</span>".html_safe
+        result += " : <span class='strain_info'>#{link_to strain.info, strain}</span>".html_safe
       elsif strain && !strain.is_dummy? && !strain.can_view?
         result += hidden_items_html [strain], " : hidden strain"
       end

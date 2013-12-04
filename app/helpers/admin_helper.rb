@@ -9,7 +9,7 @@ module AdminHelper
     result=""
     admins=Person.admins
     admins.each do |person|
-      result << mail_to(person.email,person.name)
+      result << mail_to(h(person.email),h(person.name))
       result << ", " unless admins.last==person
     end
     return result.html_safe
@@ -18,7 +18,7 @@ module AdminHelper
   #takes the terms and scores received from SearchStats, and generates a string
   def search_terms_summary terms_and_scores    
     return "<span class='none_text'>No search queries during this period</span>".html_safe if terms_and_scores.empty?
-    words=terms_and_scores.collect{|ts| "#{ts[0]}(#{ts[1]})" }
+    words=terms_and_scores.collect{|ts| "#{h(ts[0])}(#{ts[1]})" }
     words.join(", ").html_safe
   end
 

@@ -123,11 +123,11 @@ module PolicyHelper
         value.each do |v|
           html << "<p class='privileged_person'>"
           if key == 'contributor'
-            html << "#{v.name} can #{Policy.get_access_type_wording(Policy::MANAGING, try_block { resource_name.camelize.constantize.new() }).downcase} as an uploader"
+            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::MANAGING, try_block { resource_name.camelize.constantize.new() }).downcase} as an uploader"
           elsif key == 'creators'
-            html << "#{v.name} can #{Policy.get_access_type_wording(Policy::EDITING, try_block { resource_name.camelize.constantize.new() }).downcase} as a creator"
+            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::EDITING, try_block { resource_name.camelize.constantize.new() }).downcase} as a creator"
           elsif key == 'asset_managers'
-            html << "#{v.name} can #{Policy.get_access_type_wording(Policy::MANAGING, try_block { resource_name.camelize.constantize.new() }).downcase} as an asset manager"
+            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::MANAGING, try_block { resource_name.camelize.constantize.new() }).downcase} as an asset manager"
           end
           html << "</p>"
         end

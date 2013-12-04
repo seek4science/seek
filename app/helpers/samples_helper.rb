@@ -9,7 +9,7 @@ module SamplesHelper
      samples.each do |sample|
 
        result += "<tr><td style='text-align:left;'>"
-      result += link_to h(sample.title.capitalize),sample
+      result += link_to sample.title.capitalize,sample
 
       result += "</td></tr>"
      end

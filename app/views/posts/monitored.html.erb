@@ -43,7 +43,7 @@
     <span class="posts"><%= '{count} post(s)'[(count=post.user.posts.size)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %></span>
   </td>
   <td class="body entry-content">
-    <p class="topic"><%= 'Topic'[:topic_title] %>: <%= link_to h(post.topic_title), forum_topic_path(post.forum_id, post.topic_id) %></p>
+    <p class="topic"><%= 'Topic'[:topic_title] %>: <%= link_to post.topic_title, forum_topic_path(post.forum_id, post.topic_id) %></p>
     
     <%= post.body_html.html_safe %>
   </td>

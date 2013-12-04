@@ -30,7 +30,7 @@ module TagsHelper
 
     text = tag.text
 
-    link_to h(truncate(text,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(text)
+    link_to truncate(text,:length=>length), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(text)
   end
 
   def list_item_tags_list tags,options={}

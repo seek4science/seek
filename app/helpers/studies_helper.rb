@@ -24,7 +24,7 @@ module StudiesHelper
     result=""
     studies=studies.sort{|a,b| a.title<=>b.title} if sorted
     studies.each do |study|
-      result += link_to h(study.title.capitalize),study
+      result += link_to study.title.capitalize,study
       result += " | " unless studies.last==study
     end
     return result.html_safe

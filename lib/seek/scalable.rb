@@ -72,7 +72,10 @@ module Seek
           json = JSON.parse(an.value.text)
           json["scale_id"]==scale_id.to_s
         end.collect do |an|
-          JSON.parse(an.value.text)
+          json = JSON.parse(an.value.text)
+          json["param"] = h(json["param"])
+          json["unit"] = h(json["unit"])
+          json
         end
       end
 

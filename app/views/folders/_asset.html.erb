@@ -12,7 +12,7 @@
 
   <p class="asset_card_title" >
     <%= image -%>
-    <%= link_to h(truncate(asset.title,:length=>max_title_length)),asset -%><br/>
+    <%= link_to truncate(asset.title,:length=>max_title_length),asset -%><br/>
   </p>
 </li>
 

@@ -9,7 +9,7 @@ module DataFuseHelper
       if i==0
         type='string'
         row.each do |entry|
-           res << "data.addColumn('#{type}','#{entry}');\n"
+           res << "data.addColumn('#{type}','#{h(entry)}');\n"
            type='number'
         end
         res << "data.addRows(#{rows.count-1});\n"
@@ -17,7 +17,7 @@ module DataFuseHelper
         row.each_with_index do |v,i2|
           v = v+"0" if v.end_with?(".")
           v = "'#{v}'" if i2==0
-          res << "data.setValue(#{i-1},#{i2},#{v});\n"
+          res << "data.setValue(#{i-1},#{i2},#{h(v)});\n"
         end
       end
 

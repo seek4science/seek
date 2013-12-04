@@ -32,7 +32,7 @@
     <div class="investigation">
       <p>
         <label><%= t('investigation') %>:</label>
-        <%= link_to h(@study.investigation.title),@study.investigation %>
+        <%= link_to @study.investigation.title,@study.investigation %>
       </p>
     </div>
 
@@ -42,7 +42,7 @@
       <p>
         <label>Person responsible:</label>
         <% if @study.person_responsible.try :can_view? -%>
-          <%= link_to h(@study.person_responsible.name),@study.person_responsible %>
+          <%= link_to @study.person_responsible.name,@study.person_responsible %>
         <% else -%>
           <span class="none_text">Not available</span>
         <% end -%>

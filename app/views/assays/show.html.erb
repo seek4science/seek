@@ -47,7 +47,7 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
               <label>
                   Owner:
               </label>
-              <%= link_to h(@assay.owner.name),@assay.owner -%>
+              <%= link_to @assay.owner.name,@assay.owner -%>
           </p>
       <% end %>
 

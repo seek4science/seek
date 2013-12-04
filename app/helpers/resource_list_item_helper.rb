@@ -87,8 +87,9 @@ module ResourceListItemHelper
   end
 
   def list_item_attribute attribute, value, url=nil, url_options={}
+    value = value.html_safe? ? value : h(value)
     unless url.nil?
-      value = link_to h(value), url, url_options
+      value = link_to value, url, url_options
     end
     html = "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
     html.html_safe
@@ -96,7 +97,7 @@ module ResourceListItemHelper
 
   def list_item_authorized_attribute attribute, object, url=nil, method = :title
     url = object if url.nil?
-    not_authorized_text = object.try(:title_is_public?) ? object.title : "Not available"
+    not_authorized_text = object.try(:title_is_public?) ? h(object.title) : "Not available"
     list_item_optional_attribute attribute, object.try(:can_view?) ? object.send(method) : nil, url, not_authorized_text
   end
 
@@ -104,6 +105,7 @@ module ResourceListItemHelper
     if value.blank?
       value = "<span class='none_text'>#{missing_value_text}</span>"
     else
+      value = value.html_safe? ? value : h(value)
       unless url.nil?
         value = link_to value, url
       end

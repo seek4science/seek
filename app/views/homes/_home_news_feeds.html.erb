@@ -8,7 +8,7 @@
          %>
          <% unless entries.blank? %>
              <% entries.each do |entry|   %>
-                <%= display_single_entry(entry).html_safe -%>
+                <%= display_single_entry(entry) -%>
              <% end %>
          <% end %>
          </ul>
@@ -24,7 +24,7 @@
          %>
          <% unless entries.blank? %>
              <% entries.each do |entry|   %>
-                <%= display_single_entry(entry).html_safe -%>
+                <%= display_single_entry(entry) -%>
              <% end %>
          <% end %>
          </ul>

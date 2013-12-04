@@ -37,7 +37,7 @@ module PublicationsHelper
         if author.kind_of?(Person) && author.can_view?
           author_list << link_to(get_object_title(author), show_resource_path(author))
         else
-          author_list << author.first_name + " " + author.last_name
+          author_list << h(author.first_name) + " " + h(author.last_name)
         end
       end
       author_list.join(', ').html_safe
