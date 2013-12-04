@@ -230,10 +230,10 @@ class Assay < ActiveRecord::Base
   def default_assay_and_technology_type
     if is_modelling?
       self.technology_type_uri=nil
-      self.assay_type_uri ||= assay_type_reader.default_parent_class_uri
+      self.assay_type_uri ||= assay_type_reader.default_parent_class_uri.try(:to_s)
     else
-      self.assay_type_uri ||= assay_type_reader.default_parent_class_uri
-      self.technology_type_uri ||= technology_type_reader.default_parent_class_uri
+      self.assay_type_uri ||= assay_type_reader.default_parent_class_uri.try(:to_s)
+      self.technology_type_uri ||= technology_type_reader.default_parent_class_uri.try(:to_s)
     end
   end
 end

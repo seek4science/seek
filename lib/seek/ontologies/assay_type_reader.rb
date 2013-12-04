@@ -6,13 +6,11 @@ module Seek
     class AssayTypeReader < OntologyReader
 
       def default_parent_class_uri
-        #TODO: this will become configurable
-        RDF::URI.new("http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type")
+        RDF::URI.new(Seek::Config.assay_type_base_uri)
       end
 
       def ontology_file
-        #TODO: this will become configurable
-        "JERM-RDFXML.owl"
+        Seek::Config.assay_type_ontology_file
       end
 
     end

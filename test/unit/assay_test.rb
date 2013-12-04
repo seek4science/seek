@@ -374,14 +374,14 @@ class AssayTest < ActiveSupport::TestCase
     assay.assay_type_uri=nil
     assay.technology_type_uri=nil
     assay.save!
-    assert_equal Seek::Ontologies::AssayTypeReader.new.default_parent_class_uri,assay.assay_type_uri
-    assert_equal Seek::Ontologies::TechnologyTypeReader.new.default_parent_class_uri,assay.technology_type_uri
+    assert_equal Seek::Ontologies::AssayTypeReader.instance.default_parent_class_uri.to_s,assay.assay_type_uri
+    assert_equal Seek::Ontologies::TechnologyTypeReader.instance.default_parent_class_uri.to_s,assay.technology_type_uri
 
     assay = Factory(:modelling_assay)
     assay.assay_type_uri=nil
     assay.technology_type_uri=nil
     assay.save!
-    assert_equal Seek::Ontologies::ModellingAnalysisTypeReader.new.default_parent_class_uri,assay.assay_type_uri
+    assert_equal Seek::Ontologies::ModellingAnalysisTypeReader.instance.default_parent_class_uri.to_s,assay.assay_type_uri
     assert_nil assay.technology_type_uri
   end
 

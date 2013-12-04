@@ -3,13 +3,11 @@ module Seek
     class ModellingAnalysisTypeReader < OntologyReader
 
       def default_parent_class_uri
-        #TODO: this will become configurable
-        RDF::URI.new("http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type")
+        RDF::URI.new(Seek::Config.modelling_analysis_type_base_uri)
       end
 
       def ontology_file
-        #TODO: this will become configurable
-        "JERM-RDFXML.owl"
+        Seek::Config.modelling_analysis_type_ontology_file
       end
     end
   end
