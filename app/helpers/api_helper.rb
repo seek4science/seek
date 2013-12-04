@@ -38,7 +38,21 @@ module ApiHelper
   def next_link_xml_attributes(resource_uri)
     xlink_attributes(resource_uri, :title => xlink_title("Next page of results"))
   end
-  
+
+  def assay_type_xlink assay
+    xlink = xlink_attributes(assay.assay_type_uri)
+    xlink["xlink:title"] = assay.assay_type_label
+    xlink["resourceType"] = "AssayType"
+    xlink
+  end
+
+  def technology_type_xlink assay
+    xlink = xlink_attributes(assay.technology_type_uri)
+    xlink["xlink:title"] = assay.technology_type_label
+    xlink["resourceType"] = "TechnologyType"
+    xlink
+  end
+
   def core_xlink object,include_title=true
     if (object.class.name.include?("::Version"))
       xlink=xlink_attributes(uri_for_object(object.parent,{:params=>{:version=>object.version}}))

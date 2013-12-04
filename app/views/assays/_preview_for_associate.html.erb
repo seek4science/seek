@@ -1,5 +1,5 @@
 <%
-   @assay_text=resource.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
+   assay_type_text = resource.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type"
 %>
 
 <%= list_item_title resource %>
@@ -7,10 +7,10 @@
 
   <%= list_item_attribute "ID", resource.id %>
 
-  <%= list_item_attribute "#{@assay_text} type", h(resource.assay_type.title.capitalize), resource.assay_type %>
-  <% unless resource.is_modelling? -%>
-      <%= list_item_attribute "Technology type", h(resource.technology_type.title.capitalize), resource.technology_type %>
-  <% end -%>
+<%= "<p class=\"list_item_attribute\"><b>#{assay_type_text}</b>: #{link_to_assay_type(resource)}</p>".html_safe %>
+<% unless resource.is_modelling? -%>
+    <%= "<p class=\"list_item_attribute\"><b>Technology type</b>: #{link_to_technology_type(resource)}</p>".html_safe %>
+<% end -%>
 
   <%= list_item_optional_attribute t('investigation'), h(resource.investigation.try(:title)), resource.investigation %>
 

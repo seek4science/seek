@@ -37,6 +37,8 @@ class Assay < ActiveRecord::Base
 
   has_many :assay_assets, :dependent => :destroy
 
+  before_validation :default_assay_and_technology_type
+
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   def asset_sql(asset_class)
@@ -223,5 +225,15 @@ class Assay < ActiveRecord::Base
 
   def technology_type_label
     super || technology_type_reader.class_hierarchy.hash_by_uri[self.technology_type_uri].try(:label)
+  end
+
+  def default_assay_and_technology_type
+    if is_modelling?
+      self.technology_type_uri=nil
+      self.assay_type_uri ||= Seek::Ontologies::ModellingAnalysisTypeReader.new.default_parent_class_uri
+    else
+      self.assay_type_uri ||= Seek::Ontologies::AssayTypeReader.new.default_parent_class_uri
+      self.technology_type_uri ||= Seek::Ontologies::TechnologyTypeReader.new.default_parent_class_uri
+    end
   end
 end

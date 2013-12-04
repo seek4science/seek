@@ -98,55 +98,51 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.projects.empty?
     assert assay.projects.include?(projects(:sysmo_project))
   end
-  
+
 
   test "validation" do
     User.with_current_user Factory(:user) do
-    assay=new_valid_assay
-    
-    assert assay.valid?
+      assay=new_valid_assay
+
+      assert assay.valid?
 
 
-    assay.title=""
-    assert !assay.valid?
+      assay.title=""
+      assert !assay.valid?
 
-    assay.title=nil
-    assert !assay.valid?
+      assay.title=nil
+      assert !assay.valid?
 
-    assay.title=assays(:metabolomics_assay).title
-    assert assay.valid? #can have duplicate titles
+      assay.title=assays(:metabolomics_assay).title
+      assert assay.valid? #can have duplicate titles
 
-    assay.title="test"
-    assay.assay_type_uri=nil
-    assert !assay.valid?
+      assay.title="test"
+      assay.assay_type_uri=nil
+      assert assay.valid?
+      refute_nil assay.assay_type_uri, "uri should have been set to default in before_validation"
 
-    assay.assay_type_uri="http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
+      assay.assay_type_uri="http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
 
-    assert assay.valid?
+      assert assay.valid?
 
-    assay.study=nil
-    assert !assay.valid?
-    assay.study=studies(:metabolomics_study)
+      assay.study=nil
+      assert !assay.valid?
+      assay.study=studies(:metabolomics_study)
 
-    assay.technology_type_uri=nil
-    assert !assay.valid?
+      assay.technology_type_uri=nil
+      assert assay.valid?
+      refute_nil assay.technology_type_uri, "uri should have been set to default in before_validation"
 
-    assay.owner=nil
-    assert !assay.valid?
+      assay.owner=nil
+      assert !assay.valid?
 
-    assay.owner=people(:person_for_model_owner)
+      assay.owner=people(:person_for_model_owner)
 
       #an modelling assay can be valid without a technology type, sample or organism
-    assay.assay_class=assay_classes(:modelling_assay_class)
-    assay.technology_type_uri=nil
-    assay.samples = []
-    assert assay.valid?
-    
-    #an experimental assay can be invalid without a sample
-    assay.assay_class=assay_classes(:experimental_assay_class)
-    assay.technology_type_uri=nil
-    assay.samples = []
-    assert !assay.valid?
+      assay.assay_class=assay_classes(:modelling_assay_class)
+      assay.technology_type_uri=nil
+      assay.samples = []
+      assert assay.valid?
     end
   end
 
@@ -371,6 +367,22 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal "fish",assay.technology_type_label
     assay.technology_type_label = nil
     assert_equal "Binding",assay.technology_type_label
+  end
+
+  test "default assay and tech type" do
+    assay = Factory(:experimental_assay)
+    assay.assay_type_uri=nil
+    assay.technology_type_uri=nil
+    assay.save!
+    assert_equal Seek::Ontologies::AssayTypeReader.new.default_parent_class_uri,assay.assay_type_uri
+    assert_equal Seek::Ontologies::TechnologyTypeReader.new.default_parent_class_uri,assay.technology_type_uri
+
+    assay = Factory(:modelling_assay)
+    assay.assay_type_uri=nil
+    assay.technology_type_uri=nil
+    assay.save!
+    assert_equal Seek::Ontologies::ModellingAnalysisTypeReader.new.default_parent_class_uri,assay.assay_type_uri
+    assert_nil assay.technology_type_uri
   end
 
 end

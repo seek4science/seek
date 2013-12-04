@@ -83,6 +83,7 @@ class AssaysController < ApplicationController
   end
 
   def create
+    params[:assay_class_id] ||= AssayClass.for_type("experimental").id
     @assay        = Assay.new(params[:assay])
 
     organisms     = params[:assay_organism_ids] || []
