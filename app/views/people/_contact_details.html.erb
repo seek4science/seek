@@ -1,6 +1,10 @@
 <div class="fold">
-      <div class="foldTitle">Contact details</div>
-      <div id="contact_details" class="foldContent">
+      <div class="foldTitle">
+        <div title='<%= tooltip_title_attrib(h("Click to see contact details"), 300)%>'>
+          Contact details
+        </div>
+      </div>
+      <div id="contact_details" class="foldContent" style="display: none;">
         
           <div id="web_page">
             <p><label for="web_page">Web page:</label> <%= text_or_not_specified(@person.web_page, :external_link=>true) %></p>
