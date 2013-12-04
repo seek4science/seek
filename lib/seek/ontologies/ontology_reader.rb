@@ -34,7 +34,7 @@ module Seek
       private
 
       def cache_key
-        Digest::MD5.hexdigest("cls-#{default_parent_class_uri}-#{ontology_path}")
+        Digest::MD5.hexdigest("cls-#{default_parent_class_uri}-#{ontology_path}-#{Rails.env}")
       end
 
       def subclasses_for uri
