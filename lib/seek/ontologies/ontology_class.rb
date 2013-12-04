@@ -30,21 +30,24 @@ module Seek
 
       #returns a hash of all the classes from the hierarchy, including all subclasses, with the key being the URI as a string
       def hash_by_uri
-        result = {}
-        flatten_hierarchy.each do |c|
-          result[c.uri.to_s]=c
+        @hash_by_uri ||= begin
+          result = {}
+          flatten_hierarchy.each do |c|
+            result[c.uri.to_s]=c
+          end
+          result
         end
-        result
       end
 
       #returns a hash of all the classes from the hierarchy, including all subclasses, with the key being the lowercase label
       def hash_by_label
-        result = {}
-        flatten_hierarchy.each do |c|
-          result[c.label.downcase]=c
+        @hash_by_label ||= begin
+          result = {}
+          flatten_hierarchy.each do |c|
+            result[c.label.downcase]=c
+          end
+          result
         end
-        result
-
       end
 
       private

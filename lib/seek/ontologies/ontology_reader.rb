@@ -4,6 +4,8 @@ module Seek
     #a subclass is required to define the ontology file, or url, and the base class URI for the hierarchy tree, see #AssayTypeReader
     class OntologyReader
 
+      include Singleton
+
       attr_reader :ontology
 
       #access the ontology, or loads it if it hasn't been already. This is preferable to loading on initialize, since

@@ -208,14 +208,14 @@ class Assay < ActiveRecord::Base
 
   def assay_type_reader
     if is_modelling?
-      Seek::Ontologies::ModellingAnalysisTypeReader.new
+      Seek::Ontologies::ModellingAnalysisTypeReader.instance
     else
-      Seek::Ontologies::AssayTypeReader.new
+      Seek::Ontologies::AssayTypeReader.instance
     end
   end
 
   def technology_type_reader
-    Seek::Ontologies::TechnologyTypeReader.new
+    Seek::Ontologies::TechnologyTypeReader.instance
   end
 
 
@@ -230,10 +230,10 @@ class Assay < ActiveRecord::Base
   def default_assay_and_technology_type
     if is_modelling?
       self.technology_type_uri=nil
-      self.assay_type_uri ||= Seek::Ontologies::ModellingAnalysisTypeReader.new.default_parent_class_uri
+      self.assay_type_uri ||= assay_type_reader.default_parent_class_uri
     else
-      self.assay_type_uri ||= Seek::Ontologies::AssayTypeReader.new.default_parent_class_uri
-      self.technology_type_uri ||= Seek::Ontologies::TechnologyTypeReader.new.default_parent_class_uri
+      self.assay_type_uri ||= assay_type_reader.default_parent_class_uri
+      self.technology_type_uri ||= technology_type_reader.default_parent_class_uri
     end
   end
 end

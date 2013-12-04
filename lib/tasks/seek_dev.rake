@@ -173,14 +173,14 @@ namespace :seek_dev do
 
 
   task :analyse_assays_and_their_types => :environment do
-    assay_type_uri_hash = Seek::Ontologies::AssayTypeReader.new.class_hierarchy.hash_by_uri
-    assay_type_uri_hash = assay_type_uri_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.new.class_hierarchy.hash_by_uri)
+    assay_type_uri_hash = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri
+    assay_type_uri_hash = assay_type_uri_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri)
 
-    assay_type_label_hash = Seek::Ontologies::AssayTypeReader.new.class_hierarchy.hash_by_label
-    assay_type_label_hash = assay_type_label_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.new.class_hierarchy.hash_by_label)
+    assay_type_label_hash = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_label
+    assay_type_label_hash = assay_type_label_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_label)
 
-    technology_type_uri_hash = Seek::Ontologies::TechnologyTypeReader.new.class_hierarchy.hash_by_uri
-    technology_type_label_hash = Seek::Ontologies::TechnologyTypeReader.new.class_hierarchy.hash_by_label
+    technology_type_uri_hash = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri
+    technology_type_label_hash = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_label
 
     assay_type_label_known_mapping = ["generic experimental assay","generic modelling analysis","modelling analysis type"]
     technology_type_label_known_mapping = ["technology","enzymatic activity experiments"]
