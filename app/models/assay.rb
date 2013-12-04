@@ -26,8 +26,8 @@ class Assay < ActiveRecord::Base
 
   belongs_to :institution
   has_and_belongs_to_many :samples
-  belongs_to :assay_type
-  belongs_to :technology_type  
+  #belongs_to :assay_type
+  #belongs_to :technology_type
   belongs_to :study  
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
@@ -74,8 +74,8 @@ class Assay < ActiveRecord::Base
 
   has_one :investigation,:through=>:study
 
-  validates_presence_of :assay_type
-  validates_presence_of :technology_type, :unless=>:is_modelling?
+  validates_presence_of :assay_type_uri
+  validates_presence_of :technology_type_uri, :unless=>:is_modelling?
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
@@ -90,13 +90,8 @@ class Assay < ActiveRecord::Base
     :dependent => :destroy
           
   searchable(:auto_index=>false) do
-    text :description, :title, :searchable_tags, :organism_terms
-    text :assay_type do
-        assay_type.try :title
-    end
-    text :technology_type do
-        technology_type.try :title
-    end
+    text :description, :title, :searchable_tags, :organism_terms, :assay_type_label,:technology_type_label
+
     text :strains do
         strains.compact.map{|s| s.title}
     end
@@ -207,5 +202,26 @@ class Assay < ActiveRecord::Base
 
   def organism_terms
     organisms.collect{|o| o.searchable_terms}.flatten
+  end
+
+  def assay_type_reader
+    if is_modelling?
+      Seek::Ontologies::ModellingAnalysisTypeReader.new
+    else
+      Seek::Ontologies::AssayTypeReader.new
+    end
+  end
+
+  def technology_type_reader
+    Seek::Ontologies::TechnologyTypeReader.new
+  end
+
+
+  def assay_type_label
+    super || assay_type_reader.class_hierarchy.hash_by_uri[self.assay_type_uri].try(:label)
+  end
+
+  def technology_type_label
+    super || technology_type_reader.class_hierarchy.hash_by_uri[self.technology_type_uri].try(:label)
   end
 end

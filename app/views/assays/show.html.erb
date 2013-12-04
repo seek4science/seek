@@ -62,12 +62,12 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
       </p>
       <p id="assay_type">
           <b><%= assay_type_text -%>:</b>
-          <%= link_to h(@assay.assay_type.title.capitalize), @assay.assay_type -%>
+          <%= link_to_assay_type(@assay) -%>
       </p>
       <% unless @assay.is_modelling? -%>
       <p id="technology_type">
           <b>Technology type: </b>
-          <%= link_to h(try_block{@assay.technology_type.title.capitalize}), @assay.technology_type -%>
+          <%= link_to_technology_type(@assay) -%>
       </p>
       <% end -%>
 

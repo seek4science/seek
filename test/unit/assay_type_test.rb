@@ -110,14 +110,6 @@ class AssayTypeTest < ActiveSupport::TestCase
     child=assay_types(:child1)
     assert child.has_parents?
   end
-
-  test "assays association" do
-    a1=assay_types(:parent1)
-    assert a1.assays.empty?
-    a2=assay_types(:metabolomics)
-    assert a2.assays.include?(assays(:metabolomics_assay))
-    assert a2.assays.include?(assays(:metabolomics_assay2))
-  end
   
   test "get_all_descendants" do
     parent_assay = AssayType.new(:title=>"Parent")

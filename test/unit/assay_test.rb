@@ -20,7 +20,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    assay = Factory :assay, :assay_type=>Factory(:assay_type), :technology_type=>Factory(:technology_type)
+    assay = Factory :experimental_assay
     Factory :assay_organism, :assay=>assay, :organism=>Factory(:organism)
     pub = Factory :publication
     Factory :relationship, :subject=>assay, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
@@ -28,19 +28,16 @@ class AssayTest < ActiveSupport::TestCase
     assay.reload
     assert_equal 1,assay.assets.size
     rdf = assay.to_rdf
-
+    pp rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
     end
 
-    #try with assay & tech type with nil term
-    assay = Factory :assay, :organisms=>[Factory(:organism)], :assay_type=>Factory(:assay_type, :term_uri=>nil), :technology_type=>Factory(:technology_type,:term_uri=>nil)
+    #try modelling, with tech type nil
+    assay = Factory :modelling_assay, :organisms=>[Factory(:organism)], :technology_type_uri=>nil
     rdf = assay.to_rdf
-
-    #try with no assay or tech type
-    assay = Factory :assay, :technology_type=>nil
-    rdf = assay.to_rdf
+    pp rdf
   end
 
   test "is_asset?" do
@@ -122,10 +119,10 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.valid? #can have duplicate titles
 
     assay.title="test"
-    assay.assay_type=nil
+    assay.assay_type_uri=nil
     assert !assay.valid?
 
-    assay.assay_type=assay_types(:metabolomics)
+    assay.assay_type_uri="http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
 
     assert assay.valid?
 
@@ -133,11 +130,8 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.valid?
     assay.study=studies(:metabolomics_study)
 
-    assay.technology_type=nil
+    assay.technology_type_uri=nil
     assert !assay.valid?
-
-    assay.technology_type=technology_types(:gas_chromatography)
-    assert assay.valid?
 
     assay.owner=nil
     assert !assay.valid?
@@ -146,13 +140,13 @@ class AssayTest < ActiveSupport::TestCase
 
       #an modelling assay can be valid without a technology type, sample or organism
     assay.assay_class=assay_classes(:modelling_assay_class)
-    assay.technology_type=nil
+    assay.technology_type_uri=nil
     assay.samples = []
     assert assay.valid?
     
     #an experimental assay can be invalid without a sample
     assay.assay_class=assay_classes(:experimental_assay_class)
-    assay.technology_type=nil
+    assay.technology_type_uri=nil
     assay.samples = []
     assert !assay.valid?
     end
@@ -339,8 +333,8 @@ class AssayTest < ActiveSupport::TestCase
   
   def new_valid_assay
     Assay.new(:title=>"test",
-      :assay_type=>assay_types(:metabolomics),
-      :technology_type=>technology_types(:gas_chromatography),
+      :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
+      :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
       :assay_class => assay_classes(:experimental_assay_class),
@@ -361,4 +355,24 @@ class AssayTest < ActiveSupport::TestCase
       assert assay.contributor
       assert_equal assay.contributor.user, assay.contributing_user
   end
+
+  test "assay type label from ontology if missing" do
+    assay = Factory(:experimental_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response",assay_type_label:"fish")
+    assert_equal "fish",assay.assay_type_label
+    assay.assay_type_label = nil
+    assert_equal "Catabolic response",assay.assay_type_label
+
+    assay = Factory(:modelling_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Genome_scale",assay_type_label:"frog")
+    assert_equal "frog",assay.assay_type_label
+    assay.assay_type_label = nil
+    assert_equal "Genome scale",assay.assay_type_label
+  end
+
+  test "technology type label from ontology if missing" do
+    assay = Factory(:experimental_assay,technology_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Binding",technology_type_label:"fish")
+    assert_equal "fish",assay.technology_type_label
+    assay.technology_type_label = nil
+    assert_equal "Binding",assay.technology_type_label
+  end
+
 end

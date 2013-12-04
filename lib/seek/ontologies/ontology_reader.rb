@@ -19,12 +19,7 @@ module Seek
       #returns an #OntologyClass representing the root node, which itself contains the subclasses as #OntologyClass
       #the result is cached usign Rails.cache, according the root uri and the ontology path
       def class_hierarchy
-        parent_uri = default_parent_class_uri
-        OntologyClass # so that the class is loaded before it is needed from the cache
-        Rails.cache.fetch(cache_key) do
-          subclasses = subclasses_for(parent_uri)
-          build_ontology_class parent_uri,nil,nil,subclasses
-        end
+        @class_hierarchy ||= process_ontology_hierarchy
       end
 
       def clear_cache
@@ -32,6 +27,15 @@ module Seek
       end
 
       private
+
+      def process_ontology_hierarchy
+        parent_uri = default_parent_class_uri
+        OntologyClass # so that the class is loaded before it is needed from the cache
+        Rails.cache.fetch(cache_key) do
+          subclasses = subclasses_for(parent_uri)
+          build_ontology_class parent_uri,nil,nil,subclasses
+        end
+      end
 
       def cache_key
         Digest::MD5.hexdigest("cls-#{default_parent_class_uri}-#{ontology_path}-#{Rails.env}")

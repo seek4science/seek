@@ -188,17 +188,6 @@ end
     f.access_type Policy::NO_ACCESS
   end
 
-#Assay and Technology types
-
-  Factory.define(:technology_type, :class=>TechnologyType) do |f|
-    f.sequence(:title) {|n| "A TechnologyType#{n}"}
-    f.sequence(:term_uri) {|n| "http://technology_types/term##{n}"}
-  end
-
-  Factory.define(:assay_type) do |f|
-    f.sequence(:title) {|n| "An AssayType#{n}"}
-    f.sequence(:term_uri) {|n| "http://assay_types/term##{n}"}
-  end
 
   #Assay
   Factory.define(:assay_base, :class => Assay) do |f|
@@ -206,7 +195,6 @@ end
     f.sequence(:description) {|n| "Assay description #{n}"}
     f.association :contributor, :factory => :person
     f.association :study
-    f.association :assay_type
 
   end
 
@@ -222,6 +210,8 @@ end
 
   Factory.define(:modelling_assay, :parent => :assay_base) do |f|
     f.association :assay_class, :factory => :modelling_assay_class
+    f.assay_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
+    f.assay_type_label "modelling analysis"
   end
 
   Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
@@ -230,7 +220,10 @@ end
   end
   Factory.define(:experimental_assay, :parent => :assay_base) do |f|
     f.association :assay_class, :factory => :experimental_assay_class
-    f.association :technology_type
+    f.assay_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
+    f.assay_type_label "experimenal assay type"
+    f.technology_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
+    f.technology_type_label "technology type"
     f.samples {[Factory.build(:sample)]}
   end
 

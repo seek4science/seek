@@ -10,12 +10,12 @@ class,method,property,uri or literal,transformation,collection transformation
 *,updated_at,RDF::DC.modified,l,item.to_datetime,
 *,related_publications,JERMVocab.isAssociatedWith,u,,
 *,version,RDF::DC.hasVersion,l,,
-Assay,assay_type,JERMVocab.hasType,u,item.term_uri,select{|item| !item.nil? && !item.term_uri.blank?}
+Assay,assay_type_uri,JERMVocab.hasType,u,,
 Assay,organisms,JERMVocab.investigates,u,,
 Assay,projects,JERMVocab.itemProducedBy,u,,
 Assay,strains,JERMVocab.investigates,u,,
 Assay,study,JERMVocab.isPartOf,u,,
-Assay,technology_type,JERMVocab.hasType,u,item.term_uri,select{|item| !item.nil? && !item.term_uri.blank?}
+Assay,technology_type_uri,JERMVocab.hasType,u,,
 Compound,chebi_ids,RDF::OWL.sameAs,u,'http://identifiers.org/obo.chebi/CHEBI:'+item,
 Compound,chebi_ids,RDF::OWL.sameAs,u,'urn:miriam:obo.chebi:'+item,
 Compound,sabiork_ids,JERMVocab.sabiork_id,l,,

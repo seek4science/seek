@@ -181,20 +181,12 @@ module Acts #:nodoc:
         project_assays
       end
 
-      def assay_types
-        assays.collect{|a| a.assay_type}
-      end
-
-      def technology_types
-        assays.collect{|a| a.technology_type}
-      end
-
       def assay_type_titles
-        assay_types.collect{|at| at.try(:title)}.compact
+        assays.collect{|at| at.try(:assay_type_label)}.compact
       end
 
       def technology_type_titles
-        technology_types.collect{|tt| tt.try(:title)}.compact
+        assays.collect{|tt| tt.try(:technology_type_label)}.compact
       end
 
       #the search terms coming from the content-blob(s)
