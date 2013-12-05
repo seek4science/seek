@@ -175,22 +175,6 @@ module Seek
       File.join(path,inner_dir)
     end
 
-    def datacite_password= pwd
-      if pwd.nil?
-        self.datacite_password_enc=nil
-      else
-        self.datacite_password_enc=encrypt(pwd,generate_key(GLOBAL_PASSPHRASE))
-      end
-    end
-
-    def datacite_password
-      pwd=nil
-      unless self.datacite_password_enc.nil?
-        pwd=decrypt(self.datacite_password_enc,generate_key(GLOBAL_PASSPHRASE))
-      end
-      pwd
-    end
-
     def smtp_settings field
       value = self.smtp[field.to_sym]
       if field == :password || field == 'password'
@@ -314,8 +298,7 @@ module Seek
       :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,
       :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,
       :assay_type_ontology_file,:technology_type_ontology_file,:modelling_analysis_type_ontology_file,
-      :assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri,
-      :datacite_username,:datacite_password_enc,:datacite_url]
+      :assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri]
 
 
     #Settings that require a conversion to integer
