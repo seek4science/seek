@@ -841,7 +841,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should not loose permisions when managing a sop" do
+  test "should not loose permissions when managing a sop" do
     policy = Factory(:private_policy)
     a_person = Factory(:person)
     permission = Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING)
@@ -858,6 +858,19 @@ class SopsControllerTest < ActionController::TestCase
     assert_redirected_to sop
     assert_equal 1, sop.reload.policy.permissions.count
   end
+
+  test "should not loose project assignment when an asset is managed by a person from different project" do
+    sop = Factory :sop, :contributor => User.current_user
+    assert_not_equal sop.projects.first, User.current_user.person.projects.first
+
+    get :edit, :id => sop
+    assert_response :success
+
+    assert_select "select#sop_project_ids" do
+      assert_select "option[selected=selected][value=?]", sop.projects.first.id, :count => 1
+    end
+  end
+
 
   private
 
