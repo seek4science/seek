@@ -4,7 +4,6 @@ class AssayTypesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   
   def setup
     login_as(:aaron)
