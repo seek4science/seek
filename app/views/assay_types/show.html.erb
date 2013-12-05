@@ -10,11 +10,7 @@ assay_type_text = @is_modelling ? "Biological problem addressed" : "#{t('assays.
     <div class="ontology_nav">
 
       <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
-      <% if false -%>
-
-      <% else -%>
-          <span class="none_text">No parent terms</span>
-      <% end -%>
+      <%= parent_assay_types_list_links @type_class.parents  -%>
 
       <br/>
 

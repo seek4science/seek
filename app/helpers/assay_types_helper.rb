@@ -11,6 +11,16 @@ module AssayTypesHelper
     end
   end
 
+  def parent_assay_types_list_links parents
+    unless parents.empty?
+      parents.collect do |par|
+        link_to par.label,assay_types_path(uri: par.uri,label: par.label)
+      end.join(" | ").html_safe
+    else
+      content_tag :span,"No parent terms",:class=>"none_text"
+    end
+  end
+
   def child_technology_types_list_links children
     child_type_links children,"technology_type"
   end

@@ -28,5 +28,20 @@ class AssayTypeReaderTest < ActiveSupport::TestCase
     refute_empty amp
   end
 
+  test "parents are set" do
+    amp = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri["http://www.mygrid.org.uk/ontology/JERMOntology#Amplification"]
+    refute_nil amp
+    assert_equal 1,amp.parents.count
+    genomics = amp.parents.first
+    assert_equal "Genomics",genomics.label
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Genomics",genomics.uri.to_s
+
+    assert_equal 1,genomics.parents.count
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Genomics",genomics.parents.first.uri.to_s
+
+
+  end
+
+
 
 end
