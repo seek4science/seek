@@ -1304,8 +1304,8 @@ class DataFilesControllerTest < ActionController::TestCase
     get :explore, :id=>df
     assert_response :success
 
+    min_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS
     assert_select "div#spreadsheet_1" do
-      min_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS
       assert_select "div.row_heading", :count => min_rows
       (1..min_rows).each do |i|
         assert_select "div.row_heading", :text => "#{i}", :count => 1
