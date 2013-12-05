@@ -1,40 +1,37 @@
-<% @authorized_assays = @assay_type.get_child_assays.select(&:can_view?) %>
-<h1><%= t('assays.assay') %> type '<%= h @assay_type.title.capitalize %>'</h1>
+<%
+assay_type_text = @is_modelling ? "Biological problem addressed" : "#{t('assays.assay')} type"
+%>
+
+<%= render :partial => "general/item_title",:locals=>{:title=>"#{assay_type_text} '#{h(@label)}'"} %>
+
 
 <div class="ontology_nav">
 
-
   <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
-  <% if @assay_type.has_parents? -%>
-    <% for parent_type in @assay_type.parents  -%>
-      <%= link_to parent_type.title.capitalize, parent_type %>
-      <%= " | " unless @assay_type.parents.last==parent_type %>
-    <% end -%>
+  <% if false -%>
+
   <% else -%>
-    <span class="none_text">No parent terms</span>
+      <span class="none_text">No parent terms</span>
   <% end -%>
 
   <br/>
 
+  <%= image("current",{:title=>"Current #{assay_type_text}",:alt=>"Current #{assay_type_text}",:style=>"vertical-align:middle"}) -%>
+  <%= h @label -%>
 
-  <%= image("current",{:title=>"Current #{t('assays.assay').downcase} type",:alt=>"Current #{t('assays.assay').downcase} type",:style=>"vertical-align:middle"}) -%>
-  <%= h @assay_type.title.capitalize -%>
   <br/>
-
 
   <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
-  <% if @assay_type.has_children? -%>
-    <% for child_type in @assay_type.children  -%>
-      <%= link_to child_type.title.capitalize, child_type %> (<%= (child_type.get_child_assays & @authorized_assays).count %>)
-      <%= " | " unless @assay_type.children.last==child_type %>
-    <% end -%>
-  <% else -%>
-    <span class="none_text">No child terms</span>
-  <% end -%>
+  <%= child_assay_types_list_links @type_class.children  -%>
+
 
 </div>
 
-<h2>Related <%= t('assays.assay').downcase.pluralize %></h2>
-<div class="list_items_container">
-  <%= render :partial => "assets/resource_list_item", :collection=>@authorized_assays -%>
-</div>
+<% unless @type_class.nil? -%>
+    <h2>Related <%= t('assays.assay').downcase.pluralize %></h2>
+    <div class="list_items_container">
+      <%= render :partial => "assets/resource_list_item", :collection=>@assays %>
+    </div>
+
+    <%= @uris.join(", ") -%>
+<% end -%>

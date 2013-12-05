@@ -217,7 +217,7 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :assay_types, only: [:show,:index]
+  #resources :assay_types, only: [:show,:index]
 
   resources :technology_types, only: [:show,:index]
 
@@ -434,6 +434,10 @@ SEEK::Application.routes.draw do
     end
 
   end
+
+  ### ASSAY TYPES ###
+
+  get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
 
 
   ### MISC MATCHES ###

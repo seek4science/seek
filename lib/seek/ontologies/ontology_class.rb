@@ -4,6 +4,8 @@ module Seek
     class OntologyClass
       attr_reader :uri,:description,:label,:subclasses
 
+      alias_method :children, :subclasses
+
       def initialize uri,label=nil,description=nil,subclasses=[]
         @uri = uri
         validate_uri

@@ -152,11 +152,7 @@ module AssaysHelper
     return result.html_safe
   end
 
-  def link_to_assay_type assay
-    uri = assay.assay_type_uri
-    label = assay.assay_type_label
-    label
-  end
+
 
   def link_to_technology_type assay
     uri = assay.technology_type_uri
