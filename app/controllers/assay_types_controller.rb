@@ -1,6 +1,5 @@
 class AssayTypesController < ApplicationController
 
-  #before_filter :find_requested_item, :only=>[:show]
   before_filter :find_ontology_class, :only=>[:show]
   before_filter :find_and_authorize_assays, :only=>[:show]
 
@@ -20,7 +19,7 @@ class AssayTypesController < ApplicationController
     @is_modelling = cls.nil?
     cls ||= Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[uri]
     if cls.nil?
-      flash[:error] = "Unrecognised assay type"
+      flash.now[:error] = "Unrecognised assay type"
     else
       @type_class=cls
     end

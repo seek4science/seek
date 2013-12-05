@@ -11,6 +11,10 @@ module AssayTypesHelper
     end
   end
 
+  def child_technology_types_list_links children
+    child_type_links children,"technology_type"
+  end
+
   def child_assay_types_list_links children
     child_type_links children,"assay_type"
   end
@@ -21,7 +25,9 @@ module AssayTypesHelper
         uris = child.flatten_hierarchy.collect{|o| o.uri.to_s}
         assays = Assay.where("#{type}_uri".to_sym => uris)
         n = Assay.authorize_asset_collection(assays,"view").count
-        link_to h(child.label)+" (#{n})",assay_types_path(:uri=>child.uri,:label=>child.label)
+        path = send("#{type}s_path",:uri=>child.uri,:label=>child.label)
+
+        link_to "#{child.label} (#{n})",path
       end.join(" | ").html_safe
     else
       content_tag :span,"No child terms",:class=>"none_text"

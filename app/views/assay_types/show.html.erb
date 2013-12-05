@@ -5,33 +5,32 @@ assay_type_text = @is_modelling ? "Biological problem addressed" : "#{t('assays.
 <%= render :partial => "general/item_title",:locals=>{:title=>"#{assay_type_text} '#{h(@label)}'"} %>
 
 
-<div class="ontology_nav">
-
-  <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
-  <% if false -%>
-
-  <% else -%>
-      <span class="none_text">No parent terms</span>
-  <% end -%>
-
-  <br/>
-
-  <%= image("current",{:title=>"Current #{assay_type_text}",:alt=>"Current #{assay_type_text}",:style=>"vertical-align:middle"}) -%>
-  <%= h @label -%>
-
-  <br/>
-
-  <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
-  <%= child_assay_types_list_links @type_class.children  -%>
-
-
-</div>
-
 <% unless @type_class.nil? -%>
+
+    <div class="ontology_nav">
+
+      <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
+      <% if false -%>
+
+      <% else -%>
+          <span class="none_text">No parent terms</span>
+      <% end -%>
+
+      <br/>
+
+      <%= image("current",{:title=>"Current #{assay_type_text}",:alt=>"Current #{assay_type_text}",:style=>"vertical-align:middle"}) -%>
+      <%= h @label -%>
+
+      <br/>
+
+      <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
+      <%= child_assay_types_list_links @type_class.children  -%>
+
+    </div>
+
     <h2>Related <%= t('assays.assay').downcase.pluralize %></h2>
     <div class="list_items_container">
       <%= render :partial => "assets/resource_list_item", :collection=>@assays %>
     </div>
 
-    <%= @uris.join(", ") -%>
 <% end -%>
