@@ -37,4 +37,6 @@ SEEK::Application.configure do
   config.active_support.deprecation = :stderr
 
   config.cache_store = :memory_store
+  WebMock.disable_net_connect!(:allow_localhost => true)
+
 end
