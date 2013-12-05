@@ -38,9 +38,10 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
   end
 
   def assets_for_project project, asset_type, assets_projects_table
-    asset_id = asset_type.underscore + "_id"
+    asset_id = (asset_type.underscore + '_id').gsub('/','_')
+    asset_id = asset_id.gsub('taverna_player_','') if asset_id.include?('taverna_player_run_id')
     klass =  asset_type.constantize
-    table = assets_projects_table
+    table = assets_projects_table.gsub('/','_')
     sql = "select #{asset_id} from #{table}"
     sql << " where #{table}.project_id = #{project.id}"
     ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["#{asset_id}"]}
