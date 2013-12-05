@@ -1304,23 +1304,24 @@ class DataFilesControllerTest < ActionController::TestCase
     get :explore, :id=>df
     assert_response :success
 
+    min_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS
     assert_select "div#spreadsheet_1" do
-      assert_select "div.row_heading", :count => 10
-      (1..10).each do |i|
+      assert_select "div.row_heading", :count => min_rows
+      (1..min_rows).each do |i|
         assert_select "div.row_heading", :text => "#{i}", :count => 1
       end
 
-      assert_select "tr", :count => 10
+      assert_select "tr", :count => min_rows
       assert_select "td#cell_B2", :text => "A link to BBC", :count=>1
     end
 
     assert_select "div#spreadsheet_2" do
-      assert_select "div.row_heading", :count => 10
-      (1..10).each do |i|
+      assert_select "div.row_heading", :count => min_rows
+      (1..min_rows).each do |i|
         assert_select "div.row_heading", :text => "#{i}", :count => 1
       end
 
-      assert_select "tr", :count => 10
+      assert_select "tr", :count => min_rows
     end
   end
 
@@ -1344,28 +1345,29 @@ class DataFilesControllerTest < ActionController::TestCase
                  :content_blob=>Factory(:small_test_spreadsheet_content_blob,
                                         :data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
 
-    get :explore, :id=>df, :page_rows => 5
+    page_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS/2 + 1
+    get :explore, :id=>df, :page_rows => page_rows
     assert_response :success
 
     assert_select "div#paginate_sheet_1" do
       assert_select "span.previous_page.disabled", :text => /Previous/, :count => 1
       assert_select "em.current", :text => "1", :count => 1
-      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=1", :text => "2", :count => 1
-      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=1", :text => /Next/, :count => 1
+      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=1", :text => "2", :count => 1
+      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=1", :text => /Next/, :count => 1
     end
 
     assert_select "div#paginate_sheet_2" do
       assert_select "span.previous_page.disabled", :text => /Previous/, :count => 1
       assert_select "em.current", :text => "1", :count => 1
-      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=2", :text => "2", :count => 1
-      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=2", :text => /Next/, :count => 1
+      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=2", :text => "2", :count => 1
+      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=2", :text => /Next/, :count => 1
     end
 
     assert_select "div#paginate_sheet_3" do
       assert_select "span.previous_page.disabled", :text => /Previous/, :count => 1
       assert_select "em.current", :text => "1", :count => 1
-      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=3", :text => "2", :count => 1
-      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=5&amp;sheet=3", :text => /Next/, :count => 1
+      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=3", :text => "2", :count => 1
+      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=3", :text => /Next/, :count => 1
     end
   end
 
