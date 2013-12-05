@@ -37,7 +37,7 @@ class AssayTypeReaderTest < ActiveSupport::TestCase
     assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Genomics",genomics.uri.to_s
 
     assert_equal 1,genomics.parents.count
-    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Genomics",genomics.parents.first.uri.to_s
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type",genomics.parents.first.uri.to_s
 
 
   end
