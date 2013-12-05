@@ -3,7 +3,6 @@ class TechnologyTypesController < ApplicationController
   before_filter :find_and_authorize_assays, :only=>[:show]
 
   def show
-    @label = params[:label]
     respond_to do |format|
       format.html
       format.xml
@@ -13,7 +12,7 @@ class TechnologyTypesController < ApplicationController
   private
 
   def find_ontology_class
-    uri = params[:uri]
+    uri = params[:uri] || Seek::Ontologies::TechnologyTypeReader.instance.default_parent_class_uri.to_s
     cls = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[uri]
 
     if cls.nil?
@@ -21,6 +20,7 @@ class TechnologyTypesController < ApplicationController
     else
       @type_class=cls
     end
+    @label = params[:label] || @type_class.try(:label)
   end
 
   def find_and_authorize_assays

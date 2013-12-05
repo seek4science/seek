@@ -4,7 +4,6 @@ class AssayTypesController < ApplicationController
   before_filter :find_and_authorize_assays, :only=>[:show]
 
   def show
-    @label = params[:label]
     respond_to do |format|
       format.html
       format.xml
@@ -14,7 +13,8 @@ class AssayTypesController < ApplicationController
   private
 
   def find_ontology_class
-    uri = params[:uri]
+    uri = params[:uri] || Seek::Ontologies::AssayTypeReader.instance.default_parent_class_uri.to_s
+
     cls = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[uri]
     @is_modelling = cls.nil?
     cls ||= Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[uri]
@@ -23,6 +23,7 @@ class AssayTypesController < ApplicationController
     else
       @type_class=cls
     end
+    @label = params[:label] || cls.try(:label)
   end
 
   def find_and_authorize_assays
