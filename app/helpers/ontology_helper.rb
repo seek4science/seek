@@ -26,7 +26,7 @@ module OntologyHelper
   end
 
   def reader_for_type type
-    "Seek::Ontologies::#{type.capitalize}TypeReader".constantize.new
+    "Seek::Ontologies::#{type.capitalize}TypeReader".constantize.instance
   end
 
 end

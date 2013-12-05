@@ -27,16 +27,16 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:technology_type)
   end
 
-  test 'should show only related authorized assays' do
-    assays = technology_types(:child_technology_type_with_assay).assays
-    authorized_assays = assays.select(&:can_view?)
-    assert_equal 2, assays.count
-    assert_equal 1, authorized_assays.count
-
-    get :show, :id => technology_types(:child_technology_type_with_assay)
-    assert_response :success
-    assert_select 'a', :text => authorized_assays.first.title, :count => 1
-    assert_select 'a', :text => (assays - authorized_assays).first.title, :count => 0
-  end
+  #test 'should show only related authorized assays' do
+  #  assays = technology_types(:child_technology_type_with_assay).assays
+  #  authorized_assays = assays.select(&:can_view?)
+  #  assert_equal 2, assays.count
+  #  assert_equal 1, authorized_assays.count
+  #
+  #  get :show, :id => technology_types(:child_technology_type_with_assay)
+  #  assert_response :success
+  #  assert_select 'a', :text => authorized_assays.first.title, :count => 1
+  #  assert_select 'a', :text => (assays - authorized_assays).first.title, :count => 0
+  #end
 
 end

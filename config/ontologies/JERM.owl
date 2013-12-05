@@ -27,6 +27,18 @@
     <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
     <Prefix name="dc" IRI="http://purl.org/dc/elements/1.1/"/>
     <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="dc:description"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">an ontology to describe the entities and relationships in the SEEK database, a Systems Biology environment for the sharing and exchange of data and models. The SysMO-SEEK database contains the work of the SysMO consortium (Systems Biology of Micro-Organisms) 
+
+This is used as part of http://www.seek4science.org
+
+It was developed by Katy Wolstencroft, with contributions from Stuart Owen and Olga Krebs</Literal>
+    </Annotation>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">1.6-alpha</Literal>
+    </Annotation>
     <Declaration>
         <Class IRI="#13C_radiolabelling"/>
     </Declaration>

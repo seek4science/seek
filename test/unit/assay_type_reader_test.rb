@@ -4,14 +4,14 @@ require 'test_helper'
 class AssayTypeReaderTest < ActiveSupport::TestCase
 
   test "initialise" do
-    reader = Seek::Ontologies::AssayTypeReader.new
+    reader = Seek::Ontologies::AssayTypeReader.instance
     refute_nil reader
     refute_nil reader.ontology
     assert reader.ontology.count>500, "should be over 500 statements"
   end
 
   test "class hierarchy" do
-    reader = Seek::Ontologies::AssayTypeReader.new
+    reader = Seek::Ontologies::AssayTypeReader.instance
     hierarchy = reader.class_hierarchy
 
     refute_nil hierarchy

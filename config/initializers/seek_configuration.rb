@@ -50,6 +50,13 @@ SEEK::Application.configure do
   Seek::Config.default :factors_studied_enabled,true
   Seek::Config.default :experimental_conditions_enabled,true
   Seek::Config.default :documentation_enabled,true
+  Seek::Config.default :assay_type_ontology_file, "JERM-RDFXML.owl"
+  Seek::Config.default :technology_type_ontology_file, "JERM-RDFXML.owl"
+  Seek::Config.default :modelling_analysis_type_ontology_file, "JERM-RDFXML.owl"
+  Seek::Config.default :assay_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
+  Seek::Config.default :technology_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
+  Seek::Config.default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
+
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2

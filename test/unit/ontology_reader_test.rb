@@ -19,7 +19,7 @@ class OntologyReaderTest < ActiveSupport::TestCase
 
     WebMock.allow_net_connect!
 
-    reader = URIOntologyReader.new
+    reader = URIOntologyReader.instance
     assert_not_nil reader.ontology
     assert_equal 1360,reader.ontology.count
     classes = reader.class_hierarchy
@@ -42,7 +42,7 @@ class OntologyReaderTest < ActiveSupport::TestCase
 
     end
 
-    reader = DescOntologyReader.new
+    reader = DescOntologyReader.instance
     assert_not_nil reader.ontology
     classes = reader.class_hierarchy
     assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#2-hybrid_system",classes.uri.to_s
@@ -64,7 +64,7 @@ class OntologyReaderTest < ActiveSupport::TestCase
 
     end
 
-    reader = LabelOntologyReader.new
+    reader = LabelOntologyReader.instance
     assert_not_nil reader.ontology
     classes = reader.class_hierarchy
     assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Progressive_curve_experiment",classes.uri.to_s

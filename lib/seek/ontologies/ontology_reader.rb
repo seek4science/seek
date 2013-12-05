@@ -4,6 +4,8 @@ module Seek
     #a subclass is required to define the ontology file, or url, and the base class URI for the hierarchy tree, see #AssayTypeReader
     class OntologyReader
 
+      include Singleton
+
       attr_reader :ontology
 
       #access the ontology, or loads it if it hasn't been already. This is preferable to loading on initialize, since
@@ -19,12 +21,7 @@ module Seek
       #returns an #OntologyClass representing the root node, which itself contains the subclasses as #OntologyClass
       #the result is cached usign Rails.cache, according the root uri and the ontology path
       def class_hierarchy
-        parent_uri = default_parent_class_uri
-        OntologyClass # so that the class is loaded before it is needed from the cache
-        Rails.cache.fetch(cache_key) do
-          subclasses = subclasses_for(parent_uri)
-          build_ontology_class parent_uri,nil,nil,subclasses
-        end
+        @class_hierarchy ||= process_ontology_hierarchy
       end
 
       def clear_cache
@@ -33,8 +30,18 @@ module Seek
 
       private
 
+      def process_ontology_hierarchy
+        parent_uri = default_parent_class_uri
+        OntologyClass # so that the class is loaded before it is needed from the cache
+        Rails.cache.fetch(cache_key) do
+          subclasses = subclasses_for(parent_uri)
+          build_ontology_class parent_uri,nil,nil,subclasses
+        end
+      end
+
       def cache_key
-        Digest::MD5.hexdigest("cls-#{default_parent_class_uri}-#{ontology_path}-#{Rails.env}")
+        key = Digest::MD5.hexdigest("#{default_parent_class_uri}-#{ontology_path}-#{Rails.env}")
+        "onto-hierarchy-#{key}"
       end
 
       def subclasses_for uri

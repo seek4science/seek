@@ -20,7 +20,14 @@ class AssaysControllerTest < ActionController::TestCase
 
 
   test "modelling assay validates with schema" do
-    a=assays(:modelling_assay_with_data_and_relationship)
+    df = Factory(:data_file,:contributor=>User.current_user.person)
+    a = Factory(:modelling_assay,:contributor=>User.current_user.person)
+    disable_authorization_checks do
+      a.relate(df)
+      a.reload
+    end
+
+
     User.with_current_user(a.study.investigation.contributor) { a.study.investigation.projects << Factory(:project) }
     assert_difference('ActivityLog.count') do
       get :show, :id=>a, :format=>"xml"
@@ -29,7 +36,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
 
     validate_xml_against_schema(@response.body)
-
   end
 
   test "check SOP and DataFile drop down contents" do
@@ -197,7 +203,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_not_nil assigns(:assay)
 
-    assert_select "p#assay_type", :text=>/Metabalomics/, :count=>1
+    assert_select "p#assay_type", :text=>/Metabolomics/, :count=>1
     assert_select "p#technology_type", :text=>/Gas chromatography/, :count=>1
   end
 
@@ -259,8 +265,6 @@ class AssaysControllerTest < ActionController::TestCase
 
 
 test "should create experimental assay with or without sample" do
-    #THIS TEST MAY BECOME INVALID ONCE IT IS DECIDED HOW ASSAYS LINK TO SAMPLES OR ORGANISMS
-
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
@@ -300,8 +304,8 @@ end
     #create assay only with organisms
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :technology_type_id=>technology_types(:gas_chromatography).id,
-                             :assay_type_id=>assay_types(:metabolomics).id,
+                             :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
+                             :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :sample_ids => [Factory(:sample)]}
@@ -311,12 +315,12 @@ end
     growth_type = Factory(:culture_growth_type, :title=>"batch")
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :technology_type_id=>technology_types(:gas_chromatography).id,
-                             :assay_type_id=>assay_types(:metabolomics).id,
+                             :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
+                             :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :sample_ids => [Factory(:sample)]},
-           :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
+                             :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)

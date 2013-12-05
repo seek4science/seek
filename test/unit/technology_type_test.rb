@@ -102,13 +102,6 @@ class TechnologyTypeTest < ActiveSupport::TestCase
     child=technology_types(:child1)
     assert child.has_parents?
   end
-
-  test "assays association" do
-    a1=technology_types(:parent1)
-    assert a1.assays.empty?
-    a2=technology_types(:child_technology_type_with_assay)
-    assert a2.assays.include?(assays(:technology_type_test_assay2))
-  end
   
   test "get_all_descendants" do
     parent_tt = TechnologyType.new(:title=>"Parent")

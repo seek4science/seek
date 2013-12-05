@@ -274,7 +274,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal "Spreadsheet",content_blob.human_content_type
 
     content_blob.content_type = "text/html"
-    assert_equal "Website",content_blob.human_content_type
+    assert_equal "HTML document",content_blob.human_content_type
 
     content_blob.content_type = "application/x-download"
     assert_equal "Unknown file type",content_blob.human_content_type
