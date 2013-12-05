@@ -19,7 +19,7 @@ module Seek
         "image/png" => {:name => "PNG image", :icon_key => "png_file", :extensions=>["png"]},
         "image/bmp" => {:name => "BMP image", :icon_key => "bmp_file", :extensions=>["bmp"]},
         "image/svg+xml" => {:name => "SVG image", :icon_key => "svg_file", :extensions=>["svg"]},
-        "text/plain" => {:name => "Plain text file", :icon_key => "txt_file", :extensions=>["txt"]},
+        "text/plain" => {:name => "Plain text document", :icon_key => "txt_file", :extensions=>["txt"]},
         "text/x-comma-separated-values" => {:name => "Comma-seperated-values file", :icon_key => "misc_file", :extensions=>["csv"]},
         "text/xml" => {:name => "XML document", :icon_key => "xml_file", :extensions=>["xml"]},
         "application/xml" => {:name => "XML document", :icon_key => "xml_file", :extensions=>["xml"]},
@@ -31,7 +31,7 @@ module Seek
         "application/vnd.oasis.opendocument.text-flat-xml" => {:name => "Word document", :icon_key => "doc_file", :extensions=>["fodt"]},
         "application/vnd.oasis.opendocument.spreadsheet" => {:name => "Spreadsheet", :icon_key => "xls_file", :extensions=>["ods"]},
         "application/rtf" => {:name => "Document file", :icon_key => "rtf_file", :extensions=>["rtf"]},
-        "text/html" => {:name=>"Website",:icon_key=>"html_file",:extensions=>["html"]}
+        "text/html" => {:name=>"HTML document",:icon_key=>"html_file",:extensions=>["html"]}
     }
 
     #Get a nice, human readable name for the MIME type
