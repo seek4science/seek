@@ -17,7 +17,7 @@ image_style_for_title_length = title.length > 89 ? "float:left" : "position:abso
 
 <div class="contribution_title">
     <% unless avatar.blank? -%>
-        <div class="contribution_title_image" style="<%= image_style_for_title_length -%>"><%= avatar -%></div>
+        <div class="contribution_title_image curved with_smaller_shadow" style="<%= image_style_for_title_length -%>"><%= avatar -%></div>
     <% end %>
 
     <h1><%= title -%></h1>

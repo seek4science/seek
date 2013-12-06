@@ -68,7 +68,7 @@ module MenuHelper
         "<li #{attributes}>#{link_to(menu[:title],path,)}</li>"
       else
         click_js = 'update_menu_text("'+menu_section_id(menu[:title])+'",true);return false;'
-        "<li #{attributes}>#{link_to(menu[:title],{},{:onclick=>click_js})}</li>"
+        "<li #{attributes}>#{link_to(menu[:title],{},{:onclick=>click_js,:class=>"curved_top"})}</li>"
       end
 
     end.join(" ").html_safe
@@ -85,8 +85,11 @@ module MenuHelper
 
       path = section[:path] || eval("#{c}_path")
       options = section[:options] || {}
+      options[:class]="curved"
       link = link_to title, path,options
-      attributes = "class='selected_menu'" if section == selected_section
+      classes="curved"
+      classes << " selected_menu" if section == selected_section
+      attributes = "class='#{classes}'"
 
       "<li #{attributes}>#{link}</li>"
     end.join("").html_safe

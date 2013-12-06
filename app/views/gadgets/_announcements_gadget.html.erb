@@ -2,11 +2,11 @@
 <div id="announcement_gadget" class="sysmo_gadget"  >
 
 
-  <div class="header">
+  <div class="header curved_top">
     <span style="float:left;margin-left:0.5em;padding-bottom: 0.5em;"><%= link_to image("atom_feed"),feed_site_announcements_path(:format=>"atom") %></span> Announcements
   </div>
 
-  <div class="contents">
+  <div class="contents curved_bottom">
     <%= site_announcements_feed :truncate_length=>100, :limit=>3 -%>
   </div>
 </div>

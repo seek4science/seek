@@ -126,11 +126,10 @@
     <% end -%>
   </div>
 <% else -%>
-    <% if User.current_user.nil? %>
-        <span class="none_text">You are not authorized to view the related items. Please log in first.</span>
-    <% else %>
-        <span class="none_text">No items.</span>
-    <% end %>
-
+    <div class="list_items_container">
+      <div class="hidden_list_item">
+        <span class="none_text">No items found.</span>
+      </div>
+    </div>
 <% end -%>
 

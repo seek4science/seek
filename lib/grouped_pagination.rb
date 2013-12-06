@@ -34,6 +34,7 @@ module GroupedPagination
     def paginate_after_fetch(collection, *args)
       options=args.pop unless args.nil?
       options ||= {}
+      reorder = options[:reorder].nil? ? true : options[:reorder]
 
       @latest_limit = options[:latest_limit] || @latest_limit
       @default_page = options[:default_page] || @default_page
@@ -47,7 +48,11 @@ module GroupedPagination
       if page == "all"
         records=collection
       elsif page == "latest"
-        records=collection.sort{|x,y| y.updated_at <=> x.updated_at}[0...@latest_limit]
+        if reorder
+          records=collection.sort{|x,y| y.updated_at <=> x.updated_at}[0...@latest_limit]
+        else
+          records=collection[0...@latest_limit]
+        end
       elsif @pages.include?(page)           
         records=collection.select {|i| i.first_letter == page}        
       end

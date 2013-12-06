@@ -51,9 +51,11 @@ class PeopleController < ApplicationController
       else
         @people = Person.all
       end
-      @people = apply_filters(@people).select(&:can_view?)
+      @people=@people.select{|p| !p.group_memberships.empty?}
+      @people = apply_filters(@people).select(&:can_view?)#.select{|p| !p.group_memberships.empty?}
       @people=Person.paginate_after_fetch(@people,
                                           :page=>(params[:page] || Seek::Config.default_page('people')),
+                                          :reorder=>false,
                                           :latest_limit => Seek::Config.limit_latest)
     else
       @people = @people.select(&:can_view?)
@@ -252,7 +254,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.update_attributes(params[:person])
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
-
+        @person.touch
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }

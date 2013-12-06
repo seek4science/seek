@@ -267,4 +267,11 @@ class ConfigTest < ActiveSupport::TestCase
   test "publish_button_enabled" do
     assert_equal true,Seek::Config.publish_button_enabled
   end
+
+  test 'propagate bioportal api key' do
+      assert_equal "fish",Organism.bioportal_api_key
+      Seek::Config.bioportal_api_key = "frog"
+      assert_equal "frog",Organism.bioportal_api_key
+  end
+
 end

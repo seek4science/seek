@@ -1,9 +1,10 @@
 <% filter_hash = {:filter => params[:filter]} %>
+<% selected_classes = "current_page curved with_smaller_shadow" -%>
 <div class="alphabetcal_pagination">
   <ul>
-    <li class="<%= current_page == "latest" ? "current_page" : "" %>"><%= link_to "Latest ", {:id => params[:id], :page => "latest"}.merge(filter_hash) %></li> 
+    <li class="<%= current_page == "latest" ? selected_classes : "" %>"><%= link_to "Latest", {:id => params[:id], :page => "latest"}.merge(filter_hash) %></li>
     <% for page in pages -%>
-        <% current_page_class = page==current_page ? "current_page" : "" -%>
+        <% current_page_class = page==current_page ? selected_classes : "" -%>
 		<% page_title = page=="?" ? "Other" : page -%>
         <% if page_totals[page]>0 -%>
             <li class="<%= current_page_class %>"><%= link_to h(page_title), {:id => params[:id], :page => page}.merge(filter_hash) %></li>
@@ -11,7 +12,7 @@
             <li class="disabled_page <%= current_page_class %>"><%= h(page_title) %></li>
         <% end -%>
     <% end -%>
-    <li class="<%= current_page == "all" ? "current_page" : "" %>"><%= link_to "All", {:id => params[:id], :page => "all"}.merge(filter_hash) %></li>
+    <li class="<%= current_page == "all" ? selected_classes : "" %>"><%= link_to "All", {:id => params[:id], :page => "all"}.merge(filter_hash) %></li>
   </ul>
   <%=  link_to("Clear Filter", CGI::unescape(request.url).gsub(/filter\[.+\]=[0-9]*[&]?/,""), :style => "display:none") unless params[:filter].blank? %>
 </div>

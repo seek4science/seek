@@ -83,9 +83,9 @@ To create the gemset run:
 
 == Getting SEEK
 
-Now you are ready for installing SEEK. To fetch the latest version of SEEK (v0.18.1) change to the directory you want to install it and then run:
+Now you are ready for installing SEEK. To fetch the latest version of SEEK <em>(v0.18.3)</em> change to the directory you want to install it and then run:
 
-  hg clone https://bitbucket.org/seek4science/seek -r v0.18.1 seek
+  hg clone https://bitbucket.org/seek4science/seek -r v0.18.3 seek
   cd seek/
 
 Now to install the ruby gems SEEK needs:

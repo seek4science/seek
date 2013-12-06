@@ -59,7 +59,7 @@ class Assay < ActiveRecord::Base
   has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :model_masters, :through => :assay_assets, :source => :asset, :source_type => "Model"
 
-  ["data_file","sop"].each do |type|
+  ["data_file","sop","publication"].each do |type|
     eval <<-END_EVAL
       #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
       def related_#{type.pluralize}
@@ -175,7 +175,7 @@ class Assay < ActiveRecord::Base
     data_file_masters + model_masters + sop_masters
   end
   
-  def related_publications
+  def publication_masters
     self.relationships.select {|a| a.other_object_type == "Publication"}.collect { |a| a.other_object }
   end
 

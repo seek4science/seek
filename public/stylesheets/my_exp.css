@@ -199,15 +199,7 @@ li {
 	_display: inline; /* ie4 ie5 ie6 */
 }
 
-.framed {
-	border: 1px solid #CCCCCC;
-	padding: 3px;
-	background-color: #FFFFFF;
-}
 
-.framed_nospace {
-	border: 1px solid #CCCCCC;
-}
 
 
 /* end css tabs nav */ 
@@ -271,40 +263,7 @@ ul.breadcrumb_list a:hover {
 
 /* begin css tooltips/boxovers */
 
-.boxoverTooltipHeader {
-	display: none;
-	border: 0;
-	height: 0;
-}
 
-.boxoverTooltipBody {
-	border: solid 1px Gray;
-	color: #000000;
-	background-color: #FFFF66;
-	font-size: 93%;
-	font-weight: normal;
-	padding: 0.2em 0.6em;
-	max-width: 500px;
-	text-align: left;
-	line-height: 1.4em;
-}
-
-.boxoverInfoHeader {
-	display: none;
-	border: 0;
-	height: 0;
-}
-
-.boxoverInfoBody {
-	border: solid 1px Gray;
-	color: #333333;
-	padding: 0.4em;
-	background-color: #ebf3ff;
-	font-size: 93%;
-	text-align: left;
-	max-width: 400px;
-	line-height: 1.4em;
-}
 
 /* end css tooltips/boxovers */
 
@@ -738,53 +697,7 @@ table.contributable:hover {
 	
 }
 
-.sectionIcons {
-	margin: 1em 0 0.5em 0;
-	font-size: smaller;
-	text-align: center;
-}
 
-.sectionIcons * {
-	vertical-align: middle;
-}
-
-.sectionIcons li {
-	display: inline;
-	vertical-align: middle;
-	margin: 0;
-	margin-left: 8px;
-	/*border: 2px solid #F5F5F5;*/ 
-}
-
-.sectionIcons li:first {
-	margin-left: 0;
-}
-
-.sectionIcons li:hover {
-}
-
-.sectionIcons li * {
-	vertical-align: middle;
-}
-
-.sectionIcons li a {
-	width: 100%;
-	padding: 0.5em 0.5em;
-	*padding: 0.2em 0.5em;
-	line-height: 1.0;
-	text-decoration: none;
-	border: 1px solid #BBBBBB;
-	background-color: #FEF6FF;
-}
-
-.sectionIcons li a:hover {
-	background-color: #0099FF;
-	color: #F5F5F5;
-}
-
-.sectionIcons li a * {
-	vertical-align: middle;
-}
 
 a.button_slim {
 	padding: 0.2em 0.4em 0.5em 0.4em;
@@ -856,73 +769,7 @@ a.button_slim * {
 	width: 25%;
 }
 
-.contribution_version_box {
-	border: 1px dotted #999999;
-	margin-bottom: 1em;
-	background-color: #F7F7F7;
-}
 
-.contribution_version_box .title {
-	font-size: 108%; 
-	font-weight: bold; 
-	color: #660000;
-}
-
-.contribution_version_selector_box {
-	padding: 0.6em 0.5em 0.4em 0.5em;
-	border: 0px dotted #999999;
-	border-width: 0 0 1px 0;
-	background-image: url('../images/box-bg1.png');
-	background-position: top;
-	background-repeat: repeat-x;
-	background-color: #FFFFCC;
-	color: #333333;
-}
-
-.contribution_version_selector_box * {
-	vertical-align: middle;
-}
-
-.contribution_version_selector_box table {
-	width: 100%;
-	margin: 0;
-	padding: 0;
-	border-collapse: collapse;
-}
-
-.contribution_version_selector_box table td {
-	padding: 0em 0.5em;
-}
-
-.contribution_version_selector_box .heading {
-	text-align: left; 
-	font-size: 108%; 
-	font-weight: bold; 
-	color: #333333;
-}
-
-.contribution_version_inner_box {
-	padding: 0.6em 0.7em;
-}
-
-.contribution_version_inner_box h4 {
-	text-align: center;
-}
-
-.contribution_version_inner_box .option_box {
-	padding: 0.2em 0.6em; 
-	border: 1px solid #CCCCCC;
-}
-
-.contribution_version_meta_info_box {
-	padding: 0.3em 0.6em; 
-	border: 1px dotted #999999;
-	background-color: #FFFFCC;
-	color: #333333;
-	line-height: 1.2;
-	font-size: 85%;
-	margin-left: 2.5em;  
-}
 
 .contribution_currentlicense {
 	padding: 0 0 0.5em 0;
@@ -1120,11 +967,7 @@ div.auto_complete ul strong.highlight {
 	margin-top: 0.4em;
 }
 
-.box_standout {
-	padding: 0.5em 0.8em; 
-	border: 1px dotted #999999;
-	background-color: #FFFFCC;
-}
+
 
 .box_important {
 	padding: 0.5em 0.8em; 

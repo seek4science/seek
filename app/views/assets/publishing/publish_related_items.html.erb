@@ -40,7 +40,7 @@
          draftly_check_gatekeeper_required = !current_user.person.is_gatekeeper? && !current_user.person.projects.collect(&:gatekeepers).flatten.empty?
       %>
 
-      <%= submit_tag "Next" -%>
+      <%= submit_tag "Next",:disable_with=>"Next" -%>
       Or
       <%= link_to 'Cancel', resource %>
   <% end %>

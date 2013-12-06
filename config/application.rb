@@ -37,7 +37,7 @@ module SEEK
     config.time_zone = 'UTC'
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password]
+    config.filter_parameters += [:password,"rack.request.form_vars"]
 
     # Activate observers that should always be running
     config.active_record.observers = :annotation_reindexer,

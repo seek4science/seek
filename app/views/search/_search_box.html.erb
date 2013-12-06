@@ -6,7 +6,7 @@
 
   <%= form_tag search_path do -%>
     <div id="search_box">
-      <%= text_field_tag :search_query, @search_query, :style=>"display:none;" -%>
+      <%= text_field_tag :search_query, @search_query,:class=>"curved", :style=>"display:none;" -%>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
       <% if Seek::Config.external_search_enabled %>
         <span title='<%= tooltip_title_attrib(external_search_tooltip_text) -%>' >

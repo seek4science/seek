@@ -68,6 +68,7 @@ class PersonTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
+
   test "email uri" do
     p = Factory :person, :email=>"sfkh^sd@weoruweoru.com"
     assert_equal "mailto:sfkh%5Esd@weoruweoru.com",p.email_uri
@@ -180,13 +181,24 @@ class PersonTest < ActiveSupport::TestCase
     assert dups.include?(people(:duplicate_2))
   end
   
-  def test_without_group
-    without_group=Person.without_group
-    without_group.each do |p|
-      assert_equal 0,p.group_memberships.size
-    end
-    assert !without_group.include?(people(:quentin_person))
-    assert without_group.include?(people(:person_without_group))
+  test "without group" do
+    no_group = Factory(:brand_new_person)
+    in_group = Factory(:person)
+    assert no_group.projects.empty?
+    assert !in_group.projects.empty?
+    all = Person.without_group
+    assert !all.include?(in_group)
+    assert all.include?(no_group)
+  end
+
+  test "with group" do
+    no_group = Factory(:brand_new_person)
+    in_group = Factory(:person)
+    assert no_group.projects.empty?
+    assert !in_group.projects.empty?
+    all = Person.with_group
+    assert all.include?(in_group)
+    assert !all.include?(no_group)
   end
   
   def test_expertise

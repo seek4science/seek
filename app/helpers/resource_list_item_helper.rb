@@ -128,7 +128,7 @@ module ResourceListItemHelper
   end
 
   def list_item_description text, auto_link=true, length=500
-    html = "<div class=\"list_item_desc\">"
+    html = "<div class='list_item_desc curved'>"
     html << text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
     html << "</div>"
     html.html_safe

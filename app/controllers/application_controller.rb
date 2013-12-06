@@ -127,7 +127,7 @@ class ApplicationController < ActionController::Base
         else
           resources = resources.select &:can_view?
         end
-
+        resources.sort!{|item,item2| item2.updated_at <=> item.updated_at}
         page.replace_html "#{resource_type}_list_items_container",
                           :partial => "assets/resource_list",
                           :locals => {:collection => resources,
@@ -266,6 +266,7 @@ class ApplicationController < ActionController::Base
               else                 redirect_to eval "#{self.controller_name}_path"
             end
           end
+          format.rdf { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
           format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
           format.json { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
         end
@@ -278,6 +279,9 @@ class ApplicationController < ActionController::Base
         else
           flash[:error] = "You are not authorized to view #{name.humanize}"
         end
+        format.rdf { render  :text=>"Not found",:status => :not_found }
+        format.xml { render  :text=>"<error>404 Not found</error>",:status => :not_found }
+        format.json { render :text=>"Not found", :status => :not_found }
         format.html { redirect_to eval "#{self.controller_name}_path" }
       end
       return false

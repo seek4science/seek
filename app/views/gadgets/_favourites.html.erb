@@ -1,6 +1,6 @@
 <div id="favourites_gadget" class="sysmo_gadget">
 
-  <div class="header">
+  <div class="header curved_top">
     Favourites
     <span id="fav_ajax-loader" style="display:none; position: absolute; right: 13px;">
       <%= image_tag("ajax-loader.gif", :alt=>"loading...",:title=>"loading...") %>
@@ -8,7 +8,7 @@
   </div>
   
   <% cache "favourites/user/#{current_user.id}" do -%>
-  <div id="drop_favourites" class="contents" style="min-height:100px; text-align: left">    
+  <div id="drop_favourites" class="contents curved_bottom" style="min-height:100px; text-align: left">
     <div id="favourite_list">
       <%= render :partial=>"favourites/gadget_list" %>
     </div>    

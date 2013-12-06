@@ -6,16 +6,16 @@
 
         <div id="new_asset" class="sysmo_gadget">
 
-          <div class="header">
+          <div class="header curved_top">
             New or upload
           </div>
 
-          <div class="contents">
+          <div class="contents curved_bottom">
             <div style="text-align: center;">
 
               <input type=button id="new_asset_button" class="gadget_button" style="width:7em;" value="CREATE" onclick="javascript:toggleDynamicMenu('new_asset_menu');"/>
 
-              <ul id="new_asset_menu" class='dynamic_menu' style="display:none;">
+              <ul id="new_asset_menu" class='dynamic_menu with_smaller_shadow' style="display:none;">
 
                 <% new_creatable_selection_list.each do |item| -%>
                     <li class='dynamic_menu_li' onclick="javascript:newAssetSelected('<%= item[1] -%>');"><%= item[0] -%></li>

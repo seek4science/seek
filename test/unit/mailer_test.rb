@@ -226,6 +226,21 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
+  test "test mail" do
+    with_config_value(:application_title,"SEEK EMAIL TEST") do
+      with_config_value(:site_base_host,"http://fred.com") do
+        email = Mailer.test_email("fred@email.com")
+        assert_not_nil email
+        assert_equal  "SEEK Configuration Email Test",email.subject
+        assert_equal ["no-reply@sysmo-db.org"],email.from
+        assert_equal ["fred@email.com"],email.to
+
+        assert email.body.include?("This is a test email sent from SEEK EMAIL TEST configured with the Site base URL of http://fred.com")
+      end
+    end
+
+  end
+
   private
 
   def encode_mail message

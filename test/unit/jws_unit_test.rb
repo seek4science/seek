@@ -3,12 +3,12 @@ require 'test_helper'
 class JwsUnitTest < ActiveSupport::TestCase
 
   def setup
+    skip("currently skipping jws online tests") if skip_jws_tests?
     WebMock.allow_net_connect!
     @builder = Seek::JWS::Builder.new
   end
 
   test "jws online response handled when errors present" do
-    skip("temporarily skipped whilst jws online undergoes some upgrades")
     blob=Factory :invalid_sbml_content_blob
     params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content blob
     assert !error_keys.empty?
