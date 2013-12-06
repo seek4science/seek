@@ -18,7 +18,7 @@ If you use init.d scripts to start and stop the Delayed Job or Solr Search servi
 Otherwise do:
 
   ./script/delayed_job stop
-  bundle exec sunspot:solr:stop
+  bundle exec rake sunspot:solr:stop
 
 == Installating Package dependencies
 
