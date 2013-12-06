@@ -173,11 +173,11 @@ namespace :seek_dev do
 
 
   task :analyse_assays_and_their_types => :environment do
-    assay_type_uri_hash = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri
-    assay_type_uri_hash = assay_type_uri_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri)
+    exp_assay_type_uri_hash = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri
+    model_assay_type_uri_hash = Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri
 
-    assay_type_label_hash = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_label
-    assay_type_label_hash = assay_type_label_hash.merge(Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_label)
+    exp_assay_type_label_hash = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_label
+    model_assay_type_label_hash = Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_label
 
     technology_type_uri_hash = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri
     technology_type_label_hash = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_label
@@ -194,6 +194,9 @@ namespace :seek_dev do
 
       technology_type_label = technology_type_label.downcase.gsub("_"," ") unless technology_type_label.nil?
       assay_type_label = assay_type_label.downcase.gsub("_"," ") unless assay_type_label.nil?
+
+      assay_type_uri_hash = assay.is_modelling? ? model_assay_type_uri_hash : exp_assay_type_uri_hash
+      assay_type_label_hash = assay.is_modelling? ? model_assay_type_label_hash : exp_assay_type_label_hash
 
       if assay_type_label.blank? && assay_type_uri.blank?
         puts "No assay type uri or label defined, will be reset to the root class - #{id}".green
