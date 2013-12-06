@@ -10,7 +10,7 @@
       <div class="contents curved_bottom">
         <div style="text-align: center">
 
-            <input type=button id="my_project_button" class="gadget_button_menu" value="My <%= t('project') %>" onclick="javascript:myProjectClicked();"/>
+            <input type=button id="my_project_button" class="gadget_button" value="My <%= t('project') %>" onclick="javascript:myProjectClicked();"/>
 
             <ul id="my_project_menu" class='dynamic_menu with_smaller_shadow' style="display:none;">
 
@@ -22,6 +22,12 @@
         </div>
       </div>
     </div>
+
+    <script type="text/javascript">
+        <% if current_user.person.projects.size>1 -%>
+            $(document.getElementById("my_project_button")).classList.add('gadget_button_menu');
+        <% end -%>
+    </script>
 
     <script type="text/javascript">
         function myProjectClicked() {
