@@ -127,6 +127,10 @@
 
 Autocompleter.LocalAdvanced = Class.create(Autocompleter.Base, {
     initialize: function(autocompleter_id, element, display_element, update, array, prepopulate_array, options) {
+        for (var i=0;i<array.length;i++){
+            array[i][options.search_field] = decodeHTML(array[i][options.search_field])
+        }
+
         this.autocompleter_id = autocompleter_id;
 
         this.baseInitialize(element, update, options);
