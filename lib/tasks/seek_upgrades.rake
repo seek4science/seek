@@ -2,6 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'uuidtools'
+require 'colorize'
 
 
 namespace :seek do
@@ -10,7 +11,6 @@ namespace :seek do
   task :upgrade_version_tasks=>[
             :environment,
             :update_admin_assigned_roles,
-            :update_top_level_assay_type_titles,
             :repopulate_auth_lookup_tables,
             :increase_sheet_empty_rows
   ]
@@ -61,17 +61,6 @@ namespace :seek do
     end
   end
 
-  task(:update_top_level_assay_type_titles=>:environment) do
-    exp_id = AssayType.experimental_assay_type_id
-    assay_type = AssayType.find(exp_id)
-    assay_type.title="generic experimental assay"
-    assay_type.save!
-
-    mod_id = AssayType.modelling_assay_type_id
-    assay_type = AssayType.find(mod_id)
-    assay_type.title="generic modelling analysis"
-    assay_type.save!
-  end
 
   desc("Increase the min rows from 10 to 35")
   task(:increase_sheet_empty_rows => :environment) do
@@ -83,6 +72,56 @@ namespace :seek do
         ws.save
       end
     end
+  end
+
+  desc("Synchronised the assay types assigned to assays according to the current ontology")
+  task(:resynchronise_assay_types => :environment) do
+    label_map = {"generic experimental assay"=>"experimental assay type",
+                 "generic modelling analysis"=>"model analysis type",
+                 "cdna microarray"=>"transcriptional profiling",
+                 "modelling analysis type"=>"model analysis type"}
+
+    Assay.record_timestamps = false
+
+    Assay.all.each do |assay|
+      assay_type_uri_hash = assay.assay_type_reader.class_hierarchy.hash_by_uri
+      assay_type_label_hash = assay.assay_type_reader.class_hierarchy.hash_by_label
+
+      #first see if the label is known to match a URI, which could be case if it has been added to the ontology
+      label = assay[:assay_type_label].try(:downcase)
+
+      unless label.nil?
+        #check to see if the label can resolve to a uri
+        resolved_uri = assay_type_label_hash[label].try(:uri).try(:to_s)
+
+        #if the resolved uri is nil try a mapped label
+        resolved_uri ||= assay_type_label_hash[label_map[label]].try(:uri).try(:to_s)
+
+        #if the uri is resovled, update the stored uri and remove the label
+        unless resolved_uri.nil?
+          if assay.assay_type_uri != resolved_uri
+            assay.assay_type_uri = resolved_uri
+            puts "the URI for Assay #{assay.id} updated to #{resolved_uri.inspect} based on the label #{label.inspect}".green
+          end
+          assay.assay_type_label = nil
+        end
+
+      end
+
+      unless assay.valid_assay_type_uri?
+        #if the uri is still invalid, we need to set it to the default
+        uri = assay[:assay_type_uri]
+        puts "the label and URI for Assay #{assay.id} cannot be resolved, so resetting to the default.\n\t the original label was #{label.inspect} and URI was #{uri.inspect}".red
+        assay.assay_type_label=nil
+        assay.use_default_assay_type_uri!
+      end
+
+      disable_authorization_checks do
+        assay.save
+      end
+
+    end
+    Assay.record_timestamps = true
   end
 
 end

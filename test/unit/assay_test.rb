@@ -385,4 +385,22 @@ class AssayTest < ActiveSupport::TestCase
     assert_nil assay.technology_type_uri
   end
 
+  test "assay type reader" do
+    exp_assay = Factory(:experimental_assay)
+    mod_assay = Factory(:modelling_assay)
+    assert_equal Seek::Ontologies::AssayTypeReader,exp_assay.assay_type_reader.class
+    assert_equal Seek::Ontologies::ModellingAnalysisTypeReader,mod_assay.assay_type_reader.class
+  end
+
+  test "valid assay type uri" do
+    assay = Factory(:experimental_assay)
+    assert assay.valid_assay_type_uri?
+    assay.assay_type_uri="http://fish.com/onto#fish"
+    assert !assay.valid_assay_type_uri?
+
+    #modelling uri should also be invalid
+    assay.assay_type_uri = Seek::Ontologies::ModellingAnalysisTypeReader.instance.default_parent_class_uri.to_s
+    assert !assay.valid_assay_type_uri?
+  end
+
 end
