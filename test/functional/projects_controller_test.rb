@@ -71,8 +71,12 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_should_destroy_project
+    project = projects(:four)
+    get :show, :id => project
+    assert_select "span.icon", :text => /Delete #{I18n.t('project')}/, :count => 1
+
 		assert_difference('Project.count', -1) do
-			delete :destroy, :id => projects(:four)
+			delete :destroy, :id => project
 		end
 
 		assert_redirected_to projects_path
@@ -84,15 +88,28 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
 	def test_non_admin_should_not_destroy_project
-    user = Factory(:user,:person=>Factory(:person))
-    proj = Factory(:project)
-    assert !user.person.is_admin?
-		login_as user
-
+		login_as(:aaron)
+    project = projects(:four)
+    get :show, :id => project.id
+    assert_select "span.icon", :text => /Delete #{I18n.t('project')}/, :count => 0
+    assert_select "span.disabled_icon", :text => /Delete #{I18n.t('project')}/, :count => 0
 		assert_no_difference('Project.count') do
-			delete :destroy, :id => proj
-		end
+			delete :destroy, :id => project
+    end
+    assert_not_nil flash[:error]
+  end
 
+  test "can not destroy project if it contains people" do
+    project = projects(:four)
+    work_group = Factory(:work_group, :project => project)
+    a_person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    get :show, :id => project
+    assert_select "span.disabled_icon", :text => /Delete #{I18n.t('project')}/, :count => 1
+    assert_no_difference('Project.count') do
+      delete :destroy, :id => project
+    end
+    assert_redirected_to project_path(project)
+    assert_not_nil flash[:error]
   end
   
  def test_non_admin_should_not_manage_projects
@@ -228,15 +245,19 @@ test 'should get index for non-project member, should for non-login user' do
 	end
 
 	def test_user_project_manager
-		login_as(:project_manager)
-		get :show, :id=>projects(:three)
+    pm = Factory(:project_manager)
+    proj = pm.projects.first
+		login_as(pm.user)
+		get :show, :id=>proj.id
 		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
-		get :edit, :id=>projects(:three)
+		get :edit, :id=>proj.id
 		assert_response :success
 
-		put :update, :id=>projects(:three).id,:project=>{}
-		assert_redirected_to project_path(assigns(:project))
+		put :update, :id=>proj.id,:project=>{:title=>"fish"}
+    proj = assigns(:project)
+		assert_redirected_to project_path(proj)
+    assert_equal "fish",proj.title
 	end
 
 	def test_user_cant_edit_project
@@ -432,9 +453,9 @@ test 'should get index for non-project member, should for non-login user' do
 	end
 
 	test "non admin cannot administer project" do
-		#login_as(:pal_user)
-    login_as Factory(:user,:person=>Factory(:person))
-		get :admin,:id=>projects(:sysmo_project)
+    person = Factory(:person)
+		login_as(person.user)
+		get :admin,:id=>person.projects.first
 		assert_response :redirect
 		assert_not_nil flash[:error]
 	end
@@ -553,59 +574,31 @@ test 'should get index for non-project member, should for non-login user' do
     end
   end
 
-  test 'project manager can only see the new institutions (which are not yet in any projects) and the institutions this project' do
+  test 'project manager can only see all institutions' do
     as_not_virtualliver do
       project_manager = Factory(:project_manager)
       project = project_manager.projects.first
       login_as(project_manager.user)
-
-      new_institution = Institution.create(:name => 'a test institution')
-      a_project = Factory(:project)
-      a_project.institutions << Factory(:institution)
+    Factory(:institution)
 
       get :admin, :id => project
       assert_response :success
-      assert_select "select#project_institution_ids", :count => 1 do
-        (project.institutions + [new_institution]).each do |institution|
-          assert_select 'option', :text => institution.title, :count => 1
-        end
-        a_project.institutions.each do |institution|
-          assert_select 'option', :text => institution.title, :count => 0
-        end
+    Institution.all.each do |institution|
+      assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 1
       end
     end
   end
 
-  test 'project manager can assign only the new institutions (which are not yet in any projects) to their project' do
+  test 'project manager can assign all institutions to their project' do
     project_manager = Factory(:project_manager)
     project = project_manager.projects.first
     login_as(project_manager.user)
+    a_institution = Factory(:institution)
 
-    new_institution = Institution.create(:name => 'a test institution')
-
-    put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
+    put :update, :id => project, :project => {:institution_ids => Institution.all.collect(&:id)}
     assert_redirected_to project_path(project)
     project.reload
-    assert project.institutions.include?new_institution
-  end
-
-  test 'project manager can not assign the institutions (which are already in the other projects) to their project' do
-    as_not_virtualliver do
-      project_manager = Factory(:project_manager)
-      project = project_manager.projects.first
-      a_project = Factory(:project)
-      a_project.institutions << Factory(:institution)
-
-      login_as(project_manager.user)
-
-      put :update, :id => project, :project => {:institution_ids => (project.institutions + a_project.institutions).collect(&:id)}
-      assert_redirected_to :root
-      assert_not_nil flash[:error]
-      project.reload
-      a_project.institutions.each do |i|
-        assert !(project.institutions.include? i)
-      end
-    end
+    assert_equal Institution.count, project.institutions.count
   end
 
   test 'project manager can not administer sharing policy' do
@@ -686,6 +679,30 @@ test 'should get index for non-project member, should for non-login user' do
 
     assert_response :success
     assert @response.body.include?("a data file")
+  end
+
+  test "can not remove workgroup if it contains people" do
+    project = Factory(:project)
+    institution = Factory(:institution)
+    work_group = Factory(:work_group, :project => project, :institution => institution)
+    a_person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+
+    assert !project.institutions.empty?
+    assert !work_group.people.empty?
+
+    assert_no_difference('WorkGroup.count') do
+      begin
+        post :update, :id => project, :project => {:institution_ids => []}
+        assert_redirected_to project
+        assert_not_nil flash[:error]
+      rescue Exception => e
+        puts e.message
+      end
+    end
+
+
+    assert !project.reload.institutions.empty?
+    assert !work_group.reload.people.empty?
   end
 
 	private

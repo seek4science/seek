@@ -12,7 +12,7 @@
 
   <%= list_item_optional_attribute publication_type_text(publication.publication_type), h(publication.journal) %>
 
-  <%= list_item_attribute "Date Published", publication.published_date.strftime('%d/%m/%Y') %>
+  <%= list_item_attribute "Date Published", publication.published_date.try(:strftime, '%d/%m/%Y') %>
 
   <%= list_item_attribute "Citation", publication.citation%>
 
@@ -23,8 +23,8 @@
   <%= f.hidden_field :parent_name %>
   <%= f.hidden_field :pubmed_id %>
   <%= f.hidden_field :doi %>
-  <%= f.select :project_ids, @publication.project_ids, {}, :multiple=>true, :style=>"display:none;" %>
+  <%= f.select :project_ids, Project.all.collect(&:id), {}, :selected=> @publication.project_ids, :multiple=>true, :style=>"display:none;", :class => 'project_ids' %>
 
-  <%= submit_tag 'Register' %>
+  <%= f.submit 'Register', :onclick => "updateProjectIds();" %>
 
 <% end %>

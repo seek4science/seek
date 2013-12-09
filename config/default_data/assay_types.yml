@@ -5,7 +5,7 @@ assay types:
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#AssayType
 
 experimental_assay_type:
-  title: experimental assay type
+  title: generic experimental assay
   children: genomics,metabolomics,proteomics,single-cell,transcriptomics, fluxomics, reactomics, interactomics, organism_or_strain_characterisation
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#ExperimentalAssayType
 
@@ -218,7 +218,7 @@ tiling_path:
 
 
 modelling_analysis_type:
-  title: modelling analysis type
+  title: generic modelling analysis
   children: cell_cycle,enzymology,gene_expression,gene_regulatory_network,metabolic_network,metabolism,signal_transduction,translation, genome_scale
   term_uri: http://www.mygrid.org.uk/ontology/JERMOntology#ModelAnalysisType
 

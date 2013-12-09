@@ -1,6 +1,8 @@
 class BiosamplesController < ApplicationController
   include Seek::BreadCrumbs
 
+  before_filter :biosamples_enabled?
+
   def existing_strains
       strains_of_organisms = []
       organisms = []

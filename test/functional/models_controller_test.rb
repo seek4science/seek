@@ -8,6 +8,7 @@ class ModelsControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
+  include FunctionalAuthorizationTests
   
   def setup
     login_as(:model_owner)
@@ -106,7 +107,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]    
   end
 
-  test 'creators do not show in list item' do
+
+  test 'creators show in list item' do
     p1=Factory :person
     p2=Factory :person
     model=Factory(:model,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
@@ -118,12 +120,12 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.creators.include?(p2)
     assert_select ".list_item_title a[href=?]",model_path(model),"ZZZZZ","the data file for this test should appear as a list item"
 
-    #check for avatars
+    #check for avatars: uploader won't be shown if he/she is not creator
     assert_select ".list_item_avatar" do
       assert_select "a[href=?]",person_path(p2) do
         assert_select "img"
       end
-      assert_select ["a[href=?]", person_path(p1)], 0
+
     end
   end
 
@@ -162,7 +164,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.assay')} Or create New Assay Here  for the #{I18n.t('model')}./
   end
 
   test "correct title and text for associating a modelling analysis for edit" do
@@ -173,7 +175,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.assay')} Or create New Assay Here  for the #{I18n.t('model')}./
   end
 
   test "fail gracefullly when trying to access a missing model" do
@@ -263,6 +265,55 @@ class ModelsControllerTest < ActionController::TestCase
     put :update,:id=> m.id, :model => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
     m = assigns(:model)
     assert_equal "editTestSample", m.samples.first.title
+  end
+
+  test "association of scales" do
+    scale1=Factory :scale, :pos=>1
+    scale2=Factory :scale, :pos=>2
+    model_params = valid_model
+
+    assert_difference("Model.count") do
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing => valid_sharing
+    end
+    m = assigns(:model)
+    assert_not_nil m
+    assert_equal [scale1,scale2],m.scales
+    scale3 = Factory(:scale)
+
+    put :update,:id=> m.id, :scale_ids=>[scale3.id.to_s]
+    m = assigns(:model)
+    assert_equal [scale3],m.scales
+  end
+
+  test "association of scales with params" do
+    scale1=Factory :scale, :pos=>1
+    scale2=Factory :scale, :pos=>2
+    model_params = valid_model
+    scale_ids_and_params=["{\"scale_id\":\"#{scale1.id}\",\"param\":\"fish\",\"unit\":\"meter\"}",
+                          "{\"scale_id\":\"#{scale2.id}\",\"param\":\"carrot\",\"unit\":\"cm\"}",
+                          "{\"scale_id\":\"#{scale1.id}\",\"param\":\"soup\",\"unit\":\"minute\"}"]
+
+    assert_difference("Model.count") do
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:scale_ids_and_params=>scale_ids_and_params,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing => valid_sharing
+    end
+    m = assigns(:model)
+    assert_not_nil m
+    assert_equal [scale1,scale2],m.scales
+
+    info = m.fetch_additional_scale_info(scale1.id)
+    assert_equal 2,info.count
+    info.sort!{|a,b| a["param"]<=>b["param"]}
+
+    assert_equal "fish",info[0]["param"]
+    assert_equal "meter",info[0]["unit"]
+    assert_equal "soup",info[1]["param"]
+    assert_equal "minute",info[1]["unit"]
+
+    info = m.fetch_additional_scale_info(scale2.id)
+    assert_equal 1,info.count
+    info = info.first
+    assert_equal "carrot",info["param"]
+    assert_equal "cm",info["unit"]
   end
 
   test "should create model" do
@@ -668,8 +719,8 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
   
-  def test_update_should_not_overright_contributor
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this model
+  def test_update_should_not_overwrite_contributor
+    login_as(:model_owner) #this user is a member of sysmo, and can edit this model
     model=models(:model_with_no_contributor)
     put :update, :id => model, :model => {:title=>"blah blah blah blah" }
     updated_model=assigns(:model)

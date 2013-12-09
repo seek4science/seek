@@ -7,6 +7,7 @@ class SpecimensControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
+  include FunctionalAuthorizationTests
 
   def setup
     login_as :owner_of_fully_public_policy

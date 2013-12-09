@@ -15,7 +15,7 @@
                          :actions_partial_disable => actions_partial_disable} -%>
 </div>
 <% if !scaled_results_disabled %>
-<% scale_titles = Scale.all.map(&:title)
+<% scale_titles = Scale.all.map(&:key)
    scale_titles = ['all'] + scale_titles
    scale_titles.reject { |s| s == 'all' }.each do |s| %>
     <div id="<%= s %>_results" class="scaled_items" style="display: none;"></div>

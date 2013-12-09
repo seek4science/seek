@@ -75,43 +75,19 @@ class AvatarsController < ApplicationController
     else  
       size = params[:size]
     end
-    size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
 
-    size = filter_size size
-
-    id = params[:id].to_i
-    
-    if !cache_exists?(id, size) # look in file system cache before attempting db access      
-
-      resize_image size
-
-    end
+    @avatar.resize_image(size)
     
     respond_to do |format|
       format.html do
-        send_file(full_cache_path(id, size), :type => 'image/jpg', :disposition => 'inline')
+        send_file(@avatar.full_cache_path(size), :type => 'image/jpg', :disposition => 'inline')
       end
       format.xml do        
-        @cache_file=full_cache_path(id, size)
+        @cache_file=@avatar.full_cache_path(size)
         @type='image/jpg'
       end
     end
     
-  end
-
-  def filter_size size
-    max_size=500
-    matches = size.match /([0-9]+)x([0-9]+).*/
-    if matches
-      width = matches[1].to_i
-      height = matches[2].to_i
-      width = max_size if width>max_size
-      height = max_size if height>max_size
-      return "#{width}x#{height}"
-    else
-      return "100x100"
-    end
-
   end
 
   #required when first running after switching avatars from .jpg format rather than .png (for lower bandwidth and page load time)
@@ -123,16 +99,6 @@ class AvatarsController < ApplicationController
     image.write(png_path)
     Rails.logger.info("Converted #{jpg_path} to #{png_path}")
   end
-
-  def resize_image size
-    @avatar.operate do |image|
-      image.resize size
-      @image_binary = image.image.to_blob
-    end
-    # cache data
-    cache_data!(@avatar, @image_binary, size)
-  end
-  
   
   # GET /users/1/avatars
   # GET /avatars -> denied by before_filter
@@ -262,41 +228,14 @@ class AvatarsController < ApplicationController
     # all avatars for current object are only shown to the owner of the object OR to any admin (if the object is not an admin themself);
     # also, show avatars to all members of a project/institution
     if User.admin_logged_in? || (@avatar_owner_instance.class.name == "Person" && @avatar_for_id.to_i == current_user.person.id.to_i) ||
-     (["Project", "Institution"].include?(@avatar_for) && @avatar_owner_instance.people.include?(current_user))
+     (["Project", "Institution"].include?(@avatar_for) && @avatar_owner_instance.can_be_edited_by?(current_user))
       @avatars = Avatar.where(:owner_type => @avatar_for, :owner_id => @avatar_for_id)
     else
-      flash[:error] = "You can only view avatars that belong to you or any projects/institutions where you are a member of."
+      flash[:error] = "You can only change avatars of an item you have the permission to edit."
       redirect_to(person_path(current_user.person))
       return false
     end
   end
-  
-  
-  # returns true if /avatars/show/:id?size=#{size}x#{size} is cached in file system
-  def cache_exists?(avatar, size=nil)
-    File.exists?(full_cache_path(avatar, size))
-  end
-  
-  # caches data (where size = #{size}x#{size})
-  def cache_data!(avatar, image_binary, size=nil)
-    FileUtils.mkdir_p(cache_path(avatar, size))
-    File.open(full_cache_path(avatar, size), "wb+") { |f| f.write(image_binary) }
-  end
-  
-  def cache_path(avatar, size=nil, include_local_name=false)
-    
-    id = avatar.kind_of?(Integer) ? avatar : avatar.id
-    rtn = "#{Rails.root}/tmp/avatars"
-    rtn = "#{rtn}/#{size}" if size
-    rtn = "#{rtn}/#{id}.#{Avatar.image_storage_format}" if include_local_name
-    
-    return rtn
-  end
-  
-  def full_cache_path(avatar, size=nil) 
-    cache_path(avatar, size, true) 
-  end
-  
   
   # this helper will store to session full form data of edited Person / Project / Institution
   # to allow users to go to "upload new avatar" screen without loosing any new data

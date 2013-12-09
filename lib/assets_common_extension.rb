@@ -288,11 +288,13 @@ module AssetsCommonExtension
         copying_content_blobs = previous_version_content_blobs.select{|cb| @retained_content_blob_ids.include?(cb.id)}
 
         copying_content_blobs.each do |cb|
-            new_content_blob= asset.content_blobs.create(:url=>cb.url,
+            new_content_blob= asset.content_blobs.build(:url=>cb.url,
                                                          :original_filename=>cb.original_filename,
                                                          :content_type=>cb.content_type,
                                                          :asset_version=>version)
             FileUtils.cp(cb.filepath, new_content_blob.filepath) if File.exists?(cb.filepath)
+            #need to save after copying the file, coz an after_save on contentblob relies on the file
+            new_content_blob.save
         end
       end
     end

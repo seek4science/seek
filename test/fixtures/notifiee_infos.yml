@@ -1,5 +1,0 @@
-fred_info:
-    notifiee: fred (Person)
-    receive_notifications: true    
-    unique_key: abc-def-ghi
-    

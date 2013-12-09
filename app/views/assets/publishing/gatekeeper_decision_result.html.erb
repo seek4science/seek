@@ -1,0 +1,61 @@
+<style type="text/css">
+    ul.decided_item {
+      padding-left: 1em;  
+    }
+    ul.decided_item li.type_and_title {
+        font-weight: bolder;
+    }
+</style>
+
+<div class="show_basic">
+
+  <h1>Your decision results:</h1>
+
+  <h2>Items that were successfully published:</h2>
+  <ul class="decided_item" id="published">
+    <% published_items = @approve_items - @problematic_items %>
+    <% if published_items.empty? -%>
+        <li class="none_text">No items</li>
+    <% else %>
+        <% published_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <% end -%>
+    <% end -%>
+  </ul>
+
+  <h2>Items that were rejected:</h2>
+  <ul class="decided_item" id="rejected">
+    <% if @reject_items.empty? -%>
+        <li class="none_text">No items</li>
+    <% else %>
+        <% @reject_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <% end -%>
+    <% end -%>
+  </ul>
+
+  <h2>Items that will decide later:</h2>
+  <ul class="decided_item" id="decide_later">
+    <% if @decide_later_items.empty? -%>
+        <li class="none_text">No items</li>
+    <% else %>
+        <% @decide_later_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <% end -%>
+    <% end -%>
+  </ul>
+
+  <% if !@problematic_items.empty? -%>
+      <h2>Items that were decided to make published but were not published due to an unforseen problem:</h2>
+      <ul class="decided_item" id="problematic">
+        <% @problematic_items.each do |item| -%>
+            <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
+        <% end -%>
+      </ul>
+  <% end -%>
+
+  <br/>
+  <br/>
+
+  <b><%= link_to "Back to your profile", person_path(params[:id].to_i) -%></b>
+</div>

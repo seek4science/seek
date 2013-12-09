@@ -30,7 +30,7 @@
 
         <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
           <p>
-            <%= fancy_multiselect(@model, :scales, {:possibilities => sort_scales(Scale.all)} )if @model.is_scalable?-%>
+            <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} if show_scales?%>
           </p>
 
         <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>

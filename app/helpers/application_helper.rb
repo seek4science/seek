@@ -7,14 +7,20 @@ module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
   include Recaptcha::ClientHelper
-  def date_as_string date,show_time_of_day=false
-    date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
-    if date.blank?
-      str="<span class='none_text'>No date defined</span>"
+  def date_as_string date,show_time_of_day=false,year_only_1st_jan=false
+    #for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
+    if (year_only_1st_jan && !date.blank? && date.month==1 && date.day==1)
+      str=date.year.to_s
     else
-      str = date.localtime.strftime("#{date.day.ordinalize} %B %Y")
-      str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+      date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
+      if date.blank?
+        str="<span class='none_text'>No date defined</span>"
+      else
+        str = date.localtime.strftime("#{date.day.ordinalize} %b %Y")
+        str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+      end
     end
+
     str.html_safe
   end
 
@@ -66,10 +72,10 @@ module ApplicationHelper
   end
 
   def hidden_items_html hidden_items, text='hidden item'
-    html = "<span class=\"none_text\">#{text}</span>"
+    html = "<span class='none_text'>#{text}</span>"
     contributor_links = hidden_item_contributor_links hidden_items
     if !contributor_links.empty?
-      html << "<span class=\"none_text\">(Please contact: #{contributor_links.join(', ')})</span>"
+      html << "<span class='none_text'> - Please contact: #{contributor_links.join(', ')}</span>"
     end
     html.html_safe
   end
@@ -82,7 +88,7 @@ module ApplicationHelper
       contributor_person = hi.contributing_user.person
       if current_user.try(:person) && hi.can_see_hidden_item?(current_user.person) && contributor_person.can_view?
         contributor_name = contributor_person.name
-        contributor_link = link_to(contributor_name, person_path(contributor_person))
+        contributor_link = "<a href='#{person_path(contributor_person)}'>#{contributor_name}</a>"
         contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
       end
     end
@@ -598,12 +604,14 @@ module ApplicationHelper
       #link_to_function 'Return to search', "window.history.back();"
     end
   end
-  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it or you are not authorized.",
-                         Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
-                         Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it or you are not authorized." ,
+  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
+                         Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
+                         Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
                          Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
                          Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
-                         Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized."
+                         Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
+                         Project=>"You cannot delete this #{I18n.t 'project'}. It might has people associated with it.",
+                         Institution=>"You cannot delete this Institution. It might has people associated with it."
   }
 
   def delete_icon model_item, user

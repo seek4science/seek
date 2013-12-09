@@ -5,6 +5,7 @@ syntax: glob
 data.sql
 
 db/*.sqlite3
+db/*.sqlite3-journal
 config/database.yml
 config/initializers/seek_local.rb
 config/environment_local.rb

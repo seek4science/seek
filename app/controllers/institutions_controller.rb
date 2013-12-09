@@ -1,8 +1,10 @@
 class InstitutionsController < ApplicationController
+
   include WhiteListHelper
   include IndexPager
   include CommonSweepers
-  
+
+  before_filter :find_requested_item, :only=>[:show,:edit,:update, :destroy]
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :only => [:destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
@@ -14,8 +16,6 @@ class InstitutionsController < ApplicationController
   # GET /institutions/1
   # GET /institutions/1.xml
   def show
-    @institution = Institution.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render :template=>'rdf/show'}
@@ -36,7 +36,6 @@ class InstitutionsController < ApplicationController
 
   # GET /institutions/1/edit
   def edit
-    @institution = Institution.find(params[:id])
     
     possible_unsaved_data = "unsaved_#{@institution.class.name}_#{@institution.id}".to_sym
     if session[possible_unsaved_data]
@@ -73,7 +72,6 @@ class InstitutionsController < ApplicationController
   # PUT /institutions/1
   # PUT /institutions/1.xml
   def update
-    @institution = Institution.find(params[:id])
 
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
     avatar_id = params[:institution].delete(:avatar_id).to_i
@@ -95,12 +93,17 @@ class InstitutionsController < ApplicationController
   # DELETE /institutions/1
   # DELETE /institutions/1.xml
   def destroy
-    @institution = Institution.find(params[:id])
-    @institution.destroy
 
     respond_to do |format|
-      format.html { redirect_to(institutions_url) }
-      format.xml  { head :ok }
+      if @institution.can_delete?
+        @institution.destroy
+        format.html { redirect_to(institutions_url) }
+        format.xml { head :ok }
+      else
+        flash[:error] = "Unable to delete this Institution"
+        format.html { redirect_to(institution_url) }
+        format.xml { render :xml => "Unable to delete this Institution", :status => :unprocessable_entity }
+      end
     end
   end
 

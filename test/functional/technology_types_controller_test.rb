@@ -37,7 +37,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   end
 
   test "should also show manage page for pal" do
-    login_as(:pal_user)
+    login_as Factory(:pal).user
     get :manage
     assert_response :success
     assert_not_nil assigns(:technology_types)

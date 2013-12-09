@@ -11,10 +11,12 @@ class InstitutionTest < ActiveSupport::TestCase
     
     assert_equal 1,i.work_groups.size
 
-    i.work_groups.first.people=[]
+    wg = i.work_groups.first
+    wg.people=[]
+    User.current_user = Factory(:admin).user
     i.destroy
-    assert_equal (n_inst-1),Institution.find(:all).size
-    assert_equal (n_wg-1), WorkGroup.find(:all).size, "the workgroup should also have been destroyed"
+    assert_equal nil, Institution.find_by_id(i.id)
+    assert_equal nil, WorkGroup.find_by_id(wg.id), "the workgroup should also have been destroyed"
   end
 
   def test_ordered_by_name
@@ -57,19 +59,18 @@ class InstitutionTest < ActiveSupport::TestCase
     i=institutions(:one)
     assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :can_edit as he is not a member"
 
-    u=users(:project_manager)
-    i=institutions(:two)
-    assert i.can_be_edited_by?(u),"Institution :two should be editable by user :project_manager"
-
     i=institutions(:one)
     assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :project_manager since this institution is not participating in any of his projects"
 
-    i=Factory(:institution, :projects => [u.person.projects.first])
-    assert i.can_be_edited_by?(u), "This institution should be editable by user :project_manager since one of this institution is participating in one of his projects"
+    pm = Factory(:project_manager)
+    i = pm.institutions.first
+    i2 = Factory(:institution)
+    assert i.can_be_edited_by?(pm.user), "This institution should be editable as this user is project manager of a project this institution is linked to"
+    assert !i2.can_be_edited_by?(pm.user), "This institution should be not editable as this user is project manager but not of a project this institution is linked to"
 
     i=institutions(:one)
-    u=users(:quentin)
-    assert i.can_be_edited_by?(u),"Institution :one should be editable by user :quentin as he's an admin"
+    u=Factory(:admin).user
+    assert i.can_be_edited_by?(u),"Institution :one should be editable by this user, as he's an admin"
 
     u=users(:cant_edit)
     i=institutions(:two)
@@ -129,5 +130,30 @@ class InstitutionTest < ActiveSupport::TestCase
     uuid = x.attributes["uuid"]
     x.save
     assert_equal x.uuid, uuid
+  end
+
+  test "can_delete?" do
+    institution = Factory(:institution)
+
+    #none-admin can not delete
+    user = Factory(:user)
+    assert !user.is_admin?
+    assert institution.work_groups.collect(&:people).flatten.empty?
+    assert !institution.can_delete?(user)
+
+    #can not delete if workgroups contain people
+    user = Factory(:admin).user
+    assert user.is_admin?
+    institution = Factory(:project)
+    work_group = Factory(:work_group, :project => institution)
+    a_person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    assert !institution.work_groups.collect(&:people).flatten.empty?
+    assert !institution.can_delete?(user)
+
+    #can delete if admin and workgroups are empty
+    work_group.group_memberships.delete_all
+    assert institution.work_groups.reload.collect(&:people).flatten.empty?
+    assert user.is_admin?
+    assert institution.can_delete?(user)
   end
 end

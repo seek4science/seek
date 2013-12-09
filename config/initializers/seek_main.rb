@@ -9,6 +9,7 @@ require 'acts_as_taggable_extensions'
 require 'acts_as_isa'
 require 'acts_as_yellow_pages'
 require 'seek/acts_as_uniquely_identifiable'
+require 'seek/acts_as_fleximage_extension'
 require 'acts_as_favouritable'
 require 'acts_as_asset'
 require 'send_subscriptions_when_activity_logged'
@@ -42,8 +43,10 @@ require 'background_reindexing'
 require 'subscribable'
 require 'seek/permissions/publishing_permissions'
 
+require 'seek/scalable'
+
 require 'doi_query_tool_extension'
-require 'pubmed_query_tool_extension'
+
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE

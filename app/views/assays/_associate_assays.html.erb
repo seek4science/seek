@@ -1,4 +1,6 @@
 <%
+    return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
+
     show_relationships = resource.is_a?(DataFile)
     resource_text ||= text_for_resource(resource)
     all_assays=authorised_assays
@@ -15,8 +17,13 @@
       single_assay_class_text = t 'assays.modelling_analysis'
       assay_class_text = single_assay_class_text.pluralize
     else
-      assay_class_text = "#{t('assays.experimental_assay').pluralize} and #{t('assays.modelling_analysis').pluralize}"
-      single_assay_class_text = "#{t('assays.experimental_assay')} or #{t('assays.modelling_analysis')}"
+      if Seek::Config.modelling_analysis_enabled
+        assay_class_text = "#{t('assays.experimental_assay').pluralize} and #{t('assays.modelling_analysis').pluralize}"
+        single_assay_class_text = "#{t('assays.experimental_assay')} or #{t('assays.modelling_analysis')}"
+      else
+        assay_class_text = "#{t('assays.experimental_assay').pluralize}"
+        single_assay_class_text = "#{t('assays.experimental_assay')}"
+      end
     end
 %>
 
@@ -38,8 +45,9 @@
       </div>
       <div class="association_step">
         <p style="color: #666666;">
-             You may select an existing editable <%= single_assay_class_text -%> to associate with this <%= resource_text -%>.
+          You may select an existing editable Assay Or create <%= link_to h("New Assay Here"), new_assay_path(:create_from_asset => :true), :onclick => "window.open(this.href);return false;" %>  for the <%= resource_text -%>.
         </p>
+
         <% if show_relationships -%>
             <%= select_tag :possible_assays,
               options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),

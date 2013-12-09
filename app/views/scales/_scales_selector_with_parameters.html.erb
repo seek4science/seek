@@ -1,0 +1,202 @@
+
+<%
+   name = "scale_ids"
+   possibilities ||= Scale.all
+   selected ||= object.scales.map(&:id)
+   intro ||= "The following #{t('scale').pluralize} are associated with this #{t('model')}:"
+   default_choice_text ||= "Select Item ..."
+   button_text ||= "Associate with this #{t('model')}"
+   value_method ||= :id
+   text_method ||= :title
+   html_options ||= ''
+   association_step_content ||= nil
+
+
+   default_choice = [default_choice_text, 0]
+   collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
+   possibilities_collection_id = "possible_#{collection_id}"
+   possibilities_options ||= {}
+   possibilities_options[:onchange]="javascript:possibilities_selection_changed();"
+
+   fold_title = help_icon("Here you can associate the #{t('model')} with specific #{t('scale').pluralize}")
+   fold_title << " #{t('scale').pluralize}"
+%>
+
+<%= require_js "fancy_multiselect.js"  %>
+
+<div id="add_scales_form" class="fold">
+
+  <div class="foldTitle">
+    <%= fold_title %>
+  </div>
+
+  <div id="add_scales_form_fold_content" class="foldContent">
+
+    <div class="yui-u first" <%= html_options %>>
+      <p style="color: #666666;">
+        <%= intro %>
+      </p>
+
+      <div id="<%= collection_id %>_display_area" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text">Loading...</span>
+      </div>
+      <div class="association_step">
+
+        <%= select_tag possibilities_collection_id,
+                       options_for_select([default_choice]|possibilities.collect { |o| [truncate(h(o.send(text_method)), :length => 120), o.send(value_method)] }),
+                       possibilities_options -%>
+        <%# This ensures that the parameter is always sent, even when nothing is selected.
+        It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
+        value of the parameter will be ["","1","2","3"]. This is compatible with the rails
+        association association_ids= methods, which reject 'blank' values automatically.%>
+        <span id='additional_scale_details' style="display:none;" >
+            Param name: <%= text_field_tag 'choose_parameter_for_scale_id' -%>
+            Unit: <%= text_field_tag 'choose_unit_for_scale_id' -%>
+        </span>
+        <%= hidden_field_tag "#{name}[]", "" %>
+        <%= select_tag 'scale_ids_and_params',[],{:multiple=>true, :style=>"display:none"} -%>
+
+        <%= select_tag name,
+                       options_from_collection_for_select(possibilities, value_method, text_method, selected),
+                       {:multiple => true, :style => "display:none;"} -%>
+        <%= association_step_content -%>
+      </div>
+
+      <br/>
+      <%= link_to_function(image('new') + "#{button_text}", "addSelectedToFancy2('#{collection_id}', $F('#{possibilities_collection_id}'))", :id => "add_to_#{collection_id}_link", :class => "block_link") %>
+
+
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+    Event.observe(window, 'load', function () {
+        updateFancyMultiselect2('<%= collection_id %>');
+    });
+
+    function possibilities_selection_changed() {
+        if ($F('possible_scale_ids') == 0) {
+            $('add_to_scale_ids_link').hide();
+            $('additional_scale_details').hide();
+        }
+        else {
+            $('add_to_scale_ids_link').show();
+            $('additional_scale_details').show();
+        }
+    }
+
+    function addSelectedToFancy2(multiselect, value) {
+        value = {scale_id: value,
+                 param: $('choose_parameter_for_scale_id').value,
+                 unit: $('choose_unit_for_scale_id').value
+
+        }
+        if (!scale_and_params_selected(value)) {
+            $(multiselect).setValue($F(multiselect).concat(value.scale_id));
+            updateScaleAndParamsList(value);
+            updateFancyMultiselect2(multiselect);
+        } else {
+            alert('Item already exists!');
+        }
+    }
+
+    function scale_and_params_selected(json) {
+        var found=false;
+        $('scale_ids_and_params').select("option:selected").each(function(opt){
+            var json2=JSON.parse(opt.value);
+            console.log(json);
+            console.log(json2);
+            if (!found) {
+                found = (json.scale_id == json2.scale_id && json.param==json2.param);
+            }
+        });
+        return found;
+
+    }
+
+    function updateScaleAndParamsList(value) {
+        var opt = document.createElement('option');
+        opt.value=JSON.stringify(value);
+        opt.innerHTML=JSON.stringify(value);
+        opt.selected=true;
+        $('scale_ids_and_params').appendChild(opt);
+    }
+
+    function updateFancyMultiselect2(multiselect) {
+        multiselect = $(multiselect);
+        var display_area = $(multiselect.id + '_display_area');
+
+        var selected_options = multiselect.childElements().select(function(c){return c.selected});
+        if(selected_options.length > 0) {
+            display_area.innerHTML = '<ul class="related_asset_list"></ul>'
+            var list = display_area.select('ul')[0];
+            selected_options.each(function(opt){
+                insertFancyListItem2(multiselect, list, opt);
+            });
+        } else {
+            display_area.innerHTML = '<span class="none_text">None</span>';
+        }
+        multiselect.fire('fancySelect:update');
+    }
+
+    function insertFancyListItem2(multiselect, displaylist, option) {
+        var json_list = fetchJsonForScale(option.value);
+        for (i=0; i<json_list.length;i++) {
+            json = json_list[i];
+            var text = option.text;
+            text += " (param:"+json.param+", unit:"+json.unit+")";
+            var title_span = '<span title="' + text.escapeHTML() + '">' + text.truncate(100).escapeHTML() + '</span>';
+            var remove_link = '<a href="" onclick="javascript:removeFromFancy2(';
+            remove_link += "'" + $(multiselect).id + "','";
+            remove_link += option.value + "','"+json.param+"'";
+            remove_link += '); return(false);">remove</a>';
+            displaylist.insert('<li>' + title_span +'&nbsp;&nbsp;<small style="vertical-align: middle;">[' + remove_link + ']</small></li>');
+        }
+
+    }
+
+    function fetchJsonForScale(scale_id) {
+
+        var result=new Array();
+        var options = $('scale_ids_and_params').childElements().select(function(c){return c.selected});
+        options.each(function(opt) {
+
+                var json = JSON.parse(opt.value);
+                if (json.scale_id == scale_id.toString()) {
+                    result.push(json);
+                }
+
+        });
+        return result;
+    }
+
+    function removeFromFancy2(multiselect, value,param) {
+
+        console.log(value);
+        console.log(param);
+        $('scale_ids_and_params').select("option:selected").each(function(opt){
+            var item=JSON.parse(opt.value)
+
+            if (item.scale_id == value && item.param==param) {
+                console.log(opt.value);
+                opt.remove();
+            }
+        });
+        var json_list = fetchJsonForScale(value);
+        if (json_list.length==0) {
+            $(multiselect).setValue($F(multiselect).without(value));
+        }
+        updateFancyMultiselect2(multiselect);
+
+    }
+
+    <% object.scales.each do |scale| -%>
+    <%
+       info_list = object.fetch_additional_scale_info(scale.id)
+       info_list.each do |info|
+    -%>
+
+            updateScaleAndParamsList(<%= info.to_json.html_safe -%>);
+        <% end %>
+    <% end -%>
+</script>

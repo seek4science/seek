@@ -1,0 +1,2 @@
+class WorkGroupDeleteError < StandardError
+end

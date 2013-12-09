@@ -6,15 +6,15 @@ class WorkGroup < ActiveRecord::Base
 
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :institution, :project
-  
+
   def destroy
     if people.empty?
         super
     else
-      raise Exception.new("Cannot delete with associated people. This WorkGroup has "+people.size.to_s+" people associated with it")
+      raise Exception.new("You can not delete the " +description+ ". This Work Group has "+people.size.to_s+" people associated with it. Please disassociate first the people from this Work Group")
     end
   end
-  
+
   def description
     project.name + " at " + institution.name
   end

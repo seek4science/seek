@@ -36,6 +36,11 @@ Pdf rendering library - https://github.com/mozilla/pdf.js
 
 jScrollPane - http://jscrollpane.kelvinluck.com/
 
+Cytoscape.js - http://cytoscape.github.io/cytoscape.js/
+
+The scales image zooming a slider was based on source code in a blog post by Mike Thomas as http://atomicrobotdesign.com/blog/web-development/controlling-html-using-the-jquery-ui-slider-and-links/
+and the contribution of Elina Wetsch, the former web developer of SDBV Group at HITS gGmbH.
+
 == Icons and themes
 
 FamFamFam icon set (flags and silk) - http://www.famfamfam.com/lab/icons/silk/
@@ -55,6 +60,8 @@ Strain image - from Wikipedia - http://en.wikipedia.org/wiki/File:Enterococcus_f
 expand plus icon (Creative Commons Attribution (by)) - http://findicons.com/icon/439241/toggle_expand?id=439541
 collapse minus icon (Creative Commons Attribution (by)) - http://findicons.com/icon/439180/toggle_collapse?id=439440
 
+Waiting icon - FatCow Web Hosting - http://www.fatcow.com/
 
+Font awesome - http://fortawesome.github.io/Font-Awesome/
 == scale images (To BE UPDATED)
 scale slider images in public/images/slider are not allowed to be modified and redistributed.

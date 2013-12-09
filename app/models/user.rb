@@ -72,7 +72,7 @@ class User < ActiveRecord::Base
   end
 
   def self.project_manager_logged_in?
-    self.logged_in_and_registered? && self.current_user.person.is_project_manager?
+    self.logged_in_and_registered? && self.current_user.person.is_project_manager_of_any_project?
   end
 
   #a person can be logged in but not fully registered during
@@ -197,8 +197,8 @@ class User < ActiveRecord::Base
     !person.nil? && person.is_admin?
   end
 
-  def is_project_manager?
-    !person.nil? && person.is_project_manager?
+  def is_project_manager? project
+    !person.nil? && person.is_project_manager?(project)
   end
   
   def can_edit_projects?

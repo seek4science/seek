@@ -5,7 +5,7 @@ require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'l
 class TextValue < ActiveRecord::Base
 
   def self.all_tags attributes=["tag","expertise","tool"]
-    self.with_attribute_names attributes
+    self.with_attribute_names(attributes).compact
   end
 
   def tag_count

@@ -53,7 +53,7 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, :sharing_scope => 0, :contributor_types => ActiveSupport::JSON.encode(contributor_types), :contributor_values => ActiveSupport::JSON.encode(contributor_values), :resource_name => 'data_file'
 
     assert_response :success
-    assert_select "h2",:text=>"Additional fine-grained sharing permissions:", :count=>1
+    assert_select "h3",:text=>"Fine-grained sharing permissions:", :count=>1
 
     assert_select 'p', :text=>"#{person.name} can #{Policy.get_access_type_wording(Policy::MANAGING, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
     assert_select 'p', :text=>"Members of Favourite group #{favorite_group.name} have #{Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP, 'data_file'.camelize.constantize.new()).downcase}", :count => 1

@@ -1,17 +1,20 @@
 <%= render :partial => "general/item_title",:locals=>{:item=>@assay} %>
 
 <%
-@assay_word=@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay') %>
+assay_word=@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
+assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type"
+
+%>
 <ul class="sectionIcons">
     <%= render :partial => "subscriptions/subscribe", :locals => {:object => @assay }%>
     <% if @assay.can_manage? -%>
-      <li><%= image_tag_for_key('manage', edit_assay_path, nil, nil, "Manage #{@assay_word}") -%></li>
+      <li><%= image_tag_for_key('manage', edit_assay_path, nil, nil, "Manage #{assay_word}") -%></li>
     <% elsif @assay.can_edit?-%>
-      <li> <%= image_tag_for_key('edit', edit_assay_path, "Edit #{@assay_word} Details", nil, "Edit #{@assay_word} Details") -%></li>
+      <li> <%= image_tag_for_key('edit', edit_assay_path, "Edit #{assay_word} Details", nil, "Edit #{assay_word} Details") -%></li>
     <% end -%>
     <%= delete_icon(@assay,current_user) %>
     <% if logged_in? and current_user.person.member? %>
-      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"assays", :id=>@assay.id), nil, nil, "New #{@assay_word} based on this one") %></li>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"assays", :id=>@assay.id), nil, nil, "New #{assay_word} based on this one") %></li>
     <% end %>
 </ul>
 
@@ -31,12 +34,14 @@
           </label>
           <%= @assay.id -%>
       </p>
+      <% if Seek::Config.modelling_analysis_enabled %>
       <p class="id">
           <label>
               Class: 
           </label>
           <%= @assay.assay_class.title -%>
       </p>
+      <% end %>
       <% if @assay.owner.can_view? %>
           <p class="id">
               <label>
@@ -56,7 +61,7 @@
           <%= studies_link_list [@assay.study] %>
       </p>
       <p id="assay_type">
-          <b><%= @assay_word -%> type: </b>
+          <b><%= assay_type_text -%>:</b>
           <%= link_to h(@assay.assay_type.title.capitalize), @assay.assay_type -%>
       </p>
       <% unless @assay.is_modelling? -%>
@@ -66,58 +71,51 @@
       </p>
       <% end -%>
 
-
-      <p id="organism">
+      <% if Seek::Config.organisms_enabled %>
+        <p id="organism">
         <b>Organisms:</b>
-          <%= list_organisms_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
-      </p>
+            <%= list_organisms_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
+        </p>
+      <% end %>
+    
 
      <%= item_description @assay.description -%>
 
-     <%# FIXME: should be in a css file rather than in the middle of a page -%>
-      <style type="text/css">
-          div.data_model_relationship {
-              border: 1px dotted black;
-              background-color: #EEEEFF;
-              padding: 5px
-          }
-          
-          div.data_model_relationship ul li {
-              list-style: none;
-              list-style-position: inside;
-              margin-left: 5px;
-          }
-          
-          div.data_model_relationship span {
-              color: #1465FF;
-          }
 
-      </style>
+
       <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
-      <div class="data_model_relationship">
-          <% unless @assay.models.empty? %>
-          <b><%= @assay.models.size > 1 ? t('model').pluralize : t('model') %>:</b>
-          <br/>
-          <ul>
-              <% @assay.model_masters.each do |m| %>
-              <li>
-                  <%= link_to truncate(h(m.title), :length=>110), show_resource_path(m) %>
-              </li>
+          <div class="data_model_relationship">
+              <% unless @assay.models.empty? %>
+              <b><%= @assay.models.size > 1 ? t('model').pluralize : t('model') %>:</b>
+              <br/>
+              <ul class="related_models">
+                  <% @assay.model_masters.each do |m| %>
+                  <li>
+                      <% if m.can_view? %>
+                        <%= link_to truncate(h(m.title), :length=>110), show_resource_path(m) %>
+                      <% else %>
+                        <span class="none_text">Hidden <%= t('model') %></span>
+                      <% end %>
+                  </li>
+                  <% end %>
+              </ul>
               <% end %>
-          </ul>
-          <% end %>
-          <% unless @assay.data_files.empty? %>
-          <b>Data:</b>
-          <br/>
-          <ul>
-              <% @assay.data_file_masters.each do |d| %>
-              <li>
-                  <%= link_to truncate(h(d.title), :length=>110), show_resource_path(d) %><%= d.relationship_type(@assay) ? (" <span>(" + d.relationship_type(@assay).title + ")</span>").html_safe : "" %>
-              </li>
+              <% unless @assay.data_files.empty? %>
+              <b>Data:</b>
+              <br/>
+              <ul class="related_data_files">
+                  <% @assay.data_file_masters.each do |d| %>
+                  <li>
+                    <% if d.can_view? %>
+                        <%= link_to truncate(h(d.title), :length=>110), show_resource_path(d) %>
+                    <% else %>
+                        <span class="none_text">Hidden <%= t('data_file') %></span><%= d.relationship_type(@assay) ? (" <span class='relationship_type'>(" + d.relationship_type(@assay).title + ")</span>").html_safe : "" %>
+                    <% end %>
+                  </li>
+                  <% end %>
+              </ul>
               <% end %>
-          </ul>
-          <% end %>
-      </div>
+          </div>
       <% end %>
 
 	  
@@ -126,10 +124,11 @@
 	
 
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @assay, :creators=>[@assay.owner] } %>
-
+    <div style="clear:both">
+        <%= render :partial=>"general/isa_graph", :locals => {:root_item => @assay.study, :current_item => @assay, :deep => true} %>
+    </div>
 
     <div style="clear:both">
-        <%= embedded_isa_svg(@assay.study, true, @assay) -%>
         <%= render :partial=>"general/items_related_to",:object => @assay %>
     </div>
 </div>

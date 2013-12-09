@@ -1,24 +1,29 @@
-<% from_homepage = (request.url== root_url) ? true :false %>
-<% cache "header_#{from_homepage}" do -%>
-    <% if from_homepage || Seek::Config.is_virtualliver %>
-        <table width="100%">
-          <tr>
-            <td style="text-align:left">
-              <%= link_to image_tag("seek-logo-smaller.png", :alt => "SEEK", :title => "SEEK"),
-                          root_path %>
-            </td>
-            <td style="width:90%;">
-              <%= render :partial => "layouts/header_text_main" -%>
-            </td>
 
-            <td style="text-align:right;">
-              <% if Seek::Config.header_image_enabled %><%= link_to image_tag(Seek::Config.header_image, :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title),
-                                                                    Seek::Config.header_image_link %>
-              <% end %>
-            </td>
-          </tr>
-        </table>
-    <% else %>
+<%
+logged_in_class = logged_in_and_registered? ? "class=logged_in" : ""
+%>
 
-    <% end %>
+<% cache "header_#{logged_in_and_registered?}" do -%>
+
+    <ul id="header">
+      <li id="seek_logo">
+        <%= link_to image_tag("seek-logo-smaller.png", :alt => "SEEK", :title => "SEEK"),
+                    root_path %>
+      </li>
+
+      <li id="header_text" <%= logged_in_class -%>>
+        <%= render :partial => "layouts/header_text_main" -%>
+      </li>
+
+      <li id="image_block" <%= logged_in_class -%>>
+        <% if logged_in_and_registered? %>
+            <%= link_to image_tag(Seek::Config.header_image, :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title),Seek::Config.header_image_link,:class=>"logo_link" %>
+        <% else %>
+        <% if Seek::Config.header_image_enabled %><%= link_to image_tag(Seek::Config.header_image, :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title),
+                                                              Seek::Config.header_image_link %>
+        <% end %>
+        <% end %>
+      </li>
+    </ul>
+
 <% end -%>

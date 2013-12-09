@@ -15,17 +15,17 @@ class SearchController < ApplicationController
 
     @results = select_authorised @results
 
-    @results_scaled = Scale.all.collect {|scale| [scale.title, @results.select {|item| !item.respond_to?(:scale_ids) or item.scale_ids.include? scale.id}]}
+    @results_scaled = Scale.all.collect {|scale| [scale.key, @results.select {|item| !item.respond_to?(:scale_ids) or item.scale_ids.include? scale.id}]}
     @results_scaled << ['all', @results]
     @results_scaled = Hash[*@results_scaled.flatten(1)]
     logger.info @results_scaled.inspect
     if params[:scale]
       # when user does not login, params[:scale] is nil
       @results = @results_scaled[params[:scale]]
-      @scale_title = params[:scale]
+      @scale_key = params[:scale]
     else
        @results = @results_scaled['all']
-       @scale_title = 'all'
+       @scale_key = 'all'
     end
 
 
@@ -58,13 +58,13 @@ class SearchController < ApplicationController
 
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
-          sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event, Sample, Specimen]
+          sources = Seek::Util.searchable_types
           sources.delete(Specimen) if !Seek::Config.is_virtualliver
           sources.each do |source|
             search_result = source.search do |query|
               query.keywords(downcase_query)
             end.results
-            search_result = search_result.sort_by(&:published_date).reverse if source == Publication
+            search_result = search_result.sort_by(&:published_date).reverse if source == Publication && Seek::Config.is_virtualliver
             @results |= search_result
           end
       else

@@ -6,9 +6,8 @@ class AssaysController < ApplicationController
 
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show]
 
-  include Seek::Publishing::GatekeeperPublish
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs
@@ -52,6 +51,10 @@ class AssaysController < ApplicationController
     study = Study.find(params[:study_id]) if params[:study_id]
     @assay.study = study if params[:study_id] if study.try :can_edit?
     @assay_class=params[:class]
+
+    #jump straight to experimental if modelling analysis is disabled
+    @assay_class ||= "experimental" unless Seek::Config.modelling_analysis_enabled
+
     @assay.assay_class=AssayClass.for_type(@assay_class) unless @assay_class.nil?
 
     investigations = Investigation.all.select &:can_view?
@@ -99,6 +102,7 @@ class AssaysController < ApplicationController
     @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
 
     update_annotations @assay #this saves the assay
+    update_scales @assay
 
 
       if @assay.save
@@ -158,6 +162,7 @@ class AssaysController < ApplicationController
     end
 
     update_annotations @assay
+    update_scales @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     @assay.attributes = params[:assay]
@@ -208,9 +213,6 @@ class AssaysController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.svg { render :text=>to_svg(@assay.study, params[:deep]=='true', @assay) }
-      format.dot { render :text=>to_dot(@assay.study, params[:deep]=='true', @assay) }
-      format.png { render :text=>to_png(@assay.study, params[:deep]=='true', @assay) }
     end
   end
 

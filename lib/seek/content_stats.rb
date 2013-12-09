@@ -50,7 +50,9 @@ module Seek
       private
 
       def authorised_assets asset_type,action, projects, user
-        asset_type.constantize.all_authorized_for(action, user,projects)
+       assets = asset_type.constantize.all_authorized_for(action, user,projects)
+       assets = assets.select{|asset| asset.is_downloadable?} if action=="download"
+       assets
       end
       
       def assets_size assets

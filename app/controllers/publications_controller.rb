@@ -4,9 +4,10 @@ class PublicationsController < ApplicationController
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
+  include Seek::BioExtension
 
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
 
   include Seek::BreadCrumbs
@@ -31,9 +32,6 @@ class PublicationsController < ApplicationController
       format.html # show.html.erb
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.svg { render :text=>to_svg(@publication,params[:deep]=='false',@publication)}
-      format.dot { render :text=>to_dot(@publication,params[:deep]=='false',@publication)}
-      format.png { render :text=>to_png(@publication,params[:deep]=='false',@publication)}
       format.enw { send_data @publication.endnote, :type => "application/x-endnote-refer", :filename => "#{@publication.title}.enw" }
     end
   end
@@ -66,6 +64,7 @@ class PublicationsController < ApplicationController
     assay_ids = params[:assay_ids] || []
 
       if @publication.save
+        update_scales @publication
         result.authors.each_with_index do |author, index|
           pa = PublicationAuthor.new()
           pa.publication = @publication
@@ -143,7 +142,9 @@ class PublicationsController < ApplicationController
         end      
         #Add contributor
         @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.policy, :access_type => Policy::MANAGING)
-        
+
+        update_scales @publication
+
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }
@@ -183,11 +184,7 @@ class PublicationsController < ApplicationController
     result = get_data(@publication, pubmed_id, doi)
     if !result.error.nil?
       if protocol == "pubmed"
-        if key.match(/[0-9]+/).nil?
-          @error_text = "Please ensure the PubMed ID is entered in the correct format, e.g. <i>16845108</i>"
-        else
-          @error_text = "No publication could be found on PubMed with that ID"
-        end
+        @error_text = result.error
       elsif protocol == "doi"
         if key.match(/[0-9]+(\.)[0-9]+.*/).nil?
           @error_text = "There was a problem with #{result.doi} - please ensure the DOI is entered in the correct format, e.g. <i>10.1093/nar/gkl320</i>"
@@ -294,8 +291,11 @@ class PublicationsController < ApplicationController
   def fetch_pubmed_or_doi_result pubmed_id,doi
     result = nil
     if pubmed_id
-      query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
-      result = query.fetch(pubmed_id)
+      begin
+        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      rescue Exception=>e
+        result.error = e.message
+      end
     elsif doi
       query = DoiQuery.new(Seek::Config.crossref_api_email)
       result = query.fetch(doi)
@@ -315,8 +315,13 @@ class PublicationsController < ApplicationController
 
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
-      query = PubmedQuery.new("sysmo-seek",Seek::Config.pubmed_api_email)
-      result = query.fetch(pubmed_id)
+      begin
+        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      rescue Exception=>e
+        result = Bio::Reference.new({})
+        result.error = e.message
+      end
+
       unless result.nil? || !result.error.nil?
         publication.extract_pubmed_metadata(result)
       end

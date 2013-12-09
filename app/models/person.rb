@@ -4,6 +4,7 @@ class Person < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::Taggable
+  include Seek::AdminDefinedRoles
 
   acts_as_yellow_pages
   scope :default_order, order("last_name, first_name")
@@ -96,42 +97,6 @@ class Person < ActiveRecord::Base
 
   has_many :subscriptions,:dependent => :destroy
 
-  requires_can_manage :roles_mask
-
-  ROLES = %w[admin pal project_manager asset_manager gatekeeper]
-  ROLES_MASK_FOR_ADMIN = 2**ROLES.index('admin')
-  ROLES_MASK_FOR_PAL = 2**ROLES.index('pal')
-  ROLES_MASK_FOR_PROJECT_MANAGER = 2**ROLES.index('project_manager')
-
-  ROLES.each do |role|
-      eval <<-END_EVAL
-            def is_#{role}?
-              roles.include?('#{role}')
-            end
-
-            def is_#{role}
-              roles.include?('#{role}')
-            end
-
-            def is_#{role}=(yes)
-              if yes
-                add_roles ['#{role}']
-              else
-                remove_roles ['#{role}']
-              end
-            end
-
-            def self.#{role}s
-              Person.all.select(&:is_#{role}?)
-            end
-      END_EVAL
-    end
-
-   #the roles defined within SEEK
-  def roles=(roles)
-    self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.sum
-  end
-
   def queue_update_auth_table
     if changes.include?("roles_mask")
       AuthLookupUpdateJob.add_items_to_queue self
@@ -175,21 +140,7 @@ class Person < ActiveRecord::Base
     result
   end
 
-  def roles
-    ROLES.reject do |r|
-      ((roles_mask || 0) & 2**ROLES.index(r)).zero?
-    end
-  end
 
-  def add_roles roles
-    add_roles = roles - (roles & self.roles)
-    self.roles_mask = self.roles_mask.to_i + ((add_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
-  end
-
-  def remove_roles roles
-    remove_roles = roles & self.roles
-    self.roles_mask = self.roles_mask.to_i - ((remove_roles & ROLES).map { |r| 2**ROLES.index(r) }.sum)
-  end
 
 
 
@@ -275,8 +226,7 @@ class Person < ActiveRecord::Base
   #Person#projects is OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   def projects
       #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-      @known_projects ||= work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
-      @known_projects
+      work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
   end
 
 
@@ -355,12 +305,27 @@ class Person < ActiveRecord::Base
   #(admin or project managers of this person) and (this person does not have a user or not the other admin)
   #themself
   def can_be_edited_by?(subject)
-    subject == nil ? false : (((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?)) || (subject == self.user))
+    return false if subject.nil?
+    subject = subject.user if subject.is_a?(Person)
+    subject == self.user || subject.is_admin? || self.is_managed_by?(subject)
   end
 
-  #admin or project manager can administer themselves and the other people, except the other admins
+  #determines if this person is the member of a project for which the user passed is a project manager,
+  # #and the current person is not an admin
+  def is_managed_by? user
+    return false if self.is_admin?
+    match = self.projects.find do |p|
+      user.person.is_project_manager?(p)
+    end
+    !match.nil?
+  end
+
+  #admin can administer other people, project manager can administer other people except other admins and themself
   def can_be_administered_by?(user)
-    user == nil ? false : ((user.is_admin?) || (user.is_project_manager?)) &&  (self.user==user || !self.user.try(:is_admin?))
+    return false if user.nil? || user.person.nil?
+
+
+    user.is_admin? || (user.person.is_project_manager_of_any_project? && (self.is_admin? || self!=user.person))
   end
 
   def can_view? user = User.current_user
@@ -368,7 +333,7 @@ class Person < ActiveRecord::Base
   end
 
   def can_edit? user = User.current_user
-    new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
+    new_record? || can_be_edited_by?(user)
   end
 
 
@@ -465,15 +430,6 @@ class Person < ActiveRecord::Base
       end
     end
   end
-
-  def is_gatekeeper_of? item
-    is_gatekeeper? && !(item.projects & projects).empty?
-  end
-
-  def is_asset_manager_of? item
-    is_asset_manager? && !(item.projects & projects).empty?
-  end
-  
 
   private
 

@@ -66,16 +66,18 @@ module Seek
           people.select { |p| p.project_roles_of_project(projects).include?(coordinator_role) }
 
         end
-
-        #this is the intersection of project role and seek role
-        def pals
-          pal_role=ProjectRole.pal_role
-          projects = [self] + descendants
-          people.select { |p| p.is_pal? }.select do |possible_pal|
-            possible_pal.project_roles_of_project(projects).include?(pal_role)
-          end
-        end
-
+        #
+        ##this is the intersection of project role and seek role
+        #def pals
+        #  people_with_the_role("pal")
+        #
+        #  pal_role=ProjectRole.pal_role
+        #  projects = [self] + descendants
+        #  people.select { |p| p.is_pal? }.select do |possible_pal|
+        #    possible_pal.project_roles_of_project(projects).include?(pal_role)
+        #  end
+        #end
+        #
         #this is project role
         def pis
           pi_role = ProjectRole.find_by_name('PI')
@@ -115,14 +117,12 @@ module Seek
         end
 
         def projects
-          @known_projects ||= direct_projects.collect { |proj| [proj] + proj.ancestors }.flatten.uniq
-          @known_projects
+           direct_projects.collect { |proj| [proj] + proj.ancestors }.flatten.uniq
         end
 
 
         def projects_and_descendants
-          @project_and_descendants ||= direct_projects.collect { |proj| [proj] + proj.descendants }.flatten.uniq
-          @project_and_descendants
+          direct_projects.collect { |proj| [proj] + proj.descendants }.flatten.uniq
         end
       end
 

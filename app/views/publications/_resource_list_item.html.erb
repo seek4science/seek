@@ -21,7 +21,7 @@
 
 <%= list_item_attribute "DOI", resource.doi, "http://dx.doi.org/#{resource.doi}", {:onclick => "window.open(this.href);return false;"} unless resource.doi.nil? %>
 
-<%= list_item_attribute "Date Published", date_as_string(resource.published_date) %>
+<%= list_item_attribute "Date Published", "<span>#{date_as_string(resource.published_date,false,true)}</span>" %>
 </div>
 
 <div class="list_item_right_column">
@@ -32,12 +32,10 @@
 
 <%= list_item_attribute "Citation", h(resource.citation)%>
 
-<%= list_item_tag_list resource %>
-
 </div>
 
 <div class="list_item_whole_width">
-<%= list_item_scale_list resource %>
+<%= scales_list_for_list_item resource %>
 
 <%= list_item_expandable_text "Abstract", h(resource.abstract) %>
 

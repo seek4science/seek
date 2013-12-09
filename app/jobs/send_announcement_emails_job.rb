@@ -2,6 +2,11 @@ class SendAnnouncementEmailsJob < Struct.new(:site_announcement_id, :from_notifi
   DEFAULT_PRIORITY=3
   BATCHSIZE=50
 
+  def before(job)
+    #make sure the SMTP configuration is in sync with current SEEK settings
+    Seek::Config.smtp_propagate
+  end
+
   def perform
     site_announcement = SiteAnnouncement.find_by_id(site_announcement_id)
     if site_announcement

@@ -28,16 +28,19 @@
 
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop, :versioned_resource=>@display_sop } %>
 
-  <div style="clear:both;padding-top:1em;">
-    <p>
-        <%= embedded_isa_svg(@sop, true, @sop) -%>
-    </p>
+  <div style="clear:both">
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :current_item => @sop, :deep => true} %>
+  </div>
 
-    <h2>
-      Experimental Conditions
-    </h2>
-    <%= render :partial=>"sops/simple_experimental_conditions_list" %>
-    <br/>
+  <div style="clear:both;">
+    <% if Seek::Config.experimental_conditions_enabled %>
+        <p>
+            <h2>
+              Experimental Conditions
+            </h2>
+        </p>
+        <%= render :partial=>"sops/simple_experimental_conditions_list" %>
+    <% end %>
 
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"general/items_related_to",:object => @sop %>

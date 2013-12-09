@@ -141,6 +141,55 @@ class BatchPublishingTest < ActionController::TestCase
     assert_response :redirect
   end
 
+  #The following tests are for generating your asset list that you requested to make published are still waiting for approval
+  test "should have the -Your assets waiting for approval- button only on your profile" do
+    #not yourself
+    gatekeeper = Factory(:gatekeeper)
+    me = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>gatekeeper.group_memberships.first.work_group)])
+    another_person = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>gatekeeper.group_memberships.first.work_group)])
+
+    login_as(me)
+
+    get :show, :id => another_person
+    assert_response :success
+    assert_select "a", :text => /Assets awaiting approval/, :count => 0
+
+    #yourself
+    get :show, :id => User.current_user.person
+    assert_response :success
+    assert_select "a[href=?]", waiting_approval_assets_person_path, :text => /Assets awaiting approval/
+  end
+
+  test 'authorization for waiting_approval_assets' do
+    get :waiting_approval_assets, :id => User.current_user.person
+    assert_response :success
+    assert_nil flash[:error]
+
+    a_person = Factory(:person)
+    get :waiting_approval_assets, :id => a_person
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
+
+  test 'get waiting_approval_assets' do
+    df,model,sop = waiting_approval_assets_for User.current_user
+    not_requested_df = Factory(:data_file, :contributor => User.current_user)
+
+    get :waiting_approval_assets, :id => User.current_user.person
+
+    assert_select "li.type_and_title", :count => 3 do
+      assert_select "a[href=?]", data_file_path(df)
+      assert_select "a[href=?]", model_path(model)
+      assert_select "a[href=?]", sop_path(sop)
+    end
+
+    assert_select "li.request_info", :count => 3 do
+      assert_select "a[href=?]", person_path(df.gatekeepers.first), :count => 3
+    end
+
+    assert_select "a[href=?]", data_file_path(not_requested_df), :count => 0
+  end
+
   private
 
   def create_publish_immediately_assets
@@ -155,6 +204,17 @@ class BatchPublishingTest < ActionController::TestCase
     publishable_types.collect do |klass|
       Factory(klass.name.underscore.to_sym, :contributor => User.current_user, :project_ids => Factory(:gatekeeper).projects.collect(&:id))
     end
+  end
+
+  def waiting_approval_assets_for user
+    gatekeeper = Factory(:gatekeeper)
+    df = Factory(:data_file, :contributor => user, :project_ids => gatekeeper.projects.collect(&:id))
+    df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>df.contributor)
+    model = Factory(:model, :contributor => user, :project_ids => gatekeeper.projects.collect(&:id))
+    model.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>model.contributor)
+    sop = Factory(:sop, :contributor => user, :project_ids => gatekeeper.projects.collect(&:id))
+    sop.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>sop.contributor)
+    [df,model,sop]
   end
 end
 

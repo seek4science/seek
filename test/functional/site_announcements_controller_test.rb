@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SiteAnnouncementsControllerTest < ActionController::TestCase
   
-  fixtures :users,:people,:site_announcements,:notifiee_infos
+  fixtures :users,:people
 
   include AuthenticatedTestHelper
 
@@ -22,14 +22,14 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test "should show" do
-    announcement=site_announcements(:feed)
+    announcement=Factory(:feed_announcement)
     assert_not_nil announcement.announcer
     get :show,:id=>announcement
     assert_response :success
   end
   
   test "should get edit" do
-    announcement=site_announcements(:feed)
+    announcement=Factory(:feed_announcement)
     assert_not_nil announcement.announcer
     get :edit,:id=>announcement
     assert_response :success
@@ -43,45 +43,55 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
   
   test "should destroy" do
+    ann = Factory(:site_announcement)
     assert_difference("SiteAnnouncement.count",-1) do
-      delete :destroy,:id=>site_announcements(:feed)
+      delete :destroy,:id=>ann.id
     end    
   end
 
   test "should email registered users" do
     NotifieeInfo.delete_all
-    i=0
-    while i < 5
-      Factory(:notifiee_info, :id => (i+1))
-      i+=1
+    people = []
+    (0...5).to_a.each do
+      people << Factory(:person)
     end
 
-    assert_emails(Person.registered.select {|p| p.notifiee_info.try :receive_notifications?}.count) do
+    assert_equal 5,people.size
+
+    registered_receivers = Person.registered.select {|p| p.notifiee_info.try :receive_notifications?}
+    assert registered_receivers.count>=5
+
+    assert_emails(registered_receivers.count) do
       post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
       site_announcement = assigns(:site_announcement)
       assert SendAnnouncementEmailsJob.exists?(site_announcement.id,1)
-      SendAnnouncementEmailsJob.new(site_announcement.id, 1).perform
+      first_id = people.collect(&:notifiee_info).collect(&:id).min
+      SendAnnouncementEmailsJob.new(site_announcement.id, first_id).perform
     end
   end
 
   test "should handle deleted notifiee person" do
-    Person.registered.select{|p| p.notifiee_info.try :receive_notifications?}.first.delete
-    assert_emails(NotifieeInfo.find(:all, :conditions=>["receive_notifications=?",true]).count - 1) do
-      post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
+    person = Person.with_group.select{|p| p.notifiee_info.try :receive_notifications?}.first
+    if person
+      person.delete
+      assert_emails(NotifieeInfo.find(:all, :conditions=>["receive_notifications=?",true]).count - 1) do
+        post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
+      end
     end
   end
   
   test "should not destroy" do
+    ann = Factory(:feed_announcement)
     login_as(:aaron)
     assert_no_difference("SiteAnnouncement.count") do
-      delete :destroy,:id=>site_announcements(:feed)
+      delete :destroy,:id=>ann.id
     end   
     
     assert_not_nil flash[:error]
   end
   
   test "should update" do
-    ann=site_announcements(:feed)
+    ann=Factory(:feed_announcement)
     put :update,:id=>ann,:site_announcement=>{:title=>"bob"}
     ann=SiteAnnouncement.find(ann.id)
     assert_equal "bob",ann.title
@@ -97,7 +107,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   
   test "should not get edit" do
     login_as(:aaron)
-    announcement=site_announcements(:feed)
+    announcement=Factory(:feed_announcement)
     assert_not_nil announcement.announcer
     get :edit,:id=>announcement
     assert_response :redirect
@@ -117,7 +127,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   
   test "should not update" do
     login_as(:aaron)
-    ann=site_announcements(:feed)
+    ann=Factory(:feed_announcement)
     put :update,:id=>ann,:site_announcement=>{:title=>"bob"}
     
     assert_response :redirect
@@ -137,13 +147,16 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test 'should get the headline announcements on the index page' do
+    Factory :headline_announcement
     assert !SiteAnnouncement.all.select(&:is_headline).empty?
     get :index
     assert_response :success
-    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => /a headline announcement/, :count => 2
+    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => /a headline announcement/, :count => 1
   end
 
   test "should only show feeds when feed_only passed" do
+    Factory :headline_announcement, :show_in_feed=>false, :title=>"a headline announcement"
+    Factory :headline_announcement, :show_in_feed=>true,:title=>"a headline announcement also in feed"
     get :index,:feed_only=>true
     assert_response :success
     assert_select "ul.announcement_list li.announcement span.announcement_title", :text => "a headline announcement", :count => 0
@@ -152,7 +165,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
 
   test 'handle notification_settings' do
     #valid key
-    key = notifiee_infos(:fred_info).unique_key
+    key = Factory(:notifiee_info).unique_key
     get :notification_settings, :key => key
     assert_response :success
     assert_nil flash[:error]

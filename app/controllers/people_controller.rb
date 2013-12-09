@@ -2,15 +2,16 @@ class PeopleController < ApplicationController
 
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
+  include Seek::Publishing::GatekeeperPublish
 
-  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :is_user_admin_auth,:only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :removed_params,:only=>[:update,:create]
+  before_filter :administerable_by_user, :only => [:admin, :administer_update]
   before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
-  before_filter :administerable_by_user, :only => [:admin, :administer_update]
   skip_before_filter :project_membership_required, :only => [:create, :new]
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
   skip_after_filter :request_publish_approval,:log_publishing, :only => [:create,:update]
@@ -256,11 +257,10 @@ class PeopleController < ApplicationController
       params[:person]["#{param}"] = temp[:person]["#{param}"] if temp[:person]["#{param}"] and allowed
       params["#{param}"] = temp["#{param}"] if temp["#{param}"] and allowed
     end
-    set_roles(@person, params) if User.admin_logged_in?
 
     respond_to do |format|
       if @person.update_attributes(params[:person])
-
+        set_roles(@person, params) if User.admin_logged_in?
         #clear subscriptions for non_project members
         if @person.projects.empty?
              @person.project_subscriptions = []
@@ -352,10 +352,12 @@ class PeopleController < ApplicationController
   end
 
   def set_roles person, params
-    roles = person.is_admin? ? ['admin'] : []
+    roles = person.is_admin? ? [['admin']] : []
     if params[:roles]
       params[:roles].each_key do |key|
-        roles << key
+        project_ids=params[:roles][key]
+
+        roles << [key,project_ids]
       end
     end
     person.roles=roles
@@ -427,7 +429,9 @@ class PeopleController < ApplicationController
         project_manager_projects = Project.is_hierarchical?? current_user.person.projects_and_descendants : current_user.person.projects
           flag = true
           projects.each do |project|
-            flag = false if !project_manager_projects.include? project
+          unless @person.projects.include?(project) || project.can_be_administered_by?(current_user)
+            flag = false
+          end
           end
           if flag == false
           error("#{t('project')} manager can not assign person to the #{t('project').pluralize} that they are not in","Is invalid")

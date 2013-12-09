@@ -25,6 +25,9 @@
   <%= form_tag({:action => :check_related_items},:method=>:post)  do -%>
       <% if @assets.empty? %>
           <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
+          <br/>
+          <br/>
+          <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
       <% else %>
           <% @assets.sort_by { |k, v| v.first.class.name }.each do |type, items| %>
                 <h2><%= text_for_resource items.first %>(s)</h2>

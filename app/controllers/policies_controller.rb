@@ -81,11 +81,14 @@ class PoliciesController < ApplicationController
       privileged_people = {}
       #exclude the current_person from the privileged people
       contributor_person = nil if contributor_person == current_person
-      creators.delete(current_person)
       asset_managers.delete(current_person)
+      asset_managers.delete(contributor_person)
+      creators.delete(current_person)
+      creators.delete(contributor_person)
+      asset_managers.each{|am| creators.delete(am)}
       privileged_people['contributor'] = [contributor_person] if contributor_person
-      privileged_people['creators'] = creators unless creators.empty?
       privileged_people['asset_managers'] = asset_managers unless asset_managers.empty?
+      privileged_people['creators'] = creators unless creators.empty?
 
       respond_to do |format|
         format.html { render :partial => "permissions/preview_permissions",

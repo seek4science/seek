@@ -10,12 +10,10 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
+            :update_admin_assigned_roles,
+            :update_top_level_assay_type_titles,
             :repopulate_auth_lookup_tables,
-            :move_asset_files,
-            :remove_converted_pdf_and_txt_files_from_asset_store,
-            :clear_send_email_jobs,
-            :reencode_settings_table_using_psych,
-            :reencode_delayedjobs_table_using_psych
+            :repopulate_missing_publication_book_titles
   ]
 
   desc "Disassociates contributors and refreshes the list of publication authors from the doi/pubmed for all publications"
@@ -146,49 +144,44 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
-  task(:move_asset_files=>:environment) do
-    oldpath=File.join(Rails.root,"filestore","content_blobs",Rails.env.downcase)
-    newpath = Seek::Config.asset_filestore_path
-    puts "Moving asset files from:\n\t#{oldpath}\nto:\n\t#{newpath}"
-    FileUtils.mkdir_p newpath
-    if File.exists? oldpath
-      FileUtils.mv Dir.glob("#{oldpath}/*"),newpath
-      puts "You can now safely remove #{oldpath}"
-    else
-      puts "The old asset location #{oldpath} doesn't exist, nothing to do"
+  task(:update_admin_assigned_roles=>:environment) do
+    Person.where("roles_mask > 0").each do |p|
+      if p.admin_defined_role_projects.empty?
+        roles = []
+        (p.role_names & Person::PROJECT_DEPENDENT_ROLES).each do |role|
+          puts "Updating #{p.name} for - '#{role}' - adding to #{p.projects.count} projects"
+          roles << [role,p.projects]
+        end
+        roles << ["admin"] if p.is_admin?
+        unless roles.empty?
+          Person.record_timestamps = false
+          begin
+            p.roles = roles
+            disable_authorization_checks do
+              p.save!
+            end
+          rescue Exception=>e
+            puts "Error saving #{p.name} - #{p.id}: #{e.message}"
+          ensure
+            Person.record_timestamps = true
+          end
+        end
+
+      end
+
     end
   end
 
-  task(:remove_converted_pdf_and_txt_files_from_asset_store=>:environment) do
-    FileUtils.rm Dir.glob(File.join(Seek::Config.asset_filestore_path,"*.pdf"))
-    FileUtils.rm Dir.glob(File.join(Seek::Config.asset_filestore_path,"*.txt"))
-  end
+  task(:update_top_level_assay_type_titles=>:environment) do
+    exp_id = AssayType.experimental_assay_type_id
+    assay_type = AssayType.find(exp_id)
+    assay_type.title="generic experimental assay"
+    assay_type.save!
 
-  task(:clear_send_email_jobs=>:environment) do
-    Delayed::Job.where(["handler like ?","%SendPeriodicEmailsJob%"]).destroy_all
-  end
-
-  desc("Ruby 1.9.3 uses psych engine while some older versions use syck. Some encoded value using syck can not be decoded by psych")
-  task(:reencode_settings_table_using_psych=>:environment) do
-    puts "reencode settings table using psych"
-    temp = YAML::ENGINE.yamler
-    YAML::ENGINE.yamler = 'syck'
-    settings = Settings.all
-    YAML::ENGINE.yamler = temp
-    settings.each do |var, value|
-      Settings.send "#{var}=", value
-    end
-  end
-
-  desc("Ruby 1.9.3 uses psych engine while some older versions use syck.")
-  task(:reencode_delayedjobs_table_using_psych=>:environment) do
-    puts "reencode delayedjobs table using psych"
-    jobs = Delayed::Job.all
-    jobs.each do |job|
-      handler = job.handler
-      job.handler = YAML::load(handler).to_yaml
-      job.save
-    end
+    mod_id = AssayType.modelling_assay_type_id
+    assay_type = AssayType.find(mod_id)
+    assay_type.title="generic modelling analysis"
+    assay_type.save!
   end
 
   task(:repopulate_citation_for_publication=>:environment) do
@@ -256,4 +249,68 @@ desc "pre-populate investigations with projects in VLN SEEK "
       end
     end
   end
+
+  desc "adds the term uri's to assay types"
+    task :add_term_uris_to_assay_types=>:environment do
+      #fix spelling error in earlier seed data
+      type = AssayType.find_by_title("flux balanace analysis")
+      unless type.nil?
+        type.title = "flux balance analysis"
+        type.save
+      end
+
+      yamlfile=File.join(Rails.root,"config","default_data","assay_types.yml")
+      yaml=YAML.load_file(yamlfile)
+      yaml.keys.each do |k|
+        title = yaml[k]["title"]
+        uri = yaml[k]["term_uri"]
+        unless uri.nil?
+          assay_type = AssayType.where(["lower(title)=?",title.downcase]).first
+
+          unless assay_type.nil?
+                assay_type.term_uri = uri
+                assay_type.save
+          end
+        else
+          puts "No uri defined for assaytype #{title} so skipping adding term"
+        end
+
+      end
+    end
+
+    desc "adds the term uri's to technology types"
+    task :add_term_uris_to_technology_types=>:environment do
+      yamlfile=File.join(Rails.root,"config","default_data","technology_types.yml")
+      yaml=YAML.load_file(yamlfile)
+      yaml.keys.each do |k|
+        title = yaml[k]["title"]
+        uri = yaml[k]["term_uri"]
+        unless uri.nil?
+          tech_type = TechnologyType.where(["lower(title)=?",title.downcase]).first
+          unless tech_type.nil?
+                tech_type.term_uri = uri
+                tech_type.save
+          end
+        else
+          puts "No uri defined for Technology Type #{title} so skipping adding term"
+        end
+
+      end
+    end
+
+    desc "content type of jpg is image/jpeg, instead of image/jpg"
+    task(:correct_content_type_for_jpg=>:environment) do
+      content_blobs = ContentBlob.find(:all, :conditions => ['content_type=?', 'image/jpg'])
+      content_blobs.each do |cb|
+        puts cb.original_filename
+        cb.content_type = 'image/jpeg'
+        cb.save
+      end
+    end
+
+    desc "update jws online root to point to http://jjj.mib.ac.uk/"
+    task(:update_jws_online_root => :environment) do
+      Seek::Config.jws_online_root = 'http://jjj.mib.ac.uk/'
+    end
+
 end

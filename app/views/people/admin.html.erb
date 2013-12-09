@@ -1,3 +1,5 @@
+<%= javascript_include_tag "people.js" %>
+
 <h1>Administer Person: <%= link_to h(@person.name), person_path(@person) -%></h1>
 
 <div class="show_basic">
@@ -5,7 +7,7 @@
       <% if admin_logged_in? || project_manager_logged_in? -%>
           <h2 style="margin-top: 1.5em;">Choose <%= t('project') %> / Institution&nbsp;&nbsp;&nbsp;</h2>
           <%= render :partial => "work_groups", :locals=> {:person => @person} -%>
-          <h2 style="margin-top: 1.5em;">Assign roles or permissions&nbsp;&nbsp;&nbsp;</h2>
+
           <p style="line-height: 1.8;">
             <% if admin_logged_in? || (project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?) %>
 
@@ -15,40 +17,35 @@
                 </label>
                 <br/>
                 <label for="can_edit_institutions" style="font-weight: normal;">
-                  <%= f.check_box :can_edit_institutions -%>Allow this person to edit <b>institutions</b>
+                  <%= f.check_box :can_edit_institutions -%>Allow this person to edit <b>Institutions</b>
                   they work in.
                 </label>
                 <br/>
             <% end -%>
 
             <% if admin_logged_in? %>
-                <label for="is_pal" style="font-weight: normal;">
-                  <%= check_box_tag '[roles][pal]', 1, @person.try(:is_pal?) -%>
-                  This person is a certified <b><%= Seek::Config.dm_project_name %> PAL</b>
-                </label>
-                <br/>
-
-                <label for="is_project_manager" style="font-weight: normal;">
-                  <%= check_box_tag "[roles][project_manager]", 1, @person.try(:is_project_manager?) -%>
-                  This person is a <b><%= t('project') %> Manager</b>
-                </label>
-                <br/>
-
-                <label for="is_asset_manager" style="font-weight: normal;">
-                  <%= check_box_tag "[roles][asset_manager]", 1, @person.try(:is_asset_manager?) -%>
-                  This person is an <b>Asset Manager</b>
-                </label>
-                <br/>
-
-                <label for="is_gatekeeper" style="font-weight: normal;">
-                  <%= check_box_tag "[roles][gatekeeper]", 1, @person.try(:is_gatekeeper?) -%>
-                  This person is a <b>Gatekeeper</b>
-                </label>
+                    <h2>Administer defined roles</h2>
+                    <p class="box_infotext">
+                      These are the roles that can be assigned to a person by an Adminster, to allow this person to carry out specific tasks within that role. Each role is
+                      associated with, and only applies to, a particular <%= t('Project').downcase.html_safe %>.
+                      <br/><strong>Note</strong> that if new projects are added to this person (above), they will
+                      need to be saved before the <%= t('Project').downcase.pluralize.html_safe %> you can associate with a role are available. If the person is removed from a <%= t('Project').downcase.html_safe %> then the role will also be automatically removed.
+                    </p>
+                    <br/>
+                    <%
+                       roles = [["pal", "a PAL"], ["project_manager", "a Project Manager"], ["asset_manager", "an Asset Manager"], ["gatekeeper", "a Gatekeeper"]]
+                       roles.each do |role|
+                    %>
+                        <%= render :partial => "roles_selector", :locals => {:role => role[0], :role_title => role[1]} -%>
+                        <%= tag("hr")  %>
+                    <%
+                       end
+                    %>
             <% end %>
           </p>
       <% end -%>
       <p style="margin-top: 2em; text-align: center;">
-        <%= f.submit("Update", :disable_with=>"Updating...") -%>
+        <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateWorkGroupIds()") -%>
         or <%= link_to 'Cancel', person_path(@person.id) -%>
       </p>
 

@@ -5,7 +5,7 @@
     //if the external tab was chosen for this scale, then display its content
     display_external_tab_content(this.id);
 <% end %>
-<%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => scale_slider_function, :current_scale => @scale_title} %>
+<%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => scale_slider_function, :current_scale => @scale_key} %>
 
 <!--the files need to be loaded before calling the partial resource_tabbed_lazy_loading
     and with this order
@@ -23,8 +23,8 @@ But to make it easier for handling the tab names, they are created multiple time
 -->
 <% external_resource_hash = {} %>
 <div id='search_results' class="scaled_items">
-  <% (Scale.all.map(&:title) | ['all']).each do |scale|%>
-      <div id='<%= scale %>_results' <%= "style='display: none'" unless @scale_title == scale%>>
+  <% (Scale.all.map(&:key) | ['all']).each do |scale|%>
+      <div id='<%= scale %>_results' <%= "style='display: none'" unless @scale_key == scale%>>
         <% internal_resource_hash, external_resource_hash = get_resource_hash(scale, external_resource_hash) -%>
 
         <%= render :partial => "assets/resource_tabbed_lazy_loading",
@@ -58,7 +58,7 @@ But to make it easier for handling the tab names, they are created multiple time
 <% end %>
 
 <script type="text/javascript">
-    <% (Scale.all.map(&:title) | ['all']).each do |scale| %>
+    <% (Scale.all.map(&:key) | ['all']).each do |scale| %>
         <% external_resource_hash.keys.each do |key| %>
             external_tab_on_click('<%= scale %>', '<%= key %>');
         <% end %>

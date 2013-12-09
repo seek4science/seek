@@ -25,7 +25,19 @@ class UserTest < ActiveSupport::TestCase
     end
     assert without_profile.include?(users(:part_registered))
     assert without_profile.include?(users(:aaron))
-  end  
+  end
+
+  test "project manager logged in?" do
+    pm = Factory :project_manager
+    normal = Factory :person
+    User.with_current_user(pm.user) do
+      assert User.project_manager_logged_in?
+    end
+
+    User.with_current_user(normal.user) do
+      assert !User.project_manager_logged_in?
+    end
+  end
 
   def test_activate
     user = Factory :brand_new_user

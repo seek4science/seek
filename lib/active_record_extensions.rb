@@ -1,4 +1,4 @@
-module ActiveRecordExtensions
+  module ActiveRecordExtensions
 
   def self.included base
     base.class_eval do

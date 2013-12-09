@@ -1,5 +1,5 @@
 <%
-   @assay_text=resource.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
+   assay_type_text = resource.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type"
 %>
 
 <%= list_item_title resource %>
@@ -7,7 +7,7 @@
 <div class="list_item_left_column">
   <%= list_item_attribute "ID", resource.id %>
 
-  <%= list_item_attribute "#{@assay_text} type", resource.assay_type.try(:title).try(:capitalize), resource.assay_type %>
+  <%= list_item_attribute "#{assay_type_text}", resource.assay_type.try(:title).try(:capitalize), resource.assay_type %>
   <% unless resource.is_modelling? -%>
       <%= list_item_attribute "Technology type", try_block{resource.technology_type.title.capitalize}, resource.technology_type %>
   <% end -%>
@@ -24,8 +24,9 @@
   <%= list_item_authorized_attribute "Contributor", resource.owner %>
 
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
-
-  <%= list_item_simple_list(resource.assay_organisms, "Organisms") { |ao| assay_organism_list_item(ao) } %>
+  <% if Seek::Config.organisms_enabled %>
+    <%= list_item_simple_list(resource.assay_organisms, "Organisms") { |ao| assay_organism_list_item(ao) } %>
+  <% end %>
 
   <%= list_item_authorized_list resource.sop_masters, t('sop').pluralize, true, 50, true %>
 
@@ -34,7 +35,7 @@
 </div>
 
 <div class="list_item_whole_width">
-  <%= list_item_scale_list resource %>
+  <%= scales_list_for_list_item resource %>
   <%= list_item_description resource.description %>
   <%= list_item_timestamp resource %>
 </div>

@@ -13,7 +13,7 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
     test "person's projects include direct projects and parent projects" do
       parent_proj = Factory :project
       proj = Factory :project, :parent_id => parent_proj.id
-      p = Factory(:person, :work_groups => [Factory(:work_group, :project => proj)])
+      p = Factory(:brand_new_person, :work_groups => [Factory(:work_group, :project => proj)])
       assert_equal [parent_proj, proj].map(&:id).sort, p.projects.map(&:id).sort
     end
 
@@ -22,7 +22,7 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
 
     end
     test 'people subscribe to their projects and parent projects by default' do
-      #when created with a project
+      #when created without a project
       person = Factory(:brand_new_person)
 
       assert_equal person.project_subscriptions.map(&:project), []
