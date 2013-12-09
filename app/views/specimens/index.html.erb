@@ -1,3 +1,4 @@
+<h1> <font color="#456AAA"> <%= 'Specimens' %> </font> </h1> <br>
 <% if logged_in? and current_user.person.member? %>
     <ul class="sectionIcons">
       <li><%= image_tag_for_key "new", new_specimen_path, "New #{(I18n.t 'biosamples.sample_parent_term').capitalize}", nil, "New #{(I18n.t 'biosamples.sample_parent_term').capitalize}" %></li>
