@@ -259,4 +259,17 @@ class Assay < ActiveRecord::Base
       !technology_type_reader.class_hierarchy.hash_by_uri[self.technology_type_uri].nil?
     end
   end
+
+  #returns the label if it is an unrecognised suggested label, otherwise return nil
+  def suggested_assay_type_label
+    return nil if self[:assay_type_label].nil?
+    return self[:assay_type_label] if assay_type_reader.class_hierarchy.hash_by_label[self[:assay_type_label].downcase].nil?
+  end
+
+  #returns the label if it is an unrecognised suggested label, otherwise return nil
+  def suggested_technology_type_label
+    return nil if self.is_modelling?
+    return nil if self[:technology_type_label].nil?
+    return self[:technology_type_label] if technology_type_reader.class_hierarchy.hash_by_label[self[:technology_type_label].downcase].nil?
+  end
 end

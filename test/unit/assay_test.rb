@@ -416,4 +416,48 @@ class AssayTest < ActiveSupport::TestCase
     assert !exp_assay.valid_technology_type_uri?
   end
 
+  test "suggested assay type label" do
+    exp_assay = Factory(:experimental_assay)
+    assert_nil exp_assay.suggested_assay_type_label
+    exp_assay.assay_type_label=nil
+    assert_nil exp_assay.suggested_assay_type_label
+
+    #a different label, but one that is still valid
+    exp_assay.assay_type_label = "metabolite concentration"
+    assert_nil exp_assay.suggested_assay_type_label
+
+    #should be case insensitive
+    exp_assay.assay_type_label = "Metabolite CONCentration"
+    assert_nil exp_assay.suggested_assay_type_label
+
+    #a completely new one
+    exp_assay.assay_type_label = "bacteria juggling"
+    assert_equal "bacteria juggling",exp_assay.suggested_assay_type_label
+
+    #a modelling type would also be treated as a new suggstion
+    exp_assay.assay_type_label = "gene expression"
+    assert_equal "gene expression",exp_assay.suggested_assay_type_label
+  end
+
+  test "suggested tech type label" do
+    exp_assay = Factory(:experimental_assay)
+    assert_nil exp_assay.suggested_technology_type_label
+    exp_assay.technology_type_label=nil
+    assert_nil exp_assay.suggested_technology_type_label
+
+    #a different label, but one that is still valid
+    exp_assay.technology_type_label = "hplc"
+    assert_nil exp_assay.suggested_technology_type_label
+
+    #should be case insensitive
+    exp_assay.technology_type_label = "HPLC"
+    assert_nil exp_assay.suggested_technology_type_label
+
+    #a completely new one
+    exp_assay.technology_type_label = "bacteria juggling"
+    assert_equal "bacteria juggling",exp_assay.suggested_technology_type_label
+
+
+  end
+
 end

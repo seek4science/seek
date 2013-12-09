@@ -113,8 +113,8 @@ namespace :seek do
         assay.use_default_assay_type_uri!
       end
 
-      if !assay[:assay_type_label].nil? && assay_type_label_hash[assay.assay_type_label].nil?
-         puts "The Assay #{assay.id} has a suggested assay type label of #{assay.assay_type_label}, currently attached to the parent URI #{assay.assay_type_uri}".yellow
+      unless assay.suggested_assay_type_label.nil?
+         puts "The Assay #{assay.id} has a suggested assay type label of #{assay.assay_type_label.inspect}, currently attached to the parent URI #{assay.assay_type_uri.inspect}".yellow
       end
 
       disable_authorization_checks do
@@ -167,8 +167,8 @@ namespace :seek do
       disable_authorization_checks do
         assay.save if assay.changed?
       end
-      if !assay[:technology_type_label].nil? && tech_type_label_hash[assay.technology_type_label].nil?
-        puts "The Assay #{assay.id} has a suggested technology type label of #{assay.technology_type_label}, currently attached to the parent URI #{assay.technology_type_uri}".yellow
+      unless assay.suggested_technology_type_label.nil?
+        puts "The Assay #{assay.id} has a suggested technology type label of #{assay.technology_type_label.inspect}, currently attached to the parent URI #{assay.technology_type_uri.inspect}".yellow
       end
     end
     Assay.record_timestamps = true
