@@ -84,10 +84,8 @@ namespace :seek do
     Assay.record_timestamps = false
 
     Assay.all.each do |assay|
-      assay_type_uri_hash = assay.assay_type_reader.class_hierarchy.hash_by_uri
       assay_type_label_hash = assay.assay_type_reader.class_hierarchy.hash_by_label
 
-      #first see if the label is known to match a URI, which could be case if it has been added to the ontology
       label = assay[:assay_type_label].try(:downcase)
 
       unless label.nil?
@@ -101,7 +99,7 @@ namespace :seek do
         unless resolved_uri.nil?
           if assay.assay_type_uri != resolved_uri
             assay.assay_type_uri = resolved_uri
-            puts "the URI for Assay #{assay.id} updated to #{resolved_uri.inspect} based on the label #{label.inspect}".green
+            puts "the assay type URI for Assay #{assay.id} updated to #{resolved_uri.inspect} based on the label #{label.inspect}".green
           end
           assay.assay_type_label = nil
         end
@@ -111,8 +109,7 @@ namespace :seek do
       unless assay.valid_assay_type_uri?
         #if the uri is still invalid, we need to set it to the default
         uri = assay[:assay_type_uri]
-        puts "the label and URI for Assay #{assay.id} cannot be resolved, so resetting to the default.\n\t the original label was #{label.inspect} and URI was #{uri.inspect}".red
-        assay.assay_type_label=nil
+        puts "the assay type label and URI for Assay #{assay.id} cannot be resolved, so resetting the URI to the default, but keeping the stored label.\n\t the original label was #{label.inspect} and URI was #{uri.inspect}".red
         assay.use_default_assay_type_uri!
       end
 
@@ -120,6 +117,50 @@ namespace :seek do
         assay.save
       end
 
+    end
+    Assay.record_timestamps = true
+  end
+
+  desc("Synchronised the technology types assigned to assays according to the current ontology")
+  task(:resynchronise_technology_types => :environment) do
+    Assay.record_timestamps = false
+
+    tech_type_label_hash = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_label
+
+    label_map = {"technology"=>"technology type","cdna microarray"=>"microarray"}
+
+    Assay.all.each do |assay|
+      unless assay.is_modelling?
+        label = assay[:technology_type_label].try(:downcase)
+        unless label.nil?
+
+          resolved_uri = tech_type_label_hash[label].try(:uri).try(:to_s)
+
+          #if the resolved uri is nil try a mapped label
+          resolved_uri ||= tech_type_label_hash[label_map[label]].try(:uri).try(:to_s)
+
+          #if the uri is resovled, update the stored uri and remove the label
+          unless resolved_uri.nil?
+            if assay.technology_type_uri != resolved_uri
+              assay.technology_type_uri = resolved_uri
+              puts "the technology type URI for Assay #{assay.id} updated to #{resolved_uri.inspect} based on the label #{label.inspect}".green
+            end
+            assay.technology_type_label = nil
+          end
+
+        end
+      else
+        assay.technology_type_uri = nil
+      end
+      unless assay.valid_technology_type_uri?
+        uri = assay[:technology_type_uri]
+        puts "the technology type label and URI for Assay #{assay.id} cannot be resolved, so resetting the URI to the default, but keeping the stored label.\n\t the original label was #{label.inspect} and URI was #{uri.inspect}".red
+        assay.use_default_technology_type_uri!
+      end
+
+      disable_authorization_checks do
+        assay.save
+      end
     end
     Assay.record_timestamps = true
   end

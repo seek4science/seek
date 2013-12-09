@@ -232,7 +232,7 @@ class Assay < ActiveRecord::Base
     if is_modelling?
       self.technology_type_uri=nil
     else
-      self.technology_type_uri ||= technology_type_reader.default_parent_class_uri.try(:to_s)
+      self.use_default_technology_type_uri! if self.technology_type_uri.nil?
     end
   end
 
@@ -240,7 +240,23 @@ class Assay < ActiveRecord::Base
     self.assay_type_uri = assay_type_reader.default_parent_class_uri.try(:to_s)
   end
 
+  def use_default_technology_type_uri!
+    if is_modelling?
+      self.technology_type_uri = nil
+    else
+      self.technology_type_uri = technology_type_reader.default_parent_class_uri.try(:to_s)
+    end
+  end
+
   def valid_assay_type_uri?
     !assay_type_reader.class_hierarchy.hash_by_uri[self.assay_type_uri].nil?
+  end
+
+  def valid_technology_type_uri?
+    if is_modelling?
+      self.technology_type_uri.nil?
+    else
+      !technology_type_reader.class_hierarchy.hash_by_uri[self.technology_type_uri].nil?
+    end
   end
 end

@@ -403,4 +403,17 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.valid_assay_type_uri?
   end
 
+  test "valid technology type uri" do
+    mod_assay = Factory(:modelling_assay)
+    exp_assay = Factory(:experimental_assay)
+    assert mod_assay.valid_technology_type_uri?
+    mod_assay.technology_type_uri = Seek::Ontologies::TechnologyTypeReader.instance.default_parent_class_uri.to_s
+    #for a modelling assay, even if it is set it is invalid
+    assert !mod_assay.valid_technology_type_uri?
+
+    assert exp_assay.valid_technology_type_uri?
+    exp_assay.technology_type_uri = "http://fish.com/onto#fish"
+    assert !exp_assay.valid_technology_type_uri?
+  end
+
 end
