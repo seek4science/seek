@@ -34,7 +34,7 @@ SEEK::Application.configure do
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :publish_button_enabled, false 
   Seek::Config.default :auth_lookup_enabled,true
-  Seek::Config.default :sample_parser_enabled,false
+  Seek::Config.default :sample_parser_enabled,true
   Seek::Config.default :external_search_enabled, true
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
