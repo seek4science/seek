@@ -15,7 +15,7 @@ assay_type_text = @is_modelling ? "Biological problem addressed" : "#{t('assays.
       <br/>
 
       <%= image("current",{:title=>"Current #{assay_type_text}",:alt=>"Current #{assay_type_text}",:style=>"vertical-align:middle"}) -%>
-      <%= h @label -%>
+      <%= displayed_hierarchy_current_label(@label,@type_class) -%>
 
       <br/>
 

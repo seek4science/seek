@@ -24,6 +24,7 @@ class AssayTypesController < ApplicationController
       @type_class=cls
     end
     @label = params[:label] || @type_class.try(:label)
+
   end
 
   def find_and_authorize_assays

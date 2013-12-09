@@ -4,7 +4,7 @@ module AssayTypesHelper
   def link_to_assay_type assay
     uri = assay.assay_type_uri
     label = assay.assay_type_label
-    unless uri.nil?
+    if assay.valid_assay_type_uri?
       link_to label,assay_types_path(:uri=>uri,:label=>label)
     else
       label
@@ -39,6 +39,16 @@ module AssayTypesHelper
     else
       content_tag :span,"No child terms",:class=>"none_text"
     end
+  end
+
+  #the display of the label, with an indication of the actual label if the label presented is a temporary label awaiting addition to the ontology
+  def displayed_hierarchy_current_label declared_label, defined_class
+    result = h(declared_label)
+    if !defined_class.nil? && defined_class.label!=declared_label
+      comment = "  - this is a new suggested term that specialises #{defined_class.label}"
+      result << content_tag("span",comment,:class=>"none_text")
+    end
+    result.html_safe
   end
 
 end
