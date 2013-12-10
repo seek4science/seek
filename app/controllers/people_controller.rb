@@ -318,7 +318,7 @@ class PeopleController < ApplicationController
       workgroup = WorkGroup.find_by_project_id_and_institution_id(project_id,institution_id)
       people = workgroup.people
     end
-    people_list = people.collect{|p| [p.name, p.email, p.id]}
+    people_list = people.collect{|p| [h(p.name), p.email, p.id]}
     respond_to do |format|
       format.json {
         render :json => {:status => 200, :people_list => people_list }
