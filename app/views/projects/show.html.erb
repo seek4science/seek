@@ -16,7 +16,7 @@
       <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", nil, "#{t('project')} administration" -%></li>
      <% end -%>
     <% if admin_logged_in? -%>
-      <li><%= image_tag_for_key "destroy", project_path(@project), "Delete #{t('project')}", { :confirm => 'Are you sure?', :method => :delete }, "Delete #{t('project')}" -%></li>
+          <%= delete_icon(@project,current_user) %>
     <% end -%>
 
 <% end -%>
@@ -42,11 +42,12 @@
             <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
           </p>
         <% end %>
-
-        <p>
-          <label>Organisms:</label>
-          <%= organisms_link_list @project.organisms -%>
-        </p>
+        <% if Seek::Config.organisms_enabled %>
+            <p>
+                <label>Organisms:</label>
+                <%= organisms_link_list @project.organisms -%>
+            </p>
+        <% end %>
 
         <p class="pals">
           <label><%= Seek::Config.dm_project_name %> PALs:</label>

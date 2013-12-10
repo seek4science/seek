@@ -62,10 +62,11 @@
   </div>
 <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => [@study.contributing_user.try(:person)] } %>
 
-  <div style="clear:both;">
-    <%= embedded_isa_svg(@study.investigation,false,@study) -%>
+  <div style="clear:both">
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @study.investigation, :current_item => @study, :deep => false} %>
   </div>
 
-  <%= render :partial=>"general/items_related_to", :object => @study %>
-
+  <div style="clear:both">
+    <%= render :partial=>"general/items_related_to", :object => @study %>
+  </div>
 </div>

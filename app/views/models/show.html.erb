@@ -75,6 +75,7 @@
                 <span class="none_text">Not specified</span>
                 <% end -%>
             </p>
+
             <p>
                 <b><%= t('model') %> type:</b>
                 <%= model_type_text @display_model.model_type %>
@@ -97,17 +98,17 @@
             <%= item_description @display_model.description -%>
 
             <%= render :partial=>"import_details", :object=>@display_model %>
-            <p>
-                <%= embedded_isa_svg(@model, true, @model) -%>
-            </p>
 
         </div>
-
     </div>
 
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model,:versioned_resource=>@display_model } %>
 
-    <div style="clear:both;padding-top:1em;">
+    <div style="clear:both">
+      <%= render :partial=>"general/isa_graph", :locals => {:root_item => @model, :current_item => @model, :deep => true} %>
+    </div>
+
+    <div style="clear:both;">
       <%= render :partial => "general/items_related_to", :object => @model %>
     </div>
 </div>

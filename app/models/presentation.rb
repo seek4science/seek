@@ -8,7 +8,7 @@ class Presentation < ActiveRecord::Base
 
    #searchable must come before acts_as_asset is called
    searchable(:auto_index => false) do
-     text :description,:title,:searchable_tags
+     text :other_creators
    end if Seek::Config.solr_enabled
 
    acts_as_asset

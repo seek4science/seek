@@ -1,16 +1,17 @@
-<div id="organism_gadget" class="sysmo_gadget"  >
-  <div class="header curved_top">
-    Organisms
-  </div>
+<% if Seek::Config.organisms_enabled %>
+    <div id="organism_gadget" class="sysmo_gadget"  >
+      <div class="header curved_top">
+        Organisms
+      </div>
 
-  <div class="contents curved_bottom">
-    <ul>
-      <% Organism.all.sort_by(&:title).each do |organism| %>
-        <li>
-          <%= link_to organism.title, organism %>
-        </li>
-      <% end %>
-    </ul>
-  </div>
-</div>
-
+      <div class="contents curved_bottom">
+        <ul>
+          <% Organism.all.sort_by(&:title).each do |organism| %>
+            <li>
+              <%= link_to organism.title, organism %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+<% end %>

@@ -7,6 +7,7 @@ quentin_person:
   email: "quentin@email.com"
   roles_mask: 1
 
+
 aaron_person:
   id: 2
   first_name: "aaron"
@@ -85,13 +86,6 @@ aaron_openid_person:
   last_name: "spiggle"
   email: "aaron_openid@email.com"
 
-pal:
-  first_name: "A"
-  last_name: "PAL"
-  email: "pal@test.com"
-  roles_mask: 2
-  can_edit_projects: true
-  can_edit_institutions: true
 
 person_for_owner_of_my_first_sop:
   first_name: "OwnerOf"
@@ -217,17 +211,3 @@ duplicate_2:
   last_name: "duplicate"
   email: "dup2@email.com"
 
-person_for_project_manager:
-  first_name: "Project"
-  last_name: "Manager"
-  email: "manager@email.com"
-  can_edit_projects: false
-  can_edit_institutions: false
-  roles_mask: 4
-  email: "project_manager@email.com"
-  
-gatekeeper_person:
-  first_name: "Gatekeeper"
-  last_name: "Last"
-  email: "gatekeeper@email.com"
-  roles_mask: 16

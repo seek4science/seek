@@ -14,6 +14,7 @@
       <li><%= image_tag_for_key('destroy', publication_path(@publication), nil, { :confirm => 'This will unregister this publication with SEEK. Are you sure wish to do this?', :method => :delete }, 'Unregister') -%></li>
   <% end -%>
   <li><%= image_tag_for_key 'endnote', publication_path(:id => @publication.id, :format => 'enw'), nil, nil, 'Export to EndNote' %></li>
+  <%= render :partial => "subscriptions/subscribe", :locals => {:object => @publication } -%>
 </ul>
 
 <div class="show_basic">
@@ -38,13 +39,12 @@
         <br/>
         <label><%= "Citation:" -%></label>
         <%=h @publication.citation -%>
-        <br/>
-        <label>Date Published:</label>
-        <%= date_as_string(@publication.published_date) -%>
+        <label for="date_published">Date Published:</label>
+        <span><%= date_as_string(@publication.published_date,false,true) -%></span>
       </p>
 
       <p>
-        <b>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</b>
+        <label>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</label>
         <% if @publication.publication_authors.empty? %>
             <span class='none_text'>Not specified</span>
         <% else %>
@@ -54,7 +54,7 @@
               else
                 author.first_name + " " + author.last_name
               end
-            end.join(', ') %>
+            end.join(', ').html_safe %>
         <% end %>
       </p>
 
@@ -70,10 +70,12 @@
     <%= item_tags_and_tag_entry -%>
     <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @publication}-%>
   </div>
-  
-  <div style="clear:both;padding-top:1em;">      
-    <%= embedded_isa_svg(@publication, false, @publication) -%>
-    <%= render :partial=>"general/items_related_to",:object => @publication %>
 
+  <div style="clear:both">
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @publication, :current_item => @publication, :deep => false} %>
+  </div>
+
+  <div style="clear:both;">
+    <%= render :partial=>"general/items_related_to",:object => @publication %>
   </div>
 </div>

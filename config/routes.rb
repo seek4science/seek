@@ -1,5 +1,13 @@
 SEEK::Application.routes.draw do
 
+  resources :scales do
+    collection do
+      post :search
+      post :search_and_lazy_load_results
+    end
+  end
+
+
   ### GENERAL PAGES ###
 
   root :to => "homes#index"
@@ -15,8 +23,10 @@ SEEK::Application.routes.draw do
       get :others
       get :get_stats
       get :registration_form
+      get :edit_tag
       post :update_home_settings
       post :restart_server
+      post :restart_delayed_job
       post :get_stats
       post :update_admins
       post :update_rebrand
@@ -130,6 +140,10 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       put :administer_update
       post :publish
+      get :requested_approval_assets
+      post :gatekeeper_decide
+      get :gatekeeper_decision_result
+      get :waiting_approval_assets
     end
     resources :avatars do
       member do
@@ -190,10 +204,6 @@ SEEK::Application.routes.draw do
       get :view_items_in_tab
       get :resource_in_tab
     end
-    member do
-      get :approve_or_reject_publish
-      post :gatekeeper_decide
-    end
   end
 
   resources :studies do
@@ -202,11 +212,6 @@ SEEK::Application.routes.draw do
       get :view_items_in_tab
       get :resource_in_tab
     end
-    member do
-      get :approve_or_reject_publish
-      post :gatekeeper_decide
-    end
-
   end
 
   resources :assays do
@@ -216,8 +221,6 @@ SEEK::Application.routes.draw do
       get :resource_in_tab
     end
     member do
-      get :approve_or_reject_publish
-      post :gatekeeper_decide
       post :update_annotations_ajax
     end
   end
@@ -253,13 +256,11 @@ SEEK::Application.routes.draw do
       get :explore
       get :download
       get :published
-      get :approve_or_reject_publish
       post :publish_related_items
       post :publish
       post :request_resource
       post :convert_to_presentation
       post :update_annotations_ajax
-      post :gatekeeper_decide
       post :new_version
       post :destroy_version
     end
@@ -289,12 +290,10 @@ SEEK::Application.routes.draw do
       post :check_gatekeeper_required
       get :download
       get :published
-      get :approve_or_reject_publish
       post :publish_related_items
       post :publish
       post :request_resource
       post :update_annotations_ajax
-      post :gatekeeper_decide
       post :new_version
       post :destroy_version
     end
@@ -323,10 +322,8 @@ SEEK::Application.routes.draw do
       get :download
       get :matching_data
       get :published
-      get :approve_or_reject_publish
       post :publish_related_items
       post :submit_to_jws
-      post :gatekeeper_decide
       post :new_version
       post :submit_to_sycamore
       post :export_as_xgmml
@@ -366,12 +363,10 @@ SEEK::Application.routes.draw do
       post :check_gatekeeper_required
       get :download
       get :published
-      get :approve_or_reject_publish
       post :publish_related_items
       post :publish
       post :request_resource
       post :update_annotations_ajax
-      post :gatekeeper_decide
       post :new_version
       post :destroy_version
     end
@@ -467,7 +462,6 @@ SEEK::Application.routes.draw do
   end
 
   resources :tissue_and_cell_types
-  resources :scales
 
   resources :statistics, :only => [:index]
   ### MISC MATCHES ###
@@ -475,7 +469,6 @@ SEEK::Application.routes.draw do
   match '/search/' => 'search#index', :as => :search
   match '/search/save' => 'search#save', :as => :save_search
   match '/search/delete' => 'search#delete', :as => :delete_search
-  match '/scales/scale_search/' => 'scales#scale_search', :as => :scale_search
   match 'svg/:id.:format' => 'svg#show', :as => :svg
   match '/tags' => 'tags#index', :as => :all_tags
   match '/tags/:id' => 'tags#show', :as => :show_tag
@@ -498,6 +491,7 @@ SEEK::Application.routes.draw do
   match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
   match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
   match '/organism_list_autocomplete' => 'projects#auto_complete_for_organism_name', :as => :organism_list_autocomplete
+  match ':controller/:id/approve_or_reject_publish' => ":controller#show"
 
   match '/signup' => 'users#new', :as => :signup
 

@@ -31,6 +31,7 @@ module Acts #:nodoc:
         attr_accessor :parent_name
         include Seek::Taggable
 
+        acts_as_scalable
         acts_as_authorized
         acts_as_uniquely_identifiable
         acts_as_annotatable :name_field=>:title
@@ -67,7 +68,14 @@ module Acts #:nodoc:
 
         has_many :project_folder_assets, :as=>:asset, :dependent=>:destroy
 
+        has_many :activity_logs, :as => :activity_loggable
+
+        after_create :add_new_to_folder
+
+        grouped_pagination
+
         searchable do
+          text :title, :description, :searchable_tags
           text :creators do
             creators.compact.map(&:name).join(' ')
           end
@@ -75,12 +83,6 @@ module Acts #:nodoc:
             content_blob_search_terms
           end
         end if Seek::Config.solr_enabled
-
-        has_many :activity_logs, :as => :activity_loggable
-
-        after_create :add_new_to_folder
-
-        grouped_pagination
 
         class_eval do
           extend Acts::Asset::SingletonMethods
@@ -201,7 +203,7 @@ module Acts #:nodoc:
       def content_blob_search_terms
         if self.respond_to?(:content_blob) || self.respond_to?(:content_blobs)
           blobs = self.respond_to?(:content_blobs) ? content_blobs : [content_blob]
-          blobs.collect do |blob|
+          blobs.compact.collect do |blob|
             [blob.original_filename] | [blob.pdf_contents_for_search]
           end.flatten.compact.uniq
         else

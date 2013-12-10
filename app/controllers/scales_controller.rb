@@ -2,58 +2,95 @@ class ScalesController < ApplicationController
   include IndexPager
 
   before_filter :find_assets,:only => [:index]
-   def show
-    @scale = Scale.find(params[:id])
-    scalings = @scale.scalings.select{|s| !s.scalable.nil?}
-    @scaled_objects = select_authorised scalings.collect{|scaling| scaling.scalable}.uniq
 
-    if @scaled_objects.empty?
-      flash.now[:notice]="No objects (or none that you are authorized to view) are scaled with '<b>#{@scale.name}</b>'."
-    else
-      flash.now[:notice]="#{@scaled_objects.size} #{@scaled_objects.size==1 ? 'item' : 'items'} scaled with '<b>#{@scale.name}</b>'."
-    end
-    respond_to do |format|
-      format.html # show.html.erb
-    end
-  end
 
   def index
     respond_to do |format|
       format.html
     end
   end
+  def search
+    type = params[:scale_type]
+        scale = Scale.find_by_key(type)
 
-   def scale_search
-    @scale = Scale.find_by_title(params[:scale_type])
-    resource_hash = {}
+        assets = scale ? Scale.with_scale(scale) : everything_with_scale
 
-    if @scale
-      scalables = Scaling.find(:all, :include => :scalable, :conditions => ["scale_id=?", @scale.id]).collect(&:scalable).compact.uniq
-      grouped_scalings = scalables.group_by { |scalable| scalable.class.name }
-      grouped_scalings.each do |key, value|
-        resource_hash[key] = value
-      end if !grouped_scalings.blank?
-    else
-      Seek::Util.user_creatable_types.each do |klass|
-        items = klass.all
-        resource_hash["#{klass}"] = items if items.count > 0
-      end
-    end
+        resource_hash={}
+        assets.each do |res|
+          resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
+          resource_hash[res.class.name][:items] << res
+        end
+
+        scale_types = Seek::Util.scalable_types
+        scale_types.each do |type|
+          resource_hash[type.name] = {:items => [], :hidden_count => 0} unless resource_hash[type.name]
+        end
+
+        resource_hash.each do |key,res|
+          res[:items].compact!
+          unless res[:items].empty?
+            total_count = res[:items].size
+            all = res[:items]
+            res[:items] = key.constantize.authorize_asset_collection res[:items], "view"
+            res[:hidden_count] = total_count - res[:items].size
+            res[:hidden_items] = all - res[:items]
+          end
+        end
+
+        render :update do |page|
+          scale_title = scale.try(:key) || 'all'
+          page.replace_html "#{scale_title}_results", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash,
+                                                                                                                      :show_empty_tabs=>true,
+                                                                                                                      :narrow_view => true, :authorization_already_done => true,
+                                                                                                                      :limit => 20,
+                                                                                                                      :tabs_id => "#{scale_title}_resource_listing_tabbed_by_class",
+                                                                                                                      :actions_partial_disable => true, :display_immediately=>true}
+          page << "load_tabs();"
+        end
+  end
+
+  def search_and_lazy_load_results
+    type = params[:scale_type]
+    scale = Scale.find_by_key(type)
+
+    assets = scale ? Scale.with_scale(scale) : everything_with_scale
+
+    resource_hash={}
+    grouped_assets = assets.group_by { |asset| asset.class.name }
+    grouped_assets.each do |asset_type, items|
+      resource_hash[asset_type] = items if items.count > 0
+    end if !grouped_assets.blank?
 
     render :update do |page|
-      scale_title = @scale.try(:title) || 'all'
-      page.replace_html "#{scale_title}_results", :partial=>"assets/resource_tabbed_lazy_loading",
-                        :locals =>{:scale_title => scale_title,
-                                   :tabs_id => "resource_tabbed_lazy_loading_#{scale_title}",
-                                   :resource_hash => resource_hash }
-    end
-   end
+      scale_title = scale.try(:key) || 'all'
+      page.replace_html "#{scale_title}_results", :partial => "assets/resource_tabbed_lazy_loading",
+                        :locals => {:scale_title => scale_title,
+                                    :tabs_id => "resource_tabbed_lazy_loading_#{scale_title}",
+                                    :resource_hash => resource_hash}
 
+    end
+  end
+
+  def show
+      @scale_key=Scale.find_by_id(params[:id]).try(:key) || "all"
+    end
 
   private
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
   def select_authorised collection
     collection.select {|el| el.can_view?}
+  end
+
+  def everything_with_scale
+        Scale.all.collect do |scale|
+          scale.assets
+        end.flatten.uniq
+  end
+
+  def everything_in_seek
+      Seek::Util.user_creatable_types.each do |klass|
+            klass.all
+      end.flatten.uniq
   end
 end

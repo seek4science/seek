@@ -19,6 +19,7 @@ en:
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
 
+
   #DataFile
   data_file: "Data file"
 
@@ -37,6 +38,7 @@ en:
   #Project
   project: "Project"
 
+  scale: "Scale"
   #Feedback
   feedback_bar: "Provide Feedback"
 

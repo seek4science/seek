@@ -3,6 +3,10 @@
 #:assay_modelling and :assay_experimental rely on the existence of the AssayClass's
 
 #Person
+  Factory.define(:admin_defined_role_project, :class=>AdminDefinedRoleProject) do |f|
+
+  end
+
   Factory.define(:brand_new_person, :class => Person) do |f|
     f.sequence(:email) { |n| "test#{n}@test.com" }
     f.sequence(:first_name) { |n| "Person#{n}" }
@@ -10,7 +14,19 @@
   end
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
-    f.work_groups {[Factory.build(:work_group)]}
+    f.group_memberships {[Factory.build(:group_membership)]}
+    #f.work_groups {[Factory.build(:work_group)]}
+    f.after_create do |p|
+      p.reload
+    end
+  end
+
+  Factory.define(:person_in_multiple_projects, :parent=>:brand_new_person) do |f|
+    f.association :user, :factory => :activated_user
+    f.group_memberships {[Factory.build(:group_membership),Factory.build(:group_membership),Factory.build(:group_membership)]}
+    f.after_create do |p|
+      p.reload
+    end
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|
@@ -22,20 +38,34 @@
   end
 
   Factory.define(:pal, :parent => :person) do |f|
-    f.is_pal true
-    f.after_create { |pal| pal.group_memberships.first.project_roles << ProjectRole.pal_role}
+    f.roles_mask 2
+    f.after_build do |pal|
+      Factory(:pal_role) if ProjectRole.pal_role.nil?
+      pal.group_memberships.first.project_roles << ProjectRole.pal_role
+      Factory(:admin_defined_role_project,:project=>pal.projects.first,:person=>pal,:role_mask=>2)
+      pal.roles_mask = 2
+    end
   end
 
   Factory.define(:asset_manager,:parent=>:person) do |f|
-    f.is_asset_manager true
+    f.after_build do |am|
+      Factory(:admin_defined_role_project,:project=>am.projects.first,:person=>am,:role_mask=>8)
+      am.roles_mask = 8
+    end
   end
 
   Factory.define(:project_manager,:parent=>:person) do |f|
-    f.is_project_manager true
+    f.after_build do |pm|
+      Factory(:admin_defined_role_project,:project=>pm.projects.first,:person=>pm,:role_mask=>4)
+      pm.roles_mask = 4
+    end
   end
 
   Factory.define(:gatekeeper,:parent=>:person) do |f|
-    f.is_gatekeeper true
+    f.after_build do |gk|
+      Factory(:admin_defined_role_project,:project=>gk.projects.first,:person=>gk,:role_mask=>16)
+      gk.roles_mask = 16
+    end
   end
 
 #User
@@ -402,7 +432,6 @@ end
     f.sequence(:pubmed_id) {|n| n}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-    f.association :policy, :factory => :private_policy
   end
 
   #Presentation
@@ -486,6 +515,10 @@ end
 
   Factory.define(:project_role) do |f|
     f.name "A Role"
+  end
+
+  Factory.define(:pal_role,:parent=>:project_role) do |f|
+    f.name "A Pal"
   end
 
   Factory.define(:work_group) do |f|
@@ -722,10 +755,12 @@ end
 Factory.define(:scalable,:parent=>:data_file){}
 
 #Scale
-Factory.define(:scale) do |f|
-  f.sequence(:title){|n| "Scale #{n}"}
-
-end
+Factory.define :scale do |f|
+    f.sequence(:title) {|n| "scale #{n}"}
+    f.sequence(:pos) {|n| n}
+    f.sequence(:key) {|n| "scale_key_#{n}"}
+    f.sequence(:image_name) {|n| "image_#{n}"}
+  end
 #Scaling
 Factory.define(:scaling) do |f|
   f.association :person
@@ -770,13 +805,25 @@ end
     f.sequence(:title) {|n| "Announcement #{n}"}
     f.sequence(:body) {|n| "This is the body for announcement #{n}"}
     f.association :announcer,:factory=>:admin
-    f.is_headline false
     f.expires_at 5.days.since
     f.email_notification false
+    f.is_headline false
   end
 
   Factory.define :headline_announcement,:parent=>:site_announcement do |f|
     f.is_headline true
+    f.title "a headline announcement"
+  end
+
+  Factory.define :feed_announcement,:parent=>:site_announcement do |f|
+    f.show_in_feed true
+    f.title "a feed announcement"
+  end
+
+  Factory.define :mail_announcement, :parent=>:site_announcement do |f|
+    f.email_notification true
+    f.title "a mail announcement"
+    f.body "this is a mail announcement"
   end
 
   Factory.define :annotation do |f|
@@ -847,6 +894,7 @@ end
     f.sequence(:first_name) { |n| "Person#{n}" }
     f.last_name "Last"
   end
+
 
   Factory.define :post do |f|
     f.body 'post body'

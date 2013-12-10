@@ -32,6 +32,7 @@
         <p>
         <%= fancy_multiselect @model,:scales, {:possibilities=>sort_scales(Scale.all)} if @model.is_scalable? -%>
        </p>
+
         <% if current_user_authorized_to_manage -%>
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>

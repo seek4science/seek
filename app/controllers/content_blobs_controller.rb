@@ -1,7 +1,7 @@
 class ContentBlobsController < ApplicationController
 
-  before_filter :find_and_auth_asset, :only=>[:get_pdf, :view_pdf_content, :download]
-  before_filter :find_and_auth_content_blob, :only=>[:get_pdf, :view_pdf_content, :download]
+  before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_pdf_content, :download]
+  before_filter :find_and_authorize_content_blob, :only=>[:get_pdf, :view_pdf_content, :download]
   before_filter :set_asset_version, :only=>[:get_pdf, :download]
 
   include Seek::AssetsCommon
@@ -44,9 +44,10 @@ class ContentBlobsController < ApplicationController
     @asset.just_used
 
     disposition = params[:disposition] || 'attachment'
+    image_size = params[:image_size]
 
     respond_to do |format|
-      format.html {handle_download disposition}
+      format.html {handle_download(disposition, image_size)}
       format.pdf {get_pdf}
     end
   end
@@ -121,7 +122,7 @@ class ContentBlobsController < ApplicationController
     end
   end
 
-  def find_and_auth_asset
+  def find_and_authorize_associated_asset
     asset = asset_object
     if asset
       if asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))
@@ -156,7 +157,7 @@ class ContentBlobsController < ApplicationController
     end
   end
 
-  def find_and_auth_content_blob
+  def find_and_authorize_content_blob
     content_blob = content_blob_object
     if content_blob.asset.id == @asset.id
       @content_blob = content_blob

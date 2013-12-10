@@ -6,12 +6,11 @@ require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
   include Seek::Errors::ControllerErrorHandling
+  include Seek::EnabledFeaturesFilter
 
   self.mod_porter_secret = PORTER_SECRET
 
   include CommonSweepers
-
-
 
   before_filter :log_extra_exception_data
 
@@ -35,7 +34,7 @@ class ApplicationController < ActionController::Base
   end
 
 
-  before_filter :project_membership_required
+  before_filter :project_membership_required,:only=>[:create,:new]
 
   helper :all
 
@@ -130,6 +129,7 @@ class ApplicationController < ActionController::Base
   def view_items_in_tab
     resource_type = params[:resource_type]
     resource_ids = (params[:resource_ids] || []).split(',')
+    view_type = params[:view_type] || 'view_some'
     render :update do |page|
       if !resource_type.blank?
         clazz = resource_type.constantize
@@ -140,7 +140,7 @@ class ApplicationController < ActionController::Base
           resources = resources.select &:can_view?
         end
         resources.sort!{|item,item2| item2.updated_at <=> item.updated_at}
-        page.replace_html "#{resource_type}_list_items_container",
+        page.replace_html "#{resource_type}_#{view_type}",
                           :partial => "assets/resource_list",
                           :locals => {:collection => resources,
                           :narrow_view => true,
@@ -312,7 +312,25 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def find_and_auth
+  #hanles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
+  def find_requested_item
+    name = self.controller_name.singularize
+    object = name.camelize.constantize.find_by_id(params[:id])
+    if (object.nil?)
+      respond_to do |format|
+        flash[:error] = "The #{name.humanize} does not exist!"
+        format.rdf { render  :text=>"Not found",:status => :not_found }
+        format.xml { render  :text=>"<error>404 Not found</error>",:status => :not_found }
+        format.json { render :text=>"Not found", :status => :not_found }
+        format.html { redirect_to eval "#{self.controller_name}_path" }
+      end
+    else
+      eval "@#{name} = object"
+    end
+  end
+
+  #handles finding and authorizing an asset for all controllers that require authorization, and handling if the item cannot be found
+  def find_and_authorize_requested_item
     begin
       name = self.controller_name.singularize
       action = translate_action(action_name)

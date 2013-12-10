@@ -5,7 +5,7 @@
   <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
   <% if Seek::Config.copyright_addendum_enabled  %>
     <p class="copyright">
-      <%= Seek::Config.copyright_addendum_content %>
+      <%= Seek::Config.copyright_addendum_content.html_safe%>
     </p>
   <%end%>
 </p>

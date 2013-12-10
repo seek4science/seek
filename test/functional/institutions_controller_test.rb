@@ -56,11 +56,40 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_should_destroy_institution
+    institution = institutions(:four)
+    get :show, :id => institution
+    assert_select "span.icon", :text => /Delete Institution/, :count => 1
+
     assert_difference('Institution.count', -1) do
-      delete :destroy, :id => institutions(:four).id
+      delete :destroy, :id => institution
     end
 
     assert_redirected_to institutions_path
+  end
+
+  def test_non_admin_should_not_destroy_institution
+    login_as(:aaron)
+    institution = institutions(:four)
+    get :show, :id => institution.id
+    assert_select "span.icon", :text => /Delete Institution/, :count => 0
+    assert_select "span.disabled_icon", :text => /Delete Institution/, :count => 0
+    assert_no_difference('Institution.count') do
+      delete :destroy, :id => institution
+    end
+    assert_not_nil flash[:error]
+  end
+
+  test "can not destroy institution if it contains people" do
+    institution = institutions(:four)
+    work_group = Factory(:work_group, :institution => institution)
+    a_person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    get :show, :id => institution
+    assert_select "span.disabled_icon", :text => /Delete Institution/, :count => 1
+    assert_no_difference('Institution.count') do
+      delete :destroy, :id => institution
+    end
+    assert_redirected_to institution_path(institution)
+    assert_not_nil flash[:error]
   end
 
   #Checks that the edit option is availabe to the user
@@ -78,14 +107,17 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
     def test_user_project_manager
-    login_as(:project_manager)
-    get :show, :id=>institutions(:two)
+    pm = Factory(:project_manager)
+    institution = pm.institutions.first
+    login_as(pm.user)
+    get :show, :id=>institution
+    assert_response :success
     assert_select "a",:text=>/Edit Institution/,:count=>1
 
-    get :edit, :id=>institutions(:two)
+    get :edit, :id=>institution
     assert_response :success
 
-    put :update, :id=>institutions(:two).id,:institution=>{}
+    put :update, :id=>institution.id,:institution=>{}
     assert_redirected_to institution_path(assigns(:institution))
   end
 

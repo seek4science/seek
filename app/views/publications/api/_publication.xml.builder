@@ -7,8 +7,7 @@ core_xlink(publication).merge(is_root ? xml_root_attributes : {}) do
   if (is_root)
         parent_xml.tag! "creators" do
           publication.publication_authors.each do |pa|
-              if pa.person
-                    api_partial parent_xml, pa.person
+              if pa.kind_of?(Person)
               else
                 parent_xml.tag! "person" do
                   parent_xml.tag! "dc:title",  "#{pa.first_name} #{pa.last_name}"

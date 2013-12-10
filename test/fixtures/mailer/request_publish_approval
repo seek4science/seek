@@ -1,9 +1,12 @@
 Hi Gatekeeper Last,
 
-    The SEEK user Aaron Spiggle, http://localhost/people/2, has requested your approval to publish some items.
-    You can approve or reject by clicking on the links beside the items:
-        "Picture": http://localhost/data_files/383471497/approve_or_reject_publish
-        "Teusink": http://localhost/models/869456695/approve_or_reject_publish
+    The SEEK user Aaron Spiggle, http://localhost/people/-requester_id-, has requested your approval to publish the following item(s):
+        Data file: Picture - http://localhost/data_files/-df_id-
+        Model: Teusink - http://localhost/models/-model_id-
+
+    You can approve or reject by clicking on this link:
+    http://localhost/people/-person_id-/requested_approval_assets
+    (Remember to login first!)
 
     You can also reply to Aaron by replying to this email.
 

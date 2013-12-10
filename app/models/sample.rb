@@ -24,9 +24,6 @@ class Sample < ActiveRecord::Base
   belongs_to :institution
   has_and_belongs_to_many :assays
 
-  has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
-  has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
-
   has_many :sample_assets,:dependent => :destroy
  
    validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
@@ -86,9 +83,6 @@ class Sample < ActiveRecord::Base
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :searchable_terms
-    text :creators do
-      creators.compact.map(&:name)
-    end
   end if Seek::Config.solr_enabled
 
   def searchable_terms
@@ -116,7 +110,7 @@ class Sample < ActiveRecord::Base
  end
 
  def self.user_creatable?
-   true
+   Seek::Config.biosamples_enabled
  end
 
   def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title

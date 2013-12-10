@@ -1,11 +1,16 @@
-<% controller=@resource.class.name.underscore.pluralize -%>
 Hi <%= @requester.name -%>,
 
-    The <%= Seek::Config.application_name %> Gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> approved your wish to publish:
-    "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource,:host=>@host) -%>.
+    Upon your publishing requests, the <%= Seek::Config.application_name %> Gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> approved to publish:
+    <% @items_and_comments.each do |item_and_comment| %>
+        <% item = item_and_comment[:item] %>
+        <% controller=item.class.name.underscore.pluralize -%>
+        <%= item.class.name.humanize -%>: <%= item.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>item,:host=>@host) -%>
 
-    This <%= @resource.class.name -%> is now accessible to all visitors of the <%= Seek::Config.application_name %>.
+        Comment: <%= item_and_comment[:comment].blank? ? 'No comment' : item_and_comment[:comment] %>
+
+    <% end %>
+    The item(s) are now accessible in <%= Seek::Config.application_name %> without logging in.
 
     This is an automated email.
 
-- <%= Seek::Config.dm_project_name %> Team
+- <%= Seek::Config.dm_project_name %> Team.

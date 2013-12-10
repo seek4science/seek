@@ -4,12 +4,13 @@ class StudiesController < ApplicationController
   include IndexPager
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show]
 
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
 
-  include Seek::Publishing::GatekeeperPublish
   include Seek::Publishing::PublishingCommon
+
+  include Seek::AnnotationCommon
 
   include Seek::BreadCrumbs
 
@@ -83,6 +84,7 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.save
+        update_scales @study
         flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
         format.xml  { head :ok }
@@ -100,9 +102,6 @@ class StudiesController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.svg { render :text=>to_svg(@study.investigation,params[:deep]=='true',@study)}
-      format.dot { render :text=>to_dot(@study.investigation,params[:deep]=='true',@study)}
-      format.png { render :text=>to_png(@study.investigation,params[:deep]=='true',@study)}
     end
 
   end
@@ -114,6 +113,7 @@ class StudiesController < ApplicationController
 
 
   if @study.save
+    update_scales @study
     if @study.new_link_from_assay=="true"
       render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
     else

@@ -373,7 +373,7 @@ class SopsControllerTest < ActionController::TestCase
 
 
     #create new version
-    post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/little_file_v2.txt',Mime::TEXT)}
+    post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/little_file_v2.txt',(Mime::TEXT).to_s)}
     assert_redirected_to sop_path(assigns(:sop))
 
     s=Sop.find(s.id)
@@ -510,7 +510,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_editing_doesnt_change_contributor
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this sop
+    login_as(:model_owner) #this user is a member of sysmo, and can edit this sop
     sop=sops(:sop_with_no_contributor)
     put :update, :id => sop, :sop => {:title=>"blah blah blah"}, :sharing=>valid_sharing
     updated_sop=assigns(:sop)

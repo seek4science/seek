@@ -133,11 +133,15 @@ class AssayTypeTest < ActiveSupport::TestCase
   end
 
   test "experimental assay type id" do
-    assert_not_nil AssayType.experimental_assay_type_id
+    id = AssayType.experimental_assay_type_id
+    assert_not_nil id
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#ExperimentalAssayType",AssayType.find(id).term_uri
   end
 
   test "modelling assay type id" do
-    assert_not_nil AssayType.modelling_assay_type_id
+    id = AssayType.modelling_assay_type_id
+    assert_not_nil id
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#ModelAnalysisType",AssayType.find(id).term_uri
   end
 
   

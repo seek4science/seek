@@ -10,7 +10,7 @@
        current_page?("/"+s[1].to_s)? @search_type=s[1].to_s : @search_type=@search_type
      end
 end %>
-
+<% if Seek::Config.is_virtualliver %>
 <% if !Person.admins.empty? -%>
   <% if Seek::Config.email_enabled %>
     <%= image_tag_for_key("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
@@ -23,6 +23,7 @@ end %>
   <%= image_tag_for_key "admin", admin_path, "Admin", {:id=>"adminmode"}, "Admin" -%>
 <% end -%>
 
+<% end -%>
 
 
 <% if Seek::Config.solr_enabled -%>
@@ -32,7 +33,7 @@ end %>
       <font color="white"><b> <%= "Search:" %> </b></font>
       <%= text_field_tag :search_query, @search_query, :onclick => "clickclear(this, 'Search here...')", :onblur => "clickrecall(this, 'Search here...')" ,:class=>"curved", :style=>"display:none;"-%>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
-      <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all, :title, :display_title, params[:scale])) %>
+      <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])) %>
       <% if Seek::Config.external_search_enabled %>
         <span title='<%= tooltip_title_attrib(external_search_tooltip_text) -%>' >
           <%= check_box_tag :include_external_search, 1, @include_external_search -%>External

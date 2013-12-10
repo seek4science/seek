@@ -1,14 +1,16 @@
-<% controller=@resource.class.name.underscore.pluralize -%>
 Hi <%= @requester.name -%>,
 
-    The <%= Seek::Config.application_name %> Gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> rejected your wish publish:
-    "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource,:host=>@host) -%>.
+    Upon your publishing requests, the <%= Seek::Config.application_name %> Gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper,:host=>@host) -%> rejected your wish to publish:
+    <% @items_and_comments.each do |item_and_comment| %>
+        <% item = item_and_comment[:item] %>
+        <% controller=item.class.name.underscore.pluralize -%>
+        <%= item.class.name.humanize -%>: <%= item.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>item,:host=>@host) -%>
 
-    <%= @extra_comment -%>
+        Comment: <%= item_and_comment[:comment].blank? ? 'No comment' : item_and_comment[:comment] %>
 
-
-    You can also reply to <%= @gatekeeper.first_name.capitalize -%> by replying to this email.
+    <% end %>
+    You can also reply to <%= @gatekeeper.name %> by replying to this email.
 
     This is an automated email.
 
-- <%= Seek::Config.dm_project_name %> Team
+- <%= Seek::Config.dm_project_name %> Team.

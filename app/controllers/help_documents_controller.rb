@@ -1,5 +1,6 @@
 class HelpDocumentsController < ApplicationController
-  
+
+  before_filter :documentation_enabled?
   before_filter :find_document, :except => [:new, :index, :create]
   before_filter :login_required, :except=>[:show,:index]
   before_filter :is_user_admin_auth, :except => [:show, :index]

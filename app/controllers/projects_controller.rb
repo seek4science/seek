@@ -1,14 +1,16 @@
+require 'seek/custom_exception'
+
 class ProjectsController < ApplicationController
   include WhiteListHelper
   include IndexPager
   include CommonSweepers
-  
+
+  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy]
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report, :view_items_in_tab,:resource_in_tab]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin]
   before_filter :auth_params,:only=>[:update]
-  before_filter :auth_institution_list_for_project_manager, :only => [:update]
   before_filter :member_of_this_project, :only=>[:asset_report]
 
   skip_before_filter :project_membership_required
@@ -44,7 +46,6 @@ class ProjectsController < ApplicationController
   end
 
   def admin
-    @project = Project.find(params[:id])
     
     respond_to do |format|
       format.html # admin.html.erb
@@ -54,7 +55,6 @@ class ProjectsController < ApplicationController
   # GET /projects/1
   # GET /projects/1.xml
   def show
-    @project = Project.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render :template=>'rdf/show'}
@@ -96,7 +96,6 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1/edit
   def edit
-    @project = Project.find(params[:id])
     
     possible_unsaved_data = "unsaved_#{@project.class.name}_#{@project.id}".to_sym
     if session[possible_unsaved_data]
@@ -147,8 +146,6 @@ class ProjectsController < ApplicationController
   # PUT /projects/1
   # PUT /projects/1.xml
   def update
-    @project = Project.find(params[:id])
-    #@project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
     
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
     avatar_id = params[:project].delete(:avatar_id).to_i
@@ -156,16 +153,22 @@ class ProjectsController < ApplicationController
 
     @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:sharing], [@project] if params[:sharing]
 
-    respond_to do |format|
-      if @project.update_attributes(params[:project])
-        expire_resource_list_item_content
-
-        flash[:notice] = "#{t('project')} was successfully updated."
+    begin
+      respond_to do |format|
+        if @project.update_attributes(params[:project])
+          expire_resource_list_item_content
+          flash[:notice] = "#{t('project')} was successfully updated."
+          format.html { redirect_to(@project) }
+          format.xml  { head :ok }
+        else
+          format.html { render :action => "edit" }
+          format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
+        end
+      end
+    rescue WorkGroupDeleteError=>e
+      respond_to do |format|
+        flash[:error] = e.message
         format.html { redirect_to(@project) }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -180,14 +183,13 @@ class ProjectsController < ApplicationController
   # DELETE /projects/1
   # DELETE /projects/1.xml
   def destroy
-    @project = Project.find(params[:id])
     respond_to do |format|
-      if (Project.is_hierarchical? && @project.children.empty?) || !Project.is_hierarchical?
+      if @project.can_delete? && ((Project.is_hierarchical? && @project.children.empty?) || !Project.is_hierarchical?)
         @project.destroy
         format.html { redirect_to(projects_path) }
         format.xml { head :ok }
       else
-        flash.now[:error]="Unable to delete project with children"
+        flash.now[:error]="Unable to delete #{t('project')} with children"
         format.html { redirect_to(@project) }
         format.xml { render :xml=>@project.errors, :status=>:unprocessable_entity }
       end
@@ -262,31 +264,6 @@ class ProjectsController < ApplicationController
     restricted_params.each do |param, allowed|
       params[:project].delete(param) if params[:project] and not allowed
       params.delete param if params and not allowed
-    end
-  end
-
-  def auth_institution_list_for_project_manager
-    unless Seek::Config.is_virtualliver
-      if (params[:project] and params[:project][:institution_ids])
-        if User.project_manager_logged_in? && !User.admin_logged_in?
-          institutions = []
-          params[:project][:institution_ids].each do |id|
-            institution = Institution.find_by_id(id)
-            institutions << institution unless institution.nil?
-          end
-          institutions_of_this_project = @project.institutions
-          institutions_of_no_project = Institution.all.select { |i| i.projects.empty? }
-          allowed_institution_list = (institutions_of_this_project + institutions_of_no_project).uniq
-          flag = true
-          institutions.each do |i|
-            flag = false if !allowed_institution_list.include? i
-          end
-          if flag == false
-            error("Insufficient privileges", "is invalid (insufficient_privileges)")
-          end
-          return flag
-        end
-      end
     end
   end
 end

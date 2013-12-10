@@ -1,9 +1,10 @@
+require 'delayed/command'
+
 class AdminsController < ApplicationController
   include CommonSweepers
 
-  RESTART_MSG = "You settings have been updated. If you enabled search you need to restart your server.
-                 If deployed in conjunction with Passenger Phusion you can use the button at the bottom of this page,
-                 otherwise you need to restart manually."
+  RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
+                 Please see the buttons and explanations below."
   
   before_filter :login_required
   before_filter :is_user_admin_auth
@@ -23,12 +24,7 @@ class AdminsController < ApplicationController
     current_admins.each{|ca| ca.is_admin = false}
     admins.each{|a| a.is_admin = true}
     (admins | current_admins).each do |admin|
-      class << admin
-        def record_timestamps
-          false
-        end
-      end
-      admin.save
+      admin.save!
     end
     redirect_to :action=>:show
   end
@@ -50,6 +46,7 @@ class AdminsController < ApplicationController
     Seek::Config.email_enabled= string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled= string_to_boolean params[:pdf_conversion_enabled]
     Seek::Config.delete_asset_version_enabled= string_to_boolean params[:delete_asset_version_enabled]
+    Seek::Config.forum_enabled= string_to_boolean params[:forum_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
@@ -76,6 +73,7 @@ class AdminsController < ApplicationController
     Seek::Config.piwik_analytics_url= params[:piwik_analytics_url]
 
     Seek::Config.set_smtp_settings 'port', params[:port] if only_integer params[:port], 'port'
+    Seek::Util.clear_cached
     update_redirect_to (only_integer params[:port], "port"),'features_enabled'
   end
 
@@ -167,9 +165,30 @@ class AdminsController < ApplicationController
   end
 
   def restart_server
-    system ("touch #{Rails.root}/tmp/restart.txt")
-    flash[:notice] = 'The server was restarted'
-    redirect_to :action=>:show
+    command = "touch #{Rails.root}/tmp/restart.txt"
+    error = execute_command(command)
+    redirect_with_status(error, 'server')
+  end
+
+  def restart_delayed_job
+    error = nil
+    if Rails.env!="test"
+      begin
+        Delayed::Command.new(["restart"]).daemonize
+
+        #give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
+        pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job")
+        x=0
+        while !pid.running? && (x<10)
+          sleep(0.5)
+          x+=1
+        end
+      rescue Exception=>e
+        error=e.message
+      end
+    end
+
+    redirect_with_status(error, 'background tasks')
   end
 
   def edit_tag
@@ -220,9 +239,9 @@ class AdminsController < ApplicationController
     tag=TextValue.find(params[:id])
     if request.post?
       tag.annotations.each do |a|
-        a.delete
+        a.destroy
       end
-      tag.delete
+      tag.destroy
       flash.now[:notice]="Tag #{tag.text} deleted"
 
     else
@@ -391,4 +410,28 @@ class AdminsController < ApplicationController
        redirect_to :action=> action.to_s
      end
   end
+
+  def execute_command(command)
+    return nil if Rails.env=="test"
+    begin
+      cl = Cocaine::CommandLine.new(command)
+      cl.run
+      return nil
+    rescue Cocaine::CommandNotFoundError => e
+      return "The command the restart the background tasks could not be found!"
+    rescue Exception => e
+      error =  e.message
+      return error
+    end
+  end
+
+  def redirect_with_status(error, process)
+    if error.blank?
+      flash[:notice] = "The #{process} was restarted"
+    else
+      flash[:error] = "There is a problem with restarting the #{process}. #{error.gsub("Cocaine::", "")}"
+    end
+    redirect_to :action=>:show
+  end
+
 end

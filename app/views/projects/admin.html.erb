@@ -12,23 +12,18 @@
 
     <h2>Participating Institutions</h2>
 
-    <div>
-      <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making youpotr selection from the list below.") -%>
-      <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}", :style => "line-height: 2;" -%><br/>
-      <%
-         institution_list = []
-         if admin_logged_in?
-           institution_list |= Institution.all
-         elsif project_manager_logged_in?
-           if Seek::Config.is_virtualliver
-             institution_list |= Institution.all
-           else
-            institution_list |= (Institution.all.select{|i| i.projects.empty?} + @project.institutions).uniq
-           end
-         end
-      %>
-      <%= f.collection_select :institution_ids, institution_list, :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
-    </div>
+      <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}:", :style => "line-height: 2; margin-left: 1em;" -%><br/>
+      <% institution_list = Institution.order(:name) %>
+
+      <% chosen_institutions = @project.institutions %>
+      <div style="margin-top: 1em; margin-bottom: 2em; margin-left: 2em; width: 90%; height: 500px; overflow: auto;">
+          <% institution_list.each do |institution| %>
+              <%= check_box_tag "institution_#{institution.id}", institution.id, chosen_institutions.include?(institution), :class => 'institution_checkbox' %>
+              <%= institution.title %>
+              <br/>
+          <% end %>
+      </div>
+      <%= f.select :institution_ids, institution_list.collect(&:id), {}, :style => 'display:none;', :multiple => true -%>
 
     <% if admin_logged_in? && Seek::Config.jerm_enabled %>
         <br/>
@@ -46,7 +41,7 @@
     <%end%>
 
     <p>
-      <%= f.submit("Update", :disable_with=>"Updating...") -%>
+      <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateInstitutionIds();") -%>
       or <%= link_to 'Cancel', project_path(@project.id) -%>
     </p>
 

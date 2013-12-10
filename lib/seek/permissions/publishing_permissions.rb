@@ -24,7 +24,7 @@ module Seek
         end
       end
 
-      def publish!
+      def publish! comment=nil
         if can_publish?
           if gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)
             false
@@ -32,12 +32,21 @@ module Seek
             policy.access_type=Policy::ACCESSIBLE
             policy.sharing_scope=Policy::EVERYONE
             policy.save
-            self.resource_publish_logs.create(:publish_state=>ResourcePublishLog::PUBLISHED,:culprit=>User.current_user)
+            #FIXME:may need to add comment
+            self.resource_publish_logs.create(:publish_state=>ResourcePublishLog::PUBLISHED,
+                                              :user=>User.current_user,
+                                              :comment=>comment)
             touch
           end
         else
           false
         end
+      end
+
+      def reject comment
+        resource_publish_logs.create(:publish_state=>ResourcePublishLog::REJECTED,
+                                     :user=>User.current_user,
+                                     :comment=>comment)
       end
 
       def is_published?
@@ -49,15 +58,15 @@ module Seek
         end
       end
 
-      def is_rejected? time=3.months.ago
+      def is_rejected? time=ResourcePublishLog::CONSIDERING_TIME.ago
         !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
                                                 self.class.name,self.id,ResourcePublishLog::REJECTED, time]).empty?
       end
 
-      def is_waiting_approval? user=nil,time=3.months.ago
+      def is_waiting_approval? user=nil,time=ResourcePublishLog::CONSIDERING_TIME.ago
         if user
-          !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND culprit_type=? AND culprit_id=? AND publish_state=? AND created_at >?",
-                                                      self.class.name,self.id, user.class.name, user.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
+          !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND user_id=? AND publish_state=? AND created_at >?",
+                                                      self.class.name,self.id, user.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
         else
           !ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND created_at >?",
                                                          self.class.name,self.id,ResourcePublishLog::WAITING_FOR_APPROVAL,time]).empty?
@@ -70,6 +79,14 @@ module Seek
 
       def gatekeepers
         self.projects.collect(&:gatekeepers).flatten.uniq
+      end
+
+      def publish_requesters
+        user_requesters = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=?",
+                                               self.class.name, self.id, ResourcePublishLog::WAITING_FOR_APPROVAL]).collect(&:user)
+
+        person_requesters = user_requesters.compact.collect(&:person)
+        person_requesters.compact.uniq
       end
 
       #the asset that can be published together with publishing the whole ISA

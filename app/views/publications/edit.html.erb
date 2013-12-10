@@ -5,17 +5,22 @@
   <%= error_messages_for('publication', :message => nil) %>
   <%= form_tag publication_path(@publication), :method => :put do %>
     <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => true}%>
+
+
     
     <% if @publication.pubmed_id.nil? && @publication.doi %>
+      <label>Abstract:</label><br/>
+      <p class="box_infotext">
+        When adding a publication through a DOI, it is not possible to fetch the original abstract automatically.
+        <br/>Please paste the abstract below
+      </p>
       <p>
-        <label>Abstract:</label><br/>
         <%= text_area(:publication, :abstract, :cols => 90, :rows => 8) %>
       </p>
     <% end %>
 
-    <h2>Associate authors</h2>  
- 
-    <% projects = @publication.projects %>
+    <h2>Associate authors</h2>
+
     Using the form below, you can link the authors listed in PubMed to people registered in SEEK.<br/><br/>
     
     SEEK will try and suggest the correct person based on the author's name. If this suggestion is incorrect, please select the correct person from the dropdown menu, or choose "None" if this person isn't a member of SEEK.<br/><br/>
@@ -23,18 +28,20 @@
     To reset the author list to the state of the original PubMed article, click the "Disassociate All Authors".<br/>
     
     <div style="margin:1em; float: left; width:45%" class="box_editing_inner">
-      <h4>Author Associations</h4>
+      <h4>Unassociated authors</h4>
       <% unless @publication.publication_authors.empty? %>
         <table>
           <tr>
             <th>Author name</th>
             <th>SEEK person</th>
           </tr>
-          <% people = Person.all.select(&:can_view?)%>
+          <% people_by_project = people_by_project_options(Project.all) -%>
           <% @publication.publication_authors.each do |author| %>
-          <tr>    
+          <tr>
             <td><%= author.first_name + " " + author.last_name -%></td>
-            <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people.map {|person| "<option #{person == @author_associations[author.id] ? 'selected="selected"' : ''} value=\"#{person.id}\" title=\"#{h person.name}\">#{h truncate(person.name)}</option>"} -%></select></td>
+            <td>
+              <%= select_tag "author[#{author.id}]", "<option value=''>None</option>#{people_by_project}".html_safe %>
+            </td>
           </tr>
           <% end %>
         </table>
@@ -61,7 +68,7 @@
     <br style="clear: both"/>
     <div>
      <p>
-        <%= fancy_multiselect @publication,:scales, {:possibilities=>sort_scales(Scale.all)} if @publication.is_scalable? -%>
+       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@publication} if show_scales?%>
     </p>
     <p>
         <%= render :partial=>"assets/select_tags" -%>
@@ -88,3 +95,29 @@
     </p>
   <% end %>
 </div>
+
+<script type="text/javascript">
+    var project_ids = <%= @publication.projects.collect{ |p| p.id } %>
+    <% @publication.non_seek_authors.each do |author| %>
+        var select_element = $('author_' + '<%= author.id %>');
+        var options = select_element.options;
+        for (var i=0; i<options.length; i++){
+            var option = options[i];
+            if ('<%= @author_associations[author.id].try(:id) %>' == options[i].value){
+                var parent_node = option.parentNode;
+                if (project_ids.length == 0){
+                    option.selected = true;
+                    break;
+                }else{
+                    for (var j=0; j<project_ids.length; j++){
+                        if (project_ids[j].toString() == parent_node.id){
+                            option.selected = true;
+                            break;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    <% end %>
+</script>

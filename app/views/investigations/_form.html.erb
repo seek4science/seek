@@ -17,7 +17,7 @@
 
     <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>true} -%><br/>
    <p>
-      <%= f.fancy_multiselect :scales,{:possibilities=>sort_scales(Scale.all)} if @investigation.is_scalable? -%>
+     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
    </p>
   <p>
     <%= render :partial=>"assets/sharing_form" if @investigation.can_manage? -%>

@@ -24,8 +24,9 @@
   <%= list_item_attribute "Contributor", resource.owner.name, resource.owner %>
 
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true} %>
-
-  <%= list_item_simple_list(resource.assay_organisms, "Organism") { |ao| assay_organism_list_item(ao) } %>
+  <% if Seek::Config.organisms_enabled %>
+    <%= list_item_simple_list(resource.assay_organisms, "Organism") { |ao| assay_organism_list_item(ao) } %>
+  <% end %>
 
   <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
 

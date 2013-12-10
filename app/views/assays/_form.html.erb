@@ -64,13 +64,13 @@
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
     <% if User.current_user.try(:can_manage_types?) %>
-      <%= link_to h("New assay type?"),new_assay_type_path(:parent_name=>controller_name.underscore.singularize),:popup => true %>
+      <%= link_to h("New assay type?"),new_assay_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
       <% end %>
     </td>
     <% unless @assay.is_modelling? -%>
         <td><%= f.label "Technology type: " %>
        <% if User.current_user.try(:can_manage_types?) %>
-        <%= link_to h("New technology type?"),new_technology_type_path(:parent_name=>controller_name.underscore.singularize),:popup => true %>
+        <%= link_to h("New technology type?"),new_technology_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
           <% end %>
         </td>
 
@@ -94,7 +94,7 @@
     <%= render :partial=>"assays/select_organisms" -%>
 </div>
  <p>
-      <%= f.fancy_multiselect :scales,{:object_type_text=>@assay_text,:possibilities=>sort_scales(Scale.all)} if @assay.is_scalable?-%>
+   <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} if show_scales?%>
  </p>
 
 <br style="clear:both"/>

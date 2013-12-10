@@ -53,20 +53,36 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
 
   test "perform" do
     Delayed::Job.delete_all
-    BATCHSIZE=50
-    from_notifiee_id = 1
-    notifiee1 = Factory(:notifiee_info, :id => 10)
-    notifiee2 = Factory(:notifiee_info, :id => 60)
+
+    notifiee1 = Factory(:person).notifiee_info
+    temp_notifiee = Factory(:person).notifiee_info
+
+    #this is to create 2 people with notifiee id;s spread greater than BATCHSIZE
+    until temp_notifiee.id > (notifiee1.id + SendAnnouncementEmailsJob::BATCHSIZE + 1)
+      temp_notifiee.destroy
+      temp_notifiee = Factory(:person).notifiee_info
+    end
+    temp_notifiee.destroy
+    notifee2 = Factory(:person).notifiee_info
+
+    #checks 1 email is sent for the first batch
     site_announcement = SiteAnnouncement.create(:title => 'test announcement', :body => 'test', :email_notification => true)
     assert SendAnnouncementEmailsJob.exists?(site_announcement.id,1)
+    Delayed::Job.delete_all
     assert_emails 1 do
-      SendAnnouncementEmailsJob.new(site_announcement.id, 1).perform
+      assert_difference("Delayed::Job.count",1,"a new job should have been created for the next batch") do
+        SendAnnouncementEmailsJob.new(site_announcement.id, notifiee1.id).perform
+      end
     end
 
-    from_new_notifiee_id = from_notifiee_id + BATCHSIZE + 1
+    #..and 1 email is sent for the 2nd batch
+    from_new_notifiee_id = notifiee1.id + SendAnnouncementEmailsJob::BATCHSIZE + 1
     assert SendAnnouncementEmailsJob.exists?(site_announcement.id,from_new_notifiee_id)
+    Delayed::Job.delete_all
     assert_emails 1 do
-      SendAnnouncementEmailsJob.new(site_announcement.id, from_new_notifiee_id).perform
+      assert_no_difference("Delayed::Job.count","no new jobs should have been created, since there is need for a new batch") do
+        SendAnnouncementEmailsJob.new(site_announcement.id, from_new_notifiee_id).perform
+      end
     end
   end
 end

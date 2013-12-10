@@ -4,10 +4,11 @@ class InvestigationsController < ApplicationController
   include IndexPager
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_auth,:only=>[:edit, :update, :destroy, :show]
+  before_filter :find_and_authorize_requested_item,:only=>[:edit, :update, :destroy, :show]
 
-  include Seek::Publishing::GatekeeperPublish
   include Seek::Publishing::PublishingCommon
+
+  include Seek::AnnotationCommon
 
   include Seek::BreadCrumbs
 
@@ -34,9 +35,6 @@ class InvestigationsController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show' }
-      format.svg { render :text=>to_svg(@investigation,params[:deep]=='true')}
-      format.dot { render :text=>to_dot(@investigation,params[:deep]=='true')}
-      format.png { render :text=>to_png(@investigation,params[:deep]=='true')}
     end
   end
 
@@ -45,6 +43,7 @@ class InvestigationsController < ApplicationController
     @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
 
     if @investigation.save
+      update_scales @investigation
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
@@ -99,6 +98,7 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.save
+        update_scales @investigation
         flash[:notice] = "#{t('investigation')} was successfully updated."
         format.html { redirect_to(@investigation) }
         format.xml  { head :ok }

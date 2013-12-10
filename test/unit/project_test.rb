@@ -8,12 +8,14 @@ class ProjectTest < ActiveSupport::TestCase
     n_wg=WorkGroup.all.size
     p=Project.find(2)
     assert_equal 1,p.work_groups.size
+    wg = p.work_groups.first
         
-    p.work_groups.first.people=[]
-    p.save!
+    wg.people=[]
+    wg.save!
+    User.current_user = Factory(:admin).user
     p.destroy
     
-    assert_equal n_wg-1,WorkGroup.all.size
+    assert_equal nil,WorkGroup.find_by_id(wg.id)
     wg=WorkGroup.all.first
     assert_same 1,wg.project_id
   end
@@ -193,12 +195,27 @@ class ProjectTest < ActiveSupport::TestCase
     p=projects(:three)
     assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :cant_edit"
 
-    u=users(:project_manager)
+    u=Factory(:project_manager).user
+    p=u.person.projects.first
     assert p.can_be_edited_by?(u),"Project :three should be editable by user :project_manager"
 
     p=projects(:four)
     assert !p.can_be_edited_by?(u),"Project :four should not be editable by user :can_edit as he is not a member"
-  end    
+  end
+
+  test "can be administered by" do
+    admin = Factory(:admin)
+    pm = Factory(:project_manager)
+    normal = Factory(:person)
+    another_proj = Factory(:project)
+
+    assert pm.projects.first.can_be_administered_by?(pm.user)
+    assert !normal.projects.first.can_be_administered_by?(normal.user)
+
+    assert !another_proj.can_be_administered_by?(normal.user)
+    assert !another_proj.can_be_administered_by?(pm.user)
+    assert another_proj.can_be_administered_by?(admin.user)
+  end
 
   def test_update_first_letter
     p=Project.new(:name=>"test project")
@@ -267,17 +284,6 @@ class ProjectTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
-  def test_pals
-    pal=people(:pal)
-    project=projects(:sysmo_project)
-
-    assert_equal 1,project.pals.size
-    assert project.pals.include?(pal)
-
-    project = projects(:moses_project)
-    assert !project.pals.include?(pal)
-  end
-
   test "test uuid generated" do
     p = projects(:one)
     assert_nil p.attributes["uuid"]
@@ -299,6 +305,83 @@ class ProjectTest < ActiveSupport::TestCase
 
     latest_projects = Project.paginate_after_fetch([project1,project2], :page=>'latest')
     assert_equal project2, latest_projects.first
+  end
+
+  test "can_delete?" do
+    project = Factory(:project)
+
+    #none-admin can not delete
+    user = Factory(:user)
+    assert !user.is_admin?
+    assert project.work_groups.collect(&:people).flatten.empty?
+    assert !project.can_delete?(user)
+
+    #can not delete if workgroups contain people
+    user = Factory(:admin).user
+    assert user.is_admin?
+    project = Factory(:project)
+    work_group = Factory(:work_group, :project => project)
+    a_person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    assert !project.work_groups.collect(&:people).flatten.empty?
+    assert !project.can_delete?(user)
+
+    #can delete if admin and workgroups are empty
+    work_group.group_memberships.delete_all
+    assert project.work_groups.reload.collect(&:people).flatten.empty?
+    assert user.is_admin?
+    assert project.can_delete?(user)
+  end
+
+  test "gatekeepers" do
+    User.with_current_user(Factory(:admin)) do
+      person=Factory(:person_in_multiple_projects)
+      proj1 = person.projects.first
+      proj2 = person.projects.last
+      person.is_gatekeeper=true,proj1
+      person.save!
+
+      assert proj1.gatekeepers.include?(person)
+      assert !proj2.gatekeepers.include?(person)
+    end
+  end
+
+  test "project_managers" do
+    User.with_current_user(Factory(:admin)) do
+      person=Factory(:person_in_multiple_projects)
+      proj1 = person.projects.first
+      proj2 = person.projects.last
+      person.is_project_manager=true,proj1
+      person.save!
+
+      assert proj1.project_managers.include?(person)
+      assert !proj2.project_managers.include?(person)
+    end
+  end
+
+  test "asset_managers" do
+    User.with_current_user(Factory(:admin)) do
+      person=Factory(:person_in_multiple_projects)
+      proj1 = person.projects.first
+      proj2 = person.projects.last
+      person.is_asset_manager=true,proj1
+      person.save!
+
+      assert proj1.asset_managers.include?(person)
+      assert !proj2.asset_managers.include?(person)
+    end
+  end
+
+  test "pals" do
+    User.with_current_user(Factory(:admin)) do
+      person=Factory(:person_in_multiple_projects)
+      proj1 = person.projects.first
+      proj2 = person.projects.last
+      person.is_pal=true,proj1
+      person.save!
+
+      assert proj1.pals.include?(person)
+      assert !proj2.pals.include?(person)
+    end
   end
 
 

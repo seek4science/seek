@@ -30,6 +30,20 @@
         <% tooltip_text = "Publish your owned assets in one click. A preview will be given before publishing" %>
         <%= image_tag_for_key "publish", batch_publishing_preview_person_path(@person), "Publish your assets", {:title => tooltip_title_attrib(tooltip_text)}, "Publish your assets" -%>
       </li>
+      <% if @person.is_in_any_gatekept_projects? %>
+          <li>
+            <%= image_tag_for_key "waiting", waiting_approval_assets_person_path(@person), "Assets awaiting approval",
+                                  {:title => tooltip_title_attrib("The assets you have requested to publish, but are awaiting Gatekeeper approval")},
+                                  "Assets awaiting approval" -%>
+          </li>
+      <% end %>
+      <% if @person.is_gatekeeper_of_any_project? %>
+          <li>
+            <%= image_tag_for_key "waiting", requested_approval_assets_person_path(@person), "Assets you are Gatekeeping",
+                                  {:title => tooltip_title_attrib("The assets people have requested to publish, but are still awaiting your approval")},
+                                  "Assets you are Gatekeeping" -%>
+          </li>
+      <% end %>
   <% end %>
 </ul>
 
@@ -59,13 +73,13 @@
         <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
         <ul>
 
-          <%= "<li>This person is a <b>#{Seek::Config.dm_project_name} PAL</b></li>".html_safe if @person.is_pal? %>
+          <%= content_tag(:li,"This person is a #{Seek::Config.dm_project_name} PAL for #{@person.projects_for_role('pal').collect(&:title).join(', ')}") if @person.is_pal_of_any_project? %>
 
 
-          <%= "<li>This person is a <b>#{t('project')} Manager</b></li>".html_safe if @person.is_project_manager? %>
+          <%= content_tag(:li,"This person is a #{t('project')} Manager for #{@person.projects_for_role('project_manager').collect(&:title).join(', ')}") if @person.is_project_manager_of_any_project? %>
 
-          <%= "<li>This person is an <b>Asset Manager</b></li>".html_safe if @person.is_asset_manager? %>
-          <%= "<li>This person is a <b>Gatekeeper</b></li>".html_safe if @person.is_gatekeeper? %>
+          <%= content_tag(:li,"This person is an Asset Manager for #{@person.projects_for_role('asset_manager').collect(&:title).join(', ')}") if @person.is_asset_manager_of_any_project? %>
+          <%= content_tag(:li,"This person is a Gatekeeper for #{@person.projects_for_role('gatekeeper').collect(&:title).join(', ')}") if @person.is_gatekeeper_of_any_project? %>
 
           <li>
             Editing <b><%= t('project').pluralize %></b>, where this person is

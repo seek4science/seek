@@ -27,17 +27,19 @@ class MailerTest < ActionMailer::TestCase
   end
   
   test "announcement notification" do
-    announcement = site_announcements(:mail)
+    announcement = Factory(:mail_announcement)
+    recipient = Factory(:person)
+
     @expected.subject = "SEEK Announcement: #{announcement.title}"
-    @expected.to = "Fred Blogs <fred@email.com>"
+    @expected.to = recipient.email_with_name
     @expected.from    = "no-reply@sysmo-db.org"
 
 
     @expected.body    = read_fixture('announcement_notification')
-    
-    person=people(:fred)
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-unique_key-",recipient.notifiee_info.unique_key)
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.announcement_notification(announcement,person.notifiee_info,"localhost"))
+    assert_equal expected_text, encode_mail(Mailer.announcement_notification(announcement,recipient.notifiee_info,"localhost"))
 
   end
 
@@ -100,19 +102,27 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request publish approval" do
-    resources = [data_files(:picture),models(:teusink)]
-    gatekeeper = people(:gatekeeper_person)
+    gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
+    resources = [Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture"),Factory(:teusink_model,:projects=>gatekeeper.projects,:title=>"Teusink")]
+    requester=Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle").user
+
     @expected.subject = "A SEEK member requested your approval to publish some items."
 
     @expected.to = gatekeeper.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
-    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+    @expected.reply_to = requester.person.email_with_name
 
 
     @expected.body = read_fixture('request_publish_approval')
-    user=users(:aaron)
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publish_approval(gatekeeper,user,resources,"localhost"))
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",gatekeeper.id.to_s)
+    expected_text.gsub!("-df_id-",resources[0].id.to_s)
+    expected_text.gsub!("-model_id-",resources[1].id.to_s)
+    expected_text.gsub!("-requester_id-",requester.person.id.to_s)
+
+    assert_equal expected_text,encode_mail(Mailer.request_publish_approval(gatekeeper,requester,resources,"localhost"))
 
   end
 
@@ -135,27 +145,32 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "gatekeeper approval feedback" do
-    resource = data_files(:picture)
-    gatekeeper = people(:gatekeeper_person)
-    requester = people(:aaron_person)
-    @expected.subject = "A SEEK Gatekeeper approved your request to publish: #{resource.title}"
+    gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
+    item = Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture")
+    items_and_comments = [{:item => item, :comment => nil}]
+    requester = Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle")
+    @expected.subject = "A SEEK gatekeeper approved your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
 
 
     @expected.body = read_fixture('gatekeeper_approval_feedback')
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",gatekeeper.id.to_s)
+    expected_text.gsub!("-df_id-",item.id.to_s)
 
-
-    assert_equal encode_mail(@expected),encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, resource,"localhost"))
+    assert_equal expected_text,encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, items_and_comments,"localhost"))
 
   end
 
   test "gatekeeper reject feedback" do
-    resource = data_files(:picture)
-    gatekeeper = people(:gatekeeper_person)
-    requester = people(:aaron_person)
-    @expected.subject = "A SEEK Gatekeeper rejected your request to publish: #{resource.title}"
+    gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
+    item = Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture")
+    items_and_comments = [{:item => item, :comment => 'not ready'}]
+
+    requester = Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle")
+    @expected.subject = "A SEEK gatekeeper rejected your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
@@ -163,10 +178,12 @@ class MailerTest < ActionMailer::TestCase
 
 
     @expected.body = read_fixture('gatekeeper_reject_feedback')
-    extra_comment = 'Not ready'
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, resource, extra_comment, "localhost"))
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",gatekeeper.id.to_s)
+    expected_text.gsub!("-df_id-",item.id.to_s)
 
+    assert_equal expected_text,encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, items_and_comments, "localhost"))
   end
 
 
@@ -188,9 +205,8 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "contact_admin_new_user_no_profile" do
-    recipients = ["Quentin Jones <quentin@email.com>","Project Manager <project_manager@email.com>"]
     @expected.subject = 'SEEK member signed up'
-    @expected.to =  recipients
+    @expected.to =  "Quentin Jones <quentin@email.com>"
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 

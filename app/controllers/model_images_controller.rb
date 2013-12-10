@@ -44,63 +44,27 @@ class ModelImagesController < ApplicationController
 
   def show
     params[:size] ||='200x200'
-
     if params[:size]=='large'
       size = ModelImage::LARGE_SIZE
     else
       size = params[:size]
     end
-    size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
 
-    size = filter_size size
-
-    id = params[:id].to_i
-
-    if !cache_exists?(id, size) # look in file system cache before attempting db access
-      # resize (keeping image side ratio), encode and cache the picture
-      @model_image.operate do |image|
-        Rails.logger.info "resizing to #{size}"
-        image.resize size, :upsample=>true
-        @image_binary = image.image.to_blob
-      end
-      # cache data
-      cache_data!(@model_image, @image_binary, size)
-    end
+    @model_image.resize_image(size)
 
     respond_to do |format|
       format.html do
-        path = full_cache_path(id, size)
+        path = @model_image.full_cache_path(size)
         send_file(path, :type => 'image/jpeg', :disposition => 'inline')
         headers["Content-Length"]=File.size(path).to_s
       end
       format.xml do
-        @cache_file=full_cache_path(id, size)
+        @cache_file=@model_image.full_cache_path(size)
         @type='image/jpeg'
       end
     end
   end
 
-  def filter_size size
-    max_size=1500
-    matches = size.match /([0-9]+)x([0-9]+).*/
-    if matches
-      width = matches[1].to_i
-      height = matches[2].to_i
-      width = max_size if width>max_size
-      height = max_size if height>max_size
-      return "#{width}x#{height}"
-    else
-      matches = size.match /([0-9]+)/
-      if matches
-        width=matches[1].to_i
-        width = max_size if width>max_size
-        return "#{width}"
-      else
-        return "900"
-      end
-
-    end
-  end
 
   def filter_size size
     max_size=1500
@@ -121,9 +85,7 @@ class ModelImagesController < ApplicationController
         return "900"
       end
     end
-
   end
-
   def index
     respond_to do |format|
       format.html
@@ -200,29 +162,4 @@ class ModelImagesController < ApplicationController
        return false
      end
   end
-
-  # caches data (where size = #{size}x#{size})
-  def cache_data!(image, image_binary, size=nil)
-    FileUtils.mkdir_p(cache_path(image, size))
-    File.open(full_cache_path(image, size), "wb+") { |f| f.write(image_binary) }
-  end
-
-  def cache_path(image, size=nil, include_local_name=false)
-
-    id = image.kind_of?(Integer) ? image : image.id
-    rtn = "#{Rails.root}/tmp/model_images"
-    rtn = "#{rtn}/#{size}" if size
-    rtn = "#{rtn}/#{id}.#{ModelImage.image_storage_format}" if include_local_name
-
-    return rtn
-  end
-
-  def full_cache_path(image, size=nil)
-    cache_path(image, size, true)
-  end
-
-  def cache_exists?(image, size=nil)
-    File.exists?(full_cache_path(image, size))
-  end
-
 end

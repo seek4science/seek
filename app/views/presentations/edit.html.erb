@@ -23,11 +23,12 @@
         <% if current_user_authorized_to_manage -%>
             <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
         <% end -%>
+      <% if show_scales? %>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} %>
+      <% end %>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
-             <p>
-            <%= fancy_multiselect @presentation,:scales, {:possibilities=>sort_scales(Scale.all)} if @presentation.is_scalable? -%>
-            </p>
+
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f} -%>
         
         <p>

@@ -6,14 +6,16 @@ require 'libxml'
 class Publication < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   title_trimmer
-
+  alias_attribute :description, :abstract
   #searchable must come before acts_as_asset is called
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
-    text :title,:abstract,:journal,:searchable_tags, :pubmed_id, :doi
+    text :journal,:pubmed_id, :doi
     text :publication_authors do
       publication_authors.compact.map(&:first_name) + publication_authors.compact.map(&:last_name)
     end
   end if Seek::Config.solr_enabled
+
+
 
   acts_as_asset
 
@@ -92,13 +94,15 @@ class Publication < ActiveRecord::Base
     false
   end
 
-  def extract_pubmed_metadata(pubmed_record)
-    self.title = pubmed_record.title.chop #remove full stop
-    self.abstract = pubmed_record.abstract
-    self.published_date = pubmed_record.date_published
-    self.journal = pubmed_record.journal
-    self.pubmed_id = pubmed_record.pmid
-      self.citation = pubmed_record.citation
+
+
+  def extract_pubmed_metadata(reference)
+        self.title = reference.title.chop #remove full stop
+        self.abstract = reference.abstract
+        self.journal = reference.journal
+        self.pubmed_id = reference.pubmed
+        self.published_date = reference.published_date
+      self.citation = reference.citation
   end
 
   def extract_doi_metadata(doi_record)

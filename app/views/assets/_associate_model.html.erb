@@ -1,4 +1,5 @@
 <%
+   return unless Seek::Config.models_enabled
    resource_text ||= text_for_resource(resource)
    all_models=authorised_models
    project_models=authorised_models(current_user.person.projects)

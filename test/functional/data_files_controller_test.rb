@@ -11,6 +11,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include RestTestCases
   include RdfTestCases
   include SharingFormTestHelper
+  include FunctionalAuthorizationTests
 
   def setup
     login_as(:datafile_owner)
@@ -26,32 +27,6 @@ class DataFilesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
-  end
-
-  test "response code for not accessible rdf" do
-    df = Factory :data_file,:policy=>Factory(:private_policy)
-    logout
-    get :show,:id=>df.id,:format=>"rdf"
-    assert_response :forbidden
-  end
-
-  test "response code for not available rdf" do
-    logout
-    get :show,:id=>9999,:format=>"rdf"
-    assert_response :not_found
-  end
-
-  test "response code for not accessible xml" do
-    df = Factory :data_file,:policy=>Factory(:private_policy)
-    logout
-    get :show,:id=>df.id,:format=>"xml"
-    assert_response :forbidden
-  end
-
-  test "response code for not available xml" do
-    logout
-    get :show,:id=>9999,:format=>"xml"
-    assert_response :not_found
   end
 
   #because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent
@@ -1034,7 +1009,7 @@ end
   
   
   def test_update_should_not_overwrite_contributor
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
+    login_as(:datafile_owner) #this user is a member of sysmo, and can edit this data file
     df=data_files(:data_file_with_no_contributor)
     assert_difference('ActivityLog.count') do
       put :update, :id => df, :data_file => {:title=>"blah blah blah blah"}
@@ -1047,7 +1022,7 @@ end
   end
   
   def test_show_item_attributed_to_jerm_file
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
+    login_as(:datafile_owner) #this user is a member of sysmo, and can edit this data file
     df=data_files(:editable_data_file)
     jerm_file=data_files(:data_file_with_no_contributor)
     r=Relationship.new(:subject => df, :predicate => Relationship::ATTRIBUTED_TO, :other_object => jerm_file)
@@ -1621,7 +1596,30 @@ end
   end
 
 
+  test "you should not subscribe to the asset created by the person whose projects overlap with you" do
+    proj = Factory(:project)
+    current_person = User.current_user.person
+    current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
+    a_person = Factory(:person)
+    a_person.project_subscriptions.create :project => a_person.projects.first, :frequency => 'weekly'
+    current_person.group_memberships << Factory(:group_membership,:work_group=>Factory(:work_group,:project=>a_person.projects.first))
+    assert current_person.save
+    assert current_person.reload.projects.include?(a_person.projects.first)
+    assert Subscription.all.empty?
 
+    df_param = { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[proj.id]}
+    post :create, :data_file => df_param, :sharing=>valid_sharing
+
+    df = assigns(:data_file)
+
+    assert SetSubscriptionsForItemJob.exists?(df.class.name, df.id, df.projects.collect(&:id))
+    SetSubscriptionsForItemJob.new(df.class.name, df.id, df.projects.collect(&:id)).perform
+
+    assert df.subscribed?(current_person)
+    assert !df.subscribed?(a_person)
+    assert_equal 1, current_person.subscriptions.count
+    assert_equal proj, current_person.subscriptions.first.project_subscription.project
+  end
     test "can move to presentations" do
      data_file = Factory :data_file, :contributor => User.current_user
      assert_difference("DataFile.count",  -1) do

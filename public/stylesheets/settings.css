@@ -19,7 +19,7 @@ ul.settings {
     width: 5em;
 }
 
-.setting_field input {
+.setting_text_field input {
     min-width: 25em;
     text-align:left;
 }

@@ -85,7 +85,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_equal "attachment; filename=\"ms_word_test.pdf\"",@response.header['Content-Disposition']
     assert_equal "application/pdf",@response.header['Content-Type']
-    assert_equal "9240",@response.header['Content-Length']
+    assert_includes 9200..9300,@response.header['Content-Length'].to_i,"the content length should fall within the rage 9200-9300 bytes"
 
     assert File.exists?(ms_word_sop.content_blob.filepath)
     assert File.exists?(pdf_path)
@@ -126,7 +126,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal "attachment; filename=\"ms_word_test.pdf\"",@response.header['Content-Disposition']
     assert_equal "application/pdf",@response.header['Content-Type']
-    assert_equal "9240",@response.header['Content-Length']
+    assert_includes 9200..9300,@response.header['Content-Length'].to_i,"the content length should fall within the rage 9200-9300 bytes"
 
     assert !File.exists?(doc_sop.content_blob.filepath)
     assert File.exists?(doc_sop.content_blob.filepath('pdf')),"the converted file should remain"

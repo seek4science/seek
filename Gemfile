@@ -4,6 +4,7 @@ source 'http://gems.github.com'
 gem "rails", "3.2.14"
 gem "rdoc"
 
+gem "feedzirra"
 gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
@@ -11,12 +12,11 @@ gem 'rack-openid'
 gem 'libxml-ruby',"2.6.0",:require=>"libxml"
 gem 'uuidtools',"2.1.1"
 gem "RedCloth","4.2.9"
-gem 'simple-spreadsheet-extractor',"0.12.3"
+gem 'simple-spreadsheet-extractor',"0.13.1"
 gem "rmagick","2.12.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
-gem 'ratom',"0.6.9"
 gem 'rubyzip',"0.9.9"
 gem 'bio'
 gem 'sunspot_rails'
@@ -48,6 +48,7 @@ gem 'rails_autolink'
 gem 'rfc-822'
 gem 'nokogiri',"1.5.9"
 gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
+gem 'cocaine'
 
 gem 'newrelic_rpm'
 #Linked to SysMO Git repositories
@@ -72,8 +73,7 @@ gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'passenger'
-
-gem "unicorn-rails"
+gem 'unicorn-rails'
 gem "recaptcha", '0.3.1'
 
 gem 'rb-readline', '~> 0.4.2'

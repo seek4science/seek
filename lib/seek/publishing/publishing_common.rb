@@ -5,7 +5,7 @@ module Seek
         base.before_filter :set_asset, :only=>[:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
         base.before_filter :set_assets, :only=>[:batch_publishing_preview]
         base.before_filter :set_items_for_publishing, :only => [:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
-        base.before_filter :publish_auth, :only=>[:batch_publishing_preview,:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
+        base.before_filter :publish_auth, :only=>[:batch_publishing_preview,:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish,:waiting_approval_assets]
         #need to put request_publish_approval after log_publishing, so request_publish_approval will get run first.
         base.after_filter :log_publishing,:request_publish_approval, :only=>[:create,:update]
       end
@@ -82,6 +82,13 @@ module Seek
       def published
         respond_to do |format|
           format.html { render :template => "assets/publishing/published"}
+        end
+      end
+
+      def waiting_approval_assets
+        @waiting_approval_assets = ResourcePublishLog.waiting_approval_assets_for(current_user)
+        respond_to do |format|
+          format.html {render :template => "assets/publishing/waiting_approval_assets"}
         end
       end
 

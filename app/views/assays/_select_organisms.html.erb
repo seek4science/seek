@@ -1,4 +1,5 @@
 <%
+  return unless Seek::Config.organisms_enabled
   select_truncate_length=120
   all_organisms = Organism.order(:title)
   all_tissue_and_cell_types = TissueAndCellType.order(:title)

@@ -12,6 +12,12 @@ module Seek
       return params.reject { |k, v| special_params.include?(k.to_s.downcase) }
     end
 
+    def self.clear_cached
+      self.class_variables.each do |v|
+        self.class_variable_set(v,nil)
+      end
+    end
+
     def self.ensure_models_loaded
       @@models_loaded ||= begin
         Dir.glob("#{Rails.root}/app/models/*.rb").each do |file|
@@ -48,12 +54,15 @@ module Seek
     end
 
     def self.searchable_types
-      @@searchable_types ||= begin
+      @@searchable_types ||= (user_creatable_types | [Person, Project, Institution]).sort_by(&:name)
+    end
+
+    def self.scalable_types
+      @@scalable_types ||= begin
         persistent_classes.select do |c|
-          c.respond_to?(:searchable?) && c.searchable?
+          c.included_modules.include?(Seek::Scalable::InstanceMethods)
         end.sort_by(&:name)
       end
-
     end
 
     def self.rdf_capable_types

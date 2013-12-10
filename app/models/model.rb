@@ -11,7 +11,7 @@ class Model < ActiveRecord::Base
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :description,:title,:organism_terms,:searchable_tags, :model_contents_for_search,:assay_type_titles,:technology_type_titles
+    text :organism_terms,:model_contents_for_search,:assay_type_titles,:technology_type_titles, :other_creators
   end if Seek::Config.solr_enabled
 
   acts_as_asset
@@ -87,7 +87,7 @@ class Model < ActiveRecord::Base
 
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
   def self.user_creatable?
-    true
+    Seek::Config.models_enabled
   end
 
   #a simple container for handling the matching results returned from #matching_data_files

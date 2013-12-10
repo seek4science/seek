@@ -60,7 +60,15 @@ class Project < ActiveRecord::Base
   end
 
   has_many :work_groups, :dependent=>:destroy
-  has_many :institutions, :through=>:work_groups
+  has_many :institutions, :through=>:work_groups, :before_remove => :group_memberships_empty?
+
+  def group_memberships_empty? institution
+    work_group = WorkGroup.where(['project_id=? AND institution_id=?', self.id, institution.id]).first
+    if !work_group.people.empty?
+      raise WorkGroupDeleteError.new("You can not delete the " +work_group.description+ ". This Work Group has "+work_group.people.size.to_s+" people associated with it.
+                           Please disassociate first the people from this Work Group.")
+    end
+  end
 
   alias_attribute :webpage, :web_page
   alias_attribute :internal_webpage, :wiki_page
@@ -79,40 +87,38 @@ class Project < ActiveRecord::Base
   def assets
     data_files | sops | models | publications | presentations
   end
-  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
-  def project_coordinators
-    coordinator_role = ProjectRole.project_coordinator_role
-    people.select{|p| p.project_roles_of_project(self).include?(coordinator_role)}
-  end
 
-  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
-  #this is the intersection of project role and seek role
-    def pals
-      pal_role=ProjectRole.pal_role
-      people.select{|p| p.is_pal?}.select do |possible_pal|
-        possible_pal.project_roles_of_project(self).include?(pal_role)
-      end
-    end
-   #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
-    #this is project role
-    def pis
-      pi_role = ProjectRole.find_by_name('PI')
-      people.select{|p| p.project_roles_of_project(self).include?(pi_role)}
-    end
+
+
+  #this is project role
+  def pis
+    pi_role = ProjectRole.find_by_name('PI')
+    people.select{|p| p.project_roles_of_project(self).include?(pi_role)}
+  end
 
   #this is seek role
   def asset_managers
-    people.select(&:is_asset_manager?)
+    people_with_the_role("asset_manager")
   end
 
   #this is seek role
   def project_managers
-    people.select(&:is_project_manager?)
+    people_with_the_role("project_manager")
   end
 
   #this is seek role
   def gatekeepers
-    people.select(&:is_gatekeeper?)
+    people_with_the_role("gatekeeper")
+  end
+
+  def pals
+    people_with_the_role("pal")
+  end
+
+  #returns people belong to the admin defined seek 'role' for this project
+  def people_with_the_role role
+    mask = Person.mask_for_role(role)
+    AdminDefinedRoleProject.where(role_mask: mask,project_id: self.id).collect{|r| r.person}
   end
 
   def locations
@@ -194,11 +200,15 @@ class Project < ActiveRecord::Base
   end
 
   def can_be_edited_by?(user)
-    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.can_edit_projects? || user.is_project_manager?)))
+    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.can_edit_projects? || user.is_project_manager?(self))))
   end
 
   def can_be_administered_by?(user)
-    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.is_project_manager?)))
+    user == nil ? false : (user.is_admin? || user.is_project_manager?(self))
+  end
+
+  def can_delete?(user=User.current_user)
+    user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
   end
 
 

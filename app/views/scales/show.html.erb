@@ -1,6 +1,3 @@
-<% if !@scaled_objects.blank? %>
-  <% resource_hash = classify_for_tabs @scaled_objects -%>
-  <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :resource_hash => resource_hash,
-    :narrow_view => true,
-    :authorization_already_done => true } -%>
+<% if show_scales? %>
+    <%= render :partial=>"scale_display_lazy_load",:locals=>{:current_scale_key=>@scale_key} %>
 <% end %>

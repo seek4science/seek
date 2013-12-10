@@ -17,102 +17,15 @@
     });
 </script>
 
-<%if Seek::Config.is_virtualliver %>
+
 
     <%
       authorised_types=Seek::ContentStats::AUTHORISED_TYPES
+        non_downloadable=[Investigation,Study,Assay]
+        na_tag = content_tag(:span,"--",:class=>'none_text')
+        #na_tag = content_tag(:span,"--",class:'none_text')
+
       #So we don't have to run lengthy authorization a second time when calculating total stats
-
-      total_publicly_visible_models = []
-      total_publicly_accessible_models = []
-
-      total_publicly_accessible_sops = []
-      total_publicly_visible_sops = []
-
-      total_publicly_visible_data_files = []
-      total_publicly_accessible_data_files = []
-
-      total_publicly_visible_assays = []
-      total_publicly_accessible_assays = []
-
-      total_publicly_visible_studies = []
-      total_publicly_accessible_studies = []
-
-      total_publicly_visible_investigations = []
-      total_publicly_accessible_investigations = []
-
-      total_publicly_visible_presentations = []
-      total_publicly_accessible_presentations = []
-    %>
-
-    <h3>Content statistics</h3>
-    For authorised assets the numbers are split as <em><b>total</b></em> (<em>publicly visible</em>/<em>publicly accessible</em>)
-    <div>
-      <table id="content_stats_table" class="tablesorter">
-        <thead>
-        <tr>
-          <th>Project</th>
-          <th>People *</th>
-          <% authorised_types.each do |type| %>
-              <th><%= resource_tab_item_name(type.name) -%></th>
-          <% end %>
-
-          <th>Publications</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% stats.each do |stat| %>
-            <tr>
-
-              <td><%= link_to stat.project.name, stat.project -%></td>
-              <% registered_people = stat.registered_people.count %>
-              <td><%= stat.people.count -%></td>
-              <% authorised_types.each do |type| %>
-                  <% if stat.project.children.empty? then %>
-                      <% type_str = type.name.underscore.pluralize
-                         pub_vis = stat.send("publicly_visible_#{type_str}", [stat.project])
-                         pub_acc = stat.send("publicly_accessible_#{type_str}", [stat.project])
-                         total = stat.send("#{type_str}").count
-                         eval("total_publicly_visible_#{type_str} |= pub_vis")
-                         eval("total_publicly_accessible_#{type_str} |= pub_acc")
-                      -%>
-                      <td><b><%= "#{total}" -%></b><%= " (#{pub_vis.count}/#{pub_acc.count})" -%></td>
-                  <% else %>
-                      <td></td>
-                  <% end -%>
-              <% end -%>
-
-              <td><%= stat.publications.count if stat.project.children.empty? -%> </td>
-            </tr>
-        <% end %>
-        </tbody>
-        <tfoot>
-        <tr style="background-color: #DEF">
-          <td><b>Overall</b></td>
-          <td><b><%= Person.count -%></b></td>
-          <% authorised_types.each do |type| %>
-              <% type_str = type.name.underscore.pluralize
-                 total=type.count
-                 total_pub_vis = eval("total_publicly_visible_#{type_str}").count
-                 total_pub_acc = eval("total_publicly_accessible_#{type_str}").count
-              %>
-              <td><b><%= "#{total}" -%></b>   <%= " (#{total_pub_vis}/#{total_pub_acc})" -%></td>
-          <% end -%>
-
-          <td><b><%= Publication.count -%></b></td>
-        </tr>
-        </tfoot>
-
-      </table>
-    </div>
-    <hr/>
-    <em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple projects.</em>
-
-<% else %>
-
-    <%
-       authorised_types=Seek::ContentStats::AUTHORISED_TYPES
-       #So we don't have to run lengthy authorization a second time when calculating total stats
 
        total_visible_models = []
        total_accessible_models = []
@@ -148,9 +61,83 @@
        total_visible_presentations = []
        total_publicly_visible_presentations = []
        total_publicly_accessible_presentations = []
-    %>
 
-    <h3>Content statistics</h3>
+    %>
+     <h3>Content statistics</h3>
+
+<%if Seek::Config.is_virtualliver %>
+   
+    For authorised assets the numbers are split as <em><b>total</b></em> (<em>publicly visible</em>/<em>publicly accessible</em>)
+    <div>
+      <table id="content_stats_table" class="tablesorter">
+        <thead>
+        <tr>
+          <th>Project</th>
+          <th>People *</th>
+          <% authorised_types.each do |type| %>
+              <th><%= resource_tab_item_name(type.name) -%></th>
+          <% end %>
+
+          <th>Publications</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% stats.each do |stat| %>
+            <tr>
+
+              <td><%= link_to stat.project.name, stat.project -%></td>
+              <% registered_people = stat.registered_people.count %>
+              <td><%= stat.people.count -%></td>
+              <% authorised_types.each do |type| %>
+                  <% if stat.project.children.empty? %>
+                      <% type_str = type.name.underscore.pluralize
+                         pub_vis = stat.send("publicly_visible_#{type_str}", [stat.project])
+                         pub_acc = stat.send("publicly_accessible_#{type_str}", [stat.project])
+                         total = stat.send("#{type_str}").count
+                         eval("total_publicly_visible_#{type_str} |= pub_vis")
+                         eval("total_publicly_accessible_#{type_str} |= pub_acc")
+                         display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : pub_acc.count
+
+                      -%>
+                      <td><b><%= "#{total}" -%></b><%= " (#{pub_vis.count}/#{display_total_pub_accessible_count})".html_safe -%></td>
+                     <% else %>
+                      <td></td>
+                  <% end -%>
+
+              <% end -%>
+
+              <td><%= stat.publications.count if stat.project.children.empty? -%> </td>
+            </tr>
+        <% end %>
+        </tbody>
+        <tfoot>
+        <tr style="background-color: #DEF">
+          <td><b>Overall</b></td>
+          <td><b><%= Person.count -%></b></td>
+          <% authorised_types.each do |type| %>
+              <% type_str = type.name.underscore.pluralize
+                 total=type.count
+                 total_pub_vis = eval("total_publicly_visible_#{type_str}").count
+                 total_pub_acc = eval("total_publicly_accessible_#{type_str}").count
+                 display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : total_pub_acc
+
+              %>
+              <td><b><%= "#{total}" -%></b>   <%= " (#{total_pub_vis}/ #{display_total_pub_accessible_count})".html_safe -%></td>
+          <% end -%>
+
+          <td><b><%= Publication.count -%></b></td>
+        </tr>
+        </tfoot>
+
+      </table>
+    </div>
+    <hr/>
+    <em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple projects.</em>
+
+<% else %>
+
+   
+
     For authorised assets the numbers are split as <em>total</em> / <em>visible</em> / <em>accessible</em> / <em>publicly visible</em> / <em>publicly accessible</em>
     <table id="content_stats_table" class="tablesorter">
       <thead>
@@ -181,9 +168,13 @@
                    eval("total_accessible_#{type_str} |= acc")
                    eval("total_publicly_visible_#{type_str} |= pub_vis")
                    eval("total_publicly_accessible_#{type_str} |= pub_acc")
-                -%>
-                <td><%= "#{total}/#{vis.count}/#{acc.count}/#{pub_vis.count}/#{pub_acc.count}" -%></td>
-            <% end -%>
+            display_accessible_count = non_downloadable.include?(type) ? na_tag : acc.count
+            display_pub_accessible_count = non_downloadable.include?(type) ? na_tag : pub_acc.count
+           display_accessible_count = non_downloadable.include?(type) ? na_tag : acc.count
+            display_pub_accessible_count = non_downloadable.include?(type) ? na_tag : pub_acc.count
+        -%>
+        <td><%= "#{total}/#{vis.count}/#{display_accessible_count}/#{pub_vis.count}/#{display_pub_accessible_count}".html_safe -%></td>
+    <% end -%>
 
             <td><%= stat.publications.count -%> </td>
           </tr>
@@ -199,9 +190,14 @@
                 total_acc = eval("total_accessible_#{type_str}").count
                 total_pub_vis = eval("total_publicly_visible_#{type_str}").count
                 total_pub_acc = eval("total_publicly_accessible_#{type_str}").count
-            %>
-            <td><%= "#{total}/#{total_vis}/#{total_acc}/#{total_pub_vis}/#{total_pub_acc}" -%></td>
-        <% end -%>
+            display_total_accessible_count = non_downloadable.include?(type) ? na_tag : total_acc
+            display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : total_pub_acc
+          display_total_accessible_count = non_downloadable.include?(type) ? na_tag : total_acc
+            display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : total_pub_acc
+        %>
+        <td><%= "#{total}/#{total_vis}/#{display_total_accessible_count}/#{total_pub_vis}/#{display_total_pub_accessible_count}".html_safe -%></td>
+    <% end -%>
+
 
         <td><%= Publication.count -%></td>
       </tr>

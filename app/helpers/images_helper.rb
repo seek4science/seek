@@ -65,6 +65,8 @@ module ImagesHelper
       "famfamfam_silk/arrow_right.png"
       when "arrow_left", "back"
       "famfamfam_silk/arrow_left.png"
+      when "arrow_down_small"
+        "misc_icons/arrow_down_small.png"
       when "bioportal_logo"
       "logos/bioportal_logo.png"
       when "new","add"
@@ -331,6 +333,8 @@ module ImagesHelper
         "jws/shadow2.gif"
       when "home"
         "famfamfam_silk/house.png"
+      when "waiting"
+        "misc_icons/waiting.png"
     else
       return nil
     end

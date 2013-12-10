@@ -30,6 +30,18 @@ class AdminsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "non admin cannot restart the delayed job" do
+    login_as(Factory(:user))
+    post :restart_delayed_job
+    assert_not_nil flash[:error]
+  end
+
+  test "admin can restart the delayed job" do
+    login_as(Factory(:admin).user)
+    post :restart_delayed_job
+    assert_nil flash[:error]
+  end
+
   test "none admin not get registration form" do
     login_as Factory(:person).user
     get :registration_form
@@ -138,6 +150,26 @@ class AdminsControllerTest < ActionController::TestCase
     assert_equal raise_delivery_errors_setting, ActionMailer::Base.raise_delivery_errors
   end
 
+  test "get edit tag" do
+    login_as(Factory(:admin))
+    p = Factory(:person)
+    model = Factory(:model)
+    tag=Factory :tag,:value=>"twinkle",:source=>p.user,:annotatable=>model
+    get :edit_tag,:id=>tag.value.id
+    assert_response :success
+  end
+
+  test "non admin cannot get edit tag" do
+    login_as(Factory(:person))
+    p = Factory(:person)
+    model = Factory(:model)
+    tag=Factory :tag,:value=>"twinkle",:source=>p.user,:annotatable=>model
+    get :edit_tag,:id=>tag.value.id
+    assert_response :redirect
+    refute_nil flash[:error]
+  end
+
+
   test "job statistics stats" do
     login_as(:quentin)
     Delayed::Job.destroy_all
@@ -150,9 +182,9 @@ class AdminsControllerTest < ActionController::TestCase
 
     assert_select "p",:text=>"Total delayed jobs waiting = 1"
     assert_select "tr" do
-      assert_select "td",:text=>/11th September 2010 at/,:count=>1
-      assert_select "td",:text=>/12th September 2010 at/,:count=>1
-      assert_select "td",:text=>/13th September 2010 at/,:count=>1
+      assert_select "td",:text=>/11th Sep 2010 at/,:count=>1
+      assert_select "td",:text=>/12th Sep 2010 at/,:count=>1
+      assert_select "td",:text=>/13th Sep 2010 at/,:count=>1
       assert_select "td > span[class='none_text']",:text=>/No date defined/,:count=>1
     end
 

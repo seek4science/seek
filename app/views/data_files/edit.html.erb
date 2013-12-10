@@ -18,12 +18,14 @@
     </p>    
 
     <%# only the owner should be able to change sharing permissions -%>
-    <% if current_user_authorized_to_manage -%>
-          
-	<%= render :partial => "projects/project_selector", :locals => { :resource => @data_file,:allow_nil=>true } %>
-      <p>
-        <%= fancy_multiselect @data_file, :scales, {:possibilities=>sort_scales(Scale.all)} if @data_file.is_scalable? -%>
-      </p>
+      <% if current_user_authorized_to_manage -%>
+
+          <%= render :partial => "projects/project_selector", :locals => {:resource => @data_file, :allow_nil => true} %>
+          <p>
+            <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>
+          </p>
+      <% end %>
+
       <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
       
 
@@ -35,8 +37,8 @@
                 <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
             <% end -%>
           </p>
-        <%= fields_for(@data_file) {|f| f.fancy_multiselect :samples, {:hidden=> @data_file.samples.blank?  ? true : false, :other_projects_checkbox => true}}  -%>
-        <% end -%>
+          <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@data_file} %>
+
         <%= preview_permission_popup_link(@data_file)-%>
         <p>
             <%= f.submit "Update", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(false, 'data_file', #{current_user_authorized_to_manage}); return(false);" -%> or <%= link_to "Cancel", data_file_path(@data_file) -%>
