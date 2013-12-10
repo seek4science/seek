@@ -101,7 +101,7 @@
     attr_id = <%= a.id -%>;
     attr_title = "<%= h(a.title) -%>";
 
-    attribution_settings.push([attr_type, attr_title, attr_id]);
+    attribution_settings.push([attr_type, decodeHTML(attr_title), attr_id]);
 <% end -%>
 
   // ..and update the page to make existing attributions visible
