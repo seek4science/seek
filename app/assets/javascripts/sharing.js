@@ -71,7 +71,12 @@ function updateCustomSharingSettings() {
             }else{
                 shared_with += '<b>' + contributor_type + '</b>: '
             }
-            shared_with += permission_settings[contributor_type][i][0]
+            // Need to encodeHTML for person name, as it was decoded
+            if (contributor_type == "Person"){
+                shared_with += encodeHTML(permission_settings[contributor_type][i][0])
+            }else{
+                shared_with += permission_settings[contributor_type][i][0]
+            }
             + '&nbsp;&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(permission_settings[contributor_type][i][2]) +')</span>'
             + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
             if (permission_settings[contributor_type][i].length<4 || permission_settings[contributor_type][i][3]==true) {
