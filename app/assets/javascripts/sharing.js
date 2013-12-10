@@ -467,7 +467,7 @@ function updateGroupMembers() {
     for(id in currentFavouriteGroupSettings) {
         //alert(id + "\n" + currentFavouriteGroupSettings[id]);
         member_name = autocompleters[f_group_autocompleter_id].getValueFromJsonArray(autocompleters[f_group_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
-        group_members += member_name
+        group_members += encodeHTML(member_name)
         + '&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(currentFavouriteGroupSettings[id]) +')</span>'
         + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:editGroupMember('+ id +', ' + currentFavouriteGroupSettings[id] + '); return(false);">edit</a>]</small>'
