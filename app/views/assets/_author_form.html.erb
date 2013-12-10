@@ -130,7 +130,7 @@ function updateCreatorSettings() {
         }
         creators += '<b>' + creator_name + '</b>' + creator_email_text
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + ' [<a href="" onclick="javascript:deleteCreator(\''+ creator_name + '\', ' + creator_id +'); return(false);">remove</a>]</small><br/>';
+        + ' [<a href="" onclick="javascript:deleteCreator(' + creator_id +'); return(false);">remove</a>]</small><br/>';
 
         creators_arr.push([creator_name, creator_id]);
     }
@@ -185,10 +185,10 @@ function addCreator(creator_name, creator_email, creator_id) {
 
 
 // removes creator from creator list and updates the displayed list
-function deleteCreator(creator_name, creator_id) {
+function deleteCreator(creator_id) {
     // remove the actual record for the creator
     for(var i = 0; i < creator_settings.length; i++)
-        if(creator_settings[i][0] == decodeHTML(creator_name) && creator_settings[i][2] == creator_id) {
+        if(creator_settings[i][2] == creator_id) {
             creator_settings.splice(i, 1);
             break;
         }
