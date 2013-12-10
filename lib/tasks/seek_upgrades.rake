@@ -76,10 +76,8 @@ namespace :seek do
 
   desc("Synchronised the assay types assigned to assays according to the current ontology")
   task(:resynchronise_assay_types => :environment) do
-    label_map = {"generic experimental assay"=>"experimental assay type",
-                 "generic modelling analysis"=>"model analysis type",
-                 "cdna microarray"=>"transcriptional profiling",
-                 "modelling analysis type"=>"model analysis type"}
+
+    label_map = read_label_map(:assay_types)
 
     Assay.record_timestamps = false
 
@@ -131,9 +129,7 @@ namespace :seek do
 
     tech_type_label_hash = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_label
 
-    label_map = {"technology"=>"technology type",
-                 "cdna microarray"=>"microarray",
-                 "enzymatic activity experiments"=>"enzymatic activity measurements"}
+    label_map = read_label_map(:technology_types)
 
     Assay.all.each do |assay|
       unless assay.is_modelling?
@@ -172,6 +168,14 @@ namespace :seek do
       end
     end
     Assay.record_timestamps = true
+  end
+
+  private
+
+  def read_label_map type
+    file = "#{type.to_s}_label_mappings.yml"
+    file = File.join(Rails.root,"config","default_data",file)
+    YAML::load_file(file)
   end
 
 end
