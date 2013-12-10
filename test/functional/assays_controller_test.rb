@@ -1096,4 +1096,27 @@ end
     xhr(:get, :preview,{:id=>assay.id})
     assert_response :success
   end
+
+  test "should not show investigation and study title if they are hidden on assay show page" do
+    investigation = Factory(:investigation,
+                            :policy=>Factory(:private_policy),
+                            :contributor => User.current_user)
+    study = Factory(:study,
+                    :policy=>Factory(:private_policy),
+                    :contributor => User.current_user,
+                    :investigation => investigation)
+    assay = Factory(:assay,
+                    :policy=>Factory(:public_policy),
+                    :study => study)
+
+    logout
+    get :show, :id => assay
+    assert_response :success
+    assert_select "p#investigation" do
+      assert_select "span.none_text", :text => /hidden item/, :count => 1
+    end
+    assert_select "p#study" do
+      assert_select "span.none_text", :text => /hidden item/, :count => 1
+    end
+  end
 end
