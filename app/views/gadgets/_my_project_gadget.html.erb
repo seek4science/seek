@@ -24,6 +24,12 @@
     </div>
 
     <script type="text/javascript">
+        <% if current_user.person.projects.size>1 -%>
+            $(document.getElementById("my_project_button")).classList.add('gadget_button_menu');
+        <% end -%>
+    </script>
+
+    <script type="text/javascript">
         function myProjectClicked() {
         <% if current_user.person.projects.size==1 -%>
             location.href='<%= project_path(current_user.person.projects.first) -%>';

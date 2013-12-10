@@ -61,13 +61,13 @@ original_filename=nil
 <div>
   <div id="upload_type_selection">
     <ul id="switch_upload_buttons">
-      <li>
+      <table>
+      <td>
         <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class => "block_link_active", :id => "upload_from_file_button", :title => tooltip_title_attrib('Add from a local file') -%>
-      </li>
-      <li>
+        <br>
         <%= link_to_function image("internet_large"), "from_url_selected(); return (false);", :class => "block_link", :id => "upload_from_url_button", :title => tooltip_title_attrib('Add from a remote URL') -%>
-      </li>
-      <li id="upload_options">
+      </td>
+      <td>
         <div id="upload_from_file">
           <b>File to upload:</b>
           <span class="required">*</span>
@@ -75,7 +75,7 @@ original_filename=nil
           <%= file_field upload_field, :data -%>
         </div>
         <div id="upload_from_url" style="display:none;">
-
+          <br>
           <b>URL:</b>
           <span class="required">*</span>
           <%= text_field upload_field, :data_url, :size => 55 -%>
@@ -99,7 +99,8 @@ original_filename=nil
           </p>
           <%= hidden_field_tag "#{upload_field}[original_filename]", original_filename -%>
         </div>
-      </li>
+      </td>
+      </table>
     </ul>
   </div>
 </div>

@@ -1,3 +1,4 @@
+<h1> <font color="#456AAA"> <%= 'Assays' %> </font> </h1> <br>
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
         <li><%= image_tag_for_key "new", new_assay_path, "New #{t('assays.assay').downcase}", nil, "New #{t('assays.assay').downcase}" %></li>

@@ -1,7 +1,7 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
-  <%= list_item_authorized_attribute "Contributor", resource.contributor.try(:person) %>
+  <%= list_item_authorized_attribute "Uploader", resource.contributor.try(:person) %>
 
   <%= list_item_attribute "Lab internal ID", h(resource.lab_internal_number) %>
 
