@@ -195,8 +195,11 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should show item" do
+    assay = Factory(:experimental_assay,:policy=>Factory(:public_policy),
+                    :assay_type_label=>"Metabolomics",
+                    :technology_type_label=>"Gas chromatography")
     assert_difference('ActivityLog.count') do
-      get :show, :id=>assays(:metabolomics_assay)
+      get :show, :id=>assay.id
     end
 
     assert_response :success
@@ -268,8 +271,6 @@ test "should create experimental assay with or without sample" do
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
-                               :technology_type_id=>technology_types(:gas_chromatography).id,
-                               :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id}
       end
@@ -282,8 +283,6 @@ test "should create experimental assay with or without sample" do
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
-                               :technology_type_id=>technology_types(:gas_chromatography).id,
-                               :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id,
                                :sample_ids=>[sample.id]
@@ -333,7 +332,6 @@ end
 
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id}
     end
@@ -342,7 +340,6 @@ end
     growth_type = Factory(:culture_growth_type, :title=>"batch")
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id},
            :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
@@ -356,8 +353,6 @@ end
     assert_difference('ActivityLog.count') do
     assert_difference("Assay.count") do
       post :create,:assay=>{:title=>"test",
-        :technology_type_id=>technology_types(:gas_chromatography).id,
-        :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
         :assay_class_id=>assay_classes(:experimental_assay_class).id,
         :sample_ids=>[Factory(:sample).id]
@@ -373,8 +368,6 @@ end
     sample2=Factory(:sample)
     assert_no_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :technology_type_id=>technology_types(:gas_chromatography).id,
-                             :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
                              :sample_ids=>[sample1.id,sample2.id].join(",")
@@ -780,8 +773,8 @@ end
           #title is blank, so should fail validation
           post :create, :assay=>{
               :title=>"",
-              :technology_type_id=>technology_types(:gas_chromatography).id,
-              :assay_type_id=>assay_types(:metabolomics).id,
+              :technology_type_uri=>"http://some-uri#tech",
+              :assay_type_uri=>"http://some-uri#assay",
               :study_id=>studies(:metabolomics_study).id,
               :assay_class_id=>assay_classes(:modelling_assay_class).id
           },
@@ -824,8 +817,6 @@ end
 
           post :create, :assay=>{
               :title=>"fish",
-              :technology_type_id=>technology_types(:gas_chromatography).id,
-              :assay_type_id=>assay_types(:metabolomics).id,
               :study_id=>study.id,
               :assay_class_id=>assay_classes(:modelling_assay_class).id
           },
@@ -952,8 +943,10 @@ end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     login_as(:quentin)
-    a = {:title=>"test", :technology_type_id=>technology_types(:gas_chromatography).id, :assay_type_id=>assay_types(:metabolomics).id,
-         :study_id=>studies(:metabolomics_study).id, :assay_class_id=>assay_classes(:experimental_assay_class).id, :sample_ids=>[Factory(:sample).id]}
+    a = {:title=>"test",
+         :study_id=>studies(:metabolomics_study).id,
+         :assay_class_id=>assay_classes(:experimental_assay_class).id,
+         :sample_ids=>[Factory(:sample).id]}
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
         post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}

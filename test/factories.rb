@@ -221,7 +221,7 @@ end
   Factory.define(:experimental_assay, :parent => :assay_base) do |f|
     f.association :assay_class, :factory => :experimental_assay_class
     f.assay_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
-    f.assay_type_label "experimenal assay type"
+    f.assay_type_label "experimental assay type"
     f.technology_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
     f.technology_type_label "technology type"
     f.samples {[Factory.build(:sample)]}

@@ -24,6 +24,10 @@ SEEK::Application.configure do
 
       Settings.defaults[:bioportal_api_key]="fish"
 
+      Settings.defaults[:technology_type_ontology_file]= "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Settings.defaults[:modelling_analysis_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Settings.defaults[:assay_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+
     end
   end
 end

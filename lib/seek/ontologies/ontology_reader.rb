@@ -35,20 +35,28 @@ module Seek
         OntologyClass # so that the class is loaded before it is needed from the cache
         Rails.cache.fetch(cache_key) do
           subclasses = subclasses_for(parent_uri)
-          build_ontology_class parent_uri,nil,nil,subclasses
+          o = build_ontology_class parent_uri,nil,nil,subclasses
+          subclasses.each{|s| s.parents << o}
+          o
         end
       end
 
       def cache_key
         key = Digest::MD5.hexdigest("#{default_parent_class_uri}-#{ontology_path}-#{Rails.env}")
-        "onto-hierarchy-#{key}"
+        "onto-hierarchy-1-#{key}"
       end
 
       def subclasses_for uri
         ontology.query(:predicate=>RDF::RDFS.subClassOf,:object=>uri).collect do |solution|
           uri = solution.subject
           subclasses = subclasses_for(uri)
-          build_ontology_class uri,nil,nil,subclasses
+          o = build_ontology_class uri,nil,nil,subclasses
+          #FIXME: this is based on the assumption there is only 1 parent, which is true for SYsMO but may not always be the
+          #case.
+          subclasses.each do |sub|
+            sub.parents << o
+          end
+          o
         end
       end
 

@@ -385,4 +385,79 @@ class AssayTest < ActiveSupport::TestCase
     assert_nil assay.technology_type_uri
   end
 
+  test "assay type reader" do
+    exp_assay = Factory(:experimental_assay)
+    mod_assay = Factory(:modelling_assay)
+    assert_equal Seek::Ontologies::AssayTypeReader,exp_assay.assay_type_reader.class
+    assert_equal Seek::Ontologies::ModellingAnalysisTypeReader,mod_assay.assay_type_reader.class
+  end
+
+  test "valid assay type uri" do
+    assay = Factory(:experimental_assay)
+    assert assay.valid_assay_type_uri?
+    assay.assay_type_uri="http://fish.com/onto#fish"
+    assert !assay.valid_assay_type_uri?
+
+    #modelling uri should also be invalid
+    assay.assay_type_uri = Seek::Ontologies::ModellingAnalysisTypeReader.instance.default_parent_class_uri.to_s
+    assert !assay.valid_assay_type_uri?
+  end
+
+  test "valid technology type uri" do
+    mod_assay = Factory(:modelling_assay)
+    exp_assay = Factory(:experimental_assay)
+    assert mod_assay.valid_technology_type_uri?
+    mod_assay.technology_type_uri = Seek::Ontologies::TechnologyTypeReader.instance.default_parent_class_uri.to_s
+    #for a modelling assay, even if it is set it is invalid
+    assert !mod_assay.valid_technology_type_uri?
+
+    assert exp_assay.valid_technology_type_uri?
+    exp_assay.technology_type_uri = "http://fish.com/onto#fish"
+    assert !exp_assay.valid_technology_type_uri?
+  end
+
+  test "suggested assay type label" do
+    exp_assay = Factory(:experimental_assay)
+    assert_nil exp_assay.suggested_assay_type_label
+    exp_assay.assay_type_label=nil
+    assert_nil exp_assay.suggested_assay_type_label
+
+    #a different label, but one that is still valid
+    exp_assay.assay_type_label = "metabolite concentration"
+    assert_nil exp_assay.suggested_assay_type_label
+
+    #should be case insensitive
+    exp_assay.assay_type_label = "Metabolite CONCentration"
+    assert_nil exp_assay.suggested_assay_type_label
+
+    #a completely new one
+    exp_assay.assay_type_label = "bacteria juggling"
+    assert_equal "bacteria juggling",exp_assay.suggested_assay_type_label
+
+    #a modelling type would also be treated as a new suggstion
+    exp_assay.assay_type_label = "gene expression"
+    assert_equal "gene expression",exp_assay.suggested_assay_type_label
+  end
+
+  test "suggested tech type label" do
+    exp_assay = Factory(:experimental_assay)
+    assert_nil exp_assay.suggested_technology_type_label
+    exp_assay.technology_type_label=nil
+    assert_nil exp_assay.suggested_technology_type_label
+
+    #a different label, but one that is still valid
+    exp_assay.technology_type_label = "hplc"
+    assert_nil exp_assay.suggested_technology_type_label
+
+    #should be case insensitive
+    exp_assay.technology_type_label = "HPLC"
+    assert_nil exp_assay.suggested_technology_type_label
+
+    #a completely new one
+    exp_assay.technology_type_label = "bacteria juggling"
+    assert_equal "bacteria juggling",exp_assay.suggested_technology_type_label
+
+
+  end
+
 end
