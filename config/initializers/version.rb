@@ -1,0 +1,1 @@
+$version = `hg summary`.match("parent: (.+):(.+) ")[2]
