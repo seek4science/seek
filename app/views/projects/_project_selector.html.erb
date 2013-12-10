@@ -6,7 +6,7 @@
 <%
    allow_nil ||= false
 
-   possibilities = Seek::Config.is_virtualliver ? Project.all : User.current_user.person.projects
+   possibilities = Seek::Config.is_virtualliver ? Project.all : (User.current_user.person.projects + resource.try(:projects)).uniq
 
    resource ||= nil
    if resource       
