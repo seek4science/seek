@@ -178,17 +178,25 @@ class PublicationTest < ActiveSupport::TestCase
     p3=Factory(:person)
     p4=Factory(:person)
 
-    User.with_current_user(p.contributor) do
-      p.creators << p1
-      p.creators << p2
-      p.creators << p3
-      p.creators << p4
 
+    User.with_current_user(p.contributor) do
+
+      if Seek::Config.is_virtualliver
+        [p1,p2,p3,p4].each_with_index do|author, index|
+          p.publication_authors.create :person_id=>author.id, :first_name => author.first_name, :last_name=>author.last_name, :author_index => index
+        end
+      else
+        p.creators << p1
+        p.creators << p2
+        p.creators << p3
+        p.creators << p4
+      end
       p.save!
+
     end
-    
     assert_equal 4,p.creators.size
     assert_equal [p1,p2,p3,p4],p.creators
+
   end
   
   test "uuid doesn't change" do

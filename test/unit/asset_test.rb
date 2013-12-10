@@ -113,7 +113,7 @@ class AssetTest < ActiveSupport::TestCase
     disable_authorization_checks do
       model.save_as_new_version
       model.reload
-      model.content_blobs=[Factory.create(:content_blob, :url=>"http://webpage.com",:asset => model,:asset_version=>model.version)]
+      model.content_blobs=[Factory.create(:content_blob, :url=>"http://webpage.com",:asset => model,:asset_version=>model.version,:external_link=>true)]
       model.save!
       model.reload
     end
