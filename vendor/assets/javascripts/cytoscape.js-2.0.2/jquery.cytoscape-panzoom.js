@@ -26,7 +26,7 @@
 		minZoom: 0.1, // min zoom level
 		maxZoom: 10, // max zoom level
 		fitPadding: 50, // padding when fitting
-		panSpeed: 10, // how many ms in between pan ticks
+		panSpeed: 1, // how many ms in between pan ticks
 		panDistance: 10, // max pan distance per tick
 		panDragAreaSize: 75, // the length of the pan drag box in which the vector for panning is calculated (bigger = finer control of pan speed and direction)
 		panMinPercentSpeed: 0.25, // the slowest speed we can pan by (as a percent of panSpeed)
