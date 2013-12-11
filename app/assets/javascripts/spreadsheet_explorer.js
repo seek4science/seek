@@ -251,7 +251,7 @@ function adjust_container_dimensions() {
         spreadsheet_container_width = $j("div.spreadsheet_container").width();
     }
     var sheet_container_width = spreadsheet_container_width + 14;
-    var sheet_width = spreadsheet_container_width - 39;
+    var sheet_width = spreadsheet_container_width - 42;
     $j(".sheet_container").width(sheet_container_width);
     $j(".sheet").width(sheet_width);
 
