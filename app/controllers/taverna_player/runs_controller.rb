@@ -36,6 +36,8 @@ module TavernaPlayer
     # POST /runs
     def create
       @run = Run.new(params[:run])
+      # Manually add projects of current user, as they aren't prompted for this information in the form
+      @run.projects = current_user.person.projects
       @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
 
       respond_to do |format|

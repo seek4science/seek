@@ -1,13 +1,16 @@
 
 module TavernaPlayer
   class Run < ActiveRecord::Base
+    # This line has to go at the top to make sure the projects HABTM relationship is defined before the callbacks
+    #  provided by TavernaPlayer (specifically after_create :enqueue). If not, associations to Projects aren't
+    #  automatically created after the Run is saved.
+    include ProjectCompat
+
     # Do not remove the next line.
     include TavernaPlayer::Concerns::Models::Run
     # Extend the Run model here.
     acts_as_asset
 
-    before_validation :set_projects_before_validation
-    after_create :set_projects
     after_create :fix_run_input_ports_mime_types
 
     validates_presence_of :name
@@ -36,19 +39,6 @@ module TavernaPlayer
 
     private
 
-    # SEEK moans if projects aren't set before save... but they don't actually get persisted by this method for some reason.
-    def set_projects_before_validation
-      self.project_ids = contributor.person.projects.map {|p| p.id}
-    end
-
-    # This method actually sets the Run's projects after save
-    def set_projects
-      contributor.person.projects.each do |p|
-        self.projects << p
-      end
-    end
-
-
     def fix_run_input_ports_mime_types
       self.inputs.each do |input|
         input.metadata = {:size => nil, :type => ''} if input.metadata.nil?
@@ -63,6 +53,5 @@ module TavernaPlayer
         end
       end
     end
-
   end
 end

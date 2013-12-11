@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131126101335) do
+ActiveRecord::Schema.define(:version => 20131210150904) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1013,17 +1013,17 @@ ActiveRecord::Schema.define(:version => 20131126101335) do
     t.integer "strain_id"
   end
 
-  create_table "projects_taverna_player_runs", :force => true do |t|
+  create_table "projects_taverna_player_runs", :id => false, :force => true do |t|
     t.integer "run_id"
     t.integer "project_id"
   end
 
-  create_table "projects_workflow_versions", :force => true do |t|
+  create_table "projects_workflow_versions", :id => false, :force => true do |t|
     t.integer "version_id"
     t.integer "project_id"
   end
 
-  create_table "projects_workflows", :force => true do |t|
+  create_table "projects_workflows", :id => false, :force => true do |t|
     t.integer "workflow_id"
     t.integer "project_id"
   end
