@@ -112,11 +112,6 @@ class Project < ActiveRecord::Base
     people_with_the_role("gatekeeper")
   end
 
-  #this is seek role
-  def project_cordinators
-    people_with_the_role("project_cordinator")
-  end
-
   def pals
     people_with_the_role("pal")
   end

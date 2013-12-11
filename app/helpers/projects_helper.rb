@@ -54,15 +54,6 @@ module ProjectsHelper
     html.html_safe
   end
 
-  def project_cordinators_link_list project
-    if project.project_cordinators.empty?
-      html = "<span class='none_text'>No #{t('project')} Cordinators for this #{t('project')}</span>";
-    else
-      html = project.project_cordinators.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
-    end
-    html.html_safe
-  end
-
   def project_mailing_list project
     if project.people.empty?
       html = "<span class='none_text'>No people in this #{t('project')}</span>";

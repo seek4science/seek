@@ -77,7 +77,6 @@
 
 
           <%= content_tag(:li,"This person is a #{t('project')} Manager for #{@person.projects_for_role('project_manager').collect(&:title).join(', ')}") if @person.is_project_manager_of_any_project? %>
-          <%= content_tag(:li,"This person is a #{t('project')} Cordinator for #{@person.projects_for_role('project_cordinator').collect(&:title).join(', ')}") if @person.is_project_cordinator_of_any_project? %>
 
           <%= content_tag(:li,"This person is an Asset Manager for #{@person.projects_for_role('asset_manager').collect(&:title).join(', ')}") if @person.is_asset_manager_of_any_project? %>
           <%= content_tag(:li,"This person is a Gatekeeper for #{@person.projects_for_role('gatekeeper').collect(&:title).join(', ')}") if @person.is_gatekeeper_of_any_project? %>

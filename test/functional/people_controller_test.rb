@@ -579,28 +579,11 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_asset_manager?(project)
   end
 
-  test 'set the project cordinator role for a person with workgroup' do
-    work_group = Factory(:work_group)
-    assert_difference('Person.count') do
-      assert_difference('NotifieeInfo.count') do
-        post :create, :person => {:first_name=>"project cordinator", :email=>"project_cordinator@sdfsd.com"}
-      end
-    end
-    person = assigns(:person)
-    project = work_group.project
-    put :administer_update, :id => person, :person =>{:work_group_ids => [work_group.id]}, :roles => {:project_cordinator => [project.id]}
-    person = assigns(:person)
-
-    assert_not_nil person
-    assert person.is_project_cordinator?(project)
-  end
-
   test 'admin should see the session of assigning roles to a person' do
     person = Factory(:person)
     get :admin, :id => person
     assert_select "select#_roles_asset_manager", :count => 1
     assert_select "select#_roles_project_manager", :count => 1
-    assert_select "select#_roles_project_cordinator", :count => 1
     assert_select "select#_roles_gatekeeper", :count => 1
   end
 
@@ -610,7 +593,6 @@ class PeopleControllerTest < ActionController::TestCase
     get :admin, :id => person
     assert_select "select#_roles_asset_manager", :count => 0
     assert_select "select#_roles_project_manager", :count => 0
-    assert_select "select#_roles_project_cordinator", :count => 0
     assert_select "select#_roles_gatekeeper", :count => 0
   end
 
@@ -673,12 +655,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select "img[src*=?]", /medal_bronze_3.png/,:count => 1
   end
 
-  test 'should have project cordinator icon on person show page' do
-    project_cordinator = Factory(:project_cordinator)
-    get :show, :id => project_cordinator
-    assert_select "img[src*=?]", /medal_gold_2.png/,:count => 1
-  end
-
   test 'should have asset manager icon on people index page' do
     i = 0
     while i < 5 do
@@ -688,17 +664,6 @@ class PeopleControllerTest < ActionController::TestCase
     get :index
     asset_manager_number = assigns(:people).select(&:is_asset_manager_of_any_project?).count
     assert_select "img[src*=?]", /medal_bronze_3/, :count => asset_manager_number
-  end
-
-  test 'should have project cordinator icon on people index page' do
-    i = 0
-    while i < 5 do
-      Factory(:project_cordinator)
-      i += 1
-    end
-    get :index
-    project_cordinator_number = assigns(:people).select(&:is_project_cordinator_of_any_project?).count
-    assert_select "img[src*=?]", /medal_gold_2.png/, :count => project_cordinator_number
   end
 
   test 'should have project manager icon on person show page' do
