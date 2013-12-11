@@ -245,7 +245,7 @@ function addPersonToAdminDefinedRole(role) {
     var selection = $('possible_project_for_'+role);
     var selected_option = selection.options[selection.selectedIndex];
     var project_id = selected_option.value;
-    var project_name = encodeURI(selected_option.text);
+    var project_name = selected_option.text;
 
     removeNoProjectAssignedForAdminDefinedRole(role);
 
@@ -267,6 +267,7 @@ function addPersonToAdminDefinedRole(role) {
         alert("The role is already selected for that project");
     }
 }
+
 //remove the list item that says no projects defined (with the id no_projects_for_$role
 function removeNoProjectAssignedForAdminDefinedRole(role) {
     var id = "no_projects_for_"+role;
