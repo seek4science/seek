@@ -858,28 +858,6 @@ class AuthorizationTest < ActiveSupport::TestCase
      end
   end
 
-  test "project_cordinator can mark_person_left_project" do
-    project_cordinator = Factory(:project_cordinator)
-    a_person = Factory(:person, :work_groups => project_cordinator.work_groups)
-    assert project_cordinator.is_project_cordinator_of?(a_person)
-
-    User.with_current_user project_cordinator.user do
-      ability = Ability.new(project_cordinator.user)
-      assert ability.can? :mark_person_left_project, a_person
-    end
-  end
-
-  test "project_cordinator can not mark_person_left_project outside their projects" do
-    project_cordinator = Factory(:project_cordinator)
-    a_person = Factory(:person)
-    assert !project_cordinator.is_project_cordinator_of?(a_person)
-
-    User.with_current_user project_cordinator.user do
-      ability = Ability.new(project_cordinator.user)
-      assert ability.cannot? :mark_person_left_project, a_person
-    end
-  end
-
   test "should handle different types of contributor of resource (Person, User)" do
     asset_manager = Factory(:asset_manager)
 
