@@ -140,6 +140,12 @@ href="INSTALL-PRODUCTION.html">Production Installation Guide</a></p>
 
 <h2 id="label-Installing+Ruby+1.9.3+with+RVM">Installing Ruby 1.9.3 with RVM</h2>
 
+<p>If you are upgrading a production service, we recommend installing RVM as
+the www-data user, or installing it system wide. Please check the <a
+href="INSTALL-PRODUCTION.html">Production Installation Guide</a> for
+details about creating a home directory as www-data and how to switch to
+that user before carrying out the following steps.</p>
+
 <p>We strongly encourage that you use <a href="https://rvm.io/">RVM</a> for
 managing your Ruby and RubyGems version. Although you can use the version
 that comes with your linux distribution, it is more difficult to control
@@ -249,7 +255,8 @@ clear the SEEK cache:</p>
 <h2 id="label-Updating+the+init.d+scripts">Updating the init.d scripts</h2>
 
 <p>If you use init.d scripts to start and stop the Delayed Job, Solr Search
-and Soffice services, you may need to update these.</p>
+and Soffice services, you may need to update these (you will need to be a
+user with sudo access to update these scripts).</p>
 
 <p>Solr Search - <a
 href="https://gist.github.com/3143434">gist.github.com/3143434</a></p>
