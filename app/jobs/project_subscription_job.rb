@@ -31,17 +31,16 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
 
     assets |= subscribable_types.collect do |type|
       # e.g.: 'data_files_projects'
-      assets_projects_table = ["#{type.underscore.pluralize}", 'projects'].sort.join('_')
+      assets_projects_table = ["#{type.underscore.gsub('/','_').pluralize}", 'projects'].sort.join('_')
       assets_for_project subscribed_project, type, assets_projects_table
     end.flatten.uniq
     assets
   end
 
   def assets_for_project project, asset_type, assets_projects_table
-    asset_id = (asset_type.underscore + '_id').gsub('/','_')
-    asset_id = asset_id.gsub('taverna_player_','') if asset_id.include?('taverna_player_run_id')
+    asset_id = (asset_type.underscore + '_id').split('/').last
     klass =  asset_type.constantize
-    table = assets_projects_table.gsub('/','_')
+    table = assets_projects_table
     sql = "select #{asset_id} from #{table}"
     sql << " where #{table}.project_id = #{project.id}"
     ids = ActiveRecord::Base.connection.select_all(sql).collect{|k| k["#{asset_id}"]}

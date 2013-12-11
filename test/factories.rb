@@ -818,3 +818,34 @@ end
     f.sequence(:key) {|n| "scale_key_#{n}"}
     f.sequence(:image_name) {|n| "image_#{n}"}
   end
+
+
+  #Workflow
+  Factory.define(:workflow) do |f|
+    f.sequence(:title) {|n| "A Workflow_#{n}"}
+    f.projects {[Factory.build(:project)]}
+    f.association :contributor, :factory => :user
+    f.after_create do |workflow|
+      if workflow.content_blob.blank?
+        workflow.content_blob = Factory.create(:enm_workflow, :asset => workflow, :asset_version=>workflow.version)
+      else
+        workflow.content_blob.asset = workflow
+        workflow.content_blob.asset_version = workflow.version
+        workflow.content_blob.save
+      end
+    end
+  end
+
+  Factory.define(:enm_workflow, :parent => :content_blob) do |f|
+    f.original_filename "enm.t2flow"
+    f.content_type "application/pdf"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/enm.t2flow","rb").read
+  end
+
+  #Run
+  Factory.define(:taverna_player_run, :class => TavernaPlayer::Run) do |f|
+    f.sequence(:name) {|n| "Workflow Run #{n}"}
+    f.projects {[Factory.build(:project)]}
+    f.association :workflow, :factory => :workflow
+    f.association :contributor, :factory => :user
+  end
