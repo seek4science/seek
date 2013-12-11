@@ -51,7 +51,7 @@ TavernaPlayer.setup do |config|
   # It takes the run model object as its parameter.
   #config.post_run_callback = Proc.new { |run| puts "Finished: #{run.name}" }
   #config.post_run_callback = "player_post_run_callback"
-  config.post_run_callback = :fix_run_output_mime_types
+  config.post_run_callback = :fix_run_output_ports_mime_types
 
   # The run-cancelled callback is called if the run is cancelled by the user.
   # It takes the run model object as its parameter.
