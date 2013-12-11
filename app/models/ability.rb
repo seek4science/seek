@@ -63,4 +63,10 @@ class Ability
       end
     end
   end
+
+  def project_cordinator project_cordinator
+    can :mark_person_left_project, :all  do |person|
+      project_cordinator.is_project_cordinator_of?(person)
+    end
+  end
 end

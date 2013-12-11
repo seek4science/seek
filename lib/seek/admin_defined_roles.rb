@@ -5,8 +5,8 @@ module Seek
 
     end
 
-    ROLES = %w[admin pal project_manager asset_manager gatekeeper]
-    PROJECT_DEPENDENT_ROLES = %w[pal project_manager asset_manager gatekeeper]
+    ROLES = %w[admin pal project_manager asset_manager gatekeeper project_cordinator]
+    PROJECT_DEPENDENT_ROLES = %w[pal project_manager asset_manager gatekeeper project_cordinator]
 
     def self.included(base)
       raise "Only People can have roles" unless base==Person
@@ -33,8 +33,8 @@ module Seek
               end
             end
 
-            def is_#{role}_of?(asset)
-              match = asset.projects.find do |project|
+            def is_#{role}_of?(item)
+              match = item.projects.find do |project|
                 is_#{role}?(project)
               end
               !match.nil?

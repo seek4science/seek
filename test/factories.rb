@@ -67,6 +67,13 @@
     end
   end
 
+  Factory.define(:project_cordinator,:parent=>:person) do |f|
+    f.after_build do |gk|
+      Factory(:admin_defined_role_project,:project=>gk.projects.first,:person=>gk,:role_mask=>32)
+      gk.roles_mask = 32
+    end
+  end
+
 #User
   Factory.define(:brand_new_user, :class => User) do |f|
     f.sequence(:login) { |n| "user#{n}" }
