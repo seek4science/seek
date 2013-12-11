@@ -70,8 +70,6 @@ module HomesHelper
     item_hash
   end
 
-
-
   # get multiple feeds from multiple sites
   def get_feed feed_url=nil
     unless feed_url.blank?
