@@ -4,22 +4,7 @@
 <% unless ports.blank? -%>
   <% ports.each do |p| -%>
     <div class="input">
-      <%
-         mime_type = ''
-         if !p.metadata.blank? && !p.metadata[:type].blank?
-           mime_type = p.depth == 0 ? p.metadata[:type] : "(list of depth #{p.depth})"
-         end
-      %>
-      <h3><%= p.name %> <%= "<span class='mime_type'>(#{mime_type})</span>".html_safe unless mime_type.blank? %></h3>
-
-      <p>
-        <strong>Value:</strong>
-      </p>
-      <% if p.file_file_name.blank? %>
-        <pre class="script_example_data_box"><%= p.value.force_encoding('UTF-8') %></pre>
-      <% else %>
-        <p><%= link_to p.file_file_name, p.file.url %></p>
-      <% end %>
+      <%= render 'port', :port => p %>
     </div>
   <% end %>
 <% else %>

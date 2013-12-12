@@ -76,7 +76,7 @@ gem 'passenger'
 gem 'unicorn-rails'
 
 gem 'taverna-t2flow'
-gem "taverna-player", "~>0.1.0"
+gem "taverna-player", "~>0.4.0"
 
 group :development do
   gem "sqlite3","1.3.7"

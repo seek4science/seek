@@ -1,0 +1,24 @@
+<% workflow_port = (port.is_a?(TavernaPlayer::RunPort::Input) ? port.run.workflow.input_ports : port.run.workflow.output_ports).detect {|wp| wp.name == port.name} %>
+
+<h3>
+  <%= port.name %>
+  <% unless workflow_port[:description].blank? %>
+    <%= help_icon(workflow_port[:description]) -%>
+  <% end %>
+  <%
+     mime_type = ''
+     if !port.metadata.blank? && !port.metadata[:type].blank?
+       mime_type = port.depth == 0 ? port.metadata[:type] : "(list of depth #{port.depth})"
+     end
+  %>
+  <%= "<span class='mime_type'>(#{mime_type})</span>".html_safe unless mime_type.blank? %>
+  <ul class="sectionIcons" style="font-weight: normal; vertical-align:middle; text-align:right; position:relative; top:-15px; /* ugly, but necessary relative positioning */">
+
+    <li><%= render :partial => "download_link", :locals => { :download_link_name => "Download value",
+                                                             :download_url => "/runs/#{port.run.id}/download/output/#{port.name}" } %></li>
+  </ul>
+</h3>
+
+<p>
+  <%= TavernaPlayer.port_renderer.render(port) %>
+</p>

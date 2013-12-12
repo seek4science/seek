@@ -227,7 +227,7 @@ GEM
       rack
     i18n (0.6.5)
     in_place_editing (1.2.0)
-    jbuilder (1.5.2)
+    jbuilder (1.5.3)
       activesupport (>= 3.0.0)
       multi_json (>= 1.2.0)
     journey (1.0.4)
@@ -376,7 +376,7 @@ GEM
       taverna-baclava (~> 1.0.0)
     taverna-baclava (1.0.0)
       builder (~> 3.0.0)
-    taverna-player (0.1.0)
+    taverna-player (0.4.0)
       coderay (~> 1.0.9)
       daemons (~> 1.1.9)
       delayed_job_active_record (~> 0.4.3)
@@ -488,7 +488,7 @@ DEPENDENCIES
   sqlite3 (= 1.3.7)
   sunspot_rails
   sunspot_solr
-  taverna-player (~> 0.1.0)
+  taverna-player (~> 0.4.0)
   taverna-t2flow
   unicorn-rails
   uuidtools (= 2.1.1)

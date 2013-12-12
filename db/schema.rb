@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131210150904) do
+ActiveRecord::Schema.define(:version => 20131211143520) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1482,7 +1482,6 @@ ActiveRecord::Schema.define(:version => 20131210150904) do
     t.datetime "created_at",                                        :null => false
     t.datetime "updated_at",                                        :null => false
     t.boolean  "displayed",                      :default => false
-    t.string   "unique_id"
     t.text     "page"
     t.string   "feed_reply"
     t.text     "data",       :limit => 16777215
@@ -1490,8 +1489,9 @@ ActiveRecord::Schema.define(:version => 20131210150904) do
     t.string   "page_uri"
   end
 
+  add_index "taverna_player_interactions", ["run_id", "replied"], :name => "index_taverna_player_interactions_on_run_id_and_replied"
+  add_index "taverna_player_interactions", ["run_id", "serial"], :name => "index_taverna_player_interactions_on_run_id_and_serial"
   add_index "taverna_player_interactions", ["run_id"], :name => "index_taverna_player_interactions_on_run_id"
-  add_index "taverna_player_interactions", ["unique_id"], :name => "index_taverna_player_interactions_on_unique_id"
 
   create_table "taverna_player_run_auth_lookup", :force => true do |t|
     t.integer "user_id"
@@ -1518,29 +1518,26 @@ ActiveRecord::Schema.define(:version => 20131210150904) do
     t.text     "metadata"
   end
 
+  add_index "taverna_player_run_ports", ["run_id", "name"], :name => "index_taverna_player_run_ports_on_run_id_and_name"
   add_index "taverna_player_run_ports", ["run_id"], :name => "index_taverna_player_run_ports_on_run_id"
 
   create_table "taverna_player_runs", :force => true do |t|
     t.string   "run_id"
-    t.string   "saved_state",                       :default => "pending", :null => false
+    t.string   "saved_state",                    :default => "pending", :null => false
     t.datetime "create_time"
     t.datetime "start_time"
     t.datetime "finish_time"
-    t.integer  "workflow_id",                                              :null => false
-    t.datetime "created_at",                                               :null => false
-    t.datetime "updated_at",                                               :null => false
+    t.integer  "workflow_id",                                           :null => false
+    t.datetime "created_at",                                            :null => false
+    t.datetime "updated_at",                                            :null => false
     t.string   "status_message"
     t.string   "results_file_name"
-    t.string   "results_content_type"
     t.integer  "results_file_size"
-    t.datetime "results_updated_at"
-    t.boolean  "embedded",                          :default => false
-    t.boolean  "stop",                              :default => false
+    t.boolean  "embedded",                       :default => false
+    t.boolean  "stop",                           :default => false
     t.string   "log_file_name"
-    t.string   "log_content_type"
     t.integer  "log_file_size"
-    t.datetime "log_updated_at"
-    t.string   "name",                              :default => "None"
+    t.string   "name",                           :default => "None"
     t.integer  "delayed_job_id"
     t.integer  "sweep_id"
     t.integer  "contributor_id"
@@ -1549,12 +1546,14 @@ ActiveRecord::Schema.define(:version => 20131210150904) do
     t.text     "failure_message"
     t.integer  "parent_id"
     t.string   "uuid"
-    t.string   "first_letter",         :limit => 1
+    t.string   "first_letter",      :limit => 1
     t.text     "description"
     t.integer  "user_id"
   end
 
-  add_index "taverna_player_runs", ["run_id"], :name => "index_taverna_player_runs_on_run_id"
+  add_index "taverna_player_runs", ["parent_id"], :name => "index_taverna_player_runs_on_parent_id"
+  add_index "taverna_player_runs", ["user_id"], :name => "index_taverna_player_runs_on_user_id"
+  add_index "taverna_player_runs", ["workflow_id"], :name => "index_taverna_player_runs_on_workflow_id"
 
   create_table "taverna_player_service_credentials", :force => true do |t|
     t.string   "uri",         :null => false

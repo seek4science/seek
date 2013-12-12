@@ -74,7 +74,7 @@ TavernaPlayer.setup do |config|
 
   # Renderers for each type of output (referenced by MIME type) must then be
   # registered. All the renderers shown below are supplied as defaults.
-  config.output_renderers do |renderers|
+  config.port_renderers do |renderers|
     # Set a default renderer for if there is a workflow type that browsers
     # can't otherwise handle.
     #renderers.default(:cannot_inline)

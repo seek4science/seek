@@ -26,7 +26,7 @@ $modal.dialog(
     if output.blank?
         html = "<pre class=\"script_example_data_box\">Value is N/A.</pre>"
     else
-      html = show_output(run, output)
+      html = TavernaPlayer.port_renderer.render(output)
     end
 
 %>
