@@ -9,7 +9,7 @@ class Publication < ActiveRecord::Base
   alias_attribute :description, :abstract
   #searchable must come before acts_as_asset is called
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
-    text :journal,:pubmed_id, :doi
+    text :journal,:pubmed_id, :doi, :published_date
     text :publication_authors do
       publication_authors.compact.map(&:first_name) + publication_authors.compact.map(&:last_name)
     end
