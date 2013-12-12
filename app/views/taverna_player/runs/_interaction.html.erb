@@ -5,45 +5,45 @@
 
       <script type="text/javascript">
           var inputData = <%= raw(interaction.data) %>;
+
           function registerCalls() {
-              pmrpc.register({
-                  publicProcedureName: "reply",
-                  procedure: function (status, results) {
-                      interaction_reply('<%= "#{run_url(run)}/interaction/#{interaction.unique_id}" %>', status, results);
-                      return "OK";
-                  }
-              });
+            pmrpc.register({
+              publicProcedureName : "reply",
+              procedure : function(status, results) {
+                interaction_reply('<%= "#{run_url(run)}/interaction/#{interaction.serial}" %>', status, results);
+                return "OK";
+              }
+            });
 
-              pmrpc.register({
-                  publicProcedureName: "getParameterValue",
-                  procedure: function (parameterName) {
-                      return getParameterValue(parameterName);
-                  }
-              });
+            pmrpc.register({
+              publicProcedureName : "getParameterValue",
+              procedure : function(parameterName) {
+                return getParameterValue(parameterName);
+              }
+            });
 
-              pmrpc.register({
-                  publicProcedureName: "getInputData",
-                  procedure: function () {
-                      return inputData;
-                  }
-              });
+            pmrpc.register({
+              publicProcedureName : "getInputData",
+              procedure : function() {
+                return inputData;
+              }
+            });
 
-              pmrpc.register({
-                  publicProcedureName: "getWorkflowRunId",
-                  procedure: function () {
-                      return "<%= run.run_id %>";
-                  }
-              });
+            pmrpc.register( {
+              publicProcedureName : "getWorkflowRunId",
+              procedure : function () {
+                return "<%= run.run_id %>";
+              }
+            });
 
-              pmrpc.register({
-                  publicProcedureName: "setTitle",
-                  procedure: function (title) {
-                      document.title = title;
-                      return "OK";
-                  }
-              });
+            pmrpc.register( {
+              publicProcedureName : "setTitle",
+              procedure : function(title) {
+                document.title = title;
+                return "OK";
+              }
+            });
           }
-
           jQuery(document).ready(
                   function () {
                       registerCalls();
