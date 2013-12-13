@@ -312,7 +312,7 @@ module Seek
       :tagline_prefix,
       :biosamples_enabled,:events_enabled,:modelling_analysis_enabled,:organisms_enabled,:models_enabled,:forum_enabled,:jerm_enabled,:email_enabled,:jws_enabled,:external_search_enabled,:piwik_analytics_enabled,
       :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,
-      :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,
+      :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,:header_tagline_text_enabled,
       :datacite_username,:datacite_password_enc,:datacite_url]
 
 

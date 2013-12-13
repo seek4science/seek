@@ -50,6 +50,7 @@ SEEK::Application.configure do
   Seek::Config.default :factors_studied_enabled,true
   Seek::Config.default :experimental_conditions_enabled,true
   Seek::Config.default :documentation_enabled,true
+  Seek::Config.default :header_tagline_text_enabled, true
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2
