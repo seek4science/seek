@@ -16,13 +16,9 @@ logged_in_class = logged_in_and_registered? ? "class=logged_in" : ""
       </li>
 
       <li id="image_block" <%= logged_in_class -%>>
-        <% if logged_in_and_registered? %>
-            <%= link_to image_tag(Seek::Config.header_image, :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title),Seek::Config.header_image_link,:class=>"logo_link" %>
-        <% else %>
-        <% if Seek::Config.header_image_enabled %><%= link_to image_tag(Seek::Config.header_image, :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title),
-                                                              Seek::Config.header_image_link %>
-        <% end %>
-        <% end %>
+            <% if Seek::Config.header_image_enabled %>
+                <%= link_to image_tag(Seek::Config.header_image, :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title),Seek::Config.header_image_link,:class=>"logo_link" %>
+            <% end %>
       </li>
     </ul>
 
