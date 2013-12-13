@@ -2,6 +2,14 @@
   <% if !interaction.nil? %>
       <%= stylesheet_link_tag('jquery-ui-1.8.14.custom') %>
       <%= javascript_include_tag 'jquery-ui-1.8.14.custom.min.js' %>
+      <style>
+        /* Modal background color */
+        .ui-widget-overlay {
+           background: #333 50% 50% repeat-x;
+           opacity: .50;
+           filter: Alpha(Opacity=50);
+        }
+      </style>
 
       <script type="text/javascript">
           var inputData = <%= raw(interaction.data) %>;
@@ -57,7 +65,7 @@
 
           function show_interaction_overlay() {
               var $j = jQuery;
-
+              $j('.ui-dialog').remove(); // Remove any old modals that are still showing
               $modal = $j('#modal-interaction-dialog'),
                       $modalBody = $j('#modal-interaction-dialog .modal-interaction-body'),
                       $modalHeading = $j('#modal-interaction-dialog .modal-interaction-heading');
@@ -66,7 +74,9 @@
                       {
                           modal: true,
                           autoOpen: true,
-                          width: 600,
+                          width: 1000,
+                          height: 800,
+                          marginTop: 20,
                           draggable: true,
                           resizable: true,
                           dialogClass: 'no-close noTitleStuff'/*,
@@ -109,11 +119,7 @@
                       // Dialogs have no way of knowing when they're supposed to be
                       // closed without callbacks so make sure they're hidden away
                       // if the interaction is nil
-                      var $j = jQuery;
-                      $j('#modal-interaction-dialog').hide();
-                      $j('#modal-interaction-dialog .modal-interaction-body').hide();
-                      $j('#modal-interaction-dialog .modal-interaction-heading').hide();
-                      $j('#modal-interaction-dialog .modal-interaction-header').hide();
+                      jQuery('.ui-dialog').remove();
                   }
           );
       </script>
