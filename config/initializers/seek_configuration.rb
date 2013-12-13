@@ -67,6 +67,7 @@ SEEK::Application.configure do
   Seek::Config.default :header_image_title, "SysMO-DB"
   Seek::Config.default :header_image_link,"http://www.sysmo-db.org"
   Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
+  Seek::Config.default :header_home_logo_image,'seek-logo-smaller.png'
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 

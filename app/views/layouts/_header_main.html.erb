@@ -7,7 +7,7 @@ logged_in_class = logged_in_and_registered? ? "class=logged_in" : ""
 
     <ul id="header">
       <li id="seek_logo">
-        <%= link_to image_tag("seek-logo-smaller.png", :alt => "SEEK", :title => "SEEK"),
+        <%= link_to image_tag(Seek::Config.header_home_logo_image, :alt => "SEEK", :title => "SEEK"),
                     root_path %>
       </li>
 
