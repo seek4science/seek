@@ -1,3 +1,5 @@
+<%= javascript_include_tag "sharing.js" %>
+
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @run.workflow.category.name, main_app.workflows_path(:category_id => @run.workflow.category) -%> &gt;
