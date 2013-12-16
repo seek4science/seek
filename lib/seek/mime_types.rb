@@ -15,7 +15,7 @@ module Seek
         "application/vnd.ms-powerpoint" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extensions=>["ppt"]},
         "application/zip" => {:name => "Zip file", :icon_key => "zip_file", :extensions=>["zip"]},
         "image/gif" => {:name => "GIF image", :icon_key => "gif_file", :extensions=>["gif"]},
-        "image/jpeg" => {:name => "JPEG image", :icon_key => "jpg_file", :extensions=>["jpeg","jpg"]},
+        "image/jpeg" => {:name => "JPEG image", :icon_key => "jpg_file", :extensions=>["jpg","jpeg"]},
         "image/png" => {:name => "PNG image", :icon_key => "png_file", :extensions=>["png"]},
         "image/bmp" => {:name => "BMP image", :icon_key => "bmp_file", :extensions=>["bmp"]},
         "image/svg+xml" => {:name => "SVG image", :icon_key => "svg_file", :extensions=>["svg"]},
