@@ -72,10 +72,12 @@
         </div>
       </div>
 
-      <%= will_paginate(wp_rows,
-                        :id => "paginate_sheet_#{sheet_index.to_s}",
-                        :params => {:sheet => sheet_index, :page_rows => per_page, :annotation_id => nil},
-                        :style => "display:none; margin-top:1em") %>
+          <%= will_paginate(wp_rows,
+                            :id => "paginate_sheet_#{sheet_index.to_s}",
+                            :params => {:sheet => sheet_index, :page_rows => per_page, :annotation_id => nil},
+                            #:class => "additional",
+                            :previous_label => "&#8593; Previous",
+                            :next_label => "Next &#8595;") %>
 
     <% end -%>
   <% end -%>
