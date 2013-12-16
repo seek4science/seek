@@ -712,3 +712,10 @@ function relativeRows(minRow, maxRow, sheetNumber){
     }
     return [relativeMinRow, relativeMaxRow];
 }
+
+function displayRowsPerPage(){
+    paginations = document.getElementsByClassName('pagination');
+    if (paginations.length > 0){
+        $('rows_per_page').show();
+    }
+}

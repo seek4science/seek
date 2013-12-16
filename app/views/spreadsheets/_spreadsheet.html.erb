@@ -75,7 +75,6 @@
           <%= will_paginate(wp_rows,
                             :id => "paginate_sheet_#{sheet_index.to_s}",
                             :params => {:sheet => sheet_index, :page_rows => per_page, :annotation_id => nil},
-                            #:class => "additional",
                             :previous_label => "&#8593; Previous",
                             :next_label => "Next &#8595;") %>
 
@@ -83,8 +82,11 @@
   <% end -%>
 </div>
 <br/>
-Display <%= text_field_tag :per_page, per_page, :size => 4, :onkeypress => 'return onlyNumbers(event);' %> rows per page
-<input type='button' value='Update' onclick='changeRowsPerPage()'/>
+
+<div id="rows_per_page" style="display:none">
+    Display <%= text_field_tag :per_page, per_page, :size => 4, :onkeypress => 'return onlyNumbers(event);' %> rows per page
+    <input type='button' value='Update' onclick='changeRowsPerPage()'/>
+</div>
 
 <script type = "text/javascript">
   var perPage = <%= default_per_page %>;
@@ -97,6 +99,7 @@ Display <%= text_field_tag :per_page, per_page, :size => 4, :onkeypress => 'retu
   //"activate" the worksheet
     activateSheet(<%= params[:sheet] || 1 %>);
     displayAnnotation();
+    displayRowsPerPage();
   }
 
   function displayAnnotation(){
