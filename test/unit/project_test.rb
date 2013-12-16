@@ -358,19 +358,6 @@ class ProjectTest < ActiveSupport::TestCase
     end
   end
 
-  test "project_cordinators" do
-    User.with_current_user(Factory(:admin)) do
-      person=Factory(:person_in_multiple_projects)
-      proj1 = person.projects.first
-      proj2 = person.projects.last
-      person.is_project_cordinator=true,proj1
-      person.save!
-
-      assert proj1.project_cordinators.include?(person)
-      assert !proj2.project_cordinators.include?(person)
-    end
-  end
-
   test "asset_managers" do
     User.with_current_user(Factory(:admin)) do
       person=Factory(:person_in_multiple_projects)

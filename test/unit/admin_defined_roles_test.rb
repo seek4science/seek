@@ -93,12 +93,10 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     person.is_project_manager=true,project
     assert_equal ["admin","asset_manager","gatekeeper","pal","project_manager"],person.role_names.sort
 
-    person.is_project_cordinator=true,project
-    assert_equal ["admin","asset_manager","gatekeeper","pal","project_cordinator","project_manager"],person.role_names.sort
   end
 
   test "project dependent roles" do
-    assert_equal ['pal', 'project_manager', 'asset_manager', 'gatekeeper', 'project_cordinator'],Person::PROJECT_DEPENDENT_ROLES
+    assert_equal ['pal', 'project_manager', 'asset_manager', 'gatekeeper'],Person::PROJECT_DEPENDENT_ROLES
     assert Person.is_project_dependent_role?('pal')
     assert Person.is_project_dependent_role?('project_manager')
     assert Person.is_project_dependent_role?('asset_manager')
@@ -394,24 +392,6 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     end
   end
 
-  test 'is_project_cordinator?' do
-    User.with_current_user Factory(:admin).user do
-      person = Factory(:person)
-      project = person.projects.first
-      other_project = Factory(:project)
-      person.is_project_cordinator = true,project
-      person.save!
-
-      assert person.is_project_cordinator?(project)
-      assert !person.is_project_cordinator?(other_project)
-
-      person.is_project_cordinator=false,project
-      person.save!
-
-      assert !person.is_project_cordinator?(project)
-    end
-  end
-
   test 'is_asset_manager_of?' do
     asset_manager = Factory(:asset_manager)
     sop = Factory(:sop)
@@ -431,18 +411,8 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert gatekeeper.is_gatekeeper_of?(sop)
   end
 
-  test 'is_project_cordinator_of?' do
-    project_cordinator = Factory(:project_cordinator)
-    person = Factory(:person)
-    assert !project_cordinator.is_project_cordinator_of?(person)
-
-    disable_authorization_checks{person.work_groups = project_cordinator.work_groups}
-
-    assert project_cordinator.is_project_cordinator_of?(person)
-  end
-
   test "order of ROLES" do
-    assert_equal %w[admin pal project_manager asset_manager gatekeeper project_cordinator],Person::ROLES,"The order of the ROLES is critical as it determines the mask that is used."
+    assert_equal %w[admin pal project_manager asset_manager gatekeeper],Person::ROLES,"The order of the ROLES is critical as it determines the mask that is used."
   end
 
   test "factories for roles" do
@@ -472,11 +442,6 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       assert !project_manager.projects.empty?
       assert project_manager.is_project_manager?(project_manager.projects.first)
       assert project_manager.save
-
-      project_cordinator = Factory(:project_cordinator)
-      assert !project_cordinator.projects.empty?
-      assert project_cordinator.is_project_cordinator?(project_cordinator.projects.first)
-      assert project_cordinator.save
     end
 
   end
@@ -559,19 +524,6 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert project_managers.include?(project_manager)
     assert project_managers.include?(project_manager2)
     assert !project_managers.include?(normal)
-  end
-
-  test "Person.project_cordinators" do
-    normal = Factory(:person)
-    project_cordinator = Factory(:project_cordinator)
-    project_cordinator2 = Factory(:gatekeeper)
-    project_cordinator2.is_project_cordinator=true,project_cordinator2.projects.first
-    project_cordinator2.save!
-
-    project_cordinators = Person.project_cordinators
-    assert project_cordinators.include?(project_cordinator)
-    assert project_cordinators.include?(project_cordinator2)
-    assert !project_cordinators.include?(normal)
   end
 
   test "is_in_any_gatekept_projects?" do

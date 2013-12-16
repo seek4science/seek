@@ -43,7 +43,8 @@
     </ul>
   </div>
   <div style="padding-top:0.25em;">
-      <%= select_tag user_selection_id, options_from_collection_for_select(@person.projects.sort_by(&:title), "id", "title") -%>
+      <% selection_options = @person.projects.sort_by(&:title).collect{|p| [sanitize(p.title),p.id]} -%>
+      <%= select_tag user_selection_id, options_for_select(selection_options) -%>
       &nbsp;<%= link_to_function "Add", "addPersonToAdminDefinedRole('#{role}');return(false);" -%>
   </div>
   <br>

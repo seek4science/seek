@@ -4,7 +4,7 @@ class AdminDefinedRoleProject < ActiveRecord::Base
 
 
   validates :project,:person, presence:true
-  validates :role_mask,numericality: {greater_than:0,less_than_or_equal_to:32}
+  validates :role_mask,numericality: {greater_than:0,less_than_or_equal_to:16}
   validate :project_belongs_to_person
 
 

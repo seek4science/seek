@@ -702,8 +702,4 @@ class PersonTest < ActiveSupport::TestCase
     assert_empty p.projects
   end
 
-  test "project_cordinator can_mark_people_left_project" do
-    p = Factory(:project_cordinator)
-    a_person =
-  end
 end

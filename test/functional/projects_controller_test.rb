@@ -322,7 +322,7 @@ class ProjectsControllerTest < ActionController::TestCase
       end
     end
 
-  test "project_managers displayed in show page" do
+  	test "project_managers displayed in show page" do
 		project_manager = Factory(:project_manager)
     login_as project_manager.user
     get :show,:id=>project_manager.projects.first
@@ -331,18 +331,7 @@ class ProjectsControllerTest < ActionController::TestCase
 			assert_select "a",:count=>1
 			assert_select "a[href=?]",person_path(project_manager),:text=>project_manager.name,:count=>1
 		end
-  end
-
-  test "project_cordinators displayed in show page" do
-    project_cordinator = Factory(:project_cordinator)
-    login_as project_cordinator.user
-    get :show,:id=>project_cordinator.projects.first
-    assert_select "div.box_about_actor p.project_cordinators" do
-      assert_select "label",:text=>"#{I18n.t('project')} Cordinators:",:count=>1
-      assert_select "a",:count=>1
-      assert_select "a[href=?]",person_path(project_cordinator),:text=>project_cordinator.name,:count=>1
     end
-  end
 
   test "gatekeepers displayed in show page" do
     gatekeeper = Factory(:gatekeeper)
@@ -361,7 +350,6 @@ class ProjectsControllerTest < ActionController::TestCase
 
     asset_manager = Factory(:asset_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     project_manager = Factory(:project_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    project_cordinator = Factory(:project_cordinator, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     gatekeeper = Factory(:gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     pal = Factory(:pal, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
 
@@ -375,11 +363,8 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select "label", :text => "Asset Managers:", :count => 0
       assert_select "a[href=?]", person_path(asset_manager), :text => asset_manager.name, :count => 0
 
-      assert_select "label", :text => "#{I18n.t('project')} Managers:", :count => 0
+      assert_select "label", :text => "Project Managers:", :count => 0
       assert_select "a[href=?]", person_path(project_manager), :text => project_manager.name, :count => 0
-
-      assert_select "label", :text => "#{I18n.t('project')} Cordinators:", :count => 0
-      assert_select "a[href=?]", person_path(project_cordinator), :text => project_cordinator.name, :count => 0
 
       assert_select "label", :text => "Gatekeepers:", :count => 0
       assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 0
@@ -431,19 +416,6 @@ class ProjectsControllerTest < ActionController::TestCase
 			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Managers for this #{I18n.t('project')}",:count=>1
 		end
 	end
-
-  test "no project cordinators displayed for project with no project cordinator" do
-    project = Factory(:project)
-    work_group = Factory(:work_group, :project => project)
-    person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    login_as person.user
-    get :show,:id=>project
-    assert_select "div.box_about_actor p.project_cordinators" do
-      assert_select "label",:text=>"#{I18n.t('project')} Cordinators:",:count=>1
-      assert_select "a",:count=>0
-      assert_select "span.none_text",:text=>"No #{I18n.t('project')} Cordinators for this #{I18n.t('project')}",:count=>1
-    end
-  end
 
   test "no gatekeepers displayed for project with no gatekeepers" do
     project = Factory(:project)
