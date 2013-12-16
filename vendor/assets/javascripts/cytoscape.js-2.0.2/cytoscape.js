@@ -10431,13 +10431,13 @@ var cytoscape;
 	// Resize canvas
 	CanvasRenderer.prototype.matchCanvasSize = function(container) {
 		var data = this.data; var width = container.clientWidth; var height = container.clientHeight;
-		
+
 		var canvas, canvasWidth = width, canvasHeight = height;
 
-		if ('devicePixelRatio' in window) {
-			canvasWidth *= devicePixelRatio;
-			canvasHeight *= devicePixelRatio;
-		}
+		//if ('devicePixelRatio' in window) {
+		//	canvasWidth *= devicePixelRatio;
+		//	canvasHeight *= devicePixelRatio;
+		//}
 
 		for (var i = 0; i < CANVAS_LAYERS; i++) {
 
@@ -10642,11 +10642,11 @@ var cytoscape;
 			effectivePan = forcedPan;
 		}
 
-		if( 'devicePixelRatio' in window ){
-			effectiveZoom *= devicePixelRatio;
-			effectivePan.x *= devicePixelRatio;
-			effectivePan.y *= devicePixelRatio;
-		}
+		//if( 'devicePixelRatio' in window ){
+		//	effectiveZoom *= devicePixelRatio;
+		//	effectivePan.x *= devicePixelRatio;
+		//	effectivePan.y *= devicePixelRatio;
+		//}
 		
 		var elements = [];
 		for( var i = 0; i < nodes.length; i++ ){
