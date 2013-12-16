@@ -92,6 +92,8 @@ The following commands help you to check the current encoding, but replacing <my
   mysql -u <mysql_username> -p <database_name>
   SHOW VARIABLES LIKE 'character_set%';
 
+If the value of variable character_set_connection is not UTF-8, you need to convert.
+
 If the current encoding is latin1, please follow the next steps to convert it to UTF-8.
 
 First, make a dump of the database using the following:
