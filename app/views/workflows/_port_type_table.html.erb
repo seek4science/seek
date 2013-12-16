@@ -27,7 +27,7 @@
                 </td>
             <% end %>
             <td class="port-type">
-              <%= i.select(:mime_type, options_for_select($mime_types_list, :selected => (i.object.mime_type.blank? ? '' : i.object.mime_type))) -%>
+              <%= i.select(:mime_type, mime_type_options_for_select) -%>
             </td>
           </tr>
       <% end %>
@@ -61,7 +61,7 @@
                 </td>
             <% end %>
             <td class="port-type">
-              <%= o.select(:mime_type, options_for_select($mime_types_list, :selected => (o.object.mime_type.blank? ? '' : o.object.mime_type))) -%>
+              <%= o.select(:mime_type, mime_type_options_for_select) -%>
             </td>
           </tr>
       <% end %>

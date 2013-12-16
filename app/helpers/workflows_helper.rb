@@ -1,17 +1,18 @@
 module WorkflowsHelper
 
   # Get the MIME types in an array suitable for the use in forms for 'select' fields
-  mime_types_names_list = Seek::MimeTypes::MIME_MAP.map do |key, value|
-    s = "#{value[:name]}"
-    s += " (.#{value[:extensions].first})" unless value[:extensions].first.blank?
-    s
-  end.uniq.sort
+  MIME_TYPE_OPTIONS = [['','']] + Seek::MimeTypes::MIME_MAP.map do |mime_type, parameters|
+    option = []
+    option[0] = parameters[:name]
+    default_extension = parameters[:extensions].first
+    option[0] += " (.#{default_extension})" unless default_extension.blank?
+    option[1] = mime_type
+    option
+  end.sort.uniq {|option| option[0]}.freeze
 
-  $mime_types_list = [['', '']]
-  mime_types_names_list.each do |name|
-    $mime_types_list << [ name, (Seek::MimeTypes::MIME_MAP.map{ |key, value|  key if value[:name] == name }.compact)[0] ]
+  def mime_type_options_for_select
+    options_for_select(WorkflowsHelper::MIME_TYPE_OPTIONS)
   end
-
 
   def merge_workflow_filters(params, key, value)
     hash = {key => value}
