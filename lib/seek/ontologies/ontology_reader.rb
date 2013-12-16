@@ -51,8 +51,6 @@ module Seek
           uri = solution.subject
           subclasses = subclasses_for(uri)
           o = build_ontology_class uri,nil,nil,subclasses
-          #FIXME: this is based on the assumption there is only 1 parent, which is true for SYsMO but may not always be the
-          #case.
           subclasses.each do |sub|
             sub.parents << o
           end
@@ -61,9 +59,15 @@ module Seek
       end
 
       def build_ontology_class uri,label=nil,description=nil,subclasses=[]
-        label ||= fetch_label_for(uri)
-        description ||= fetch_description_for(uri)
-        OntologyClass.new(uri, label, description, subclasses)
+        @known_classes||={}
+        @known_classes[uri] || begin
+          label ||= fetch_label_for(uri)
+          description ||= fetch_description_for(uri)
+          result = OntologyClass.new(uri, label, description, subclasses)
+          @known_classes[uri]=result
+          result
+        end
+
       end
 
       def fetch_label_for uri

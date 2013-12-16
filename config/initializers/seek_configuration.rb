@@ -57,6 +57,7 @@ SEEK::Application.configure do
   Seek::Config.default :technology_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
   Seek::Config.default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
 
+  Seek::Config.default :header_tagline_text_enabled, true
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2
@@ -73,6 +74,7 @@ SEEK::Application.configure do
   Seek::Config.default :header_image_title, "SysMO-DB"
   Seek::Config.default :header_image_link,"http://www.sysmo-db.org"
   Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
+  Seek::Config.default :header_home_logo_image,'seek-logo-smaller.png'
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
