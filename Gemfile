@@ -52,6 +52,9 @@ gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
 gem 'cocaine'
 gem 'colorize'
 
+#gem for BiVeS and BudHat
+gem 'bives'
+
 
 #Linked to SysMO Git repositories
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"

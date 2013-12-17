@@ -195,6 +195,7 @@ GEM
       net-http-persistent
     arel (3.0.2)
     bio (1.4.3.0001)
+    bives (0.1)
     breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
     cancan (1.6.10)
@@ -471,6 +472,7 @@ DEPENDENCIES
   app_version!
   bio
   bioportal!
+  bives
   breadcrumbs_on_rails
   calendar_date_select!
   cancan
