@@ -1,4 +1,5 @@
-<%= stylesheet_link_tag :bives -%>
+<%= stylesheet_link_tag 'bives','cytoscape.js-2.0.2/index' -%>
+<%= javascript_include_tag 'jquery-1.5.1.min','cytoscape.js-2.0.3/index' %>
 
 <%= @other_version.version -%>
 
@@ -13,5 +14,114 @@
 
 <div class="bives_output">
     <%= @comparison_html.html_safe -%>
+    <%#= @crn -%>
 </div>
+
+<div id="subtab_graph_graph_js">
+
+</div>
+
+<script>
+    var cytoscapeJSoptions = {
+        //layout: {
+        //    numIter             : 100,
+        //    name: 'cose'
+            //name: 'arbor'//,
+//			    ,'edgeLength': '20'
+//,idealEdgeLength     : 5
+
+        //},
+        layout: {name: 'arbor'},
+
+        style: cytoscape.stylesheet()
+                .selector('node')
+                .css({
+                    'content': 'data(name)',
+                    'text-valign': 'center',
+                    'color': '#000',
+                    'background-color': '#fff',
+                    'border-width':'1',
+                    'border-color':'#666'
+                })
+                .selector('.compartment').css({
+                    'text-valign': 'bottom',
+                    'opacity':.9,
+                    'background-color': '#ddd',
+                    'border-width':'0'
+
+                })
+                .selector('.species').css({
+                    'shape': 'ellipse'
+                    ,'font-size': '10'
+                })
+                .selector('.reaction').css({
+                    'shape': 'hexagon'
+                    ,'font-size': '10'
+                })
+                .selector(':selected')
+                .css({
+                    'border-width': 3,
+                    'border-color': '#333'
+                })
+                .selector('edge')
+                .css({
+                    'target-arrow-shape': 'triangle',
+                    'target-arrow-color': '#000',
+                    'line-color': '#000'
+                })
+                .selector ('.bives-unkwnmod').css({
+                    'target-arrow-shape': 'circle',
+                    'line-style':'dashed'
+
+                })
+                .selector ('.bives-inhibitor').css({
+                    'target-arrow-shape': 'tee',
+                    'line-style':'dashed'
+
+                })
+                .selector ('.bives-stimulator').css({
+                    'target-arrow-shape': 'triangle',
+                    'line-style':'dashed'
+
+                })
+
+
+                .selector ('.bives-deleted').css({
+                    'background-color': '#f00',
+                    'target-arrow-color': '#f00',
+                    'line-color': '#f00'
+                })
+                .selector ('.bives-inserted').css({
+                    'background-color': '#44f',
+                    'target-arrow-color': '#44f',
+                    'line-color': '#44f'
+                })
+                .selector ('.bives-modified').css({
+                    'background-color': '#ff0',
+                    'target-arrow-color': '#ff0',
+                    'line-color': '#ff0'
+                })
+                .selector('edge.bives-deleted').css({'width': '2'})
+                .selector('edge.bives-modified').css({'width': '2'})
+                .selector('edge.bives-inserted').css({'width': '2'}),
+        ready: function(){
+            cy = this;
+        }
+    };
+
+
+    function drawDiffGraphJS (graph)
+    {console.log(graph);
+        graph = JSON.parse(graph);
+        cytoscapeJSoptions.elements = graph.elements;
+        //cytoscapeJSoptions.layout = {name: 'breadthfirst'};
+        $("#subtab_graph_graph_js").html("");
+        console.log(graph.elements);
+
+        $("#subtab_graph_graph_js").cytoscape(cytoscapeJSoptions);
+
+    }
+
+    drawDiffGraphJS('<%= @crn.html_safe -%>');
+</script>
 

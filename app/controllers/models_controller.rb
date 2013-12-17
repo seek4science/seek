@@ -39,8 +39,8 @@ class ModelsController < ApplicationController
     @file1=blob1.filepath
     @file2=blob2.filepath
 
-    json = compare @file1,@file2,["reportHtml","crnGraphml","json"]
-    @graph_ml = JSON.parse(json)["crnGraphml"]
+    json = compare @file1,@file2,["reportHtml","crnJson","json"]
+    @crn = JSON.parse(json)["crnJson"]
     @comparison_html = JSON.parse(json)["reportHtml"]
   end
 
