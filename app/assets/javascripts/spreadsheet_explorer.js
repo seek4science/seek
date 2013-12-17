@@ -250,8 +250,8 @@ function adjust_container_dimensions() {
         $j(".spreadsheet_container").width("95%");
         spreadsheet_container_width = $j("div.spreadsheet_container").width();
     }
-    var sheet_container_width = spreadsheet_container_width + 14;
-    var sheet_width = spreadsheet_container_width - 42;
+    var sheet_container_width = spreadsheet_container_width - 2;
+    var sheet_width = spreadsheet_container_width - 45;
     $j(".sheet_container").width(sheet_container_width);
     $j(".sheet").width(sheet_width);
 
