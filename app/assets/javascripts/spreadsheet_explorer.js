@@ -60,7 +60,9 @@ $j(document).ready(function ($) {
         .click(function () {
             activateSheet(null, $(this));
         })
-    ;
+        .mouseover(function (){
+            this.style.cursor = 'pointer';
+        });
 
     //Cell selection
     $("table.sheet td.cell")
