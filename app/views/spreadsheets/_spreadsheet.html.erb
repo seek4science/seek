@@ -8,7 +8,7 @@
 
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
   <% unless sheet.rows.empty? %>
-    <a index="<%= sheet_index + 1 -%>" class="sheet_tab curved_top with_smaller_shadow <%= "selected_tab" if workbook.sheets.first == sheet -%>" href="#"><%= h(sheet.name) -%></a>
+    <a index="<%= sheet_index + 1 -%>" class="sheet_tab curved_top with_smaller_shadow <%= "selected_tab" if workbook.sheets.first == sheet -%>"><%= h(sheet.name) -%></a>
   <% end %>
 <% end %>
 
