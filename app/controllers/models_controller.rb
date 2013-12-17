@@ -1,6 +1,8 @@
  require 'zip/zip'
  require 'zip/zipfilesystem'
  require 'libxml'
+ require 'bives'
+
 class ModelsController < ApplicationController
 
   include WhiteListHelper
@@ -12,16 +14,33 @@ class ModelsController < ApplicationController
   before_filter :models_enabled?
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml,:compare_versions]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
+
+  before_filter :find_other_version,:only=>[:compare_versions]
 
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs
 
+  include Bives
+
   @@model_builder = Seek::JWS::Builder.new
 
+  def find_other_version
+    version = params[:other_version]
+    @other_version = @model.find_version(version)
+  end
+
+  def compare_versions
+    blob1 = @display_model.content_blobs.first
+    blob2 = @other_version.content_blobs.first
+    @file1=blob1.filepath
+    @file2=blob2.filepath
+
+    @comparison_html = compare @file1,@file2
+  end
 
   def export_as_xgmml
       type =  params[:type]

@@ -291,6 +291,7 @@ SEEK::Application.routes.draw do
       post :test_asset_url
     end
     member do
+      get :compare_versions
       get :builder
       post :check_related_items
       get :visualise
