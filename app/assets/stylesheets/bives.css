@@ -1,0 +1,16 @@
+div.bives_output li {
+    list-style: none;
+}
+
+div.bives_output span.bives-delete {
+    color:red;
+}
+
+div.bives_output span.bives-insert {
+    color:green;
+}
+
+span.bives-attr {
+    font-style: italic;
+    font-weight: bolder;
+}

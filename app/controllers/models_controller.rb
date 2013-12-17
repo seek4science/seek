@@ -39,7 +39,9 @@ class ModelsController < ApplicationController
     @file1=blob1.filepath
     @file2=blob2.filepath
 
-    @comparison_html = compare @file1,@file2
+    json = compare @file1,@file2,["reportHtml","crnGraphml","json"]
+    @graph_ml = JSON.parse(json)["crnGraphml"]
+    @comparison_html = JSON.parse(json)["reportHtml"]
   end
 
   def export_as_xgmml
