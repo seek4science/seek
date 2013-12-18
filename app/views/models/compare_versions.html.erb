@@ -1,16 +1,7 @@
 <%= stylesheet_link_tag 'bives','cytoscape.js-2.0.2/index' -%>
 <%= javascript_include_tag 'jquery-1.5.1.min','cytoscape.js-2.0.3/index' %>
 
-<%= @other_version.version -%>
 
-<%= @model.version -%>
-
-<p>
-<%= "file 1 = #{@file1}" -%>
-</p>
-<p>
-<%= "file 2 = #{@file2}" -%>
-</p>
 
 <div class="bives_output">
     <%= @comparison_html.html_safe -%>
