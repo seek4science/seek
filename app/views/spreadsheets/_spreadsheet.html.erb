@@ -8,7 +8,7 @@
 
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
   <% unless sheet.rows.empty? %>
-    <a index="<%= sheet_index + 1 -%>" class="sheet_tab <%= "selected_tab" if workbook.sheets.first == sheet -%>" href="#"><%= h(sheet.name) -%></a>
+    <a index="<%= sheet_index + 1 -%>" class="sheet_tab curved_top with_smaller_shadow <%= "selected_tab" if workbook.sheets.first == sheet -%>"><%= h(sheet.name) -%></a>
   <% end %>
 <% end %>
 
@@ -20,7 +20,7 @@
           <%
              wp_rows = generate_paginate_rows(sheet.rows, sheet_index, per_page)
           %>
-      <div style="display:none" class="sheet_container" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
+      <div style="display:none" class="sheet_container curved" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
         <div class="corner_heading">&nbsp;</div>
         <div class="col_headings <%= "odd_heading" if sheet.last_col % 2 == 0 -%>">
           <div style="min-width:1000000px">
