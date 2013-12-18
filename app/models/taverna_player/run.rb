@@ -11,6 +11,8 @@ module TavernaPlayer
     # Extend the Run model here.
     acts_as_asset
 
+    attr_accessible :workflow_version, :project_ids
+
     after_create :fix_run_input_ports_mime_types
 
     validates_presence_of :name
@@ -42,7 +44,7 @@ module TavernaPlayer
     def fix_run_input_ports_mime_types
       self.inputs.each do |input|
         input.metadata = {:size => nil, :type => ''} if input.metadata.nil?
-        port = self.workflow.input_ports.detect { |i| i.name == input.name }
+        port = self.workflow.find_version(self.workflow_version).input_ports.detect { |i| i.name == input.name }
         if port && !port.mime_type.blank?
           if input.depth == 0
             input.metadata[:type] = port.mime_type

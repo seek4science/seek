@@ -64,6 +64,10 @@ class Workflow < ActiveRecord::Base
     def file_path
       content_blob.filepath
     end
+
+    def has_interaction?
+      t2flow.all_processors.any? {|p| p.type == 'interaction'}
+    end
   end
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do

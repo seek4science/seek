@@ -339,6 +339,7 @@ input[type="submit"], button {
     padding: 3px 4px;
     font-size: 14px;
     font-family: arial, sans-serif;
+    margin-top: 5px;
 }
 
 h2.standout {
@@ -426,4 +427,10 @@ div.main_content_left_box {
 
 pre {
   text-align: left;
+}
+
+#upload_new_version_form {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 30px;
 }

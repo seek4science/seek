@@ -12,8 +12,7 @@
     <p>
       <b>Workflow:</b>
       <% workflow = Workflow.find(run.workflow_id) %>
-      <%= link_to workflow.title, main_app.workflow_path(workflow)#, :version => run.workflow_version)),
-      %>
+      <%= link_to workflow.title, main_app.workflow_path(workflow, :version => run.workflow_version) %>
     </p>
     <p>
       <b>Category:</b>

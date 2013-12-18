@@ -36,6 +36,7 @@ class SweepsController < ApplicationController
     params[:sweep][:user_id] = current_user.id
     @sweep = Sweep.new(params[:sweep])
     @workflow = @sweep.workflow
+    @workflow_version = @workflow.find_version(@sweep.workflow_version)
     respond_to do |format|
       if @sweep.save
         format.html { redirect_to sweep_path(@sweep) }
@@ -117,9 +118,7 @@ class SweepsController < ApplicationController
       @workflow = Workflow.find(params[:workflow_id])
     end
 
-    unless params[:version].blank?
-      @workflow_version = @workflow.find_version(params[:version])
-    end
+    @workflow_version = params[:version].blank? ? @workflow.latest_version : @workflow.find_version(params[:version])
   end
 
   def set_runlet_parameters
@@ -127,7 +126,9 @@ class SweepsController < ApplicationController
     shared_input_values_for_all_runs = params[:sweep].delete(:shared_input_values_for_all_runs)
     params[:sweep][:runs_attributes].each_with_index do |(run_id, run_attributes), iteration_index|
       run_attributes[:workflow_id] = params[:sweep][:workflow_id]
+      run_attributes[:workflow_version] = params[:sweep][:workflow_version]
       run_attributes[:name] = "#{params[:sweep][:name]} ##{iteration_index + 1}"
+      run_attributes[:project_ids] = current_user.person.projects.map { |p| p.id }
       # Set parent ID to replay interactions
       run_attributes[:parent_id] = params[:run_id].to_i unless params[:run_id].blank?
       # Copy shared inputs from "parent" run

@@ -1,28 +1,27 @@
 <!-- Run workflow button -->
 <li>
-  <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => version), nil, nil, 'Run workflow') -%>
+  <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => display_workflow.version), nil, nil, 'Run workflow') -%>
 </li>
 
 <!-- Run new data sweep button - only if there is at least on data port to sweep over. -->
-<% if workflow.input_ports.any?{|port| (port.port_type.name == WorkflowInputPortType::DATA)} && !workflow.has_interaction? %>
+<% if display_workflow.input_ports.any?{|port| (port.port_type.name == WorkflowInputPortType::DATA)} && !display_workflow.has_interaction? %>
   <li>
-      <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id), nil, nil, 'Run data sweep')  -%>
+      <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id, :version=>display_workflow.version), nil, nil, 'Run data sweep')  -%>
   </li>
 <% end %>
 
 <!-- Manage button -->
 <% if workflow.can_manage? -%>
-    <li><%= image_tag_for_key('manage', edit_workflow_path(workflow, :version => version), nil, nil, 'Manage workflow') -%></li>
+    <li><%= image_tag_for_key('manage', edit_workflow_path(workflow), nil, nil, 'Manage workflow') -%></li>
+    <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
 <% end -%>
 
 <!-- Download button -->
-<% display_workflow = workflow.find_version(version) %>
-
 <% if display_workflow.contains_downloadable_items? && display_workflow.is_downloadable? -%>
     <%# param code is used for temporary link -%>
     <% if can_download_asset?(workflow, params[:code]) -%>
         <%
-           path = polymorphic_path(workflow,:version=>version,:action=>:download,:code=>params[:code])
+           path = polymorphic_path(workflow,:version=>display_workflow.version,:action=>:download,:code=>params[:code])
         %>
         <li>
           <%= image_tag_for_key('download', path, nil, nil, 'Download workflow') -%>

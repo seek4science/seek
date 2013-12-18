@@ -1,6 +1,6 @@
 <%
-   workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || ""
-   workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow).sort_by {|i| i.name.downcase }
+   workflow_title = TavernaPlayer.workflow_proxy.title(@workflow_version) || ""
+   workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow_version).sort_by {|i| i.name.downcase }
    data_inputs = workflow_inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }
    data_input_names = data_inputs.collect { |input| input.name }
    parameter_inputs = workflow_inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER }
@@ -28,8 +28,8 @@
 
   <%= form_for @sweep, :html => {:multipart => true} do |sweep_form| %>
     <%= sweep_form.hidden_field :workflow_id, :value => @workflow.id %>
+    <%= sweep_form.hidden_field :workflow_version, :value => @workflow_version.version %>
     <%= hidden_field_tag :run_id, params[:run_id] %>
-    <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
 
     <div>
       <% if !@run.blank? %>

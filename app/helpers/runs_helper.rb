@@ -3,6 +3,9 @@ module RunsHelper
   def runs_table(runs, redirect_to=nil)
     runs.map do |run|
       workflow = run.workflow
+      version = run.workflow_version
+      workflow_version = workflow.find_version(version)
+
       created_at = run.created_at.strftime("%e %b %Y %H:%M:%S %Z")
 
       if run.is_a?(Sweep)
@@ -13,7 +16,7 @@ module RunsHelper
 
       action_buttons = render(:partial => "taverna_player/runs/delete_or_cancel_button", :locals => { :run => run, :redirect_to => redirect_to })
       [link_to("#{image(run.is_a?(Sweep) ? 'sweep_run' : 'simple_run')} #{run.name}".html_safe, run.is_a?(Sweep) ? main_app.sweep_path(run) : taverna_player.run_path(run)),
-       workflow.can_view? ? link_to(workflow.title, main_app.workflow_path(workflow)) : workflow.title,
+       workflow.can_view? ? link_to(workflow_version.title, main_app.workflow_path(workflow, :version => version)) : workflow_version.title,
        workflow.category.name,
        "#{run.state} #{(run.complete? ? '' : image_tag('ajax-loader.gif', :style => "vertical-align: middle"))}".html_safe,
        created_at,

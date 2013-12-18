@@ -8,7 +8,7 @@ class Sweep < ActiveRecord::Base
 
   accepts_nested_attributes_for :runs
 
-  attr_accessible :user_id, :workflow_id, :name, :runs_attributes
+  attr_accessible :user_id, :workflow_id, :name, :runs_attributes, :workflow_version
 
   before_destroy :cancel
 

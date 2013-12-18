@@ -6,7 +6,7 @@ module TavernaPlayer
     before_filter :find_runs, :only => :index
     before_filter :add_sweeps, :only => :index
     before_filter :filter_users_runs_and_sweeps, :only => :index
-    after_filter :find_workflow_and_version, :only => :new
+    before_filter :find_workflow_and_version, :only => :new
 
     def edit
       @run = Run.find(params[:id])
@@ -76,10 +76,7 @@ module TavernaPlayer
 
     def find_workflow_and_version
       @workflow = @run.workflow || TavernaPlayer.workflow_proxy.class_name.find(params[:workflow_id])
-
-      unless params[:version].blank?
-        @workflow_version = @workflow.find_version(params[:version])
-      end
+      @workflow_version = params[:version].blank? ? @workflow.latest_version : @workflow.find_version(params[:version])
     end
 
     def choose_layout

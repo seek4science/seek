@@ -1,32 +1,37 @@
+<%= javascript_include_tag "resource" %>
+
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
-  <%= @workflow.title -%>
+  <%= @display_workflow.title -%>
 </div>
 
-<%= render :partial => "general/item_title", :locals => {:item => @workflow} -%>
+<div class="contribution_title">
+  <h1><%= @display_workflow.title  -%></h1>
+</div>
 
 <ul class="sectionIcons">
   <% human_name = text_for_resource @workflow %>
-  <%= render :partial => "buttons", :locals => {:workflow => @workflow, :version => @display_workflow.version, :based_off => nil, :human_name => human_name} %>
+  <%= render :partial => "buttons", :locals => {:workflow => @workflow, :display_workflow => @display_workflow, :based_off => nil, :human_name => human_name} %>
 </ul>
 <br/>
 
 <div class="show_basic">
 
-<%# Versioning hidden for now: %>
-<% render :partial => "assets/upload_new_version_form", :locals => {:resource => @workflow} -%>
+<%= render :partial => "assets/upload_new_version_form", :locals => {:resource => @workflow} -%>
 
 <div class="main_content_left_box">
-  <%# Versioning hidden for now: %>
-  <% render :partial => "assets/resource_version_details", :locals => {:displayed_resource => @display_workflow, :resource => @workflow} -%>
+  <% if @workflow.version > 1 %>
+      <span style="font-weight: bold;">Version: </span>
+      <%= resource_version_selection @workflow, @display_workflow -%>
+  <% end %>
 
   <%= item_description @display_workflow.description -%>
 
   <% workflow_model = @display_workflow.t2flow %>
   <% processors = workflow_model.all_processors || [] -%>
-  <% inputs = @workflow.input_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
-  <% outputs = @workflow.output_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
+  <% inputs = @display_workflow.input_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
+  <% outputs = @display_workflow.output_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
 
   <!-- Inputs -->
   <div class="fold">
@@ -137,13 +142,13 @@
         <!-- Uploader -->
         <p>
           <b>Uploader:</b>
-          <%= @workflow.contributor.nil? ? jerm_harvester_name.html_safe : link_to(@workflow.contributor.person.name, person_path(@workflow.contributor.person)) %>
+          <%= @display_workflow.contributor.nil? ? jerm_harvester_name.html_safe : link_to(@display_workflow.contributor.person.name, person_path(@display_workflow.contributor.person)) %>
         </p>
 
         <!-- Upload time -->
         <p>
           <b>Uploaded at:</b>
-          <%= @workflow.created_at.strftime("%e %b %Y %H:%M:%S %Z") %>
+          <%= @display_workflow.created_at.strftime("%e %b %Y %H:%M:%S %Z") %>
         </p>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
