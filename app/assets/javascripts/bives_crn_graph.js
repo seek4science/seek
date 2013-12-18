@@ -1,3 +1,6 @@
+jQuery.noConflict();
+var $j = jQuery;
+
 var cytoscapeJSoptions = {
 
     layout: {name: 'arbor'},
@@ -75,18 +78,15 @@ var cytoscapeJSoptions = {
         .selector('edge.bives-inserted').css({'width': '2'}),
     ready: function(){
         cy = this;
+        cy.zoomingEnabled(false);
     }
 };
 
 
-function drawDiffGraphJS (graph,element)
-{console.log(graph);
-    graph = JSON.parse(graph);
+function drawDiffGraphJS (graphJSON,element)
+{
+    graph = JSON.parse(graphJSON);
     cytoscapeJSoptions.elements = graph.elements;
-
-    $(element).html("");
-    console.log(graph.elements);
-
-    $(element).cytoscape(cytoscapeJSoptions);
-
+    $j(element).html("");
+    $j(element).cytoscape(cytoscapeJSoptions);
 }
