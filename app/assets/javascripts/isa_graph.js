@@ -92,7 +92,9 @@ function connectedNodes(node){
 
 function processPanzoom() {
     //display panzoom
-    $j('#cy').cytoscapePanzoom();
+    $j('#cy').cytoscapePanzoom({
+        panSpeed: 1
+    });
 
     //set again the graph height if panzoom height is bigger
     var panzoom_height = 220;
