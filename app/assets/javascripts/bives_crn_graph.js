@@ -79,6 +79,7 @@ var cytoscapeJSoptions = {
     ready: function(){
         cy = this;
         cy.zoomingEnabled(false);
+        cy.center();
     }
 };
 
