@@ -34,12 +34,12 @@ class ModelsController < ApplicationController
   end
 
   def compare_versions
-    blob1 = @display_model.content_blobs.first
-    blob2 = @other_version.content_blobs.first
+    blob1 = @display_model.sbml_content_blobs.first
+    blob2 = @other_version.sbml_content_blobs.first
     @file1=blob1.filepath
     @file2=blob2.filepath
 
-    json = compare @file2,@file1,["reportHtml","crnJson","json"]
+    json = compare @file1,@file2,["reportHtml","crnJson","json"]
     @crn = JSON.parse(json)["crnJson"]
     @comparison_html = JSON.parse(json)["reportHtml"]
   end
