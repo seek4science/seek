@@ -1,0 +1,26 @@
+div.bives_output {
+    padding-left:1em;
+    padding-right:1em;
+}
+div.bives_output li {
+    list-style: none;
+}
+
+div.bives_output span.bives-delete {
+    color:red;
+}
+
+div.bives_output span.bives-insert {
+    color:blue;
+}
+
+span.bives-attr {
+    font-style: italic;
+    font-weight: bolder;
+}
+
+div.bives_cytoscape_graph {
+    width: 100%;
+    height: 100em;
+    background-color:white;
+}

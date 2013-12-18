@@ -1,21 +1,4 @@
-div.bives_output li {
-    list-style: none;
-}
-
-div.bives_output span.bives-delete {
-    color:red;
-}
-
-div.bives_output span.bives-insert {
-    color:blue;
-}
-
-span.bives-attr {
-    font-style: italic;
-    font-weight: bolder;
-}
-
-#subtab_graph_graph_js {
-    width: 100%;
-    height: 100em;
-}
+/* ...
+*= require bives_html_report
+*= require cytoscape.js-2.0.2/index
+*/

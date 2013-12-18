@@ -1,16 +1,5 @@
-<style>
-    div#version_box li.current {
-        font-style: italic;
-        font-size:larger;
-    }
-    .smaller {
-        font-size:smaller;
-    }
-    ul#version_list {
-        text-align: left;
-        padding-left:1em;
-    }
-</style>
+
+
 <div id="version_box" class="contribution_section_box curved with_shadow">
 
   <p class="heading">
@@ -25,9 +14,9 @@
         <% end %>
         <%
            link = link_to "#{date_as_string(version.updated_at,true)}",model_path(resource,:version=>version.version)
-           if version!=versioned_resource && versioned_resource.contains_sbml? && version.contains_sbml?
+           if resource.can_download? && version!=versioned_resource && versioned_resource.contains_sbml? && version.contains_sbml?
              compare_path = compare_versions_model_path(resource,:version=>versioned_resource.version,:other_version=>version.version)
-             compare_link = link_to " [compare sbml]",compare_path,:class=>"smaller"
+             compare_link = link_to " [compare SBML]",compare_path,:class=>"compare"
            else
              compare_link = ""
            end
