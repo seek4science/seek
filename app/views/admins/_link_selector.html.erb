@@ -21,7 +21,7 @@
                     <%= item.title -%>
               </td>
             </tr>
-            <%= javascript_tag "addInstanceOfObject('#{resource_id}','#{item.id.to_s}', '#{item.title}')" -%>
+            <%= javascript_tag "addInstanceOfObject('#{resource_id}','#{item.id.to_s}', '#{h(item.title)}')" -%>
           <% end -%>
         <% end -%>
       </tbody>
