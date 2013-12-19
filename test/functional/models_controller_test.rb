@@ -1057,6 +1057,17 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'a', :text => /View content/, :count => 0
   end
 
+  test "compare versions" do
+    #just compares with itself for now
+    model = Factory :model,:contributor=>User.current_user.person
+    assert model.contains_sbml?,"model should contain sbml"
+
+
+    get :compare_versions,:id=>model,:other_version=>model.versions.last.version
+    assert_response :success
+    assert_select "div.bives_output ul li",:text=>/Both documents have same Level\/Version:/,:count=>1
+  end
+
   def valid_model
     { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
   end
