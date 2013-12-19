@@ -194,6 +194,22 @@ function clickLabelLink(node, mouse_event){
     }
 }
 
+/*
+    The following part is to modify the default behavior of cytoscape
+*/
+
+function disableMouseWheel(){
+    var canvas_render = cy.renderer();
+    var bindings = canvas_render.bindings;
+    for( var i=0; i<bindings.length; i++){
+        binding = bindings[i];
+        var event = binding.event;
+        if (event.match(/wheel/i) != null || event.match(/scroll/i) !=null){
+            binding.target.removeEventListener(event, binding.handler, binding.useCapture);
+        }
+    }
+}
+
 // This jquery function is to overide the cytoscape BreadthFirstLayout
 (function($$){
     var defaults = {
