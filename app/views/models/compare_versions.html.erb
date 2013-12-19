@@ -1,5 +1,4 @@
 <%= stylesheet_link_tag 'bives' -%>
-<%= javascript_include_tag 'bives' %>
 
 
 <div class="show_basic">
@@ -7,6 +6,14 @@
     <p class="box_standout curved">A summary of the differences in the SBML between  <%= link_to "version #{@display_model.version}",model_path(@model,:version=>@display_model.version) -%>
       and <%= link_to "version #{@other_version.version}",model_path(@model,:version=>@other_version.version) -%> for the files <%= @blob1.original_filename -%> and <%= @blob2.original_filename -%> respectively</p>
   </div>
+  <p>
+    <%= @blob1.filepath -%>
+    <br/>
+    <%= @blob2.filepath -%>
+  </p>
+  <p>
+    <%= @b_json %>
+  </p>
 <% unless @comparison_html.blank? %>
       <p>
     <div class="bives_output curved with_shadow">

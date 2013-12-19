@@ -41,6 +41,7 @@ class ModelsController < ApplicationController
 
     begin
       json = compare file1,file2,["reportHtml","crnJson","json"]
+      @b_json = json
       @crn = JSON.parse(json)["crnJson"]
       @comparison_html = JSON.parse(json)["reportHtml"]
     rescue Exception=>e
