@@ -27,7 +27,7 @@
                 </td>
             <% end %>
             <td class="port-type">
-              <%= i.select(:mime_type, mime_type_options_for_select) -%>
+              <%= i.select(:mime_type, mime_type_options_for_select(i.object.mime_type)) -%>
             </td>
           </tr>
       <% end %>
@@ -61,7 +61,7 @@
                 </td>
             <% end %>
             <td class="port-type">
-              <%= o.select(:mime_type, mime_type_options_for_select) -%>
+              <%= o.select(:mime_type, mime_type_options_for_select(o.object.mime_type)) -%>
             </td>
           </tr>
       <% end %>
