@@ -11,8 +11,9 @@ class CountriesController < ApplicationController
         if !User.current_user.nil?
           format.html # show.html.erb
         else
-        flash[:error] = "You are not authorized to view institutions and people in this country, you may need to login first."
-        format.html { redirect_to home_url}
+          store_location
+          flash[:error] = "You are not authorized to view institutions and people in this country, you may need to login first."
+          format.html { redirect_to home_url}
         end
       else
         format.html # show.html.erb
