@@ -10434,6 +10434,7 @@ var cytoscape;
 
 		var canvas, canvasWidth = width, canvasHeight = height;
 
+        // Comment out these lines to fix that the graph disappears when browser is in the zoom mode
 		//if ('devicePixelRatio' in window) {
 		//	canvasWidth *= devicePixelRatio;
 		//	canvasHeight *= devicePixelRatio;
@@ -10642,6 +10643,7 @@ var cytoscape;
 			effectivePan = forcedPan;
 		}
 
+        // Comment out these lines to fix that the graph disappears when browser is in the zoom mode
 		//if( 'devicePixelRatio' in window ){
 		//	effectiveZoom *= devicePixelRatio;
 		//	effectivePan.x *= devicePixelRatio;
@@ -14008,6 +14010,7 @@ var cytoscape;
 	CanvasRenderer.prototype.getRoundRectangleRadius = function(width, height) {
 		
 		// Set the default radius, unless half of width or height is smaller than default
+        // Change the dault value for SEEK, it looks better with 6 instead of 10
 		return Math.min(width / 2, height / 2, 6);
 	}
 	
@@ -14067,7 +14070,8 @@ var cytoscape;
 	CanvasRenderer.prototype.roundRectangleIntersectLine = function(
 		x, y, nodeX, nodeY, width, height, padding) {
 		
-		var cornerRadius = 0;
+		//Manually change for seek to fix that safari quits unexpectedly
+        var cornerRadius = 0;
 
 		var halfWidth = width / 2;
 		var halfHeight = height / 2;
