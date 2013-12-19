@@ -40,8 +40,7 @@ class ModelsController < ApplicationController
     file2=@blob2.filepath
 
     begin
-      json = compare file1,file2,["reportHtml","crnJson","json"]
-      @b_json = json
+      json = compare file1,file2,["reportHtml","crnJson","json","SBML"]
       @crn = JSON.parse(json)["crnJson"]
       @comparison_html = JSON.parse(json)["reportHtml"]
     rescue Exception=>e
