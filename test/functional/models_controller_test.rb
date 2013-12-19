@@ -1068,6 +1068,16 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select "div.bives_output ul li",:text=>/Both documents have same Level\/Version:/,:count=>1
   end
 
+  test "cannot compare versions if you cannot download" do
+    model = Factory(:model,:contributor=>Factory(:person),:policy=>Factory(:publicly_viewable_policy))
+    assert model.can_view?, "should be able to view this model"
+    assert !model.can_download?, "should not be able to download this model"
+    get :compare_versions,:id=>model,:other_version=>model.versions.last.version
+    assert_response :redirect
+    refute_nil flash[:error]
+
+  end
+
   def valid_model
     { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
   end
