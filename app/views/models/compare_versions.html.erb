@@ -41,10 +41,24 @@
 <% end %>
 
 <% unless @crn.blank? %>
+      <div id="chemical_reaction_network" class="curved with_smaller_shadow bives_output">
       <h2>Chemical Reaction Network</h2>
-    <div id="bives_crn_graph" class="curved with_smaller_shadow bives_cytoscape_graph">
+      <p>
+        Deletions are coloured in <span class="bives-delete">red</span> and insertions are coloured in <span class="bives-insert">blue</span>, and updates that don't affect the network are <span class="bives-update">yellow</span>.
+      </p>
+      </p>
+      <p id="legend">
+        <%= image_tag "bives/legend-species.png",:alt=>"species" %><span class="legend_text">species</span>
+        <%= image_tag "bives/legend-reaction-js.png",:alt=>"reaction" %><span class="legend_text">reaction</span>
+        <%= image_tag "bives/legend-reaction-participant.png",:alt=>"reaction-participant" %><span class="legend_text">participant in reaction</span>
+        <%= image_tag "bives/legend-mod-stimulator.png",:alt=>"mod-stimulator" %><span class="legend_text">stimulator</span>
+        <%= image_tag "bives/legend-mod-inhibitor.png",:alt=>"mod-inhibitor" %><span class="legend_text">inhibitor</span>
+        <%= image_tag "bives/legend-mod-unknown.png",:alt=>"mod-unknown" %><span class="legend_text">unknown modifier</span>
+      </p>
+    <div id="bives_crn_graph" class="bives_cytoscape_graph">
 
     </div>
+      </div>
 <% end %>
 </div>
 

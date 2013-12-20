@@ -19,8 +19,7 @@ div.bives_output h2 {
     background-color: transparent;
     border: none;
     font-size:larger;
-    padding:0px;
-    padding-left: 1em;
+    padding: 0px 1em 0px;
 
 }
 div.bives_output li {
@@ -63,5 +62,39 @@ span.bives-attr {
 div.bives_cytoscape_graph {
     width: 75%;
     height: 50em;
-    background-color:white;
+}
+
+div#chemical_reaction_network {
+    background-color: white;
+    padding-left:1em;
+}
+
+div#chemical_reaction_network p span.bives-delete {
+    font-weight: bolder;
+    padding: 3px;
+    background-color: red;
+    color:white;
+}
+
+div#chemical_reaction_network p span.bives-insert {
+    font-weight: bolder;
+    padding: 3px;
+    background-color: blue;
+    color:white;
+}
+
+div#chemical_reaction_network p span.bives-update {
+    font-weight: bolder;
+    padding: 3px;
+    background-color: yellow;
+}
+
+div#chemical_reaction_network p#legend img {
+    vertical-align: middle;
+}
+
+div#chemical_reaction_network p#legend span.legend_text {
+    vertical-align: middle;
+    padding-right: 1em;
+    padding-left: 0.5em;
 }
