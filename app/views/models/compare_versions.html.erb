@@ -9,7 +9,7 @@
           and <%= link_to "version #{@other_version.version}",model_path(@model,:version=>@other_version.version) -%> for the files <%= @blob1.original_filename -%> and <%= @blob2.original_filename -%> respectively</p>
       </div>
   <% end %>
-  <% if @display_model.sbml_content_blobs.size>1 || @other_version.sbml_content_blobs.size>1 || true %>
+  <% if @display_model.sbml_content_blobs.size>1 || @other_version.sbml_content_blobs.size>1  %>
       <%= form_tag compare_versions_model_path(@model), :method => :post do %>
           <%= hidden_field_tag :other_version, @other_version.version %>
           <%= hidden_field_tag :version, @display_model.version %>
