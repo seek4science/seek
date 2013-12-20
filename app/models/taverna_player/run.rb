@@ -15,6 +15,8 @@ module TavernaPlayer
 
     validates_presence_of :name
 
+    attr_accessible :project_ids
+
     belongs_to :sweep
 
     scope :default_order, order('created_at')

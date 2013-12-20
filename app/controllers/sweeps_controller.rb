@@ -130,6 +130,7 @@ class SweepsController < ApplicationController
       run_attributes[:name] = "#{params[:sweep][:name]} ##{iteration_index + 1}"
       # Set parent ID to replay interactions
       run_attributes[:parent_id] = params[:run_id].to_i unless params[:run_id].blank?
+      run_attributes[:project_ids] = current_user.person.projects.map { |p| p.id }
       # Copy shared inputs from "parent" run
       if !shared_input_values_for_all_runs.blank?
         base_index = run_attributes[:inputs_attributes].keys.map { |k| k.to_i }.max + 1
