@@ -13,7 +13,7 @@
       <%= form_tag compare_versions_model_path(@model), :method => :post do %>
           <%= hidden_field_tag :other_version, @other_version.version %>
           <%= hidden_field_tag :version, @display_model.version %>
-          <div id="version_file_selection" class="curved with_shadow">
+          <div id="version_file_selection" class="curved with_smaller_shadow">
             <h2>Select different files to compare:</h2>
 
               <div>
@@ -33,7 +33,8 @@
   <% end %>
 <% unless @comparison_html.blank? %>
       <p>
-    <div class="bives_output curved with_shadow">
+    <div class="bives_output curved with_smaller_shadow">
+      <p>Deletions are coloured in <span class="bives-delete">red</span> and insertions are coloured in <span class="bives-insert">blue</span></p>
         <%= @comparison_html.html_safe -%>
     </div>
       </p>
@@ -41,7 +42,7 @@
 
 <% unless @crn.blank? %>
       <h2>Chemical Reaction Network</h2>
-    <div id="bives_crn_graph" class="curved with_shadow bives_cytoscape_graph">
+    <div id="bives_crn_graph" class="curved with_smaller_shadow bives_cytoscape_graph">
 
     </div>
 <% end %>

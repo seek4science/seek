@@ -78,7 +78,7 @@ var cytoscapeJSoptions = {
         .selector('edge.bives-inserted').css({'width': '2'}),
     ready: function(){
         cy = this;
-        cy.zoomingEnabled(false);
+        //cy.zoomingEnabled(false);
         cy.center();
     }
 };
