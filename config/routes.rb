@@ -292,6 +292,7 @@ SEEK::Application.routes.draw do
     end
     member do
       get :compare_versions
+      post :compare_versions
       get :builder
       post :check_related_items
       get :visualise

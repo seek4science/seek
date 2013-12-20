@@ -34,18 +34,31 @@ class ModelsController < ApplicationController
   end
 
   def compare_versions
-    @blob1 = @display_model.sbml_content_blobs.first
-    @blob2 = @other_version.sbml_content_blobs.first
-    file1=@blob1.filepath
-    file2=@blob2.filepath
-
-    begin
-      json = compare file1,file2,["reportHtml","crnJson","json","SBML"]
-      @crn = JSON.parse(json)["crnJson"]
-      @comparison_html = JSON.parse(json)["reportHtml"]
-    rescue Exception=>e
-      flash.now[:error]="there was an error trying to compare the two versions - #{e.message}"
+    if params[:file_id]
+      @blob1 = @display_model.sbml_content_blobs.find{|b| b.id.to_s == params[:file_id]}
+    else
+      @blob1 = @display_model.sbml_content_blobs.first
     end
+    if params[:other_file_id]
+      @blob2 = @other_version.sbml_content_blobs.find{|b| b.id.to_s == params[:other_file_id]}
+    else
+      @blob2 = @other_version.sbml_content_blobs.first
+    end
+
+    if @blob1 && @blob2
+      file1=@blob1.filepath
+      file2=@blob2.filepath
+      begin
+        json = compare file1,file2,["reportHtml","crnJson","json","SBML"]
+        @crn = JSON.parse(json)["crnJson"]
+        @comparison_html = JSON.parse(json)["reportHtml"]
+      rescue Exception=>e
+        flash.now[:error]="there was an error trying to compare the two versions - #{e.message}"
+      end
+    else
+      flash.now[:error]="One of the version files could not be found, or you are not authorized to examine it"
+    end
+
 
 
   end

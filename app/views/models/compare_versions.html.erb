@@ -1,11 +1,36 @@
 <%= stylesheet_link_tag 'bives' -%>
+<%= javascript_include_tag 'bives' %>
 
 
 <div class="show_basic">
-  <div class="summary">
-    <p class="box_standout curved">A summary of the differences in the SBML between  <%= link_to "version #{@display_model.version}",model_path(@model,:version=>@display_model.version) -%>
-      and <%= link_to "version #{@other_version.version}",model_path(@model,:version=>@other_version.version) -%> for the files <%= @blob1.original_filename -%> and <%= @blob2.original_filename -%> respectively</p>
-  </div>
+  <% if @display_model && @other_version && @blob1 && @blob2 %>
+      <div class="summary">
+        <p class="box_standout curved">A summary of the differences in the SBML between  <%= link_to "version #{@display_model.version}",model_path(@model,:version=>@display_model.version) -%>
+          and <%= link_to "version #{@other_version.version}",model_path(@model,:version=>@other_version.version) -%> for the files <%= @blob1.original_filename -%> and <%= @blob2.original_filename -%> respectively</p>
+      </div>
+  <% end %>
+  <% if @display_model.sbml_content_blobs.size>1 || @other_version.sbml_content_blobs.size>1 || true %>
+      <%= form_tag compare_versions_model_path(@model), :method => :post do %>
+          <%= hidden_field_tag :other_version, @other_version.version %>
+          <%= hidden_field_tag :version, @display_model.version %>
+          <div id="version_file_selection" class="curved with_shadow">
+            <h2>Select different files to compare:</h2>
+
+              <div>
+                <b>Version:<%= @display_model.version -%></b>
+                <%= select_tag :file_id, options_for_select(@display_model.sbml_content_blobs.collect { |b| [b.original_filename, b.id] }, @blob1.id) %>
+              </div>
+              <div>
+                <b>Version:<%= @other_version.version -%></b>
+                <%= select_tag :other_file_id, options_for_select(@other_version.sbml_content_blobs.collect { |b| [b.original_filename, b.id] }, @blob2.id) %>
+              </div>
+              <div>
+                <%= submit_tag "Compare",:disable_with=>"Comparing" %>
+              </div>
+
+          </div>
+      <% end %>
+  <% end %>
 <% unless @comparison_html.blank? %>
       <p>
     <div class="bives_output curved with_shadow">

@@ -1,3 +1,12 @@
+div#version_file_selection {
+    margin-top: 1em;
+    padding: 0.25em 1em 0.75em;
+}
+
+div#version_file_selection li {
+    float :left;
+}
+
 div.bives_output {
     padding-left:1em;
     padding-right:1em;
