@@ -12,7 +12,8 @@ namespace :seek do
             :environment,
             :update_admin_assigned_roles,
             :repopulate_auth_lookup_tables,
-            :increase_sheet_empty_rows
+            :increase_sheet_empty_rows,
+            :clear_filestore_tmp
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
