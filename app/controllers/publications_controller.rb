@@ -9,7 +9,7 @@ class PublicationsController < ApplicationController
   require 'pubmed_query_tool'
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
+  #before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
 
   include Seek::BreadCrumbs
@@ -29,7 +29,7 @@ class PublicationsController < ApplicationController
   # GET /publications/1
   # GET /publications/1.xml
   def show
-
+    @publication = Publication.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
       format.xml
