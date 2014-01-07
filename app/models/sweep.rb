@@ -64,7 +64,7 @@ class Sweep < ActiveRecord::Base
             zip_file.mkdir(run_dir_name) # Make subfolder for each run in the sweep
             if output.file.exists?
               file = output.file
-              zip_file.get_output_stream("#{run_dir_name}/#{output.file_file_name}") do |f|
+              zip_file.get_output_stream("#{run_dir_name}/#{output.filename}") do |f|
                 f.write(File.read(file.path))
               end
             else
