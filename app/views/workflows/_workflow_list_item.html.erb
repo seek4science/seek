@@ -28,6 +28,9 @@
 </div>
 
 <!-- Action buttons -->
+<div style="float: left; margin-top: 10px; font-size: 80%; color: #666;">
+  Uploaded <%= workflow.created_at.strftime("%e %b %Y %H:%M:%S %Z") -%>
+</div>
 <ul class="sectionIcons" style="float: right; padding: 0; margin: 0;">
   <li>
     <% human_name = text_for_resource workflow %>
