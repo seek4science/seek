@@ -35,7 +35,7 @@ module SweepsHelper
     sweep.runs.select { |r| r.can_view? }.each_with_index do |run, i|
 
       # Run name
-      row = [ link_to("#{image('simple_run')} #{run.name}".html_safe, taverna_player.run_path(run))]
+      row = [ link_to("#{image('simple_run')}#{run.name}".html_safe, taverna_player.run_path(run), :class => 'with_icon')]
 
       output_ports.each do |output_port|
 
