@@ -6,7 +6,6 @@ module Seek
     class SearchBiomodelsAdaptor < AbstractSearchAdaptor
 
       def perform_search query
-        if !Seek::Config.pubmed_api_email.blank?
           yaml = Rails.cache.fetch("biomodels_search_#{URI::encode(query)}",:expires_in=>1.day) do
             connection = SysMODB::SearchBiomodel.instance
             biomodels_search_results = connection.models(query).select do |result|
@@ -17,15 +16,11 @@ module Seek
             end.compact.to_yaml
           end
           YAML::load(yaml)
-        else
-          Rails.logger.warn("Pubmed email not defined, so skipping biomodels search")
-          []
-        end
       end
 
     end
 
-    class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :date_published, :pubmed_id, :model_id, :last_modification_date)
+    class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :published_date, :pubmed_id, :model_id, :last_modification_date)
 
       include Seek::ExternalSearchResult
 
@@ -42,16 +37,20 @@ module Seek
       def populate pubmed_id
         self.pubmed_id = pubmed_id
         query_result = Rails.cache.fetch("pubmed_fetch_#{pubmed_id}",:expires_in=>1.week) do
-          result = PubmedQuery.new("seek@sysmo-db.org", Seek::Config.pubmed_api_email).fetch(pubmed_id)
+          begin
+            result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+          rescue Exception=>e
+            result = Bio::MEDLINE.new("").reference
+          end
           hash = {}
           hash[:abstract]=result.abstract
           hash[:title]=result.title
-          hash[:date_published]=result.date_published
+          hash[:published_date]=result.published_date
           hash[:authors]=result.authors.collect{|a| a.name.to_s}
           hash
         end
         self.abstract = query_result[:abstract]
-        self.date_published = query_result[:date_published]
+        self.published_date = query_result[:published_date]
         self.title = query_result[:title]
         self.authors = query_result[:authors]
       end
