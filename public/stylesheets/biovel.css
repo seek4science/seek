@@ -9,7 +9,7 @@
 
 /* Max Width */
 
-#header > div, #bd > div, #ft > div {
+#header > div, #bd > div, #ft {
     max-width: 1400px;
     min-width: 900px;
     margin: auto;
@@ -59,16 +59,14 @@ body, html {
 }
 
 #ft {
-    width: 100%;
     position: absolute;
-    min-width: 800px;
     height: 110px;
     border: none;
     background: #dddddd;
     color: #555555;
     font-weight: normal;
-    padding-top: 20px;
-    text-align: left;
+    padding: 20px;
+    text-align: justify;
     margin-top: 20px;
 }
 
