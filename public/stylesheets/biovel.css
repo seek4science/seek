@@ -9,11 +9,17 @@
 
 /* Max Width */
 
-#header > div, #bd > div, #ft {
+#header > div, #bd > div {
     max-width: 1400px;
     min-width: 900px;
     margin: auto;
 }
+
+#ft > div {
+  max-width: 1360px;
+  min-width: 860px;
+  padding: 0 20px;
+  margin: auto;}
 
 .workflow-category {
     display: inline-block;
@@ -60,12 +66,13 @@ body, html {
 
 #ft {
     position: absolute;
+    width: 100%;
     height: 110px;
     border: none;
     background: #dddddd;
     color: #555555;
+    padding-top: 20px;
     font-weight: normal;
-    padding: 20px;
     text-align: justify;
     margin-top: 20px;
 }
