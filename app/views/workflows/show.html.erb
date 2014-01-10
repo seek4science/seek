@@ -134,6 +134,14 @@
           <%= @workflow.category.name.html_safe -%>
         </p>
 
+        <!-- Workflow creators -->
+        <% unless workflow_model.annotations.authors.empty? %>
+          <p>
+            <b>Author<%= 's' if workflow_model.annotations.authors.size > 1 -%>:</b>
+            <%= workflow_model.annotations.authors.join(', ') %>
+          </p>
+        <% end %>
+
         <!-- Uploader -->
         <p>
           <b>Uploader:</b>
