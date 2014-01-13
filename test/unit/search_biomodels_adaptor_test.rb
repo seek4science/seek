@@ -67,7 +67,7 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
         with(:headers => {'Soapaction'=>'"getSimpleModelById"'}).
         to_return(:status=>200,:body => response4.read)
 
-    pub_response = File.new("#{Rails.root}/test/fixtures/files/mocking/pubmed_18846089.xml")
+    pub_response = File.new("#{Rails.root}/test/fixtures/files/mocking/pubmed_18846089.txt")
     stub_request(:post,"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi").
         to_return(:body=>pub_response)
   end
