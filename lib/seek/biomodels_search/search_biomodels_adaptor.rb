@@ -23,7 +23,7 @@ module Seek
     class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :published_date, :pubmed_id, :model_id, :last_modification_date)
 
       include Seek::ExternalSearchResult
-
+      include Seek::BioExtension
 
       def initialize biomodels_search_result
         self.authors = []
