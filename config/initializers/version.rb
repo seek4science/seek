@@ -1,1 +1,1 @@
-$version = `hg summary`.match("parent: (.+):(.+) ")[2]
+$version = "Alpha #{`hg summary`.match("parent: (.+):(.+) ")[1]}"
