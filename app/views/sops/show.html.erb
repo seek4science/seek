@@ -12,8 +12,9 @@
   <div class="main_content_left_box">
 
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
-  
+
     <div class="box_about_actor">
+      <%= item_description @display_sop.description -%>
       <%= render :partial => 'assets/fileinfo',:object=>@display_sop.content_blob -%>
 
       <br/>
@@ -23,7 +24,7 @@
 
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sop} %>
 
-      <%= item_description @display_sop.description -%>
+
     </div>
   </div>
 

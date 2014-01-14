@@ -20,6 +20,7 @@
 <div class="show_basic">
   <div class="main_content_left_box">
     <div class="box_about_actor">
+      <%=  item_description @publication.abstract,:label=>"Abstract",:none_text=>"No abstract specified" %>
       <p>
         <% unless @publication.pubmed_id.nil? %>
             <label>PubMed ID:</label>
@@ -50,7 +51,7 @@
           <%= render :partial=>"scales/asset_scales_list",:object=>@publication -%>
       <% end %>
 
-      <%=  item_description @publication.abstract,:label=>"Abstract",:none_text=>"No abstract specified" %>
+
 
     </div>
   </div>

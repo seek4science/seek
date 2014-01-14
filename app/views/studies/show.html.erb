@@ -15,13 +15,14 @@
     <% end -%>
 
   <%= delete_icon @study,current_user -%>
-    <% if logged_in? and current_user.person.member? %>
+    <% if logged_in? && current_user.person.member? %>
       <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"studies",:id=>@study.id), nil, nil, "New #{t('study')} based on this one") %></li>
     <% end %>
 </ul>
 
 <div class="show_basic">
   <div class="main_content_left_box">
+    <%= item_description @study.description -%>
   <p class="id">
     <label>ID: </label>
     <%= @study.id -%>
@@ -55,8 +56,6 @@
     <% if show_scales? -%>
         <%= render :partial=>"scales/asset_scales_list",:object=>@study -%>
     <% end %>
-
-    <%= item_description @study.description -%>
 
   </div>
   </div>

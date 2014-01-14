@@ -3,11 +3,10 @@
 %>
 
 <div <%= "class='yui-gc'".html_safe if admin_or_me -%> >
+
+  <%= item_description @person.description,:label=>"About #{@person.name}" %>
   <div <%= "class='yui-u first'".html_safe if admin_or_me -%>>
-    <p>
-      <b>Name:</b>
-      <%= h @person.name %>
-    </p>
+
 
     <p>
       <% locations = @person.locations -%>
@@ -65,5 +64,3 @@
       </div>
   <% end %>
 </div>
-
-<%= item_description @person.description,:label=>"About me" %>

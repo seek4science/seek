@@ -30,7 +30,8 @@
 
   <div class="main_content_left_box">
 
-    <div class="box_about_actor">      
+    <div class="box_about_actor">
+      <%=  item_description @project.description -%>
         <p>
           <label>Public web page:</label>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
@@ -88,8 +89,6 @@
   <% end %>
 
   <div style="clear:both;">
-    <%=  item_description @project.description,:label=>"About this #{t('project')}" %>
-
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"general/items_related_to",:object => @project %>
     

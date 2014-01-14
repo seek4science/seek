@@ -22,6 +22,7 @@
 
 <div class="show_basic">
   <div class="main_content_left_box">
+    <%= item_description @investigation.description -%>
     <p class="id">
         <label>
             ID: 
@@ -29,7 +30,6 @@
         <%= @investigation.id -%>
     </p>
     <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
-    <%= item_description @investigation.description -%>
 
     <br/>
     <% if show_scales? -%>

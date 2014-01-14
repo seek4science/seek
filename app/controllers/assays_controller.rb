@@ -17,31 +17,38 @@ class AssaysController < ApplicationController
     params[:data_file_ids]=@existing_assay.data_file_masters.collect{|d|"#{d.id},None"}
     params[:related_publication_ids]= @existing_assay.related_publications.collect{|p| "#{p.id},None"}
 
-    unless @assay.study.can_edit?
-      @assay.study = nil
-      flash.now[:notice] = "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>".html_safe
+    if @existing_assay.can_view?
+      unless @assay.study.can_edit?
+        @assay.study = nil
+        flash.now[:notice] = "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>".html_safe
+      end
+
+      @existing_assay.data_file_masters.each do |d|
+        if !d.can_view?
+          flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+          break
+        end
+      end
+      @existing_assay.sop_masters.each do |s|
+        if !s.can_view?
+          flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+          break
+        end
+      end
+      @existing_assay.model_masters.each do |m|
+        if !m.can_view?
+          flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+          break
+        end
+      end
+
+      render :action=>"new"
+    else
+      flash[:error]="You do not have the necessary permissions to copy this #{t('assays.assay')}"
+      redirect_to @existing_assay
     end
 
-    @existing_assay.data_file_masters.each do |d|
-      if !d.can_view?
-       flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
-        break
-      end
-    end
-    @existing_assay.sop_masters.each do |s|
-       if !s.can_view?
-       flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
-        break
-      end
-    end
-    @existing_assay.model_masters.each do |m|
-       if !m.can_view?
-       flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
-        break
-      end
-    end
 
-    render :action=>"new"
    end
 
   def new

@@ -17,6 +17,8 @@
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
 
     <div class="box_about_actor">
+      <%= item_description @display_presentation.description -%>
+
       <%= render :partial => 'assets/fileinfo',:object=>@display_presentation.content_blob -%>
       <br/>
 
@@ -26,7 +28,7 @@
 
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @presentation} %>
 
-      <%= item_description @display_presentation.description -%>
+
 
     </div>
   </div>
