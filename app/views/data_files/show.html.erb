@@ -26,6 +26,8 @@
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
 
+      <%= item_description @display_data_file.description -%>
+
       <%= render :partial => 'assets/fileinfo',:object=>@display_data_file.content_blob -%>
 
       <br/>
@@ -33,7 +35,7 @@
           <%= render :partial=>"scales/asset_scales_list",:object=>@data_file -%>
       <% end %>
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
-      <%= item_description @display_data_file.description -%>
+
     </div>
   </div>
 

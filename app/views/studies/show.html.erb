@@ -22,6 +22,7 @@
 
 <div class="show_basic">
   <div class="main_content_left_box">
+    <%= item_description @study.description -%>
   <p class="id">
     <label>ID: </label>
     <%= @study.id -%>
@@ -55,8 +56,6 @@
     <% if show_scales? -%>
         <%= render :partial=>"scales/asset_scales_list",:object=>@study -%>
     <% end %>
-
-    <%= item_description @study.description -%>
 
   </div>
   </div>

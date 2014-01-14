@@ -5,6 +5,7 @@
 </ul>
 
 <div class="show_basic">
+  <%= item_description @event.description -%>
   <div class="main_content_left_box">
 
       <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event}%>
@@ -50,7 +51,7 @@
 
   <div style="clear:both;">
     <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
-    <%= item_description @event.description -%>
+
 
     <%= render :partial=>"general/items_related_to",:object => @event %>
 

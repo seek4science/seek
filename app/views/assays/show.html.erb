@@ -20,6 +20,7 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
 
 <div class="show_basic">
    <div class="main_content_left_box">
+
       <% if @assay.study.nil? -%>
       <div class="warning">
           <%= image("warning") %><b style="color:red">WARNING</b>
@@ -28,6 +29,7 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
           An <%= t('assays.assay') %> may be edited by anybody, regardless of <%= t('project') %> membership, until it has been associated with a <%= t('study') %>
       </div>
       <% end -%>
+     <%= item_description @assay.description -%>
       <p class="id">
           <label>
               ID: 
@@ -81,7 +83,7 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
          <%= render :partial=>"scales/asset_scales_list",:object=>@assay -%>
      <% end %>
 
-     <%= item_description @assay.description -%>
+
 
 
       <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
