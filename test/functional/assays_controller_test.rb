@@ -1119,4 +1119,22 @@ end
       assert_select "span.none_text", :text => /hidden item/, :count => 1
     end
   end
+
+  test "new object based on existing one" do
+    study = Factory(:study,:policy=>Factory(:public_policy))
+    assay = Factory(:assay,:policy=>Factory(:public_policy),:title=>"the assay",:study=>study)
+    assert assay.can_view?
+    assert assay.study.can_edit?
+    get :new_object_based_on_existing_one,:id=>assay.id
+    assert_response :success
+    assert_select "textarea#assay_title",:text=>"the assay"
+  end
+
+  test "new object based on existing one when unauthorised to view" do
+    assay = Factory(:assay,:policy=>Factory(:private_policy),:title=>"the assay")
+    refute assay.can_view?
+    get :new_object_based_on_existing_one,:id=>assay.id
+    assert_redirected_to assay
+    refute_nil flash[:error]
+  end
 end

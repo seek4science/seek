@@ -14,8 +14,14 @@ class InvestigationsController < ApplicationController
 
   def new_object_based_on_existing_one
     @existing_investigation =  Investigation.find(params[:id])
-    @investigation = @existing_investigation.clone_with_associations
-    render :action=>"new"
+    if @existing_investigation.can_view?
+      @investigation = @existing_investigation.clone_with_associations
+      render :action=>"new"
+    else
+      flash[:error]="You do not have the necessary permissions to copy this #{t('investigation')}"
+      redirect_to @existing_investigation
+    end
+
   end
 
   def destroy    

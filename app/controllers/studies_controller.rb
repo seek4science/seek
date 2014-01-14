@@ -16,14 +16,18 @@ class StudiesController < ApplicationController
 
   def new_object_based_on_existing_one
     @existing_study =  Study.find(params[:id])
-    @study = @existing_study.clone_with_associations
 
-    unless @study.investigation.can_edit?
-       @study.investigation = nil
-      flash.now[:notice] = "The #{t('investigation')} of the existing #{t('study')} cannot be viewed, please specify your own #{t('investigation')}!"
+    if @existing_study.can_view?
+      @study = @existing_study.clone_with_associations
+      unless @existing_study.investigation.can_edit?
+        @study.investigation=nil
+        flash.now[:notice] = "The #{t('investigation')} associated with the original #{t('study')} cannot be edited, so you need to select a different #{t('investigation')}"
+      end
+      render :action => "new"
+    else
+      flash[:error]="You do not have the necessary permissions to copy this #{t('study')}"
+      redirect_to study_path(@existing_study)
     end
-
-    render :action => "new"
 
   end
 

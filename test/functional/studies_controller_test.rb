@@ -351,5 +351,34 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'object based on existing study' do
+    study = Factory :study,:title=>"the study",:policy=>Factory(:public_policy)
+    get :new_object_based_on_existing_one,:id=>study.id
+    assert_response :success
+    assert_select "textarea#study_title",:text=>"the study"
+    assert_select "select#study_investigation_id option[selected][value=?]",study.investigation.id,:count=>1
+  end
+
+  test 'object based on existing one when unauthorized to view' do
+    study = Factory :study,:title=>"the private study",:policy=>Factory(:private_policy)
+    refute study.can_view?
+    get :new_object_based_on_existing_one,:id=>study.id
+    assert_redirected_to study_path(study)
+    refute_nil flash[:error]
+  end
+
+  test 'object based on existing one when unauthorized to edit investigation' do
+    inv = Factory(:investigation,:policy=>Factory(:private_policy),:contributor=>Factory(:person))
+
+    study = Factory :study,:title=>"the private study",:policy=>Factory(:public_policy),:investigation=>inv
+    assert study.can_view?
+    refute study.investigation.can_edit?
+    get :new_object_based_on_existing_one,:id=>study.id
+    assert_response :success
+    assert_select "textarea#study_title",:text=>"the private study"
+    assert_select "select#study_investigation_id option[selected][value=?]",study.investigation.id,:count=>0
+    refute_nil flash.now[:notice]
+  end
+
 
 end
