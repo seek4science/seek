@@ -237,7 +237,6 @@ class InvestigationsControllerTest < ActionController::TestCase
     get :new_object_based_on_existing_one,:id=>inv.id
     assert_response :success
     assert_select "textarea#investigation_title",:text=>"the inv"
-    assert_select "select#assay_study_id option[selected][value=?]",assay.study.id,:count=>1
   end
 
   test "object based on existing one when unauthorised" do
