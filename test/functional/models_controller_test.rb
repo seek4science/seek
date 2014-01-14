@@ -1061,7 +1061,7 @@ class ModelsControllerTest < ActionController::TestCase
     #just compares with itself for now
     model = Factory :model,:contributor=>User.current_user.person
     assert model.contains_sbml?,"model should contain sbml"
-
+    assert model.can_download?,"should be able to download"
 
     get :compare_versions,:id=>model,:other_version=>model.versions.last.version
     assert_response :success
@@ -1076,6 +1076,16 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :redirect
     refute_nil flash[:error]
 
+  end
+
+  test "gracefully handle error when other version missing" do
+    model = Factory :model,:contributor=>User.current_user.person
+    assert model.contains_sbml?,"model should contain sbml"
+    assert model.can_download?,"should be able to download"
+
+    get :compare_versions,:id=>model
+    assert_redirected_to model_path(model,:version=>model.version)
+    refute_nil flash[:error]
   end
 
   def valid_model

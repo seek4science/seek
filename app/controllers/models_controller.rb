@@ -31,6 +31,10 @@ class ModelsController < ApplicationController
   def find_other_version
     version = params[:other_version]
     @other_version = @model.find_version(version)
+    if version.nil? || @other_version.nil?
+      flash[:error] = "The other version to compare with was not specified, or it does not exist"
+      redirect_to model_path(@model,:version=>@display_model.version)
+    end
   end
 
   def compare_versions
