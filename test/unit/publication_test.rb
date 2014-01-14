@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'pubmed_query'
 
 class PublicationTest < ActiveSupport::TestCase
   
