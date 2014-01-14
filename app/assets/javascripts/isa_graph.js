@@ -193,3 +193,15 @@ function clickLabelLink(node, mouse_event){
         clickLink(link);
     }
 }
+
+function disableMouseWheel(){
+    var canvas_render = cy.renderer();
+    var bindings = canvas_render.bindings;
+    for( var i=0; i<bindings.length; i++){
+        binding = bindings[i];
+        var event = binding.event;
+        if (event.match(/wheel/i) != null || event.match(/scroll/i) !=null){
+            binding.target.removeEventListener(event, binding.handler, binding.useCapture);
+        }
+    }
+}

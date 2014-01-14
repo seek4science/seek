@@ -83,12 +83,6 @@ GIT
       rails (>= 3.0.0)
 
 GIT
-  remote: git://github.com/SysMO-DB/pubmed_query_tool.git
-  revision: 931788ea92ca898882e1d4f6a8bf494cde89be23
-  specs:
-    pubmed_query_tool (1.0.0)
-
-GIT
   remote: git://github.com/SysMO-DB/redbox
   revision: 494451d01aeeb70b186783d08b6b9aefcb537e98
   specs:
@@ -512,7 +506,6 @@ DEPENDENCIES
   pry
   pry-doc
   pry-remote
-  pubmed_query_tool!
   rack-openid
   rails (= 3.2.14)
   rails-dev-boost!

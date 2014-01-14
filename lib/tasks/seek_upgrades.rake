@@ -1,3 +1,4 @@
+#encoding: utf-8
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
@@ -12,12 +13,14 @@ namespace :seek do
             :environment,
             :update_admin_assigned_roles,
             :repopulate_auth_lookup_tables,
-            :increase_sheet_empty_rows
+            :increase_sheet_empty_rows,
+            :clear_filestore_tmp,
+            :remove_non_seek_authors
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
   task(:upgrade=>[:environment,"db:migrate","db:sessions:clear","tmp:clear","tmp:assets:clear"]) do
-    
+
     solr=Seek::Config.solr_enabled
 
     Seek::Config.solr_enabled=false
@@ -170,6 +173,65 @@ namespace :seek do
     Assay.record_timestamps = true
   end
 
+  desc("Some publication authors are associated with seek_authors, but the original authors are still in non_seek_authors")
+  task(:remove_non_seek_authors=>:environment) do
+    #get the publications where the seek_authors are associated but still full non_seek_authors
+    p1 = Publication.all.select{|p| !p.seek_authors.empty?}
+    p2 = Publication.all.select{|p| p.publication_author_orders.size == p.non_seek_authors.size}
+
+    #Improve the matching algorithm to solve the remaining unmatched names
+    (p1&p2).each do |publication|
+      non_seek_authors = publication.non_seek_authors
+      seek_authors = publication.seek_authors
+      non_seek_authors.each do |author|
+
+        #Get author by last name
+        matches = seek_authors.select{|seek_author| seek_author.last_name == author.last_name}
+
+        #If more than one result, filter by first initial
+        if matches.size > 1
+          first_and_last_name_matches = matches.select{|p| p.first_name.at(0).upcase == author.first_name.at(0).upcase}
+
+          if first_and_last_name_matches.size >= 1  #use this result unless it resulted in no matches
+            matches = first_and_last_name_matches
+          end
+        end
+
+        #If no results, match by normalised name, taken from grouped_pagination.rb
+        if matches.empty?
+          seek_authors.each do |seek_author|
+            ascii1 = normalize_name(author.last_name)
+            ascii2 = normalize_name(seek_author.last_name)
+            matches << seek_author if (ascii1 == ascii2)
+          end
+        end
+
+        #special normalization case for umlaut: e.g. ü match ue
+        if matches.empty?
+          seek_authors.each do |seek_author|
+            ascii1 = normalize_name(author.last_name, false, true)
+            ascii2 = normalize_name(seek_author.last_name, false, true)
+            matches << seek_author if (ascii1 == ascii2)
+          end
+        end
+
+        #if no results, match by parts of last name
+        if matches.empty?
+          matches = seek_authors.select{|seek_author| Regexp.new(seek_author.last_name, Regexp::IGNORECASE).match(author.last_name) ||
+                                                      Regexp.new(author.last_name, Regexp::IGNORECASE).match(seek_author.last_name)}
+        end
+
+        match = matches.first
+        unless match.nil?
+          updating_publication_author_order = PublicationAuthorOrder.where(["publication_id=? AND author_id=? AND author_type=?", publication.id, author.id, 'PublicationAuthor' ]).first
+          updating_publication_author_order.author = match
+          updating_publication_author_order.save
+          author.delete
+        end
+      end
+    end
+  end
+
   private
 
   def read_label_map type
@@ -178,4 +240,19 @@ namespace :seek do
     YAML::load_file(file)
   end
 
+  def normalize_name(name, remove_special_character=true, replace_umlaut=false)
+    #handle the characters that can't be handled through normalization
+    %w[ØO].each do |s|
+      name.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
+    end
+
+    codepoints = name.mb_chars.normalize(:d).split(//u)
+    if remove_special_character
+      ascii=codepoints.map(&:to_s).reject{|e| e.bytesize > 1}.join
+    end
+    if replace_umlaut
+      ascii=codepoints.map(&:to_s).collect {|e| e == '̈' ? 'e' : e}.join
+    end
+    ascii
+  end
 end

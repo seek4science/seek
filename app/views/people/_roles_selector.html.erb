@@ -1,7 +1,7 @@
 <%
 
    projects = @person.projects_for_role(role)
-   project_list = projects.collect(&:title).collect{|t| "<strong>#{t}</strong>"}.join(", ")
+   project_list = projects.collect(&:title).collect{|t| "<strong>#{h(t)}</strong>"}.join(", ").html_safe
    project_ids = projects.collect(&:id)
    select_name = "[roles][#{role}]"
    select_id = "_roles_#{role}"
