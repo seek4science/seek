@@ -118,8 +118,7 @@ module TavernaPlayer
 
     def filter_users_runs_and_sweeps
       @user_runs = @runs.select do |run|
-        run.is_a?(Sweep) && run.user == current_user ||
-        run.is_a?(TavernaPlayer::Run) && run.contributor == current_user
+        run.contributor == current_user
       end
 
       @runs = @runs - @user_runs

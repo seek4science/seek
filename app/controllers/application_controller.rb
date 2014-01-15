@@ -214,11 +214,12 @@ class ApplicationController < ActionController::Base
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
           'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
+          'tag', 'items', 'statistics', 'tag_suggestions', 'preview', 'runs'
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,
-          'export_as_xgmml', 'download_log', 'download_results', 'input', 'output', 'download_output', 'download_input'
+          'export_as_xgmml', 'download_log', 'download_results', 'input', 'output', 'download_output', 'download_input',
+          'view_result'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',

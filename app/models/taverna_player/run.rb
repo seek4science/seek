@@ -12,6 +12,7 @@ module TavernaPlayer
     acts_as_asset
 
     after_create :fix_run_input_ports_mime_types
+    before_create :inherit_sweep_policy
 
     validates_presence_of :name
 
@@ -39,6 +40,10 @@ module TavernaPlayer
       true
     end
 
+    def using_sweep_policy?
+      !sweep.nil? && (policy_id == sweep.policy_id)
+    end
+
     private
 
     def fix_run_input_ports_mime_types
@@ -54,6 +59,10 @@ module TavernaPlayer
           input.save
         end
       end
+    end
+
+    def inherit_sweep_policy
+      self.policy_id = sweep.policy_id unless sweep.nil?
     end
   end
 end

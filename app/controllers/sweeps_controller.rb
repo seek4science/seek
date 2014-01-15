@@ -4,7 +4,7 @@ class SweepsController < ApplicationController
   before_filter :find_run, :only => :new
   before_filter :set_runlet_parameters, :only => :create
   before_filter :find_workflow_and_version, :only => :new
-  before_filter :auth
+  before_filter :auth, :except => [ :index, :new, :create ]
 
   def show
     @runs = @sweep.runs.select { |r| r.can_view? }
@@ -21,7 +21,14 @@ class SweepsController < ApplicationController
   end
 
   def update
-    if @sweep.update_attributes(params[:sweep])
+    @sweep.attributes = params[:sweep]
+
+    if params[:sharing]
+      @sweep.policy_or_default
+      @sweep.policy.set_attributes_with_sharing params[:sharing], @sweep.projects
+    end
+
+    if @sweep.save
       respond_to do |format|
         format.html { redirect_to sweep_path(@sweep) }
       end
@@ -33,9 +40,13 @@ class SweepsController < ApplicationController
   end
 
   def create
-    params[:sweep][:user_id] = current_user.id
     @sweep = Sweep.new(params[:sweep])
     @workflow = @sweep.workflow
+
+    raise if @workflow.nil?
+    # Manually add projects of current user, as they aren't prompted for this information in the form
+    @sweep.projects = current_user.person.projects
+    @sweep.policy.set_attributes_with_sharing params[:sharing], @sweep.projects
     respond_to do |format|
       if @sweep.save
         format.html { redirect_to sweep_path(@sweep) }
@@ -144,29 +155,23 @@ class SweepsController < ApplicationController
   end
 
   def auth
-    case action_name
-      when 'update', 'edit', 'destroy', 'cancel'
-        unless @sweep.user == current_user
-          respond_to do |format|
-            flash[:error] = "You are not authorized to #{action_name} this sweep."
-            format.html { redirect_to @sweep }
-          end
-        end
-      when 'show'
-        unless @sweep.can_view?
-          respond_to do |format|
-            flash[:error] = "You are not authorized to view this sweep."
-            format.html do
-              begin
-                redirect_to :back
-              rescue ActionController::RedirectBackError
-                redirect_to taverna_player.runs_path
-              end
-            end
-          end
-        end
+    action = translate_action(action_name)
+    unless is_auth?(@sweep, action)
+      if User.current_user.nil?
+        flash[:error] = "You are not authorized to #{action} this Sweep, you may need to login first."
       else
-        true
+        flash[:error] = "You are not authorized to #{action} this Sweep."
+      end
+      respond_to do |format|
+        format.html do
+          case action
+            when 'manage','edit','download','delete'
+              redirect_to @sweep
+            else
+              redirect_to taverna_player.runs_path
+          end
+        end
+      end
     end
   end
 
