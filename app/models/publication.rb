@@ -9,7 +9,7 @@ class Publication < ActiveRecord::Base
   alias_attribute :description, :abstract
   #searchable must come before acts_as_asset is called
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
-    text :journal,:pubmed_id, :doi
+    text :journal,:pubmed_id, :doi, :published_date
     text :publication_authors do
       publication_authors.compact.map(&:first_name) + publication_authors.compact.map(&:last_name)
     end
@@ -196,8 +196,11 @@ class Publication < ActiveRecord::Base
       existing = Publication.find_all_by_doi(doi) - [self]
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
-        if !matching_projects.empty?
+        if !matching_projects.empty? && !Seek::Config.is_virtualliver
           self.errors[:base] << "You cannot register the same DOI within the same project"
+          return false
+        else
+          self.errors[:base] << "You cannot register the same DOI two times"
           return false
         end
       end
@@ -206,8 +209,11 @@ class Publication < ActiveRecord::Base
       existing = Publication.find_all_by_pubmed_id(pubmed_id) - [self]
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
-        if !matching_projects.empty?
+        if !matching_projects.empty? && !Seek::Config.is_virtualliver
           self.errors[:base] << "You cannot register the same PubMed ID within the same project"
+          return false
+        else
+          self.errors[:base] << "You cannot register the same PubMed ID two times"
           return false
         end
       end
@@ -219,8 +225,11 @@ class Publication < ActiveRecord::Base
     existing = Publication.find_all_by_title(title) - [self]
     if !existing.empty?
       matching_projects = existing.collect(&:projects).flatten.uniq & projects
-      if !matching_projects.empty?
+      if !matching_projects.empty? && !Seek::Config.is_virtualliver
         self.errors[:base] << "You cannot register the same Title within the same project"
+        return false
+      else
+        self.errors[:base] << "You cannot register the same Title two times"
         return false
       end
     end

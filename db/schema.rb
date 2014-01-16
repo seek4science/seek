@@ -1050,8 +1050,8 @@ ActiveRecord::Schema.define(:version => 20131203082953) do
     t.string   "doi"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "publication_type",              :default => 1
-    t.string   "citation"
+    t.integer  "publication_type",                :default => 1
+    t.string   "citation",         :limit => 256
   end
 
   add_index "publications", ["contributor_id", "contributor_type"], :name => "index_publications_on_contributor_id_and_contributor_type"

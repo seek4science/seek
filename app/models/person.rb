@@ -140,9 +140,11 @@ class Person < ActiveRecord::Base
     result
   end
 
-
-
-
+  def related_samples
+    user_items = []
+    user_items =  user.try(:send,:samples) if user.respond_to?(:samples)
+    user_items
+  end
 
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
   RELATED_RESOURCE_TYPES.each do |type|

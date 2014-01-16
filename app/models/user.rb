@@ -18,6 +18,7 @@ class User < ActiveRecord::Base
 
   has_many :investigations,:as=>:contributor
   has_many :studies,:as=>:contributor
+  has_many :samples,:as=>:contributor
 
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
