@@ -4,23 +4,24 @@
 
   <% workflow = resource.workflow %>
   <% unless workflow.nil? %>
-    <%= list_item_attribute "Run of Workflow", workflow.title, workflow_path(workflow) %>
+      <%= list_item_attribute "Run of Workflow", workflow.title, workflow_path(workflow) %>
   <% end %>
 
+  <% contributor = resource.contributor %>
+  <% unless contributor.nil? %>
+      <%= list_item_attribute "Run By", contributor.person.name, person_path(contributor.person) %>
+      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
+  <% end %>
   <%= list_item_attribute "Status", resource.status_message %>
-  <%= list_item_attribute "Created", resource.created_at %>
-  <%= list_item_attribute "Last Updated", resource.updated_at %>
 
 </div>
 
 <div class="list_item_right_column">
-  <%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>
-  <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
+  <%= list_item_attribute "Created", resource.created_at %>
+  <%= list_item_attribute "Last Updated", resource.updated_at %>
 </div>
 
 <div class="list_item_whole_width">
-
-  <%= list_item_description resource.description %>
 
   <%= list_item_timestamp resource %>
 
