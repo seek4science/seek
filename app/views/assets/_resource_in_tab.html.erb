@@ -20,7 +20,7 @@
            tab_content_view_all = scale_title + '_' + resource_type + '_view_all'
            tab_content_view_some = scale_title + '_' + resource_type + '_view_some'
         %>
-        <%= link_to "View all "+(authorized_resources.size).to_s+" items",
+        <%= link_to_with_callbacks "View all "+(authorized_resources.size).to_s+" items",
 
                            {:url => url_for(:action => 'resource_in_tab'),
                            :condition => "check_tab_content('#{tab_content_view_all}', '#{tab_content_view_some}')",
@@ -31,7 +31,7 @@
                            {:style => (view_type=='view_all' ? "display:none" : "display:block"), :remote=> true}
 
         -%>
-        <%= link_to "View " + limit.to_s + " items",
+        <%= link_to_with_callbacks "View " + limit.to_s + " items",
                            {:url => url_for(:action => 'resource_in_tab'),
                            :condition => "check_tab_content('#{tab_content_view_some}', '#{tab_content_view_all}')",
                            :with => "'resource_type=' + '#{resource_type}' + '&resource_ids=' + '#{resources.collect(&:id).join(",")}' + '&scale_title=' + '#{scale_title}' + '&view_type=' + 'view_some'",
