@@ -47,7 +47,7 @@
               <li style="margin-left: 2em">You can share with the all visitors right away if you are the gatekeeper or if the <%= t('project').pluralize %> associated with this <%= @resource_type -%> have no gatekeeper</li>
               <li style="margin-left: 2em">Or you can request the gatekeepers for their approval to share with all visitors</li>
           <% if !disable_advanced_view%>
-            <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your <%= t('project') %>/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
+            <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your <%= t('project') %>/Institution only,<br/> with specific individuals, or set up custom <%= t('favourite_group').pluralize -%> for people you regularly need to share with.</li>
           <% end %>
         </ul>
       </div>
@@ -153,14 +153,14 @@
 
               <div class="foldTitle">
                 <%= image_tag icon_filename_for_key("spinner"), :id => "f_group_deleting_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
-                <%= help_icon("Here you can choose your favourite groups to share this #{@resource_type} with.") -%>
-                Favourite Groups
+                <%= help_icon("Here you can choose your #{t('favourite_group').pluralize} to share this #{@resource_type} with.") -%>
+                <%= t('favourite_group').capitalize.pluralize -%>
               </div>
 
               <div class="foldContent" style="display: none; background-color: #F2F2F2;">
                 <p style="margin: 1em 0 0 0; padding: 0; line-height: 1; text-align: center;">
                   <% favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id) -%>
-                  <% f_group_select_options = (favourite_groups.blank? ? "<option value=\"\">You don't have any favourite groups</option>" : options_for_select(favourite_groups)) -%>
+                  <% f_group_select_options = (favourite_groups.blank? ? "<option value=\"\">You don't have any #{t('favourite_group').pluralize}</option>" : options_for_select(favourite_groups)) -%>
 
                   <%= select_tag "favourite_group_select", f_group_select_options, :style => "width: 82%; vertical-align: middle; margin-right: 0.4em;", :disabled => (favourite_groups.blank?) -%>
 
@@ -170,7 +170,7 @@
                 <ul style="text-align: left; margin: 1em 0 0.5em 3.2em;">
                   <li id="edit_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;"><%= favourite_group_popup_link_action_edit(@resource.class.name) -%></li>
                   <li id="delete_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;">
-                    <%= link_to "Delete selected favourite group", main_app.delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
+                    <%= link_to "Delete selected #{t('favourite_group').pluralize}", main_app.delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
                   </li>
                   <li id="create_f_group_li" style="list-style-type: disc; padding: 0.5em 0 0 0;"><%= favourite_group_popup_link_action_new(@resource.class.name) -%></li>
 

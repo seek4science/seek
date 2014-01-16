@@ -10,7 +10,7 @@ def fix_run_output_ports_mime_types(run)
     if port && !port.mime_type.blank?
       if output.depth > 0
         output.metadata[:type] = recursively_set_mime_type(output.metadata[:type], output.depth, port.mime_type)
-      else
+      elsif output.metadata[:type] != "application/x-error"
         output.metadata[:type] = port.mime_type
       end
       output.save
@@ -48,7 +48,7 @@ def recursively_set_mime_type(list, depth, type)
   depth -= 1
   list.map do |el|
     if depth == 0
-      type
+      el == "application/x-error" ? el : type
     else
       recursively_set_mime_type(el, depth, type)
     end
