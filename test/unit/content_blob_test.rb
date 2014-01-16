@@ -199,6 +199,16 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal "frog",data.to_s
   end
 
+  test "validates by content blob or url" do
+    blob = ContentBlob.new
+    refute blob.valid?
+    blob.original_filename="fish"
+    assert blob.valid?
+    blob.original_filename=nil
+    blob.url="http://google.com"
+    assert blob.valid?
+  end
+
   def test_data_io
     io_object = StringIO.new("frog")
     blob=ContentBlob.new(:tmp_io_object=>io_object,:original_filename=>"frog.txt")
