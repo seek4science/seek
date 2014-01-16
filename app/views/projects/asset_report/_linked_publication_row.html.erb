@@ -39,7 +39,7 @@
                  cls << " bordered" unless organism==organisms.last
               -%>
               <tr class='<%= cls -%>'>
-                <td><%= organism.ncbi_id.nil? ? "<span class='none_text'>Unknown</span>" : organism.ncbi_id -%></span></td>
+                <td><%= organism.ncbi_id.nil? ? "<span class='none_text'>Unknown</span>".html_safe : organism.ncbi_id -%></span></td>
               </tr>
           <% end -%>
         </table>
@@ -57,7 +57,7 @@
           -%>
           <tr class='<%= cls -%>'>
             <td>
-              <span class='cell_content'><%= df.can_view? ? df.title : "<span class='none_text'>Hidden</span>" -%></span>
+              <span class='cell_content'><%= df.can_view? ? df.title : "<span class='none_text'>Hidden</span>".html_safe -%></span>
             </td>
           </tr>
       <% end -%>
@@ -92,7 +92,7 @@
           -%>
           <tr class='<%= cls -%>'>
             <td>
-              <span class='cell_content'><%= model.can_view? ? model.title : "<span class='none_text'>Hidden</span>" -%></span>
+              <span class='cell_content'><%= model.can_view? ? model.title : "<span class='none_text'>Hidden</span>".html_safe -%></span>
             </td>
           </tr>
       <% end -%>
