@@ -118,11 +118,21 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory :person
     project = person.projects.first
     other_person = Factory :person
+    refute project.has_member?(other_person)
     login_as(other_person.user)
     get :asset_report,:id=>project.id
     assert_redirected_to project
     assert_not_nil flash[:error]
 
+  end
+
+  test "asset report available to non project member if admin" do
+    admin = Factory :admin
+    project = Factory :project
+    refute project.has_member?(admin)
+    login_as(admin)
+    get :asset_report, :id=>project.id
+    assert_response :success
   end
 
   test "asset report button shown to project members" do
@@ -153,7 +163,7 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory :person
     project = person.projects.first
     other_person = Factory :person
-    assert !project.people.include?(other_person)
+    refute project.has_member?(other_person)
 
     login_as other_person.user
     get :show, :id=>project.id
@@ -162,6 +172,18 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select "a[href=?]",asset_report_project_path(project),:text=>"Sharing report",:count=>0
     end
 
+  end
+
+  test "asset report button shown to admin that is not a project member" do
+    admin = Factory(:admin)
+    project = Factory(:project)
+    refute project.has_member?(admin)
+    login_as(admin)
+    get :show, :id=>project.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report"
+    end
   end
 
   test "should show organise link for member" do
