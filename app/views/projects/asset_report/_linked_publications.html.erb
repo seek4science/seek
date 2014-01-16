@@ -1,27 +1,34 @@
 <%
 
-   publications = @project.publications.select{|p| p.has_assets?}
+   publications = @project.publications.select { |p| p.has_assets? }
 
    publications_all_public = publications.select do |pub|
      assets = pub.all_related_models | pub.all_related_data_files
-     assets.detect{|asset| !asset.can_download?(nil)}.nil?
+     assets.detect { |asset| !asset.can_download?(nil) }.nil?
    end
    publications_not_all_public = publications - publications_all_public
 
 %>
-<h1>Publications associated with publicly available assets</h1>
-<p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
-  These are the publications, with associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %> that are available to download by any visitor to the <%= Seek::Config.application_name %> site.
-</p>
-<%= render :partial=>"projects/asset_report/linked_publication_table",:object=>publications_all_public -%>
+<div class="asset_report_container curved">
+  <h1>Publications associated with publicly available assets</h1>
 
-<div style="height:2em">&nbsp;</div>
+  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+    These are the publications, with associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %> that
+    are available to download by any visitor to the <%= Seek::Config.application_name %> site.
+  </p>
+  <%= render :partial => "projects/asset_report/linked_publication_table", :object => publications_all_public -%>
+</div>
 
-<h1>Publications associated with assets, where some are not available publicly</h1>
-<p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
-  These are the publications that have associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %>, however not all the associated assets are available to download by everybody visiting the <%=  Seek::Config.application_name %> site. <br/>
-  The assets that have restricted access and need sharing publicly are highlighted in Red.
-</p>
-<%= render :partial=>"projects/asset_report/linked_publication_table",:object=>publications_not_all_public -%>
+<div class="asset_report_container curved">
 
+  <h1>Publications associated with assets, where some are not available publicly</h1>
 
+  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+    These are the publications that have associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %>,
+    however not all the associated assets are available to download by everybody visiting
+    the <%= Seek::Config.application_name %> site. <br/>
+    The assets that have restricted access and need sharing publicly are highlighted in Red.
+  </p>
+  <%= render :partial => "projects/asset_report/linked_publication_table", :object => publications_not_all_public -%>
+
+</div>

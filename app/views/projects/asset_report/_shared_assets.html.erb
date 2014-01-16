@@ -1,52 +1,68 @@
-<h1>Data, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are a available publicly, including to non <%= Seek::Config.application_name %> members</h1>
-<p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
-  These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are available to download by any visitor to the <%= Seek::Config.application_name -%>, including those without a registered account.
-</p>
-<% @types.each do |type| -%>
+<div id="public_assets" class="asset_report_container curved">
+  <h1>Data, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are a available publicly, including to
+    non <%= Seek::Config.application_name %> members</h1>
 
-<% items = instance_variable_get("@public_#{type.name.underscore.pluralize}") -%>
-    <% asset_name = resource_tab_item_name type.name,false -%>
-        <h2><%= asset_name.pluralize %></h2>
-<% if items.empty? %>
-    <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared publicly</span>
-<% else -%>
-    <table class='asset_report_table'>
-      <thead>
+  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+    These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are
+    available to download by any visitor to the <%= Seek::Config.application_name -%>, including those without a
+    registered account.
+  </p>
 
-            <tr>
-              <th style="width:30em"><%= asset_name -%> URL</th><th><%= asset_name -%> title</th><th style="width:15em">Owners of the <%= asset_name -%></th>
-            </tr>
-      </thead>
-      <tbody>
-        <%=  render :partial=>"projects/asset_report/shared_asset_row",:collection=>items %>
-      </tbody>
-    </table>
- <% end %>
-<% end -%>
+  <% @types.each do |type| -%>
 
-
-<h1><%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are available to all projects, but are not available publicly</h1>
-<p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
-  These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are not available to download by any visitor to the <%= Seek::Config.application_name -%>, but are available to download by all members with a registered account.
-</p>
-<% @types.each do |type| -%>
-
-<% items = instance_variable_get("@projects_only_#{type.name.underscore.pluralize}") -%>
-    <% asset_name = resource_tab_item_name type.name,false -%>
-    <h2><%= asset_name.pluralize %></h2>
-<% if items.empty? %>
-    <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared with all other projects, apart from those listed as available publicly</span>
-<% else -%>
-    <table class='asset_report_table'>
-      <thead>
+      <% items = instance_variable_get("@public_#{type.name.underscore.pluralize}") -%>
+      <% asset_name = resource_tab_item_name type.name, false -%>
+      <h2><%= asset_name.pluralize %></h2>
+      <% if items.empty? %>
+          <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared publicly</span>
+      <% else -%>
+          <table class='asset_report_table'>
+            <thead>
 
             <tr>
-              <th style="width:30em"><%= asset_name -%> URL</th><th><%= asset_name -%> title</th><th style="width:15em">Owners of the <%= asset_name -%></th>
+              <th style="width:30em"><%= asset_name -%> URL</th>
+              <th><%= asset_name -%> title</th>
+              <th style="width:15em">Owners of the <%= asset_name -%></th>
             </tr>
-      </thead>
-      <tbody>
-        <%=  render :partial=>"projects/asset_report/shared_asset_row",:collection=>items %>
-      </tbody>
-    </table>
- <% end %>
-<% end -%>
+            </thead>
+            <tbody>
+            <%= render :partial => "projects/asset_report/shared_asset_row", :collection => items %>
+            </tbody>
+          </table>
+      <% end %>
+  <% end -%>
+</div>
+
+<div id="semi_public_assets"  class="asset_report_container curved">
+  <h1><%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are available to
+    all projects, but are not available publicly</h1>
+
+  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+    These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are
+    not available to download by any visitor to the <%= Seek::Config.application_name -%>, but are available to download
+    by all members with a registered account.
+  </p>
+  <% @types.each do |type| -%>
+
+      <% items = instance_variable_get("@projects_only_#{type.name.underscore.pluralize}") -%>
+      <% asset_name = resource_tab_item_name type.name, false -%>
+      <h2><%= asset_name.pluralize %></h2>
+      <% if items.empty? %>
+          <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared with all other projects, apart from those listed as available publicly</span>
+      <% else -%>
+          <table class='asset_report_table'>
+            <thead>
+
+            <tr>
+              <th style="width:30em"><%= asset_name -%> URL</th>
+              <th><%= asset_name -%> title</th>
+              <th style="width:15em">Owners of the <%= asset_name -%></th>
+            </tr>
+            </thead>
+            <tbody>
+            <%= render :partial => "projects/asset_report/shared_asset_row", :collection => items %>
+            </tbody>
+          </table>
+      <% end %>
+  <% end -%>
+</div>
