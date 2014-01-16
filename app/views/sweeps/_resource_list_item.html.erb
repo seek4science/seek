@@ -1,15 +1,21 @@
-<%= list_item_title resource %>
+<%= list_item_title resource, :options => {:include_avatar => false} %>
 
 <div class="list_item_left_column">
-  <%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>
+
+  <% workflow = resource.workflow %>
+  <% unless workflow.nil? %>
+      <%= list_item_attribute "Sweep of Workflow", workflow.title, workflow_path(workflow) %>
+  <% end %>
+
+  <%= list_item_attribute "Iterations", resource.runs.count %>
+  <%= list_item_attribute "Created", resource.created_at %>
+  <%= list_item_attribute "Last Updated", resource.updated_at %>
+
 </div>
 
 <div class="list_item_right_column">
-
-  <%#= list_item_attribute "Version", resource.version %>
-
+  <%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
-
 </div>
 
 <div class="list_item_whole_width">
