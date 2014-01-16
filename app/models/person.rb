@@ -248,6 +248,18 @@ class Person < ActiveRecord::Base
     member?
   end
 
+  def workflows
+     self.user.workflows
+  end
+
+  def runs
+    self.user.taverna_player_runs
+  end
+
+  def sweeps
+    self.user.sweeps
+  end
+
   def institutions
     work_groups.collect {|wg| wg.institution }.uniq
   end
