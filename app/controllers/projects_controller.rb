@@ -24,25 +24,27 @@ class ProjectsController < ApplicationController
 
   def asset_report
     @no_sidebar=true
-    @types=[DataFile,Model,Sop]
+    project_assets = @project.assets | @project.assays | @project.studies | @project.investigations
+    @types=[Investigation,Study,Assay,DataFile,Model,Sop,Presentation]
+    @public_assets = {}
+    @semi_public_assets = {}
+    @restricted_assets = {}
     @types.each do |type|
-      downloadable = type.all_authorized_for "download", nil, @project
-      instance_variable_set "@public_#{type.name.underscore.pluralize}".to_sym,downloadable
+      action = type.is_isa? ? "view" : "download"
+      @public_assets[type] = type.all_authorized_for action, nil, @project
       #to reduce the initial list - will start with all assets that can be seen by the first user fouund to be in a project
       user = User.all.detect{|user| !user.try(:person).nil? && !user.person.projects.empty?}
       projects_shared = user.nil? ? [] : type.all_authorized_for("download", user, @project)
       #now select those with a policy set to downloadable to all-sysmo-users
       projects_shared  = projects_shared.select do |item|
-        (item.policy.sharing_scope == Policy::ALL_SYSMO_USERS && item.policy.access_type == Policy::ACCESSIBLE)
+        access_type = type.is_isa? ? Policy::VISIBLE : Policy::ACCESSIBLE
+        (item.policy.sharing_scope == Policy::ALL_SYSMO_USERS && item.policy.access_type == access_type)
       end
       #just those shared with sysmo but NOT shared publicly
-      projects_shared  = projects_shared  - downloadable
-      instance_variable_set "@projects_only_#{type.name.underscore.pluralize}".to_sym,projects_shared
+      @semi_public_assets[type]  = projects_shared  - @public_assets[type]
 
-      all = @project.assets.select{|a|a.class==type}
-      restrictive = all - (projects_shared | downloadable)
-      instance_variable_set "@restrictive_#{type.name.underscore.pluralize}".to_sym,restrictive
-
+      all = project_assets.select{|a|a.class==type}
+      @restricted_assets[type] = all - (@semi_public_assets[type] | @public_assets[type])
     end
 
     respond_to do |format|
