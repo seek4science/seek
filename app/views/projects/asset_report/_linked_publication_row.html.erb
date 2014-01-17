@@ -39,7 +39,7 @@
                  cls << " bordered" unless organism==organisms.last
               -%>
               <tr class='<%= cls -%>'>
-                <td><%= organism.ncbi_id.nil? ? "<span class='none_text'>Unknown</span>" : organism.ncbi_id -%></span></td>
+                <td><%= organism.ncbi_id.nil? ? "<span class='none_text'>Unknown</span>".html_safe : organism.ncbi_id -%></span></td>
               </tr>
           <% end -%>
         </table>
@@ -57,7 +57,7 @@
           -%>
           <tr class='<%= cls -%>'>
             <td>
-              <span class='cell_content'><%= df.can_view? ? df.title : "<span class='none_text'>Hidden</span>" -%></span>
+              <span class='cell_content'><%= df.can_view? ? df.title : "<span class='none_text'>Hidden</span>".html_safe -%></span>
             </td>
           </tr>
       <% end -%>
@@ -81,6 +81,22 @@
   </td>
   <td>
     <table class='inner_linked_assets'>
+      <% if data.empty? %>
+          <span class='none_text'>None defined</span>
+      <% end -%>
+      <% data.each do |df| -%>
+          <%
+             cls = df.can_download?(nil) ? '' : 'notpublic'
+             cls << " bordered" unless df==data.last
+          -%>
+          <tr class='<%= cls -%>'>
+            <td><span class='cell_content'><%= df.managers.collect{|m| link_to(h(m.name),m)}.join(", ").html_safe %></span></td>
+          </tr>
+      <% end -%>
+    </table>
+  </td>
+  <td>
+    <table class='inner_linked_assets'>
       <% if models.empty? %>
           <span class='none_text'>None defined</span>
       <% end -%>
@@ -92,7 +108,7 @@
           -%>
           <tr class='<%= cls -%>'>
             <td>
-              <span class='cell_content'><%= model.can_view? ? model.title : "<span class='none_text'>Hidden</span>" -%></span>
+              <span class='cell_content'><%= model.can_view? ? model.title : "<span class='none_text'>Hidden</span>".html_safe -%></span>
             </td>
           </tr>
       <% end -%>
@@ -110,6 +126,22 @@
           -%>
           <tr class='<%= cls -%>'>
             <td><span class='cell_content'><%= link_to polymorphic_url(model), polymorphic_url(model) -%></span></td>
+          </tr>
+      <% end -%>
+    </table>
+  </td>
+  <td>
+    <table class='inner_linked_assets'>
+      <% if models.empty? %>
+          <span class='none_text'>None defined</span>
+      <% end -%>
+      <% models.each do |model| -%>
+          <%
+             cls = model.can_download?(nil) ? '' : 'notpublic'
+             cls << " bordered" unless model==models.last
+          -%>
+          <tr class='<%= cls -%>'>
+            <td><span class='cell_content'><%= model.managers.collect{|m| link_to(h(m.name),m)}.join(", ").html_safe %></span></td>
           </tr>
       <% end -%>
     </table>

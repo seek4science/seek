@@ -1,6 +1,6 @@
 <% asset = shared_asset_row -%>
 <tr>
   <td><%= link_to polymorphic_url(asset),polymorphic_url(asset) -%></td>
-  <td><%= h(asset.title) %></td>
+  <td><%= asset.can_view? ? asset.title : "<span class='none_text'>Hidden</span>".html_safe -%></td>
   <td><%= asset.managers.collect{|m| link_to(h(m.name),m)}.join(", ").html_safe %></td>
 </tr>

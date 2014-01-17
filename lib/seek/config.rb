@@ -314,7 +314,8 @@ module Seek
       :seek_video_link, :scales, :delete_asset_version_enabled, :recaptcha_enabled,#putting vl settings on their own line to simplify merges
       :admin_impersonation_enabled, :auth_lookup_enabled, :sample_parent_term,:specimen_culture_starting_date,:sample_age,:specimen_creators, :sample_parser_enabled,
       :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,
-      :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,
+      :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,:header_tagline_text_enabled,
+      :header_home_logo_image,
       :datacite_username,:datacite_password_enc,:datacite_url]
 
 

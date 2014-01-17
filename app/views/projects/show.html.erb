@@ -20,7 +20,7 @@
     <% end -%>
 
 <% end -%>
-  <% if @project.try(:has_member?,current_user) -%>
+  <% if @project.try(:has_member?,current_user) || admin_logged_in? -%>
       <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
       <li><%= image_tag_for_key "report", asset_report_project_path(@project), "Asset report", {:title=>tooltip_title_attrib(tooltip_text)}, "Asset report" -%></li>
   <% end -%>

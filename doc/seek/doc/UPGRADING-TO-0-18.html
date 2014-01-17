@@ -129,7 +129,7 @@ the backup.</p>
 services, please stop them using that script. Otherwise do:</p>
 
 <pre>./script/delayed_job stop
-bundle exec sunspot:solr:stop</pre>
+bundle exec rake sunspot:solr:stop</pre>
 
 <h2 id="label-Installating+Package+dependencies">Installating Package dependencies</h2>
 
@@ -139,6 +139,12 @@ server, please also install the packages described in the <a
 href="INSTALL-PRODUCTION.html">Production Installation Guide</a></p>
 
 <h2 id="label-Installing+Ruby+1.9.3+with+RVM">Installing Ruby 1.9.3 with RVM</h2>
+
+<p>If you are upgrading a production service, we recommend installing RVM as
+the www-data user, or installing it system wide. Please check the <a
+href="INSTALL-PRODUCTION.html">Production Installation Guide</a> for
+details about creating a home directory as www-data and how to switch to
+that user before carrying out the following steps.</p>
 
 <p>We strongly encourage that you use <a href="https://rvm.io/">RVM</a> for
 managing your Ruby and RubyGems version. Although you can use the version
@@ -210,10 +216,24 @@ bundle exec rake tmp:clear</pre>
 correctly report UTF-8. If you know of a cleaner way to do this then please
 let us know!</p>
 
+<p>If your database is already UTF-8 encoded, you don’t need to convert.</p>
+
 <p>First refer to <em>config/database.yml</em> to check the database name, and
-the username and password you use. Then make a dump of the database using
-the following, but replacing &lt;mysql_username&gt; and
-&lt;database_name&gt;:</p>
+the username and password you use.</p>
+
+<p>The following commands help you to check the current encoding, but
+replacing &lt;mysql_username&gt; and &lt;database_name&gt;:</p>
+
+<pre>mysql -u &lt;mysql_username&gt; -p &lt;database_name&gt;
+SHOW VARIABLES LIKE 'character_set%';</pre>
+
+<p>If the value of variable character_set_connection is not UTF-8, you need to
+convert.</p>
+
+<p>If the current encoding is latin1, please follow the next steps to convert
+it to UTF-8.</p>
+
+<p>First, make a dump of the database using the following:</p>
 
 <pre>mysqldump -u &lt;mysql_username&gt; -p --opt --default-character-set=latin1 --skip-set-charset  &lt;database_name&gt; &gt; seek_db.sql</pre>
 
@@ -238,7 +258,8 @@ clear the SEEK cache:</p>
 <h2 id="label-Updating+the+init.d+scripts">Updating the init.d scripts</h2>
 
 <p>If you use init.d scripts to start and stop the Delayed Job, Solr Search
-and Soffice services, you may need to update these.</p>
+and Soffice services, you may need to update these (you will need to be a
+user with sudo access to update these scripts).</p>
 
 <p>Solr Search - <a
 href="https://gist.github.com/3143434">gist.github.com/3143434</a></p>

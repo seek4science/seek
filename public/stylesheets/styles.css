@@ -2075,6 +2075,11 @@ ul#header > li#seek_logo {
     float:left;
 }
 
+ul#header > li#seek_logo img{
+    max-height: 80px;
+    max-width: 80px;
+}
+
 ul#header > li#header_text {
     width:80%;
 }

@@ -27,6 +27,9 @@ also install the packages described in the {Production Installation Guide}[link:
 
 == Installing Ruby 1.9.3 with RVM
 
+If you are upgrading a production service, we recommend installing RVM as the www-data user, or installing it system wide. Please check the {Production Installation Guide}[link:doc/INSTALL-PRODUCTION.html] for details
+about creating a home directory as www-data and how to switch to that user before carrying out the following steps.
+
 We strongly encourage that you use {RVM}[https://rvm.io/] for managing your Ruby and RubyGems version. Although you can use the version that comes with your linux distribution,
 it is more difficult to control the version you use and keep up to date.
 
@@ -92,6 +95,8 @@ The following commands help you to check the current encoding, but replacing <my
   mysql -u <mysql_username> -p <database_name>
   SHOW VARIABLES LIKE 'character_set%';
 
+If the value of variable character_set_connection is not UTF-8, you need to convert.
+
 If the current encoding is latin1, please follow the next steps to convert it to UTF-8.
 
 First, make a dump of the database using the following:
@@ -117,7 +122,8 @@ You can now clear out the intermediate files:
 
 == Updating the init.d scripts
 
-If you use init.d scripts to start and stop the Delayed Job, Solr Search and Soffice services, you may need to update these.
+If you use init.d scripts to start and stop the Delayed Job, Solr Search and Soffice services, you may need to update these (you will need to be a user
+with sudo access to update these scripts).
 
 Solr Search - https://gist.github.com/3143434
 

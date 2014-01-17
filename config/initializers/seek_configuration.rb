@@ -51,6 +51,7 @@ Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :factors_studied_enabled,true
   Seek::Config.default :experimental_conditions_enabled,true
   Seek::Config.default :documentation_enabled,true
+  Seek::Config.default :header_tagline_text_enabled, true
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2
 
@@ -67,6 +68,7 @@ Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","
   Seek::Config.default :header_image_title, "SysMO-DB"
   Seek::Config.default :header_image_link,"http://www.sysmo-db.org"
   Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
+  Seek::Config.default :header_home_logo_image,'seek-logo-smaller.png'
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
