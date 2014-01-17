@@ -1,0 +1,31 @@
+<div id="report_selection">
+  Report displayed: <%= select_tag "displayed_unlinked_report",options_for_select([["Unlinked","unlinked_to_anything"],["Unlinked to assays","unlinked_to_assay"],["Unlinked to publications","unlinked_to_publication"]],"unlinked_to_anything"),:onchange=>"displayed_unlinked_report_changed();" -%>
+</div>
+
+<div id="unlinked_to_anything"  class="asset_report_container curved">
+  <p>Unlinked to anything</p>
+  <% @types_for_unlinked.each do |type| -%>
+      <%= render :partial=>"projects/asset_report/shared_assets_table",
+                 :locals=>{:type=>type,:items=>@unlinked_assets[type],:no_items_suffix=>"that are not linked to either a Publication or an #{t('assays.assay')}"} -%>
+  <% end -%>
+</div>
+
+<div id="unlinked_to_assay"  class="asset_report_container curved">
+  <p>Unlinked to assay</p>
+  <% @types_for_unlinked.each do |type| -%>
+      <%= render :partial=>"projects/asset_report/shared_assets_table",
+                 :locals=>{:type=>type,:items=>@unlinked_to_assay[type],:no_items_suffix=>"that are not linked to either a Publication or an #{t('assays.assay')}"} -%>
+  <% end -%>
+</div>
+
+<div id="unlinked_to_publication"  class="asset_report_container curved">
+  <p>Unlinked to publication</p>
+  <% @types_for_unlinked.each do |type| -%>
+      <%= render :partial=>"projects/asset_report/shared_assets_table",
+                 :locals=>{:type=>type,:items=>@unlinked_to_publication[type],:no_items_suffix=>"that are not linked to either a Publication or an #{t('assays.assay')}"} -%>
+  <% end -%>
+</div>
+
+<script type="text/javascript">
+    displayed_unlinked_report_changed();
+</script>
