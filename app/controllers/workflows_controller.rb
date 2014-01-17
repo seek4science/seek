@@ -32,7 +32,7 @@ class WorkflowsController < ApplicationController
 
 
   def new
-    @workflow = Workflow.new
+    @workflow = Workflow.new(:category_id => params[:category_id])
     #@data_file.parent_name = params[:parent_name]
     #@data_file.is_with_sample= params[:is_with_sample]
     @page_title = params[:page_title]

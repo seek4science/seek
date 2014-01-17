@@ -2,7 +2,7 @@
 
 <% if logged_in? and current_user.person.member?%>
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_workflow_path, nil, nil, 'Upload a workflow' %></li>
+        <li><%= image_tag_for_key "new", new_workflow_path(:category_id => params[:category_id]), nil, nil, 'Upload a workflow' %></li>
     </ul>
 <% end %>
 
