@@ -17,20 +17,21 @@
 
 .results-navbar {
     position: fixed;
-    float: left;
-    width: 250px;
+    width: 200px;
     text-align: left;
-    margin-right: 10px;
+    height: 70%;
+    float: right;
+    right: 10px;
 }
 .navbar-item {
     width: 100%;
-    height: 50px;
+    height: 40px;
 }
 
 .run_results {
-    min-width: 640px;
-    max-width: 1140px;
-    margin-left: 260px;
+    float: left;
+    margin-right: 10px;
+    width: 80%
 }
 
 #ft > div {

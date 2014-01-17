@@ -13,10 +13,6 @@
 <% run_error_log_outputs = @run.outputs.select { |output| error_log_output_port_names.include?(output.name) } %>
 
 
-<% if @run.finished? && @run.outputs.any? %>
-    <%= render :partial => 'results_navigator', :locals => {:run_result_outputs => run_result_outputs,
-                                                            :run_error_log_outputs => run_error_log_outputs }%>
-<% end %>
 
 
 <div class="run_results">
@@ -94,3 +90,10 @@
     <% end %>
   </div>
 </div>
+
+<div class="spacer"></div>
+
+<% if @run.finished? && @run.outputs.any? %>
+    <%= render :partial => 'results_navigator', :locals => {:run_result_outputs => run_result_outputs,
+                                                            :run_error_log_outputs => run_error_log_outputs }%>
+<% end %>
