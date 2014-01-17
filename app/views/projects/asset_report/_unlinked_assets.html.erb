@@ -1,4 +1,4 @@
-<div id="report_selection">
+<div class="report_selection">
   Report displayed: <%= select_tag "displayed_unlinked_report",options_for_select([["Not linked to either #{t('assays.assay').pluralize} or Publications","unlinked_to_anything"],
                                                                                    ["Not linked to #{t('assays.assay').pluralize}","unlinked_to_assay"],
                                                                                    ["Not linked to Publications","unlinked_to_publication"]],"unlinked_to_anything"),:onchange=>"displayed_unlinked_report_changed();" -%>

@@ -9,7 +9,7 @@
         padding: 1em;
         margin-bottom: 1em;
     }
-    div#report_selection {
+    div.report_selection {
        padding: 1em;
     }
 
@@ -33,6 +33,9 @@
   function displayed_unlinked_report_changed() {
     update_displayed_report('displayed_unlinked_report');
   }
+  function displayed_publication_report_changed() {
+      update_displayed_report('displayed_publication_report');
+  }
 </script>
 
 
@@ -42,7 +45,7 @@
 <h1>Asset reports</h1>
 <div class='box_infotext'>
 <p>
-  There are 3 sets of reports about the availability of your <%= t('project').pluralize %> assets:
+  There are 3 sets of reports about the availability of your <%= t('project').pluralize %> items:
 </p>
   <ul>
     <li>The first report gives an overview of the publications your <%= t('project') %> has registered, that have <%= t('model').pluralize %> or <%= t('data_file').pluralize %> associated with them (either directly or through an <%= t('assays.assay') %>). Publications without associated <%= t('data_file').pluralize %> or <%= t('model').pluralize %> are not listed. You can view this report by clicking the <b>Summary of publications linked to assets</b> tab.</li>

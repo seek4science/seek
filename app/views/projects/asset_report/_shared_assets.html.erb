@@ -1,4 +1,4 @@
-<div id="report_selection">
+<div class="report_selection">
     Report displayed: <%= select_tag "displayed_sharing_report",options_for_select([["Fully publicly available","public_assets"],["Shared across projects","semi_public_assets"],["Restricted sharing","restricted_assets"]],"public_assets"),:onchange=>"displayed_sharing_report_changed();" -%>
 </div>
 <div id="public_assets" class="asset_report_container curved">

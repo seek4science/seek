@@ -1,5 +1,4 @@
 <%
-
    publications = @project.publications.select { |p| p.has_assets? }
 
    publications_all_public = publications.select do |pub|
@@ -7,10 +6,13 @@
      assets.detect { |asset| !asset.can_download?(nil) }.nil?
    end
    publications_not_all_public = publications - publications_all_public
-
 %>
-<div class="asset_report_container curved">
-  <h1>Publications associated with publicly available assets</h1>
+<div class="report_selection">
+Report displayed: <%= select_tag "displayed_publication_report",options_for_select([["Publications with public items","publications_with_public"],["Publications with some restricted items","publications_with_private"]],"publications_with_private"),:onchange=>"displayed_publication_report_changed();" -%>
+</div>
+
+<div id="publications_with_public" class="asset_report_container curved">
+  <h1>Publications associated with publicly available items</h1>
 
   <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the publications, with associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %> that
@@ -19,9 +21,9 @@
   <%= render :partial => "projects/asset_report/linked_publication_table", :object => publications_all_public -%>
 </div>
 
-<div class="asset_report_container curved">
+<div id="publications_with_private" class="asset_report_container curved">
 
-  <h1>Publications associated with assets, where some are not available publicly</h1>
+  <h1>Publications associated with items, where some are not available publicly</h1>
 
   <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the publications that have associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %>,
@@ -32,3 +34,7 @@
   <%= render :partial => "projects/asset_report/linked_publication_table", :object => publications_not_all_public -%>
 
 </div>
+
+<script type="text/javascript">
+    displayed_publication_report_changed();
+</script>
