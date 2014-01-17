@@ -1,75 +1,96 @@
 <%= javascript_include_tag 'jquery-1.5.1.min.js' %>
 <script>
-  $j = jQuery.noConflict();
+    $j = jQuery.noConflict();
 </script>
 <%= javascript_include_tag 'taverna_player/application.js' %>
 
-<% workflow = Workflow.find(@run.workflow_id) %>
 
-<div class="breadcrumbs">
-  <a href="/">Home</a> &gt;
-  <%= link_to workflow.category.name, main_app.workflows_path(:category_id => workflow.category) -%> &gt;
-  <%= link_to workflow.title, main_app.workflow_path(workflow) -%> &gt;
-  <% if @run.sweep %>
-    <%= link_to @run.sweep.name, main_app.sweep_path(@run.sweep) -%> &gt;
-  <% end %>
-  <%= @run.name -%>
-</div>
+<% result_output_port_names = @run.workflow.output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::RESULT) }.collect { |i| i.name }.sort{ |a,b| a.downcase <=> b.downcase} -%>
+<% run_result_outputs = @run.outputs.select { |output| result_output_port_names.include?(output.name) } %>
+<!-- Error/log output port names from the workflow -->
+<% error_log_output_port_names = @run.workflow.output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }.collect { |i| i.name }.sort{ |a,b| a.downcase <=> b.downcase} -%>
+<!-- Figure out error/log outputs from the run -->
+<% run_error_log_outputs = @run.outputs.select { |output| error_log_output_port_names.include?(output.name) } %>
 
-<div class="contribution_title">
-  <h1><%= 'Run: ' + @run.name -%></h1>
-</div>
 
-<%= render :partial => 'buttons', :locals => {:run => @run, :redirect_to => taverna_player.runs_path} %>
-<br/>
+<% if @run.finished? && @run.outputs.any? %>
+    <%= render :partial => 'results_navigator', :locals => {:run_result_outputs => run_result_outputs,
+                                                            :run_error_log_outputs => run_error_log_outputs }%>
+<% end %>
 
-<div class="show_basic">
-  <%= render :partial => "info", :locals => {:run => @run} %>
 
-  <div style="clear: both;"></div>
+<div class="run_results">
 
-  <%= render :partial => "interaction", :locals =>
-          {:run => @run, :interaction => @interaction} %>
+  <% workflow = Workflow.find(@run.workflow_id) %>
 
-  <div id="run-outputs" style="<%= 'display: none' unless @run.complete? && @run.outputs.size > 0-%>">
-    <div class="fold">
-      <div class="foldTitle">
-        Outputs
-      </div>
-      <div class="foldContent">
-        <% if @run.finished? && @run.outputs.any? %>
-          <%= render :partial => "outputs", :locals => {:run => @run} %>
-        <% end %>
-      </div>
-    </div>
+  <div class="breadcrumbs">
+    <a href="/">Home</a> &gt;
+    <%= link_to workflow.category.name, main_app.workflows_path(:category_id => workflow.category) -%> &gt;
+    <%= link_to workflow.title, main_app.workflow_path(workflow) -%> &gt;
+    <% if @run.sweep %>
+        <%= link_to @run.sweep.name, main_app.sweep_path(@run.sweep) -%> &gt;
+    <% end %>
+    <%= @run.name -%>
   </div>
 
-  <% if @run.inputs.any? %>
-  <div id="run-inputs">
-    <div class="fold">
-      <div class="foldTitle">
-        Inputs
-      </div>
-      <div class="foldContent">
-        <%= render :partial => "inputs", :locals => {:run => @run} %>
-      </div>
-    </div>
-  </div>
-  <% end %>
 
-  <div id="advanced" style="<%= 'display: none' unless @run.finished? -%>">
-    <div class="fold">
-      <div class="foldTitle">
-        Advanced
-      </div>
-      <div class="foldContent" style="display: none;">
-        <b>Log:</b>
-        <pre id="log_url" class="script_example_data_box"><%= File.read(@run.log.path) unless @run.log.blank? || @run.log.url.blank? %></pre>
-      </div>
-    </div>
+  <div class="contribution_title">
+    <h1><%= 'Run: ' + @run.name -%></h1>
   </div>
 
-  <% unless @run.complete? %>
-      <%= render :partial => "poll", :locals => {:reload => run_path(@run)} %>
-  <% end %>
+  <%= render :partial => 'buttons', :locals => {:run => @run, :redirect_to => taverna_player.runs_path} %>
+  <br/>
+
+  <div class="show_basic">
+    <%= render :partial => "info", :locals => {:run => @run} %>
+
+    <div style="clear: both;"></div>
+
+    <%= render :partial => "interaction", :locals =>
+            {:run => @run, :interaction => @interaction} %>
+
+
+    <a href=''></a>
+    <div id="run-outputs" style="<%= 'display: none' unless @run.complete? && @run.outputs.size > 0-%>">
+      <div class="fold">
+        <div class="foldTitle">
+          Outputs
+        </div>
+        <div class="foldContent">
+          <% if @run.finished? && @run.outputs.any? %>
+              <%= render :partial => "outputs", :locals => {:run_result => run_result_outputs, :run_error => run_error_log_outputs} %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <% if @run.inputs.any? %>
+        <div id="run-inputs">
+          <div class="fold">
+            <div class="foldTitle">
+              Inputs
+            </div>
+            <div class="foldContent">
+              <%= render :partial => "inputs", :locals => {:run => @run} %>
+            </div>
+          </div>
+        </div>
+    <% end %>
+
+    <div id="advanced" style="<%= 'display: none' unless @run.finished? -%>">
+      <div class="fold">
+        <div class="foldTitle">
+          Advanced
+        </div>
+        <div class="foldContent" style="display: none;">
+          <b>Log:</b>
+          <pre id="log_url" class="script_example_data_box"><%= File.read(@run.log.path) unless @run.log.blank? || @run.log.url.blank? %></pre>
+        </div>
+      </div>
+    </div>
+
+    <% unless @run.complete? %>
+        <%= render :partial => "poll", :locals => {:reload => run_path(@run)} %>
+    <% end %>
+  </div>
 </div>
