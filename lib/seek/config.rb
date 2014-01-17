@@ -250,7 +250,7 @@ module Seek
         val = val.send(conversion) if conversion && val
         val
       end
-      def set_value setter, val
+      def set_value setter, val, conversion=nil
         val = val.send(conversion) if conversion && val
         Settings.defaults[setter.to_sym] = val
       end

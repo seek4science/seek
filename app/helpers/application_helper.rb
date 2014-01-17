@@ -561,6 +561,8 @@ module ApplicationHelper
       result = t('biosamples.sample_parent_term')
     elsif resource_type == "Assay"
       result = t('assays.assay')
+    elsif resource_type == "TavernaPlayer::Run"
+      result = "Run"
     else
       translated_resource_type = translate_resource_type(resource_type)
       result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
