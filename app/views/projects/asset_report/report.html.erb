@@ -1,42 +1,5 @@
 <%= stylesheet_link_tag "asset_report" %>
-
-
-<%# TODO: move to stylesheet after merging, rather than dealing with conflicts with the asset pipelining changes %>
-<style>
-    div.asset_report_container {
-        background-color: white;
-        border: 1px solid #999;
-        padding: 1em;
-        margin-bottom: 1em;
-    }
-    div.report_selection {
-       padding: 1em;
-    }
-
-</style>
-<script type="text/javascript">
-  function update_displayed_report(id) {
-      var selected = $(id).value;
-      $$('select#'+id+' option').each(function(option) {
-          var val = option.value;
-          if (val == selected) {
-              $(val).show();
-          }
-          else {
-              $(val).hide();
-          }
-      });
-  }
-  function displayed_sharing_report_changed() {
-    update_displayed_report('displayed_sharing_report');
-  }
-  function displayed_unlinked_report_changed() {
-    update_displayed_report('displayed_unlinked_report');
-  }
-  function displayed_publication_report_changed() {
-      update_displayed_report('displayed_publication_report');
-  }
-</script>
+<%= javascript_include_tag "asset_report" %>
 
 
 <script type="text/javascript">
