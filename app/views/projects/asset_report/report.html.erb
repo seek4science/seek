@@ -42,11 +42,12 @@
 <h1>Asset reports</h1>
 <div class='box_infotext'>
 <p>
-  There are 2 sets of reports about the availability of your <%= t('project').pluralize %> assets:
+  There are 3 sets of reports about the availability of your <%= t('project').pluralize %> assets:
 </p>
   <ul>
     <li>The first report gives an overview of the publications your <%= t('project') %> has registered, that have <%= t('model').pluralize %> or <%= t('data_file').pluralize %> associated with them (either directly or through an <%= t('assays.assay') %>). Publications without associated <%= t('data_file').pluralize %> or <%= t('model').pluralize %> are not listed. You can view this report by clicking the <b>Summary of publications linked to assets</b> tab.</li>
-    <li>The second report gives are general report of <%= t('data_file').pluralize %>, <%= t('model').pluralize %> and <%= t('sop').pluralize %> your <%= t('project') %> has made available, either publicly or with ALL other registered <%= t('project') %> members. You can view this report by clicking the <b>Summary of assets shared</b> tab.</li>
+    <li>The second report gives are general report of items your <%= t('project') %> has made available, either publicly or with ALL other registered <%= t('project') %> members. It also displays items that have more restrictive sharing permissions.  You can view this report by clicking the <b>Summary of shared assets</b> tab.</li>
+    <li>The third report displays items within your <%= t('project') %> that are not associated with publications, <%= t('assays.assay').pluralize %> or neither.You can view this report by clicking the <b>Summary of unlinked assets</b> tab.</li>
   </ul>
 </div>
 
