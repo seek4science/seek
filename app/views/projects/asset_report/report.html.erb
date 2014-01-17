@@ -9,8 +9,25 @@
         padding: 1em;
         margin-bottom: 1em;
     }
+    div#sharing_report_selection {
+       margin-bottom: 1em;
+    }
 
 </style>
+<script type="text/javascript">
+  function displayed_sharing_report_changed() {
+    var selected = $('displayed_sharing_report').value;
+    $$('select#displayed_sharing_report option').each(function(option) {
+        var val = option.value;
+        if (val == selected) {
+            $(val).show();
+        }
+        else {
+            $(val).hide();
+        }
+    });
+  }
+</script>
 
 
 <script type="text/javascript">

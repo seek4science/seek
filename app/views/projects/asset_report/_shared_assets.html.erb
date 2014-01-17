@@ -1,3 +1,6 @@
+<div id="sharing_report_selection">
+    Report displayed: <%= select_tag "displayed_sharing_report",options_for_select([["Fully publicaly available","public_assets"],["Available between projects","semi_public_assets"],["Restricted sharing","restricted_assets"]],"public_assets"),:onchange=>"displayed_sharing_report_changed();" -%>
+</div>
 <div id="public_assets" class="asset_report_container curved">
   <h1>Data, <%= t('model').pluralize %> and <%= t('sop').pluralize %> that are a available publicly, including to
     non <%= Seek::Config.application_name %> members</h1>
@@ -41,3 +44,7 @@
                  :locals=>{:type=>type,:items=>@restricted_assets[type],:no_items_suffix=>"that have restrictive sharing permissions"} -%>
   <% end -%>
 </div>
+
+<script type="text/javascript">
+  displayed_sharing_report_changed();
+</script>
