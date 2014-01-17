@@ -1,0 +1,19 @@
+<% asset_name = resource_tab_item_name type.name, false -%>
+<h2><%= asset_name.pluralize %></h2>
+<% if items.empty? %>
+    <span class='none_text'>There are no <%= resource_tab_item_name type.name %> <%= no_items_suffix -%></span>
+<% else -%>
+    <table class='asset_report_table'>
+      <thead>
+
+      <tr>
+        <th style="width:30em"><%= asset_name -%> URL</th>
+        <th><%= asset_name -%> title</th>
+        <th style="width:15em">Owners of the <%= asset_name -%></th>
+      </tr>
+      </thead>
+      <tbody>
+      <%= render :partial => "projects/asset_report/shared_asset_row", :collection => items %>
+      </tbody>
+    </table>
+<% end %>
