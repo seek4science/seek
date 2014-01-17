@@ -9,27 +9,8 @@
   </p>
 
   <% @types.each do |type| -%>
-
-      <% items = @public_assets[type] -%>
-      <% asset_name = resource_tab_item_name type.name, false -%>
-      <h2><%= asset_name.pluralize %></h2>
-      <% if items.empty? %>
-          <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared publicly</span>
-      <% else -%>
-          <table class='asset_report_table'>
-            <thead>
-
-            <tr>
-              <th style="width:30em"><%= asset_name -%> URL</th>
-              <th><%= asset_name -%> title</th>
-              <th style="width:15em">Owners of the <%= asset_name -%></th>
-            </tr>
-            </thead>
-            <tbody>
-            <%= render :partial => "projects/asset_report/shared_asset_row", :collection => items %>
-            </tbody>
-          </table>
-      <% end %>
+      <%= render :partial=>"projects/asset_report/shared_assets_table",
+                 :locals=>{:type=>type,:items=>@public_assets[type],:no_items_suffix=>" shared publicly"} -%>
   <% end -%>
 </div>
 
@@ -43,27 +24,8 @@
     by all members with a registered account.
   </p>
   <% @types.each do |type| -%>
-
-      <% items = @semi_public_assets[type] -%>
-      <% asset_name = resource_tab_item_name type.name, false -%>
-      <h2><%= asset_name.pluralize %></h2>
-      <% if items.empty? %>
-          <span class='none_text'>There are no <%= resource_tab_item_name type.name %> shared with all other projects, apart from those listed as available publicly</span>
-      <% else -%>
-          <table class='asset_report_table'>
-            <thead>
-
-            <tr>
-              <th style="width:30em"><%= asset_name -%> URL</th>
-              <th><%= asset_name -%> title</th>
-              <th style="width:15em">Owners of the <%= asset_name -%></th>
-            </tr>
-            </thead>
-            <tbody>
-            <%= render :partial => "projects/asset_report/shared_asset_row", :collection => items %>
-            </tbody>
-          </table>
-      <% end %>
+      <%= render :partial=>"projects/asset_report/shared_assets_table",
+                 :locals=>{:type=>type,:items=>@semi_public_assets[type],:no_items_suffix=>"shared with all other projects, apart from those listed as available publicly"} -%>
   <% end -%>
 </div>
 
@@ -75,26 +37,7 @@
     download publicly, or possibly even by other projects or members of this project.
   </p>
   <% @types.each do |type| -%>
-
-      <% items = @restricted_assets[type] -%>
-      <% asset_name = resource_tab_item_name type.name, false -%>
-      <h2><%= asset_name.pluralize %></h2>
-      <% if items.empty? %>
-          <span class='none_text'>There are no <%= resource_tab_item_name type.name %> that have restrictive sharing permissions</span>
-      <% else -%>
-          <table class='asset_report_table'>
-            <thead>
-
-            <tr>
-              <th style="width:30em"><%= asset_name -%> URL</th>
-              <th><%= asset_name -%> title</th>
-              <th style="width:15em">Owners of the <%= asset_name -%></th>
-            </tr>
-            </thead>
-            <tbody>
-            <%= render :partial => "projects/asset_report/shared_asset_row", :collection => items %>
-            </tbody>
-          </table>
-      <% end %>
+      <%= render :partial=>"projects/asset_report/shared_assets_table",
+                 :locals=>{:type=>type,:items=>@restricted_assets[type],:no_items_suffix=>"that have restrictive sharing permissions"} -%>
   <% end -%>
 </div>
