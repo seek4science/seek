@@ -1,3 +1,4 @@
+
 div.report_tab_content {
     width: 98%;
     background-color: #F0F0F0;
@@ -5,6 +6,16 @@ div.report_tab_content {
     padding: 1em;
     border: #999 solid 1px;
     border-collapse: collapse;
+}
+
+div.asset_report_container {
+    background-color: white;
+    border: 1px solid #999;
+    padding: 1em;
+    margin-bottom: 1em;
+}
+div.report_selection {
+    padding: 1em;
 }
 
 table.asset_report_table {

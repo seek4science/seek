@@ -545,6 +545,7 @@ end
   Factory.define(:content_blob) do |f|
     f.sequence(:uuid) { UUIDTools::UUID.random_create.to_s }
     f.sequence(:data) {|n| "data [#{n}]" }
+    f.sequence(:original_filename) {|n| "file-#{n}"}
   end
 
   Factory.define(:url_content_blob, :parent => :content_blob) do |f|
@@ -572,6 +573,7 @@ end
   Factory.define(:rightfield_annotated_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/simple_populated_rightfield.xls","rb").read
     f.content_type "application/excel"
+    f.original_filename 'simple_populated_rightfield.xls'
   end
 
   Factory.define(:small_test_spreadsheet_content_blob,:parent=>:content_blob) do |f|
@@ -583,6 +585,7 @@ end
   Factory.define(:xlsx_content_blob,:parent=>:content_blob) do |f|
     f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     f.data  File.new("#{Rails.root}/test/fixtures/files/lihua_column_index_error.xlsx","rb").read
+    f.original_filename 'lihua_column_index_error.xlsx'
   end
 
   Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
@@ -626,11 +629,13 @@ end
   Factory.define(:docx_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_word_test.docx", "rb").read
     f.content_type "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    f.original_filename 'ms_word_test.docx'
   end
 
   Factory.define(:odt_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_word_test.odt", "rb").read
     f.content_type 'application/vnd.oasis.opendocument.text'
+    f.original_filename 'openoffice_word_test.odt'
   end
 
   Factory.define(:ppt_content_blob, :parent => :content_blob) do |f|
@@ -642,21 +647,25 @@ end
   Factory.define(:pptx_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.pptx", "rb").read
     f.content_type "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    f.original_filename 'ms_ppt_test.pptx'
   end
 
   Factory.define(:odp_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_ppt_test.odp", "rb").read
     f.content_type 'application/vnd.oasis.opendocument.presentation'
+    f.original_filename 'openoffice_ppt_test.odp'
   end
 
   Factory.define(:rtf_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/rtf_test.rtf", "rb").read
     f.content_type "application/rtf"
+    f.original_filename 'rtf_test.rtf'
   end
 
   Factory.define(:txt_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/txt_test.txt", "rb").read
     f.content_type "text/plain"
+    f.original_filename 'txt_test.txt'
   end
 
   Factory.define(:typeless_content_blob, :parent=>:content_blob) do |f|
