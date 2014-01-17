@@ -32,7 +32,7 @@
     <div class="investigation">
       <p>
         <label><%= t('investigation') %>:</label>
-        <%= link_to h(@study.investigation.title),@study.investigation %>
+        <%= investigation_link(@study.investigation) %>
       </p>
     </div>
 
