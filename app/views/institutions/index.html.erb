@@ -15,6 +15,6 @@
   <%= render :partial=>"assets/resource_list_item", :collection=>@institutions %>
 </div>
 
-<% if @institutions.page == "latest" && Institution.find(:all).length > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all"%>
+<% if @institutions.page == "latest" && Institution.count > Seek::Config.limit_latest %>
+    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>Institution.count} %>
 <% end %>

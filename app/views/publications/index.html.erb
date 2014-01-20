@@ -13,6 +13,6 @@
   <%= render :partial=>"assets/resource_list_item", :collection=>@publications %>
 </div>
 
-<% if @publications.page == "latest" && Publication.count > Seek::Config.limit_latest%>
-   <%= render :partial => "general/paginate_see_all"%>
+<% if @publications.page == "latest" && (n=Publication.count) > Seek::Config.limit_latest%>
+   <%= render :partial => "general/paginate_see_all", :locals=>{:total=>n} %>
 <% end %>
