@@ -1,0 +1,20 @@
+<table>
+  <tr>
+    <th>Month</th>
+    <th>Number of New User Registrations</th>
+    <th>Number of Active Users</th>
+  </tr>
+  <% stats.each do |row| %>
+      <tr>
+        <%
+        month = row.first
+        values = row.last
+        registrations = values.first
+        active_users = values.last
+        %>
+        <td><%= Time.at(month).strftime("%B %Y") %></td>
+        <td><%= registrations %></td>
+        <td><%= active_users %></td>
+      </tr>
+  <% end %>
+</table>
