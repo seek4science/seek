@@ -181,15 +181,16 @@ td.port-type label {
 
 .run_result_links {
     min-height: 20px;
+
 }
 .run_result_link {
     background-color: #ffffff;
     border: 1px solid rgba(221, 221, 170, 0.70);
     border-radius: 4px 4px 4px 4px;
-    float: left;
     font-size: 15px;
     padding: 2px 5px;
     margin: 0px 2px;
+    display: inline-block;
 }
 
 #top-link-box {
