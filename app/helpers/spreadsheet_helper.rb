@@ -23,7 +23,7 @@ module SpreadsheetHelper
     end
     WillPaginate::Collection.create(current_page, per_page, rows_with_index.count) do |pager|
       start = (current_page-1)*per_page # assuming current_page is 1 based.
-      pager.replace(rows_with_index[start, per_page])
+      pager.replace(rows_with_index[start, per_page]) unless rows_with_index[start, per_page].nil?
     end
   end
 end  
