@@ -15,25 +15,6 @@
     margin: auto;
 }
 
-.results-navbar {
-    position: fixed;
-    width: 200px;
-    text-align: left;
-    height: 70%;
-    float: right;
-    right: 10px;
-}
-.navbar-item {
-    width: 100%;
-    height: 40px;
-}
-
-.run_results {
-    float: left;
-    margin-right: 10px;
-    width: 80%
-}
-
 #ft > div {
   max-width: 1360px;
   min-width: 860px;
@@ -183,7 +164,6 @@ td.port-type label {
     color: #333333;
     padding: 10px;
     text-align: left;
-    background-color: #f4f4f4;
     font-size: 16px;
     box-shadow: 1px 1px 3px #ccc;
     border: 1px solid #ccc;
@@ -197,6 +177,38 @@ td.port-type label {
     float: right;
     font-size: 12px;
     padding: 2px 5px;
+}
+
+.run_result_links {
+    min-height: 20px;
+}
+.run_result_link {
+    background-color: #ffffff;
+    border: 1px solid rgba(221, 221, 170, 0.70);
+    border-radius: 4px 4px 4px 4px;
+    float: left;
+    font-size: 15px;
+    padding: 2px 5px;
+    margin: 0px 2px;
+}
+
+#top-link-box {
+    display:none;
+    position:fixed;
+    right: 0;
+    padding: 20px 20px;
+    border:1px solid #CCC;
+    background-color: white;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    box-shadow: -2px -2px 3px #eee;
+    -moz-box-shadow: -2px -2px 3px #eee;
+    text-align:center;
+    z-index: 100;
+}
+
+#top-link-close {
+    float: right;
 }
 
 .workflow .description {

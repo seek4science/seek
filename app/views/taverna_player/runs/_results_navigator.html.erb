@@ -1,13 +1,12 @@
 <!-- Setup navbar -->
 
 
-<ul class='results-navbar menutabs'>
-  <%= "<h3><a href='#'>Run Results</a></h3>".html_safe  unless run_result_outputs.empty? %>
+<div class='run_result_links'>
   <% run_result_outputs.each do |p| %>
-      <li class='navbar-item'><a href="#<%=p.name%>" ><%=p.name%></a></li><br>
+      <div class='run_result_link'><a href="#<%=p.name%>" ><%=p.name%></a></div>
   <% end  %>
   <%= "<h3>Run Errors</h3>".html_safe unless run_error_log_outputs.empty? %>
   <% run_error_log_outputs.each do |p| %>
-      <li class='navbar-item'><a href="#<%=p.name%>" ><%=p.name%></a></li><br>
+      <div class='run_result_link'><a href="#<%=p.name%>" ><%=p.name%></a></div>
   <% end %>
-</ul>
+</div>
