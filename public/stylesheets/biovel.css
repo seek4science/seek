@@ -208,8 +208,12 @@ td.port-type label {
     z-index: 100;
 }
 
+#top-link {
+    text-decoration: underline;
+}
+
 #top-link-close {
-    float: right;
+    display: inline;
 }
 
 .workflow .description {
