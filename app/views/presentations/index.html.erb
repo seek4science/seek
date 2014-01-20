@@ -12,6 +12,6 @@
 
 <%= render :partial => "assets/resource_list", :locals => { :collection => @presentations, :authorization_for_showing_already_done=>true } %>
 
-<% if @presentations.page == "latest" && Presentation.count > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all"%>
+<% if @presentations.page == "latest" && (n=Presentation.all_authorized_for("view").count) > Seek::Config.limit_latest%>
+    <%= render :partial => "general/paginate_see_all", :locals=>{:total=>n} %>
 <% end %>

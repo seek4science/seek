@@ -13,6 +13,6 @@
   <%= render :partial => "assets/resource_list_item", :collection=>@investigations %>
 </div>
 
-<% if @investigations.page == "latest" && Investigation.count > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all"%>
+<% if @investigations.page == "latest" && (n=Investigation.all_authorized_for("view").count) > Seek::Config.limit_latest %>
+    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>n}%>
 <% end %>

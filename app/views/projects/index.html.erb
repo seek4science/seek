@@ -12,5 +12,5 @@
 </div>
 
 <% if @projects.page == "latest" && Project.count > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all"%>
+    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>Project.count}%>
 <% end %>
