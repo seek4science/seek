@@ -54,9 +54,14 @@ namespace :seek do
             Person.record_timestamps = true
           end
         end
-
       end
+    end
+  end
 
+  task(:clean_up_sop_specimens=>:environment) do
+    broken = SopSpecimen.all.select{|ss| ss.sop.nil? || ss.specimen.nil?}
+    disable_authorization_checks do
+      broken.each{|b| b.destroy}
     end
   end
 
