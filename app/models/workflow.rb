@@ -147,6 +147,14 @@ class Workflow < ActiveRecord::Base
     Policy.sysmo_and_projects_policy
   end
 
+  def result_output_ports
+    output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::RESULT) }
+  end
+
+  def error_log_output_ports
+    output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }
+  end
+
   private
 
   def generate_workflow_image

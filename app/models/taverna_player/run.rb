@@ -44,6 +44,14 @@ module TavernaPlayer
       !sweep.nil? && (policy_id == sweep.policy_id)
     end
 
+    def result_outputs
+      outputs.select {|o| workflow.result_output_ports.collect { |op| op.name }.include?(o) }.sort{ |a,b| a <=> b}
+    end
+
+    def error_log_outputs
+      outputs.select {|o| workflow.error_log_output_ports.collect { |op| op.name }.include?(o) }.sort{ |a,b| a <=> b}
+    end
+
     private
 
     def fix_run_input_ports_mime_types

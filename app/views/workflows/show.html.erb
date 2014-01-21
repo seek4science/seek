@@ -50,11 +50,9 @@
     </div>
     <div class="foldContent" style="display: none;">
       <!-- Result outputs -->
-      <% result_outputs = outputs.select { |output| output.port_type.name == WorkflowOutputPortType::RESULT } -%>
-      <%= render :partial => "port_list", :locals => { :ports => result_outputs, :title => "Result Outputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @workflow.result_output_ports, :title => "Result Outputs" } -%>
       <!-- Error/log outputs -->
-      <% error_log_outputs = outputs.select { |output| output.port_type.name == WorkflowOutputPortType::ERROR_LOG } -%>
-      <%= render :partial => "port_list", :locals => { :ports => error_log_outputs, :title => "Error/Log Outputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @workflow.error_log_output_ports, :title => "Error/Log Outputs" } -%>
     </div>
   </div>
 
