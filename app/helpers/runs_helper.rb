@@ -3,12 +3,13 @@ module RunsHelper
   def runs_table(runs, redirect_to=nil)
     runs.map do |run|
       workflow = run.workflow
-      created_at = run.created_at.strftime("%e %b %Y %H:%M:%S %Z")
+      created_at = "#{time_ago_in_words(run.created_at)} ago"
 
-      if run.is_a?(Sweep)
-        finish_time = run.runs.any? {|r| r.finish_time.blank? } ? '' : run.runs.map { |r| r.finish_time }.max.strftime("%e %b %Y %H:%M:%S %Z")
+      if run.is_a?(Sweep) # If a sweep, get the latest finish time of its runs
+        finish_time = run.runs.any? {|r| r.finish_time.blank? } ? '' :
+            "#{time_ago_in_words(run.runs.map { |r| r.finish_time }.max)} ago"
       else
-        finish_time = run.finish_time.blank? ? '' : run.finish_time.strftime("%e %b %Y %H:%M:%S %Z")
+        finish_time = run.finish_time.blank? ? '' : "#{time_ago_in_words(run.finish_time)} ago".html_safe
       end
 
       action_buttons = render(:partial => "taverna_player/runs/delete_or_cancel_button", :locals => { :run => run, :redirect_to => redirect_to })
