@@ -66,12 +66,42 @@ class SpecimenTest < ActiveSupport::TestCase
 
   test "related sops" do
     User.with_current_user Factory(:user) do
-      specimen = Factory :specimen, :contributor => User.current_user
-      sop = Factory :sop, :contributor => User.current_user
+      specimen = Factory :specimen, :contributor => User.current_user.person
+      sop = Factory :sop, :contributor => User.current_user.person
       specimen.build_sop_masters [sop.id]
       assert specimen.save
 
       assert_equal [sop], specimen.related_sops
+    end
+  end
+
+  test "cleans up relationship with sop when either deleted" do
+    person = Factory(:person)
+    User.with_current_user person.user do
+      specimen = Factory :specimen, :contributor => person
+      sop = Factory :sop, :contributor => person
+      specimen.build_sop_masters [sop.id]
+      assert specimen.save
+      specimen.reload
+      refute specimen.sop_masters.empty?
+      assert_difference("SopSpecimen.count",-1) do
+        sop.destroy
+      end
+      specimen.reload
+      assert specimen.sop_masters.empty?
+      assert specimen.sops.empty?
+
+      #now delete specimen
+      sop = Factory :sop, :contributor => person
+      specimen.build_sop_masters [sop.id]
+      assert specimen.save
+      sop.reload
+      refute sop.specimens.empty?
+      assert_difference("SopSpecimen.count",-1) do
+        specimen.destroy
+      end
+      sop.reload
+      assert sop.specimens.empty?
     end
   end
 
