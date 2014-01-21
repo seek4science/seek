@@ -76,7 +76,7 @@ gem 'passenger'
 gem 'unicorn-rails'
 
 gem 'taverna-t2flow'
-gem "taverna-player", '~> 0.5.0'
+gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
 
 group :development do
   gem "sqlite3","1.3.7"
