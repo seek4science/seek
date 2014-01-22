@@ -46,22 +46,22 @@ module TavernaPlayer
 
     def result_outputs
       port_names = workflow.result_output_ports.map { |o| o.name }
-      outputs.select {|o| port_names.include?(o.name) }.sort{ |a,b| a <=> b}
+      outputs.select {|o| port_names.include?(o.name) }
     end
 
     def error_log_outputs
       port_names = workflow.error_log_output_ports.map { |o| o.name }
-      outputs.select {|o| port_names.include?(o.name) }.sort{ |a,b| a <=> b}
+      outputs.select {|o| port_names.include?(o.name) }
     end
 
     def data_inputs
       port_names = workflow.data_input_ports.map { |i| i.name }
-      inputs.select {|i| port_names.include?(i.name) }.sort{ |a,b| a <=> b}
+      inputs.select {|i| port_names.include?(i.name) }
     end
 
     def parameter_inputs
       port_names = workflow.parameter_input_ports.map { |i| i.name }
-      inputs.select {|i| port_names.include?(i.name) }.sort{ |a,b| a <=> b}
+      inputs.select {|i| port_names.include?(i.name) }
     end
 
     private
