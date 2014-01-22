@@ -155,6 +155,14 @@ class Workflow < ActiveRecord::Base
     output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }
   end
 
+  def data_input_ports
+    input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }
+  end
+
+  def parameter_input_ports
+    input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::PARAMETER) }
+  end
+
   private
 
   def generate_workflow_image

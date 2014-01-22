@@ -1,12 +1,10 @@
 <%
    workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || ""
    workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow).sort_by {|i| i.name.downcase }
-   data_inputs = workflow_inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }
-   data_input_names = data_inputs.collect { |input| input.name }
-   parameter_inputs = workflow_inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER }
+   data_input_names = @workflow.data_input_ports.map { |input| input.name }
 %>
 <script type="text/javascript">
-  var inputs = <%= input_json_hash(data_inputs) -%>;
+  var inputs = <%= input_json_hash(@workflow.data_input_ports) -%>;
   var iteration_template = "<%= escape_javascript render('iteration_template') -%>";
   var input_template = "<%= escape_javascript render('input_template') -%>";
 </script>
@@ -82,7 +80,7 @@
         </div>
         <div class="foldContent" id="fixed_data">
           <%# skip first input because its the sweep input by default %>
-          <% data_inputs[1..-1].each do |input| %>
+          <% @workflow.data_input_ports[1..-1].each do |input| %>
             <%= render :partial => 'taverna_player/runs/input_form', :locals => {:input => input, :form => shared_input_values} %>
           <% end %>
         </div>
@@ -93,8 +91,8 @@
           Parameters
         </div>
         <div class="foldContent" id="parameters">
-          <% unless parameter_inputs.blank? %>
-            <% parameter_inputs.each do |input| %>
+          <% unless @workflow.parameter_input_ports.blank? %>
+            <% @workflow.parameter_input_ports.each do |input| %>
               <%= render :partial => 'taverna_player/runs/input_form', :locals => {:input => input, :form => shared_input_values} %>
             <% end %>
           <% else %>
