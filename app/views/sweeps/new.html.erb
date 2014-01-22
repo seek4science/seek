@@ -1,6 +1,5 @@
 <%
    workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || ""
-   workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow).sort_by {|i| i.name.downcase }
    data_input_names = @workflow.data_input_ports.map { |input| input.name }
 %>
 <script type="text/javascript">
@@ -73,7 +72,7 @@
     <!--Another form for all other input ports which values are fixed (i.e. shared over all sweep iterations). -->
     <!--These will be copied over to each individual run/iteration of a sweep as input data values for those ports. -->
     <!--They form "special shared values" that needs to be removed from a sweep model after the input data is copied.-->
-    <%= sweep_form.fields_for :shared_input_values_for_all_runs, TavernaPlayer::Run.new do |shared_input_values| %>
+    <%= sweep_form.fields_for :shared_input_values_for_all_runs, @run || TavernaPlayer::Run.new do |shared_input_values| %>
       <div class="fold">
         <div class="foldTitle">
           Fixed Data
