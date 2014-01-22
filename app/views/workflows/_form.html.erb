@@ -4,33 +4,28 @@
     <%= error_messages_for :workflow -%>
     <%= hidden_field_tag 'workflow[title]', 'A workflow' -%>
     <% if @workflow.new_record? %>
-      <p style="margin: 1.5em 0;">
-        <b>File</b> <span class="required">*</span>
-        <br/>
+      <label>File</label><br/>
+      <p>
         <%= file_field_tag 'workflow[data]' %>
       </p>
     <% end %>
 
-    <div class="fold">
-      <div class="foldTitle">
-        <%= help_icon("Specify the category this workflow belongs to.") -%>
-        Category
-      </div>
-      <div class="foldContent">
-        <%= f.select(:category_id, WorkflowCategory.all.collect { |c| [c.name, c.id] }) %>
-      </div>
-    </div>
+    <p>
+      <label>Category</label><br/>
+      <%= f.select(:category_id, WorkflowCategory.all.collect { |c| [c.name, c.id] }) %>
+    </p>
+
+    <p>
+      <label for="workflow_sweepable">
+        <%= help_icon("Ticking this box will allow users to run batches of runs with this workflow. "+
+                      "It may not be appropriate for all workflows to be ran in this manner, for example certain workflows with interactions.") -%>
+        Allow data sweeps?
+        <%= f.check_box(:sweepable, :style => "vertical-align: middle") -%>
+      </label>
+    </p>
 
     <% unless @workflow.new_record? %>
-      <div class="fold">
-        <div class="foldTitle">
-          <%= help_icon("Specify the input and output types of the workflow.") -%>
-          Input and Output Types
-        </div>
-        <div class="foldContent" >
-          <%= render :partial => 'port_type_table', :locals => {:f => f} %>
-        </div>
-      </div>
+      <%= render :partial => 'port_type_table', :locals => {:f => f} %>
     <% end %>
 
     <div style="display: none">

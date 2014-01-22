@@ -163,6 +163,14 @@ class Workflow < ActiveRecord::Base
     input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::PARAMETER) }.sort_by { |p| p.name.downcase }
   end
 
+  def sweepable_from_run?
+    sweepable && data_input_ports.size > 0
+  end
+
+  def sweepable?
+    sweepable_from_run? && !has_interaction?
+  end
+
   private
 
   def generate_workflow_image
