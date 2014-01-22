@@ -26,13 +26,13 @@
       </div>
 
       <!-- Data inputs -->
-      <% unless @workflow.data_inputs.blank? %>
-          <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => @workflow.data_inputs, :form => f} %>
+      <% unless @workflow.data_input_ports.blank? %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => @workflow.data_input_ports, :form => f} %>
       <% end %>
 
       <!-- Parameter inputs -->
-      <% unless @workflow.parameter_inputs.blank? %>
-          <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => @workflow.parameter_inputs, :form => f} %>
+      <% unless @workflow.parameter_input_ports.blank? %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => @workflow.parameter_input_ports, :form => f} %>
       <% end %>
       <br/>
 

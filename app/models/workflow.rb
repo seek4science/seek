@@ -148,19 +148,19 @@ class Workflow < ActiveRecord::Base
   end
 
   def result_output_ports
-    output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::RESULT) }
+    output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::RESULT) }.sort{ |a,b| a.name <=> b.name}
   end
 
   def error_log_output_ports
-    output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }
+    output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }.sort{ |a,b| a.name <=> b.name}
   end
 
   def data_input_ports
-    input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }
+    input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }.sort{ |a,b| a.name <=> b.name}
   end
 
   def parameter_input_ports
-    input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::PARAMETER) }
+    input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::PARAMETER) }.sort{ |a,b| a.name <=> b.name}
   end
 
   private
