@@ -30,8 +30,10 @@
                 { "sWidth":"15%" },
                 { "sWidth":"10%" },
                 { "sWidth":"10%" },
-                { "sWidth":"10%", "bSearchable": false },
-                { "sWidth":"10%", "bSearchable": false },
+                { "iDataSort": 5, "sWidth":"10%", "bSearchable": false },
+                { "bSearchable": false, "bVisible": false }, //Unix timestamp of "created" date for sorting purposes
+                { "iDataSort": 7, "sWidth":"10%", "bSearchable": false },
+                { "bSearchable": false, "bVisible": false }, //Unix timestamp of "finished" date for sorting purposes
                 { "sWidth":"10%", "bSortable":false, "bSearchable": false }
             ]
         });
@@ -52,7 +54,9 @@
         <th>Category</th>
         <th>State</th>
         <th>Created</th>
+        <th>Created Timestamp</th>
         <th>Finished</th>
+        <th>Finished Timestamp</th>
         <th>Actions</th>
       </tr>
       </thead>
