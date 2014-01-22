@@ -4,7 +4,7 @@
 </li>
 
 <!-- Run new data sweep button - only if there is at least on data port to sweep over. -->
-<% if workflow.data_input_ports.size > 0 && !workflow.has_interaction? %>
+<% if workflow.sweepable? %>
   <li>
       <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id), nil, nil, 'Run data sweep')  -%>
   </li>

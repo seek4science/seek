@@ -64,6 +64,10 @@ module TavernaPlayer
       inputs.select {|i| port_names.include?(i.name) }
     end
 
+    def sweepable?
+      workflow.sweepable_from_run? && sweep_id.blank?
+    end
+
     private
 
     def fix_run_input_ports_mime_types
