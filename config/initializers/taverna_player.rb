@@ -92,6 +92,9 @@ TavernaPlayer.setup do |config|
     #renderers.add("image/png", :show_image)
     #renderers.add("image/gif", :show_image)
     #renderers.add("image/bmp", :show_image)
+    renderers.add("application/json", :format_json)
+    renderers.add("application/xml", :format_xml)
+    renderers.add("text/xml", :format_xml)
     renderers.add("text/csv", :format_csv)
 
     # This is the workflow error type and you should have a special renderer
