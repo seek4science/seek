@@ -18,6 +18,7 @@ filestore*/
 
 debug.log
 .project
+.buildpath
 
 tmp/pids/*
 tmp/cache/*
