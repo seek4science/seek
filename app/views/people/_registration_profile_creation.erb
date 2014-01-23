@@ -1,4 +1,66 @@
-<script type="text/javascript">
+<%= javascript_include_tag 'jquery-1.5.1.min.js' %>
+<script>
+  $j = jQuery.noConflict();
+
+  jQuery(document).ready(function() {
+
+      var project_institutions_json = new Array();
+      var project_institution_ids_json = new Array();
+
+      <% Project.all.each_with_index do |p, i| %>
+      <% institutions = p.institutions.collect{|inst| [inst.name, inst.id]}%>
+      <% institution_ids = p.institutions.collect{|inst| inst.id}%>
+      project_institutions_json[<%=p.id%>] = '<%= raw institutions.to_json %>';
+      project_institution_ids_json[<%=p.id%>] = '<%= raw institution_ids.to_json %>';
+      <% end %>
+
+      jQuery(function($) {
+          /*Gets the selected project id and displays what institutions are valid for those projects */
+          $("#projects").change(function() {
+              var selected_project_ids = []
+              $('#projects option:selected').each(function(){ selected_project_ids.push($(this).val()); });
+              var $institution_select = $('#institutions');
+              $institution_select.empty();
+
+              if (selected_project_ids.length > 0) {
+                  var institutions = [];
+                  var project_institutions = new Array();
+                  var project_institution_ids= new Array();
+                  var final_array = [];
+
+                  /*parse the project's institutions of the selected project*/
+                  for (var project_index = 0; project_index < selected_project_ids.length; project_index++) {
+                      project_institutions[project_index] = $.parseJSON(project_institutions_json[selected_project_ids[project_index]]);
+                      project_institution_ids[project_index] = $.parseJSON(project_institution_ids_json[selected_project_ids[project_index]]);
+                  }
+
+                  /* loop through each of the institutions of the first project */
+                  for (var institution_index = 0; institution_index < project_institutions[0].length; institution_index++) {
+                      var institution = project_institutions[0][institution_index];
+                      var institution_id = project_institution_ids[0][institution_index];
+                      var institution_in_all_projects = true;
+
+                      /*see if the institution is in each of the other project*/
+                      for (var j = 1; j < project_institution_ids.length; j++) {
+                          /*leave out the final array if the institution isn't available this project*/
+                          if ((jQuery.inArray(institution_id, project_institution_ids[j])) < 0 ) {
+                              institution_in_all_projects = false
+                          }
+                      }
+                      if (institution_in_all_projects === true) {
+                          final_array.push(institution);
+                      }
+                  }
+                  /* finally add the options of the final array institutions */
+                  for (var i = 0; i < final_array.length; i++) {
+                      institution = final_array[i];
+                      $institution_select.append('<option value=' + institution[1] + '>' + institution[0] + '</option>');
+                  }
+              }
+          });
+      });
+  });
+
   function others(element_id){
      //check if the selected item is 'Other'
      var selected_texts = selectedEntryTexts(element_id)
@@ -94,39 +156,33 @@
 
 
     <br/>
-  <% if false %>
+  <% if true %>
     <h2><%= t('project').pluralize %> & Institutions</h2>
         <div class="yui-g box_simple">
-        <center>
           <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
             <span style="font-weight:bold;float: left">Projects:</span> <br/>
             <%= select_tag "projects",
-              options_for_select(Project.all.collect {|p| [p.name, "#{p.name},#{p.id}"]}|[['Others','Others,0']], :selected => params['projects']),
-              {:onchange => "Javascript:others('projects')", :multiple => true, :style => "width: 100%" }
+              options_for_select(Project.all.collect {|p| [p.name, "#{p.id}"]}, :selected => params['projects']), {:multiple => true, :style => "width:100%"}
             -%>
+
             <div id='other_projects' style='display: none'>
               <br/>
               <span style="font-weight:bold;float: left">Other <%= t('project').pluralize %>:</span> <br/> <%= text_field_tag :other_projects, nil, {:style => "width: 100%", :value => params['other_projects']} %>
             </div>
           </div>
-        </center>
-
-        <center>
           <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
               <span style="font-weight:bold;float: left">Institutions:</span> <br/>
               <%= select_tag "institutions",
-                options_for_select(Institution.all.collect {|i| [i.name, "#{i.name},#{i.id}"]}|[['Others', 'Others,0']], :selected => params['institutions']),
-                {:onchange => "Javascript:others('institutions')", :multiple => true, :style => "width: 100%;" }
+                options_for_select(Institution.all.collect {|i| [i.name, "#{i.id}"]}, :selected => params['institutions']), {:multiple => true, :style => "width:100%"}
               -%>
               <div id='other_institutions' style='display: none'>
                 <br/>
                 <span style="font-weight:bold;float: left">Other institutions:</span> <br/> <%= text_field_tag :other_institutions, nil, {:style => "width: 100%", :value => params['other_institutions']} %>
               </div>
           </div>
-        </center>
         </div>
     <% end %>
-  <%= render :partial => 'single_project_institution_select' , :locals => { :form => f } %>
+  <%#= render :partial => 'single_project_institution_select' , :locals => { :form => f } %>
 
     <br/>
 
