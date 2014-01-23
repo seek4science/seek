@@ -1,7 +1,9 @@
 <!-- Run workflow button -->
-<li>
-  <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => version), nil, nil, 'Run workflow') -%>
-</li>
+<% if workflow.can_run? %>
+  <li>
+    <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => version), nil, nil, 'Run workflow') -%>
+  </li>
+<% end %>
 
 <!-- Run new data sweep button - only if there is at least on data port to sweep over. -->
 <% if workflow.sweepable? %>

@@ -171,6 +171,10 @@ class Workflow < ActiveRecord::Base
     sweepable_from_run? && !has_interaction?
   end
 
+  def can_run?(user = User.current_user)
+    !user.nil? # just checks if user is logged in for now
+  end
+
   private
 
   def generate_workflow_image
