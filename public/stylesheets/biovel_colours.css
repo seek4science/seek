@@ -51,7 +51,7 @@ body, #bd {
   background-image: none;
 }
 
-.foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow {
+.foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow, .box_infotext, input[type="text"] {
   border-color: #b2af6a;
 }
 
@@ -93,3 +93,28 @@ input[type="submit"], button {
   background-color: #FFFFCC;
   border-color: #b2af6a;
 }
+
+.with_shadow {
+  box-shadow: -4px -4px 6px #b2af6a;
+  border-color: #b2af6a;
+}
+
+ul.tabbernav li a {
+  background-color: #99CC33;
+  border-color: #99CC33;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+}
+
+ul.tabbernav li a:hover {
+  background-color: #b1e10f;
+  border-color: #b1e10f;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+}
+
+ul.tabbernav {
+  border-bottom: 1px solid #b2af6a;
+  margin: -1px 0 0 1em;
+}
+
