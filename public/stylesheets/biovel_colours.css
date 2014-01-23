@@ -1,5 +1,6 @@
 /* Yellow:            #EEEB99 */
 /* Light yellow:      #FFFFCC */
+/* Medium-dark yellow (borders) #b2af6a */
 /* Dark yellow-ish:   #918e5b */
 /* Dark green:        #287621 */
 /* Light green:       #99CC33 */
@@ -86,4 +87,9 @@ h2.standout {
 
 .dataTables_wrapper table {
   border: 1px solid #918e5b;
+}
+
+input[type="submit"], button {
+  background-color: #FFFFCC;
+  border-color: #b2af6a;
 }
