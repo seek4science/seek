@@ -45,17 +45,13 @@ body, #bd {
   border-color: #287621;
 }
 
-.box_standout {
-  border-color: #918e5b;
-}
-
 .foldTitle, h2 {
   background-color: #FFC;
   background-image: none;
 }
 
-.foldContent, .foldTitle, h2 {
-  border-color: #6c693c;
+.foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow {
+  border-color: #b2af6a;
 }
 
 #workflow_filters a.active {
@@ -80,7 +76,8 @@ a:hover {
 }
 
 h2.standout {
-  background: #99cc33; /* Old browsers */
+  background: #99cc33;
+  border: none;
 }
 
 .dataTables_wrapper th {
