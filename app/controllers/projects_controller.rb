@@ -25,7 +25,7 @@ class ProjectsController < ApplicationController
   def asset_report
     @no_sidebar=true
     project_assets = @project.assets | @project.assays | @project.studies | @project.investigations
-    @types=[Investigation,Study,Assay,DataFile,Model,Sop,Presentation]
+    @types=[DataFile,Model,Sop,Presentation,Investigation,Study,Assay]
     @public_assets = {}
     @semi_public_assets = {}
     @restricted_assets = {}
@@ -46,6 +46,32 @@ class ProjectsController < ApplicationController
       all = project_assets.select{|a|a.class==type}
       @restricted_assets[type] = all - (@semi_public_assets[type] | @public_assets[type])
     end
+
+    #inlinked assets - either not linked to an assay or publication, or in the case of assays not linked to a publication or other assets
+    @types_for_unlinked = [DataFile, Model, Sop, Assay]
+    @unlinked_to_publication={}
+    @unlinked_to_assay={}
+    @unlinked_assets={}
+    @types_for_unlinked.each do |type|
+      @unlinked_assets[type] = []
+      @unlinked_to_publication[type] = []
+      @unlinked_to_assay[type] = []
+    end
+    project_assets.each do |asset|
+      if @types_for_unlinked.include?(asset.class)
+        if asset.related_publications.empty?
+          @unlinked_to_publication[asset.class] << asset
+        end
+        if (!asset.respond_to?(:assays) || asset.assays.empty?) && (!asset.is_isa? || asset.assets.empty?)
+          @unlinked_to_assay[asset.class] << asset
+        end
+      end
+    end
+    #get those that are unlinked to either
+    @types_for_unlinked.each do |type|
+      @unlinked_assets[type]=@unlinked_to_assay[type] & @unlinked_to_publication[type]
+    end
+
 
     respond_to do |format|
       format.html {render :template=>"projects/asset_report/report"}

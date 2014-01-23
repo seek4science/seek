@@ -34,7 +34,7 @@ class Sop < ActiveRecord::Base
 
   has_many :experimental_conditions, :conditions =>  Proc.new{["experimental_conditions.sop_version =?", version]}
 
-  has_many :sop_specimens
+  has_many :sop_specimens, :dependent => :destroy
   has_many :specimens,:through=>:sop_specimens
 
   explicit_versioning(:version_column => "version") do
