@@ -43,15 +43,8 @@
     });
 
 </script>
+
 <%= javascript_include_tag 'taverna_player/application.js' %>
-
-
-<% run_result_outputs = @run.result_outputs %>
-<!-- Figure out error/log outputs from the run -->
-<% run_error_log_outputs = @run.error_log_outputs %>
-
-
-
 
 <div class="run_results">
 
@@ -96,9 +89,7 @@
         </div>
         <div class="foldContent">
           <% if @run.finished? && @run.outputs.any? %>
-                  <%= render :partial => 'results_navigator', :locals => {:run_result_outputs => run_result_outputs,
-                                                                          :run_error_log_outputs => run_error_log_outputs }%>
-              <%= render :partial => "outputs", :locals => {:run_result => run_result_outputs, :run_error => run_error_log_outputs} %>
+              <%= render :partial => "outputs", :locals => {:run => @run} %>
           <% end %>
         </div>
       </div>

@@ -1,12 +1,11 @@
 <!-- Setup navbar -->
-
 <div class='run_result_links'>
-  <h3>Shortcuts:</h3>
-  <% run_result_outputs.each do |p| %>
+  <h3>Jump to:</h3>
+  <strong>Results:</strong><% run.result_outputs.each do |p| %>
       <div class='run_result_link'><a href="#<%=p.name%>" ><%=p.name%></a></div>
   <% end  %>
-  <%= "<h3>Run Errors</h3>".html_safe unless run_error_log_outputs.empty? %>
-  <% run_error_log_outputs.each do |p| %>
+  <%= "<br/><strong>Error/Log Outputs:</strong>".html_safe unless run.error_log_outputs.empty? %>
+  <% run.error_log_outputs.each do |p| %>
       <div class='run_result_link'><a href="#<%=p.name%>" ><%=p.name%></a></div>
   <% end %>
 </div>
