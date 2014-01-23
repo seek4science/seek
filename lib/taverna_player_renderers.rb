@@ -17,3 +17,13 @@ def format_csv(output, index = [])
 
   raw(html)
 end
+
+def format_json(port, index = [])
+  CodeRay.scan(port.value(index), :json).div(:css => :class)
+end
+
+def format_xml(port, index = [])
+  out = String.new
+  REXML::Document.new(port.value(index)).write(out, 1)
+  CodeRay.scan(out, :xml).div(:css => :class)
+end
