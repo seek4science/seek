@@ -319,7 +319,7 @@ table.display tr td:first-child {
     border-color: #ccc;
     box-shadow: 0 3px 5px #ccc;
     width: 200px;
-    margin-left: -60px;
+    margin-left: 30px;
     background: white;
     z-index: 999999;
 }
