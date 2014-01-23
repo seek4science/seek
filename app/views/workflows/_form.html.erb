@@ -32,7 +32,7 @@
       <%= render :partial => "projects/project_selector", :locals => {:resource => @workflow} -%>
     </div>
     <%= fields_for(@workflow) { |form| render :partial => "assets/asset_form_bottom", :locals => {:f => form,
-                                                                                                  :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => !@workflow.new_record?, :sharing_link => false} } -%>
+                                                                                                  :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => true, :sharing_link => false} } -%>
     <p>
       <%= preview_permission_popup_link(@workflow) -%>
       <%= submit_tag @workflow.new_record? ? "Next" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>
