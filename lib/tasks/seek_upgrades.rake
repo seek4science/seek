@@ -16,7 +16,8 @@ namespace :seek do
             :increase_sheet_empty_rows,
             :clear_filestore_tmp,
             :remove_non_seek_authors,
-            :clean_up_sop_specimens
+            :clean_up_sop_specimens,
+            :drop_solr_index
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -35,6 +36,11 @@ namespace :seek do
     end
 
     puts "Upgrade completed successfully"
+  end
+
+  task(:drop_solr_index=>:environment) do
+    dir = File.join(Rails.root,"solr","data")
+    FileUtils.remove_dir(dir)
   end
 
   task(:update_admin_assigned_roles=>:environment) do
