@@ -135,7 +135,7 @@ GIT
 
 GIT
   remote: git://github.com/myGrid/taverna-player.git
-  revision: 4b05ee095ceadda194dd1921c00e079e0489e5a7
+  revision: 2884c83ae7fead198022eaf5d44ad7b06ec91930
   branch: list-inputs
   specs:
     taverna-player (0.5.0)
@@ -268,10 +268,10 @@ GEM
       minitest (>= 2.12, < 5.0)
       powerbar
     modporter-plugin (0.1.0)
-    multi_json (1.8.2)
+    multi_json (1.8.4)
     multi_xml (0.5.5)
     mysql2 (0.3.13)
-    net-http-persistent (2.9)
+    net-http-persistent (2.9.1)
     nokogiri (1.5.9)
     nori (1.1.5)
     open4 (1.3.0)
