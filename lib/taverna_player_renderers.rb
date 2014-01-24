@@ -27,3 +27,10 @@ def format_xml(port, index = [])
   REXML::Document.new(port.value(index)).write(out, 1)
   CodeRay.scan(out, :xml).div(:css => :class)
 end
+
+def inline_pdf(port, index = [])
+  "If you do not see the PDF document displayed in the browser below, "\
+  "please download it (using the button above) and load it into a PDF "\
+  "reader application on your local machine.<br/>" +
+    tag(:iframe, :src => port.path(index), :class => "inline_pdf")
+end
