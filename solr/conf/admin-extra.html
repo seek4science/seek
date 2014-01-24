@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
  contributor license agreements.  See the NOTICE file distributed with
@@ -16,21 +15,17 @@
  limitations under the License.
 -->
 
-<!-- If this file is found in the config directory, it will only be
-     loaded once at startup.  If it is found in Solr's data
-     directory, it will be re-loaded every commit.
--->
+<!-- The content of this page will be statically included into the top
+of the admin page.  Uncomment this as an example to see there the content
+will show up.
 
-<elevate>
- <query text="foo bar">
-  <doc id="1" />
-  <doc id="2" />
-  <doc id="3" />
- </query>
- 
- <query text="ipod">
-   <doc id="MA147LL/A" />  <!-- put the actual ipod at the top -->
-   <doc id="IW-02" exclude="true" /> <!-- exclude this cable -->
- </query>
- 
-</elevate>
+<hr>
+<i>This line will appear before the first table</i>
+<tr>
+<td colspan="2">
+This row will be appended to the end of the first table
+</td>
+</tr>
+<hr>
+
+-->
