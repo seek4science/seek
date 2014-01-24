@@ -56,7 +56,7 @@ class Specimen < ActiveRecord::Base
   end
 
   has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
-  has_many :sop_masters,:class_name => "SopSpecimen"
+  has_many :sop_masters,:class_name => "SopSpecimen",:dependent => :destroy
 
   scope :default_order, order("title")
 

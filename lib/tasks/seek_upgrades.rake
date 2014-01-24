@@ -15,7 +15,8 @@ namespace :seek do
             :repopulate_auth_lookup_tables,
             :increase_sheet_empty_rows,
             :clear_filestore_tmp,
-            :remove_non_seek_authors
+            :remove_non_seek_authors,
+            :clean_up_sop_specimens
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -58,9 +59,14 @@ namespace :seek do
             Person.record_timestamps = true
           end
         end
-
       end
+    end
+  end
 
+  task(:clean_up_sop_specimens=>:environment) do
+    broken = SopSpecimen.all.select{|ss| ss.sop.nil? || ss.specimen.nil?}
+    disable_authorization_checks do
+      broken.each{|b| b.destroy}
     end
   end
 
