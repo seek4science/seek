@@ -97,6 +97,7 @@ TavernaPlayer.setup do |config|
     renderers.add("text/xml", :format_xml)
     renderers.add("text/csv", :format_csv)
     renderers.add("application/pdf", :inline_pdf)
+    renderers.add("application/x-error", :format_error)
 
     # This is the workflow error type and you should have a special renderer
     # for it.

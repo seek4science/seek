@@ -34,3 +34,8 @@ def inline_pdf(port, index = [])
   "reader application on your local machine.<br/>" +
     tag(:iframe, :src => port.path(index), :class => "inline_pdf")
 end
+
+def format_error(port, index = [])
+  "This output is an error, details are below.<br/>"\
+  "<pre class = \"script_example_data_box\">#{port.value(index)}</pre>"
+end
