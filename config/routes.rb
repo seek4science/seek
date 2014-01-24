@@ -456,6 +456,8 @@ SEEK::Application.routes.draw do
 
   resources :runs, :controller => 'TavernaPlayer::Runs', :only => ['edit', 'update']
 
+  resources :group_memberships
+
   resources :sweeps do
     member do
       put :cancel
