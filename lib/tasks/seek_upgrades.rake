@@ -15,7 +15,8 @@ namespace :seek do
             :repopulate_auth_lookup_tables,
             :increase_sheet_empty_rows,
             :clear_filestore_tmp,
-            :remove_non_seek_authors
+            :remove_non_seek_authors,
+            :clean_up_sop_specimens
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
