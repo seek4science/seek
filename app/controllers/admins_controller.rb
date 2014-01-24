@@ -304,18 +304,17 @@ class AdminsController < ApplicationController
 
   def get_monthly_stats
     first_month = User.all.sort_by(&:created_at).first.created_at
-
     number_of_months_since_first = (Date.today.year * 12 + Date.today.month) - (first_month.year * 12 + first_month.month)
     stats = {}
-
     (0..number_of_months_since_first).each do |x|
       time_range = (x.month.ago.beginning_of_month.to_date..x.month.ago.end_of_month.to_date)
       registrations = User.where(:created_at => time_range).count
       active_users = 0
       User.all.each do |user|
-        active_users = active_users + 1 unless user.taverna_player_runs.where(:created_at => time_range).empty?
+        active_users = active_users + 1 unless user.taverna_player_runs.where(:created_at => time_range, :saved_state => "finished").empty?
       end
-      stats[x.month.ago.beginning_of_month.to_i] = [registrations, active_users]
+      complete_runs = TavernaPlayer::Run.where(:created_at => time_range, :saved_state => "finished").count
+      stats[x.month.ago.beginning_of_month.to_i] = [registrations, active_users, complete_runs]
     end
     return stats
   end

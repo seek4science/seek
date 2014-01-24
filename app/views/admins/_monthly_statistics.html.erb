@@ -3,18 +3,21 @@
     <th>Month</th>
     <th>Number of New User Registrations</th>
     <th>Number of Active Users</th>
+    <th>Number of Completed Workflow Runs</th>
   </tr>
   <% stats.each do |row| %>
       <tr>
         <%
         month = row.first
         values = row.last
-        registrations = values.first
-        active_users = values.last
+        registrations = values[0]
+        active_users = values[1]
+        runs = values[2]
         %>
         <td><%= Time.at(month).strftime("%B %Y") %></td>
         <td><%= registrations %></td>
         <td><%= active_users %></td>
+        <td><%= runs %></td>
       </tr>
   <% end %>
 </table>
