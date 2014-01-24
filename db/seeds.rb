@@ -16,9 +16,9 @@ institutions = [{:name => 'University of Manchester', :country => 'United Kingdo
 {:name => 'Max Planck Society, MPI for Marine Microbiology', :country => 'Germany'},
 {:name => 'National Institute of Nuclear Physics', :country => 'Italy'},
 {:name => 'National Research Council: Institute for Biomedical Technologies and Institute of Biomembrane and Bioenergetics', :country => 'Italy'},
-{:name => 'Netherlands Centre for Biodiversity ', :country => 'The Netherlands'},
-{:name => 'Stichting European Grid Initiative', :country => 'The Netherlands'},
-{:name => 'University of Amsterdam', :country => 'The Netherlands'},
+{:name => 'Netherlands Centre for Biodiversity ', :country => 'Netherlands'},
+{:name => 'Stichting European Grid Initiative', :country => 'Netherlands'},
+{:name => 'University of Amsterdam', :country => 'Netherlands'},
 {:name => 'University of Eastern Finland', :country => 'Finland'},
 {:name => 'University of Gothenburg', :country => 'Sweden'}]
 
