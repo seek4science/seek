@@ -43,9 +43,11 @@
              end
           %>
           <li>Share within members of <%= t('project').pluralize %> associated with this <%= @resource_type -%> <%= through_resource%> and with all other users that are a member of a <%= Seek::Config.project_name %> <%= t('project') %>.</li>
-          <li>Share with the all visitors (including anonymous visitors with no login)</li>
-              <li style="margin-left: 2em">You can share with the all visitors right away if you are the gatekeeper or if the <%= t('project').pluralize %> associated with this <%= @resource_type -%> have no gatekeeper</li>
-              <li style="margin-left: 2em">Or you can request the gatekeepers for their approval to share with all visitors</li>
+          <% if current_user.admin? %>
+            <li>Share with the all visitors (including anonymous visitors with no login)</li>
+                <li style="margin-left: 2em">You can share with the all visitors right away if you are the gatekeeper or if the <%= t('project').pluralize %> associated with this <%= @resource_type -%> have no gatekeeper</li>
+                <li style="margin-left: 2em">Or you can request the gatekeepers for their approval to share with all visitors</li>
+          <% end %>
           <% if !disable_advanced_view%>
             <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your <%= t('project') %>/Institution only,<br/> with specific individuals, or set up custom <%= t('favourite_group').pluralize -%> for people you regularly need to share with.</li>
           <% end %>
@@ -92,17 +94,19 @@
         </p>
 
         <!-- public -->
-        <p>
-          <label for="sharing_scope_<%= Policy::EVERYONE -%>">
-            <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::EVERYONE -%>"/>
-            - All visitors (including anonymous visitors with no login):
-          </label>
-           <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
-            :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
-           <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
-          <br/>
-        </p>
+        <% if current_user.admin? %>
+          <p>
+            <label for="sharing_scope_<%= Policy::EVERYONE -%>">
+              <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
+                     value="<%= Policy::EVERYONE -%>"/>
+              - All visitors (including anonymous visitors with no login):
+            </label>
+             <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
+              :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
+             <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
+            <br/>
+          </p>
+        <% end %>
 
     </div>
 
