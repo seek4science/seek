@@ -280,32 +280,13 @@ test "should update genotypes and phenotypes" do
     assert_equal 1, associated_sops.size
     assert_equal sop, associated_sops.first
 
-    put :update, :id => specimen.id, :specimen_sop_ids => []
+    assert_difference("SopSpecimen.count",-1) do
+      put :update, :id => specimen.id, :specimen_sop_ids => []
+    end
+
     specimen.reload
     associated_sops = specimen.sop_masters.collect(&:sop)
     assert associated_sops.empty?
-    #sop_master can not be deleted because no specified version
-    assert_not_nil SopSpecimen.find_by_id(sop_master.id)
   end
 
-  test 'should not unassociate private sops' do
-    sop = Factory(:sop, :policy => Factory(:public_policy))
-    specimen = Factory(:specimen)
-    login_as specimen.contributor
-    specimen.sop_masters << SopSpecimen.create!(:sop_id => sop.id, :sop_version => 1, :specimen_id => specimen.id)
-    associated_sops = specimen.sop_masters.collect(&:sop)
-    specimen.reload
-    assert_equal 1, associated_sops.size
-    assert_equal sop, associated_sops.first
-
-    disable_authorization_checks do
-      sop.policy = Factory(:private_policy)
-      sop.save
-    end
-
-    put :update, :id => specimen.id, :specimen_sop_ids => []
-    specimen.reload
-    assert_equal 1, associated_sops.size
-    assert_equal sop, associated_sops.first
-  end
 end
