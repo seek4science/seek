@@ -77,5 +77,8 @@ SEEK::Application.configure do
   Seek::Config.default :max_attachments_num,100
 
   Seek::Config.default :datacite_url,"https://mds.datacite.org/"
+
+  # Admin setting to allow user impersonation
+  Seek::Config.default :admin_impersonation_enabled, true
 end
 
