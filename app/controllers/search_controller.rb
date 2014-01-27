@@ -63,6 +63,7 @@ class SearchController < ApplicationController
           sources.each do |source|
             search_result = source.search do |query|
               query.keywords(downcase_query)
+              query.paginate(:page => 1, :per_page => source.count ) if source.count > 30  # By default, Sunspot requests the first 30 results from Solr
             end.results
             search_result = search_result.sort_by(&:published_date).reverse if source == Publication && Seek::Config.is_virtualliver
             @results |= search_result
@@ -71,6 +72,7 @@ class SearchController < ApplicationController
            object = type.singularize.camelize.constantize
            search_result = object.search do |query|
              query.keywords(downcase_query)
+             query.paginate(:page => 1, :per_page => object.count ) if object.count > 30 # By default, Sunspot requests the first 30 results from Solr
            end.results
            search_result = search_result.sort_by(&:published_date).reverse if object == Publication
            @results = search_result
