@@ -1,7 +1,18 @@
+<%
+  # Copyright (c) 2013 The University of Manchester, UK.
+  #
+  # BSD Licenced. See LICENCE.rdoc for details.
+  #
+  # Taverna Player was developed in the BioVeL project, funded by the European
+  # Commission 7th Framework Programme (FP7), through grant agreement
+  # number 283359.
+  #
+  # Author: Robert Haines
+%>
 
-$j("#run-info").replaceWith('<%= escape_javascript(render(:partial => "taverna_player/runs/embedded/info", :locals => { :run => @run })) %>');
+jQuery("#run-info").replaceWith('<%= escape_javascript(render("taverna_player/runs/embedded/info", :run => @run)) %>');
 
-$j("#run-button").replaceWith('<%= escape_javascript(render(:partial => "taverna_player/runs/embedded/button", :locals => { :run => @run })) %>');
+jQuery("#run-button").replaceWith('<%= escape_javascript(render("taverna_player/runs/embedded/button", :run => @run)) %>');
 
 <%
   # Note that the base run/interaction partial is used here. You can still
@@ -9,18 +20,16 @@ $j("#run-button").replaceWith('<%= escape_javascript(render(:partial => "taverna
   # change the file name below AND in embedded/show.html.erb.
 %>
 <% if @interaction.nil? || @new_interaction %>
-  $j("#run-interaction").replaceWith('<%= escape_javascript(render(:partial => "interaction", :locals => { :run => @run, :interaction => @interaction })) %>');
+  jQuery("#run-interaction").replaceWith('<%= escape_javascript(render("interaction", :run => @run, :interaction => @interaction)) %>');
 <% end %>
 
-<% if @run.outputs.size > 0 %>
-  $j("#run-outputs").replaceWith('<%= escape_javascript(render(:partial => "taverna_player/runs/embedded/outputs", :locals => { :run => @run })) %>');
-<% end %>
-
-<%
-  # Note that the base run/poll partial is used here. You can still
-  # override it in the embedded directory if you wish but you will need to
-  # change the file name below AND in embedded/show.html.erb.
-%>
-<% unless @run.finished? || @run.cancelled? %>
-  $j("#run-poll").replaceWith('<%= escape_javascript(render(:partial => "poll", :locals => { :reload => run_path(@run) })) %>');
+<% if @run.complete? %>
+  jQuery("#run-outputs").replaceWith('<%= escape_javascript(render("taverna_player/runs/embedded/outputs", :run => @run)) %>');
+<% else %>
+  <%
+    # Note that the base run/poll partial is used here. You can still
+    # override it in the embedded directory if you wish but you will need to
+    # change the file name below AND in embedded/show.html.erb.
+  %>
+  jQuery("#run-poll").replaceWith('<%= escape_javascript(render("poll", :reload => run_path(@run))) %>');
 <% end %>

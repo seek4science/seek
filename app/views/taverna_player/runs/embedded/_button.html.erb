@@ -1,5 +1,17 @@
+<%
+  # Copyright (c) 2013 The University of Manchester, UK.
+  #
+  # BSD Licenced. See LICENCE.rdoc for details.
+  #
+  # Taverna Player was developed in the BioVeL project, funded by the European
+  # Commission 7th Framework Programme (FP7), through grant agreement
+  # number 283359.
+  #
+  # Author: Robert Haines
+%>
+
 <div id="run-button">
-  <% if run.finished? %>
+  <% if run.complete? %>
     <%= link_to 'Restart', new_embedded_run_path(run) %>
   <% else %>
     <%= link_to "Cancel", cancel_run_path(run.id), :method => :put, :data => { confirm: "Are you sure?" } %>
