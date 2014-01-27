@@ -17,6 +17,8 @@ class Workflow < ActiveRecord::Base
 
   validates_presence_of :title
 
+  validates :myexperiment_link, :format => { :with => /^http:\/\/(www\.)?myexperiment\.org\/workflows\/[0-9]+/, :message => "is invalid, please make sure the URL is in the format: http://www.myexperiment.org/workflows/..." }
+
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   belongs_to :category, :class_name => 'WorkflowCategory'
