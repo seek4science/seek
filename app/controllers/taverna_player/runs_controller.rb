@@ -93,7 +93,7 @@ module TavernaPlayer
 
     def find_runs
       select = params[:workflow_id] ? { :workflow_id => params[:workflow_id] } : {}
-      @runs = Run.where(select).includes(:sweep).includes(:workflow).all
+      @runs = Run.where(select).where(:embedded => :false).includes(:sweep).includes(:workflow).all
       @runs = @runs & Run.all_authorized_for('view', current_user)
     end
 
