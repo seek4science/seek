@@ -30,13 +30,13 @@ body, #bd {
   text-decoration: none;
 }
 
-.sectionIcons li a, .with_smaller_shadow {
+.sectionIcons li a, .with_smaller_shadow, a.doc-link {
   box-shadow: none;
   background-color: #FFFFCC;
   border-color: #918e5b;
 }
 
-.sectionIcons li a:hover {
+.sectionIcons li a:hover, a.doc-link:hover {
   background-color: #b1e10f;
   color: #287621;
 }
@@ -51,7 +51,7 @@ body, #bd {
   background-image: none;
 }
 
-.foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow, .box_infotext, input[type="text"] {
+.foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow, .box_infotext, input[type="text"], a.doc-link {
   border-color: #b2af6a;
 }
 

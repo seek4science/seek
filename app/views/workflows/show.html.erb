@@ -15,11 +15,24 @@
 <div class="show_basic">
 
 <%# Versioning hidden for now: %>
-<% render :partial => "assets/upload_new_version_form", :locals => {:resource => @workflow} -%>
+<%# render :partial => "assets/upload_new_version_form", :locals => {:resource => @workflow} -%>
 
 <div class="main_content_left_box">
   <%# Versioning hidden for now: %>
   <% render :partial => "assets/resource_version_details", :locals => {:displayed_resource => @display_workflow, :resource => @workflow} -%>
+
+  <p>
+    <% unless @display_workflow.documentation_link.blank? %>
+      <%= link_to @display_workflow.documentation_link, :target => :blank, :class => "doc-link" do %>
+        <%= image 'help', :class => "icon", :style => "margin-right: 0.5em" %>Documentation
+      <% end %>
+    <% end %>
+    <% unless @display_workflow.myexperiment_link.blank? %>
+      <%= link_to @display_workflow.myexperiment_link, :target => :blank, :class => "doc-link" do %>
+        <%= image 'myexperiment', :class => "icon", :style => "margin-right: 0.5em" %>View on myExperiment
+      <% end %>
+    <% end %>
+  </p>
 
   <%= item_description @display_workflow.description -%>
 

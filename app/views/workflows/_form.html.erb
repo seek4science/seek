@@ -16,6 +16,15 @@
     </p>
 
     <p>
+      <label>MyExperiment Link</label><br/>
+      <%= f.text_field(:myexperiment_link) -%>
+    </p>
+    <p>
+      <label>Documentation Link</label><br/>
+      <%= f.text_field(:documentation_link) -%>
+    </p>
+
+    <p>
       <label for="workflow_sweepable">
         <%= help_icon("Ticking this box will allow users to run batches of runs with this workflow. "+
                       "It may not be appropriate for all workflows to be ran in this manner, for example certain workflows with interactions.") -%>

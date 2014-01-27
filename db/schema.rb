@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140122143728) do
+ActiveRecord::Schema.define(:version => 20140127101602) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1756,14 +1756,16 @@ ActiveRecord::Schema.define(:version => 20140122143728) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.text     "other_creators"
-    t.string   "first_letter",      :limit => 1
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
+    t.string   "first_letter",       :limit => 1
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
     t.datetime "last_used_at"
     t.integer  "workflow_id"
     t.text     "revision_comments"
     t.integer  "version"
     t.boolean  "sweepable"
+    t.string   "myexperiment_link"
+    t.string   "documentation_link"
   end
 
   create_table "workflows", :force => true do |t|
@@ -1775,12 +1777,14 @@ ActiveRecord::Schema.define(:version => 20140122143728) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.text     "other_creators"
-    t.string   "first_letter",     :limit => 1
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.string   "first_letter",       :limit => 1
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
     t.datetime "last_used_at"
     t.integer  "version"
     t.boolean  "sweepable"
+    t.string   "myexperiment_link"
+    t.string   "documentation_link"
   end
 
   create_table "worksheets", :force => true do |t|

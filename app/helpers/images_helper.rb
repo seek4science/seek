@@ -341,6 +341,8 @@ module ImagesHelper
         "famfamfam_silk/table_multiple.png"
       when "simple_run"
         "famfamfam_silk/table.png"
+      when "myexperiment"
+        "myexp_icon.png"
     else
       return nil
     end
