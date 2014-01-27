@@ -109,7 +109,7 @@
         </div>
     <% end %>
 
-    <div id="advanced" style="<%= 'display: none' unless @run.finished? -%>">
+    <div id="advanced" style="<%= 'display: none' unless @run.complete? -%>">
       <div class="fold">
         <div class="foldTitle">
           Advanced

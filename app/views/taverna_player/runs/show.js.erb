@@ -14,7 +14,7 @@ $j("#buttons").replaceWith('<%= escape_javascript(render(:partial => "buttons", 
 
 <% if !@run.complete? %>
   $j("#run-poll").replaceWith('<%= escape_javascript(render(:partial => "poll", :locals => { :reload => run_path(@run) })) %>');
-<% elsif @run.finished? %>
-  $j("#advanced #log_url").replaceWith('<pre class="script_example_data_box"><%= escape_javascript(File.read(@run.log.path)) %></pre>');
+<% else %>
+  $j("#advanced #log_url").replaceWith('<pre class="script_example_data_box"><%= escape_javascript(File.read(@run.log.path) unless @run.log.blank? || @run.log.url.blank?) %></pre>');
   $j("#advanced").show();
 <% end %>
