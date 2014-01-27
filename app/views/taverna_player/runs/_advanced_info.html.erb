@@ -1,5 +1,16 @@
 
-<b>Tavena Server Log:</b>
+<h2 class="standout">
+  Tavena Server Log
+</h2>
 <pre class="script_example_data_box">
-  <%= File.read(@run.log.path) unless @run.log.blank? || @run.log.url.blank? %>
+  <%= File.read(run.log.path) unless run.log.blank? || run.log.url.blank? %>
 </pre>
+
+<% if run.failed? %>
+<h2 class="standout">
+  Portal Log
+</h2>
+<pre class="script_example_data_box">
+  <%= run.failure_message %>
+</pre>
+<% end %>
