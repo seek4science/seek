@@ -115,8 +115,7 @@
           Advanced
         </div>
         <div class="foldContent" style="display: none;">
-          <b>Log:</b>
-          <pre id="log_url" class="script_example_data_box"><%= File.read(@run.log.path) unless @run.log.blank? || @run.log.url.blank? %></pre>
+          <%= render :partial => "advanced_info", :locals => {:run => @run} %>
         </div>
       </div>
     </div>

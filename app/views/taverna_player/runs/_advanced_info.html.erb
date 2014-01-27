@@ -1,0 +1,5 @@
+
+<b>Tavena Server Log:</b>
+<pre class="script_example_data_box">
+  <%= File.read(@run.log.path) unless @run.log.blank? || @run.log.url.blank? %>
+</pre>
