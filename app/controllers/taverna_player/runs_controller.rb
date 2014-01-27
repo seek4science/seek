@@ -2,6 +2,8 @@ module TavernaPlayer
   class RunsController < TavernaPlayer::ApplicationController
     include TavernaPlayer::Concerns::Controllers::RunsController
 
+    skip_before_filter :project_membership_required
+    before_filter :check_project_membership_unless_embedded, :only => [:create, :new]
     before_filter :auth, :except => [ :index, :new, :create ]
     before_filter :find_runs, :only => :index
     before_filter :add_sweeps, :only => :index
@@ -36,7 +38,7 @@ module TavernaPlayer
     def create
       @run = Run.new(params[:run])
       # Manually add projects of current user, as they aren't prompted for this information in the form
-      @run.projects = current_user.person.projects
+      @run.projects = @run.contributor.person.projects
       @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
 
       respond_to do |format|
@@ -143,5 +145,12 @@ module TavernaPlayer
         end
       end
     end
+
+    def check_project_membership_unless_embedded
+      unless (params[:run] && params[:run][:embedded] == 'true') || (params[:embedded] && params[:embedded] == 'true')
+        project_membership_required
+      end
+    end
+
   end
 end

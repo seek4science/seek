@@ -223,6 +223,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.guest
+    User.find_by_login('guest')
+  end
+
   protected
   # before filter
   def encrypt_password

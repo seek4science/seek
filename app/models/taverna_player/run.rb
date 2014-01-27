@@ -28,7 +28,11 @@ module TavernaPlayer
 
     # Runs should be private by default
     def default_policy
-      Policy.private_policy
+      if self.embedded
+        Policy.public_policy
+      else
+        Policy.private_policy
+      end
     end
 
     def title
@@ -69,6 +73,16 @@ module TavernaPlayer
     end
 
     private
+
+    alias_method :old_default_contributor, :default_contributor
+
+    def default_contributor
+      if self.embedded
+        User.guest
+      else
+        old_default_contributor
+      end
+    end
 
     def fix_run_input_ports_mime_types
       self.inputs.each do |input|
