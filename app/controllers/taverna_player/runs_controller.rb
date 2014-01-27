@@ -26,7 +26,6 @@ module TavernaPlayer
           format.html { render "taverna_player/runs/show" }
         end
       else
-        puts @run.errors.full_messages
         respond_to do |format|
           format.html { render "taverna_player/runs/edit" }
         end
