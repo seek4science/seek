@@ -21,6 +21,12 @@
       <%= image 'refresh', :class => "icon" -%> Restart
     <% end %>
   <% else %>
+    <% if @interaction %>
+      <%# works by refreshing the page, presenting the interaction again %>
+      <%= link_to '', :class => 'button-link' do %>
+        <%= image 'show', :class => "icon" -%> Show Interaction
+      <% end %>
+    <% end %>
     <%= link_to cancel_run_path(run.id), :method => :put, :data => { confirm: "Are you sure?" }, :class => 'button-link' do %>
       <%= image 'destroy', :class => "icon" -%> Cancel
     <% end %>

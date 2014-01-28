@@ -21,7 +21,10 @@ jQuery("#embedded-run-button").replaceWith('<%= escape_javascript(render("tavern
 %>
 <% if @interaction.nil? || @new_interaction %>
   jQuery("#run-interaction").replaceWith('<%= escape_javascript(render("interaction", :run => @run, :interaction => @interaction)) %>');
-  verticallyAlign();
+
+  <% if @new_interaction %>
+    verticallyAlign();
+  <% end %>
 <% end %>
 
 <% if @run.complete? %>

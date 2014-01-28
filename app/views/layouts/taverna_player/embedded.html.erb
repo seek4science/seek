@@ -31,6 +31,8 @@
          var divH = $j('#content').innerHeight()/2;
          var pageH = $j(window).height()/2;
          var pad = pageH - divH;
+         if(pad < 10)
+           pad = 10;
          $j('#content').css({paddingTop: pad});
        }
 

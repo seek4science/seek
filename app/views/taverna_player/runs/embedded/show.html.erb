@@ -21,7 +21,10 @@
   # override it in the embedded directory if you wish but you will need to
   # change the file name below AND in embedded/show.js.erb.
 %>
-<%= render "interaction", :run => @run, :interaction => @interaction %>
+
+<%= render :partial => "taverna_player/runs/interaction", :locals =>
+        {:run => @run, :interaction => @interaction} %>
+
 
 <div id="run-outputs" style="<%= 'display: none' unless @run.complete? && @run.outputs.size > 0-%>">
   <div class="fold">
