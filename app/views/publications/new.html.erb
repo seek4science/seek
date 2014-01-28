@@ -25,8 +25,8 @@
         Please select the <%= t('project').pluralize %> this publication is related to. You must select a <%= t('project') %>, and it must be a <%= t('project') %>
         you are a member of.
     </p>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication} -%>
-
+    <%= fields_for(@publication) {|f|  f.hidden_field :parent_name } -%>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => true} -%>
 	<p>
 		<%= submit_tag 'Fetch',:id=>"fetch_button" %>
 	</p>

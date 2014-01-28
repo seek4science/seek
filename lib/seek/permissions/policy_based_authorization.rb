@@ -25,15 +25,8 @@ module Seek
 
           after_save :queue_update_auth_table
           after_destroy :remove_from_lookup_table
-          before_save :update_timestamp_if_policy_was_saved, :if => "Seek::Config.is_virtualliver"
-
-          def update_timestamp_if_policy_was_saved
-            #autosaved belongs_to associations get saved before the parent, so to check if it has changed, see if it has a newer updated_at
-            update_timestamp if updated_at && policy.updated_at > updated_at
-          end
         end
       end
-
       #the can_#{action}? methods are split into 2 parts, to differentiate between pure authorization and additional permissions based upon the state of the object or other objects it depends upon)
       #for example, an assay may not be deleted if it is linked to assets, even though the authorization of the user wishing to do so allows it - meaning the authorization passes, but its current state does not
       #therefore the can_#{action} depends upon 2 pairs of methods returning true:
@@ -46,7 +39,6 @@ module Seek
             def can_#{action}? user = User.current_user
               authorized_for_#{action}?(user) && state_allows_#{action}?(user)
             end
-
             def authorized_for_#{action}? user = User.current_user
                 return true if new_record?
                 user_id = user.nil? ? 0 : user.id
@@ -79,7 +71,7 @@ module Seek
           if Seek::Config.auth_lookup_enabled
             if (lookup_table_consistent?(user_id))
               Rails.logger.info("Lookup table #{lookup_table_name} is complete for user_id = #{user_id}")
-              assets = lookup_for_action_and_user action, user_id, projects
+              assets = lookup_for_action_and_user action, user_id,projects
             else
               Rails.logger.info("Lookup table #{lookup_table_name} is incomplete for user_id = #{user_id} - doing things the slow way")
               assets = default_order.select { |df| df.send("authorized_for_#{action}?",user) }
@@ -232,7 +224,7 @@ module Seek
           permissions.can_edit = self.can_edit?
           permissions.can_manage = self.can_manage?
           permissions.can_delete = self.can_delete?
-        end
+      end
         permissions
       end
 
@@ -269,7 +261,7 @@ module Seek
       end
 
       def contributor_credited?
-        true
+        !respond_to?(:creators) or creators.empty?
       end
 
       def private?

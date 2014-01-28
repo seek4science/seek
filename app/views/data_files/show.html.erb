@@ -31,9 +31,7 @@
       <%= render :partial => 'assets/fileinfo',:object=>@display_data_file.content_blob -%>
 
       <br/>
-      <% if show_scales? -%>
-          <%= render :partial=>"scales/asset_scales_list",:object=>@data_file -%>
-      <% end %>
+
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
 
     </div>
@@ -126,7 +124,6 @@
     <% end -%>
   <% end -%>
   </div>
-
 
   <%= render :partial=>"general/items_related_to",:object => @data_file -%>
 

@@ -32,9 +32,36 @@ class Person < ActiveRecord::Base
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
 
-  has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}},
-  :before_remove => proc {|person, wg| person.project_subscriptions.delete(person.project_subscriptions.detect {|ps| ps.project == wg.project} || [])}
+  has_many :work_groups, :through=>:group_memberships, :before_add => [:subscribe_to_work_group_project, :touch_work_group_project],
+  :before_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
   has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"
+  def subscribe_to_work_group_project wg
+
+    #subscribe direct project
+    project_subscriptions.build :project => wg.project unless project_subscriptions.detect {|ps| ps.project == wg.project}
+
+    #subscribe to ancestor projects
+    if Project.is_hierarchical?
+       wg.project.ancestors.each do |ancestor_proj|
+         project_subscriptions.build :project => ancestor_proj unless project_subscriptions.detect {|ps| ps.project == ancestor_proj}
+       end
+    end
+
+  end
+
+  def unsubscribe_to_work_group_project wg
+
+    #FIXME: ONLY direct project subscriptions are deleted, the related parent projects subscriptions remains there.
+    # people have to manually unsubscribe them on profle_edit_page
+    if ps = project_subscriptions.detect {|ps| ps.project == wg.project}
+      project_subscriptions.delete ps
+    end
+  end
+
+  def touch_work_group_project wg
+    wg.project.touch
+  end
+
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
 
@@ -65,11 +92,10 @@ class Person < ActiveRecord::Base
 
   alias_attribute :webpage,:web_page
 
-  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person},:dependent => :destroy
+  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person},:uniq=> true, :dependent => :destroy
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions,:dependent => :destroy
-  before_create :set_default_subscriptions
 
   def queue_update_auth_table
     if changes.include?("roles_mask")
@@ -83,7 +109,7 @@ class Person < ActiveRecord::Base
   end
 
   def receive_notifications
-    registered? and super
+    member? and super
   end
 
   def registered?
@@ -114,19 +140,17 @@ class Person < ActiveRecord::Base
     result
   end
 
-
-
-  def set_default_subscriptions
-    projects.each do |proj|
-      project_subscriptions.build :project => proj
-    end
+  def related_samples
+    user_items = []
+    user_items =  user.try(:send,:samples) if user.respond_to?(:samples)
+    user_items
   end
 
-  RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications]
+  RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
       user_items = []
-      user_items =  user.try(:send,type) if user.respond_to?(type) && type == :events
+      user_items =  user.try(:send,type) if user.respond_to?(type) && [:events,:investigations].include?(type)
       user_items =  user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
       user_items
     end
@@ -201,10 +225,13 @@ class Person < ActiveRecord::Base
     work_groups.collect {|wg| wg.institution }.uniq
   end
 
+  #Person#projects is OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   def projects
-    #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}.uniq
+      #updating workgroups doesn't change groupmemberships until you save. And vice versa.
+      work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
   end
+
+
 
   def member?
     !projects.empty?
@@ -212,7 +239,7 @@ class Person < ActiveRecord::Base
 
   def member_of?(item_or_array)
     array = Array(item_or_array)
-    array.detect {|item| projects.include?(item)}
+    array.detect {|item|Rails.cache.fetch([:member_of?, self.cache_key, item.cache_key]) { (item.is_a?(Project) && projects.include?(item)) || item.people.include?(self)}}
   end
 
   def locations
@@ -262,9 +289,13 @@ class Person < ActiveRecord::Base
     self.first_letter=first_letter
   end
 
-  def project_roles_of_project(project)
+  def project_roles_of_project(projects_or_project)
     #Get intersection of all project memberships + person's memberships to find project membership
-    memberships = group_memberships.select{|g| g.work_group.project == project}
+    if projects_or_project.is_a? Array
+      memberships = group_memberships.select{|g| projects_or_project.include? g.work_group.project}
+    else
+      memberships = group_memberships.select{|g| g.work_group.project == projects_or_project}
+    end
     return memberships.collect{|m| m.project_roles}.flatten
   end
 
@@ -273,7 +304,7 @@ class Person < ActiveRecord::Base
   end
 
   #can be edited by:
-  #admin or (project managers of this person and this person does not have a user or not the other admin)
+  #(admin or project managers of this person) and (this person does not have a user or not the other admin)
   #themself
   def can_be_edited_by?(subject)
     return false if subject.nil?

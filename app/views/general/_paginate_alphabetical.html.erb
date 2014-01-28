@@ -11,7 +11,7 @@
         <% else -%>
             <li class="disabled_page <%= current_page_class %>"><%= h(page_title) %></li>
         <% end -%>
-    <% end -%>
+    <% end -%>    
     <li class="<%= current_page == "all" ? selected_classes : "" %>"><%= link_to "All", {:id => params[:id], :page => "all"}.merge(filter_hash) %></li>
   </ul>
   <%=  link_to("Clear Filter", CGI::unescape(request.url).gsub(/filter\[.+\]=[0-9]*[&]?/,""), :style => "display:none") unless params[:filter].blank? %>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131202163217) do
+ActiveRecord::Schema.define(:version => 20131203082953) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
     t.string   "controller_name"
   end
 
@@ -141,6 +141,7 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.integer  "strain_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "tissue_and_cell_type_id"
   end
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
@@ -167,15 +168,11 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.integer  "technology_type_id"
     t.integer  "study_id"
     t.integer  "owner_id"
-    t.string   "first_letter",          :limit => 1
+    t.string   "first_letter",       :limit => 1
     t.integer  "assay_class_id"
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "institution_id"
-    t.string   "assay_type_uri"
-    t.string   "technology_type_uri"
-    t.string   "technology_type_label"
-    t.string   "assay_type_label"
   end
 
   create_table "assays_samples", :id => false, :force => true do |t|
@@ -202,26 +199,6 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
   end
 
   add_index "assets_creators", ["asset_id", "asset_type"], :name => "index_assets_creators_on_asset_id_and_asset_type"
-
-  create_table "attachments", :force => true do |t|
-    t.integer  "size"
-    t.integer  "height"
-    t.integer  "width"
-    t.integer  "parent_id"
-    t.integer  "attachable_id"
-    t.integer  "position"
-    t.string   "content_type"
-    t.string   "filename"
-    t.string   "thumbnail"
-    t.string   "attachable_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "data_url"
-    t.string   "original_filename"
-  end
-
-  add_index "attachments", ["attachable_id", "attachable_type"], :name => "index_attachments_on_attachable_id_and_attachable_type"
-  add_index "attachments", ["parent_id"], :name => "index_attachments_on_parent_id"
 
   create_table "auth_lookup_update_queues", :force => true do |t|
     t.integer  "item_id"
@@ -277,6 +254,7 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.integer "asset_id"
     t.string  "asset_type"
     t.integer "asset_version"
+    t.boolean "external_link"
     t.boolean "is_webpage",                              :default => false
   end
 
@@ -707,9 +685,9 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
-    t.integer  "model_image_id"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -738,9 +716,9 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
-    t.integer  "model_image_id"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
@@ -938,6 +916,11 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
   add_index "presentations_projects", ["presentation_id", "project_id"], :name => "index_presentations_projects_on_presentation_id_and_project_id"
   add_index "presentations_projects", ["project_id"], :name => "index_presentations_projects_on_project_id"
 
+  create_table "project_descendants", :id => false, :force => true do |t|
+    t.integer "ancestor_id"
+    t.integer "descendant_id"
+  end
+
   create_table "project_folder_assets", :force => true do |t|
     t.integer  "asset_id"
     t.string   "asset_type"
@@ -987,6 +970,7 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
+    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -1047,6 +1031,8 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.integer  "publication_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "author_index"
+    t.integer  "person_id"
   end
 
   create_table "publications", :force => true do |t|
@@ -1064,7 +1050,8 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.string   "doi"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "publication_type",              :default => 1
+    t.integer  "publication_type",                :default => 1
+    t.string   "citation",         :limit => 256
   end
 
   add_index "publications", ["contributor_id", "contributor_type"], :name => "index_publications_on_contributor_id_and_contributor_type"
@@ -1153,10 +1140,10 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.float    "age_at_sampling"
-    t.string   "uuid"
-    t.integer  "age_at_sampling_unit_id"
     t.string   "sample_type"
     t.string   "treatment"
+    t.string   "uuid"
+    t.integer  "age_at_sampling_unit_id"
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
@@ -1175,11 +1162,20 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
 
   create_table "scales", :force => true do |t|
     t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "key"
     t.integer  "pos",        :default => 1
     t.string   "image_name"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
+  end
+
+  create_table "scalings", :force => true do |t|
+    t.integer  "scale_id"
+    t.integer  "scalable_id"
+    t.integer  "person_id"
+    t.string   "scalable_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "sessions", :force => true do |t|
@@ -1332,8 +1328,8 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.boolean  "is_dummy",               :default => false
-    t.string   "uuid"
     t.string   "age_unit"
+    t.string   "uuid"
   end
 
   create_table "strain_auth_lookup", :id => false, :force => true do |t|
@@ -1498,6 +1494,8 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
     t.datetime "updated_at"
   end
 
+  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
+
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"
     t.integer  "user_id"
@@ -1528,12 +1526,20 @@ ActiveRecord::Schema.define(:version => 20131202163217) do
   add_index "trash_records", ["trashable_type", "trashable_id"], :name => "index_trash_records_on_trashable_type_and_trashable_id"
 
   create_table "treatments", :force => true do |t|
-    t.string   "substance"
-    t.float    "concentration"
     t.integer  "unit_id"
     t.string   "treatment_protocol"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "treatment_type_id"
+    t.float    "start_value"
+    t.float    "end_value"
+    t.float    "standard_deviation"
+    t.text     "comments"
+    t.float    "incubation_time"
+    t.integer  "incubation_time_unit_id"
+    t.integer  "sample_id"
+    t.integer  "specimen_id"
+    t.integer  "compound_id"
   end
 
   create_table "units", :force => true do |t|

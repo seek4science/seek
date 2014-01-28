@@ -147,6 +147,22 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  if Seek::Config.is_virtualliver
+    test 'anonymous user cannot view people' do
+        logout
+        get :show, :id => people(:quentin_person)
+        assert_not_nil flash[:error]
+      end
+
+
+    test 'anonymous user doesnt see people in index' do
+      Factory :person, :first_name => 'Invisible', :last_name => ''
+      logout
+      get :index
+      assert_select 'a', :text => /Invisible/, :count => 0
+    end
+  end
+
   def test_should_get_edit
     get :edit, :id => people(:quentin_person)
     assert_response :success
@@ -1139,7 +1155,18 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should unsubscribe a person to a project when unassign a person to that project' do
-      a_person = Factory(:person)
+      a_person = Factory(:brand_new_person)
+      #no default subscriptions for new created person,as no projects related to the new person
+      assert a_person.project_subscriptions.empty?
+      work_groups = a_person.work_groups
+      projects = a_person.projects
+      assert_equal 0, projects.count
+      assert_equal 0, work_groups.count
+
+      # create default project subscriptions when the person becomes member of projects
+      put :administer_update, :id => a_person, :person =>{:work_group_ids => [Factory(:work_group).id]}
+      assert_redirected_to a_person
+      a_person.reload
       work_groups = a_person.work_groups
       projects = a_person.projects
       assert_equal 1, projects.count
@@ -1185,9 +1212,9 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
 
       logout
-
+      #in vln, people are not shown when logged out
       get :show, :id => a_person
-      assert_response :success
+      assert_response :redirect
       assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
   end
 
@@ -1223,5 +1250,4 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select "div.list_item_content  a[href=?]",person_path(person_not_in_project),:text=>/#{person_not_in_project.name}/,:count=>0
     end
   end
-
 end

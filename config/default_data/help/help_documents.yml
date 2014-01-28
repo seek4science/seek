@@ -92,7 +92,7 @@ help_documents:
       All assets should be associated with a project\r\n\r\n\r\nh3. Study\r\n\r\n*Title*
       â€“ as described above. All assets should have a title\r\n*Description* â€“
       free text describing the purpose of the study\r\n*Person Responsible* â€“ the
-      creator of the study description\r\n*Experimentalists* â€“ other scientists
+      contributor of the study description\r\n*Experimentalists* â€“ other scientists
       involved in any of the work in the study. If they are in SysMO, please give
       their SEEK ID, so we can link to their profiles in SEEK. If they are not in
       SEEK, their names will still be displayed, but not linked. Peopleâ€™s involvement

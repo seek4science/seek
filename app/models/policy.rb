@@ -23,7 +23,7 @@ class Policy < ActiveRecord::Base
       record.errors[:base] << "Sharing policy is invalid" unless value.is_a? Integer
     end
   end
-  
+
   alias_attribute :title, :name
 
   after_save :queue_update_auth_table
@@ -114,7 +114,7 @@ class Policy < ActiveRecord::Base
 
         # obtain parameters from sharing hash
         policy.sharing_scope = sharing[:sharing_scope]
-        policy.access_type = sharing["access_type_#{sharing_scope}"]
+        policy.access_type = sharing["access_type_#{sharing_scope}"].blank? ? 0 : sharing["access_type_#{sharing_scope}"]
 
         # NOW PROCESS THE PERMISSIONS
 
@@ -128,7 +128,7 @@ class Policy < ActiveRecord::Base
         end
 
         #if share with your project is chosen
-        if (sharing[:sharing_scope].to_i == Policy::ALL_SYSMO_USERS) and !projects.blank?
+        if (sharing[:sharing_scope].to_i == Policy::ALL_SYSMO_USERS) and !projects.map(&:id).compact.blank?
           #add Project to contributor_type
           contributor_types << "Project" if !contributor_types.include? "Project"
           #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
@@ -168,13 +168,19 @@ class Policy < ActiveRecord::Base
   end
   
   def self.private_policy
-    policy = Policy.new(:name => "default private",                        
-                        :sharing_scope => PRIVATE,
-                        :access_type => NO_ACCESS,
-                        :use_whitelist => false,
-                        :use_blacklist => false)
+    Policy.new(:name => "default private",
+               :sharing_scope => PRIVATE,
+               :access_type => NO_ACCESS,
+               :use_whitelist => false,
+               :use_blacklist => false)
+  end
 
-    return policy
+  def self.registered_users_accessible_policy
+    Policy.new(:name => "default accessible",
+               :sharing_scope => ALL_SYSMO_USERS,
+               :access_type => ACCESSIBLE,
+               :use_whitelist => false,
+               :use_blacklist => false)
   end
 
   def self.public_policy
@@ -199,7 +205,7 @@ class Policy < ActiveRecord::Base
 
   #The default policy to use when creating authorized items if no other policy is specified
   def self.default resource=nil
-    private_policy
+    Policy.new(:name => "default accessible", :use_whitelist => false, :use_blacklist => false)
   end
    
   # translates access type codes into human-readable form
@@ -210,11 +216,11 @@ class Policy < ActiveRecord::Base
       when Policy::NO_ACCESS
         return "No access"
       when Policy::VISIBLE
-        return resource.try(:is_downloadable?) ? "View summary only" : "View summary"
+        return resource.try(:is_downloadable?) ? "View summary only (NO DOWNLOAD)" : "View summary"
       when Policy::ACCESSIBLE
-        return resource.try(:is_downloadable?) ? "View summary and get contents" : "View summary"
+        return resource.try(:is_downloadable?) ? "Download" : "View summary"
       when Policy::EDITING
-        return resource.try(:is_downloadable?) ? "View and edit summary and contents" : "View and edit summary"
+        return resource.try(:is_downloadable?) ? "Edit" : "View and edit summary"
       when Policy::MANAGING
         return "Manage"
       else

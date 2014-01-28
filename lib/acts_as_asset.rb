@@ -27,6 +27,7 @@ module Acts #:nodoc:
     module ClassMethods
 
       def acts_as_asset
+        attr_accessor :parent_name
         include Seek::Taggable
 
         acts_as_scalable
@@ -39,7 +40,8 @@ module Acts #:nodoc:
         does_not_require_can_edit :last_used_at
 
         validates_presence_of :title
-        validates_presence_of :projects
+
+        acts_as_scalable if Seek::Config.is_virtualliver
 
         has_many :relationships,
                  :class_name => 'Relationship',
@@ -74,7 +76,7 @@ module Acts #:nodoc:
         searchable do
           text :title, :description, :searchable_tags
           text :creators do
-            creators.compact.map(&:name)
+            creators.compact.map(&:name).join(' ')
           end
           text :content_blob do
             content_blob_search_terms

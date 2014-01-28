@@ -15,7 +15,8 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object=Factory :model_2_files, :contributor=>User.current_user, :organism=>Factory(:organism)
+    @object=Factory :model_2_files, :contributor=>User.current_user, :policy=>Factory(:private_policy),:organism=>Factory(:organism)
+
   end
 
   test "should get index" do
@@ -119,14 +120,12 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.creators.include?(p2)
     assert_select ".list_item_title a[href=?]",model_path(model),"ZZZZZ","the data file for this test should appear as a list item"
 
-    #check for avatars
+    #check for avatars: uploader won't be shown if he/she is not creator
     assert_select ".list_item_avatar" do
       assert_select "a[href=?]",person_path(p2) do
         assert_select "img"
       end
-      assert_select "a[href=?]",person_path(p1) do
-        assert_select "img"
-      end
+
     end
   end
 
@@ -165,7 +164,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.assay')} Or create New Assay Here  for the #{I18n.t('model')}./
   end
 
   test "correct title and text for associating a modelling analysis for edit" do
@@ -176,7 +175,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.assay')} Or create New Assay Here  for the #{I18n.t('model')}./
   end
 
   test "fail gracefullly when trying to access a missing model" do
@@ -256,7 +255,7 @@ class ModelsControllerTest < ActionController::TestCase
      model_with_samples = valid_model
      model_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
      assert_difference("Model.count") do
-       post :create,:model => model_with_samples,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+       post :create,:model => model_with_samples,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing => valid_sharing
      end
 
     m = assigns(:model)
@@ -274,7 +273,7 @@ class ModelsControllerTest < ActionController::TestCase
     model_params = valid_model
 
     assert_difference("Model.count") do
-      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing => valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m
@@ -295,7 +294,7 @@ class ModelsControllerTest < ActionController::TestCase
                           "{\"scale_id\":\"#{scale1.id}\",\"param\":\"soup\",\"unit\":\"minute\"}"]
 
     assert_difference("Model.count") do
-      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:scale_ids_and_params=>scale_ids_and_params,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:scale_ids_and_params=>scale_ids_and_params,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing => valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m
@@ -328,6 +327,23 @@ class ModelsControllerTest < ActionController::TestCase
     assay.reload
     assert assay.related_asset_ids('Model').include? assigns(:model).id
   end
+
+  def test_missing_sharing_should_default_to_blank
+    assert_no_difference('Model.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+      end
+    end
+
+    m = assigns(:model)
+    assert !m.valid?
+    assert !m.policy.valid?
+    assert_blank m.policy.sharing_scope
+    assert_blank m.policy.access_type
+    assert_blank m.policy.permissions
+
+  end
+  
 
   test "should create model with image" do
       login_as(:model_owner)
@@ -406,7 +422,18 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal user, model.contributor
   end
   
+  test "default policy is nil when sharing is missing in VLN"  do
+    skip("test default policy is nil when sharing is missing in VLN") if !Seek::Config.is_virtualliver
+    assert_difference('Model.count', 0) do
+          assert_difference('ContentBlob.count', 0) do
+            post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+          end
+    end
+  end
+
   def test_missing_sharing_should_default_to_private
+    skip("default policy is nil when sharing is missing in VLN") if Seek::Config.is_virtualliver
+
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
@@ -434,7 +461,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => valid_model_with_url,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
+        post :create, :model => valid_model_with_url.tap {|model| model[:external_link] = "1"},:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
       end
     end
     model = assigns(:model)
@@ -450,7 +477,8 @@ class ModelsControllerTest < ActionController::TestCase
   
   test "should create model and store with url and store flag" do
     model_details=valid_model_with_url
-    model_details[:local_copy]="1"
+    key = Seek::Config.is_virtualliver ? :external_link : :local_copy
+    model_details[key]="1"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => model_details,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
@@ -461,8 +489,10 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal users(:model_owner),model.contributor
     assert_equal 1,model.content_blobs.count
     assert !model.content_blobs.first.url.blank?
-    assert !model.content_blobs.first.data_io_object.read.nil?
-    assert model.content_blobs.first.file_exists?
+
+
+    assert !model.content_blobs.first.data_io_object.read.nil? unless Seek::Config.is_virtualliver
+    assert model.content_blobs.first.file_exists? unless Seek::Config.is_virtualliver
     assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
     assert_equal "image/png", model.content_blobs.first.content_type
   end
@@ -474,8 +504,9 @@ class ModelsControllerTest < ActionController::TestCase
     stub_request(:head, "http://news.bbc.co.uk").to_return(:status=>301,:headers=>{'Location'=>'http://bbc.co.uk/news'})
     stub_request(:head, "http://bbc.co.uk/news").to_return(:status=>200,:headers=>{'Content-Type' => 'text/html'})
 
+    key = Seek::Config.is_virtualliver ? :external_link : :local_copy
     model_details=valid_model_with_url
-    model_details[:local_copy]="0"
+    model_details[key]="0"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => model_details,:content_blob=>{:url_0=>"http://news.bbc.co.uk"}, :sharing=>valid_sharing
@@ -486,7 +517,21 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal users(:model_owner),model.contributor
     assert_equal 1,model.content_blobs.count
     assert_equal "http://news.bbc.co.uk",model.content_blobs.first.url
-    assert model.content_blobs.first.is_webpage?
+    assert model.content_blobs.first.is_webpage? unless Seek::Config.is_virtualliver
+
+
+    model_details[key]="1"
+    assert_difference('Model.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :model => model_details, :content_blob => {:url_0 => "http://news.bbc.co.uk"}, :sharing => valid_sharing
+      end
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal users(:model_owner), model.contributor
+    assert_equal 1, model.content_blobs.count
+    assert_equal "http://news.bbc.co.uk", model.content_blobs.first.url
+    assert model.content_blobs.first.is_webpage? if Seek::Config.is_virtualliver
 
   end
   
@@ -939,7 +984,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should not submit_to_sycamore if sycamore is disable" do
-    with_config_value :sycamore_enabled, false do
+    with_config_value :sycamore_enabled,false do
       model = Factory :teusink_model
       login_as(model.contributor)
       post :submit_to_sycamore, :id => model.id, :version => model.version
@@ -968,7 +1013,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should create new model version based on content_blobs of previous version" do
-    m = Factory(:model_2_files)
+    m = Factory(:model_2_files, :policy => Factory(:private_policy))
     retained_content_blob = m.content_blobs.first
     login_as(m.contributor)
     assert_difference("Model::Version.count", 1) do

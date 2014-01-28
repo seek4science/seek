@@ -46,8 +46,9 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
 	def test_should_create_project
+    parent_id = Factory(:project,:title=>"Test Parent").id
 		assert_difference('Project.count') do
-			post :create, :project => {:name=>"test"}
+			post :create, :project => {:name=>"test",:parent_id=>parent_id}
 		end
 
 		assert_redirected_to project_path(assigns(:project))
@@ -64,7 +65,8 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_should_update_project
-		put :update, :id => projects(:four), :project => valid_project
+    parent_id = Factory(:project,:title=>"Test Parent").id
+		put :update, :id => projects(:four), :project => {:parent_id=>parent_id}
 		assert_redirected_to project_path(assigns(:project))
 	end
 
@@ -78,7 +80,12 @@ class ProjectsControllerTest < ActionController::TestCase
 		end
 
 		assert_redirected_to projects_path
-	end
+  end
+
+  def test_admin_can_manage
+    get :manage, :id=> Factory(:project)
+    assert_response :success
+  end
 
 	def test_non_admin_should_not_destroy_project
 		login_as(:aaron)
@@ -104,7 +111,13 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project_path(project)
     assert_not_nil flash[:error]
   end
-
+  
+ def test_non_admin_should_not_manage_projects
+		login_as(:aaron)
+		get :manage,:id=> Factory(:project)
+    assert_not_nil flash[:error]
+  end
+  
   test "asset report visible to project member" do
     person = Factory :person
     project = person.projects.first
@@ -203,17 +216,19 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select "a[href=?]",project_folders_path(p.projects.first), :count=>0
   end
 
-	test 'should get index for non-project member, non-login user' do
-		login_as(:registered_user_with_no_projects)
+test 'should get index for non-project member, should for non-login user' do
+    registered_user_with_no_projects = Factory :user, :person=> Factory(:brand_new_person)
+		login_as registered_user_with_no_projects
 		get :index
 		assert_response :success
-		assert_not_nil assigns(:projects)
 
 		logout
 		get :index
 		assert_response :success
 		assert_not_nil assigns(:projects)
 	end
+
+
 
 	test 'should show project for non-project member and non-login user' do
 		login_as(:registered_user_with_no_projects)
@@ -295,7 +310,11 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(user)
     sop = Factory :sop,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
-    assert_select "div.list_item div.list_item_desc" do
+    assert_response :success
+
+    get :resource_in_tab, {:resource_ids => [sop.id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+
+    assert_select "div.list_item  div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
     end
 	end
@@ -306,6 +325,8 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(user)
     df = Factory :data_file,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
+    assert_response :success
+    get :resource_in_tab, {:resource_ids => [df.id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
     end
@@ -317,7 +338,8 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(user)
     model = Factory :model,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
-    assert_select "div.list_item div.list_item_desc" do
+    get :resource_in_tab, {:resource_ids => [model.id].join(","), :resource_type => "Model", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    assert_select "div.list_item  div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
     end
 	end
@@ -575,15 +597,17 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'project manager can only see all institutions' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    login_as(project_manager.user)
+    as_not_virtualliver do
+      project_manager = Factory(:project_manager)
+      project = project_manager.projects.first
+      login_as(project_manager.user)
     Factory(:institution)
 
-    get :admin, :id => project
-    assert_response :success
+      get :admin, :id => project
+      assert_response :success
     Institution.all.each do |institution|
       assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 1
+      end
     end
   end
 
@@ -638,7 +662,33 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test "should view_items_in_tab in project page for non-admin" do
+  test "unassign institution out of project" do
+    project = Factory(:project)
+    project.institutions << Factory(:institution)
+
+    login_as(:quentin)
+
+    put :update, :id => project, :project => {:institution_ids => []}
+    assert_redirected_to project
+    assert_nil flash[:error]
+    project.reload
+    assert project.institutions.empty?
+  end
+
+  test "should not unassign institution out of project if there are people in this workgroup" do
+    wg=WorkGroup.find(1)
+    assert !wg.people.empty?
+    project = wg.project
+
+    login_as(:quentin)
+    assert_raise(Exception){
+      put :update, :id => project, :project => {:institution_ids => []}
+    }
+    project.reload
+    assert !project.institutions.empty?
+  end
+  
+ test "should view_items_in_tab in project page for non-admin" do
     project = Factory(:project)
     df = Factory :data_file,
                  :title=>"a data file",
@@ -663,11 +713,16 @@ class ProjectsControllerTest < ActionController::TestCase
     assert !work_group.people.empty?
 
     assert_no_difference('WorkGroup.count') do
-      post :update, :id => project, :project => {:institution_ids => []}
+      begin
+        post :update, :id => project, :project => {:institution_ids => []}
+        assert_redirected_to project
+        assert_not_nil flash[:error]
+      rescue Exception => e
+        puts e.message
+      end
     end
 
-    assert_redirected_to project
-    assert_not_nil flash[:error]
+
     assert !project.reload.institutions.empty?
     assert !work_group.reload.people.empty?
   end

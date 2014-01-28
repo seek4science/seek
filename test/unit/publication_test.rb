@@ -136,7 +136,7 @@ class PublicationTest < ActiveSupport::TestCase
   test "sort by published_date" do
     assert_equal Publication.find(:all).sort_by { |p| p.published_date}.reverse, Publication.default_order
   end
-  
+
   test "title trimmed" do
     x = Factory :publication, :title => " a pub"
     assert_equal("a pub",x.title)
@@ -157,7 +157,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert !asset.valid?
 
     asset=Publication.new :title=>"fred",:doi=>"111"
-    assert !asset.valid?
+    assert asset.valid?
 
     #cant have both a pubmed and doi
     asset = Publication.new :title=>"bob",:doi=>"777",:projects=>[project]
@@ -177,17 +177,25 @@ class PublicationTest < ActiveSupport::TestCase
     p3=Factory(:person)
     p4=Factory(:person)
 
-    User.with_current_user(p.contributor) do
-      p.creators << p1
-      p.creators << p2
-      p.creators << p3
-      p.creators << p4
 
+    User.with_current_user(p.contributor) do
+
+      if Seek::Config.is_virtualliver
+        [p1,p2,p3,p4].each_with_index do|author, index|
+          p.publication_authors.create :person_id=>author.id, :first_name => author.first_name, :last_name=>author.last_name, :author_index => index
+        end
+      else
+        p.creators << p1
+        p.creators << p2
+        p.creators << p3
+        p.creators << p4
+      end
       p.save!
+
     end
-    
     assert_equal 4,p.creators.size
     assert_equal [p1,p2,p3,p4],p.creators
+
   end
   
   test "uuid doesn't change" do
@@ -198,10 +206,8 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal x.uuid, uuid
   end
   
-  def test_project_required
+  def test_project_not_required
     p=Publication.new(:title=>"blah blah blah",:pubmed_id=>"123")
-    assert !p.valid?
-    p.projects=[projects(:sysmo_project)]
     assert p.valid?
   end
 

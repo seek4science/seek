@@ -3,6 +3,7 @@ SEEK::Application.routes.draw do
   resources :scales do
     collection do
       post :search
+      post :search_and_lazy_load_results
     end
   end
 
@@ -127,6 +128,7 @@ SEEK::Application.routes.draw do
       get :select
       get :get_work_group
       get :view_items_in_tab
+      get :resource_in_tab
       post :userless_project_selected_ajax
     end
     member do
@@ -154,6 +156,8 @@ SEEK::Application.routes.draw do
     collection do
       get :request_institutions
       get :view_items_in_tab
+      get :resource_in_tab
+      get :manage
     end
     member do
       get :asset_report
@@ -184,6 +188,7 @@ SEEK::Application.routes.draw do
     collection do
       get :request_all
       get :view_items_in_tab
+      get :resource_in_tab
     end
     resources :avatars do
       member do
@@ -197,6 +202,7 @@ SEEK::Application.routes.draw do
   resources :investigations do
     collection do
       get :view_items_in_tab
+      get :resource_in_tab
     end
   end
 
@@ -204,6 +210,7 @@ SEEK::Application.routes.draw do
     collection do
       post :investigation_selected_ajax
       get :view_items_in_tab
+      get :resource_in_tab
     end
   end
 
@@ -211,9 +218,21 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       post :update_annotations_ajax
+    end
+  end
+  resources :assay_types do
+    collection do
+      get :manage
+    end
+  end
+
+  resources :technology_types do
+    collection do
+      get :manage
     end
   end
 
@@ -223,6 +242,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       get :view_items_in_tab
+      get :resource_in_tab
       post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
@@ -242,6 +262,7 @@ SEEK::Application.routes.draw do
       post :convert_to_presentation
       post :update_annotations_ajax
       post :new_version
+      post :destroy_version
     end
     resources :studied_factors do
       collection do
@@ -261,6 +282,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       get :view_items_in_tab
+      get :resource_in_tab
       post :test_asset_url
     end
     member do
@@ -273,6 +295,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :destroy_version
     end
     resources :content_blobs do
       member do
@@ -288,6 +311,7 @@ SEEK::Application.routes.draw do
       get :build
       get :preview
       get :view_items_in_tab
+      get :resource_in_tab
       post :test_asset_url
     end
     member do
@@ -308,6 +332,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :execute
       post :request_resource
+      post :destroy_version
     end
     resources :model_images do
       collection do
@@ -330,6 +355,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       get :view_items_in_tab
+      get :resource_in_tab
       post :test_asset_url
     end
     member do
@@ -342,6 +368,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :destroy_version
     end
     resources :experimental_conditions do
       collection do
@@ -362,6 +389,7 @@ SEEK::Application.routes.draw do
       get :preview
       post :fetch_preview
       get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -373,6 +401,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       get :view_items_in_tab
+      get :resource_in_tab
     end
   end
 
@@ -390,6 +419,7 @@ SEEK::Application.routes.draw do
   resources :samples do
     collection do
       get :preview
+      get :resource_in_tab
     end
   end
 
@@ -397,12 +427,11 @@ SEEK::Application.routes.draw do
     collection do
       get :existing_strains_for_assay_organism
       get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       post :update_annotations_ajax
     end
-
-
   end
 
   resources :biosamples do
@@ -424,6 +453,7 @@ SEEK::Application.routes.draw do
     collection do
       post :search_ajax
       get :view_items_in_tab
+      get :resource_in_tab
     end
     member do
       get :visualise
@@ -431,12 +461,9 @@ SEEK::Application.routes.draw do
 
   end
 
-  ### ASSAY AND TECHNOLOGY TYPES ###
+  resources :tissue_and_cell_types
 
-  get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
-  get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
-
-
+  resources :statistics, :only => [:index]
   ### MISC MATCHES ###
 
   match '/search/' => 'search#index', :as => :search
@@ -474,6 +501,13 @@ SEEK::Application.routes.draw do
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
 
+
+  #feedback
+  match '/home/feedback' => 'homes#feedback', :as=> :feedback, :via=>:get
+
+  #tabber lazy load
+  match 'application/resource_in_tab' => 'application#resource_in_tab'
+
   get "errors/error_422"
 
   get "errors/error_404"
@@ -483,4 +517,6 @@ SEEK::Application.routes.draw do
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id))(.:format)'
+
+
 end

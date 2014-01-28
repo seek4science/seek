@@ -4,12 +4,12 @@ require 'seek/config'
 SEEK::Application.configure do
   #Main settings
   Seek::Config.default :public_seek_enabled,true
-  Seek::Config.default :sycamore_enabled,false
+  Seek::Config.default :sycamore_enabled,true
   Seek::Config.default :events_enabled,true
   Seek::Config.default :jerm_enabled,false
   Seek::Config.default :email_enabled,false
   Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
-  Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
+  Seek::Config.default :noreply_sender, 'seek1@virtual-liver.de'
   Seek::Config.default :solr_enabled,false
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"http://jjj.mib.ac.uk/"
@@ -32,13 +32,14 @@ SEEK::Application.configure do
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
-  Seek::Config.default :publish_button_enabled, true
+  Seek::Config.default :publish_button_enabled, false 
   Seek::Config.default :auth_lookup_enabled,true
-  Seek::Config.default :sample_parser_enabled,false
+  Seek::Config.default :sample_parser_enabled,true
   Seek::Config.default :external_search_enabled, true
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
+Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
   Seek::Config.default :biosamples_enabled, true
@@ -58,10 +59,10 @@ SEEK::Application.configure do
   Seek::Config.default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
 
   Seek::Config.default :header_tagline_text_enabled, true
-
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2
 
+Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
 # Branding
   Seek::Config.default :project_name,'SysMO'
   Seek::Config.default :project_type,'Consortium'
@@ -78,7 +79,7 @@ SEEK::Application.configure do
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
-  Seek::Config.default :is_virtualliver, false
+Seek::Config.default :is_virtualliver, true
 
 # Pagination
   Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
@@ -86,16 +87,22 @@ SEEK::Application.configure do
 
 # Others
   Seek::Config.default :type_managers_enabled,true
-  Seek::Config.default :type_managers,'admins'
+Seek::Config.default :type_managers,'users'
   Seek::Config.default :tag_threshold,1
   Seek::Config.default :max_visible_tags,20
   Seek::Config.default :pubmed_api_email,nil
   Seek::Config.default :crossref_api_email,nil
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
+Seek::Config.default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
+#Biosamples renaming
+Seek::Config.default :sample_parent_term, "cell culture"
+Seek::Config.default :specimen_culture_starting_date,"Culture starting date"
+Seek::Config.default :sample_age, "Age at sampling"
+Seek::Config.default :specimen_creators, "Contributors"
+Seek::Config.default :recaptcha_enabled, true
+Seek::Config.default :admin_impersonation_enabled, true
+ Seek::Config.default :datacite_url,"https://mds.datacite.org/"
 
-  Seek::Config.default :max_attachments_num,100
-
-  Seek::Config.default :datacite_url,"https://mds.datacite.org/"
 end
 

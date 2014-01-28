@@ -10,6 +10,12 @@ class ProjectRole < ActiveRecord::Base
     end
   end
 
+  def self.project_coordinator_role
+    ProjectRole.all.find do |r|
+      /project coordinator/i =~ r.name
+    end
+  end
+
   def to_s
     title
   end

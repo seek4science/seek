@@ -27,14 +27,15 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    asset=Sop.new :title=>"fred",:projects=>[projects(:sysmo_project)]
+    asset=Sop.new :title=>"fred",:projects=>[projects(:sysmo_project)], :policy => Factory(:private_policy)
     assert asset.valid?
 
-    asset=Sop.new :projects=>[projects(:sysmo_project)]
+    asset=Sop.new :projects=>[projects(:sysmo_project)], :policy => Factory(:private_policy)
     assert !asset.valid?
 
-    asset=Sop.new :title=>"fred"
-    assert !asset.valid?
+    #VL only:allow no projects
+    asset=Sop.new :title=>"fred", :policy => Factory(:private_policy)
+    assert asset.valid?
   end
 
   test "assay association" do
@@ -61,16 +62,16 @@ class SopTest < ActiveSupport::TestCase
     assert sop_versions(:my_first_sop_v1).use_mime_type_for_avatar?
   end
   
-  def test_defaults_to_private_policy
+  def test_defaults_to_blank_policy
     sop=Sop.new Factory.attributes_for(:sop).tap{|h|h[:policy] = nil}
-    sop.save!
-    sop.reload
-    assert_not_nil sop.policy
-    assert_equal Policy::PRIVATE, sop.policy.sharing_scope
-    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    sop.save
+    assert !sop.valid?
+    assert !sop.policy.valid?
+    assert_blank sop.policy.sharing_scope
+    assert_blank sop.policy.access_type
     assert_equal false,sop.policy.use_whitelist
     assert_equal false,sop.policy.use_blacklist
-    assert sop.policy.permissions.empty?
+    assert_blank sop.policy.permissions
   end
 
   def test_version_created_for_new_sop

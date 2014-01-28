@@ -1,0 +1,101 @@
+K-12/MG1655:
+  id: 1
+  title: K-12/MG1655
+
+MC4100:
+  id: 2
+  title: MC4100
+
+168:
+  id: 3
+  title: 168
+
+NCIB3610:
+  id: 4
+  title: NCIB3610
+
+JW49:
+  id: 5
+  title: JW49
+
+ATCC6633:
+  id: 6
+  title: ATCC6633
+
+V583:
+  id: 7
+  title: V583
+
+ATCC29200:
+  id: 81
+  title: ATCC29200
+
+DS5:
+  id: 9
+  title: DS5
+
+TX0012:
+  id: 10
+  title: TX0012
+
+M49(591):
+  id: 11
+  title: M49 (591)
+
+ATCC824:
+  id: 12
+  title: ATCC824
+
+NCIMB8052:
+  id: 13
+  title: NCIMB8052
+
+DOTT1:
+  id: 14
+  title: DOT-T1
+
+NCIMB10525:
+  id: 15
+  title: NCIMB10525
+
+A3(2):
+  id: 16
+  title: A3(2)
+
+M145:
+  id: 17
+  title: M145
+
+P2:
+  id: 18
+  title: P2
+
+YJM789:
+  id: 19
+  title: YJM789
+
+FY2:
+  id: 20
+  title: FY2 diploid
+
+FY3:
+  id: 21
+  title: FY3 diploid
+
+YSBN1:
+  id: 22
+  title: YSBN1 diploid
+
+YSBN2:
+  id: 23
+  title: YSBN2 diploid
+
+CENPK113-7D:
+  id: 24
+  title: CEN.PK113-7D haploid
+
+BY4741:
+  id: 25
+  title: BY4741
+
+

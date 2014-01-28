@@ -3,12 +3,12 @@ require 'test_helper'
 class PresentationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include SharingFormTestHelper
   include RestTestCases
   include FunctionalAuthorizationTests
 
   def setup
     login_as Factory(:user)
-    User.current_user.person.set_default_subscriptions
   end
 
   def rest_api_test_object
@@ -31,7 +31,7 @@ class PresentationsControllerTest < ActionController::TestCase
                                                   :data_url => "http://somewhere.com/piccy.png")
 
     assert_difference "Presentation.count" do
-      post :create,:presentation => presentation_attrs
+      post :create,:presentation => presentation_attrs, :sharing => valid_sharing
     end
   end
 
@@ -43,7 +43,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
     assert_difference "Presentation.count" do
       assert_difference "ActivityLog.count" do
-        post :create,:presentation => presentation_attrs
+        post :create,:presentation => presentation_attrs, :sharing => valid_sharing
       end
     end
   end

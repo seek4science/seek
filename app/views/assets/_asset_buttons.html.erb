@@ -2,10 +2,13 @@
 <% if asset.is_downloadable? -%>
     <% display_asset = asset.find_version(version) %>
     <%# param code is used for temporary link -%>
-    <% if display_asset.contains_downloadable_items? && can_download_asset?(asset, params[:code]) -%>
+
         <%
            path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
+           is_external_link = display_asset.respond_to?(:content_blob) ?   display_asset.content_blob.external_link? : ( display_asset.respond_to?(:content_blobs) && display_asset.content_blobs.count == 1 && display_asset.content_blobs.first.external_link?)
+           link_url =  try_block{display_asset.content_blob.url} || try_block{ display_asset.content_blobs.first.url}
         %>
+    <% if display_asset.contains_downloadable_items? && can_download_asset?(asset, params[:code]) -%>
         <li>
           <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>
         </li>
@@ -18,6 +21,10 @@
             <% content_blob = display_asset.respond_to?(:content_blobs) ? display_asset.content_blobs.first : display_asset.content_blob %>
             <%= render :partial => "assets/view_content", :locals => {:content_blob => content_blob, :button_style => true} -%>
         <% end %>
+    <% elsif is_external_link %>
+        <li>
+          <%= image_tag_for_key('download', link_url, "Link", {:target => 'blank'}, "Link" ) -%>
+        </li>
     <% end -%>
     <% if logged_in? && !can_download_asset?(asset, params[:code]) %>
         <li>
@@ -44,6 +51,14 @@
   <% end -%>
 
   <%= delete_icon(asset, current_user)%>
+
+<% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :to_presentation %>
+    <li>
+      <%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:title => "click to move this #{t('data_file')} to #{t('presentation').pluralize}", :confirm => "Are you sure you wish to move this #{t('data_file')} to #{t('presentation').pluralize}? Doing so is irreversible!", :method => :post}, "Move to #{t('presentation').pluralize}" %>
+    </li>
+<% end %>
+
+
 
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
 

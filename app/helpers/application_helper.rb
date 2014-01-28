@@ -6,7 +6,7 @@ require 'app_version'
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
-
+  include Recaptcha::ClientHelper
 
   def is_front_page?
     current_page?(root_url)
@@ -491,6 +491,11 @@ module ApplicationHelper
     "Effect.toggle('#{block_id}','slide',{duration:0.5})".html_safe
   end
 
+  def toggle_appear_with_image_javascript block_id
+      toggle_appear_javascript block_id
+      ""
+  end
+
   def count_actions(object, actions=nil)
     count = 0
     if actions.nil?
@@ -590,7 +595,6 @@ module ApplicationHelper
     if !request_uri.include?(root_path)
       request_uri = root_path.chop + request_uri
     end
-
     if referer == search_path && referer != request_uri && request_uri != root_path
       javascript_tag "
         if (window.history.length > 1){
@@ -605,7 +609,6 @@ module ApplicationHelper
       #link_to_function 'Return to search', "window.history.back();"
     end
   end
-
   NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
                          Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
                          Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,

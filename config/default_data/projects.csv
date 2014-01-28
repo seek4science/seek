@@ -1,0 +1,58 @@
+name,web_page,wiki_page,first_letter
+A1: Cellular metabolism,,,C
+A1.1: Central liver metabolism and its regulation under nutritional challenges,,,C
+A1.2 Detoxification in hepatocytes challenged by steatotic conditions,,,D
+A1.3: Identification of crucial metabolic processes during hepatocyte proliferation,,,I
+A2: Integration of Signalling Pathways in Hepatocellular Response,,,I
+A2.1: Multilevel regulation of signalling pathways important for priming of hepatocyte proliferation and inflammatory response,,,M
+A2.2: Regulation of proapoptotic and antiapoptotic responses in hepatocytes,,,R
+A2.3.: Crosstalk and distinct properties of growth factor signalling regulating cellcycle progression and migration in hepatocytes,,,C
+A2.4.: Linking signalling pathways regulating liver regeneration and organsize control,,,L
+A2.5: Integration of insulin and Wnt signalling in hepatocytes,,,I
+A3: Crosslinking signalling metabolism and hepatocyte polarisation,,,C
+A3.1 Integration of signalling generegulatory and metabolic network models for guiding the experimental strategies,,,I
+A3.2.: Crosstalk of signaling pathways and endocytic machinery in hepatocytes: Impact on cell polarity and presence of transporters,,,C
+A3.3.: Hepatocyte polarity,,,H
+A3.4: Linking signalling to metabolic functions,,,L
+A3.5 The impact of cell polarity on metabolism detoxification and endocytosis,,,T
+A3.6: Transcription factor network and links to metabolism in NAFLD,,,T
+B: Communication of Hepatocytes and NonParenchymal Liver Cells,,,C
+B1: Intercellular communication of hepatocytes and macrophages,,,I
+B1.2: Reciprocal effect of cell-cell communication on information processing in macrophages and hepatocytes,,,R
+B1.3: Linking modulation of iron metabolism with the impact of macrophagemediated inflammatory responses on hepatocytes,,,L
+B2: Intercellular communication of hepatocytes and hepatic stellate cells,,,I
+B2.1: Hepatic stellate cells as source and target for hepatocellular growth factors,,,H
+B2.2: Importance of Wnt- and Hedgehog factors for hepatic stellate cells and hepatocellular metabolism,,,I
+B2.3: Effect of hepatic stellate cells on hepatocyte polarity and transdifferentiation,,,E
+B3: Intercellular communication through cell adhesion,,,I
+B.4: Regulation of proinflammatory stimuli through communication of liver sinusoidal endothelial cell and hepatocytes,,,R
+B5.: Cell-cell communication influences detoxifying functions in hepatocytes,,,C
+C: Liver lobule level,,,L
+C1: The role of blood flow in liver lobule function and morphology,,,T
+C2: Organization of the sinusoidal system and the liver lobule reference state,,,O
+C3: Zonation of metabolism and its regulation,,,Z
+C4: Disturbance of liver lobule organization in NAFLD,,,D
+C5: Structural changes and functional consequences of the liver lobular/sinusoidal system during inflammation and fibrosis,,,S
+C6: Organization and function of the sinusoidal system and the liver lobule during regeneration after partial hepatectomy,,,O
+D: Whole organ level,,,W
+D1: Regulation of Blood Flow and Perfusion in the Liver,,,R
+D2: Dynamics of metabolism, inflammation and ammonia detoxication during
+liver regeneration: a whole organ approach using vital remnant mouse liver perfusion,,,A
+D3: Inflammation and Regeneration: the whole organ,,,I
+D4: Regeneration and Liver Size,,,R
+E: Model integration,,,M
+E1: Integration on the cellular level,,,I
+E2: Integration on the liver lobule scale: Image processing and mathematicali
+modelling,,,
+E3: Horizontal integration on organ scale,,,h
+E4: Vertical integration across biological scales,,,V
+F: Data management,,,D
+F1: The data management system,,,T
+F2: The liver knowledge base,,,T
+F3: Kinetic data handling,,,K
+G: Clinical translation,,,C
+G1: Clinical Translation to Invasively Characterized Patients,,,C
+G2: Clinical Translation to Non-Invasive Volunteer Setting,,,C
+G3: Clinical Translation to Pharmaceutical Drug Development,,,C
+G4: Whole-Body Detoxification in Mouse Models,,,W
+Admin:Administration,,,A

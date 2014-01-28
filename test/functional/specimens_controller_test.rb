@@ -5,6 +5,7 @@ class SpecimensControllerTest < ActionController::TestCase
   fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
   include RdfTestCases
   include FunctionalAuthorizationTests
 
@@ -59,7 +60,7 @@ class SpecimensControllerTest < ActionController::TestCase
                                   :lab_internal_number =>"Do232",
                                   :institution_id => Factory(:institution).id,
                                   :strain_id => Factory(:strain).id,
-                                  :project_ids => [Factory(:project).id]}
+                                  :project_ids => [Factory(:project).id]}, :sharing=>valid_sharing
 
     end
     s = assigns(:specimen)
@@ -106,15 +107,16 @@ class SpecimensControllerTest < ActionController::TestCase
     login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :specimen, :policy => Factory(:private_policy)
     get :edit, :id =>s.id
-    assert_redirected_to specimen_path(s)
+    assert_response :redirect
     assert flash[:error]
   end
+
   test "unauthorized user cannot update specimen" do
     login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :specimen, :policy => Factory(:private_policy)
 
     put :update, :id=> s.id, :specimen =>{:title =>"test"}
-    assert_redirected_to specimen_path(s)
+    assert_response :redirect
     assert flash[:error]
   end
 
@@ -125,7 +127,7 @@ class SpecimensControllerTest < ActionController::TestCase
       delete :destroy, :id => s.id
     end
     assert flash[:error]
-    assert_redirected_to s
+    assert_response :redirect
   end
 
   test "only current user can delete specimen" do
@@ -154,30 +156,34 @@ class SpecimensControllerTest < ActionController::TestCase
   end
 
   test "should create specimen with strings for confluency passage viability and purity" do
-    attrs = [:confluency, :passage, :viability, :purity]
-    specimen= Factory.attributes_for :specimen,
-                                     :confluency => "Test", :passage => "Test",
-                                     :viability => "Test", :purity => "Test",
-                                     :project_ids => [Factory(:project).id]
+    as_virtualliver do
+      attrs = [:confluency, :passage, :viability, :purity, :institution_id]
+      specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test",
+                                       :viability => "Test", :purity => "Test",
+                                       :institution_id => Factory(:institution).id,
+                                       :project_ids => [Factory(:project).id]
 
-    specimen[:strain_id]=Factory(:strain).id
-    post :create, :specimen => specimen
-    assert specimen = assigns(:specimen)
+      specimen[:strain_id]=Factory(:strain).id
+      post :create, :specimen => specimen, :sharing => valid_sharing
+      assert !( specimen=assigns(:specimen) ).new_record?
 
-    assert_redirected_to specimen
+      assert_redirected_to specimen
 
-    attrs.each do |attr|
-      assert_equal "Test", specimen.send(attr)
+      attrs.reject{|a| a == :institution_id}.each do |attr|
+        assert_equal "Test", specimen.send(attr)
+      end
     end
   end
 
   test "should show without institution" do
-    get :show, :id => Factory(:specimen,
-                              :title=>"running mouse NO2 with no institution",
-                              :policy =>policies(:editing_for_all_sysmo_users_policy),
+    as_not_virtualliver do
+      get :show, :id => Factory(:specimen,
+                                :title => "running mouse NO2 with no institution",
+                                :policy => policies(:editing_for_all_sysmo_users_policy),
                               :institution_id=>nil)
-    assert_response :success
-    assert_not_nil assigns(:specimen)
+      assert_response :success
+      assert_not_nil assigns(:specimen)
+    end
   end
 
 test "should update genotypes and phenotypes" do
@@ -227,7 +233,8 @@ test "should update genotypes and phenotypes" do
                                   :institution_id => Factory(:institution).id,
                                   :strain_id => Factory(:strain).id,
                                   :project_ids => [Factory(:project).id]},
-                    :specimen_sop_ids => [sop.id]
+                    :specimen_sop_ids => [sop.id],
+                    :sharing => valid_sharing
 
     end
     s = assigns(:specimen)
@@ -241,15 +248,20 @@ test "should update genotypes and phenotypes" do
   end
 
   test 'should associate sops' do
-    sop = Factory(:sop, :policy => Factory(:public_policy))
-    specimen= Factory.attributes_for :specimen,
-                                     :confluency => "Test", :passage => "Test",
-                                     :viability => "Test", :purity => "Test",
-                                     :project_ids => [Factory(:project).id]
-    specimen[:strain_id]=Factory(:strain).id
+    # only login project members can create new specimen
+    logout
+    login_as Factory(:user)
 
-    post :create, :specimen => specimen, :specimen_sop_ids => [sop.id]
-    assert specimen = assigns(:specimen)
+    sop = Factory(:sop, :policy => Factory(:public_policy))
+    #attributes_for method only predefine some attributes (associations are excluded)) that are defined in factories.rb
+    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test", :project_ids => [Factory(:project).id]
+    specimen[:strain_id] = Factory(:strain).id
+    specimen[:institution_id] = Factory(:institution).id if Seek::Config.is_virtualliver
+
+    post :create, :specimen => specimen, :specimen_sop_ids => [sop.id],:sharing => valid_sharing
+
+    specimen = assigns(:specimen)
+    assert !specimen.new_record?
 
     assert_redirected_to specimen
     associated_sops = specimen.sop_masters.collect(&:sop)

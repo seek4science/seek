@@ -17,7 +17,7 @@ module AuthenticatedSystem
     session[:user_id] = new_user ? new_user.id : nil
     @current_user = new_user || false
   end
-  
+
   # Check if the user is authorized
   #
   # Override this method in your controllers if you want to restrict access
@@ -79,6 +79,10 @@ module AuthenticatedSystem
   # We can return to this location by calling #redirect_back_or_default.
   def store_location
     session[:return_to] = request.fullpath
+  end
+
+  def clear_return_to
+    session.delete(:return_to)
   end
   
   # Redirect to the URI stored by the most recent store_location call or

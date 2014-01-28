@@ -1,7 +1,55 @@
 module ScalesHelper
 
+  def all_scaled_items_hash
+    #key: item_type, value: items
+    resource_hash = {}
+    all_scaled_assets = Scale.all.collect do |scale|
+      scale.assets
+    end.flatten.uniq
+
+    all_scaled_assets.group_by { |asset| asset.class.name }.each do |asset_type, items|
+      resource_hash[asset_type] = items if items.count > 0
+    end
+
+    resource_hash
+
+  end
+
+  def all_items_hash
+    #key: item_type, value: items
+    resource_hash = {}
+    Seek::Util.user_creatable_types.each do |klass|
+      items = klass.all
+      resource_hash["#{klass}"] = items if items.count > 0
+    end
+    resource_hash
+  end
+
   def show_scales?
-    Scale.count>0
+    Scale.count > 0
+  end
+
+
+  def link_for_scale scale, options={}
+    length=options[:truncate_length]
+    length||=150
+    link = scale_path(scale)
+    link_to h(truncate(scale.name, :length=>length)), link, :class=>options[:class], :id=>options[:id], :style=>options[:style], :title=>tooltip_title_attrib(scale.name)
+  end
+
+  def sort_scales scales
+    ordered_scales = scales.sort_by{|scale|
+      Seek::Config.scales.index(scale.title)
+    }
+    ordered_scales
+  end
+  def show_item_scales resource
+    link = "".html_safe
+    resource.scales.each do |scale|
+      link += link_to h(scale.title), scale
+      link += ",<br/>".html_safe unless scale==resource.scales.last
+    end
+    link.html_safe
   end
 
   def scales_list entity,list_item=false
@@ -59,4 +107,5 @@ module ScalesHelper
       ""
     end
   end
+
 end

@@ -7,6 +7,26 @@ module AssetsCommonExtension
   include Seek::MimeTypes
   include Seek::ContentBlobCommon
 
+  def destroy_version
+      name = self.controller_name.singularize
+      @asset = eval("@#{name}")
+
+      if Seek::Config.delete_asset_version_enabled
+            @asset.destroy_version  params[:version]
+
+            flash[:notice] = "Version #{params[:version]} was deleted!"
+            respond_to do |format|
+              format.html { redirect_to(polymorphic_path(@asset)) }
+              format.xml { head :ok }
+            end
+      else
+        flash[:error] = "Deleting a version of #{@asset.class.name.underscore.humanize} is not enabled!"
+        respond_to do |format|
+              format.html { redirect_to(polymorphic_path(@asset)) }
+              format.xml { head :ok }
+        end
+      end
+  end
   def download
     if self.controller_name=="models"
       download_model
@@ -101,6 +121,7 @@ module AssetsCommonExtension
     @tmp_io_objects_localfile = []
     @tmp_io_objects_url = []
     @data_urls = []
+    @external_link = false
     symb = c.singularize.to_sym
     object = eval("@#{c.singularize}")
     params_files = calculate_params(:content_blob)
@@ -151,9 +172,9 @@ module AssetsCommonExtension
         end
         if !params_url.blank?
 
-          make_local_copy = (params[symb][:local_copy]=="1")
           @data_urls=params_url
-
+          @external_link = (params[symb][:external_link]=="1")
+          make_local_copy = !@external_link
           @data_urls.each_with_index do |data_url,index|
 
             code = url_response_code data_url
@@ -161,11 +182,7 @@ module AssetsCommonExtension
               downloader=Seek::RemoteDownloader.new
               data_hash = downloader.get_remote_data data_url, nil, nil, nil, make_local_copy
 
-              if make_local_copy
-                @tmp_io_objects_url << File.open(data_hash[:data_tmp_path], "r")
-              else
-                @tmp_io_objects_url << nil
-              end
+              @tmp_io_objects_url << File.open(data_hash[:data_tmp_path], "r") if make_local_copy
 
               @content_types << data_hash[:content_type]
               @original_filenames << (params_original_filename_from_ulr[index] || data_hash[:filename])
@@ -213,7 +230,7 @@ module AssetsCommonExtension
       end
       params[symb].delete 'data_url'
       params[symb].delete 'data'
-      params[symb].delete 'local_copy'
+      params[symb].delete 'external_link'
       return true
     end
   end
@@ -232,6 +249,7 @@ module AssetsCommonExtension
       # create new /new version
       asset.create_content_blob(:tmp_io_object => @tmp_io_object,
                                 :url=>@data_url,
+                                :external_link=>@external_link,
                                 :original_filename=>params[sym][:original_filename],
                                 :content_type=>content_type,
                                 :asset_version=>version
@@ -258,6 +276,7 @@ module AssetsCommonExtension
         asset.content_blobs.create(:tmp_io_object => @tmp_io_objects_url[index],
                                    :url=>data_url,
                                    :original_filename=>@original_filenames[index],
+                                   :external_link => @external_link,
                                    :content_type=>@content_types[index],
                                    :asset_version=>version)
       end
@@ -298,12 +317,12 @@ module AssetsCommonExtension
         files_to_download["#{filename}"] = content_blob.filepath
         content_type = content_blob.content_type
       elsif !content_blob.url.nil?
-        downloader=Seek::RemoteDownloader.new
-        data_hash = downloader.get_remote_data content_blob.url, nil, nil, nil, true
-        original_filename = get_filename data_hash[:filename], content_blob.original_filename
-        filename = check_and_rename_file files_to_download.keys, original_filename
-        files_to_download["#{filename}"] = data_hash[:data_tmp_path]
-        content_type = data_hash[:content_type] || content_blob.content_type
+          downloader=Seek::RemoteDownloader.new
+          data_hash = downloader.get_remote_data content_blob.url, nil, nil, nil, true
+          original_filename = get_filename data_hash[:filename], content_blob.original_filename
+          filename = check_and_rename_file files_to_download.keys, original_filename
+          files_to_download["#{filename}"] = data_hash[:data_tmp_path]
+          content_type = data_hash[:content_type] || content_blob.content_type
       end
     end
 
@@ -392,6 +411,7 @@ end
 Seek::AssetsCommon.module_eval do
   include AssetsCommonExtension
 end
+
 
 
 

@@ -15,10 +15,10 @@
     <%= f.text_area :description,:style => "width: 100%;", :rows => 10 -%>
   </p>
 
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation} -%><br/>
-  <% if show_scales? %>
-      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} %>
-  <% end %>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>true} -%><br/>
+   <p>
+     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
+   </p>
   <p>
     <%= render :partial=>"assets/sharing_form" if @investigation.can_manage? -%>
   </p>

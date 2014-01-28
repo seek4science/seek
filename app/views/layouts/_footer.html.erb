@@ -5,17 +5,20 @@
   <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
   <% if Seek::Config.copyright_addendum_enabled  %>
     <p class="copyright">
-      <%= Seek::Config.copyright_addendum_content %>
+      <%= Seek::Config.copyright_addendum_content.html_safe%>
     </p>
   <%end%>
 </p>
 
-<% cache "footer" do -%>
+<% logged_in?? cache_name = "footer" : cache_name = "footer1" %>
+
+<% cache cache_name do -%>
 <div>
   <table>
     <tr>
       <td class="left">
         <p><%= link_to "Front Page", "/" %></p>
+
         <%if Seek::Config.dm_project_link != Seek::Config.project_link %><p><%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' %></p><%end%>
         <p><%= link_to Seek::Config.project_title, Seek::Config.project_link %> </p>
         <p class="none_text"><%= version_text -%></p>

@@ -15,6 +15,7 @@ namespace :seek do
             :repopulate_auth_lookup_tables,
             :increase_sheet_empty_rows,
             :clear_filestore_tmp,
+            :repopulate_missing_publication_book_titles,
             :remove_non_seek_authors,
             :clean_up_sop_specimens,
             :drop_solr_index
@@ -267,4 +268,21 @@ namespace :seek do
     end
     ascii
   end
+ desc "repopulate missing book titles for publications"
+  task(:repopulate_missing_publication_book_titles => :environment) do
+    disable_authorization_checks do
+      Publication.all.select { |p| p.publication_type ==3 && p.journal.blank? }.each do |pub|
+        if pub.doi
+          query = DoiQuery.new(Seek::Config.crossref_api_email)
+          result = query.fetch(pub.doi)
+          unless result.nil? || !result.error.nil?
+            pub.extract_doi_metadata(result)
+            pub.save
+          end
+        end
+      end
+    end
+  end
+
+  
 end

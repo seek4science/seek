@@ -14,6 +14,21 @@ class SearchController < ApplicationController
     @results = @results.select{|r| !r.nil?}
 
     @results = select_authorised @results
+
+    @results_scaled = Scale.all.collect {|scale| [scale.key, @results.select {|item| !item.respond_to?(:scale_ids) or item.scale_ids.include? scale.id}]}
+    @results_scaled << ['all', @results]
+    @results_scaled = Hash[*@results_scaled.flatten(1)]
+    logger.info @results_scaled.inspect
+    if params[:scale]
+      # when user does not login, params[:scale] is nil
+      @results = @results_scaled[params[:scale]]
+      @scale_key = params[:scale]
+    else
+       @results = @results_scaled['all']
+       @scale_key = 'all'
+    end
+
+
     if @results.empty?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'.".html_safe
     else
@@ -48,6 +63,7 @@ class SearchController < ApplicationController
           sources.each do |source|
             search_result = source.search do |query|
               query.keywords(downcase_query)
+              query.paginate(:page => 1, :per_page => source.count ) if source.count > 30  # By default, Sunspot requests the first 30 results from Solr
             end.results
             search_result = search_result.sort_by(&:published_date).reverse if source == Publication && Seek::Config.is_virtualliver
             @results |= search_result
@@ -56,6 +72,7 @@ class SearchController < ApplicationController
            object = type.singularize.camelize.constantize
            search_result = object.search do |query|
              query.keywords(downcase_query)
+             query.paginate(:page => 1, :per_page => object.count ) if object.count > 30 # By default, Sunspot requests the first 30 results from Solr
            end.results
            search_result = search_result.sort_by(&:published_date).reverse if object == Publication
            @results = search_result

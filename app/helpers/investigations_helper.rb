@@ -3,7 +3,7 @@ module InvestigationsHelper
   def investigation_link investigation
     unless investigation.nil?
       if investigation.can_view?
-        link_to investigation.title,investigation
+        link_to investigation.title, investigation
       else
         hidden_items_html [investigation]
       end

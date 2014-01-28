@@ -17,7 +17,9 @@ module Acts #:nodoc:
         acts_as_favouritable
         acts_as_scalable
 
+        acts_as_scalable if Seek::Config.is_virtualliver
         scope :default_order, order("title")
+
 
         title_trimmer
 
@@ -42,7 +44,6 @@ module Acts #:nodoc:
         include Acts::Isa::InstanceMethods
         include BackgroundReindexing
         include Subscribable
-
       end
 
       def is_isa?

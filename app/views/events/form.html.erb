@@ -67,11 +67,11 @@
             </p>
         <% end %>
 
-        <%= render :partial => "assets/associate_publication", :locals=>{:f=>f, :resource => @event} -%>
+        <%=  f.fancy_multiselect :publications,:with_new_link=>true,:other_projects_checkbox=>true -%>
         <br/>
         <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event, :show_relationships=>false} -%>
         <br/>
-        <%= render :partial => "assets/associate_presentation", :locals=>{:resource => @event} -%>
+        <%= f.fancy_multiselect :presentations,:with_new_link=>true,:other_projects_checkbox=>true %>
 
       </div>
       <p>
@@ -85,6 +85,7 @@
         <% else %>
             <%= f.submit button_text, :disable_with=>disabled_text, :id => "event_submit_btn", :onclick => "javascript: $('event_submit_btn').form.submit();return(false);" -%>
         <% end %>
+        or <%= link_to 'Cancel', (@event.id ? event_path(@event.id) : events_path) -%>
       </p>
   <% end %>
 </div>

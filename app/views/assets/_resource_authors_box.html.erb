@@ -7,15 +7,15 @@
 creators ||= nil
 if resource.respond_to?(:contributor) and resource.contributor_credited? and !creators
     creators = (resource.try(:creators) || []) | [resource.contributor.nil? ? nil : resource.contributor.person]
-    title ||= "Uploader and creators"
+    title ||= "Uploader and contributors"
 else
     creators ||= resource.creators.dup
-    title ||= "Creators"
+    title ||= "Contributors"
 end
 %>
 <div class="contribution_section_box curved with_shadow">
   <p class="heading">
-    <%= help_icon("These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its creators.") -%>
+    <%= help_icon("These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its contributors.") -%>
     <%= h(title) -%>
   </p>
   <p class="author_list">
@@ -45,7 +45,7 @@ end
 
   <p class="heading">
     <%= help_icon("Non-SEEK members who helped with the creation of this file.") -%>
-    Other Creators
+    Other Contributors
   </p>
   <div style="border: 1px dashed #BBB; margin: 0.5em;padding: 3px;text-align:left">
     <%= h(resource.other_creators) %>

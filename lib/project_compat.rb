@@ -5,10 +5,15 @@ module ProjectCompat
       has_and_belongs_to_many :projects, :join_table => "#{join_table_name}",
                               :before_add => :react_to_project_addition ,
                               :before_remove => :react_to_project_removal
+      if Project.is_hierarchical?
+          def projects_and_ancestors
+            self.projects.collect { |proj| [proj]+proj.ancestors }.flatten.uniq
+          end
 
-
-    end
-  end
+          def projects_and_descendants
+            self.projects.collect { |proj| [proj]+proj.descendants }.flatten.uniq
+          end
+      end
 
   def react_to_project_addition project
     SetSubscriptionsForItemJob.create_job(self.class.name, self.id, [project.id]) if (!self.new_record? && self.subscribable?)
@@ -18,5 +23,8 @@ module ProjectCompat
   def react_to_project_removal project
     RemoveSubscriptionsForItemJob.create_job(self.class.name, self.id, [project.id]) if self.subscribable?
     self.create_rdf_generation_job(true) if self.respond_to?(:create_rdf_generation_job)
+  end
+
+   end
   end
 end

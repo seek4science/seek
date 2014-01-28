@@ -45,6 +45,7 @@ class AdminsController < ApplicationController
     Seek::Config.jerm_enabled= string_to_boolean params[:jerm_enabled]
     Seek::Config.email_enabled= string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled= string_to_boolean params[:pdf_conversion_enabled]
+    Seek::Config.delete_asset_version_enabled= string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.forum_enabled= string_to_boolean params[:forum_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]

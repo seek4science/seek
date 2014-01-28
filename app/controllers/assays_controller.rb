@@ -4,6 +4,7 @@ class AssaysController < ApplicationController
   include IndexPager
   include Seek::AnnotationCommon
 
+
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show]
 
@@ -99,9 +100,9 @@ class AssaysController < ApplicationController
     model_ids     = params[:model_ids] || []
 
      Array(organisms).each do |text|
-      o_id, strain, culture_growth_type_text=text.split(",")
+      o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-      @assay.associate_organism(o_id, strain, culture_growth)
+      @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
     end
 
     @assay.owner=current_user.person
@@ -163,10 +164,10 @@ class AssaysController < ApplicationController
 
     @assay.assay_organisms = []
     Array(organisms).each do |text|
-          o_id, strain, culture_growth_type_text=text.split(",")
+          o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-          @assay.associate_organism(o_id, strain, culture_growth)
-        end
+          @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
+    end
 
     update_annotations @assay
     update_scales @assay
@@ -208,6 +209,7 @@ class AssaysController < ApplicationController
         format.html { redirect_to(@assay) }
         format.xml { head :ok }
       else
+
         format.html { render :action => "edit" }
         format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }
       end

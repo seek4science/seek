@@ -18,6 +18,7 @@ class User < ActiveRecord::Base
 
   has_many :investigations,:as=>:contributor
   has_many :studies,:as=>:contributor
+  has_many :samples,:as=>:contributor
 
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
@@ -207,6 +208,31 @@ class User < ActiveRecord::Base
   
   def can_edit_institutions?
     !person.nil? && person.can_edit_institutions?
+  end
+
+  def can_manage_types?
+    unless Seek::Config.type_managers_enabled
+      return false
+    end
+
+    case Seek::Config.type_managers
+      when "admins"
+        if User.admin_logged_in?
+          return true
+        else
+          return false
+        end
+      when "pals"
+        if User.admin_logged_in? || User.pal_logged_in?
+          return true
+        else
+          return false
+        end
+      when "users"
+        return true
+      when "none"
+        return false
+    end
   end
 
   def self.with_current_user user

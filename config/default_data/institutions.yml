@@ -1,0 +1,485 @@
+#encoding: utf-8
+record_2:
+ id: 102
+ name: "Bayer Schering Pharma AG - Clinical Pharmacology, Modeling & Simulation"
+ address: "Aprather Weg 18a"
+ web_page: "http://www.bayerscheringpharma.de"
+ city: "42096 Wuppertal"
+ country: "Germany"
+
+record_3:
+ id: 14
+ name: "Bayer Technology Services GmbH"
+ address: "PT-AS-CS, Building E41"
+ web_page: "http://www.bayertechnology.com/"
+ city: "51368 Leverkusen"
+ country: "Germany"
+
+record_4:
+ id: 104
+ name: "Berlin-Brandenburg Center for Regenerative Therapies, Charité Campus Virchow-Klinikum"
+ address: "Augustenburger Platz 1"
+ web_page: "http://bcrt.charite.de/"
+ city: "13353 Berlin"
+ country: "Germany"
+
+record_5:
+ id: 105
+ name: "BioControl Jena GmbH"
+ address: "Wildenbruchstr. 15"
+ web_page: "http://www.biocontrol-jena.com/"
+ city: "07745 Jena"
+ country: "Germany"
+
+record_6:
+ id: 8
+ name: "Charité - Universitätsmedizin Berlin, Institut für Biochemie"
+ address: "Seestr. 73"
+ web_page: "http://www.charite.de/sysbio/"
+ city: "13347 Berlin"
+ country: "Germany"
+
+record_7:
+ id: 107
+ name: "Deutsches Herzzentrum Berlin"
+ address: "Augustenburger Platz 1"
+ web_page: ""
+ city: "13353 Berlin"
+ country: "Germany"
+
+record_8:
+ id: 108
+ name: "Deutsches Krebsforschungszentrum"
+ address: "Im Neuenheimer Feld 280"
+ web_page: "http://www.dkfz.de/"
+ city: "69120 Heidelberg"
+ country: "Germany"
+
+record_9:
+ id: 109
+ name: "Dr. Margarete Fischer-Bosch-Institut für Klinische Pharmakologie"
+ address: "Auerbachstr. 112"
+ web_page: "http://www.ikp-stuttgart.de/"
+ city: "70376 Stuttgart"
+ country: "Germany"
+
+record_10:
+ id: 110
+ name: "EMBL Heidelberg"
+ address: "Meyerhofstr. 1"
+ web_page: "http://www.embl.de/"
+ city: "69117 Heidelberg"
+ country: "Germany"
+
+record_11:
+ id: 11
+ name: "Fraunhofer MEVIS"
+ address: "Universitaetsallee 29"
+ web_page: "http://www.mevis.fraunhofer.org"
+ city: "28359 Bremen"
+ country: "Germany"
+
+record_12:
+ id: 112
+ name: "Fraunhoferinstitut für Toxikologie und Experimentelle Medizin (ITEM)"
+ address: "Nicolai-Fuchs-Str. 1"
+ web_page: "http://www.item.fraunhofer.de/"
+ city: "30625 Hannover"
+ country: "Germany"
+
+record_13:
+ id: 113
+ name: "French National Institute for Research in Computer Science and Control INRIA - Domaine de Voluceau-Rocquencourt"
+ address: "B.P. 105"
+ web_page: "http://www.inria.fr/"
+ city: "F-78153 Le Chesnay Cedex"
+ country: "France"
+
+record_14:
+ id: 114
+ name: "FRIAS – Freiburg Institute for Advanced Studies
+School of Life Sciences - LifeNet"
+ address: "Albertstr. 19"
+ web_page: "http://www.frias.uni-freiburg.de/lifenet"
+ city: "79104 Freiburg im Breisgau"
+ country: "Germany"
+
+record_15:
+ id: 115
+ name: "Friedrich-Schiller-Universität Jena - Biologisch-Pharmazeutische Fakultät - Lehrstuhl für Bioinformatik"
+ address: "Ernst-Abbe-Platz 2"
+ web_page: "http://pinguin.biologie.uni-jena.de/bioinformatik/en/"
+ city: "07743 Jena"
+ country: "Germany"
+
+record_16:
+ id: 116
+ name: "Hamamatsu Tissue Imaging and Analysis Center (TIGA), University Heidelberg"
+ address: "Im Neuenheimer Feld 267"
+ web_page: "http://tigacenter.bioquant.uni-heidelberg.de/"
+ city: "69120 Heidelberg"
+ country: "Germany"
+
+record_17:
+ id: 117
+ name: "Helmholtz-Institut für Biomedizinische Technologien, Universitätsklinikum Aachen (UKA)"
+ address: "Pauwelsstr. 20"
+ web_page: "http://www.molecular-imaging.ukaachen.de"
+ city: "52074 Aachen"
+ country: "Germany"
+
+record_18:
+ id: 1
+ name: "HITS gGmbH"
+ address: "Schloss-Wolfsbrunnenweg 35"
+ web_page: "http://www.h-its.org/sdbv"
+ city: "69118 Heidelberg"
+ country: "Germany"
+
+record_19:
+ id: 119
+ name: "Insilico Biotechnology AG"
+ address: "Nobelstr. 15"
+ web_page: "http://www.insilico-biotechnology.com/"
+ city: "70569 Stuttgart"
+ country: "Germany"
+
+record_20:
+ id: 120
+ name: "Institut für Molekulare Medizin und Zellforschung, Zentrum für Biochemie und Molekulare Zellforschung (ZBMZ), Albert-Ludwigs-Universität Freiburg"
+ address: "Stefan-Meier-Str. 17"
+ web_page: "http://www.mol-med.uni-freiburg.de/"
+ city: "79104 Freiburg im Breisgau"
+ country: "Germany"
+
+record_21:
+ id: 121
+ name: "Institut für Pharmazeutische Wissenschaften - Lehrstuhl für Pharmazeutische Biologie und Biotechnologie, Albert-Ludwigs-Universität Freiburg"
+ address: "Stefan-Meier-Str. 19"
+ web_page: "http://portal.uni-freiburg.de/pharmazie/"
+ city: "79104 Freiburg"
+ country: "Germany"
+
+record_22:
+ id: 122
+ name: "Institute for Bioinformatics and Systems Biology, Helmholtz Zentrum München"
+ address: "Ingolstädter Landstr. 1"
+ web_page: "http://www.helmholtz-muenchen.de/en/cmb/"
+ city: "85764 Neuherberg"
+ country: "Germany"
+
+record_23:
+ id: 123
+ name: "Institute for Cell Biology - Department of Molecular Biology, University of Tübingen"
+ address: "Auf der Morgenstelle 15"
+ web_page: "http://www.uni-tuebingen.de/uni/kxm/"
+ city: "72076 Tübingen"
+ country: "Germany"
+
+record_24:
+ id: 124
+ name: "Institute for Computer Science, Humboldt-Universität zu Berlin"
+ address: "Rudower Chaussee 25"
+ web_page: "http://www.informatik.hu-berlin.de/"
+ city: "12489 Berlin"
+ country: "Germany"
+
+record_25:
+ id: 125
+ name: "Institute of Molecular Medicine, Friedrich-Wilhelms-Universität Bonn"
+ address: "Sigmund-Freud Str. 25"
+ web_page: "http://www.immei.uni-bonn.de/"
+ city: "53105 Bonn"
+ country: "Germany"
+
+record_26:
+ id: 10
+ name: "Institute of Physics - University of Freiburg"
+ address: "Hermann-Herder Str. 3"
+ web_page: "http://webber.physik.uni-freiburg.de/"
+ city: "79104 Freiburg im Breisgau"
+ country: "Germany"
+
+record_27:
+ id: 127
+ name: "Interdisziplinäres Zentrum für Bioinformatik (IZBI),
+Universität Leipzig"
+ address: "Härtelstr. 16-18"
+ web_page: "http://ms.izbi.uni-leipzig.de/"
+ city: "04107 Leipzig"
+ country: "Germany"
+
+record_28:
+ id: 128
+ name: "KeyNeurotek Pharmaceuticals AG"
+ address: "Leipziger Str. 44"
+ web_page: "http://www.keyneurotek.de/"
+ city: "39120 Magdeburg"
+ country: "Germany"
+
+record_29:
+ id: 129
+ name: "Klinik für Allgemein-, Viszeral- und Gefäßchirurgie
+Universitätsklinikum Jena, Abt. Experimentelle Transplantationschirurgie"
+ address: "Drackendorfer Str. 1"
+ web_page: ""
+ city: "07749 Jena"
+ country: "Germany"
+
+record_30:
+ id: 130
+ name: "Klinikum der Universität Regensburg - Klinik und Poliklinik für Kinder- und Jugendmedizin - Zentrum für Leberzellforschung "
+ address: "Franz-Josef-Strauss-Allee 11"
+ web_page: ""
+ city: "93053 Regensburg"
+ country: "Germany"
+
+record_31:
+ id: 6
+ name: "Leibniz-Institut für Arbeitsforschung (IfADo)"
+ address: "Ardeystr. 67"
+ web_page: "http://www.ifado.de/"
+ city: "44139 Dortmund"
+ country: "Germany"
+
+record_32:
+ id: 132
+ name: "Leibniz-Institut für Naturstoff-Forschung und Infektionsbiologie e.V. - Angewandte Mikrobiologie - Hans-Knöll-Institut"
+ address: "Beutenbergstr. 11a"
+ web_page: "http://www.hki-jena.de/"
+ city: "07745 Jena"
+ country: "Germany"
+
+record_33:
+ id: 133
+ name: "Leibniz-Institut für Polymerforschung Dresden e.V."
+ address: "Hohe Str. 6"
+ web_page: "http://www.ipfdd.de/"
+ city: "01069 Dresden"
+ country: "Germany"
+
+record_34:
+ id: 134
+ name: "Life & Medical Sciences (LIMES) - Universität Bonn"
+ address: "Carl-Troll-Str. 31"
+ web_page: "http://www.limes-zentrum.uni-bonn.de/"
+ city: "53115 Bonn"
+ country: "Germany"
+
+record_35:
+ id: 135
+ name: "Ludwig-Maximillian-Universität München - Klinikum Großhadern - Klinik und Poliklinik für Chirurgie"
+ address: "Marchioninistr. 15"
+ web_page: "http://gch.klinikum.uni-muenchen.de/"
+ city: "81377 München"
+ country: "Germany"
+
+record_36:
+ id: 136
+ name: "Max Planck Institute for Biochemistry - Department of Proteomics and Signaltransduction"
+ address: "Am Klopferspitz 18"
+ web_page: "http://www.biochem.mpg.de/"
+ city: "82152 Martinsried"
+ country: "Germany"
+
+record_37:
+ id: 137
+ name: "Max Planck Institute for Dynamics of Complex Technical Systems"
+ address: "Sandtorstr. 1"
+ web_page: "http://www.mpi-magdeburg.mpg.de/"
+ city: "39106 Magdeburg"
+ country: "Germany"
+
+record_38:
+ id: 12
+ name: "Max Planck Institute of Molecular Cell Biology and Genetics"
+ address: "Pfotenhauerstr. 108"
+ web_page: "www.mpi-cbg.de"
+ city: "01307 Dresden"
+ country: "Germany"
+
+record_39:
+ id: 139
+ name: "Molekulare Medizin, Abteilung Pediatrische Onkologie, Hämatologie und Immunologie, Universität Heidelberg"
+ address: "Im Neuenheimer Feld 153"
+ web_page: "http://www.klinikum.uni-heidelberg.de/Molekulare-Onkologie-und-Haematologie.6683.0.html?&FS=9311.pdf%3FL%3D"
+ city: "69120 Heidelberg"
+ country: "Germany"
+
+record_40:
+ id: 140
+ name: "National Technical University of Athens, Department of Mechanical Engineering"
+ address: "Heroon Polytechniou 9"
+ web_page: "http://www.ntua.gr/index_en.html"
+ city: "15780 Zografou, Athens"
+ country: "Greece"
+
+record_41:
+ id: 141
+ name: "Naturwissenschaftliches und Medizinisches Institut an der Universität Tübingen (NMI)"
+ address: "Markwiesenstr. 55"
+ web_page: "http://www.nmi.de/"
+ city: "72770 Reutlingen"
+ country: "Germany"
+
+record_42:
+ id: 142
+ name: "Profil Institut für Stoffwechselforschung GmbH"
+ address: "Hellersbergstr. 9"
+ web_page: "http://www.profil.com/"
+ city: "41460 Neuss"
+ country: "Germany"
+
+record_43:
+ id: 143
+ name: "Technische Universität Dresden, Informatik"
+ address: "Nöthnitzer Str. 46"
+ web_page: "http://theobio.mtbio.de/imc/"
+ city: "01187 Dresden"
+ country: "Germany"
+
+record_44:
+ id: 144
+ name: "Technische Universität München - MRI - Abteilung Traumatologie"
+ address: "Ismaniger Str. 22"
+ web_page: ""
+ city: "81675 München"
+ country: "Germany"
+
+record_45:
+ id: 145
+ name: "Universität des Saarlandes - Technische Biochemie"
+ address: "Campus A 1.5"
+ web_page: "http://www.uni-saarland.de/fak8/heinzle/"
+ city: "66123 Saarbrücken"
+ country: "Germany"
+
+record_46:
+ id: 146
+ name: "Universität Heidelberg - Pathologisches Institut"
+ address: "Im Neuenheimer Feld 220/221"
+ web_page: "http://www.klinikum.uni-heidelberg.de/Pathologisches-Institut.112.0.html"
+ city: "69120 Heidelberg"
+ country: "Germany"
+
+record_47:
+ id: 147
+ name: "Universität Leipzig - Institut für Medizinische Physik und Biophysik"
+ address: "Härtelstr. 16-18"
+ web_page: "http://www.uni-leipzig.de/~biophys/"
+ city: "04107 Leipzig"
+ country: "Germany"
+
+record_48:
+ id: 5
+ name: "Universität Leipzig - Medizinische Fakultät - Institut für Biochemie"
+ address: "Johannisallee 30"
+ web_page: "http://www.uni-leipzig.de/~biochem/bch_cms/"
+ city: "04103 Leipzig"
+ country: "Germany"
+
+record_49:
+ id: 149
+ name: "Universität Stuttgart, Institut für Systemdynamik (ISYS)"
+ address: "Pfaffenwaldring 9"
+ web_page: "http://www.isys.uni-stuttgart.de/"
+ city: "70569 Stuttgart"
+ country: "Germany"
+
+record_50:
+ id: 150
+ name: "Universitätsklinikum Campus Kiel - Klinik für Allgemeine Chirurgie und Thoraxchirurgie"
+ address: "Arnold-Heller-Str. 3"
+ web_page: "http://141.83.55.222/output/La3/677.258/676.609.html"
+ city: "24105 Kiel"
+ country: "Germany"
+
+record_51:
+ id: 151
+ name: "Universitätsklinikum Campus Kiel - Medizinische Klinik I - Klinik für Allgemeine Innere Medizin"
+ address: "Schittenhelmstr. 12"
+ web_page: ""
+ city: "24105 Kiel"
+ country: "Germany"
+
+record_52:
+ id: 152
+ name: "Universitätsklinikum Düsseldorf - Klinik für Gastroenterologie, Hepatologie und Infektiologie"
+ address: "Moorenstr. 5"
+ web_page: ""
+ city: "40225 Düsseldorf"
+ country: "Germany"
+
+record_53:
+ id: 153
+ name: "Universitätsklinikum Freiburg - Innere Medizin - Klinische Chemie"
+ address: "Hugstetter Str. 55"
+ web_page: "http://www.uniklinik-freiburg.de/zentrallabor/live/index.html"
+ city: "79106 Freiburg im Breisgau"
+ country: "Germany"
+
+record_54:
+ id: 154
+ name: "Universitätsklinikum Freiburg, Innere Medizin II"
+ address: "Hugstetter Str. 55"
+ web_page: "http://www.uniklinik-freiburg.de/"
+ city: "79106 Freiburg im Breisgau"
+ country: "Germany"
+
+record_55:
+ id: 155
+ name: "Universitätsklinikum Halle (Saale) - Universitätsklinik und Poliklinik für Innere Medizin I"
+ address: "Ernst-Grube-Str. 40"
+ web_page: "http://www.medizin.uni-halle.de/kim1/"
+ city: "06097 Halle"
+ country: "Germany"
+
+record_56:
+ id: 4
+ name: "Universitätsklinikum Mannheim, II. Medizinische Klinik - Molekulare Alkoholforschung in der Gastroenterologie"
+ address: "Theodor-Kutzer-Ufer 1-3, H42 E4"
+ web_page: "http://www.umm.uni-heidelberg.de/inst/med2/molalk/"
+ city: "68167 Mannheim"
+ country: "Germany"
+
+record_57:
+ id: 157
+ name: "University Heidelberg - Virtual Liver Network"
+ address: "Im Neuenheimer Feld 327"
+ web_page: "http://www.virtual-liver.de/"
+ city: "69120 Heidelberg"
+ country: "Germany"
+
+record_58:
+ id: 9
+ name: "University of Heidelberg, BIOQUANT BQ 18, Abteilung Modellierung Biologischer Prozesse"
+ address: "Im Neuenheimer Feld 267"
+ web_page: "http://www.bioquant.uni-heidelberg.de/research/groups/modeling_of_biological_processes.html"
+ city: "69120 Heidelberg"
+ country: "Germany"
+
+record_59:
+ id: 159
+ name: "Wilhelm-Schickard-Institute for Computer Science - University of Tübingen"
+ address: "Sand 1"
+ web_page: "http://www.ra.cs.uni-tuebingen.de/"
+ city: "72076 Tübingen"
+ country: "Germany"
+
+record_60:
+ id: 160
+ name: "Zentrum für Biosystemanalyse Freiburg (zbsa)"
+ address: "Habsburgerstr. 49"
+ web_page: "http://www.zbsa.uni-freiburg.de/"
+ city: "79104 Freiburg"
+ country: "Germany"
+
+record_61:
+ id: 161
+ name: "Zentrum für Informationsdienste und Hochleistungsrechnen (ZIH), Technische Universität Dresden"
+ address: "Nöthnitzer Str. 46"
+ web_page: "http://tu-dresden.de/die_tu_dresden/zentrale_einrichtungen/zih/"
+ city: "01187 Dresden"
+ country: "Germany"
+
+

@@ -17,15 +17,14 @@
             <% sop_description_value = (params[:sop].blank? || params[:sop][:description].blank?) ? nil : params[:sop][:description] -%>
             <%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
-        <%= render :partial => "projects/project_selector", :locals => { :resource => @sop } -%>
-      <% if show_scales? %>
-          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} %>
-      <% end %>
-        
-		<%= fields_for(@sop) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
-		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
-      <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@sop} %>
+        <%= render :partial => "projects/project_selector", :locals => { :resource => @sop,:allow_nil=> true} -%>
         <p>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} if show_scales?%>
+       </p>
+       <%= fields_for(@sop) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
+		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
+        <%= fields_for(@sop) { |f|  f.fancy_multiselect :samples, {:hidden=> @sop.samples.blank?  ? true : false, :other_projects_checkbox => true}} -%>
+      <p>
           <%= preview_permission_popup_link(@sop)-%>
           <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "validateResourceFields(true,'sop',true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>
         </p>

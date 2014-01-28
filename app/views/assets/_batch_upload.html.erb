@@ -1,12 +1,12 @@
 <%
    # determine the asset type from the controller
    upload_field = controller_name.downcase.singularize.underscore
-   # inject the attributes data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
+   # inject the attributes data_url and external_link in the asset type, e.g. @model. This keeps the form clean.
    resource=eval("@"+upload_field)
    class << resource
-       attr_accessor :data_url, :local_copy
+       attr_accessor :data_url, :external_link
    end unless resource.nil?
-   resource.local_copy=0 unless resource.nil?
+   resource.external_link = 1 unless resource.nil?
    asset_name = text_for_resource upload_field
    @content_blob ||= ContentBlob.new
    with_image_file = resource && resource.kind_of?(Model) && (mine?(resource) || resource.can_edit?)
@@ -38,19 +38,21 @@
     -%>
   </p>
     <span id="more_upload_info" style="display:none;">
-        <p>
-          If the URL points to another webpage - for example a collection of datasets in another repostiory - then the link will be shown for this asset, and there will be no download option.
-        </p>
-        <p>
-          If the URL points to a remote file, then it will appear just like an uploaded asset in SEEK. If accessing the file requires authorization, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
-          then they will simply directed to the URL (for example, so that they can login to access the file).
-        </p>
-        <p>
+        
+       <p>
           When registering a URL to a file, you can specify that a copy of the data should be stored
           within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL become unavailable, the data is still available from SEEK. However, you should
           be sure that the copyright on the file allows you to do this.
         </p>
-        <p></p>
+
+        <p>
+          If the URL results in a redirection or unauthorized response, or if external link is selected,
+          then SEEK will store only the URL. In this case, when another user selects to download the <%= asset_name -%>
+          URL. In this case, when another user selects to download the <%= asset_name -%>
+          then they will simply directed to the URL (for example, so that they can login to access the file).
+        </p>
+      
+        
     </span>
   <% if new_version -%>
       <p>
@@ -66,16 +68,18 @@
 
   <div id="upload_type_selection">
     <ul id="switch_upload_buttons">
-      <li>
+      <table>
+      <td>
         <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class=>"block_link_active", :id=>"upload_from_file_button", :title=>tooltip_title_attrib('Add from a local file') -%>
-      </li>
-      <li>
+        <br>
         <%= link_to_function image("internet_large"), "from_url_selected(); return (false);", :class=>"block_link", :id=>"upload_from_url_button", :title=>tooltip_title_attrib('Add from a remote URL') -%>
-      </li>
-      <li id="upload_options">
+      </td>
+      <td>
+      <div id="upload_options">
         <div id="upload_from_file">
           <p>
             <b>File to upload:</b>
+            <span class="required">*</span>
             <br/>
                 <%= fields_for @content_blob do |content_blob| -%>
                     <input id="content_blob_data" type="file">
@@ -85,6 +89,7 @@
         </div>
         <div id="upload_from_url" style="display:none;">
           <p>
+            <br>
             <b>URL:</b>
             <span class="required">*</span>
 
@@ -102,8 +107,8 @@
                 </span>
 
                 <p style="clear:both;">
-                  <b>Make a copy?</b>
-                  <%= check_box upload_field, :local_copy, :id=>"local_copy" -%>
+                  <b>Make an external link?</b>
+                  <%= check_box upload_field, :external_link,:id=>"external_link" -%>
                 </p>
             <%= hidden_field_tag "content_blob[original_filename_0]", original_filename -%>
             </p>
@@ -111,8 +116,10 @@
               <span id="test_url_result_icon"></span>
               <span id="test_url_msg" style="display:none;"></span>
             </p>
-          </div>
-      </li>
+        </div>
+      </div>
+      </td>
+      </table>
     </ul>
   </div>
 
@@ -129,6 +136,7 @@
     <% resource_name = resource.class.name.underscore %>
     <%= hidden_field_tag("#{resource_name}_id", resource.id) -%>
       <p>
+        <br/>
         <b>Image file: </b>
         <br/>
         <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>

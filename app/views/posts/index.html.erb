@@ -33,9 +33,11 @@
       </abbr>
     </div>
 
-    <%= avatar_for @users[post.user_id] %>
-    <span class="fn"><%= link_to truncate(h(@users[post.user_id].display_name), :lengh => 15), person_path(@users[post.user_id].person) %></span>
-    <span class="posts"><%= '{count} posts'[(count=@users[post.user_id].posts.size)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %></span>
+    <% unless @users[post.user_id].nil? %>
+        <%= avatar_for @users[post.user_id] %>
+        <span class="fn"><%= link_to truncate(h(@users[post.user_id].display_name), {:length => 15}), person_path(@users[post.user_id].person) %></span>
+        <span class="posts"><%= '{count} posts'[(count=@users[post.user_id].posts.size)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %></span>
+    <% end %>
   </td>
   <td class="body entry-content">
     <p class="topic">

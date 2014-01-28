@@ -7,9 +7,9 @@ class Project < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::Rdf::ReactToAssociatedChange
 
-  acts_as_yellow_pages 
-
+  acts_as_yellow_pages
   include SimpleCrypt
+
 
   title_trimmer
 
@@ -29,6 +29,15 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
 
+  RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
+
+  RELATED_RESOURCE_TYPES.each do |type|
+    define_method "related_#{type.underscore.pluralize}" do
+      send "#{type.underscore.pluralize}"
+    end
+  end
+
+
   def studies
     investigations.collect(&:studies).flatten.uniq
   end
@@ -47,7 +56,7 @@ class Project < ActiveRecord::Base
   after_initialize :default_default_policy_if_new
 
   def default_default_policy_if_new
-    self.default_policy = Policy.default if new_record?
+    self.default_policy = Policy.private_policy if new_record?
   end
 
   has_many :work_groups, :dependent=>:destroy
@@ -60,13 +69,13 @@ class Project < ActiveRecord::Base
                            Please disassociate first the people from this Work Group.")
     end
   end
-  
+
   alias_attribute :webpage, :web_page
   alias_attribute :internal_webpage, :wiki_page
 
   has_and_belongs_to_many :organisms, :before_add=>:update_rdf_on_associated_change, :before_remove=>:update_rdf_on_associated_change
   has_many :project_subscriptions,:dependent => :destroy
-  
+
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :name , :description, :locations
   end if Seek::Config.solr_enabled
@@ -78,18 +87,8 @@ class Project < ActiveRecord::Base
   def assets
     data_files | sops | models | publications | presentations
   end
-  
-  def institutions=(new_institutions)
-    new_institutions.each_index do |i|
-      new_institutions[i]=Institution.find(new_institutions[i]) unless new_institutions.is_a?(Institution)
-    end
-    work_groups.each do |wg|
-      wg.destroy unless new_institutions.include?(wg.institution)
-    end
-    for institution in new_institutions
-      institutions << institution unless institutions.include?(institution)
-    end
-  end
+
+
 
   #this is project role
   def pis
@@ -133,13 +132,13 @@ class Project < ActiveRecord::Base
     return locations
   end
 
+  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   def people
-    #TODO: look into doing this with a scope or direct query
-    res = work_groups.collect(&:people).flatten.uniq.compact
-    #TODO: write a test to check they are ordered
-    res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
-  end
-
+      #TODO: look into doing this with a named_scope or direct query
+      res = work_groups.collect(&:people).flatten.uniq.compact
+      #TODO: write a test to check they are ordered
+      res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
+    end
   # provides a list of people that are said to be members of this project, but are not associated with any user
   def userless_people
     people.select{|p| p.user.nil?}
@@ -212,4 +211,8 @@ class Project < ActiveRecord::Base
     user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
   end
 
+
+   #should put below at the bottom in order to override methods for hierarchies,
+   #Try to find a better way for overriding methods regardless where to include the module
+    include Seek::ProjectHierarchies if Seek::Config.is_virtualliver
 end

@@ -1,38 +1,28 @@
 Bacillus subtilis:
   title: Bacillus subtilis
+  
+Bos taurus:
+  title: Bos taurus
 
-Clostridium acetobutylicum:
-  title: Clostridium acetobutylicum
+Homo sapiens:
+  title: Homo sapiens
 
-Escherichia coli:
-  title: Escherichia coli
+Mus musculus:
+  title: Mus musculus
 
-Lactic Acid Bacteria:
-  title: Lactic Acid Bacteria
+Oryctolagus cuniculus:
+  title: Oryctolagus cuniculus
 
-Lactococcus lactis:
-  title: Lactococcus lactis
+Ovis aries:
+  title: Ovis aries
 
-Enterococcus faecalis:
-  title: Enterococcus faecalis
+Rattus norvegicus:
+  title: Rattus norvegicus
 
-Streptococcus pyogenes:
-  title: Streptococcus pyogenes
+Sus scrofa:
+  title: Sus scrofa
 
-Pseudomonas putida:
-  title: Pseudomonas putida
 
-Pseudomonas fluorescens:
-  title: Pseudomonas fluorescens
-
-Saccharomyces cerevisiae:
-  title: Saccharomyces cerevisiae
-
-Streptomyces coelicolor:
-  title: Streptomyces coelicolor
-
-Sulfolobus solfataricus:
-  title: Sulfolobus solfataricus
 
 Trypanosoma brucei:
   title: Trypanosoma brucei

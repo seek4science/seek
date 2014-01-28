@@ -2,7 +2,7 @@
 <div class="show_basic">    
   <%= error_messages_for('publication', :message => nil) %>
   <%= form_tag publication_path(@publication), :method => :put do %>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication}%>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => true}%>
 
 
     
@@ -27,14 +27,14 @@
     
     <div style="margin:1em; float: left; width:45%" class="box_editing_inner">
       <h4>Unassociated authors</h4>
-      <% unless @publication.non_seek_authors.empty? %>
+      <% unless @publication.publication_authors.empty? %>
         <table>
           <tr>
             <th>Author name</th>
             <th>SEEK person</th>
           </tr>
           <% people_by_project = people_by_project_options(Project.all) -%>
-          <% @publication.non_seek_authors.each do |author| %>
+          <% @publication.publication_authors.each do |author| %>
           <tr>
             <td><%= author.first_name + " " + author.last_name -%></td>
             <td>
@@ -62,11 +62,12 @@
         <span class="none_text">No associated authors</span>
       <% end %>
     </div>
+
     <br style="clear: both"/>
     <div>
-      <% if show_scales? %>
-          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@publication} %>
-      <% end %>
+     <p>
+       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@publication} if show_scales?%>
+    </p>
     <p>
         <%= render :partial=>"assets/select_tags" -%>
     </p>

@@ -1,23 +1,26 @@
 <div id="publication_preview" class="list_item" style="margin-bottom:1em">
-	
+
   <p class="list_item_title"><%= publication.title %></p>
-        
+
   <%= list_item_attribute "PubMed ID", publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{publication.pubmed_id}", {:onclick => "window.open(this.href);return false;"} unless publication.pubmed_id.nil? %>
-  
+
   <%= list_item_attribute "DOI", publication.doi, "http://dx.doi.org/#{publication.doi}", {:onclick => "window.open(this.href);return false;"} unless publication.doi.nil? %>
-  
+
   <%= list_item_simple_list(authors, "Author(s)") {|a| a.first_name + " " + a.last_name} -%>
-  
+
   <%= list_item_expandable_text "Abstract", h(publication.abstract) %>
-  
+
   <%= list_item_optional_attribute publication_type_text(publication.publication_type), h(publication.journal) %>
-  
+
   <%= list_item_attribute "Date Published", date_as_string(publication.published_date) %>
+
+  <%= list_item_attribute "Citation", publication.citation%>
 
 </div>
 <div style="clear:both;"></div>
 
 <%= form_for @publication do |f| %>
+  <%= f.hidden_field :parent_name %>
   <%= f.hidden_field :pubmed_id %>
   <%= f.hidden_field :doi %>
   <%= f.select :project_ids, Project.all.collect(&:id), {}, :selected=> @publication.project_ids, :multiple=>true, :style=>"display:none;", :class => 'project_ids' %>

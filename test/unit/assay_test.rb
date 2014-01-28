@@ -143,6 +143,11 @@ class AssayTest < ActiveSupport::TestCase
       assay.technology_type_uri=nil
       assay.samples = []
       assert assay.valid?
+    #an experimental assay can be invalid without a sample
+    assay.assay_class=assay_classes(:experimental_assay_class)
+    assay.technology_type=nil
+    assay.samples = []
+    assert !assay.valid?
     end
   end
 
@@ -332,7 +337,8 @@ class AssayTest < ActiveSupport::TestCase
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
       :assay_class => assay_classes(:experimental_assay_class),
-      :samples => [Factory(:sample)]
+      :samples => [Factory(:sample)],
+      :policy => Factory(:private_policy)
     )
   end
 

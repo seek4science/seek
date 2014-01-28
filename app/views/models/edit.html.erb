@@ -19,7 +19,7 @@
 
             <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
             <% if current_user_authorized_to_manage -%>
-              <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :disable_project_select => true } -%>
+              <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :disable_project_select => true ,:allow_nil => true } -%>
             <% end -%>
             <%= render :partial=>"model_metadata" -%>
 
@@ -27,16 +27,15 @@
         <p>
             <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
         </p>
-      <% if show_scales? %>
-          <%= render :partial => "scales/scales_selector_with_parameters",:locals=>{:object=>@model} %>
-          <%#= render :partial => "scales/scales_selector",:locals=>{:object=>@model} %>
-      <% end %>
+        <p>
+        <%= fancy_multiselect @model,:scales, {:possibilities=>sort_scales(Scale.all)} if @model.is_scalable? -%>
+       </p>
 
         <% if current_user_authorized_to_manage -%>
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
-        <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@model} %>
+        <%= f.fancy_multiselect :samples,{:hidden=> @model.samples.blank?  ? true : false, :other_projects_checkbox => true} -%>
 
         <% end -%>
         <p>

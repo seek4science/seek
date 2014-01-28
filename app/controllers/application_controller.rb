@@ -1,5 +1,6 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
+  include Recaptcha::Verify
 
 require 'authenticated_system'
 
@@ -13,7 +14,6 @@ class ApplicationController < ActionController::Base
 
   before_filter :log_extra_exception_data
 
-
   after_filter :log_event
 
   include AuthenticatedSystem
@@ -26,6 +26,13 @@ class ApplicationController < ActionController::Base
   end
 
   before_filter :profile_for_login_required
+  #around_filter :silence_logging if Rails.env == 'production'
+  def silence_logging
+    Rails.logger.silence do
+      yield
+    end
+  end
+
 
   before_filter :project_membership_required,:only=>[:create,:new]
 
@@ -54,7 +61,7 @@ class ApplicationController < ActionController::Base
     return  "http://#{base_host}"
   end
   helper_method :application_root
-  
+
   #Overridden from restful_authentication
   #Does a second check that there is a profile assigned to the user, and if not goes to the profile
   #selection page (GET people/select)
@@ -111,7 +118,11 @@ class ApplicationController < ActionController::Base
     current_user.forget_me if logged_in?
     cookies.delete :auth_token
     cookies.delete :open_id
+    error = flash[:error]
+    notice = flash[:notice]
     reset_session
+    flash[:error] = error
+    flash[:notice] = notice
   end
 
   #called via ajax to provide the full list of resources for the tabs
@@ -141,21 +152,62 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def resource_in_tab
+    resource_type = params[:resource_type]
+    view_type = params[:view_type]
+    scale_title = params[:scale_title] || ''
+
+    if params[:actions_partial_disable] == "true"
+      actions_partial_disable = true
+    else
+      actions_partial_disable = false
+    end
+
+     #params[:resource_ids] is passed as string, e.g. "id1, id2, ..."
+    resource_ids = (params[:resource_ids] || '').split(',')
+    clazz = resource_type.constantize
+    resources = clazz.find_all_by_id(resource_ids)
+    if clazz.respond_to?(:authorized_partial_asset_collection)
+      authorized_resources = clazz.authorized_partial_asset_collection(resources,"view")
+    elsif resource_type == 'Project' || resource_type == 'Institution'
+      authorized_resources = resources
+    elsif resource_type == "Person" && Seek::Config.is_virtualliver && User.current_user.nil?
+      authorized_resources = []
+    else
+      authorized_resources = resources.select &:can_view?
+    end
+
+    render :update do |page|
+        page.replace_html "#{scale_title}_#{resource_type}_#{view_type}",
+                          :partial => "assets/resource_in_tab",
+                          :locals => {:resources => resources,
+                                      :scale_title => scale_title,
+                                      :authorized_resources => authorized_resources,
+                                      :view_type => view_type,
+                                      :actions_partial_disable => actions_partial_disable}
+    end
+  end
+
   private
 
   def project_membership_required
-    #FIXME: remove the try_block{} and also use User.logged_in_and_member
-    unless try_block {current_user.person.member? or User.admin_logged_in?}
-      flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
-      respond_to do |format|
-        format.html do
-          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+    unless current_user.try(:person).try(:member?) or User.admin_logged_in?
+      if current_user.try(:person)
+        flash[:error] = "Only members of known projects, institutions or work groups are allowed to access seek. Please contact a Project Manager or Admin."
+        respond_to do |format|
+          format.html {redirect_to logout_path}
+          format.json { render :json => {:status => 401, :error_message => flash[:error] } }
         end
-        format.json { render :json => {:status => 401, :error_message => flash[:error] } }
+      elsif ["new", "create"].include? params[:action]
+        flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
+        respond_to do |format|
+          format.html do
+            try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+            format.json { render :json => {:status => 401, :error_message => flash[:error] } }
+          end
+        end
       end
-
     end
-
   end
 
   def pal_or_admin_required
@@ -173,6 +225,30 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def check_allowed_to_manage_types
+      unless Seek::Config.type_managers_enabled
+        error("Type management disabled", "...")
+        return false
+      end
+
+      if User.current_user.can_manage_types?
+        return true
+      else
+        case Seek::Config.type_managers
+          when "admins"
+            error("Admin rights required to manage types", "...")
+            return false
+
+          when "pals"
+            error("Admin or PAL rights required to manage types", "...")
+            return false
+
+          when "none"
+            error("Type management disabled", "...")
+            return false
+        end
+      end
+  end
 
   def currently_logged_in
     current_user.person
@@ -214,7 +290,7 @@ class ApplicationController < ActionController::Base
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
           'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
+          'tag', 'items', 'statistics', 'tag_suggestions', 'preview', 'send_image'
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,
@@ -268,6 +344,7 @@ class ApplicationController < ActionController::Base
         params.delete :sharing unless object.can_manage?(current_user)
       else
         respond_to do |format|
+          store_location
           #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
           if User.current_user.nil?
             flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
@@ -453,6 +530,9 @@ class ApplicationController < ActionController::Base
         when (filter == 'study' and res.respond_to? :assays) then res.assays.collect{|a| a.study_id}.include? value.id
         when (filter == 'person' and res.class.is_asset?)    then (res.creators.include?(value) or res.contributor.try(:person) == value)
         when (filter == 'person' and res.respond_to? :owner) then res.send(:owner) == value
+        when (filter == 'project' and res.respond_to? :projects_and_ancestors) then res.projects_and_ancestors.include? value
+        when (filter == 'project' and res.class.name == "Assay") then Project.is_hierarchical? ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
+        when (filter == 'project' and res.class.name == "Study") then Project.is_hierarchical? ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
         #then the general case
         when res.respond_to?(filter)                         then res.send(filter) == value
         when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value
@@ -468,7 +548,6 @@ class ApplicationController < ActionController::Base
           :current_logged_in_user=>current_user
       }
   end
-
 
 
 end

@@ -130,16 +130,20 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "should display unexpired temporary link of #{type_name} for manager" do
-      item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy), :contributor => Factory(:user))
-      disable_authorization_checks do
-        item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+      user = Factory(:user)
+      User.with_current_user user do
+        item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy), :contributor => user)
+        disable_authorization_checks do
+          item.special_auth_codes << Factory(:special_auth_code, :asset => item)
+        end
+
+        post '/session', :login => item.contributor.login, :password => item.contributor.password
+
+        get "/#{type_name}/#{item.id}"
+
+        assert_response :success, "failed for asset #{type_name}"
+        assert_select "p", :text => /Temporary access link/, :count => 1
       end
-
-      post '/session', :login => item.contributor.login, :password => item.contributor.password
-      get "/#{type_name}/#{item.id}"
-
-      assert_response :success, "failed for asset #{type_name}"
-      assert_select "p", :text => /Temporary access link/
     end
   end
 

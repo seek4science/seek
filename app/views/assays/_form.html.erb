@@ -32,27 +32,27 @@
       </p>
   <% end -%>
   <% if @assay.study.blank? or @assay.study.can_view? %>
-      <p>
-      <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
+  <p>
+    <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
     <%= t('study') -%>
     <span class="required">*</span>
      <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %> <br/>
     <% investigations = Investigation.all.select &:can_view? -%>
-      <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
-      <% investigations.each do |i| %>
-         <% studies = i.studies.select &:can_edit? %>
-        <% unless studies.empty?%>
+    <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>" : "" %>
+    <% investigations.each do |i| %>
+        <% studies = i.studies.select &:can_edit? %>
+        <% unless studies.empty? %>
           <% options << "<optgroup label=\"#{truncate(h(i.title), :length => 64)}\">\n" %>
-          <% studies.each do |s| %>
+            <% studies.each do |s| %>
             <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{h(s.title)}\')\">#{truncate(h(s.title), :length => 64)}</option>\n" %>
-          <% end %>
-          <% options << "</optgroup>" %>
+            <% end %>
+            <% options << "</optgroup>" %>
         <% end %>
-      <% end %>
+    <% end %>
     <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" style="width:100%">
         <%= options.html_safe %>
     </select>
-    </p>
+  </p>
   <%end%>
 
 </div>
@@ -62,13 +62,17 @@
 <table class="padded_table">
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
-
+    <% if User.current_user.try(:can_manage_types?) %>
+      <%= link_to h("New assay type?"),new_assay_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
+      <% end %>
     </td>
     <% unless @assay.is_modelling? -%>
-      <td><%= f.label "Technology type: " %>
+        <td><%= f.label "Technology type: " %>
+       <% if User.current_user.try(:can_manage_types?) %>
+        <%= link_to h("New technology type?"),new_technology_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
+          <% end %>
+        </td>
 
-
-      </td>
     <% end -%>
   </tr>
   <tr>
@@ -88,9 +92,9 @@
 <div id="add_organism_form">
     <%= render :partial=>"assays/select_organisms" -%>
 </div>
-    <% if show_scales? %>
-        <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} %>
-    <% end %>
+ <p>
+   <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} if show_scales?%>
+ </p>
 
 <br style="clear:both"/>
 
@@ -145,6 +149,23 @@
     elem.style.display = 'none';
   }
 
+  }
+
+  function check_show_organism_form() {
+      if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
+          Effect.Fade('add_organism_form');
+      }
+      else {
+          Effect.Appear('add_organism_form');
+      }
+  }
+
+  function check_show_sample_form() {
+      if ($F('assay_organism_ids') && $F('assay_organism_ids').length > 0) {
+          Effect.Fade('add_samples_form');
+      } else {
+          Effect.Appear('add_samples_form');
+      }
   function check_show_organism_form() {
       if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
           Effect.Fade('add_organism_form');

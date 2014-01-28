@@ -58,7 +58,7 @@ class SendPeriodicEmailsJob < Struct.new(:frequency)
         log.activity_loggable.nil? || !log.activity_loggable.subscribable?
       end
 
-      #limit to only the people subscribed to the items logged, and those that are set to receive notifications
+      #limit to only the people subscribed to the items logged, and those that are set to receive notifications and are project members
       people = people_subscribed_to_logged_items logs
       people.reject!{|person| !person.receive_notifications?}
 

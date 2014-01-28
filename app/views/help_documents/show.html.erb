@@ -1,3 +1,4 @@
+<h1> <font color="#456AAA"> <%= h @help_document.title %> </font> </h1> <br>
 <ul class="sectionIcons">
   <% if admin_logged_in? -%>
     <% if @help_document.identifier == "index" -%>
@@ -8,7 +9,6 @@
   <% end -%>
 </ul>
 
-<h1><%= h @help_document.title %></h1>
 <div style="padding: 0.5em 2em;">
   <% if @help_document.identifier == "index" -%>
     Help Index<br/>

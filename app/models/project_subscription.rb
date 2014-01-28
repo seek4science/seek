@@ -32,7 +32,7 @@ class ProjectSubscription < ActiveRecord::Base
   end
 
   def self.subscribable_types
-    Seek::Util.persistent_classes.select(&:subscribable?).collect &:name
+    Seek::Util.persistent_classes.select(&:subscribable?)
   end
 
   def subscribable_types
@@ -48,6 +48,6 @@ class ProjectSubscription < ActiveRecord::Base
   after_create :subscribe_to_all_in_project
 
   def subscribe_to_all_in_project
-    ProjectSubscriptionJob.create_job id
+      ProjectSubscriptionJob.create_job id
   end
 end

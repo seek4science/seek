@@ -141,4 +141,8 @@ class Strain < ActiveRecord::Base
   def self.user_creatable?
     Seek::Config.organisms_enabled
   end
+
+  def default_policy
+    Policy.registered_users_accessible_policy
+  end
 end

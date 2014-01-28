@@ -1,10 +1,11 @@
 require 'grouped_pagination'
 require 'subscribable'
-
+require 'acts_as_scalable'
 class Specimen < ActiveRecord::Base
   include Subscribable
-
   include Seek::Rdf::RdfGeneration
+
+   acts_as_scalable if Seek::Config.is_virtualliver
 
   acts_as_authorized
   acts_as_favouritable
@@ -24,6 +25,8 @@ class Specimen < ActiveRecord::Base
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
+#  accepts_nested_attributes_for :creators
+  has_many :treatments
 
   belongs_to :institution
   belongs_to :culture_growth_type
@@ -114,7 +117,7 @@ class Specimen < ActiveRecord::Base
     end if Seek::Config.is_virtualliver
 
     text :creators do
-      creators.compact.map(&:name)
+      creators.compact.map(&:name).join(' ')
     end
   end if Seek::Config.solr_enabled
 
@@ -180,6 +183,7 @@ class Specimen < ActiveRecord::Base
     new_object.sop_masters = self.try(:sop_masters)
     new_object.creators = self.try(:creators)
     new_object.project_ids = self.project_ids
+    new_object.scale_ids = self.scale_ids
     new_object.genotypes = self.genotypes.map &:clone
     new_object.phenotypes = self.phenotypes.map &:clone
     return new_object

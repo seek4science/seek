@@ -87,7 +87,7 @@ class SpecimensController < ApplicationController
   end
 
   def update
-    sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) ||[]
+    sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
     @specimen.build_sop_masters sop_ids
 
     @specimen.attributes = params[:specimen]

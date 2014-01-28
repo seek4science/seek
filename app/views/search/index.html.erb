@@ -1,17 +1,68 @@
-<div class="show_basic">
+<% scale_slider_function = capture do %>
+    $$('#search_results > div').invoke('hide');
+    $$('#external_search_result_content > div').invoke('hide');
+    $$('#search_results #' + this.id +'_results').first().show();
+    //if the external tab was chosen for this scale, then display its content
+    display_external_tab_content(this.id);
+<% end %>
+<%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => scale_slider_function, :current_scale => @scale_key} %>
+
+<!--the files need to be loaded before calling the partial resource_tabbed_lazy_loading
+    and with this order
+-->
+<%= javascript_include_tag "tabber-minimized.js" %>
+<%= javascript_include_tag "tab_lazy_load.js" %>
+
+<!--
+The lazy loading tabs are applied to only the internal results
+The external results are loaded immediately.
+Because the external results are loaded and the same for all the scales, its content is generated one time,
+and then apply to all scales in external_search_result_content
+But to make it easier for handling the tab names, they are created multiple times for each scale, by external_search_result_tab partial.
+
+-->
+<% external_resource_hash = {} %>
+<div id='search_results' class="scaled_items">
+  <% (Scale.all.map(&:key) | ['all']).each do |scale|%>
+      <div id='<%= scale %>_results' <%= "style='display: none'" unless @scale_key == scale%>>
+        <% internal_resource_hash, external_resource_hash = get_resource_hash(scale, external_resource_hash) -%>
+
+        <%= render :partial => "assets/resource_tabbed_lazy_loading",
+                   :locals => {:scale_title => scale,
+                               :tabs_id => "resource_tabbed_lazy_loading_#{scale}",
+                               :resource_hash => internal_resource_hash,
+                               :external_resource_hash => external_resource_hash} -%>
+      </div>
+  <% end %>
+</div>
+<div id='external_search_result_content'>
+  <% external_resource_hash.each do |key, value| -%>
+      <div id="<%= key%>" style="display: none">
+        <%= render :partial => "assets/resource_in_tab",
+                   :locals => {:resources => value,
+                               :scale_title => 'all',
+                               :authorized_resources => value,
+                               :view_type => 'view_all',
+                               :limit => value.count} %>
+      </div>
+  <% end %>
+</div>
+<br/>
 <% unless !logged_in? || params[:saved_search] %>
       <div class="box_standout curved with_smaller_shadow">
         <% tiny_image = image "saved_search_avatar", {:class => "avatar curved with_smaller_shadow search_fav_avatar"} %>
-        <%= link_to_draggable(tiny_image, search_path, :title=>tooltip_title_attrib("Drag to Favourites to save this search"), :class=>"search", :id => "drag_search") %>
-        Drag this icon over to your Favourites to save this search.
-      </div>
+      <%= link_to_draggable(tiny_image, search_path, :title=>tooltip_title_attrib("Drag to Favourites to save this search"), :class=>"search", :id => "drag_search") %>
+      Drag this icon over to your Favourites to save this search.
+    </div>
 
 <% end %>
-<% if !@results.blank? %>
-    <% resource_hash = classify_for_tabs @results -%>
-    <%= render :partial => "assets/resource_listing_tabbed_by_class",
-               :locals => {:resource_hash => resource_hash,
-                           :narrow_view => true,
-                           :authorization_already_done => true} -%>
-<% end %>
-</div>
+
+<script type="text/javascript">
+    <% (Scale.all.map(&:key) | ['all']).each do |scale| %>
+        <% external_resource_hash.keys.each do |key| %>
+            external_tab_on_click('<%= scale %>', '<%= key %>');
+        <% end %>
+        //check if no internal result is found and no tab was chosen, then display the first external tab
+        display_first_external_tab_content('<%= scale %>');
+    <% end %>
+</script>

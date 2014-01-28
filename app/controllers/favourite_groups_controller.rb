@@ -8,7 +8,7 @@ class FavouriteGroupsController < ApplicationController
   protect_from_forgery :except => [:create, :update, :destroy]
 
   skip_before_filter :project_membership_required
-  
+
   def new
     @f_group = FavouriteGroup.new
     

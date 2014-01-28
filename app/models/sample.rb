@@ -1,9 +1,10 @@
 require 'grouped_pagination'
 
-
+require "acts_as_scalable"
 class Sample < ActiveRecord::Base
  include Subscribable
 
+  acts_as_scalable if Seek::Config.is_virtualliver
   include Seek::Rdf::RdfGeneration
 
   acts_as_authorized
@@ -18,14 +19,18 @@ class Sample < ActiveRecord::Base
 
   accepts_nested_attributes_for :specimen
 
-  has_and_belongs_to_many :tissue_and_cell_types
+ has_and_belongs_to_many :tissue_and_cell_types  if Seek::Config.is_virtualliver
 
   belongs_to :institution
   has_and_belongs_to_many :assays
 
   has_many :sample_assets,:dependent => :destroy
-  validates_numericality_of :age_at_sampling, :greater_than=> 0, :allow_nil=> true, :message => "is invalid value", :unless => "Seek::Config.is_virtualliver"
-  validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
+ 
+   validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
+   validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
+
+
+
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
   'INNER JOIN sample_sops ' +
@@ -45,10 +50,14 @@ class Sample < ActiveRecord::Base
   end
 
   has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
+  has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
   has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new{self.asset_sql("Sop")}
 
   has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
+  has_many :model_masters, :through => :sample_assets, :source => :asset, :source_type => 'Model'
   has_many :sop_masters, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
+  has_many :treatments
+
 
   alias_attribute :description, :comments
   validates_presence_of :title
@@ -56,7 +65,6 @@ class Sample < ActiveRecord::Base
   validates_presence_of :specimen,:lab_internal_number
   validates_presence_of :donation_date, :if => "Seek::Config.is_virtualliver"
 
-  validates_presence_of :donation_date if Seek::Config.is_virtualliver
 
  scope :default_order, order("title")
 
@@ -64,7 +72,7 @@ class Sample < ActiveRecord::Base
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 
-  ["data_file","sop"].each do |type|
+  ["data_file","sop","model"].each do |type|
      eval <<-END_EVAL
        #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
        def related_#{type.pluralize}
@@ -90,8 +98,8 @@ class Sample < ActiveRecord::Base
       text << specimen.title
       text << specimen.provider_id
       if (specimen.strain)
-        text << specimen.strain.info
-        text << specimen.strain.try(:organism).try(:title).to_s
+        text << specimen.try(:strain).try(:info).to_s
+        text << specimen.try(:strain).try(:organism).try(:title).to_s
       end
     end
     text
@@ -105,6 +113,32 @@ class Sample < ActiveRecord::Base
    Seek::Config.biosamples_enabled
  end
 
+  def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
+       tissue_and_cell_type=nil
+    if !tissue_and_cell_type_title.blank?
+      if ( tissue_and_cell_type_id =="0" )
+          found = TissueAndCellType.find(:first,:conditions => {:title => tissue_and_cell_type_title})
+          unless found
+          tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title)
+          end
+      else
+          tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+      end
+
+      if tissue_and_cell_type
+       existing = false
+       self.tissue_and_cell_types.each do |t|
+         if t == tissue_and_cell_type
+           existing = true
+           break
+         end
+       end
+       unless existing
+         self.tissue_and_cell_types << tissue_and_cell_type
+       end
+      end
+    end
+  end
 
  def associate_asset asset
    sample_asset = sample_assets.detect { |sa| sa.asset == asset }
@@ -141,8 +175,11 @@ class Sample < ActiveRecord::Base
    new_object= self.dup
    new_object.policy = self.policy.deep_copy
    new_object.data_file_masters = self.data_file_masters.select(&:can_view?)
+   new_object.model_masters = self.model_masters.select(&:can_view?)  
    new_object.sop_masters = self.sop_masters.select(&:can_view?)
+   new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
    new_object.project_ids = self.project_ids
+    new_object.scale_ids = self.scale_ids
    return new_object
   end
 

@@ -6,6 +6,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
   include RdfTestCases
   
   def setup
@@ -38,6 +39,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
       post :create, :publication => {:pubmed_id => 1,:project_ids=>[projects(:sysmo_project).id]},:assay_ids=>[assay.id.to_s]
+      p assigns(:publication).errors.full_messages
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -257,20 +259,18 @@ class PublicationsControllerTest < ActionController::TestCase
 
 
   test "should associate authors" do
-    p = publications(:pubmed_2)
-    assert_equal 2, p.non_seek_authors.size
+    p = Factory(:publication, :publication_authors => [Factory.build(:publication_author), Factory.build(:publication_author)])
+    assert_equal 2, p.publication_authors.size
     assert_equal 0, p.creators.size
     
     seek_author1 = people(:modeller_person)
     seek_author2 = people(:quentin_person)
     
     #Associate a non-seek author to a seek person
-
-    #Check the non_seek_authors (PublicationAuthors) decrease by 1, and the
-    # seek_authors (AssetsCreators) increase by 1.
-    assert_difference('PublicationAuthor.count', -2) do
+    login_as p.contributor
+    assert_difference('PublicationAuthor.count', 0) do
       assert_difference('AssetsCreator.count', 2) do
-        put :update, :id => p.id, :author => {p.non_seek_authors[1].id => seek_author2.id,p.non_seek_authors[0].id => seek_author1.id}
+        put :update, :id => p.id, :author => {p.publication_authors[1].id => seek_author2.id,p.publication_authors[0].id => seek_author1.id}
       end
     end
     
@@ -281,15 +281,16 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should disassociate authors" do
     mock_pubmed(:content_file=>"pubmed_5.txt")
     p = publications(:one)
+    p.publication_authors << PublicationAuthor.new(:publication => p, :first_name => people(:quentin_person).first_name, :last_name => people(:quentin_person).last_name, :person => people(:quentin_person))
+    p.publication_authors << PublicationAuthor.new(:publication => p, :first_name => people(:aaron_person).first_name, :last_name => people(:aaron_person).last_name, :person => people(:aaron_person))
     p.creators << people(:quentin_person)
     p.creators << people(:aaron_person)
     
-    assert_equal 0, p.non_seek_authors.size
+    assert_equal 2, p.publication_authors.size
     assert_equal 2, p.creators.size
     
-    #Check the non_seek_authors (PublicationAuthors) increase by 2, and the
-    # seek_authors (AssetsCreators) decrease by 2.
-    assert_difference('PublicationAuthor.count', 2) do
+    assert_difference('PublicationAuthor.count', 0) do
+      # seek_authors (AssetsCreators) decrease by 2.
       assert_difference('AssetsCreator.count', -2) do
         post :disassociate_authors, :id => p.id
       end 
@@ -314,11 +315,13 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_redirected_to publications_path
   end
   
-  test "shouldn't add paper with non-unique title" do
+  test "shouldn't add paper with non-unique title within the same project" do
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1093/nar/gkl320",:content_file=>"cross_ref4.xml")
+    pub = Publication.find_by_doi("10.1093/nar/gkl320")
+
     #PubMed version of publication already exists, so it shouldn't re-add
     assert_no_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1093/nar/gkl320" }
+      post :create, :publication => {:doi => "10.1093/nar/gkl320" ,:projects=>pub.projects.first} if pub
     end
   end
 
@@ -331,32 +334,40 @@ class PublicationsControllerTest < ActionController::TestCase
     original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
                         "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
 
-    authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
+    authors = publication.publication_authors.collect{|pa| pa.first_name + ' ' + pa.last_name} #publication_authors are ordered by author_index by default
     assert_equal original_authors, authors
 
     seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
     seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
 
     #Associate a non-seek author to a seek person
-    assert_difference('PublicationAuthor.count', -2) do
-      assert_difference('AssetsCreator.count', 2) do
-        put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
+    if Seek::Config.is_virtualliver
+      assert_difference('publication.non_seek_authors.count', -2) do
+        assert_difference('AssetsCreator.count', 2) do
+          put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id}
+        end
+      end
+    else
+      assert_difference('PublicationAuthor.count', -2) do
+        assert_difference('AssetsCreator.count', 2) do
+          put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
+        end
       end
     end
 
     publication.reload
-    authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
+    authors = publication.publication_authors.map{|pa| pa.first_name + ' ' + pa.last_name}
     assert_equal original_authors, authors
 
     #Disassociate seek-authors
-    assert_difference('PublicationAuthor.count', 2) do
+    assert_difference('publication.non_seek_authors.count', 2) do
       assert_difference('AssetsCreator.count', -2) do
         post :disassociate_authors, :id => publication.id
       end
     end
 
     publication.reload
-    authors = publication.publication_author_orders.sort_by(&:order).collect{|o| o.author.first_name + ' ' + o.author.last_name}
+    authors =  publication.publication_authors.map{|pa| pa.first_name + ' ' + pa.last_name}
     assert_equal original_authors, authors
   end
 
@@ -370,20 +381,29 @@ class PublicationsControllerTest < ActionController::TestCase
     original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
                         "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
 
+
+
     seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
     seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
 
+    # seek_authors are links
+    original_authors[12] = %!<a href="/people/#{seek_author1.id}">#{publication.non_seek_authors[12].first_name + " " + publication.non_seek_authors[12].last_name}</a>!
+    original_authors[15] = %!<a href="/people/#{seek_author2.id}">#{publication.non_seek_authors[15].first_name + " " + publication.non_seek_authors[15].last_name}</a>!
+
     #Associate a non-seek author to a seek person
-    assert_difference('PublicationAuthor.count', -2) do
+    assert_difference('publication.non_seek_authors.count', -2) do
       assert_difference('AssetsCreator.count', 2) do
         put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
       end
     end
 
     publication.reload
+
+
     joined_original_authors = original_authors.join(', ')
     get :show, :id => publication.id
-    assert_select 'p', :text => /#{joined_original_authors}/
+
+    assert_equal true, @response.body.include?(joined_original_authors)
   end
 
   test 'should update page pagination when changing the setting from admin' do

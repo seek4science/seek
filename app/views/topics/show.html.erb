@@ -81,6 +81,7 @@
               </a>
             </div>
 
+        <% if User.find_by_id(post.user_id) != nil %>
             <%= avatar_for post.user %>
             <span class="fn"><%= link_to truncate(h(post.user.display_name), :length => 15), person_path(post.user.person), :class => (post.user == @posts.first.user ? "threadauthor" : nil) %></span>
             <% if post.user.admin? or post.forum.moderators.include?(post.user) %>
@@ -106,7 +107,9 @@
                 </span>
               </p>
             <% end -%>
-
+        <% else %>
+            <font color="#787878"><i><%= "hidden item" %></i></font>
+        <% end -%>
 
           </td>
           <td class="body entry-content" id="post-body-<%= post.id %>">

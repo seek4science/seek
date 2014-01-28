@@ -383,4 +383,7 @@ class ProjectTest < ActiveSupport::TestCase
       assert !proj2.pals.include?(person)
     end
   end
+
+
+
 end

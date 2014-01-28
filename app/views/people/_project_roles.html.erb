@@ -1,8 +1,10 @@
 <div class="fold">
   <div class="foldTitle">
-     <%= t('project') %> roles
+    <div title='<%= tooltip_title_attrib(h("Click to see project roles"), 300)%>'>
+      <%= t('project') %> roles
+    </div>
   </div>
-  <div class="foldContent">
+  <div class="foldContent" style="display: none;">
     <ul class="groups">
       <% for group_membership in @person.group_memberships -%>
         <li class="group">

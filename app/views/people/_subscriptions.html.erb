@@ -56,6 +56,10 @@
 
 <script type="text/javascript">
 
+    <% project_subscriptions_with_unsubscribed.map(&:project_id).each do |proj_id| %>
+      $$('#subscription<%= proj_id %> input').invoke('disable');
+    <% end %>
+
     var project_subscription = "subscription";
 
     function swap_subscription(old_div_id, new_div_id) {
@@ -66,6 +70,7 @@
         var new_div = $(new_div_id);
         if (new_div && new_div.style.display == "none") {
             new_div.style.display = "block";
+            new_div.select('input').invoke('enable');
         }
     }
 

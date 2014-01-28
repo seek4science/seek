@@ -52,7 +52,7 @@ gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
 gem 'cocaine'
 gem 'colorize'
 
-
+gem 'newrelic_rpm'
 #Linked to SysMO Git repositories
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "git://github.com/SysMO-DB/white_list.git"
@@ -73,9 +73,11 @@ gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=
 gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
-
 gem 'passenger'
 gem 'unicorn-rails'
+gem "recaptcha", '0.3.1'
+
+gem 'rb-readline', '~> 0.4.2'
 
 group :development do
   gem "pry"
