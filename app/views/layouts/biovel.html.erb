@@ -52,7 +52,7 @@
       </ul>
       <ul class="menutabs clearfix" style="float: right; margin-right: 20px">
         <%= navigation_link('Contact', main_app.contact_path, nil, false) -%>
-        <% if logged_in? && current_user.person %>
+        <% if logged_in? && current_user.person && !current_user.person.new_record? %>
             <%= navigation_link current_user.person.name, main_app.person_path(current_user.person), nil, false -%>
             <%= navigation_link('Admin', main_app.admin_path, nil, false) if admin_logged_in? -%>
             <%= navigation_link 'Log out', main_app.logout_path, nil, false -%>
