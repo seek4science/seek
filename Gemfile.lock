@@ -135,7 +135,7 @@ GIT
 
 GIT
   remote: git://github.com/myGrid/taverna-player.git
-  revision: 2884c83ae7fead198022eaf5d44ad7b06ec91930
+  revision: 4095c7c5b2f3fe0f28a7f1665244893b67bf263f
   branch: list-inputs
   specs:
     taverna-player (0.5.0)
