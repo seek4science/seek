@@ -1,15 +1,11 @@
 <%
    sweep_length ||= 1
-   locked ||= false
    hidden ||= false
 %>
 
 <div class="fold">
   <div class="foldTitle">
     <%= title %>
-    <% if locked %>
-      (fixed)
-    <% end %>
   </div>
   <div class="foldContent workflow_input" <%= 'style="display: none;"'.html_safe if hidden -%>>
     <% if form.object.is_a?(Sweep) %>
