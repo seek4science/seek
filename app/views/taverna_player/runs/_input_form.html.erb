@@ -1,28 +1,12 @@
 <div class="run_input" data-input-name="<%= input[:name]-%>">
-<% locked ||= false %>
 
-<% input_data = form.object.new_record? ? nil : form.object.inputs.select { |i| i.name == input[:name] }.last %>
-<h3><%= input[:name] %>
-  <% unless input[:description].blank? %>
-    <%= help_icon(input[:description]) -%>
-  <% end %>
-</h3>
+  <% input_data = form.object.new_record? ? nil : form.object.inputs.select { |i| i.name == input[:name] }.last %>
+  <h3><%= input[:name] %>
+    <% unless input[:description].blank? %>
+      <%= help_icon(input[:description]) -%>
+    <% end %>
+  </h3>
 
-<% if locked %>
-  <% unless input_data.value.blank? %>
-    <p>
-      <b>Value:</b>
-      <%= input_data.value %>
-    </p>
-  <% end %>
-
-  <% unless input_data.file_file_name.blank? %>
-    <p>
-      <b>File:</b>
-      <%= link_to input_data.file_file_name, input_data.file.url %>
-    </p>
-  <% end %>
-<% else %>
   <%= form.fields_for :inputs, TavernaPlayer::RunPort::Input.new do |input_fields| %>
     <% unless input[:example_value].blank? %>
       <% unless input_data.try(:value) %>
@@ -43,5 +27,5 @@
     </div>
     <div style="clear:both"></div>
   <% end %>
-<% end %>
+
 </div>
