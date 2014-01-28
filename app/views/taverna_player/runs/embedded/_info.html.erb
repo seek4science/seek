@@ -10,16 +10,9 @@
   # Author: Robert Haines
 %>
 
-<div id="run-info">
-
-  <p>
-    <b>Name:</b>
-    <%= run.name %>
-  </p>
-
-  <p>
-    <b>Status message:</b>
-    <%= run.status_message %>
-  </p>
-
+<div id="embedded-run-info">
+  <% unless run.complete? %>
+    <%= image_tag '/images/ajax-loader-large.gif' %><br/>
+  <% end %>
+  <%= run.status_message %>
 </div>

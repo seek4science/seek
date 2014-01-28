@@ -11,48 +11,23 @@
 %>
 
 <% workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || "" %>
-<% workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow) %>
 
-<h1>Embedded Workflow: &quot;<%= workflow_title %>&quot;</h1>
+<h1><%= workflow_title %></h1>
 
 <%= form_for @run, :html => {:multipart => true} do |f| %>
   <%= f.hidden_field :workflow_id %>
   <%= f.hidden_field :embedded %>
   <%= f.hidden_field :name, :value => "#{workflow_title} (embedded)" %>
 
-  <% workflow_inputs.each do |input| %>
-    <% input_param = params[input[:name].to_sym] %>
-    <% if input_param.nil? %>
-      <div>Input: <%= input[:name] %></div>
-
-      <% unless input[:description].blank? %>
-        <div>Description: <%= input[:description] %></div>
-      <% end %>
-
-      <% unless input[:example].blank? %>
-        <div>Example value: <%= input[:example] %></div>
-        <div>
-          The example value is automatically entered in the box below.
-          Click to edit or enter a new value directly or choose a file.
-        </div>
-      <% else %>
-        <div>Set this input by entering data directly or choosing a file.</div>
-      <% end %>
-    <% end %>
-
-    <%= f.fields_for :inputs, TavernaPlayer::RunPort::Input.new do |input_fields| %>
-      <%= input_fields.hidden_field :name, :value => input[:name] %>
-      <% if input_param.nil? %>
-        <%= input_fields.text_area :value, :value => input[:example], :rows => 3 %>
-        <%= input_fields.file_field :file %>
-      <% else %>
-        <%= input_fields.hidden_field :value, :value => input_param %>
-      <% end %>
-    <% end %>
+  <% unless @workflow.data_input_ports.empty? %>
+    <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => @workflow.data_input_ports, :form => f} %>
   <% end %>
 
-  <div><%= f.submit 'Start Run' %></div>
-<% end %>
-<% unless @run.embedded? %>
-  <%= link_to 'Cancel', :back %>
+  <% unless @workflow.parameter_input_ports.empty? %>
+    <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => @workflow.parameter_input_ports, :form => f} %>
+  <% end %>
+
+  <div style="text-align: center;">
+    <%= f.submit 'Start Run', :id => "embedded-start-button" %>
+  </div>
 <% end %>

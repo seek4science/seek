@@ -10,10 +10,19 @@
   # Author: Robert Haines
 %>
 
-<div id="run-button">
+<div id="embedded-run-button">
   <% if run.complete? %>
-    <%= link_to 'Restart', new_embedded_run_path(run) %>
+    <% if run.finished? %>
+      <%= link_to run.results.url, :class => 'button-link' do %>
+        <%= image 'download', :class => "icon" -%> Download Results
+      <% end %>
+    <% end %>
+    <%= link_to new_embedded_run_path(run), :class => 'button-link' do %>
+      <%= image 'refresh', :class => "icon" -%> Restart
+    <% end %>
   <% else %>
-    <%= link_to "Cancel", cancel_run_path(run.id), :method => :put, :data => { confirm: "Are you sure?" } %>
+    <%= link_to cancel_run_path(run.id), :method => :put, :data => { confirm: "Are you sure?" }, :class => 'button-link' do %>
+      <%= image 'destroy', :class => "icon" -%> Cancel
+    <% end %>
   <% end %>
 </div>

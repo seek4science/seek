@@ -4,7 +4,7 @@
   <strong>Results:</strong><% run.result_outputs.each do |p| %>
       <div class='run_result_link'><a href="#<%=p.name%>" ><%=p.name%></a></div>
   <% end  %>
-  <%= "<br/><strong>Error/Log Outputs:</strong>".html_safe unless run.error_log_outputs.empty? %>
+  <%= "<br/><strong>Run Information:</strong>".html_safe unless run.error_log_outputs.empty? %>
   <% run.error_log_outputs.each do |p| %>
       <div class='run_result_link'><a href="#<%=p.name%>" ><%=p.name%></a></div>
   <% end %>

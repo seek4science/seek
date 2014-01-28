@@ -10,19 +10,11 @@
   # Author: Robert Haines
 %>
 
-<script>
-    $j = jQuery.noConflict();
-</script>
-
-<h1>Embedded Run</h1>
+<h1><%= @run.workflow.title -%></h1>
 
 <%= render "taverna_player/runs/embedded/info", :run => @run %>
 
 <%= render "taverna_player/runs/embedded/button", :run => @run %>
-
-<% if @run.inputs.size > 0 %>
-  <%= render "taverna_player/runs/embedded/inputs", :run => @run %>
-<% end %>
 
 <%
   # Note that the base run/interaction partial is used here. You can still
@@ -31,7 +23,18 @@
 %>
 <%= render "interaction", :run => @run, :interaction => @interaction %>
 
-<%= render "taverna_player/runs/embedded/outputs", :run => @run %>
+<div id="run-outputs" style="<%= 'display: none' unless @run.complete? && @run.outputs.size > 0-%>">
+  <div class="fold">
+    <div class="foldTitle">
+      Outputs
+    </div>
+    <div class="foldContent">
+      <% if @run.complete? %>
+        <%= render(:partial => "taverna_player/runs/embedded/outputs", :locals => { :run => @run }) -%>
+      <% end %>
+    </div>
+  </div>
+</div>
 
 <%
   # Note that the base run/poll partial is used here. You can still
