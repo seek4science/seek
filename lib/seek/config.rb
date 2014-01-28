@@ -54,6 +54,7 @@ module Seek
 
     def smtp_propagate
       smtp_hash = self.smtp
+
       password =  self.smtp_settings 'password'
       smtp_hash.merge! "password" => password
 
@@ -179,7 +180,12 @@ module Seek
       value = self.smtp[field.to_sym]
       if field == :password || field == 'password'
         if !value.blank?
-          value = decrypt(value,generate_key(GLOBAL_PASSPHRASE))
+          begin
+            value = decrypt(value,generate_key(GLOBAL_PASSPHRASE))
+          rescue Exception=>e
+            value=""
+            Rails.logger.error "ERROR DETERIMINING THE SMTP EMAIL PASSWORD - USING BLANK"
+          end
         end
       end
       value
