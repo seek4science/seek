@@ -1,4 +1,4 @@
-<% related_items = workflow.runs.where(:sweep_id => nil) + workflow.sweeps %>
+<% related_items = workflow.runs.where(:sweep_id => nil).where(:embedded => :false) + workflow.sweeps %>
 <% related_items = related_items.select {|i| i.can_view? }.sort_by(&:created_at).reverse %>
 
 <h3>Related runs</h3>
