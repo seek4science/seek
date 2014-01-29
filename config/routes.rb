@@ -448,6 +448,9 @@ SEEK::Application.routes.draw do
       post :temp_link
       post :new_version
       post :update_annotations_ajax
+      post :check_related_items
+      post :publish
+      get :published
 #      get :view_items_in_tab
     end
 
