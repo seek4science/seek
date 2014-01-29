@@ -51,6 +51,14 @@ packages should then be installed. At the time of writing this guide this should
 
 
 == After you have installed SEEK
+
+== Compiling Assets ==
+
+Assets - such as images, javascript and stylesheets, need to be precompiled - which means minifying them, grouping some together into a single file, and compressing. These then
+get placed into <em>public/assets</em>. To compile them run the following command. This can take some time, so be patient
+
+    bundle exec rake assets:precompile
+
 === Serving SEEK through Apache
 
 First you need to setup {Passenger Phusion}[https://www.phusionpassenger.com/] .Still as the www-data user, run the command:
@@ -83,7 +91,20 @@ which looks like (if you have registered a DNS for your site, then set ServerNam
          AllowOverride all
          Options -MultiViews
       </Directory>
+      <LocationMatch "^/assets/.*$">
+         Header unset ETag
+         FileETag None
+         # RFC says only cache for 1 year
+         ExpiresActive On
+         ExpiresDefault "access plus 1 year"
+      </LocationMatch>
    </VirtualHost>
+
+The LocationMatch block tells Apache to serve up the assets (images, CSS, Javascript) with a long expiry time, leading to better performance since these
+items will be cached. You may need to enable the <em>headers</em> and <em>expires</em> modules for Apache, so run:
+
+  sudo a2enmod headers
+  sudo a2enmod expires
 
 Now enable the SEEK site, and disable the default that is installed with Apache, and restart:
 
