@@ -101,6 +101,10 @@ You may also need to enable a couple of Apache modules, so run:
     sudo a2enmod headers
     sudo a2enmod expires
 
+You will then need to restart Apache
+
+    sudo service apache2 restart
+
 == Steps to upgrade from 0.18.x to 0.19.x
 
 Upgrading follows the standard steps:
