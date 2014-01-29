@@ -21,6 +21,16 @@ SEEK::Application.configure do
       Settings.defaults[:project_browser_enabled] = true
       Settings.defaults[:experimental_features_enabled] = true
       Settings.defaults[:filestore_path] = "tmp/testing-filestore"
+
+      Settings.defaults[:project_link] = 'http://www.sysmo.net'
+      Settings.defaults[:application_name] = 'SEEK'
+      Settings.defaults[:dm_project_name] = "SysMO-DB"
+      Settings.defaults[:dm_project_link] = "http://www.sysmo-db.org"
+      Settings.defaults[:project_type] = 'Consortium'
+      Settings.defaults[:header_image_enabled] = true
+      Settings.defaults[:header_image_title] =  "SysMO-DB"
+      Settings.defaults[:header_image_link] = "http://www.sysmo-db.org"
+      Settings.defaults[:header_image] = 'sysmo-db-logo_smaller.png'
     end
   end
 end
