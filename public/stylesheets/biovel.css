@@ -529,3 +529,10 @@ a.doc-link:hover, a.button-link:hover {
   border: 0;
   padding-bottom: 0.2em;
 }
+
+.enable-data-sweeps {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 3px;
+}

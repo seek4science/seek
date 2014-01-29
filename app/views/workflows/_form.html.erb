@@ -24,8 +24,8 @@
       <%= f.text_field(:documentation_link) -%>
     </p>
 
-    <p>
-      <label for="workflow_sweepable">
+    <p style="margin: 1em 0">
+      <label for="workflow_sweepable" class="enable-data-sweeps">
         <%= help_icon("Ticking this box will allow users to run batches of runs with this workflow. "+
                       "It may not be appropriate for all workflows to be ran in this manner, for example certain workflows with interactions.") -%>
         Allow data sweeps?

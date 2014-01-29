@@ -118,3 +118,7 @@ ul.tabbernav {
   margin: -1px 0 0 1em;
 }
 
+.enable-data-sweeps {
+  background-color: #ffffcc;
+  border: 1px solid #b2af6a;
+}
