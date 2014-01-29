@@ -16,17 +16,21 @@
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      ontologyIRI="http://www.mygrid.org.uk/ontology/JERMOntology">
-    <Prefix name="JERMOntology3" IRI="http://www.mygrid.org.uk/ontology/JERMOntology#2"/>
-    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
-    <Prefix name="owl2xml" IRI="http://www.w3.org/2006/12/owl2-xml#"/>
-    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
-    <Prefix name="JERMOntology" IRI="http://www.mygrid.org.uk/ontology/JERMOntology#"/>
-    <Prefix name="JERMOntology4" IRI="http://www.mygrid.org.uk/ontology/JERMOntology#2-"/>
-    <Prefix name="JERMOntology2" IRI="http://www.mygrid.org.uk/ontology/JERMOntology#13"/>
     <Prefix name="" IRI="http://www.mygrid.org.uk/ontology/JERMOntology#"/>
-    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
     <Prefix name="dc" IRI="http://purl.org/dc/elements/1.1/"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
     <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Prefix name="owl2xml" IRI="http://www.w3.org/2006/12/owl2-xml#"/>
+    <Prefix name="JERMOntology" IRI="http://www.mygrid.org.uk/ontology/JERMOntology#"/>
+    <Prefix name="JERMOntology2" IRI="http://www.mygrid.org.uk/ontology/JERMOntology#13"/>
+    <Prefix name="JERMOntology3" IRI="http://www.mygrid.org.uk/ontology/JERMOntology#2"/>
+    <Prefix name="JERMOntology4" IRI="http://www.mygrid.org.uk/ontology/JERMOntology#2-"/>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">1.6-alpha</Literal>
+    </Annotation>
     <Annotation>
         <AnnotationProperty abbreviatedIRI="dc:description"/>
         <Literal datatypeIRI="&rdf;PlainLiteral">an ontology to describe the entities and relationships in the SEEK database, a Systems Biology environment for the sharing and exchange of data and models. The SysMO-SEEK database contains the work of the SysMO consortium (Systems Biology of Micro-Organisms) 
@@ -34,10 +38,6 @@
 This is used as part of http://www.seek4science.org
 
 It was developed by Katy Wolstencroft, with contributions from Stuart Owen and Olga Krebs</Literal>
-    </Annotation>
-    <Annotation>
-        <AnnotationProperty abbreviatedIRI="owl:versionInfo"/>
-        <Literal datatypeIRI="&rdf;PlainLiteral">1.6-alpha</Literal>
     </Annotation>
     <Declaration>
         <Class IRI="#13C_radiolabelling"/>
@@ -2847,12 +2847,12 @@ It was developed by Katy Wolstencroft, with contributions from Stuart Owen and O
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#is_investigated_by"/>
         <NamedIndividual IRI="#Escherichia_coli"/>
-        <NamedIndividual IRI="#KOSMOBAC"/>
+        <NamedIndividual IRI="#SUMO"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#is_investigated_by"/>
         <NamedIndividual IRI="#Escherichia_coli"/>
-        <NamedIndividual IRI="#SUMO"/>
+        <NamedIndividual IRI="#KOSMOBAC"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#investigates"/>
@@ -2887,7 +2887,7 @@ It was developed by Katy Wolstencroft, with contributions from Stuart Owen and O
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#investigates"/>
         <NamedIndividual IRI="#SysmoLab"/>
-        <NamedIndividual IRI="#Enterococcus_faecalis"/>
+        <NamedIndividual IRI="#Streptococcus_pyogenes"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#investigates"/>
@@ -2897,7 +2897,7 @@ It was developed by Katy Wolstencroft, with contributions from Stuart Owen and O
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#investigates"/>
         <NamedIndividual IRI="#SysmoLab"/>
-        <NamedIndividual IRI="#Streptococcus_pyogenes"/>
+        <NamedIndividual IRI="#Enterococcus_faecalis"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#investigates"/>
@@ -3469,6 +3469,11 @@ It was developed by Katy Wolstencroft, with contributions from Stuart Owen and O
         <Literal datatypeIRI="&rdf;PlainLiteral">An experimental assay is an assay carried out in a laboratory</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Experimental_assay_type</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">Experimental Assay</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
         <IRI>#Experimental_design_type</IRI>
         <Literal datatypeIRI="&rdf;PlainLiteral">JERM:58493</Literal>
@@ -3955,6 +3960,11 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <Literal datatypeIRI="&rdf;PlainLiteral">JERM:00044</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Model_analysis_type</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">Modelling Analysis</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
         <IRI>#Model_execution_environment</IRI>
         <Literal datatypeIRI="&rdf;PlainLiteral">JERM:00039</Literal>
@@ -4352,7 +4362,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
         <IRI>#Specimen</IRI>
-        <Literal datatypeIRI="&rdf;PlainLiteral">This class is equivalent to the &#39;sample groups&#39; class in the EBI BioSamples data model and to a bacterial culture in the sysmo context, where we refer to it as &#39;Culture Growth&#39; instead of specimen</Literal>
+        <Literal datatypeIRI="&rdf;PlainLiteral">This class is equivalent to the &apos;sample groups&apos; class in the EBI BioSamples data model and to a bacterial culture in the sysmo context, where we refer to it as &apos;Culture Growth&apos; instead of specimen</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:description"/>
@@ -4512,6 +4522,11 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#informatics_analysis_type</IRI>
+        <Literal datatypeIRI="&rdf;PlainLiteral">Informatics Analysis</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#instrument_model</IRI>
         <Literal datatypeIRI="&rdf;PlainLiteral">instrument_model</Literal>
     </AnnotationAssertion>
@@ -4634,5 +4649,5 @@ The interaction between models and data is at the heart of SysMO, so the SBO sho
 
 
 
-<!-- Generated by the OWL API (version 3.2.3.1824) http://owlapi.sourceforge.net -->
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
 

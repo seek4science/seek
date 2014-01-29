@@ -40,6 +40,71 @@ same pattern. Upgrading to version 0.18 is an exception and involves some additi
 only be necessary to run <em>bundle install</em> and the <em>db:migrate</em> rake task. Using seek:upgrade should still work, but could take a lot of unnecessary time. There is more details and
 an example towards the end of the this page.
 
+== Steps to upgrade from 0.19.x to 0.20.x
+
+Start the upgrade following the standard steps:
+
+    export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
+
+    ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop
+    hg pull https://bitbucket.org/seek4science/seek -r v0.20.0
+    hg update
+    hg merge # only required if you've made changes since installing. If you have, you may need to deal with conflicts.
+    hg commit -m "merged" # likewise - only required if you made changes since installing
+    bundle install --deployment
+    bundle exec rake seek:upgrade
+
+If you are upgrading a production server, you also need to run the following task. Be patient, as this can take a few minutes
+
+        bundle exec rake assets:precompile
+
+Now proceed with the rest of the usual tasks:
+
+    bundle exec rake sunspot:solr:start # to restart the search server
+    ./script/delayed_job start
+
+    touch tmp/restart.txt
+    bundle exec rake tmp:clear
+
+
+If you are running through Apache, you should also add the following block to your Apache configuration, after the Directory block:
+
+    <LocationMatch "^/assets/.*$">
+             Header unset ETag
+             FileETag None
+             # RFC says only cache for 1 year
+             ExpiresActive On
+             ExpiresDefault "access plus 1 year"
+    </LocationMatch>
+
+so it will look something like:
+
+    <VirtualHost *:80>
+         ServerName www.yourhost.com
+         DocumentRoot /srv/rails/seek/public
+            <Directory /srv/rails/seek/public>
+             AllowOverride all
+             Options -MultiViews
+          </Directory>
+          <LocationMatch "^/assets/.*$">
+             Header unset ETag
+             FileETag None
+             # RFC says only cache for 1 year
+             ExpiresActive On
+             ExpiresDefault "access plus 1 year"
+          </LocationMatch>
+    </VirtualHost>
+
+You may also need to enable a couple of Apache modules, so run:
+
+    sudo a2enmod headers
+    sudo a2enmod expires
+
+You will then need to restart Apache
+
+    sudo service apache2 restart
+
 == Steps to upgrade from 0.18.x to 0.19.x
 
 Upgrading follows the standard steps:

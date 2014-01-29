@@ -1,6 +1,6 @@
 #Defines mappings between assay type labels, and those in declared in the ontology, but synchronising assay types during
 #an upgrade. The key defines the old label, which will be replaced by the assay type defined by the value label, and its associated URI
-generic experimental assay: experimental assay type
-generic modelling analysis: model analysis type
+generic experimental assay: experimental assay
+generic modelling analysis: modelling analysis
 cdna microarray: transcriptional profiling
-modelling analysis type: model analysis type
+modelling analysis type: modelling analysis
