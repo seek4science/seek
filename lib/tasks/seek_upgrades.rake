@@ -85,7 +85,7 @@ namespace :seek do
         #if the resolved uri is nil try a mapped label
         resolved_uri ||= assay_type_label_hash[label_map[label]].try(:uri).try(:to_s)
 
-        #if the uri is resovled, update the stored uri and remove the label
+        #if the uri is resolved, update the stored uri and remove the label
         unless resolved_uri.nil?
           if assay.assay_type_uri != resolved_uri
             assay.assay_type_uri = resolved_uri

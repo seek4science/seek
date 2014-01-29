@@ -44,7 +44,7 @@ module AssayTypesHelper
   #the display of the label, with an indication of the actual label if the label presented is a temporary label awaiting addition to the ontology
   def displayed_hierarchy_current_label declared_label, defined_class
     result = h(declared_label)
-    if !defined_class.nil? && defined_class.label!=declared_label
+    if !defined_class.nil? && defined_class.label.try(:downcase)!=declared_label.try(:downcase)
       comment = "  - this is a new suggested term that specialises #{defined_class.label}"
       result << content_tag("span",comment,:class=>"none_text")
     end
