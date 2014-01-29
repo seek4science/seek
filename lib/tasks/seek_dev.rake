@@ -172,87 +172,25 @@ namespace :seek_dev do
   end
 
 
-  task :analyse_assays_and_their_types => :environment do
-    exp_assay_type_uri_hash = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri
-    model_assay_type_uri_hash = Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri
-
-    exp_assay_type_label_hash = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_label
-    model_assay_type_label_hash = Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_label
-
-    technology_type_uri_hash = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri
-    technology_type_label_hash = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_label
-
-    assay_type_label_known_mapping = ["generic experimental assay","generic modelling analysis","modelling analysis type"]
-    technology_type_label_known_mapping = ["technology","enzymatic activity experiments"]
-
-    Assay.all.each do |assay|
-      id = assay.id
-      assay_type_label = assay.assay_type_label
-      assay_type_uri = assay.assay_type_uri
-      technology_type_uri = assay.technology_type_uri
-      technology_type_label = assay.technology_type_label
-
-      technology_type_label = technology_type_label.downcase.gsub("_"," ") unless technology_type_label.nil?
-      assay_type_label = assay_type_label.downcase.gsub("_"," ") unless assay_type_label.nil?
-
-      assay_type_uri_hash = assay.is_modelling? ? model_assay_type_uri_hash : exp_assay_type_uri_hash
-      assay_type_label_hash = assay.is_modelling? ? model_assay_type_label_hash : exp_assay_type_label_hash
-
-      if assay_type_label.blank? && assay_type_uri.blank?
-        puts "No assay type uri or label defined, will be reset to the root class - #{id}".green
-      elsif assay_type_uri.blank? || assay_type_uri_hash[assay_type_uri].nil?
-        if assay_type_label_known_mapping.include?(assay_type_label)
-          puts "Invalid assay type uri and but the label is recognised as a known mapping to fix '#{assay_type_label}' - #{id}".green
-        elsif assay_type_label_hash[assay_type_label].nil?
-          if technology_type_label_hash[assay_type_label].nil?
-            if technology_type_uri_hash[assay_type_uri].nil?
-              puts "Invalid assay type uri and it cannot be resolved by the label '#{assay_type_label}' - #{id}".red
-              puts "\t uri is #{assay_type_uri}".red
-            else
-              puts "Invalid assay type uri and it cannot be resolved by the label '#{assay_type_label}', but does match a technology type uri  - #{id}".orange
-              puts "\t the assay type uri is #{assay_type_uri}"
-              puts "\t this assays technology type label is currently #{technology_type_label}".orange
-            end
-
-          else
-            puts "Invalid assay type uri and it cannot be resolved by the label, but does match a technology type '#{assay_type_label}' - #{id}".orange
-            puts "\t this assays technology type label is currently #{technology_type_label}".orange
-          end
-        else
-          puts "Invalid assay type uri but it can be resolved by the label '#{assay_type_label}' - #{id}".green
-        end
-      end
-
-      unless assay.is_modelling?
-        if technology_type_label.blank? && technology_type_uri.blank?
-          puts "No technology type uri or label defined, will be reset to the root class - #{id}".green
-
-        elsif technology_type_uri.blank? || technology_type_uri_hash[technology_type_uri].nil?
-          if technology_type_label_known_mapping.include?(technology_type_label)
-            puts "Invalid technology type uri and but the label is recognised as a known mapping to fix '#{technology_type_label}' - #{id}".green
-          elsif technology_type_label_hash[technology_type_label].nil?
-            if assay_type_label_hash[technology_type_label].nil?
-              if assay_type_uri_hash[technology_type_uri].nil?
-                puts "Invalid technology type uri and it cannot be resolved by the label '#{technology_type_label}' - #{id}".red
-                puts "\t uri is #{technology_type_uri}".red
-              else
-                puts "Invalid technology type uri and it cannot be resolved by the label '#{technology_type_label}', but does match a assay type uri  - #{id}".orange
-                puts "\t the technology type uri is #{technology_type_uri}"
-                puts "\t this assays assay type label is currently #{assay_type_label}".orange
-              end
-
-            else
-              puts "Invalid technology type uri and it cannot be resolved by the label, but does match an assay type '#{technology_type_label}' - #{id}".orange
-              puts "\t this assays assay type label is currently #{assay_type_label}".orange
-            end
-          else
-            puts "Invalid technology type uri but it can be resolved by the label '#{technology_type_label}' - #{id}".green
+  desc "Gives project pals manage rights to their projects Investigation, Studies and Assays - this was a particular SysMO need"
+  task :pals_manage_isa => :environment do
+    Project.all.select{|p| !p.pals.empty?}.each do |project|
+      pals = project.pals
+      puts "Updating ISA for project #{project.title} for PALs #{pals.collect{|p|p.name}.join(", ")}"
+      investigations = project.investigations
+      studies = project.studies
+      assays = project.assays
+      (investigations | studies | assays).each do |isa|
+        policy = isa.policy
+        pals.each do |pal|
+          if policy.permissions.select{|p| p.contributor==pal && p.access_type==Policy::MANAGING}.empty?
+            policy.permissions << Permission.new(:contributor=>pal,:access_type=>Policy::MANAGING)
           end
         end
       end
-
-
+      puts "\t#{assays.count} Assays updated, #{studies.count} Studies updated, #{investigations.count} Investigations updated"
     end
+    Rake::Task["seek:repopulate_auth_lookup_tables"].invoke
   end
 
 
