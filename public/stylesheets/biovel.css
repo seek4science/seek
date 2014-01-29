@@ -510,3 +510,22 @@ a.doc-link:hover, a.button-link:hover {
   padding: 1em 3em;
   font-size: 150%;
 }
+
+#corner-logo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 128px;
+  background-color: white;
+  padding: 4px;
+  font-size: 12px;
+  vertical-align: middle;
+  border-top-left-radius: 5px;
+  box-shadow: 0 0 8px #333;
+}
+
+.contribution_title {
+  margin-left: 0;
+  border: 0;
+  padding-bottom: 0.2em;
+}

@@ -53,7 +53,7 @@
   <body>
 
   <div id="container">
-    <div id="bd">
+    <div id="bd" style="padding-bottom: 48px">
       <div id="yui-main">
         <div id="content">
           <%= yield %>
@@ -62,7 +62,9 @@
     </div>
   </div>
 
-    <%= javascript_include_tag "folds.js" %>
-    <%= javascript_include_tag "tabber-minimized.js" %>
+  <%= render :partial => "taverna_player/runs/embedded/corner_logo" -%>
+
+  <%= javascript_include_tag "folds.js" %>
+  <%= javascript_include_tag "tabber-minimized.js" %>
   </body>
 </html>
