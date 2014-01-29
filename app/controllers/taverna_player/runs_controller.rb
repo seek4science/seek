@@ -126,6 +126,13 @@ module TavernaPlayer
     end
 
     def auth
+      # Skip certain auth if run is embedded
+      if @run.embedded
+        if ['cancel','read_interaction','write_interaction'].include?(action_name)
+          return true
+        end
+      end
+
       action = translate_action(action_name)
       unless is_auth?(@run, action)
         if User.current_user.nil?

@@ -480,7 +480,7 @@ a.advanced_sharing_link {
   height: 500px;
 }
 
-a.doc-link {
+a.doc-link, a.button-link {
   background-color: #F0F4FF;
   border: 1px solid #AAAAAA;
   border-radius: 4px;
@@ -491,6 +491,41 @@ a.doc-link {
   display: inline-block;
 }
 
-a.doc-link:hover {
+a.doc-link:hover, a.button-link:hover {
   text-decoration: none;
+}
+
+#embedded-run-info {
+  font-size: 120%;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#embedded-run-button {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#embedded-start-button {
+  padding: 1em 3em;
+  font-size: 150%;
+}
+
+#corner-logo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 128px;
+  background-color: white;
+  padding: 4px;
+  font-size: 12px;
+  vertical-align: middle;
+  border-top-left-radius: 5px;
+  box-shadow: 0 0 8px #333;
+}
+
+.contribution_title {
+  margin-left: 0;
+  border: 0;
+  padding-bottom: 0.2em;
 }

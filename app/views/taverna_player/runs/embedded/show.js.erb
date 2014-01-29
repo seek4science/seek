@@ -10,9 +10,9 @@
   # Author: Robert Haines
 %>
 
-jQuery("#run-info").replaceWith('<%= escape_javascript(render("taverna_player/runs/embedded/info", :run => @run)) %>');
+jQuery("#embedded-run-info").replaceWith('<%= escape_javascript(render("taverna_player/runs/embedded/info", :run => @run)) %>');
 
-jQuery("#run-button").replaceWith('<%= escape_javascript(render("taverna_player/runs/embedded/button", :run => @run)) %>');
+jQuery("#embedded-run-button").replaceWith('<%= escape_javascript(render("taverna_player/runs/embedded/button", :run => @run)) %>');
 
 <%
   # Note that the base run/interaction partial is used here. You can still
@@ -21,10 +21,16 @@ jQuery("#run-button").replaceWith('<%= escape_javascript(render("taverna_player/
 %>
 <% if @interaction.nil? || @new_interaction %>
   jQuery("#run-interaction").replaceWith('<%= escape_javascript(render("interaction", :run => @run, :interaction => @interaction)) %>');
+
+  <% if @new_interaction %>
+    verticallyAlign();
+  <% end %>
 <% end %>
 
 <% if @run.complete? %>
-  jQuery("#run-outputs").replaceWith('<%= escape_javascript(render("taverna_player/runs/embedded/outputs", :run => @run)) %>');
+  jQuery("#run-outputs .foldContent").html('<%= escape_javascript(render(:partial => "taverna_player/runs/embedded/outputs", :locals => { :run => @run })) %>');
+  jQuery("#run-outputs").show();
+  verticallyAlign();
 <% else %>
   <%
     # Note that the base run/poll partial is used here. You can still

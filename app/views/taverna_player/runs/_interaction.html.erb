@@ -83,11 +83,14 @@
 
     </script>
 
-    <p>
-      <button id="show-interaction">
-        Show interaction
-      </button>
-    </p>
+    <% unless run.embedded %>
+      <%# embedded runs have the show interaction button in a different place %>
+      <p>
+        <button id="show-interaction">
+          Show interaction
+        </button>
+      </p>
+    <% end %>
     <!-- Hidden div for the contents of the interaction that will appear as
 a modal dialog and will be populated via an AJAX call. -->
     <div style="display:none;">
