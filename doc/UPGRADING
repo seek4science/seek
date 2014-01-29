@@ -55,11 +55,18 @@ Start the upgrade following the standard steps:
     bundle install --deployment
     bundle exec rake seek:upgrade
 
+If you are upgrading a production server, you also need to run the following task. Be patient, as this can take a few minutes
+
+        bundle exec rake assets:precompile
+
+Now proceed with the rest of the usual tasks:
+
     bundle exec rake sunspot:solr:start # to restart the search server
     ./script/delayed_job start
 
     touch tmp/restart.txt
     bundle exec rake tmp:clear
+
 
 If you are running through Apache, you should also add the following block to your Apache configuration, after the Directory block:
 

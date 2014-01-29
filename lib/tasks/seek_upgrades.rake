@@ -11,17 +11,18 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
-            :update_admin_assigned_roles,
-            :repopulate_auth_lookup_tables,
+            :resynchronise_assay_types,
+            :resynchronise_technology_types,
             :increase_sheet_empty_rows,
             :clear_filestore_tmp,
             :remove_non_seek_authors,
             :clean_up_sop_specimens,
+            :repopulate_auth_lookup_tables,
             :drop_solr_index
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
-  task(:upgrade=>[:environment,"db:migrate","db:sessions:clear","tmp:clear","tmp:assets:clear"]) do
+  task(:upgrade=>[:environment,"db:migrate","db:sessions:clear","tmp:clear"]) do
 
     solr=Seek::Config.solr_enabled
 
@@ -40,32 +41,8 @@ namespace :seek do
 
   task(:drop_solr_index=>:environment) do
     dir = File.join(Rails.root,"solr","data")
-    FileUtils.remove_dir(dir)
-  end
-
-  task(:update_admin_assigned_roles=>:environment) do
-    Person.where("roles_mask > 0").each do |p|
-      if p.admin_defined_role_projects.empty?
-        roles = []
-        (p.role_names & Person::PROJECT_DEPENDENT_ROLES).each do |role|
-          puts "Updating #{p.name} for - '#{role}' - adding to #{p.projects.count} projects"
-          roles << [role,p.projects]
-        end
-        roles << ["admin"] if p.is_admin?
-        unless roles.empty?
-          Person.record_timestamps = false
-          begin
-            p.roles = roles
-            disable_authorization_checks do
-              p.save!
-            end
-          rescue Exception=>e
-            puts "Error saving #{p.name} - #{p.id}: #{e.message}"
-          ensure
-            Person.record_timestamps = true
-          end
-        end
-      end
+    if File.exists?(dir)
+      FileUtils.remove_dir(dir)
     end
   end
 
