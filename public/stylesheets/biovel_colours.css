@@ -51,7 +51,8 @@ body, #bd {
   background-image: none;
 }
 
-.foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow, .box_infotext, input[type="text"],  {
+.foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow, .box_infotext,
+input[type="text"], a.doc-link, a.button-link  {
   border-color: #b2af6a;
 }
 
