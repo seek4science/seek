@@ -190,8 +190,6 @@ namespace :seek_dev do
       end
       puts "\t#{assays.count} Assays updated, #{studies.count} Studies updated, #{investigations.count} Investigations updated"
     end
-    Rake::Task["seek:repopulate_auth_lookup_tables"].invoke
   end
-
 
 end
