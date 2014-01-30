@@ -56,7 +56,7 @@ body, #container {
 }
 
 .foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow, .box_infotext,
-input[type="text"], a.doc-link, a.button-link  {
+input[type="text"], a.doc-link, a.button-link, .easytabs-pane, ul.easytabs-nav, ul.easytabs-nav > li {
   border-color: #b2af6a;
 }
 
@@ -75,6 +75,14 @@ a:hover {
 
 .easytabs-pane, ul.easytabs-nav > li.active {
   background-color: #FFC;
+}
+
+ul.easytabs-nav > li.active {
+  border-bottom-color: #FFC;
+}
+
+ul.easytabs-nav > li {
+  background-color: #EEEB99;
 }
 
 .workflow .category {
