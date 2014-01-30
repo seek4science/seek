@@ -127,3 +127,11 @@ ul.tabbernav {
   background-color: #ffffcc;
   border: 1px solid #b2af6a;
 }
+
+ul.sweep_input_selection label {
+  background: #FFFFCC;
+}
+
+ul.sweep_input_selection label:hover {
+  background: white;
+}

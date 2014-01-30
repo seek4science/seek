@@ -438,7 +438,7 @@ ul.sweep_input_selection li {
 }
 
 ul.sweep_input_selection label {
-  background: #FFFFCC;
+  background: #CDE;
   padding: 5px;
   display: block;
   width: 20em;
@@ -447,7 +447,7 @@ ul.sweep_input_selection label {
 }
 
 ul.sweep_input_selection label:hover {
-  background: white;
+  background: #DEF;
 }
 
 ul.sweep_input_selection li input {
