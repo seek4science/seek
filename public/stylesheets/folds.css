@@ -5,7 +5,7 @@
 }
 
 .foldTitle {
-	background-image: url('../images/header-bg.png');
+	background-image: url('/images/header-bg.png');
 	background-position: top;
 	background-repeat: repeat-x;
 	background-color: #EEEEEE;
@@ -48,7 +48,7 @@
 	padding: 0.5em;
 	*padding: 0.3em;
 	vertical-align: middle;
-	
+
 }
 
 .foldText * {
@@ -73,7 +73,7 @@
 	border: 1px solid #aaa;
 	border-width: 0px 1px 1px 1px;
 	padding: 1em 0.5em;
-	
+
     background-color: #FCFCFF;
     border-bottom-right-radius: 4px;
     border-bottom-left-radius: 4px;
