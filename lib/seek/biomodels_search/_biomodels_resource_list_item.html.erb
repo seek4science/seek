@@ -24,7 +24,7 @@
 
     <div class="list_item_whole_width">
       <p class='list_item_attribute'>
-        <%= "<b> URL of Original: </b> #{link_to(biomodel_link, 'http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}',:target=>'_blank')}".html_safe %>
+        <%= "<b> URL of Original: </b> #{link_to(biomodel_link, biomodel_link,:target=>'_blank')}".html_safe %>
       </p>
       <p class='list_item_attribute'>
         <%= "<b> Abstract: </b> #{list_item_description(resource.abstract,true,1000)}".html_safe  %>
