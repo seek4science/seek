@@ -12,7 +12,9 @@
   <a href="/">Home</a> &gt;
   <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
   <%= link_to @workflow.title, main_app.workflow_path(@workflow) -%> &gt;
-  <%= link_to "#{@run.name}", taverna_player.run_path(@run) unless @run.blank? -%> &gt;
+  <% unless @run.blank? %>
+    <%= link_to "#{@run.name}", taverna_player.run_path(@run) -%> &gt;
+  <% end %>
   New sweep
 </div>
 
