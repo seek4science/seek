@@ -74,7 +74,6 @@ body, html {
     padding-top: 20px;
     font-weight: normal;
     text-align: justify;
-    margin-top: 20px;
 }
 
 #ft a {
@@ -83,12 +82,17 @@ body, html {
 
 #bd {
     min-height: 0;
-    padding: 0 20px 150px;
+    padding: 50px 20px 130px;
 }
 
 #container {
     position: relative;
     min-height: 100%;
+}
+
+#content {
+  padding-bottom: 20px;
+  overflow: auto;
 }
 
 a {
@@ -100,11 +104,12 @@ a:hover {
 }
 
 #header {
-    margin-bottom: 10px;
     box-shadow: 0 3px 5px #ccc;
     height: 50px;
     background-color: #99cc33;
     border-bottom: 1px solid #88bb22;
+    position: absolute;
+    width: 100%;
 }
 
 div.asset_form {
@@ -535,4 +540,8 @@ a.doc-link:hover, a.button-link:hover {
   border: 1px solid #ccc;
   padding: 8px;
   border-radius: 3px;
+}
+
+.show_basic {
+  margin-right: 1em;
 }

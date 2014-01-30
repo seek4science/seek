@@ -8,8 +8,12 @@
 
 
 
-body, #bd {
+body, #container {
   background-color: #EEEB99;
+}
+
+#bd {
+  background-color: transparent;
 }
 
 #ft {
