@@ -29,6 +29,7 @@ module RunsHelper
                run.is_a?(Sweep) ? main_app.sweep_path(run) : taverna_player.run_path(run),
                :class => 'with_icon'
        ),
+       workflow.contributor.display_name,
        workflow.can_view? ? link_to(workflow.title, main_app.workflow_path(workflow)) : workflow.title,
        workflow.category.name,
        "#{run.state} #{(run.complete? ? '' : image_tag('ajax-loader.gif', :style => "vertical-align: middle"))}".html_safe,
