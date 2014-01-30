@@ -8,7 +8,10 @@
 
     <div class="list_item_left_column">
         <p class='list_item_attribute'>
-        <%= "<b> Original Authors: </b> #{resource.authors.join(", ")}".html_safe %>
+          <b>Publication title:</b> <%= resource.publication_title %>
+        </p>
+        <p class='list_item_attribute'>
+            <%= "<b> Original Authors: </b> #{resource.authors.join(", ")}".html_safe %>
         </p>
     </div>
 

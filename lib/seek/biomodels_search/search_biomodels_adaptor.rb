@@ -24,7 +24,7 @@ module Seek
 
     end
 
-    class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :published_date, :publication_id, :model_id, :last_modification_date)
+    class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :published_date, :publication_id, :publication_title,:model_id, :last_modification_date)
 
       include Seek::ExternalSearchResult
       include Seek::BioExtension
@@ -34,6 +34,7 @@ module Seek
         self.model_id=biomodels_search_result[:model_id]
         self.last_modification_date=biomodels_search_result[:last_modification_date]
         self.publication_id = biomodels_search_result[:publication_id]
+        self.title = biomodels_search_result[:model_name]
         populate
       end
 
@@ -41,14 +42,31 @@ module Seek
 
       def populate
         if publication_id_is_doi?
-
+          populate_from_doi
         else
           populate_from_pubmed
         end
       end
 
+      def populate_from_doi
+        query_result = Rails.cache.fetch("biomodels_doi_fetch_#{self.publication_id}", :expires_in=>1.week) do
+          query = DoiQuery.new(Seek::Config.crossref_api_email)
+          result = query.fetch(self.publication_id)
+          hash = {}
+          hash[:published_date] = result.date_published
+          hash[:title] = result.title
+          hash[:authors] = result.authors.collect{|a| a.name}
+          hash
+        end
+
+        self.published_date = query_result[:published_date]
+        self.title ||= query_result[:title]
+        self.publication_title = query_result[:title]
+        self.authors = query_result[:authors]
+      end
+
       def populate_from_pubmed
-        query_result = Rails.cache.fetch("pubmed_fetch_#{self.publication_id}",:expires_in=>1.week) do
+        query_result = Rails.cache.fetch("biomodels_pubmed_fetch_#{self.publication_id}",:expires_in=>1.week) do
           begin
             result = Bio::MEDLINE.new(Bio::PubMed.efetch(self.publication_id).first).reference
           rescue Exception=>e
@@ -63,7 +81,8 @@ module Seek
         end
         self.abstract = query_result[:abstract]
         self.published_date = query_result[:published_date]
-        self.title = query_result[:title]
+        self.title ||= query_result[:title]
+        self.publication_title = query_result[:title]
         self.authors = query_result[:authors]
       end
 
