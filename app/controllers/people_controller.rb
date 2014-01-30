@@ -146,11 +146,6 @@ class PeopleController < ApplicationController
   def create
     @person = Person.new(params[:person])
 
-    unless params[:projects].nil? || params[:institutions].nil?
-      workgroups= WorkGroup.where(:institution_id => params[:institutions], :project_id => params[:projects] )
-      @person.work_group_ids = workgroups.collect{|workgroup| workgroup.id}.to_a
-    end
-
     redirect_action="new"
 
     set_tools_and_expertise(@person, params)
@@ -398,8 +393,7 @@ class PeopleController < ApplicationController
     project_manager_list = []
     unless projects_param.blank?
       projects_param.each do |project_param|
-        project_detail = project_param.split(',')
-        project = Project.find_by_id(project_detail[1])
+        project = Project.find_by_id(project_param)
         project_managers = project.try(:project_managers)
         project_manager_list |= project_managers unless project_managers.nil?
       end
