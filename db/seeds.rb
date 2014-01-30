@@ -91,6 +91,10 @@ admin_user.activate
 admin_user.person ||= Person.create(:first_name => 'Admin', :last_name => 'User', :email => 'admin@example.com')
 admin_user.save
 admin_user.person.work_groups << admin_workgroup
+admin_person = admin_user.person
+admin_person.add_roles(['gatekeeper', 'project_manager'])
+admin_person.save
+
 puts 'Seeded the Admin user.'
 
 # Guest User
