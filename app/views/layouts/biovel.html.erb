@@ -90,7 +90,12 @@
               <%= flash[:notice] %>
             </div>
         <% end %>
-
+        <% if logged_in? && current_user.person && current_user.person.projects.empty? %>
+          <div class="box_standout curved with_smaller_shadow" style="margin: 0.8em 0.8em; line-height: 1.4;">
+            <%= image 'denied', :class => 'icon' %> Your project membership has not been confirmed.
+            You will be unable to run or upload workflows until an administrator confirms your membership.
+          </div>
+        <% end %>
 
 
         <%# main content part of every page -%>
