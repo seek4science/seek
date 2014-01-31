@@ -6,8 +6,8 @@ class PeopleController < ApplicationController
 
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
-  before_filter :is_user_admin_auth,:only=>[:destroy]
-  before_filter :is_user_admin_or_personless, :only=>[:new]
+  before_filter :is_during_registration,:only=>[:select]
+  before_filter :is_user_admin_auth,:only=>[:destroy,:new]
   before_filter :removed_params,:only=>[:update,:create]
   before_filter :administerable_by_user, :only => [:admin, :administer_update]
   before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
@@ -27,6 +27,8 @@ class PeopleController < ApplicationController
   def auto_complete_for_expertise_name
     render :json => Person.expertise_counts.map(&:name).to_json
   end
+
+
   
   protect_from_forgery :only=>[]
   
@@ -440,6 +442,13 @@ class PeopleController < ApplicationController
     @person=Person.find(params[:id])
     unless @person.can_be_administered_by?(current_user)
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
+      return false
+    end
+  end
+
+  def is_during_registration
+    if User.logged_in_and_registered?
+      error("You cannot register a new profile to yourself as you are already registered","Is invalid (already registered)")
       return false
     end
   end

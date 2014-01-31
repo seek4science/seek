@@ -99,6 +99,13 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil Person.find(assigns(:person).id).notifiee_info
   end
 
+  test "cannot access select form as registered user, even admin" do
+    login_as Factory(:admin)
+    get :select
+    assert_redirected_to(root_path)
+    refute_nil flash[:error]
+  end
+
   test "should reload form for incomplete details" do
 
     new_user = Factory(:brand_new_user)
