@@ -1,2 +1,2 @@
-text = `hg log --limit 1`
-$version = "Alpha #{text.match("changeset:\s+(.+):")[1]} - #{text.match("date:\s+(.+) \+")[1]}"
+text = `hg summary`
+$version = "0.7.0-#{text.match("parent:\s+(.+):")[1]}"
