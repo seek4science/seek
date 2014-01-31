@@ -78,7 +78,7 @@ class User < ActiveRecord::Base
   #a person can be logged in but not fully registered during
   #the registration process whilst selecting or creating a profile
   def self.logged_in_and_registered?
-    self.logged_in? && self.current_user.person
+    self.logged_in? && self.current_user.person && self.current_user.person.id
   end
 
   def self.logged_in_and_member?

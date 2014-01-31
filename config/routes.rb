@@ -142,6 +142,7 @@ SEEK::Application.routes.draw do
       post :gatekeeper_decide
       get :gatekeeper_decision_result
       get :waiting_approval_assets
+      get :select
     end
     resources :avatars do
       member do

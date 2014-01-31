@@ -139,7 +139,6 @@ class PeopleController < ApplicationController
     @userless_projects.sort!{|a,b|a.name<=>b.name}
     @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
 
-    render :action=>"select"
   end
 
   # POST /people
@@ -198,7 +197,7 @@ class PeopleController < ApplicationController
         end
 
       else
-        format.html { render :action => redirect_action }
+        format.html { render redirect_action }
         format.xml { render :xml => @person.errors, :status => :unprocessable_entity }
       end
     end
