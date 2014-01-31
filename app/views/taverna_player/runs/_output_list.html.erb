@@ -1,9 +1,11 @@
 <h2 class="standout">
   <%= title -%> (<%= ports.count -%>)
 </h2>
+
 <% unless ports.blank? -%>
   <% ports.each do |p| -%>
     <div class="output">
+      <a id="<%=p.name %>"></a>
       <%= render 'port', :port => p %>
     </div>
   <% end %>

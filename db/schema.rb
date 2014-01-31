@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131216092845) do
+ActiveRecord::Schema.define(:version => 20140131155853) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1013,6 +1013,11 @@ ActiveRecord::Schema.define(:version => 20131216092845) do
     t.integer "strain_id"
   end
 
+  create_table "projects_sweeps", :force => true do |t|
+    t.integer "sweep_id"
+    t.integer "project_id"
+  end
+
   create_table "projects_taverna_player_runs", :id => false, :force => true do |t|
     t.integer "run_id"
     t.integer "project_id"
@@ -1440,13 +1445,28 @@ ActiveRecord::Schema.define(:version => 20131216092845) do
     t.integer  "project_subscription_id"
   end
 
+  create_table "sweep_auth_lookup", :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.integer "can_view",     :limit => 1
+    t.integer "can_manage",   :limit => 1
+    t.integer "can_edit",     :limit => 1
+    t.integer "can_download", :limit => 1
+    t.integer "can_delete",   :limit => 1
+  end
+
   create_table "sweeps", :force => true do |t|
     t.string   "name"
-    t.integer  "user_id"
+    t.integer  "contributor_id"
     t.integer  "workflow_id"
-    t.integer  "workflow_version", :default => 1
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
+    t.integer  "workflow_version",              :default => 1
+    t.datetime "created_at",                                   :null => false
+    t.datetime "updated_at",                                   :null => false
+    t.string   "contributor_type"
+    t.text     "description"
+    t.string   "uuid"
+    t.string   "first_letter",     :limit => 1
+    t.integer  "policy_id"
   end
 
   create_table "synonyms", :force => true do |t|
@@ -1737,13 +1757,16 @@ ActiveRecord::Schema.define(:version => 20131216092845) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.text     "other_creators"
-    t.string   "first_letter",      :limit => 1
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
+    t.string   "first_letter",       :limit => 1
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
     t.datetime "last_used_at"
     t.integer  "workflow_id"
     t.text     "revision_comments"
     t.integer  "version"
+    t.boolean  "sweepable"
+    t.string   "myexperiment_link"
+    t.string   "documentation_link"
   end
 
   create_table "workflows", :force => true do |t|
@@ -1755,11 +1778,14 @@ ActiveRecord::Schema.define(:version => 20131216092845) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.text     "other_creators"
-    t.string   "first_letter",     :limit => 1
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.string   "first_letter",       :limit => 1
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
     t.datetime "last_used_at"
     t.integer  "version"
+    t.boolean  "sweepable"
+    t.string   "myexperiment_link"
+    t.string   "documentation_link"
   end
 
   create_table "worksheets", :force => true do |t|

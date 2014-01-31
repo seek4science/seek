@@ -24,7 +24,7 @@ module Seek
         "text/x-comma-separated-values" => {:name => "Comma-seperated-values document", :icon_key => "misc_file", :extensions=>["csv"]},
         "application/xml" => {:name => "XML document", :icon_key => "xml_file", :extensions=>["xml"]},
         "text/xml" => {:name => "XML document", :icon_key => "xml_file", :extensions=>["xml"]},
-        "application/sbml+xml" => {:name => "SBML and XML document", :icon_key => "xml_file", :extensions=>["xml"]},
+        #"application/sbml+xml" => {:name => "SBML and XML document", :icon_key => "xml_file", :extensions=>["xml"]},
         "text/x-objcsrc" => {:name => "Objective C file", :icon_key => "misc_file", :extensions=>["objc"]},
         "application/vnd.oasis.opendocument.presentation" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extensions=>["odp"]},
         "application/vnd.oasis.opendocument.presentation-flat-xml" => {:name => "PowerPoint presentation", :icon_key => "ppt_file", :extensions=>["fodp"]},

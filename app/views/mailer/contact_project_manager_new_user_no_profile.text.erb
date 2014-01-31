@@ -1,12 +1,11 @@
 Hi,
 
-The new user <%= @person.name %> just signed up and indicated that they were not listed as a <%= Seek::Config.project_name %> <%= t('project').downcase %> member.
-They have provided the following details about their <%= t('project').pluralize.downcase %>:
+The new user <%= @person.name %> just signed up and indicated that they are a member of the following projects and/or institutions.
 
 "<%= @details %>"
 
 If you know they are genuine member of the <%= t('project').pluralize.downcase %> you can manage, please assign him/her to the <%= t('project').pluralize.downcase %> by:
-- Go to <%= person_url(@person, :host=>@host) %>
+- Going to <%= person_url(@person, :host=>@host) %>
 - Choose 'Person Administration'
 - At the bottom. you will see the list of <%= t('project').pluralize.downcase %> and institutions that you can assign this person to
 

@@ -10,8 +10,8 @@ module WorkflowsHelper
     option
   end.sort.uniq {|option| option[0]}.freeze
 
-  def mime_type_options_for_select
-    options_for_select(WorkflowsHelper::MIME_TYPE_OPTIONS)
+  def mime_type_options_for_select(selected)
+    options_for_select(WorkflowsHelper::MIME_TYPE_OPTIONS, :selected => selected)
   end
 
   def merge_workflow_filters(params, key, value)

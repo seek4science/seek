@@ -9,11 +9,17 @@
 
 /* Max Width */
 
-#header > div, #bd > div, #ft > div {
+#header > div, #bd > div {
     max-width: 1400px;
     min-width: 900px;
     margin: auto;
 }
+
+#ft > div {
+  max-width: 1360px;
+  min-width: 860px;
+  padding: 0 20px;
+  margin: auto;}
 
 .workflow-category {
     display: inline-block;
@@ -39,16 +45,16 @@
 #modal-interaction-dialog {
     background-color: #FFFFCC;
 }
-.modal-interaction-heading {
+.interaction-modal .ui-dialog-titlebar {
     padding: 15px;
     background-color: #b1e10f;
     color: #333333;
     border-color: #77aa11;
+    background-image: none;
 }
 .modal-interaction-body {
     background-color: #ffffff;
 }
-
 
 body, html {
     background: #FAFAFA;
@@ -59,17 +65,15 @@ body, html {
 }
 
 #ft {
-    width: 100%;
     position: absolute;
-    min-width: 800px;
+    width: 100%;
     height: 110px;
     border: none;
     background: #dddddd;
     color: #555555;
-    font-weight: normal;
     padding-top: 20px;
-    text-align: left;
-    margin-top: 20px;
+    font-weight: normal;
+    text-align: justify;
 }
 
 #ft a {
@@ -78,12 +82,17 @@ body, html {
 
 #bd {
     min-height: 0;
-    padding: 0 20px 150px;
+    padding: 50px 20px 130px;
 }
 
 #container {
     position: relative;
     min-height: 100%;
+}
+
+#content {
+  padding-bottom: 20px;
+  overflow: auto;
 }
 
 a {
@@ -95,11 +104,12 @@ a:hover {
 }
 
 #header {
-    margin-bottom: 10px;
     box-shadow: 0 3px 5px #ccc;
     height: 50px;
     background-color: #99cc33;
     border-bottom: 1px solid #88bb22;
+    position: absolute;
+    width: 100%;
 }
 
 div.asset_form {
@@ -159,7 +169,6 @@ td.port-type label {
     color: #333333;
     padding: 10px;
     text-align: left;
-    background-color: #f4f4f4;
     font-size: 16px;
     box-shadow: 1px 1px 3px #ccc;
     border: 1px solid #ccc;
@@ -173,6 +182,43 @@ td.port-type label {
     float: right;
     font-size: 12px;
     padding: 2px 5px;
+}
+
+.run_result_links {
+    min-height: 20px;
+
+}
+.run_result_link {
+    background-color: #ffffff;
+    border: 1px solid rgba(221, 221, 170, 0.70);
+    border-radius: 4px 4px 4px 4px;
+    font-size: 15px;
+    padding: 2px 5px;
+    margin: 0px 2px;
+    display: inline-block;
+}
+
+#top-link-box {
+    display:none;
+    position:fixed;
+    right: 0;
+    padding: 20px 20px;
+    border:1px solid #CCC;
+    background-color: white;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    box-shadow: -2px -2px 3px #eee;
+    -moz-box-shadow: -2px -2px 3px #eee;
+    text-align:center;
+    z-index: 100;
+}
+
+#top-link {
+    text-decoration: underline;
+}
+
+#top-link-close {
+    display: inline;
 }
 
 .workflow .description {
@@ -278,7 +324,7 @@ table.display tr td:first-child {
     border-color: #ccc;
     box-shadow: 0 3px 5px #ccc;
     width: 200px;
-    margin-left: -60px;
+    margin-left: 30px;
     background: white;
     z-index: 999999;
 }
@@ -373,11 +419,6 @@ ul.runs_and_sweeps_list li {
   margin-left: 5px;
 }
 
-ul.runs_and_sweeps_list li > a > img {
-  vertical-align: text-top;
-  margin-right: 10px;
-}
-
 div.csv {
   overflow-x: scroll;
   max-height: 800px;
@@ -398,7 +439,7 @@ ul.sweep_input_selection li {
 }
 
 ul.sweep_input_selection label {
-  background: #FFFFCC;
+  background: #CDE;
   padding: 5px;
   display: block;
   width: 20em;
@@ -407,7 +448,7 @@ ul.sweep_input_selection label {
 }
 
 ul.sweep_input_selection label:hover {
-  background: white;
+  background: #DEF;
 }
 
 ul.sweep_input_selection li input {
@@ -429,8 +470,87 @@ pre {
   text-align: left;
 }
 
+
 #upload_new_version_form {
   margin-bottom: 30px;
   border-bottom: 1px solid #333;
   padding-bottom: 30px;
 }
+
+a.with_icon img {
+  margin-right: 0.5em;
+  vertical-align: text-top;
+}
+
+a.advanced_sharing_link {
+  float: none;
+  display: inline-block;
+  padding: 7px 0;
+}
+
+.inline_pdf {
+  width: 100%;
+  height: 500px;
+}
+
+a.doc-link, a.button-link {
+  background-color: #F0F4FF;
+  border: 1px solid #AAAAAA;
+  border-radius: 4px;
+  box-shadow: -2px -2px 3px #EEEEEE;
+  line-height: 1;
+  padding: 0.5em;
+  text-decoration: none;
+  display: inline-block;
+}
+
+a.doc-link:hover, a.button-link:hover {
+  text-decoration: none;
+}
+
+#embedded-run-info {
+  font-size: 120%;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#embedded-run-button {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#embedded-start-button {
+  padding: 1em 3em;
+  font-size: 150%;
+}
+
+#corner-logo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 128px;
+  background-color: white;
+  padding: 4px;
+  font-size: 12px;
+  vertical-align: middle;
+  border-top-left-radius: 5px;
+  box-shadow: 0 0 8px #333;
+}
+
+.contribution_title {
+  margin-left: 0;
+  border: 0;
+  padding-bottom: 0.2em;
+}
+
+.enable-data-sweeps {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 3px;
+}
+
+.show_basic {
+  margin-right: 1em;
+}
+

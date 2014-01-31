@@ -1,21 +1,15 @@
+<%
+  # Copyright (c) 2013 The University of Manchester, UK.
+  #
+  # BSD Licenced. See LICENCE.rdoc for details.
+  #
+  # Taverna Player was developed in the BioVeL project, funded by the European
+  # Commission 7th Framework Programme (FP7), through grant agreement
+  # number 283359.
+  #
+  # Author: Robert Haines
+%>
 
-<div id="run-outputs">
-  <% if run.outputs.size > 0 %>
-    <h2>Outputs</h2>
-
-    <%= link_to "Download All", run.results.url %>
-
-    <% run.outputs.each do |output| %>
-      <p>
-        <b>Name:</b>
-        <%= output.name %>
-      </p>
-
-      <p>
-        <b>Value:</b>
-        <%= TavernaPlayer.port_renderer.render(output) %>
-      </p>
-
-    <% end%>
-  <% end %>
-</div>
+<%= render :partial => 'taverna_player/runs/results_navigator', :locals => { :run => @run } %>
+<%= render :partial => "taverna_player/runs/output_list", :locals => { :ports => run.result_outputs, :title => "Results"} -%>
+<%= render :partial => "taverna_player/runs/output_list", :locals => { :ports => run.error_log_outputs, :title => "Information"} -%>

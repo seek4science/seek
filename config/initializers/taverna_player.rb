@@ -51,7 +51,7 @@ TavernaPlayer.setup do |config|
   # It takes the run model object as its parameter.
   #config.post_run_callback = Proc.new { |run| puts "Finished: #{run.name}" }
   #config.post_run_callback = "player_post_run_callback"
-  config.post_run_callback = :fix_run_output_ports_mime_types
+  config.post_run_callback = :fix_types_and_extensions
 
   # The run-cancelled callback is called if the run is cancelled by the user.
   # It takes the run model object as its parameter.
@@ -92,7 +92,12 @@ TavernaPlayer.setup do |config|
     #renderers.add("image/png", :show_image)
     #renderers.add("image/gif", :show_image)
     #renderers.add("image/bmp", :show_image)
+    renderers.add("application/json", :format_json)
+    renderers.add("application/xml", :format_xml)
+    renderers.add("text/xml", :format_xml)
     renderers.add("text/csv", :format_csv)
+    renderers.add("application/pdf", :inline_pdf)
+    renderers.add("application/x-error", :format_error)
 
     # This is the workflow error type and you should have a special renderer
     # for it.

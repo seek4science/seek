@@ -1,13 +1,18 @@
-<div id="run-info">
+<%
+  # Copyright (c) 2013 The University of Manchester, UK.
+  #
+  # BSD Licenced. See LICENCE.rdoc for details.
+  #
+  # Taverna Player was developed in the BioVeL project, funded by the European
+  # Commission 7th Framework Programme (FP7), through grant agreement
+  # number 283359.
+  #
+  # Author: Robert Haines
+%>
 
-  <p>
-    <b>Name:</b>
-    <%= run.name %>
-  </p>
-
-  <p>
-    <b>Status message:</b>
-    <%= run.status_message %>
-  </p>
-
+<div id="embedded-run-info">
+  <% unless run.complete? %>
+    <%= image_tag '/images/ajax-loader-large.gif' %><br/>
+  <% end %>
+  <%= run.status_message %>
 </div>

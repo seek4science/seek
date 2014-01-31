@@ -1,14 +1,14 @@
 require 'zip/zip'
 
 class Sweep < ActiveRecord::Base
+  acts_as_asset
 
   has_many :runs, :class_name => 'TavernaPlayer::Run', :dependent => :destroy
-  belongs_to :user
   belongs_to :workflow
 
   accepts_nested_attributes_for :runs
 
-  attr_accessible :user_id, :workflow_id, :name, :runs_attributes, :workflow_version
+  attr_accessible :contributor_id, :workflow_id, :name, :runs_attributes, :workflow_version
 
   before_destroy :cancel
 
@@ -47,7 +47,11 @@ class Sweep < ActiveRecord::Base
   end
 
   def self.by_owner(uid)
-    where(:user_id => uid)
+    where(:contributor_id => uid)
+  end
+
+  def title
+    name
   end
 
   def build_zip(output_list)
@@ -62,15 +66,8 @@ class Sweep < ActiveRecord::Base
           outputs.each do |output|
             run_dir_name = "#{output_dir_name}/#{output.run.name}"
             zip_file.mkdir(run_dir_name) # Make subfolder for each run in the sweep
-            if output.file.exists?
-              file = output.file
-              zip_file.get_output_stream("#{run_dir_name}/#{output.file_file_name}") do |f|
-                f.write(File.read(file.path))
-              end
-            else
-              zip_file.get_output_stream("#{run_dir_name}/value.txt") do |f|
-                f.write(output.value)
-              end
+            zip_file.get_output_stream("#{run_dir_name}/#{output.filename}") do |f|
+              f.write(output.value)
             end
           end
         end
@@ -80,9 +77,9 @@ class Sweep < ActiveRecord::Base
     path
   end
 
-  # Sweep should only be visible if at least one of its runs is visible... or theres no point in viewing it!
-  def can_view?
-    runs.any? { |r| r.can_view? }
+  # Sweeps should be private by default
+  def default_policy
+    Policy.private_policy
   end
 
 end

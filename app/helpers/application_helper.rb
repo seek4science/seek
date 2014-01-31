@@ -344,7 +344,7 @@ module ApplicationHelper
   end
 
   def favourite_group_popup_link_action_new resource_type=nil
-    return link_to_remote_redbox("Create new favourite group",
+    return link_to_remote_redbox("Create new #{t('favourite_group')}",
       { :url => main_app.new_favourite_group_url,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
@@ -357,7 +357,7 @@ module ApplicationHelper
   end
   
   def favourite_group_popup_link_action_edit resource_type=nil
-    return link_to_remote_redbox("Edit selected favourite group",
+    return link_to_remote_redbox("Edit selected #{t('favourite_group')}",
       { :url => main_app.edit_favourite_group_url,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}' + '&id=' + selectedFavouriteGroup()" },
@@ -561,6 +561,8 @@ module ApplicationHelper
       result = t('biosamples.sample_parent_term')
     elsif resource_type == "Assay"
       result = t('assays.assay')
+    elsif resource_type == "TavernaPlayer::Run"
+      result = "Run"
     else
       translated_resource_type = translate_resource_type(resource_type)
       result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type

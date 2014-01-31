@@ -68,7 +68,9 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions,:dependent => :destroy
-  before_create :set_default_subscriptions
+  # This line was causing 2 project subscriptions to be created when a user registered,
+  # as one is also created when a work group is added
+  #before_create :set_default_subscriptions
 
   requires_can_manage :roles_mask
 
@@ -244,6 +246,18 @@ class Person < ActiveRecord::Base
 
   def can_create_new_items?
     member?
+  end
+
+  def workflows
+     self.user.workflows
+  end
+
+  def runs
+    self.user.taverna_player_runs
+  end
+
+  def sweeps
+    self.user.sweeps
   end
 
   def institutions

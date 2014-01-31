@@ -32,7 +32,7 @@ class WorkflowsController < ApplicationController
 
 
   def new
-    @workflow = Workflow.new
+    @workflow = Workflow.new(:category_id => params[:category_id])
     #@data_file.parent_name = params[:parent_name]
     #@data_file.is_with_sample= params[:is_with_sample]
     @page_title = params[:page_title]
@@ -144,11 +144,18 @@ class WorkflowsController < ApplicationController
   end
 
   def destroy
-    @workflow.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(workflows_path) }
-      format.xml  { head :ok }
+    if @workflow.runs.empty?
+      @workflow.destroy
+      respond_to do |format|
+        format.html { redirect_to(workflows_path) }
+        format.xml  { head :ok }
+      end
+    else
+      flash[:error] = "This workflow has #{@workflow.runs.size} runs associated with it and so cannot be deleted. Please make it private instead."
+      respond_to do |format|
+        format.html { redirect_to(workflows_path) }
+        format.xml  { head :forbidden }
+      end
     end
   end
 

@@ -21,19 +21,17 @@
 
       <div class="box_about_actor" style="text-align: left; padding: 20px 20px 20px 0px;">
         <%= f.label :name, "Run name:"  %>
-        <%= f.text_field :name, :value => "#{@workflow_version.title} (v#{@workflow_version.version}) run " + Time.now.strftime('%e %b %Y %H:%m:%S %Z'), :size => 80 %>
+        <%= f.text_field :name, :value => "#{@workflow_version.title} (v#{@workflow_version.version}) run " + Time.now.utc.strftime('%e %b %Y %H:%M:%S %Z'), :size => 80 %>
       </div>
 
       <!-- Data inputs -->
-      <% data_inputs = workflow_inputs.select{|input| (input.port_type.name == WorkflowInputPortType::DATA)}  -%>
-      <% unless data_inputs.blank? %>
-          <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => data_inputs, :form => f} %>
+      <% unless @workflow.data_input_ports.blank? %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => @workflow.data_input_ports, :form => f} %>
       <% end %>
 
       <!-- Parameter inputs -->
-      <% paramater_inputs = workflow_inputs.select{|input| input.port_type.name == WorkflowInputPortType::PARAMETER} -%>
-      <% unless paramater_inputs.blank? %>
-          <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => paramater_inputs, :form => f} %>
+      <% unless @workflow.parameter_input_ports.blank? %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => @workflow.parameter_input_ports, :form => f} %>
       <% end %>
       <br/>
 

@@ -22,9 +22,11 @@
         <%= f.text_field :name, :size => 80 -%>
       </p>
 
-      <p>
-        <%= render :partial => "assets/sharing_form" -%>
-      </p>
+      <% unless @run.using_sweep_policy? %>
+        <p>
+          <%= render :partial => "assets/sharing_form" -%>
+        </p>
+      <% end %>
 
       <p>
         <%= submit_tag 'Save' -%>

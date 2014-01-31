@@ -4,10 +4,10 @@ function foldUpdate(el) {
 
   var title = getPaneTitleDiv(el);
 
-  var img = "../../images/folds/fold.png";
+  var img = "/images/folds/fold.png";
 
   if (getPaneBodyDiv(el).style.display == 'none')
-    img = "../../images/folds/unfold.png";
+    img = "/images/folds/unfold.png";
 
   var newTitle = document.createElement('DIV');
 

@@ -1,7 +1,7 @@
 /* Code made by RoRCraft limited, 2004-2008
  * Taken from http://devblog.rorcraft.com/2008/8/13/the-facebook-autocomplete-address-to-field
  * (relevant pictures also obtained from the same website)
- */ 
+ */
 
 .clearfix:after{content:".";display:block;clear:both;visibility:hidden;line-height:0;height:0;}
 .clearfix{display:inline-block;}
@@ -42,24 +42,24 @@ html[xmlns] .clearfix{display:block;}
 .tokenizer_input_shadow{border:0px solid black;outline:0;font-family:'lucida grande', tahoma, verdana, arial, sans-serif;font-size:11px;padding:0px 5px;margin:0 0 -1px 0;white-space:pre;}
 .tokenizer_input_shadow{display:inline;left:-10000px;position:absolute;top:-10000px;}
 .tokenizer .tokenizer_input_shadow{height:0px;display:block;left:0px;overflow:hidden;position:relative;top:0px;}
-div.tokenizer .token{background-image:url('../images/autocompleter_tokens/token.gif');background-repeat:no-repeat;color:black;white-space:nowrap;}
-div.tokenizer .token span{background-image:url('../images/autocompleter_tokens/token.gif');background-position:top right;background-repeat:no-repeat;display:block;}
+div.tokenizer .token{background-image:url('/images/autocompleter_tokens/token.gif');background-repeat:no-repeat;color:black;white-space:nowrap;}
+div.tokenizer .token span{background-image:url('/images/autocompleter_tokens/token.gif');background-position:top right;background-repeat:no-repeat;display:block;}
 div.tokenizer .token span span{background-position:bottom right;}
 div.tokenizer .token span span span{background-position:bottom left;}
 div.tokenizer .token span span span span{background-image:none;padding:2px 3px 2px 5px;}
 div.tokenizer.tokenizer_locked .token span span span span{padding-right:5px;}
 html div.tokenizer_locked .token:hover,
-html div.tokenizer_locked .token:hover span{background-image:url('../images/autocompleter_tokens/token.gif');}
+html div.tokenizer_locked .token:hover span{background-image:url('/images/autocompleter_tokens/token.gif');}
 div.tokenizer .token:hover,
-div.tokenizer .token:hover span{background-image:url('../images/autocompleter_tokens/token_hover.gif');text-decoration:none;}
+div.tokenizer .token:hover span{background-image:url('/images/autocompleter_tokens/token_hover.gif');text-decoration:none;}
 div.tokenizer .token_selected,
 div.tokenizer .token_selected span,
 div.tokenizer .token_selected:hover,
-div.tokenizer .token_selected:hover span{background-image:url('../images/autocompleter_tokens/token_selected.gif');color:white;text-decoration:none;}
+div.tokenizer .token_selected:hover span{background-image:url('/images/autocompleter_tokens/token_selected.gif');color:white;text-decoration:none;}
 div.tokenizer .token span.x,
 div.tokenizer .token span.x_hover,
 div.tokenizer .token:hover span.x,
-div.tokenizer .token:hover span.x_hover{background-image:url('../images/autocompleter_tokens/token_x.gif');background-position:4px 2px;cursor:pointer;display:inline;padding:0px 6px 0px 5px;}
+div.tokenizer .token:hover span.x_hover{background-image:url('/images/autocompleter_tokens/token_x.gif');background-position:4px 2px;cursor:pointer;display:inline;padding:0px 6px 0px 5px;}
 div.tokenizer.tokenizer_locked .token span.x,
 div.tokenizer.tokenizer_locked .token span.x_hover{display:none;}
 div.autocomplete {  background-color:white;  border:1px solid #888;  margin-top:-2px;  padding:0px;}

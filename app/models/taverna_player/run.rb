@@ -14,8 +14,11 @@ module TavernaPlayer
     attr_accessible :workflow_version, :project_ids
 
     after_create :fix_run_input_ports_mime_types
+    before_create :inherit_sweep_policy
 
     validates_presence_of :name
+
+    attr_accessible :project_ids
 
     belongs_to :sweep
 
@@ -27,7 +30,11 @@ module TavernaPlayer
 
     # Runs should be private by default
     def default_policy
-      Policy.private_policy
+      if self.embedded
+        Policy.public_policy
+      else
+        Policy.private_policy
+      end
     end
 
     def title
@@ -39,7 +46,45 @@ module TavernaPlayer
       true
     end
 
+    def using_sweep_policy?
+      !sweep.nil? && (policy_id == sweep.policy_id)
+    end
+
+    def result_outputs
+      port_names = workflow.result_output_ports.map { |o| o.name }
+      outputs.select {|o| port_names.include?(o.name) }
+    end
+
+    def error_log_outputs
+      port_names = workflow.error_log_output_ports.map { |o| o.name }
+      outputs.select {|o| port_names.include?(o.name) }
+    end
+
+    def data_inputs
+      port_names = workflow.data_input_ports.map { |i| i.name }
+      inputs.select {|i| port_names.include?(i.name) }
+    end
+
+    def parameter_inputs
+      port_names = workflow.parameter_input_ports.map { |i| i.name }
+      inputs.select {|i| port_names.include?(i.name) }
+    end
+
+    def sweepable?
+      workflow.sweepable_from_run? && sweep_id.blank?
+    end
+
     private
+
+    alias_method :old_default_contributor, :default_contributor
+
+    def default_contributor
+      if self.embedded
+        User.guest
+      else
+        old_default_contributor
+      end
+    end
 
     def fix_run_input_ports_mime_types
       self.inputs.each do |input|
@@ -54,6 +99,10 @@ module TavernaPlayer
           input.save
         end
       end
+    end
+
+    def inherit_sweep_policy
+      self.policy_id = sweep.policy_id unless sweep.nil?
     end
   end
 end

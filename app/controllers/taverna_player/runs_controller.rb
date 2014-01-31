@@ -2,6 +2,8 @@ module TavernaPlayer
   class RunsController < TavernaPlayer::ApplicationController
     include TavernaPlayer::Concerns::Controllers::RunsController
 
+    skip_before_filter :project_membership_required
+    before_filter :check_project_membership_unless_embedded, :only => [:create, :new]
     before_filter :auth, :except => [ :index, :new, :create ]
     before_filter :find_runs, :only => :index
     before_filter :add_sweeps, :only => :index
@@ -26,7 +28,6 @@ module TavernaPlayer
           format.html { render "taverna_player/runs/show" }
         end
       else
-        puts @run.errors.full_messages
         respond_to do |format|
           format.html { render "taverna_player/runs/edit" }
         end
@@ -37,7 +38,7 @@ module TavernaPlayer
     def create
       @run = Run.new(params[:run])
       # Manually add projects of current user, as they aren't prompted for this information in the form
-      @run.projects = current_user.person.projects
+      @run.projects = @run.contributor.person.projects
       @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
 
       respond_to do |format|
@@ -89,7 +90,7 @@ module TavernaPlayer
 
     def find_runs
       select = params[:workflow_id] ? { :workflow_id => params[:workflow_id] } : {}
-      @runs = Run.where(select).includes(:sweep).includes(:workflow).all
+      @runs = Run.where(select).where(:embedded => :false).includes(:sweep).includes(:workflow).all
       @runs = @runs & Run.all_authorized_for('view', current_user)
     end
 
@@ -115,14 +116,20 @@ module TavernaPlayer
 
     def filter_users_runs_and_sweeps
       @user_runs = @runs.select do |run|
-        run.is_a?(Sweep) && run.user == current_user ||
-        run.is_a?(TavernaPlayer::Run) && run.contributor == current_user
+        run.contributor == current_user
       end
 
       @runs = @runs - @user_runs
     end
 
     def auth
+      # Skip certain auth if run is embedded
+      if @run.embedded
+        if ['cancel','read_interaction','write_interaction'].include?(action_name)
+          return true
+        end
+      end
+
       action = translate_action(action_name)
       unless is_auth?(@run, action)
         if User.current_user.nil?
@@ -142,5 +149,12 @@ module TavernaPlayer
         end
       end
     end
+
+    def check_project_membership_unless_embedded
+      unless (params[:run] && params[:run][:embedded] == 'true') || (params[:embedded] && params[:embedded] == 'true')
+        project_membership_required
+      end
+    end
+
   end
 end

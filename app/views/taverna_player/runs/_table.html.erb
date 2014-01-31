@@ -1,6 +1,7 @@
 <%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'DataTables-1.8.2/jquery.dataTables.rowGrouping.js', 'DataTables-1.8.2/Scroller.js' %>
 <% id ||= 'workflow_runs_table' %>
-<% default_sort ||= [4, 'desc'] %>
+<% default_sort ||= [6, 'desc'] %>
+<% show_user ||= false %>
 <%
   unless defined?(poll)
      poll = true
@@ -26,13 +27,21 @@
                 [ <%= default_sort[0] -%>, "<%= default_sort[1] -%>" ]
             ],
             "aoColumns":[
-                { "sWidth":"15%" },
+                <% if show_user %>
+                { "sWidth":"24%" },
+                { "sWidth":"8%" },
+                <% else %>
+                { "sWidth":"32%" },
+                { "sWidth":"0%","bSearchable": false, "bVisible": false },
+                <% end %>
                 { "sWidth":"15%" },
                 { "sWidth":"10%" },
-                { "sWidth":"10%" },
-                { "sWidth":"15%", "bSearchable": false },
-                { "sWidth":"15%", "bSearchable": false },
-                { "sWidth":"10%", "bSortable":false, "bSearchable": false }
+                { "sWidth":"8%" },
+                { "iDataSort": 6, "sWidth":"10%", "bSearchable": false },
+                { "bSearchable": false, "bVisible": false }, //Unix timestamp of "created" date for sorting purposes
+                { "iDataSort": 8, "sWidth":"10%", "bSearchable": false },
+                { "bSearchable": false, "bVisible": false }, //Unix timestamp of "finished" date for sorting purposes
+                { "sWidth":"5%", "bSortable":false, "bSearchable": false }
             ]
         });
         <% if poll %>
@@ -48,11 +57,14 @@
       <thead>
       <tr>
         <th>Run</th>
+        <th>User</th>
         <th>Workflow</th>
         <th>Category</th>
         <th>State</th>
-        <th>Created at</th>
-        <th>Finished at</th>
+        <th>Created</th>
+        <th>Created Timestamp</th>
+        <th>Finished</th>
+        <th>Finished Timestamp</th>
         <th>Actions</th>
       </tr>
       </thead>

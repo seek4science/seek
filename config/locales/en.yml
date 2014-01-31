@@ -57,3 +57,5 @@ en:
     isa_best_practice: "ISA best practice"
 
   taverna_player/run: "workflow run"
+
+  favourite_group: "collaboration"

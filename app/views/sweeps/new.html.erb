@@ -1,12 +1,9 @@
 <%
-   workflow_title = TavernaPlayer.workflow_proxy.title(@workflow_version) || ""
-   workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow_version).sort_by {|i| i.name.downcase }
-   data_inputs = workflow_inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }
-   data_input_names = data_inputs.collect { |input| input.name }
-   parameter_inputs = workflow_inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER }
+   workflow_title = @workflow_version.title
+   data_input_names = @workflow_version.data_input_ports.map { |input| input.name }
 %>
 <script type="text/javascript">
-  var inputs = <%= input_json_hash(data_inputs) -%>;
+  var inputs = <%= input_json_hash(@workflow_version.data_input_ports) -%>;
   var iteration_template = "<%= escape_javascript render('iteration_template') -%>";
   var input_template = "<%= escape_javascript render('input_template') -%>";
 </script>
@@ -14,8 +11,10 @@
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
-  <%= link_to @workflow.title, main_app.workflow_path(@workflow) -%> &gt;
-  <%= link_to "#{@run.name} &gt;", taverna_player.run_path(@run) unless @run.blank?-%>
+  <%= link_to @workflow_version.title, main_app.workflow_path(@workflow, :version => @workflow_version.version) -%> &gt;
+  <% unless @run.blank? %>
+    <%= link_to "#{@run.name}", taverna_player.run_path(@run) -%> &gt;
+  <% end %>
   New sweep
 </div>
 
@@ -75,14 +74,14 @@
     <!--Another form for all other input ports which values are fixed (i.e. shared over all sweep iterations). -->
     <!--These will be copied over to each individual run/iteration of a sweep as input data values for those ports. -->
     <!--They form "special shared values" that needs to be removed from a sweep model after the input data is copied.-->
-    <%= sweep_form.fields_for :shared_input_values_for_all_runs, TavernaPlayer::Run.new do |shared_input_values| %>
+    <%= sweep_form.fields_for :shared_input_values_for_all_runs, @run || TavernaPlayer::Run.new do |shared_input_values| %>
       <div class="fold">
         <div class="foldTitle">
           Fixed Data
         </div>
         <div class="foldContent" id="fixed_data">
           <%# skip first input because its the sweep input by default %>
-          <% data_inputs[1..-1].each do |input| %>
+          <% @workflow_version.data_input_ports[1..-1].each do |input| %>
             <%= render :partial => 'taverna_player/runs/input_form', :locals => {:input => input, :form => shared_input_values} %>
           <% end %>
         </div>
@@ -93,8 +92,8 @@
           Parameters
         </div>
         <div class="foldContent" id="parameters">
-          <% unless parameter_inputs.blank? %>
-            <% parameter_inputs.each do |input| %>
+          <% unless @workflow_version.parameter_input_ports.blank? %>
+            <% @workflow_version.parameter_input_ports.each do |input| %>
               <%= render :partial => 'taverna_player/runs/input_form', :locals => {:input => input, :form => shared_input_values} %>
             <% end %>
           <% else %>

@@ -1,7 +1,2 @@
-<% data_input_port_names = run.workflow.input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }.collect { |i| i.name }.sort{ |a,b| a.downcase <=> b.downcase} -%>
-<% run_data_inputs = run.inputs.select { |input| data_input_port_names.include?(input.name) } %>
-<%= render :partial => "input_list", :locals => { :ports => run_data_inputs, :title => "Data" } -%>
-
-<% parameter_input_port_names = run.workflow.input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::PARAMETER) }.collect { |i| i.name }.sort{ |a,b| a.downcase <=> b.downcase} -%>
-<% run_parameter_inputs = run.inputs.select { |input| parameter_input_port_names.include?(input.name) } %>
-<%= render :partial => "input_list", :locals => { :ports => run_parameter_inputs, :title => "Parameters" } -%>
+<%= render :partial => "input_list", :locals => { :ports => @run.data_inputs, :title => "Data" } -%>
+<%= render :partial => "input_list", :locals => { :ports => @run.parameter_inputs, :title => "Parameters" } -%>

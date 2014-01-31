@@ -1,0 +1,31 @@
+
+
+
+<%= list_item_title resource, :options => {:include_avatar => false} %>
+
+<div class="list_item_left_column">
+
+  <% workflow = resource.workflow %>
+  <% unless workflow.nil? %>
+      <%= list_item_attribute "Sweep of Workflow", workflow.title, workflow_path(workflow) %>
+  <% end %>
+  <%= list_item_attribute "Iterations", resource.runs.count %>
+
+  <% contributor = resource.contributor %>
+  <% unless contributor.nil? %>
+      <%= list_item_attribute "Run By", contributor.person.name, person_path(contributor.person) %>
+      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
+  <% end %>
+
+</div>
+
+<div class="list_item_right_column">
+  <%= list_item_attribute "Created", resource.created_at %>
+  <%= list_item_attribute "Last Updated", resource.updated_at %>
+</div>
+
+<div class="list_item_whole_width">
+
+  <%= list_item_timestamp resource %>
+
+</div>

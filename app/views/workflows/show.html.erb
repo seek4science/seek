@@ -26,6 +26,19 @@
       <%= resource_version_selection @workflow, @display_workflow -%>
   <% end %>
 
+  <p>
+    <% unless @display_workflow.documentation_link.blank? %>
+      <%= link_to @display_workflow.documentation_link, :target => :blank, :class => "doc-link" do %>
+        <%= image 'help', :class => "icon", :style => "margin-right: 0.5em" %>Documentation
+      <% end %>
+    <% end %>
+    <% unless @display_workflow.myexperiment_link.blank? %>
+      <%= link_to @display_workflow.myexperiment_link, :target => :blank, :class => "doc-link" do %>
+        <%= image 'myexperiment', :class => "icon", :style => "margin-right: 0.5em" %>View on myExperiment
+      <% end %>
+    <% end %>
+  </p>
+
   <%= item_description @display_workflow.description -%>
 
   <% workflow_model = @display_workflow.t2flow %>
@@ -55,11 +68,9 @@
     </div>
     <div class="foldContent" style="display: none;">
       <!-- Result outputs -->
-      <% result_outputs = outputs.select { |output| output.port_type.name == WorkflowOutputPortType::RESULT } -%>
-      <%= render :partial => "port_list", :locals => { :ports => result_outputs, :title => "Result Outputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @workflow.result_output_ports, :title => "Result Outputs" } -%>
       <!-- Error/log outputs -->
-      <% error_log_outputs = outputs.select { |output| output.port_type.name == WorkflowOutputPortType::ERROR_LOG } -%>
-      <%= render :partial => "port_list", :locals => { :ports => error_log_outputs, :title => "Error/Log Outputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @workflow.error_log_output_ports, :title => "Error/Log Outputs" } -%>
     </div>
   </div>
 
@@ -138,6 +149,14 @@
           <b>Category:</b>
           <%= @workflow.category.name.html_safe -%>
         </p>
+
+        <!-- Workflow creators -->
+        <% unless workflow_model.annotations.authors.empty? %>
+          <p>
+            <b>Author<%= 's' if workflow_model.annotations.authors.size > 1 -%>:</b>
+            <%= workflow_model.annotations.authors.join(', ') %>
+          </p>
+        <% end %>
 
         <!-- Uploader -->
         <p>

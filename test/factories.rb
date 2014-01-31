@@ -849,3 +849,18 @@ end
     f.association :workflow, :factory => :workflow
     f.association :contributor, :factory => :user
   end
+
+  Factory.define(:sweep) do |f|
+    f.sequence(:name) {|n| "Sweep #{n}"}
+    f.projects {[Factory.build(:project)]}
+    f.association :workflow, :factory => :workflow
+    f.association :contributor, :factory => :user
+  end
+
+  Factory.define(:sweep_with_runs, :parent => :sweep) do |f|
+    f.after_create do |sweep|
+      5.times do |i|
+        Factory.build(:taverna_player_run, :sweep => sweep)
+      end
+    end
+  end

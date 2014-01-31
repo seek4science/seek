@@ -1,3 +1,5 @@
+<%= javascript_include_tag "sharing.js" %>
+
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @sweep.workflow.category.name, main_app.workflows_path(:category_id => @sweep.workflow.category) -%> &gt;
@@ -19,6 +21,10 @@
       <p>
         <b>Name:</b>
         <%= f.text_field :name, :size => 80 -%>
+      </p>
+
+      <p>
+        <%= render :partial => "assets/sharing_form" -%>
       </p>
 
       <p>

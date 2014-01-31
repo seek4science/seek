@@ -87,7 +87,8 @@ class SessionsController < ApplicationController
   end
   
   def successful_login
-    self.current_user = @user    
+    self.current_user = @user
+    flash[:notice] = "You have successfully logged in, #{@user.display_name}."
     if params[:remember_me] == "on"
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { :value => @user.remember_token , :expires => @user.remember_token_expires_at }

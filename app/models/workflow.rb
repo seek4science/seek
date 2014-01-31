@@ -17,6 +17,10 @@ class Workflow < ActiveRecord::Base
 
   validates_presence_of :title
 
+  validates :myexperiment_link, :format => { :with => /^http:\/\/(www\.)?myexperiment\.org\/workflows\/[0-9]+/,
+                                             :message => "is invalid, please make sure the URL is in the format: http://www.myexperiment.org/workflows/...",
+                                             :allow_blank => true }
+
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   belongs_to :category, :class_name => 'WorkflowCategory'
@@ -149,6 +153,34 @@ class Workflow < ActiveRecord::Base
 
   def default_policy
     Policy.sysmo_and_projects_policy
+  end
+
+  def result_output_ports
+    output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::RESULT) }.sort_by { |p| p.name.downcase }
+  end
+
+  def error_log_output_ports
+    output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }.sort_by { |p| p.name.downcase }
+  end
+
+  def data_input_ports
+    input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }.sort_by { |p| p.name.downcase }
+  end
+
+  def parameter_input_ports
+    input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::PARAMETER) }.sort_by { |p| p.name.downcase }
+  end
+
+  def sweepable_from_run?
+    sweepable && data_input_ports.size > 0
+  end
+
+  def sweepable?
+    sweepable_from_run? && !has_interaction?
+  end
+
+  def can_run?(user = User.current_user)
+    !user.nil? # just checks if user is logged in for now
   end
 
   private
