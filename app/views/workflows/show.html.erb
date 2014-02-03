@@ -173,7 +173,7 @@
 </div>
 
 <div class="main_content_right_box">
-  <%= render :partial => "related_items", :locals => {:workflow => @workflow} -%>
+  <%= render :partial => "related_items", :locals => {:workflow => @workflow, :version => @display_workflow.version} -%>
 </div>
 
 <div style="clear:both"></div>
