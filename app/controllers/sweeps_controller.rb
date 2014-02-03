@@ -1,6 +1,6 @@
 class SweepsController < ApplicationController
 
-  before_filter :find_sweep, :except => [:create, :new, :index, :download_results]
+  before_filter :find_sweep, :except => [:create, :new, :index]
   before_filter :find_run, :only => :new
   before_filter :set_runlet_parameters, :only => :create
   before_filter :find_workflow_and_version, :only => :new
