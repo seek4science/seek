@@ -43,34 +43,30 @@
 
   <% workflow_model = @display_workflow.t2flow %>
   <% processors = workflow_model.all_processors || [] -%>
-  <% inputs = @display_workflow.input_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
-  <% outputs = @display_workflow.output_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
 
   <!-- Inputs -->
   <div class="fold">
     <div class="foldTitle">
-      Inputs (<%= inputs.count %>)
+      Inputs (<%= @display_workflow.input_ports.count %>)
     </div>
     <div class="foldContent" style="display: none;">
       <!-- Data inputs -->
-      <% data_inputs = inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) } -%>
-      <%= render :partial => "port_list", :locals => { :ports => data_inputs, :title => "Data Inputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @display_workflow.data_input_ports, :title => "Data Inputs" } -%>
       <!-- Parameter inputs -->
-      <% paramater_inputs = inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER } -%>
-      <%= render :partial => "port_list", :locals => { :ports => paramater_inputs, :title => "Parameter Inputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @display_workflow.parameter_input_ports, :title => "Parameter Inputs" } -%>
     </div>
   </div>
 
   <!-- Outputs -->
   <div class="fold">
     <div class="foldTitle">
-      Outputs (<%= outputs.count %>)
+      Outputs (<%= @display_workflow.output_ports.count %>)
     </div>
     <div class="foldContent" style="display: none;">
       <!-- Result outputs -->
-      <%= render :partial => "port_list", :locals => { :ports => @workflow.result_output_ports, :title => "Result Outputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @display_workflow.result_output_ports, :title => "Result Outputs" } -%>
       <!-- Error/log outputs -->
-      <%= render :partial => "port_list", :locals => { :ports => @workflow.error_log_output_ports, :title => "Error/Log Outputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @display_workflow.error_log_output_ports, :title => "Error/Log Outputs" } -%>
     </div>
   </div>
 

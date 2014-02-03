@@ -5,8 +5,6 @@
   New Run
 </div>
 
-<% workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow_version).sort{ |a,b| a.name.downcase <=> b.name.downcase} %>
-
 <div class="contribution_title">
   <h1><%= 'New Workflow Run: ' + @workflow_version.title -%></h1>
 </div>
@@ -25,13 +23,13 @@
       </div>
 
       <!-- Data inputs -->
-      <% unless @workflow.data_input_ports.blank? %>
-          <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => @workflow.data_input_ports, :form => f} %>
+      <% unless @workflow_version.data_input_ports.blank? %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => @workflow_version.data_input_ports, :form => f} %>
       <% end %>
 
       <!-- Parameter inputs -->
-      <% unless @workflow.parameter_input_ports.blank? %>
-          <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => @workflow.parameter_input_ports, :form => f} %>
+      <% unless @workflow_version.parameter_input_ports.blank? %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => @workflow_version.parameter_input_ports, :form => f} %>
       <% end %>
       <br/>
 

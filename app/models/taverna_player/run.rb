@@ -51,30 +51,40 @@ module TavernaPlayer
     end
 
     def result_outputs
-      port_names = workflow.result_output_ports.map { |o| o.name }
+      port_names = executed_workflow.result_output_ports.map { |o| o.name }
       outputs.select {|o| port_names.include?(o.name) }
     end
 
     def error_log_outputs
-      port_names = workflow.error_log_output_ports.map { |o| o.name }
+      port_names = executed_workflow.error_log_output_ports.map { |o| o.name }
       outputs.select {|o| port_names.include?(o.name) }
     end
 
     def data_inputs
-      port_names = workflow.data_input_ports.map { |i| i.name }
+      port_names = executed_workflow.data_input_ports.map { |i| i.name }
       inputs.select {|i| port_names.include?(i.name) }
     end
 
     def parameter_inputs
-      port_names = workflow.parameter_input_ports.map { |i| i.name }
+      port_names = executed_workflow.parameter_input_ports.map { |i| i.name }
       inputs.select {|i| port_names.include?(i.name) }
     end
 
     def sweepable?
-      workflow.sweepable_from_run? && sweep_id.blank?
+      executed_workflow.sweepable_from_run? && sweep_id.blank?
+    end
+
+    def executed_workflow
+      workflow.find_version(workflow_version)
     end
 
     private
+
+    def enqueue
+      worker = TavernaPlayer::Worker.new(self, executed_workflow.content_blob.data_io_object.path)
+      job = Delayed::Job.enqueue worker, :queue => TavernaPlayer.job_queue_name
+      update_attributes(:delayed_job => job, :status_message => "Queued")
+    end
 
     alias_method :old_default_contributor, :default_contributor
 
@@ -89,7 +99,7 @@ module TavernaPlayer
     def fix_run_input_ports_mime_types
       self.inputs.each do |input|
         input.metadata = {:size => nil, :type => ''} if input.metadata.nil?
-        port = self.workflow.find_version(self.workflow_version).input_ports.detect { |i| i.name == input.name }
+        port = executed_workflow.input_ports.detect { |i| i.name == input.name }
         if port && !port.mime_type.blank?
           if input.depth == 0
             input.metadata[:type] = port.mime_type

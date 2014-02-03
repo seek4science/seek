@@ -49,12 +49,13 @@
 
 <div class="run_results">
 
-  <% workflow = Workflow.find(@run.workflow_id) %>
+  <% workflow = @run.workflow %>
+  <% workflow_version = workflow.find_version(@run.workflow_version) %>
 
   <div class="breadcrumbs">
     <a href="/">Home</a> &gt;
     <%= link_to workflow.category.name, main_app.workflows_path(:category_id => workflow.category) -%> &gt;
-    <%= link_to workflow.title, main_app.workflow_path(workflow) -%> &gt;
+    <%= link_to workflow_version.title, main_app.workflow_path(workflow, :version => workflow_version.version) -%> &gt;
     <% if @run.sweep %>
         <%= link_to @run.sweep.name, main_app.sweep_path(@run.sweep) -%> &gt;
     <% end %>

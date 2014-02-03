@@ -6,7 +6,7 @@ end
 def fix_run_output_ports_mime_types(run)
   run.outputs.each do |output|
     output.metadata = {:size => nil, :type => ''} if output.metadata.nil?
-    port = run.workflow.output_ports.detect { |o| o.name == output.name }
+    port = run.executed_workflow.output_ports.detect { |o| o.name == output.name }
     if port && !port.mime_type.blank?
       if output.depth > 0
         output.metadata[:type] = recursively_set_mime_type(output.metadata[:type], output.depth, port.mime_type)
