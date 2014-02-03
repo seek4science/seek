@@ -72,6 +72,34 @@ class Workflow < ActiveRecord::Base
     def has_interaction?
       t2flow.all_processors.any? {|p| p.type == 'interaction'}
     end
+
+    def result_output_ports
+      output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::RESULT) }.sort_by { |p| p.name.downcase }
+    end
+
+    def error_log_output_ports
+      output_ports.select { |output| (output.port_type.name == WorkflowOutputPortType::ERROR_LOG) }.sort_by { |p| p.name.downcase }
+    end
+
+    def data_input_ports
+      input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) }.sort_by { |p| p.name.downcase }
+    end
+
+    def parameter_input_ports
+      input_ports.select { |input| (input.port_type.name == WorkflowInputPortType::PARAMETER) }.sort_by { |p| p.name.downcase }
+    end
+
+    def sweepable_from_run?
+      sweepable && data_input_ports.size > 0
+    end
+
+    def sweepable?
+      sweepable_from_run? && !has_interaction?
+    end
+
+    def can_run?(user = User.current_user)
+      !user.nil? # just checks if user is logged in for now
+    end
   end
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
