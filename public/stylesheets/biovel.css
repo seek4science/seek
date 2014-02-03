@@ -545,3 +545,7 @@ a.doc-link:hover, a.button-link:hover {
 .show_basic {
   margin-right: 1em;
 }
+
+.dataTables_wrapper {
+  min-height: 100px;
+}
