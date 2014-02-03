@@ -3,7 +3,8 @@ class InstitutionsController < ApplicationController
   include WhiteListHelper
   include IndexPager
   include CommonSweepers
-  include Seek::NestedFilters
+
+  support_nested_filters :projects,:people
 
   before_filter :find_requested_item, :only=>[:show,:edit,:update, :destroy]
   before_filter :find_assets, :only=>[:index]

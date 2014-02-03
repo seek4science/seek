@@ -20,6 +20,8 @@ class PeopleController < ApplicationController
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   include Seek::BreadCrumbs
 
+  support_nested_filters :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events
+
   def auto_complete_for_tools_name
     render :json => Person.tool_counts.map(&:name).to_json
   end

@@ -143,6 +143,7 @@ SEEK::Application.routes.draw do
       get :gatekeeper_decision_result
       get :waiting_approval_assets
       get :select
+      get :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events
     end
     resources :avatars do
       member do
@@ -159,7 +160,7 @@ SEEK::Application.routes.draw do
     member do
       get :asset_report
       get :admin
-      get :people,:institutions,:assays,:studies,:investigation,:models,:sops,:data_files,:presentations,:publications,:events
+      get :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events
     end
     resources :avatars do
       member do
@@ -186,6 +187,9 @@ SEEK::Application.routes.draw do
     collection do
       get :request_all
       get :view_items_in_tab
+    end
+    member do
+      get :projects,:people
     end
     resources :avatars do
       member do
