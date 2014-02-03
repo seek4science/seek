@@ -99,6 +99,30 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil Person.find(assigns(:person).id).notifiee_info
   end
 
+  test "cannot access select form as registered user, even admin" do
+    login_as Factory(:admin)
+    get :select
+    assert_redirected_to(root_path)
+    refute_nil flash[:error]
+  end
+
+  test "should reload form for incomplete details" do
+
+    new_user = Factory(:brand_new_user)
+    assert new_user.person.nil?
+    login_as(new_user)
+    assert_no_difference('Person.count') do
+      post :create, :person => {:first_name=>"test"}
+    end
+    assert_response :success
+    assert_select "div#errorExplanation" do
+      assert_select "ul > li",:text=>"Email can&#x27;t be blank"
+    end
+    assert_select "form#new_person" do
+      assert_select "input#person_first_name[value=?]","test"
+    end
+  end
+
   def test_should_create_person_with_project
     work_group_id = Factory(:work_group).id
     assert_difference('Person.count') do

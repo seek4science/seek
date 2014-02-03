@@ -206,7 +206,7 @@
             <% content_blobs.each do |cb| %>
                 var element = document.createElement('input');
                 element.name = "content_blobs[id][<%= cb.id%>]";
-                element.value = "<%= (cb.original_filename || cb.url) << " (original)" %>";
+                element.value = "<%= (cb.original_filename || cb.url) + " (original)" %>";
                 element.type = 'hidden';
                 var current_element = multi_selector.current_element;
                 current_element.parentNode.insertBefore(element, current_element);
