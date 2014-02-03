@@ -82,4 +82,8 @@ class Sweep < ActiveRecord::Base
     Policy.private_policy
   end
 
+  def executed_workflow
+    workflow.find_version(workflow_version)
+  end
+
 end

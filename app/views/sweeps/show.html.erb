@@ -1,7 +1,7 @@
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @sweep.workflow.category.name, main_app.workflows_path(:category_id => @sweep.workflow.category) -%> &gt;
-  <%= link_to @sweep.workflow.title, main_app.workflow_path(@sweep.workflow) -%> &gt;
+  <%= link_to @sweep.executed_workflow.title, main_app.workflow_path(@sweep.workflow, :version => @sweep.workflow_version) -%> &gt;
   <%= @sweep.name -%>
 </div>
 
