@@ -42,6 +42,8 @@ require 'seek/permissions/publishing_permissions'
 
 require 'seek/scalable'
 
+require 'seek/nested_filters'
+
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 

@@ -5,6 +5,8 @@ class ProjectsController < ApplicationController
   include IndexPager
   include CommonSweepers
 
+  support_nested_filters :people,:institutions,:assays,:studies,:investigation,:models,:sops,:data_files,:presentations,:publications,:events
+
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report]
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report, :view_items_in_tab]
