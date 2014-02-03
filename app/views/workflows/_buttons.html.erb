@@ -1,7 +1,7 @@
 <!-- Run workflow button -->
 <% if workflow.can_run? %>
   <li>
-    <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => display_workflow.vers), nil, nil, 'Run workflow') -%>
+    <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => display_workflow.version), nil, nil, 'Run workflow') -%>
   </li>
 <% end %>
 
