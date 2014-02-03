@@ -28,6 +28,10 @@ TavernaPlayer.setup do |config|
     proxy.inputs_method_name = :input_ports
   end
 
+  # Where to store files created by workflow runs. Should be fully qualified
+  # or use :rails_root for the root directory of your application.
+  config.file_store = ":rails_root/filestore"
+
   # Callbacks to be run at various points during a workflow run. These can be
   # defined as Proc objects or as methods and referenced by name.
   #
