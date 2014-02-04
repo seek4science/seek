@@ -337,6 +337,20 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "filter by person using nested routes" do
+    assert_routing "people/2/studies",{controller:"studies",action:"index",person_id:"2"}
+    study = Factory(:study,:policy=>Factory(:public_policy))
+    study2 = Factory(:study,:policy=>Factory(:public_policy))
+    person = study.contributor
+    refute_equal study.contributor,study2.contributor
+    assert person.is_a?(Person)
+    get :index,person_id:person.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",study_path(study),:text=>study.title
+      assert_select "p > a[href=?]",study_path(study2),:text=>study2.title,:count=>0
+    end
+  end
 
   test 'edit study with selected projects scope policy' do
     proj = User.current_user.person.projects.first

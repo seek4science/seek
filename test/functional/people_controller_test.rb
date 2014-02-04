@@ -99,6 +99,30 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil Person.find(assigns(:person).id).notifiee_info
   end
 
+  test "cannot access select form as registered user, even admin" do
+    login_as Factory(:admin)
+    get :select
+    assert_redirected_to(root_path)
+    refute_nil flash[:error]
+  end
+
+  test "should reload form for incomplete details" do
+
+    new_user = Factory(:brand_new_user)
+    assert new_user.person.nil?
+    login_as(new_user)
+    assert_no_difference('Person.count') do
+      post :create, :person => {:first_name=>"test"}
+    end
+    assert_response :success
+    assert_select "div#errorExplanation" do
+      assert_select "ul > li",:text=>"Email can&#x27;t be blank"
+    end
+    assert_select "form#new_person" do
+      assert_select "input#person_first_name[value=?]","test"
+    end
+  end
+
   def test_should_create_person_with_project
     work_group_id = Factory(:work_group).id
     assert_difference('Person.count') do
@@ -1249,5 +1273,25 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select "div.list_item_content  a[href=?]",person_path(person_in_project),:text=>/#{person_in_project.name}/,:count=>1
       assert_select "div.list_item_content  a[href=?]",person_path(person_not_in_project),:text=>/#{person_not_in_project.name}/,:count=>0
     end
+  end
+
+  test "project people through filtered route" do
+
+    assert_routing 'projects/2/people',{controller: 'people',action:'index',project_id:'2'}
+
+    person1 = Factory(:person)
+    proj = person1.projects.first
+    person2 = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>proj.work_groups.first)])
+    person3 = Factory(:person)
+    assert_equal 2,proj.people.count
+    refute proj.people.include?(person3)
+    get :index,:project_id=>proj.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",person_path(person1),:text=>person1.name
+      assert_select "p > a[href=?]",person_path(person2),:text=>person2.name
+      assert_select "p > a[href=?]",person_path(person3),:text=>person3.name,:count=>0
+    end
+
   end
 end

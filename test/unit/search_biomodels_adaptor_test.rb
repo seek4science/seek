@@ -25,8 +25,8 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
     result = results.first
     assert_equal 34, result.authors.count
     assert_equal "M. J. Herrgard", result.authors.first
-    assert_equal "A consensus yeast metabolic network reconstruction obtained from a community approach to systems biology.", result.title
-    assert_equal "18846089", result.pubmed_id
+    assert_equal "Herrgård2008_MetabolicNetwork_Yeast", result.title
+    assert_equal "18846089", result.publication_id
     assert_match /Genomic data allow the large-scale manual or semi-automated assembly/, result.abstract
     assert_equal DateTime.parse("2008-10-11"), result.published_date
     assert_equal "MODEL0072364382", result.model_id

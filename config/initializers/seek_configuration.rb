@@ -85,6 +85,8 @@ Seek::Config.default :is_virtualliver, true
   Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
   Seek::Config.default :limit_latest,7
 
+  Seek::Config.default :related_items_limit,5
+
 # Others
   Seek::Config.default :type_managers_enabled,true
 Seek::Config.default :type_managers,'users'

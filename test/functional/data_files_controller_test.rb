@@ -1737,6 +1737,19 @@ end
    end
 
 
+  test "project data files through nested routing" do
+    assert_routing 'projects/2/data_files',{controller:"data_files",action:"index",project_id:"2"}
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    project = df.projects.first
+    df2 = Factory(:data_file,:policy=>Factory(:public_policy))
+    get :index,:project_id=>project.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",data_file_path(df),:text=>df.title
+      assert_select "p > a[href=?]",data_file_path(df2),:text=>df2.title,:count=>0
+    end
+  end
+
   private
 
   def mock_http

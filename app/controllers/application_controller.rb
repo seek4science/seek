@@ -515,6 +515,14 @@ class ApplicationController < ActionController::Base
 
   def apply_filters(resources)
     filters = params[:filter] || {}
+
+    #translate params that are send as an _id, like project_id=12 - which will usually be a consequence of nested routing
+    params.keys.each do |key|
+      if (key.end_with?("_id"))
+        filters[key.gsub("_id","")]=params[key]
+        params[:page]="all"
+      end
+    end
     #apply_filters will be dispatching to methods based on the symbols in params[:filter].
     #Permitted filters protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
     filters.delete_if {|k,v| not (permitted_filters.include? k.to_s) }
@@ -526,13 +534,14 @@ class ApplicationController < ActionController::Base
 
         case
         #first the special cases
-        when (filter == 'investigation' and res.respond_to? :assays) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
-        when (filter == 'study' and res.respond_to? :assays) then res.assays.collect{|a| a.study_id}.include? value.id
-        when (filter == 'person' and res.class.is_asset?)    then (res.creators.include?(value) or res.contributor.try(:person) == value)
-        when (filter == 'person' and res.respond_to? :owner) then res.send(:owner) == value
-        when (filter == 'project' and res.respond_to? :projects_and_ancestors) then res.projects_and_ancestors.include? value
-        when (filter == 'project' and res.class.name == "Assay") then Project.is_hierarchical? ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
-        when (filter == 'project' and res.class.name == "Study") then Project.is_hierarchical? ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
+        when (filter == 'investigation' && res.respond_to?(:assays)) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
+        when (filter == 'study' && res.respond_to?(:assays)) then res.assays.collect{|a| a.study_id}.include? value.id
+        when (filter == 'person' && res.class.is_isa?)    then (res.contributor== value || res.contributor.try(:person) == value)
+        when (filter == 'person' && res.class.is_asset?)    then (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
+        when (filter == 'person' && res.respond_to?(:owner)) then res.send(:owner) == value
+        when (filter == 'project' && res.respond_to?(:projects_and_ancestors)) then res.projects_and_ancestors.include? value
+        when (filter == 'project' && res.class.name == "Assay") then Project.is_hierarchical? ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
+        when (filter == 'project' && res.class.name == "Study") then Project.is_hierarchical? ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
         #then the general case
         when res.respond_to?(filter)                         then res.send(filter) == value
         when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value

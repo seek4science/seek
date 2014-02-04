@@ -39,5 +39,7 @@ config.action_controller.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
 
+  config.i18n.enforce_available_locales = true
+
   config.cache_store = :memory_store
 end

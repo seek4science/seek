@@ -59,6 +59,7 @@ module Acts #:nodoc:
     end
 
     module InstanceMethods
+
     end
   end
 

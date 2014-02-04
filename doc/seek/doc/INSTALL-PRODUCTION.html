@@ -165,6 +165,16 @@ installed. At the time of writing this guide this shouldn’t be necessary.</p>
 
 <h2 id="label-After+you+have+installed+SEEK">After you have installed SEEK</h2>
 
+<h2 id="label-Compiling+Assets+%3D%3D">Compiling Assets ==</h2>
+
+<p>Assets - such as images, javascript and stylesheets, need to be precompiled
+- which means minifying them, grouping some together into a single file,
+and compressing. These then get placed into <em>public/assets</em>. To
+compile them run the following command. This can take some time, so be
+patient</p>
+
+<pre>bundle exec rake assets:precompile</pre>
+
 <h3 id="label-Serving+SEEK+through+Apache">Serving SEEK through Apache</h3>
 
 <p>First you need to setup <a
@@ -200,7 +210,22 @@ ServerName appropriately):</p>
        AllowOverride all
        Options -MultiViews
     &lt;/Directory&gt;
+    &lt;LocationMatch &quot;^/assets/.*$&quot;&gt;
+       Header unset ETag
+       FileETag None
+       # RFC says only cache for 1 year
+       ExpiresActive On
+       ExpiresDefault &quot;access plus 1 year&quot;
+    &lt;/LocationMatch&gt;
  &lt;/VirtualHost&gt;</pre>
+
+<p>The LocationMatch block tells Apache to serve up the assets (images, CSS,
+Javascript) with a long expiry time, leading to better performance since
+these items will be cached. You may need to enable the <em>headers</em> and
+<em>expires</em> modules for Apache, so run:</p>
+
+<pre>sudo a2enmod headers
+sudo a2enmod expires</pre>
 
 <p>Now enable the SEEK site, and disable the default that is installed with
 Apache, and restart:</p>

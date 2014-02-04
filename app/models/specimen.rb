@@ -34,7 +34,6 @@ class Specimen < ActiveRecord::Base
 
   has_one :organism, :through=>:strain
 
-
   alias_attribute :description, :comments
 
   HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:born => 'culture starting date', :culture_growth_type => 'culture type'}
@@ -46,7 +45,9 @@ class Specimen < ActiveRecord::Base
   validates_presence_of :title,:lab_internal_number, :contributor,:strain
 
   validates_presence_of :institution, :if => "Seek::Config.is_virtualliver"
+
   validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
+
   validates_uniqueness_of :title
 
   AGE_UNITS = ["second","minute","hour","day","week","month","year"]
@@ -75,6 +76,7 @@ class Specimen < ActiveRecord::Base
     end
     self.sop_masters = self.sop_masters.select { |s| sop_ids.include? s.sop_id }
   end
+
   def genotype_info
         genotype_detail = []
       genotypes.each do |genotype|

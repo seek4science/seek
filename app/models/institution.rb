@@ -19,7 +19,7 @@ class Institution < ActiveRecord::Base
   has_many :projects, :through=>:work_groups
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :name,:country,:city
+    text :name,:country,:city, :address
   end if Seek::Config.solr_enabled
 
   def people

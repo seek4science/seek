@@ -9,6 +9,8 @@ class Study < ActiveRecord::Base
 
   belongs_to :investigation
 
+
+
   def projects
     investigation.try(:projects) || []
   end

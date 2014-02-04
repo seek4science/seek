@@ -47,10 +47,8 @@
   <% total_count += count %>
 <% end %>
 <% if total_count > 0 || show_empty_tabs -%>
-  <div id='<%= "#{tabs_id}_spinner".html_safe -%>'>
-    <center>
+  <div id='<%= "#{tabs_id}_spinner".html_safe -%>' style="width:100%;text-align:center">
       <%= image_tag "ajax-loader-large.gif" -%>
-    </center>
   </div>
   <div <%= "id='#{tabs_id}'".html_safe if tabs_id -%> class="tabber" style="display:none;">
     <% assets = resource_hash.keys.sort_by do |asset|
@@ -107,32 +105,7 @@
                 %>
                 <% item ||= nil
                     if item %>
-                      <%= link_to_with_callbacks "View all "+(extra_count + resources.size).to_s+" items",
-                                        {:url => url_for(:action => 'view_items_in_tab'),
-                                         :method => :get,
-                                         :condition => "check_tab_content('#{tab_content_view_all}', '#{tab_content_view_some}', '#{resource_type}')",
-                                         :with => "'resource_type=' + '#{resource_type}' +
-                                                   '&resource_ids=' + '#{(resource_hash[resource_type][:items] + resource_hash[resource_type][:extra_items]).collect(&:id).join(',')}' +
-                                                   '&view_type=' + 'view_all'",
-                                         :before => "$('#{tab_content_view_some}').hide();
-                                                     $('#{tab_content_view_all}').show();
-                                                     show_large_ajax_loader('#{tab_content_view_all}')"
-                                        },
-                                        {:id => "view_#{resource_type}s_and_extra", :style => "display:block", :remote=>true}
-                      -%>
-                      <%= link_to_with_callbacks "View " + resources.size.to_s + " items",
-                                        {:url => url_for(:action => 'view_items_in_tab'),
-                                         :method => :get,
-                                         :condition => "check_tab_content('#{tab_content_view_some}', '#{tab_content_view_all}', '#{resource_type}')",
-                                         :with => "'resource_type=' +
-                                                   '#{resource_type}' + '&resource_ids=' + '#{resource_hash[resource_type][:items].collect(&:id).join(',')}' +
-                                                   '&view_type=' + 'view_some'",
-                                         :before => "$('#{tab_content_view_all}').hide();
-                                                     $('#{tab_content_view_some}').show();
-                                                     show_large_ajax_loader('#{tab_content_view_some}')"
-                                        },
-                                        {:id => "view_#{resource_type}s", :style => "display:none", :remote=>true}
-                      -%>
+                    <%= link_to "View all "+(extra_count + resources.size).to_s+" items", filter_url(resource_type, item) -%>
                     <% else
                         link_to "View all items", eval("#{resource_type.pluralize.underscore}_path")
                     end

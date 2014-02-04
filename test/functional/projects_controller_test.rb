@@ -727,6 +727,26 @@ test 'should get index for non-project member, should for non-login user' do
     assert !work_group.reload.people.empty?
   end
 
+
+  test "projects belonging to an institution through nested route" do
+    assert_routing "institutions/3/projects",{controller:"projects",action:"index",institution_id:"3"}
+
+    project = Factory(:project)
+    institution = Factory(:institution)
+    Factory(:work_group, :project => project, :institution => institution)
+    project2 = Factory(:project)
+    Factory(:work_group, :project => project2, :institution => Factory(:institution))
+
+    get :index,institution_id:institution.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(project),:text=>project.title
+      assert_select "p > a[href=?]",project_path(project2),:text=>project2.title,:count=>0
+    end
+
+  end
+
+
 	private
 
 	def valid_project

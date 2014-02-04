@@ -35,20 +35,20 @@ module AssetsHelper
 
   def text_for_resource resource_or_text
     if resource_or_text.is_a?(String)
-      text = resource_or_text
+      text = resource_or_text.underscore.humanize
     else
       resource_type = resource_or_text.class.name
       if resource_or_text.is_a?(Assay)
         text = resource_or_text.is_modelling? ? t("assays.modelling_analysis") : t("assays.assay")
       elsif resource_or_text.is_a?(Specimen)
         text = t('biosamples.sample_parent_term')
-      elsif !translate_resource_type(resource_type).include?("translation missing")
-        text = translate_resource_type(resource_type)
+      elsif !(translated = translate_resource_type(resource_type)).include?("translation missing")
+        text = translated
       else
-        text = resource_type
+        text = resource_type.underscore.humanize
       end
     end
-    text.underscore.humanize
+    text
   end
 
   def resource_version_selection versioned_resource, displayed_resource_version

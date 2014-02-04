@@ -13,17 +13,17 @@
 <% else %>
     <p>
       <b>Filename:</b>
-      <%=h fileinfo.original_filename -%>
+      <span class='filename'><%=h fileinfo.original_filename -%></span>
     </p>
 
     <p>
       <b>Format:</b>
-      <%=h fileinfo.human_content_type -%>
+      <span class="format"><%=h fileinfo.human_content_type -%></span>
     </p>
 
     <p>
       <b>Size:</b>
-      <%= filesize_as_text(fileinfo) %>
+      <span class="filesize"><%= filesize_as_text(fileinfo) %></span>
     </p>
 
     <%# This is for multiple files asset %>

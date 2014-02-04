@@ -558,13 +558,13 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select "div.box_about_actor" do
       assert_select "p > strong",:text=>"1 item is associated with this #{I18n.t('model')}:"
       assert_select "ul.fileinfo_list" do
-        assert_select "li.fileinfo_container" do
-            assert_select "p > b",:text=>/Filename:/
-            assert_select "p",:text=>/cronwright\.xml/
-            assert_select "p > b",:text=>/Format:/
-            assert_select "p",:text=>/XML document/
-            assert_select "p > b",:text=>/Size:/
-            assert_select "p",:text=>/5\.9 KB/
+        assert_select "li.fileinfo_container > div.fileinfo" do
+            assert_select "p > b",:text=>"Filename:"
+            assert_select "p > span.filename",:text=>"cronwright.xml"
+            assert_select "p > b",:text=>"Format:"
+            assert_select "p > span.format",:text=>"XML document"
+            assert_select "p > b",:text=>"Size:"
+            assert_select "p > span.filesize",:text=>"5.9 KB"
         end
       end
     end
@@ -585,15 +585,15 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "p > strong",:text=>"2 items are associated with this #{I18n.t('model')}:"
       assert_select "ul.fileinfo_list" do
         assert_select "li.fileinfo_container",:count=>2 do
-          assert_select "p > b",:text=>/Filename:/,:count=>2
-          assert_select "p",:text=>/cronwright\.xml/
-          assert_select "p",:text=>/rightfield\.xls/
-          assert_select "p > b",:text=>/Format:/,:count=>2
-          assert_select "p",:text=>/XML document/
-          assert_select "p",:text=>/Spreadsheet/
-          assert_select "p > b",:text=>/Size:/,:count=>2
-          assert_select "p",:text=>/5\.9 KB/
-          assert_select "p",:text=>/9\.2 KB/
+          assert_select "p > b",:text=>"Filename:",:count=>2
+          assert_select "p > span.filename",:text=>/cronwright\.xml/
+          assert_select "p > span.filename",:text=>/rightfield\.xls/
+          assert_select "p > b",:text=>"Format:",:count=>2
+          assert_select "p > span.format",:text=>"XML document"
+          assert_select "p > span.format",:text=>"Spreadsheet"
+          assert_select "p > b",:text=>"Size:",:count=>2
+          assert_select "p > span.filesize",:text=>"5.9 KB"
+          assert_select "p > span.filesize",:text=>"9.2 KB"
         end
       end
     end
