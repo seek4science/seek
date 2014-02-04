@@ -11,7 +11,7 @@
 
   <%= csrf_meta_tag %>
 
-  <% if is_front_page? %>
+  <% if is_front_page? && !Seek::Config.is_virtualliver %>
       <%= stylesheet_link_tag 'front_page' %>
       <%= javascript_include_tag 'front_page' %>
   <% else %>

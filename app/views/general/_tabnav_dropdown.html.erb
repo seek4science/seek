@@ -7,7 +7,7 @@
 <table cellspacing="0" cellpadding="0" id="menu" class="dm">
   <tr>
     <td>
-      <a class="item1" href="javascript:void(0)">Yellow Pages</a>
+      <a class="item1 curved_top" href="javascript:void(0)">Yellow Pages <%=image_tag('misc_icons/arrow_down_small_white.png')%></a>
 
       <div class="section">
         <%= tab_definition :controllers=>["people"] -%>
@@ -21,7 +21,7 @@
     </td>
     <td>
       <div class="tab_gap_before">
-        <a class="item1" href="javascript:void(0)">Experiments</a>
+        <a class="item1 curved_top" href="javascript:void(0)">Experiments <%=image_tag('misc_icons/arrow_down_small_white.png')%></a>
 
 
         <div class="section">
@@ -39,7 +39,7 @@
 
     <td>
       <div class="tab_gap_before">
-        <a class="item1" href="javascript:void(0)">Items</a>
+        <a class="item1 curved_top" href="javascript:void(0)">Items <%=image_tag('misc_icons/arrow_down_small_white.png')%></a>
 
 
         <div class="section">
@@ -66,7 +66,7 @@
     </td>
     <td>
       <div class="tab_gap_before">
-        <a class="item1" href="javascript:void(0)">Activities</a>
+        <a class="item1 curved_top" href="javascript:void(0)">Activities <%=image_tag('misc_icons/arrow_down_small_white.png')%></a>
 
         <div class="section">
           <!-- Events tab -->
@@ -79,12 +79,12 @@
     </td>
     <td>
       <div class="tab_gap_before">
-        <%= link_to "Content Statistics", statistics_path,{:class =>"item1",:target=>"_blank"} if logged_in?%>
+        <%= link_to "Content Statistics", statistics_path,{:class =>"item1 curved_top",:target=>"_blank"} if logged_in?%>
       </div>
     </td>
     <td>
       <div class="tab_gap_before">
-        <%= link_to "Help", {:controller => "help_documents", :action=>"index"}, {:class =>"item1"} %>
+        <%= link_to "Help", {:controller => "help_documents", :action=>"index"}, {:class =>"item1 curved_top"} %>
       </div>
     </td>
   </tr>
