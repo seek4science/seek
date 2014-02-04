@@ -168,11 +168,15 @@ ActiveRecord::Schema.define(:version => 20131203082953) do
     t.integer  "technology_type_id"
     t.integer  "study_id"
     t.integer  "owner_id"
-    t.string   "first_letter",       :limit => 1
+    t.string   "first_letter",          :limit => 1
     t.integer  "assay_class_id"
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "institution_id"
+    t.string   "assay_type_uri"
+    t.string   "technology_type_uri"
+    t.string   "technology_type_label"
+    t.string   "assay_type_label"
   end
 
   create_table "assays_samples", :id => false, :force => true do |t|
@@ -1050,8 +1054,8 @@ ActiveRecord::Schema.define(:version => 20131203082953) do
     t.string   "doi"
     t.string   "uuid"
     t.integer  "policy_id"
-    t.integer  "publication_type",                :default => 1
-    t.string   "citation",         :limit => 256
+    t.integer  "publication_type",              :default => 1
+    t.string   "citation"
   end
 
   add_index "publications", ["contributor_id", "contributor_type"], :name => "index_publications_on_contributor_id_and_contributor_type"
