@@ -54,6 +54,19 @@ namespace :seek_stats do
 
   end
 
+  task(:downloaded_cross_project => :environment) do
+    assets = Model.all | DataFile.all
+    assets.each do |asset|
+      logs = ActivityLog.where(action:"download").select{|l| l.activity_loggable==asset}
+      people = logs.collect{|l| l.culprit.try(:person)}.compact.uniq
+      if people.count>0
+        puts "#{asset.class.name}:#{asset.id} - downloaded by #{people.count} different registered people"
+        other_projects = people.select{|p| (p.projects & asset.projects).empty?}
+        puts "\t of which #{other_projects.count} belong to other projects than the asset"
+      end
+    end
+  end
+
   #things linked to publications
 
 
