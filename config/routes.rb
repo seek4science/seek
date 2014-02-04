@@ -143,8 +143,8 @@ SEEK::Application.routes.draw do
       get :gatekeeper_decision_result
       get :waiting_approval_assets
       get :select
-      get :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events
     end
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -188,7 +188,7 @@ SEEK::Application.routes.draw do
       get :request_all
       get :view_items_in_tab
     end
-    resources :people,:projects
+    resources :people,:projects,:only=>[:index]
     resources :avatars do
       member do
         post :select

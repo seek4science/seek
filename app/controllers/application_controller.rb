@@ -457,10 +457,11 @@ class ApplicationController < ActionController::Base
 
         case
         #first the special cases
-        when (filter == 'investigation' and res.respond_to? :assays) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
-        when (filter == 'study' and res.respond_to? :assays) then res.assays.collect{|a| a.study_id}.include? value.id
-        when (filter == 'person' and res.class.is_asset?)    then (res.creators.include?(value) or res.contributor.try(:person) == value)
-        when (filter == 'person' and res.respond_to? :owner) then res.send(:owner) == value
+        when (filter == 'investigation' && res.respond_to?(:assays)) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
+        when (filter == 'study' && res.respond_to?(:assays)) then res.assays.collect{|a| a.study_id}.include? value.id
+        when (filter == 'person' && res.class.is_isa?)    then (res.contributor== value || res.contributor.try(:person) == value)
+        when (filter == 'person' && res.class.is_asset?)    then (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
+        when (filter == 'person' && res.respond_to?(:owner)) then res.send(:owner) == value
         #then the general case
         when res.respond_to?(filter)                         then res.send(filter) == value
         when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value
