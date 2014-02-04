@@ -188,9 +188,7 @@ SEEK::Application.routes.draw do
       get :request_all
       get :view_items_in_tab
     end
-    member do
-      get :projects,:people
-    end
+    resources :people,:projects
     resources :avatars do
       member do
         post :select
