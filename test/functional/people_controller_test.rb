@@ -1248,4 +1248,24 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test "project people through filtered route" do
+
+    assert_routing 'projects/2/people',{controller: 'people',action:'index',project_id:'2'}
+
+    person1 = Factory(:person)
+    proj = person1.projects.first
+    person2 = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>proj.work_groups.first)])
+    person3 = Factory(:person)
+    assert_equal 2,proj.people.count
+    refute proj.people.include?(person3)
+    get :index,:project_id=>proj.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",person_path(person1),:text=>person1.name
+      assert_select "p > a[href=?]",person_path(person2),:text=>person2.name
+      assert_select "p > a[href=?]",person_path(person3),:text=>person3.name,:count=>0
+    end
+
+  end
+
 end

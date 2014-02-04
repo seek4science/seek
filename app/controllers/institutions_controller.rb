@@ -4,8 +4,6 @@ class InstitutionsController < ApplicationController
   include IndexPager
   include CommonSweepers
 
-  support_nested_filters :projects,:people
-
   before_filter :find_requested_item, :only=>[:show,:edit,:update, :destroy]
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :only => [:destroy]

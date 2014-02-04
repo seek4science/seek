@@ -438,6 +438,14 @@ class ApplicationController < ActionController::Base
 
   def apply_filters(resources)
     filters = params[:filter] || {}
+
+    #translate params that are send as an _id, like project_id=12 - which will usually be a consequence of nested routing
+    params.keys.each do |key|
+      if (key.end_with?("_id"))
+        filters[key.gsub("_id","")]=params[key]
+        params[:page]="all"
+      end
+    end
     #apply_filters will be dispatching to methods based on the symbols in params[:filter].
     #Permitted filters protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
     filters.delete_if {|k,v| not (permitted_filters.include? k.to_s) }

@@ -160,8 +160,8 @@ SEEK::Application.routes.draw do
     member do
       get :asset_report
       get :admin
-      get :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events
     end
+    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:only=>[:index]
     resources :avatars do
       member do
         post :select

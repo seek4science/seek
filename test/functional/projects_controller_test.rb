@@ -672,6 +672,9 @@ class ProjectsControllerTest < ActionController::TestCase
     assert !work_group.reload.people.empty?
   end
 
+
+
+
 	private
 
 	def valid_project
