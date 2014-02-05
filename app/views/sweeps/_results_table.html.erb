@@ -50,7 +50,7 @@
           <thead>
           <tr>
             <th>Run</th>
-            <% output_ports = @sweep.workflow.output_ports %>
+            <% output_ports = @sweep.executed_workflow.output_ports %>
             <% output_ports.each do |output_port| %>
                 <th>
                   <%= output_port.name -%>

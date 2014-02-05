@@ -1,4 +1,4 @@
-<% workflow_port = (port.is_a?(TavernaPlayer::RunPort::Input) ? port.run.workflow.input_ports : port.run.workflow.output_ports).detect {|wp| wp.name == port.name} %>
+<% workflow_port = (port.is_a?(TavernaPlayer::RunPort::Input) ? port.run.executed_workflow.input_ports : port.run.executed_workflow.output_ports).detect {|wp| wp.name == port.name} %>
 <% download_url =  (port.is_a?(TavernaPlayer::RunPort::Input) ? "/runs/#{port.run.id}/download/input/#{port.name}" : "/runs/#{port.run.id}/download/output/#{port.name}") %>
 
 <h3>

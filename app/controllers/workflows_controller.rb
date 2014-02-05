@@ -180,14 +180,6 @@ class WorkflowsController < ApplicationController
         if @workflow.save_as_new_version(comments)
           create_content_blobs
 
-          # Check if the uploaded file contains a Taverna workflow
-          if !taverna_workflow?(@workflow.content_blob.data_io_object)
-            @workflow.destroy
-            flash[:error] = 'The uploaded file does not appear to be a Taverna workflow.'
-            format.html {redirect_to :back}
-            return
-          end
-
           extract_workflow_metadata
 
           flash[:notice] = "New version uploaded - now on version #{@workflow.version}"

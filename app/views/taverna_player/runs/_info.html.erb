@@ -11,9 +11,10 @@
   <div style="float: left; width: 300px; margin-right: 50px;">
     <p>
       <b>Workflow:</b>
-      <% workflow = Workflow.find(run.workflow_id) %>
-      <%= link_to workflow.title, main_app.workflow_path(workflow)#, :version => run.workflow_version)),
-      %>
+      <% workflow = run.workflow %>
+      <% workflow_version = workflow.find_version(run.workflow_version) %>
+
+      <%= link_to workflow_version.title, main_app.workflow_path(workflow, :version => workflow_version.version) %>
     </p>
     <p>
       <b>Category:</b>

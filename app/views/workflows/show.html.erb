@@ -1,25 +1,30 @@
+<%= javascript_include_tag "resource" %>
+
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
-  <%= @workflow.title -%>
+  <%= @display_workflow.title -%>
 </div>
 
-<%= render :partial => "general/item_title", :locals => {:item => @workflow} -%>
+<div class="contribution_title">
+  <h1><%= @display_workflow.title  -%></h1>
+</div>
 
 <ul class="sectionIcons">
   <% human_name = text_for_resource @workflow %>
-  <%= render :partial => "buttons", :locals => {:workflow => @workflow, :version => @display_workflow.version, :based_off => nil, :human_name => human_name} %>
+  <%= render :partial => "buttons", :locals => {:workflow => @workflow, :display_workflow => @display_workflow, :based_off => nil, :human_name => human_name} %>
 </ul>
 <br/>
 
 <div class="show_basic">
 
-<%# Versioning hidden for now: %>
-<%# render :partial => "assets/upload_new_version_form", :locals => {:resource => @workflow} -%>
+<%= render :partial => "assets/simple_new_version_form", :locals => {:resource => @workflow} -%>
 
 <div class="main_content_left_box">
-  <%# Versioning hidden for now: %>
-  <% render :partial => "assets/resource_version_details", :locals => {:displayed_resource => @display_workflow, :resource => @workflow} -%>
+  <% if @workflow.version > 1 %>
+      <span style="font-weight: bold;">Version: </span>
+      <%= resource_version_selection @workflow, @display_workflow -%>
+  <% end %>
 
   <p>
     <% unless @display_workflow.documentation_link.blank? %>
@@ -38,34 +43,30 @@
 
   <% workflow_model = @display_workflow.t2flow %>
   <% processors = workflow_model.all_processors || [] -%>
-  <% inputs = @workflow.input_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
-  <% outputs = @workflow.output_ports.sort{|a, b| a.name.downcase <=> b.name.downcase} || [] -%>
 
   <!-- Inputs -->
   <div class="fold">
     <div class="foldTitle">
-      Inputs (<%= inputs.count %>)
+      Inputs (<%= @display_workflow.input_ports.count %>)
     </div>
     <div class="foldContent" style="display: none;">
       <!-- Data inputs -->
-      <% data_inputs = inputs.select { |input| (input.port_type.name == WorkflowInputPortType::DATA) } -%>
-      <%= render :partial => "port_list", :locals => { :ports => data_inputs, :title => "Data Inputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @display_workflow.data_input_ports, :title => "Data Inputs" } -%>
       <!-- Parameter inputs -->
-      <% paramater_inputs = inputs.select { |input| input.port_type.name == WorkflowInputPortType::PARAMETER } -%>
-      <%= render :partial => "port_list", :locals => { :ports => paramater_inputs, :title => "Parameter Inputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @display_workflow.parameter_input_ports, :title => "Parameter Inputs" } -%>
     </div>
   </div>
 
   <!-- Outputs -->
   <div class="fold">
     <div class="foldTitle">
-      Outputs (<%= outputs.count %>)
+      Outputs (<%= @display_workflow.output_ports.count %>)
     </div>
     <div class="foldContent" style="display: none;">
       <!-- Result outputs -->
-      <%= render :partial => "port_list", :locals => { :ports => @workflow.result_output_ports, :title => "Result Outputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @display_workflow.result_output_ports, :title => "Result Outputs" } -%>
       <!-- Error/log outputs -->
-      <%= render :partial => "port_list", :locals => { :ports => @workflow.error_log_output_ports, :title => "Error/Log Outputs" } -%>
+      <%= render :partial => "port_list", :locals => { :ports => @display_workflow.error_log_output_ports, :title => "Error/Log Outputs" } -%>
     </div>
   </div>
 
@@ -156,13 +157,13 @@
         <!-- Uploader -->
         <p>
           <b>Uploader:</b>
-          <%= @workflow.contributor.nil? ? jerm_harvester_name.html_safe : link_to(@workflow.contributor.person.name, person_path(@workflow.contributor.person)) %>
+          <%= @display_workflow.contributor.nil? ? jerm_harvester_name.html_safe : link_to(@display_workflow.contributor.person.name, person_path(@display_workflow.contributor.person)) %>
         </p>
 
         <!-- Upload time -->
         <p>
           <b>Uploaded at:</b>
-          <%= @workflow.created_at.strftime("%e %b %Y %H:%M:%S %Z") %>
+          <%= @display_workflow.created_at.strftime("%e %b %Y %H:%M:%S %Z") %>
         </p>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @workflow} %>
@@ -172,7 +173,7 @@
 </div>
 
 <div class="main_content_right_box">
-  <%= render :partial => "related_items", :locals => {:workflow => @workflow} -%>
+  <%= render :partial => "related_items", :locals => {:workflow => @workflow, :version => @display_workflow.version} -%>
 </div>
 
 <div style="clear:both"></div>

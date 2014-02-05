@@ -10,7 +10,7 @@
   # Author: Robert Haines
 %>
 <div class="contribution_title">
-  <h1><%= @run.workflow.title -%></h1>
+  <h1><%= @run.executed_workflow.title -%></h1>
 </div>
 
 <%= render "taverna_player/runs/embedded/info", :run => @run %>

@@ -3,6 +3,8 @@ module RunsHelper
   def runs_table(runs, redirect_to=nil)
     runs.map do |run|
       workflow = run.workflow
+      version = run.workflow_version
+      workflow_version = workflow.find_version(version)
       created_at = "#{time_ago_in_words(run.created_at)} ago"
 
       if run.is_a?(Sweep) # If a sweep, get the latest finish time of its runs
@@ -30,7 +32,7 @@ module RunsHelper
                :class => 'with_icon'
        ),
        workflow.contributor.display_name,
-       workflow.can_view? ? link_to(workflow.title, main_app.workflow_path(workflow)) : workflow.title,
+       workflow.can_view? ? link_to(workflow_version.title, main_app.workflow_path(workflow, :version => version)) : workflow_version.title,
        workflow.category.name,
        "#{run.state} #{(run.complete? ? '' : image_tag('ajax-loader.gif', :style => "vertical-align: middle"))}".html_safe,
        created_at,

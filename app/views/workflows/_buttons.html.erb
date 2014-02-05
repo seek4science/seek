@@ -1,40 +1,41 @@
 <!-- Run workflow button -->
 <% if workflow.can_run? %>
   <li>
-    <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => version), nil, nil, 'Run workflow') -%>
+    <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => display_workflow.version), nil, nil, 'Run workflow') -%>
   </li>
 <% end %>
 
 <!-- Run new data sweep button - only if there is at least on data port to sweep over. -->
-<% if workflow.sweepable? %>
+<% if display_workflow.sweepable? %>
   <li>
-      <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id), nil, nil, 'Run data sweep')  -%>
+      <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id, :version=>display_workflow.version), nil, nil, 'Run data sweep')  -%>
   </li>
 <% end %>
 
-<!-- Manage button -->
-<% if workflow.can_manage? -%>
-    <li><%= image_tag_for_key('manage', edit_workflow_path(workflow, :version => version), nil, nil, 'Manage workflow') -%></li>
-<% end -%>
-
-<!-- Publish button -->
-
-<% if workflow.is_in_isa_publishable? && workflow.can_publish? -%>
-    <li><%= image_tag_for_key('publish', polymorphic_path(workflow, :action => :check_related_items), nil, {:method=>:post}, "Publish #{human_name}") -%></li>
-<% end %>
-
-
 <!-- Download button -->
-<% display_workflow = workflow.find_version(version) %>
-
 <% if display_workflow.contains_downloadable_items? && display_workflow.is_downloadable? -%>
     <%# param code is used for temporary link -%>
     <% if can_download_asset?(workflow, params[:code]) -%>
         <%
-           path = polymorphic_path(workflow,:version=>version,:action=>:download,:code=>params[:code])
+           path = polymorphic_path(workflow,:version=>display_workflow.version,:action=>:download,:code=>params[:code])
         %>
         <li>
           <%= image_tag_for_key('download', path, nil, nil, 'Download workflow') -%>
         </li>
     <% end -%>
 <% end -%>
+
+<% if display_workflow.latest_version? %>
+  <!-- Manage button -->
+  <% if workflow.can_manage? -%>
+      <li><%= image_tag_for_key('manage', edit_workflow_path(workflow), nil, nil, 'Manage workflow') -%></li>
+      <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
+  <% end -%>
+
+  <!-- Publish button -->
+
+  <% if workflow.is_in_isa_publishable? && workflow.can_publish? -%>
+      <li><%= image_tag_for_key('publish', polymorphic_path(workflow, :action => :check_related_items), nil, {:method=>:post}, "Publish #{human_name}") -%></li>
+  <% end %>
+<% end -%>
+

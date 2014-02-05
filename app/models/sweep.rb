@@ -8,7 +8,7 @@ class Sweep < ActiveRecord::Base
 
   accepts_nested_attributes_for :runs
 
-  attr_accessible :contributor_id, :workflow_id, :name, :runs_attributes
+  attr_accessible :contributor_id, :workflow_id, :name, :runs_attributes, :workflow_version
 
   before_destroy :cancel
 
@@ -80,6 +80,10 @@ class Sweep < ActiveRecord::Base
   # Sweeps should be private by default
   def default_policy
     Policy.private_policy
+  end
+
+  def executed_workflow
+    workflow.find_version(workflow_version)
   end
 
 end

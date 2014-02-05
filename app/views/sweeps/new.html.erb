@@ -1,9 +1,9 @@
 <%
-   workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || ""
-   data_input_names = @workflow.data_input_ports.map { |input| input.name }
+   workflow_title = @workflow_version.title
+   data_input_names = @workflow_version.data_input_ports.map { |input| input.name }
 %>
 <script type="text/javascript">
-  var inputs = <%= input_json_hash(@workflow.data_input_ports) -%>;
+  var inputs = <%= input_json_hash(@workflow_version.data_input_ports) -%>;
   var iteration_template = "<%= escape_javascript render('iteration_template') -%>";
   var input_template = "<%= escape_javascript render('input_template') -%>";
 </script>
@@ -11,7 +11,7 @@
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
-  <%= link_to @workflow.title, main_app.workflow_path(@workflow) -%> &gt;
+  <%= link_to @workflow_version.title, main_app.workflow_path(@workflow, :version => @workflow_version.version) -%> &gt;
   <% unless @run.blank? %>
     <%= link_to "#{@run.name}", taverna_player.run_path(@run) -%> &gt;
   <% end %>
@@ -27,8 +27,8 @@
 
   <%= form_for @sweep, :html => {:multipart => true} do |sweep_form| %>
     <%= sweep_form.hidden_field :workflow_id, :value => @workflow.id %>
+    <%= sweep_form.hidden_field :workflow_version, :value => @workflow_version.version %>
     <%= hidden_field_tag :run_id, params[:run_id] %>
-    <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
 
     <div>
       <% if !@run.blank? %>
@@ -81,7 +81,7 @@
         </div>
         <div class="foldContent" id="fixed_data">
           <%# skip first input because its the sweep input by default %>
-          <% @workflow.data_input_ports[1..-1].each do |input| %>
+          <% @workflow_version.data_input_ports[1..-1].each do |input| %>
             <%= render :partial => 'taverna_player/runs/input_form', :locals => {:input => input, :form => shared_input_values} %>
           <% end %>
         </div>
@@ -92,8 +92,8 @@
           Parameters
         </div>
         <div class="foldContent" id="parameters">
-          <% unless @workflow.parameter_input_ports.blank? %>
-            <% @workflow.parameter_input_ports.each do |input| %>
+          <% unless @workflow_version.parameter_input_ports.blank? %>
+            <% @workflow_version.parameter_input_ports.each do |input| %>
               <%= render :partial => 'taverna_player/runs/input_form', :locals => {:input => input, :form => shared_input_values} %>
             <% end %>
           <% else %>

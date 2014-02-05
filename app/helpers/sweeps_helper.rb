@@ -2,7 +2,7 @@ module SweepsHelper
 
   # Return an array of table rows, one for each workflow output port
   def sweep_results_table_upside_down(sweep)
-    workflow = sweep.workflow
+    workflow = sweep.executed_workflow
     output_ports = workflow.output_ports
 
     output_ports.map do |output_port|
@@ -26,7 +26,7 @@ module SweepsHelper
   # Return an array of table rows, one for each run in the sweep
   def sweep_results_table(sweep)
 
-    workflow = sweep.workflow
+    workflow = sweep.executed_workflow
     output_ports = workflow.output_ports
 
     rows = []

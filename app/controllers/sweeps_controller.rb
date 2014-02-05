@@ -42,6 +42,7 @@ class SweepsController < ApplicationController
   def create
     @sweep = Sweep.new(params[:sweep])
     @workflow = @sweep.workflow
+    @workflow_version = @workflow.find_version(@sweep.workflow_version)
 
     raise if @workflow.nil?
     # Manually add projects of current user, as they aren't prompted for this information in the form
@@ -123,13 +124,11 @@ class SweepsController < ApplicationController
 
   def find_workflow_and_version
     if !@run.blank?
-      @workflow = Workflow.find(@run.workflow_id)
+      @workflow = @run.workflow
+      @workflow_version = @run.executed_workflow
     else
       @workflow = Workflow.find(params[:workflow_id])
-    end
-
-    unless params[:version].blank?
-      @workflow_version = @workflow.find_version(params[:version])
+      @workflow_version = params[:version].blank? ? @workflow.latest_version : @workflow.find_version(params[:version])
     end
   end
 
@@ -138,7 +137,9 @@ class SweepsController < ApplicationController
     shared_input_values_for_all_runs = params[:sweep].delete(:shared_input_values_for_all_runs)
     params[:sweep][:runs_attributes].each_with_index do |(run_id, run_attributes), iteration_index|
       run_attributes[:workflow_id] = params[:sweep][:workflow_id]
+      run_attributes[:workflow_version] = params[:sweep][:workflow_version]
       run_attributes[:name] = "#{params[:sweep][:name]} ##{iteration_index + 1}"
+      run_attributes[:project_ids] = current_user.person.projects.map { |p| p.id }
       # Set parent ID to replay interactions
       run_attributes[:parent_id] = params[:run_id].to_i unless params[:run_id].blank?
       run_attributes[:project_ids] = current_user.person.projects.map { |p| p.id }

@@ -1,15 +1,12 @@
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
-  <%= link_to @workflow.title, main_app.workflow_path(@workflow) -%> &gt;
+  <%= link_to @workflow_version.title, main_app.workflow_path(@workflow, :version => @workflow_version.version) -%> &gt;
   New Run
 </div>
 
-<% workflow_title = TavernaPlayer.workflow_proxy.title(@workflow) || "" %>
-<% workflow_inputs = TavernaPlayer.workflow_proxy.inputs(@workflow).sort{ |a,b| a.name.downcase <=> b.name.downcase} %>
-
 <div class="contribution_title">
-  <h1><%= 'New Workflow Run: ' + workflow_title -%></h1>
+  <h1><%= 'New Workflow Run: ' + @workflow_version.title -%></h1>
 </div>
 
 <div class="show_basic">
@@ -17,22 +14,22 @@
 
   <%= form_for @run, :html => {:multipart => true} do |f| %>
       <%= f.hidden_field :workflow_id, :value => @workflow.id %>
-      <%# f.hidden_field :workflow_version, :value => @workflow_version.version %>
+      <%= f.hidden_field :workflow_version, :value => @workflow_version.version %>
       <%= f.hidden_field :embedded %>
 
       <div class="box_about_actor" style="text-align: left; padding: 20px 20px 20px 0px;">
         <%= f.label :name, "Run name:"  %>
-        <%= f.text_field :name, :value => "#{workflow_title} run " + Time.now.utc.strftime('%e %b %Y %H:%M:%S %Z'), :size => 80 %>
+        <%= f.text_field :name, :value => "#{@workflow_version.title} (v#{@workflow_version.version}) run " + Time.now.utc.strftime('%e %b %Y %H:%M:%S %Z'), :size => 80 %>
       </div>
 
       <!-- Data inputs -->
-      <% unless @workflow.data_input_ports.blank? %>
-          <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => @workflow.data_input_ports, :form => f} %>
+      <% unless @workflow_version.data_input_ports.blank? %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Data", :inputs => @workflow_version.data_input_ports, :form => f} %>
       <% end %>
 
       <!-- Parameter inputs -->
-      <% unless @workflow.parameter_input_ports.blank? %>
-          <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => @workflow.parameter_input_ports, :form => f} %>
+      <% unless @workflow_version.parameter_input_ports.blank? %>
+          <%= render :partial => 'inputs_form', :locals => {:title => "Parameters", :inputs => @workflow_version.parameter_input_ports, :form => f} %>
       <% end %>
       <br/>
 
