@@ -1,9 +1,9 @@
 
 module TavernaPlayer
   class ServiceCredentialsController < TavernaPlayer::ApplicationController
-    # Do not remove the next line.
-    include TavernaPlayer::Concerns::Controllers::ServiceCredentialsController
+    before_filter :login_required
+    before_filter :is_user_admin_auth
 
-    # Extend the ServiceCredentialsController here.
+    include TavernaPlayer::Concerns::Controllers::ServiceCredentialsController
   end
 end
