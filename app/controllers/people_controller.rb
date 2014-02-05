@@ -378,13 +378,14 @@ class PeopleController < ApplicationController
   def project_or_institution_details projects_or_institutions
     details = ''
     unless params[projects_or_institutions].blank?
-        params[projects_or_institutions].each do |project_or_institution_id|
-          project_or_institution_class = projects_or_institutions.capitalize.singularize.constantize
-          project_or_institution = project_or_institution_class.find(project_or_institution_id)
-          unless project_or_institution.nil?
-            details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{project_or_institution.name}, Id: #{project_or_institution_id}; ")
-          end
+      params[projects_or_institutions].each do |project_or_institution|
+        project_or_institution_details= project_or_institution.split(',')
+        if project_or_institution_details[0] == 'Others'
+          details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
+        else
+          details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
         end
+      end
     end
     details
   end
