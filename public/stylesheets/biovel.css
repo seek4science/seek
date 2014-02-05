@@ -549,3 +549,8 @@ a.doc-link:hover, a.button-link:hover {
 .dataTables_wrapper {
   min-height: 100px;
 }
+
+.workflow-category.no-workflows {
+  background-color: #eaeaea;
+  border-color: #aaa;
+}

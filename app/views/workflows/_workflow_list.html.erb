@@ -1,6 +1,8 @@
 <% authorization_for_showing_already_done ||= false -%>
 
-<% unless collection.empty? -%>
+<% if collection.empty? -%>
+  <span style="font-size: 22px">No workflows found.</span>
+<% else %>
     <div id="workflow_list">
     <% collection.each do |workflow| %>
         <% if authorization_for_showing_already_done || workflow.can_view? -%>
