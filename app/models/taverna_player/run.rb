@@ -80,6 +80,13 @@ module TavernaPlayer
 
     private
 
+    # Override of Taverna Player method to support versioned workflows
+    def initialize_child_run
+      self.workflow = parent.workflow
+      self.workflow_version = parent.workflow_version
+    end
+
+    # Override of Taverna Player method to support versioned workflows
     def enqueue
       worker = TavernaPlayer::Worker.new(self, executed_workflow.content_blob.data_io_object.path)
       job = Delayed::Job.enqueue worker, :queue => TavernaPlayer.job_queue_name

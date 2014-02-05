@@ -124,12 +124,12 @@ class SweepsController < ApplicationController
 
   def find_workflow_and_version
     if !@run.blank?
-      @workflow = Workflow.find(@run.workflow_id)
+      @workflow = @run.workflow
+      @workflow_version = @run.executed_workflow
     else
       @workflow = Workflow.find(params[:workflow_id])
+      @workflow_version = params[:version].blank? ? @workflow.latest_version : @workflow.find_version(params[:version])
     end
-
-    @workflow_version = params[:version].blank? ? @workflow.latest_version : @workflow.find_version(params[:version])
   end
 
   def set_runlet_parameters
