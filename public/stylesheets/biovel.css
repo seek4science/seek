@@ -560,4 +560,5 @@ a.doc-link:hover, a.button-link:hover {
 .workflow-category.no-workflows {
   background-color: #eaeaea;
   border-color: #aaa;
+  color: #aaa;
 }
