@@ -66,7 +66,7 @@ module AuthenticatedSystem
     respond_to do |format|
       format.html do
         store_location
-        redirect_to root_path
+        redirect_to main_app.root_path
       end
       format.any do
         request_http_basic_authentication 'Web Password'
@@ -92,7 +92,7 @@ module AuthenticatedSystem
     if request.env['HTTP_REFERER']
       redirect_to(:back)
     else
-      redirect_to :root
+      redirect_to main_app.root_path
     end
 
     session[:return_to] = nil
@@ -130,7 +130,7 @@ module AuthenticatedSystem
       if User.find_by_openid(cookies[:open_id])
         respond_to do |format|
           format.html do
-            redirect_to auto_openid_session_path(:openid_identifier=>cookies[:open_id])
+            redirect_to main_app.auto_openid_session_path(:openid_identifier=>cookies[:open_id])
             return true
           end
         end
