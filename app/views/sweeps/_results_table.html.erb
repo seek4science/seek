@@ -38,7 +38,6 @@
           });
       });
   </script>
-  <div class="scroll_box">
     <%= form_tag(download_results_sweep_path(@sweep), :method => :post) do %>
         <%= content_tag :button, :type => :button, :id => :'chk-select-all' do %>
             Select all
@@ -46,6 +45,7 @@
         <%= content_tag :button, :type => :button, :id => :'chk-unselect-all' do %>
             Unselect all
         <% end %>
+      <div>
         <table cellpadding="0" cellspacing="0" class="display">
           <thead>
           <tr>
@@ -63,12 +63,12 @@
           <%= render :partial => 'results_table_body', :locals => {:sweep => @sweep} %>
           </tbody>
         </table>
+      </div>
 
         <!--#Button to download all results for this port across all runs&ndash;&gt;-->
         <%= submit_tag("Download selected values", :name => "download_results", :id => "download_results_button") %>
     <% end %>
 
-  </div>
 
   <!-- Hidden div for the contents of the result value being viewed that will appear as
   a modal dialog and will be populated via an AJAX call. -->

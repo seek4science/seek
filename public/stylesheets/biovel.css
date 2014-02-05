@@ -392,11 +392,18 @@ h2.standout {
   background-image: url('/public/images/header-bg2.png');
 }
 
+#sweep_results div {
+  min-width: 800px;
+  max-width: 1300px;
+  overflow-x: auto;
+  margin-bottom: 10px;
+}
+
 #sweep_results_table table {
   width: auto;
   background-color: white;
   border-collapse: collapse;
-  margin: 10px 0;
+  margin: 10px 0 0;
 }
 
 #sweep_results_table table td, #sweep_results_table table th {
