@@ -66,11 +66,11 @@ module Seek
     end
 
     def google_analytics_enabled_propagate
-      Rubaidh::GoogleAnalytics.enabled = self.google_analytics_enabled
+
       if self.google_analytics_enabled
-          Rubaidh::GoogleAnalytics.tracker_id = self.google_analytics_tracker_id
+        GA.tracker= self.google_analytics_tracker_id
       else
-          Rubaidh::GoogleAnalytics.tracker_id = "000-000"
+        GA.tracker= "000-000"
       end
     end
 
@@ -318,24 +318,4 @@ module Seek
     end
   end
 
-end
-
-module Rubaidh
-  class GoogleAnalytics
-    def self.enabled= enabled
-      if enabled
-        enable
-      else
-        disable
-      end
-    end
-
-    def self.enable
-      @@environments = ['production']
-    end
-
-    def self.disable
-      @@environments = []
-    end
-  end
 end

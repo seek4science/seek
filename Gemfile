@@ -4,7 +4,7 @@ source 'http://gems.github.com'
 gem "rails", "3.2.14"
 gem "rdoc"
 
-gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
+gem 'google-analytics-rails'
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'

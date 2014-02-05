@@ -9,7 +9,8 @@
   <title>BioVeL Portal</title>
   <link rel="shortcut icon" href="/images/biovel-logo-no-text.png" type="image/png"/>
 
-  <%= csrf_meta_tag %>
+  <%= analytics_init if Seek::Config.google_analytics_enabled %>
+      <%= csrf_meta_tag %>
 
   <%= javascript_include_tag 'savage_beast/application.js' -%>
   <%= javascript_include_tag 'prototype.js', 'prototype_ujs.js', 'effects.js', 'dragdrop.js', 'boxover.js',
