@@ -233,6 +233,7 @@ GEM
     factory_girl (2.6.4)
       activesupport (>= 2.3.9)
     fssm (0.2.10)
+    google-analytics-rails (0.0.4)
     gyoku (0.4.6)
       builder (>= 2.1.2)
     hashie (2.0.5)
@@ -354,9 +355,6 @@ GEM
     rmagick (2.13.2)
     rsolr (1.0.9)
       builder (>= 2.1.2)
-    rubaidh-google_analytics (1.1.4)
-      actionpack
-      activesupport
     ruby-openid (2.3.0)
     ruby-prof (0.13.0)
     rubyzip (0.9.9)
@@ -450,6 +448,7 @@ DEPENDENCIES
   fleximage!
   fssm
   gibberish!
+  google-analytics-rails
   hpricot (~> 0.8.2)
   in_place_editing
   libxml-ruby (= 2.6.0)
@@ -483,7 +482,6 @@ DEPENDENCIES
   rest-client (>= 1.6.1)
   rfc-822
   rmagick
-  rubaidh-google_analytics (~> 1.1.4)
   ruby-openid
   ruby-prof
   rubyzip (= 0.9.9)
