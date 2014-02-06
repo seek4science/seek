@@ -3,6 +3,8 @@ module TavernaPlayer
     include TavernaPlayer::Concerns::Controllers::RunsController
 
     skip_before_filter :project_membership_required
+    skip_before_filter :restrict_guest_user, :only => :new
+
     before_filter :check_project_membership_unless_embedded, :only => [:create, :new]
     before_filter :auth, :except => [ :index, :new, :create ]
     before_filter :find_runs, :only => :index

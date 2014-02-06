@@ -227,6 +227,10 @@ class User < ActiveRecord::Base
     User.find_by_login('guest')
   end
 
+  def guest?
+    current_user == User.guest
+  end
+
   protected
   # before filter
   def encrypt_password

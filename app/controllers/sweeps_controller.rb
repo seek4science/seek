@@ -1,5 +1,6 @@
 class SweepsController < ApplicationController
 
+  skip_before_filter :restrict_guest_user, :only => :new
   before_filter :find_sweep, :except => [:create, :new, :index]
   before_filter :find_run, :only => :new
   before_filter :set_runlet_parameters, :only => :create

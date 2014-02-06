@@ -27,6 +27,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :project_membership_required,:only=>[:create,:new]
 
+  before_filter :restrict_guest_user, :only => [:new, :edit]
   helper :all
 
   layout 'biovel'
@@ -142,6 +143,17 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def restrict_guest_user
+    if current_user.guest?
+      flash[:error] = "You cannot perform this action as the Guest User. Please sign in or register for an account to #{(action_name == 'new') ? "create new" : "#{action_name}"} #{controller_name}"
+      if !request.env["HTTP_REFERER"].nil?
+        redirect_to :back
+      else
+        redirect_to main_app.root_path
+      end
+    end
+  end
 
   def project_membership_required
     #FIXME: remove the try_block{} and also use User.logged_in_and_member
