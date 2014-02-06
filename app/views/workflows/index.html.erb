@@ -1,6 +1,6 @@
 <h1><%= @category.nil? ? "Workflows" : "#{@category.name} Workflows" -%></h1>
 
-<% if logged_in? and current_user.person.member?%>
+<% if logged_in? and current_user.person.member? and !current_user.guest?%>
     <ul class="sectionIcons">
         <li><%= image_tag_for_key "new", new_workflow_path(:category_id => params[:category_id]), nil, nil, 'Upload a workflow' %></li>
     </ul>

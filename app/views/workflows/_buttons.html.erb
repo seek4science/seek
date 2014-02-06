@@ -27,7 +27,7 @@
 
 <% if display_workflow.latest_version? %>
   <!-- Manage button -->
-  <% if workflow.can_manage? -%>
+  <% if workflow.can_manage? and !current_user.guest? -%>
       <li><%= image_tag_for_key('manage', edit_workflow_path(workflow), nil, nil, 'Manage workflow') -%></li>
       <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
   <% end -%>

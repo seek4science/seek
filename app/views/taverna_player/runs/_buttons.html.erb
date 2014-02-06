@@ -9,7 +9,7 @@
         <% if @run.sweepable? %>
             <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "Data sweep based on this run") -%></li>
         <% end %>
-        <% if @run.can_manage? -%>
+        <% if @run.can_manage? and !current_user.guest? -%>
             <li><%= image_tag_for_key('manage', main_app.edit_run_path(@run), nil, nil, "Manage run") -%></li>
         <% end -%>
     <% end %>
