@@ -25,7 +25,7 @@
       </li>
   <% end -%>
 
-  <% if mine?(@person) -%>
+  <% if mine?(@person) && !current_user.guest? -%>
       <li>
         <% tooltip_text = "Publish your owned assets in one click. A preview will be given before publishing" %>
         <%= image_tag_for_key "publish", batch_publishing_preview_person_path(@person), "Publish your assets", {:title => tooltip_title_attrib(tooltip_text)}, "Publish your assets" -%>

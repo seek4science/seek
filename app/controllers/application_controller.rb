@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :project_membership_required,:only=>[:create,:new]
 
-  before_filter :restrict_guest_user, :only => [:new, :edit]
+  before_filter :restrict_guest_user, :only => [:new, :edit, :batch_publishing_preview]
   helper :all
 
   layout 'biovel'
@@ -145,8 +145,8 @@ class ApplicationController < ActionController::Base
   private
 
   def restrict_guest_user
-    if current_user.guest?
-      flash[:error] = "You cannot perform this action as the Guest User. Please sign in or register for an account to #{(action_name == 'new') ? "create new" : "#{action_name}"} #{controller_name}"
+    if current_user && current_user.guest?
+      flash[:error] = "You cannot perform this action as the Guest User. Please sign in or register for an account first."
       if !request.env["HTTP_REFERER"].nil?
         redirect_to :back
       else
