@@ -8,7 +8,7 @@ namespace :seek_stats do
 
   task(:activity=>:environment) do
     actions = ["download","create"]
-    types = [nil,"Model","Sop","Presentation","DataFile","Publication","Investigation","Study","Assay"]
+    types = ["Model","Sop","DataFile"]
 
     actions.each do |action|
       types.each do |type|
@@ -55,17 +55,28 @@ namespace :seek_stats do
   end
 
   task(:downloaded_cross_project => :environment) do
-    assets = Model.all | DataFile.all
+    assets = Model.all | DataFile.all | Sop.all | Presentation.all
+
+    puts "type, id, n downloads, n registered users,n downloads by reg users, n users from other projects,n downloads by other projects, n users from sysmo-db,n downloads by sysmo"
+    sysmo_db = Project.find(12)
     assets.each do |asset|
-      logs = ActivityLog.where(action:"download").select{|l| l.activity_loggable==asset}
+      $stdout.flush
+      logs = ActivityLog.where(action:"download",activity_loggable_type:asset.class.name,activity_loggable_id:asset.id).includes(:culprit)
       people = logs.collect{|l| l.culprit.try(:person)}.compact.uniq
       if people.count>0
-        puts "#{asset.class.name}:#{asset.id} - downloaded by #{people.count} different registered people"
         other_projects = people.select{|p| (p.projects & asset.projects).empty?}
-        puts "\t of which #{other_projects.count} belong to other projects than the asset"
+        if other_projects.count>0
+          sysmo_db_people = other_projects.select{|p| p.projects.include?(sysmo_db)}
+          sysmo_db_n = sysmo_db_people.count
+          downloads_by_reg = logs.select{|l| !l.culprit.nil?}.count
+          downloads_by_other_proj = logs.select{|l| other_projects.include?(l.culprit.try(:person))}.count
+          downloads_by_sysmo = logs.select{|l| sysmo_db_people.include?(l.culprit.try(:person))}.count
+          puts "#{asset.class.name},#{asset.id},#{logs.count},#{people.count},#{downloads_by_reg},#{other_projects.count},#{downloads_by_other_proj},#{sysmo_db_n},#{downloads_by_sysmo}"
+        end
       end
     end
   end
+
 
   #things linked to publications
 
