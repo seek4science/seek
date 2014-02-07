@@ -691,6 +691,19 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test "projects filtered by data file using nested routes" do
+    assert_routing "data_files/3/projects",{controller:"projects",action:"index",data_file_id:"3"}
+    df1 = Factory(:data_file,policy:Factory(:public_policy))
+    df2 = Factory(:data_file,policy:Factory(:public_policy))
+    refute_equal df1.projects,df2.projects
+    get :index,data_file_id:df1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(df1.projects.first),:text=>df1.projects.first.title
+      assert_select "p > a[href=?]",project_path(df2.projects.first),:text=>df2.projects.first.title,:count=>0
+    end
+  end
+
 
 	private
 

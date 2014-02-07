@@ -262,6 +262,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   resources :presentations do
