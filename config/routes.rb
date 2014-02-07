@@ -221,6 +221,7 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
+    resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
   end
 
   ### ASSETS ###

@@ -394,5 +394,21 @@ class StudiesControllerTest < ActionController::TestCase
     refute_nil flash.now[:notice]
   end
 
+  test "studies filtered by assay through nested routing" do
+    assert_routing "assays/22/studies",{controller:"studies",action:"index",assay_id:"22"}
+    contributor = Factory(:person)
+    assay1 = Factory :assay,contributor:contributor,study:Factory(:study,:contributor=>contributor)
+    assay2 = Factory :assay,contributor:contributor,study:Factory(:study,:contributor=>contributor)
+    login_as contributor
+    assert assay1.study.can_view?
+    assert assay2.study.can_view?
+    get :index,assay_id:assay1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",study_path(assay1.study),:text=>assay1.study.title
+      assert_select "p > a[href=?]",study_path(assay2.study),:text=>assay2.study.title,:count=>0
+    end
+  end
+
 
 end
