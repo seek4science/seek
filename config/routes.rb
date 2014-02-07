@@ -210,6 +210,7 @@ SEEK::Application.routes.draw do
       post :investigation_selected_ajax
       get :view_items_in_tab
     end
+    resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
   end
 
   resources :assays do
