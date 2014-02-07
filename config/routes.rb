@@ -202,6 +202,7 @@ SEEK::Application.routes.draw do
     collection do
       get :view_items_in_tab
     end
+    resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
   end
 
   resources :studies do
