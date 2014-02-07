@@ -730,6 +730,32 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test "projects filtered by publication using nested routes" do
+    assert_routing "publications/3/projects",{controller:"projects",action:"index",publication_id:"3"}
+    pub1 = Factory(:publication)
+    pub2 = Factory(:publication)
+    refute_equal pub1.projects,pub2.projects
+    get :index,publication_id:pub1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(pub1.projects.first),:text=>pub1.projects.first.title
+      assert_select "p > a[href=?]",project_path(pub2.projects.first),:text=>pub2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by events using nested routes" do
+    assert_routing "events/3/projects",{controller:"projects",action:"index",event_id:"3"}
+    event1 = Factory(:event)
+    event2 = Factory(:event)
+    refute_equal event1.projects,event2.projects
+    get :index,event_id:event1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(event1.projects.first),:text=>event1.projects.first.title
+      assert_select "p > a[href=?]",project_path(event2.projects.first),:text=>event2.projects.first.title,:count=>0
+    end
+  end
+
 
 	private
 

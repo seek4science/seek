@@ -377,6 +377,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :disassociate_authors
     end
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:events,:only=>[:index]
   end
 
   resources :events do
@@ -384,6 +385,7 @@ SEEK::Application.routes.draw do
       get :preview
       get :view_items_in_tab
     end
+    resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
 
   resource :policies do

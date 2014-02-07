@@ -531,6 +531,7 @@ end
     f.title "An Event"
     f.start_date Time.now
     f.end_date 1.days.from_now
+    f.projects { [Factory.build(:project)] }
   end
 
   Factory.define(:saved_search) do |f|
