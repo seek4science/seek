@@ -704,6 +704,32 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test "projects filtered by models using nested routes" do
+    assert_routing "models/3/projects",{controller:"projects",action:"index",model_id:"3"}
+    model1 = Factory(:model,policy:Factory(:public_policy))
+    model2 = Factory(:model,policy:Factory(:public_policy))
+    refute_equal model1.projects,model2.projects
+    get :index,model_id:model1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(model1.projects.first),:text=>model1.projects.first.title
+      assert_select "p > a[href=?]",project_path(model2.projects.first),:text=>model2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by sops using nested routes" do
+    assert_routing "sops/3/projects",{controller:"projects",action:"index",sop_id:"3"}
+    sop1 = Factory(:sop,policy:Factory(:public_policy))
+    sop2 = Factory(:sop,policy:Factory(:public_policy))
+    refute_equal sop1.projects,sop2.projects
+    get :index,sop_id:sop1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(sop1.projects.first),:text=>sop1.projects.first.title
+      assert_select "p > a[href=?]",project_path(sop2.projects.first),:text=>sop2.projects.first.title,:count=>0
+    end
+  end
+
 
 	private
 
