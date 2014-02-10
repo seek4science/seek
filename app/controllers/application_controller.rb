@@ -114,33 +114,6 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  #called via ajax to provide the full list of resources for the tabs
-  def view_items_in_tab
-    resource_type = params[:resource_type]
-    resource_ids = (params[:resource_ids] || []).split(',')
-    view_type = params[:view_type] || 'view_some'
-    render :update do |page|
-      if !resource_type.blank?
-        clazz = resource_type.constantize
-        resources = clazz.find_all_by_id(resource_ids)
-        if clazz.respond_to?(:authorize_asset_collection)
-          resources = clazz.authorize_asset_collection(resources,"view")
-        else
-          resources = resources.select &:can_view?
-        end
-        resources.sort!{|item,item2| item2.updated_at <=> item.updated_at}
-        page.replace_html "#{resource_type}_#{view_type}",
-                          :partial => "assets/resource_list",
-                          :locals => {:collection => resources,
-                          :narrow_view => true,
-                          :authorization_for_showing_already_done => true,
-                          :actions_partial_disable=>false}
-        page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.05
-        page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.05
-      end
-    end
-  end
-
   private
 
   def project_membership_required
