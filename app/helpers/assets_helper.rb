@@ -222,12 +222,6 @@ module AssetsHelper
     related
   end
 
-  def filter_url(resource_type, context_resource)
-    #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"
-    filter_text = "(:filter => {:#{context_resource.class.name.downcase} => #{context_resource.id}},:page=>'all')"
-    eval("#{resource_type.underscore.pluralize}_path" + filter_text)
-  end
-
   #provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view
   #if projects is provided, only authorizes the assets for that project
   def authorised_assets asset_class,projects=nil, action="view"

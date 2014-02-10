@@ -105,7 +105,7 @@
                 %>
                 <% item ||= nil
                     if item %>
-                    <%= link_to "View all "+(extra_count + resources.size).to_s+" items", filter_url(resource_type, item) -%>
+                    <%= link_to "View all "+(extra_count + resources.size).to_s+" items", [item,resource_type.tableize] -%>
                     <% else
                         link_to "View all items", eval("#{resource_type.pluralize.underscore}_path")
                     end
