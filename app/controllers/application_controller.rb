@@ -432,10 +432,12 @@ class ApplicationController < ActionController::Base
         #first the special cases
         when (filter == 'investigation' && res.respond_to?(:assays)) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
         when (filter == 'study' && res.respond_to?(:assays)) then res.assays.collect{|a| a.study_id}.include? value.id
-        when (filter == 'person' && res.class.is_isa?)    then (res.contributor== value || res.contributor.try(:person) == value)
-        when (filter == 'person' && res.class.is_asset?)    then (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
-        when (filter == 'person' && res.respond_to?(:owner)) then res.send(:owner) == value
+        when ((filter == 'person' || filter=='people') && res.respond_to?(:contributor) || res.respond_to?(:creators) || res.respond_to?(:owner)) then (res.contributor== value || res.contributor.try(:person) == value)
+        when ((filter == 'person' || filter=='people') && res.class.is_asset?)    then (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
+        when ((filter == 'person' || filter=='people') && res.respond_to?(:owner)) then res.send(:owner) == value
         #then the general case
+        when res.respond_to?("all_related_#{filter.pluralize}")            then res.send("all_related_#{filter.pluralize}").include?(value)
+        when res.respond_to?("related_#{filter.pluralize}")            then res.send("related_#{filter.pluralize}").include?(value)
         when res.respond_to?(filter)                         then res.send(filter) == value
         when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value
         #defaults to true, if a filter is irrelevant then it is silently ignored

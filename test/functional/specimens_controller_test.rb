@@ -277,4 +277,20 @@ test "should update genotypes and phenotypes" do
     assert associated_sops.empty?
   end
 
+  test "filter by sample using nested routes" do
+    assert_routing "samples/5/specimens",{controller:"specimens",action:"index",sample_id:"5"}
+    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+
+    refute_nil sample1.specimen
+    refute_equal sample1.specimen,sample2.specimen
+
+    get :index,sample_id:sample1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(sample1.specimen),:text=>sample1.specimen.title
+      assert_select "p > a[href=?]",specimen_path(sample2.specimen),:text=>sample2.specimen.title,:count=>0
+    end
+  end
+
 end

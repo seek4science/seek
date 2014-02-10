@@ -384,11 +384,14 @@ SEEK::Application.routes.draw do
 
   ### BIOSAMPLES AND ORGANISMS ###
 
-  resources :specimens
+  resources :specimens do
+    resources :projects,:people,:samples,:strains,:institutions,:sops
+  end
   resources :samples do
     collection do
       get :preview
     end
+    resources :projects,:people,:specimens,:sops,:data_files
   end
 
   resources :strains do
@@ -399,8 +402,6 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
-
-
   end
 
   resources :biosamples do
@@ -421,8 +422,8 @@ SEEK::Application.routes.draw do
   resources :organisms do
     collection do
       post :search_ajax
-      get :view_items_in_tab
     end
+    resources :projects,:assays,:studies,:models,:strains,:specimens
     member do
       get :visualise
     end
