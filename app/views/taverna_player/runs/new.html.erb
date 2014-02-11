@@ -18,8 +18,8 @@
       <%= f.hidden_field :embedded %>
 
       <div class="box_about_actor" style="text-align: left; padding: 20px 20px 20px 0px;">
-        <%= f.label :name, "Run name:"  %>
-        <%= f.text_field :name, :value => "#{@workflow_version.title} (v#{@workflow_version.version}) run " + Time.now.utc.strftime('%e %b %Y %H:%M:%S %Z'), :size => 80 %>
+        <%= f.label :name, "Run name:"  %><br/>
+        <%= f.text_field :name, :value => "#{@workflow_version.title} (v#{@workflow_version.version}) run " + Time.now.utc.strftime('%e %b %Y %H:%M:%S %Z'), :style => 'width: 100%' %>
       </div>
 
       <!-- Data inputs -->
