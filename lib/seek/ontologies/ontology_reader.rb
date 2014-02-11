@@ -90,7 +90,7 @@ module Seek
       #relative to config/ontologies/
       def ontology_path
         file = ontology_file
-        if valid_uri_schemes.include?(Addressable::URI.parse(file).scheme)
+        if valid_uri_schemes.include?(RDF::URI.new(file).scheme)
           file
         else
           File.join(Rails.root,"config","ontologies",ontology_file)
