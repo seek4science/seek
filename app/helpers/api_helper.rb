@@ -272,7 +272,9 @@ module ApiHelper
   def associated_resources_xml builder, object
     #FIXME: this needs fixing, with some refactoring of the version->asset linkage - see http://www.mygrid.org.uk/dev/issues/browse/SYSMO-362
     object=object.parent if (object.class.name.include?("::Version"))
-    associated = get_related_resources object
+    associated = get_related_resources(object)
+    associated.delete("Strain")
+
     builder.tag! "associated" do
       associated.keys.sort.each do |key|
         attr={}

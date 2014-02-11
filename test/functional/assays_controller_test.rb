@@ -18,7 +18,6 @@ class AssaysControllerTest < ActionController::TestCase
     @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
   end
 
-
   test "modelling assay validates with schema" do
     df = Factory(:data_file,:contributor=>User.current_user.person)
     a = Factory(:modelling_assay,:contributor=>User.current_user.person)
