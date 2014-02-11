@@ -1138,4 +1138,34 @@ end
     assert_redirected_to assay
     refute_nil flash[:error]
   end
+
+  test "assays filtered by investigation via nested routing" do
+    assert_routing "investigations/1/assays",{controller:"assays",action:"index",investigation_id:"1"}
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    inv = assay.study.investigation
+    assay2 = Factory(:assay,:policy=>Factory(:public_policy))
+    refute_nil(inv)
+    refute_equal assay.study.investigation, assay2.study.investigation
+    get :index,investigation_id:inv.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
+      assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+    end
+  end
+
+  test "assays filtered by study via nested routing" do
+    assert_routing "studies/1/assays",{controller:"assays",action:"index",study_id:"1"}
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    study = assay.study
+    assay2 = Factory(:assay,:policy=>Factory(:public_policy))
+
+    refute_equal assay.study, assay2.study
+    get :index,study_id:study.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
+      assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+    end
+  end
 end

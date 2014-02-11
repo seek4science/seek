@@ -402,7 +402,7 @@ class DataFilesController < ApplicationController
       format.html
     end
   end
-  
+
   protected
 
   def translate_action action

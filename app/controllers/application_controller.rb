@@ -114,33 +114,6 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  #called via ajax to provide the full list of resources for the tabs
-  def view_items_in_tab
-    resource_type = params[:resource_type]
-    resource_ids = (params[:resource_ids] || []).split(',')
-    view_type = params[:view_type] || 'view_some'
-    render :update do |page|
-      if !resource_type.blank?
-        clazz = resource_type.constantize
-        resources = clazz.find_all_by_id(resource_ids)
-        if clazz.respond_to?(:authorize_asset_collection)
-          resources = clazz.authorize_asset_collection(resources,"view")
-        else
-          resources = resources.select &:can_view?
-        end
-        resources.sort!{|item,item2| item2.updated_at <=> item.updated_at}
-        page.replace_html "#{resource_type}_#{view_type}",
-                          :partial => "assets/resource_list",
-                          :locals => {:collection => resources,
-                          :narrow_view => true,
-                          :authorization_for_showing_already_done => true,
-                          :actions_partial_disable=>false}
-        page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.05
-        page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.05
-      end
-    end
-  end
-
   private
 
   def project_membership_required
@@ -438,6 +411,14 @@ class ApplicationController < ActionController::Base
 
   def apply_filters(resources)
     filters = params[:filter] || {}
+
+    #translate params that are send as an _id, like project_id=12 - which will usually be a consequence of nested routing
+    params.keys.each do |key|
+      if (key.end_with?("_id"))
+        filters[key.gsub("_id","")]=params[key]
+        params[:page]="all"
+      end
+    end
     #apply_filters will be dispatching to methods based on the symbols in params[:filter].
     #Permitted filters protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
     filters.delete_if {|k,v| not (permitted_filters.include? k.to_s) }
@@ -449,11 +430,14 @@ class ApplicationController < ActionController::Base
 
         case
         #first the special cases
-        when (filter == 'investigation' and res.respond_to? :assays) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
-        when (filter == 'study' and res.respond_to? :assays) then res.assays.collect{|a| a.study_id}.include? value.id
-        when (filter == 'person' and res.class.is_asset?)    then (res.creators.include?(value) or res.contributor.try(:person) == value)
-        when (filter == 'person' and res.respond_to? :owner) then res.send(:owner) == value
+        when filter == 'investigation' && res.respond_to?(:assays) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
+        when filter == 'study' && res.respond_to?(:assays) then res.assays.collect{|a| a.study_id}.include? value.id
+        when filter == 'person' && (res.respond_to?(:contributor) || res.respond_to?(:creators) || res.respond_to?(:owner)) then (res.contributor== value || res.contributor.try(:person) == value)
+        when filter == 'person' && res.class.is_asset?    then (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
+        when filter == 'person' && res.respond_to?(:owner) then res.send(:owner) == value
         #then the general case
+        when res.respond_to?("all_related_#{filter.pluralize}")            then res.send("all_related_#{filter.pluralize}").include?(value)
+        when res.respond_to?("related_#{filter.pluralize}")            then res.send("related_#{filter.pluralize}").include?(value)
         when res.respond_to?(filter)                         then res.send(filter) == value
         when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value
         #defaults to true, if a filter is irrelevant then it is silently ignored

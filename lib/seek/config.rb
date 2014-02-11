@@ -304,7 +304,7 @@ module Seek
       :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,
       :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,
       :assay_type_ontology_file,:technology_type_ontology_file,:modelling_analysis_type_ontology_file,:assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri,
-      :header_tagline_text_enabled,:header_home_logo_image]
+      :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit]
 
 
     #Settings that require a conversion to integer
