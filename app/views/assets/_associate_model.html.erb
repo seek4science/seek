@@ -31,7 +31,7 @@
               :url=>preview_models_path(:element=>"model_preview"),
               :with=>"'id='+this.value",
               :before=>"show_ajax_loader('model_preview')"
-            )+";check_show_add_model();return(false);"
+            )+";return(false);"
           } -%>
 
           <%= select_tag :model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
@@ -80,11 +80,20 @@
             }
         <% end -%>
         }
-        selection_box.selectedIndex=0;
-        selection_box.onchange();
+        //selection_box.onchange();
     }
+    function check_show_add_model() {
+    i = $('possible_models').selectedIndex;
+    selected_id = $('possible_models').options[i].value;
+    if (selected_id == '0') {
+      $('add_model_link').hide();
+    }
+    else {
+      $('add_model_link').show();
+    }
+  }
 
-<% models = resource.is_a?(Publication) ? resource.related_models : resource.model_masters %>
+    <% models = resource.is_a?(Publication) ? resource.related_models : resource.model_masters %>
 <% models.each do |model| -%>
   <% if model.can_view? -%>
       model_id = '<%= model.id -%>';
@@ -104,19 +113,7 @@
   <% end -%>
 <% end -%>
 
+
   updateModels();
-
-
-  function check_show_add_model() {
-    i = $('possible_models').selectedIndex;
-    selected_id = $('possible_models').options[i].value;
-    if (selected_id == '0') {
-      $('add_model_link').hide();
-    }
-    else {
-      $('add_model_link').show();
-    }
-  }
   toggle_model_list()
-  check_show_add_model();
 </script>

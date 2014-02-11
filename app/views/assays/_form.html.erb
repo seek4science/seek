@@ -149,7 +149,6 @@
     elem.style.display = 'none';
   }
 
-  }
 
   function check_show_organism_form() {
       if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
@@ -166,6 +165,7 @@
       } else {
           Effect.Appear('add_samples_form');
       }
+  }
   function check_show_organism_form() {
       if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
           Effect.Fade('add_organism_form');

@@ -15,11 +15,13 @@
     position: relative;
     width: 100%;
     font-weight: bold;
-
+    text-align: center
 }
 .dm .item1 {
     background: #3173ff;
     color: #ffffff;
+    white-space: nowrap;
+
 }
 .dm .item1:hover,
 .dm .item1-active,
@@ -32,7 +34,7 @@
     border-style: solid solid solid solid;
     position: absolute;
     visibility: hidden;
-    z-index: -1;
+    z-index: 3 !important;
     white-space: nowrap;
 
     text-align: left;

@@ -30,7 +30,7 @@
                                :url=>preview_sops_path(:element=>"sop_preview"),
                                :with=>"'id='+this.value",
                                :before=>"show_ajax_loader('sop_preview')"
-                       )+";check_show_add_sop();return(false);"
+                       )+";return(false);"
                        } -%>
         
         <%= select_tag :assay_sop_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
@@ -80,9 +80,19 @@
                 }
             <% end -%>
             }
-
-            selection_box.onchange();
+            selection_box.selectedIndex = 0;
+           // selection_box.onchange();
         }
+    function check_show_add_sop() {
+            i = $('possible_sops').selectedIndex;
+            selected_id = $('possible_sops').options[i].value;
+            if (selected_id == '0') {
+                $('add_sop_link').hide();
+            }
+            else {
+                $('add_sop_link').show();
+            }
+     }
 
     <% @assay.sop_masters.each do |s| -%>    
       <% if s.can_view? -%>
@@ -103,19 +113,10 @@
       <% end -%>
     <% end -%>
 
+
+
+
     updateSops();
-
-
-    function check_show_add_sop() {
-        i = $('possible_sops').selectedIndex;
-        selected_id = $('possible_sops').options[i].value;
-        if (selected_id == '0') {
-            $('add_sop_link').hide();
-        }
-        else {
-            $('add_sop_link').show();
-        }
-    }
     toggle_sop_list()
-    check_show_add_sop();
+
 </script>

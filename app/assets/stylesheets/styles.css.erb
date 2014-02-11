@@ -870,6 +870,7 @@ img.badge {
 }
 
 #topbar {
+    text-align: center;
     height: 20px;
     background-image: url("<%= asset_path('searchfade-repeat.png') %>");
     background-repeat: repeat-x;
@@ -1479,12 +1480,15 @@ a.block_link {
 
 a.block_link_active {
   display: block;
-  border: 1px solid #0000ff;
+  border: 2px solid #0000ff;
   background-color: #eee;  
   padding: 0.4em;
   margin-top: 0.3em;
   text-align: left;
   vertical-align: middle;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
 }
 
 a:hover.block_link {

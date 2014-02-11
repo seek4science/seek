@@ -25,7 +25,7 @@
                 :url=>preview_publications_path(:element=>"publication_preview"),
                 :with=>"'id='+this.value",
                 :before=>"show_ajax_loader('publication_preview')"
-                )+";check_show_add_publication();return(false);"
+                )+";return(false);"
                 } -%>
                 <%= select_tag :related_publication_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
                 <% if show_relationships -%>
@@ -77,8 +77,7 @@
                 }
         <% end -%>
             }
-            selection_box.selectedIndex=0;
-            selection_box.onchange();
+            //selection_box.onchange();
           }
 
     <% related_publications.each do |publication| -%>    
@@ -115,5 +114,4 @@
         }
       }
     
-      check_show_add_publication();
 </script>

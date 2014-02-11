@@ -147,8 +147,7 @@
               }
           <% end -%>
           }
-          selection_box.selectedIndex = 0;
-          selection_box.onchange();
+          //selection_box.onchange();
       }
 
 <% associated_assay_ids = resource.is_a?(Publication) ? resource.related_assays.collect(&:id) : resource.assays.collect(&:id) %>
@@ -184,5 +183,4 @@
 
   updateAssays();
   toggle_assay_list()
-  check_show_add_assay();
 </script>

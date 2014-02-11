@@ -32,7 +32,7 @@
             :url=>{:action=>"preview",:controller=>"publications",:element=>"publication_preview"},
             :with=>"'id='+this.value",
             :before=>"show_ajax_loader('publication_preview')"
-          )+";check_show_add_publication();return(false);"
+          )+";return(false);"
         } -%>
         
         <%= select_tag :related_publication_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
@@ -85,7 +85,6 @@
             }
         <% end -%>
         }
-        selection_box.selectedIndex = 0;
         selection_box.onchange();
     }
 <% resource.publications.each do |publication| -%>
