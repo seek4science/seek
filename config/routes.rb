@@ -159,7 +159,8 @@ SEEK::Application.routes.draw do
       get :asset_report
       get :admin
     end
-    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:only=>[:index]
+    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
+              :publications,:events,:samples,:specimens,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -403,6 +404,7 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
+    resources :specimens
   end
 
   resources :biosamples do
