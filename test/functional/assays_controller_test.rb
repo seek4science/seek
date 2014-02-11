@@ -1167,4 +1167,6 @@ end
       assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
     end
   end
+
+
 end

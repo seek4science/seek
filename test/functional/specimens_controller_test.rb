@@ -328,4 +328,23 @@ test "should update genotypes and phenotypes" do
     end
   end
 
+  test "filter by institution using nested routes" do
+    assert_routing "institutions/8/specimens",{controller:"specimens",action:"index",institution_id:"8"}
+    spec1 = Factory(:specimen,:policy=>Factory(:public_policy))
+    spec2 = Factory(:specimen,:policy=>Factory(:public_policy))
+
+    refute_nil spec1.institution
+    refute_nil spec2.institution
+    refute_equal spec1.institution,spec2.institution
+
+    get :index,institution_id:spec1.institution.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(spec1),:text=>spec1.title
+      assert_select "p > a[href=?]",specimen_path(spec2),:text=>spec2.title,:count=>0
+    end
+  end
+
+
+
 end
