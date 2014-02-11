@@ -77,7 +77,7 @@ class ActiveSupport::TestCase
   end
 
   def skip_rest_schema_check?
-    true
+    false
   end
 
   def clear_rails_cache
