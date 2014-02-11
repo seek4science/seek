@@ -145,6 +145,22 @@ class Workflow < ActiveRecord::Base
     where(:contributor_id => uid, :contributor_type => "User")
   end
 
+  def self.by_visibility(visibility)
+    if visibility == 'public'
+      joins(:policy).where(:policies => {:sharing_scope => 4})
+    elsif visibility == 'private'
+      joins(:policy).where(:policies => {:sharing_scope => 0, :access_type => 0}).by_uploader(User.current_user.id)
+    elsif visibility == "registered"
+      joins(:policy).where('policies.sharing_scope = 2 AND policies.access_type > 0')
+    else
+      match = visibility.match(/(.*):(.*)/)
+      puts match.inspect
+      joins(:policy => :permissions).where(:policies => {:access_type => 0},
+                                           :permissions => {:contributor_type => match[1],
+                                                            :contributor_id => match[2].to_i})
+    end
+  end
+
   def uploader
     if :contributor_type == 'User'
       return self.contributor.person.name

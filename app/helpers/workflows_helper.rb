@@ -22,7 +22,7 @@ module WorkflowsHelper
   end
 
   def workflow_filter(name, params, key, value)
-    is_active = (params[key].to_i == value) && !params[key].nil?
+    is_active = (params[key] == value.to_s) && !params[key].nil?
 
     link_to name, workflows_path(merge_workflow_filters(params, key, value)), :class => (is_active ? 'active' : '')
   end
