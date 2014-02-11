@@ -76,6 +76,10 @@ class ActiveSupport::TestCase
     false
   end
 
+  def skip_rest_tests?
+    true
+  end
+
   def clear_rails_cache
     Rails.cache.clear
   end
