@@ -8,7 +8,6 @@ module RestTestCases
   SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
   
   def test_index_rest_api_xml
-    skip("currently skipping REST API tests") if skip_rest_tests?
     #to make sure something in the database is created
     object=rest_api_test_object
 
@@ -17,7 +16,6 @@ module RestTestCases
   end
 
   def test_get_rest_api_xml object=rest_api_test_object
-    skip("currently skipping REST API tests") if skip_rest_tests?
     get :show,:id=>object, :format=>"xml"
     perform_api_checks
 
@@ -57,7 +55,6 @@ module RestTestCases
   end
   
   def perform_api_checks
-    skip("currently skipping REST API tests") if skip_rest_tests?
     assert_response :success    
     valid,message = check_xml
     assert valid,message        
@@ -72,7 +69,8 @@ module RestTestCases
     return true,""    
   end  
   
-  def validate_xml_against_schema(xml,schema=SCHEMA_FILE_PATH)       
+  def validate_xml_against_schema(xml,schema=SCHEMA_FILE_PATH)
+    skip("currently skipping REST API schema check") if skip_rest_schema_check?
     document = LibXML::XML::Document.string(xml)
     schema = LibXML::XML::Schema.new(schema)
     result = true

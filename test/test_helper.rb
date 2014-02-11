@@ -76,7 +76,7 @@ class ActiveSupport::TestCase
     false
   end
 
-  def skip_rest_tests?
+  def skip_rest_schema_check?
     true
   end
 
