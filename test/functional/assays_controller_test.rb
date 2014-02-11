@@ -18,6 +18,20 @@ class AssaysControllerTest < ActionController::TestCase
     @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
   end
 
+  def test_get_rest_api_xml object=rest_api_test_object
+    get :show,:id=>object, :format=>"xml"
+    perform_api_checks
+
+    #check the title, due to an error with it being incorrectly described
+    if object.respond_to?(:title)
+      xml = @response.body
+      doc = LibXML::XML::Document.string(xml)
+
+      title = doc.find("//dc:title",["dc:http://purl.org/dc/elements/1.1/"]).first
+      assert_not_nil title
+      assert_equal object.title,title.content
+    end
+  end
 
   test "modelling assay validates with schema" do
     df = Factory(:data_file,:contributor=>User.current_user.person)
