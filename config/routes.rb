@@ -186,7 +186,7 @@ SEEK::Application.routes.draw do
     collection do
       get :request_all
     end
-    resources :people,:projects,:only=>[:index]
+    resources :people,:projects,:specimens,:only=>[:index]
     resources :avatars do
       member do
         post :select

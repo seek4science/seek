@@ -1138,6 +1138,48 @@ end
     refute_nil flash[:error]
   end
 
+  test "should show experimental assay types for new experimental assay" do
+    get :new,:class=>:experimental
+    assert_response :success
+    assert_select "label",:text=>/assay type/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i,:count=>0
+    end
+  end
+
+  test "should show modelling assay types for new modelling assay" do
+    get :new,:class=>:modelling
+    assert_response :success
+    assert_select "label",:text=>/Biological problem addressed/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i,:count=>0
+    end
+  end
+
+  test "should show experimental assay types when editing experimental assay" do
+    a = Factory(:experimental_assay,:contributor=>User.current_user.person)
+    get :edit,:id=>a.id
+    assert_response :success
+    assert_select "label",:text=>/assay type/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i,:count=>0
+    end
+  end
+
+  test "should show modelling assay types when editing modelling assay" do
+    a = Factory(:modelling_assay,:contributor=>User.current_user.person)
+    get :edit,:id=>a.id
+    assert_response :success
+    assert_select "label",:text=>/Biological problem addressed/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i,:count=>0
+    end
+  end
+
   test "assays filtered by investigation via nested routing" do
     assert_routing "investigations/1/assays",{controller:"assays",action:"index",investigation_id:"1"}
     assay = Factory(:assay,:policy=>Factory(:public_policy))
@@ -1167,4 +1209,6 @@ end
       assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
     end
   end
+
+
 end
