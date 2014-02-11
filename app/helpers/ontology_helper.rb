@@ -1,7 +1,8 @@
 module OntologyHelper
 
-  def assay_type_select_tag form, element_id, selected_uri,html_options={}
-    ontology_select_tag form, "assay",element_id, selected_uri,html_options
+  def assay_type_select_tag form, is_modelling,element_id, selected_uri,html_options={}
+    type = is_modelling ? "modelling_analysis" : "assay"
+    ontology_select_tag form, type ,element_id, selected_uri,html_options
   end
 
   def technology_type_select_tag form, element_id, selected_uri,html_options={}
@@ -26,7 +27,7 @@ module OntologyHelper
   end
 
   def reader_for_type type
-    "Seek::Ontologies::#{type.capitalize}TypeReader".constantize.instance
+    "Seek::Ontologies::#{type.camelize}TypeReader".constantize.instance
   end
 
 end
