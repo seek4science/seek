@@ -638,20 +638,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test "should view_items_in_tab in project page for non-admin" do
-    project = Factory(:project)
-    df = Factory :data_file,
-                 :title=>"a data file",
-                 :contributor=>User.current_user,
-                 :policy=>Factory(:public_policy),
-                 :project_ids => [project.id]
 
-    login_as(Factory(:user))
-    get :view_items_in_tab,{:resource_type=>"DataFile",:resource_ids=>[df.id].join(",")}
-
-    assert_response :success
-    assert @response.body.include?("a data file")
-  end
 
   test "can not remove workgroup if it contains people" do
     project = Factory(:project)

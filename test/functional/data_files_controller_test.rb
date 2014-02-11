@@ -73,21 +73,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
   end
 
-  test "view_items_in_tab" do
-    other_user = Factory :user
-    df = Factory :data_file,:title=>"a data file",:contributor=>User.current_user,:policy=>Factory(:public_policy)
-    private_df = Factory :data_file,:title=>"a private data file",:contributor=>other_user,:policy=>Factory(:private_policy)
-    xml_http_request :get, :view_items_in_tab,:resource_type=>"DataFile",:resource_ids=>[df.id,private_df.id,1000].join(",")
-    assert_response :success
-
-    assert @response.body.include?("a data file")
-    assert !@response.body.include?("a private data file")
-
-    #try with no parameters
-    xml_http_request :get, :view_items_in_tab
-    assert_response :success
-  end
-
   test "get XML when not logged in" do
     logout
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))

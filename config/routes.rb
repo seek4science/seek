@@ -397,7 +397,6 @@ SEEK::Application.routes.draw do
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
-      get :view_items_in_tab
     end
     member do
       post :update_annotations_ajax
