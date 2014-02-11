@@ -402,6 +402,7 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
+    resources :specimens
   end
 
   resources :biosamples do
