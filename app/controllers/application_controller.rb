@@ -448,8 +448,8 @@ class ApplicationController < ActionController::Base
         when res.respond_to?("related_#{filter.pluralize}")            then res.send("related_#{filter.pluralize}").include?(value)
         when res.respond_to?(filter)                         then res.send(filter) == value
         when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value
-        #defaults to true, if a filter is irrelevant then it is silently ignored
-        else true
+        #defaults to false, if a filter is not recognised then nothing is return
+        else false
         end
       end
     end
