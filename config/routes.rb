@@ -280,6 +280,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:publications,:events
   end
 
   resources :models do
