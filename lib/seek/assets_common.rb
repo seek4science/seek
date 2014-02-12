@@ -107,7 +107,11 @@ module Seek
       symb=c.singularize.to_sym
 
       if (params[symb][:data]).blank? && (params[symb][:data_url]).blank?
-        flash.now[:error] = "Please select a file to upload or provide a URL to the data."
+        if params[symb].include?(:data_url)
+          flash.now[:error] = "Please select a file to upload or provide a URL to the data."
+        else
+          flash.now[:error] = "Please select a file to upload."
+        end
         if render_action_on_error
           init_asset_for_render params
           respond_to do |format|
