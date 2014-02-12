@@ -9,17 +9,17 @@ module Seek
     include ImagesHelper
 
     #this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page
-    def init_asset_for_render params                                                            
-        c     = self.controller_name.singularize                                                  
-        model = c.camelize.constantize                                                            
-        symb  =c.to_sym                                                                           
-        params[symb].delete 'data_url'                                                            
-        params[symb].delete 'data'                                                                
-        params[symb].delete 'local_copy'                                                          
-        obj=model.new params[symb]                                                                
-        eval "@#{c.singularize} = obj"                                                            
+    def init_asset_for_render params
+        c     = self.controller_name.singularize
+        model = c.camelize.constantize
+        symb  =c.to_sym
+        params[symb].delete 'data_url'
+        params[symb].delete 'data'
+        params[symb].delete 'local_copy'
+        obj=model.new params[symb]
+        eval "@#{c.singularize} = obj"
     end
-    
+
     def url_response_code asset_url
       url = URI.parse(URI.encode(asset_url.strip))
       code=""
@@ -28,42 +28,42 @@ module Seek
           http =  Net::HTTP.new(url.host, url.port)
           http.use_ssl=true if url.scheme=="https"
           http.start do |http|
-            code = http.head(url.request_uri).code        
+            code = http.head(url.request_uri).code
           end
-        elsif (url.scheme=="ftp")        
+        elsif (url.scheme=="ftp")
           username = 'anonymous'
           password = nil
           username, password = url.userinfo.split(/:/) if url.userinfo
-          
+
           ftp = Net::FTP.new(url.host)
           ftp.login(username,password)
           ftp.getbinaryfile(url.path, '/dev/null', 20) { break }
           ftp.close
-          code="200"                       
+          code="200"
         else
-          raise Seek::IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")  
+          raise Seek::IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")
         end
       rescue Net::FTPPermError
-        code="401"       
+        code="401"
       rescue Errno::ECONNREFUSED,SocketError,Errno::EHOSTUNREACH
         #FIXME:also using 404 for uknown host, which wouldn't actually really be a http response code
         #indicating that using response codes is not the best approach here.
-        code="404" 
+        code="404"
       end
-      
+
       return code
     end
-    
+
     def test_asset_url
       c = self.controller_name.downcase
       symb= params[:symb].nil?? c.singularize.to_sym : params[:symb].to_sym
-      
+
       icon_filename=icon_filename_for_key("error")
       code=""
       msg=""
       asset_url=  params[:symb].nil?? params[symb][:data_url] : params[symb].values.first
-      begin        
-        code = url_response_code(asset_url)        
+      begin
+        code = url_response_code(asset_url)
         if code == "200"
           icon_filename=icon_filename_for_key("tick")
           msg="The URL was accessed successfully"
@@ -77,13 +77,13 @@ module Seek
           msg="Nothing was found at the URL you provided. You can test the link by opening in another window or tab:<br/><a href=#{asset_url} target='_blank'>#{asset_url}</a>"
         else
           msg="There was a problem accessing the URL. You can test the link by opening in another window or tab:<br/><a href=#{asset_url} target='_blank'>#{asset_url}</a>"
-        end        
+        end
       rescue Seek::IncompatibleProtocolException=>e
         msg = e.message
-      rescue Exception=>e        
+      rescue Exception=>e
         msg="There was a problem accessing the URL. You can test the link by opening in another window or tab:<br/><a href=#{asset_url}>#{asset_url}</a>"
       end
-      
+
       image = "<img src='/images/#{icon_filename}'/>"
       render :update do |page|
         page.replace_html "test_url_result_icon",image
@@ -100,18 +100,18 @@ module Seek
         end
       end
     end
-    
+
     def handle_data render_action_on_error=:new
       #FIXME: too many nested if,else and rescue blocks. This method needs refactoring.
-      c = self.controller_name.downcase    
+      c = self.controller_name.downcase
       symb=c.singularize.to_sym
-      
+
       if (params[symb][:data]).blank? && (params[symb][:data_url]).blank?
         flash.now[:error] = "Please select a file to upload or provide a URL to the data."
         if render_action_on_error
           init_asset_for_render params
           respond_to do |format|
-            format.html do 
+            format.html do
               render :action => render_action_on_error
             end
           end
@@ -121,8 +121,8 @@ module Seek
         flash.now[:error] = "The file that you are uploading is empty. Please check your selection and try again!"
         if render_action_on_error
           init_asset_for_render params
-          respond_to do |format|          
-            format.html do 
+          respond_to do |format|
+            format.html do
               render :action => render_action_on_error
             end
           end
@@ -144,9 +144,9 @@ module Seek
             if (code == "200")
               downloader=RemoteDownloader.new
               data_hash = downloader.get_remote_data @data_url,nil,nil,nil,make_local_copy
-              
+
               @tmp_io_object=File.open data_hash[:data_tmp_path],"r" if make_local_copy
-              
+
               params[symb][:content_type] = data_hash[:content_type]
               params[symb][:original_filename] = data_hash[:filename] if params[symb][:original_filename].blank?
             elsif (["301","302","401"].include?(code))
@@ -156,21 +156,21 @@ module Seek
               flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the URL is inaccessible."
               if render_action_on_error
                 init_asset_for_render params
-                respond_to do |format|                  
-                  format.html do 
+                respond_to do |format|
+                  format.html do
                     render :action => render_action_on_error
                   end
                 end
               end
               return false
-            end            
+            end
           end
-        rescue Seek::IncompatibleProtocolException=>e          
+        rescue Seek::IncompatibleProtocolException=>e
           flash.now[:error] = e.message
           if render_action_on_error
             init_asset_for_render params
-            respond_to do |format|            
-              format.html do 
+            respond_to do |format|
+              format.html do
                 render :action => render_action_on_error
               end
             end
@@ -180,8 +180,8 @@ module Seek
           flash.now[:error] = "Unable to read from the URL."
           if render_action_on_error
             init_asset_for_render params
-            respond_to do |format|            
-              format.html do 
+            respond_to do |format|
+              format.html do
                 render :action => render_action_on_error
               end
             end
@@ -190,7 +190,7 @@ module Seek
         end
         params[symb].delete 'data_url'
         params[symb].delete 'data'
-        params[symb].delete 'local_copy' 
+        params[symb].delete 'local_copy'
         return true
       end
     end
