@@ -68,5 +68,7 @@ module SEEK
 
     config.middleware.use Rack::Deflater
 
+    config.exceptions_app = self.routes
+
   end
 end

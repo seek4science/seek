@@ -19,6 +19,9 @@ class ApplicationController < ActionController::Base
   include AuthenticatedSystem
 
   around_filter :with_current_user
+
+  rescue_from "ActionController::RoutingError", :with=>:render_routing_error
+
   def with_current_user
     User.with_current_user current_user do
         yield

@@ -475,11 +475,13 @@ SEEK::Application.routes.draw do
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
 
-  get "errors/error_422"
-
-  get "errors/error_404"
-
-  get "errors/error_500"
+  #error rendering
+  match "/404" => "errors#error_404"
+  match "/422" => "errors#error_422"
+  match "/500" => "errors#error_500"
+  #get "errors/error_422"
+  #get "errors/error_404"
+  #get "errors/error_500"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
