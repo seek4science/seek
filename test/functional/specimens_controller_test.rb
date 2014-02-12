@@ -277,4 +277,74 @@ test "should update genotypes and phenotypes" do
     assert associated_sops.empty?
   end
 
+  test "filter by sample using nested routes" do
+    assert_routing "samples/5/specimens",{controller:"specimens",action:"index",sample_id:"5"}
+    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+
+    refute_nil sample1.specimen
+    refute_equal sample1.specimen,sample2.specimen
+
+    get :index,sample_id:sample1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(sample1.specimen),:text=>sample1.specimen.title
+      assert_select "p > a[href=?]",specimen_path(sample2.specimen),:text=>sample2.specimen.title,:count=>0
+    end
+  end
+
+  test "filter by project using nested routes" do
+    assert_routing "projects/4/specimens",{controller:"specimens",action:"index",project_id:"4"}
+    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+
+    refute_empty sample1.specimen.projects
+    refute_empty sample2.specimen.projects
+    assert_equal sample1.specimen.projects.count,sample2.specimen.projects.count
+    refute_equal sample1.specimen.projects,sample2.specimen.projects
+
+    get :index,project_id:sample1.specimen.projects.first.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(sample1.specimen),:text=>sample1.specimen.title
+      assert_select "p > a[href=?]",specimen_path(sample2.specimen),:text=>sample2.specimen.title,:count=>0
+    end
+  end
+
+  test "filter by strain using nested routes" do
+    assert_routing "strains/4/specimens",{controller:"specimens",action:"index",strain_id:"4"}
+    spec1 = Factory(:specimen,:policy=>Factory(:public_policy))
+    spec2 = Factory(:specimen,:policy=>Factory(:public_policy))
+
+    refute_nil spec1.strain
+    refute_nil spec2.strain
+    refute_equal spec1.strain,spec2.strain
+
+    get :index,strain_id:spec1.strain.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(spec1),:text=>spec1.title
+      assert_select "p > a[href=?]",specimen_path(spec2),:text=>spec2.title,:count=>0
+    end
+  end
+
+  test "filter by institution using nested routes" do
+    assert_routing "institutions/8/specimens",{controller:"specimens",action:"index",institution_id:"8"}
+    spec1 = Factory(:specimen,:policy=>Factory(:public_policy))
+    spec2 = Factory(:specimen,:policy=>Factory(:public_policy))
+
+    refute_nil spec1.institution
+    refute_nil spec2.institution
+    refute_equal spec1.institution,spec2.institution
+
+    get :index,institution_id:spec1.institution.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(spec1),:text=>spec1.title
+      assert_select "p > a[href=?]",specimen_path(spec2),:text=>spec2.title,:count=>0
+    end
+  end
+
+
+
 end

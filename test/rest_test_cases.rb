@@ -69,7 +69,8 @@ module RestTestCases
     return true,""    
   end  
   
-  def validate_xml_against_schema(xml,schema=SCHEMA_FILE_PATH)       
+  def validate_xml_against_schema(xml,schema=SCHEMA_FILE_PATH)
+    skip("currently skipping REST API schema check") if skip_rest_schema_check?
     document = LibXML::XML::Document.string(xml)
     schema = LibXML::XML::Schema.new(schema)
     result = true

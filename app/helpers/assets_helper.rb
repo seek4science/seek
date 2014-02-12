@@ -35,20 +35,20 @@ module AssetsHelper
 
   def text_for_resource resource_or_text
     if resource_or_text.is_a?(String)
-      text = resource_or_text
+      text = resource_or_text.underscore.humanize
     else
       resource_type = resource_or_text.class.name
       if resource_or_text.is_a?(Assay)
         text = resource_or_text.is_modelling? ? t("assays.modelling_analysis") : t("assays.assay")
       elsif resource_or_text.is_a?(Specimen)
         text = t('biosamples.sample_parent_term')
-      elsif !translate_resource_type(resource_type).include?("translation missing")
-        text = translate_resource_type(resource_type)
+      elsif !(translated = translate_resource_type(resource_type)).include?("translation missing")
+        text = translated
       else
-        text = resource_type
+        text = resource_type.underscore.humanize
       end
     end
-    text.underscore.humanize
+    text
   end
 
   def resource_version_selection versioned_resource, displayed_resource_version
@@ -193,7 +193,7 @@ module AssetsHelper
 
   def collect_related_items(resource)
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-               "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {}}
+               "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {}, "Strain" => {}}
 
     related.each_key do |key|
       related[key][:items] = []
@@ -220,12 +220,6 @@ module AssetsHelper
       end
     end
     related
-  end
-
-  def filter_url(resource_type, context_resource)
-    #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"
-    filter_text = "(:filter => {:#{context_resource.class.name.downcase} => #{context_resource.id}},:page=>'all')"
-    eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
   #provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view

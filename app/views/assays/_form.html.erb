@@ -73,7 +73,7 @@
   </tr>
   <tr>
 
-    <td style="width:50%"><%= assay_type_select_tag f,"assay_type_uri",(@assay.assay_type_uri),{:style=>"width:100%"} %></td>
+    <td style="width:50%"><%= assay_type_select_tag f,@assay.is_modelling?,"assay_type_uri",(@assay.assay_type_uri),{:style=>"width:100%"} %></td>
     <% unless @assay.is_modelling? -%>
       <td style="width:50%"><%= technology_type_select_tag f,"technology_type_uri",(@assay.technology_type_uri),{:style=>"width:100%"} %></td>
     <% end -%>
