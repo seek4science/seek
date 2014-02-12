@@ -416,9 +416,14 @@ class ApplicationController < ActionController::Base
     params.keys.each do |key|
       if (key.end_with?("_id"))
         filters[key.gsub("_id","")]=params[key]
-        params[:page]="all"
       end
     end
+
+    if filters.size>0
+      params[:page]||="all"
+      params[:filtered]=true
+    end
+
     #apply_filters will be dispatching to methods based on the symbols in params[:filter].
     #Permitted filters protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
     filters.delete_if {|k,v| not (permitted_filters.include? k.to_s) }
