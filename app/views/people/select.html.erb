@@ -1,19 +1,15 @@
-<center>
-  <div id="profile_select" style="width: 700px; margin-top: 0.5em;">
+<%= javascript_include_tag 'profile_project_selection' -%>
 
-    <div class="show_basic">
-      <div id="profile_selection">
-        <%= render :partial=>"registration_profile_selection" -%>
-      </div>
-
-      <div id="profile_creation" style="display:none">
-        <%= render :partial=>"registration_profile_creation" %>
-
-      </div>
-
+<div id="profile_select">
+  <div class="show_basic">
+    <div id="profile_selection">
+      <%= render :partial => "registration_profile_selection" -%>
+    </div>
+    <div id="profile_creation" style="display:none">
+      <%= render :partial => "registration_profile_creation" %>
     </div>
   </div>
-</center>
+</div>
 
 <% if @userless_projects.blank? || !error_messages_for(:person).empty? %>
   <script type="text/javascript">
