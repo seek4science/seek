@@ -48,7 +48,7 @@
           <%= render :partial=>"data_files/studied_factors" -%>
         </p>
     <% end %>
-    <%= render :partial=>"data_files/vl_samples_info" -%>
+    <%= render(:partial=>"data_files/vl_samples_info") if Seek::Config.is_virtualliver -%>
   </div>
 
 
