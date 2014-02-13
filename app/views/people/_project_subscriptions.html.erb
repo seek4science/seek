@@ -2,7 +2,7 @@
   <div class="foldTitle">
     Subscriptions
   </div>
-  <div class="foldContent">
+  <div class="foldContent" style="display:none">
     Here is the list of <%= t('project').pluralize %> you are subscribed to:
     <% project_subscriptions = person.project_subscriptions.uniq %>
     <% if project_subscriptions.empty? %>
