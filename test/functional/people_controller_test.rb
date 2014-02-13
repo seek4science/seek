@@ -30,7 +30,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     test_get_rest_api_xml p
 
-    doc = LibXML::XML::Document.string(@response.body)
+    doc = LibXML::XML::Document.string(@responMse.body)
     doc.root.namespaces.default_prefix="s"
     assert_equal 2, doc.find("//s:tags/s:tag[@context='expertise']").count
     assert_equal 1,doc.find("//s:tags/s:tag[@context='tool']").count
