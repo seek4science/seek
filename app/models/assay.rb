@@ -28,15 +28,15 @@ class Assay < ActiveRecord::Base
 
   belongs_to :institution
   has_and_belongs_to_many :samples
-  #belongs_to :assay_type
-  #belongs_to :technology_type
-  belongs_to :study  
+  belongs_to :assay_type
+  belongs_to :technology_type
+  belongs_to :study
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
   has_many :assay_organisms, :dependent=>:destroy
   has_many :organisms, :through=>:assay_organisms
   has_many :strains, :through=>:assay_organisms
-#  has_many :tissue_and_cell_types,:through => :assay_organisms
+  has_many :tissue_and_cell_types,:through => :assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
 

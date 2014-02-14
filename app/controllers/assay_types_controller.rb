@@ -3,9 +3,9 @@ class AssayTypesController < ApplicationController
   before_filter :check_allowed_to_manage_types, :except=>[:show,:index]
   before_filter :find_ontology_class, :only=>[:show]
   before_filter :find_and_authorize_assays, :only=>[:show]
+  before_filter :check_allowed_to_edit_types, :only=> [:edit]
 
   def show
-    @assay_type = AssayType.find(params[:id])
     respond_to do |format|
       format.html
       format.xml
@@ -48,14 +48,12 @@ class AssayTypesController < ApplicationController
   end
   
   def create
-    @assay_type = AssayType.new(params[:assay_type].reject{|k,v|k=='parent_id'})
-    @assay_type.parents = params[:assay_type][:parent_id].collect {|p_id| AssayType.find_by_id(p_id)}
-    #@assay_type.owner=current_user.person    
-    
+    @assay_type = AssayType.new(params[:assay_type])
+
 
       if @assay_type.save
         if @assay_type.parent_name == 'assay'
-          render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@assay_type,:parent=>@assay_type.parent_name}
+          render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@assay_type,:parent=>@assay_type.parent_name,:child_list_id=> "assay_assay_type_uri" }
         else
          respond_to do |format|
           flash[:notice] = "#{t('assays.assay')} type was successfully created."
@@ -76,10 +74,8 @@ class AssayTypesController < ApplicationController
     @assay_type=AssayType.find(params[:id])
 
     respond_to do |format|
-      if @assay_type.update_attributes(:title => params[:assay_type][:title])
-        unless params[:assay_type][:parent_id] == @assay_type.parents.collect {|par| par.id}
-          @assay_type.parents = params[:assay_type][:parent_id].collect {|p_id| AssayType.find_by_id(p_id)}
-        end
+      if @assay_type.save
+
         flash[:notice] = "#{t('assays.assay')} type was successfully updated."
         format.html { redirect_to(:action => 'manage') }
         format.xml  { head :ok }
@@ -139,6 +135,12 @@ class AssayTypesController < ApplicationController
     end
   end
 
+  def check_allowed_to_edit_types
+    @assay_type=AssayType.find(params[:id])
+    if !@assay_type.source_path.blank?
+       flash.now[:error] = "It cannot be edited, as it is extracted from external ontology!"
+    end
+  end
   
   
 end
