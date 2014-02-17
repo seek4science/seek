@@ -1210,5 +1210,40 @@ end
     end
   end
 
+  test "assays filtered by strain through nested route" do
+    assert_routing "strains/3/assays",{controller:"assays",action:"index",strain_id:"3"}
+    ao1 = Factory(:assay_organism,:assay=>Factory(:assay,:policy=>Factory(:public_policy)))
+    ao2 = Factory(:assay_organism,:assay=>Factory(:assay,:policy=>Factory(:public_policy)))
+    strain1 = ao1.strain
+    strain2 = ao2.strain
+    assay1=ao1.assay
+    assay2=ao2.assay
+
+    refute_nil strain1
+    refute_nil strain2
+    refute_equal strain1,strain2
+    refute_nil assay1
+    refute_nil assay2
+    refute_equal assay1,assay2
+
+    assert_include assay1.strains,strain1
+    assert_include assay2.strains,strain2
+
+    assert_include strain1.assays,assay1
+    assert_include strain2.assays,assay2
+
+    assert strain1.can_view?
+    assert strain2.can_view?
+
+    get :index,strain_id:strain1.id
+    assert_response :success
+
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]",assay_path(assay1),:text=>assay1.title
+      assert_select "a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+    end
+
+  end
+
 
 end

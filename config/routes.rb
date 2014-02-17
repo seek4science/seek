@@ -405,7 +405,7 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
-    resources :specimens
+    resources :specimens,:assays,:people,:projects
   end
 
   resources :biosamples do
