@@ -290,11 +290,11 @@ GEM
       treetop (~> 1.4.8)
     method_source (0.8.2)
     mime-types (1.25.1)
-    minitest (5.2.3)
-    minitest-reporters (1.0.1)
+    minitest (4.7.5)
+    minitest-reporters (0.14.24)
       ansi
       builder
-      minitest (>= 5.0)
+      minitest (>= 2.12, < 5.0)
       powerbar
     modporter-plugin (0.1.0)
     multi_json (1.8.4)
@@ -529,7 +529,7 @@ DEPENDENCIES
   jquery-rails (~> 3.0.4)
   libxml-ruby (= 2.6.0)
   linkeddata
-  minitest-reporters (>= 0.4.1)
+  minitest-reporters (~> 0.14)
   modporter-plugin
   my_annotations!
   my_rails_settings!

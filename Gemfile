@@ -93,7 +93,7 @@ group :test do
   gem "sqlite3","1.3.7"
   gem "ruby-prof"
   gem "webmock"
-  gem 'minitest-reporters','>= 0.4.1'
+  gem 'minitest-reporters','~> 0.14'
 end
 
 group :assets do
