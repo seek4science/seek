@@ -9,7 +9,7 @@ class WorkflowsController < ApplicationController
   include AssetsCommonExtension
 
   before_filter :find_and_filter_workflows, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :preview ]
+  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview ]
   before_filter :find_display_asset, :only=>[:show, :download, :run]
   before_filter :check_runs_before_destroy, :only => :destroy
 

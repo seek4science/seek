@@ -28,3 +28,6 @@
 //= require folds
 //= require tabber-minimized
 //= require detect_browser
+//= require easytabs
+//= require sweeps
+//= require taverna_player/application
