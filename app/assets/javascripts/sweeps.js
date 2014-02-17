@@ -1,3 +1,5 @@
+var $j = jQuery.noConflict();
+
 var fixed_prefixes = {
   name_prefix: "sweep[shared_input_values_for_all_runs][inputs_attributes][{{input_number}}]",
   id_prefix: "sweep_shared_input_values_for_all_runs_inputs_attributes_{{input_number}}"
