@@ -758,6 +758,28 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test "projects filtered by strain using nested routes" do
+    assert_routing "strains/2/projects",{controller:"projects",action:"index",strain_id:"2"}
+    strain1=Factory(:strain,:policy=>Factory(:public_policy))
+    strain2=Factory(:strain,:policy=>Factory(:public_policy))
+    project1 = strain1.projects.first
+    project2 = strain2.projects.first
+    refute_empty strain1.projects
+    refute_empty strain2.projects
+    refute_equal project1,project2
+
+    assert_include project1.strains,strain1
+    assert_include project2.strains,strain2
+
+    get :index,strain_id:strain1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(strain1.projects.first),:text=>strain1.projects.first.title
+      assert_select "p > a[href=?]",project_path(strain2.projects.first),:text=>strain2.projects.first.title,:count=>0
+    end
+
+  end
+
 
 	private
 
