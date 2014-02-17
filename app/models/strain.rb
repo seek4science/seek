@@ -2,25 +2,8 @@ require 'grouped_pagination'
 require 'acts_as_cached_tree'
 
 class Strain < ActiveRecord::Base
+
   include Seek::Rdf::RdfGeneration
-
-  belongs_to :organism
-  has_many :genotypes
-  has_many :phenotypes
-  accepts_nested_attributes_for :genotypes,:allow_destroy=>true
-  accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
-  has_many :specimens
-
-  has_many :assay_organisms
-  has_many :assays,:through=>:assay_organisms
-
-  before_destroy :destroy_genotypes_phenotypes
-  scope :by_title
-
-  validates_presence_of :title, :organism
-
-  scope :without_default,where(:is_dummy=>false)
-
   include ActsAsCachedTree
   include Subscribable
   acts_as_authorized
@@ -28,12 +11,28 @@ class Strain < ActiveRecord::Base
   acts_as_favouritable
   acts_as_annotatable :name_field=>:title
   include Seek::Taggable
+  grouped_pagination
 
+  belongs_to :organism
+  has_many :genotypes
+  has_many :phenotypes
+  has_many :specimens
+  has_many :assay_organisms
+  has_many :assays,:through=>:assay_organisms
+
+  before_destroy :destroy_genotypes_phenotypes
+  scope :by_title
+
+  scope :without_default,where(:is_dummy=>false)
+
+
+  accepts_nested_attributes_for :genotypes,:allow_destroy=>true
+  accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
+
+  validates_presence_of :title, :organism
   validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
 
   scope :default_order, order("title")
-
-  grouped_pagination
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
       text :searchable_terms
