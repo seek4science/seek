@@ -1,23 +1,23 @@
-<%= javascript_include_tag "people.js" %>
+<%= javascript_include_tag "people" %>
 <%= f.error_messages %>
 <h2>Personal Information & Contact Details</h2>
 <table style="width: 100%;" class="box_simple">
     <tr>
         <td style="width: 45%;">
-            <center>
+
                 <div style="width: 90%;">
                     <p>
-                        <%= f.label :first_name -%>
+                        <%= f.label :first_name -%><span class="required">*</span>
                         <br/>
                         <%= f.text_field :first_name, :style => "width: 100%;" -%>
                     </p>
                     <p>
-                        <%= f.label :last_name %>
+                        <%= f.label :last_name %><span class="required">*</span>
                         <br/>
                         <%= f.text_field :last_name, :style => "width: 100%;" %>
                     </p>
                     <p>
-                        <%= f.label :email %>
+                        <%= f.label :email %><span class="required">*</span>
                         <br/>
                         <%= f.text_field :email, :style => "width: 100%;" %>
                     </p>
@@ -30,10 +30,10 @@
                     </p>
 
                 </div>
-            </center>
+
         </td>
         <td style="width: 45%;">
-            <center>
+
                 <div style="width: 90%">
                     <p>
                         <%= f.label :phone %>
@@ -51,7 +51,7 @@
                         <%= f.text_field :web_page, :style => "width: 100%;" %>
                     </p>
                 </div>
-            </center>
+
         </td>
     </tr>
 </table>

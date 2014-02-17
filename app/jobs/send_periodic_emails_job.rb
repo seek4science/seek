@@ -1,6 +1,11 @@
 class SendPeriodicEmailsJob < Struct.new(:frequency)
   DEFAULT_PRIORITY=3
 
+  def before(job)
+    #make sure the SMTP configuration is in sync with current SEEK settings
+    Seek::Config.smtp_propagate
+  end
+
   def perform
     next_run_at = Time.new
     logs = []

@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js",  "resource.js" %>
+
 <%= f.error_messages -%>
 
 <%= f.hidden_field :create_from_asset %>
@@ -16,7 +16,9 @@
   </p>
 
     <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation} -%><br/>
-
+  <% if show_scales? %>
+      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} %>
+  <% end %>
   <p>
     <%= render :partial=>"assets/sharing_form" if @investigation.can_manage? -%>
   </p>

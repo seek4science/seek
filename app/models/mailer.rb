@@ -1,7 +1,5 @@
 class Mailer < ActionMailer::Base
 
-  default :from=>Seek::Config.noreply_sender
-
   def feedback user,topic,details,send_anonymously,base_host
     @anon = send_anonymously
     @anon = true if user.try(:person).nil?
@@ -11,7 +9,10 @@ class Mailer < ActionMailer::Base
     @person=user.try(:person)
     @host=base_host
     reply_to=user.person.email_with_name unless @anon
-    mail(:to=>admin_emails,:subject=>"#{Seek::Config.application_name} Feedback provided - #{topic}",:reply_to=>reply_to)
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>admin_emails,
+         :subject=>"#{Seek::Config.application_name} Feedback provided - #{topic}",
+         :reply_to=>reply_to)
 
   end
 
@@ -20,7 +21,9 @@ class Mailer < ActionMailer::Base
     @uploader=uploader.person
     @receiver=receiver
     @data_file=file
-    mail(:to=>[uploader.person.email_with_name,receiver.email_with_name],:subject=>"#{Seek::Config.application_name} - File Upload",
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>[uploader.person.email_with_name,receiver.email_with_name],
+         :subject=>"#{Seek::Config.application_name} - File Upload",
          :reply_to=>uploader.person.email_with_name)
   end
 
@@ -29,7 +32,9 @@ class Mailer < ActionMailer::Base
     @publisher=publisher
     @resources=resources
     @host=base_host
-    mail(:to=>owner.email_with_name,:reply_to=>publisher.email_with_name,
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>owner.email_with_name,
+         :reply_to=>publisher.email_with_name,
          :subject=>"A #{Seek::Config.application_name} member requests you make some items public")
   end
 
@@ -38,7 +43,9 @@ class Mailer < ActionMailer::Base
     @requester=user.person
     @resources=resources
     @host=base_host
-    mail(:to=>gatekeeper.email_with_name,:reply_to=>user.person.email_with_name,
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>gatekeeper.email_with_name,
+         :reply_to=>user.person.email_with_name,
          :subject=>"A #{Seek::Config.application_name} member requested your approval to publish some items.")
   end
 
@@ -47,7 +54,9 @@ class Mailer < ActionMailer::Base
     @requester=requester
     @items_and_comments=items_and_comments
     @host=base_host
-    mail(:to=>requester.email_with_name,:subject=>"A #{Seek::Config.application_name} gatekeeper approved your publishing requests.")
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>requester.email_with_name,
+         :subject=>"A #{Seek::Config.application_name} gatekeeper approved your publishing requests.")
 
   end
 
@@ -57,7 +66,10 @@ class Mailer < ActionMailer::Base
     @items_and_comments=items_and_comments
     @host=base_host
 
-    mail(:to => requester.email_with_name, :subject => "A #{Seek::Config.application_name} gatekeeper rejected your publishing requests.", :reply_to => gatekeeper.email_with_name)
+    mail(:from=>Seek::Config.noreply_sender,
+         :to => requester.email_with_name,
+         :subject => "A #{Seek::Config.application_name} gatekeeper rejected your publishing requests.",
+         :reply_to => gatekeeper.email_with_name)
   end
 
   def request_resource(user,resource,details,base_host)
@@ -66,7 +78,9 @@ class Mailer < ActionMailer::Base
     @resource=resource
     @details=details
     @host=base_host
-    mail(:to=>resource.managers.collect{|m| m.email_with_name},:reply_to=>user.person.email_with_name,
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>resource.managers.collect{|m| m.email_with_name},
+         :reply_to=>user.person.email_with_name,
          :subject=>"A #{Seek::Config.application_name} member requested a protected file: #{resource.title}")
   end
 
@@ -77,7 +91,9 @@ class Mailer < ActionMailer::Base
     @admins=admins
     @activation_code=user.activation_code
     @host=base_host
-    mail(:to=>user.person.email_with_name,:subject=>"#{Seek::Config.application_name} account activation")
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>user.person.email_with_name,
+         :subject=>"#{Seek::Config.application_name} account activation")
   end
 
   def forgot_password(user,base_host)
@@ -85,21 +101,27 @@ class Mailer < ActionMailer::Base
     @name=user.person.name
     @reset_code=user.reset_password_code
     @host=base_host
-    mail(:to=>user.person.email_with_name, :subject=>"#{Seek::Config.application_name} - Password reset")
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>user.person.email_with_name,
+         :subject=>"#{Seek::Config.application_name} - Password reset")
   end
 
   def welcome(user,base_host)
     @name = user.person.name
     @person = user.person
     @host = base_host
-    mail(:to=>user.person.email_with_name,:subject=>"Welcome to #{Seek::Config.application_name}")
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>user.person.email_with_name,
+         :subject=>"Welcome to #{Seek::Config.application_name}")
   end
   
   def welcome_no_projects(user,base_host)
     @name = user.person.name
     @person = user.person
     @host = base_host
-    mail(:to=>user.person.email_with_name,:subject=>"Welcome to #{Seek::Config.application_name}")
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>user.person.email_with_name,
+         :subject=>"Welcome to #{Seek::Config.application_name}")
   end
 
   def contact_admin_new_user_no_profile(details,user,base_host)
@@ -107,8 +129,10 @@ class Mailer < ActionMailer::Base
     @person = user.person
     @user = user
     @host = base_host
-    mail(:to=>admin_emails,:reply_to=>user.person.email_with_name,
-      :subject=>"#{Seek::Config.application_name} member signed up")
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>admin_emails,
+         :reply_to=>user.person.email_with_name,
+         :subject=>"#{Seek::Config.application_name} member signed up")
 
   end
 
@@ -118,7 +142,9 @@ class Mailer < ActionMailer::Base
     @person = user.person
     @user = user
     @host = base_host
-    mail(:to=>project_manager_email(project_manager),:reply_to=>user.person.email_with_name,
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>project_manager_email(project_manager),
+         :reply_to=>user.person.email_with_name,
          :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} which you are #{I18n.t('project').downcase} manager")
   end
 
@@ -127,7 +153,9 @@ class Mailer < ActionMailer::Base
     @person = user.person
     @host = base_host
     subject_text = (harvester_responses.size > 1) ? 'New resources registered with SEEK' : 'New resource registered with SEEK'
-    mail(:to=>user.person.email_with_name,:subject=>subject_text)
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>user.person.email_with_name,
+         :subject=>subject_text)
   end
   
   def announcement_notification(site_announcement, notifiee_info,base_host)
@@ -135,11 +163,15 @@ class Mailer < ActionMailer::Base
     @site_announcement  = site_announcement
     @notifiee_info = notifiee_info
     @host = base_host
-    mail(:to=>notifiee_info.notifiee.email_with_name,:subject=>"#{Seek::Config.application_name} Announcement: #{site_announcement.title}")
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>notifiee_info.notifiee.email_with_name,
+         :subject=>"#{Seek::Config.application_name} Announcement: #{site_announcement.title}")
   end
 
   def test_email testing_email
-    mail(:to=>testing_email,:subject=>"SEEK Configuration Email Test")
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>testing_email,
+         :subject=>"SEEK Configuration Email Test")
   end
 
   private

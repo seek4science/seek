@@ -5,13 +5,14 @@
 </ul>
 
 <div class="show_basic">
+  <%= item_description @event.description -%>
   <div class="main_content_left_box">
 
       <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event}%>
       <% unless @event.contributor.nil? then %>
           <p>
             <label>Created by:</label>
-            <%= link_to h(@event.contributor.person.name), @event.contributor.person -%>
+            <%= link_to @event.contributor.person.name, @event.contributor.person -%>
           </p>
       <% end %>
       <p>
@@ -50,7 +51,7 @@
 
   <div style="clear:both;">
     <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
-    <%= item_description @event.description -%>
+
 
     <%= render :partial=>"general/items_related_to",:object => @event %>
 

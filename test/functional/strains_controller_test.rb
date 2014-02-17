@@ -6,6 +6,7 @@ class StrainsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
 
   def setup
     login_as :owner_of_fully_public_policy
@@ -190,5 +191,40 @@ class StrainsControllerTest < ActionController::TestCase
     updated_strain = Strain.find_by_id strain.id
     assert updated_strain.policy.permissions.empty?
     assert !updated_strain.can_manage?(user)
+  end
+
+  test "strains filtered by assay through nested route" do
+    assert_routing "assays/5/strains",{controller:"strains",action:"index",assay_id:"5"}
+    ao1 = Factory(:assay_organism,:strain=>Factory(:strain,:policy=>Factory(:public_policy)))
+    ao2 = Factory(:assay_organism,:strain=>Factory(:strain,:policy=>Factory(:public_policy)))
+    strain1 = ao1.strain
+    strain2 = ao2.strain
+    assay1=ao1.assay
+    assay2=ao2.assay
+
+    refute_nil strain1
+    refute_nil strain2
+    refute_equal strain1,strain2
+    refute_nil assay1
+    refute_nil assay2
+    refute_equal assay1,assay2
+
+    assert_include assay1.strains,strain1
+    assert_include assay2.strains,strain2
+
+    assert_include strain1.assays,assay1
+    assert_include strain2.assays,assay2
+
+    assert strain1.can_view?
+    assert strain2.can_view?
+
+    get :index,assay_id:assay1.id
+    assert_response :success
+
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]",strain_path(strain1),:text=>strain1.title
+      assert_select "a[href=?]",strain_path(strain2),:text=>strain2.title,:count=>0
+    end
+
   end
 end

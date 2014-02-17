@@ -1,5 +1,3 @@
-<%= javascript_include_tag "sharing.js", "assays.js","attribution.js","resource.js" %>
-
 <% current_user_authorized_to_manage = @sop.can_manage? -%>
 
 <h1>Editing <%= t('sop') %>: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
@@ -22,12 +20,16 @@
         <% if current_user_authorized_to_manage -%>
             <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :disable_project_select => true } -%>
         <% end -%>
+
+      <% if show_scales? %>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} %>
+      <% end %>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
-        <%= f.fancy_multiselect :samples, {:hidden=> @sop.samples.blank?  ? true : false, :other_projects_checkbox => true} -%>
+          <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@sop} %>
         <% end -%>
         <p>
           <%= preview_permission_popup_link(@sop)-%>

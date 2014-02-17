@@ -252,7 +252,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "to rdf" do
-    df=Factory :data_file, :assay_ids=>[Factory(:assay,:technology_type=>Factory(:technology_type)).id,Factory(:assay).id]
+    df=Factory :data_file, :assay_ids=>[Factory(:assay,:technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type").id,Factory(:assay).id]
     pub = Factory :publication
     Factory :relationship,:subject=>df,:predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
     df.reload

@@ -20,36 +20,25 @@ module MenuHelper
 
         {:title=>t("menu.assets"),:sections=>[
             {:controller=>"data_files",:title=>t("data_file").pluralize},
-            {:controller=>"models", :title=>t("model").pluralize},
+            {:controller=>"models", :title=>t("model").pluralize,:hide=>!Seek::Config.models_enabled},
             {:controller=>"sops", :title=>t("sop").pluralize},
             {:controller=>"publications", :title=>"Publications"},
-            {:controller=>"biosamples",:title=>"Biosamples"}
+            {:controller=>"biosamples",:title=>"Biosamples",:hide=>!Seek::Config.biosamples_enabled}
         ]},
         {:title=>t("menu.activities"),:sections=>[
             {:controller=>"presentations",:title=>t("presentation").pluralize},
-            {:controller=>"events", :title=>t("event").pluralize},
+            {:controller=>"events", :title=>t("event").pluralize, :hide => !Seek::Config.events_enabled},
+            {:controller=>"forums", :title => "Forums", :hide => !Seek::Config.forum_enabled}
         ]},
         ]
+
     if show_scales?
       scales_menu = {:title=>t("scale").pluralize,:sections=>[]}
       scales_menu[:sections] << {:path=>scales_path,:title=>"Browse #{t("scale").pluralize}"}
       definitions << scales_menu
     end
-    if logged_in_and_registered?
-      account_menu = {:title=>t("menu.account"),:spacer=>true,:sections=>[]}
 
-      account_menu[:sections] << {:path=>person_path(User.current_user.person),:title=>"Your profile"}
-
-      account_menu[:sections] << {:path=>admin_path,:title=>t("menu.admin")} if admin_logged_in?
-
-      account_menu[:sections] << {:path=>feedback_home_path(),:title=>t("menu.feedback")} if Seek::Config.email_enabled
-
-      account_menu[:sections] << {:path=>"/logout",:title=>"Logout",:options=>{:confirm=>"Are you sure you wish to logout?"}}
-
-      definitions << account_menu
-    end
-
-    definitions << {:title=>t("menu.documentation"),:spacer=>true, :sections=>[
+    definitions << {:title=>t("menu.documentation"),:spacer=>true, :hide=>!Seek::Config.documentation_enabled,:sections=>[
         {:controller=>"help_documents",:title=>t("menu.help")},
         {:path=>"/help/faq",:title=>t("menu.faq")},
         {:path=>"/help/templates",:title=>t("menu.jerm_templates")},
@@ -60,8 +49,7 @@ module MenuHelper
 
   def top_level_menu_tabs definitions
     selected_tab = current_top_level_tab(definitions)
-    definitions.collect do |menu|
-
+    definitions.select{|d| !d[:hide]}.collect do |menu|
       attributes = ""
       attributes << "id = 'selected_tabnav'" if selected_tab == menu
       attributes << " class='spacer_before'" if menu[:spacer]
@@ -83,20 +71,22 @@ module MenuHelper
     sections||=[]
     selected_section = current_second_level_section sections
     sections.collect do |section|
-      c = section[:controller]
-      path = section[:path]
-      title = section[:title]
-      title ||= c.capitalize
+      unless section[:hide]
+        c = section[:controller]
+        path = section[:path]
+        title = section[:title]
+        title ||= c.capitalize
 
-      path = section[:path] || eval("#{c}_path")
-      options = section[:options] || {}
-      options[:class]="curved"
-      link = link_to title, path,options
-      classes="curved"
-      classes << " selected_menu" if section == selected_section
-      attributes = "class='#{classes}'"
+        path = section[:path] || eval("#{c}_path")
+        options = section[:options] || {}
+        options[:class]="curved"
+        link = link_to title, path,options
+        classes="curved"
+        classes << " selected_menu" if section == selected_section
+        attributes = "class='#{classes}'"
 
-      "<li #{attributes}>#{link}</li>"
+        "<li #{attributes}>#{link}</li>"
+      end
     end.join("").html_safe
   end
 

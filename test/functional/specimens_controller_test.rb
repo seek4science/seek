@@ -6,6 +6,7 @@ class SpecimensControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
 
   def setup
     login_as :owner_of_fully_public_policy
@@ -267,32 +268,83 @@ test "should update genotypes and phenotypes" do
     assert_equal 1, associated_sops.size
     assert_equal sop, associated_sops.first
 
-    put :update, :id => specimen.id, :specimen_sop_ids => []
+    assert_difference("SopSpecimen.count",-1) do
+      put :update, :id => specimen.id, :specimen_sop_ids => []
+    end
+
     specimen.reload
     associated_sops = specimen.sop_masters.collect(&:sop)
     assert associated_sops.empty?
-    #sop_master can not be deleted because no specified version
-    assert_not_nil SopSpecimen.find_by_id(sop_master.id)
   end
 
-  test 'should not unassociate private sops' do
-    sop = Factory(:sop, :policy => Factory(:public_policy))
-    specimen = Factory(:specimen)
-    login_as specimen.contributor
-    specimen.sop_masters << SopSpecimen.create!(:sop_id => sop.id, :sop_version => 1, :specimen_id => specimen.id)
-    associated_sops = specimen.sop_masters.collect(&:sop)
-    specimen.reload
-    assert_equal 1, associated_sops.size
-    assert_equal sop, associated_sops.first
+  test "filter by sample using nested routes" do
+    assert_routing "samples/5/specimens",{controller:"specimens",action:"index",sample_id:"5"}
+    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
 
-    disable_authorization_checks do
-      sop.policy = Factory(:private_policy)
-      sop.save
+    refute_nil sample1.specimen
+    refute_equal sample1.specimen,sample2.specimen
+
+    get :index,sample_id:sample1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(sample1.specimen),:text=>sample1.specimen.title
+      assert_select "p > a[href=?]",specimen_path(sample2.specimen),:text=>sample2.specimen.title,:count=>0
     end
-
-    put :update, :id => specimen.id, :specimen_sop_ids => []
-    specimen.reload
-    assert_equal 1, associated_sops.size
-    assert_equal sop, associated_sops.first
   end
+
+  test "filter by project using nested routes" do
+    assert_routing "projects/4/specimens",{controller:"specimens",action:"index",project_id:"4"}
+    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+
+    refute_empty sample1.specimen.projects
+    refute_empty sample2.specimen.projects
+    assert_equal sample1.specimen.projects.count,sample2.specimen.projects.count
+    refute_equal sample1.specimen.projects,sample2.specimen.projects
+
+    get :index,project_id:sample1.specimen.projects.first.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(sample1.specimen),:text=>sample1.specimen.title
+      assert_select "p > a[href=?]",specimen_path(sample2.specimen),:text=>sample2.specimen.title,:count=>0
+    end
+  end
+
+  test "filter by strain using nested routes" do
+    assert_routing "strains/4/specimens",{controller:"specimens",action:"index",strain_id:"4"}
+    spec1 = Factory(:specimen,:policy=>Factory(:public_policy))
+    spec2 = Factory(:specimen,:policy=>Factory(:public_policy))
+
+    refute_nil spec1.strain
+    refute_nil spec2.strain
+    refute_equal spec1.strain,spec2.strain
+
+    get :index,strain_id:spec1.strain.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(spec1),:text=>spec1.title
+      assert_select "p > a[href=?]",specimen_path(spec2),:text=>spec2.title,:count=>0
+    end
+  end
+
+  test "filter by institution using nested routes" do
+    assert_routing "institutions/8/specimens",{controller:"specimens",action:"index",institution_id:"8"}
+    spec1 = Factory(:specimen,:policy=>Factory(:public_policy))
+    spec2 = Factory(:specimen,:policy=>Factory(:public_policy))
+
+    refute_nil spec1.institution
+    refute_nil spec2.institution
+    refute_equal spec1.institution,spec2.institution
+
+    get :index,institution_id:spec1.institution.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",specimen_path(spec1),:text=>spec1.title
+      assert_select "p > a[href=?]",specimen_path(spec2),:text=>spec2.title,:count=>0
+    end
+  end
+
+
+
 end

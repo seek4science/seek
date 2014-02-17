@@ -11,7 +11,7 @@ class WorkGroup < ActiveRecord::Base
     if people.empty?
         super
     else
-      raise Exception.new("Cannot delete the " +description+ ". This Work Group has "+people.size.to_s+" people associated with it. Please disassociate first the people from this Work Group")
+      raise Exception.new("You can not delete the " +description+ ". This Work Group has "+people.size.to_s+" people associated with it. Please disassociate first the people from this Work Group")
     end
   end
 

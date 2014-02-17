@@ -5,10 +5,10 @@ core_xlink(assay).merge(is_root ? xml_root_attributes : {}) do
   
   render :partial=>"api/standard_elements",:locals=>{:parent_xml => parent_xml,:is_root=>is_root,:object=>assay}
   parent_xml.tag! "assay_class",core_xlink(assay.assay_class)
-  parent_xml.tag! "assay_type",core_xlink(assay.assay_type)
+  parent_xml.tag! "assay_type",assay_type_xlink(assay)
   
   unless assay.is_modelling? 
-    parent_xml.tag! "technology_type",core_xlink(assay.technology_type)
+    parent_xml.tag! "technology_type",technology_type_xlink(assay)
   else
     parent_xml.tag! "technology_type",{"xsi:nil"=>true}
   end

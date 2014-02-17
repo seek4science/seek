@@ -373,11 +373,20 @@
               <% else -%>
                 <% contributor_name = p.contributor.name -%>
               <% end -%>
-                // add current values into the associative array of permissions:
-                // first index is the category of contributor type of the permission, the second - consecutive
-                // number of occurrences of permissions for such type of contributor
-                permission_settings['<%= p.contributor_type -%>'][permissions_for_set['<%= p.contributor_type -%>']] =
-                  ['<%= h(contributor_name) -%>', <%= p.contributor_id -%>, <%= p.access_type -%>, <%= allow_removal -%> ];
+
+              // Need to decodeHTML for person name, as it comes from the autocompleter
+              <% contributor_name = h(contributor_name) %>
+              var contributor_name = '<%= contributor_name -%>';
+              <% if p.contributor_type == "Person" -%>
+                contributor_name = decodeHTML(contributor_name);
+              <% end %>
+
+              // add current values into the associative array of permissions:
+              // first index is the category of contributor type of the permission, the second - consecutive
+              // number of occurrences of permissions for such type of contributor
+
+              permission_settings['<%= p.contributor_type -%>'][permissions_for_set['<%= p.contributor_type -%>']] =
+                 [contributor_name, <%= p.contributor_id -%>, <%= p.access_type -%>, <%= allow_removal -%> ];
             <% end -%>
           <% end -%>
       <% end -%>

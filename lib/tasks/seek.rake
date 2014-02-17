@@ -162,4 +162,9 @@ namespace :seek do
     Unit.create(:title => title, :symbol => symbol, :order => order, :comment => comment)
     puts "New unit is added"
   end
+
+  task(:clear_filestore_tmp => :environment) do
+    FileUtils.rm_r(Dir["#{Seek::Config.temporary_filestore_path}/*"])
+  end
+
 end

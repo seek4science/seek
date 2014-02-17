@@ -27,12 +27,12 @@ class AssayType < ActiveRecord::Base
 
   #FIXME: really not happy looking up by title, but will be replaced by BioPortal eventually
   def self.experimental_assay_type_id
-    at=AssayType.find_by_title("experimental assay type").id
+    at=AssayType.find_by_term_uri("http://www.mygrid.org.uk/ontology/JERMOntology#ExperimentalAssayType").id
   end
 
   #FIXME: really not happy looking up by title, but will be replaced by BioPortal eventually
   def self.modelling_assay_type_id
-    at=AssayType.find_by_title("modelling analysis type").id
+    at=AssayType.find_by_term_uri("http://www.mygrid.org.uk/ontology/JERMOntology#ModelAnalysisType").id
   end
 
 

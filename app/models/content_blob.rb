@@ -35,6 +35,14 @@ class ContentBlob < ActiveRecord::Base
 
   has_many :worksheets, :dependent => :destroy
 
+  validate :original_filename_or_url
+
+  def original_filename_or_url
+    if original_filename.blank? && url.blank?
+      errors.add(:base, "Need to specifiy either original_filename or url")
+    end
+  end
+
   def spreadsheet_annotations
     worksheets.collect {|w| w.cell_ranges.collect {|c| c.annotations}}.flatten
   end

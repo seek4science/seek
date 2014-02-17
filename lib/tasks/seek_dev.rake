@@ -2,6 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'uuidtools'
+require 'colorize'
 
 namespace :seek_dev do
   desc 'A simple task for quickly setting up a project and institution, and assigned the first user to it. This is useful for quickly setting up the database when testing. Need to create a default user before running this task'
@@ -168,6 +169,27 @@ namespace :seek_dev do
     FileUtils.copy("db/#{dir}/synonyms.yml", 'config/default_data/')
     puts "Cleaning up"
     FileUtils.rm_r("db/#{dir}/")
+  end
+
+
+  desc "Gives project pals manage rights to their projects Investigation, Studies and Assays - this was a particular SysMO need"
+  task :pals_manage_isa => :environment do
+    Project.all.select{|p| !p.pals.empty?}.each do |project|
+      pals = project.pals
+      puts "Updating ISA for project #{project.title} for PALs #{pals.collect{|p|p.name}.join(", ")}"
+      investigations = project.investigations
+      studies = project.studies
+      assays = project.assays
+      (investigations | studies | assays).each do |isa|
+        policy = isa.policy
+        pals.each do |pal|
+          if policy.permissions.select{|p| p.contributor==pal && p.access_type==Policy::MANAGING}.empty?
+            policy.permissions << Permission.new(:contributor=>pal,:access_type=>Policy::MANAGING)
+          end
+        end
+      end
+      puts "\t#{assays.count} Assays updated, #{studies.count} Studies updated, #{investigations.count} Investigations updated"
+    end
   end
 
 end

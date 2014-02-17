@@ -12,7 +12,7 @@
         <ul><label>Institutions:</label>
           <% for institution in person.institutions %>
             <li>
-              <%= link_to h(institution.name),url_for(institution) %>
+              <%= link_to institution.name,url_for(institution) %>
             </li>
           <% end -%>
         </ul>
@@ -24,7 +24,7 @@
         <ul><label>Projects:</label>
           <% for project in person.projects %>
             <li>
-              <%= link_to h(project.name), url_for(project) %>
+              <%= link_to project.name, url_for(project) %>
             </li>
           <% end -%>
         </ul>

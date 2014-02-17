@@ -1,7 +1,5 @@
-<%= javascript_include_tag 'studied_factor.js' -%>
-
 <h1>
-  <%= "Experimental conditions for '#{link_to h(@sop.title),sop_path(@sop, :version => @display_sop.version)}' version #{@display_sop.version}".html_safe %>
+  <%= "Experimental conditions for '#{link_to @sop.title,sop_path(@sop, :version => @display_sop.version)}' version #{@display_sop.version}".html_safe %>
 </h1>
 
 <center>

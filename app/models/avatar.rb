@@ -2,7 +2,7 @@
 # (hence will be unique, no matter what kind of owner -- person/project/institution -- we have)
 
 # DECLARING WHAT "LARGE" AVATAR IS
-LARGE_SIZE = "1000x1000"
+LARGE_SIZE = "500"
 
 
 class Avatar < ActiveRecord::Base
@@ -47,6 +47,34 @@ class Avatar < ActiveRecord::Base
   
   def selected?
     owner.avatar_id && owner.avatar_id.to_i == id.to_i
+  end
+
+  #provides a url to the avatar to be served from public/assets/ - resizing and copying the avatar across if necessary
+  def public_asset_url size=nil
+    size ||= 200
+
+    if size=="large"
+      size = LARGE_SIZE
+    end
+    size = "#{size}x#{size}" if size.kind_of?(Numeric)
+
+    size = filter_size(size)
+    resize_image(size)
+
+    public_avatars_path = File.join(Rails.configuration.assets.prefix,"avatar-images")
+    public_avatar_dir = File.join(Rails.root,"public",public_avatars_path)
+
+    unless File.exists?(public_avatar_dir)
+      FileUtils.mkdir_p public_avatar_dir
+    end
+
+    avatar_filename = "#{self.id}-#{size}.#{self.class.image_storage_format}"
+    avatar_public_file_path = File.join(public_avatar_dir,avatar_filename)
+    unless File.exists?(avatar_public_file_path)
+      FileUtils.copy(full_cache_path(size),avatar_public_file_path)
+    end
+
+    File.join(public_avatars_path,avatar_filename)
   end
   
 end

@@ -1,6 +1,6 @@
 class SubscriptionsController < ApplicationController
   before_filter :login_required
-  before_filter :find_and_auth, :only => [:destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:destroy]
 
   def create
     @subscription = Subscription.new params[:subscription]

@@ -1,5 +1,3 @@
- <%= javascript_include_tag "sharing.js", 'resource.js' %>
-
 <%= error_messages_for :study %>
 
 <%= f.hidden_field :create_from_asset %>
@@ -32,7 +30,7 @@
 
     <p>
       <%= t('investigation') %><span class="required">*</span>
-      <%=link_to h("New #{t('investigation')}?"),new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
+      <%=link_to "New #{t('investigation')}?",new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
       <div id="investigation_collection">
         <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
       </div>
@@ -48,6 +46,11 @@
     </p>
 
   </div>
+  <% if show_scales? %>
+      <p>
+      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
+      </p>
+  <% end %>
   <p>
     <%= render :partial=>"assets/sharing_form" if @study.can_manage? -%>
   </p>

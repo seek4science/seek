@@ -25,7 +25,7 @@
 </div>
 
 <% if @people.respond_to?(:page) && @people.page == "latest" && Person.count > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all"%>
+    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>Person.count} %>
 <% end %>
 
 

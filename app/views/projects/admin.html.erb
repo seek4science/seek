@@ -1,10 +1,9 @@
-<%= javascript_include_tag 'sharing.js'%>
-<h1>Administer <%= t('project') %>: <%= link_to h(@project.name), project_path(@project) -%></h1>
+<h1>Administer <%= t('project') %>: <%= link_to @project.name, project_path(@project) -%></h1>
 
 <div class="show_basic">
   <%= form_for(@project) do |f| -%>
 
-    <%= javascript_include_tag "projects.js" %>
+    <%= javascript_include_tag "projects" %>
   
     <%= f.hidden_field :avatar_id -%>
   
@@ -13,14 +12,7 @@
     <h2>Participating Institutions</h2>
 
       <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}:", :style => "line-height: 2; margin-left: 1em;" -%><br/>
-      <%
-         institution_list = []
-         if admin_logged_in?
-           institution_list |= Institution.all
-         elsif project_manager_logged_in?
-           institution_list |= (Institution.all.select{|i| i.projects.empty?} + @project.institutions).uniq
-         end
-      %>
+      <% institution_list = Institution.order(:name) %>
 
       <% chosen_institutions = @project.institutions %>
       <div style="margin-top: 1em; margin-bottom: 2em; margin-left: 2em; width: 90%; height: 500px; overflow: auto;">

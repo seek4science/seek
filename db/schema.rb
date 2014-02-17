@@ -36,6 +36,12 @@ ActiveRecord::Schema.define(:version => 20140131155853) do
   add_index "activity_logs", ["format"], :name => "act_logs_format_index"
   add_index "activity_logs", ["referenced_type", "referenced_id"], :name => "act_logs_referenced_index"
 
+  create_table "admin_defined_role_projects", :force => true do |t|
+    t.integer "project_id"
+    t.integer "role_mask"
+    t.integer "person_id"
+  end
+
   create_table "annotation_attributes", :force => true do |t|
     t.string   "name",       :null => false
     t.datetime "created_at"
@@ -161,11 +167,15 @@ ActiveRecord::Schema.define(:version => 20140131155853) do
     t.integer  "technology_type_id"
     t.integer  "study_id"
     t.integer  "owner_id"
-    t.string   "first_letter",       :limit => 1
+    t.string   "first_letter",          :limit => 1
     t.integer  "assay_class_id"
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "institution_id"
+    t.string   "assay_type_uri"
+    t.string   "technology_type_uri"
+    t.string   "technology_type_label"
+    t.string   "assay_type_label"
   end
 
   create_table "assays_samples", :id => false, :force => true do |t|

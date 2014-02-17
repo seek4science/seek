@@ -2,7 +2,7 @@
   <div class="foldTitle">
     Subscriptions
   </div>
-  <div class="foldContent">
+  <div class="foldContent" style="display:none">
     Here is the list of <%= t('project').pluralize %> you are subscribed to:
     <% project_subscriptions = person.project_subscriptions.uniq %>
     <% if project_subscriptions.empty? %>
@@ -15,7 +15,7 @@
           </tr>
           <% project_subscriptions.each do |project_subscription| %>
               <tr>
-                <td style="text-align: left"> <%= link_to h(project_subscription.project.name), project_subscription.project %> </td>
+                <td style="text-align: left"> <%= link_to project_subscription.project.name, project_subscription.project %> </td>
                 <td> <%= project_subscription.frequency %> </td>
               </tr>
           <% end %>

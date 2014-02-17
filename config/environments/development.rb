@@ -15,7 +15,11 @@ SEEK::Application.configure do
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
-  config.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
+  #config.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
+
+  #This can be very useful in development when you have code that interacts directly with Rails.cache,
+  #but caching may interfere with being able to see the results of code changes.
+  config.cache_store = :null_store
 
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = false
@@ -38,6 +42,9 @@ SEEK::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+  config.serve_static_assets = true
+
+  I18n.enforce_available_locales = true
 end
 
 

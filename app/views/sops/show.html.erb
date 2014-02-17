@@ -1,5 +1,3 @@
-<%= javascript_include_tag "resource" -%>
-
 <%= render :partial => "general/item_title",:locals=>{:item=>@sop} %>
 
 <ul class="sectionIcons">
@@ -14,15 +12,19 @@
   <div class="main_content_left_box">
 
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
-  
+
     <div class="box_about_actor">
+      <%= item_description @display_sop.description -%>
       <%= render :partial => 'assets/fileinfo',:object=>@display_sop.content_blob -%>
 
       <br/>
+      <% if show_scales? -%>
+          <%= render :partial=>"scales/asset_scales_list",:object=>@sop -%>
+      <% end %>
 
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sop} %>
 
-      <%= item_description @display_sop.description -%>
+
     </div>
   </div>
 
@@ -33,13 +35,14 @@
   </div>
 
   <div style="clear:both;">
-    <p>
-        <h2>
-          Experimental Conditions
-        </h2>
-    </p>
-    <%= render :partial=>"sops/simple_experimental_conditions_list" %>
-    <br/>
+    <% if Seek::Config.experimental_conditions_enabled %>
+        <p>
+            <h2>
+              Experimental Conditions
+            </h2>
+        </p>
+        <%= render :partial=>"sops/simple_experimental_conditions_list" %>
+    <% end %>
 
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"general/items_related_to",:object => @sop %>

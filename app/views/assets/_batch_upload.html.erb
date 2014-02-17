@@ -1,6 +1,3 @@
-<%= javascript_include_tag 'batch_upload', 'models', 'parseuri' %>
-<%= stylesheet_link_tag 'batch_upload' %>
-
 <%
    # determine the asset type from the controller
    upload_field = controller_name.downcase.singularize.underscore
@@ -119,7 +116,7 @@
     </ul>
   </div>
 
-  <p id='text_for_new_version' style="display:none; margin-bottom:0.5em;"> Here are the items from the previous version, you can remove them and/or add new items: </p>
+  <p id='text_for_new_version' style="display:none; margin-bottom:0.5em;"> The items from the current version are here, and can be removed or added to. The original files are indicated with <em>(original)</em> to help distinguish when adding a new file with the same name. If you are replacing a file, you should also remove the current one. </p>
 
   <table id="pending_files">
 
@@ -199,7 +196,7 @@
         }
 
         if (error) {
-            alert("In invalid URL was provided");
+            alert("An invalid URL was provided");
         }
     }
 
@@ -209,7 +206,7 @@
             <% content_blobs.each do |cb| %>
                 var element = document.createElement('input');
                 element.name = "content_blobs[id][<%= cb.id%>]";
-                element.value = "<%= cb.original_filename || cb.url %>";
+                element.value = "<%= (cb.original_filename || cb.url) + " (original)" %>";
                 element.type = 'hidden';
                 var current_element = multi_selector.current_element;
                 current_element.parentNode.insertBefore(element, current_element);

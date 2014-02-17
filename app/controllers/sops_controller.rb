@@ -8,7 +8,7 @@ class SopsController < ApplicationController
   
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon
@@ -89,6 +89,7 @@ class SopsController < ApplicationController
       @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
       update_annotations @sop
+      update_scales @sop
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @sop.save
@@ -131,6 +132,8 @@ class SopsController < ApplicationController
     end
 
     update_annotations @sop
+    update_scales @sop
+
     assay_ids = params[:assay_ids] || []
 
     @sop.attributes = params[:sop]

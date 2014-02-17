@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag 'full_scroll_table' -%>
-<%= javascript_include_tag 'link_adder.js' %>
+<%= javascript_include_tag 'link_adder' %>
 
 <div id="<%= resource_id -%>_hidden">
 </div>
@@ -21,7 +21,7 @@
                     <%= item.title -%>
               </td>
             </tr>
-            <%= javascript_tag "addInstanceOfObject('#{resource_id}','#{item.id.to_s}', '#{item.title}')" -%>
+            <%= javascript_tag "addInstanceOfObject('#{resource_id}','#{item.id.to_s}', '#{h(item.title)}')" -%>
           <% end -%>
         <% end -%>
       </tbody>

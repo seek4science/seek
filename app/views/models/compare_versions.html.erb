@@ -1,0 +1,71 @@
+<%= stylesheet_link_tag 'bives' -%>
+<%= javascript_include_tag 'bives' %>
+
+
+<div class="show_basic">
+  <% if @display_model && @other_version && @blob1 && @blob2 %>
+      <div class="summary">
+        <p class="box_standout curved">A summary of the differences in the SBML between  <%= link_to "version #{@display_model.version}",model_path(@model,:version=>@display_model.version) -%>
+          and <%= link_to "version #{@other_version.version}",model_path(@model,:version=>@other_version.version) -%> for the files <%= @blob1.original_filename -%> and <%= @blob2.original_filename -%> respectively</p>
+      </div>
+  <% end %>
+  <% if @display_model.sbml_content_blobs.size>1 || @other_version.sbml_content_blobs.size>1  %>
+      <%= form_tag compare_versions_model_path(@model), :method => :post do %>
+          <%= hidden_field_tag :other_version, @other_version.version %>
+          <%= hidden_field_tag :version, @display_model.version %>
+          <div id="version_file_selection" class="curved with_smaller_shadow">
+            <h2>Select different files to compare:</h2>
+
+              <div>
+                <b>Version:<%= @display_model.version -%></b>
+                <%= select_tag :file_id, options_for_select(@display_model.sbml_content_blobs.collect { |b| [b.original_filename, b.id] }, @blob1.id) %>
+              </div>
+              <div>
+                <b>Version:<%= @other_version.version -%></b>
+                <%= select_tag :other_file_id, options_for_select(@other_version.sbml_content_blobs.collect { |b| [b.original_filename, b.id] }, @blob2.id) %>
+              </div>
+              <div>
+                <%= submit_tag "Compare",:disable_with=>"Comparing" %>
+              </div>
+
+          </div>
+      <% end %>
+  <% end %>
+<% unless @comparison_html.blank? %>
+      <p>
+    <div class="bives_output curved with_smaller_shadow">
+      <p>Deletions are coloured in <span class="bives-delete">red</span> and insertions are coloured in <span class="bives-insert">blue</span></p>
+        <%= @comparison_html.html_safe -%>
+    </div>
+      </p>
+<% end %>
+
+<% unless @crn.blank? %>
+      <div id="chemical_reaction_network" class="curved with_smaller_shadow bives_output">
+      <h2>Chemical Reaction Network</h2>
+      <p>
+        Deletions are coloured in <span class="bives-delete">red</span> and insertions are coloured in <span class="bives-insert">blue</span>, and updates that don't affect the network are <span class="bives-update">yellow</span>.
+      </p>
+      </p>
+      <p id="legend">
+        <%= image_tag "bives/legend-species.png",:alt=>"species" %><span class="legend_text">species</span>
+        <%= image_tag "bives/legend-reaction-js.png",:alt=>"reaction" %><span class="legend_text">reaction</span>
+        <%= image_tag "bives/legend-reaction-participant.png",:alt=>"reaction-participant" %><span class="legend_text">participant in reaction</span>
+        <%= image_tag "bives/legend-mod-stimulator.png",:alt=>"mod-stimulator" %><span class="legend_text">stimulator</span>
+        <%= image_tag "bives/legend-mod-inhibitor.png",:alt=>"mod-inhibitor" %><span class="legend_text">inhibitor</span>
+        <%= image_tag "bives/legend-mod-unknown.png",:alt=>"mod-unknown" %><span class="legend_text">unknown modifier</span>
+      </p>
+    <div id="bives_crn_graph" class="bives_cytoscape_graph">
+
+    </div>
+      </div>
+<% end %>
+</div>
+
+
+<% unless @crn.blank? %>
+    <script>
+        drawDiffGraphJS('<%= @crn.html_safe -%>','#bives_crn_graph');
+    </script>
+<% end %>
+

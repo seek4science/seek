@@ -12,7 +12,7 @@ class DataFilesController < ApplicationController
   include AssetsCommonExtension
 
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show,:explore,:download,:matching_models]
   skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, :only => [:upload_for_tool, :upload_from_email]
@@ -179,6 +179,7 @@ class DataFilesController < ApplicationController
 
       if @data_file.save
         update_annotations @data_file
+        update_scales @data_file
 
         create_content_blobs
 
@@ -267,6 +268,7 @@ class DataFilesController < ApplicationController
     publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
     update_annotations @data_file
+    update_scales @data_file
 
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
@@ -365,11 +367,6 @@ class DataFilesController < ApplicationController
   
   def explore
     if @display_data_file.contains_extractable_spreadsheet?
-      #Generate Ruby spreadsheet model from XML
-      @spreadsheet = @display_data_file.spreadsheet
-
-      #FIXME: Annotations need to be specific to version
-      @spreadsheet.annotations = @display_data_file.spreadsheet_annotations
       respond_to do |format|
         format.html
       end
@@ -405,7 +402,7 @@ class DataFilesController < ApplicationController
       format.html
     end
   end
-  
+
   protected
 
   def translate_action action

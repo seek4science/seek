@@ -4,14 +4,14 @@ class PeopleController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::Publishing::GatekeeperPublish
 
-  before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
-  before_filter :is_user_admin_auth,:only=>[:destroy]
-  before_filter :is_user_admin_or_personless, :only=>[:new]
+  before_filter :is_during_registration,:only=>[:select]
+  before_filter :is_user_admin_auth,:only=>[:destroy,:new]
   before_filter :removed_params,:only=>[:update,:create]
+  before_filter :administerable_by_user, :only => [:admin, :administer_update]
   before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
-  before_filter :administerable_by_user, :only => [:admin, :administer_update]
 
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
@@ -27,6 +27,8 @@ class PeopleController < ApplicationController
   def auto_complete_for_expertise_name
     render :json => Person.expertise_counts.map(&:name).to_json
   end
+
+
   
   protect_from_forgery :only=>[]
   
@@ -56,6 +58,7 @@ class PeopleController < ApplicationController
       @people = apply_filters(@people).select(&:can_view?)#.select{|p| !p.group_memberships.empty?}
       @people=Person.paginate_after_fetch(@people,
                                           :page=>(params[:page] || Seek::Config.default_page('people')),
+                                          :reorder=>false,
                                           :latest_limit => Seek::Config.limit_latest)
     else
       @people = @people.select(&:can_view?)
@@ -138,7 +141,6 @@ class PeopleController < ApplicationController
     @userless_projects.sort!{|a,b|a.name<=>b.name}
     @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
 
-    render :action=>"select"
   end
 
   # POST /people
@@ -198,7 +200,7 @@ class PeopleController < ApplicationController
         end
 
       else
-        format.html { render :action => redirect_action }
+        format.html { render redirect_action }
         format.xml { render :xml => @person.errors, :status => :unprocessable_entity }
       end
     end
@@ -250,12 +252,13 @@ class PeopleController < ApplicationController
       params[:person]["#{param}"] = temp[:person]["#{param}"] if temp[:person]["#{param}"] and allowed
       params["#{param}"] = temp["#{param}"] if temp["#{param}"] and allowed
     end
-    set_roles(@person, params) if User.admin_logged_in?
+
 
     respond_to do |format|
       if @person.update_attributes(params[:person])
+        set_roles(@person, params) if User.admin_logged_in?
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
-
+        @person.touch
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
@@ -317,7 +320,7 @@ class PeopleController < ApplicationController
       workgroup = WorkGroup.find_by_project_id_and_institution_id(project_id,institution_id)
       people = workgroup.people
     end
-    people_list = people.collect{|p| [p.name, p.email, p.id]}
+    people_list = people.collect{|p| [h(p.name), p.email, p.id]}
     respond_to do |format|
       format.json {
         render :json => {:status => 200, :people_list => people_list }
@@ -340,10 +343,12 @@ class PeopleController < ApplicationController
   end
 
   def set_roles person, params
-    roles = person.is_admin? ? ['admin'] : []
+    roles = person.is_admin? ? [['admin']] : []
     if params[:roles]
       params[:roles].each_key do |key|
-        roles << key
+        project_ids=params[:roles][key]
+
+        roles << [key,project_ids]
       end
     end
     person.roles=roles
@@ -414,7 +419,9 @@ class PeopleController < ApplicationController
         project_manager_projects = current_user.person.projects
         flag = true
         projects.each do |project|
-          flag = false if !project_manager_projects.include? project
+          unless @person.projects.include?(project) || project.can_be_administered_by?(current_user)
+            flag = false
+          end
         end
         if flag == false
           error("#{t('project')} manager can not assign person to the #{t('project').pluralize} that they are not in","Is invalid")
@@ -435,6 +442,13 @@ class PeopleController < ApplicationController
     @person=Person.find(params[:id])
     unless @person.can_be_administered_by?(current_user)
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
+      return false
+    end
+  end
+
+  def is_during_registration
+    if User.logged_in_and_registered?
+      error("You cannot register a new profile to yourself as you are already registered","Is invalid (already registered)")
       return false
     end
   end

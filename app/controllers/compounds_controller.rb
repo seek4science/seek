@@ -1,4 +1,6 @@
 class CompoundsController < ApplicationController
+
+  before_filter :find_requested_item, :only=>[:show,:edit,:update,:destroy]
   before_filter :login_required
   before_filter :is_user_admin_auth
   before_filter :find_all_compounds
@@ -55,14 +57,12 @@ class CompoundsController < ApplicationController
    end
 
    def show
-     @compound = Compound.find(params[:id])
      respond_to do |format|
        format.rdf { render :template=>'rdf/show'}
      end
    end
 
    def update
-      @compound = Compound.find(params[:id])
       compound_name =  params["#{@compound.id}_title"]
 
       unless compound_name.blank?
@@ -95,7 +95,6 @@ class CompoundsController < ApplicationController
    end
 
   def destroy
-    @compound=Compound.find(params[:id])
     #destroy the factor_studied, experimental_condition and their links
     @compound.studied_factors.each{|sf| sf.destroy}
     @compound.experimental_conditions.each{|ec| ec.destroy}

@@ -54,6 +54,7 @@ module Seek
 
     def smtp_propagate
       smtp_hash = self.smtp
+
       password =  self.smtp_settings 'password'
       smtp_hash.merge! "password" => password
 
@@ -63,6 +64,15 @@ module Seek
       end
 
       ActionMailer::Base.smtp_settings = new_hash
+    end
+
+    def bioportal_api_key_propagate
+      affected = ActiveRecord::Base.descendants.select do |cl|
+        cl.respond_to?(:bioportal_api_key=)
+      end
+      affected.each do |cl|
+        cl.bioportal_api_key = bioportal_api_key
+      end
     end
 
     def google_analytics_enabled_propagate
@@ -166,27 +176,16 @@ module Seek
       File.join(path,inner_dir)
     end
 
-    def datacite_password= pwd
-      if pwd.nil?
-        self.datacite_password_enc=nil
-      else
-        self.datacite_password_enc=encrypt(pwd,generate_key(GLOBAL_PASSPHRASE))
-      end
-    end
-
-    def datacite_password
-      pwd=nil
-      unless self.datacite_password_enc.nil?
-        pwd=decrypt(self.datacite_password_enc,generate_key(GLOBAL_PASSPHRASE))
-      end
-      pwd
-    end
-
     def smtp_settings field
       value = self.smtp[field.to_sym]
       if field == :password || field == 'password'
         if !value.blank?
-          value = decrypt(value,generate_key(GLOBAL_PASSPHRASE))
+          begin
+            value = decrypt(value,generate_key(GLOBAL_PASSPHRASE))
+          rescue Exception=>e
+            value=""
+            Rails.logger.error "ERROR DETERIMINING THE SMTP EMAIL PASSWORD - USING BLANK"
+          end
         end
       end
       value
@@ -293,16 +292,20 @@ module Seek
     extend CustomAccessors
 
     #Basic settings
-    settings = [:home_description, :home_feeds_cache_timeout, :public_seek_enabled, :events_enabled, :bioportal_api_key, :jerm_enabled, :email_enabled, :no_reply, :jws_enabled,
-      :jws_online_root, :hide_details_enabled, :activation_required_enabled, :project_name, :smtp, :default_pages, :project_type, :project_link, :header_image_enabled, :header_image,
+    settings = [:home_description, :home_feeds_cache_timeout, :public_seek_enabled, :bioportal_api_key, :no_reply,
+      :jws_online_root, :hide_details_enabled, :activation_required_enabled, :project_name, :smtp, :default_pages, :project_type, :project_link, :header_image,
       :pubmed_api_email, :crossref_api_email,:site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :solr_enabled,
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
       :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
-      :google_analytics_tracker_id,:piwik_analytics_enabled,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
-      :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver, :sabiork_ws_base_url, :publish_button_enabled,
-      :admin_impersonation_enabled, :auth_lookup_enabled,:sample_parser_enabled,
-      :project_browser_enabled, :experimental_features_enabled, :external_search_enabled,:pdf_conversion_enabled,:filestore_path,
-      :datacite_username,:datacite_password_enc,:datacite_url]
+      :google_analytics_tracker_id,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
+      :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver, :sabiork_ws_base_url,:filestore_path,
+      :tagline_prefix,
+      :biosamples_enabled,:events_enabled,:modelling_analysis_enabled,:organisms_enabled,:models_enabled,:forum_enabled,:jerm_enabled,:email_enabled,:jws_enabled,:external_search_enabled,:piwik_analytics_enabled,
+      :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,
+      :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,
+      :assay_type_ontology_file,:technology_type_ontology_file,:modelling_analysis_type_ontology_file,:assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri,
+      :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit]
+
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"

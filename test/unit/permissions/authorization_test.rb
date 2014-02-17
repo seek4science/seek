@@ -60,9 +60,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     
     assert !res, "test person should have not been identified as being in the blacklist of test user"
   end
-  
-  
-  
+
   # testing: is_member?(person_id, group_type, group_id)
   # member of any SysMO projects at all? (e.g. a "SysMO user": person who is associated with at least one project / institution ('workgroup'), not just a registered user)
   def test_is_member_associated_with_any_projects_true
@@ -691,28 +689,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert sop.can_edit?(users(:aaron))
   end
 
-  def test_asset_with_no_contributor
-    sop=sops(:sop_with_no_contributor) #should be editable to all those that are members of a project
-    user=users(:pal_user)
-    assert Seek::Permissions::Authorization.is_authorized?("view",Sop,sop,user), "The sop with no contributor should be viewable to the pal"
-    assert Seek::Permissions::Authorization.is_authorized?("edit",Sop,sop,user), "The sop with no contributor should be editable to the pal"
-    assert Seek::Permissions::Authorization.is_authorized?("download",Sop,sop,user), "The sop with no contributor should be downloadable to the pal"
-    assert !Seek::Permissions::Authorization.is_authorized?("manage",Sop,sop,user), "The sop with no contributor should not be managable to the pal"
-  end
-
-  def test_asset_with_no_contributor_with_managing_permission
-    sop=sops(:sop_with_no_contributor) #should be editable to all those that are members of a project
-    user=users(:pal_user)
-    assert !Seek::Permissions::Authorization.is_authorized?("manage",Sop,sop,user), "The should not be managable to the pal"
-    #now add the managable
-    p=Permission.new(:contributor=>user.person,:policy=>sop.policy,:access_type=>Policy::MANAGING)    
-    sop.policy.permissions << p
-    sop.policy
-    sop.policy.save!
-    
-    assert sop.can_manage?(user), "The sop should now be managable to the pal"
-  end
-
   test "anyone can do anything on policy free items, except the overriten can_action?" do
     item = Factory :project
     User.current_user = Factory :user
@@ -818,7 +794,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test "asset manager can manage the items inside their projects, even the entirely private items" do
-    asset_manager = Factory(:person, :roles => ['asset_manager'])
+    asset_manager = Factory(:asset_manager)
     datafile1 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:publicly_viewable_policy))
     datafile2 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:private_policy))
 
@@ -835,9 +811,27 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test "asset manager can not manage the items outside their projects" do
-    asset_manager = Factory(:person, :roles => ['asset_manager'])
+    asset_manager = Factory(:asset_manager)
     datafile = Factory(:data_file)
     assert (asset_manager.projects & datafile.projects).empty?
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.cannot? :manage_asset, datafile
+    assert ability.cannot? :manage, datafile
+
+    User.with_current_user asset_manager.user do
+      assert !datafile.can_manage?
+    end
+  end
+
+  test "asset manager can not manage items for projects he is a member of but not manager of" do
+    asset_manager = Factory(:person_in_multiple_projects)
+    project = asset_manager.projects.first
+    other_project = asset_manager.projects.last
+    asset_manager.is_asset_manager=true,project
+    datafile = Factory(:data_file, :projects=>[other_project])
+    assert !(asset_manager.projects & datafile.projects).empty?
 
     ability = Ability.new(asset_manager.user)
 
@@ -857,7 +851,7 @@ class AuthorizationTest < ActiveSupport::TestCase
        assert !datafile.can_manage?
 
        ability = Ability.new(gatekeeper.user)
-       assert gatekeeper.is_gatekeeper?
+       assert gatekeeper.is_gatekeeper?(gatekeeper.projects.first)
        assert ability.cannot? :publish, datafile
        assert ability.cannot? :manage_asset, datafile
        assert ability.cannot? :manage, datafile

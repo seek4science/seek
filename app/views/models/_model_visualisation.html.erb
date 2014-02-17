@@ -6,7 +6,10 @@
            image_width = @display_model.model_image.image_width.nil??  "600" : @display_model.model_image.image_width
 
            #zoom to larger image
-           zoom_width=image_width < 900 ? 900 : image_width
+           #STANDARD_SIZE=900
+           #MAX_SIZE=1500
+           zoom_width=image_width < Seek::ActsAsFleximageExtension::STANDARD_SIZE ? Seek::ActsAsFleximageExtension::STANDARD_SIZE : image_width
+           zoom_width=zoom_width > Seek::ActsAsFleximageExtension::MAX_SIZE ? Seek::ActsAsFleximageExtension::MAX_SIZE : zoom_width
 
            #show smaller image in view
            image_width=600 if image_width>600

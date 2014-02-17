@@ -1,5 +1,5 @@
 
-<%= javascript_include_tag "resource" ,"zoom/lightbox"-%>
+<%= javascript_include_tag "zoom/lightbox"-%>
 <%= stylesheet_link_tag "lightbox" %>
 
 <%= render :partial => "general/item_title",:locals=>{:item=>@model} %>
@@ -63,8 +63,9 @@
 
     <div class="main_content_left_box">
 
-        <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
+        <%#= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
+          <%= item_description @display_model.description -%>
             <%= render :partial=>"assets/multiple_fileinfo", :object=>@display_model -%>
 
             <p>
@@ -76,7 +77,7 @@
                 <% end -%>
             </p>
             <% if show_scales? -%>
-                <%= render :partial=>"scales/asset_scales_list",:object=>@model.scales -%>
+                <%= render :partial=>"scales/asset_scales_list",:object=>@model -%>
             <% end %>
             <p>
                 <b><%= t('model') %> type:</b>
@@ -97,7 +98,7 @@
 
             <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @model} %>
 
-            <%= item_description @display_model.description -%>
+
 
             <%= render :partial=>"import_details", :object=>@display_model %>
 

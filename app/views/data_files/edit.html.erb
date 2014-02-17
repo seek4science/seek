@@ -1,5 +1,3 @@
-<%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" %>
-
 <% current_user_authorized_to_manage = @data_file.can_manage? -%>
 <h1>Editing <%= t('data_file') %>: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>
 <div class="show_basic">
@@ -22,6 +20,10 @@
           
 	<%= render :partial => "projects/project_selector", :locals => { :resource => @data_file } %>
 
+          <% if show_scales? %>
+              <%= render :partial => "scales/scales_selector",:locals=>{:object=>@data_file} %>
+          <% end %>
+
 	<%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 
 
@@ -33,7 +35,7 @@
                 <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
             <% end -%>
           </p>
-        <%= fields_for(@data_file) {|f| f.fancy_multiselect :samples, {:hidden=> @data_file.samples.blank?  ? true : false, :other_projects_checkbox => true}}  -%>
+          <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@data_file} %>
         <% end -%>
         <%= preview_permission_popup_link(@data_file)-%>
         <p>

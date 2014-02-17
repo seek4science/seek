@@ -519,7 +519,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_editing_doesnt_change_contributor
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this sop
+    login_as(:model_owner) #this user is a member of sysmo, and can edit this sop
     sop=sops(:sop_with_no_contributor)
     put :update, :id => sop, :sop => {:title=>"blah blah blah"}, :sharing=>valid_sharing
     updated_sop=assigns(:sop)
@@ -826,20 +826,36 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
-  test "view_items_in_tab" do
-    other_user = Factory :user
-    sop = Factory :sop,:title=>"a sop",:contributor=>User.current_user,:policy=>Factory(:public_policy)
-    private_sop = Factory :sop,:title=>"a private sop",:contributor=>other_user,:policy=>Factory(:private_policy)
-    xml_http_request :get, :view_items_in_tab,:resource_type=>"Sop",:resource_ids=>[sop.id,private_sop.id,1000].join(",")
-    assert_response :success
+  test "should not loose permissions when managing a sop" do
+    policy = Factory(:private_policy)
+    a_person = Factory(:person)
+    permission = Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING)
+    policy.permissions = [permission]
+    policy.save
+    sop = Factory :sop, :contributor => User.current_user, :policy => policy
+    assert sop.can_manage?
 
-    assert @response.body.include?("a sop")
-    assert !@response.body.include?("a private sop")
+    put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE,
+                                             "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS,
+                                             :permissions =>{:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {a_person.id =>  {"access_type" =>  Policy::MANAGING}}})}
+                                            }
 
-    #try with no parameters
-    xml_http_request :get, :view_items_in_tab
-    assert_response :success
+    assert_redirected_to sop
+    assert_equal 1, sop.reload.policy.permissions.count
   end
+
+  test "should not loose project assignment when an asset is managed by a person from different project" do
+    sop = Factory :sop, :contributor => User.current_user
+    assert_not_equal sop.projects.first, User.current_user.person.projects.first
+
+    get :edit, :id => sop
+    assert_response :success
+
+    assert_select "select#sop_project_ids" do
+      assert_select "option[selected=selected][value=?]", sop.projects.first.id, :count => 1
+    end
+  end
+
 
   private
 

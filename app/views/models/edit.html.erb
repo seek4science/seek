@@ -1,5 +1,3 @@
-<%= javascript_include_tag "sharing.js","models.js", "assays.js","attribution.js","resource.js" -%>
-
 <% current_user_authorized_to_manage = @model.can_manage? -%>
 <h1>Editing <%= t('model') %>: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
 <div class="show_basic">
@@ -30,14 +28,15 @@
             <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
         </p>
       <% if show_scales? %>
-          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} %>
+          <%= render :partial => "scales/scales_selector_with_parameters",:locals=>{:object=>@model} %>
+          <%#= render :partial => "scales/scales_selector",:locals=>{:object=>@model} %>
       <% end %>
 
         <% if current_user_authorized_to_manage -%>
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
-        <%= f.fancy_multiselect :samples,{:hidden=> @model.samples.blank?  ? true : false, :other_projects_checkbox => true} -%>
+        <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@model} %>
 
         <% end -%>
         <p>

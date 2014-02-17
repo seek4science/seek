@@ -27,22 +27,16 @@ class HomesControllerTest < ActionController::TestCase
   test "shouldn't display feedback link when not logged in" do
     get :index
     assert_response :success
-    assert_select "span#account_menu_section", :count=>0
-
-    assert_select "li" do
-        assert_select "a[href=?]",feedback_home_path,:text=>I18n.t("menu.feedback"),:count=>0
-    end
-
+    assert_select "ul#my_profile_menu",:count=>0
+    assert_select "li.dynamic_menu_li",:text=>/Provide feedback/, :count=>0
   end
 
   test "should display feedback link when logged in" do
     login_as(Factory(:user))
     get :index
     assert_response :success
-    assert_select "span#account_menu_section" do
-      assert_select "li" do
-        assert_select "a[href=?]",feedback_home_path,:text=>I18n.t("menu.feedback")
-      end
+    assert_select "ul#my_profile_menu" do
+      assert_select "li.dynamic_menu_li",:text=>/Provide feedback/, :count=>1
     end
   end
 
@@ -68,11 +62,8 @@ class HomesControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index
     assert_response :success
-    assert_response :success
-    assert_select "span#account_menu_section" do
-      assert_select "li" do
-        assert_select "a",:text=>I18n.t("menu.admin"),:count=>0
-      end
+    assert_select "ul#my_profile_menu" do
+      assert_select "li.dynamic_menu_li",:text=>"Server admin", :count=>0
     end
   end
 
@@ -80,10 +71,8 @@ class HomesControllerTest < ActionController::TestCase
     login_as(:quentin)
     get :index
     assert_response :success
-    assert_select "span#account_menu_section" do
-      assert_select "li" do
-        assert_select "a",:text=>I18n.t("menu.admin")
-      end
+    assert_select "ul#my_profile_menu" do
+      assert_select "li.dynamic_menu_li",:text=>"Server admin", :count=>1
     end
   end
 
@@ -182,14 +171,10 @@ class HomesControllerTest < ActionController::TestCase
     assert_select "div[class=?][style='display:none']",/yui-u home_panel.*/, :count => 1
   end
 
-  test "feed reader should handle feed title as subtitle" do
-    xml = %!<?xml version="1.0" encoding="UTF-8"?>
-      <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/news_feed.xml" /><atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/atom+xml" href="http://feeds.feedburner.com/sysmo-db/ALIS" /><subtitle type="html">Latest news</subtitle><updated>1970-01-01T00:00:00+00:00</updated><atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/rss+xml" href="http://feeds.feedburner.com/sysmo-db/ALIS" /><feedburner:info xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0" uri="sysmo-db/alis" /><atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="hub" href="http://pubsubhubbub.appspot.com/" /><entry><title type="text">Semi-Bad News</title><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/node/50" /><author><name>sowen</name></author><updated>2011-10-21T11:36:33-07:00</updated><id>50 at http://www.sysmo-db.org</id><content type="html">&lt;p&gt;There is a 30 minute maximum delay before feedburner updates.&lt;br /&gt;
-      But we can live with that, and its possible to ping it if we need it to update sooner.&lt;/p&gt;</content></entry><entry><title type="text">Good News</title><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/node/49" /><author><name>sowen</name></author><updated>2011-10-21T11:30:44-07:00</updated><id>49 at http://www.sysmo-db.org</id><content type="html">&lt;p&gt;Sysmo-DB news feed now working correctly and working in SEEK&lt;/p&gt;</content></entry><entry><title type="text">Some more news</title><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/node/47" /><author><name>sowen</name></author><updated>2011-10-21T08:45:08-07:00</updated><id>47 at http://www.sysmo-db.org</id><content type="html">&lt;p&gt;This is some more exiting news.&lt;/p&gt;</content></entry><entry><title type="text">Some news</title><link rel="alternate" type="text/html" href="http://www.sysmo-db.org/node/46" /><author><name>sowen</name></author><updated>2011-10-21T08:44:42-07:00</updated><id>46 at http://www.sysmo-db.org</id><content type="html">&lt;p&gt;Here is some news&lt;/p&gt;</content></entry></feed>!
+  test "feed reader should handle missing feed title" do
 
-    stub_request(:get,"http://feed.rss").to_return(:status=>200,:body=>xml)
     Seek::Config.project_news_enabled=true
-    Seek::Config.project_news_feed_urls = "http://feed.rss"
+    Seek::Config.project_news_feed_urls = uri_to_feed("simple_feed_with_subtitle.xml")
     Seek::Config.project_news_number_of_entries = "5"
 
     get :index
@@ -197,7 +182,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "li.homepanel_item" do
-      assert_select "div.feedinfo",:text=>/Latest news/,:count=>4
+      assert_select "div.feedinfo",:text=>/Unknown publisher/,:count=>4
     end
   end
 
@@ -208,9 +193,9 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test "should show the content of project news and community news with the configurable number of entries" do
-    sbml = mock_response_contents "http://sbml.atom.feed","sbml_atom.xml"
-    bbc = mock_response_contents "http://bbc.atom.feed","bbc_atom.xml"
-    guardian = mock_response_contents "http://guardian.atom.feed","guardian_atom.xml"
+    sbml = uri_to_sbml_feed
+    bbc = uri_to_bbc_feed
+    guardian = uri_to_guardian_feed
     #project news
     Seek::Config.project_news_enabled=true
     Seek::Config.project_news_feed_urls = "#{bbc}, #{sbml}"
@@ -307,6 +292,27 @@ class HomesControllerTest < ActionController::TestCase
         assert_select "div#search_box input#include_external_search",:count=>0
       end
     end
+  end
+
+  def uri_to_guardian_feed
+    uri_to_feed "guardian_atom.xml"
+  end
+
+  def uri_to_sbml_feed
+    uri_to_feed "sbml_atom.xml"
+  end
+
+  def uri_to_bbc_feed
+    uri_to_feed("bbc_atom.xml")
+  end
+
+  def uri_to_bad_feed
+    uri_to_feed("bad_atom.xml")
+  end
+
+  def uri_to_feed filename
+    path = File.join(Rails.root,"test","fixtures","files","mocking",filename)
+    URI.join('file:///',path).to_s
   end
   
 end

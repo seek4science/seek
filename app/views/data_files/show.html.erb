@@ -1,10 +1,6 @@
-<%= javascript_include_tag "resource" -%>
+
 <% truncate_length_for_boxes = 22 -%>
-<% if @data_file.is_with_sample?
-   bio_samples = @data_file.bio_samples_population nil, false
-   sample_names = bio_samples.instance_values["sample_names"]
-  end
--%>
+
 
 <%= render :partial => "general/item_title",:locals=>{:item=>@data_file } -%>
 
@@ -26,11 +22,16 @@
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
 
+      <%= item_description @display_data_file.description -%>
+
       <%= render :partial => 'assets/fileinfo',:object=>@display_data_file.content_blob -%>
 
       <br/>
+      <% if show_scales? -%>
+          <%= render :partial=>"scales/asset_scales_list",:object=>@data_file -%>
+      <% end %>
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
-      <%= item_description @display_data_file.description -%>
+
     </div>
   </div>
 
@@ -41,83 +42,15 @@
   </div>
 
   <div style="clear:both;">
-    <p>
-      <h2>Factors studied:</h2>
-      <%= render :partial=>"data_files/studied_factors" -%>
-    </p>
-
-    <div class="fold">
-
-      <div class="foldTitle">
-        Treatments
-      </div>
-
-      <div class="foldContent" style="display:none;" >
-        <% if can_download_asset?(@data_file, params[:code]) -%>
-                <% if Seek::Config.is_virtualliver &&  @data_file.is_with_sample?
-
-                     treatments = bio_samples.instance_values["treatments_text"]
-                     is_empty = treatments.empty?
-                     #treatments = Hash[treatments.sort] unless treatments.length == 0
-                     #sample_names = Hash[sample_names.sort] unless sample_names.length == 0
-                     #Rails.logger.warn "samples to render in extractions table: #{sample_names}"
-
-                     treatment_table = render :partial => "extractions_table", :locals => {:extractions => treatments, :sample_names => sample_names} unless is_empty
-                   else
-                     treatments = @display_data_file.treatments
-                     is_empty = treatments.values.keys.empty?
-                     treatment_table = render :partial => "treatment_table", :locals => {:treatments => treatments} unless is_empty
-                   end
-                 -%>
-                <% if is_empty -%>
-                    <span class="none_text">No treatments were found in the <%= t('data_file') %>, or it does not match a known template.</span>
-                <% else -%>
-                    <%= treatment_table -%>
-                <% end -%>
-        <% else -%>
-            <span id="treatments" class="none_text">You do not have permission to view the treatments for this <%= t('data_file') %>.</span>
-        <% end -%>
-      </div>
-    </div>
-  <% if @data_file.is_with_sample? -%>
-    <% rna_extractions = bio_samples.instance_values["rna_extractions"] -%>
-    <% unless rna_extractions.nil? -%>
-        <% unless rna_extractions.empty? -%>
-            <div class="fold">
-              <div class="foldTitle">
-                RNA Extractions
-              </div>
-              <div class="foldContent" style="display:none;">
-                <% if can_download_asset?(@data_file, params[:code]) -%>
-                    <%= render :partial => "extractions_table", :locals => {:extractions => rna_extractions, :sample_names => sample_names} -%>
-                <% else -%>
-                    <span id="rna_extractions" class="none_text">You do not have permission to view the RNA extractions for this file.</span>
-                <% end -%>
-              </div>
-            </div>
-        <% end -%>
-    <% end -%>
-    <% sequencing = bio_samples.instance_values["sequencing"] -%>
-    <% unless sequencing.nil? -%>
-        <% unless sequencing.empty? -%>
-            <div class="fold">
-              <div class="foldTitle">
-                Sequencing
-              </div>
-              <div class="foldContent" style="display:none;">
-                <% if can_download_asset?(@data_file, params[:code]) -%>
-
-                    <%= render :partial => "extractions_table", :locals => {:extractions => sequencing, :sample_names => sample_names} -%>
-
-                <% else -%>
-                    <span id="sequencing" class="none_text">You do not have permission to view the sequencing for this file.</span>
-                <% end -%>
-              </div>
-            </div>
-        <% end -%>
-    <% end -%>
-  <% end -%>
+    <% if Seek::Config.factors_studied_enabled %>
+        <p>
+          <h2>Factors studied:</h2>
+          <%= render :partial=>"data_files/studied_factors" -%>
+        </p>
+    <% end %>
+    <%= render(:partial=>"data_files/vl_samples_info") if Seek::Config.is_virtualliver -%>
   </div>
+
 
   <%= render :partial=>"general/items_related_to",:object => @data_file -%>
 

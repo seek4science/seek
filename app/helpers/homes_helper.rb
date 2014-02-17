@@ -11,6 +11,10 @@ module HomesHelper
     simple_format(auto_link(Seek::Config.home_description.html_safe,:sanitize=>false),{},:sanitize=>false)
   end
 
+  def show_guide_box?
+    Seek::Config.guide_box_enabled && ((!logged_in? && cookies[:hide_guide_box].nil?) || (logged_in? && current_user.try(:show_guide_box?)))
+  end
+
   def recent_project_changes_hash
 
     projects=current_user.person.projects
@@ -66,8 +70,6 @@ module HomesHelper
     item_hash
   end
 
-
-
   # get multiple feeds from multiple sites
   def get_feed feed_url=nil
     unless feed_url.blank?
@@ -102,10 +104,10 @@ module HomesHelper
       html=''
       unless entry.blank?
           #get the link of the entry
-          entry_link = try_block{entry.links.alternate.href}
+          entry_link = entry.url
           entry_title = entry.title || "Unknown title"
           feed_title = entry.feed_title || "Unknown publisher"
-          entry_date = try_block{entry.updated} || try_block{entry.published} || try_block{entry.last_modified}
+          entry_date = entry.try(:updated) || entry.try(:published) || entry.try(:last_modified)
           entry_summary = truncate(strip_tags(entry.summary || entry.content),:length=>500)
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
 
@@ -187,7 +189,7 @@ module HomesHelper
           tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{item[:created_at]}</p>")
           html << "<li class='homepanel_item'>"
           html << "#{icon} "
-          html << link_to(h(item[:title]), item[:url], :title => tooltip)
+          html << link_to(item[:title], item[:url], :title => tooltip)
           html << "<div class='feedinfo none_text'>"
           html << "<span>#{item[:type]} - #{action} #{time_ago_in_words(item[:created_at])} ago</span>"
           html << "</div>"

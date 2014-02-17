@@ -5,7 +5,7 @@ class AssaysController < ApplicationController
   include Seek::AnnotationCommon
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show]
 
   include Seek::Publishing::PublishingCommon
 
@@ -17,31 +17,38 @@ class AssaysController < ApplicationController
     params[:data_file_ids]=@existing_assay.data_file_masters.collect{|d|"#{d.id},None"}
     params[:related_publication_ids]= @existing_assay.related_publications.collect{|p| "#{p.id},None"}
 
-    unless @assay.study.can_edit?
-      @assay.study = nil
-      flash.now[:notice] = "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>".html_safe
+    if @existing_assay.can_view?
+      unless @assay.study.can_edit?
+        @assay.study = nil
+        flash.now[:notice] = "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>".html_safe
+      end
+
+      @existing_assay.data_file_masters.each do |d|
+        if !d.can_view?
+          flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+          break
+        end
+      end
+      @existing_assay.sop_masters.each do |s|
+        if !s.can_view?
+          flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+          break
+        end
+      end
+      @existing_assay.model_masters.each do |m|
+        if !m.can_view?
+          flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+          break
+        end
+      end
+
+      render :action=>"new"
+    else
+      flash[:error]="You do not have the necessary permissions to copy this #{t('assays.assay')}"
+      redirect_to @existing_assay
     end
 
-    @existing_assay.data_file_masters.each do |d|
-      if !d.can_view?
-       flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
-        break
-      end
-    end
-    @existing_assay.sop_masters.each do |s|
-       if !s.can_view?
-       flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
-        break
-      end
-    end
-    @existing_assay.model_masters.each do |m|
-       if !m.can_view?
-       flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
-        break
-      end
-    end
 
-    render :action=>"new"
    end
 
   def new
@@ -50,6 +57,10 @@ class AssaysController < ApplicationController
     study = Study.find(params[:study_id]) if params[:study_id]
     @assay.study = study if params[:study_id] if study.try :can_edit?
     @assay_class=params[:class]
+
+    #jump straight to experimental if modelling analysis is disabled
+    @assay_class ||= "experimental" unless Seek::Config.modelling_analysis_enabled
+
     @assay.assay_class=AssayClass.for_type(@assay_class) unless @assay_class.nil?
 
     investigations = Investigation.all.select &:can_view?
@@ -79,6 +90,7 @@ class AssaysController < ApplicationController
   end
 
   def create
+    params[:assay_class_id] ||= AssayClass.for_type("experimental").id
     @assay        = Assay.new(params[:assay])
 
     organisms     = params[:assay_organism_ids] || []
@@ -97,6 +109,7 @@ class AssaysController < ApplicationController
     @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
 
     update_annotations @assay #this saves the assay
+    update_scales @assay
 
 
       if @assay.save
@@ -156,6 +169,7 @@ class AssaysController < ApplicationController
         end
 
     update_annotations @assay
+    update_scales @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     @assay.attributes = params[:assay]

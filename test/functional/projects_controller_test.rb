@@ -118,11 +118,21 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory :person
     project = person.projects.first
     other_person = Factory :person
+    refute project.has_member?(other_person)
     login_as(other_person.user)
     get :asset_report,:id=>project.id
     assert_redirected_to project
     assert_not_nil flash[:error]
 
+  end
+
+  test "asset report available to non project member if admin" do
+    admin = Factory :admin
+    project = Factory :project
+    refute project.has_member?(admin)
+    login_as(admin)
+    get :asset_report, :id=>project.id
+    assert_response :success
   end
 
   test "asset report button shown to project members" do
@@ -153,7 +163,7 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory :person
     project = person.projects.first
     other_person = Factory :person
-    assert !project.people.include?(other_person)
+    refute project.has_member?(other_person)
 
     login_as other_person.user
     get :show, :id=>project.id
@@ -162,6 +172,18 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select "a[href=?]",asset_report_project_path(project),:text=>"Sharing report",:count=>0
     end
 
+  end
+
+  test "asset report button shown to admin that is not a project member" do
+    admin = Factory(:admin)
+    project = Factory(:project)
+    refute project.has_member?(admin)
+    login_as(admin)
+    get :show, :id=>project.id
+    assert_response :success
+    assert_select "ul.sectionIcons" do
+      assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report"
+    end
   end
 
   test "should show organise link for member" do
@@ -230,15 +252,19 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_user_project_manager
-		login_as(:project_manager)
-		get :show, :id=>projects(:three)
+    pm = Factory(:project_manager)
+    proj = pm.projects.first
+		login_as(pm.user)
+		get :show, :id=>proj.id
 		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
-		get :edit, :id=>projects(:three)
+		get :edit, :id=>proj.id
 		assert_response :success
 
-		put :update, :id=>projects(:three).id,:project=>{}
-		assert_redirected_to project_path(assigns(:project))
+		put :update, :id=>proj.id,:project=>{:title=>"fish"}
+    proj = assigns(:project)
+		assert_redirected_to project_path(proj)
+    assert_equal "fish",proj.title
 	end
 
 	def test_user_cant_edit_project
@@ -427,8 +453,9 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	test "non admin cannot administer project" do
-		login_as(:pal_user)
-		get :admin,:id=>projects(:sysmo_project)
+    person = Factory(:person)
+		login_as(person.user)
+		get :admin,:id=>person.projects.first
 		assert_response :redirect
 		assert_not_nil flash[:error]
 	end
@@ -547,54 +574,29 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'project manager can only see the new institutions (which are not yet in any projects) and the institutions this project' do
+  test 'project manager can only see all institutions' do
     project_manager = Factory(:project_manager)
     project = project_manager.projects.first
     login_as(project_manager.user)
-
-    new_institution = Institution.create(:name => 'a test institution')
-    a_project = Factory(:project)
-    a_project.institutions << Factory(:institution)
+    Factory(:institution)
 
     get :admin, :id => project
     assert_response :success
-
-    (project.institutions + [new_institution]).each do |institution|
+    Institution.all.each do |institution|
       assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 1
     end
-    a_project.institutions.each do |institution|
-      assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 0
-    end
   end
 
-  test 'project manager can assign only the new institutions (which are not yet in any projects) to their project' do
+  test 'project manager can assign all institutions to their project' do
     project_manager = Factory(:project_manager)
     project = project_manager.projects.first
     login_as(project_manager.user)
+    a_institution = Factory(:institution)
 
-    new_institution = Institution.create(:name => 'a test institution')
-
-    put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
+    put :update, :id => project, :project => {:institution_ids => Institution.all.collect(&:id)}
     assert_redirected_to project_path(project)
     project.reload
-    assert project.institutions.include?new_institution
-  end
-
-  test 'project manager can not assign the institutions (which are already in the other projects) to their project' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    a_project = Factory(:project)
-    a_project.institutions << Factory(:institution)
-
-    login_as(project_manager.user)
-
-    put :update, :id => project, :project => {:institution_ids => (project.institutions + a_project.institutions).collect(&:id)}
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-    project.reload
-    a_project.institutions.each do |i|
-       assert !(project.institutions.include?i)
-    end
+    assert_equal Institution.count, project.institutions.count
   end
 
   test 'project manager can not administer sharing policy' do
@@ -636,20 +638,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test "should view_items_in_tab in project page for non-admin" do
-    project = Factory(:project)
-    df = Factory :data_file,
-                 :title=>"a data file",
-                 :contributor=>User.current_user,
-                 :policy=>Factory(:public_policy),
-                 :project_ids => [project.id]
 
-    login_as(Factory(:user))
-    get :view_items_in_tab,{:resource_type=>"DataFile",:resource_ids=>[df.id].join(",")}
-
-    assert_response :success
-    assert @response.body.include?("a data file")
-  end
 
   test "can not remove workgroup if it contains people" do
     project = Factory(:project)
@@ -669,6 +658,106 @@ class ProjectsControllerTest < ActionController::TestCase
     assert !project.reload.institutions.empty?
     assert !work_group.reload.people.empty?
   end
+
+
+  test "projects belonging to an institution through nested route" do
+    assert_routing "institutions/3/projects",{controller:"projects",action:"index",institution_id:"3"}
+
+    project = Factory(:project)
+    institution = Factory(:institution)
+    Factory(:work_group, :project => project, :institution => institution)
+    project2 = Factory(:project)
+    Factory(:work_group, :project => project2, :institution => Factory(:institution))
+
+    get :index,institution_id:institution.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(project),:text=>project.title
+      assert_select "p > a[href=?]",project_path(project2),:text=>project2.title,:count=>0
+    end
+
+  end
+
+  test "projects filtered by data file using nested routes" do
+    assert_routing "data_files/3/projects",{controller:"projects",action:"index",data_file_id:"3"}
+    df1 = Factory(:data_file,policy:Factory(:public_policy))
+    df2 = Factory(:data_file,policy:Factory(:public_policy))
+    refute_equal df1.projects,df2.projects
+    get :index,data_file_id:df1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(df1.projects.first),:text=>df1.projects.first.title
+      assert_select "p > a[href=?]",project_path(df2.projects.first),:text=>df2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by models using nested routes" do
+    assert_routing "models/3/projects",{controller:"projects",action:"index",model_id:"3"}
+    model1 = Factory(:model,policy:Factory(:public_policy))
+    model2 = Factory(:model,policy:Factory(:public_policy))
+    refute_equal model1.projects,model2.projects
+    get :index,model_id:model1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(model1.projects.first),:text=>model1.projects.first.title
+      assert_select "p > a[href=?]",project_path(model2.projects.first),:text=>model2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by sops using nested routes" do
+    assert_routing "sops/3/projects",{controller:"projects",action:"index",sop_id:"3"}
+    sop1 = Factory(:sop,policy:Factory(:public_policy))
+    sop2 = Factory(:sop,policy:Factory(:public_policy))
+    refute_equal sop1.projects,sop2.projects
+    get :index,sop_id:sop1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(sop1.projects.first),:text=>sop1.projects.first.title
+      assert_select "p > a[href=?]",project_path(sop2.projects.first),:text=>sop2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by publication using nested routes" do
+    assert_routing "publications/3/projects",{controller:"projects",action:"index",publication_id:"3"}
+    pub1 = Factory(:publication)
+    pub2 = Factory(:publication)
+    refute_equal pub1.projects,pub2.projects
+    get :index,publication_id:pub1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(pub1.projects.first),:text=>pub1.projects.first.title
+      assert_select "p > a[href=?]",project_path(pub2.projects.first),:text=>pub2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by events using nested routes" do
+    assert_routing "events/3/projects",{controller:"projects",action:"index",event_id:"3"}
+    event1 = Factory(:event)
+    event2 = Factory(:event)
+    refute_equal event1.projects,event2.projects
+    get :index,event_id:event1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(event1.projects.first),:text=>event1.projects.first.title
+      assert_select "p > a[href=?]",project_path(event2.projects.first),:text=>event2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by specimens using nested routes" do
+    assert_routing "specimens/2/projects",{controller:"projects",action:"index",specimen_id:"2"}
+    spec1 = Factory(:specimen,:policy=>Factory(:public_policy))
+    spec2 = Factory(:specimen,:policy=>Factory(:public_policy))
+    refute_equal spec1.projects,spec2.projects
+    refute_equal spec1.projects.first,spec2.projects.first
+    get :index,specimen_id:spec1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(spec1.projects.first),:text=>spec1.projects.first.title
+      assert_select "p > a[href=?]",project_path(spec2.projects.first),:text=>spec2.projects.first.title,:count=>0
+    end
+
+  end
+
 
 	private
 

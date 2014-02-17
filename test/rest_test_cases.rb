@@ -29,6 +29,30 @@ module RestTestCases
       assert_equal object.title,title.content
     end
   end
+
+  def test_response_code_for_not_accessible_xml
+    clz = @controller.controller_name.classify.constantize
+    if clz.respond_to?(:authorization_supported?) && clz.authorization_supported?
+      itemname = @controller.controller_name.singularize.underscore
+      item = Factory itemname.to_sym, :policy => Factory(:private_policy)
+
+      logout
+      get :show,:id=>item.id,:format=>"xml"
+      assert_response :forbidden
+    end
+  end
+
+  def test_response_code_for_not_available_xml
+    clz = @controller.controller_name.classify.constantize
+    id = 9999
+    while (!clz.find_by_id(id).nil?)
+      id += 1
+    end
+
+    logout
+    get :show,:id=>id,:format=>"xml"
+    assert_response :not_found
+  end
   
   def perform_api_checks
     assert_response :success    
@@ -45,7 +69,8 @@ module RestTestCases
     return true,""    
   end  
   
-  def validate_xml_against_schema(xml,schema=SCHEMA_FILE_PATH)       
+  def validate_xml_against_schema(xml,schema=SCHEMA_FILE_PATH)
+    skip("currently skipping REST API schema check") if skip_rest_schema_check?
     document = LibXML::XML::Document.string(xml)
     schema = LibXML::XML::Schema.new(schema)
     result = true

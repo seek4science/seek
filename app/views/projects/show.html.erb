@@ -20,7 +20,7 @@
     <% end -%>
 
 <% end -%>
-  <% if @project.try(:has_member?,current_user) -%>
+  <% if @project.try(:has_member?,current_user) || admin_logged_in? -%>
       <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
       <li><%= image_tag_for_key "report", asset_report_project_path(@project), "Asset report", {:title=>tooltip_title_attrib(tooltip_text)}, "Asset report" -%></li>
   <% end -%>
@@ -30,7 +30,8 @@
 
   <div class="main_content_left_box">
 
-    <div class="box_about_actor">      
+    <div class="box_about_actor">
+      <%=  item_description @project.description -%>
         <p>
           <label>Public web page:</label>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
@@ -42,11 +43,12 @@
             <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
           </p>
         <% end %>
-
-        <p>
-          <label>Organisms:</label>
-          <%= organisms_link_list @project.organisms -%>
-        </p>
+        <% if Seek::Config.organisms_enabled %>
+            <p>
+                <label>Organisms:</label>
+                <%= organisms_link_list @project.organisms -%>
+            </p>
+        <% end %>
 
         <p class="pals">
           <label><%= Seek::Config.dm_project_name %> PALs:</label>
@@ -87,8 +89,6 @@
   <% end %>
 
   <div style="clear:both;">
-    <%=  item_description @project.description,:label=>"About this #{t('project')}" %>
-
     <%# get, classify and authorize all assets for this project -%>
     <%= render :partial=>"general/items_related_to",:object => @project %>
     

@@ -9,7 +9,7 @@ class PresentationsController < ApplicationController
   include AssetsCommonExtension
 
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
+  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon
@@ -64,6 +64,8 @@ class PresentationsController < ApplicationController
       @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.projects
 
       update_annotations @presentation
+      update_scales @presentation
+
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @presentation.save
@@ -134,6 +136,7 @@ class PresentationsController < ApplicationController
     publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
     update_annotations @presentation
+    update_scales @presentation
 
     @presentation.attributes = params[:presentation]
 

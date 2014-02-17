@@ -10,6 +10,7 @@
 <% authorization_already_done ||= false -%>
 <% actions_partial_disable ||= false %>
 <% display_immediately ||= false %>
+<% show_empty_tabs ||= false %>
 
 <% unless authorization_already_done
        resource_hash.each_value do |res|
@@ -42,14 +43,12 @@
 <% total_count = 0 %>
 <% resource_hash.each_key do |k| %>
   <% count = resource_hash[k][:items].size + resource_hash[k][:hidden_count] %>
-  <% resource_hash.delete(k) if count == 0 %>
+  <% resource_hash.delete(k) if (!show_empty_tabs && count == 0) %>
   <% total_count += count %>
 <% end %>
-<% unless total_count == 0-%>
-  <div id='<%= "#{tabs_id}_spinner".html_safe -%>'>
-    <center>
+<% if total_count > 0 || show_empty_tabs -%>
+  <div id='<%= "#{tabs_id}_spinner".html_safe -%>' style="width:100%;text-align:center">
       <%= image_tag "ajax-loader-large.gif" -%>
-    </center>
   </div>
   <div <%= "id='#{tabs_id}'".html_safe if tabs_id -%> class="tabber" style="display:none;">
     <% assets = resource_hash.keys.sort_by do |asset|
@@ -61,6 +60,7 @@
       <% hidden_count = 0 %>
       <% extra_count = 0 %>
       <% is_external = false -%>
+
       <% unless resource_hash[resource_type].nil? %>
         <% if resource_hash.class == Hash %>
           <% hidden_count = resource_hash[resource_type][:hidden_count] %>
@@ -76,7 +76,7 @@
       <% visible_resource_type = resource_tab_item_name(resource_type,!is_external) -%>
       <% tab_title = "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%>
       <% title_class = is_external ? "external_result" : "" %>
-      <% unless (resources.empty? && hidden_count < 1) %>
+      <% if (!resources.empty? || hidden_count > 0) || show_empty_tabs %>
         <div id="<%= resource_type.downcase.pluralize.html_safe -%>" class="tabbertab">
           <% unless resources.empty? && extra_count < 1 %>
             <h3 class='<%= title_class -%>'><%= tab_title -%></h3>
@@ -87,7 +87,14 @@
 
                 <div id="<%= resource_type %>_view_all"></div>
           <% else %>
-            <h3><%= "#{visible_resource_type} (0+#{hidden_count})".html_safe -%></h3>
+            <h3><%= "#{visible_resource_type} (0#{'+'+hidden_count.to_s if hidden_count>0})".html_safe -%></h3>
+            <% if hidden_count==0 -%>
+                  <div class="list_items_container">
+                    <div class="hidden_list_item">
+                        <span class="none_text">There are no matching items</span>
+                    </div>
+                  </div>
+            <% end %>
           <% end %>
           <% unless extra_count < 1 %>
             <div class="list_items_container">
@@ -98,32 +105,7 @@
                 %>
                 <% item ||= nil
                     if item %>
-                      <%= link_to_with_callbacks "View all "+(extra_count + resources.size).to_s+" items",
-                                        {:url => url_for(:action => 'view_items_in_tab'),
-                                         :method => :get,
-                                         :condition => "check_tab_content('#{tab_content_view_all}', '#{tab_content_view_some}', '#{resource_type}')",
-                                         :with => "'resource_type=' + '#{resource_type}' +
-                                                   '&resource_ids=' + '#{(resource_hash[resource_type][:items] + resource_hash[resource_type][:extra_items]).collect(&:id).join(',')}' +
-                                                   '&view_type=' + 'view_all'",
-                                         :before => "$('#{tab_content_view_some}').hide();
-                                                     $('#{tab_content_view_all}').show();
-                                                     show_large_ajax_loader('#{tab_content_view_all}')"
-                                        },
-                                        {:id => "view_#{resource_type}s_and_extra", :style => "display:block", :remote=>true}
-                      -%>
-                      <%= link_to_with_callbacks "View " + resources.size.to_s + " items",
-                                        {:url => url_for(:action => 'view_items_in_tab'),
-                                         :method => :get,
-                                         :condition => "check_tab_content('#{tab_content_view_some}', '#{tab_content_view_all}', '#{resource_type}')",
-                                         :with => "'resource_type=' +
-                                                   '#{resource_type}' + '&resource_ids=' + '#{resource_hash[resource_type][:items].collect(&:id).join(',')}' +
-                                                   '&view_type=' + 'view_some'",
-                                         :before => "$('#{tab_content_view_all}').hide();
-                                                     $('#{tab_content_view_some}').show();
-                                                     show_large_ajax_loader('#{tab_content_view_some}')"
-                                        },
-                                        {:id => "view_#{resource_type}s", :style => "display:none", :remote=>true}
-                      -%>
+                    <%= link_to "View all "+(extra_count + resources.size).to_s+" items", [item,resource_type.tableize] -%>
                     <% else
                         link_to "View all items", eval("#{resource_type.pluralize.underscore}_path")
                     end

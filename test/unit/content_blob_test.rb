@@ -94,7 +94,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_file_dump
     pic=content_blobs(:picture_blob)
-    blob=ContentBlob.new(:data=>pic.data_io_object.read)
+    blob=ContentBlob.new(:data=>pic.data_io_object.read,:original_filename=>"piccy.jpg")
     blob.save!
     assert_not_nil blob.filepath
     data=nil
@@ -110,7 +110,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   def test_data_assignment
     pic=content_blobs(:picture_blob)
     pic.save! #to trigger callback to save to file
-    blob=ContentBlob.new(:data=>pic.data_io_object.read)
+    blob=ContentBlob.new(:data=>pic.data_io_object.read,:original_filename=>"piccy.jpg")
     blob.save!
     blob=ContentBlob.find(blob.id)
     assert_nil blob.data_old
@@ -148,7 +148,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_uuid
     pic=content_blobs(:picture_blob)
-    blob=ContentBlob.new(:data=>pic.data_io_object.read)
+    blob=ContentBlob.new(:data=>pic.data_io_object.read,:original_filename=>"piccy.jpg")
     blob.save!
     assert_not_nil blob.uuid
     assert_not_nil ContentBlob.find(blob.id).uuid
@@ -163,7 +163,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     io_object = Tempfile.new('tmp_io_object_test')
     io_object.write("blah blah\nmonkey_business")
 
-    blob=ContentBlob.new(:tmp_io_object=>io_object)
+    blob=ContentBlob.new(:tmp_io_object=>io_object,:original_filename=>"monkey.txt")
     assert_difference("ContentBlob.count") do
       blob.save!
     end
@@ -182,7 +182,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_string_io_object
     io_object = StringIO.new("frog")
-    blob=ContentBlob.new(:tmp_io_object=>io_object)
+    blob=ContentBlob.new(:tmp_io_object=>io_object,:original_filename=>"frog.txt")
     assert_difference("ContentBlob.count") do
       blob.save!
     end
@@ -199,9 +199,19 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal "frog",data.to_s
   end
 
+  test "validates by content blob or url" do
+    blob = ContentBlob.new
+    refute blob.valid?
+    blob.original_filename="fish"
+    assert blob.valid?
+    blob.original_filename=nil
+    blob.url="http://google.com"
+    assert blob.valid?
+  end
+
   def test_data_io
     io_object = StringIO.new("frog")
-    blob=ContentBlob.new(:tmp_io_object=>io_object)
+    blob=ContentBlob.new(:tmp_io_object=>io_object,:original_filename=>"frog.txt")
     blob.save!
     blob.reload
     assert_equal "frog",blob.data_io_object.read
@@ -211,7 +221,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     f.close
 
     io_object = File.new(f.path,"r")
-    blob=ContentBlob.new(:tmp_io_object=>io_object)
+    blob=ContentBlob.new(:tmp_io_object=>io_object,:original_filename=>"seek-data-io-test")
     blob.save!
     blob.reload
     io_object.rewind
@@ -223,7 +233,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob.reload
     assert_nil blob.data_io_object
 
-    blob=ContentBlob.new
+    blob=ContentBlob.new :original_filename=>"nil"
     assert_nil blob.data_io_object
     blob.save!
     assert_nil blob.data_io_object
@@ -241,7 +251,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_exception_when_both_data_and_io_object
     io_object = StringIO.new("frog")
-    blob=ContentBlob.new(:tmp_io_object=>io_object,:data=>"snake")
+    blob=ContentBlob.new(:tmp_io_object=>io_object,:data=>"snake",:original_filename=>"snake.txt")
     assert_raise Exception do
       blob.save
     end
@@ -274,7 +284,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal "Spreadsheet",content_blob.human_content_type
 
     content_blob.content_type = "text/html"
-    assert_equal "Website",content_blob.human_content_type
+    assert_equal "HTML document",content_blob.human_content_type
 
     content_blob.content_type = "application/x-download"
     assert_equal "Unknown file type",content_blob.human_content_type

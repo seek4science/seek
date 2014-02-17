@@ -31,11 +31,14 @@
 			<% if avatar_can_be_edited_by_current_user -%>
 				<% avatar_link = avatar_url(@avatar_owner_instance, avatar.id) -%>
 				<% unless avatar.selected? -%>
-					<%= image_tag_for_key "avatar", avatar_link + "/select", nil, { :method => :post }, "Set as Main Picture" -%>
+              <%
+                change_path = eval("select_#{@avatar_owner_instance.class.name.downcase}_avatar_path(@avatar_owner_instance,avatar)")
+              %>
+					<%= image_tag_for_key "avatar", change_path, nil, { :method => :post }, "Set as Main Picture" -%>
 				<% end -%>
 			<% end -%>
 			<%# "enlarge" option is shown to everyone -%>
-			<%= image_tag_for_key "show", avatar_url(@avatar_owner_instance, avatar.id, "large"), nil, nil, "Enlarge" -%>
+			<%= image_tag_for_key "show", avatar_url(@avatar_owner_instance, avatar.id, "large"), nil, nil, "View enlarged" -%>
 			<% if avatar_can_be_edited_by_current_user -%>
 				<%= image_tag_for_key "destroy", avatar_link, nil, { :confirm => 'Are you sure?', :method => :delete }, "Delete" -%>
 			<% end -%>

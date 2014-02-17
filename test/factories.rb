@@ -3,6 +3,10 @@
 #:assay_modelling and :assay_experimental rely on the existence of the AssayClass's
 
 #Person
+  Factory.define(:admin_defined_role_project, :class=>AdminDefinedRoleProject) do |f|
+
+  end
+
   Factory.define(:brand_new_person, :class => Person) do |f|
     f.sequence(:email) { |n| "test#{n}@test.com" }
     f.sequence(:first_name) { |n| "Person#{n}" }
@@ -11,6 +15,17 @@
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
     f.group_memberships {[Factory.build(:group_membership)]}
+    f.after_create do |p|
+      p.reload
+    end
+  end
+
+  Factory.define(:person_in_multiple_projects, :parent=>:brand_new_person) do |f|
+    f.association :user, :factory => :activated_user
+    f.group_memberships {[Factory.build(:group_membership),Factory.build(:group_membership),Factory.build(:group_membership)]}
+    f.after_create do |p|
+      p.reload
+    end
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|
@@ -22,20 +37,34 @@
   end
 
   Factory.define(:pal, :parent => :person) do |f|
-    f.is_pal true
-    f.after_create { |pal| pal.group_memberships.first.project_roles << ProjectRole.pal_role}
+    f.roles_mask 2
+    f.after_build do |pal|
+      Factory(:pal_role) if ProjectRole.pal_role.nil?
+      pal.group_memberships.first.project_roles << ProjectRole.pal_role
+      Factory(:admin_defined_role_project,:project=>pal.projects.first,:person=>pal,:role_mask=>2)
+      pal.roles_mask = 2
+    end
   end
 
   Factory.define(:asset_manager,:parent=>:person) do |f|
-    f.is_asset_manager true
+    f.after_build do |am|
+      Factory(:admin_defined_role_project,:project=>am.projects.first,:person=>am,:role_mask=>8)
+      am.roles_mask = 8
+    end
   end
 
   Factory.define(:project_manager,:parent=>:person) do |f|
-    f.is_project_manager true
+    f.after_build do |pm|
+      Factory(:admin_defined_role_project,:project=>pm.projects.first,:person=>pm,:role_mask=>4)
+      pm.roles_mask = 4
+    end
   end
 
   Factory.define(:gatekeeper,:parent=>:person) do |f|
-    f.is_gatekeeper true
+    f.after_build do |gk|
+      Factory(:admin_defined_role_project,:project=>gk.projects.first,:person=>gk,:role_mask=>16)
+      gk.roles_mask = 16
+    end
   end
 
 #User
@@ -159,17 +188,6 @@ end
     f.access_type Policy::NO_ACCESS
   end
 
-#Assay and Technology types
-
-  Factory.define(:technology_type, :class=>TechnologyType) do |f|
-    f.sequence(:title) {|n| "A TechnologyType#{n}"}
-    f.sequence(:term_uri) {|n| "http://technology_types/term##{n}"}
-  end
-
-  Factory.define(:assay_type) do |f|
-    f.sequence(:title) {|n| "An AssayType#{n}"}
-    f.sequence(:term_uri) {|n| "http://assay_types/term##{n}"}
-  end
 
   #Assay
   Factory.define(:assay_base, :class => Assay) do |f|
@@ -177,7 +195,6 @@ end
     f.sequence(:description) {|n| "Assay description #{n}"}
     f.association :contributor, :factory => :person
     f.association :study
-    f.association :assay_type
 
   end
 
@@ -193,6 +210,8 @@ end
 
   Factory.define(:modelling_assay, :parent => :assay_base) do |f|
     f.association :assay_class, :factory => :modelling_assay_class
+    f.assay_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
+    f.assay_type_label "modelling analysis"
   end
 
   Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
@@ -201,7 +220,10 @@ end
   end
   Factory.define(:experimental_assay, :parent => :assay_base) do |f|
     f.association :assay_class, :factory => :experimental_assay_class
-    f.association :technology_type
+    f.assay_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
+    f.assay_type_label "experimental assay type"
+    f.technology_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
+    f.technology_type_label "technology type"
     f.samples {[Factory.build(:sample)]}
   end
 
@@ -472,6 +494,10 @@ end
     f.name "A Role"
   end
 
+  Factory.define(:pal_role,:parent=>:project_role) do |f|
+    f.name "A Pal"
+  end
+
   Factory.define(:work_group) do |f|
     f.association :project
     f.association :institution
@@ -505,6 +531,7 @@ end
     f.title "An Event"
     f.start_date Time.now
     f.end_date 1.days.from_now
+    f.projects { [Factory.build(:project)] }
   end
 
   Factory.define(:saved_search) do |f|
@@ -519,6 +546,7 @@ end
   Factory.define(:content_blob) do |f|
     f.sequence(:uuid) { UUIDTools::UUID.random_create.to_s }
     f.sequence(:data) {|n| "data [#{n}]" }
+    f.sequence(:original_filename) {|n| "file-#{n}"}
   end
 
   Factory.define(:url_content_blob, :parent => :content_blob) do |f|
@@ -546,6 +574,7 @@ end
   Factory.define(:rightfield_annotated_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/simple_populated_rightfield.xls","rb").read
     f.content_type "application/excel"
+    f.original_filename 'simple_populated_rightfield.xls'
   end
 
   Factory.define(:small_test_spreadsheet_content_blob,:parent=>:content_blob) do |f|
@@ -557,6 +586,7 @@ end
   Factory.define(:xlsx_content_blob,:parent=>:content_blob) do |f|
     f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     f.data  File.new("#{Rails.root}/test/fixtures/files/lihua_column_index_error.xlsx","rb").read
+    f.original_filename 'lihua_column_index_error.xlsx'
   end
 
   Factory.define(:cronwright_model_content_blob,:parent=>:content_blob) do |f|
@@ -600,11 +630,13 @@ end
   Factory.define(:docx_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_word_test.docx", "rb").read
     f.content_type "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    f.original_filename 'ms_word_test.docx'
   end
 
   Factory.define(:odt_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_word_test.odt", "rb").read
     f.content_type 'application/vnd.oasis.opendocument.text'
+    f.original_filename 'openoffice_word_test.odt'
   end
 
   Factory.define(:ppt_content_blob, :parent => :content_blob) do |f|
@@ -616,21 +648,25 @@ end
   Factory.define(:pptx_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/ms_ppt_test.pptx", "rb").read
     f.content_type "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    f.original_filename 'ms_ppt_test.pptx'
   end
 
   Factory.define(:odp_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/openoffice_ppt_test.odp", "rb").read
     f.content_type 'application/vnd.oasis.opendocument.presentation'
+    f.original_filename 'openoffice_ppt_test.odp'
   end
 
   Factory.define(:rtf_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/rtf_test.rtf", "rb").read
     f.content_type "application/rtf"
+    f.original_filename 'rtf_test.rtf'
   end
 
   Factory.define(:txt_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/txt_test.txt", "rb").read
     f.content_type "text/plain"
+    f.original_filename 'txt_test.txt'
   end
 
   Factory.define(:typeless_content_blob, :parent=>:content_blob) do |f|
@@ -739,13 +775,25 @@ end
     f.sequence(:title) {|n| "Announcement #{n}"}
     f.sequence(:body) {|n| "This is the body for announcement #{n}"}
     f.association :announcer,:factory=>:admin
-    f.is_headline false
     f.expires_at 5.days.since
     f.email_notification false
+    f.is_headline false
   end
 
   Factory.define :headline_announcement,:parent=>:site_announcement do |f|
     f.is_headline true
+    f.title "a headline announcement"
+  end
+
+  Factory.define :feed_announcement,:parent=>:site_announcement do |f|
+    f.show_in_feed true
+    f.title "a feed announcement"
+  end
+
+  Factory.define :mail_announcement, :parent=>:site_announcement do |f|
+    f.email_notification true
+    f.title "a mail announcement"
+    f.body "this is a mail announcement"
   end
 
   Factory.define :annotation do |f|

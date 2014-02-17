@@ -1,40 +1,32 @@
-<% @authorized_assays = @assay_type.get_child_assays.select(&:can_view?) %>
-<h1><%= t('assays.assay') %> type '<%= h @assay_type.title.capitalize %>'</h1>
+<%
+assay_type_text = @is_modelling ? "Biological problem addressed" : "#{t('assays.assay')} type"
+%>
 
-<div class="ontology_nav">
-
-
-  <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
-  <% if @assay_type.has_parents? -%>
-    <% for parent_type in @assay_type.parents  -%>
-      <%= link_to h(parent_type.title.capitalize), parent_type %>
-      <%= " | " unless @assay_type.parents.last==parent_type %>
-    <% end -%>
-  <% else -%>
-    <span class="none_text">No parent terms</span>
-  <% end -%>
-
-  <br/>
+<%= render :partial => "general/item_title",:locals=>{:title=>"#{assay_type_text} '#{h(@label)}'"} %>
 
 
-  <%= image("current",{:title=>"Current #{t('assays.assay').downcase} type",:alt=>"Current #{t('assays.assay').downcase} type",:style=>"vertical-align:middle"}) -%>
-  <%= h @assay_type.title.capitalize -%>
-  <br/>
+<% unless @type_class.nil? -%>
 
+    <div class="ontology_nav">
 
-  <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
-  <% if @assay_type.has_children? -%>
-    <% for child_type in @assay_type.children  -%>
-      <%= link_to h(child_type.title.capitalize), child_type %> (<%= (child_type.get_child_assays & @authorized_assays).count %>)
-      <%= " | " unless @assay_type.children.last==child_type %>
-    <% end -%>
-  <% else -%>
-    <span class="none_text">No child terms</span>
-  <% end -%>
+      <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
+      <%= parent_assay_types_list_links @type_class.parents  -%>
 
-</div>
+      <br/>
 
-<h2>Related <%= t('assays.assay').downcase.pluralize %></h2>
-<div class="list_items_container">
-  <%= render :partial => "assets/resource_list_item", :collection=>@authorized_assays -%>
-</div>
+      <%= image("current",{:title=>"Current #{assay_type_text}",:alt=>"Current #{assay_type_text}",:style=>"vertical-align:middle"}) -%>
+      <%= displayed_hierarchy_current_label(@label,@type_class) -%>
+
+      <br/>
+
+      <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
+      <%= child_assay_types_list_links @type_class.children  -%>
+
+    </div>
+
+    <h2>Related <%= t('assays.assay').downcase.pluralize %></h2>
+    <div class="list_items_container">
+      <%= render :partial => "assets/resource_list_item", :collection=>@assays %>
+    </div>
+
+<% end -%>

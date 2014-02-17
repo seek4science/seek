@@ -171,11 +171,13 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "creators through asset" do
-    model=models(:teusink)
+    p1 = Factory(:person)
+    p2 = Factory(:person)
+    model=Factory(:teusink_model,:creators=>[p1,p2])
     assert_not_nil model.creators
     assert_equal 2,model.creators.size
-    assert model.creators.include?(people(:pal))
-    assert model.creators.include?(people(:person_for_model_owner))
+    assert model.creators.include?(p1)
+    assert model.creators.include?(p2)
     
   end
   

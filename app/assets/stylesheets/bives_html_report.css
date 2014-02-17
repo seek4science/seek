@@ -1,0 +1,100 @@
+div#version_file_selection {
+    margin-top: 1em;
+    padding: 0.25em 1em 0.75em;
+}
+
+div#version_file_selection li {
+    float :left;
+}
+
+div.bives_output {
+    padding: 0.25em 1em 1em;
+}
+div.bives_output h1 {
+    text-align: left;
+    padding-left:1em;
+}
+div.bives_output h2 {
+    background-image:none;
+    background-color: transparent;
+    border: none;
+    font-size:larger;
+    padding: 0px 1em 0px;
+
+}
+div.bives_output li {
+    list-style: none;
+}
+
+div.bives_output span.bives-delete {
+    color:red;
+}
+
+div.bives_output span.bives-insert {
+    color:blue;
+}
+
+div.bives_output table {
+    width:100%;
+    border:#CCC solid 1px;
+}
+div.bives_output tr {
+    background-color: white;
+    border: #CCC solid 1px;
+}
+div.bives_output tr:nth-child(even) {
+    background-color: #bbd6ff;
+
+}
+
+div.bives_output td {
+    text-align: left;
+}
+div.bives_output td.bives-table-left {
+    width: 15em;
+}
+
+span.bives-attr {
+    font-style: italic;
+    font-weight: bolder;
+}
+
+div.bives_cytoscape_graph {
+    width: 75%;
+    height: 50em;
+}
+
+div#chemical_reaction_network {
+    background-color: white;
+    padding-left:1em;
+}
+
+div#chemical_reaction_network p span.bives-delete {
+    font-weight: bolder;
+    padding: 3px;
+    background-color: red;
+    color:white;
+}
+
+div#chemical_reaction_network p span.bives-insert {
+    font-weight: bolder;
+    padding: 3px;
+    background-color: blue;
+    color:white;
+}
+
+div#chemical_reaction_network p span.bives-update {
+    font-weight: bolder;
+    padding: 3px;
+    background-color: yellow;
+}
+
+div#chemical_reaction_network p#legend img {
+    vertical-align: middle;
+}
+
+div#chemical_reaction_network p#legend span.legend_text {
+    vertical-align: middle;
+    padding-right: 1em;
+    padding-left: 0.5em;
+}

@@ -41,18 +41,24 @@ class AssetTest < ActiveSupport::TestCase
 
   test "assay type titles" do
     df = Factory :data_file
-    assay = Factory :experimental_assay,:assay_type=>Factory(:assay_type,:title=>"aaa")
-    assay2 = Factory :modelling_assay,:assay_type=>Factory(:assay_type,:title=>"bbb")
+    assay = Factory :experimental_assay,:assay_type_label=>"aaa"
+    assay2 = Factory :modelling_assay,:assay_type_label=>"bbb"
+    assay3 = Factory :modelling_assay,:assay_type_label=>nil,:assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle"
+    assay4 = Factory :modelling_assay,:assay_type_label=>nil,:assay_type_uri=>"http://some-made-up-uri-not-resolvable-from-ontology.org/types#to_force_nil_label"
 
     disable_authorization_checks do
       assay.relate(df)
       assay2.relate(df)
       assay.reload
       assay2.reload
+      assay3.relate(df)
+      assay3.reload
+      assay4.relate(df)
+      assay4.reload
       df.reload
     end
 
-    assert_equal ["aaa","bbb"],df.assay_type_titles.sort
+    assert_equal ["Cell cycle","aaa","bbb"],df.assay_type_titles.sort
     m=Factory :model
     assert_equal [],m.assay_type_titles
 
@@ -126,9 +132,9 @@ class AssetTest < ActiveSupport::TestCase
 
   test "tech type titles" do
     df = Factory :data_file
-    assay = Factory :experimental_assay,:technology_type=>Factory(:technology_type,:title=>"aaa")
-    assay2 = Factory :modelling_assay,:technology_type=>Factory(:technology_type,:title=>"bbb")
-    assay3 = Factory :modelling_assay,:technology_type=>nil
+    assay = Factory :experimental_assay,:technology_type_label=>"aaa"
+    assay2 = Factory :modelling_assay,:technology_type_label=>"bbb"
+    assay3 = Factory :modelling_assay,:technology_type_label=>nil
 
     disable_authorization_checks do
       assay.relate(df)

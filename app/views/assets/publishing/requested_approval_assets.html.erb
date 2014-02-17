@@ -1,37 +1,5 @@
 <style type="text/css">
-    span.published {
-        font-size: 18px;
-        font-weight: bold;
-        color: green;
-    }
 
-    ul.item_for_decision {
-        padding-left: 1em;
-        margin-top: 2em;
-        margin-bottom: 2em;
-    }
-
-    ul.item_for_decision li.type_and_title {
-        font-weight: bolder;
-    }
-
-    span.approve {
-        color: limegreen;
-        font-weight: bolder;
-    }
-
-    span.reject {
-        color: red;
-        font-weight: bolder;
-    }
-
-    span.decide_later {
-        font-weight: bolder;
-    }
-
-    img.icon_visibility {
-        margin-left: 2em;
-    }
 </style>
 
 <div class="show_basic">
@@ -39,47 +7,47 @@
   <div class="box_infotext">
     <ul style="padding-left:1em;">
       <li>
-        <% project_names = current_user.person.projects.collect(&:name) %>
-        You are the <b>Gatekeeper</b> of <%= project_names.count > 1 ? t('project').pluralize : t('project') %>
-        : <%= project_names.join(', ') %>.
+        <% project_names = current_user.person.projects_for_role('gatekeeper').collect(&:title) %>
+        You are the Gatekeeper for the <%= t('project').downcase.pluralize(project_names.count) %>
+        : <strong><%= project_names.join(', ') %></strong>.
       </li>
       <li>
-        As the <b>Gatekeeper</b>, you control the process of making the items within
-        your <%= project_names.count > 1 ? t('project').pluralize : t('project') %> published, that is:
-        the owners of the items ask for your approval to make the items published.
+        As the Gatekeeper, you control the final process of publishing items in
+        your <%= t('project').downcase.pluralize(project_names.count) %>, that is:
+        the owners of the items requested to make these items public, but it requires your approval.
       </li>
       <li>
-        The owners will be informed if you <span class="approve">approve</span> or <span class="reject">reject</span> the requests.
+        The owners will be informed if you <span class="approve">approve</span> or <span class="reject">reject</span> these requests.
       </li>
     </ul>
   </div>
 
   <br/>
   <% if @requested_approval_assets.empty? %>
-      <span class="published">You have no items waiting for your approval</span>
+      <span class="published">There are no items waiting for your approval</span>
       <br/>
       <br/>
       <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
   <% else %>
       <%= form_tag :action => :gatekeeper_decide do %>
-          <h2>You have been requested to make the following items published. Please select your decision:</h2>
+          <h2>You have been requested to allow the following items to be published. Please select your decision:</h2>
           <% isa_order = ['Investigation', 'Study', 'Assay']%>
           <% @requested_approval_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
               <ul class="item_for_decision">
                 <li class="type_and_title">
-                  <%= text_for_resource asset -%>:&nbsp;<%= link_to (asset.title), asset -%>
+                  <strong><%= text_for_resource asset -%></strong>:&nbsp;<%= link_to (asset.title), asset -%>
                   <%= list_item_visibility(asset, "icon_visibility") -%>
                 </li>
                 <li class="request_info">
                   Requested by:&nbsp;
                   <% asset.publish_requesters.each do |requester| %>
                       <%= link_to(requester.name, requester) %>
-                      On
+                      on
                       <%
                          log = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND user_id=?",
                                                          asset.class.name, asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL, requester.user.id]).last
                       %>
-                      <%= date_as_string(log.created_at) %>
+                      <%= date_as_string(log.created_at,true) %>
                       <br/>
                   <% end %>
                 </li>
@@ -95,7 +63,7 @@
                   <span class="decide_later">Decide later</span>
                 </li>
                 <li class="comment">
-                  Reasons/comments(optional):
+                  Reason or other comments(optional):
                   <br/>
                   <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil, :style => "width: 50%;", :rows => 3 -%>
                 </li>

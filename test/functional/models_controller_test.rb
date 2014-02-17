@@ -8,6 +8,7 @@ class ModelsControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
+  include FunctionalAuthorizationTests
   
   def setup
     login_as(:model_owner)
@@ -268,7 +269,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "association of scales" do
-    scale1=Factory :scale
+    scale1=Factory :scale, :pos=>1
     scale2=Factory :scale, :pos=>2
     model_params = valid_model
 
@@ -283,6 +284,37 @@ class ModelsControllerTest < ActionController::TestCase
     put :update,:id=> m.id, :scale_ids=>[scale3.id.to_s]
     m = assigns(:model)
     assert_equal [scale3],m.scales
+  end
+
+  test "association of scales with params" do
+    scale1=Factory :scale, :pos=>1
+    scale2=Factory :scale, :pos=>2
+    model_params = valid_model
+    scale_ids_and_params=["{\"scale_id\":\"#{scale1.id}\",\"param\":\"fish\",\"unit\":\"meter\"}",
+                          "{\"scale_id\":\"#{scale2.id}\",\"param\":\"carrot\",\"unit\":\"cm\"}",
+                          "{\"scale_id\":\"#{scale1.id}\",\"param\":\"soup\",\"unit\":\"minute\"}"]
+
+    assert_difference("Model.count") do
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:scale_ids_and_params=>scale_ids_and_params,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+    end
+    m = assigns(:model)
+    assert_not_nil m
+    assert_equal [scale1,scale2],m.scales
+
+    info = m.fetch_additional_scale_info(scale1.id)
+    assert_equal 2,info.count
+    info.sort!{|a,b| a["param"]<=>b["param"]}
+
+    assert_equal "fish",info[0]["param"]
+    assert_equal "meter",info[0]["unit"]
+    assert_equal "soup",info[1]["param"]
+    assert_equal "minute",info[1]["unit"]
+
+    info = m.fetch_additional_scale_info(scale2.id)
+    assert_equal 1,info.count
+    info = info.first
+    assert_equal "carrot",info["param"]
+    assert_equal "cm",info["unit"]
   end
 
   test "should create model" do
@@ -481,13 +513,13 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select "div.box_about_actor" do
       assert_select "p > strong",:text=>"1 item is associated with this #{I18n.t('model')}:"
       assert_select "ul.fileinfo_list" do
-        assert_select "li.fileinfo_container" do
-            assert_select "p > b",:text=>/Filename:/
-            assert_select "p",:text=>/cronwright\.xml/
-            assert_select "p > b",:text=>/Format:/
-            assert_select "p",:text=>/XML document/
-            assert_select "p > b",:text=>/Size:/
-            assert_select "p",:text=>/5\.9 KB/
+        assert_select "li.fileinfo_container > div.fileinfo" do
+            assert_select "p > b",:text=>"Filename:"
+            assert_select "p > span.filename",:text=>"cronwright.xml"
+            assert_select "p > b",:text=>"Format:"
+            assert_select "p > span.format",:text=>"XML document"
+            assert_select "p > b",:text=>"Size:"
+            assert_select "p > span.filesize",:text=>"5.9 KB"
         end
       end
     end
@@ -508,15 +540,15 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "p > strong",:text=>"2 items are associated with this #{I18n.t('model')}:"
       assert_select "ul.fileinfo_list" do
         assert_select "li.fileinfo_container",:count=>2 do
-          assert_select "p > b",:text=>/Filename:/,:count=>2
-          assert_select "p",:text=>/cronwright\.xml/
-          assert_select "p",:text=>/rightfield\.xls/
-          assert_select "p > b",:text=>/Format:/,:count=>2
-          assert_select "p",:text=>/XML document/
-          assert_select "p",:text=>/Spreadsheet/
-          assert_select "p > b",:text=>/Size:/,:count=>2
-          assert_select "p",:text=>/5\.9 KB/
-          assert_select "p",:text=>/9\.2 KB/
+          assert_select "p > b",:text=>"Filename:",:count=>2
+          assert_select "p > span.filename",:text=>/cronwright\.xml/
+          assert_select "p > span.filename",:text=>/rightfield\.xls/
+          assert_select "p > b",:text=>"Format:",:count=>2
+          assert_select "p > span.format",:text=>"XML document"
+          assert_select "p > span.format",:text=>"Spreadsheet"
+          assert_select "p > b",:text=>"Size:",:count=>2
+          assert_select "p > span.filesize",:text=>"5.9 KB"
+          assert_select "p > span.filesize",:text=>"9.2 KB"
         end
       end
     end
@@ -642,8 +674,8 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
   
-  def test_update_should_not_overright_contributor
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this model
+  def test_update_should_not_overwrite_contributor
+    login_as(:model_owner) #this user is a member of sysmo, and can edit this model
     model=models(:model_with_no_contributor)
     put :update, :id => model, :model => {:title=>"blah blah blah blah" }
     updated_model=assigns(:model)
@@ -1023,6 +1055,37 @@ class ModelsControllerTest < ActionController::TestCase
     get :show, :id => multiple_files_model.id
     assert_response :success
     assert_select 'a', :text => /View content/, :count => 0
+  end
+
+  test "compare versions" do
+    #just compares with itself for now
+    model = Factory :model,:contributor=>User.current_user.person
+    assert model.contains_sbml?,"model should contain sbml"
+    assert model.can_download?,"should be able to download"
+
+    get :compare_versions,:id=>model,:other_version=>model.versions.last.version
+    assert_response :success
+    assert_select "div.bives_output ul li",:text=>/Both documents have same Level\/Version:/,:count=>1
+  end
+
+  test "cannot compare versions if you cannot download" do
+    model = Factory(:model,:contributor=>Factory(:person),:policy=>Factory(:publicly_viewable_policy))
+    assert model.can_view?, "should be able to view this model"
+    assert !model.can_download?, "should not be able to download this model"
+    get :compare_versions,:id=>model,:other_version=>model.versions.last.version
+    assert_response :redirect
+    refute_nil flash[:error]
+
+  end
+
+  test "gracefully handle error when other version missing" do
+    model = Factory :model,:contributor=>User.current_user.person
+    assert model.contains_sbml?,"model should contain sbml"
+    assert model.can_download?,"should be able to download"
+
+    get :compare_versions,:id=>model
+    assert_redirected_to model_path(model,:version=>model.version)
+    refute_nil flash[:error]
   end
 
   def valid_model

@@ -14,7 +14,7 @@ class FeedReaderTest < ActiveSupport::TestCase
   
   test "fetch atom entries" do
 
-    Seek::Config.project_news_feed_urls="#{stub_bbc}, #{stub_sbml}"
+    Seek::Config.project_news_feed_urls="#{uri_to_bbc_feed}, #{uri_to_sbml_feed}"
     Seek::Config.project_news_number_of_entries = 5
     entries = Seek::FeedReader.fetch_entries_for :project_news
 
@@ -22,42 +22,25 @@ class FeedReaderTest < ActiveSupport::TestCase
   end
 
   test "check caching" do
+    Seek::FeedReader.clear_cache
+    feed_to_use = uri_to_guardian_feed
 
-    feed_to_use = stub_guardian
-    path = Seek::FeedReader.cache_path(feed_to_use)
-    assert_equal File.join(Rails.root,"tmp","testing-seek-cache","atom-feeds",CGI::escape(feed_to_use)),path
-    FileUtils.rm path if File.exists?(path)
+    key = Seek::FeedReader.cache_key(feed_to_use)
+    refute_nil key
+    assert !Rails.cache.exist?(key)
 
     Seek::Config.project_news_feed_urls="#{feed_to_use}"
     Seek::FeedReader.fetch_entries_for :project_news
 
-    assert File.exists?(path)
+    assert Rails.cache.exist?(key)
 
-    #check it doesn't overwrite each time
-    time = File.mtime(path)
-    sleep(2)
-    Seek::FeedReader.fetch_entries_for :project_news
-    assert_equal time,File.mtime(path)
-  end
-
-  test "clear cache" do
-    dir = File.join(Rails.root,"tmp","testing-seek-cache","atom-feeds")
-
-    FileUtils.mkdir_p dir unless File.exists?(dir)
-
-    #stick a file in there to make sure it handles directory with files in
-    f=open(File.join(dir,"test-file"),"w+")
-    f.write("some info")
-    f.close
-    
     Seek::FeedReader.clear_cache
-    assert !File.exists?(dir)
+    assert !Rails.cache.exist?(key),"cache should have been cleared"
   end
 
   test "handles error and ignores bad feed" do
     XML::Error.set_handler(&XML::Error::QUIET_HANDLER)
-    stub_request(:get,"http://dodgy.atom.feed").to_return(:status=>200,:body=>"<badly><formed></xml>")
-    Seek::Config.project_news_feed_urls="http://dodgy.atom.feed"
+    Seek::Config.project_news_feed_urls="#{uri_to_bad_feed}}"
     Seek::Config.project_news_number_of_entries = 5
     entries = Seek::FeedReader.fetch_entries_for :project_news
     assert entries.empty?
@@ -65,16 +48,25 @@ class FeedReaderTest < ActiveSupport::TestCase
 
 
 
-  def stub_guardian
-    mock_response_contents "http://guardian.atom.feed","guardian_atom.xml"
+  def uri_to_guardian_feed
+    uri_to_feed "guardian_atom.xml"
   end
 
-  def stub_sbml
-    mock_response_contents "http://sbml.atom.feed","sbml_atom.xml"
+  def uri_to_sbml_feed
+    uri_to_feed "sbml_atom.xml"
   end
   
-  def stub_bbc
-    mock_response_contents "http://bbc.atom.feed","bbc_atom.xml"
+  def uri_to_bbc_feed
+    uri_to_feed("bbc_atom.xml")
+  end
+
+  def uri_to_bad_feed
+    uri_to_feed("bad_atom.xml")
+  end
+
+  def uri_to_feed filename
+    path = File.join(Rails.root,"test","fixtures","files","mocking",filename)
+    URI.join('file:///',path).to_s
   end
 
 end

@@ -10,6 +10,6 @@
 <% end %>
 <%= render :partial => "assets/resource_list", :locals => { :collection => @data_files, :authorization_for_showing_already_done=>true } %>
 
-<% if @data_files.page == "latest" && DataFile.count > Seek::Config.limit_latest%>
-   <%= render :partial => "general/paginate_see_all"%>
+<% if @data_files.page == "latest" && (n=DataFile.all_authorized_for("view").count) > Seek::Config.limit_latest%>
+   <%= render :partial => "general/paginate_see_all",:locals=>{:total=>n}%>
 <% end %>

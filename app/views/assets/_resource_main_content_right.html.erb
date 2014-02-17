@@ -17,5 +17,9 @@
                :truncate_to => truncate_length_for_boxes } -%>
   <% end -%>
 
+  <% if resource.is_a?(Model) -%>
+    <%= render :partial=>"assets/version_info_right",:locals=>{:resource=>resource, :versioned_resource=>versioned_resource} -%>
+  <% end -%>
+
   <%= render :partial => "assets/usage_info",:locals => { :resource => resource, :versioned_resource=>versioned_resource } -%>
 </div>

@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" -%>
+
 <% @page_title ||= "New #{t('data_file')}" %>
 <h1><%= @page_title %></h1>
 <% all_institutions = Institution.order(:name) %>
@@ -44,7 +44,10 @@
             <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file } -%>
-        
+
+      <% if show_scales? %>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@data_file} %>
+      <% end %>
 
         <%= fields_for(@data_file) {|f|render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
 
@@ -56,7 +59,8 @@
             <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
         <% end -%>
       </p>
-        <%= fields_for(@data_file) {|f| f.fancy_multiselect :samples, {:hidden=> @data_file.samples.blank?  ? true : false, :other_projects_checkbox => true}}  -%>
+      <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@data_file} %>
+
 
         <p>
           <%= preview_permission_popup_link(@data_file)-%>

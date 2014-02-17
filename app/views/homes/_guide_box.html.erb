@@ -1,5 +1,4 @@
-
-<% if (!logged_in? && cookies[:hide_guide_box].nil?) || (logged_in? && current_user.try(:show_guide_box?)) %>
+<% if show_guide_box? %>
     <% tool_tip_text = tooltip_title_attrib("You may delete this box so it is no longer shown in the future.") %>
     <div id='guide_box' class='top_home_panel curved with_shadow' >
       <span id="guide_box_close">

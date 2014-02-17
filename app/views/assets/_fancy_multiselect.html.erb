@@ -19,7 +19,7 @@
 
 %>
 
-<%= require_js "fancy_multiselect.js"  %>
+<%= require_js "fancy_multiselect"  %>
 
     <div class="yui-u first" <%= html_options %>>
       <p style="color: #666666;">
@@ -31,7 +31,7 @@
       <div class="association_step">
         <% if with_new_link  %>
          <p style="color: #666666;">
-             You may select an existing  <%= association.to_s.singularize %> or create <%= link_to h("new #{association.to_s.singularize.capitalize} here"), new_association_path, :onclick => "window.open(this.href);return false;"%>  for the <%= object_type_text -%>.
+             You may select an existing  <%= association.to_s.singularize %> or create <%= link_to "new #{association.to_s.singularize.capitalize} here", new_association_path, :onclick => "window.open(this.href);return false;"%>  for the <%= object_type_text -%>.
         </p>
         <% end  %>
          <%= select_tag possibilities_collection_id,

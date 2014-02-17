@@ -4,16 +4,24 @@ class InvestigationsController < ApplicationController
   include IndexPager
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_auth,:only=>[:edit, :update, :destroy]
+  before_filter :find_and_authorize_requested_item,:only=>[:edit, :update, :destroy, :show]
 
   include Seek::Publishing::PublishingCommon
+
+  include Seek::AnnotationCommon
 
   include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
     @existing_investigation =  Investigation.find(params[:id])
-    @investigation = @existing_investigation.clone_with_associations
-    render :action=>"new"
+    if @existing_investigation.can_view?
+      @investigation = @existing_investigation.clone_with_associations
+      render :action=>"new"
+    else
+      flash[:error]="You do not have the necessary permissions to copy this #{t('investigation')}"
+      redirect_to @existing_investigation
+    end
+
   end
 
   def destroy    
@@ -41,6 +49,7 @@ class InvestigationsController < ApplicationController
     @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
 
     if @investigation.save
+      update_scales @investigation
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
@@ -95,6 +104,7 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.save
+        update_scales @investigation
         flash[:notice] = "#{t('investigation')} was successfully updated."
         format.html { redirect_to(@investigation) }
         format.xml  { head :ok }

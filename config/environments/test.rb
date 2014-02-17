@@ -36,6 +36,8 @@ SEEK::Application.configure do
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
 
+  I18n.enforce_available_locales = true
+
   config.cache_store = :memory_store
   WebMock.disable_net_connect!(:allow_localhost => true)
 

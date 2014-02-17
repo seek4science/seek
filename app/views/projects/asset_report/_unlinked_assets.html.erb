@@ -1,0 +1,42 @@
+<div class="report_selection">
+  Report displayed: <%= select_tag "displayed_unlinked_report",options_for_select([["Not linked to either #{t('assays.assay').pluralize} or Publications","unlinked_to_anything"],
+                                                                                   ["Not linked to #{t('assays.assay').pluralize}","unlinked_to_assay"],
+                                                                                   ["Not linked to Publications","unlinked_to_publication"]],"unlinked_to_anything"),:onchange=>"displayed_unlinked_report_changed();" -%>
+</div>
+
+<div id="unlinked_to_anything"  class="asset_report_container curved">
+  <h1>Not linked to anything</h1>
+  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+    These are items that have not been linked to either a Publication or an <%= t('assays.assay') %>, or the case of the <%= t('assays.assay').pluralize %> do not have other files associated with them.
+  </p>
+  <% @types_for_unlinked.each do |type| -%>
+      <%= render :partial=>"projects/asset_report/shared_assets_table",
+                 :locals=>{:type=>type,:items=>@unlinked_assets[type],:no_items_suffix=>"that are not linked to either a Publication or an #{t('assays.assay')}"} -%>
+  <% end -%>
+</div>
+
+<div id="unlinked_to_assay"  class="asset_report_container curved">
+  <h1>Not linked to an <%= t('assays.assay') %></h1>
+  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+    These are items that have not been linked to an <%= t('assays.assay') %>, or the case of the <%= t('assays.assay').pluralize %> do not have other files associated with them. These items may have been linked to publications.
+  </p>
+  <% @types_for_unlinked.each do |type| -%>
+      <%= render :partial=>"projects/asset_report/shared_assets_table",
+                 :locals=>{:type=>type,:items=>@unlinked_to_assay[type],:no_items_suffix=>"that are not linked to an #{t('assays.assay')}"} -%>
+  <% end -%>
+</div>
+
+<div id="unlinked_to_publication"  class="asset_report_container curved">
+  <h1>Not linked to a Publication</h1>
+  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+    These are items that have not been linked to a Publication. These items may have been linked to <%= t('assays.assay').pluralize %>.
+  </p>
+  <% @types_for_unlinked.each do |type| -%>
+      <%= render :partial=>"projects/asset_report/shared_assets_table",
+                 :locals=>{:type=>type,:items=>@unlinked_to_publication[type],:no_items_suffix=>"that are not linked to Publications"} -%>
+  <% end -%>
+</div>
+
+<script type="text/javascript">
+    displayed_unlinked_report_changed();
+</script>

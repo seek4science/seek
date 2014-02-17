@@ -1,0 +1,386 @@
+table.sheet {
+  background-color: #69F;
+  table-layout: fixed;
+  width: 1px;
+}
+
+table.sheet tr{
+  height: 15pt;
+  line-height: 11pt;
+  padding:  0px;
+  margin:  0px;
+}
+
+table.sheet tr td {
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0px 5px;
+}
+
+th.col_heading, td.row_heading {
+  border: 1px solid #000;
+  background: #DDD;
+  text-align: center;
+  width: 2em;
+  padding: 2px 0px;
+  border-width: 0px 1px 1px 0px;
+}
+
+td.cell {
+  background: #FFF;
+  border: 1px solid #CCC;
+  border-width: 0px 1px 1px 0px;
+  text-align: left;
+}
+
+td.selected_cell {
+  opacity: 0.5;
+  filter:alpha(opacity=50);
+}
+
+td.primary_selected_cell {
+  background: #69F;
+}
+
+td.text_annotation_type {
+    background-image: url("<%= asset_path('famfamfam_silk/tag_blue.png') %>");
+    background-repeat:no-repeat;
+    background-position: center;
+}
+
+td.plot_data_type {
+    background-image: url("<%= asset_path('famfamfam_silk/chart_line.png') %>");
+    background-repeat:no-repeat;
+}
+
+td.annotated_cell {
+  border: 1px dotted #4477FF;
+  background-image: url("<%= asset_path('famfamfam_silk/tag_blue.png') %>");
+  background-repeat:no-repeat;
+  background-position: right;
+}
+
+
+a.sheet_tab {
+  display: inline-block;
+  background: #AAA;
+  margin: 0 0.5em;
+  padding: 0.5em;
+  border: 1px solid grey;
+  border-width: 1px 1px 0px 1px;
+  color: #000;
+}
+
+a.sheet_tab:hover
+{
+  background: #7CF;
+  color: #125;
+}
+
+a.selected_tab
+{
+  background: #EEE;
+}
+
+div.sheet {
+  overflow: auto;
+  height: 715px;
+  margin: 0px;
+}
+
+div.spreadsheet_container
+{
+  padding: 0px;
+  display:block;
+  overflow:  hidden;
+}
+
+div.sheet_container
+{
+  border: 1px solid grey;
+  background-color: #DDD;
+  height: 736px;
+  overflow:  hidden;
+}
+
+div.annotation
+{
+  border: 1px solid #CCC;
+  background-color: #FFF;
+  padding: 0.5em;
+  position: relative;
+  display:none;
+  width:20em;
+  z-index: 10;
+  margin-bottom: 0.5em;
+  display: none;
+}
+
+div.annotation_content
+{
+  background-color: #FFF;
+  margin-bottom: 0.5em
+}
+
+div.annotation_content img
+{
+  vertical-align: middle;
+  margin-right: 0.5em;
+}
+
+div.annotation_avatar
+{
+  width: 3em;
+  float: left;
+}
+
+div.annotation_text
+{
+  width: 17em;
+  float: right;  
+}
+
+div.annotation_footer
+{
+  text-align: right;  
+  color: #999; 
+}
+
+div.annotation_footer img
+{
+  vertical-align: middle;
+}
+
+
+
+div.annotation textarea
+{
+  background-color: #FFD;
+  border: 1px dashed #F99;
+  width: 16em;
+  height: 8em;
+}
+
+div#annotation_controls
+{
+  text-align: center;
+  margin: 0.5em; 
+  border-top: 1px dashed #AAA; 
+  padding: 0.5em;
+}
+
+div#annotation_container
+{
+  position: absolute;
+  z-index: 20;
+}
+
+div.annotation_plot_data {
+    min-width: 650px;
+    min-height: 450px;
+}
+
+span.cell_coverage, span.sheet_location
+{
+}
+
+div.spreadsheet_popup
+{
+  min-width: 650px;
+  min-height: 450px;
+  border: 1px solid #CCC;
+  padding: 0.5em;
+  margin: 0.5em;
+  background-color: #FFFFFF;
+  position: absolute;
+  z-index: 20;
+}
+
+
+div#annotation_form
+{
+}
+
+div#annotation_overview
+{
+}
+
+div#annotation_overview table td
+{
+  text-align: left;
+}
+
+div#annotation_overview table tr.source_header
+{
+  background-color: #ddd;
+  color: #000000;
+}
+
+div#annotation_overview table tr.annotation_stub
+{
+  cursor: pointer;
+  color: #000099;
+}
+
+div#annotation_overview table tr.annotation_stub:hover
+{
+  background-color: #ffd;
+  color: #FF0000;
+}
+
+div.spreadsheet_controls
+{
+  margin: 0.5em;
+}
+
+a.requires_selection
+{
+  display: none;
+}
+
+a.spreadsheet_button
+{
+  border: 1px outset #DDD;
+  background-color: #EEE;
+  padding: 0.2em 0.5em;  
+  display: inline-block;
+}
+
+a.spreadsheet_button:hover
+{
+  background-color: #DDF;
+}
+
+a.spreadsheet_button:active
+{
+  border: 1px inset #444;
+  background-color: #DDF;
+}
+
+a.spreadsheet_button img
+{
+  vertical-align: middle;
+}
+
+div.spreadsheet_box_title
+{
+  background-color: #DDF;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+div.spreadsheet_errors
+{
+  margin: 0.5em;
+  padding: 0.5em;
+  border: 2px solid red;
+  background-color: #FFDDDD;
+}
+
+div.spreadsheet_errors h1
+{
+  color: #FF0000;
+  text-align: left;
+  line-height: 1;
+  font-size: 125%;
+}
+
+div.spreadsheet_errors ul li
+{
+  list-style: disc inside none;
+}
+
+#annotation_drag
+{
+  background-color: #DDD;
+  margin: 2px 0;
+  border: 1px solid #555;
+  text-align: right;
+  padding: 1px;
+  z-index: 10;
+}
+
+td.layout_segment
+{
+  padding:  0px;
+  margin:  0px;
+  vertical-align: top;
+}
+
+div.row_headings
+{
+  height: 715px;
+  width:3em;
+  border-right:  1px solid #bbb;
+}
+
+div.col_headings
+{
+  height: 15pt;
+  border-bottom:  1px solid #bbb;
+}
+
+div.col_heading, div.row_heading, div.col_heading_spacer
+{
+  background: #DDD;
+  text-align: center;
+  vertical-align: middle;
+  width: 3em;
+  padding: 0;
+  margin: 0;
+  height: 15pt;
+}
+
+div.col_heading, div.col_heading_spacer
+{
+  display: block;
+  /* Because having whitespace between inline-blocks puts a space between them */
+  float:left;
+}
+
+div.row_heading
+{
+  border:  none;
+  padding:  0px;
+}
+
+div.corner_heading
+{
+  width: 3em;
+  height: 15pt;
+  display: block;
+  float:left;
+  border-right: 1px solid #bbb;
+  z-index:5;
+  background-color: #DDD;
+  position: absolute;
+}
+
+div.odd_heading
+{
+ background: #BBB;
+}
+
+div.row_headings, div.col_headings
+{
+  overflow:  hidden;
+}
+
+
+div.selected_heading {
+  background-color: #69F;
+}
+
+div.odd_heading.selected_heading {
+  background-color: #47D;
+}
+
+.ui-resizable-handle {
+  z-index:5 !important;
+}
+
+div.pagination{
+    display:none;
+    margin-top: 0.8em;
+    margin-bottom: 0.8em;
+}

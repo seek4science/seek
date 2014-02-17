@@ -39,7 +39,7 @@ Pay attention to what you use for the 'MySQL root' password when requested - you
 The remaining packages are:
 
   sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git libreadline-dev
-  sudo apt-get install libxml++2.6-dev openjdk-7-jdk graphviz libsqlite3-dev sqlite3
+  sudo apt-get install libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3
   sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev
 
 Installing these packages now will make installing Ruby 1.9.3 easier later on:
@@ -83,9 +83,9 @@ To create the gemset run:
 
 == Getting SEEK
 
-Now you are ready for installing SEEK. To fetch the latest version of SEEK <em>(v0.18.2)</em> change to the directory you want to install it and then run:
+Now you are ready for installing SEEK. To fetch the latest version of SEEK <em>(v0.20.0)</em> change to the directory you want to install it and then run:
 
-  hg clone https://bitbucket.org/seek4science/seek -r v0.18.2 seek
+  hg clone https://bitbucket.org/seek4science/seek -r v0.20.0 seek
   cd seek/
 
 Now to install the ruby gems SEEK needs:
@@ -135,6 +135,11 @@ for automating these services.
 
 === Starting and Stopping the Search Service
 
+For a new installation, by default search is disabled. Before running the service you may need to enable search in the Administration setting.
+The SEEK server needs restarting whenever search is enabled or disabled.
+
+<b>If search is enabled and the following service is not running, you will get errors when adding or updating information in SEEK.</b>
+
 SEEK search is based upon the {Apache Lucene Solr}[http://lucene.apache.org/solr/] service. To start this service run:
 
   bundle exec rake sunspot:solr:start
@@ -146,11 +151,10 @@ and to stop run:
 Optionally, there is also a configuration file in config/sunspot.yml for configuring the port that Solr runs on - which is important if running multiple SEEK
 installations on the same machine.
 
-To trigger some of the default data to be indexed for search you should run:
+The following task can also be at any time if there is need to force all content to be reindexed (such as after a period of running SEEK with search turned off).
 
   bundle exec rake seek:reindex_all
 
-This task can also be used at any time if there is need to force all content to be reindexed (such as after a period of running SEEK with search turned off).
 
 === Starting and Stopping the Background Service
 

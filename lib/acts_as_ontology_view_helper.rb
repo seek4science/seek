@@ -5,8 +5,10 @@ module Stu
   module Acts
     module Ontology
       module ActsAsOntologyViewHelper
+
+
         
-        def ontology_select_tag form,type,root_id,element_id,selected_id=nil,html_options={}
+        def ontology_select_tag_old form,type,root_id,element_id,selected_id=nil,html_options={}
 
           roots=type.to_tree(root_id).sort{|a,b| a.title.downcase <=> b.title.downcase}
           options=[]

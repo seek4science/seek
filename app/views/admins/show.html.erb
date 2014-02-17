@@ -1,3 +1,4 @@
+<%= stylesheet_link_tag "settings" -%>
 <h1> Administration <span style="font-size:smaller;"><%= version_text -%></span></h1>
 
 
@@ -10,21 +11,18 @@
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Register SEEK", :partial => 'admins/registration'} -%>
 
   <br/>
-  <div class='box_infotext'>
-      If you are running in an production environment deployed in conjunction with <%= link_to "Passenger Phusion (modrails)","http://www.modrails.com/",:target=>"_blank" -%>
-      on a single machine, then the following button will restart the instances for you.
-    </div>
-  <br/>
-  <%= button_to 'Restart server', restart_server_admin_path, :id => 'restart_server', :onclick => "restart_server_confirmation();return false;" -%>
+
+  <%= render :partial => "admins/restart_buttons" -%>
+
 </div>
 
 <script type="text/javascript">
-  function restart_server_confirmation(){
-      if (confirm('Are you sure you want to restart the server?')){
-          var restart_button = $('restart_server');
-          restart_button.disabled = true;
-          restart_button.value = 'Restarting ...'
-          restart_button.form.submit();
+  function confirmation(button_id, value){
+      if (confirm('Are you sure?')){
+          var button = $(button_id);
+          button.disabled = true;
+          button.value = value
+          button.form.submit();
       }
   }
 

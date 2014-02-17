@@ -1,14 +1,18 @@
-<%= javascript_include_tag "associate_events.js", "assays.js" %>
-
 <h1>Edit publication: <%= link_to(h(@publication.title), publication_path(@publication)) -%></h1>
 <div class="show_basic">    
   <%= error_messages_for('publication', :message => nil) %>
   <%= form_tag publication_path(@publication), :method => :put do %>
     <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication}%>
+
+
     
     <% if @publication.pubmed_id.nil? && @publication.doi %>
+      <label>Abstract:</label><br/>
+      <p class="box_infotext">
+        When adding a publication through a DOI, it is not possible to fetch the original abstract automatically.
+        <br/>Please paste the abstract below
+      </p>
       <p>
-        <label>Abstract:</label><br/>
         <%= text_area(:publication, :abstract, :cols => 90, :rows => 8) %>
       </p>
     <% end %>
@@ -60,6 +64,9 @@
     </div>
     <br style="clear: both"/>
     <div>
+      <% if show_scales? %>
+          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@publication} %>
+      <% end %>
     <p>
         <%= render :partial=>"assets/select_tags" -%>
     </p>

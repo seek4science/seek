@@ -3,18 +3,17 @@
 %>
 
 <div <%= "class='yui-gc'".html_safe if admin_or_me -%> >
+
+  <%= item_description @person.description,:label=>"About #{@person.name}" %>
   <div <%= "class='yui-u first'".html_safe if admin_or_me -%>>
-    <p>
-      <b>Name:</b>
-      <%= h @person.name %>
-    </p>
+
 
     <p>
       <% locations = @person.locations -%>
       <% unless locations.empty? -%>
           <b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b>
           <% locations.each do |location| -%>
-              <%= flag_icon(location) + "&nbsp;".html_safe + link_to(h(location), country_path(h(location))) -%>
+              <%= flag_icon(location) + "&nbsp;".html_safe + link_to(location, country_path(location)) -%>
               <%= ", " unless location==locations.last -%>
           <% end -%>
       <% else -%>
@@ -65,5 +64,3 @@
       </div>
   <% end %>
 </div>
-
-<%= item_description @person.description,:label=>"About me" %>

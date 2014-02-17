@@ -1,0 +1,130 @@
+PMID- 18846089
+OWN - NLM
+STAT- MEDLINE
+DA  - 20081010
+DCOM- 20081229
+IS  - 1546-1696 (Electronic)
+IS  - 1087-0156 (Linking)
+VI  - 26
+IP  - 10
+DP  - 2008 Oct
+TI  - A consensus yeast metabolic network reconstruction obtained from a community
+      approach to systems biology.
+PG  - 1155-60
+LID - 10.1038/nbt1492 [doi]
+AB  - Genomic data allow the large-scale manual or semi-automated assembly of metabolic
+      network reconstructions, which provide highly curated organism-specific knowledge
+      bases. Although several genome-scale network reconstructions describe
+      Saccharomyces cerevisiae metabolism, they differ in scope and content, and use
+      different terminologies to describe the same chemical entities. This makes
+      comparisons between them difficult and underscores the desirability of a
+      consolidated metabolic network that collects and formalizes the 'community
+      knowledge' of yeast metabolism. We describe how we have produced a consensus
+      metabolic network reconstruction for S. cerevisiae. In drafting it, we placed
+      special emphasis on referencing molecules to persistent databases or using
+      database-independent forms, such as SMILES or InChI strings, as this permits
+      their chemical structure to be represented unambiguously and in a manner that
+      permits automated reasoning. The reconstruction is readily available via a
+      publicly accessible database and in the Systems Biology Markup Language
+      (http://www.comp-sys-bio.org/yeastnet). It can be maintained as a resource that
+      serves as a common denominator for studying the systems biology of yeast. Similar
+      strategies should benefit communities studying genome-scale metabolic networks of
+      other organisms.
+FAU - Herrgard, Markus J
+AU  - Herrgard MJ
+AD  - Department of Bioengineering, University of California, San Diego, La Jolla,
+California 92093-0412, USA.
+FAU - Swainston, Neil
+AU  - Swainston N
+FAU - Dobson, Paul
+AU  - Dobson P
+FAU - Dunn, Warwick B
+AU  - Dunn WB
+FAU - Arga, K Yalcin
+AU  - Arga KY
+FAU - Arvas, Mikko
+AU  - Arvas M
+FAU - Bluthgen, Nils
+AU  - Bluthgen N
+FAU - Borger, Simon
+AU  - Borger S
+FAU - Costenoble, Roeland
+AU  - Costenoble R
+FAU - Heinemann, Matthias
+AU  - Heinemann M
+FAU - Hucka, Michael
+AU  - Hucka M
+FAU - Le Novere, Nicolas
+AU  - Le Novere N
+FAU - Li, Peter
+AU  - Li P
+FAU - Liebermeister, Wolfram
+AU  - Liebermeister W
+FAU - Mo, Monica L
+AU  - Mo ML
+FAU - Oliveira, Ana Paula
+AU  - Oliveira AP
+FAU - Petranovic, Dina
+AU  - Petranovic D
+FAU - Pettifer, Stephen
+AU  - Pettifer S
+FAU - Simeonidis, Evangelos
+AU  - Simeonidis E
+FAU - Smallbone, Kieran
+AU  - Smallbone K
+FAU - Spasic, Irena
+AU  - Spasic I
+FAU - Weichart, Dieter
+AU  - Weichart D
+FAU - Brent, Roger
+AU  - Brent R
+FAU - Broomhead, David S
+AU  - Broomhead DS
+FAU - Westerhoff, Hans V
+AU  - Westerhoff HV
+FAU - Kirdar, Betul
+AU  - Kirdar B
+FAU - Penttila, Merja
+AU  - Penttila M
+FAU - Klipp, Edda
+AU  - Klipp E
+FAU - Palsson, Bernhard O
+AU  - Palsson BO
+FAU - Sauer, Uwe
+AU  - Sauer U
+FAU - Oliver, Stephen G
+AU  - Oliver SG
+FAU - Mendes, Pedro
+AU  - Mendes P
+FAU - Nielsen, Jens
+AU  - Nielsen J
+FAU - Kell, Douglas B
+AU  - Kell DB
+LA  - eng
+GR  - R01 GM071808/GM/NIGMS NIH HHS/United States
+GR  - Biotechnology and Biological Sciences Research Council/United Kingdom
+PT  - Journal Article
+PT  - Research Support, N.I.H., Extramural
+PT  - Research Support, Non-U.S. Gov't
+PL  - United States
+TA  - Nat Biotechnol
+JT  - Nature biotechnology
+JID - 9604648
+RN  - 0 (Saccharomyces cerevisiae Proteins)
+SB  - IM
+MH  - Computer Simulation
+MH  - *Databases, Protein
+MH  - Information Storage and Retrieval/methods
+MH  - *Models, Biological
+MH  - Saccharomyces cerevisiae/*metabolism
+MH  - Saccharomyces cerevisiae Proteins/*metabolism
+MH  - Signal Transduction/*physiology
+MH  - Systems Biology/*methods
+MH  - Systems Integration
+EDAT- 2008/10/11 09:00
+MHDA- 2008/12/30 09:00
+CRDT- 2008/10/11 09:00
+AID - nbt1492 [pii]
+AID - 10.1038/nbt1492 [doi]
+PST - ppublish
+SO  - Nat Biotechnol. 2008 Oct;26(10):1155-60. doi: 10.1038/nbt1492.

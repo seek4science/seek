@@ -7,6 +7,7 @@ class StudiesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
 
   def setup
     login_as Factory(:admin).user
@@ -327,6 +328,20 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "filter by person using nested routes" do
+    assert_routing "people/2/studies",{controller:"studies",action:"index",person_id:"2"}
+    study = Factory(:study,:policy=>Factory(:public_policy))
+    study2 = Factory(:study,:policy=>Factory(:public_policy))
+    person = study.contributor
+    refute_equal study.contributor,study2.contributor
+    assert person.is_a?(Person)
+    get :index,person_id:person.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",study_path(study),:text=>study.title
+      assert_select "p > a[href=?]",study_path(study2),:text=>study2.title,:count=>0
+    end
+  end
 
   test 'edit study with selected projects scope policy' do
     proj = User.current_user.person.projects.first
@@ -347,6 +362,51 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select "a[href=?]",person_path(study.contributing_user.person) do
         assert_select "img"
       end
+    end
+  end
+
+  test 'object based on existing study' do
+    study = Factory :study,:title=>"the study",:policy=>Factory(:public_policy)
+    get :new_object_based_on_existing_one,:id=>study.id
+    assert_response :success
+    assert_select "textarea#study_title",:text=>"the study"
+    assert_select "select#study_investigation_id option[selected][value=?]",study.investigation.id,:count=>1
+  end
+
+  test 'object based on existing one when unauthorized to view' do
+    study = Factory :study,:title=>"the private study",:policy=>Factory(:private_policy)
+    refute study.can_view?
+    get :new_object_based_on_existing_one,:id=>study.id
+    assert_redirected_to study_path(study)
+    refute_nil flash[:error]
+  end
+
+  test 'object based on existing one when unauthorized to edit investigation' do
+    inv = Factory(:investigation,:policy=>Factory(:private_policy),:contributor=>Factory(:person))
+
+    study = Factory :study,:title=>"the private study",:policy=>Factory(:public_policy),:investigation=>inv
+    assert study.can_view?
+    refute study.investigation.can_edit?
+    get :new_object_based_on_existing_one,:id=>study.id
+    assert_response :success
+    assert_select "textarea#study_title",:text=>"the private study"
+    assert_select "select#study_investigation_id option[selected][value=?]",study.investigation.id,:count=>0
+    refute_nil flash.now[:notice]
+  end
+
+  test "studies filtered by assay through nested routing" do
+    assert_routing "assays/22/studies",{controller:"studies",action:"index",assay_id:"22"}
+    contributor = Factory(:person)
+    assay1 = Factory :assay,contributor:contributor,study:Factory(:study,:contributor=>contributor)
+    assay2 = Factory :assay,contributor:contributor,study:Factory(:study,:contributor=>contributor)
+    login_as contributor
+    assert assay1.study.can_view?
+    assert assay2.study.can_view?
+    get :index,assay_id:assay1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",study_path(assay1.study),:text=>assay1.study.title
+      assert_select "p > a[href=?]",study_path(assay2.study),:text=>assay2.study.title,:count=>0
     end
   end
 

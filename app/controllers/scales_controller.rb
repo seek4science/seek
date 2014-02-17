@@ -12,6 +12,11 @@ class ScalesController < ApplicationController
       resource_hash[res.class.name][:items] << res
     end
 
+    scale_types = Seek::Util.scalable_types
+    scale_types.each do |type|
+      resource_hash[type.name] = {:items => [], :hidden_count => 0} unless resource_hash[type.name]
+    end
+
     resource_hash.each do |key,res|
       res[:items].compact!
       unless res[:items].empty?
@@ -26,6 +31,7 @@ class ScalesController < ApplicationController
     render :update do |page|
       scale_title = scale.try(:key) || 'all'
       page.replace_html "#{scale_title}_results", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash,
+                                                                                                                  :show_empty_tabs=>true,
                                                                                                                   :narrow_view => true, :authorization_already_done => true,
                                                                                                                   :limit => 20,
                                                                                                                   :tabs_id => "#{scale_title}_resource_listing_tabbed_by_class",

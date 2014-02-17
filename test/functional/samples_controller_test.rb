@@ -5,6 +5,7 @@ class SamplesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
 
   # Called before every test method runs. Can be used
   # to set up fixture information.
@@ -31,7 +32,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "show xml validates with schema" do
-    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:roles_mask=> Person::ROLES_MASK_FOR_ADMIN)),
+    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:roles_mask=> Person.mask_for_admin)),
                 :title => "test sample",
                 :policy => policies(:policy_for_viewable_data_file))
     get :show, :id => s, :format =>"xml"
@@ -413,5 +414,39 @@ test "should show organism and strain information of a sample if there is organi
     assert_equal sop, s.sop_masters.first
     assert_equal 1, s.sops.length
     assert_equal sop_version_2, s.sops.first
+  end
+
+  test "filter by specimen using nested routes" do
+    assert_routing "specimens/4/samples",{controller:"samples",action:"index",specimen_id:"4"}
+    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+
+    refute_nil sample1.specimen
+    refute_equal sample1.specimen,sample2.specimen
+
+    get :index,specimen_id:sample1.specimen.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",sample_path(sample1),:text=>sample1.title
+      assert_select "p > a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
+    end
+  end
+
+  test "filter by project using nested routes" do
+    assert_routing "projects/4/samples",{controller:"samples",action:"index",project_id:"4"}
+    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+
+    refute_empty sample1.projects
+    refute_empty sample2.projects
+    assert_equal sample1.projects.count,sample2.projects.count
+    refute_equal sample1.projects,sample2.projects
+
+    get :index,project_id:sample1.projects.first.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",sample_path(sample1),:text=>sample1.title
+      assert_select "p > a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
+    end
   end
 end

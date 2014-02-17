@@ -6,41 +6,7 @@
     <% end %>
 
     var current_scale = scales_arr.indexOf('<%= current_scale %>');
-</script>
-<%= javascript_include_tag "jquery-1.5.1.min.js","jquery-ui-1.8.14.custom.min.js","scales/scales.js" %>
-<%= stylesheet_link_tag  "scales/scales" %>
-<style>
-    .ui-slider-vertical{
-        height: <%= (Scale.count+1) * 2.6%>em;
-    }
-</style>
-<div id="wrapper">
 
-
-  <div id="options">
-    <div id="minus">-</div>
-    <ul id="scale_list" class="step">
-      <li id="all">All -</li>
-      <% Scale.all.reverse.each do |s| -%>
-        <li id="<%= s.key -%>"><%= s.title -%> -</li>
-      <% end %>
-    </ul>
-
-    <div id="slider"></div>
-    <div id="plus">+</div>
-
-  </div>
-
-  <div id="zoom" >
-    <%= image_tag "scales/airprom/all.jpg", {:alt=>"all", :id=>"scale_image_all", :class=>"scale_image"} %>
-    <% Scale.all.reverse.each do |s| -%>
-        <%= image_tag s.image_path,{:alt=>s.image_name,:id=>"scale_image_#{s.key}",:class=>"scale_image"} %>
-    <% end %>
-
-  </div>
-</div>
-
-<script type="text/javascript">
     function scales_onclick() {
         $$('#scale_list li').each(function(item){
             item.onclick = function(){
@@ -55,9 +21,46 @@
     }
 
 
-    scales_onclick();
+
 
     if ($('scale')) {
         $('scale').value = scales_arr[current_scale];
     }
+</script>
+<%= javascript_include_tag "jquery-1.5.1.min","jquery-ui-1.8.14.custom.min","scales/scales" %>
+<%= stylesheet_link_tag  "scales/scales" %>
+<style>
+    .ui-slider-vertical{
+        height: <%= (Scale.count+1) * 1.85 %>em;
+    }
+</style>
+
+<div id="wrapper">
+
+
+  <div id="options">
+    <!-- <div id="minus">-</div> -->
+    <ul id="scale_list" class="step">
+      <li id="all">All -</li>
+      <% Scale.all.reverse.each do |s| -%>
+        <li id="<%= s.key -%>"><%= s.title -%> -</li>
+      <% end %>
+    </ul>
+
+    <div id="slider"></div>
+    <!-- <div id="plus">+</div> -->
+
+  </div>
+
+  <div id="zoom" >
+    <%= image_tag "scales/airprom/all.jpg", {:alt=>"all", :id=>"scale_image_all", :class=>"scale_image"} %>
+    <% Scale.all.reverse.each do |s| -%>
+        <%= image_tag s.image_path,{:alt=>s.image_name,:id=>"scale_image_#{s.key}",:class=>"scale_image"} %>
+    <% end %>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+    scales_onclick();
 </script>

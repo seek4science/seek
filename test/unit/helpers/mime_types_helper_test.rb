@@ -82,7 +82,7 @@ class MimeTypesHelperTest < ActionView::TestCase
     
     TEXT.each do |type|
       assert mime_extensions(type).include?("txt")
-      assert_equal "Plain text file",mime_nice_name(type)
+      assert_equal "Plain text document",mime_nice_name(type)
       assert_equal icon_filename_for_key("txt_file"),mime_icon_url(type)
     end
     
@@ -130,7 +130,7 @@ class MimeTypesHelperTest < ActionView::TestCase
 
     HTML.each do |type|
       assert mime_extensions(type).include?("html")
-      assert_equal "Website", mime_nice_name(type)
+      assert_equal "HTML document", mime_nice_name(type)
       assert_equal icon_filename_for_key("html_file"), mime_icon_url(type)
     end
   end

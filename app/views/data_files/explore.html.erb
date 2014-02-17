@@ -1,16 +1,9 @@
 <%= stylesheet_link_tag('spreadsheet_explorer', 'jquery-ui-1.8.14.custom') %>
-<%= javascript_include_tag 'jquery-1.5.1.min.js','jquery-ui-1.8.14.custom.min.js', 'spreadsheet_explorer.js','spreadsheet_explorer_plot.js',
-                           'flot/excanvas.js','flot/jquery.flot.js', 'flot/curvedLines.js',:cache=>"explorer_cached" %>
+<%= javascript_include_tag 'jquery-1.5.1.min','jquery-ui-1.8.14.custom.min', 'spreadsheet_explorer','spreadsheet_explorer_plot',
+                           'flot/index' %>
 
-<ul class="sectionIcons">
-  <li>
-    <%= image_tag_for_key('arrow_left', data_file_path(@data_file), "Return to #{t('data_file')}", nil, "Return to #{t('data_file')}") -%>
-  </li>
-</ul>
 
-<h1>Exploring <%= t('data_file') %></h1>
-
-<div style="margin-left: auto; margin-right: auto; width: 98%;">
+<div style="margin-left: auto; margin-right: auto; margin-top: 2em; width: 98%;">
   <div id="spreadsheet_errors"></div>
   
   <input size="10" id="selection_data">
@@ -31,17 +24,22 @@
           :title => "Cancel the current selection", :class => "spreadsheet_button requires_selection" %>
   </div>
   
-  <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
-  
   <div class="spreadsheet_viewer" id="spreadsheet_outer_frame">
     <%= render :partial => "spreadsheets/annotation_form" %>
     <%= render :partial => "spreadsheets/export" %>
     <%= render :partial => "spreadsheets/plot" %>
     
     <div id="annotations">
-      <%= render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
+      <%= render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @display_data_file.spreadsheet_annotations } %>
     </div>
-    
-    <%= render :partial => "spreadsheets/spreadsheet", :locals => {:workbook => @spreadsheet }%>
+
+        <%
+           spreadsheet = Rails.cache.fetch(@display_data_file.content_blob.cache_key) do
+             @display_data_file.spreadsheet
+           end
+        %>
+        <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => spreadsheet.styles} %>
+        <%= render :partial => "spreadsheets/spreadsheet", :locals => {:workbook => spreadsheet }%>
+
   </div>
 </div>

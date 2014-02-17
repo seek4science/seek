@@ -1,7 +1,7 @@
 class ContentBlobsController < ApplicationController
 
-  before_filter :find_and_auth_asset, :only=>[:get_pdf, :view_pdf_content, :download]
-  before_filter :find_and_auth_content_blob, :only=>[:get_pdf, :view_pdf_content, :download]
+  before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_pdf_content, :download]
+  before_filter :find_and_authorize_content_blob, :only=>[:get_pdf, :view_pdf_content, :download]
   before_filter :set_asset_version, :only=>[:get_pdf, :download]
 
   include Seek::AssetsCommon
@@ -60,11 +60,11 @@ class ContentBlobsController < ApplicationController
   #then return the pdf file
   def pdf_or_convert dat_filepath=@content_blob.filepath
 
-    pdf_filepath = @content_blob.filepath("pdf")
     if @content_blob.is_pdf?
       send_file dat_filepath, :filename => @content_blob.original_filename, :type => "application/pdf", :disposition => 'attachment'
       headers["Content-Length"]=File.size(dat_filepath).to_s
     else
+      pdf_filepath = @content_blob.filepath("pdf")
       @content_blob.convert_to_pdf(dat_filepath,pdf_filepath)
 
       if File.exists?(pdf_filepath)
@@ -84,7 +84,15 @@ class ContentBlobsController < ApplicationController
       pdf_path = @content_blob.filepath("pdf")
       FileUtils.rm pdf_path if File.exist?(pdf_path) && @content_blob.file_exists?
     else
-      data_hash = get_data_hash_from_jerm
+      begin
+        data_hash = get_data_hash_from_jerm
+      rescue Jerm::JermException=>e
+        if @content_blob.file_exists?
+          data_hash = nil
+        else
+          raise e
+        end
+      end
     end
 
     if data_hash
@@ -122,7 +130,7 @@ class ContentBlobsController < ApplicationController
     end
   end
 
-  def find_and_auth_asset
+  def find_and_authorize_associated_asset
     asset = asset_object
     if asset
       if asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))
@@ -157,7 +165,7 @@ class ContentBlobsController < ApplicationController
     end
   end
 
-  def find_and_auth_content_blob
+  def find_and_authorize_content_blob
     content_blob = content_blob_object
     if content_blob.asset.id == @asset.id
       @content_blob = content_blob

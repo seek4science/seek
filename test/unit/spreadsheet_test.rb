@@ -14,14 +14,15 @@ class SpreadsheetTest < ActiveSupport::TestCase
     datafile = Factory :small_test_spreadsheet_datafile
 
     spreadsheet = datafile.spreadsheet
+    min_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS
 
     assert_equal 3, spreadsheet.sheets.size
 
     assert_equal 11, spreadsheet.sheets.first.columns.size
 
-    assert_equal 3, spreadsheet.sheets.first.actual_rows.size
+    assert_equal (min_rows - 10), spreadsheet.sheets.first.actual_rows.size #the first ten rows are nil
 
-    assert_equal 11, spreadsheet.sheets[1].actual_rows.size
+    assert_equal min_rows, spreadsheet.sheets[1].actual_rows.size
 
     assert_equal 4, spreadsheet.sheets[1].actual_rows.first.actual_cells.size
 

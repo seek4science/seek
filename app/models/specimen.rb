@@ -10,20 +10,12 @@ class Specimen < ActiveRecord::Base
   acts_as_favouritable
   acts_as_uniquely_identifiable
 
+  grouped_pagination
+
   before_save  :clear_garbage
-  attr_accessor :from_biosamples
-
-  has_many :genotypes
-  has_many :phenotypes
-  accepts_nested_attributes_for :genotypes, :allow_destroy => true
-  accepts_nested_attributes_for :phenotypes, :allow_destroy => true
-
   before_destroy :destroy_genotypes_phenotypes
 
-  has_many :samples
-  has_many :activity_logs, :as => :activity_loggable
-  has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
-  has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
+  attr_accessor :from_biosamples
 
   belongs_to :institution
   belongs_to :culture_growth_type
@@ -31,20 +23,34 @@ class Specimen < ActiveRecord::Base
 
   has_one :organism, :through=>:strain
 
+  has_many :genotypes
+  has_many :phenotypes
+  has_many :samples
+  has_many :activity_logs, :as => :activity_loggable
+  has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
+  has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
+  has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
+  has_many :sop_masters,:class_name => "SopSpecimen",:dependent => :destroy
+
+  accepts_nested_attributes_for :genotypes, :allow_destroy => true
+  accepts_nested_attributes_for :phenotypes, :allow_destroy => true
 
   alias_attribute :description, :comments
+
+  validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
+  validates_uniqueness_of :title
+
+  validates_presence_of :title,:lab_internal_number, :contributor,:strain
+  validates_presence_of :institution, :if => "Seek::Config.is_virtualliver"
+  validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
+
+  scope :default_order, order("title")
 
   HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:born => 'culture starting date', :culture_growth_type => 'culture type'}
   HUMANIZED_COLUMNS[:title] = "#{(I18n.t 'biosamples.sample_parent_term').capitalize} title"
   HUMANIZED_COLUMNS[:lab_internal_number] = "#{(I18n.t 'biosamples.sample_parent_term').capitalize} lab internal identifier"
   HUMANIZED_COLUMNS[:provider_id] = "provider's #{(I18n.t 'biosamples.sample_parent_term')} identifier"
 
-  validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :title,:lab_internal_number, :contributor,:strain
-
-  validates_presence_of :institution, :if => "Seek::Config.is_virtualliver"
-  validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
-  validates_uniqueness_of :title
 
   AGE_UNITS = ["second","minute","hour","day","week","month","year"]
 
@@ -55,12 +61,7 @@ class Specimen < ActiveRecord::Base
   "AND sop_specimens.specimen_id = #{self.id})"
   end
 
-  has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
-  has_many :sop_masters,:class_name => "SopSpecimen"
 
-  scope :default_order, order("title")
-
-  grouped_pagination
 
   def build_sop_masters sop_ids
     # map string ids to int ids for ["1","2"].include? 1 == false
@@ -72,6 +73,7 @@ class Specimen < ActiveRecord::Base
     end
     self.sop_masters = self.sop_masters.select { |s| sop_ids.include? s.sop_id }
   end
+
   def genotype_info
         genotype_detail = []
       genotypes.each do |genotype|
@@ -140,7 +142,7 @@ class Specimen < ActiveRecord::Base
   end
 
   def self.user_creatable?
-    true
+    Seek::Config.biosamples_enabled
   end
 
   def clear_garbage

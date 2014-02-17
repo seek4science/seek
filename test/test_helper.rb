@@ -7,6 +7,7 @@ MiniTest::Reporters.use! MiniTest::Reporters::DefaultReporter.new
 
 require 'rest_test_cases'
 require 'rdf_test_cases'
+require 'functional_authorization_tests'
 require 'ruby-prof'
 require 'factory_girl'
 require 'webmock/test_unit'
@@ -70,6 +71,14 @@ end
 class ActiveSupport::TestCase
   setup :clear_rails_cache
   teardown :clear_current_user
+
+  def skip_jws_tests?
+    false
+  end
+
+  def skip_rest_schema_check?
+    false
+  end
 
   def clear_rails_cache
     Rails.cache.clear

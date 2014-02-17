@@ -63,4 +63,35 @@ class ScalableTest < ActiveSupport::TestCase
     assert_equal [@small_scale,@medium_scale,@large_scale],scales
   end
 
+  test "attaching and fetching additional info" do
+    @model.scales = [@small_scale]
+    @model.attach_additional_scale_info @small_scale.id,:param=>"fish",:unit=>"meter"
+    info = @model.fetch_additional_scale_info(@small_scale.id)
+    assert_equal 1,info.length
+    info=info.first
+    assert_equal "fish",info["param"]
+    assert_equal "meter",info["unit"]
+    assert_equal @small_scale.id.to_s,info["scale_id"]
+    assert_empty @model.fetch_additional_scale_info(@large_scale.id)
+
+    @model.scales = []
+    assert_empty @model.fetch_additional_scale_info(@small_scale.id)
+  end
+
+  test "attaching multiple additional info" do
+    @model.scales = [@small_scale]
+    @model.attach_additional_scale_info @small_scale.id,:param=>"fish",:unit=>"meter"
+    @model.attach_additional_scale_info @small_scale.id,:param=>"soup",:unit=>"cm"
+    info = @model.fetch_additional_scale_info(@small_scale.id)
+    assert_equal 2,info.count
+    info.sort!{|a,b| a["param"] <=> b["param"]}
+    assert_equal "fish",info[0]["param"]
+    assert_equal "meter",info[0]["unit"]
+    assert_equal "soup",info[1]["param"]
+    assert_equal "cm",info[1]["unit"]
+
+    @model.scales = []
+    assert_empty @model.fetch_additional_scale_info(@small_scale.id)
+  end
+
 end

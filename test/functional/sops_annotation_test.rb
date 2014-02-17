@@ -4,6 +4,7 @@ class SopsAnnotationTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
+  include FunctionalAuthorizationTests
 
   fixtures :all
 

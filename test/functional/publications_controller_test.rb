@@ -95,6 +95,28 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_redirected_to edit_publication_path(assigns(:publication))
   end
 
+  test "should only show the year for 1st Jan" do
+    publication = Factory(:publication,:published_date=>Date.new(2013,1,1))
+    get :show,:id=>publication
+    assert_response :success
+    assert_select "label[for=?]","date_published",:text=>"Date Published:"
+    assert_select "label[for='date_published']+span",:text=>/2013/,:count=>1
+    assert_select "label[for='date_published']+span",:text=>/Jan.* 2013/,:count=>0
+  end
+
+  test "should only show the year for 1st Jan in list view" do
+    publication = Factory(:publication,:published_date=>Date.new(2013,1,1),:title=>"blah blah blah science")
+    get :index
+    assert_response :success
+    assert_select "div.list_item:first-of-type" do
+      assert_select "div.list_item_title a[href=?]",publication_path(publication),:text=>/#{publication.title}/
+      assert_select "div.list_item_left_column" do
+        assert_select "p.list_item_attribute",:text=>/2013/,:count=>1
+        assert_select "p.list_item_attribute",:text=>/Jan.* 2013/,:count=>0
+      end
+    end
+  end
+
   test "should show publication" do
     get :show, :id => publications(:one)
     assert_response :success

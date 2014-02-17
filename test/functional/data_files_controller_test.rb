@@ -11,6 +11,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include RestTestCases
   include RdfTestCases
   include SharingFormTestHelper
+  include FunctionalAuthorizationTests
 
   def setup
     login_as(:datafile_owner)
@@ -70,21 +71,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
     assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
-  end
-
-  test "view_items_in_tab" do
-    other_user = Factory :user
-    df = Factory :data_file,:title=>"a data file",:contributor=>User.current_user,:policy=>Factory(:public_policy)
-    private_df = Factory :data_file,:title=>"a private data file",:contributor=>other_user,:policy=>Factory(:private_policy)
-    xml_http_request :get, :view_items_in_tab,:resource_type=>"DataFile",:resource_ids=>[df.id,private_df.id,1000].join(",")
-    assert_response :success
-
-    assert @response.body.include?("a data file")
-    assert !@response.body.include?("a private data file")
-
-    #try with no parameters
-    xml_http_request :get, :view_items_in_tab
-    assert_response :success
   end
 
   test "get XML when not logged in" do
@@ -984,7 +970,7 @@ class DataFilesControllerTest < ActionController::TestCase
   
   
   def test_update_should_not_overwrite_contributor
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
+    login_as(:datafile_owner) #this user is a member of sysmo, and can edit this data file
     df=data_files(:data_file_with_no_contributor)
     assert_difference('ActivityLog.count') do
       put :update, :id => df, :data_file => {:title=>"blah blah blah blah"}
@@ -997,7 +983,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def test_show_item_attributed_to_jerm_file
-    login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
+    login_as(:datafile_owner) #this user is a member of sysmo, and can edit this data file
     df=data_files(:editable_data_file)
     jerm_file=data_files(:data_file_with_no_contributor)
     r=Relationship.new(:subject => df, :predicate => Relationship::ATTRIBUTED_TO, :other_object => jerm_file)
@@ -1295,6 +1281,81 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "td a[href=?][target=_blank]","http://bbc.co.uk/news",:count=>1
   end
 
+  test "correctly displays rows in spreadsheet explorer" do
+    df = Factory(:data_file,
+                 :policy=>Factory(:public_policy),
+                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,:data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+
+    get :explore, :id=>df
+    assert_response :success
+
+    min_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS
+    assert_select "div#spreadsheet_1" do
+      assert_select "div.row_heading", :count => min_rows
+      (1..min_rows).each do |i|
+        assert_select "div.row_heading", :text => "#{i}", :count => 1
+      end
+
+      assert_select "tr", :count => min_rows
+      assert_select "td#cell_B2", :text => "A link to BBC", :count=>1
+    end
+
+    assert_select "div#spreadsheet_2" do
+      assert_select "div.row_heading", :count => min_rows
+      (1..min_rows).each do |i|
+        assert_select "div.row_heading", :text => "#{i}", :count => 1
+      end
+
+      assert_select "tr", :count => min_rows
+    end
+  end
+
+  test "correctly displays number of rows in spreadsheet explorer" do
+    df = Factory(:data_file,
+                 :policy=>Factory(:public_policy),
+                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,
+                                        :data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+
+    get :explore, :id=>df, :page_rows => 5
+    assert_response :success
+    assert_select "div#spreadsheet_1" do
+      assert_select "div.row_heading", :count => 5
+      assert_select "tr", :count => 5
+    end
+  end
+
+  test "correctly displays pagination in spreadsheet explorer" do
+    df = Factory(:data_file,
+                 :policy=>Factory(:public_policy),
+                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,
+                                        :data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+
+    page_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS/2 + 1
+    get :explore, :id=>df, :page_rows => page_rows
+    assert_response :success
+
+    assert_select "div#paginate_sheet_1" do
+      assert_select "span.previous_page.disabled", :text => /Previous/, :count => 1
+      assert_select "em.current", :text => "1", :count => 1
+      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=1", :text => "2", :count => 1
+      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=1", :text => /Next/, :count => 1
+    end
+
+    assert_select "div#paginate_sheet_2" do
+      assert_select "span.previous_page.disabled", :text => /Previous/, :count => 1
+      assert_select "em.current", :text => "1", :count => 1
+      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=2", :text => "2", :count => 1
+      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=2", :text => /Next/, :count => 1
+    end
+
+    assert_select "div#paginate_sheet_3" do
+      assert_select "span.previous_page.disabled", :text => /Previous/, :count => 1
+      assert_select "em.current", :text => "1", :count => 1
+      assert_select "a[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=3", :text => "2", :count => 1
+      assert_select "a.next_page[href=?]", "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=3", :text => /Next/, :count => 1
+    end
+  end
+
   test "uploader can publish the item when projects associated with the item have no gatekeeper" do
     uploader = Factory(:user)
     data_file = Factory(:data_file, :contributor => uploader)
@@ -1480,40 +1541,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div', :text => /another creator/, :count => 1
   end
 
-  test "should show treatments" do
-    user = Factory :user
-    data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
-    df = Factory :data_file,
-                 :policy=>Factory(:downloadable_public_policy),
-                 :contributor=>user,
-                 :content_blob => Factory(:content_blob,:data=>data,:content_type=>"application/excel")
-
-
-    get :show,:id=>df
-    assert_response :success
-    assert_select "table#treatments" do
-      assert_select "th",:text=>"pH"
-      assert_select "th",:text=>"Dilution_rate"
-      assert_select "td",:text=>"samplea"
-      assert_select "td",:text=>"6.5"
-      assert_select "tr",:count=>4
-    end
-  end
-
-  test "should not show treatments if not downloadable" do
-    user = Factory :user
-    data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
-    df = Factory :data_file,
-                 :policy=>Factory(:publicly_viewable_policy),
-                 :contributor=>user,
-                 :content_blob => Factory(:content_blob,:data=>data,:content_type=>"application/excel")
-
-    get :show,:id=>df
-    assert_response :success
-    assert_select "table#treatments", :count=>0
-    assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
-  end
-
   test "should display find matching model button for spreadsheet" do
     with_config_value :solr_enabled,true do
       d = Factory(:xlsx_spreadsheet_datafile)
@@ -1563,7 +1590,7 @@ class DataFilesControllerTest < ActionController::TestCase
     current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
     a_person = Factory(:person)
     a_person.project_subscriptions.create :project => a_person.projects.first, :frequency => 'weekly'
-    current_person.projects << a_person.projects.first
+    current_person.group_memberships << Factory(:group_membership,:work_group=>Factory(:work_group,:project=>a_person.projects.first))
     assert current_person.save
     assert current_person.reload.projects.include?(a_person.projects.first)
     assert Subscription.all.empty?
@@ -1580,6 +1607,19 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !df.subscribed?(a_person)
     assert_equal 1, current_person.subscriptions.count
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
+  end
+
+  test "project data files through nested routing" do
+    assert_routing 'projects/2/data_files',{controller:"data_files",action:"index",project_id:"2"}
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    project = df.projects.first
+    df2 = Factory(:data_file,:policy=>Factory(:public_policy))
+    get :index,:project_id=>project.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",data_file_path(df),:text=>df.title
+      assert_select "p > a[href=?]",data_file_path(df2),:text=>df2.title,:count=>0
+    end
   end
 
   private

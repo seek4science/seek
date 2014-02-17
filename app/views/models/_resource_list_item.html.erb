@@ -18,6 +18,8 @@
 
 <%= list_item_optional_attribute "Environment", resource.recommended_environment.try(:title) %>
 
+  <%= scales_list_for_list_item resource -%>
+
 </div>
 
 <div class="list_item_whole_width">

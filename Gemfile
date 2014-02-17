@@ -1,22 +1,22 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 source 'http://gems.github.com'
 
-gem "rails", "3.2.14"
+gem "rails", "3.2.16"
 gem "rdoc"
 
 gem 'google-analytics-rails'
+gem "feedzirra"
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'
 gem 'libxml-ruby',"2.6.0",:require=>"libxml"
 gem 'uuidtools',"2.1.1"
 gem "RedCloth","4.2.9"
-gem 'simple-spreadsheet-extractor',"0.12.3"
-gem "rmagick", :require => false
+gem 'simple-spreadsheet-extractor',"0.13.1"
+gem "rmagick","2.12.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
-gem 'ratom',"~>0.8.2"
 gem 'rubyzip',"0.9.9"
 gem 'bio'
 gem 'sunspot_rails'
@@ -28,8 +28,7 @@ gem "delayed_job_active_record"
 gem "daemons"
 gem "cancan"
 gem "in_place_editing"
-gem "rdf",">=0.3.8"
-gem "rdf-rdfxml",">=0.3.8"
+gem "linkeddata"
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
 gem 'docsplit'
@@ -48,6 +47,11 @@ gem 'rails_autolink'
 gem 'rfc-822'
 gem 'nokogiri',"1.5.9"
 gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
+gem 'cocaine'
+gem 'colorize'
+
+#gem for BiVeS and BudHat
+gem 'bives'
 
 
 #Linked to SysMO Git repositories
@@ -66,7 +70,6 @@ gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activi
 gem 'acts_as_trashable',:git=> "git://github.com/SysMO-DB/acts_as_trashable.git"
 gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
-gem 'pubmed_query_tool', :git => "git://github.com/SysMO-DB/pubmed_query_tool.git"
 gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
 gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
@@ -79,12 +82,10 @@ gem 'taverna-t2flow'
 gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
 
 group :development do
-  gem "sqlite3","1.3.7"
   gem "pry"
   gem "pry-doc"
   gem "pry-remote"
   gem "request-log-analyzer"
-  #gem 'rails-dev-boost', :git => 'git://github.com/thedarkone/rails-dev-boost.git'
 end
 
 group :test do
@@ -94,4 +95,6 @@ group :test do
   gem 'minitest-reporters','>= 0.4.1'
 end
 
-
+group :assets do
+  gem 'yui-compressor'
+end

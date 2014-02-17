@@ -21,7 +21,7 @@ echo "${txtgrn} Installing prequisites ${txtrst}"
 sudo apt-get update
 
 sudo apt-get install wget git-core mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server
-sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk graphviz libsqlite3-dev sqlite3
+sudo apt-get install libmysqlclient16-dev libmagick++-dev libxslt-dev libxml++2.6-dev openjdk-6-jdk libsqlite3-dev sqlite3
 sudo apt-get install poppler-utils openoffice.org openoffice.org-java-common
 
 echo "${txtgrn} *********************************** ${txtrst}"

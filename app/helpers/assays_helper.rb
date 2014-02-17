@@ -10,10 +10,10 @@ module AssaysHelper
   end
 
   def assay_organism_list_item assay_organism
-    result = link_to h(assay_organism.organism.title), assay_organism.organism
+    result = link_to assay_organism.organism.title, assay_organism.organism
     if assay_organism.strain
       result += " : "
-      result += assay_organism.strain.title
+      result += h(assay_organism.strain.title)
     end
     if assay_organism.culture_growth_type
       result += " (#{assay_organism.culture_growth_type.title})"
@@ -39,17 +39,17 @@ module AssaysHelper
       culture_growth_type = as.specimen.culture_growth_type
 
       if organism
-        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
+        result += link_to organism.title, organism, {:class => "assay_organism_info"}
       end
 
       if strain
         result += " : "
-        result += strain.title
+        result += h(strain.title)
       end
 
       if sample
         result += " : "
-        result += link_to h(sample.title), sample
+        result += link_to sample.title, sample
       end
 
       if culture_growth_type
@@ -65,12 +65,12 @@ module AssaysHelper
 
       result += "<br/>" if assay_samples.blank? and ao==assay_organisms.first
       if organism
-        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
+        result += link_to organism.title, organism, {:class => "assay_organism_info"}
       end
 
       if strain
         result += " : "
-        result += strain.title
+        result += h(strain.title)
       end
 
       if culture_growth_type
@@ -98,17 +98,17 @@ module AssaysHelper
 
 
       if organism
-        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
+        result += link_to organism.title, organism, {:class => "assay_organism_info"}
       end
 
       if strain
         result += " : "
-        result += strain.title
+        result += h(strain.title)
       end
 
       if sample
         result += " : "
-        result += link_to h(sample.title), sample
+        result += link_to sample.title, sample
       end
 
       if culture_growth_type
@@ -133,12 +133,12 @@ module AssaysHelper
       culture_growth_type = ao.culture_growth_type
 
       if organism
-        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
+        result += link_to organism.title, organism, {:class => "assay_organism_info"}
       end
 
       if strain
         result += " : "
-        result += strain.title
+        result += h(strain.title)
       end
 
 
@@ -151,5 +151,9 @@ module AssaysHelper
     result += "</p>"
     return result.html_safe
   end
+
+
+
+
 
 end

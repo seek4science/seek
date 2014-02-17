@@ -24,8 +24,10 @@ SEEK::Application.routes.draw do
       get :others
       get :get_stats
       get :registration_form
+      get :edit_tag
       post :update_home_settings
       post :restart_server
+      post :restart_delayed_job
       post :get_stats
       post :update_admins
       post :update_rebrand
@@ -126,7 +128,6 @@ SEEK::Application.routes.draw do
     collection do
       get :select
       get :get_work_group
-      get :view_items_in_tab
       post :userless_project_selected_ajax
     end
     member do
@@ -142,7 +143,9 @@ SEEK::Application.routes.draw do
       post :gatekeeper_decide
       get :gatekeeper_decision_result
       get :waiting_approval_assets
+      get :select
     end
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -153,12 +156,13 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
-      get :view_items_in_tab
     end
     member do
       get :asset_report
       get :admin
     end
+    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
+              :publications,:events,:samples,:specimens,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -183,8 +187,8 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       get :request_all
-      get :view_items_in_tab
     end
+    resources :people,:projects,:specimens,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -195,38 +199,31 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations do
-    collection do
-      get :view_items_in_tab
-    end
+    resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
   end
 
   resources :studies do
     collection do
       post :investigation_selected_ajax
-      get :view_items_in_tab
     end
+    resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
   end
 
   resources :assays do
     collection do
       get :preview
-      get :view_items_in_tab
     end
     member do
       post :update_annotations_ajax
     end
+    resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
-
-  resources :assay_types, only: [:show,:index]
-
-  resources :technology_types, only: [:show,:index]
 
   ### ASSETS ###
 
   resources :data_files do
     collection do
       get :preview
-      get :view_items_in_tab
       post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
@@ -259,12 +256,12 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   resources :presentations do
     collection do
       get :preview
-      get :view_items_in_tab
       post :test_asset_url
     end
     member do
@@ -285,16 +282,18 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:publications,:events
   end
 
   resources :models do
     collection do
       get :build
       get :preview
-      get :view_items_in_tab
       post :test_asset_url
     end
     member do
+      get :compare_versions
+      post :compare_versions
       get :builder
       post :check_related_items
       get :visualise
@@ -328,12 +327,12 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   resources :sops do
     collection do
       get :preview
-      get :view_items_in_tab
       post :test_asset_url
     end
     member do
@@ -359,25 +358,26 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   resources :publications do
     collection do
       get :preview
       post :fetch_preview
-      get :view_items_in_tab
     end
     member do
       post :update_annotations_ajax
       post :disassociate_authors
     end
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:events,:only=>[:index]
   end
 
   resources :events do
     collection do
       get :preview
-      get :view_items_in_tab
     end
+    resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
 
   resource :policies do
@@ -390,23 +390,24 @@ SEEK::Application.routes.draw do
 
   ### BIOSAMPLES AND ORGANISMS ###
 
-  resources :specimens
+  resources :specimens do
+    resources :projects,:people,:samples,:strains,:institutions,:sops
+  end
   resources :samples do
     collection do
       get :preview
     end
+    resources :projects,:people,:specimens,:sops,:data_files
   end
 
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
-      get :view_items_in_tab
     end
     member do
       post :update_annotations_ajax
     end
-
-
+    resources :specimens,:assays,:people,:projects
   end
 
   resources :biosamples do
@@ -427,8 +428,8 @@ SEEK::Application.routes.draw do
   resources :organisms do
     collection do
       post :search_ajax
-      get :view_items_in_tab
     end
+    resources :projects,:assays,:studies,:models,:strains,:specimens
     member do
       get :visualise
     end
@@ -470,6 +471,11 @@ SEEK::Application.routes.draw do
     end
   end
 
+  ### ASSAY AND TECHNOLOGY TYPES ###
+
+  get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
+  get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
+
   ### MISC MATCHES ###
 
   match '/search/' => 'search#index', :as => :search
@@ -509,11 +515,10 @@ SEEK::Application.routes.draw do
 
   match '/contact' => 'contact#index', :as => :contact, :via => :get
 
-  get "errors/error_422"
-
-  get "errors/error_404"
-
-  get "errors/error_500"
+  #error rendering
+  match "/404" => "errors#error_404"
+  match "/422" => "errors#error_422"
+  match "/500" => "errors#error_500"
 
   # Terrible hack to get around lack of asset pipeline
   match "assets/taverna_player/application.js", :to => redirect('/javascripts/taverna_player/application.js')

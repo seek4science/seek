@@ -7,6 +7,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
   
   def setup
     login_as(:quentin)
@@ -224,11 +225,26 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Delete #{I18n.t('investigation')}/i,:count=>0
   end
 
-  def test_should_add_nofollow_to_links_in_show_page
+  test "should_add_nofollow_to_links_in_show_page" do
     get :show, :id=> investigations(:investigation_with_links_in_description)    
     assert_select "div#description" do
       assert_select "a[rel=nofollow]"
     end
+  end
+
+  test "object based on existing one" do
+    inv = Factory :investigation,:title=>"the inv",:policy=>Factory(:public_policy)
+    get :new_object_based_on_existing_one,:id=>inv.id
+    assert_response :success
+    assert_select "textarea#investigation_title",:text=>"the inv"
+  end
+
+  test "object based on existing one when unauthorised" do
+    inv = Factory :investigation,:title=>"the inv",:policy=>Factory(:private_policy),:contributor=>Factory(:person)
+    refute inv.can_view?
+    get :new_object_based_on_existing_one,:id=>inv.id
+    assert_redirected_to inv
+    refute_nil flash[:error]
   end
 
   test "filtering by project" do

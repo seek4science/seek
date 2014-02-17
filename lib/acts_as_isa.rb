@@ -15,6 +15,7 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_isa
         acts_as_favouritable
+        acts_as_scalable
 
         scope :default_order, order("title")
 
@@ -57,6 +58,7 @@ module Acts #:nodoc:
     end
 
     module InstanceMethods
+
     end
   end
 

@@ -8,13 +8,16 @@
 
     <div class="list_item_left_column">
         <p class='list_item_attribute'>
-        <%= "<b> Original Authors: </b> #{resource.authors.join(", ")}".html_safe %>
+          <b>Publication title:</b> <%= resource.publication_title %>
+        </p>
+        <p class='list_item_attribute'>
+            <%= "<b> Original Authors: </b> #{resource.authors.join(", ")}".html_safe %>
         </p>
     </div>
 
     <div class="list_item_right_column">
         <p class='list_item_attribute'>
-            <%= "<b> Publication Date: </b> #{date_as_string(resource.date_published)}".html_safe %>
+            <%= "<b> Publication Date: </b> #{date_as_string(resource.published_date)}".html_safe %>
         </p>
         <p class='list_item_attribute'>
           <%= "<b> Last Modified: </b> #{date_as_string(resource.last_modification_date, true)}".html_safe  %>
@@ -24,7 +27,7 @@
 
     <div class="list_item_whole_width">
       <p class='list_item_attribute'>
-        <%= "<b> URL of Original: </b> #{link_to(biomodel_link, 'http://www.ebi.ac.uk/biomodels-main/#{resource.model_id}',:target=>'_blank')}".html_safe %>
+        <%= "<b> URL of Original: </b> #{link_to(biomodel_link, biomodel_link,:target=>'_blank')}".html_safe %>
       </p>
       <p class='list_item_attribute'>
         <%= "<b> Abstract: </b> #{list_item_description(resource.abstract,true,1000)}".html_safe  %>

@@ -6,11 +6,10 @@ class AssayTest < ActiveSupport::TestCase
 
 
   test "shouldnt edit the assay" do
-    ActiveRecord::Fixtures
-    non_admin = Factory :user,:person=> Factory(:person,:is_admin=>false)
-    user = non_admin #users(:aaron)
+    non_admin = Factory :user
+    assert !non_admin.person.is_admin?
     assay = assays(:modelling_assay_with_data_and_relationship)
-    assert_equal false, assay.can_edit?(user)
+    assert_equal false, assay.can_edit?(non_admin)
   end
 
   test "sops association" do
@@ -21,7 +20,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "to_rdf" do
-    assay = Factory :assay, :assay_type=>Factory(:assay_type), :technology_type=>Factory(:technology_type)
+    assay = Factory :experimental_assay
     Factory :assay_organism, :assay=>assay, :organism=>Factory(:organism)
     pub = Factory :publication
     Factory :relationship, :subject=>assay, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
@@ -29,18 +28,13 @@ class AssayTest < ActiveSupport::TestCase
     assay.reload
     assert_equal 1,assay.assets.size
     rdf = assay.to_rdf
-
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
     end
 
-    #try with assay & tech type with nil term
-    assay = Factory :assay, :organisms=>[Factory(:organism)], :assay_type=>Factory(:assay_type, :term_uri=>nil), :technology_type=>Factory(:technology_type,:term_uri=>nil)
-    rdf = assay.to_rdf
-
-    #try with no assay or tech type
-    assay = Factory :assay, :technology_type=>nil
+    #try modelling, with tech type nil
+    assay = Factory :modelling_assay, :organisms=>[Factory(:organism)], :technology_type_uri=>nil
     rdf = assay.to_rdf
   end
 
@@ -104,58 +98,51 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.projects.empty?
     assert assay.projects.include?(projects(:sysmo_project))
   end
-  
+
 
   test "validation" do
     User.with_current_user Factory(:user) do
-    assay=new_valid_assay
-    
-    assert assay.valid?
+      assay=new_valid_assay
+
+      assert assay.valid?
 
 
-    assay.title=""
-    assert !assay.valid?
+      assay.title=""
+      assert !assay.valid?
 
-    assay.title=nil
-    assert !assay.valid?
+      assay.title=nil
+      assert !assay.valid?
 
-    assay.title=assays(:metabolomics_assay).title
-    assert assay.valid? #can have duplicate titles
+      assay.title=assays(:metabolomics_assay).title
+      assert assay.valid? #can have duplicate titles
 
-    assay.title="test"
-    assay.assay_type=nil
-    assert !assay.valid?
+      assay.title="test"
+      assay.assay_type_uri=nil
+      assert assay.valid?
+      refute_nil assay.assay_type_uri, "uri should have been set to default in before_validation"
 
-    assay.assay_type=assay_types(:metabolomics)
+      assay.assay_type_uri="http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
 
-    assert assay.valid?
+      assert assay.valid?
 
-    assay.study=nil
-    assert !assay.valid?
-    assay.study=studies(:metabolomics_study)
+      assay.study=nil
+      assert !assay.valid?
+      assay.study=studies(:metabolomics_study)
 
-    assay.technology_type=nil
-    assert !assay.valid?
+      assay.technology_type_uri=nil
+      assert assay.valid?
+      refute_nil assay.technology_type_uri, "uri should have been set to default in before_validation"
 
-    assay.technology_type=technology_types(:gas_chromatography)
-    assert assay.valid?
+      assay.owner=nil
+      assert !assay.valid?
 
-    assay.owner=nil
-    assert !assay.valid?
-
-    assay.owner=people(:person_for_model_owner)
+      assay.owner=people(:person_for_model_owner)
 
       #an modelling assay can be valid without a technology type, sample or organism
-    assay.assay_class=assay_classes(:modelling_assay_class)
-    assay.technology_type=nil
-    assay.samples = []
-    assert assay.valid?
-    
-    #an experimental assay can be invalid without a sample
-    assay.assay_class=assay_classes(:experimental_assay_class)
-    assay.technology_type=nil
-    assay.samples = []
-    assert !assay.valid?
+      assay.assay_class=assay_classes(:modelling_assay_class)
+      assay.technology_type_uri=nil
+      assay.samples = []
+      assert assay.valid?
     end
   end
 
@@ -340,8 +327,8 @@ class AssayTest < ActiveSupport::TestCase
   
   def new_valid_assay
     Assay.new(:title=>"test",
-      :assay_type=>assay_types(:metabolomics),
-      :technology_type=>technology_types(:gas_chromatography),
+      :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
+      :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
       :assay_class => assay_classes(:experimental_assay_class),
@@ -362,4 +349,115 @@ class AssayTest < ActiveSupport::TestCase
       assert assay.contributor
       assert_equal assay.contributor.user, assay.contributing_user
   end
+
+  test "assay type label from ontology if missing" do
+    assay = Factory(:experimental_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response",assay_type_label:"fish")
+    assert_equal "fish",assay.assay_type_label
+    assay.assay_type_label = nil
+    assert_equal "Catabolic response",assay.assay_type_label
+
+    assay = Factory(:modelling_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Genome_scale",assay_type_label:"frog")
+    assert_equal "frog",assay.assay_type_label
+    assay.assay_type_label = nil
+    assert_equal "Genome scale",assay.assay_type_label
+  end
+
+  test "technology type label from ontology if missing" do
+    assay = Factory(:experimental_assay,technology_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Binding",technology_type_label:"fish")
+    assert_equal "fish",assay.technology_type_label
+    assay.technology_type_label = nil
+    assert_equal "Binding",assay.technology_type_label
+  end
+
+  test "default assay and tech type" do
+    assay = Factory(:experimental_assay)
+    assay.assay_type_uri=nil
+    assay.technology_type_uri=nil
+    assay.save!
+    assert_equal Seek::Ontologies::AssayTypeReader.instance.default_parent_class_uri.to_s,assay.assay_type_uri
+    assert_equal Seek::Ontologies::TechnologyTypeReader.instance.default_parent_class_uri.to_s,assay.technology_type_uri
+
+    assay = Factory(:modelling_assay)
+    assay.assay_type_uri=nil
+    assay.technology_type_uri=nil
+    assay.save!
+    assert_equal Seek::Ontologies::ModellingAnalysisTypeReader.instance.default_parent_class_uri.to_s,assay.assay_type_uri
+    assert_nil assay.technology_type_uri
+  end
+
+  test "assay type reader" do
+    exp_assay = Factory(:experimental_assay)
+    mod_assay = Factory(:modelling_assay)
+    assert_equal Seek::Ontologies::AssayTypeReader,exp_assay.assay_type_reader.class
+    assert_equal Seek::Ontologies::ModellingAnalysisTypeReader,mod_assay.assay_type_reader.class
+  end
+
+  test "valid assay type uri" do
+    assay = Factory(:experimental_assay)
+    assert assay.valid_assay_type_uri?
+    assay.assay_type_uri="http://fish.com/onto#fish"
+    assert !assay.valid_assay_type_uri?
+
+    #modelling uri should also be invalid
+    assay.assay_type_uri = Seek::Ontologies::ModellingAnalysisTypeReader.instance.default_parent_class_uri.to_s
+    assert !assay.valid_assay_type_uri?
+  end
+
+  test "valid technology type uri" do
+    mod_assay = Factory(:modelling_assay)
+    exp_assay = Factory(:experimental_assay)
+    assert mod_assay.valid_technology_type_uri?
+    mod_assay.technology_type_uri = Seek::Ontologies::TechnologyTypeReader.instance.default_parent_class_uri.to_s
+    #for a modelling assay, even if it is set it is invalid
+    assert !mod_assay.valid_technology_type_uri?
+
+    assert exp_assay.valid_technology_type_uri?
+    exp_assay.technology_type_uri = "http://fish.com/onto#fish"
+    assert !exp_assay.valid_technology_type_uri?
+  end
+
+  test "suggested assay type label" do
+    exp_assay = Factory(:experimental_assay)
+    assert_nil exp_assay.suggested_assay_type_label
+    exp_assay.assay_type_label=nil
+    assert_nil exp_assay.suggested_assay_type_label
+
+    #a different label, but one that is still valid
+    exp_assay.assay_type_label = "metabolite concentration"
+    assert_nil exp_assay.suggested_assay_type_label
+
+    #should be case insensitive
+    exp_assay.assay_type_label = "Metabolite CONCentration"
+    assert_nil exp_assay.suggested_assay_type_label
+
+    #a completely new one
+    exp_assay.assay_type_label = "bacteria juggling"
+    assert_equal "bacteria juggling",exp_assay.suggested_assay_type_label
+
+    #a modelling type would also be treated as a new suggstion
+    exp_assay.assay_type_label = "gene expression"
+    assert_equal "gene expression",exp_assay.suggested_assay_type_label
+  end
+
+  test "suggested tech type label" do
+    exp_assay = Factory(:experimental_assay)
+    assert_nil exp_assay.suggested_technology_type_label
+    exp_assay.technology_type_label=nil
+    assert_nil exp_assay.suggested_technology_type_label
+
+    #a different label, but one that is still valid
+    exp_assay.technology_type_label = "hplc"
+    assert_nil exp_assay.suggested_technology_type_label
+
+    #should be case insensitive
+    exp_assay.technology_type_label = "HPLC"
+    assert_nil exp_assay.suggested_technology_type_label
+
+    #a completely new one
+    exp_assay.technology_type_label = "bacteria juggling"
+    assert_equal "bacteria juggling",exp_assay.suggested_technology_type_label
+
+
+  end
+
 end

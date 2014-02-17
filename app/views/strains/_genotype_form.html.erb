@@ -1,4 +1,4 @@
-<%= javascript_include_tag 'strain.js', 'biosample.js' %>
+<%= javascript_include_tag 'strain', 'biosample' %>
 <%= stylesheet_link_tag  "biosamples" %>
 <% parent_name ||= item.class.name.underscore
    action ||=nil
@@ -29,12 +29,12 @@
                 <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_genotype_#{index}"), "fadeGenotypeRow('#{index}','#{action}');" -%>
                 </td>
               </tr>
+              <%= genotype_form.hidden_field :_destroy,{:id => "genotype_#{index}",:value=>0} %>
             <% end %>
-          <%= genotype_form.hidden_field :_destroy,{:id => "genotype_#{index}",:value=>0} %>
       <% end %>
 
 
     </table>
-    <img src='/images/famfamfam_silk/add.png' alt="Add more" title="Add more gene and mutation" onclick="addGenotypeRow('genotype_table','<%=parent_name%>','<%=action%>')"/>
+    <%= image_tag 'famfamfam_silk/add.png', :alt=>"Add more", :title=>"Add more gene and mutation", :onclick=>"addGenotypeRow('genotype_table','#{parent_name}','#{action}')" %>
   </div>
 </center>

@@ -1,6 +1,8 @@
  require 'zip/zip'
  require 'zip/zipfilesystem'
  require 'libxml'
+ require 'bives'
+
 class ModelsController < ApplicationController
 
   include WhiteListHelper
@@ -8,19 +10,62 @@ class ModelsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon
   include AssetsCommonExtension
-  
+
+  before_filter :models_enabled?
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml]
+  before_filter :find_and_authorize_requested_item, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml,:compare_versions]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
+
+  before_filter :find_other_version,:only=>[:compare_versions]
 
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs
 
+  include Bives
+
   @@model_builder = Seek::JWS::Builder.new
 
+  def find_other_version
+    version = params[:other_version]
+    @other_version = @model.find_version(version)
+    if version.nil? || @other_version.nil?
+      flash[:error] = "The other version to compare with was not specified, or it does not exist"
+      redirect_to model_path(@model,:version=>@display_model.version)
+    end
+  end
+
+  def compare_versions
+    if params[:file_id]
+      @blob1 = @display_model.sbml_content_blobs.find{|b| b.id.to_s == params[:file_id]}
+    else
+      @blob1 = @display_model.sbml_content_blobs.first
+    end
+    if params[:other_file_id]
+      @blob2 = @other_version.sbml_content_blobs.find{|b| b.id.to_s == params[:other_file_id]}
+    else
+      @blob2 = @other_version.sbml_content_blobs.first
+    end
+
+    if @blob1 && @blob2
+      file1=@blob1.filepath
+      file2=@blob2.filepath
+      begin
+        json = compare file1,file2,["reportHtml","crnJson","json","SBML"]
+        @crn = JSON.parse(json)["crnJson"]
+        @comparison_html = JSON.parse(json)["reportHtml"]
+      rescue Exception=>e
+        flash.now[:error]="there was an error trying to compare the two versions - #{e.message}"
+      end
+    else
+      flash.now[:error]="One of the version files could not be found, or you are not authorized to examine it"
+    end
+
+
+
+  end
 
   def export_as_xgmml
       type =  params[:type]

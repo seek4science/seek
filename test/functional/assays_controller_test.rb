@@ -8,6 +8,7 @@ class AssaysControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include FunctionalAuthorizationTests
 
   def setup
     login_as(:quentin)
@@ -17,9 +18,15 @@ class AssaysControllerTest < ActionController::TestCase
     @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
   end
 
-
   test "modelling assay validates with schema" do
-    a=assays(:modelling_assay_with_data_and_relationship)
+    df = Factory(:data_file,:contributor=>User.current_user.person)
+    a = Factory(:modelling_assay,:contributor=>User.current_user.person)
+    disable_authorization_checks do
+      a.relate(df)
+      a.reload
+    end
+
+
     User.with_current_user(a.study.investigation.contributor) { a.study.investigation.projects << Factory(:project) }
     assert_difference('ActivityLog.count') do
       get :show, :id=>a, :format=>"xml"
@@ -28,7 +35,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
 
     validate_xml_against_schema(@response.body)
-
   end
 
   test "check SOP and DataFile drop down contents" do
@@ -188,15 +194,18 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should show item" do
+    assay = Factory(:experimental_assay,:policy=>Factory(:public_policy),
+                    :assay_type_label=>"Metabolomics",
+                    :technology_type_label=>"Gas chromatography")
     assert_difference('ActivityLog.count') do
-      get :show, :id=>assays(:metabolomics_assay)
+      get :show, :id=>assay.id
     end
 
     assert_response :success
 
     assert_not_nil assigns(:assay)
 
-    assert_select "p#assay_type", :text=>/Metabalomics/, :count=>1
+    assert_select "p#assay_type", :text=>/Metabolomics/, :count=>1
     assert_select "p#technology_type", :text=>/Gas chromatography/, :count=>1
   end
 
@@ -258,13 +267,9 @@ class AssaysControllerTest < ActionController::TestCase
 
 
 test "should create experimental assay with or without sample" do
-    #THIS TEST MAY BECOME INVALID ONCE IT IS DECIDED HOW ASSAYS LINK TO SAMPLES OR ORGANISMS
-
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
-                               :technology_type_id=>technology_types(:gas_chromatography).id,
-                               :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id}
       end
@@ -277,8 +282,6 @@ test "should create experimental assay with or without sample" do
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
-                               :technology_type_id=>technology_types(:gas_chromatography).id,
-                               :assay_type_id=>assay_types(:metabolomics).id,
                                :study_id=>studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id,
                                :sample_ids=>[sample.id]
@@ -299,8 +302,8 @@ end
     #create assay only with organisms
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :technology_type_id=>technology_types(:gas_chromatography).id,
-                             :assay_type_id=>assay_types(:metabolomics).id,
+                             :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
+                             :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :sample_ids => [Factory(:sample)]}
@@ -310,12 +313,12 @@ end
     growth_type = Factory(:culture_growth_type, :title=>"batch")
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :technology_type_id=>technology_types(:gas_chromatography).id,
-                             :assay_type_id=>assay_types(:metabolomics).id,
+                             :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
+                             :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :sample_ids => [Factory(:sample)]},
-           :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
+                             :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
@@ -328,7 +331,6 @@ end
 
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id}
     end
@@ -337,7 +339,6 @@ end
     growth_type = Factory(:culture_growth_type, :title=>"batch")
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id},
            :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
@@ -351,8 +352,6 @@ end
     assert_difference('ActivityLog.count') do
     assert_difference("Assay.count") do
       post :create,:assay=>{:title=>"test",
-        :technology_type_id=>technology_types(:gas_chromatography).id,
-        :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
         :assay_class_id=>assay_classes(:experimental_assay_class).id,
         :sample_ids=>[Factory(:sample).id]
@@ -368,8 +367,6 @@ end
     sample2=Factory(:sample)
     assert_no_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
-                             :technology_type_id=>technology_types(:gas_chromatography).id,
-                             :assay_type_id=>assay_types(:metabolomics).id,
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id,
                              :sample_ids=>[sample1.id,sample2.id].join(",")
@@ -775,8 +772,8 @@ end
           #title is blank, so should fail validation
           post :create, :assay=>{
               :title=>"",
-              :technology_type_id=>technology_types(:gas_chromatography).id,
-              :assay_type_id=>assay_types(:metabolomics).id,
+              :technology_type_uri=>"http://some-uri#tech",
+              :assay_type_uri=>"http://some-uri#assay",
               :study_id=>studies(:metabolomics_study).id,
               :assay_class_id=>assay_classes(:modelling_assay_class).id
           },
@@ -819,8 +816,6 @@ end
 
           post :create, :assay=>{
               :title=>"fish",
-              :technology_type_id=>technology_types(:gas_chromatography).id,
-              :assay_type_id=>assay_types(:metabolomics).id,
               :study_id=>study.id,
               :assay_class_id=>assay_classes(:modelling_assay_class).id
           },
@@ -947,8 +942,10 @@ end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     login_as(:quentin)
-    a = {:title=>"test", :technology_type_id=>technology_types(:gas_chromatography).id, :assay_type_id=>assay_types(:metabolomics).id,
-         :study_id=>studies(:metabolomics_study).id, :assay_class_id=>assay_classes(:experimental_assay_class).id, :sample_ids=>[Factory(:sample).id]}
+    a = {:title=>"test",
+         :study_id=>studies(:metabolomics_study).id,
+         :assay_class_id=>assay_classes(:experimental_assay_class).id,
+         :sample_ids=>[Factory(:sample).id]}
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
         post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
@@ -1054,5 +1051,199 @@ end
         assert_select "a[href=?]", data_file_path(df), :text => df.title
         assert_select "a[href=?]", model_path(model), :text => model.title, :count => 0
         assert_select "a[href=?]", sop_path(sop), :text => sop.title
-   end
+  end
+
+  test "should not show private data or model title on modelling analysis summary" do
+    df = Factory(:data_file, :title=>"private data file", :policy=>Factory(:private_policy))
+    df2 = Factory(:data_file, :title=>"public data file", :policy=>Factory(:public_policy))
+    model = Factory(:model, :title=>"private model", :policy=>Factory(:private_policy))
+    model2 = Factory(:model, :title=>"public model", :policy=>Factory(:public_policy))
+    assay = Factory(:modelling_assay,:policy=>Factory(:public_policy))
+
+    assay.data_file_masters << df
+    assay.data_file_masters << df2
+    assay.model_masters << model
+    assay.model_masters << model2
+
+    assay.save!
+
+    login_as Factory(:person)
+
+    get :show,:id=>assay.id
+    assert_response :success
+    assert_select "div.data_model_relationship" do
+      assert_select "ul.related_models" do
+        assert_select "li a[href=?]",model_path(model2),:text=>/#{model2.title}/,:count=>1
+        assert_select "li a[href=?]",model_path(model),:text=>/#{model.title}/,:count=>0
+        assert_select "li",:text=>/Hidden/,:count=>1
+      end
+      assert_select "ul.related_data_files" do
+        assert_select "li a[href=?]",data_file_path(df2),:text=>/#{df2.title}/,:count=>1
+        assert_select "li a[href=?]",data_file_path(df),:text=>/#{df.title}/,:count=>0
+        assert_select "li",:text=>/Hidden/,:count=>1
+      end
+    end
+
+  end
+
+  test "preview assay with associated hidden items" do
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    private_df = Factory(:data_file,:policy=>Factory(:private_policy))
+    assay.data_file_masters << private_df
+    assay.save!
+    login_as Factory(:person)
+    xhr(:get, :preview,{:id=>assay.id})
+    assert_response :success
+  end
+
+  test "should not show investigation and study title if they are hidden on assay show page" do
+    investigation = Factory(:investigation,
+                            :policy=>Factory(:private_policy),
+                            :contributor => User.current_user)
+    study = Factory(:study,
+                    :policy=>Factory(:private_policy),
+                    :contributor => User.current_user,
+                    :investigation => investigation)
+    assay = Factory(:assay,
+                    :policy=>Factory(:public_policy),
+                    :study => study)
+
+    logout
+    get :show, :id => assay
+    assert_response :success
+    assert_select "p#investigation" do
+      assert_select "span.none_text", :text => /hidden item/, :count => 1
+    end
+    assert_select "p#study" do
+      assert_select "span.none_text", :text => /hidden item/, :count => 1
+    end
+  end
+
+  test "new object based on existing one" do
+    study = Factory(:study,:policy=>Factory(:public_policy))
+    assay = Factory(:assay,:policy=>Factory(:public_policy),:title=>"the assay",:study=>study)
+    assert assay.can_view?
+    assert assay.study.can_edit?
+    get :new_object_based_on_existing_one,:id=>assay.id
+    assert_response :success
+    assert_select "textarea#assay_title",:text=>"the assay"
+    assert_select "select#assay_study_id option[selected][value=?]",assay.study.id,:count=>1
+  end
+
+  test "new object based on existing one when unauthorised to view" do
+    assay = Factory(:assay,:policy=>Factory(:private_policy),:title=>"the assay")
+    refute assay.can_view?
+    get :new_object_based_on_existing_one,:id=>assay.id
+    assert_redirected_to assay
+    refute_nil flash[:error]
+  end
+
+  test "should show experimental assay types for new experimental assay" do
+    get :new,:class=>:experimental
+    assert_response :success
+    assert_select "label",:text=>/assay type/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i,:count=>0
+    end
+  end
+
+  test "should show modelling assay types for new modelling assay" do
+    get :new,:class=>:modelling
+    assert_response :success
+    assert_select "label",:text=>/Biological problem addressed/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i,:count=>0
+    end
+  end
+
+  test "should show experimental assay types when editing experimental assay" do
+    a = Factory(:experimental_assay,:contributor=>User.current_user.person)
+    get :edit,:id=>a.id
+    assert_response :success
+    assert_select "label",:text=>/assay type/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i,:count=>0
+    end
+  end
+
+  test "should show modelling assay types when editing modelling assay" do
+    a = Factory(:modelling_assay,:contributor=>User.current_user.person)
+    get :edit,:id=>a.id
+    assert_response :success
+    assert_select "label",:text=>/Biological problem addressed/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i,:count=>0
+    end
+  end
+
+  test "assays filtered by investigation via nested routing" do
+    assert_routing "investigations/1/assays",{controller:"assays",action:"index",investigation_id:"1"}
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    inv = assay.study.investigation
+    assay2 = Factory(:assay,:policy=>Factory(:public_policy))
+    refute_nil(inv)
+    refute_equal assay.study.investigation, assay2.study.investigation
+    get :index,investigation_id:inv.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
+      assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+    end
+  end
+
+  test "assays filtered by study via nested routing" do
+    assert_routing "studies/1/assays",{controller:"assays",action:"index",study_id:"1"}
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    study = assay.study
+    assay2 = Factory(:assay,:policy=>Factory(:public_policy))
+
+    refute_equal assay.study, assay2.study
+    get :index,study_id:study.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
+      assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+    end
+  end
+
+  test "assays filtered by strain through nested route" do
+    assert_routing "strains/3/assays",{controller:"assays",action:"index",strain_id:"3"}
+    ao1 = Factory(:assay_organism,:assay=>Factory(:assay,:policy=>Factory(:public_policy)))
+    ao2 = Factory(:assay_organism,:assay=>Factory(:assay,:policy=>Factory(:public_policy)))
+    strain1 = ao1.strain
+    strain2 = ao2.strain
+    assay1=ao1.assay
+    assay2=ao2.assay
+
+    refute_nil strain1
+    refute_nil strain2
+    refute_equal strain1,strain2
+    refute_nil assay1
+    refute_nil assay2
+    refute_equal assay1,assay2
+
+    assert_include assay1.strains,strain1
+    assert_include assay2.strains,strain2
+
+    assert_include strain1.assays,assay1
+    assert_include strain2.assays,assay2
+
+    assert strain1.can_view?
+    assert strain2.can_view?
+
+    get :index,strain_id:strain1.id
+    assert_response :success
+
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]",assay_path(assay1),:text=>assay1.title
+      assert_select "a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+    end
+
+  end
+
+
 end

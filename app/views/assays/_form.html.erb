@@ -1,11 +1,10 @@
-<%= javascript_include_tag 'strain.js' -%>
+<%= javascript_include_tag 'strain' -%>
 <%
  select_truncate_length=120
 @assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.assay')}"
 @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
 %>
-<%= javascript_include_tag "assays.js"  %>
-<%= javascript_include_tag "sharing.js", "resource.js"%>
+
 
 <%= f.error_messages -%>
 <%= f.hidden_field :create_from_asset %>
@@ -37,7 +36,7 @@
       <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
     <%= t('study') -%>
     <span class="required">*</span>
-     <%= link_to h(" New #{t('study')}?"),new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %> <br/>
+     <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %> <br/>
     <% investigations = Investigation.all.select &:can_view? -%>
       <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
       <% investigations.each do |i| %>
@@ -73,10 +72,10 @@
     <% end -%>
   </tr>
   <tr>
-    <% root_id = @assay.is_modelling? ? AssayType.modelling_assay_type_id : AssayType.experimental_assay_type_id %>
-    <td style="width:50%"><%= ontology_select_tag f,AssayType,root_id,"assay_type_id",(@assay.assay_type.nil? ? nil : @assay.assay_type.id),{:style=>"width:100%"} %></td>
+
+    <td style="width:50%"><%= assay_type_select_tag f,@assay.is_modelling?,"assay_type_uri",(@assay.assay_type_uri),{:style=>"width:100%"} %></td>
     <% unless @assay.is_modelling? -%>
-      <td style="width:50%"><%= try_block{ontology_select_tag f,TechnologyType,nil,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} } %></td>
+      <td style="width:50%"><%= technology_type_select_tag f,"technology_type_uri",(@assay.technology_type_uri),{:style=>"width:100%"} %></td>
     <% end -%>
   </tr>
 </table>
@@ -89,6 +88,9 @@
 <div id="add_organism_form">
     <%= render :partial=>"assays/select_organisms" -%>
 </div>
+    <% if show_scales? %>
+        <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} %>
+    <% end %>
 
 <br style="clear:both"/>
 

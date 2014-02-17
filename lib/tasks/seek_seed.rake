@@ -21,7 +21,7 @@ namespace :seek do
   task :seed_testing=>[:environment,:create_controlled_vocabs,:tags,:compounds]
 
   desc 'creates the standard initial controlled vocublaries'
-  task :create_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :assay_types, :disciplines, :organisms, :technology_types, :recommended_model_environments, :measured_items, :units, :project_roles, :assay_classes, :relationship_types]
+  task :create_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :disciplines, :organisms, :recommended_model_environments, :measured_items, :units, :project_roles, :assay_classes, :relationship_types]
 
   desc "adds the default tags"
   task(:tags=>:environment) do
@@ -69,11 +69,6 @@ namespace :seek do
     ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "model_formats")
   end
 
-  task(:assay_types=>:environment) do
-    AssayType.delete_all
-    ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "assay_types")
-  end
-
   task(:disciplines=>:environment) do
     Discipline.delete_all
     ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "disciplines")
@@ -100,11 +95,6 @@ namespace :seek do
       end
     end
 
-  end
-
-  task(:technology_types=>:environment) do
-    TechnologyType.delete_all
-    ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "technology_types")
   end
 
   task(:recommended_model_environments=>:environment) do
@@ -168,3 +158,5 @@ namespace :seek do
     end
   end
 end
+
+

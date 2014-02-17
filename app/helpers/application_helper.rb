@@ -8,14 +8,25 @@ module ApplicationHelper
   include FancyMultiselectHelper
   include TavernaPlayer::RunsHelper
 
-  def date_as_string date,show_time_of_day=false
-    date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
-    if date.blank?
-      str="<span class='none_text'>No date defined</span>"
+
+  def is_front_page?
+    current_page?(root_url)
+  end
+
+  def date_as_string date,show_time_of_day=false,year_only_1st_jan=false
+    #for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
+    if (year_only_1st_jan && !date.blank? && date.month==1 && date.day==1)
+      str=date.year.to_s
     else
-      str = date.localtime.strftime("#{date.day.ordinalize} %B %Y")
-      str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+      date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
+      if date.blank?
+        str="<span class='none_text'>No date defined</span>"
+      else
+        str = date.localtime.strftime("#{date.day.ordinalize} %b %Y")
+        str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+      end
     end
+
     str.html_safe
   end
 
@@ -51,7 +62,7 @@ module ApplicationHelper
       items = items.sort_by { |i| get_object_title(i) } if sort
       title_only_items = title_only_items.sort_by { |i| get_object_title(i) } if sort
 
-      list = items.collect { |i| link_to h(truncate(i.title, :length => max_length)), show_resource_path(i), :title => get_object_title(i) }
+      list = items.collect { |i| link_to truncate(i.title, :length => max_length), show_resource_path(i), :title => get_object_title(i) }
       list = list + title_only_items.collect { |i| h(truncate(i.title, :length => max_length)) }
       html << list.join(', ')
 
@@ -83,7 +94,7 @@ module ApplicationHelper
       contributor_person = hi.contributing_user.person
       if current_user.try(:person) && hi.can_see_hidden_item?(current_user.person) && contributor_person.can_view?
         contributor_name = contributor_person.name
-        contributor_link = "<a href='#{person_path(contributor_person)}'>#{contributor_name}</a>"
+        contributor_link = "<a href='#{person_path(contributor_person)}'>#{h(contributor_name)}</a>"
         contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
       end
     end
@@ -196,7 +207,7 @@ module ApplicationHelper
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
       text.capitalize! if options[:capitalize]            
-      res=text
+      res = text.html_safe? ? text : h(text)
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length])  if options[:length]
       res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true  
@@ -225,7 +236,7 @@ module ApplicationHelper
     else
       list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
     end
-    item_caption = " " + h(caption.blank? ? item.name : caption)
+    item_caption = " " + (caption.blank? ? item.name : caption)
     list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += "</li>"
     
@@ -407,7 +418,7 @@ module ApplicationHelper
         :with => "'sharing_scope=' + selectedSharingScope() + '&access_type=' + selectedAccessType(selectedSharingScope())
         + '&project_ids=' + getProjectIds('#{resource_name}') + '&project_access_type=' + $F('sharing_your_proj_access_type')
         + '&contributor_types=' + $F('sharing_permissions_contributor_types') + '&contributor_values=' + $F('sharing_permissions_values')
-        + '&creators=' + getCreators() + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&resource_id=' + '#{resource_id}' + '&is_new_file=' + '#{is_new_file}'"},
+        + '&creators=' + encodeURIComponent(getCreators()) + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&resource_id=' + '#{resource_id}' + '&is_new_file=' + '#{is_new_file}'"},
       { :id => 'preview_permission',
         :style => 'display:none'
       } #,

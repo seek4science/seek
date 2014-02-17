@@ -4,24 +4,30 @@ class StudiesController < ApplicationController
   include IndexPager
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show]
 
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
 
   include Seek::Publishing::PublishingCommon
 
+  include Seek::AnnotationCommon
+
   include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
     @existing_study =  Study.find(params[:id])
-    @study = @existing_study.clone_with_associations
 
-    unless @study.investigation.can_edit?
-       @study.investigation = nil
-      flash.now[:notice] = "The #{t('investigation')} of the existing #{t('study')} cannot be viewed, please specify your own #{t('investigation')}!"
+    if @existing_study.can_view?
+      @study = @existing_study.clone_with_associations
+      unless @existing_study.investigation.can_edit?
+        @study.investigation=nil
+        flash.now[:notice] = "The #{t('investigation')} associated with the original #{t('study')} cannot be edited, so you need to select a different #{t('investigation')}"
+      end
+      render :action => "new"
+    else
+      flash[:error]="You do not have the necessary permissions to copy this #{t('study')}"
+      redirect_to study_path(@existing_study)
     end
-
-    render :action => "new"
 
   end
 
@@ -82,6 +88,7 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.save
+        update_scales @study
         flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
         format.xml  { head :ok }
@@ -110,6 +117,7 @@ class StudiesController < ApplicationController
 
 
   if @study.save
+    update_scales @study
     if @study.new_link_from_assay=="true"
       render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
     else

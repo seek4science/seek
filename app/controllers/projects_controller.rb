@@ -1,14 +1,17 @@
+require 'seek/custom_exception'
+
 class ProjectsController < ApplicationController
   include WhiteListHelper
   include IndexPager
-  
+  include CommonSweepers
+
+  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report]
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report, :view_items_in_tab]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin]
   before_filter :auth_params,:only=>[:update]
-  before_filter :auth_institution_list_for_project_manager, :only => [:update]
-  before_filter :member_of_this_project, :only=>[:asset_report]
+  before_filter :member_of_this_project, :only=>[:asset_report],:unless=>:admin?
 
   skip_before_filter :project_membership_required
 
@@ -21,21 +24,54 @@ class ProjectsController < ApplicationController
 
   def asset_report
     @no_sidebar=true
-    @types=[DataFile,Model,Sop]
+    project_assets = @project.assets | @project.assays | @project.studies | @project.investigations
+    @types=[DataFile,Model,Sop,Presentation,Investigation,Study,Assay]
+    @public_assets = {}
+    @semi_public_assets = {}
+    @restricted_assets = {}
     @types.each do |type|
-      all = type.all_authorized_for "download", nil, @project
-      instance_variable_set "@public_#{type.name.underscore.pluralize}".to_sym,all
+      action = type.is_isa? ? "view" : "download"
+      @public_assets[type] = type.all_authorized_for action, nil, @project
       #to reduce the initial list - will start with all assets that can be seen by the first user fouund to be in a project
       user = User.all.detect{|user| !user.try(:person).nil? && !user.person.projects.empty?}
       projects_shared = user.nil? ? [] : type.all_authorized_for("download", user, @project)
       #now select those with a policy set to downloadable to all-sysmo-users
       projects_shared  = projects_shared.select do |item|
-        (item.policy.sharing_scope == Policy::ALL_SYSMO_USERS && item.policy.access_type == Policy::ACCESSIBLE)
+        access_type = type.is_isa? ? Policy::VISIBLE : Policy::ACCESSIBLE
+        (item.policy.sharing_scope == Policy::ALL_SYSMO_USERS && item.policy.access_type == access_type)
       end
       #just those shared with sysmo but NOT shared publicly
-      projects_shared  = projects_shared  - all
-      instance_variable_set "@projects_only_#{type.name.underscore.pluralize}".to_sym,projects_shared
+      @semi_public_assets[type]  = projects_shared  - @public_assets[type]
+
+      all = project_assets.select{|a|a.class==type}
+      @restricted_assets[type] = all - (@semi_public_assets[type] | @public_assets[type])
     end
+
+    #inlinked assets - either not linked to an assay or publication, or in the case of assays not linked to a publication or other assets
+    @types_for_unlinked = [DataFile, Model, Sop, Assay]
+    @unlinked_to_publication={}
+    @unlinked_to_assay={}
+    @unlinked_assets={}
+    @types_for_unlinked.each do |type|
+      @unlinked_assets[type] = []
+      @unlinked_to_publication[type] = []
+      @unlinked_to_assay[type] = []
+    end
+    project_assets.each do |asset|
+      if @types_for_unlinked.include?(asset.class)
+        if asset.related_publications.empty?
+          @unlinked_to_publication[asset.class] << asset
+        end
+        if (!asset.respond_to?(:assays) || asset.assays.empty?) && (!asset.is_isa? || asset.assets.empty?)
+          @unlinked_to_assay[asset.class] << asset
+        end
+      end
+    end
+    #get those that are unlinked to either
+    @types_for_unlinked.each do |type|
+      @unlinked_assets[type]=@unlinked_to_assay[type] & @unlinked_to_publication[type]
+    end
+
 
     respond_to do |format|
       format.html {render :template=>"projects/asset_report/report"}
@@ -43,7 +79,6 @@ class ProjectsController < ApplicationController
   end
 
   def admin
-    @project = Project.find(params[:id])
     
     respond_to do |format|
       format.html # admin.html.erb
@@ -53,7 +88,6 @@ class ProjectsController < ApplicationController
   # GET /projects/1
   # GET /projects/1.xml
   def show
-    @project = Project.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render :template=>'rdf/show'}
@@ -95,7 +129,6 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1/edit
   def edit
-    @project = Project.find(params[:id])
     
     possible_unsaved_data = "unsaved_#{@project.class.name}_#{@project.id}".to_sym
     if session[possible_unsaved_data]
@@ -147,8 +180,6 @@ class ProjectsController < ApplicationController
   # PUT /projects/1
   # PUT /projects/1.xml
   def update
-    @project = Project.find(params[:id])
-    #@project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
     
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
     avatar_id = params[:project].delete(:avatar_id).to_i
@@ -159,6 +190,7 @@ class ProjectsController < ApplicationController
     begin
       respond_to do |format|
         if @project.update_attributes(params[:project])
+          expire_resource_list_item_content
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
           format.xml  { head :ok }
@@ -167,7 +199,7 @@ class ProjectsController < ApplicationController
           format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
         end
       end
-    rescue Exception=>e
+    rescue WorkGroupDeleteError=>e
       respond_to do |format|
         flash[:error] = e.message
         format.html { redirect_to(@project) }
@@ -178,8 +210,6 @@ class ProjectsController < ApplicationController
   # DELETE /projects/1
   # DELETE /projects/1.xml
   def destroy
-    @project = Project.find(params[:id])
-
     respond_to do |format|
       if @project.can_delete?
         @project.destroy
@@ -261,29 +291,6 @@ class ProjectsController < ApplicationController
     restricted_params.each do |param, allowed|
       params[:project].delete(param) if params[:project] and not allowed
       params.delete param if params and not allowed
-    end
-  end
-
-  def auth_institution_list_for_project_manager
-     if (params[:project] and params[:project][:institution_ids])
-      if User.project_manager_logged_in? && !User.admin_logged_in?
-        institutions = []
-        params[:project][:institution_ids].each do |id|
-          institution = Institution.find_by_id(id)
-          institutions << institution unless institution.nil?
-        end
-        institutions_of_this_project = @project.institutions
-        institutions_of_no_project = Institution.all.select{|i| i.projects.empty?}
-        allowed_institution_list =  (institutions_of_this_project + institutions_of_no_project).uniq
-        flag = true
-        institutions.each do |i|
-          flag = false if !allowed_institution_list.include? i
-        end
-        if flag == false
-          error("Insufficient privileges","is invalid (insufficient_privileges)")
-        end
-        return flag
-      end
     end
   end
 end

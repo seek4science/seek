@@ -2,7 +2,7 @@
   <div class="foldTitle">
      <%= t('project') %> roles
   </div>
-  <div class="foldContent">
+  <div class="foldContent" style="display:none">
     <ul class="groups">
       <% for group_membership in @person.group_memberships -%>
         <li class="group">
@@ -21,7 +21,7 @@
                     </script>
                   <% else -%>
                     <li>
-                      <%= link_to h(role.name),people_path(:project_role_id=>role.id) %>
+                      <%= link_to role.name,people_path(:project_role_id=>role.id) %>
                     </li>
                   <% end -%>
 

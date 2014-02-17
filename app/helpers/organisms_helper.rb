@@ -4,7 +4,7 @@ module OrganismsHelper
   def organism_link_to model_or_tag
     return "<span class='none_text'>No Organism specified</span>" if model_or_tag.nil?
     if model_or_tag.instance_of?(Organism)
-      link_to h(model_or_tag.title.capitalize),model_or_tag
+      link_to model_or_tag.title.capitalize,model_or_tag
     end
   end
   
@@ -23,7 +23,7 @@ module OrganismsHelper
     html_options[:title]||=text
     concept_uri=organism.concept_uri
     ncbi_id=concept_uri.split(":")[1]
-    link_to h(text),"http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=info&id=#{ncbi_id}",html_options
+    link_to text,"http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=info&id=#{ncbi_id}",html_options
   end
   
   def delete_organism_icon organism
@@ -56,7 +56,7 @@ module OrganismsHelper
     if organism
       result << link_to(h(organism.title), organism)
       if strain && !strain.is_dummy? && strain.can_view?
-        result << " : <span class='strain_info'>#{link_to h(strain.info), strain}</span>"
+        result << " : <span class='strain_info'>#{link_to strain.info, strain}</span>"
       elsif strain && !strain.is_dummy? && !strain.can_view?
         result << hidden_items_html([strain], " : hidden strain")
       end

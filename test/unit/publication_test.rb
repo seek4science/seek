@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'pubmed_query'
 
 class PublicationTest < ActiveSupport::TestCase
   
@@ -173,10 +172,10 @@ class PublicationTest < ActiveSupport::TestCase
     p=Factory :publication
     assert_equal 0,p.creators.size
     
-    p1=people(:modeller_person)
-    p2=people(:fred)    
-    p3=people(:aaron_person)
-    p4=people(:pal)
+    p1=Factory(:person)
+    p2=Factory(:person)
+    p3=Factory(:person)
+    p4=Factory(:person)
 
     User.with_current_user(p.contributor) do
       p.creators << p1

@@ -12,6 +12,7 @@ class JwsFunctionalTest < ActionController::TestCase
   #FIXME: some of these tests would be better suited as integration tests using capybara - https://github.com/jnicklas/capybara
 
   def setup
+    skip("currently skipping jws online tests") if skip_jws_tests?
     WebMock.allow_net_connect!
     login_as(:model_owner)
   end
@@ -65,6 +66,7 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_difference("Model::Version.count", 1) do
         post :submit_to_jws, :id=>m,
              "following_action"=>"save_new_version",
+             "new_version_filename"=>"new-version.dat",
              "saved_model_format"=>"dat",
              "assignmentRules"=>"\r\n",
              "modelname"=>"model1",
@@ -80,6 +82,7 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_not_nil flash[:notice]
       assert_nil flash[:error]
       assert_equal "text/plain", m.content_blobs.first.content_type
+      assert_equal "new-version.dat",m.content_blobs.first.original_filename
     end
 
     test "save new sbml version with jws builder" do
@@ -89,6 +92,7 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_difference("Model::Version.count", 1) do
         post :submit_to_jws, :id=>m,
              "following_action"=>"save_new_version",
+             "new_version_filename"=>"new-version.xml",
              "saved_model_format"=>"sbml",
              "assignmentRules"=>"\r\n",
              "modelname"=>"model1",
@@ -106,6 +110,7 @@ class JwsFunctionalTest < ActionController::TestCase
       assert_nil flash[:error]
       assert_equal 1,m.content_blobs.size
       assert_equal "text/xml", m.content_blobs.first.content_type
+      assert_equal "new-version.xml", m.content_blobs.first.original_filename
     end
 
     test "show eqs graph" do
