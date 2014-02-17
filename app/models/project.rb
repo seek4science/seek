@@ -30,7 +30,8 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :presentations
   has_and_belongs_to_many :specimens
   has_and_belongs_to_many :samples
-  #has_and_belongs_to_many :organisms
+  has_and_belongs_to_many :strains
+  has_and_belongs_to_many :organisms
 
   def studies
     investigations.collect(&:studies).flatten.uniq
