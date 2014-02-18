@@ -1,4 +1,5 @@
 <%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'DataTables-1.8.2/jquery.dataTables.rowGrouping.js', 'DataTables-1.8.2/Scroller.js' %>
+<%= stylesheet_link_tag  'data_tables' %>
 <% id ||= 'workflow_runs_table' %>
 <% default_sort ||= [6, 'desc'] %>
 <% show_user ||= false %>
@@ -36,12 +37,12 @@
                 <% end %>
                 { "sWidth":"15%" },
                 { "sWidth":"10%" },
-                { "sWidth":"8%" },
+                { "sWidth":"7%" },
                 { "iDataSort": 6, "sWidth":"10%", "bSearchable": false },
                 { "bSearchable": false, "bVisible": false }, //Unix timestamp of "created" date for sorting purposes
                 { "iDataSort": 8, "sWidth":"10%", "bSearchable": false },
                 { "bSearchable": false, "bVisible": false }, //Unix timestamp of "finished" date for sorting purposes
-                { "sWidth":"5%", "bSortable":false, "bSearchable": false }
+                { "sWidth":"6%", "bSortable":false, "bSearchable": false }
             ]
         });
         <% if poll %>

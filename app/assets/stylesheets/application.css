@@ -17,8 +17,8 @@
 *= require top_menu
 *= require dynamic_menu
 *= require batch_upload
-*= require biovel
-*= require biovel_colours
 *= require easytabs
 *= require taverna_player/application
+*= require biovel
+*= require biovel_colours
 */

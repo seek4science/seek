@@ -602,3 +602,6 @@ a.doc-link:hover, a.button-link:hover {
     background-color: #b1e10f;
 }
 
+.dataTables_wrapper {
+  font-size: 12px;
+}

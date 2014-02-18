@@ -34,7 +34,7 @@ module RunsHelper
        run.contributor.display_name,
        workflow.can_view? ? link_to(workflow_version.title, main_app.workflow_path(workflow, :version => version)) : workflow_version.title,
        workflow.category.name,
-       "#{run.state} #{(run.complete? ? '' : image_tag('ajax-loader.gif', :style => "vertical-align: middle"))}".html_safe,
+       "#{run.state.capitalize} #{(run.complete? ? '' : image_tag('ajax-loader.gif', :style => "vertical-align: middle"))}".html_safe,
        created_at,
        run.created_at.to_i,
        finish_time_text,
