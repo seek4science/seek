@@ -7,33 +7,19 @@ module TavernaPlayer
 
     before_filter :check_project_membership_unless_embedded, :only => [:create, :new]
     before_filter :auth, :except => [ :index, :new, :create ]
-    before_filter :find_runs, :only => :index
     before_filter :add_sweeps, :only => :index
     before_filter :filter_users_runs_and_sweeps, :only => :index
     before_filter :find_workflow_and_version, :only => :new
 
-    def edit
-      @run = Run.find(params[:id])
-    end
-
     def update
-      @run.attributes = params[:run]
+      @run.update_attributes(params[:run])
 
       if params[:sharing]
         @run.policy_or_default
         @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
       end
 
-      if @run.save
-        respond_to do |format|
-          # Render show.html.erb unless the run is embedded.
-          format.html { render "taverna_player/runs/show" }
-        end
-      else
-        respond_to do |format|
-          format.html { render "taverna_player/runs/edit" }
-        end
-      end
+      respond_with(@run)
     end
 
     # POST /runs
@@ -43,21 +29,11 @@ module TavernaPlayer
       @run.projects = @run.contributor.person.projects
       @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
 
-      respond_to do |format|
-        if @run.save
-          format.html { redirect_to @run, :notice => 'Run was successfully created.' }
-        else
-          format.html { render :action => "new" }
-        end
+      if @run.save
+        flash[:notice] = "Run was successfully created."
       end
-    end
 
-    # GET /runs
-    def index
-      respond_to do |format|
-        format.html # index.html.erb
-        format.js # index.js.erb
-      end
+      respond_with(@run, :status => :created, :location => @run)
     end
 
     # DELETE /runs/1
@@ -102,7 +78,8 @@ module TavernaPlayer
       if Run.where(:id => params[:id]).blank?
         respond_to do |format|
           flash[:error] = 'The run you are looking for does not exist.'
-          format.html { redirect_to runs_path}
+          format.html { redirect_to runs_path }
+          format.json { render :nothing => true, :status => "404" }
         end
       else
         @run = Run.find(params[:id])
@@ -139,7 +116,7 @@ module TavernaPlayer
         else
           flash[:error] = "You are not authorized to #{action} this Workflow Run."
         end
-        respond_to do |format|
+        respond_with(@run, :nothing => true, :status => :unauthorized) do |format|
           format.html do
             case action
               when 'manage','edit','download','delete'
