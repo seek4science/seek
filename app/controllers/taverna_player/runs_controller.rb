@@ -121,7 +121,7 @@ module TavernaPlayer
         run.contributor == current_user
       end
 
-      @runs = @runs - @user_runs
+      @extra_runs = @runs - @user_runs
     end
 
     def auth
