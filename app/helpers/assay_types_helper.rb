@@ -9,7 +9,6 @@ module AssayTypesHelper
       list = list + indented_child_options(root,0,show_edit,show_delete,selected_id)
     end
     list = list.join("\n").html_safe
-    list = list + "<br/> <em>* Note that it is created by seek user.</em>".html_safe
   end
 
   #Displays the ontology node with appropriate indentation, as well as optional
@@ -19,7 +18,7 @@ module AssayTypesHelper
 
     unless parent.children.empty?
       parent.children.sort{|a,b| a.title.downcase <=> b.title.downcase}.each do |child|
-        result << ("<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + (link_to child.title, child,{:style=>"#{child.is_user_defined ? "color:green;font-style:italic": ""}"}) + "#{child.is_user_defined ? "*" : ""}"+" " +
+        result << ("<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + link_to(child.title, child) + " " +
                     (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style=>"vertical-align:middle"}) : "") + " " +
                     (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"),child, :confirm =>
                       "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
