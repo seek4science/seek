@@ -392,7 +392,7 @@ input[type="submit"], button {
 
 h2.standout {
   background-color: #CDDEEF;
-  background-image: url('/public/images/header-bg2.png');
+  background-image: url('/assets/header-bg2.png');
 }
 
 #sweep_results div {
