@@ -227,22 +227,4 @@ class Workflow < ActiveRecord::Base
     !user.nil? # just checks if user is logged in for now
   end
 
-  private
-
-  def generate_workflow_image
-    img_path = "/images/workflow_images/#{id}v#{version}.svg"
-    file_path = "#{Rails.root}/public#{img_path}"
-    FileUtils.mkdir("#{Rails.root}/public/images/workflow_images") unless File.exists?("#{Rails.root}/public/images/workflow_images")
-    unless File.exists?(file_path)
-      i = Tempfile.new("workflowimage#{@workflow.id}")
-      T2Flow::Dot.new.write_dot(i, t2flow)
-      i.close(false)
-      img = StringIO.new(`dot -Tsvg #{i.path}`)
-      File.open(file_path,"w") do |f|
-        f.write(img.read)
-      end
-    end
-    @workflow_image = img_path
-  end
-
 end
