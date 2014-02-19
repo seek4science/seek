@@ -18,31 +18,62 @@ def fix_run_output_ports_mime_types(run)
   end
 end
 
-# Add file extensions to all files in the results zip
+# Add file extensions to all the entries in all the results zips. We have to
+# Copy things into a new file due to problems with the Mac Archive Utility.
 def fix_file_extensions(run)
-  Zip::ZipFile.open(run.results.path) do |zip|
-    zip.each do |file|
-      output = run.outputs.detect { |o| o.name == file.name.split('/').first }
-      unless file.name.ends_with?('.error')
-        ext = output.file_extension
-        zip.rename(file.name, "#{file.name}#{ext}") unless ext.nil?
-      end
-    end
-  end
+  Dir.mktmpdir("#{run.id}", Rails.root.join("tmp")) do |tmp_dir|
+    tmp_zip = File.join(tmp_dir, "all.zip")
+    Zip::ZipFile.open(run.results.path) do |old_zip|
+      Zip::ZipFile.open(tmp_zip, Zip::ZipFile::CREATE) do |new_zip|
+        old_zip.each do |file|
+          output = run.outputs.detect { |o| o.name == file.name.split('/').first }
+          ext = output.file_extension
 
-  run.outputs.select { |o| o.depth > 0 }.each do |output|
-    ext = output.file_extension
-    Zip::ZipFile.open(output.file.path) do |zip|
-      zip.each do |file|
-        unless file.name.ends_with?('.error')
-          zip.rename(file.name, "#{file.name}#{ext}") unless ext.nil?
+          copy_file_between_zips(old_zip, new_zip, file.name, ext)
         end
       end
     end
+
+    run.results = File.new(tmp_zip)
+    run.save
+
+    run.outputs.select { |o| o.depth > 0 }.each do |output|
+      ext = output.file_extension
+      tmp_zip = File.join(tmp_dir, File.basename(output.file.path))
+      Zip::ZipFile.open(output.file.path) do |old_zip|
+        Zip::ZipFile.open(tmp_zip, Zip::ZipFile::CREATE) do |new_zip|
+          old_zip.each do |file|
+            copy_file_between_zips(old_zip, new_zip, file.name, ext)
+          end
+        end
+      end
+
+      output.file = File.new(tmp_zip)
+      output.save
+    end
+
   end
 end
 
 private
+
+# This streams data between two zip files (both previously opened) and adds a
+# file extension where appropriate.
+def copy_file_between_zips(src, dest, name, ext)
+  if name.ends_with?('.error')
+    new_name = name
+  else
+    new_name = ext.nil? ? name : "#{name}#{ext}"
+  end
+
+  dest.get_output_stream(new_name) do |zos|
+    src.get_input_stream(name) do |zis|
+      while !(buffer = zis.read(32768)).nil?
+        zos.write buffer
+      end
+    end
+  end
+end
 
 def recursively_set_mime_type(list, depth, type)
   depth -= 1
