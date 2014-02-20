@@ -89,7 +89,15 @@ module TavernaPlayer
     # Override of Taverna Player method to support versioned workflows
     def enqueue
       worker = TavernaPlayer::Worker.new(self, executed_workflow.content_blob.data_io_object.path)
-      job = Delayed::Job.enqueue worker, :queue => TavernaPlayer.job_queue_name
+      opts = {}
+      opts[:queue] = TavernaPlayer.job_queue_name
+      # De-prioritise sweep runs and space them out so they don't all execute at once and kill Taverna server
+      if sweep
+        opts[:priority] = 2
+        last_job = Delayed::Job.order('run_at DESC').where(:queue => TavernaPlayer.job_queue_name).first
+        opts[:run_at] = last_job.run_at + 10.seconds if last_job
+      end
+      job = Delayed::Job.enqueue worker, opts
       update_attributes(:delayed_job => job, :status_message => "Queued")
     end
 
