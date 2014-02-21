@@ -1622,6 +1622,32 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test "filter by people, including creators, using nested routes" do
+    assert_routing "people/7/presentations",{controller:"presentations",action:"index",person_id:"7"}
+
+    person1=Factory(:person)
+    person2=Factory(:person)
+
+    df1=Factory(:data_file,:contributor=>person1,:policy=>Factory(:public_policy))
+    df2=Factory(:data_file,:contributor=>person2,:policy=>Factory(:public_policy))
+
+    df3=Factory(:data_file,:contributor=>Factory(:person),:creators=>[person1],:policy=>Factory(:public_policy))
+    df4=Factory(:data_file,:contributor=>Factory(:person),:creators=>[person2],:policy=>Factory(:public_policy))
+
+
+    get :index,:person_id=>person1.id
+    assert_response :success
+
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]",data_file_path(df1),:text=>df1.title
+      assert_select "a[href=?]",data_file_path(df3),:text=>df3.title
+
+      assert_select "a[href=?]",data_file_path(df2),:text=>df2.title,:count=>0
+      assert_select "a[href=?]",data_file_path(df4),:text=>df4.title,:count=>0
+    end
+
+  end
+
   private
 
   def mock_http
