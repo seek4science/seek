@@ -63,7 +63,7 @@
 
     <div class="main_content_left_box">
 
-        <%#= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
+        <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
           <%= item_description @display_model.description -%>
             <%= render :partial=>"assets/multiple_fileinfo", :object=>@display_model -%>
