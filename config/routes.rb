@@ -160,7 +160,7 @@ SEEK::Application.routes.draw do
       get :admin
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
-              :publications,:events,:samples,:specimens,:only=>[:index]
+              :publications,:events,:samples,:specimens,:strains,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -280,7 +280,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
-    resources :people,:projects,:publications,:events
+    resources :people,:projects,:publications,:events,:only=>[:index]
   end
 
   resources :models do
@@ -389,13 +389,13 @@ SEEK::Application.routes.draw do
   ### BIOSAMPLES AND ORGANISMS ###
 
   resources :specimens do
-    resources :projects,:people,:samples,:strains,:institutions,:sops
+    resources :projects,:people,:samples,:strains,:institutions,:sops,:only=>[:index]
   end
   resources :samples do
     collection do
       get :preview
     end
-    resources :projects,:people,:specimens,:sops,:data_files
+    resources :projects,:people,:specimens,:sops,:data_files,:only=>[:index]
   end
 
   resources :strains do
@@ -405,7 +405,7 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
-    resources :specimens,:assays,:people,:projects
+    resources :specimens,:assays,:people,:projects,:only=>[:index]
   end
 
   resources :biosamples do
@@ -427,7 +427,7 @@ SEEK::Application.routes.draw do
     collection do
       post :search_ajax
     end
-    resources :projects,:assays,:studies,:models,:strains,:specimens
+    resources :projects,:assays,:studies,:models,:strains,:specimens,:only=>[:index]
     member do
       get :visualise
     end

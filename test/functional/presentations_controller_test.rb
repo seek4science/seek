@@ -246,4 +246,31 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "img[src=?]", /\/assets\/file_icons\/small\/pdf\.png/
   end
+
+  test "filter by people, including creators, using nested routes" do
+    assert_routing "people/7/presentations",{controller:"presentations",action:"index",person_id:"7"}
+
+    person1=Factory(:person)
+    person2=Factory(:person)
+
+    pres1=Factory(:presentation,:contributor=>person1,:policy=>Factory(:public_policy))
+    pres2=Factory(:presentation,:contributor=>person2,:policy=>Factory(:public_policy))
+
+    pres3=Factory(:presentation,:contributor=>Factory(:person),:creators=>[person1],:policy=>Factory(:public_policy))
+    pres4=Factory(:presentation,:contributor=>Factory(:person),:creators=>[person2],:policy=>Factory(:public_policy))
+
+
+    get :index,:person_id=>person1.id
+    assert_response :success
+
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]",presentation_path(pres1),:text=>pres1.title
+      assert_select "a[href=?]",presentation_path(pres3),:text=>pres3.title
+
+      assert_select "a[href=?]",presentation_path(pres2),:text=>pres2.title,:count=>0
+      assert_select "a[href=?]",presentation_path(pres4),:text=>pres4.title,:count=>0
+    end
+
+  end
 end
+

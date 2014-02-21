@@ -418,7 +418,7 @@ class ApplicationController < ActionController::Base
     #translate params that are send as an _id, like project_id=12 - which will usually be a consequence of nested routing
     params.keys.each do |key|
       if (key.end_with?("_id"))
-        filters[key.gsub("_id","")]=params[key]
+        filters[key.gsub("_id", "")]=params[key]
       end
     end
 
@@ -429,7 +429,7 @@ class ApplicationController < ActionController::Base
 
     #apply_filters will be dispatching to methods based on the symbols in params[:filter].
     #Permitted filters protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
-    filters.delete_if {|k,v| not (permitted_filters.include? k.to_s) }
+    filters.delete_if { |k, v| not (permitted_filters.include? k.to_s) }
     resources.select do |res|
       filters.all? do |filter, value|
         filter = filter.to_s
@@ -437,19 +437,31 @@ class ApplicationController < ActionController::Base
         value = klass.find_by_id value.to_i
 
         case
-        #first the special cases
-        when filter == 'investigation' && res.respond_to?(:assays) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
-        when filter == 'study' && res.respond_to?(:assays) then res.assays.collect{|a| a.study_id}.include? value.id
-        when filter == 'person' && (res.respond_to?(:contributor) || res.respond_to?(:creators) || res.respond_to?(:owner)) then (res.contributor== value || res.contributor.try(:person) == value)
-        when filter == 'person' && res.class.is_asset?    then (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
-        when filter == 'person' && res.respond_to?(:owner) then res.send(:owner) == value
-        #then the general case
-        when res.respond_to?("all_related_#{filter.pluralize}")            then res.send("all_related_#{filter.pluralize}").include?(value)
-        when res.respond_to?("related_#{filter.pluralize}")            then res.send("related_#{filter.pluralize}").include?(value)
-        when res.respond_to?(filter)                         then res.send(filter) == value
-        when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value
-        #defaults to false, if a filter is not recognised then nothing is return
-        else false
+          #first the special cases
+          when filter == 'investigation' && res.respond_to?(:assays)
+            res.assays.collect { |a| a.study.investigation_id }.include? value.id
+          when filter == 'study' && res.respond_to?(:assays)
+            res.assays.collect { |a| a.study_id }.include? value.id
+          when filter == 'person' && res.class.is_asset?
+            (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
+          when filter == 'person' && (res.respond_to?(:contributor) || res.respond_to?(:creators) || res.respond_to?(:owner))
+            people = [res.contributor,res.contributor.try(:person)]
+            people = people | res.creators if res.respond_to?(:creators)
+            people << res.owner if res.respond_to?(:owner)
+            people.compact!
+            people.include?(value)
+          #then the general case
+          when res.respond_to?("all_related_#{filter.pluralize}")
+            res.send("all_related_#{filter.pluralize}").include?(value)
+          when res.respond_to?("related_#{filter.pluralize}")
+            res.send("related_#{filter.pluralize}").include?(value)
+          when res.respond_to?(filter)
+            res.send(filter) == value
+          when res.respond_to?(filter.pluralize)
+            res.send(filter.pluralize).include? value
+          #defaults to false, if a filter is not recognised then nothing is return
+          else
+            false
         end
       end
     end
