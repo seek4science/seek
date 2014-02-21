@@ -11,8 +11,12 @@
         </td>
         <td style="text-align:right">
           <% if resource.version > 1 %>
-              <span style="font-weight: bold;">View version: </span>
+              <span>View version: </span>
               <%= resource_version_selection resource, displayed_resource -%>
+              <% if allow_model_comparison(resource,displayed_resource) -%>
+                  <span>Compare with: </span>
+                  <%= compare_model_version_selection resource, displayed_resource -%>
+              <% end %>
           <% end %>
         </td>
       </tr>

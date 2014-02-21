@@ -72,6 +72,8 @@ module AssetsHelper
     ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
   end
 
+
+
   def resource_title_draggable_avatar resource,version=nil
 
     icon=""
