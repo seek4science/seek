@@ -27,7 +27,6 @@ SEEK::Application.configure do
       Settings.defaults[:technology_type_ontology_file]= "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
       Settings.defaults[:modelling_analysis_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
       Settings.defaults[:assay_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
-      Settings.defaults[:related_item_limit]=1
 
     end
   end
