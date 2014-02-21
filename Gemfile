@@ -4,7 +4,7 @@ gem "rails", "3.2.17"
 gem "rdoc"
 
 gem "feedzirra"
-gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
+gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'
@@ -28,8 +28,7 @@ gem "daemons"
 gem "cancan"
 gem "in_place_editing"
 gem "linkeddata"
-#gem "rdf",">=0.3.8"
-#gem "rdf-rdfxml",">=0.3.8"
+
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
 gem 'docsplit'
