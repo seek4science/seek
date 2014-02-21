@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
-source 'http://gems.github.com'
 
-gem "rails", "3.2.16"
+gem "rails", "3.2.17"
 gem "rdoc"
 
 gem "feedzirra"
