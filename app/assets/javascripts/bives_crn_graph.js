@@ -3,7 +3,7 @@ var $j = jQuery;
 
 var cytoscapeJSoptions = {
 
-    layout: {name: 'cose'},
+    layout: {name: 'arbor'},
 
     style: cytoscape.stylesheet()
         .selector('node')
