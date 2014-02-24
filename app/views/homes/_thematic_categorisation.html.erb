@@ -1,15 +1,19 @@
 <h1>Choose an analysis...</h1>
-<div style="width: 800px; margin: auto; text-align: center">
+<div style="width: 900px; margin: auto; text-align: center; overflow: auto">
   <% WorkflowCategory.all.each do |category| %>
     <% if category.name != WorkflowCategory::OTHER %>
       <% visible_workflow_count = Workflow.where(:category_id => category.id).select {|w| w.can_view?}.count %>
       <% if visible_workflow_count > 0 %>
         <%= link_to workflows_path(:category_id => category.id), :class => "workflow-category",
                     :title => "#{pluralize(visible_workflow_count, 'workflow')} in this category" do %>
+          <%= image_tag "category_logos/#{category.name.underscore.gsub(' ','_')}.png", :size => '80x80', :alt => category.name %>
+          <br/>
           <%= category.name %>
         <% end %>
       <% else %>
         <div class="workflow-category no-workflows" title="No workflows in this category">
+          <%= image_tag "category_logos/#{category.name.underscore.gsub(' ','_')}.png", :size => '80x80', :alt => category.name %>
+          <br/>
           <%= category.name %>
         </div>
       <% end %>

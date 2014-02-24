@@ -24,9 +24,14 @@ body, #container {
   box-shadow:  0 3px 5px #918e5b;
 }
 
-.workflow,.workflow-category {
+.workflow {
   background-color: #ffc;
   border-color: #918e5b;
+  box-shadow: 1px 1px 3px #918e5b;
+}
+
+.workflow-category {
+  background-color: #fff;
   box-shadow: 1px 1px 3px #918e5b;
 }
 
