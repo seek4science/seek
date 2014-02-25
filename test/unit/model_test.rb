@@ -25,6 +25,20 @@ class ModelTest < ActiveSupport::TestCase
     assert contents.include?("F16P")
   end
 
+  test "model file format forces SBML format" do
+    model = Factory(:teusink_model,:model_format=>nil)
+    assert model.contains_sbml?
+    assert_equal ModelFormat.sbml,model.model_format
+    other_format = Factory(:model_format)
+    model = Factory(:teusink_model,:model_format=>other_format)
+    refute_nil model.model_format
+    assert_equal other_format,model.model_format
+
+    model = Factory(:teusink_jws_model,:model_format=>nil)
+    assert_nil model.model_format
+
+  end
+
   test "to_rdf" do
     User.with_current_user Factory(:user) do
       object = Factory :model, :assay_ids=>[Factory(:assay).id], :policy=>Factory(:public_policy)

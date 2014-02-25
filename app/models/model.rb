@@ -12,6 +12,15 @@ class Model < ActiveRecord::Base
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
     text :organism_terms,:model_contents_for_search,:assay_type_titles,:technology_type_titles, :other_creators
+    text :model_format do
+      model_format.try(:title)
+    end
+    text :model_type do
+      model_type.try(:title)
+    end
+    text :recommended_environment do
+      recommended_environment.try(:title)
+    end
   end if Seek::Config.solr_enabled
 
   acts_as_asset
@@ -24,6 +33,8 @@ class Model < ActiveRecord::Base
   validates_presence_of :title
 
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
+
+  before_save :check_for_sbml_format
   
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
@@ -52,6 +63,14 @@ class Model < ActiveRecord::Base
     belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
     belongs_to :model_type
     belongs_to :model_format
+
+    def model_format
+      if read_attribute(:model_format_id).nil? && contains_sbml?
+        ModelFormat.sbml.first
+      else
+        super
+      end
+    end
 
     def content_blobs
       ContentBlob.where(["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
@@ -132,6 +151,20 @@ class Model < ActiveRecord::Base
     end
 
     results.values.sort_by{|a| -a.score}
+  end
+
+  def model_format
+    if read_attribute(:model_format_id).nil? && contains_sbml?
+      ModelFormat.sbml.first
+    else
+      super
+    end
+  end
+
+  private
+
+  def check_for_sbml_format
+    self.model_format = self.model_format
   end
   
 end
