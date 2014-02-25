@@ -40,27 +40,26 @@ have a fixed width and height (but it's not required).
   font-size: 50px;
   font-weight: bold;
   position: absolute;
-  color: #eeeeee;
   top: 120px;
 }
 
 .jcarousel-prev:hover, .jcarousel-next:hover {
   text-decoration: none;
-  color: #ffffff;
 }
 
 .jcarousel-next {
-  right: 20px;
+  right: -40px;
 }
 
 .jcarousel-prev {
-  left: 20px;
+  left: -40px;
 }
 
 .jcarousel-wrapper {
   width: 900px;
   margin: auto;
   position: relative;
+  border: 1px solid #ccc;
 }
 
 .jcarousel-pagination {

@@ -1,21 +1,4 @@
 <div id="home">
-
-  <div class="box_infotext curved" style="margin-bottom: 1em">
-    <h4>Welcome to the BioVeL Portal</h4>
-    <p>
-      For technical support or questions about the <%= link_to 'BioVeL Project', 'http://biovel.eu/' -%>, please visit the <%= link_to 'contact page', contact_path -%>.
-    </p>
-    <% unless logged_in? %>
-      <br/>
-      <h5>Visitors</h5>
-      <p>
-        A guest account is available for visitors to use to evaluate the BioVeL Portal's functionality, but please be aware that any workflow runs created under this
-        account will be periodically deleted. <br/>
-        <strong><%= guest_login_link('Click here to log into the guest account') -%></strong>
-      </p>
-    <% end %>
-  </div>
-
   <%= render :partial=>"carousel" -%>
 
   <%= render :partial=>"thematic_categorisation" -%>
