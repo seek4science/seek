@@ -1,5 +1,4 @@
 <%= javascript_include_tag 'jquery.jcarousel' -%>
-<%= stylesheet_link_tag 'jquery.jcarousel' -%>
 
 <script type="application/javascript">
   $j(function() {
@@ -21,7 +20,23 @@
   <div class="jcarousel">
     <ul>
       <li>
-        <div style="text-align: center; width: 900px; height: 300px; background-color: #99cc33; font-size: 32px;line-height: 300px">Your picture here</div>
+        <div style="text-align: center; width: 900px; height: 300px; background-color: #99cc33; position: relative;">
+          <div class="carousel-info-box">
+            <h4>Welcome to the BioVeL Portal</h4>
+            <p>
+              For technical support or questions about the <%= link_to 'BioVeL Project', 'http://biovel.eu/' -%>, please visit the <%= link_to 'contact page', contact_path -%>.
+            </p>
+            <% unless logged_in? %>
+              <br/>
+              <h5>Visitors</h5>
+              <p>
+                A guest account is available for visitors to use to evaluate the BioVeL Portal's functionality, but please be aware that any workflow runs created under this
+                account will be periodically deleted. <br/>
+                <strong><%= guest_login_link('Click here to log into the guest account') -%></strong>
+              </p>
+            <% end %>
+          </div>
+        </div>
       </li>
       <li>
         <div style="text-align: center; width: 900px; height: 300px; background-color: #88cc22; font-size: 32px;line-height: 300px">Your picture here</div>

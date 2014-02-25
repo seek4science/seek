@@ -148,3 +148,7 @@ ul.sweep_input_selection label {
 ul.sweep_input_selection label:hover {
   background: white;
 }
+
+.jcarousel-wrapper  {
+  border-color: #b2af6a;
+}
