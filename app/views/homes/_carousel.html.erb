@@ -1,3 +1,37 @@
-<div class="carousel">
-  Images will go here
+<%= javascript_include_tag 'jquery.jcarousel' -%>
+<%= stylesheet_link_tag 'jquery.jcarousel' -%>
+
+<script type="application/javascript">
+  $j(function() {
+    $j('.jcarousel').jcarousel({
+      wrap: 'circular'
+    });
+
+    $j('.jcarousel-prev').jcarouselControl({
+        target: '-=1'
+    });
+
+    $j('.jcarousel-next').jcarouselControl({
+        target: '+=1'
+    });
+  });
+</script>
+
+<div class="jcarousel-wrapper">
+  <div class="jcarousel">
+    <ul>
+      <li>
+        <div style="text-align: center; width: 900px; height: 300px; background-color: #99cc33; font-size: 32px;line-height: 300px">Your picture here</div>
+      </li>
+      <li>
+        <div style="text-align: center; width: 900px; height: 300px; background-color: #88cc22; font-size: 32px;line-height: 300px">Your picture here</div>
+      </li>
+      <li>
+        <div style="text-align: center; width: 900px; height: 300px; background-color: #aabb33; font-size: 32px;line-height: 300px">Your picture here</div>
+      </li>
+    </ul>
+  </div>
+  <!-- Controls -->
+  <a class="jcarousel-prev" href="#">&lt;</a>
+  <a class="jcarousel-next" href="#">&gt;</a>
 </div>

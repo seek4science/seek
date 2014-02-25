@@ -611,10 +611,3 @@ a.doc-link:hover, a.button-link:hover {
 .dataTables_wrapper {
   font-size: 12px;
 }
-
-.carousel {
-  width: 900px;
-  height: 300px;
-  margin: auto;
-  background-color: #b1e10f;
-}
