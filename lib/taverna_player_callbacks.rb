@@ -27,7 +27,7 @@ def fix_file_extensions(run)
       Zip::ZipFile.open(tmp_zip, Zip::ZipFile::CREATE) do |new_zip|
         old_zip.each do |file|
           output = run.outputs.detect { |o| o.name == file.name.split('/').first }
-          ext = output.file_extension
+          ext = output.nil? ? nil : output.file_extension
 
           copy_file_between_zips(old_zip, new_zip, file.name, ext)
         end
