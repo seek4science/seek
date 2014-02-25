@@ -28,7 +28,7 @@ class ModelTest < ActiveSupport::TestCase
   test "model file format forces SBML format" do
     model = Factory(:teusink_model,:model_format=>nil)
     assert model.contains_sbml?
-    assert_equal ModelFormat.sbml,model.model_format
+    assert_equal ModelFormat.sbml.first,model.model_format
     other_format = Factory(:model_format)
     model = Factory(:teusink_model,:model_format=>other_format)
     refute_nil model.model_format
