@@ -183,10 +183,12 @@ function mouseOnLabel(node, mouse_event){
 }
 
 function clickLabelLink(node, mouse_event){
-    if (mouseOnLabel(node, mouse_event)){
-        var link = document.createElement('a');
-        link.href = node.data().node_info.split('"')[1];
-        clickLink(link);
+    if (node.data().name != "Hidden item"){
+        if (mouseOnLabel(node, mouse_event)){
+            var link = document.createElement('a');
+            link.href = node.data().item_info.split('"')[1];
+            clickLink(link);
+        }
     }
 }
 
