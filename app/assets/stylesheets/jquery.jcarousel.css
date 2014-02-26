@@ -34,6 +34,7 @@ have a fixed width and height (but it's not required).
   /* Required only for block elements like <li>'s */
   float: left;
   list-style: none;
+  position: relative;
 }
 
 .jcarousel-prev, .jcarousel-next {
@@ -57,9 +58,10 @@ have a fixed width and height (but it's not required).
 
 .jcarousel-wrapper {
   width: 900px;
+  height: 300px;
   margin: auto;
   position: relative;
-  border: 1px solid #ccc;
+  border: none;
 }
 
 .jcarousel-pagination {
@@ -78,4 +80,12 @@ have a fixed width and height (but it's not required).
   height: 16px;
   text-align: center;
   margin: 0 5px;
+}
+
+.image-credit {
+  color: #FFFFFF;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  text-shadow: 1px 1px 0 #000000;
 }
