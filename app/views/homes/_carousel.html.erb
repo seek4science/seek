@@ -13,6 +13,9 @@
     $j('.jcarousel-next').jcarouselControl({
         target: '+=1'
     });
+
+    var rand = Math.random() * $j('.jcarousel').jcarousel('items').length;
+    $j('.jcarousel').jcarousel('scroll', rand, false);
   });
 </script>
 
