@@ -38,22 +38,24 @@ have a fixed width and height (but it's not required).
 }
 
 .jcarousel-prev, .jcarousel-next {
-  font-size: 50px;
+  font-size: 40px;
   font-weight: bold;
   position: absolute;
   top: 120px;
+  color: #eeeeee;
 }
 
 .jcarousel-prev:hover, .jcarousel-next:hover {
   text-decoration: none;
+  color: #ffffff;
 }
 
 .jcarousel-next {
-  right: -40px;
+  right: 10px;
 }
 
 .jcarousel-prev {
-  left: -40px;
+  left: 10px;
 }
 
 .jcarousel-wrapper {
@@ -61,7 +63,7 @@ have a fixed width and height (but it's not required).
   height: 300px;
   margin: auto;
   position: relative;
-  border: none;
+  border: 1px solid #ccc;
 }
 
 .jcarousel-pagination {

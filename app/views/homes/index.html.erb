@@ -1,6 +1,10 @@
 <div id="home">
   <%= render :partial=>"carousel" -%>
 
+  <% unless logged_in? %>
+    <%= render :partial=>'visitor_message' %>
+  <% end %>
+
   <%= render :partial=>"thematic_categorisation" -%>
 
   <% if logged_in? %>
