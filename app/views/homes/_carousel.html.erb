@@ -14,7 +14,7 @@
         target: '+=1'
     });
 
-    var rand = Math.random() * $j('.jcarousel').jcarousel('items').length;
+    var rand = Math.floor(Math.random() * $j('.jcarousel').jcarousel('items').length);
     $j('.jcarousel').jcarousel('scroll', rand, false);
   });
 </script>
