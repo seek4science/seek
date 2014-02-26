@@ -60,6 +60,12 @@ class HomesController < ApplicationController
     end
   end
 
+  def my_biovel
+    respond_to do |format|
+      format.html
+    end
+  end
+
   private
 
   RECENT_SIZE=3

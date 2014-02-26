@@ -1,7 +1,7 @@
 <% unless current_user.nil? %>
   <% runs = (TavernaPlayer::Run.by_owner(current_user.id).where(:sweep_id => nil).order('created_at DESC').limit(5) +
              Sweep.by_owner(current_user.id).order('created_at DESC').limit(5)).sort_by(&:created_at).reverse.first(5) %>
-  <div class="your_recent">
+  <div class="your_recent full_width">
     <h2>Your recent runs</h2>
     <% if runs.empty? %>
       <span class="none_text">No workflow runs</span>

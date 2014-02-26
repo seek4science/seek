@@ -1,5 +1,5 @@
 <h1>Choose an analysis...</h1>
-<div style="width: 900px; margin: auto; text-align: center; overflow: auto">
+<div style="width: <%= logged_in? ? '900px' : '770px'-%>; margin: auto; text-align: center; overflow: auto">
   <% WorkflowCategory.all.each do |category| %>
     <% if category.name != WorkflowCategory::OTHER %>
       <% visible_workflow_count = Workflow.where(:category_id => category.id).select {|w| w.can_view?}.count %>
@@ -17,6 +17,13 @@
           <%= category.name %>
         </div>
       <% end %>
+    <% end %>
+  <% end %>
+  <% if logged_in? %>
+    <%= link_to my_biovel_path, :class => "workflow-category my-biovel" do %>
+      <%= image_tag "biovel-logo-no-text.png", :size => '64x64', :alt => 'BioVeL Logo' %>
+      <br/>
+      My BioVeL
     <% end %>
   <% end %>
 </div>
