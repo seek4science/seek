@@ -216,8 +216,8 @@ class WorkflowsController < ApplicationController
 
   # Checks if the uploaded file looks like a Taverna workflow
   def taverna_workflow?(file)
-    first_couple_of_bytes = IO.read(file, 100) # returns string
-    if first_couple_of_bytes.include?('http://taverna.sf.net/2008/xml/t2flow') # This looks like a Taverna workflow
+    first_couple_of_bytes = IO.read(file, 512) # returns string
+    if first_couple_of_bytes.include?('xmlns="http://taverna.sf.net/2008/xml/t2flow"') # This looks like a Taverna workflow
       return true
     else
       return false
