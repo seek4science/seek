@@ -454,6 +454,8 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
 #      get :view_items_in_tab
+      post :favourite
+      delete :favourite_delete
     end
 
     resources :runs, :controller => 'TavernaPlayer::Runs'

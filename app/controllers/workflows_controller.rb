@@ -212,6 +212,40 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def favourite
+    f = Favourite.new(:user => current_user, :resource => @workflow)
+    if Favourite.find_by_user_id_and_resource_type_and_resource_id(current_user,f.resource_type,f.resource_id).nil?
+      if f.save
+        flash[:notice] = "Added to favourites"
+      else
+        flash[:error] = "Couldn't add to favourites: #{f.errors.full_messages}"
+      end
+    else
+      flash[:error] = "This workflow is already in your favourites"
+    end
+
+    respond_to do |format|
+      format.html { redirect_to @workflow }
+    end
+  end
+
+  def favourite_delete
+    f = Favourite.find(:first, :conditions => {:user_id => current_user.id, :resource_type => 'Workflow', :resource_id => @workflow.id})
+    if f
+      if f.destroy
+        flash[:notice] = "Removed from favourites"
+      else
+        flash[:error] = "Couldn't remove from favourites: #{f.errors.full_messages}"
+      end
+    else
+      flash[:error] = "This workflow wasn't in your favourites"
+    end
+
+    respond_to do |format|
+      format.html { redirect_to @workflow }
+    end
+  end
+
   private
 
   # Checks if the uploaded file looks like a Taverna workflow
