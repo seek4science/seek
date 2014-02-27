@@ -20,7 +20,7 @@
 *= require easytabs
 *= require taverna_player/application
 *= require data_tables
-*= require jquery.jcarousel
+*= require jquery.bxslider
 *= require biovel
 *= require biovel_colours
 */

@@ -1,52 +1,38 @@
-<%= javascript_include_tag 'jquery.jcarousel' -%>
+<%= javascript_include_tag 'jquery.bxslider' -%>
 
 <script type="application/javascript">
-  $j(function() {
-    $j('.jcarousel').jcarousel({
-      wrap: 'circular'
+    $j(function() {
+        $j('.bxslider').bxSlider({
+            randomStart: true,
+            slideWidth: 900,
+            pager: false
+        });
     });
-
-    $j('.jcarousel-prev').jcarouselControl({
-        target: '-=1'
-    });
-
-    $j('.jcarousel-next').jcarouselControl({
-        target: '+=1'
-    });
-
-    var rand = Math.floor(Math.random() * $j('.jcarousel').jcarousel('items').length);
-    $j('.jcarousel').jcarousel('scroll', rand, false);
-  });
 </script>
 
-<div class="jcarousel-wrapper">
-  <div class="jcarousel">
-    <ul>
-      <li><%= image_tag 'carousel_images/maria_1.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
-      <li><%= image_tag 'carousel_images/sarah_1.jpg' -%> <div class="image-credit">Photo by Sarah Bourlat</div></li>
-      <li><%= image_tag 'carousel_images/matthias_1.jpg' -%> <div class="image-credit">Photo by Matthias Obst</div></li>
-      <li><%= image_tag 'carousel_images/maria_2.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
-      <li><%= image_tag 'carousel_images/sarah_3.jpg' -%> <div class="image-credit">Photo by Sarah Bourlat</div></li>
-      <li><%= image_tag 'carousel_images/matthias_2.jpg' -%> <div class="image-credit">Photo by Matthias Obst</div></li>
-      <li><%= image_tag 'carousel_images/maria_3.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
-      <li><%= image_tag 'carousel_images/matthias_3.jpg' -%> <div class="image-credit">Photo by Matthias Obst</div></li>
-      <li><%= image_tag 'carousel_images/maria_4.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
-      <li><%= image_tag 'carousel_images/sarah_2.jpg' -%> <div class="image-credit">Photo by Sarah Bourlat</div></li>
-      <li><%= image_tag 'carousel_images/maria_5.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
-      <!--<li>-->
-        <!--<div style="text-align: center; width: 900px; height: 300px; background: #ffffcc; line-height: 300px; font-size: 32px;">-->
-          <!--Your photo here-->
-        <!--</div>-->
-      <!--</li>-->
-    </ul>
-  </div>
+<div class="carousel-wrapper">
+  <ul class="bxslider">
+    <li><%= image_tag 'carousel_images/maria_1.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
+    <li><%= image_tag 'carousel_images/sarah_1.jpg' -%> <div class="image-credit">Photo by Sarah Bourlat</div></li>
+    <li><%= image_tag 'carousel_images/matthias_1.jpg' -%> <div class="image-credit">Photo by Matthias Obst</div></li>
+    <li><%= image_tag 'carousel_images/maria_2.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
+    <li><%= image_tag 'carousel_images/sarah_3.jpg' -%> <div class="image-credit">Photo by Sarah Bourlat</div></li>
+    <li><%= image_tag 'carousel_images/matthias_2.jpg' -%> <div class="image-credit">Photo by Matthias Obst</div></li>
+    <li><%= image_tag 'carousel_images/maria_3.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
+    <li><%= image_tag 'carousel_images/matthias_3.jpg' -%> <div class="image-credit">Photo by Matthias Obst</div></li>
+    <li><%= image_tag 'carousel_images/maria_4.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
+    <li><%= image_tag 'carousel_images/sarah_2.jpg' -%> <div class="image-credit">Photo by Sarah Bourlat</div></li>
+    <li><%= image_tag 'carousel_images/maria_5.jpg' -%> <div class="image-credit">Photo by Maria Paula Balcázar Vargas</div></li>
+    <!--<li>-->
+    <!--<div style="text-align: center; width: 900px; height: 300px; background: #ffffcc; line-height: 300px; font-size: 32px;">-->
+    <!--Your photo here-->
+    <!--</div>-->
+    <!--</li>-->
+  </ul>
   <div class="carousel-info-box">
     <h5>Welcome to the BioVeL Portal</h5>
     <p>
       For technical support or questions about the <%= link_to 'BioVeL Project', 'http://biovel.eu/' -%>, please visit the <%= link_to 'contact page', contact_path -%>.
     </p>
   </div>
-  <!-- Controls -->
-  <a class="jcarousel-prev" href="#">&lt;</a>
-  <a class="jcarousel-next" href="#">&gt;</a>
 </div>
