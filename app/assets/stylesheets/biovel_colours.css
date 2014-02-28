@@ -55,9 +55,17 @@ body, #container {
   border-color: #287621;
 }
 
-.foldTitle, h2 {
+.foldTitle, h2, div.collapsable_div_header {
   background-color: #FFC;
   background-image: none;
+}
+
+.collapsable_div_contents {
+  background-color: white;
+}
+
+.box_normal {
+  background-color: white;
 }
 
 h2 {
@@ -65,7 +73,8 @@ h2 {
 }
 
 .foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow, .box_infotext,
-input[type="text"], a.doc-link, a.button-link, .easytabs-pane, ul.easytabs-nav, ul.easytabs-nav > li {
+input[type="text"], a.doc-link, a.button-link, .easytabs-pane, ul.easytabs-nav, ul.easytabs-nav > li,
+div.collapsable_div, div.collapsable_div_contents {
   border-color: #b2af6a;
 }
 
