@@ -78,6 +78,10 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'passenger'
 gem 'unicorn-rails'
 
+group :assets do
+  gem 'turbo-sprockets-rails3'
+end
+
 group :development do
   gem "pry"
   gem "pry-doc"
