@@ -1088,6 +1088,16 @@ class ModelsControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test "should show SBML format for model that contains sbml and format not specified" do
+    model = Factory(:teusink_model,:policy=>Factory(:public_policy),:model_format=>nil)
+    assert model.contains_sbml?
+    get :show, :id=>model.id
+    assert_response :success
+    assert_select "#format_info" do
+      assert_select "#model_format",:text=>/SBML/i
+    end
+  end
+
   def valid_model
     { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
   end

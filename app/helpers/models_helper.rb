@@ -61,7 +61,7 @@ module ModelsHelper
       #using javascript to decode the escaped strings (like \\n) as the URI.decode in ruby doesn't do this.
       html+="<script type='text/javascript'>$('#{param}').value=decodeURI('#{value}');</script>".html_safe
       html
-    end
+    end.join(" ")
   end
   
   def jws_key_to_text key

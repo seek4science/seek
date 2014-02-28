@@ -21,7 +21,7 @@ module Seek
           nil
         end
       end
-      feeds.delete(nil)
+      feeds.compact!
 
       filter_feeds_entries_with_chronological_order(feeds, n)
       
@@ -51,7 +51,7 @@ module Seek
         #trim the url element
         feed_url.strip!
         feed = Feedzirra::Feed.fetch_and_parse(feed_url)
-        raise "Error reading feed for #{feed_url}" if feed==0
+        raise "Error reading feed for #{feed_url} error #{feed}" if feed.is_a?(Numeric)
         feed
       end
     end

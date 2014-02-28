@@ -404,6 +404,10 @@ end
     end
   end
 
+  Factory.define(:model_format) do |f|
+    f.sequence(:title) {|n| "format #{n}"}
+  end
+
   #Publication
   Factory.define(:publication) do |f|
     f.sequence(:title) {|n| "A Publication #{n}"}
