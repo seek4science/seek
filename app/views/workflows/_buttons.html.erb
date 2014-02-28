@@ -26,10 +26,12 @@
 <% end -%>
 
 <!-- Favourite workflow button -->
-<% if Favourite.exists?(:user_id => current_user.id, :resource_type => 'Workflow', :resource_id => workflow.id) %>
+<% if logged_in? %>
+  <% if Favourite.exists?(:user_id => current_user.id, :resource_type => 'Workflow', :resource_id => workflow.id) %>
     <li><%= image_tag_for_key('destroy', favourite_delete_workflow_path(workflow), nil, {:method=>:delete}, "Remove from Favourites") -%></li>
-<% else %>
+  <% else %>
     <li><%= image_tag_for_key('favourite', favourite_workflow_path(workflow), nil, {:method=>:post}, "Add to Favourites") -%></li>
+  <% end %>
 <% end %>
 
 <% if display_workflow.latest_version? %>
