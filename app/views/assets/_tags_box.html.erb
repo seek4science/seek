@@ -27,7 +27,7 @@
 </small>
 
 <div id="create_a_tag" style="display:none;">
-
+  <div class="none_text" style="font-size:smaller;padding-top:0.2em;">Either select a suggested tag whilst typing, or type a comma to end and define a new tag.</div>
   <%= form_tag_with_callbacks({:action => :update_annotations_ajax},
                {:method =>:post,
                 :id=>"create_tag",
