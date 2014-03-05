@@ -37,7 +37,7 @@
       <%= render :partial => 'port_type_table', :locals => {:f => f} %>
     <% end %>
 
-    <div style="display: none">
+    <div>
       <%= render :partial => "projects/project_selector", :locals => {:resource => @workflow} -%>
     </div>
     <%= fields_for(@workflow) { |form| render :partial => "assets/asset_form_bottom", :locals => {:f => form,
