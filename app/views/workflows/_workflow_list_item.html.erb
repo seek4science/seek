@@ -22,6 +22,13 @@
 
 <div style="clear: both;"></div>
 
+<!-- Avatar -->
+<% project = workflow.projects.first %>
+<% unless project.avatar.nil? %>
+    <%= image_tag avatar_url(project, project.avatar_id), :title => "Workflow contributed by #{project.title}",
+                  :alt => "#{project.title} avatar", :class => 'framed project-avatar' %>
+<% end %>
+
 <!-- Description -->
 <div class="description">
   <%= text_or_not_specified(workflow.description, :description => true, :auto_link=>true, :length=>300) %>
