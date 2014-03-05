@@ -38,7 +38,7 @@
 <div style="float: left; margin-top: 10px; font-size: 80%; color: #666;">
   Uploaded <%= workflow.created_at.strftime("%e %b %Y %H:%M:%S %Z") -%>
 </div>
-<ul class="sectionIcons" style="float: right; padding: 0; margin: 0;">
+<ul class="sectionIcons" style="position: absolute; margin: 0px; padding: 0px; right: 10px; bottom: 10px;">
   <% if workflow.can_run? %>
     <li>
       <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow.id, :version => workflow.version, :based_off => nil), nil, {:style => "font-size: smaller;"}, 'Run workflow') -%>
