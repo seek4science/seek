@@ -11,6 +11,9 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
+            :update_assay_types_from_ontology,
+            :update_technology_types_from_ontology,
+             :update_top_level_assay_type_titles,
             :resynchronise_assay_types,
             :resynchronise_technology_types,
             :increase_sheet_empty_rows,
@@ -66,8 +69,251 @@ namespace :seek do
       end
     end
   end
+   desc "update assay types from ontology"
+   task :update_assay_types_from_ontology => :environment  do
 
-  desc("Synchronised the assay types assigned to assays according to the current ontology")
+     #fix spelling error in earlier seed data
+           type = AssayType.find_by_title("flux balanace analysis")
+           unless type.nil?
+             type.title = "flux balance analysis"
+             type.save
+           end
+      # add term_uri to root: assay_types
+      root = AssayType.find_by_title("assay types")
+      root.term_uri =  "http://www.mygrid.org.uk/ontology/JERMOntology#Assay_type"
+      root.source_path = Seek::Ontologies::AssayTypeReader.instance.ontology_file
+      root.save!
+      #some title:label mapping
+
+      label_map = read_label_map(:assay_types)
+
+     assay_type_label_hash =  Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_label
+     assay_type_label_hash.each do |label, clz|
+           term_uri = clz.uri.to_s
+           title =  label_map.key(label).nil? ? label : label_map.key(label)
+           source_path = Seek::Ontologies::AssayTypeReader.instance.ontology_file
+
+           parents = []
+           clz.parents.each do |p|
+                parent = AssayType.find_by_term_uri(p.uri.to_s)
+                parent ||= AssayType.find_by_title(p.label)
+                if parent.nil?
+                  parent = AssayType.create :title=> p.label, :term_uri=> p.uri.to_s
+                  puts "parent #{parent.title} was created for assay type #{title}".red
+                end
+                parents << parent
+           end
+
+
+           at = AssayType.find_by_term_uri term_uri
+           at ||= AssayType.where(["lower(title)=?",label.downcase]).first
+           at ||= AssayType.where(["lower(title)=?",label.gsub("_"," ").downcase]).first
+           at ||= AssayType.where(["lower(title)=?",title.downcase]).first
+           at ||= AssayType.where(["lower(title)=?",title.gsub("_"," ").downcase]).first
+         if at
+           puts "Assay Type Title: #{at.title} || label is #{label} || || label_map is #{label_map.key(label)}" if at.title != label || at.title != title
+           at.source_path = source_path
+           at.term_uri = term_uri
+           at.parents = parents
+
+           if at.changed?
+             puts "Assay Type: #{at.title} was updated, changes are: #{at.changes}".yellow
+           end
+           at.save!
+         else
+           at = AssayType.new :title => title.gsub("_"," "), :term_uri => term_uri, :source_path => source_path
+
+            at.parents = parents
+           at.save!
+           puts "title: #{at.title}, label: #{title}"
+           puts "uri: #{at.term_uri}, uri: #{term_uri}"
+           puts "parents: #{at.parents.map(&:title).join(", ")}, parents: #{clz.parents.map(&:label).join(", ")}"
+           puts "Assay Type: #{label} was created with uri #{term_uri}, and parents: #{at.parents.map(&:title).join(", ")}".red
+         end
+
+
+     end
+
+           modelling_analysis_label_hash = Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_label
+
+           modelling_analysis_label_hash.each do |label, clz|
+             term_uri = clz.uri.to_s
+             title = label_map.key(label).nil? ? label : label_map.key(label)
+             source_path = Seek::Ontologies::ModellingAnalysisTypeReader.instance.ontology_file
+
+             parents = []
+             clz.parents.each do |p|
+               parent = AssayType.find_by_term_uri(p.uri.to_s)
+               parent ||= AssayType.find_by_title(p.label)
+               if parent.nil?
+                 parent = AssayType.create :title => p.label, :term_uri => p.uri.to_s
+                 puts "parent #{parent.title} was created for assay type #{title}".red
+               end
+               parents << parent
+             end
+
+             at = AssayType.find_by_term_uri term_uri
+             at ||= AssayType.where(["lower(title)=?", label.downcase]).first
+             at ||= AssayType.where(["lower(title)=?", label.gsub("_", " ").downcase]).first
+             at ||= AssayType.where(["lower(title)=?", title.downcase]).first
+             at ||= AssayType.where(["lower(title)=?", title.gsub("_", " ").downcase]).first
+             if at
+               puts "Assay Type Title: #{at.title} || label is #{label} || || label_map is #{label_map.key(label)}" if at.title != label || at.title != title
+               at.source_path = source_path
+               at.term_uri = term_uri
+               at.parents = parents
+               if at.changed?
+                 puts "Assay Type: #{at.title} was updated, changes are: #{at.changes}".yellow
+               end
+               at.save!
+             else
+               at = AssayType.new :title => title.gsub("_", " "), :term_uri => term_uri, :source_path => source_path
+               at.parents = parents
+               at.save!
+               puts "title: #{at.title}, label: #{title}"
+               puts "uri: #{at.term_uri}, uri: #{term_uri}"
+               puts "parents: #{at.parents.map(&:title).join(", ")}, parents: #{clz.parents.map(&:label).join(", ")}"
+               puts "Assay Type: #{label} was created with uri #{term_uri}, and parents: #{at.parents.map(&:title).join(", ")}".red
+             end
+           end
+
+
+     # add default parents to two sub-roots
+           exp_id = AssayType.experimental_assay_type_id
+           assay_type = AssayType.find(exp_id)
+           assay_type.parents = [AssayType.ontology_root]
+           assay_type.save!
+
+           mod_id = AssayType.modelling_assay_type_id
+           assay_type = AssayType.find(mod_id)
+           assay_type.parents = [AssayType.ontology_root]
+           assay_type.save!
+   end
+
+  desc "update technology types from ontology"
+     task :update_technology_types_from_ontology => :environment  do
+       # add term_uri to root: technology_types
+             root = TechnologyType.find_by_title("technology")
+             root.term_uri =  "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
+             root.source_path = Seek::Ontologies::TechnologyTypeReader.instance.ontology_file
+             root.save!
+             #some title:label mapping
+
+             label_map = read_label_map(:technology_types)
+
+             technology_type_label_hash =  Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_label
+             technology_type_label_hash.each do |label, clz|
+                  term_uri = clz.uri.to_s
+                  title =  label_map.key(label).nil? ? label : label_map.key(label)
+                  source_path = Seek::Ontologies::TechnologyTypeReader.instance.ontology_file
+
+                  parents = []
+                  clz.parents.each do |p|
+                       parent = TechnologyType.find_by_term_uri(p.uri.to_s)
+                       parent ||= TechnologyType.find_by_title(p.label)
+                       if parent.nil?
+                         parent = TechnologyType.create :title=> p.label, :term_uri=> p.uri.to_s
+                         puts "parent #{parent.title} was created for Technology type #{title}".red
+                       end
+                       parents << parent
+                  end
+
+
+                  tt = TechnologyType.find_by_term_uri term_uri
+                  tt ||= TechnologyType.where(["lower(title)=?",label.downcase]).first
+                  tt ||= TechnologyType.where(["lower(title)=?",label.gsub("_"," ").downcase]).first
+                  tt ||= TechnologyType.where(["lower(title)=?",title.downcase]).first
+                  tt ||= TechnologyType.where(["lower(title)=?",title.gsub("_"," ").downcase]).first
+                if tt
+                  puts "Technology Type Title: #{tt.title} || label is #{label} || || label_map is #{label_map.key(label)}" if tt.title != label || tt.title != title
+                  tt.source_path = source_path
+                  tt.term_uri = term_uri
+                  tt.parents = parents
+
+                  if tt.changed?
+                    puts "Technology Type: #{tt.title} was updated, changes are: #{tt.changes}".yellow
+                  end
+                  tt.save!
+                else
+                  tt = TechnologyType.new :title => title.gsub("_"," "), :term_uri => term_uri, :source_path => source_path
+
+                   tt.parents = parents
+                  tt.save!
+                  puts "title: #{tt.title}, label: #{title}"
+                  puts "uri: #{tt.term_uri}, uri: #{term_uri}"
+                  puts "parents: #{tt.parents.map(&:title).join(", ")}, parents: #{clz.parents.map(&:label).join(", ")}"
+                  puts "Technology Type: #{label} was created with uri #{term_uri}, and parents: #{tt.parents.map(&:title).join(", ")}".red
+                end
+
+
+            end
+     end
+
+
+   desc "adds the term uri's to assay types"
+    task :add_term_uris_to_assay_types=>:environment do
+      #fix spelling error in earlier seed data
+      type = AssayType.find_by_title("flux balanace analysis")
+      unless type.nil?
+        type.title = "flux balance analysis"
+        type.save
+      end
+
+      yamlfile=File.join(Rails.root,"config","default_data","assay_types.yml")
+      yaml=YAML.load_file(yamlfile)
+      yaml.keys.each do |k|
+        title = yaml[k]["title"]
+        uri = yaml[k]["term_uri"]
+        unless uri.nil?
+          assay_type = AssayType.where(["lower(title)=?",title.downcase]).first
+
+          unless assay_type.nil?
+                assay_type.term_uri = uri
+                assay_type.save!
+          end
+        else
+          puts "No uri defined for assaytype #{title} so skipping adding term"
+        end
+
+      end
+    end
+
+    desc "adds the term uri's to technology types"
+    task :add_term_uris_to_technology_types=>:environment do
+      yamlfile=File.join(Rails.root,"config","default_data","technology_types.yml")
+      yaml=YAML.load_file(yamlfile)
+      yaml.keys.each do |k|
+        title = yaml[k]["title"]
+        uri = yaml[k]["term_uri"]
+        unless uri.nil?
+          tech_type = TechnologyType.where(["lower(title)=?",title.downcase]).first
+          unless tech_type.nil?
+                tech_type.term_uri = uri
+                tech_type.save
+          end
+        else
+          puts "No uri defined for Technology Type #{title} so skipping adding term"
+        end
+
+      end
+    end
+
+
+  task(:update_top_level_assay_type_titles=>:environment) do
+    exp_id = AssayType.experimental_assay_type_id
+    assay_type = AssayType.find(exp_id)
+    assay_type.title="generic experimental assay"
+    assay_type.parents = AssayType.find_all_by_title("assay types")
+    assay_type.save!
+
+    mod_id = AssayType.modelling_assay_type_id
+    assay_type = AssayType.find(mod_id)
+    assay_type.title="generic modelling analysis"
+    assay_type.parents = AssayType.find_all_by_title("assay types")
+    assay_type.save!
+  end
+
+   desc("Synchronised the assay types assigned to assays according to the current ontology")
   task(:resynchronise_assay_types => :environment) do
 
     label_map = read_label_map(:assay_types)
@@ -149,7 +395,7 @@ namespace :seek do
       end
       unless assay.valid_technology_type_uri?
         uri = assay[:technology_type_uri]
-        puts "the technology type label and URI for Assay #{assay.id} cannot be resolved, so resetting the URI to the default, but keeping the stored label.\n\t the original label was #{label.inspect} and URI was #{uri.inspect}".red
+        puts "the technology type label and URI for Assay #{assay.id} cannot be resolved, so resetting the URI to the default, but keeping the stored label.\n\t the original label was #{title.inspect} and URI was #{uri.inspect}".red
         assay.use_default_technology_type_uri!
       end
 

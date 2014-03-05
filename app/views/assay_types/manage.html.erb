@@ -6,7 +6,7 @@
   </div>      
   <div style="float:left">
     <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_assay_type_path, "New #{t('assays.assay').downcase} type", nil, "New #{t('assays.assay').downcase} type" %></li>
+        <li><%= create_assay_type_popup_link nil, nil %> </li>
         <li><%= image_tag_for_key "new", new_assay_path, "New #{t('assays.assay').downcase}", nil, "New #{t('assays.assay').downcase}" %></li>
     </ul>
   </div>

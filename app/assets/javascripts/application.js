@@ -29,3 +29,6 @@
 //= require folds
 //= require tabber-minimized
 //= require detect_browser
+//= require assay_type
+//= require technology_type
+

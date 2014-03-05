@@ -4,22 +4,22 @@
 
 
 
-<% unless @type_class.nil? -%>
+<% unless @technology_type.nil? -%>
 
     <div class="ontology_nav">
 
       <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
-      <%= parent_technology_types_list_links @type_class.parents  -%>
+      <%= parent_technology_types_list_links @parents  -%>
 
       <br/>
 
       <%= image("current",{:title=>"Current technology type",:alt=>"Current technology type",:style=>"vertical-align:middle"}) -%>
-      <%= displayed_hierarchy_current_label(@label,@type_class) -%>
+      <%= displayed_hierarchy_current_label(@label,@technology_type) -%>
 
       <br/>
 
       <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
-      <%= child_technology_types_list_links @type_class.children  -%>
+      <%= child_technology_types_list_links @technology_type.children  -%>
 
 
     </div>

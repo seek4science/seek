@@ -101,6 +101,11 @@ class Assay < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
+
+  def assay_type_uri
+      assay_type.term_uri
+  end
+
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title
    

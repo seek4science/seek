@@ -228,13 +228,28 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
     end
   end
+
+
+   ### ASSAY AND TECHNOLOGY TYPES ###
+
+  get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
+  get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
+
   resources :assay_types do
+    member do
+      post :new
+      post :update_term_uri
+    end
     collection do
       get :manage
     end
   end
 
   resources :technology_types do
+    member do
+      post :new
+      post :update_term_uri
+    end
     collection do
       get :manage
     end

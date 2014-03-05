@@ -2,7 +2,7 @@
 
 <div class="show_basic">
   <div style="float:left">
-    <ul><%= ontology_editor_display TechnologyType, false, false, @technology_type.id %></ul>
+    <ul><%= ontology_editor_display TechnologyType, nil, @technology_type.id %></ul>
   </div>      
   <div style="float:left">
     <%= form_for @technology_type do |f| %>

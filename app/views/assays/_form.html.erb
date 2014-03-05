@@ -1,4 +1,6 @@
 <%= javascript_include_tag 'strain' -%>
+
+
 <%
  select_truncate_length=120
 @assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.assay')}"
@@ -28,7 +30,7 @@
   <% if Seek::Config.is_virtualliver -%>
       <p>
         <%= f.label "Institution" %><br/>
-        <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."},{:style=>"width:90%"}) %>
+        <%#= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."},{:style=>"width:90%"}) %>
       </p>
   <% end -%>
   <% if @assay.study.blank? or @assay.study.can_view? %>
@@ -40,7 +42,7 @@
     <% investigations = Investigation.all.select &:can_view? -%>
     <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>" : "" %>
     <% investigations.each do |i| %>
-        <% studies = i.studies.select &:can_edit? %>
+        <% studies = i.studies.select(&:can_edit?) %>
         <% unless studies.empty? %>
           <% options << "<optgroup label=\"#{truncate(h(i.title), :length => 64)}\">\n" %>
             <% studies.each do |s| %>
@@ -60,40 +62,52 @@
 <%= f.hidden_field :assay_class_id -%>
 
 <table class="padded_table">
+  <% root_id = @assay.is_modelling? ? AssayType.modelling_assay_type_id : AssayType.experimental_assay_type_id %>
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
     <% if User.current_user.try(:can_manage_types?) %>
-      <%= link_to h("New assay type?"),new_assay_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
+      <%#= link_to (image('new') + " new assay type"), new_assay_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
+        <%= create_assay_type_popup_link root_id, controller_name %>
+
       <% end %>
     </td>
     <% unless @assay.is_modelling? -%>
         <td><%= f.label "Technology type: " %>
        <% if User.current_user.try(:can_manage_types?) %>
-        <%= link_to h("New technology type?"),new_technology_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
+           <%#= link_to (image('new') + " new technology type"), new_technology_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
+              <%= create_technology_type_popup_link controller_name %>
           <% end %>
         </td>
 
     <% end -%>
   </tr>
   <tr>
+        <td style="width:50%">
+         <div id="assay_assay_types_list">
+           <%= render :partial => "assays/assay_types_list", :locals=>{:root_id=> root_id, :assay_type=> @assay.assay_type} %>
+         </div>
+        </td>
+        <% unless @assay.is_modelling? -%>
 
-    <td style="width:50%"><%= assay_type_select_tag f,"assay_type_uri",(@assay.assay_type_uri),{:style=>"width:100%"} %></td>
-    <% unless @assay.is_modelling? -%>
-      <td style="width:50%"><%= technology_type_select_tag f,"technology_type_uri",(@assay.technology_type_uri),{:style=>"width:100%"} %></td>
-    <% end -%>
+          <td style="width:50%">
+             <div id="assay_technology_types_list">
+               <%= render :partial => "assays/technology_types_list", :locals=>{:technology_type=> @assay.technology_type} %>
+           </div>
+          </td>
+        <% end -%>
   </tr>
 </table>
 
 <br style="clear:both"/>
 <% if User.current_user -%>
 <% if Seek::Config.is_virtualliver %>
-    <%= f.fancy_multiselect :samples, :object_type_text => @assay_text,:with_new_link=>true -%>
+    <%#= f.fancy_multiselect :samples, :object_type_text => @assay_text,:with_new_link=>true -%>
 <% end %>
 <div id="add_organism_form">
-    <%= render :partial=>"assays/select_organisms" -%>
+    <%#= render :partial=>"assays/select_organisms" -%>
 </div>
  <p>
-   <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} if show_scales?%>
+   <%#= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} if show_scales?%>
  </p>
 
 <br style="clear:both"/>
@@ -103,18 +117,18 @@
 </p>
 
 <p>
-  <%= render :partial=>"assets/select_tags" -%>
+  <%#= render :partial=>"assets/select_tags" -%>
 </p>
 
-<%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
+<%#= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
 
 <%  if @assay.is_modelling? -%>
-  <%= render :partial=>"assets/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
+  <%#= render :partial=>"assets/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
 <% end -%>
 
-<%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
+<%#= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
 
-<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
+<%#= render :partial => "assets/publication_relation_form", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
                                                                         :related_publications => @assay.related_publications} -%>
 
 <% end -%>
@@ -134,6 +148,24 @@
 </p>
 
 <script type="text/javascript">
+
+    function hideAssayTypeForm(parent_container_id) {
+        if ($(parent_container_id)) {
+            $(parent_container_id).style.display = 'none';
+        }
+    }
+  function add_assay_type(){
+     var div = document.getElementById("add_assay_type_section");
+      if(div){
+          div.style.display = "block";
+      }
+  }
+  function add_technology_type(){
+       var div = document.getElementById("add_technology_type_section");
+        if(div){
+            div.style.display = "block";
+        }
+    }
 
   function hide_organism_form(){
       Effect.Fade('add_organism_form');
