@@ -47,7 +47,7 @@ module Stu
           list = []
           roots.each do |root|
             if root_id
-              path = send("#{type.class_name.underscore}_path", :uri=>root.term_uri, :label=> root.title)
+              path = send("#{type.model_name.underscore}_path", :uri=>root.term_uri, :label=> root.title)
               root_link = "<li style=\"margin-left:0px;\">" + link_to(root.title, path) + "</li>"
               list << root_link
               depth = 1
@@ -71,7 +71,7 @@ module Stu
           result = []
           unless parent.children.empty?
             parent.children.sort { |a, b| a.title.downcase <=> b.title.downcase }.each do |child|
-              child_path = send("#{type.class_name.underscore}s_path", :uri=>child.term_uri, :label=> child.title)
+              child_path = send("#{type.model_name.underscore}s_path", :uri=>child.term_uri, :label=> child.title)
               ontology_term_li = link_to(child.title, child_path).html_safe
               user_defined_term_li = link_to(child.title, child_path, {:style => "color:green;font-style:italic"}) + "*" + " " +
                   (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style => "vertical-align:middle"}) : "") + " " +
