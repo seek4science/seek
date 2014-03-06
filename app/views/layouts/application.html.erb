@@ -98,6 +98,7 @@
 <% end %>
 
 <%= piwik_tracking_tag %>
+<%= analytics_init if Seek::Config.google_analytics_enabled %>
 </body>
 </html>
 

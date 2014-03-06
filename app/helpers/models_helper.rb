@@ -61,7 +61,7 @@ module ModelsHelper
       #using javascript to decode the escaped strings (like \\n) as the URI.decode in ruby doesn't do this.
       html+="<script type='text/javascript'>$('#{param}').value=decodeURI('#{value}');</script>".html_safe
       html
-    end
+    end.join(" ")
   end
   
   def jws_key_to_text key
@@ -70,6 +70,36 @@ module ModelsHelper
   
   def jws_key_to_prefix key
     JWS_ERROR_TO_PREFIX[key]  
+  end
+
+  def allow_model_comparison model,displayed_model
+    return false unless model.is_a?(Model)
+    return false unless displayed_model.contains_sbml?
+    return false unless model.versions.select{|v| v.contains_sbml?}.count > 1
+    true
+  end
+
+  def compare_model_version_selection versioned_model, displayed_resource_version
+    versions=versioned_model.versions.reverse
+    disabled=versions.size==1
+    options=""
+    versions.each do |v|
+      if (v.version==displayed_resource_version.version || !v.contains_sbml?)
+        options << "<option value='' disabled"
+      else
+        compare_path = compare_versions_model_path(versioned_model,:version=>displayed_resource_version.version,:other_version=>v.version)
+        options << "<option value='#{compare_path}'"
+      end
+
+      options << " selected='selected'" if v.version==displayed_resource_version.version
+      text = "#{v.version.to_s} #{versioned_model.describe_version(v.version)}"
+      options << "> #{text} </option>"
+    end
+    select_tag(:compare_versions,
+               options.html_safe,
+               :disabled=>disabled,
+               :onchange=>"showCompareVersions($('compare_versions_form'));"
+    ) + "<form id='compare_versions_form' onsubmit='showCompareVersions(this); return false;'></form>".html_safe
   end
 
 end

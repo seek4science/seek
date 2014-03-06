@@ -4,6 +4,12 @@ function showResourceVersion(form) {
     form.submit;
 }
 
+function showCompareVersions(form) {
+    var url=$('compare_versions').value;
+    location.href=url;
+    form.submit;
+}
+
 // ***************  Resource Upload Validation  *****************
 
 function validateResourceFields(is_new_file, resource_name, is_managed) {

@@ -73,21 +73,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
   end
 
-  test "view_items_in_tab" do
-    other_user = Factory :user
-    df = Factory :data_file,:title=>"a data file",:contributor=>User.current_user,:policy=>Factory(:public_policy)
-    private_df = Factory :data_file,:title=>"a private data file",:contributor=>other_user,:policy=>Factory(:private_policy)
-    xml_http_request :get, :view_items_in_tab,:resource_type=>"DataFile",:resource_ids=>[df.id,private_df.id,1000].join(",")
-    assert_response :success
-
-    assert @response.body.include?("a data file")
-    assert !@response.body.include?("a private data file")
-
-    #try with no parameters
-    xml_http_request :get, :view_items_in_tab
-    assert_response :success
-  end
-
   test "get XML when not logged in" do
     logout
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
@@ -1583,40 +1568,6 @@ end
     assert_select 'div', :text => /another creator/, :count => 1
   end
 
-  test "should show treatments" do
-    user = Factory :user
-    data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
-    df = Factory :data_file,
-                 :policy=>Factory(:downloadable_public_policy),
-                 :contributor=>user,
-                 :content_blob => Factory(:content_blob,:data=>data,:content_type=>"application/excel")
-
-
-    get :show,:id=>df
-    assert_response :success
-    assert_select "table#treatments" do
-      assert_select "th",:text=>"pH"
-      assert_select "th",:text=>"Dilution_rate"
-      assert_select "td",:text=>"samplea"
-      assert_select "td",:text=>"6.5"
-      assert_select "tr",:count=>4
-    end
-  end
-
-  test "should not show treatments if not downloadable" do
-    user = Factory :user
-    data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
-    df = Factory :data_file,
-                 :policy=>Factory(:publicly_viewable_policy),
-                 :contributor=>user,
-                 :content_blob => Factory(:content_blob,:data=>data,:content_type=>"application/excel")
-
-    get :show,:id=>df
-    assert_response :success
-    assert_select "table#treatments", :count=>0
-    assert_select "span#treatments",:text=>/you do not have permission to view the treatments/i
-  end
-
   test 'should select the correct sharing access_type when updating the datafile' do
     df = Factory(:data_file, :policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE))
     login_as(df.contributor)
@@ -1748,6 +1699,32 @@ end
       assert_select "p > a[href=?]",data_file_path(df),:text=>df.title
       assert_select "p > a[href=?]",data_file_path(df2),:text=>df2.title,:count=>0
     end
+  end
+
+  test "filter by people, including creators, using nested routes" do
+    assert_routing "people/7/presentations",{controller:"presentations",action:"index",person_id:"7"}
+
+    person1=Factory(:person)
+    person2=Factory(:person)
+
+    df1=Factory(:data_file,:contributor=>person1,:policy=>Factory(:public_policy))
+    df2=Factory(:data_file,:contributor=>person2,:policy=>Factory(:public_policy))
+
+    df3=Factory(:data_file,:contributor=>Factory(:person),:creators=>[person1],:policy=>Factory(:public_policy))
+    df4=Factory(:data_file,:contributor=>Factory(:person),:creators=>[person2],:policy=>Factory(:public_policy))
+
+
+    get :index,:person_id=>person1.id
+    assert_response :success
+
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]",data_file_path(df1),:text=>df1.title
+      assert_select "a[href=?]",data_file_path(df3),:text=>df3.title
+
+      assert_select "a[href=?]",data_file_path(df2),:text=>df2.title,:count=>0
+      assert_select "a[href=?]",data_file_path(df4),:text=>df4.title,:count=>0
+    end
+
   end
 
   private

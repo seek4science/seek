@@ -19,6 +19,9 @@ class ApplicationController < ActionController::Base
   include AuthenticatedSystem
 
   around_filter :with_current_user
+
+  rescue_from "ActionController::RoutingError", :with=>:render_routing_error
+
   def with_current_user
     User.with_current_user current_user do
         yield
@@ -123,33 +126,6 @@ class ApplicationController < ActionController::Base
     reset_session
     flash[:error] = error
     flash[:notice] = notice
-  end
-
-  #called via ajax to provide the full list of resources for the tabs
-  def view_items_in_tab
-    resource_type = params[:resource_type]
-    resource_ids = (params[:resource_ids] || []).split(',')
-    view_type = params[:view_type] || 'view_some'
-    render :update do |page|
-      if !resource_type.blank?
-        clazz = resource_type.constantize
-        resources = clazz.find_all_by_id(resource_ids)
-        if clazz.respond_to?(:authorize_asset_collection)
-          resources = clazz.authorize_asset_collection(resources,"view")
-        else
-          resources = resources.select &:can_view?
-        end
-        resources.sort!{|item,item2| item2.updated_at <=> item.updated_at}
-        page.replace_html "#{resource_type}_#{view_type}",
-                          :partial => "assets/resource_list",
-                          :locals => {:collection => resources,
-                          :narrow_view => true,
-                          :authorization_for_showing_already_done => true,
-                          :actions_partial_disable=>false}
-        page.visual_effect :toggle_blind, "view_#{resource_type}s", :duration => 0.05
-        page.visual_effect :toggle_blind, "view_#{resource_type}s_and_extra", :duration => 0.05
-      end
-    end
   end
 
   def resource_in_tab
@@ -298,7 +274,7 @@ class ApplicationController < ActionController::Base
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,
-          'export_as_xgmml'
+          'export_as_xgmml','compare_versions'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
@@ -523,13 +499,18 @@ class ApplicationController < ActionController::Base
     #translate params that are send as an _id, like project_id=12 - which will usually be a consequence of nested routing
     params.keys.each do |key|
       if (key.end_with?("_id"))
-        filters[key.gsub("_id","")]=params[key]
-        params[:page]="all"
+        filters[key.gsub("_id", "")]=params[key]
       end
     end
+
+    if filters.size>0
+      params[:page]||="all"
+      params[:filtered]=true
+    end
+
     #apply_filters will be dispatching to methods based on the symbols in params[:filter].
     #Permitted filters protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
-    filters.delete_if {|k,v| not (permitted_filters.include? k.to_s) }
+    filters.delete_if { |k, v| not (permitted_filters.include? k.to_s) }
     resources.select do |res|
       filters.all? do |filter, value|
         filter = filter.to_s
@@ -537,20 +518,36 @@ class ApplicationController < ActionController::Base
         value = klass.find_by_id value.to_i
 
         case
-        #first the special cases
-        when (filter == 'investigation' && res.respond_to?(:assays)) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
-        when (filter == 'study' && res.respond_to?(:assays)) then res.assays.collect{|a| a.study_id}.include? value.id
-        when (filter == 'person' && res.class.is_isa?)    then (res.contributor== value || res.contributor.try(:person) == value)
-        when (filter == 'person' && res.class.is_asset?)    then (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
-        when (filter == 'person' && res.respond_to?(:owner)) then res.send(:owner) == value
+          #first the special cases
+          when filter == 'investigation' && res.respond_to?(:assays)
+            res.assays.collect { |a| a.study.investigation_id }.include? value.id
+          when filter == 'study' && res.respond_to?(:assays)
+            res.assays.collect { |a| a.study_id }.include? value.id
+         
         when (filter == 'project' && res.respond_to?(:projects_and_ancestors)) then res.projects_and_ancestors.include? value
         when (filter == 'project' && res.class.name == "Assay") then Project.is_hierarchical? ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
         when (filter == 'project' && res.class.name == "Study") then Project.is_hierarchical? ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
-        #then the general case
-        when res.respond_to?(filter)                         then res.send(filter) == value
-        when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value
-        #defaults to true, if a filter is irrelevant then it is silently ignored
-        else true
+            when filter == 'person' && res.class.is_asset?
+
+             (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
+          when filter == 'person' && (res.respond_to?(:contributor) || res.respond_to?(:creators) || res.respond_to?(:owner))
+            people = [res.contributor,res.contributor.try(:person)]
+            people = people | res.creators if res.respond_to?(:creators)
+            people << res.owner if res.respond_to?(:owner)
+            people.compact!
+            people.include?(value)
+          #then the general case
+          when res.respond_to?("all_related_#{filter.pluralize}")
+            res.send("all_related_#{filter.pluralize}").include?(value)
+          when res.respond_to?("related_#{filter.pluralize}")
+            res.send("related_#{filter.pluralize}").include?(value)
+          when res.respond_to?(filter)
+            res.send(filter) == value
+          when res.respond_to?(filter.pluralize)
+            res.send(filter.pluralize).include? value
+          #defaults to false, if a filter is not recognised then nothing is return
+          else
+            false
         end
       end
     end

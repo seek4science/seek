@@ -126,6 +126,10 @@ class Publication < ActiveRecord::Base
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
 
+  def related_presentations
+    self.backwards_relationships.select {|a| a.subject_type == "Presentation"}.collect { |a| a.subject }
+  end
+
   #includes those related directly, or through an assay
   def all_related_data_files
     via_assay = related_assays.collect do |assay|

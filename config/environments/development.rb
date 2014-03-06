@@ -44,7 +44,7 @@ SEEK::Application.configure do
   config.assets.debug = true
   config.serve_static_assets = true
 
-  config.i18n.enforce_available_locales = true
+  I18n.enforce_available_locales = true
 end
 
 

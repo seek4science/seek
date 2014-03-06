@@ -1,11 +1,10 @@
 source 'https://rubygems.org'
-source 'http://gems.github.com'
 
 gem "rails", "3.2.17"
 gem "rdoc"
 
 gem "feedzirra"
-gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
+gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'
@@ -29,8 +28,7 @@ gem "daemons"
 gem "cancan"
 gem "in_place_editing"
 gem "linkeddata"
-#gem "rdf",">=0.3.8"
-#gem "rdf-rdfxml",">=0.3.8"
+
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
 gem 'docsplit'
@@ -53,6 +51,9 @@ gem 'cocaine'
 gem 'colorize'
 
 gem 'newrelic_rpm'
+#gem for BiVeS and BudHat
+gem 'bives'
+
 #Linked to SysMO Git repositories
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "git://github.com/SysMO-DB/white_list.git"
@@ -78,6 +79,10 @@ gem 'unicorn-rails'
 gem "recaptcha", '0.3.1'
 
 gem 'rb-readline', '~> 0.4.2'
+
+group :assets do
+  gem 'turbo-sprockets-rails3'
+end
 
 group :development do
   gem "pry"

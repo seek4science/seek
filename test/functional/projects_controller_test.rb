@@ -746,6 +746,108 @@ test 'should get index for non-project member, should for non-login user' do
 
   end
 
+  test "projects filtered by data file using nested routes" do
+    assert_routing "data_files/3/projects",{controller:"projects",action:"index",data_file_id:"3"}
+    df1 = Factory(:data_file,policy:Factory(:public_policy))
+    df2 = Factory(:data_file,policy:Factory(:public_policy))
+    refute_equal df1.projects,df2.projects
+    get :index,data_file_id:df1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(df1.projects.first),:text=>df1.projects.first.title
+      assert_select "p > a[href=?]",project_path(df2.projects.first),:text=>df2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by models using nested routes" do
+    assert_routing "models/3/projects",{controller:"projects",action:"index",model_id:"3"}
+    model1 = Factory(:model,policy:Factory(:public_policy))
+    model2 = Factory(:model,policy:Factory(:public_policy))
+    refute_equal model1.projects,model2.projects
+    get :index,model_id:model1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(model1.projects.first),:text=>model1.projects.first.title
+      assert_select "p > a[href=?]",project_path(model2.projects.first),:text=>model2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by sops using nested routes" do
+    assert_routing "sops/3/projects",{controller:"projects",action:"index",sop_id:"3"}
+    sop1 = Factory(:sop,policy:Factory(:public_policy))
+    sop2 = Factory(:sop,policy:Factory(:public_policy))
+    refute_equal sop1.projects,sop2.projects
+    get :index,sop_id:sop1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(sop1.projects.first),:text=>sop1.projects.first.title
+      assert_select "p > a[href=?]",project_path(sop2.projects.first),:text=>sop2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by publication using nested routes" do
+    assert_routing "publications/3/projects",{controller:"projects",action:"index",publication_id:"3"}
+    pub1 = Factory(:publication)
+    pub2 = Factory(:publication)
+    refute_equal pub1.projects,pub2.projects
+    get :index,publication_id:pub1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(pub1.projects.first),:text=>pub1.projects.first.title
+      assert_select "p > a[href=?]",project_path(pub2.projects.first),:text=>pub2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by events using nested routes" do
+    assert_routing "events/3/projects",{controller:"projects",action:"index",event_id:"3"}
+    event1 = Factory(:event)
+    event2 = Factory(:event)
+    refute_equal event1.projects,event2.projects
+    get :index,event_id:event1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(event1.projects.first),:text=>event1.projects.first.title
+      assert_select "p > a[href=?]",project_path(event2.projects.first),:text=>event2.projects.first.title,:count=>0
+    end
+  end
+
+  test "projects filtered by specimens using nested routes" do
+    assert_routing "specimens/2/projects",{controller:"projects",action:"index",specimen_id:"2"}
+    spec1 = Factory(:specimen,:policy=>Factory(:public_policy))
+    spec2 = Factory(:specimen,:policy=>Factory(:public_policy))
+    refute_equal spec1.projects,spec2.projects
+    refute_equal spec1.projects.first,spec2.projects.first
+    get :index,specimen_id:spec1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(spec1.projects.first),:text=>spec1.projects.first.title
+      assert_select "p > a[href=?]",project_path(spec2.projects.first),:text=>spec2.projects.first.title,:count=>0
+    end
+
+  end
+
+  test "projects filtered by strain using nested routes" do
+    assert_routing "strains/2/projects",{controller:"projects",action:"index",strain_id:"2"}
+    strain1=Factory(:strain,:policy=>Factory(:public_policy))
+    strain2=Factory(:strain,:policy=>Factory(:public_policy))
+    project1 = strain1.projects.first
+    project2 = strain2.projects.first
+    refute_empty strain1.projects
+    refute_empty strain2.projects
+    refute_equal project1,project2
+
+    assert_include project1.strains,strain1
+    assert_include project2.strains,strain2
+
+    get :index,strain_id:strain1.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",project_path(strain1.projects.first),:text=>strain1.projects.first.title
+      assert_select "p > a[href=?]",project_path(strain2.projects.first),:text=>strain2.projects.first.title,:count=>0
+    end
+
+  end
+
 
 	private
 

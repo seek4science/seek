@@ -127,7 +127,6 @@ SEEK::Application.routes.draw do
     collection do
       get :select
       get :get_work_group
-      get :view_items_in_tab
       get :resource_in_tab
       post :userless_project_selected_ajax
     end
@@ -157,7 +156,6 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
-      get :view_items_in_tab
       get :resource_in_tab
       get :manage
     end
@@ -165,7 +163,8 @@ SEEK::Application.routes.draw do
       get :asset_report
       get :admin
     end
-    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:only=>[:index]
+    resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
+              :publications,:events,:samples,:specimens,:strains,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -190,10 +189,9 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       get :request_all
-      get :view_items_in_tab
       get :resource_in_tab
     end
-    resources :people,:projects,:only=>[:index]
+    resources :people,:projects,:specimens,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -204,29 +202,27 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations do
-    collection do
-      get :view_items_in_tab
+    resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
       get :resource_in_tab
-    end
   end
 
   resources :studies do
     collection do
       post :investigation_selected_ajax
-      get :view_items_in_tab
       get :resource_in_tab
     end
+    resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
   end
 
   resources :assays do
     collection do
       get :preview
-      get :view_items_in_tab
       get :resource_in_tab
     end
     member do
       post :update_annotations_ajax
     end
+    resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
 
 
@@ -260,7 +256,6 @@ SEEK::Application.routes.draw do
   resources :data_files do
     collection do
       get :preview
-      get :view_items_in_tab
       get :resource_in_tab
       post :test_asset_url
       post :upload_for_tool
@@ -295,12 +290,12 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   resources :presentations do
     collection do
       get :preview
-      get :view_items_in_tab
       get :resource_in_tab
       post :test_asset_url
     end
@@ -323,17 +318,19 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:publications,:events,:only=>[:index]
   end
 
   resources :models do
     collection do
       get :build
       get :preview
-      get :view_items_in_tab
       get :resource_in_tab
       post :test_asset_url
     end
     member do
+      get :compare_versions
+      post :compare_versions
       get :builder
       post :check_related_items
       get :visualise
@@ -368,12 +365,12 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   resources :sops do
     collection do
       get :preview
-      get :view_items_in_tab
       get :resource_in_tab
       post :test_asset_url
     end
@@ -401,27 +398,28 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
   resources :publications do
     collection do
       get :preview
       post :fetch_preview
-      get :view_items_in_tab
       get :resource_in_tab
     end
     member do
       post :update_annotations_ajax
       post :disassociate_authors
     end
+    resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:events,:only=>[:index]
   end
 
   resources :events do
     collection do
       get :preview
-      get :view_items_in_tab
       get :resource_in_tab
     end
+    resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
 
   resource :policies do
@@ -434,23 +432,26 @@ SEEK::Application.routes.draw do
 
   ### BIOSAMPLES AND ORGANISMS ###
 
-  resources :specimens
+  resources :specimens do
+    resources :projects,:people,:samples,:strains,:institutions,:sops,:only=>[:index]
+  end
   resources :samples do
     collection do
       get :preview
       get :resource_in_tab
     end
+    resources :projects,:people,:specimens,:sops,:data_files,:only=>[:index]
   end
 
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
-      get :view_items_in_tab
       get :resource_in_tab
     end
     member do
       post :update_annotations_ajax
     end
+    resources :specimens,:assays,:people,:projects,:only=>[:index]
   end
 
   resources :biosamples do
@@ -471,9 +472,9 @@ SEEK::Application.routes.draw do
   resources :organisms do
     collection do
       post :search_ajax
-      get :view_items_in_tab
       get :resource_in_tab
     end
+    resources :projects,:assays,:studies,:models,:strains,:specimens,:only=>[:index]
     member do
       get :visualise
     end
@@ -527,11 +528,13 @@ SEEK::Application.routes.draw do
   #tabber lazy load
   match 'application/resource_in_tab' => 'application#resource_in_tab'
 
-  get "errors/error_422"
-
-  get "errors/error_404"
-
-  get "errors/error_500"
+  #error rendering
+  match "/404" => "errors#error_404"
+  match "/422" => "errors#error_422"
+  match "/500" => "errors#error_500"
+  #get "errors/error_422"
+  #get "errors/error_404"
+  #get "errors/error_500"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.

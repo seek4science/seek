@@ -77,18 +77,20 @@
                 <% end -%>
             </p>
 
-            <p>
+            <span id="format_info">
+            <p id="model_type">
                 <b><%= t('model') %> type:</b>
                 <%= model_type_text @display_model.model_type %>
             </p>
-            <p>
+            <p id="model_format">
                 <b><%= t('model') %> format:</b>
                 <%= model_format_text @display_model.model_format %>
             </p>
-            <p>
+            <p id="execution_environment">
                 <b>Execution or visualisation environment:</b>
                 <%= model_environment_text @display_model %>
             </p>
+            </span>
 
             <%= render :partial=>"model_visualisation" -%>
 

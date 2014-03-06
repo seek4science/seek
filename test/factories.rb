@@ -428,6 +428,10 @@ end
     end
   end
 
+  Factory.define(:model_format) do |f|
+    f.sequence(:title) {|n| "format #{n}"}
+  end
+
   #Publication
   Factory.define(:publication) do |f|
     f.sequence(:title) {|n| "A Publication #{n}"}
@@ -557,6 +561,7 @@ end
     f.start_date Time.now
     f.end_date 1.days.from_now
     f.association :policy, :factory => :private_policy
+    f.projects { [Factory.build(:project)] }
   end
 
   Factory.define(:saved_search) do |f|

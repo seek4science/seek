@@ -1102,6 +1102,47 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'a', :text => /View content/, :count => 0
   end
 
+  test "compare versions" do
+    #just compares with itself for now
+    model = Factory :model,:contributor=>User.current_user.person
+    assert model.contains_sbml?,"model should contain sbml"
+    assert model.can_download?,"should be able to download"
+
+    get :compare_versions,:id=>model,:other_version=>model.versions.last.version
+    assert_response :success
+    assert_select "div.bives_output ul li",:text=>/Both documents have same Level\/Version:/,:count=>1
+  end
+
+  test "cannot compare versions if you cannot download" do
+    model = Factory(:model,:contributor=>Factory(:person),:policy=>Factory(:publicly_viewable_policy))
+    assert model.can_view?, "should be able to view this model"
+    assert !model.can_download?, "should not be able to download this model"
+    get :compare_versions,:id=>model,:other_version=>model.versions.last.version
+    assert_response :redirect
+    refute_nil flash[:error]
+
+  end
+
+  test "gracefully handle error when other version missing" do
+    model = Factory :model,:contributor=>User.current_user.person
+    assert model.contains_sbml?,"model should contain sbml"
+    assert model.can_download?,"should be able to download"
+
+    get :compare_versions,:id=>model
+    assert_redirected_to model_path(model,:version=>model.version)
+    refute_nil flash[:error]
+  end
+
+  test "should show SBML format for model that contains sbml and format not specified" do
+    model = Factory(:teusink_model,:policy=>Factory(:public_policy),:model_format=>nil)
+    assert model.contains_sbml?
+    get :show, :id=>model.id
+    assert_response :success
+    assert_select "#format_info" do
+      assert_select "#model_format",:text=>/SBML/i
+    end
+  end
+
   def valid_model
     { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
   end

@@ -72,6 +72,8 @@ module AssetsHelper
     ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
   end
 
+
+
   def resource_title_draggable_avatar resource,version=nil
 
     icon=""
@@ -193,7 +195,7 @@ module AssetsHelper
 
   def collect_related_items(resource)
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-               "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {}}
+               "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {}, "Strain" => {}}
 
     related.each_key do |key|
       related[key][:items] = []
@@ -220,12 +222,6 @@ module AssetsHelper
       end
     end
     related
-  end
-
-  def filter_url(resource_type, context_resource)
-    #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"
-    filter_text = "(:filter => {:#{context_resource.class.name.downcase} => #{context_resource.id}},:page=>'all')"
-    eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
   #provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view

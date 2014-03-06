@@ -1292,6 +1292,22 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select "p > a[href=?]",person_path(person2),:text=>person2.name
       assert_select "p > a[href=?]",person_path(person3),:text=>person3.name,:count=>0
     end
+  end
 
+  test "filtered by presentation via nested route" do
+    assert_routing 'presentations/4/people',{controller:"people",action:"index",presentation_id:"4"}
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    presentation1 = Factory(:presentation,:policy=>Factory(:public_policy),:contributor=>person1)
+    presentation2 = Factory(:presentation,:policy=>Factory(:public_policy),:contributor=>person2)
+
+    refute_equal presentation1.contributor,presentation2.contributor
+    get :index,presentation_id:presentation1.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",person_path(person1),:text=>person1.name
+      assert_select "p > a[href=?]",person_path(person2),:text=>person2.name,:count=>0
+    end
   end
 end

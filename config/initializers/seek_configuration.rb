@@ -12,7 +12,7 @@ SEEK::Application.configure do
   Seek::Config.default :noreply_sender, 'seek1@virtual-liver.de'
   Seek::Config.default :solr_enabled,false
   Seek::Config.default :jws_enabled, true
-  Seek::Config.default :jws_online_root,"http://jjj.mib.ac.uk/"
+  Seek::Config.default :jws_online_root,"https://jws.sysmo-db.org/"
   Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""

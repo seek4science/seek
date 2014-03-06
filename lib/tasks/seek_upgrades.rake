@@ -21,6 +21,7 @@ namespace :seek do
             :repopulate_missing_publication_book_titles,
 
             :clean_up_sop_specimens,
+            :update_jws_online_root,
             :repopulate_auth_lookup_tables,
             :drop_solr_index
   ]
@@ -57,6 +58,9 @@ namespace :seek do
     end
   end
 
+  task(:update_jws_online_root => :environment) do
+    Seek::Config.jws_online_root = 'https://jws.sysmo-db.org/'
+  end
 
   desc("Increase the min rows from 10 to 35")
   task(:increase_sheet_empty_rows => :environment) do

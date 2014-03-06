@@ -9,7 +9,6 @@ class AssayTypesControllerTest < ActionController::TestCase
     login_as(:aaron)
   end
 
-
   test "should show assay types to public" do
     assay = Factory :experimental_assay,:assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:policy=>Factory(:public_policy)
     logout

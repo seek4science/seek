@@ -17,6 +17,7 @@ class Institution < ActiveRecord::Base
   
   has_many :work_groups, :dependent => :destroy
   has_many :projects, :through=>:work_groups
+  has_many :specimens
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :name,:country,:city, :address

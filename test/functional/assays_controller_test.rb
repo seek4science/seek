@@ -19,7 +19,6 @@ class AssaysControllerTest < ActionController::TestCase
     @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
   end
 
-
   test "modelling assay validates with schema" do
     df = Factory(:data_file,:contributor=>User.current_user.person)
     a = Factory(:modelling_assay,:contributor=>User.current_user.person)
@@ -1197,3 +1196,112 @@ end
     assert_redirected_to assay
     refute_nil flash[:error]
 end
+
+  test "should show experimental assay types for new experimental assay" do
+    get :new,:class=>:experimental
+    assert_response :success
+    assert_select "label",:text=>/assay type/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i,:count=>0
+    end
+  end
+
+  test "should show modelling assay types for new modelling assay" do
+    get :new,:class=>:modelling
+    assert_response :success
+    assert_select "label",:text=>/Biological problem addressed/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i,:count=>0
+    end
+  end
+
+  test "should show experimental assay types when editing experimental assay" do
+    a = Factory(:experimental_assay,:contributor=>User.current_user.person)
+    get :edit,:id=>a.id
+    assert_response :success
+    assert_select "label",:text=>/assay type/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i,:count=>0
+    end
+  end
+
+  test "should show modelling assay types when editing modelling assay" do
+    a = Factory(:modelling_assay,:contributor=>User.current_user.person)
+    get :edit,:id=>a.id
+    assert_response :success
+    assert_select "label",:text=>/Biological problem addressed/i
+    assert_select "select#assay_assay_type_uri" do
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle",:text=>/Cell cycle/i
+      assert_select "option[value=?]","http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",:text=>/Fluxomics/i,:count=>0
+    end
+  end
+
+  test "assays filtered by investigation via nested routing" do
+    assert_routing "investigations/1/assays",{controller:"assays",action:"index",investigation_id:"1"}
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    inv = assay.study.investigation
+    assay2 = Factory(:assay,:policy=>Factory(:public_policy))
+    refute_nil(inv)
+    refute_equal assay.study.investigation, assay2.study.investigation
+    get :index,investigation_id:inv.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
+      assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+    end
+  end
+
+  test "assays filtered by study via nested routing" do
+    assert_routing "studies/1/assays",{controller:"assays",action:"index",study_id:"1"}
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    study = assay.study
+    assay2 = Factory(:assay,:policy=>Factory(:public_policy))
+
+    refute_equal assay.study, assay2.study
+    get :index,study_id:study.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
+      assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+    end
+  end
+
+  test "assays filtered by strain through nested route" do
+    assert_routing "strains/3/assays",{controller:"assays",action:"index",strain_id:"3"}
+    ao1 = Factory(:assay_organism,:assay=>Factory(:assay,:policy=>Factory(:public_policy)))
+    ao2 = Factory(:assay_organism,:assay=>Factory(:assay,:policy=>Factory(:public_policy)))
+    strain1 = ao1.strain
+    strain2 = ao2.strain
+    assay1=ao1.assay
+    assay2=ao2.assay
+
+    refute_nil strain1
+    refute_nil strain2
+    refute_equal strain1,strain2
+    refute_nil assay1
+    refute_nil assay2
+    refute_equal assay1,assay2
+
+    assert_include assay1.strains,strain1
+    assert_include assay2.strains,strain2
+
+    assert_include strain1.assays,assay1
+    assert_include strain2.assays,assay2
+
+    assert strain1.can_view?
+    assert strain2.can_view?
+
+    get :index,strain_id:strain1.id
+    assert_response :success
+
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]",assay_path(assay1),:text=>assay1.title
+      assert_select "a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+    end
+
+  end
+
+

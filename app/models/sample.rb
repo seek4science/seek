@@ -2,7 +2,7 @@ require 'grouped_pagination'
 
 require "acts_as_scalable"
 class Sample < ActiveRecord::Base
- include Subscribable
+  include Subscribable
 
   acts_as_scalable if Seek::Config.is_virtualliver
   include Seek::Rdf::RdfGeneration
@@ -11,64 +11,46 @@ class Sample < ActiveRecord::Base
   acts_as_favouritable
   acts_as_uniquely_identifiable
 
+  grouped_pagination
+
   attr_accessor :parent_name
   attr_accessor :from_biosamples
 
   belongs_to :specimen
   belongs_to :age_at_sampling_unit, :class_name => 'Unit', :foreign_key => "age_at_sampling_unit_id"
-
-  accepts_nested_attributes_for :specimen
-
- has_and_belongs_to_many :tissue_and_cell_types  if Seek::Config.is_virtualliver
-
   belongs_to :institution
-  has_and_belongs_to_many :assays
 
-  has_many :sample_assets,:dependent => :destroy
+  has_and_belongs_to_many :assays
+  has_and_belongs_to_many :tissue_and_cell_types
+  has_many :sample_assets, :dependent => :destroy
  
    validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-   validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
 
 
 
-  def self.sop_sql()
-  'SELECT sop_versions.* FROM sop_versions ' +
-  'INNER JOIN sample_sops ' +
-  'ON sample_sops.sop_id = sop_versions.sop_id ' +
-  'WHERE (sample_sops.sop_version = sop_versions.version ' +
-  "AND sample_sops.sample_id = #{self.id})"
-  end
 
-  def asset_sql(asset_class)
-    asset_class_underscored = asset_class.underscore
-    'SELECT ' + asset_class_underscored + '_versions.* FROM ' + asset_class_underscored + '_versions ' +
-    'INNER JOIN sample_assets ' +
-    'ON sample_assets.asset_id= '+ asset_class_underscored + '_id ' +
-    'AND sample_assets.asset_type=\'' + asset_class + '\' ' +
-    'WHERE (sample_assets.version= ' + asset_class_underscored + '_versions.version ' +
-    "AND sample_assets.sample_id= #{self.id})"
-  end
-
-  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
+  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
   has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
-  has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new{self.asset_sql("Sop")}
-
+  has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new { self.asset_sql("Sop") }
   has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
   has_many :model_masters, :through => :sample_assets, :source => :asset, :source_type => 'Model'
   has_many :sop_masters, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
   has_many :treatments
 
 
+  accepts_nested_attributes_for :specimen
   alias_attribute :description, :comments
-  validates_presence_of :title
+
   validates_uniqueness_of :title
-  validates_presence_of :specimen,:lab_internal_number
+  validates_numericality_of :age_at_sampling, :greater_than => 0, :allow_nil => true, :message => "is invalid value", :unless => "Seek::Config.is_virtualliver"
+
+  validates_presence_of :title
+  validates_presence_of :specimen, :lab_internal_number
   validates_presence_of :donation_date, :if => "Seek::Config.is_virtualliver"
+  validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
 
+  scope :default_order, order("title")
 
- scope :default_order, order("title")
-
- grouped_pagination
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 
@@ -84,6 +66,24 @@ class Sample < ActiveRecord::Base
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :searchable_terms
   end if Seek::Config.solr_enabled
+
+  def self.sop_sql()
+    'SELECT sop_versions.* FROM sop_versions ' +
+        'INNER JOIN sample_sops ' +
+        'ON sample_sops.sop_id = sop_versions.sop_id ' +
+        'WHERE (sample_sops.sop_version = sop_versions.version ' +
+        "AND sample_sops.sample_id = #{self.id})"
+  end
+
+  def asset_sql(asset_class)
+    asset_class_underscored = asset_class.underscore
+    'SELECT ' + asset_class_underscored + '_versions.* FROM ' + asset_class_underscored + '_versions ' +
+        'INNER JOIN sample_assets ' +
+        'ON sample_assets.asset_id= '+ asset_class_underscored + '_id ' +
+        'AND sample_assets.asset_type=\'' + asset_class + '\' ' +
+        'WHERE (sample_assets.version= ' + asset_class_underscored + '_versions.version ' +
+        "AND sample_assets.sample_id= #{self.id})"
+  end
 
   def searchable_terms
     text=[]
@@ -105,13 +105,13 @@ class Sample < ActiveRecord::Base
     text
   end
 
- def state_allows_delete? *args
-   assays.empty? && super
- end
+  def state_allows_delete? *args
+    assays.empty? && super
+  end
 
- def self.user_creatable?
-   Seek::Config.biosamples_enabled
- end
+  def self.user_creatable?
+    Seek::Config.biosamples_enabled
+  end
 
   def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
        tissue_and_cell_type=nil
@@ -140,47 +140,46 @@ class Sample < ActiveRecord::Base
     end
   end
 
- def associate_asset asset
-   sample_asset = sample_assets.detect { |sa| sa.asset == asset }
+  def associate_asset asset
+    sample_asset = sample_assets.detect { |sa| sa.asset == asset }
 
-   unless sample_asset
-     sample_asset = SampleAsset.new
-     sample_asset.sample = self
-     sample_asset.asset = asset
-   end
+    unless sample_asset
+      sample_asset = SampleAsset.new
+      sample_asset.sample = self
+      sample_asset.asset = asset
+    end
 
-   sample_asset.version = asset.version
-   sample_asset.save if sample_asset.changed?
+    sample_asset.version = asset.version
+    sample_asset.save if sample_asset.changed?
 
-   return sample_asset
- end
+    return sample_asset
+  end
 
- def create_or_update_assets asset_ids, asset_class_name
-   asset_class = eval asset_class_name
-   existing_sample_assets = sample_assets.select {|sa| sa.asset_type == asset_class_name}
-   asset_ids_to_destroy = existing_sample_assets.map(&:asset_id) - asset_ids.map(&:to_i)
+  def create_or_update_assets asset_ids, asset_class_name
+    asset_class = eval asset_class_name
+    existing_sample_assets = sample_assets.select { |sa| sa.asset_type == asset_class_name }
+    asset_ids_to_destroy = existing_sample_assets.map(&:asset_id) - asset_ids.map(&:to_i)
 
-   #destroy old,redundant sample_assets
-   existing_sample_assets.select{|sa| asset_ids_to_destroy.include? sa.asset_id}.each &:destroy
+    #destroy old,redundant sample_assets
+    existing_sample_assets.select { |sa| asset_ids_to_destroy.include? sa.asset_id }.each &:destroy
 
-   #update/create new sample assets
-   asset_ids.each do |id|
-     asset = asset_class.find id
-     associate_asset asset if asset.can_view?
-   end
+    #update/create new sample assets
+    asset_ids.each do |id|
+      asset = asset_class.find id
+      associate_asset asset if asset.can_view?
+    end
+  end
 
- end
-
- def clone_with_associations
-   new_object= self.dup
-   new_object.policy = self.policy.deep_copy
-   new_object.data_file_masters = self.data_file_masters.select(&:can_view?)
+  def clone_with_associations
+    new_object= self.dup
+    new_object.policy = self.policy.deep_copy
+    new_object.data_file_masters = self.data_file_masters.select(&:can_view?)
    new_object.model_masters = self.model_masters.select(&:can_view?)  
-   new_object.sop_masters = self.sop_masters.select(&:can_view?)
+    new_object.sop_masters = self.sop_masters.select(&:can_view?)
    new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
-   new_object.project_ids = self.project_ids
+    new_object.project_ids = self.project_ids
     new_object.scale_ids = self.scale_ids
-   return new_object
+    return new_object
   end
 
   def self.human_attribute_name(attribute, options = {})
@@ -214,5 +213,5 @@ class Sample < ActiveRecord::Base
     else
       ''
     end
- end
+  end
 end

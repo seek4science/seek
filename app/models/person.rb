@@ -64,6 +64,7 @@ class Person < ActiveRecord::Base
 
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
+  has_many :presentations_for_person,:as=>:contributor, :class_name=>"Presentation"
 
   validate :orcid_id_must_be_valid_or_blank
 
@@ -129,7 +130,7 @@ class Person < ActiveRecord::Base
     if user
       result = (result | user.studies).compact
     end
-    result
+    result.uniq
   end
 
   def investigations
@@ -137,7 +138,15 @@ class Person < ActiveRecord::Base
     if user
       result = (result | user.investigations).compact
     end
-    result
+    result.uniq
+  end
+
+  def presentations
+    result = presentations_for_person
+    if user
+      result = (result | user.investigations).compact
+    end
+    result.uniq
   end
 
   def related_samples
@@ -152,7 +161,8 @@ class Person < ActiveRecord::Base
       user_items = []
       user_items =  user.try(:send,type) if user.respond_to?(type) && [:events,:investigations].include?(type)
       user_items =  user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
-      user_items
+      user_items = user_items | self.send("#{type}_for_person".to_sym) if self.respond_to? "#{type}_for_person".to_sym
+      user_items.uniq
     end
   end
 

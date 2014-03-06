@@ -28,6 +28,10 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :publications
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
+  has_and_belongs_to_many :specimens
+  has_and_belongs_to_many :samples
+  has_and_belongs_to_many :strains
+  has_and_belongs_to_many :organisms
 
   RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
 
