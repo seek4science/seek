@@ -24,7 +24,7 @@ class TechnologyType < ActiveRecord::Base
 
 
   def default_parents_and_term_uri
-    self.parents = [TechnologyType.ontology_root]
+    self.parents = [TechnologyType.ontology_root] if TechnologyType.ontology_root
     self.term_uri = self.parents.first.try(:term_uri) if self.term_uri.nil?
   end
   def uniq_term_uri_combined_with_title

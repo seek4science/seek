@@ -2,8 +2,8 @@
 
 metabolomics_assay:
   title: Metabolomics Assay  
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography
   study: metabolomics_study  
   owner: person_for_model_owner
   assay_class: experimental_assay_class  
@@ -13,8 +13,9 @@ metabolomics_assay:
 
 metabolomics_assay2:
   title: Metabolomics Assay2
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+
+  assay_type: metabolomics
+  technology_type: gas_chromatography  
   study: study_with_overlapping_assay_sops
   owner: person_for_model_owner
   assay_class: experimental_assay_class
@@ -24,8 +25,8 @@ metabolomics_assay2:
 
 metabolomics_assay3:
   title: Metabolomics Assay3
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography
   study: study_with_overlapping_assay_sops
   owner: person_for_model_owner
   assay_class: experimental_assay_class
@@ -34,8 +35,8 @@ metabolomics_assay3:
 
 assay_with_just_a_study:
   title: Assay with just a Study
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography
   study: metabolomics_study2
   owner: person_for_model_owner
   assay_class: experimental_assay_class
@@ -44,8 +45,8 @@ assay_with_just_a_study:
 
 assay_with_no_study_or_files:
   title: Assay with no Study or files
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
@@ -54,8 +55,8 @@ assay_with_no_study_or_files:
 
 assay_with_no_study_but_has_some_files:
   title: Assay with no Study but has some files
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
@@ -64,78 +65,78 @@ assay_with_no_study_but_has_some_files:
 
 assay_with_no_study_but_has_some_sops:
   title: Assay with no Study but has some sops
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography  
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
   policy: policy_for_viewable_data_file
   samples: [test_sample]
 
-#assay_type_test_assay1:
-#  title: assay_type_test_assay1
-#  assay_type: assay_type_with_child_and_assay
-#  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
-#  owner: person_for_model_owner
-#  assay_class: experimental_assay_class
-#  study: junk_study
-#  policy: policy_for_viewable_data_file
-#  samples: [test_sample]
+assay_type_test_assay1:
+  title: assay_type_test_assay1
+  assay_type: assay_type_with_child_and_assay
+  technology_type: gas_chromatography
+  owner: person_for_model_owner
+  assay_class: experimental_assay_class
+  study: junk_study
+  policy: policy_for_viewable_data_file
+  samples: [test_sample]
 
-#assay_type_test_assay2:
-#  title: assay_type_test_assay2
-#  assay_type: child_assay_type_with_assay
-#  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
-#  owner: person_for_model_owner
-#  assay_class: experimental_assay_class
-#  study: junk_study
-#  policy: policy_for_viewable_data_file
-#  samples: [test_sample]
+assay_type_test_assay2:
+  title: assay_type_test_assay2
+  assay_type: child_assay_type_with_assay
+  technology_type: gas_chromatography
+  owner: person_for_model_owner
+  assay_class: experimental_assay_class
+  study: junk_study
+  policy: policy_for_viewable_data_file
+  samples: [test_sample]
 
-#assay_type_test_assay3:
-#  title: assay_type_test_assay3
-#  assay_type: child_assay_type_with_assay
-#  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
-#  owner: person_for_model_owner
-#  assay_class: experimental_assay_class
-#  study: junk_study
-#  policy: private_policy
-#  samples: [test_sample]
+assay_type_test_assay3:
+  title: assay_type_test_assay3
+  assay_type: child_assay_type_with_assay
+  technology_type: gas_chromatography
+  owner: person_for_model_owner
+  assay_class: experimental_assay_class
+  study: junk_study
+  policy: private_policy
+  samples: [test_sample]
 
-#technology_type_test_assay1:
-#  title: technology_type_test_assay1
-#  technology_type: technology_type_with_child_and_assay
-#  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-#  owner: person_for_model_owner
-#  assay_class: experimental_assay_class
-#  study: junk_study
-#  policy: policy_for_viewable_data_file
-#  samples: [test_sample]
+technology_type_test_assay1:
+  title: technology_type_test_assay1
+  technology_type: technology_type_with_child_and_assay
+  assay_type: metabolomics
+  owner: person_for_model_owner
+  assay_class: experimental_assay_class
+  study: junk_study
+  policy: policy_for_viewable_data_file
+  samples: [test_sample]
 
-#technology_type_test_assay2:
-#  title: technology_type_test_assay2
-#  technology_type: child_technology_type_with_assay
-#  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-#  owner: person_for_model_owner
-#  assay_class: experimental_assay_class
-#  study: junk_study
-#  policy: policy_for_viewable_data_file
-#  samples: [test_sample]
-#
-#technology_type_test_assay3:
-#    title: technology_type_test_assay3
-#    technology_type: child_technology_type_with_assay
-#    assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-#    owner: person_for_model_owner
-#    assay_class: experimental_assay_class
-#    study: junk_study
-#    policy: private_policy
-#    samples: [test_sample]
+technology_type_test_assay2:
+  title: technology_type_test_assay2
+  technology_type: child_technology_type_with_assay
+  assay_type: metabolomics
+  owner: person_for_model_owner
+  assay_class: experimental_assay_class
+  study: junk_study
+  policy: policy_for_viewable_data_file
+  samples: [test_sample]
+
+technology_type_test_assay3:
+    title: technology_type_test_assay3
+    technology_type: child_technology_type_with_assay
+    assay_type: metabolomics
+    owner: person_for_model_owner
+    assay_class: experimental_assay_class
+    study: junk_study
+    policy: private_policy
+    samples: [test_sample]
 
 assay_with_links_in_description:
   title: Assay with links in description
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography  
   owner: person_for_model_owner
   description: Visit my site http://www.sysmo-db.org
   study: study_with_links_in_description
@@ -145,8 +146,8 @@ assay_with_links_in_description:
 
 assay_with_public_and_private_sops_and_datafiles:
   title: Assay with 2 sops, and 2 datafiles - one of each public & private
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography
   owner: person_for_owner_of_my_first_sop
   description: Visit my site http://www.sysmo-db.org
   study: study_with_assay_with_public_private_sops_and_datafile
@@ -156,7 +157,7 @@ assay_with_public_and_private_sops_and_datafiles:
 
 modelling_assay_with_data_and_relationship:
   title: Modelling Assay with Data
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
+  assay_type: metabolomics  
   owner: person_for_owner_of_my_first_sop
   description: modelling assay
   study: study_with_modelling_assay
@@ -165,8 +166,8 @@ modelling_assay_with_data_and_relationship:
 
 assay_with_a_model:
   title: Assay with model
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography
   study: metabolomics_study2
   owner: person_for_model_owner
   assay_class: experimental_assay_class
@@ -175,8 +176,8 @@ assay_with_a_model:
 
 assay_with_a_publication:
   title: Assay with publication 
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
-  technology_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
+  assay_type: metabolomics
+  technology_type: gas_chromatography
   study: metabolomics_study2
   owner: person_for_model_owner
   assay_class: experimental_assay_class    
@@ -185,7 +186,7 @@ assay_with_a_publication:
 
 modelling_assay:
   title: Modelling Assay
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
+  assay_type: metabolomics
   owner: person_for_model_owner
   description: modelling assay
   study: study_with_modelling_assay
@@ -194,7 +195,7 @@ modelling_assay:
 
 assay_can_edit_by_datafile_owner:
   title: Modelling Assay
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
+  assay_type: metabolomics
   owner: person_for_datafile_owner
   description: modelling assay
   study: study_with_modelling_assay
@@ -203,7 +204,7 @@ assay_can_edit_by_datafile_owner:
 
 assay_can_edit_by_my_first_sop_owner1:
   title: Modelling Assay
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
+  assay_type: metabolomics
   owner: person_for_owner_of_my_first_sop
   description: modelling assay
   study: study_with_modelling_assay
@@ -212,7 +213,7 @@ assay_can_edit_by_my_first_sop_owner1:
 
 assay_can_edit_by_my_first_sop_owner2:
   title: Modelling Assay
-  assay_type_uri: "http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics"
+  assay_type: metabolomics
   owner: person_for_owner_of_my_first_sop
   description: modelling assay
   study: study_with_modelling_assay

@@ -357,6 +357,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "assay type label from ontology if missing" do
+
     assay = Factory(:experimental_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response",assay_type_label:"fish")
     assert_equal "fish",assay.assay_type_label
     assay.assay_type_label = nil

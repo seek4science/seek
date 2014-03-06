@@ -18,7 +18,7 @@ class AssayType < ActiveRecord::Base
 
 
   def default_parents_and_term_uri
-    self.parents = [AssayType.ontology_root]
+    self.parents = [AssayType.ontology_root] if AssayType.ontology_root
     self.term_uri = self.parents.first.try(:term_uri) if self.term_uri.nil?
   end
 
