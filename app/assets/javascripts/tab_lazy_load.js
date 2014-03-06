@@ -24,7 +24,7 @@ function tab_on_click(scale_title, resource_type, resource_ids, actions_partial_
             tab_content_view_some.show();
             request = new Ajax.Request('/application/resource_in_tab',
                 {
-                    method: 'get',
+                    method: 'post',
                     parameters: {
                         resource_type: resource_type,
                         resource_ids: resource_ids,
