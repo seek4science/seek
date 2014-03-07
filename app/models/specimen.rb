@@ -32,6 +32,9 @@ class Specimen < ActiveRecord::Base
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
 #  accepts_nested_attributes_for :creators
   has_many :treatments
+  has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
+  has_many :sop_masters,:class_name => "SopSpecimen",:dependent => :destroy
+
 
   accepts_nested_attributes_for :genotypes, :allow_destroy => true
   accepts_nested_attributes_for :phenotypes, :allow_destroy => true
