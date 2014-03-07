@@ -86,8 +86,10 @@ module TavernaPlayer
       end
     end
 
-    # Returns a list of simple Run objects and Sweep objects
+    # Returns a list of simple Run objects and Sweep objects. We only want to
+    # group sweeps when serving html, though. There may be a better way...
     def add_sweeps
+      return unless request.format.to_s.include?("html")
       @runs = @runs.group_by { |run| run.sweep }
       @runs = (@runs[nil] || []) + @runs.keys
       @runs.compact! # to ignore 'nil' key
