@@ -1,5 +1,5 @@
 <%
-   limit ||= 5
+   limit ||= Seek::Config.related_items_limit
    hidden_items = resources - authorized_resources
    hidden_count = hidden_items.count
    extra_count = resources.count - hidden_items.count - limit
