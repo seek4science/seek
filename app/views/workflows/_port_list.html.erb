@@ -2,26 +2,24 @@
   <%= title -%> (<%= ports.count -%>)
 </h2>
 <% if ports.blank? -%>
-  <p class="none_text" style="margin-left:20px;">None</p>
+    <p class="none_text" style="margin-left:20px;">None</p>
 <% else %>
-  <table class="simple" style="width: 96%; margin-left:2%; margin-right:2%;">
-    <% ports.each do |p| -%>
-      <tr>
-        <td>
-          <h3><%= p.name %> <%= "<span class='mime_type'>(#{p.mime_type})</span>".html_safe unless p.mime_type.blank? %></h3>
+    <div>
+      <% ports.each do |p| -%>
+          <div class="workflow-port">
+            <h3><%= p.name %> <%= "<span class='mime_type'>(#{p.mime_type})</span>".html_safe unless p.mime_type.blank? %></h3>
 
-          <p>
-            <%= ('<strong>Description: </strong>' + (p.description || '')).html_safe %>
-          </p>
+            <p>
+              <%= ('<strong>Description: </strong>' + (p.description || '')).html_safe %>
+            </p>
 
-          <p>
-            <strong>Example value:</strong>
-          </p>
-          <% unless p.example_value.blank? %>
-            <pre class="script_example_data_box"><%= p.example_value %></pre>
-          <% end %>
-        </td>
-      </tr>
-    <% end %>
-  </table>
+            <% unless p.example_value.blank? %>
+                <p>
+                  <strong>Example value:</strong>
+                </p>
+                <pre class="script_example_data_box"><%= p.example_value %></pre>
+            <% end %>
+          </div>
+      <% end %>
+    </div>
 <% end %>
