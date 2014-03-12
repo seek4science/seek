@@ -13,12 +13,14 @@
 
     <script type="text/javascript">
       var inputData = <%= raw(interaction.data) %>;
+      var oldTitle = document.title;
 
       function registerCalls() {
         pmrpc.register({
           publicProcedureName : "reply",
           procedure : function(status, results) {
             interaction_reply('<%= "#{run_url(run)}/interaction/#{interaction.serial}" %>', status, results);
+            document.title = oldTitle;
             return "OK";
           }
         });
