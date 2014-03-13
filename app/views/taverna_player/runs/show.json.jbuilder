@@ -22,5 +22,7 @@ unless @interaction.nil?
   json.interaction do
     json.serial @interaction.serial
     json.uri interaction_redirect(@interaction)
+    json.data @interaction.data
+    json.reply_uri "#{run_url(@run)}/interaction/#{@interaction.serial}"
   end
 end
