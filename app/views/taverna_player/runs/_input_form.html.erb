@@ -9,7 +9,7 @@
     <% else %>
       <h3><%= input[:name] %>
         <% unless input[:description].blank? %>
-          <%= help_icon(input[:description]) -%>
+          <%= help_icon(simple_format(input[:description])) -%>
         <% end %>
       </h3>
 

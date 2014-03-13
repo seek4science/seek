@@ -4,7 +4,7 @@
 <h3>
   <%= port.name %>
   <% unless workflow_port[:description].blank? %>
-    <%= help_icon(workflow_port[:description]) -%>
+    <%= help_icon(simple_format(workflow_port[:description])) -%>
   <% end %>
   <%
      mime_type = ''

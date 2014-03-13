@@ -10,7 +10,8 @@
             <h3><%= p.name %> <%= "<span class='mime_type'>(#{p.mime_type})</span>".html_safe unless p.mime_type.blank? %></h3>
 
             <p>
-              <%= ('<strong>Description: </strong>' + (p.description || '')).html_safe %>
+              <strong>Description:</strong>
+              <%= simple_format(p.description) %>
             </p>
 
             <% unless p.example_value.blank? %>
