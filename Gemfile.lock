@@ -525,6 +525,7 @@ DEPENDENCIES
   google-analytics-rails
   hpricot (~> 0.8.2)
   in_place_editing
+  jbuilder (~> 1.5)
   jquery-rails (~> 3.0.4)
   libxml-ruby (= 2.6.0)
   linkeddata

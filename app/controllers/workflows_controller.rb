@@ -16,6 +16,13 @@ class WorkflowsController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
 
+  def index
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json # index.json.jbuilder
+    end
+  end
+
   def show
 
   end
