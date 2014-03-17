@@ -196,7 +196,11 @@ class Workflow < ActiveRecord::Base
   end
 
   def default_policy
-    Policy.sysmo_and_projects_policy
+    if self.contributor.guest_project_member?
+      Policy.private_policy
+    else
+      Policy.sysmo_and_projects_policy
+    end
   end
 
   def result_output_ports

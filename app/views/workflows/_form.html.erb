@@ -37,11 +37,14 @@
       <%= render :partial => 'port_type_table', :locals => {:f => f} %>
     <% end %>
 
-    <div>
+    <div<%= ' style="display: none"'.html_safe if current_user.guest_project_member? -%>>
       <%= render :partial => "projects/project_selector", :locals => {:resource => @workflow} -%>
     </div>
-    <%= fields_for(@workflow) { |form| render :partial => "assets/asset_form_bottom", :locals => {:f => form,
-                                                                                                  :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => true, :sharing_link => false} } -%>
+
+    <%= fields_for(@workflow) do |form| %>
+        <%= render :partial => "assets/asset_form_bottom",
+                   :locals => {:f => form, :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => !current_user.guest_project_member?, :sharing_link => false} %>
+    <% end %>
     <p>
       <%= preview_permission_popup_link(@workflow) -%>
       <%= submit_tag @workflow.new_record? ? "Next" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>

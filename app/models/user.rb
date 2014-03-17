@@ -231,6 +231,11 @@ class User < ActiveRecord::Base
     current_user == User.guest
   end
 
+  def guest_project_member?
+    project = Project.find_by_name('BioVeL Portal Guests')
+    self.person.projects.include?(project)
+  end
+
   protected
   # before filter
   def encrypt_password

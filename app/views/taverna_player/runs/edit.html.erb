@@ -22,7 +22,7 @@
         <%= f.text_field :name, :size => 80 -%>
       </p>
 
-      <% unless @run.using_sweep_policy? %>
+      <% unless @run.using_sweep_policy? || current_user.guest_project_member?%>
         <p>
           <%= render :partial => "assets/sharing_form" -%>
         </p>
