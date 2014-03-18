@@ -1,21 +1,5 @@
-<div class="yui-u first" style="width:19%; float: left; margin-top: 2em">
-  <%= render :partial => "general/facets", :object => @assays %>
-</div>
+<%= render :partial => "general/facets", :object => @assays %>
 
-<div class="yui-u" style="width:79%; float: right">
-    <% if logged_in? and current_user.person.member?%>
-        <ul class="sectionIcons">
-            <li><%= image_tag_for_key "new", new_assay_path, "New #{t('assays.assay').downcase}", nil, "New #{t('assays.assay').downcase}" %></li>
-        </ul>
-    <% end %>
 
-    <% if @assays.public_methods.include?(:page_totals) %>
-      <!-- only do the page links if the collection supports it -->
-      <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @assays.pages, :page_totals=>@assays.page_totals,:current_page=>@assays.page } -%>
-    <% end %>
 
-    <div class="list_items_container">
-      <%= render :partial => "assets/resource_list_item", :collection=>@assays %>
-    </div>
-</div>
 

@@ -9,7 +9,7 @@
 <div style="width: 100%">
     <table cellpadding="0" cellspacing="10" border="0" id="exhibit" width="100%">
       <tr>
-        <td width="15%">
+        <td style="float:left;">
           <b>Search</b>
           <div data-ex-role="facet" data-ex-facet-class="TextSearch"></div>
           <hr/>
@@ -19,7 +19,22 @@
               <br/>
           <% end %>
         </td>
+        <td style="width: 85%;">
+          <div id="content-area">
+            <div data-ex-role="exhibit-lens" style="display: none">
+              <span data-ex-content=".all"></span>
+            </div>
 
+            <div data-ex-role="exhibit-viewPanel">
+              <div data-ex-role="exhibit-view"
+                   data-ex-label="Tiles"
+                   data-ex-possible-orders=".<%= facet_config[object_type].keys.join(',.') %>"
+                   data-ex-paginate="true"
+                   data-ex-page-size="20"
+              ></div>
+            </div>
+          </div>
+        </td>
       </tr>
     </table>
 </div>
@@ -40,6 +55,7 @@
             exhibit_item[facet] = related_object.send(represented_field)
           end
         end
+        exhibit_item['all'] =  render :partial => "assets/resource_list_item", :object=>object
         exhibit_items << exhibit_item
      end
   %>
