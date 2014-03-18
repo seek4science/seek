@@ -1,0 +1,22 @@
+Assay:
+  organisms:
+    label: Organism
+    value: title
+  projects:
+      label: Project
+      value: title
+
+
+Model:
+  projects:
+    label: Project
+    value: title
+  model_type:
+    label: Model Type
+    value: title
+  model_format:
+      label: Model Format
+      value: title
+  recommended_environment:
+      label: Execution or Visualization Environment
+      value: title

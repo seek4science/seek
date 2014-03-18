@@ -1,0 +1,51 @@
+<%= javascript_include_tag 'exhibit/exhibit-api.js' %>
+
+<%
+   objects = facets
+   object_type = objects.first.class.name
+   facet_config = YAML.load(File.read(File.join(Rails.root, "config/facets.yml")))
+%>
+
+<div style="width: 100%">
+    <table cellpadding="0" cellspacing="10" border="0" id="exhibit" width="100%">
+      <tr>
+        <td width="15%">
+          <b>Search</b>
+          <div data-ex-role="facet" data-ex-facet-class="TextSearch"></div>
+          <hr/>
+          <% facet_config[object_type].keys.each do |facet| %>
+              <% label = facet_config[object_type][facet]['label'] %>
+              <div data-ex-role="facet" data-ex-expression=".<%= facet %>" data-ex-facet-label="<%= label %>" data-ex-height="13em"></div>
+              <br/>
+          <% end %>
+        </td>
+
+      </tr>
+    </table>
+</div>
+
+<div id="data" style="display:none">
+  <%
+     exhibit_items = []
+     objects.each do |object|
+        exhibit_item = {}
+        facet_config[object_type].keys.each do |facet|
+          represented_field = facet_config[object_type][facet]['value']
+          related_object = object.send(facet)
+          if related_object.blank?
+            exhibit_item[facet] = nil
+          elsif related_object.kind_of?(Array)
+            exhibit_item[facet] = related_object.collect(&:"#{represented_field}")
+          else
+            exhibit_item[facet] = related_object.send(represented_field)
+          end
+        end
+        exhibit_items << exhibit_item
+     end
+  %>
+
+{
+  "items": <%= exhibit_items.to_json %>
+}
+
+</div>
