@@ -46,7 +46,7 @@ gem "yaml_db"
 gem 'rails_autolink'
 gem 'rfc-822'
 gem 'nokogiri',"1.5.9"
-gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
+gem 'rdf-virtuoso', ">=0.1.6"
 gem 'cocaine'
 gem 'colorize'
 
