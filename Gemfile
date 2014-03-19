@@ -49,6 +49,7 @@ gem 'nokogiri',"1.5.9"
 gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
 gem 'cocaine'
 gem 'colorize'
+gem 'lograge'
 
 #gem for BiVeS and BudHat
 gem 'bives'

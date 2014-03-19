@@ -270,6 +270,10 @@ GEM
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
       rb-kqueue (>= 0.2)
+    lograge (0.3.0)
+      actionpack (>= 3)
+      activesupport (>= 3)
+      railties (>= 3)
     loofah (1.2.1)
       nokogiri (>= 1.4.4)
     mail (2.5.4)
@@ -492,6 +496,7 @@ DEPENDENCIES
   in_place_editing
   libxml-ruby (= 2.6.0)
   linkeddata
+  lograge
   minitest-reporters (>= 0.4.1)
   modporter-plugin
   my_annotations!
