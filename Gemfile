@@ -8,10 +8,10 @@ gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'
-gem 'libxml-ruby',"2.6.0",:require=>"libxml"
+gem 'libxml-ruby',">=2.7.0",:require=>"libxml"
 gem 'uuidtools',"2.1.1"
 gem "RedCloth","4.2.9"
-gem 'simple-spreadsheet-extractor',"0.13.1"
+gem 'simple-spreadsheet-extractor',"~>0.13.2"
 gem "rmagick","2.12.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
