@@ -18,6 +18,7 @@ namespace :seek do
             :remove_non_seek_authors,
             :clean_up_sop_specimens,
             :update_jws_online_root,
+            :update_bioportal_concepts,
             :repopulate_auth_lookup_tables,
             :drop_solr_index
   ]
@@ -38,6 +39,19 @@ namespace :seek do
     end
 
     puts "Upgrade completed successfully"
+  end
+
+  task(:update_bioportal_concepts=>:environment) do
+    BioportalConcept.all.each do |concept|
+      uri = concept.concept_uri
+      unless uri.include?("purl")
+        uri = uri.gsub(":","_")
+        concept.concept_uri = "http://purl.obolibrary.org/obo/#{uri}"
+      end
+      concept.ontology_id = "NCBITAXON"
+      concept.cached_concept_yaml=nil
+      concept.save!
+    end
   end
 
   task(:drop_solr_index=>:environment) do

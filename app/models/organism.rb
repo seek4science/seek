@@ -18,8 +18,8 @@ class Organism < ActiveRecord::Base
   validates_presence_of :title
 
   def ncbi_uri
-    unless bioportal_concept.nil? || bioportal_concept.concept_uri.blank?
-      "http://purl.obolibrary.org/obo/"+bioportal_concept.concept_uri.gsub(":","_")
+    unless bioportal_concept.nil?
+      bioportal_concept.concept_uri
     else
       nil
     end
@@ -33,7 +33,6 @@ class Organism < ActiveRecord::Base
     terms = [title]
     if concept
       terms = terms | concept[:synonyms].collect{|s| s.gsub("\"","")} if concept[:synonyms]
-      terms = terms | concept[:related_synonyms].collect{|s| s.gsub("\"","")} if concept[:related_synonyms]
       terms = terms | concept[:definitions].collect{|s| s.gsub("\"","")} if concept[:definitions]
     end
     terms

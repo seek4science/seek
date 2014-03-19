@@ -24,36 +24,25 @@
           Ontology label
         </th>
         <th>
-          Ontology ID
+          Ontology acronym
         </th>
+        <th>Concept synonmys</th>
+
         <th>
-          Version ID
-        </th>
-        <th>
-          Concept id
-        </th>
-        <th>
-          Preferred name (click to select)
+          Concept name (click to select)
         </th>
       </tr>
       <% search_results.each do |result| %>
           <tr>
             <td>
-              <%= h(result[:ontology_display_label]) -%>
+              <%= h(result[:ontology_name]) -%>
             </td>
             <td>
-              <%= link_to_ontology(result[:ontology_id], result[:ontology_id]) -%>
+              <%= result[:ontology_acronym] -%>
             </td>
+            <td><%= h(result[:synonyms].join(", ")) %></td>
             <td>
-              <%= link_to_ontology_version(result[:ontology_version_id], result[:ontology_version_id]) -%>
-              <%= link_to_ontology_version_visualize("Explore", result[:ontology_version_id]) -%>
-              <%= link_to_download_ontology("Download", result[:ontology_version_id]) -%>
-            </td>
-            <td>
-              <%= result[:concept_id_short] -%>
-            </td>
-            <td>
-              <%= link_to_function(h(result[:preferred_name]), "add_concept('#{result[:preferred_name]}',#{result[:ontology_id]},#{result[:ontology_version_id]},'#{result[:concept_id_short]}');") -%>
+              <%= link_to_function(h(result[:preferred_label]), "add_concept('#{result[:preferred_label]}','#{result[:ontology_acronym]}','#{result[:class_id]}');") -%>
             </td>
           </tr>
       <% end %>

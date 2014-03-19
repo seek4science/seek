@@ -19,9 +19,9 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/bioportal.git
-  revision: 8c861fd91ca8e2fe3ab67b09779355c8379050ec
+  revision: f55a49b9560c73bb84755a9223bb61083389d407
   specs:
-    bioportal (1.0.0)
+    bioportal (2.0.0)
 
 GIT
   remote: git://github.com/SysMO-DB/convert_office.git
