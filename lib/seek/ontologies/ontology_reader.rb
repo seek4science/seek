@@ -83,7 +83,6 @@ module Seek
 
       def load_ontology
         path = ontology_path
-        pp path
         @ontology = RDF::Graph.load(path, :format => :rdfxml)
       end
 
