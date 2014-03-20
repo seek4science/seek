@@ -5,8 +5,8 @@
   </li>
 <% end %>
 
-<!-- Run new data sweep button - only if there is at least on data port to sweep over. -->
-<% if display_workflow.sweepable? %>
+<!-- Run new data sweep button - only if there is at least on data port to sweep over and a real user is logged in. -->
+<% if display_workflow.sweepable? && !current_user.guest? %>
   <li>
       <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id, :version=>display_workflow.version), nil, nil, 'Run data sweep')  -%>
   </li>

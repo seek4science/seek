@@ -3,13 +3,13 @@ module AuthenticatedSystem
   # Returns true or false if the user is logged in.
   # Preloads @current_user with the user model if they're logged in.
   def logged_in?
-    !!current_user
+    current_user && !current_user.guest?
   end
 
   # Accesses the current user from the session.
   # Future calls avoid the database because nil is not equal to false.
   def current_user
-    @current_user ||= (login_from_session || login_from_basic_auth || login_from_cookie) unless @current_user == false
+    @current_user ||= (login_from_session || login_from_basic_auth || login_from_cookie || User.guest) unless @current_user == false
   end
 
   # Store the given user id in the session.

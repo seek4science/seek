@@ -90,7 +90,7 @@ class User < ActiveRecord::Base
   end
 
   def self.logged_in?
-    self.current_user
+    self.current_user && !self.current_user.guest?
   end
 
   def self.pal_logged_in?

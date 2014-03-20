@@ -9,6 +9,21 @@
   <h1><%= 'New Workflow Run: ' + @workflow_version.title -%></h1>
 </div>
 
+<% if current_user.guest? %>
+    <div class="box_infotext curved" style="margin: 1em auto">
+      <h5>Guest Users</h5>
+      <p>
+        You are starting this workflow run as a <strong>Guest user</strong>.
+        The results of this run will be publicly visible by other guests, and will only be accessible for seven days after it finishes, at which point they will be deleted.
+      </p>
+      <p>
+        If you wish to keep the results for longer than that please <%= link_to 'log in', main_app.new_session_path -%> before starting a run.
+        If you do not have an account yet you can <%= link_to 'sign up', main_app.signup_path -%>.
+      </p>
+    </div>
+<% end %>
+
+
 <div class="show_basic">
   <%= error_messages_for :run -%>
 
