@@ -1,5 +1,4 @@
 yeast_concept:
-  ontology_id: 1132
-  ontology_version_id: 38802
-  concept_uri: "NCBITaxon:4932"
+  ontology_id: "NCBITAXON"
+  concept_uri: "http://purl.obolibrary.org/obo/NCBITaxon_4932"
   conceptable: yeast_with_bioportal_concept(Organism)  

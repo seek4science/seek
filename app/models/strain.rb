@@ -25,6 +25,7 @@ class Strain < ActiveRecord::Base
 
   scope :without_default,where(:is_dummy=>false)
 
+  delegate :ncbi_uri, :to=>:organism
 
   accepts_nested_attributes_for :genotypes,:allow_destroy=>true
   accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
@@ -57,14 +58,6 @@ class Strain < ActiveRecord::Base
 
   def is_default?
     title=="default" && is_dummy==true
-  end
-
-  def ncbi_uri
-    unless organism.bioportal_concept.nil? || organism.bioportal_concept.concept_uri.blank?
-      "http://purl.obolibrary.org/obo/"+organism.bioportal_concept.concept_uri.gsub(":","_")
-    else
-      nil
-    end
   end
 
   def is_default?

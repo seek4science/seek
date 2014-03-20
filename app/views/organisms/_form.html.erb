@@ -20,17 +20,12 @@
         </p>
 
         <p>
-          <%= f.label :ontology_id -%><br/>
+          <label>Ontology acroymn</label> <br/>
           <%= f.text_field :ontology_id, :style => "width: 350px;" -%>
         </p>
 
         <p>
-          <%= f.label :ontology_version_id -%><br/>
-          <%= f.text_field :ontology_version_id, :style => "width: 350px;" -%>
-        </p>
-
-        <p>
-          <%= f.label :concept_uri -%><br/>
+          <label>Class uri</label><br/>
           <%= f.text_field :concept_uri, :style => "width: 350px;" -%>
         </p>
       </div>
@@ -51,10 +46,9 @@
   </div>
 </div>
 <script type="text/javascript">
-    function add_concept(label, ont_id, ont_version_id, conc_id) {
+    function add_concept(label, ont_acronym, conc_id) {
         $('organism_title').value = label;
-        $('organism_ontology_id').value = ont_id;
-        $('organism_ontology_version_id').value = ont_version_id;
+        $('organism_ontology_id').value = ont_acronym;
         $('organism_concept_uri').value = conc_id;
         new Effect.Highlight("edit_organism");
     }

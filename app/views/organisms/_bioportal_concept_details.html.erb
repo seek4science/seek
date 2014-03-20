@@ -8,13 +8,6 @@
     <p><%= concept[:synonyms].join(", ") %></p>
 <% end -%>
 <br/>
-<b>Related Synonyms (<%= concept[:related_synonyms].count -%>) </b>
-<% if concept[:related_synonyms].empty? -%>
-    <p class="none_text">None defined</p>
-<% else -%>
-    <p><%= concept[:related_synonyms].join(", ") %></p>
-<% end -%>
-<br/>
 <b>Definitions (<%= concept[:definitions].count -%>) </b>
 <% if concept[:definitions].empty? -%>
     <p class="none_text">None defined</p>
