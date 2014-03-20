@@ -29,7 +29,10 @@ class Study < ActiveRecord::Base
   validates_presence_of :investigation
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :description,:title
+    text :description,:title, :experimentalists
+    text :contributor do
+      [contributor.try(:person).try(:name),person_responsible.try(:name)]
+    end
   end if Seek::Config.solr_enabled
 
   #FIXME: see comment in Assay about reversing these

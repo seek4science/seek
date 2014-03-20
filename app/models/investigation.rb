@@ -19,6 +19,9 @@ class Investigation < ActiveRecord::Base
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :description,:title
+    text :contributor do
+      contributor.try(:person).try(:name)
+    end
   end if Seek::Config.solr_enabled
 
   def state_allows_delete? *args
