@@ -20,6 +20,12 @@ class OrganismTest < ActiveSupport::TestCase
     assert_nil org.ncbi_uri
   end
 
+  test "ncbi_id" do
+    org = Factory(:organism,:bioportal_concept=>Factory(:bioportal_concept))
+    assert_equal "http://purl.obolibrary.org/obo/NCBITaxon_2287",org.ncbi_uri
+    assert_equal 2287,org.ncbi_id
+  end
+
   test "to_rdf" do
     object = Factory(:assay_organism).organism
     object.bioportal_concept = Factory(:bioportal_concept)
@@ -46,25 +52,22 @@ class OrganismTest < ActiveSupport::TestCase
   end
  
   test "bioportal_link" do
-    o=organisms(:yeast_with_bioportal_concept)
+    o=Factory(:organism,:bioportal_concept=>Factory(:bioportal_concept))
     assert_not_nil o.bioportal_concept,"There should be an associated bioportal concept"
-    assert_equal 1132,o.ontology_id
-    assert_equal 38802,o.ontology_version_id
-    assert_equal "NCBITaxon:4932",o.concept_uri    
+    assert_equal "NCBITAXON",o.ontology_id
+    assert_equal "http://purl.obolibrary.org/obo/NCBITaxon_2287",o.concept_uri
   end
 
   test "assigning terms to organism with no concept by default" do
     o=organisms(:Saccharomyces_cerevisiae)
     assert_equal nil,o.ontology_id
-    assert_equal nil,o.ontology_version_id
     assert_equal nil,o.concept_uri
-    o.ontology_id=4
-    o.ontology_version_id=5
+    o.ontology_id="NCBITAXON"
+
     o.concept_uri="abc"
     o.save!
     o=Organism.find(o.id)
-    assert_equal 4,o.ontology_id
-    assert_equal 5,o.ontology_version_id
+    assert_equal "NCBITAXON",o.ontology_id
     assert_equal "abc",o.concept_uri
   end
 
@@ -90,22 +93,6 @@ class OrganismTest < ActiveSupport::TestCase
     assert !o.can_delete?(admin)
   end
 
-#  test "get concept" do
-#    o=organisms(:yeast_with_bioportal_concept)
-#    concept=o.concept({:maxchildren=>5,:light=>0,:refresh=>true})
-#    assert_not_nil concept
-#    assert_equal "NCBITaxon:4932",concept[:id]
-#    assert !concept[:synonyms].empty?
-#    assert !concept[:children].empty?
-#    assert !concept[:parents].empty?
-#    assert_equal 38802,concept[:ontology_version_id]
-#  end
 
-#  test "get ontology" do
-#    o=organisms(:yeast_with_bioportal_concept)
-#    ontology=o.ontology({:maxchildren=>5,:light=>0,:refresh=>true})
-#    assert_not_nil ontology
-#    assert_equal "1132",ontology[:ontology_id]
-#  end
 
 end

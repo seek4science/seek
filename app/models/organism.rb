@@ -17,13 +17,6 @@ class Organism < ActiveRecord::Base
 
   validates_presence_of :title
 
-  def ncbi_uri
-    unless bioportal_concept.nil?
-      bioportal_concept.concept_uri
-    else
-      nil
-    end
-  end
   
   def can_delete? user=User.current_user
     !user.nil? && user.is_admin? && models.empty? && assays.empty? && projects.empty?
@@ -36,11 +29,6 @@ class Organism < ActiveRecord::Base
       terms = terms | concept[:definitions].collect{|s| s.gsub("\"","")} if concept[:definitions]
     end
     terms
-  end
-
-  def ncbi_id
-    return nil if self.bioportal_concept.nil? || self.bioportal_concept.concept_uri.nil?
-    self.bioportal_concept.concept_uri.gsub("NCBITaxon:","")
   end
 
 end
