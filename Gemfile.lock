@@ -172,7 +172,7 @@ GEM
       httparty
     arel (3.0.3)
     bio (1.4.3.0001)
-    bioportal (2.1)
+    bioportal (2.2)
     bives (0.10)
     breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
@@ -468,7 +468,7 @@ DEPENDENCIES
   acts_as_tree (= 0.2.0)
   app_version!
   bio
-  bioportal (>= 2.1)
+  bioportal (>= 2.2)
   bives
   breadcrumbs_on_rails
   calendar_date_select!
