@@ -66,7 +66,7 @@ gem 'redbox', :git=>"git://github.com/SysMO-DB/redbox"
 gem "my_responds_to_parent", :git => "git://github.com/SysMO-DB/my_responds_to_parent.git"
 gem 'site_announcements', :git => "git://github.com/SysMO-DB/site_announcements.git"
 gem 'open_id_authentication', :git => "git://github.com/SysMO-DB/open_id_authentication.git"
-gem 'bioportal',">=2.1"
+gem 'bioportal',">=2.2"
 
 gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_trashable',:git=> "git://github.com/SysMO-DB/acts_as_trashable.git"
