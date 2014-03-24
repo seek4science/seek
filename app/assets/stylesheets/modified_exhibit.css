@@ -1,0 +1,28 @@
+div.exhibit-facet-value-count {
+    float:          right;
+    width:          2em;
+    text-align:     right;
+    color:          #aaa;
+    padding-right:  5px;
+}
+
+div.exhibit-facet-value-checkbox {
+    float:          left;
+    padding-right:   2px;
+}
+
+div.exhibit-facet-header {
+    padding:        1px;
+}
+
+div.exhibit-facet-header-filterControl {
+    float:          left;
+    width:          2em;
+    display:        none;
+    cursor:         pointer;
+}
+
+div.exhibit-facet-value-inner {
+    float:          left;
+    padding-left:   5px;
+}

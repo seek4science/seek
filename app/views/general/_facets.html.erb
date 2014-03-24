@@ -2,6 +2,8 @@
 <script src="/assets/exhibit/exhibit-api.js?bundle=false"></script>
 <%#need to go after exhibit lib %>
 <%= javascript_include_tag 'modified_exhibit' %>
+<%= stylesheet_link_tag 'modified_exhibit' %>
+
 
 <%
    objects = facets
@@ -33,7 +35,7 @@
                    data-ex-label="Tiles"
                    data-ex-possible-orders=".<%= facet_config[object_type].keys.join(',.') %>"
                    data-ex-paginate="true"
-                   data-ex-page-size="5"
+                   data-ex-page-size="10"
               ></div>
             </div>
           </div>
