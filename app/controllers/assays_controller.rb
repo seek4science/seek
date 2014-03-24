@@ -11,7 +11,28 @@ class AssaysController < ApplicationController
 
   include Seek::BreadCrumbs
 
-   def new_object_based_on_existing_one
+  def filtered_items
+     item_type = params[:item_type]
+     item_ids = (params[:item_ids] || []).split(',')
+     #item_ids  = [params[:item_ids].to_i]
+     if !item_type.blank?
+        clazz = item_type.constantize
+        resources = clazz.find_all_by_id(item_ids)
+        if clazz.respond_to?(:authorize_asset_collection)
+          resources = clazz.authorize_asset_collection(resources,"view")
+        else
+          resources = resources.select &:can_view?
+        end
+     end
+
+     resource_list_items = resources.collect{|resource| render_to_string :partial => "assets/resource_list_item", :object => resource}
+
+    respond_to do |format|
+      format.json {render :json => {:resource_list_items => resource_list_items.join(' ')}}
+    end
+  end
+
+  def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations
     params[:data_file_ids]=@existing_assay.data_file_masters.collect{|d|"#{d.id},None"}

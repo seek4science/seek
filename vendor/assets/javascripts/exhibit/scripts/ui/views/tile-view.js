@@ -222,7 +222,9 @@ Exhibit.TileView.prototype._reconstruct = function() {
     this._orderedViewFrame.reconstruct();
     closeGroups(0);
 
-    Exhibit.jQuery(this.getContainer()).show();
+    //Temporary modify code here, will isolate it later
+    updateFirstPage();
+    //Exhibit.jQuery(this.getContainer()).show();
 };
 
 /**

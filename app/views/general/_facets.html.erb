@@ -1,4 +1,7 @@
-<%= javascript_include_tag 'exhibit/exhibit-api.js' %>
+<%#= javascript_include_tag 'exhibit/exhibit-api.js' %>
+<script src="/assets/exhibit/exhibit-api.js?bundle=false"></script>
+<%#need to go after exhibit lib %>
+<%= javascript_include_tag 'modified_exhibit' %>
 
 <%
    objects = facets
@@ -30,7 +33,7 @@
                    data-ex-label="Tiles"
                    data-ex-possible-orders=".<%= facet_config[object_type].keys.join(',.') %>"
                    data-ex-paginate="true"
-                   data-ex-page-size="20"
+                   data-ex-page-size="5"
               ></div>
             </div>
           </div>
@@ -44,6 +47,7 @@
      exhibit_items = []
      objects.each do |object|
         exhibit_item = {}
+        exhibit_item['item_id'] = object.id
         facet_config[object_type].keys.each do |facet|
           represented_field = facet_config[object_type][facet]['value']
           related_object = object.send(facet)
@@ -55,7 +59,7 @@
             exhibit_item[facet] = related_object.send(represented_field)
           end
         end
-        exhibit_item['all'] =  render :partial => "assets/resource_list_item", :object=>object
+        exhibit_item['all'] = ''
         exhibit_items << exhibit_item
      end
   %>

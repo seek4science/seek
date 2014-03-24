@@ -210,6 +210,7 @@ SEEK::Application.routes.draw do
   resources :assays do
     collection do
       get :preview
+      get :filtered_items
     end
     member do
       post :update_annotations_ajax
