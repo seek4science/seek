@@ -72,15 +72,16 @@ module Stu
           unless parent.children.empty?
             parent.children.sort { |a, b| a.title.downcase <=> b.title.downcase }.each do |child|
               child_path = send("#{type.model_name.underscore}s_path", :uri=>child.term_uri, :label=> child.title)
+              assay_stat = child.assays.count == 0 ?  "" : "(<span style='color: #666666;'>(#{child.assays.count} assays)</span>)".html_safe
               ontology_term_li = link_to(child.title, child_path).html_safe
               user_defined_term_li = link_to(child.title, child_path, {:style => "color:green;font-style:italic"}) + "*" + " " +
                   (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style => "vertical-align:middle"}) : "") + " " +
-                  (show_delete ? (child.assays.size == 0 && child.children.empty? ? link_to(image("destroy"), child, :confirm =>
+                  (show_delete ? (child.assays.count == 0 && child.children.empty? ? link_to(image("destroy"), child, :confirm =>
                       "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
-                                                                        :method => :delete, :style => "vertical-align:middle") : "<span style='color: #666666;'>(#{child.assays.size} assays)</span>") : "").html_safe
+                                                                        :method => :delete, :style => "vertical-align:middle") : "") : "").html_safe
               child_link = (child.respond_to?(:is_user_defined) && child.is_user_defined) ? user_defined_term_li : ontology_term_li
 
-              result << ("<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + child_link +
+              result << ("<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + child_link +  assay_stat +
                   "</li>")
               result = result + indented_child_options(type, child, depth+1, show_edit, show_delete, selected_id) if child.has_children?
             end
