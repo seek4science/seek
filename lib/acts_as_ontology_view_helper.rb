@@ -75,7 +75,7 @@ module Stu
               ontology_term_li = link_to(child.title, child_path).html_safe
               user_defined_term_li = link_to(child.title, child_path, {:style => "color:green;font-style:italic"}) + "*" + " " +
                   (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style => "vertical-align:middle"}) : "") + " " +
-                  (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"), child, :confirm =>
+                  (show_delete ? (child.assays.size == 0 && child.children.empty? ? link_to(image("destroy"), child, :confirm =>
                       "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
                                                                         :method => :delete, :style => "vertical-align:middle") : "<span style='color: #666666;'>(#{child.assays.size} assays)</span>") : "").html_safe
               child_link = (child.respond_to?(:is_user_defined) && child.is_user_defined) ? user_defined_term_li : ontology_term_li
