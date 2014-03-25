@@ -13,7 +13,7 @@ class AssaysController < ApplicationController
 
   def filtered_items
      item_type = params[:item_type]
-     item_ids = (params[:item_ids] || []).split(',')
+     item_ids = (params[:item_ids] || []).collect(&:to_i)
      #item_ids  = [params[:item_ids].to_i]
      if !item_type.blank?
         clazz = item_type.constantize
@@ -25,6 +25,7 @@ class AssaysController < ApplicationController
         end
      end
 
+     resources.sort!{|a,b| item_ids.index(a.id) <=> item_ids.index(b.id)}
      resource_list_items = resources.collect{|resource| render_to_string :partial => "assets/resource_list_item", :object => resource}
 
     respond_to do |format|
