@@ -59,7 +59,6 @@ class AssayTypesController < ApplicationController
 
         render :update do |page|
           if @assay_type.save
-                      page.call 'RedBox.close'
                       if @assay_type.link_from == "assays"
                         page.replace_html 'assay_assay_types_list',:partial => "assays/assay_types_list", :locals=>{:assay_type=>@assay_type, :root_id=> @assay_type.default_parent_id}
                       elsif @assay_type.link_from == "assay_types"

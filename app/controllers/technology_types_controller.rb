@@ -49,7 +49,6 @@ class TechnologyTypesController < ApplicationController
 
     render :update do |page|
       if @technology_type.save
-        page.call 'RedBox.close'
         if @technology_type.link_from == "assays"
           page.replace_html 'assay_technology_types_list', :partial => "assays/technology_types_list", :locals => {:technology_type => @technology_type}
         elsif @technology_type.link_from == "technology_types"
@@ -86,7 +85,7 @@ class TechnologyTypesController < ApplicationController
 
       respond_to do |format|
         if @technology_type.assays.empty? && @technology_type.get_child_assays.empty? && @technology_type.children.empty?
-          title = @technology.title
+          title = @technology_type.title
           @technology_type.destroy
           flash[:notice] = "Technology type #{title} was deleted."
           format.html { redirect_to(:action => 'manage') }

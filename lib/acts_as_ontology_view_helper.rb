@@ -47,7 +47,7 @@ module Stu
           list = []
           roots.each do |root|
             if root_id
-              path = send("#{type.model_name.underscore}_path", :uri=>root.term_uri, :label=> root.title)
+              path = send("#{type.model_name.underscore}s_path", :uri=>root.term_uri, :label=> root.title)
               root_link = "<li style=\"margin-left:0px;\">" + link_to(root.title, path) + "</li>"
               list << root_link
               depth = 1
