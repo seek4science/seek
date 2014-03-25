@@ -26,6 +26,7 @@ Exhibit.TileView = function(containerElmt, uiContext) {
         // correctly
         view._orderedViewFrame._settings.page = 0;
         view._reconstruct();
+        updateFirstPage();
     };
     Exhibit.jQuery(uiContext.getCollection().getElement()).bind(
         "onItemsChanged.exhibit",
@@ -35,6 +36,7 @@ Exhibit.TileView = function(containerElmt, uiContext) {
     this._orderedViewFrame = new Exhibit.OrderedViewFrame(uiContext);
     this._orderedViewFrame.parentReconstruct = function() {
         view._reconstruct();
+        updateFirstPage();
     };
     this._orderedViewFrame.parentHistoryAction = function(child, state, title) {
         Exhibit.History.pushComponentState(
@@ -223,7 +225,7 @@ Exhibit.TileView.prototype._reconstruct = function() {
     closeGroups(0);
 
     //Temporary modify code here, will isolate it later
-    updateFirstPage();
+    //updateFirstPage();
     //Exhibit.jQuery(this.getContainer()).show();
 };
 
