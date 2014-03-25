@@ -8,10 +8,10 @@
     </span>
   </div>
   <div class="body">
-    <div style="float:left;">
+    <div style="float:left;;width: 50%">
       <ul><%= ontology_editor_display TechnologyType, nil, @technology_type.id %></ul>
     </div>
-    <div style="float:left;">
+    <div style="float:left;;width: 50%">
       <%= form_for @technology_type, :condition => "validateTechnologyTypeRequiredFields('create_technology_type_btn')",
                    :html=>{:method => :post, :remote => true,:onsubmit => "RedBox.close()"} do |f| %>
           <%= render :partial => "form", :locals => {:f => f, :action => :new} -%>
