@@ -72,7 +72,7 @@ module Stu
           unless parent.children.empty?
             parent.children.sort { |a, b| a.title.downcase <=> b.title.downcase }.each do |child|
               child_path = send("#{type.model_name.underscore}s_path", :uri=>child.term_uri, :label=> child.title)
-              assay_stat = child.assays.count == 0 ?  "" : "(<span style='color: #666666;'>(#{child.assays.count} assays)</span>)".html_safe
+              assay_stat = child.assays.count == 0 ?  "" : "<span style='color: #666666;'>(#{child.assays.count} assays)</span>".html_safe
               ontology_term_li = link_to(child.title, child_path).html_safe
               user_defined_term_li = link_to(child.title, child_path, {:style => "color:green;font-style:italic"}) + "*" + " " +
                   (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style => "vertical-align:middle"}) : "") + " " +
