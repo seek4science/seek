@@ -36,7 +36,10 @@ var RedBox = {
   {
     new Effect.Fade('RB_window', {duration: 0.3});
      new Effect.Fade('RB_overlay', {duration: 0.3});
-     $('RB_window').lastChild.style.display='none';
+      // child nodes could be of non elements, e.g. newline text
+      if($('RB_window').lastChild.style != null){
+          $('RB_window').lastChild.style.display='none';
+      }
      if (this.content_parentNode)
      {
         this.content_parentNode.appendChild($('RB_window').lastChild);
