@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140210115148) do
+ActiveRecord::Schema.define(:version => 20140319165730) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -224,8 +224,7 @@ ActiveRecord::Schema.define(:version => 20140210115148) do
   add_index "avatars", ["owner_type", "owner_id"], :name => "index_avatars_on_owner_type_and_owner_id"
 
   create_table "bioportal_concepts", :force => true do |t|
-    t.integer "ontology_id"
-    t.integer "ontology_version_id"
+    t.string  "ontology_id"
     t.string  "concept_uri"
     t.text    "cached_concept_yaml"
     t.integer "conceptable_id"
