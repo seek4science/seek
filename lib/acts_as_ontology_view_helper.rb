@@ -48,7 +48,8 @@ module Stu
           roots.each do |root|
             if root_id
               path = send("#{type.model_name.underscore}s_path", :uri=>root.term_uri, :label=> root.title)
-              root_link = "<li style=\"margin-left:0px;\">" + link_to(root.title, path) + "</li>"
+              assay_stat = root.assays.size == 0 ?  "" : "<span style='color: #666666;'>(#{root.assays.count} assays)</span>".html_safe
+              root_link = "<li style=\"margin-left:0px;\">" + link_to(root.title, path) + assay_stat + "</li>"
               list << root_link
               depth = 1
             else
@@ -72,7 +73,7 @@ module Stu
           unless parent.children.empty?
             parent.children.sort { |a, b| a.title.downcase <=> b.title.downcase }.each do |child|
               child_path = send("#{type.model_name.underscore}s_path", :uri=>child.term_uri, :label=> child.title)
-              assay_stat = child.assays.count == 0 ?  "" : "<span style='color: #666666;'>(#{child.assays.count} assays)</span>".html_safe
+              assay_stat = child.assays.size == 0 ?  "" : "<span style='color: #666666;'>(#{child.assays.count} assays)</span>".html_safe
               ontology_term_li = link_to(child.title, child_path).html_safe
               user_defined_term_li = link_to(child.title, child_path, {:style => "color:green;font-style:italic"}) + "*" + " " +
                   (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style => "vertical-align:middle"}) : "") + " " +
