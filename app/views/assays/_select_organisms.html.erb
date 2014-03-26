@@ -72,9 +72,10 @@
   <% @assay.assay_organisms.each do |o| -%>
       organism_id = '<%= o.organism.id -%>';
       organism_title = '<%= escape_javascript(o.organism.title) -%>';
-      strain = '<%= o.strain.nil? ? "" : o.strain.title -%>';
+      strain_info = '<%= o.strain.nil? ? "" : o.strain.info -%>';
+      strain_id = '<%= o.strain.nil? ? "" : o.strain.id -%>';
       culture_growth = '<%= o.culture_growth_type.nil? ? "" : o.culture_growth_type.title -%>';
-      addOrganism(organism_title, organism_id, strain, culture_growth);
+      addOrganism(organism_title, organism_id, strain_info,strain_id, culture_growth);
   <% end -%>
 
 
