@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140326114330) do
+ActiveRecord::Schema.define(:version => 20140326132324) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1527,8 +1527,6 @@ ActiveRecord::Schema.define(:version => 20140326114330) do
   add_index "trash_records", ["trashable_type", "trashable_id"], :name => "index_trash_records_on_trashable_type_and_trashable_id"
 
   create_table "treatments", :force => true do |t|
-    t.string   "substance"
-    t.float    "concentration"
     t.integer  "unit_id"
     t.string   "treatment_protocol"
     t.datetime "created_at"
