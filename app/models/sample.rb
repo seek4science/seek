@@ -22,6 +22,7 @@ class Sample < ActiveRecord::Base
   has_and_belongs_to_many :assays
   has_and_belongs_to_many :tissue_and_cell_types
   has_many :sample_assets, :dependent => :destroy
+  has_many :treatments, :dependent=>:destroy
 
   has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
   has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new { self.asset_sql("Sop") }

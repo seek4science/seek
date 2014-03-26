@@ -91,4 +91,26 @@ class SampleTest < ActiveSupport::TestCase
     end
   end
 
+  test "associated treatments" do
+    treatment = Factory(:treatment)
+    refute_nil treatment.sample
+    sample = treatment.sample
+    treatment2 = Factory(:treatment,:sample=>sample)
+    sample.reload
+    assert_equal 2,sample.treatments.size
+    assert_include sample.treatments,treatment
+    assert_include sample.treatments,treatment2
+
+    #dependent destroy
+    assert_difference('Treatment.count',-2) do
+      assert_difference('Sample.count',-1) do
+        disable_authorization_checks do
+          sample.destroy
+        end
+      end
+    end
+    assert_nil Treatment.find_by_id(treatment.id)
+    assert_nil Treatment.find_by_id(treatment2.id)
+  end
+
 end

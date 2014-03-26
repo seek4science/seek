@@ -287,6 +287,11 @@ end
     f.association :specimen
   end
 
+  #Treatment
+  Factory.define(:treatment) do |f|
+    f.association :sample, :factory=>:sample
+  end
+
 
   #Data File
   Factory.define(:data_file) do |f|
