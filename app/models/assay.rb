@@ -95,7 +95,9 @@ class Assay < ActiveRecord::Base
           
   searchable(:auto_index=>false) do
     text :description, :title, :searchable_tags, :organism_terms, :assay_type_label,:technology_type_label
-
+    text :contributor do
+      contributor.try(:person).try(:name)
+    end
     text :strains do
         strains.compact.map{|s| s.title}
     end

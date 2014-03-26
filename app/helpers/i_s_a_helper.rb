@@ -10,7 +10,7 @@ module ISAHelper
                   'DataFile'=>"#eec591", #burlywood2
                   'Investigation'=>"#C7E9C0",
                   'Study'=>"#91c98b",
-                  'Assay'=>"#64b466",
+                  'Assay'=> {'EXP'=>"#64b466",'MODEL'=>"#92CD00"},
                   'Publication'=>"#84B5FD",
                   'Presentation' => "#8ee5ee", #cadetblue2
                   'Sample' => "#ffa500", #orange
@@ -22,7 +22,7 @@ module ISAHelper
                     'DataFile'=>"#be9d74",
                     'Investigation'=>"#9fba99",
                     'Study'=>"#74a06f",
-                    'Assay'=>"#509051",
+                    'Assay'=> {'EXP'=>"#509051",'MODEL'=>"#74a400"},
                     'Publication'=>"#6990ca",
                     'Presentation' => "#71b7be", #cadetblue2
                     'Sample' => "#cc8400",
@@ -61,24 +61,31 @@ module ISAHelper
         description = item.description
         no_description_text = item.kind_of?(Publication) ? 'No abstract' : 'No description'
         tooltip = description.blank? ? no_description_text : truncate(h(description), :length => 500)
-        link = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
-
-        cytoscape_node_elements << {:group => 'nodes',
-                                    :data => {:id => node,
-                                              :name => truncate(item_type.humanize + ': ' + item.title),
-                                              :link => link,
-                                              :faveColor => (FILL_COLOURS[item_type] || FILL_COLOURS.default),
-                                              :borderColor => (BORDER_COLOURS[item_type] || BORDER_COLOURS.default)}
-        }
+        #distinquish two assay classes
+        if item.kind_of?(Assay)
+          assay_class_title = item.assay_class.title
+          assay_class_key = item.assay_class.key
+          name = truncate(assay_class_title + ': ' + item.title)
+          item_info = link_to("<b>#{assay_class_title}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
+          fave_color = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
+          border_color = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
+        else
+          name = truncate(item_type.humanize + ': ' + item.title)
+          item_info = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
+          fave_color = FILL_COLOURS[item_type] || FILL_COLOURS.default
+          border_color = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
+        end
+        # give more space for title of isa elements
+        if item.is_isa?
+          name = truncate item.title
+        end
       else
-        cytoscape_node_elements << {:group => 'nodes',
-                                    :data => {:id => node,
-                                              :name => 'Hidden item',
-                                              :hidden_item_info => hidden_items_html([item], 'Hidden item'),
-                                              :faveColor => (FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default),
-                                              :borderColor => (BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default)}
-        }
+        name = 'Hidden item'
+        item_info = hidden_items_html([item], 'Hidden item')
+        fave_color = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
+        border_color = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
+      cytoscape_node_elements << node_element(node, name, item_info, fave_color, border_color)
     end
     cytoscape_node_elements
   end
@@ -92,25 +99,39 @@ module ISAHelper
       edge.strip!
       target_type,target_id = target.split('_')
       target_item = target_type.constantize.find_by_id(target_id)
+      name = edge_label(source, target)
       if target_item.can_view?
-        cytoscape_edge_elements << {:group => 'edges',
-                                    :data => {:id => edge,
-                                              :name => edge_label(source, target),
-                                              :source => source,
-                                              :target => target,
-                                              :faveColor => (BORDER_COLOURS[target_type] || BORDER_COLOURS.default)}
-        }
+        if target_item.kind_of?(Assay)
+          fave_color = BORDER_COLOURS[target_type][target_item.assay_class.key] || BORDER_COLOURS.default
+        else
+          fave_color = BORDER_COLOURS[target_type] || BORDER_COLOURS.default
+        end
       else
-        cytoscape_edge_elements << {:group => 'edges',
-                                    :data => {:id => edge,
-                                              :source => source,
-                                              :name => edge_label(source, target),
-                                              :target => target,
-                                              :faveColor => (BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default)}
-        }
+        fave_color = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
+      cytoscape_edge_elements << edge_element(edge, name, source, target, fave_color)
     end
     cytoscape_edge_elements
+  end
+
+  def node_element id, name, item_info, fave_color, border_color
+    {:group => 'nodes',
+     :data => {:id => id,
+               :name => name,
+               :item_info => item_info,
+               :faveColor => fave_color,
+               :borderColor => border_color}
+    }
+  end
+
+  def edge_element id, name, source, target, fave_color
+    {:group => 'edges',
+     :data => {:id => id,
+               :name => name,
+               :source => source,
+               :target => target,
+               :faveColor => fave_color}
+    }
   end
 
   def edge_label source,target

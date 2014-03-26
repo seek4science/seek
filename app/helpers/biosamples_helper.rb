@@ -41,9 +41,10 @@ module BiosamplesHelper
   def strain_row_data strain
     creator = strain.contributor.try(:person)
     creator_link = creator ? link_to(creator.name, person_path(creator.id)) : ""
-    [(link_to strain.organism.title, organism_path(strain.organism.id)),
+    parent_strain_link = strain.parent.nil? ? nil : link_to(h(strain.parent.title),strain.parent)
+    [(link_to h(strain.organism.title), organism_path(strain.organism.id)),
      (check_box_tag "selected_strain_#{strain.id}", strain.id, false, :onchange => strain_checkbox_onchange_function)   ,
-     link_to(strain.title, strain), text_or_not_specified(strain.genotype_info), text_or_not_specified(strain.phenotype_info), strain.id, text_or_not_specified(strain.synonym), text_or_not_specified(creator_link), text_or_not_specified(strain.parent_strain),
+     link_to(h(strain.title), strain), text_or_not_specified(strain.genotype_info), text_or_not_specified(strain.phenotype_info), strain.id, text_or_not_specified(strain.synonym), text_or_not_specified(creator_link), text_or_not_specified(parent_strain_link),
      (if strain.can_delete?
         link_to image("destroy", :alt => "Delete", :title => "Delete this strain"), {:action => "destroy", :controller => 'biosamples', :id => strain.id, :class => 'strain', :id_column_position => 5},
                              :confirm => "Are you sure you want to delete this strain?", :method => :delete, :remote => true
@@ -89,7 +90,7 @@ module BiosamplesHelper
     id_column = Seek::Config.is_virtualliver ? 8 : 6
     creators = []
     specimen.creators.each do |creator|
-      creators << link_to(creator.name, person_path(creator.id))
+      creators << link_to(h(creator.name), person_path(creator.id))
     end
     creators << specimen.other_creators unless specimen.other_creators.blank?
 
@@ -111,6 +112,8 @@ module BiosamplesHelper
     strain = specimen.strain
     strain_info = 'Strain' + ": "+ strain.info + "(Seek ID=#{strain.id})"
 
+    creators_list = creators.collect{|creator| creator}.join(", ").html_safe
+    sops_list = asset_version_links(specimen.sops).join(", ").html_safe
     unless Seek::Config.is_virtualliver
       [strain_info,
        (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
@@ -118,7 +121,7 @@ module BiosamplesHelper
                                                                                                                     :method => :get,
                                                                                                                     :with => "'specimen_ids=' + getSelectedSpecimens()",
                                                                                                                     :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
-       link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
+       link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(creators_list), specimen.id, text_or_not_specified(sops_list), delete_icon, update_icon]
 
     else
       [strain_info,
@@ -127,7 +130,7 @@ module BiosamplesHelper
                                                                                                                         :method => :get,
                                                                                                                         :with => "'specimen_ids=' + getSelectedSpecimens()",
                                                                                                                         :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
-           link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(specimen.genotype_info),text_or_not_specified(specimen.phenotype_info),text_or_not_specified(creators.join(", ")), specimen.id, text_or_not_specified(asset_version_links(specimen.sops).join(", ")), delete_icon, update_icon]
+           link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(specimen.genotype_info),text_or_not_specified(specimen.phenotype_info),text_or_not_specified(creators_list), specimen.id, text_or_not_specified(sops_list), delete_icon, update_icon]
     end
   end
 

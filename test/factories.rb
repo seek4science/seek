@@ -552,8 +552,8 @@ end
   end
 
   Factory.define(:bioportal_concept) do |f|
-    f.ontology_id 1132
-    f.concept_uri "NCBITaxon:2287"
+    f.ontology_id "NCBITAXON"
+    f.concept_uri "http://purl.obolibrary.org/obo/NCBITaxon_2287"
   end
 
   Factory.define(:event) do |f|

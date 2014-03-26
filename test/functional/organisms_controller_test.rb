@@ -139,7 +139,7 @@ class OrganismsControllerTest < ActionController::TestCase
 
   test "visualise available when logged out" do
     logout
-    o=organisms(:human)
+    o=Factory(:organism,:bioportal_concept=>Factory(:bioportal_concept))
     get :visualise, :id=>o
     assert_response :success
   end
