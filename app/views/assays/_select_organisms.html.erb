@@ -30,7 +30,7 @@
                   :before=>"show_ajax_loader('existing_strains_for_assay_organism')",
                   :method=>:get
                   )+
-          ";check_show_add_organism();$('strain').clear();return(false);",
+          ";check_show_add_organism();removeStrain();return(false);",
          } -%>
         <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
@@ -43,7 +43,8 @@
         <div class="association_step">
           <b>Step 3</b> - Specify a strain (optional)<br/>
           <div id="existing_strains_for_assay_organism"></div>
-          <%= text_field_tag :strain, nil, :disabled => true %>
+          <%= hidden_field_tag :strain_id -%>
+          <%= text_field_tag :strain_info, nil, :disabled => true %>
           <%= link_to_function image("destroy", :alt => "Remove", :title => "Remove this strain", :id => 'destroy_image', :style => 'display:none;'), "removeStrain()" %>
           <br/>
             </div>
@@ -55,14 +56,16 @@
 </div>
 
 <script type="text/javascript">
-    function setStrainTextField(strain){
-      $('strain').value = strain;
-      new Effect.Highlight('strain');
+    function setSelectedStrain(id,strain_info){
+      $('strain_id').value = id;
+      $('strain_info').value = strain_info;
+      new Effect.Highlight('strain_info');
       $('destroy_image').style['display']='block';
   }
 
   function removeStrain(){
-      $('strain').value = '';
+      $('strain_id').clear();
+      $('strain_info').clear();
       $('destroy_image').style['display']='none';
   }
 

@@ -4,8 +4,8 @@
       <p class="none_text">No Strains have yet been defined for <span style="font-weight: bold;"><%= h(organism.title) -%></span>.</p>
   <% else -%>
       <p class="none_text">Here are the Strains for <span style="font-weight: bold;"><%= h(organism.title) -%></span>. Please choose one.</p>
-          <% existing_strains_for_assay_organism.each do |strain| -%>
-              <% strain_links << link_to_function(h(strain.title), "setStrainTextField('#{strain.title}');") %>
+          <% existing_strains_for_assay_organism.select{|strain| strain.can_view?}.each do |strain| -%>
+              <% strain_links << link_to_function(h(strain.info), "setSelectedStrain(#{strain.id},'#{strain.info}');") %>
           <% end -%>
       <%= strain_links.join(", ").html_safe -%>
   <% end -%>
