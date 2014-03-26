@@ -12,6 +12,7 @@
 %>
 
 <div style="width: 100%">
+    <div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_type%>"></div>
     <table cellpadding="0" cellspacing="10" border="0" id="exhibit" width="100%">
       <tr>
         <td style="float:left;">
@@ -20,10 +21,22 @@
           <hr/>
           <% facet_config[object_type].keys.each do |facet| %>
               <% label = facet_config[object_type][facet]['label'] %>
-              <div data-ex-role="facet" data-ex-expression=".<%= facet %>" data-ex-facet-label="<%= label %>" data-ex-height="13em"></div>
+              <div data-ex-role="facet"
+                   data-ex-expression=".<%= facet %>"
+                   data-ex-facet-label="<%= label %>"
+                   data-ex-height="13em">
+              </div>
               <br/>
           <% end %>
+
+          <div data-ex-role="facet"
+               data-ex-facet-class="Exhibit.HierarchicalFacet"
+               data-ex-expression=".assay_type"
+               data-ex-uniform-grouping=".subclassOf"
+               data-ex-scroll="false">
+          </div>
         </td>
+
         <td style="width: 85%;">
           <div id="content-area">
             <div data-ex-role="exhibit-lens" style="display: none">
@@ -48,6 +61,13 @@
 <div id="data" style="display:none">
   <%
      exhibit_items = []
+     experimental_types = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy
+     exhibit_items.push({'type' => 'AssayType', 'label' => experimental_types.label})
+     exhibit_items |= generate_tree(experimental_types)
+     modelling_types = Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy
+     exhibit_items.push({'type' => 'AssayType', 'label' => modelling_types.label})
+     exhibit_items |= generate_tree(modelling_types)
+
      objects.each do |object|
         exhibit_item = {}
         exhibit_item['item_id'] = object.id
@@ -62,7 +82,9 @@
             exhibit_item[facet] = related_object.send(represented_field)
           end
         end
+        exhibit_item['assay_type'] = object.assay_type_label
         exhibit_item['all'] = ''
+        exhibit_item['type'] = object_type
         exhibit_items << exhibit_item
      end
   %>

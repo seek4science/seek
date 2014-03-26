@@ -52,3 +52,12 @@ module AssayTypesHelper
   end
 
 end
+
+def generate_tree(ontology_class)
+  result = []
+  ontology_class.subclasses.each do |child|
+      result << {'type' => 'AssayType', 'label' => child.label, 'subclassOf' => child.parents.first.label}
+      result = result + generate_tree(child) unless child.subclasses.empty?
+  end
+  result
+end
