@@ -99,9 +99,9 @@ class AssaysController < ApplicationController
     model_ids     = params[:model_ids] || []
 
      Array(organisms).each do |text|
-      o_id, strain, culture_growth_type_text=text.split(",")
+      o_id, strain_title, strain_id, culture_growth_type_text=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-      @assay.associate_organism(o_id, strain, culture_growth)
+      @assay.associate_organism(o_id, strain_id, culture_growth)
     end
 
     @assay.owner=current_user.person
@@ -163,9 +163,9 @@ class AssaysController < ApplicationController
 
     @assay.assay_organisms = []
     Array(organisms).each do |text|
-          o_id, strain, culture_growth_type_text=text.split(",")
+          o_id, strain, strain_id, culture_growth_type_text=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-          @assay.associate_organism(o_id, strain, culture_growth)
+          @assay.associate_organism(o_id, strain_id, culture_growth)
         end
 
     update_annotations @assay

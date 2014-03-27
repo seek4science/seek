@@ -30,7 +30,7 @@
                   :before=>"show_ajax_loader('existing_strains_for_assay_organism')",
                   :method=>:get
                   )+
-          ";check_show_add_organism();$('strain').clear();return(false);",
+          ";check_show_add_organism();return(false);",
          } -%>
         <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
@@ -43,7 +43,6 @@
         <div class="association_step">
           <b>Step 3</b> - Specify a strain (optional)<br/>
           <div id="existing_strains_for_assay_organism"></div>
-          <%= text_field_tag :strain, nil, :disabled => true %>
           <%= link_to_function image("destroy", :alt => "Remove", :title => "Remove this strain", :id => 'destroy_image', :style => 'display:none;'), "removeStrain()" %>
           <br/>
             </div>
@@ -55,23 +54,20 @@
 </div>
 
 <script type="text/javascript">
-    function setStrainTextField(strain){
-      $('strain').value = strain;
-      new Effect.Highlight('strain');
+    function setSelectedStrain(id,strain_info){
+      $('strain_id').value = id;
+      $('strain_info').value = strain_info;
+      new Effect.Highlight('strain_info');
       $('destroy_image').style['display']='block';
-  }
-
-  function removeStrain(){
-      $('strain').value = '';
-      $('destroy_image').style['display']='none';
   }
 
   <% @assay.assay_organisms.each do |o| -%>
       organism_id = '<%= o.organism.id -%>';
       organism_title = '<%= escape_javascript(o.organism.title) -%>';
-      strain = '<%= o.strain.nil? ? "" : o.strain.title -%>';
+      strain_info = '<%= o.strain.nil? ? "" : o.strain.info -%>';
+      strain_id = '<%= o.strain.nil? ? "" : o.strain.id -%>';
       culture_growth = '<%= o.culture_growth_type.nil? ? "" : o.culture_growth_type.title -%>';
-      addOrganism(organism_title, organism_id, strain, culture_growth);
+      addOrganism(organism_title, organism_id, strain_info,strain_id, culture_growth);
   <% end -%>
 
 
