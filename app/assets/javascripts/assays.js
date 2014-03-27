@@ -370,7 +370,7 @@ function checkOrganismNotInList(organism_id,strain_id,culture_growth) {
 
         for (var i = 0; i < organisms.length; i++){
             if (organisms[i][0] == title
-                    && organisms[i][1] == id
+                    && organisms[i][1] == organism_id
                     && organisms[i][3] == strain_id
                     && organisms[i][4] == culture_growth) {
 
