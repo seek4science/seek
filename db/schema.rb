@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140319165730) do
+ActiveRecord::Schema.define(:version => 20140327111037) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -153,6 +153,7 @@ ActiveRecord::Schema.define(:version => 20140319165730) do
     t.datetime "updated_at"
     t.string   "term_uri"
     t.string   "source_path"
+    t.integer  "contributor_id"
   end
 
   create_table "assay_types_edges", :id => false, :force => true do |t|
@@ -1467,6 +1468,7 @@ ActiveRecord::Schema.define(:version => 20140319165730) do
     t.datetime "updated_at"
     t.string   "term_uri"
     t.string   "source_path"
+    t.integer  "contributor_id"
   end
 
   create_table "technology_types_edges", :id => false, :force => true do |t|

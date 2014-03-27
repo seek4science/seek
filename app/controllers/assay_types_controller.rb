@@ -56,6 +56,8 @@ class AssayTypesController < ApplicationController
     # this is try to convert parents string to be string array, e.g.. "1" --> ["1"]
     @assay_type.parent_ids = params[:assay_type][:parent_ids].split if params[:assay_type][:parent_ids]
 
+    @assay_type.contributor_id= User.current_user.try(&:person_id)
+
 
         render :update do |page|
           if @assay_type.save

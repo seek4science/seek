@@ -46,7 +46,7 @@ class TechnologyTypesController < ApplicationController
   def create
     @technology_type = TechnologyType.new(params[:technology_type])
     @technology_type.parent_ids = params[:technology_type][:parent_ids].split if params[:technology_type][:parent_ids]
-
+    @technology_type.contributor_id= User.current_user.try(&:person_id)
     render :update do |page|
       if @technology_type.save
         if @technology_type.link_from == "assays"

@@ -2,8 +2,10 @@ require 'acts_as_ontology'
 
 class TechnologyType < ActiveRecord::Base
 
+  belongs_to :contributor,:class_name => "Person"
+
   has_many :assays
-  scope :user_defined_technology_types, :conditions => "source_path is null || source_path = ''"
+  scope :user_defined_technology_types, :conditions => "contributor_id is not null"
 
    # link_from: where the new technology type link was initiated, e.g. new technology type link at assay creation page,--> link_from = "assays"
   attr_accessor :link_from
@@ -37,7 +39,7 @@ class TechnologyType < ActiveRecord::Base
 
 
   def is_user_defined
-    self.source_path.blank?
+    !contributor.nil?
   end
 
 
@@ -61,4 +63,11 @@ class TechnologyType < ActiveRecord::Base
     return result
   end
 
+  def can_edit?
+    contributor && User.logged_in_and_member?
+  end
+
+  def can_destroy? user=User.current_user
+    (contributor && (user == contributor.user)) || User.asset_manager_logged_in?
+  end
 end

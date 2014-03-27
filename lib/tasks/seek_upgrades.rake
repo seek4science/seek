@@ -267,6 +267,52 @@ namespace :seek do
             end
      end
 
+    desc "add missing contributor to existing new assay types"
+    task :add_missing_contributor_to_assay_types=>:environment do
+         AssayType.all.each do |at|
+             label = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[at.term_uri].try(&:label).try(&:to_s).try(&:downcase)
+             label ||= Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[at.term_uri].try(&:label).try(&:to_s).try(&:downcase)
+            if at.contributor.nil? && label != at.title.downcase && !["generic experimental assay","generic modelling analysis","assay types"].include?(at.title)
+              puts at.title.yellow
+              puts label
+              at.contributor = at.assays.first.nil? ? Person.all.detect(&:is_asset_manager?) || Person.all.detect(&:is_admin?) : at.assays.first.contributor
+             disable_authorization_checks do
+               at.save!
+             end
+              puts at.errors.full_messages
+            end
+
+         end
+
+    end
+
+  desc "add missing contributor to existing new technology types"
+    task :add_missing_contributor_to_technology_types=>:environment do
+      TechnologyType.all.each do |tt|
+        label = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[tt.term_uri].try(&:label).try(&:to_s).try(&:downcase)
+
+        #Not relate to the contributor, but fixing one technology type from ontology with wrong title in DB
+        if label == "enzymatic activity measurements"
+           tt.title = label
+          disable_authorization_checks do
+            tt.save!
+          end
+        end
+
+
+        if tt.contributor.nil? && label != tt.title.downcase && tt.title != "technology"
+          puts tt.title
+          tt.contributor = tt.assays.first.nil? ? Person.all.detect(&:is_asset_manager?) || Person.all.detect(&:is_admin?) : tt.assays.first.contributor
+          disable_authorization_checks do
+            tt.save!
+          end
+        end
+
+      end
+
+    end
+
+
 
    desc "adds the term uri's to assay types"
     task :add_term_uris_to_assay_types=>:environment do

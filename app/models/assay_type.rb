@@ -2,8 +2,9 @@ require 'acts_as_ontology'
 
 class AssayType < ActiveRecord::Base
 
+  belongs_to :contributor,:class_name => "Person"
   has_many :assays
-  scope :user_defined_assay_types, :conditions => "source_path is null || source_path = ''"
+  scope :user_defined_assay_types, :conditions => "contributor_id is not null"
 
   # default_parent_id: either exp assay type or modelling analysis type
   # link_from: where the new assay type link was initiated, e.g. new assay type link at assay creation page,--> link_from = "assays".
@@ -37,7 +38,7 @@ class AssayType < ActiveRecord::Base
 
 
   def is_user_defined
-      self.source_path.nil?
+     !contributor.nil?
   end
 
   def get_child_assays assay_type=self
@@ -70,7 +71,13 @@ class AssayType < ActiveRecord::Base
   end
 
 
+  def can_edit?
+    contributor && User.logged_in_and_member?
+  end
 
+  def can_destroy? user=User.current_user
+   (contributor && (user == contributor.user)) || User.asset_manager_logged_in?
+  end
 
 end
   

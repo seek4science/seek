@@ -76,6 +76,9 @@ class User < ActiveRecord::Base
     self.logged_in_and_registered? && self.current_user.person.is_project_manager_of_any_project?
   end
 
+  def self.asset_manager_logged_in?
+     self.logged_in_and_registered? && self.current_user.person.is_asset_manager?
+  end
   #a person can be logged in but not fully registered during
   #the registration process whilst selecting or creating a profile
   def self.logged_in_and_registered?

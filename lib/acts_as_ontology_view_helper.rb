@@ -35,13 +35,6 @@ module Stu
           # only admin can edit/delete new defined assay/technology types
           show_edit = false
           show_delete = false
-          if User.admin_logged_in? && action_name =="manage"
-            show_edit = true
-            show_delete = true
-          elsif User.logged_in_and_member?
-            show_edit = true
-            show_delete = false
-          end
 
           roots=type.to_tree(root_id).sort { |a, b| a.title.downcase <=> b.title.downcase }
           list = []
@@ -55,7 +48,7 @@ module Stu
             else
               depth = 0
             end
-            list = list + indented_child_options(type, root, depth, show_edit, show_delete,selected_id)
+            list = list + indented_child_options(type, root, depth, selected_id)
           end
           list = list.join("\n").html_safe
           list = list + "<br/> <em>* Note that it is created by seek user.</em>".html_safe
@@ -67,7 +60,7 @@ module Stu
 
         #Displays the ontology node with appropriate indentation, as well as optional
         #edit and remove icons, and the number of assays associated with the node.
-        def indented_child_options type, parent, depth=0, show_edit, show_delete, selected_id
+        def indented_child_options type, parent, depth=0, selected_id
 
           result = []
           unless parent.children.empty?
@@ -76,15 +69,15 @@ module Stu
               assay_stat = child.assays.size == 0 ?  "" : "<span style='color: #666666;'>(#{child.assays.count} assays)</span>".html_safe
               ontology_term_li = link_to(child.title, child_path).html_safe
               user_defined_term_li = link_to(child.title, child_path, {:style => "color:green;font-style:italic"}) + "*" + " " +
-                  (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style => "vertical-align:middle"}) : "") + " " +
-                  (show_delete ? (child.assays.count == 0 && child.children.empty? ? link_to(image("destroy"), child, :confirm =>
+                  (child.can_edit? ? link_to(image("edit"), edit_polymorphic_path(child), {:style => "vertical-align:middle"}) : "") + " " +
+                  (child.can_destroy? ? (child.assays.count == 0 && child.children.empty? ? link_to(image("destroy"), child, :confirm =>
                       "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
                                                                         :method => :delete, :style => "vertical-align:middle") : "") : "").html_safe
               child_link = (child.respond_to?(:is_user_defined) && child.is_user_defined) ? user_defined_term_li : ontology_term_li
 
               result << ("<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + child_link +  assay_stat +
                   "</li>")
-              result = result + indented_child_options(type, child, depth+1, show_edit, show_delete, selected_id) if child.has_children?
+              result = result + indented_child_options(type, child, depth+1,selected_id) if child.has_children?
             end
           end
           return result
