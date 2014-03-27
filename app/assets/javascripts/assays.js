@@ -397,8 +397,14 @@ function addSelectedOrganism() {
     selected_option=$("possible_organisms").options[selected_option_index];
     title=selected_option.text;
     id=selected_option.value;
-    strain_info=$('strain_info').value;
-    strain_id=$('strain_id').value;
+    strain_index = $('strains').selectedIndex;
+    if (strain_index!=0) {
+        strain_info = $('strains')[strain_index].text;
+        strain_id = $('strains')[strain_index].value;
+    } else {
+        strain_id="";
+        strain_info="";
+    }
 
     selected_option_index=$('culture_growth').selectedIndex;
     selected_option=$('culture_growth').options[selected_option_index];
