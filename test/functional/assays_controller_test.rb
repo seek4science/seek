@@ -299,18 +299,24 @@ end
 
   test "should create experimental assay with/without organisms" do
 
-    #create assay only with organisms
+    sample = Factory(:sample)
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
                              :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :sample_ids => [Factory(:sample)]}
+                             :sample_ids => [sample]}
     end
+    assay = assigns(:assay)
+    refute_nil assay
+    assert assay.organisms.empty?
+    assert assay.strains.empty?
+    assert_include assay.samples,sample
+
     organism = Factory(:organism,:title=>"Frog")
     strain = Factory(:strain, :title=>"UUU", :organism=>organism)
-    growth_type = Factory(:culture_growth_type, :title=>"batch")
+    growth_type = Factory(:culture_growth_type, :title=>"ssdfkhsdfkh")
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
@@ -318,13 +324,31 @@ end
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :sample_ids => [Factory(:sample)]},
-                             :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
+                             :assay_organism_ids => [organism.id,strain.title, strain.id, growth_type.title].join(",")
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
-    assert a.organisms.include?(organism)
-    assert a.strains.include?(strain)
+    assert_include a.organisms, organism
+    assert_include a.strains,strain
     assert_equal 1,a.assay_organisms.count
+    assert_equal growth_type,a.assay_organisms.last.culture_growth_type
+
+    #create assay with samples and organisms, but not strain
+    sample = Factory(:sample)
+    assert_difference('ActivityLog.count') do
+      assert_difference("Assay.count") do
+        post :create,:assay=>{:title=>"test",
+                              :study_id=>studies(:metabolomics_study).id,
+                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
+                              :sample_ids=>[sample.id]
+        },:assay_organism_ids=>[organism.id.to_s,"","",""].join(",")
+      end
+    end
+    a=assigns(:assay)
+    assert_include a.organisms, organism
+    assert_include a.samples,sample
+    assert_empty a.strains
+    assert_redirected_to assay_path(a)
   end
 
   test "should create modelling assay with/without organisms" do
@@ -334,6 +358,12 @@ end
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id}
     end
+
+    assay = assigns(:assay)
+    refute_nil assay
+    assert assay.organisms.empty?
+    assert assay.strains.empty?
+
     organism = Factory(:organism,:title=>"Frog")
     strain = Factory(:strain, :title=>"UUU", :organism=>organism)
     growth_type = Factory(:culture_growth_type, :title=>"batch")
@@ -341,25 +371,15 @@ end
       post :create, :assay=>{:title=>"test",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id},
-           :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(",")
+           :assay_organism_ids => [organism.id, strain.title,strain.id, growth_type.title].join(",")
     end
     a=assigns(:assay)
     assert_equal 1, a.assay_organisms.count
-    assert a.organisms.include?(organism)
-    assert a.strains.include?(strain)
+    assert_include a.organisms, organism
+    assert_include a.strains,strain
     assert_redirected_to assay_path(a)
-    #create assay with samples and organisms
-    assert_difference('ActivityLog.count') do
-    assert_difference("Assay.count") do
-      post :create,:assay=>{:title=>"test",
-        :study_id=>studies(:metabolomics_study).id,
-        :assay_class_id=>assay_classes(:experimental_assay_class).id,
-        :sample_ids=>[Factory(:sample).id]
-      },:assay_organism_ids=>[organism.id.to_s,"",""].join(",")
-    end
-    end
-    a=assigns(:assay)
-    assert_redirected_to assay_path(a)
+
+
   end
 
   test "should not create modelling assay with sample" do
