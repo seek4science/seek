@@ -365,7 +365,7 @@ function removeAssay(index) {
     updateAssays();
 }
 
-function checkOrganismNotInList(title,id,strain_id,culture_growth) {
+function checkOrganismNotInList(organism_id,strain_id,culture_growth) {
         toAdd = true;
 
         for (var i = 0; i < organisms.length; i++){
@@ -385,7 +385,7 @@ function checkOrganismNotInList(title,id,strain_id,culture_growth) {
     }
 
 function addOrganism(title,id,strain_info,strain_id,culture_growth) {
-    if(checkOrganismNotInList(title,id,strain_info,strain_id,culture_growth)){
+    if(checkOrganismNotInList(id,strain_id,culture_growth)){
        organisms.push([title,id,strain_info,strain_id,culture_growth]);
        updateOrganisms();
     }
