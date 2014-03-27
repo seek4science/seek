@@ -266,12 +266,12 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
 
-test "should create experimental assay with or without sample" do
+  test "should create experimental assay with or without sample" do
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
-        post :create, :assay=>{:title=>"test",
-                               :study_id=>studies(:metabolomics_study).id,
-                               :assay_class_id=>assay_classes(:experimental_assay_class).id}
+        post :create, :assay => {:title => "test",
+                                 :study_id => studies(:metabolomics_study).id,
+                                 :assay_class_id => assay_classes(:experimental_assay_class).id}
       end
     end
     a=assigns(:assay)
@@ -281,20 +281,42 @@ test "should create experimental assay with or without sample" do
     sample = Factory(:sample)
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
-        post :create, :assay=>{:title=>"test",
-                               :study_id=>studies(:metabolomics_study).id,
-                               :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                               :sample_ids=>[sample.id]
+        post :create, :assay => {:title => "test",
+                                 :study_id => studies(:metabolomics_study).id,
+                                 :assay_class_id => assay_classes(:experimental_assay_class).id,
+                                 :sample_ids => [sample.id]
         }
 
       end
     end
     a=assigns(:assay)
-    assert_equal User.current_user.person,a.owner
+    assert_equal User.current_user.person, a.owner
     assert_redirected_to assay_path(a)
-    assert_equal [sample],a.samples
-    #assert_equal organisms(:yeast),a.organism
-end
+    assert_equal [sample], a.samples
+  end
+
+  test "should update assay with strains and organisms and sample" do
+    assay = Factory(:assay,:contributor=>User.current_user.person)
+    assert_empty assay.organisms
+    assert_empty assay.strains
+    assert_empty assay.samples
+
+    organism = Factory(:organism,:title=>"Frog")
+    strain = Factory(:strain, :title=>"UUU", :organism=>organism)
+    sample = Factory(:sample)
+
+    assert_difference("AssayOrganism.count") do
+      put :update, :id=>assay.id,:assay => {:title => "test",
+                                            :sample_ids => [sample.id]},
+                        :assay_organism_ids => [organism.id,strain.title, strain.id, ""].join(",")
+
+    end
+    assert_response :success
+    assay = assigns(:assay)
+    assert_include assay.organisms,organism
+    assert_include assay.strains,strain
+    assert_include assay.samples,sample
+  end
 
 
   test "should create experimental assay with/without organisms" do
