@@ -24,13 +24,13 @@
         <%= select_tag :possible_organisms,
         options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
          {:style=>"width:90%",
-          :onchange=>remote_function(
+          :onchange=>"if (this.value!='0'){"+remote_function(
                   :url=>{:action=>"existing_strains_for_assay_organism", :controller=>"strains"},
                   :with=>"'organism_id='+this.value",
                   :before=>"show_ajax_loader('existing_strains_for_assay_organism')",
                   :method=>:get
                   )+
-          ";check_show_add_organism();return(false);",
+          "};check_show_add_organism();return(false);",
          } -%>
         <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
