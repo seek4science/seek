@@ -10,6 +10,26 @@ class StrainTest < ActiveSupport::TestCase
     User.current_user = Factory(:user)
   end
 
+  test "info" do
+    strain = Factory(:strain,:title=>"CCTV")
+    assert_equal "CCTV (wild-type / wild-type)",strain.info
+
+    genotype = Factory(:genotype,:gene=>Factory(:gene,:title=>"fff"),:modification=>Factory(:modification,:title=>"del"))
+    strain.genotypes << genotype
+
+    assert_equal "CCTV (del fff / wild-type)",strain.info
+
+    genotype = Factory(:genotype,:gene=>Factory(:gene,:title=>"ggg"),:modification=>Factory(:modification,:title=>"ins"))
+    strain.genotypes << genotype
+
+    assert_equal "CCTV (del fff;ins ggg / wild-type)",strain.info
+
+    strain.phenotypes << Factory(:phenotype,:description=>"yellow beard")
+
+    assert_equal "CCTV (del fff;ins ggg / yellow beard)",strain.info
+
+  end
+
   test "to_rdf" do
     object = Factory(:strain, :organism=>Factory(:organism, :bioportal_concept=>Factory(:bioportal_concept)),:provider_id=>"Dxxu1")
     Factory :assay_organism, :strain=>object, :organism=>object.organism
