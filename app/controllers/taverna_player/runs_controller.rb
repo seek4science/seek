@@ -17,6 +17,7 @@ module TavernaPlayer
       if params[:sharing]
         @run.policy_or_default
         @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
+        @run.save
       end
 
       respond_with(@run)
