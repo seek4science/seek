@@ -134,13 +134,6 @@ class ApplicationController < ActionController::Base
 
   end
 
-  def pal_or_admin_required
-    unless User.admin_logged_in? || (User.pal_logged_in?)
-      error("Admin or PAL rights required", "is invalid (not admin)")
-      return false
-    end
-  end
-
   #used to suppress elements that are for virtualliver only or are still currently being worked on
   def virtualliver_only
     if !Seek::Config.is_virtualliver
