@@ -13,7 +13,7 @@ module AssaysHelper
     result = link_to assay_organism.organism.title, assay_organism.organism
     if assay_organism.strain
       result += " : "
-      result += h(assay_organism.strain.title)
+      result += link_to(h(assay_organism.strain.info),assay_organism.strain)
     end
     if assay_organism.culture_growth_type
       result += " (#{assay_organism.culture_growth_type.title})"
