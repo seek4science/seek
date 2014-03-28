@@ -1180,6 +1180,15 @@ class AssaysControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test "new object based on existing one when can view but not logged in" do
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    logout
+    assert assay.can_view?
+    get :new_object_based_on_existing_one, :id=>assay.id
+    assert_redirected_to assay
+    refute_nil flash[:error]
+  end
+
   test "should show experimental assay types for new experimental assay" do
     get :new,:class=>:experimental
     assert_response :success

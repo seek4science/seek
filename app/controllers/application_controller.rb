@@ -120,18 +120,22 @@ class ApplicationController < ActionController::Base
   private
 
   def project_membership_required
-    #FIXME: remove the try_block{} and also use User.logged_in_and_member
-    unless try_block {User.logged_in_and_member? || User.admin_logged_in?}
+    unless User.logged_in_and_member? || User.admin_logged_in?
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do
-          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+          #FIXME: remove the try_block{}
+          object = eval("@"+controller_name.singularize)
+          if !object.nil? && object.try(:can_view?)
+            redirect_to object
+          else
+            try_block { redirect_to eval("#{controller_name}_path") } or redirect_to root_url
+          end
+
         end
-        format.json { render :json => {:status => 401, :error_message => flash[:error] } }
+        format.json { render :json => {:status => 401, :error_message => flash[:error]} }
       end
-
     end
-
   end
 
   #used to suppress elements that are for virtualliver only or are still currently being worked on
@@ -183,7 +187,7 @@ class ApplicationController < ActionController::Base
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
           'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
+          'tag', 'items', 'statistics', 'tag_suggestions', 'preview','new_object_based_on_existing_one'
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,
