@@ -121,7 +121,7 @@ class ApplicationController < ActionController::Base
 
   def project_membership_required
     #FIXME: remove the try_block{} and also use User.logged_in_and_member
-    unless try_block {current_user.person.member? or User.admin_logged_in?}
+    unless try_block {User.logged_in_and_member? || User.admin_logged_in?}
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do

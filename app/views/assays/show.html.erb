@@ -13,7 +13,7 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
       <li> <%= image_tag_for_key('edit', edit_assay_path, "Edit #{assay_word} Details", nil, "Edit #{assay_word} Details") -%></li>
     <% end -%>
     <%= delete_icon(@assay,current_user) %>
-    <% if logged_in? and current_user.person.member? %>
+    <% if logged_in_and_member? %>
       <li><%= image_tag_for_key('new', new_object_based_on_existing_one_assay_path(@assay,:controller_name=>"assays"), nil, nil, "New #{assay_word} based on this one") %></li>
     <% end %>
 </ul>
