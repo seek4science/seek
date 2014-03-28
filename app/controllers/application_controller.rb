@@ -31,7 +31,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :profile_for_login_required
 
-  before_filter :project_membership_required_app_controller,:only=>[:create,:new]
+  before_filter :project_membership_required,:only=>[:create,:new]
 
   helper :all
 
@@ -139,7 +139,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  alias_method :project_membership_required_app_controller, :project_membership_required
+  alias_method :project_membership_required_appended, :project_membership_required
 
 
   #used to suppress elements that are for virtualliver only or are still currently being worked on
