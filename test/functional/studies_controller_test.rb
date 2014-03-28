@@ -381,6 +381,15 @@ class StudiesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test "new object based on existing one when can view but not logged in" do
+    study = Factory(:study,:policy=>Factory(:public_policy))
+    logout
+    assert study.can_view?
+    get :new_object_based_on_existing_one, :id=>study.id
+    assert_redirected_to study
+    refute_nil flash[:error]
+  end
+
   test 'object based on existing one when unauthorized to edit investigation' do
     inv = Factory(:investigation,:policy=>Factory(:private_policy),:contributor=>Factory(:person))
 

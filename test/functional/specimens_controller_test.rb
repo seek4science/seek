@@ -345,6 +345,15 @@ test "should update genotypes and phenotypes" do
     end
   end
 
+  test "new object based on existing one when can view but not logged in" do
+    specimen = Factory(:specimen,:policy=>Factory(:public_policy))
+    logout
+    assert specimen.can_view?
+    get :new_object_based_on_existing_one, :id=>specimen.id
+    assert_redirected_to specimen
+    refute_nil flash[:error]
+  end
+
 
 
 end
