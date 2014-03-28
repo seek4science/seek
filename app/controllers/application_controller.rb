@@ -118,9 +118,7 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  #def project_membership_required_app_controller
-  #  project_membership_required
-  #end
+  private
 
   def project_membership_required
     unless User.logged_in_and_member? || User.admin_logged_in?
@@ -142,7 +140,7 @@ class ApplicationController < ActionController::Base
   end
 
   alias_method :project_membership_required_app_controller, :project_membership_required
-  private
+
 
   #used to suppress elements that are for virtualliver only or are still currently being worked on
   def virtualliver_only
