@@ -32,9 +32,18 @@
           <div data-ex-role="facet"
                data-ex-facet-class="Exhibit.HierarchicalFacet"
                data-ex-expression=".assay_type"
+               data-ex-facet-label="Assay Type"
                data-ex-uniform-grouping=".subclassOf"
                data-ex-scroll="false">
           </div>
+          <br/>
+          <br/>
+          <div data-ex-role="facet"
+               data-ex-facet-class="NumericRange"
+               data-ex-expression=".created_at"
+               data-ex-facet-label="Created at"
+               data-ex-interval="1">
+          </div
         </td>
 
         <td style="width: 85%;">
@@ -83,13 +92,22 @@
           end
         end
         exhibit_item['assay_type'] = object.assay_type_label
+        exhibit_item['created_at'] = object.created_at.year
         exhibit_item['all'] = ''
         exhibit_item['type'] = object_type
         exhibit_items << exhibit_item
      end
+
+     exhibit_properties = {
+             "created_at" => {
+                "valueType" => "number"
+             }
+     }
+
   %>
 
 {
+  "properties": <%= exhibit_properties.to_json %>,
   "items": <%= exhibit_items.to_json %>
 }
 
