@@ -107,7 +107,7 @@ class DataFilesController < ApplicationController
     @data_file.is_with_sample= params[:is_with_sample]
     @page_title = params[:page_title]
     respond_to do |format|
-      if current_user.person.member?
+      if User.logged_in_and_member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new Data files. Only members of known projects, institutions or work groups are allowed to create new content."

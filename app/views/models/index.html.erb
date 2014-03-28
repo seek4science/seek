@@ -1,4 +1,4 @@
-<% if logged_in? and current_user.person.member?%>
+<% if logged_in_and_member? %>
     <ul class="sectionIcons">
         <li><%= image_tag_for_key "new", new_model_path, "Upload a #{t('model')}", nil, "Upload a #{t('model')}" %></li>
         <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->

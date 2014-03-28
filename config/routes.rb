@@ -198,11 +198,17 @@ SEEK::Application.routes.draw do
 
   resources :investigations do
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
+    member do
+      get :new_object_based_on_existing_one
+    end
   end
 
   resources :studies do
     collection do
       post :investigation_selected_ajax
+    end
+    member do
+      get :new_object_based_on_existing_one
     end
     resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
   end
@@ -213,6 +219,7 @@ SEEK::Application.routes.draw do
     end
     member do
       post :update_annotations_ajax
+      get :new_object_based_on_existing_one
     end
     resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
@@ -390,10 +397,17 @@ SEEK::Application.routes.draw do
 
   resources :specimens do
     resources :projects,:people,:samples,:strains,:institutions,:sops,:only=>[:index]
+    member do
+      get :new_object_based_on_existing_one
+    end
   end
+
   resources :samples do
     collection do
       get :preview
+    end
+    member do
+      get :new_object_based_on_existing_one
     end
     resources :projects,:people,:specimens,:sops,:data_files,:only=>[:index]
   end
@@ -463,7 +477,6 @@ SEEK::Application.routes.draw do
   match 'studies/new_investigation_redbox' => 'studies#new_investigation_redbox', :as => :new_investigation_redbox, :via => :post
   match 'experiments/create_investigation' => 'studies#create_investigation', :as => :create_investigation, :via => :post
   match '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group, :via => :post
-  match ':controller/new_object_based_on_existing_one/:id' => "#new_object_based_on_existing_one", :as => :new_object_based_on_existing_one, :via => :get
   match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
   match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
   match '/organism_list_autocomplete' => 'projects#auto_complete_for_organism_name', :as => :organism_list_autocomplete

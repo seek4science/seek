@@ -210,7 +210,7 @@ module Seek
           #if no version is specified, show the latest version
           #otherwise, show the specified version, if (this version is correct for login and project member user or if (this is the latest version and the user doesn't login or is not project member')
           if params[:version]
-            if asset.find_version(params[:version]).blank? || (!(logged_in? and try_block{current_user.person.member?}) && params[:version].to_i != asset.latest_version.version)
+            if asset.find_version(params[:version]).blank? || (!(User.logged_in_and_member?) && params[:version].to_i != asset.latest_version.version)
               error('This version is not available', "invalid route")
               return false
             else

@@ -89,10 +89,6 @@ class User < ActiveRecord::Base
     self.current_user
   end
 
-  def self.pal_logged_in?
-    self.logged_in_and_registered? && self.current_user.person.is_pal?
-  end
-
   # Activates the user in the database.
   def activate
     @activated = true
