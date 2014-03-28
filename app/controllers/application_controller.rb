@@ -4,6 +4,7 @@
 require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
+
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
 
@@ -30,7 +31,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :profile_for_login_required
 
-  before_filter :project_membership_required,:only=>[:create,:new]
+  before_filter :project_membership_required_app_controller,:only=>[:create,:new]
 
   helper :all
 
@@ -117,7 +118,9 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  private
+  #def project_membership_required_app_controller
+  #  project_membership_required
+  #end
 
   def project_membership_required
     unless User.logged_in_and_member? || User.admin_logged_in?
@@ -137,6 +140,9 @@ class ApplicationController < ActionController::Base
       end
     end
   end
+
+  alias_method :project_membership_required_app_controller, :project_membership_required
+  private
 
   #used to suppress elements that are for virtualliver only or are still currently being worked on
   def virtualliver_only

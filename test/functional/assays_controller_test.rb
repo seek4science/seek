@@ -26,7 +26,6 @@ class AssaysControllerTest < ActionController::TestCase
       a.reload
     end
 
-
     User.with_current_user(a.study.investigation.contributor) { a.study.investigation.projects << Factory(:project) }
     assert_difference('ActivityLog.count') do
       get :show, :id=>a, :format=>"xml"
@@ -1176,7 +1175,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay = Factory(:assay,:policy=>Factory(:private_policy),:title=>"the assay")
     refute assay.can_view?
     get :new_object_based_on_existing_one,:id=>assay.id
-    assert_redirected_to assay
+    assert_redirected_to assays_path
     refute_nil flash[:error]
   end
 
@@ -1259,6 +1258,12 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
       assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
     end
+  end
+
+  test "logged out user can't see new" do
+    logout
+    get :new
+    assert_redirected_to assays_path
   end
 
   test "assays filtered by strain through nested route" do

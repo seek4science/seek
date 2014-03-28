@@ -6,6 +6,7 @@ class SpecimensController < ApplicationController
   before_filter :find_and_authorize_requested_item, :only => [:show, :update, :edit, :destroy,:new_object_based_on_existing_one]
   before_filter :project_membership_required, :only=>[:new_object_based_on_existing_one]
 
+
   include IndexPager
 
   include Seek::Publishing::PublishingCommon

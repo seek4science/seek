@@ -354,6 +354,12 @@ test "should update genotypes and phenotypes" do
     refute_nil flash[:error]
   end
 
+  test "logged out user can't see new" do
+    logout
+    get :new
+    assert_redirected_to specimens_path
+  end
+
 
 
 end
