@@ -5,7 +5,7 @@ class InvestigationsController < ApplicationController
 
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_authorize_requested_item,:only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
-  before_filter :project_membership_required, :only=>[:new,:new_object_based_on_existing_one]
+  before_filter :project_membership_required, :only=>[:new_object_based_on_existing_one]
 
   include Seek::Publishing::PublishingCommon
 
