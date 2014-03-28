@@ -16,7 +16,7 @@
 
   <%= delete_icon @study,current_user -%>
     <% if logged_in? && current_user.person.member? %>
-      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"studies",:id=>@study.id), nil, nil, "New #{t('study')} based on this one") %></li>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_study_path(@study,:controller_name=>"studies"), nil, nil, "New #{t('study')} based on this one") %></li>
     <% end %>
 </ul>
 

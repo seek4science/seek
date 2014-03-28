@@ -1,18 +1,18 @@
 <% truncate_length_for_boxes = 22 -%>
 
-<%= render :partial => "general/item_title", :locals=>{:item=>@specimen} %>
+<%= render :partial => "general/item_title", :locals => {:item => @specimen} %>
 
 <ul class="sectionIcons">
   <%= render :partial => "subscriptions/subscribe", :locals => {:object => @specimen} %>
   <% if @specimen.can_manage? %>
-  <li><%= image_tag_for_key('manage', edit_specimen_path, "Manage #{(I18n.t 'biosamples.sample_parent_term').capitalize}", nil, "Manage #{(I18n.t 'biosamples.sample_parent_term').capitalize}") %></li>
+      <li><%= image_tag_for_key('manage', edit_specimen_path, "Manage #{(I18n.t 'biosamples.sample_parent_term').capitalize}", nil, "Manage #{(I18n.t 'biosamples.sample_parent_term').capitalize}") %></li>
   <% elsif @specimen.can_edit? %>
       <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit #{(I18n.t 'biosamples.sample_parent_term').capitalize}", nil, "Edit #{(I18n.t 'biosamples.sample_parent_term').capitalize}") %></li>
   <% end %>
-  <%= delete_icon(@specimen, current_user)-%>
+  <%= delete_icon(@specimen, current_user) -%>
 
   <% if logged_in? and current_user.person.member? %>
-      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"specimens",:id=>@specimen.id), nil, nil, "New #{I18n.t 'biosamples.sample_parent_term'} based on this one") %></li>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_specimen_path(@specimen, :controller_name => "specimens"), nil, nil, "New #{I18n.t 'biosamples.sample_parent_term'} based on this one") %></li>
   <% end %>
 </ul>
 
@@ -31,7 +31,7 @@
 
   <div style="clear:both">
     <br/>
-    <%= render :partial=>"general/items_related_to", :object => @specimen %>
+    <%= render :partial => "general/items_related_to", :object => @specimen %>
 
   </div>
 
