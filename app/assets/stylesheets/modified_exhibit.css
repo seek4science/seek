@@ -26,3 +26,16 @@ div.exhibit-facet-value-inner {
     float:          left;
     padding-left:   5px;
 }
+
+a.exhibit-flowingFacet-value-link {
+    text-decoration: none;
+    float:           left;
+    padding-left:    5px;
+}
+
+div.exhibit-flowingFacet-value-checkbox {
+    position:       absolute;
+    left:           -15px;
+    padding:        0;
+    margin:         0;
+}
