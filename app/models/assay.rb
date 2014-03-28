@@ -221,7 +221,6 @@ class Assay < ActiveRecord::Base
     new_object.model_masters = self.try(:model_masters)
     new_object.sample_ids = self.try(:sample_ids)
     new_object.assay_organisms = self.try(:assay_organisms)
-    new_object.scale_ids = self.scale_ids
     return new_object
   end
 

@@ -186,7 +186,6 @@ class Specimen < ActiveRecord::Base
     new_object.sop_masters = self.try(:sop_masters)
     new_object.creators = self.try(:creators)
     new_object.project_ids = self.project_ids
-    new_object.scale_ids = self.scale_ids
     new_object.genotypes = self.genotypes.map &:clone
     new_object.phenotypes = self.phenotypes.map &:clone
     return new_object
