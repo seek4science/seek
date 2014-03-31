@@ -27,8 +27,6 @@ class Assay < ActiveRecord::Base
 
   belongs_to :institution
   has_and_belongs_to_many :samples
-  #belongs_to :assay_type
-  #belongs_to :technology_type
   belongs_to :study  
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
