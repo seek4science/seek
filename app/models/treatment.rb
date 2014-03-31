@@ -1,5 +1,6 @@
 class Treatment < ActiveRecord::Base
   belongs_to :sample
+  belongs_to :specimen
   belongs_to :unit
 
   belongs_to :measured_item

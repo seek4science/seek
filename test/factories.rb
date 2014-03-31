@@ -290,6 +290,7 @@ end
   #Treatment
   Factory.define(:treatment) do |f|
     f.association :sample, :factory=>:sample
+    f.association :specimen, :factory=>:specimen
   end
 
 

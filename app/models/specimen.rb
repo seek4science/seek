@@ -26,6 +26,7 @@ class Specimen < ActiveRecord::Base
   has_many :genotypes
   has_many :phenotypes
   has_many :samples
+  has_many :treatments, :dependent=>:destroy
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp

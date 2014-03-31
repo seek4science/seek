@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class TreatmentTest < ActiveSupport::TestCase
+
   test "validation of sample required" do
     t = Treatment.new
     refute t.valid?
@@ -27,5 +28,15 @@ class TreatmentTest < ActiveSupport::TestCase
     t.save!
     t.reload
     assert_equal c,t.compound
+  end
+
+  test "association with specimen" do
+    spec = Factory(:specimen)
+    t = Factory(:treatment, :specimen=>spec)
+    t.save!
+    t.reload
+    spec.reload
+    assert_equal spec, t.specimen
+    assert_include spec.treatments,t
   end
 end
