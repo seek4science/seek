@@ -243,6 +243,15 @@ class InvestigationsControllerTest < ActionController::TestCase
     inv = Factory :investigation,:title=>"the inv",:policy=>Factory(:private_policy),:contributor=>Factory(:person)
     refute inv.can_view?
     get :new_object_based_on_existing_one,:id=>inv.id
+    assert_redirected_to investigations_path
+    refute_nil flash[:error]
+  end
+
+  test "new object based on existing one when can view but not logged in" do
+    inv = Factory(:investigation,:policy=>Factory(:public_policy))
+    logout
+    assert inv.can_view?
+    get :new_object_based_on_existing_one, :id=>inv.id
     assert_redirected_to inv
     refute_nil flash[:error]
   end
