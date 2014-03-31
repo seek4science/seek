@@ -29,29 +29,24 @@
                    data-ex-height="13em"
 
                    <% if facet_class == "NumericRange" %>
-                    <% interval = facet_config[object_type][facet]['interval']%>
-                    data-ex-interval='1'
+                        <% interval = facet_config[object_type][facet]['interval']%>
+                        data-ex-interval='1'
+                   <% end %>
+
+                   <% if facet_class == "Exhibit.HierarchicalFacet" %>
+                        data-ex-uniform-grouping=".subclassOf"
+                        data-ex-scroll="false">
                    <% end %>
               >
               </div>
               <br/>
           <% end %>
-
-          <div data-ex-role="facet"
-               data-ex-facet-class="Exhibit.HierarchicalFacet"
-               data-ex-expression=".assay_type"
-               data-ex-facet-label="Assay Type"
-               data-ex-uniform-grouping=".subclassOf"
-               data-ex-scroll="false">
-          </div>
-          <br/>
-          <br/>
         </td>
 
         <td style="width: 85%;">
           <div id="content-area">
             <div data-ex-role="exhibit-lens" style="display: none">
-              <span data-ex-content=".all"></span>
+              <span data-ex-content=".display_content"></span>
             </div>
 
             <div data-ex-role="exhibit-viewPanel">
@@ -82,20 +77,25 @@
      objects.each do |object|
         exhibit_item = {}
         exhibit_item['item_id'] = object.id
-        facet_config[object_type].keys.each do |facet|
-          represented_field = facet_config[object_type][facet]['value']
-          related_object = object.send(facet)
-          if related_object.blank?
-            exhibit_item[facet] = nil
-          elsif related_object.kind_of?(Array)
-            exhibit_item[facet] = related_object.collect(&:"#{represented_field}")
-          else
-            exhibit_item[facet] = related_object.send(represented_field)
-          end
-        end
-        exhibit_item['assay_type'] = object.assay_type_label
-        exhibit_item['all'] = ''
+        #This display_content will be later on replaced by resource_list_item, by using ajax, otherwise it causes speed problem
+        exhibit_item['display_content'] = ''
         exhibit_item['type'] = object_type
+
+        facet_config[object_type].keys.each do |facet|
+          value = object
+          value_from = facet_config[object_type][facet]['value_from']
+          value_from.split(':').each do |field|
+            if value.blank?
+              next
+            elsif value.kind_of?(Array)
+              value = value.collect(&:"#{field}")
+            else
+              value = value.send(field)
+            end
+          end
+          exhibit_item[facet] = value
+        end
+
         exhibit_items << exhibit_item
      end
 

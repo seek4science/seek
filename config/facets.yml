@@ -1,15 +1,19 @@
 Assay:
-  organisms:
-    label: Organism
-    value: title
-  projects:
+  organism:
+      label: Organism
+      value_from: organisms:title
+  project:
       label: Project
-      value: title
+      value_from: projects:title
   created_at:
       label: Created At
-      value: year
+      value_from: created_at:year
       facet_class: NumericRange
       interval: 1
+  assay_type:
+      label: Assay Type
+      value_from: assay_type_label
+      facet_class: Exhibit.HierarchicalFacet
 
 
 Model:
