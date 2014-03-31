@@ -24,6 +24,7 @@ function updateFirstPage(){
                 collection_view_body.html(resource_list_items.join(' '));
             }
 
+            Exhibit.jQuery('div.exhibit-viewPanel').removeClass('exhibit-ui-protection');
             Exhibit.jQuery('.exhibit-viewPanel-viewContainer').show();
 
     });
