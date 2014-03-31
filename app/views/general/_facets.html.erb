@@ -21,10 +21,18 @@
           <hr/>
           <% facet_config[object_type].keys.each do |facet| %>
               <% label = facet_config[object_type][facet]['label'] %>
+              <% facet_class = facet_config[object_type][facet]['facet_class'] %>
               <div data-ex-role="facet"
                    data-ex-expression=".<%= facet %>"
                    data-ex-facet-label="<%= label %>"
-                   data-ex-height="13em">
+                   data-ex-facet-class="<%= facet_class %>"
+                   data-ex-height="13em"
+
+                   <% if facet_class == "NumericRange" %>
+                    <% interval = facet_config[object_type][facet]['interval']%>
+                    data-ex-interval='1'
+                   <% end %>
+              >
               </div>
               <br/>
           <% end %>
@@ -38,12 +46,6 @@
           </div>
           <br/>
           <br/>
-          <div data-ex-role="facet"
-               data-ex-facet-class="NumericRange"
-               data-ex-expression=".created_at"
-               data-ex-facet-label="Created at"
-               data-ex-interval="1">
-          </div
         </td>
 
         <td style="width: 85%;">
@@ -92,7 +94,6 @@
           end
         end
         exhibit_item['assay_type'] = object.assay_type_label
-        exhibit_item['created_at'] = object.created_at.year
         exhibit_item['all'] = ''
         exhibit_item['type'] = object_type
         exhibit_items << exhibit_item

@@ -5,6 +5,11 @@ Assay:
   projects:
       label: Project
       value: title
+  created_at:
+      label: Created At
+      value: year
+      facet_class: NumericRange
+      interval: 1
 
 
 Model:
