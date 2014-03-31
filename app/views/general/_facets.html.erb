@@ -67,13 +67,20 @@
 <div id="data" style="display:none">
   <%
      exhibit_items = []
-     experimental_types = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy
-     exhibit_items.push({'type' => 'AssayType', 'label' => experimental_types.label})
-     exhibit_items |= generate_tree(experimental_types)
-     modelling_types = Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy
-     exhibit_items.push({'type' => 'AssayType', 'label' => modelling_types.label})
-     exhibit_items |= generate_tree(modelling_types)
+     exhibit_properties = {}
+     facet_config[object_type].keys.each do |facet|
+       facet_class = facet_config[object_type][facet]['facet_class']
+       if facet_class == 'NumericRange'
+         exhibit_properties[facet] = {"valueType" => "number"}
+       elsif facet_class == 'Exhibit.HierarchicalFacet'
+         tree_from = facet_config[object_type][facet]['tree_from']
+         tree_from.split(',').each do |tree_class|
+            exhibit_items |= exhibit_tree(tree_class, facet)
+         end
+       end
+     end
 
+     #items
      objects.each do |object|
         exhibit_item = {}
         exhibit_item['item_id'] = object.id
@@ -97,14 +104,6 @@
         end
 
         exhibit_items << exhibit_item
-     end
-
-     exhibit_properties = {}
-     facet_config[object_type].keys.each do |facet|
-       facet_class = facet_config[object_type][facet]['facet_class']
-       if facet_class == 'NumericRange'
-         exhibit_properties[facet] = {"valueType" => "number"}
-       end
      end
   %>
 
