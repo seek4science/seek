@@ -99,12 +99,13 @@
         exhibit_items << exhibit_item
      end
 
-     exhibit_properties = {
-             "created_at" => {
-                "valueType" => "number"
-             }
-     }
-
+     exhibit_properties = {}
+     facet_config[object_type].keys.each do |facet|
+       facet_class = facet_config[object_type][facet]['facet_class']
+       if facet_class == 'NumericRange'
+         exhibit_properties[facet] = {"valueType" => "number"}
+       end
+     end
   %>
 
 {
