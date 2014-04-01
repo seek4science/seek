@@ -4,11 +4,10 @@ class HomesController < ApplicationController
   before_filter :redirect_to_sign_up_when_no_user
   before_filter :login_required, :only=>[:feedback,:send_feedback]
 
+  respond_to :html,:only=>[:index]
 
   def index
-    respond_to do |format|
-      format.html # index.html.erb      
-    end
+    respond_with
   end
 
   def faq

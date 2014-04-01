@@ -40,6 +40,8 @@ require 'background_reindexing'
 require 'subscribable'
 require 'seek/permissions/publishing_permissions'
 
+require 'seek/seek_render_override'
+
 require 'seek/scalable'
 
 require 'taverna_player_callbacks'
