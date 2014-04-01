@@ -599,7 +599,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, :id => data_files(:picture)
     assert_response :success
     assert_select "h1",:text=>/Editing #{I18n.t('data_file')}/
-    assert_select "label",:text=>/Keep this #{I18n.t('data_file')} private/
+    assert_select "label",:text=>/Keep this #{I18n.t('data_file').downcase} private/
   end
 
   
