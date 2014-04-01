@@ -320,7 +320,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_select "h1", :text=>/Editing #{I18n.t('sop')}/
 
     #this is to check the SOP is all upper case in the sharing form
-    assert_select "label",:text=>/Keep this #{I18n.t('sop')} private/
+    assert_select "label",:text=>/Keep this #{I18n.t('sop')} private/i
   end
 
   test "publications excluded in form for sops" do
