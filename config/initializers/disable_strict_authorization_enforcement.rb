@@ -1,1 +1,1 @@
-$authorization_checks_disabled = true
+$authorization_checks_disabled = true if Seek::Config.is_biovel?
