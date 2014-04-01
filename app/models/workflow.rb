@@ -196,7 +196,7 @@ class Workflow < ActiveRecord::Base
   end
 
   def default_policy
-    if self.contributor.guest_project_member?
+    if self.contributor.try(:guest_project_member?)
       Policy.private_policy
     else
       Policy.sysmo_and_projects_policy

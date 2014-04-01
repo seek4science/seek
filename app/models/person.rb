@@ -80,6 +80,11 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def guest_project_member?
+    project = Project.find_by_name('BioVeL Portal Guests')
+    !project.nil? && self.projects.include?(project)
+  end
+
   #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
   def self.active
     Person.unscoped.order("avatar_id is null, updated_at DESC")
