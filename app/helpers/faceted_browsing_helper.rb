@@ -1,4 +1,4 @@
-module FacetsHelper
+module FacetedBrowsingHelper
   def exhibit_tree tree_class, facet
     tree = []
     class_hierarchy = tree_class.constantize.instance.class_hierarchy
