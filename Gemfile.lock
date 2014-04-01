@@ -288,7 +288,7 @@ GEM
     modporter-plugin (0.1.0)
     multi_json (1.9.2)
     multi_xml (0.5.5)
-    mysql2 (0.3.11)
+    mysql2 (0.3.15)
     net-http-persistent (2.9.4)
     nokogiri (1.5.9)
     nori (1.1.5)
