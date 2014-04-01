@@ -15,6 +15,11 @@ Assay:
       value_from: assay_type_label
       facet_class: Exhibit.HierarchicalFacet
       tree_from: Seek::Ontologies::AssayTypeReader,Seek::Ontologies::ModellingAnalysisTypeReader
+  technology_type:
+      label: Technology Type
+      value_from: technology_type_label
+      facet_class: Exhibit.HierarchicalFacet
+      tree_from: Seek::Ontologies::TechnologyTypeReader
 
 
 Model:
