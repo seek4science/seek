@@ -10,7 +10,7 @@ class MoveTechTypesOverToAssay < ActiveRecord::Migration
         assay_sql = "select title,term_uri from technology_types where id=#{technology_type_id};"
         tech_type = ActiveRecord::Base.connection.select(assay_sql).first
         if tech_type.nil?
-          puts "Unable to find assay_type with id, #{id}"
+          puts "Unable to find assay_type with id, #{technology_type_id}"
         else
           label = tech_type["title"]
           uri = tech_type["term_uri"]
