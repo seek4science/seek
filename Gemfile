@@ -5,7 +5,6 @@ gem "rdoc"
 
 gem 'google-analytics-rails'
 gem "feedzirra"
-gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'
