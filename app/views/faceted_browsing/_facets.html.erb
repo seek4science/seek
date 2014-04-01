@@ -29,13 +29,13 @@
                    data-ex-height="13em"
 
                    <% if facet_class == "NumericRange" %>
-                        <% interval = facet_config[object_type][facet]['interval']%>
+                        <% interval = facet_config[object_type][facet]['interval'] %>
                         data-ex-interval='1'
                    <% end %>
 
                    <% if facet_class == "Exhibit.HierarchicalFacet" %>
                         data-ex-uniform-grouping=".subclassOf"
-                        data-ex-scroll="false">
+                        data-ex-scroll="false"
                    <% end %>
               >
               </div>
