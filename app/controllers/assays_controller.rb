@@ -29,7 +29,7 @@ class AssaysController < ApplicationController
      resource_list_items = resources.collect{|resource| render_to_string :partial => "assets/resource_list_item", :object => resource}
 
     respond_to do |format|
-      format.json {render :json => {:resource_list_items => resource_list_items}}
+      format.json {render :json => {:resource_list_items => resource_list_items.join(' ')}}
     end
   end
 
