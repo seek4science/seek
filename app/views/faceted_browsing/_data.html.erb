@@ -37,6 +37,13 @@
              value = value.send(field)
            end
          end
+         #escape value
+         if value.blank?
+         elsif value.kind_of?(Array)
+           value = value.collect{|v| h(v)}
+         else
+           value = h(value)
+         end
          exhibit_item[facet] = value
        end
 
