@@ -23,15 +23,15 @@ Assay:
 
 
 Model:
-  projects:
-    label: Project
-    value: title
+  project:
+      label: Project
+      value_from: projects:title
   model_type:
-    label: Model Type
-    value: title
+      label: Model Type
+      value_from: model_type:title
   model_format:
       label: Model Format
-      value: title
+      value_from: model_format:title
   recommended_environment:
       label: Execution or Visualization Environment
-      value: title
+      value_from: recommended_environment:title
