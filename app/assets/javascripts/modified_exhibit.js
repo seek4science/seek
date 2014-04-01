@@ -1,13 +1,11 @@
 function updateFirstPage(){
     var items = Exhibit.jQuery('div[itemid]');
-    var item_ids = items.map(function(){
-        var exhibit_item_id = Exhibit.jQuery(this).attr("itemid");
-        return database.getObject(exhibit_item_id, 'item_id');
-    }).get();
+    var item_type = getItemType(items);
+    var item_ids = getItemIds(items);
 
     Exhibit.jQuery.ajax({
-        url: "http://localhost:3001/assays/filtered_items",
-        data: {item_ids: item_ids, item_type: 'Assay'}
+        url: faceted_items_url,
+        data: {item_ids: item_ids, item_type: item_type}
     })
     .done(function( data ) {
             updateContent(data.resource_list_items);
@@ -19,6 +17,19 @@ function updateFirstPage(){
             Exhibit.jQuery('.exhibit-viewPanel-viewContainer').show();
 
     });
+}
+
+function getItemIds(items){
+    var item_ids = items.map(function(){
+        var exhibit_item_id = Exhibit.jQuery(this).attr("itemid");
+        return database.getObject(exhibit_item_id, 'item_id');
+    }).get();
+
+    return item_ids;
+}
+
+function getItemType(items){
+    return database.getObject(items.attr("itemid"), 'type');
 }
 
 function updateContent(resource_list_items){
