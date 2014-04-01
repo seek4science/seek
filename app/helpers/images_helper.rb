@@ -25,9 +25,9 @@ module ImagesHelper
 
     image_options = alt ? { :alt => alt } : { :alt => key.humanize }
     image_options[:size] = "#{size}x#{size}" unless size.blank?
-    img_tag = image_tag(filename, image_options)
+    img_tag = image_tag(filename, image_options).html_safe
 
-    inner = img_tag;
+    inner = img_tag.html_safe;
     inner = "#{img_tag} #{label}".html_safe unless label.blank?
     
     if (url)
@@ -40,7 +40,7 @@ module ImagesHelper
       end
     end
     
-    tag = '<span class="icon">' + inner + '</span>'
+    tag = '<span class="icon">'.html_safe + inner.html_safe + '</span>'.html_safe
     tag.html_safe
   end
 
@@ -118,7 +118,7 @@ module ImagesHelper
       when "avatars"
       "famfamfam_silk/photos.png"
       when "save"
-      "famfamfam_silk/save.png"
+      "famfamfam_silk/disk.png"
       when "message"
       "famfamfam_silk/email.png"
       when "message_read"
@@ -331,6 +331,20 @@ module ImagesHelper
         "famfamfam_silk/house.png"
       when "waiting"
         "misc_icons/waiting.png"
+      when "run_workflow"
+        "famfamfam_silk/cog_go.png"
+      when "workflow_avatar"
+        "logos/taverna_logo.png"
+      when "sweep"
+        "famfamfam_silk/chart_organisation.png"
+      when "share"
+        "famfamfam_silk/link.png"
+      when "sweep_run"
+        "famfamfam_silk/table_multiple.png"
+      when "simple_run"
+        "famfamfam_silk/table.png"
+      when "myexperiment"
+        "myexp_icon.png"
     else
       return nil
     end

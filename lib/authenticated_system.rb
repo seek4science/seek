@@ -3,21 +3,21 @@ module AuthenticatedSystem
   # Returns true or false if the user is logged in.
   # Preloads @current_user with the user model if they're logged in.
   def logged_in?
-    !!current_user      
+    current_user && !current_user.guest?
   end
-  
-  # Accesses the current user from the session. 
+
+  # Accesses the current user from the session.
   # Future calls avoid the database because nil is not equal to false.
   def current_user
-    @current_user ||= (login_from_session || login_from_basic_auth || login_from_cookie) unless @current_user == false
+    @current_user ||= (login_from_session || login_from_basic_auth || login_from_cookie || User.guest) unless @current_user == false
   end
-  
+
   # Store the given user id in the session.
   def current_user=(new_user)
     session[:user_id] = new_user ? new_user.id : nil
     @current_user = new_user || false
   end
-  
+
   # Check if the user is authorized
   #
   # Override this method in your controllers if you want to restrict access
@@ -31,9 +31,9 @@ module AuthenticatedSystem
   #    current_user.login != "bob"
   #  end
   def authorized?
-    logged_in?      
+    logged_in?
   end
-  
+
   # Filter method to enforce a login requirement.
   #
   # To require logins for all actions, use this in your controllers:
@@ -48,10 +48,10 @@ module AuthenticatedSystem
   #
   #   skip_before_filter :login_required
   #
-  def login_required      
-    authorized? || access_denied      
+  def login_required
+    authorized? || access_denied
   end
-  
+
   # Redirect as appropriate when an access request fails.
   #
   # The default action is to redirect to the login screen.
@@ -62,25 +62,25 @@ module AuthenticatedSystem
   # simply close itself.
   def access_denied
     request.format = :html if request.env['HTTP_USER_AGENT'] =~ /msie/i
-    
+
     respond_to do |format|
       format.html do
         store_location
-        redirect_to root_path
+        redirect_to main_app.root_path
       end
       format.any do
         request_http_basic_authentication 'Web Password'
       end
     end
   end
-  
+
   # Store the URI of the current request in the session.
   #
   # We can return to this location by calling #redirect_back_or_default.
   def store_location
     session[:return_to] = request.fullpath
   end
-  
+
   # Redirect to the URI stored by the most recent store_location call or
   # to the passed default.
   def redirect_back_or_default(default)
@@ -92,30 +92,30 @@ module AuthenticatedSystem
     if request.env['HTTP_REFERER']
       redirect_to(:back)
     else
-      redirect_to :root
+      redirect_to main_app.root_path
     end
-    
+
     session[:return_to] = nil
   end
-  
+
   # Inclusion hook to make #current_user and #logged_in?
   # available as ActionView helper methods.
   def self.included(base)
     base.send :helper_method, :current_user, :logged_in?
   end
-  
+
   # Called from #current_user.  First attempt to login by the user id stored in the session.
   def login_from_session
     self.current_user = User.find_by_id(session[:user_id]) if session[:user_id]
   end
-  
+
   # Called from #current_user.  Now, attempt to login by basic authentication information.
   def login_from_basic_auth
     authenticate_with_http_basic do |username, password|
       self.current_user = User.authenticate(username, password)
     end
   end
-  
+
   # Called from #current_user.  Finaly, attempt to login by an expiring token in the cookie.
   def login_from_cookie
     user = cookies[:auth_token] && User.find_by_remember_token(cookies[:auth_token])
@@ -124,19 +124,19 @@ module AuthenticatedSystem
       self.current_user = user
     end
   end
-  
+
   def login_from_open_id_cookie
     if cookies[:open_id]
       if User.find_by_openid(cookies[:open_id])
         respond_to do |format|
           format.html do
-            redirect_to auto_openid_session_path(:openid_identifier=>cookies[:open_id])
+            redirect_to main_app.auto_openid_session_path(:openid_identifier=>cookies[:open_id])
             return true
-          end          
-        end        
+          end
+        end
       end
     end
     return false
   end
-  
+
 end

@@ -136,6 +136,13 @@ module ResourceListItemHelper
     html.html_safe
   end
 
+  def small_list_item_description text, auto_link=true, length=150
+    html = "<div class='list_item_desc curved'>"
+    html << text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
+    html << "</div>"
+    html.html_safe
+  end
+
   def list_item_contributor resource
     return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{jerm_harvester_name}</p>".html_safe if resource.contributor.nil?
     list_item_authorized_attribute 'Uploader', resource.contributor.person
@@ -185,7 +192,7 @@ module ResourceListItemHelper
           title = "Visible to all #{Seek::Config.project_name} #{t('project').pluralize}"
           html << image('open', :title=>title, :class => css_class)
         else
-          title = "Visible to the #{t('project').pluralize} associated with this item"
+          title = "Visible to the #{t('project').pluralize.downcase} associated with this item"
           html << image('open', :title=>title, :class => css_class)
         end
       when Policy::EVERYONE

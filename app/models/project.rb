@@ -28,6 +28,8 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :publications
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
+  has_and_belongs_to_many :taverna_player_runs, :class_name => 'TavernaPlayer::Run',
+                          :join_table => "projects_taverna_player_runs", :association_foreign_key => "run_id"
   has_and_belongs_to_many :specimens
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :strains

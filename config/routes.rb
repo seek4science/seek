@@ -1,5 +1,7 @@
 SEEK::Application.routes.draw do
 
+  mount TavernaPlayer::Engine, :at => "/"
+
   resources :scales do
     collection do
       post :search
@@ -48,6 +50,7 @@ SEEK::Application.routes.draw do
 
   match 'index.html' => 'homes#index', :as => :match
   match 'index' => 'homes#index', :as => :match
+  match 'my_biovel' => 'homes#my_biovel', :as => :my_biovel
 
   resource :favourites do
     collection do
@@ -448,11 +451,47 @@ SEEK::Application.routes.draw do
 
   end
 
+  resources :workflows do
+    collection do
+      post :test_asset_url
+#      get :preview
+    end
+
+    member do
+#      get :check_related_items
+      get :download
+      get :describe_ports
+      post :temp_link
+      post :new_version
+      post :update_annotations_ajax
+      post :check_related_items
+      post :publish
+      get :published
+#      get :view_items_in_tab
+      post :favourite
+      delete :favourite_delete
+    end
+
+    resources :runs, :controller => 'TavernaPlayer::Runs'
+  end
+
+  resources :runs, :controller => 'TavernaPlayer::Runs', :only => ['edit', 'update']
+
+  resources :group_memberships
+
+  resources :sweeps do
+    member do
+      put :cancel
+      get :runs
+      post :download_results
+      get :view_result
+    end
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
   get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
-
 
   ### MISC MATCHES ###
 
@@ -490,13 +529,15 @@ SEEK::Application.routes.draw do
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
 
+  match '/contact' => 'contact#index', :as => :contact, :via => :get
+
   #error rendering
   match "/404" => "errors#error_404"
   match "/422" => "errors#error_422"
   match "/500" => "errors#error_500"
-  #get "errors/error_422"
-  #get "errors/error_404"
-  #get "errors/error_500"
+
+  # Terrible hack to get around lack of asset pipeline
+  match "assets/taverna_player/application.js", :to => redirect('/javascripts/taverna_player/application.js')
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.

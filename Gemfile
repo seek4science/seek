@@ -3,15 +3,16 @@ source 'https://rubygems.org'
 gem "rails", "3.2.17"
 gem "rdoc"
 
+gem 'google-analytics-rails'
 gem "feedzirra"
 gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'
-gem 'libxml-ruby',">=2.7.0",:require=>"libxml"
+gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
 gem 'uuidtools',"2.1.1"
 gem "RedCloth","4.2.9"
-gem 'simple-spreadsheet-extractor',"~>0.13.2"
+gem 'simple-spreadsheet-extractor',"~>0.13.3"
 gem "rmagick","2.12.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
@@ -84,19 +85,23 @@ group :assets do
   gem 'turbo-sprockets-rails3'
 end
 
+gem 'taverna-t2flow'
+gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
+gem 'jquery-rails', '~> 3.0.4'
+gem "jbuilder", "~> 1.5"
+
 group :development do
   gem "pry"
   gem "pry-doc"
   gem "pry-remote"
   gem "request-log-analyzer"
-  gem 'rails-dev-boost', :git => 'git://github.com/thedarkone/rails-dev-boost.git'
 end
 
 group :test do
   gem "sqlite3","1.3.7"
   gem "ruby-prof"
   gem "webmock"
-  gem 'minitest-reporters','>= 0.4.1'
+  gem 'minitest-reporters','~> 0.14'
 end
 
 group :assets do

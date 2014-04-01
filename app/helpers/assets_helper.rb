@@ -150,10 +150,10 @@ module AssetsHelper
     authorize_related_items(related)
 
     order_related_items(related)
-    
+
     #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
-      if limit && related[key][:items].size > limit && ["Project", "Investigation", "Study", "Assay", "Person", "Specimen", "Sample"].include?(resource.class.name)
+      if limit && related[key][:items].size > limit && ["Project", "Investigation", "Study", "Assay", "Person", "Specimen", "Sample", "Run", "Workflow", "Sweep"].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]
       end
@@ -195,7 +195,9 @@ module AssetsHelper
 
   def collect_related_items(resource)
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-               "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {}, "Strain" => {}}
+               "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {},
+               "Workflow" => {}, "TavernaPlayer::Run" => {}, "Sweep" => {}, "Strain" => {}
+    }
 
     related.each_key do |key|
       related[key][:items] = []
@@ -207,8 +209,14 @@ module AssetsHelper
     # polymorphic 'related_resource' with ResourceClass#related_resource_type(s),e.g. Person#related_presentations
     related_types = related.keys - [resource.class.name]
     related_types.each do |type|
-      method_name = type.underscore.pluralize
+      if type == "TavernaPlayer::Run"
+        method_name = 'runs'
+      else
+        method_name = type.underscore.pluralize
+      end
+
       #FIXME: need to fix that Publications treat #related_data_files as those directly linked, and #all_related_data_files include those that come through assays
+
       if resource.respond_to? "all_related_#{method_name}"
         related[type][:items] = resource.send "all_related_#{method_name}"
       elsif resource.respond_to? "related_#{method_name}"

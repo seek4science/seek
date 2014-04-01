@@ -33,7 +33,10 @@ class ApplicationController < ActionController::Base
 
   before_filter :project_membership_required,:only=>[:create,:new]
 
+  before_filter :restrict_guest_user, :only => [:new, :edit, :batch_publishing_preview]
   helper :all
+
+  layout 'biovel'
 
   def strip_root_for_xml_requests
     #intended to use as a before filter on requests that lack a single root model.
@@ -120,6 +123,17 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def restrict_guest_user
+    if current_user && current_user.guest?
+      flash[:error] = "You cannot perform this action as a Guest User. Please sign in or register for an account first."
+      if !request.env["HTTP_REFERER"].nil?
+        redirect_to :back
+      else
+        redirect_to main_app.root_path
+      end
+    end
+  end
+
   def project_membership_required
     unless User.logged_in_and_member? || User.admin_logged_in?
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
@@ -182,7 +196,7 @@ class ApplicationController < ActionController::Base
     if User.current_user
       if User.current_user.person.nil?
         flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
-        redirect_to select_people_path
+        redirect_to main_app.select_people_path
       end
     end
   end
@@ -191,29 +205,30 @@ class ApplicationController < ActionController::Base
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
           'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview','new_object_based_on_existing_one'
+          'tag', 'items', 'statistics', 'tag_suggestions', 'preview','runs','new_object_based_on_existing_one'
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,
-          'export_as_xgmml','compare_versions'
+          'export_as_xgmml', 'download_log', 'download_results', 'input', 'output', 'download_output', 'download_input',
+          'view_result','compare_versions'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
           'destroy_version', 'edit_version', 'update_version', 'new_item',
-          'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link'
+          'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link', 'describe_ports'
         'edit'
 
-      when 'destroy', 'destroy_item'
+      when 'destroy', 'destroy_item', 'cancel'
         'delete'
 
-      when 'manage'
+      when 'manage', 'notification', 'read_interaction', 'write_interaction'
           'manage'
       else
         nil
     end
   end
 
-  #hanles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
+  #handles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
   def find_requested_item
     name = self.controller_name.singularize
     object = name.camelize.constantize.find_by_id(params[:id])
@@ -271,7 +286,7 @@ class ApplicationController < ActionController::Base
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
         if eval("@#{name}").nil?
-          flash[:error] = "The #{name.humanize} does not exist!"
+          flash[:error] = "The #{name.humanize.downcase} does not exist!"
         else
           flash[:error] = "You are not authorized to view #{name.humanize}"
         end
@@ -473,8 +488,6 @@ class ApplicationController < ActionController::Base
           :current_logged_in_user=>current_user
       }
   end
-
-
 
 end
 

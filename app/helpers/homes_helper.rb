@@ -198,6 +198,10 @@ module HomesHelper
       html.html_safe
   end
 
+  def guest_login_link(text)
+    link_to(text, session_path(:login => 'guest', :password => 'guest'), :method => :post)
+  end
+
 end
 
 

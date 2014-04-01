@@ -1,0 +1,15 @@
+<% authorization_for_showing_already_done ||= false -%>
+
+<% if collection.empty? -%>
+  <span style="font-size: 22px">No workflows found.</span>
+<% else %>
+    <div id="workflow_list">
+    <% collection.each do |workflow| %>
+        <% if authorization_for_showing_already_done || workflow.can_view? -%>
+              <div class="workflow">
+                <%= render :partial => "workflow_list_item", :locals => {:workflow => workflow, :show_category => show_category} -%>
+              </div>
+        <% end %>
+    <% end %>
+    </div>
+<% end %>

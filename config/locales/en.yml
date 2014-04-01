@@ -19,7 +19,6 @@ en:
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
 
-
   #DataFile
   data_file: "Data file"
 
@@ -38,6 +37,9 @@ en:
   #Project
   project: "Project"
 
+  #Workflow
+  workflow: "Workflow"
+
   scale: "Scale"
 
   menu:
@@ -53,3 +55,7 @@ en:
     jerm_templates: "JERM templates"
     feedback: "Provide feedback"
     isa_best_practice: "ISA best practice"
+
+  taverna_player/run: "workflow run"
+
+  favourite_group: "collaboration"

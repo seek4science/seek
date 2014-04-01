@@ -1,0 +1,24 @@
+<%= javascript_include_tag "resource.js" %>
+<%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
+<%= stylesheet_link_tag 'calendar_date_select/default' %>
+<%= javascript_include_tag "sharing.js", "associate_events.js", "assays.js", "attribution.js", "resource.js" %>
+
+
+<div class="redbox_contents" id="temp_link" style="width:600px;">
+  <div class="head">
+    <span style="float:center;">Share your workflow</span>
+  </div>
+
+  <div class="body">
+    <div align="center" style="margin-top: 1em">
+      <%= form_for(workflow, :html => { :multipart => true } ) do |f| -%>
+          <% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
+              <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} %>
+          <% end %>
+          <%= submit_tag "Save Changes", :id => "redbox_workflow_submit_btn", :onclick => "javascript: createOrUpdateResourceInRedBox(false,'workflow'); return(false)", :hidden => true -%>
+          <%= submit_tag "Cancel", :onclick => "javascript: RedBox.close(); return(false);"-%>
+
+      <% end %>
+    </div>
+  </div>
+</div>

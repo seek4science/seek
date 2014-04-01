@@ -9,7 +9,7 @@ SEEK::Application.configure do
   Seek::Config.default :jerm_enabled,false
   Seek::Config.default :email_enabled,false
   Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
-  Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
+  Seek::Config.default :noreply_sender, 'no-reply@portal.biovel.eu'
   Seek::Config.default :solr_enabled,false
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"https://jws.sysmo-db.org/"
@@ -63,17 +63,19 @@ SEEK::Application.configure do
   Seek::Config.default :home_feeds_cache_timeout,2
 
 # Branding
-  Seek::Config.default :project_name,'SysMO'
-  Seek::Config.default :project_type,'Consortium'
-  Seek::Config.default :project_link,'http://www.sysmo.net'
+  Seek::Config.default :project_name,'BioVeL'
+  Seek::Config.default :project_type,'Project'
+  Seek::Config.default :project_title,'The BioVeL Project'
+  Seek::Config.default :project_link,'http://www.biovel.eu'
 
-  Seek::Config.default :application_name,"SEEK"
-  Seek::Config.default :dm_project_name,"SysMO-DB"
-  Seek::Config.default :dm_project_link,"http://www.sysmo-db.org"
-  Seek::Config.default :header_image_enabled,true
-  Seek::Config.default :header_image_title, "SysMO-DB"
-  Seek::Config.default :header_image_link,"http://www.sysmo-db.org"
-  Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
+  Seek::Config.default :application_name,"BioVeL Portal"
+  Seek::Config.default :application_title,"BioVeL Portal"
+  Seek::Config.default :dm_project_name,"BioVeL"
+  Seek::Config.default :dm_project_link,"http://www.biovel.eu"
+  Seek::Config.default :header_image_enabled,false
+  Seek::Config.default :header_image_title, "BioVeL"
+  Seek::Config.default :header_image_link,"http://www.biovel.eu"
+  Seek::Config.default :header_image,'biovel-logo-official.png'
   Seek::Config.default :header_home_logo_image,'seek-logo-smaller.png'
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
@@ -99,5 +101,8 @@ SEEK::Application.configure do
   Seek::Config.default :max_attachments_num,100
 
   Seek::Config.default :datacite_url,"https://mds.datacite.org/"
+
+  # Admin setting to allow user impersonation
+  Seek::Config.default :admin_impersonation_enabled, true
 end
 

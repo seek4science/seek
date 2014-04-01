@@ -3,7 +3,7 @@
 <%= render :partial => "general/item_title", :locals=>{:item=>@person} %>
 
 <ul class="sectionIcons">
-  <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
+  <% if (mine?(@person) || @person.can_be_edited_by?(current_user)) && !current_user.guest? -%>
       <li>
         <%= image_tag_for_key('edit', edit_person_path(@person), "Edit Person Profile", nil, 'Edit Profile') -%>
       </li>
@@ -25,7 +25,7 @@
       </li>
   <% end -%>
 
-  <% if mine?(@person) -%>
+  <% if mine?(@person) && !current_user.guest? -%>
       <li>
         <% tooltip_text = "Publish your owned assets in one click. A preview will be given before publishing" %>
         <%= image_tag_for_key "publish", batch_publishing_preview_person_path(@person), "Publish your assets", {:title => tooltip_title_attrib(tooltip_text)}, "Publish your assets" -%>
@@ -66,7 +66,8 @@
     <%= render :partial=>"people/project_roles", :locals=>{:editable=>false} %>
     <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <%= render :partial=>"general/items_related_to", :object => @person %>
+    <%# disabled for now because it doesn't cope with TavernaPlayer::Run assets %>
+    <%# = render :partial=>"general/items_related_to", :object => @person %>
     <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
     <%# this is because it's not needed then: admins can see everything anyway -%>
     <% if admin_logged_in? -%>

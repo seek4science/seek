@@ -147,6 +147,7 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
+
     redirect_action="new"
 
     set_tools_and_expertise(@person, params)
@@ -382,14 +383,14 @@ class PeopleController < ApplicationController
   def project_or_institution_details projects_or_institutions
     details = ''
     unless params[projects_or_institutions].blank?
-        params[projects_or_institutions].each do |project_or_institution|
-          project_or_institution_details= project_or_institution.split(',')
-          if project_or_institution_details[0] == 'Others'
-             details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
-          else
-             details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
-          end
+      params[projects_or_institutions].each do |project_or_institution|
+        project_or_institution_details= project_or_institution.split(',')
+        if project_or_institution_details[0] == 'Others'
+          details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
+        else
+          details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
         end
+      end
     end
     details
   end
@@ -398,8 +399,7 @@ class PeopleController < ApplicationController
     project_manager_list = []
     unless projects_param.blank?
       projects_param.each do |project_param|
-        project_detail = project_param.split(',')
-        project = Project.find_by_id(project_detail[1])
+        project = Project.find_by_id(project_param)
         project_managers = project.try(:project_managers)
         project_manager_list |= project_managers unless project_managers.nil?
       end
