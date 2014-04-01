@@ -13,6 +13,7 @@
   <%= csrf_meta_tag %>
 
   <%= stylesheet_link_tag 'application' %>
+  <%= stylesheet_link_tag 'biovel_application' if Seek::Config.is_biovel? %>
   <%= javascript_include_tag 'application' %>
 
   <script type="text/javascript">

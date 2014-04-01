@@ -291,6 +291,11 @@ module Seek
     extend Propagators
     extend CustomAccessors
 
+    #FIXME: temporary hack. Ideally I'd like to avoid a config like, like we have for VL
+    def self.is_biovel?
+      false
+    end
+
     #Basic settings
     settings = [:home_description, :home_feeds_cache_timeout, :public_seek_enabled, :bioportal_api_key, :no_reply,
       :jws_online_root, :hide_details_enabled, :activation_required_enabled, :project_name, :smtp, :default_pages, :project_type, :project_link, :header_image,
