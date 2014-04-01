@@ -26,6 +26,11 @@ function updateFirstPage(){
 
             Exhibit.jQuery('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
             Exhibit.jQuery('.exhibit-collectionView-header-groupControl').hide();
+
+            Exhibit.jQuery('.exhibit-facet-value').map(function(){
+                var title = Exhibit.jQuery(this).attr("title");
+                Exhibit.jQuery(this).attr("title", decodeHTML(title));
+            })
             Exhibit.jQuery('.exhibit-viewPanel-viewContainer').show();
 
     });
