@@ -51,6 +51,7 @@ public/stylesheets/*_cached.css
 public/system/
 
 public/assets/
+public/assets_dev/
 
 .bundle/config
 
