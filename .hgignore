@@ -47,6 +47,7 @@ public/javascripts/*_cached.js
 public/stylesheets/*_cached.css
 
 public/assets/
+public/assets_dev/
 
 .bundle/config
 
