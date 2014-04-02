@@ -12,6 +12,8 @@ class Sweep < ActiveRecord::Base
 
   before_destroy :cancel
 
+  alias_attribute :title, :name
+
   def cancel
     runs.each do |run|
       run.cancel unless run.finished?
@@ -48,10 +50,6 @@ class Sweep < ActiveRecord::Base
 
   def self.by_owner(uid)
     where(:contributor_id => uid)
-  end
-
-  def title
-    name
   end
 
   def build_zip(output_list)
