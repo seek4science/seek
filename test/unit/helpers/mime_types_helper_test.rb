@@ -21,6 +21,7 @@ class MimeTypesHelperTest < ActionView::TestCase
   FODT=%w{application/vnd.oasis.opendocument.text-flat-xml}
   RTF=%w{application/rtf}
   HTML=%w{text/html}
+  SBML=%w{application/sbml+xml}
 
   
   def test_recognised
@@ -44,6 +45,12 @@ class MimeTypesHelperTest < ActionView::TestCase
   end
 
   def test_common_types
+    SBML.each do |type|
+      assert mime_extensions(type).include?("xml")
+      assert_equal "SBML and XML document",mime_nice_name(type)
+      assert_equal icon_filename_for_key("xml_file"),mime_icon_url(type)
+    end
+
     EXCEL.each do |type|
       assert mime_extensions(type).include?("xls")
       assert_equal "Spreadsheet",mime_nice_name(type)
@@ -88,7 +95,7 @@ class MimeTypesHelperTest < ActionView::TestCase
     
     CSV.each do |type|
       assert mime_extensions(type).include?('csv')
-      assert_equal "Comma-seperated-values file",mime_nice_name(type)
+      assert_equal "Comma-separated values document",mime_nice_name(type)
       assert_equal icon_filename_for_key("misc_file"),mime_icon_url(type)
     end
 
@@ -124,7 +131,7 @@ class MimeTypesHelperTest < ActionView::TestCase
 
     RTF.each do |type|
       assert mime_extensions(type).include?("rtf")
-      assert_equal "Document file", mime_nice_name(type)
+      assert_equal "RTF document", mime_nice_name(type)
       assert_equal icon_filename_for_key("rtf_file"), mime_icon_url(type)
     end
 
