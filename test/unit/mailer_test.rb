@@ -218,7 +218,7 @@ class MailerTest < ActionMailer::TestCase
 
   test "contact_project_manager_new_user_no_profile" do
     project_manager = Factory(:project_manager)
-    @expected.subject = 'SEEK member signed up, please assign this person to the projects which you are project manager'
+    @expected.subject = 'SEEK member signed up, please assign this person to the projects of which you are project manager'
     @expected.to = project_manager.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
