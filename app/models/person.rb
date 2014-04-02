@@ -70,9 +70,10 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions,:dependent => :destroy
+
   # This line was causing 2 project subscriptions to be created when a user registered,
   # as one is also created when a work group is added
-  #before_create :set_default_subscriptions
+  before_create :set_default_subscriptions unless Seek::Config.is_biovel?
 
   def queue_update_auth_table
     if changes.include?("roles_mask")
