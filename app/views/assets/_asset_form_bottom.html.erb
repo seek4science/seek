@@ -14,7 +14,7 @@
    related_publications||=[]
    other_creators||=nil
    show_publications=true if show_publications.nil?
-   taggable = resource_type.constantize.respond_to?("is_taggable?") && resource_type.constantize.is_taggable?
+   taggable = !Seek::Config.is_biovel? && (resource_type.constantize.respond_to?("is_taggable?") && resource_type.constantize.is_taggable?)
    sharing_enable=true if sharing_enable.nil?
    attribution_enable=true if attribution_enable.nil?
    creators_enable=true if creators_enable.nil?
@@ -26,7 +26,7 @@
     </p>
 <% end -%>
 
-<% if false #taggable -%>
+<% if taggable -%>
     <p>
       <%= render :partial=>"assets/select_tags" -%>
     </p>
