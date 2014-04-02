@@ -7,7 +7,9 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test "authorized types" do
-    assert_equal [Assay,DataFile,Event,Investigation,Model,Presentation,Publication,Sample,Sop,Specimen,Strain,Study,TavernaPlayer::Run,Workflow],Seek::Util.authorized_types
+    expected =  [Assay,DataFile,Event,Investigation,Model,Presentation,Publication,Sample,Sop,Specimen,Strain,Study,Sweep,TavernaPlayer::Run,Workflow].collect(&:name)
+    actual = Seek::Util.authorized_types.collect(&:name)
+    assert_equal expected,actual
   end
 
   test "rdf capable types" do
