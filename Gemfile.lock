@@ -252,7 +252,7 @@ GEM
     json (1.8.1)
     json-ld (1.1.1)
       rdf (>= 1.0.8)
-    kgio (2.8.0)
+    kgio (2.9.2)
     libxml-ruby (2.6.0)
     linkeddata (1.1.0)
       json-ld (>= 1.1.0)
