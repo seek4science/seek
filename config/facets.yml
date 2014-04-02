@@ -93,12 +93,12 @@ Sop:
       value_from: creators:name
 
 Publication:
-  author:
-      label: Author
-      value_from: publication_author_names
   project:
       label: Project
       value_from: projects:title
+  author:
+      label: Author
+      value_from: publication_author_names
   published_year:
       label: Published Year
       value_from: published_date:year
