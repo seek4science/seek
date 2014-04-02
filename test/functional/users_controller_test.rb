@@ -76,11 +76,13 @@ class UsersControllerTest < ActionController::TestCase
   end  
   
   def test_should_activate_user
-    assert !users(:aaron).active?
-    get :activate, :activation_code => users(:aaron).activation_code
+    user = users(:aaron)
+    assert !user.guest?, "user mustn't be a guest for activation"
+    assert !user.active?
+    get :activate, :activation_code => user.activation_code
     assert_redirected_to person_path(people(:aaron_person))
     assert_not_nil flash[:notice]
-    assert User.find(users(:aaron).id).active?    
+    assert User.find(user.id).active?
   end
   
   def test_should_not_activate_user_without_key
