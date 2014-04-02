@@ -127,6 +127,7 @@ SEEK::Application.routes.draw do
       get :select
       get :get_work_group
       post :userless_project_selected_ajax
+      get :faceted_items
     end
     member do
       post :check_related_items
@@ -142,7 +143,6 @@ SEEK::Application.routes.draw do
       get :gatekeeper_decision_result
       get :waiting_approval_assets
       get :select
-      get :faceted_items
     end
     resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:only=>[:index]
     resources :avatars do
