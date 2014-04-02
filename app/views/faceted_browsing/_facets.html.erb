@@ -36,6 +36,7 @@
           <b>Search</b>
           <div data-ex-role="facet" data-ex-facet-class="TextSearch"></div>
           <hr/>
+          <% count = 0 %>
           <% facet_config[object_type].keys.each do |facet| %>
               <% label = facet_config[object_type][facet]['label'] %>
               <% facet_class = facet_config[object_type][facet]['facet_class'] %>
@@ -53,6 +54,10 @@
                    <% if facet_class == "Exhibit.HierarchicalFacet" %>
                         data-ex-uniform-grouping=".subclassOf"
                         data-ex-scroll="false"
+                   <% end %>
+                   <% count += 1%>
+                   <% if count > 3 %>
+                        data-ex-collapsed="true"
                    <% end %>
               >
               </div>
