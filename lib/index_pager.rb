@@ -15,7 +15,6 @@ module IndexPager
     eval("@"+controller+"= objects")
 
     respond_to do |format|
-      @no_sidebar=true
       format.html
       format.xml
     end

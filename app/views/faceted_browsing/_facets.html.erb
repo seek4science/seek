@@ -15,7 +15,24 @@
     <div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_type%>"></div>
     <table cellpadding="0" cellspacing="10" border="0" id="exhibit" width="100%">
       <tr>
-        <td style="float:left;">
+        <td style="width: 85%;">
+          <div id="content-area">
+            <div data-ex-role="exhibit-lens" style="display: none">
+              <span data-ex-content=".display_content"></span>
+            </div>
+
+            <div data-ex-role="exhibit-viewPanel">
+              <div data-ex-role="exhibit-view"
+                   data-ex-label="Tiles"
+                   data-ex-possible-orders=".<%= facet_config[object_type].keys.join(',.') %>"
+                   data-ex-paginate="true"
+                   data-ex-page-size="10"
+                   data-ex-show-all="true"
+              ></div>
+            </div>
+          </div>
+        </td>
+        <td style="float:right;">
           <b>Search</b>
           <div data-ex-role="facet" data-ex-facet-class="TextSearch"></div>
           <hr/>
@@ -41,24 +58,6 @@
               </div>
               <br/>
           <% end %>
-        </td>
-
-        <td style="width: 85%;">
-          <div id="content-area">
-            <div data-ex-role="exhibit-lens" style="display: none">
-              <span data-ex-content=".display_content"></span>
-            </div>
-
-            <div data-ex-role="exhibit-viewPanel">
-              <div data-ex-role="exhibit-view"
-                   data-ex-label="Tiles"
-                   data-ex-possible-orders=".<%= facet_config[object_type].keys.join(',.') %>"
-                   data-ex-paginate="true"
-                   data-ex-page-size="10"
-                   data-ex-show-all="true"
-              ></div>
-            </div>
-          </div>
         </td>
       </tr>
     </table>
