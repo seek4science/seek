@@ -82,6 +82,9 @@ SEEK::Application.configure do
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
+  #FIXME: maybe these developer type settings are beter in a separate file and out of the database, so they can be changed between runs
+  Seek::Config.default :css_appended,'biovel_application'
+  Seek::Config.default :main_layout,'biovel'
   Seek::Config.default :is_virtualliver, false
 
 # Pagination

@@ -36,7 +36,7 @@ class ApplicationController < ActionController::Base
   before_filter :restrict_guest_user, :only => [:new, :edit, :batch_publishing_preview]
   helper :all
 
-  layout 'biovel' if Seek::Config.is_biovel?
+  layout Seek::Config.main_layout
 
   def strip_root_for_xml_requests
     #intended to use as a before filter on requests that lack a single root model.

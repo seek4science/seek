@@ -12,10 +12,10 @@
   <%= csrf_meta_tag %>
 
   <% if is_front_page? %>
-      <%= stylesheet_link_tag 'front_page' %>
+      <%= seek_stylesheet_tags 'front_page' %>
       <%= javascript_include_tag 'front_page' %>
   <% else %>
-      <%= stylesheet_link_tag 'application' %>
+      <%= seek_stylesheet_tags %>
       <%= javascript_include_tag 'application' %>
   <% end %>
 
