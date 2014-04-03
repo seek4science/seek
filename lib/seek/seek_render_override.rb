@@ -1,5 +1,13 @@
+
 module ActionView
   class Renderer
+
+    @@map = {}
+
+    def self.define_alternative key,value
+      @@map[key]=value
+    end
+
     def render(context, options)
       options = check_for_override(context,options)
       if options.key?(:partial)
@@ -9,15 +17,11 @@ module ActionView
       end
     end
 
-    def check_for_override context,options
-      #FIXME: hardcoded hack - this will be moved to a configuration if decided to be the approach to take
-      if Seek::Config.is_biovel?
-        unless options[:seek_template].nil?
-          if context.controller_name=="homes"
-            if options[:seek_template].to_s=="index"
-              options[:template]="index_biovel"
-            end
-          end
+    def check_for_override context, options
+      unless options[:seek_template].nil?
+        key = {:controller => context.controller_name.to_sym, :seek_template => options[:seek_template].to_sym}
+        unless @@map[key].nil?
+          options[:template]=@@map[key].to_s
         end
       end
       options
