@@ -12,9 +12,11 @@ module ActionView
     def check_for_override context,options
       #FIXME: hardcoded hack - this will be moved to a configuration if decided to be the approach to take
       if Seek::Config.is_biovel?
-        if context.controller_name=="homes"
-          if options[:template]=="index"
-            options[:template]="index_biovel"
+        unless options[:seek_template].nil?
+          if context.controller_name=="homes"
+            if options[:seek_template].to_s=="index"
+              options[:template]="index_biovel"
+            end
           end
         end
       end

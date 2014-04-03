@@ -7,7 +7,9 @@ class HomesController < ApplicationController
   respond_to :html,:only=>[:index]
 
   def index
-    respond_with
+    respond_with do |format|
+      format.html { render :seek_template=>:index }
+    end
   end
 
   def faq
