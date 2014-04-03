@@ -3,7 +3,6 @@ require 'simple-spreadsheet-extractor'
 
 class DataFilesController < ApplicationController
 
-  include IndexPager
   include SysMODB::SpreadsheetExtractor
   include MimeTypesHelper
   include DotGenerator

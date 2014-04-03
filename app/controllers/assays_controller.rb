@@ -1,7 +1,6 @@
 class AssaysController < ApplicationController
 
   include DotGenerator
-  include IndexPager
   include Seek::AnnotationCommon
 
   before_filter :find_assets, :only=>[:index]

@@ -6,7 +6,6 @@
 class ModelsController < ApplicationController
 
   include WhiteListHelper
-  include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
   include AssetsCommonExtension
