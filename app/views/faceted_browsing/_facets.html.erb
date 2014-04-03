@@ -33,8 +33,9 @@
           </div>
         </td>
         <td style="float:right;">
-          <b>Search</b>
-          <div data-ex-role="facet" data-ex-facet-class="TextSearch"></div>
+          <div data-ex-role="facet" data-ex-facet-class="TextSearch" title='Search filters here'></div>
+          <br/>
+          <b>Filter <%= object_type%> by:</b>
           <hr/>
           <% count = 0 %>
           <% facet_config[object_type].keys.each do |facet| %>
