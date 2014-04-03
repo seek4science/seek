@@ -24,6 +24,27 @@ module ActionView
           options[:template]=@@map[key].to_s
         end
       end
+
+      if options[:partial]=="people/resource_list_item"
+        pp "-----------------------------"
+        pp options
+        pp "xx"
+        pp context
+        pp "------------------------------"
+
+      end
+
+      #pp context
+
+      unless options[:seek_partial].nil?
+        key = {:controller => context.controller_name.to_sym, :seek_partial => options[:seek_partial].to_sym}
+        key = {:seek_partial => options[:seek_partial].to_s} if @@map[key].nil?
+        if @@map[key].nil?
+          options[:partial]= options[:seek_partial]
+        else
+          options[:partial]=@@map[key].to_s
+        end
+      end
       options
     end
   end
