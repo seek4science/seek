@@ -14,6 +14,7 @@ function updateFirstPage(){
 
             Exhibit.jQuery('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
             Exhibit.jQuery('.exhibit-collectionView-header-groupControl').hide();
+            Exhibit.jQuery('.exhibit-toolboxWidget-button').hide();
             decodeValueTooltip();
 
             Exhibit.jQuery('.exhibit-viewPanel-viewContainer').show();
