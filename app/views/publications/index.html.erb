@@ -4,15 +4,4 @@
       <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
     </ul>
 <% end %>
-<% if @publications.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @publications.pages, :page_totals=>@publications.page_totals,:current_page=>@publications.page } -%>
-<% end %>
-
-<div class="list_items_container">
-  <%= render :partial=>"assets/resource_list_item", :collection=>@publications %>
-</div>
-
-<% if @publications.page == "latest" && (n=Publication.count) > Seek::Config.limit_latest%>
-   <%= render :partial => "general/paginate_see_all", :locals=>{:total=>n} %>
-<% end %>
+<%= render :partial => "faceted_browsing/facets", :object => @publications %>

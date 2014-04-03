@@ -4,14 +4,4 @@
         <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
     </ul>
 <% end %>
-
-<% if @sops.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @sops.pages, :page_totals=>@sops.page_totals,:current_page=>@sops.page } -%>
-<% end %>
-
-<%= render :partial => "assets/resource_list", :locals => { :collection => @sops, :authorization_for_showing_already_done=>true } %>
-
-<% if @sops.page == "latest" && (n=Sop.all_authorized_for("view").count) > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all", :locals=>{:total=>n} %>
-<% end %>
+<%= render :partial => "faceted_browsing/facets", :object => @sops %>
