@@ -53,3 +53,7 @@ img.exhibit-facet-header-expand {
     float: right;
     padding-left: 3px;
 }
+
+div.exhibit-viewPanel {
+    margin-top : -2em;
+}
