@@ -59,3 +59,12 @@ en:
   taverna_player/run: "workflow run"
 
   favourite_group: "collaboration"
+
+  access:
+    determined_by_group: "Individual access rights for each member"
+    no_access: "No access"
+    visible: "View summary"
+    visible_only: "View summary only"
+    accessible: "View and download"
+    editing: "View, download and edit"
+    managing: "Manage"

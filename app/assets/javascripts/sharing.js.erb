@@ -131,22 +131,22 @@ function accessTypeTranslation(access_type) {
   
     switch(access_type) {
         case DETERMINED_BY_GROUP:
-            txt = 'individual access rights for each member';
+            txt = "<%= Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP) %>";
             break;
         case NO_ACCESS:
-            txt = 'No access';
+            txt = "<%= Policy.get_access_type_wording(Policy::NO_ACCESS) %>";
             break;
         case VIEWING:
-            txt = 'View summary only';
+            txt = "<%= Policy.get_access_type_wording(Policy::VISIBLE) %>";
             break;
         case DOWNLOADING:
-            txt = 'View summary and get contents';
+            txt = "<%= Policy.get_access_type_wording(Policy::ACCESSIBLE) %>";
             break;
         case EDITING:
-            txt = 'View and edit summary and contents';
+            txt = "<%= Policy.get_access_type_wording(Policy::EDITING) %>";
             break;
         case MANAGING:
-            txt = "Manage"
+            txt = "<%= Policy.get_access_type_wording(Policy::MANAGING) %>";
             break;
     }
   

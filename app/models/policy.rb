@@ -206,17 +206,17 @@ class Policy < ActiveRecord::Base
   def self.get_access_type_wording(access_type, resource=nil)
     case access_type
       when Policy::DETERMINED_BY_GROUP
-        return "Individual access rights for each member"
+        return I18n.t('access.determined_by_group')
       when Policy::NO_ACCESS
-        return "No access"
-      when Policy::VISIBLE # Not used
-        return resource.try(:is_downloadable?) ? "View summary only" : "View summary"
+        return I18n.t("access.no_access")
+      when Policy::VISIBLE
+        return resource.try(:is_downloadable?) ? I18n.t('access.visible_only') : I18n.t('access.visible')
       when Policy::ACCESSIBLE
-        return "View and download"
+        return I18n.t('access.accessible')
       when Policy::EDITING
-        return "View, download and edit"
+        return I18n.t('access.editing')
       when Policy::MANAGING
-        return "Manage"
+        return I18n.t('access.managing')
       else
         return "Invalid access type"
     end
