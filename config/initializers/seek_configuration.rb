@@ -82,11 +82,6 @@ SEEK::Application.configure do
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
-  #FIXME: maybe these developer type settings are beter in a separate file and out of the database, so they can be changed between runs
-  Seek::Config.default :css_appended,'biovel_application'
-  Seek::Config.default :main_layout,'biovel'
-  Seek::Config.default :is_virtualliver, false
-
 # Pagination
   Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
   Seek::Config.default :limit_latest,7
@@ -110,6 +105,10 @@ SEEK::Application.configure do
   # Admin setting to allow user impersonation
   Seek::Config.default :admin_impersonation_enabled, true
 
+
+  Seek::Config.fixed :css_appended,'biovel_application'
+  Seek::Config.fixed :main_layout,'application'
+  Seek::Config.fixed :is_virtualliver, false
 
   #alternative views and partials
   ActionView::Renderer.define_alternative({:controller=>:homes,:seek_template=>:index},:index_biovel)

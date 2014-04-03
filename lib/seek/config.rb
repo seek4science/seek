@@ -229,6 +229,12 @@ module Seek
       Settings.defaults[setting]=value
     end
 
+    #unlike default, always sets the value
+    def fixed setting,value
+      setter="#{setting.to_s}="
+      set_value setter,value
+    end
+
     def define_class_method method ,*args, &block
       singleton_class.instance_eval { define_method method.to_sym, *args, &block }
     end
