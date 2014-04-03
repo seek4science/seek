@@ -80,7 +80,6 @@ gem 'unicorn-rails'
 gem 'taverna-t2flow'
 gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
 gem 'jquery-rails', '~> 3.0.4'
-gem "jbuilder", "~> 1.5"
 
 group :development do
   gem "pry"

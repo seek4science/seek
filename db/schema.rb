@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140131155853) do
+ActiveRecord::Schema.define(:version => 20140403092453) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1553,21 +1553,21 @@ ActiveRecord::Schema.define(:version => 20140131155853) do
 
   create_table "taverna_player_runs", :force => true do |t|
     t.string   "run_id"
-    t.string   "saved_state",                    :default => "pending", :null => false
+    t.string   "saved_state",                     :default => "pending", :null => false
     t.datetime "create_time"
     t.datetime "start_time"
     t.datetime "finish_time"
-    t.integer  "workflow_id",                                           :null => false
-    t.datetime "created_at",                                            :null => false
-    t.datetime "updated_at",                                            :null => false
-    t.string   "status_message"
+    t.integer  "workflow_id",                                            :null => false
+    t.datetime "created_at",                                             :null => false
+    t.datetime "updated_at",                                             :null => false
+    t.string   "status_message_key"
     t.string   "results_file_name"
     t.integer  "results_file_size"
-    t.boolean  "embedded",                       :default => false
-    t.boolean  "stop",                           :default => false
+    t.boolean  "embedded",                        :default => false
+    t.boolean  "stop",                            :default => false
     t.string   "log_file_name"
     t.integer  "log_file_size"
-    t.string   "name",                           :default => "None"
+    t.string   "name",                            :default => "None"
     t.integer  "delayed_job_id"
     t.integer  "sweep_id"
     t.integer  "contributor_id"
@@ -1576,10 +1576,10 @@ ActiveRecord::Schema.define(:version => 20140131155853) do
     t.text     "failure_message"
     t.integer  "parent_id"
     t.string   "uuid"
-    t.string   "first_letter",      :limit => 1
+    t.string   "first_letter",       :limit => 1
     t.text     "description"
     t.integer  "user_id"
-    t.integer  "workflow_version",               :default => 1
+    t.integer  "workflow_version",                :default => 1
   end
 
   add_index "taverna_player_runs", ["parent_id"], :name => "index_taverna_player_runs_on_parent_id"

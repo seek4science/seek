@@ -98,7 +98,7 @@ module TavernaPlayer
         opts[:run_at] = last_job.run_at + 10.seconds if last_job
       end
       job = Delayed::Job.enqueue worker, opts
-      update_attributes(:delayed_job => job, :status_message => "Queued")
+      update_attributes(:delayed_job => job, :status_message_key => "pending")
     end
 
     alias_method :old_default_contributor, :default_contributor
