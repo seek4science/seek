@@ -119,6 +119,9 @@ Person:
   tool:
       label: Tool
       value_from: tools:text
+  role:
+      label: Role
+      value_from: project_roles:title
   institution:
       label: Institution
       value_from: institutions:title
