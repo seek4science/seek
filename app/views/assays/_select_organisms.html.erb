@@ -25,13 +25,13 @@
         <%= select_tag :possible_organisms,
         options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
          {:style=>"width:90%",
-          :onchange=>remote_function(
+          :onchange=>"if (this.value!='0'){"+remote_function(
                   :url=>{:action=>"existing_strains_for_assay_organism", :controller=>"strains"},
                   :with=>"'organism_id='+this.value",
                   :before=>"show_ajax_loader('existing_strains_for_assay_organism')",
                   :method=>:get
                   )+
-          ";check_show_add_organism();$('strain').clear();return(false);",
+          "};check_show_add_organism();return(false);",
          } -%>
         <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
@@ -44,7 +44,6 @@
         <div class="association_step">
           <b>Step 3</b> - <span class="assay_strain_info">  Specify a strain (optional)</span><br/>
           <div id="existing_strains_for_assay_organism"></div>
-          <%= text_field_tag :strain, nil, :disabled => true %>
           <%= link_to_function image("destroy", :alt => "Remove", :title => "Remove this strain", :id => 'destroy_image', :style => 'display:none;'), "removeStrain()" %>
           <br/>
             </div>
@@ -68,25 +67,22 @@
 </div>
 
 <script type="text/javascript">
-    function setStrainTextField(strain){
-      $('strain').value = strain;
-      new Effect.Highlight('strain');
+    function setSelectedStrain(id,strain_info){
+      $('strain_id').value = id;
+      $('strain_info').value = strain_info;
+      new Effect.Highlight('strain_info');
       $('destroy_image').style['display']='block';
-  }
-
-  function removeStrain(){
-      $('strain').value = '';
-      $('destroy_image').style['display']='none';
   }
 
   <% @assay.assay_organisms.each do |o| -%>
       organism_id = '<%= o.organism.id -%>';
       organism_title = '<%= escape_javascript(o.organism.title) -%>';
-      strain = '<%= o.strain.nil? ? "" : o.strain.title -%>';
+      strain_info = '<%= o.strain.nil? ? "" : o.strain.info -%>';
+      strain_id = '<%= o.strain.nil? ? "" : o.strain.id -%>';
       culture_growth = '<%= o.culture_growth_type.nil? ? "" : o.culture_growth_type.title -%>';
       tissue_and_cell_type_id ='<%= o.tissue_and_cell_type.nil?? 0 : o.tissue_and_cell_type.id%>';
       tissue_and_cell_type_title ='<%= o.tissue_and_cell_type.nil?? "": escape_javascript(o.tissue_and_cell_type.title) %>';
-      addOrganism(organism_title, organism_id, strain, culture_growth,tissue_and_cell_type_id,tissue_and_cell_type_title);
+      addOrganism(organism_title, organism_id, strain_info,strain_id, culture_growth,tissue_and_cell_type_id,tissue_and_cell_type_title);
   <% end -%>
 
 

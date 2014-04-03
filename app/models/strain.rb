@@ -78,7 +78,7 @@ class Strain < ActiveRecord::Base
 
   #gives the long title that includes genotype and phenotype details
   def info
-    title + " (" + genotype_info + '/' + phenotype_info + ')'
+    title + " (" + genotype_info + ' / ' + phenotype_info + ')'
   end
 
   def genotype_info
@@ -86,7 +86,7 @@ class Strain < ActiveRecord::Base
     genotypes.each do |genotype|
       genotype_detail << genotype.modification.try(:title).to_s + ' ' + genotype.gene.try(:title).to_s if genotype.gene
     end
-    genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail.join('; ')
+    genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail.join(';')
     genotype_detail
   end
 

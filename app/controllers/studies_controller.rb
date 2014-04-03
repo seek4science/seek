@@ -4,7 +4,11 @@ class StudiesController < ApplicationController
   include IndexPager
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show]
+  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
+
+  #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
+  #defined in the application controller
+  before_filter :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
 

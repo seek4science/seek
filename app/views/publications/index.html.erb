@@ -1,5 +1,5 @@
 <h1> <font color="#456AAA"> <%= 'Publications' %> </font> </h1> <br>
-<% if logged_in? and current_user.person.member?%>
+<% if logged_in_and_member? %>
     <ul class="sectionIcons">
       <li><%= image_tag_for_key "new", new_publication_path, "Register a publication", nil, "Register a publication" %></li>
       <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->

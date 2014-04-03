@@ -30,7 +30,7 @@ class EventsController < ApplicationController
     @event = Event.new
     @new = true
     respond_to do |format|
-      if current_user.person.member?
+      if User.logged_in_and_member?
         format.html {render "events/form"}
       else
         flash[:error] = "You are not authorized to create new Events. Only members of known projects, institutions or work groups are allowed to create new content."

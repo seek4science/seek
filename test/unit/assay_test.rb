@@ -289,29 +289,46 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "associate organism with strain" do
-    assay=assays(:metabolomics_assay2)
-    organism=organisms(:Streptomyces_coelicolor)
-    strain=strains(:strain_for_streptomyces_coelicolor)
+    assay=Factory(:assay)
+    organism=Factory(:organism)
+    strain=Factory(:strain, :organism=>organism)
+
+    assert_equal organism,strain.organism
+    assert_equal strain,organism.strains.find(strain.id)
+
     assert_equal 0,assay.assay_organisms.count,"This test relies on this assay having no organisms"
 
     assert_difference("AssayOrganism.count") do
       assert_no_difference("Strain.count") do
-        disable_authorization_checks{assay.associate_organism(organism,strain.title)}
+        disable_authorization_checks{assay.associate_organism(organism,strain.id)}
       end
     end
+
+    assay.reload
+    assert_include assay.strains,strain
+    assert_include assay.organisms,organism
 
     assert_no_difference("AssayOrganism.count") do
       assert_no_difference("Strain.count") do
-        disable_authorization_checks{assay.associate_organism(organism,strain.title)}
+        disable_authorization_checks{assay.associate_organism(organism,strain.id)}
       end
     end
 
-    organism=organisms(:yeast)
+    organism = Factory(:organism)
+    strain = Factory(:strain, :organism=>organism)
+    culture_growth = Factory(:culture_growth_type)
+
     assert_difference("AssayOrganism.count") do
       assert_no_difference("Strain.count") do
-        disable_authorization_checks{assay.associate_organism(organism,strain.title)}
+        disable_authorization_checks{assay.associate_organism(organism,strain.id,culture_growth)}
       end
     end
+
+    assay.reload
+    assert_include assay.strains,strain
+    assert_include assay.organisms,organism
+    ao = assay.assay_organisms.find{|ao| ao.strain==strain}
+    assert_equal culture_growth,ao.culture_growth_type
 
   end
 

@@ -47,7 +47,7 @@ class PresentationsController < ApplicationController
     @presentation=Presentation.new
     @presentation.parent_name = params[:parent_name]
     respond_to do |format|
-      if current_user.person.member?
+      if User.logged_in_and_member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new Presentations. Only members of known projects, institutions or work groups are allowed to create new content."

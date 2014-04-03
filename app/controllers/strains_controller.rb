@@ -63,6 +63,11 @@ class StrainsController < ApplicationController
   end
 
   def existing_strains_for_assay_organism
+    if User.current_user && !Seek::Config.is_virtualliver
+      #restrict strains to those of that persons project
+      projects = User.current_user.person.projects
+      @strains = @strains.select{|s| !(s.projects & projects).empty?}
+    end
     render :update do |page|
       if @strains && @organism
         page.replace_html 'existing_strains_for_assay_organism', :partial=>"strains/existing_strains_for_assay_organism",:object=>@strains,:locals=>{:organism=>@organism}

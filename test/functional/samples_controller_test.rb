@@ -47,6 +47,12 @@ class SamplesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:samples)
   end
 
+  test "logged out user can't see new" do
+    logout
+    get :new
+    assert_redirected_to samples_path
+  end
+
   test "related specimen tab title" do
     s = Factory :sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy))
     assert !s.specimen.nil?

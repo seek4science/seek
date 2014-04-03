@@ -31,7 +31,7 @@
       <%= text_area_tag :annotation_content,nil,:class=>"annotation_content_class" %>
       <%= hidden_field_tag :annotation_attribute_name, "plot_data" %>
     </div>
-    <%= submit_tag 'Store as annotation',:id=>"store_plot_button" %>
+    <%= submit_tag('Store as annotation',:id=>"store_plot_button") if logged_in? %>
   <% end %>
   <%= image_tag "ajax-loader.gif", :id => 'spinner_plot', :style => 'display:none;' -%>
 

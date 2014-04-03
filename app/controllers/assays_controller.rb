@@ -6,7 +6,11 @@ class AssaysController < ApplicationController
 
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show]
+  before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
+
+  #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
+  #defined in the application controller
+  before_filter :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
   include Seek::Publishing::PublishingCommon
 
@@ -100,9 +104,9 @@ class AssaysController < ApplicationController
     model_ids     = params[:model_ids] || []
 
      Array(organisms).each do |text|
-      o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
+      o_id, strain_title, strain_id, culture_growth_type_text,t_id,t_title=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-      @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
+      @assay.associate_organism(o_id, strain_id, culture_growth,t_id,t_title)
     end
 
     @assay.owner=current_user.person
@@ -164,9 +168,9 @@ class AssaysController < ApplicationController
 
     @assay.assay_organisms = []
     Array(organisms).each do |text|
-          o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
+          o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-          @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
+          @assay.associate_organism(o_id, strain_id, culture_growth,t_id,t_title)
     end
 
     update_annotations @assay

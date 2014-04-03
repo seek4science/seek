@@ -27,7 +27,6 @@ class AssaysControllerTest < ActionController::TestCase
       a.reload
     end
 
-
     User.with_current_user(a.study.investigation.contributor) { a.study.investigation.projects << Factory(:project) }
     assert_difference('ActivityLog.count') do
       get :show, :id=>a, :format=>"xml"
@@ -267,11 +266,11 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
 
-test "should create experimental assay with or without sample" do
+  test "should create experimental assay with or without sample" do
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
-        post :create, :assay=>{:title=>"test",
-                               :study_id=>studies(:metabolomics_study).id,
+        post :create, :assay => {:title => "test",
+                                 :study_id => studies(:metabolomics_study).id,
                                :assay_class_id=>assay_classes(:experimental_assay_class).id}, :sharing => valid_sharing
       end
     end
@@ -282,25 +281,48 @@ test "should create experimental assay with or without sample" do
     sample = Factory(:sample)
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
-        post :create, :assay=>{:title=>"test",
-                               :study_id=>studies(:metabolomics_study).id,
-                               :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                               :sample_ids=>[sample.id]
+        post :create, :assay => {:title => "test",
+                                 :study_id => studies(:metabolomics_study).id,
+                                 :assay_class_id => assay_classes(:experimental_assay_class).id,
+                                 :sample_ids => [sample.id]
         }, :sharing => valid_sharing
 
       end
     end
     a=assigns(:assay)
-    assert_equal User.current_user.person,a.owner
+    assert_equal User.current_user.person, a.owner
     assert_redirected_to assay_path(a)
-    assert_equal [sample],a.samples
-    #assert_equal organisms(:yeast),a.organism
-end
+    assert_equal [sample], a.samples
+  end
+
+  test "should update assay with strains and organisms and sample" do
+    assay = Factory(:assay,:contributor=>User.current_user.person)
+    assert_empty assay.organisms
+    assert_empty assay.strains
+    assert_empty assay.samples
+
+    organism = Factory(:organism,:title=>"Frog")
+    strain = Factory(:strain, :title=>"UUU", :organism=>organism)
+    sample = Factory(:sample)
+
+    assert_difference("AssayOrganism.count") do
+      put :update, :id=>assay.id,:assay => {:title => "test",
+                                            :sample_ids => [sample.id]},
+                        :assay_organism_ids => [organism.id,strain.title, strain.id, ""].join(",")
+
+    end
+    assert_response :success
+    assay = assigns(:assay)
+    assert_include assay.organisms,organism
+    assert_include assay.strains,strain
+    assert_include assay.samples,sample
+  end
 
 
   test "should create experimental assay with/without organisms" do
 
     tissue_and_cell_type = Factory(:tissue_and_cell_type)
+    sample = Factory(:sample)
     #create assay only with organisms
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
@@ -308,11 +330,17 @@ end
                              :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :sample_ids => [Factory(:sample).id]}, :assay_organism_ids =>[Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,tissue_and_cell_type.id,tissue_and_cell_type.title].join(",") , :sharing => valid_sharing
+                             :sample_ids => [sample]}
     end
+    assay = assigns(:assay)
+    refute_nil assay
+    assert assay.organisms.empty?
+    assert assay.strains.empty?
+    assert_include assay.samples,sample
+
     organism = Factory(:organism,:title=>"Frog")
     strain = Factory(:strain, :title=>"UUU", :organism=>organism)
-    growth_type = Factory(:culture_growth_type, :title=>"batch")
+    growth_type = Factory(:culture_growth_type, :title=>"ssdfkhsdfkh")
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
@@ -320,13 +348,31 @@ end
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :sample_ids => [Factory(:sample)] },
-                             :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(","), :sharing => valid_sharing
+                             :assay_organism_ids => [organism.id, strain.title,strain.id, growth_type.title].join(","), :sharing => valid_sharing
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
-    assert a.organisms.include?(organism)
-    assert a.strains.include?(strain)
+    assert_include a.organisms, organism
+    assert_include a.strains,strain
     assert_equal 1,a.assay_organisms.count
+    assert_equal growth_type,a.assay_organisms.last.culture_growth_type
+
+    #create assay with samples and organisms, but not strain
+    sample = Factory(:sample)
+    assert_difference('ActivityLog.count') do
+      assert_difference("Assay.count") do
+        post :create,:assay=>{:title=>"test",
+                              :study_id=>studies(:metabolomics_study).id,
+                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
+                              :sample_ids=>[sample.id]
+        },:assay_organism_ids=>[organism.id.to_s,"","",""].join(",")
+      end
+    end
+    a=assigns(:assay)
+    assert_include a.organisms, organism
+    assert_include a.samples,sample
+    assert_empty a.strains
+    assert_redirected_to assay_path(a)
   end
 
   test "should create modelling assay with/without organisms" do
@@ -336,6 +382,12 @@ end
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id}, :sharing => valid_sharing
     end
+
+    assay = assigns(:assay)
+    refute_nil assay
+    assert assay.organisms.empty?
+    assert assay.strains.empty?
+
     organism = Factory(:organism,:title=>"Frog")
     strain = Factory(:strain, :title=>"UUU", :organism=>organism)
     growth_type = Factory(:culture_growth_type, :title=>"batch")
@@ -343,25 +395,15 @@ end
       post :create, :assay=>{:title=>"test",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id},
-           :assay_organism_ids => [organism.id, strain.title, growth_type.title].join(","), :sharing => valid_sharing
+           :assay_organism_ids => [organism.id, strain.title,strain.id, growth_type.title].join(","), :sharing => valid_sharing
     end
     a=assigns(:assay)
     assert_equal 1, a.assay_organisms.count
-    assert a.organisms.include?(organism)
-    assert a.strains.include?(strain)
+    assert_include a.organisms, organism
+    assert_include a.strains,strain
     assert_redirected_to assay_path(a)
-    #create assay with samples and organisms
-    assert_difference('ActivityLog.count') do
-    assert_difference("Assay.count") do
-      post :create,:assay=>{:title=>"test",
-        :study_id=>studies(:metabolomics_study).id,
-        :assay_class_id=>assay_classes(:experimental_assay_class).id,
-        :sample_ids=>[Factory(:sample).id]
-      },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(","), :sharing => valid_sharing
-    end
-    end
-    a=assigns(:assay)
-    assert_redirected_to assay_path(a)
+
+
   end
 
   test "should not create modelling assay with sample for SysMO, but for VL" do
@@ -1193,6 +1235,15 @@ end
     assay = Factory(:assay,:policy=>Factory(:private_policy),:title=>"the assay")
     refute assay.can_view?
     get :new_object_based_on_existing_one,:id=>assay.id
+    assert_redirected_to assays_path
+    refute_nil flash[:error]
+  end
+
+  test "new object based on existing one when can view but not logged in" do
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    logout
+    assert assay.can_view?
+    get :new_object_based_on_existing_one, :id=>assay.id
     assert_redirected_to assay
     refute_nil flash[:error]
 end
@@ -1267,6 +1318,12 @@ end
       assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
       assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
     end
+  end
+
+  test "logged out user can't see new" do
+    logout
+    get :new
+    assert_redirected_to assays_path
   end
 
   test "assays filtered by strain through nested route" do

@@ -5,6 +5,7 @@
 require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
+
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
 
@@ -167,31 +168,26 @@ class ApplicationController < ActionController::Base
   private
 
   def project_membership_required
-    unless current_user.try(:person).try(:member?) or User.admin_logged_in?
-      if current_user.try(:person)
-        flash[:error] = "Only members of known projects, institutions or work groups are allowed to access seek. Please contact a Project Manager or Admin."
-        respond_to do |format|
-          format.html {redirect_to logout_path}
-          format.json { render :json => {:status => 401, :error_message => flash[:error] } }
-        end
-      elsif ["new", "create"].include? params[:action]
-        flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
-        respond_to do |format|
-          format.html do
-            try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
-            format.json { render :json => {:status => 401, :error_message => flash[:error] } }
+    unless User.logged_in_and_member? || User.admin_logged_in?
+      flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
+      respond_to do |format|
+        format.html do
+          #FIXME: remove the try_block{}
+          object = eval("@"+controller_name.singularize)
+          if !object.nil? && object.try(:can_view?)
+            redirect_to object
+          else
+            try_block { redirect_to eval("#{controller_name}_path") } or redirect_to root_url
           end
+
         end
+        format.json { render :json => {:status => 401, :error_message => flash[:error]} }
       end
     end
   end
 
-  def pal_or_admin_required
-    unless User.admin_logged_in? || (User.pal_logged_in?)
-      error("Admin or PAL rights required", "is invalid (not admin)")
-      return false
-    end
-  end
+  alias_method :project_membership_required_appended, :project_membership_required
+
 
   #used to suppress elements that are for virtualliver only or are still currently being worked on
   def virtualliver_only
@@ -270,7 +266,8 @@ class ApplicationController < ActionController::Base
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
           'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview', 'send_image'
+          'tag', 'items', 'statistics', 'tag_suggestions', 'preview', 'new_object_based_on_existing_one'
+
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,

@@ -151,9 +151,9 @@ class Assay < ActiveRecord::Base
 
   #Associates and organism with the assay
   #organism may be either an ID or Organism instance
-  #strain_title should be the String for the strain
+  #strain_id should be the id of the strain
   #culture_growth should be the culture growth instance
-  def associate_organism(organism,strain_title=nil,culture_growth_type=nil,tissue_and_cell_type_id="0",tissue_and_cell_type_title=nil)
+  def associate_organism(organism,strain_id=nil,culture_growth_type=nil,tissue_and_cell_type_id="0",tissue_and_cell_type_title=nil)
 
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
     assay_organism=AssayOrganism.new
@@ -161,8 +161,8 @@ class Assay < ActiveRecord::Base
     assay_organism.organism = organism
     strain=nil
 
-    if (!strain_title.blank?)
-      strain=organism.strains.find_by_title(strain_title)
+    if (!strain_id.blank?)
+      strain=organism.strains.find(strain_id)
     end
     assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
     assay_organism.strain=strain

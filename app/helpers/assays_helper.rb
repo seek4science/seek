@@ -20,7 +20,7 @@ module AssaysHelper
     result = link_to assay_organism.organism.title, assay_organism.organism
     if assay_organism.strain
       result += " : "
-       result += link_to h(assay_organism.strain.title),assay_organism.organism,{:class => "assay_strain_info"}
+       result += link_to h(assay_organism.strain.info),assay_organism.strain,{:class => "assay_strain_info"}
     end
 
     if assay_organism.tissue_and_cell_type
@@ -108,7 +108,7 @@ module AssaysHelper
 
       if strain
         result += " : "
-        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+        result += link_to h(strain.info,strain,{:class => "assay_strain_info"})
       end
 
       if sample
