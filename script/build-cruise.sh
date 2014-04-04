@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/bin/bash
+
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 #delete tmp and filestore artifacts remaining from previous tests
 echo "Deleting old artifacts in tmp/ and filestore/"
