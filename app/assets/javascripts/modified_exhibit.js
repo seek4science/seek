@@ -18,7 +18,22 @@ function updateFirstPage(){
             decodeValueTooltip();
 
             Exhibit.jQuery('.exhibit-viewPanel-viewContainer').show();
+    });
+}
 
+window.onload = function(){
+    Exhibit.jQuery(document).on( "exhibitConfigured.exhibit", function() {
+        defaultSearchText();
+    });
+
+};
+
+function defaultSearchText(default_text){
+    Exhibit.jQuery.noConflict();
+    var $j = Exhibit.jQuery;
+    var default_text = 'Search filters below';
+    $j('div[id="facet_search_box"] input').each(function(){
+        $j(this).attr('placeholder',default_text);
     });
 }
 
