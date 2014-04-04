@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem "rails", "3.2.17"
 gem "rdoc"
 
-gem "feedzirra"
+gem "feedjira","~>1"
 gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
@@ -45,7 +45,7 @@ gem 'calendar_date_select', :git => 'git://github.com/paneq/calendar_date_select
 gem "yaml_db"
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri',"1.5.9"
+gem 'nokogiri'
 gem 'rdf-virtuoso', ">=0.1.6"
 gem 'cocaine'
 gem 'colorize'
