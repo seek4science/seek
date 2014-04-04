@@ -58,7 +58,7 @@
   </div>
   <div class="main_content_right_box">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => {:object => @person, :drag_id => drag_id} -%>
-    <%= render :partial=>"personal_tags", :locals=>{:person=>@person} %>
+    <%= render :partial=>"personal_tags", :locals=>{:person=>@person} if Seek::Config.tagging_enabled %>
   </div>
   <div style="clear:both;">
     <br/>

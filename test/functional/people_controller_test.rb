@@ -1284,4 +1284,16 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test "should show personal tags according to config" do
+    p = Factory(:person)
+    get :show,:id=>p.id
+    assert_response :success
+    assert_select "div#personal_tags",:count=>1
+    with_config_value :tagging_enabled,false do
+      get :show,:id=>p.id
+      assert_response :success
+      assert_select "div#personal_tags",:count=>0
+    end
+  end
+
 end

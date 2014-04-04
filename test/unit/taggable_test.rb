@@ -2,6 +2,16 @@ require 'test_helper'
 
 class TaggableTest < ActiveSupport::TestCase
 
+  test "tagging enabled" do
+    assert Person.is_taggable?
+    assert Model.is_taggable?
+
+    with_config_value :tagging_enabled,false do
+      refute Person.is_taggable?
+      refute Model.is_taggable?
+    end
+  end
+
   test "tag_with" do
      p=Factory :person
      User.current_user = p.user

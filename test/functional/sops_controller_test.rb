@@ -856,6 +856,18 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
+  test "should show tags box according to config" do
+    sop = Factory(:sop,:policy=>Factory(:public_policy))
+    get :show,:id=>sop.id
+    assert_response :success
+    assert_select "div#tags_box",:count=>1
+    with_config_value :tagging_enabled,false do
+      get :show,:id=>sop.id
+      assert_response :success
+      assert_select "div#tags_box",:count=>0
+    end
+  end
+
 
   private
 

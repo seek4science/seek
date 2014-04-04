@@ -1649,6 +1649,42 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "edit should include tags element" do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    get :edit, :id=>df.id
+    assert_response :success
+
+    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div#tag_ids",:count=>1
+  end
+
+  test "new should include tags element" do
+    get :new
+    assert_response :success
+    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div#tag_ids",:count=>1
+  end
+
+  test "edit should include not include tags element when tags disabled" do
+    with_config_value :tagging_enabled,false do
+      df = Factory(:data_file,:policy=>Factory(:public_policy))
+      get :edit, :id=>df.id
+      assert_response :success
+
+      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div#tag_ids",:count=>0
+    end
+  end
+
+  test "new should not include tags element when tags disabled" do
+    with_config_value :tagging_enabled,false do
+      get :new,:class=>:experimental
+      assert_response :success
+      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div#tag_ids",:count=>0
+    end
+  end
+
   private
 
   def mock_http

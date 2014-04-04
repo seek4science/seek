@@ -98,9 +98,11 @@
   <%= render :partial=>"assets/sharing_form" if @assay.can_manage? -%>
 </p>
 
-<p>
-  <%= render :partial=>"assets/select_tags" -%>
-</p>
+<% if @assay.is_taggable? %>
+    <p>
+      <%= render :partial=>"assets/select_tags" %>
+    </p>
+<% end %>
 
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
 

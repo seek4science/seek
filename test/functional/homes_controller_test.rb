@@ -295,6 +295,15 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+  test "should show tag cloud according to config" do
+    get :index
+    assert_select "div#sidebar_tag_cloud",:count=>1
+    with_config_value :tagging_enabled,false do
+      get :index
+      assert_select "div#sidebar_tag_cloud",:count=>0
+    end
+  end
+
   def uri_to_guardian_feed
     uri_to_feed "guardian_atom.xml"
   end

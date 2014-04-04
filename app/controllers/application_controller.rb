@@ -23,12 +23,6 @@ class ApplicationController < ActionController::Base
 
   rescue_from "ActionController::RoutingError", :with=>:render_routing_error
 
-  def with_current_user
-    User.with_current_user current_user do
-        yield
-    end
-  end
-
   before_filter :profile_for_login_required
 
   before_filter :project_membership_required,:only=>[:create,:new]
@@ -37,6 +31,12 @@ class ApplicationController < ActionController::Base
   helper :all
 
   layout Seek::Config.main_layout
+
+  def with_current_user
+    User.with_current_user current_user do
+      yield
+    end
+  end
 
   def strip_root_for_xml_requests
     #intended to use as a before filter on requests that lack a single root model.
