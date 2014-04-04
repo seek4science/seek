@@ -121,6 +121,7 @@ class ApplicationController < ActionController::Base
     item_type = params[:item_type]
     item_ids = (params[:item_ids] || []).collect(&:to_i)
 
+    resources = []
     if !item_type.blank?
       clazz = item_type.constantize
       resources = clazz.find_all_by_id(item_ids)
