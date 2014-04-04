@@ -18,7 +18,7 @@ module Seek
       end
 
       def check_owner_can_manage(code)
-        unless $authorization_checks_disabled
+        if authorization_checks_enabled
           raise "You cannot change the items" unless can_manage?
         end
 
