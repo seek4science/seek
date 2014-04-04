@@ -63,9 +63,11 @@ function fill_template(template, values) {
 }
 
 $j(document).ready(function () {
-  $j('input:checkbox.sweep_inputs').click(function (e) {
+  $j('input:checkbox.sweep_inputs').change(function (e) {
     var name = $j(this).val();
-    if($j(this).attr('checked')) { // It was added
+    if(this.checked) {
+        console.log('checked');
+     // It was added
       // Add the new input to existing iterations
       $j('#sweep_data .iteration').each(function () {
         $j(this).append(
