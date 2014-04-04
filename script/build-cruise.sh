@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #delete tmp and filestore artifacts remaining from previous tests
 echo "Deleting old artifacts in tmp/ and filestore/"
