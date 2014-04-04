@@ -40,6 +40,15 @@ SEEK::Application.configure do
       Settings.defaults[:modelling_analysis_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
       Settings.defaults[:assay_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
 
+      Seek::Config.fixed :css_prepended,''
+      Seek::Config.fixed :css_appended,''
+      Seek::Config.fixed :main_layout,'application'
+
+      #force back to using the defaults
+      ActionView::Renderer.clear_alternative({:controller=>:homes,:seek_template=>:index})
+      ActionView::Renderer.clear_alternative({:seek_partial=>"people/resource_list_item"})
+      ActionView::Renderer.clear_alternative({:seek_partial=>"projects/resource_list_item"})
+
     end
   end
 end

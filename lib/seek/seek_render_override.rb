@@ -4,6 +4,10 @@ module ActionView
 
     @@map = {}
 
+    def self.clear_alternative key
+      @@map.delete(key)
+    end
+
     def self.define_alternative key,value
       @@map[key]=value
     end

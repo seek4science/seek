@@ -80,6 +80,7 @@ class HomesControllerTest < ActionController::TestCase
   test "SOP menu item should be capitalized" do
     login_as(:quentin)
     get :index
+    record_body
     if Seek::Config.is_virtualliver
       assert_select "div.section>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
     else
