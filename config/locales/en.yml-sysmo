@@ -19,6 +19,7 @@ en:
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
 
+
   #DataFile
   data_file: "Data file"
 
@@ -37,9 +38,6 @@ en:
   #Project
   project: "Project"
 
-  #Workflow
-  workflow: "Workflow"
-
   scale: "Scale"
 
   menu:
@@ -56,17 +54,13 @@ en:
     feedback: "Provide feedback"
     isa_best_practice: "ISA best practice"
 
-  taverna_player/run: "workflow run"
-
-  favourite_group: "collaboration"
-
   access:
     determined_by_group: "Individual access rights for each member"
     no_access: "No access"
     visible: "View summary"
     visible_only: "View summary only"
-    accessible: "View and download"
-    accessible_only: "View and download"
-    editing: "View, download and edit"
-    editing_only: "View, download and edit"
+    accessible: "View summary"
+    accessible_only: "View summary and get contents"
+    editing: "View and edit summary"
+    editing_only: "View and edit summary and contents"
     managing: "Manage"
