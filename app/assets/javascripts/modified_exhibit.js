@@ -26,6 +26,9 @@ window.onload = function(){
         defaultSearchText();
     });
 
+    Exhibit.jQuery(document).on( "onItemsChanged.exhibit", function() {
+        updateFirstPage();
+    });
 };
 
 function defaultSearchText(default_text){

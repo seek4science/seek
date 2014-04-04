@@ -26,7 +26,6 @@ Exhibit.TileView = function(containerElmt, uiContext) {
         // correctly
         view._orderedViewFrame._settings.page = 0;
         view._reconstruct();
-        updateFirstPage();
     };
     Exhibit.jQuery(uiContext.getCollection().getElement()).bind(
         "onItemsChanged.exhibit",
