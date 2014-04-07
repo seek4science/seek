@@ -220,11 +220,11 @@ class User < ActiveRecord::Base
   end
 
   def self.guest
-    User.find_by_login('guest')
+    Seek::Config.magic_guest_enabled ? User.find_by_login('guest') : nil
   end
 
   def guest?
-    Seek::Config.magic_guest_enabled && self == User.guest
+    self == User.guest
   end
 
   def guest_project_member?

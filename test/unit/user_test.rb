@@ -31,6 +31,7 @@ class UserTest < ActiveSupport::TestCase
     user = Factory(:user, :login=>"guest")
     with_config_value :magic_guest_enabled,true do
       User.with_current_user user do
+        assert_equal user, User.guest
         assert user.guest?
         assert !User.logged_in?
       end
@@ -41,6 +42,7 @@ class UserTest < ActiveSupport::TestCase
     user = Factory(:user, :login=>"guest")
     with_config_value :magic_guest_enabled,false do
       User.with_current_user user do
+        assert_nil User.guest
         assert !user.guest?
         assert User.logged_in?
       end
