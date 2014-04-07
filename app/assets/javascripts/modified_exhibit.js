@@ -5,20 +5,22 @@ function updateFirstPage(){
     var item_type = getItemType(items);
     var item_ids = getItemIds(items);
 
-    Exhibit.jQuery.ajax({
-        url: faceted_items_url,
-        data: {item_ids: item_ids, item_type: item_type}
-    })
-    .done(function( data ) {
-            updateContent(data.resource_list_items);
+    if (item_type != null && item_ids.length > 0){
+        Exhibit.jQuery.ajax({
+            url: faceted_items_url,
+            data: {item_ids: item_ids, item_type: item_type}
+        })
+        .done(function( data ) {
+                updateContent(data.resource_list_items);
 
-            Exhibit.jQuery('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
-            Exhibit.jQuery('.exhibit-collectionView-header-groupControl').hide();
-            Exhibit.jQuery('.exhibit-toolboxWidget-button').hide();
-            decodeValueTooltip();
+                Exhibit.jQuery('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
+                Exhibit.jQuery('.exhibit-collectionView-header-groupControl').hide();
+                Exhibit.jQuery('.exhibit-toolboxWidget-button').hide();
+                decodeValueTooltip();
 
-            Exhibit.jQuery('.exhibit-viewPanel-viewContainer').show();
-    });
+                Exhibit.jQuery('.exhibit-viewPanel-viewContainer').show();
+        });
+    }
 }
 
 window.onload = function(){
