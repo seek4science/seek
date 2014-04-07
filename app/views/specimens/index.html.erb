@@ -4,19 +4,10 @@
     </ul>
 <% end %>
 
-<% if @specimens.public_methods.include?(:page_totals) %>
-    <!-- only do the page links if the collection supports it -->
-    <%= render :partial => "general/paginate_alphabetical", :locals => {:pages => @specimens.pages, :page_totals=>@specimens.page_totals, :current_page=>@specimens.page} -%>
-<% end %>
-
-
-<div class="list_items_container">
-  <%= render :partial=>"assets/resource_list_item", :collection=>@specimens %>
-</div>
-
-
-<% if @specimens.page == "latest" && Specimen.count > Seek::Config.limit_latest %>
-    <%= render :partial => "general/paginate_see_all" %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
+    <%= render :partial => "faceted_browsing/facets", :object => @specimens %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @specimens %>
 <% end %>
 
 
