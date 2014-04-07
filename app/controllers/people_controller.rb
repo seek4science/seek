@@ -49,8 +49,17 @@ class PeopleController < ApplicationController
     end
 
     unless @people
+      if (params[:page].blank? || params[:page]=='latest' || params[:page]=="all")
+        @people = Person.active
+      else
+        @people = Person.all
+      end
       @people=@people.select{|p| !p.group_memberships.empty?}
       @people = apply_filters(@people).select(&:can_view?)#.select{|p| !p.group_memberships.empty?}
+      @people=Person.paginate_after_fetch(@people,
+                                          :page=>(params[:page] || Seek::Config.default_page('people')),
+                                          :reorder=>false,
+                                          :latest_limit => Seek::Config.limit_latest)
     else
       @people = @people.select(&:can_view?)
     end
