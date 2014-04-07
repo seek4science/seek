@@ -57,10 +57,11 @@ en:
   access:
     determined_by_group: "Individual access rights for each member"
     no_access: "No access"
+    #the appended _downloadable allows a different message for downloadable items - e.g Workflows can be downloaded, assays cannot
     visible: "View summary"
-    visible_only: "View summary only"
+    visible_downloadable: "View summary only"
     accessible: "View summary"
-    accessible_only: "View summary and get contents"
+    accessible_downloadable: "View summary and get contents"
     editing: "View and edit summary"
-    editing_only: "View and edit summary and contents"
+    editing_downloadable: "View and edit summary and contents"
     managing: "Manage"

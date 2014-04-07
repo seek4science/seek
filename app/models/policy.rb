@@ -210,11 +210,11 @@ class Policy < ActiveRecord::Base
       when Policy::NO_ACCESS
         return I18n.t("access.no_access")
       when Policy::VISIBLE
-        return resource.try(:is_downloadable?) ? I18n.t('access.visible_only') : I18n.t('access.visible')
+        return resource.try(:is_downloadable?) ? I18n.t('access.visible_downloadable') : I18n.t('access.visible')
       when Policy::ACCESSIBLE
-        return resource.try(:is_downloadable?) ? I18n.t('access.accessible_only') : I18n.t('access.accessible')
+        return resource.try(:is_downloadable?) ? I18n.t('access.accessible_downloadable') : I18n.t('access.accessible')
       when Policy::EDITING
-        return resource.try(:is_downloadable?) ? I18n.t('access.editing_only') : I18n.t('access.editing')
+        return resource.try(:is_downloadable?) ? I18n.t('access.editing_downloadable') : I18n.t('access.editing')
       when Policy::MANAGING
         return I18n.t('access.managing')
       else
