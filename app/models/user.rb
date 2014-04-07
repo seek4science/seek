@@ -224,7 +224,7 @@ class User < ActiveRecord::Base
   end
 
   def guest?
-    !current_user.nil? && current_user == User.guest
+    self == User.guest
   end
 
   def guest_project_member?
