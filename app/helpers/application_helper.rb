@@ -633,7 +633,9 @@ module ApplicationHelper
     return text.html_safe
   end
 
-
+  def klass_from_controller controller_name
+    controller_name.singularize.camelize.constantize
+  end
 
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>I18n.t('project').pluralize,"institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search",
