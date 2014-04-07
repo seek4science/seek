@@ -4,4 +4,9 @@
         <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
     </ul>
 <% end %>
-<%= render :partial => "faceted_browsing/facets", :object => @sops %>
+
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
+    <%= render :partial => "faceted_browsing/facets", :object => @sops %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @sops %>
+<% end %>

@@ -4,4 +4,8 @@
     </ul>
 <% end %>
 
-<%= render :partial => "faceted_browsing/facets", :object => @data_files %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
+    <%= render :partial => "faceted_browsing/facets", :object => @data_files %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @data_files %>
+<% end %>

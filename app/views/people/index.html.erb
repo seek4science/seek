@@ -14,7 +14,10 @@
   <h2><%= "People with the role '#{h(@project_role.name)}'" %></h2>
 <% end -%>
 
-
-<%= render :partial => "faceted_browsing/facets", :object => @people %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
+    <%= render :partial => "faceted_browsing/facets", :object => @people %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @people %>
+<% end %>
 
 
