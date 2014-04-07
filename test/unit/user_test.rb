@@ -27,6 +27,26 @@ class UserTest < ActiveSupport::TestCase
     assert without_profile.include?(users(:aaron))
   end
 
+  test "with magic_guest_enabled" do
+    user = Factory(:user, :login=>"guest")
+    with_config_value :magic_guest_enabled,true do
+      User.with_current_user user do
+        assert user.guest?
+        assert !User.logged_in?
+      end
+    end
+  end
+
+  test "without auto magic_guest_enabled" do
+    user = Factory(:user, :login=>"guest")
+    with_config_value :magic_guest_enabled,false do
+      User.with_current_user user do
+        assert !user.guest?
+        assert User.logged_in?
+      end
+    end
+  end
+
   test "logged in and registered" do
     user = Factory(:brand_new_user)
     User.with_current_user(user) do

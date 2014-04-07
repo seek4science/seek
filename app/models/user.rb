@@ -224,7 +224,7 @@ class User < ActiveRecord::Base
   end
 
   def guest?
-    self == User.guest
+    Seek::Config.magic_guest_enabled && self == User.guest
   end
 
   def guest_project_member?

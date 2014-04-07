@@ -104,6 +104,9 @@ SEEK::Application.configure do
 
   Seek::Config.default :datacite_url,"https://mds.datacite.org/"
 
+  #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
+  Seek::Config.default :magic_guest_enabled,false
+
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,''
   Seek::Config.fixed :main_layout,'application'

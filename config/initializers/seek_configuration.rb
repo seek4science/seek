@@ -109,6 +109,9 @@ SEEK::Application.configure do
   # Admin setting to allow user impersonation
   Seek::Config.default :admin_impersonation_enabled, true
 
+  #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
+  Seek::Config.default :magic_guest_enabled,true
+
 
   Seek::Config.fixed :css_appended,'biovel_application'
   Seek::Config.fixed :main_layout,'biovel'

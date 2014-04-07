@@ -309,7 +309,7 @@ module Seek
       :biosamples_enabled,:events_enabled,:modelling_analysis_enabled,:organisms_enabled,:models_enabled,:forum_enabled,:jerm_enabled,:email_enabled,:jws_enabled,:external_search_enabled,:piwik_analytics_enabled,
       :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,
       :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,:tagging_enabled,
-      :authorization_checks_enabled,
+      :authorization_checks_enabled,:magic_guest_enabled,
       :assay_type_ontology_file,:technology_type_ontology_file,:modelling_analysis_type_ontology_file,:assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri,
       :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit,:css_appended, :css_prepended, :js_appended,:css_appended,:main_layout]
 

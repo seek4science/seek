@@ -24,6 +24,7 @@ SEEK::Application.configure do
       Settings.defaults[:filestore_path] = "tmp/testing-filestore"
       Settings.defaults[:tagging_enabled] = true
       Settings.defaults[:authorization_checks_enabled] = true
+      Settings.defaults[:magic_guest_enabled] = false
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'SEEK'
