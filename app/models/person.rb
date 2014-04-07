@@ -71,9 +71,7 @@ class Person < ActiveRecord::Base
 
   has_many :subscriptions,:dependent => :destroy
 
-  # This line was causing 2 project subscriptions to be created when a user registered,
-  # as one is also created when a work group is added
-  before_create :set_default_subscriptions unless Seek::Config.is_biovel?
+  before_create :set_default_subscriptions
 
   def queue_update_auth_table
     if changes.include?("roles_mask")
