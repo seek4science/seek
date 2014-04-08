@@ -29,6 +29,8 @@ SEEK::Application.configure do
       Settings.defaults[:modelling_analysis_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
       Settings.defaults[:assay_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
 
+      Settings.defaults[:faceted_browsing_enabled] = false
+
     end
   end
 end
