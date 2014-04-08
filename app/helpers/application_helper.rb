@@ -565,7 +565,7 @@ module ApplicationHelper
     end
   end
 
-  def resource_tab_item_name resource_type,pluralize=true
+  def internationalized_resource_name resource_type,pluralize=true
     resource_type = resource_type.singularize
     if resource_type == "Speciman"
       result = t('biosamples.sample_parent_term')
