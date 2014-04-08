@@ -1296,4 +1296,37 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test "should show related items" do
+    person = Factory(:person)
+    project=person.projects.first
+    inst = person.institutions.first
+
+    refute_nil project
+    refute_nil inst
+
+    get :show,:id=>person.id
+    assert_response :success
+
+    assert_select "h2",:text=>/Related items/i
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item" do
+        assert_select "div.list_item_title" do
+          assert_select "p > a[href=?]",project_path(project),:text=>project.title
+          assert_select "p > a[href=?]",institution_path(inst),:text=>inst.title
+        end
+      end
+    end
+  end
+
+  test "related items turned off for biovel" do
+    person = Factory(:person)
+    with_alternative_rendering({:controller=>:people,:seek_partial=>"general/items_related_to"},"") do
+      get :show,:id=>person.id
+      assert_response :success
+
+      assert_select "h2",:text=>/Related items/i,:count=>0
+      assert_select "div.list_items_container",:count=>0
+    end
+  end
+
 end

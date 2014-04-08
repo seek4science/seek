@@ -112,9 +112,5 @@ SEEK::Application.configure do
   Seek::Config.fixed :css_appended,''
   Seek::Config.fixed :main_layout,'application'
 
-  #alternative views and partials
-  #ActionView::Renderer.define_alternative({:controller=>:homes,:seek_template=>:index},:index_biovel)
-  #ActionView::Renderer.define_alternative({:seek_partial=>"people/resource_list_item"},"people/resource_list_item_biovel")
-  #ActionView::Renderer.define_alternative({:seek_partial=>"projects/resource_list_item"},"projects/resource_list_item_biovel")
 end
 

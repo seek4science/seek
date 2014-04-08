@@ -31,11 +31,18 @@ module ActionView
 
       unless options[:seek_partial].nil?
         key = {:controller => context.controller_name.to_sym, :seek_partial => options[:seek_partial].to_sym}
+        key = {:controller => context.controller_name.to_sym, :seek_partial => options[:seek_partial].to_s} if @@map[key].nil?
         key = {:seek_partial => options[:seek_partial].to_s} if @@map[key].nil?
-        if @@map[key].nil?
+        value = @@map[key]
+        if value.nil?
           options[:partial]= options[:seek_partial]
         else
-          options[:partial]=@@map[key].to_s
+          if value.blank?
+            options[:text]=""
+          else
+            options[:partial]=value.to_s
+          end
+
         end
       end
       options

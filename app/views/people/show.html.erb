@@ -66,8 +66,8 @@
     <%= render :partial=>"people/project_roles", :locals=>{:editable=>false} %>
     <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <%# disabled for now because it doesn't cope with TavernaPlayer::Run assets %>
-    <%# = render :partial=>"general/items_related_to", :object => @person %>
+
+    <%= render :seek_partial=>"general/items_related_to", :object => @person %>
     <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
     <%# this is because it's not needed then: admins can see everything anyway -%>
     <% if admin_logged_in? -%>
