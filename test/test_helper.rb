@@ -18,7 +18,8 @@ require 'authenticated_test_helper'
 module ActionView
   class Renderer
     def self.get_alternative key
-      @@map[key]
+      key = stringify_values(key)
+      @@alternative_map[key]
     end
   end
 end

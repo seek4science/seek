@@ -2,14 +2,21 @@
 module ActionView
   class Renderer
 
-    @@map = {}
+    @@alternative_map = {}
 
     def self.clear_alternative key
-      @@map.delete(key)
+      key = stringify_values(key)
+      @@alternative_map.delete(key)
     end
 
     def self.define_alternative key,value
-      @@map[key]=value
+      key = stringify_values(key)
+      @@alternative_map[key]=value
+    end
+
+    #converts all the values to strings (from symbols) to simplify lookup
+    def self.stringify_values hash
+      Hash[hash.map{|k,v| [k,v.to_s]}]
     end
 
     def render(context, options)
@@ -23,17 +30,17 @@ module ActionView
 
     def check_for_override context, options
       unless options[:seek_template].nil?
-        key = {:controller => context.controller_name.to_sym, :seek_template => options[:seek_template].to_sym}
-        unless @@map[key].nil?
-          options[:template]=@@map[key].to_s
+        value = @@alternative_map[{:controller => context.controller_name, :seek_template => options[:seek_template].to_s}]
+        unless value.nil?
+          options[:template]=value
         end
       end
 
       unless options[:seek_partial].nil?
-        key = {:controller => context.controller_name.to_sym, :seek_partial => options[:seek_partial].to_sym}
-        key = {:controller => context.controller_name.to_sym, :seek_partial => options[:seek_partial].to_s} if @@map[key].nil?
-        key = {:seek_partial => options[:seek_partial].to_s} if @@map[key].nil?
-        value = @@map[key]
+        value = @@alternative_map[{:controller => context.controller_name.to_s, :seek_partial => options[:seek_partial].to_s}]
+        if value.nil?
+          value = @@alternative_map[{:seek_partial => options[:seek_partial].to_s}]
+        end
         if value.nil?
           options[:partial]= options[:seek_partial]
         else
@@ -42,10 +49,10 @@ module ActionView
           else
             options[:partial]=value.to_s
           end
-
         end
       end
       options
     end
+
   end
 end
