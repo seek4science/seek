@@ -314,6 +314,13 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+  test "with biovel index rendering" do
+    with_alternative_rendering({:controller=>:homes,:seek_template=>:index},:index_biovel) do
+      get :index
+      assert_select "div#home > div.carousel-wrapper",:count=>1
+    end
+  end
+
   def uri_to_guardian_feed
     uri_to_feed "guardian_atom.xml"
   end

@@ -15,6 +15,14 @@ require 'action_view/test_case'
 require 'tmpdir'
 require 'authenticated_test_helper'
 
+module ActionView
+  class Renderer
+    def self.get_alternative key
+      @@map[key]
+    end
+  end
+end
+
 
 FactoryGirl.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
@@ -58,6 +66,18 @@ Kernel.class_eval do
     Seek::Config.auth_lookup_enabled=false
     yield
     Seek::Config.auth_lookup_enabled=val
+  end
+
+  def with_alternative_rendering key,value
+    current = ActionView::Renderer.get_alternative(key)
+    ActionView::Renderer.define_alternative key,value
+    yield
+    if current.nil?
+      ActionView::Renderer.clear_alternative key
+    else
+      ActionView::Renderer.define_alternative key,current
+    end
+
   end
 
   def with_config_value config,value
