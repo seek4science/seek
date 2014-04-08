@@ -1158,7 +1158,6 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "correct response to unknown action" do
-    skip("Not critical, but needs checking why the error has changed when running tests, but behaves as expected when running server ")
     df=data_files(:picture)
     assert_raises ActionController::RoutingError do
       get :sdkfjshdfkhsdf, :id=>df
