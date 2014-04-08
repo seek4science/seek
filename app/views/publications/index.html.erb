@@ -1,9 +1,4 @@
-<% if logged_in? and current_user.person.member?%>
-    <ul class="sectionIcons">
-      <li><%= image_tag_for_key "new", new_publication_path, "Register a publication", nil, "Register a publication" %></li>
-      <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
-    </ul>
-<% end %>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_publication_path, :label => "Register a publication"} %>
 
 <% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
     <%= render :partial => "faceted_browsing/facets", :object => @publications %>

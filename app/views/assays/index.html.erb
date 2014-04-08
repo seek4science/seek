@@ -1,8 +1,4 @@
-<% if logged_in_and_member? %>
-     <ul class="sectionIcons align_new_button">
-         <li><%= image_tag_for_key "new", new_assay_path, "New #{t('assays.assay').downcase}", nil, "New #{t('assays.assay').downcase}" %></li>
-     </ul>
-<% end %>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_assay_path, :label => "New #{t('assays.assay')}"} %>
 
 <% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
     <%= render :partial => "faceted_browsing/facets", :object => @assays %>

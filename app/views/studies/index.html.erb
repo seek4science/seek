@@ -1,8 +1,4 @@
-<% if logged_in? and current_user.person.member?%>
-    <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_study_path, "New #{t('study')}", nil, "New #{t('study')}" %></li>
-    </ul>
-<% end %>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_study_path, :label => "New #{t('study')}"} %>
 
 <% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
     <%= render :partial => "faceted_browsing/facets", :object => @studies %>
