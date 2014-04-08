@@ -214,15 +214,15 @@ class Person < ActiveRecord::Base
   end
 
   def workflows
-     self.user.workflows
+     self.try(:user).try(:workflows) || []
   end
 
   def runs
-    self.user.taverna_player_runs
+    self.try(:user).try(:taverna_player_runs) || []
   end
 
   def sweeps
-    self.user.sweeps
+    self.try(:user).try(:sweeps) || []
   end
 
   def institutions
