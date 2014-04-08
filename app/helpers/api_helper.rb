@@ -270,11 +270,10 @@ module ApiHelper
   end
   
   def associated_resources_xml builder, object
-    #FIXME: this needs fixing, with some refactoring of the version->asset linkage - see http://www.mygrid.org.uk/dev/issues/browse/SYSMO-362
     object=object.parent if (object.class.name.include?("::Version"))
     associated = get_related_resources(object)
-    associated.delete("Strain")
-
+    to_ignore = ignore_associated_types.collect{|t| t.name}
+    associated.delete_if {|k,v| to_ignore.include?(k)}
     builder.tag! "associated" do
       associated.keys.sort.each do |key|
         attr={}
@@ -286,7 +285,12 @@ module ApiHelper
         generic_list_xml(builder, associated[key][:items],key.underscore.pluralize,attr)        
       end
     end    
-  end    
+  end
+
+  #types that should be ignored from the related resources. It may be desirable to add items in this list to the schema
+  def ignore_associated_types
+    [Strain,TavernaPlayer::Run,Workflow,Sweep]
+  end
   
   def generic_list_xml builder,list,tag,attr={}
     builder.tag! tag,attr do 

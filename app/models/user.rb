@@ -19,6 +19,10 @@ class User < ActiveRecord::Base
   has_many :investigations,:as=>:contributor
   has_many :studies,:as=>:contributor
 
+  has_many :workflows, :as => :contributor
+  has_many :taverna_player_runs, :class_name => 'TavernaPlayer::Run', :as => :contributor
+  has_many :sweeps, :as => :contributor
+
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
   attr_accessor :password, :password_confirmation
@@ -86,7 +90,7 @@ class User < ActiveRecord::Base
   end
 
   def self.logged_in?
-    self.current_user
+    self.current_user && !self.current_user.guest?
   end
 
   # Activates the user in the database.
@@ -213,6 +217,18 @@ class User < ActiveRecord::Base
     ensure
       User.current_user = previous
     end
+  end
+
+  def self.guest
+    Seek::Config.magic_guest_enabled ? User.find_by_login('guest') : nil
+  end
+
+  def guest?
+    self == User.guest
+  end
+
+  def guest_project_member?
+    self.person.try(:guest_project_member?)
   end
 
   protected

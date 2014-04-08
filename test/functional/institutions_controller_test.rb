@@ -58,7 +58,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   def test_should_destroy_institution
     institution = institutions(:four)
     get :show, :id => institution
-    assert_select "span.icon", :text => /Delete Institution/, :count => 1
+    assert_select "span.icon", :text => /Delete institution/, :count => 1
 
     assert_difference('Institution.count', -1) do
       delete :destroy, :id => institution

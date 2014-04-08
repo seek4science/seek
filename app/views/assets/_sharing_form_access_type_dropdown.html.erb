@@ -4,7 +4,7 @@
 <%# 3) access_type - active access_type for the current policy -%>
 
 <%
-   access_type_options ||= [Policy::VISIBLE, Policy::ACCESSIBLE,Policy::EDITING]
+   access_type_options ||= [Policy::ACCESSIBLE,Policy::EDITING]
    access_type_options.delete(Policy::EDITING) if access_type_selector_for_scope == Policy::EVERYONE
 -%>
 

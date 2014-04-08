@@ -1,0 +1,167 @@
+/* Yellow:            #EEEB99 */
+/* Light yellow:      #FFFFCC */
+/* Medium-dark yellow (borders) #b2af6a */
+/* Dark yellow-ish:   #918e5b */
+/* Dark green:        #287621 */
+/* Light green:       #99CC33 */
+/* Footer grey:       #CFD5AF */
+
+
+
+body, #container {
+  background-color: #EEEB99;
+}
+
+#bd {
+  background-color: transparent;
+}
+
+#ft {
+  background-color: #CFD5AF;
+}
+
+#header {
+  box-shadow:  0 3px 5px #918e5b;
+}
+
+.workflow {
+  background-color: #ffc;
+  border-color: #918e5b;
+  box-shadow: 1px 1px 3px #918e5b;
+}
+
+.workflow-category {
+  background-color: #fff;
+  box-shadow: 1px 1px 3px #918e5b;
+}
+
+.workflow-category:hover {
+  text-decoration: none;
+}
+
+.sectionIcons li a, .with_smaller_shadow, a.doc-link, a.button-link {
+  box-shadow: none;
+  background-color: #FFFFCC;
+  border-color: #918e5b;
+}
+
+.sectionIcons li a:hover, a.doc-link:hover, a.button-link:hover {
+  background-color: #b1e10f;
+  color: #287621;
+}
+
+.contribution_title {
+  background-color: #99CC33;
+  border-color: #287621;
+}
+
+.foldTitle, h2, div.collapsable_div_header {
+  background-color: #FFC;
+  background-image: none;
+}
+
+.collapsable_div_contents {
+  background-color: white;
+}
+
+.box_normal {
+  background-color: white;
+}
+
+h2 {
+  border: none;
+}
+
+.foldContent, .foldTitle, h2, .box_standout, h3, .sectionIcons li a, .with_smaller_shadow, .box_infotext,
+input[type="text"], a.doc-link, a.button-link, .easytabs-pane, ul.easytabs-nav, ul.easytabs-nav > li,
+div.collapsable_div, div.collapsable_div_contents {
+  border-color: #b2af6a;
+}
+
+#workflow_filters a.active {
+  background-color: #B1E10F;
+}
+
+a {
+  color: #287621;
+}
+
+a:hover {
+  color: #287621;
+  text-decoration: underline;
+}
+
+.easytabs-pane, ul.easytabs-nav > li.active {
+  background-color: #FFC;
+}
+
+ul.easytabs-nav > li.active {
+  border-bottom-color: #FFC;
+}
+
+ul.easytabs-nav > li {
+  background-color: #dcd98a;
+}
+
+.workflow .category {
+  background-color: white;
+}
+
+h2.standout {
+  background: #99cc33;
+  border: none;
+}
+
+.dataTables_wrapper th {
+  background-color: white;
+}
+
+.dataTables_wrapper table {
+  border: 1px solid #918e5b;
+}
+
+input[type="submit"], button {
+  background-color: #FFFFCC;
+  border-color: #b2af6a;
+}
+
+.with_shadow {
+  box-shadow: -4px -4px 6px #b2af6a;
+  border-color: #b2af6a;
+}
+
+ul.tabbernav li a {
+  background-color: #99CC33;
+  border-color: #99CC33;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+}
+
+ul.tabbernav li a:hover {
+  background-color: #b1e10f;
+  border-color: #b1e10f;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+}
+
+ul.tabbernav {
+  border-bottom: 1px solid #b2af6a;
+  margin: -1px 0 0 1em;
+}
+
+.enable-data-sweeps {
+  background-color: #ffffcc;
+  border: 1px solid #b2af6a;
+}
+
+ul.sweep_input_selection label {
+  background: #FFFFCC;
+}
+
+ul.sweep_input_selection label:hover {
+  background: white;
+}
+
+.jcarousel-wrapper  {
+  border-color: #b2af6a;
+}

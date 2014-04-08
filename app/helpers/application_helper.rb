@@ -6,10 +6,20 @@ require 'app_version'
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
+  include TavernaPlayer::RunsHelper
 
 
   def is_front_page?
     current_page?(root_url)
+  end
+
+  def seek_stylesheet_tags main='application'
+
+    prepended = (Seek::Config.css_prepended || "").split(",")
+    prepended << main
+    appended = (Seek::Config.css_appended || "").split(",")
+    [stylesheet_link_tag(prepended.join(',')),
+    stylesheet_link_tag(appended.join(','))].join(" ").html_safe
   end
 
   def date_as_string date,show_time_of_day=false,year_only_1st_jan=false
@@ -349,8 +359,8 @@ module ApplicationHelper
   end
 
   def favourite_group_popup_link_action_new resource_type=nil
-    return link_to_remote_redbox("Create new favourite group",
-      { :url => new_favourite_group_url,
+    return link_to_remote_redbox("Create new #{t('favourite_group')}",
+      { :url => main_app.new_favourite_group_url,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
       { #:style => options[:style],
@@ -362,8 +372,8 @@ module ApplicationHelper
   end
   
   def favourite_group_popup_link_action_edit resource_type=nil
-    return link_to_remote_redbox("Edit selected favourite group",
-      { :url => edit_favourite_group_url,
+    return link_to_remote_redbox("Edit selected #{t('favourite_group')}",
+      { :url => main_app.edit_favourite_group_url,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}' + '&id=' + selectedFavouriteGroup()" },
       { #:style => options[:style],
@@ -376,7 +386,7 @@ module ApplicationHelper
   
   def workgroup_member_review_popup_link resource_type=nil
     return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>".html_safe,
-      { :url => review_work_group_url("type", "id", "access_type"),
+      { :url => main_app.review_work_group_url("type", "id", "access_type"),
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
       { #:style => options[:style],
@@ -566,6 +576,8 @@ module ApplicationHelper
       result = t('biosamples.sample_parent_term')
     elsif resource_type == "Assay"
       result = t('assays.assay')
+    elsif resource_type == "TavernaPlayer::Run"
+      result = "Run"
     else
       translated_resource_type = translate_resource_type(resource_type)
       result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
@@ -579,8 +591,8 @@ module ApplicationHelper
 
   def add_return_to_search
     referer = request.headers["Referer"].try(:normalize_trailing_slash)
-    search_path = search_url.normalize_trailing_slash
-    root_path = root_url.normalize_trailing_slash
+    search_path = main_app.search_url.normalize_trailing_slash
+    root_path = main_app.root_url.normalize_trailing_slash
     request_uri = request.fullpath.try(:normalize_trailing_slash)
     if !request_uri.include?(root_path)
       request_uri = root_path.chop + request_uri
@@ -614,7 +626,7 @@ module ApplicationHelper
   def delete_icon model_item, user
     item_name = text_for_resource model_item
     if model_item.can_delete?(user)
-      html = "<li>"+image_tag_for_key('destroy',url_for(model_item),"Delete #{item_name}", {:confirm=>"Are you sure?",:method=>:delete },"Delete #{item_name}") + "</li>"
+      html = "<li>"+image_tag_for_key('destroy',url_for(model_item),"Delete #{item_name.downcase}", {:confirm=>"Are you sure?",:method=>:delete },"Delete #{item_name.downcase}") + "</li>"
       return html.html_safe
     elsif model_item.can_manage?(user)
       explanation=unable_to_delete_text model_item
@@ -622,6 +634,44 @@ module ApplicationHelper
       return html.html_safe
     end
   end
+
+
+  def share_icon
+    icon = simple_image_tag_for_key('share').html_safe
+    html = link_to_remote_redbox(icon + "Share workflow".html_safe,
+                                 {:url => url_for(:action => 'temp_link'),
+                                  :failure => "alert('Sorry, an error has occurred.'); RedBox.close();"}
+    )
+    return html.html_safe
+  end
+
+  #
+  # Converts the given HASH array like 'params' to a flat
+  # HASH array that's compatible with url_for and link_to
+  # From http://www.gamecreatures.com/blog/2007/08/21/rails-url_for-and-params-missery/
+  #
+  def flatten_param_hash( params )
+    found = true
+
+    while found
+      found = false
+      new_hash = {}
+
+      params.each do |key,value|
+        if value.is_a?( Hash )
+          found = true
+          value.each do |key2,value2|
+            new_hash[ key.to_s + '[' + key2.to_s + ']' ] = value2
+          end
+        else
+          new_hash[ key.to_s ] = value
+        end
+      end
+      params = new_hash
+    end
+    params
+  end
+
 
   def unable_to_delete_text model_item
     text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"

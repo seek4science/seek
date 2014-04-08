@@ -1,9 +1,8 @@
 module PolicyHelper
   
   def policy_selection_options policies = nil, resource = nil, access_type = nil
-    policies ||= [Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING]
+    policies ||= [Policy::NO_ACCESS,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING]
     options=""
-    policies.delete(Policy::ACCESSIBLE) if resource && !resource.is_downloadable?
     policies.each do |policy|
       options << "<option value='#{policy}' #{"selected='selected'" if access_type == policy}>#{Policy.get_access_type_wording(policy, resource)} </option>"
     end      
@@ -30,7 +29,7 @@ module PolicyHelper
 
   def policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name)
     html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
-    html << "<p class='private'>You keep this #{resource_name.humanize} private (only visible to you)</p>"
+    html << "<p class='private'>You keep this #{resource_name.humanize.downcase} private (only visible to you)</p>"
     html << process_permissions(permissions, resource_name)
     html.html_safe
   end

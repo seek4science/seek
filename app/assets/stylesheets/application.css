@@ -17,4 +17,8 @@
 *= require top_menu
 *= require dynamic_menu
 *= require batch_upload
+*= require easytabs
+*= require taverna_player/application
+*= require data_tables
+*= require jquery.bxslider
 */

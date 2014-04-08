@@ -71,7 +71,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	def test_should_destroy_project
     project = projects(:four)
     get :show, :id => project
-    assert_select "span.icon", :text => /Delete #{I18n.t('project')}/, :count => 1
+    assert_select "span.icon", :text => /Delete #{I18n.t('project')}/i, :count => 1
 
 		assert_difference('Project.count', -1) do
 			delete :destroy, :id => project

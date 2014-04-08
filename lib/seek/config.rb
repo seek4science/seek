@@ -229,6 +229,12 @@ module Seek
       Settings.defaults[setting]=value
     end
 
+    #unlike default, always sets the value
+    def fixed setting,value
+      setter="#{setting.to_s}="
+      set_value setter,value
+    end
+
     def define_class_method method ,*args, &block
       singleton_class.instance_eval { define_method method.to_sym, *args, &block }
     end
@@ -249,7 +255,7 @@ module Seek
         val = val.send(conversion) if conversion && val
         val
       end
-      def set_value setter, val
+      def set_value setter, val, conversion=nil
         val = val.send(conversion) if conversion && val
         Settings.defaults[setter.to_sym] = val
       end
@@ -302,9 +308,10 @@ module Seek
       :tagline_prefix,
       :biosamples_enabled,:events_enabled,:modelling_analysis_enabled,:organisms_enabled,:models_enabled,:forum_enabled,:jerm_enabled,:email_enabled,:jws_enabled,:external_search_enabled,:piwik_analytics_enabled,
       :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,
-      :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,
+      :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,:tagging_enabled,
+      :authorization_checks_enabled,:magic_guest_enabled,:workflows_enabled,
       :assay_type_ontology_file,:technology_type_ontology_file,:modelling_analysis_type_ontology_file,:assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri,
-      :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit]
+      :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit,:css_appended, :css_prepended, :js_appended,:css_appended,:main_layout]
 
 
     #Settings that require a conversion to integer

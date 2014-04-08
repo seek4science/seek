@@ -1160,6 +1160,42 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test "edit should include tags element" do
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    get :edit, :id=>assay.id
+    assert_response :success
+
+    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div#tag_ids",:count=>1
+  end
+
+  test "new should include tags element" do
+    get :new,:class=>:experimental
+    assert_response :success
+    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div#tag_ids",:count=>1
+  end
+
+  test "edit should include not include tags element when tags disabled" do
+    with_config_value :tagging_enabled,false do
+      assay = Factory(:assay,:policy=>Factory(:public_policy))
+      get :edit, :id=>assay.id
+      assert_response :success
+
+      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div#tag_ids",:count=>0
+    end
+  end
+
+  test "new should not include tags element when tags disabled" do
+    with_config_value :tagging_enabled,false do
+      get :new,:class=>:experimental
+      assert_response :success
+      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div#tag_ids",:count=>0
+    end
+  end
+
   test "new object based on existing one" do
     study = Factory(:study,:policy=>Factory(:public_policy))
     assay = Factory(:assay,:policy=>Factory(:public_policy),:title=>"the assay",:study=>study)

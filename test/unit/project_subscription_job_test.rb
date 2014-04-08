@@ -53,7 +53,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
 
     #create items for project
     ps.subscribable_types.reject{|t| t=='Assay' || t=='Study'}.each do |type|
-      Factory("#{type.underscore}", :projects => [project])
+      Factory("#{type.underscore.gsub('/','_')}", :projects => [project])
     end
     project.reload
     #study

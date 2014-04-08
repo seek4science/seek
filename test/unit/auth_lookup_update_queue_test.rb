@@ -168,9 +168,36 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_equal specimen, AuthLookupUpdateQueue.last(:order=>:id).item
   end
 
+  test "updates to queue for sweep" do
+    user = Factory :user
+    #otherwise a workflow is also created and triggers inserts to queue
+    sweep = Factory :sweep, :contributor=>user.person, :policy=>Factory(:private_policy)
+    assert_difference("AuthLookupUpdateQueue.count", 1) do
+      sweep = Factory :sweep, :contributor=>user.person, :policy=>Factory(:private_policy), :workflow=>sweep.workflow
+    end
+    assert_equal sweep, AuthLookupUpdateQueue.last(:order=>:id).item
+
+    AuthLookupUpdateQueue.destroy_all
+    sweep.policy.access_type = Policy::VISIBLE
+
+    assert_difference("AuthLookupUpdateQueue.count", 1) do
+      sweep.policy.save
+    end
+    assert_equal sweep, AuthLookupUpdateQueue.last(:order=>:id).item
+
+    AuthLookupUpdateQueue.destroy_all
+    sweep.title = Time.now.to_s
+    assert_difference("AuthLookupUpdateQueue.count", 1) do
+      disable_authorization_checks do
+        sweep.save!
+      end
+    end
+    assert_equal sweep, AuthLookupUpdateQueue.last(:order=>:id).item
+  end
+
   test "updates for remaining authorized assets" do
     user = Factory :user
-    types = Seek::Util.authorized_types - [Sop, Assay, Sample, Specimen, Study]
+    types = Seek::Util.authorized_types - [Sop, Assay, Sample, Specimen, Study,Sweep,TavernaPlayer::Run]
     types.each do |type|
       entity=nil
       assert_difference("AuthLookupUpdateQueue.count", 1, "unexpected count for created type #{type.name}") do

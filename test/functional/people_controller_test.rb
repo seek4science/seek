@@ -366,7 +366,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_should_add_nofollow_to_links_in_show_page
-    get :show, :id=> people(:person_with_links_in_description)
+    person = people(:person_with_links_in_description)
+    get :show, :id=> person
     assert_select "div#description" do
       assert_select "a[rel=nofollow]"
     end
@@ -1283,5 +1284,41 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select "p > a[href=?]",person_path(person2),:text=>person2.name,:count=>0
     end
   end
+
+  test "should show personal tags according to config" do
+    p = Factory(:person)
+    get :show,:id=>p.id
+    assert_response :success
+    assert_select "div#personal_tags",:count=>1
+    with_config_value :tagging_enabled,false do
+      get :show,:id=>p.id
+      assert_response :success
+      assert_select "div#personal_tags",:count=>0
+    end
+  end
+
+  test "should show related items" do
+    person = Factory(:person)
+    project=person.projects.first
+    inst = person.institutions.first
+
+    refute_nil project
+    refute_nil inst
+
+    get :show,:id=>person.id
+    assert_response :success
+
+    assert_select "h2",:text=>/Related items/i
+    assert_select "div.list_items_container" do
+      assert_select "div.list_item" do
+        assert_select "div.list_item_title" do
+          assert_select "p > a[href=?]",project_path(project),:text=>project.title
+          assert_select "p > a[href=?]",institution_path(inst),:text=>inst.title
+        end
+      end
+    end
+  end
+
+
 
 end

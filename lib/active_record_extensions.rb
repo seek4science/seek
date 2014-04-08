@@ -13,7 +13,7 @@
       class_alias_method_chain :after_initialize, :ensure_base_exists
 
       def self.is_taggable?
-        self.ancestors.include?(Seek::Taggable)
+        false #defaults to false, unless it includes Taggable which will override this and check the configuration
       end
 
     end

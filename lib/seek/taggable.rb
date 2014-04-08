@@ -1,6 +1,14 @@
 module Seek
   module Taggable
 
+    def self.included(mod)
+      mod.extend(ClassMethods)
+    end
+
+    def is_taggable?
+      self.class.is_taggable?
+    end
+
     def tag_as_user_with_params params,attr="tag",owner=User.current_user
       tags = resolve_tags_from_params params,attr
       tag_as_user_with tags,attr,owner
@@ -93,6 +101,12 @@ module Seek
 
     def tags_as_text_array
       self.annotations.include_values.collect{|a| a.value.text}
+    end
+
+    module ClassMethods
+      def is_taggable?
+        Seek::Config.tagging_enabled
+      end
     end
 
   end

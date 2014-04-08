@@ -87,14 +87,17 @@ class SessionsController < ApplicationController
   end
   
   def successful_login
-    self.current_user = @user    
+    self.current_user = @user
+    flash[:notice] = "You have successfully logged in, #{@user.display_name}."
     if params[:remember_me] == "on"
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { :value => @user.remember_token , :expires => @user.remember_token_expires_at }
     end
     
     respond_to do |format|
-      if !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
+      if !params[:called_from].blank? && !params[:called_from][:url].blank?
+        return_to_url = params[:called_from][:url]
+      elsif !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
         unless params[:called_from][:id].blank?
           return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
         else

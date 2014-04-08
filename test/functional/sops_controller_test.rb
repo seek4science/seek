@@ -320,7 +320,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_select "h1", :text=>/Editing #{I18n.t('sop')}/
 
     #this is to check the SOP is all upper case in the sharing form
-    assert_select "label",:text=>/Keep this #{I18n.t('sop')} private/
+    assert_select "label",:text=>/Keep this #{I18n.t('sop')} private/i
   end
 
   test "publications excluded in form for sops" do
@@ -853,6 +853,18 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_select "select#sop_project_ids" do
       assert_select "option[selected=selected][value=?]", sop.projects.first.id, :count => 1
+    end
+  end
+
+  test "should show tags box according to config" do
+    sop = Factory(:sop,:policy=>Factory(:public_policy))
+    get :show,:id=>sop.id
+    assert_response :success
+    assert_select "div#tags_box",:count=>1
+    with_config_value :tagging_enabled,false do
+      get :show,:id=>sop.id
+      assert_response :success
+      assert_select "div#tags_box",:count=>0
     end
   end
 

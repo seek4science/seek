@@ -70,12 +70,18 @@ class Person < ActiveRecord::Base
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions,:dependent => :destroy
+
   before_create :set_default_subscriptions
 
   def queue_update_auth_table
     if changes.include?("roles_mask")
       AuthLookupUpdateJob.add_items_to_queue self
     end
+  end
+
+  def guest_project_member?
+    project = Project.find_by_name('BioVeL Portal Guests')
+    !project.nil? && self.projects.include?(project)
   end
 
   #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
@@ -205,6 +211,18 @@ class Person < ActiveRecord::Base
 
   def can_create_new_items?
     member?
+  end
+
+  def workflows
+     self.try(:user).try(:workflows) || []
+  end
+
+  def runs
+    self.try(:user).try(:taverna_player_runs) || []
+  end
+
+  def sweeps
+    self.try(:user).try(:sweeps) || []
   end
 
   def institutions

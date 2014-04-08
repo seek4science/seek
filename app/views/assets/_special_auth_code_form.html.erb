@@ -1,7 +1,9 @@
+<%= hidden_field_tag :sharing_form, "true" %>
 <% if f.object.can_manage? %>
+
   <% title_and_help = capture do %>
-        <%= help_icon("Here you can create temporary a access link for reviewing this asset. The reviewers with this link can view/download this asset with no login") %>
-        Temporary Access Link
+        <%= help_icon("Here you can create a temporary access link for reviewing this asset. The reviewers with this link can view/download this asset with no login") %>
+        Sharing Link
   <% end %>
 
   <% content = capture do %>
@@ -11,9 +13,9 @@
                 <% temporary_link = url_for :action => :show, :only_path => false, :code => sub_form.object.code %>
                 Visitors (with no login) can access this <%= f.object.class.name.underscore.humanize %> with:
                 <br/>
-                <%= text_field_tag 'temp_link', temporary_link, :size => 90 -%>
+                <%= text_field_tag 'temp_link', temporary_link, :size => 70 -%>
                 <br/>
-                <span class='none_text'>(If this is the first time you generate this link, the link is not valid until this page is updated)</span>
+                <span class='none_text'>(If this is the first time you generate this link, the link is not valid until you click 'Save Changes')</span>
                 <%= sub_form.hidden_field :code %>
               </p>
 
@@ -23,19 +25,10 @@
                 <br/>
                 <span class='none_text'>(After this date, the link is not accessible anymore)</span>
               </p>
-              <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show()"}, :class => 'hidden_destroy_field' %>
+              <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show(); flipSaveEnable();"}, :class => 'hidden_destroy_field' %>
             </fieldset>
         <% end %>
-        <%= link_to_function "Add a Temporary Link", "addTempLink()", :id => "add_a_temporary_link", :style => "display: #{f.object.special_auth_codes.empty? ? 'block' : 'none'}" %>
+        <%= link_to_function "Add a Sharing Link", "addTempLink(); flipSaveEnable();", :id => "add_a_temporary_link", :style => "display: #{f.object.special_auth_codes.empty? ? 'block' : 'none'}" %>
    <% end %>
-  <%= render :partial => 'assets/folding_box', :locals => {:hidden => f.object.special_auth_codes.empty? ? true : false, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
+  <%= render :partial => 'assets/folding_box', :locals => {:hidden =>  false, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
 <% end %>
-
-<script type="text/javascript">
-  function addTempLink(){
-      $('new_temporary_link_form').show();
-      $('new_temporary_link_form').select('.hidden_destroy_field')[0].setValue('false');
-      $("add_a_temporary_link").hide();
-      $('temp_link').select();
-  }
-</script>
