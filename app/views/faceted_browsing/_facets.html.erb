@@ -36,7 +36,7 @@
         <td style="float:right;">
           <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
           <br/>
-          <b>Filter <%= object_type%> by:</b>
+          <b>Filter <%= internationalized_resource_name(object_type)%> by:</b>
           <hr/>
           <% count = 0 %>
           <% facets_for_object.each do |key, value| %>
