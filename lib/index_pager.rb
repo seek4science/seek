@@ -2,7 +2,7 @@ module IndexPager
 
   def index
     controller = self.controller_name.downcase    
-    unless Seek::Config.facet_enable_for_pages[controller]
+    unless Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller]
       model_name=controller.classify
       model_class=eval(model_name)
       objects = eval("@"+controller)
