@@ -9,6 +9,7 @@
    objects = facets
    object_type = objects.first.class.name
    facet_config = YAML.load(File.read(File.join(Rails.root, "config/facets.yml")))
+   facets_for_object = facet_config[object_type] || {}
 %>
 
 <div style="width: 100%">
@@ -24,7 +25,7 @@
             <div data-ex-role="exhibit-viewPanel">
               <div data-ex-role="exhibit-view"
                    data-ex-label="Tiles"
-                   data-ex-possible-orders=".<%= facet_config[object_type].keys.join(',.') %>"
+                   data-ex-possible-orders=".<%= facets_for_object.keys.join(',.') %>"
                    data-ex-paginate="true"
                    data-ex-page-size="10"
                    data-ex-show-all="true"
@@ -38,19 +39,19 @@
           <b>Filter <%= object_type%> by:</b>
           <hr/>
           <% count = 0 %>
-          <% facet_config[object_type].keys.each do |facet| %>
-              <% label = facet_config[object_type][facet]['label'] %>
-              <% facet_class = facet_config[object_type][facet]['facet_class'] %>
+          <% facets_for_object.each do |key, value| %>
+              <% label = value['label'] %>
+              <% facet_class = value['facet_class'] %>
               <div data-ex-role="facet"
-                   data-ex-expression=".<%= facet %>"
+                   data-ex-expression=".<%= key %>"
                    data-ex-facet-label="<%= label %>"
                    data-ex-facet-class="<%= facet_class %>"
                    data-ex-height="13em"
                    data-ex-collapsible="true"
 
                    <% if facet_class == "NumericRange" %>
-                        <% interval = facet_config[object_type][facet]['interval'] %>
-                        data-ex-interval='1'
+                        <% interval = value['interval'] %>
+                        data-ex-interval="<%= interval %>"
                    <% end %>
 
                    <% if facet_class == "Exhibit.HierarchicalFacet" %>
