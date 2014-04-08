@@ -8,6 +8,7 @@ class WorkflowsController < ApplicationController
   include Seek::AssetsCommon
   include AssetsCommonExtension
 
+  before_filter :workflows_enabled?
   before_filter :find_and_filter_workflows, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview ]
   before_filter :find_display_asset, :only=>[:show, :download, :run]

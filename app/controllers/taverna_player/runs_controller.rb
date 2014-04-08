@@ -2,6 +2,8 @@ module TavernaPlayer
   class RunsController < TavernaPlayer::ApplicationController
     include TavernaPlayer::Concerns::Controllers::RunsController
 
+    before_filter :workflows_enabled?
+
     skip_before_filter :project_membership_required
     skip_before_filter :restrict_guest_user, :only => :new
 

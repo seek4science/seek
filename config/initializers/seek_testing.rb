@@ -25,6 +25,7 @@ SEEK::Application.configure do
       Settings.defaults[:tagging_enabled] = true
       Settings.defaults[:authorization_checks_enabled] = true
       Settings.defaults[:magic_guest_enabled] = false
+      Settings.defaults[:workflows_enabled] = true
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'SEEK'

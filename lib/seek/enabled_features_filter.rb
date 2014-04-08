@@ -1,6 +1,6 @@
 module Seek
   module EnabledFeaturesFilter
-    FEATURES = [:models,:biosamples,:organisms,:events,:documentation]
+    FEATURES = [:models,:biosamples,:organisms,:events,:documentation, :workflows]
 
     def feature_enabled? feature
       feature=feature.to_s

@@ -109,7 +109,7 @@ class Workflow < ActiveRecord::Base
 
 
   def self.user_creatable?
-    true
+    Seek::Config.workflows_enabled
   end
 
   def self.get_all_as_json(user)
