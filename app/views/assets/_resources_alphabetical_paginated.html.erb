@@ -8,6 +8,14 @@
   <%= render :partial => "assets/resource_list_item", :collection=>objects %>
 </div>
 
-<% if objects.page == "latest" && (n=klass_from_controller(controller_name).all_authorized_for("view").count) > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all", :locals=>{:total=>n}%>
+<%
+   klass = klass_from_controller(controller_name)
+   if klass.respond_to?(:all_authorized_for)
+     total = klass.all_authorized_for("view").count
+   else
+     total = klass.count
+   end
+%>
+<% if objects.respond_to?(:page) && objects.page == "latest" && total > Seek::Config.limit_latest%>
+    <%= render :partial => "general/paginate_see_all", :locals=>{:total=>total}%>
 <% end %>
