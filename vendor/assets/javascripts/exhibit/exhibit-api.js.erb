@@ -483,8 +483,8 @@ Exhibit.load = function() {
     }
 
     if (Exhibit.params.bundle) {
-        Exhibit.scripts = ["exhibit-scripted-bundle.js"];
-        Exhibit.styles = ["styles/exhibit-scripted-bundle.css"];
+        Exhibit.scripts = ["<%= asset_path('exhibit/exhibit-scripted-bundle.js') %>"];
+        Exhibit.styles = ["<%= asset_path('exhibit/styles/exhibit-scripted-bundle.css') %>"];
     }
     
     if (typeof Exhibit.params.backstage !== "undefined") {
