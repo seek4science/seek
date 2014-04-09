@@ -20,15 +20,13 @@
 
     }
 
-
-
-
     if ($('scale')) {
         $('scale').value = scales_arr[current_scale];
     }
 </script>
-<%= javascript_include_tag "jquery-1.5.1.min","jquery-ui-1.8.14.custom.min","scales/scales" %>
+<%= javascript_include_tag "jquery-ui-1.8.14.custom.min","scales/scales" %>
 <%= stylesheet_link_tag  "scales/scales" %>
+
 <style>
     .ui-slider-vertical{
         height: <%= (Scale.count+1) * 1.85 %>em;

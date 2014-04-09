@@ -10,5 +10,6 @@
 //= require builder
 //= require top_menu
 //= require dynamic_menu
-//= require jquery-1.5.1.min
+//= require jquery
+//= require jquery_no_conflict
 //= require jscrollpane/index

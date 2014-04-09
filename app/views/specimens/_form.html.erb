@@ -111,7 +111,7 @@
 
     <% if specimen.can_manage? %>
         <p>
-          <%= render :partial => "assets/sharing_form" ,:locals=>{:object=>specimen}-%>
+          <%= render :seek_partial => "assets/sharing_form" ,:locals=>{:object=>specimen}-%>
         </p>
 
         <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} if !@specimen.try(:new_record?) %>

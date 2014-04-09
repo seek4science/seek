@@ -110,6 +110,8 @@ SEEK::Application.configure do
 
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,''
+  Seek::Config.fixed :javascript_prepended,''
+  Seek::Config.fixed :javascript_appended,''
   Seek::Config.fixed :main_layout,'application'
 
 end
