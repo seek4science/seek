@@ -18,7 +18,7 @@ module ApplicationHelper
     css = (Seek::Config.css_prepended || "").split(",")
     css << main
     css = css | (Seek::Config.css_appended || "").split(",")
-    css.empty? ? "" : stylesheet_link_tag(css.join(','))
+    css.empty? ? "" : stylesheet_link_tag(*css)
   end
 
   def date_as_string date,show_time_of_day=false,year_only_1st_jan=false
