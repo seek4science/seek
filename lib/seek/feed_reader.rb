@@ -73,7 +73,20 @@ module Seek
            filtered_entries |= entries.take(number_of_entries) if entries
           end
       end
-      filtered_entries.sort {|a,b| (b.try(:updated) || b.try(:published) || b.try(:last_modified) || 10.year.ago) <=> (a.try(:updated) || a.try(:published) || a.try(:last_modified) || 10.year.ago)}.take(number_of_entries)
+      filtered_entries.sort do |a,b|
+        date_b = nil
+        date_b = b.try(:updated) if b.respond_to?(:updated)
+        date_b ||= b.try(:published) if b.respond_to?(:published)
+        date_b ||= b.try(:last_modified) if b.respond_to?(:last_modified)
+        date_b ||= 10.year.ago
+
+        date_a = a.try(:updated) if a.respond_to?(:updated)
+        date_a ||= a.try(:published) if a.respond_to?(:published)
+        date_a ||= a.try(:last_modified) if a.respond_to?(:last_modified)
+        date_a ||= 10.year.ago
+
+        date_b <=> date_a
+      end.take(number_of_entries)
 
     end
 

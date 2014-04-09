@@ -107,7 +107,11 @@ module HomesHelper
           entry_link = entry.url
           entry_title = entry.title || "Unknown title"
           feed_title = entry.feed_title || "Unknown publisher"
-          entry_date = entry.try(:updated) || entry.try(:published) || entry.try(:last_modified)
+
+          entry_date = entry.try(:updated) if entry.respond_to?(:updated)
+          entry_date ||= entry.try(:published) if entry.respond_to?(:published)
+          entry_date ||= entry.try(:last_modified) if entry.respond_to?(:last_modified)
+
           entry_summary = truncate(strip_tags(entry.summary || entry.content),:length=>500)
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
 
