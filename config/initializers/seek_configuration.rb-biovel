@@ -113,8 +113,10 @@ SEEK::Application.configure do
   #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
   Seek::Config.default :magic_guest_enabled,true
 
-
+  Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,'biovel_application'
+  Seek::Config.fixed :javascript_prepended,''
+  Seek::Config.fixed :javascript_appended,''
   Seek::Config.fixed :main_layout,'biovel'
 
   #alternative views and partials
