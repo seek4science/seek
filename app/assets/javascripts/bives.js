@@ -1,5 +1,4 @@
 // ...
-//= require jquery-1.5.1.min
 //= require cytoscape.js-2.0.3/cytoscape
 //= require cytoscape.js-2.0.3/cytoscape.min
 //= require cytoscape.js-2.0.3/arbor
