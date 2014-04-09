@@ -13,10 +13,10 @@
 
   <% if is_front_page? %>
       <%= seek_stylesheet_tags 'front_page' %>
-      <%= javascript_include_tag 'front_page' %>
+      <%= seek_javascript_tags 'front_page' %>
   <% else %>
       <%= seek_stylesheet_tags %>
-      <%= javascript_include_tag 'application' %>
+      <%= seek_javascript_tags %>
   <% end %>
 
   <script type="text/javascript">

@@ -14,11 +14,17 @@ module ApplicationHelper
   end
 
   def seek_stylesheet_tags main='application'
-
     css = (Seek::Config.css_prepended || "").split(",")
     css << main
     css = css | (Seek::Config.css_appended || "").split(",")
     css.empty? ? "" : stylesheet_link_tag(*css)
+  end
+
+  def seek_javascript_tags main='application'
+    js = (Seek::Config.javascript_prepended || "").split(",")
+    js << main
+    js = js | (Seek::Config.javascript_appended || "").split(",")
+    js.empty? ? "" : javascript_include_tag(*js)
   end
 
   def date_as_string date,show_time_of_day=false,year_only_1st_jan=false

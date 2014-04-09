@@ -25,6 +25,36 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "2nd Jan 2012",text
   end
 
+  test "seek stylesheet tag" do
+    with_config_value :css_appended,"fish" do
+      with_config_value :css_prepended,"apple" do
+        tags = seek_stylesheet_tags "carrot"
+        assert_include tags,"<link href=\"/stylesheets/apple.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />"
+        assert_include tags,"<link href=\"/stylesheets/carrot.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />"
+        assert_include tags,"<link href=\"/stylesheets/fish.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />"
+        assert tags.index("fish.css") > tags.index("carrot.css")
+        assert tags.index("carrot.css") > tags.index("apple.css")
+        refute_equal 0,tags.index("apple.css")
+      end
+
+    end
+  end
+
+  test "seek javascript tag" do
+    with_config_value :javascript_appended,"fish" do
+      with_config_value :javascript_prepended,"apple" do
+        tags = seek_javascript_tags "carrot"
+        assert_include tags,"<script src=\"/javascripts/apple.js\" type=\"text/javascript\"></script>"
+        assert_include tags,"<script src=\"/javascripts/carrot.js\" type=\"text/javascript\"></script>"
+        assert_include tags,"<script src=\"/javascripts/fish.js\" type=\"text/javascript\"></script>"
+        assert tags.index("fish.js") > tags.index("carrot.js")
+        assert tags.index("carrot.js") > tags.index("apple.js")
+        refute_equal 0,tags.index("apple.js")
+      end
+
+    end
+  end
+
   test "should handle nil date" do
     text = date_as_string(nil)
     assert_equal "<span class='none_text'>No date defined</span>",text
