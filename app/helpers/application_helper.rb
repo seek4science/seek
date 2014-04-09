@@ -15,11 +15,10 @@ module ApplicationHelper
 
   def seek_stylesheet_tags main='application'
 
-    prepended = (Seek::Config.css_prepended || "").split(",")
-    prepended << main
-    appended = (Seek::Config.css_appended || "").split(",")
-    [stylesheet_link_tag(prepended.join(',')),
-    stylesheet_link_tag(appended.join(','))].join(" ").html_safe
+    css = (Seek::Config.css_prepended || "").split(",")
+    css << main
+    css = css | (Seek::Config.css_appended || "").split(",")
+    css.empty? ? "" : stylesheet_link_tag(css.join(','))
   end
 
   def date_as_string date,show_time_of_day=false,year_only_1st_jan=false
