@@ -83,7 +83,7 @@
 
   <% if @sample.can_manage?%>
       <p>
-          <%= render :partial => "assets/sharing_form" -%>
+          <%= render :seek_partial => "assets/sharing_form" -%>
       </p>
       
    <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} if !@sample.try(:new_record?)%>

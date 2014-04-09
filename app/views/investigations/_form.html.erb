@@ -20,7 +20,7 @@
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} %>
   <% end %>
   <p>
-    <%= render :partial=>"assets/sharing_form" if @investigation.can_manage? -%>
+    <%= render :seek_partial=>"assets/sharing_form" if @investigation.can_manage? -%>
   </p>
 </div>
 

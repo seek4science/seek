@@ -4,7 +4,7 @@
    disable_advanced_view ||= nil
    show_advanced_permissions = !@resource.respond_to?(:has_advanced_permissions?) || @resource.has_advanced_permissions?
    default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::EDITING
-   default_consortium_access_type = Policy::VISIBLE
+   default_consortium_access_type = Policy::ACCESSIBLE
    can_publish = @resource.respond_to?(:can_publish?) ? @resource.can_publish? : true
 %>
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
@@ -19,7 +19,7 @@
 <div class="fold" id="sharing_form">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") -%>
+    <%= help_icon("Specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type.downcase}.") -%>
     Sharing
   </div>
 
@@ -27,7 +27,7 @@
 
     <div class="box_infotext">
       <p>
-        Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type -%>.
+        Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type.downcase -%>.
         <%= link_to_function(("More info " + expand_image).html_safe, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3)) -%>
       </p>
       <div id="more_sharing_info" class="box_simple" style="display: none;">        
@@ -43,11 +43,13 @@
              end
           %>
           <li>Share within members of <%= t('project').pluralize %> associated with this <%= @resource_type -%> <%= through_resource%> and with all other users that are a member of a <%= Seek::Config.project_name %> <%= t('project') %>.</li>
-          <li>Share with the all visitors (including anonymous visitors with no login)</li>
-              <li style="margin-left: 2em">You can share with the all visitors right away if you are the gatekeeper or if the <%= t('project').pluralize %> associated with this <%= @resource_type -%> have no gatekeeper</li>
-              <li style="margin-left: 2em">Or you can request the gatekeepers for their approval to share with all visitors</li>
+          <% if admin_logged_in? %>
+            <li>Share with the all visitors (including anonymous visitors with no login)</li>
+                <li style="margin-left: 2em">You can share with the all visitors right away if you are the gatekeeper or if the <%= t('project').pluralize %> associated with this <%= @resource_type -%> have no gatekeeper</li>
+                <li style="margin-left: 2em">Or you can request the gatekeepers for their approval to share with all visitors</li>
+          <% end %>
           <% if !disable_advanced_view%>
-            <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your <%= t('project') %>/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
+            <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your <%= t('project') %>/Institution only,<br/> with specific individuals, or set up custom <%= t('favourite_group').pluralize -%> for people you regularly need to share with.</li>
           <% end %>
         </ul>
       </div>
@@ -68,7 +70,7 @@
             <input type="hidden" id='access_type_select_<%= Policy::PRIVATE -%>' name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
             <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
                                                                                   value="<%= Policy::PRIVATE -%>" type="radio" />
-            - Keep this <%= @resource_type -%> private (only visible to you)
+            - Keep this <%= @resource_type.downcase -%> private (only visible to you)
           </label>
           <%= additional_advanced_permissions_included @resource, Policy::PRIVATE -%>
         </p>
@@ -79,30 +81,36 @@
         <p>
           <label>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
-            - Members of <%= t('project').pluralize %> associated with this <%= @resource_type -%>:
+            - Members of <%= t('project').pluralize.downcase %> associated with this <%= @resource_type.downcase -%>:
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
-                 <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource) || default_projects_access_type) -%>
+                 <%= policy_selection_options([Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource) || default_projects_access_type) -%>
              </select>
              <br/>
-            <span style="margin-left:10em;">... and all other <%= t('project') %> members:</span>
-             <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
-               :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => (@resource.respond_to?(:policy) && @resource.policy.try(:sharing_scope)==Policy::ALL_SYSMO_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] } -%>
+             <% if admin_logged_in? %>
+               <span style="margin-left:10em;">... and all other <%= t('project').downcase %> members:</span>
+               <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
+                                                                                               :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => (@resource.respond_to?(:policy) && @resource.policy.try(:sharing_scope)==Policy::ALL_SYSMO_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::ACCESSIBLE,Policy::EDITING] } -%>
+             <% else %>
+               <%= hidden_field_tag 'sharing[access_type_2]', '0' -%>
+             <% end %>
              <%= additional_advanced_permissions_included @resource, Policy::ALL_SYSMO_USERS -%>
         </p>
 
         <!-- public -->
-        <p>
-          <label for="sharing_scope_<%= Policy::EVERYONE -%>">
-            <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::EVERYONE -%>"/>
-            - All visitors (including anonymous visitors with no login):
-          </label>
-           <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
-            :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
-           <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
-          <br/>
-        </p>
+        <% if admin_logged_in? %>
+          <p>
+            <label for="sharing_scope_<%= Policy::EVERYONE -%>">
+              <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
+                     value="<%= Policy::EVERYONE -%>"/>
+              - All visitors (including anonymous visitors with no login):
+            </label>
+             <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
+              :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
+             <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
+            <br/>
+          </p>
+        <% end %>
 
     </div>
 
@@ -135,7 +143,7 @@
         <div id="specific_sharing" style="display:block; margin-top: 1em;">
           <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
             <p style="color: #666666;">
-              So far you have selected to share this <%= @resource_type -%> with:
+              So far you have selected to share this <%= @resource_type.downcase -%> with:
             </p>
 
             <p id="shared_with_list" class="box_editing_inner" style="line-height: 1.5;">
@@ -153,14 +161,14 @@
 
               <div class="foldTitle">
                 <%= image_tag icon_filename_for_key("spinner"), :id => "f_group_deleting_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
-                <%= help_icon("Here you can choose your favourite groups to share this #{@resource_type} with.") -%>
+                <%= help_icon("Here you can choose your #{t('favourite_group').pluralize} to share this #{@resource_type} with.") -%>
                 <%= t('favourite_group').capitalize.pluralize -%>
               </div>
 
               <div class="foldContent" style="display: none; background-color: #F2F2F2;">
                 <p style="margin: 1em 0 0 0; padding: 0; line-height: 1; text-align: center;">
                   <% favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id) -%>
-                  <% f_group_select_options = (favourite_groups.blank? ? "<option value=\"\">You don't have any favourite groups</option>" : options_for_select(favourite_groups)) -%>
+                  <% f_group_select_options = (favourite_groups.blank? ? "<option value=\"\">You don't have any #{t('favourite_group').pluralize}</option>" : options_for_select(favourite_groups)) -%>
 
                   <%= select_tag "favourite_group_select", f_group_select_options, :style => "width: 82%; vertical-align: middle; margin-right: 0.4em;", :disabled => (favourite_groups.blank?) -%>
 
@@ -170,7 +178,7 @@
                 <ul style="text-align: left; margin: 1em 0 0.5em 3.2em;">
                   <li id="edit_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;"><%= favourite_group_popup_link_action_edit(@resource.class.name) -%></li>
                   <li id="delete_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;">
-                    <%= link_to "Delete selected favourite group", delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
+                    <%= link_to "Delete selected #{t('favourite_group').pluralize}", main_app.delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
                   </li>
                   <li id="create_f_group_li" style="list-style-type: disc; padding: 0.5em 0 0 0;"><%= favourite_group_popup_link_action_new(@resource.class.name) -%></li>
 
@@ -225,7 +233,7 @@
                       submit
 
                       <select name="proj_access_type_select" id="proj_access_type_select" onchange="javascript: replaceReviewWorkGroupURL();" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
-                        <%= policy_selection_options [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING], @resource -%>
+                        <%= policy_selection_options [Policy::NO_ACCESS, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING], @resource -%>
                       </select>
                     </div>
 
@@ -260,7 +268,7 @@
 
               <div class="foldTitle">
                 <%= help_icon("Here you can specify individual people to share this #{@resource_type} with.") -%>
-                Individual People
+                Individual people
               </div>
 
               <div class="foldContent" style="display: none; background-color: #F2F2F2; padding-bottom: 1.3em;">
@@ -333,13 +341,13 @@
 <script type="text/javascript">
   init_sharing();
 
-  GET_INSTITUTIONS_LINK = '<%= request_institutions_projects_path -%>';
-  GET_ALL_INSTITUTIONS_LINK = '<%= request_all_institutions_path -%>';
+  GET_INSTITUTIONS_LINK = '<%= main_app.request_institutions_projects_path -%>';
+  GET_ALL_INSTITUTIONS_LINK = '<%= main_app.request_all_institutions_path -%>';
 
-  CREATE_FAVOURITE_GROUP_LINK = '<%= create_favourite_group_path -%>';
-  UPDATE_FAVOURITE_GROUP_LINK = '<%= update_favourite_group_path -%>';
+  CREATE_FAVOURITE_GROUP_LINK = '<%= main_app.create_favourite_group_path -%>';
+  UPDATE_FAVOURITE_GROUP_LINK = '<%= main_app.update_favourite_group_path -%>';
 
-  REVIEW_WORK_GROUP_LINK = '<%= review_work_group_path("type", "id", "access_type") -%>';
+  REVIEW_WORK_GROUP_LINK = '<%= main_app.review_work_group_path("type", "id", "access_type") -%>';
 
   PROJECT_TRANSLATED_TERM = "<%= t('project') -%>";
 
