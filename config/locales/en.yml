@@ -54,6 +54,10 @@ en:
     feedback: "Provide feedback"
     isa_best_practice: "ISA best practice"
 
+  taverna_player/run: "workflow run"
+
+  favourite_group: "favourite groups"
+
   access:
     determined_by_group: "Individual access rights for each member"
     no_access: "No access"
