@@ -233,7 +233,7 @@ class User < ActiveRecord::Base
 
   def guest_project_member?
     project = Project.find_by_name('BioVeL Portal Guests')
-    self.person.projects.include?(project)
+    self.person.projects.size == 1 && self.person.projects.include?(project)
   end
 
   protected
