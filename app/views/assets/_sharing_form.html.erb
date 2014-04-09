@@ -43,7 +43,7 @@
              end
           %>
           <li>Share within members of <%= t('project').pluralize %> associated with this <%= @resource_type -%> <%= through_resource%> and with all other users that are a member of a <%= Seek::Config.project_name %> <%= t('project') %>.</li>
-          <% if current_user.admin? %>
+          <% if admin_logged_in? %>
             <li>Share with the all visitors (including anonymous visitors with no login)</li>
                 <li style="margin-left: 2em">You can share with the all visitors right away if you are the gatekeeper or if the <%= t('project').pluralize %> associated with this <%= @resource_type -%> have no gatekeeper</li>
                 <li style="margin-left: 2em">Or you can request the gatekeepers for their approval to share with all visitors</li>
@@ -87,7 +87,7 @@
                  <%= policy_selection_options([Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource) || default_projects_access_type) -%>
              </select>
              <br/>
-             <% if current_user.admin? %>
+             <% if admin_logged_in? %>
                <span style="margin-left:10em;">... and all other <%= t('project').downcase %> members:</span>
                <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
                                                                                                :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => (@resource.respond_to?(:policy) && @resource.policy.try(:sharing_scope)==Policy::ALL_SYSMO_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::ACCESSIBLE,Policy::EDITING] } -%>
@@ -98,7 +98,7 @@
         </p>
 
         <!-- public -->
-        <% if current_user.admin? %>
+        <% if admin_logged_in? %>
           <p>
             <label for="sharing_scope_<%= Policy::EVERYONE -%>">
               <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
