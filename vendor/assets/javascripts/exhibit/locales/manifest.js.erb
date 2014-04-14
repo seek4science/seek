@@ -2,12 +2,5 @@ Exhibit.jQuery(document).bind("registerLocales.exhibit", function() {
     Exhibit.jQuery(document).trigger("beforeLocalesRegistered.exhibit");
     new Exhibit.Locale("default", "<%= asset_path('exhibit/locales/en/locale.js') %>");
     new Exhibit.Locale("en", "<%= asset_path('exhibit/locales/en/locale.js') %>");
-    new Exhibit.Locale("de", "<%= asset_path('exhibit/locales/de/locale.js') %>";
-    new Exhibit.Locale("es", "<%= asset_path('exhibit/locales/es/locale.js') %>");
-    new Exhibit.Locale("fr", "<%= asset_path('exhibit/locales/fr/locale.js') %>");
-    new Exhibit.Locale("nl", "<%= asset_path('exhibit/locales/nl/locale.js') %>");
-    new Exhibit.Locale("no", "<%= asset_path('exhibit/locales/no/locale.js') %>");
-    new Exhibit.Locale("sv", "<%= asset_path('exhibit/locales/sv/locale.js') %>");
-    new Exhibit.Locale("pt-BR", "<%= asset_path('exhibit/locales/pt-BR/locale.js') %>");
     Exhibit.jQuery(document).trigger("localesRegistered.exhibit");
 });
