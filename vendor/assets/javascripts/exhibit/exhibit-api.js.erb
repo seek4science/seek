@@ -81,17 +81,17 @@ var Exhibit = {
     Extension: {},
 
     _dependencies: {
-        "lib/jquery-1.8.2.min.js": "jQuery",
-        "lib/json2.js": "JSON",
-        "lib/base64.js": "Base64",
-        "lib/sprintf.js": "sprintf",
+        "<%= asset_path('exhibit/lib/jquery-1.8.2.min.js') %>": "jQuery",
+        "<%= asset_path('exhibit/lib/json2.js') %>": "JSON",
+        "<%= asset_path('exhibit/lib/base64.js') %>": "Base64",
+        "<%= asset_path('exhibit/lib/sprintf.js') %>": "sprintf",
         // History fails to load correctly in Safari through this mechanism
-        "lib/jquery.history.js": undefined, // "History.init",
-        "lib/jquery.history.shim.js": undefined, //always load?
+        "<%= asset_path('exhibit/lib/jquery.history.js') %>": undefined, // "History.init",
+        "<%= asset_path('exhibit/lib/jquery.history.shim.js') %>": undefined, //always load?
         // SIMILE jQuery plugins fail to load under nonconflicting
         // circumstances because jQuery hasn't been made available yet
-        "lib/jquery.simile.dom.js": undefined, // "jQuery.simileDOM",
-        "lib/jquery.simile.bubble.js": undefined // "jQuery.simileBubble"
+        "<%= asset_path('exhibit/lib/jquery.simile.dom.js') %>": undefined, // "jQuery.simileDOM",
+        "<%= asset_path('exhibit/lib/jquery.simile.bubble.js') %>": undefined // "jQuery.simileBubble"
     },
 
     /**
@@ -266,7 +266,7 @@ Exhibit.parseURLParameters = function(url, to, types) {
         name = decode(param.slice(0, eq));
         old = parsed[name];
         replacement = decode(param.slice(eq+1));
- 
+
         if (typeof old === "undefined") {
             old = [];
         } else if (!(old instanceof Array)) {
@@ -344,7 +344,7 @@ Exhibit.includeCssFile = function(doc, url) {
                 // fall through
         }
     }
-        
+
     link = doc.createElement("link");
     link.setAttribute("rel", "stylesheet");
     link.setAttribute("type", "text/css");
@@ -428,7 +428,7 @@ Exhibit.generateDelayID = function() {
 
 /**
  * Load all scripts associated with Exhibit.
- * 
+ *
  * @static
  */
 Exhibit.load = function() {
@@ -458,8 +458,8 @@ Exhibit.load = function() {
                                        paramTypes);
         }
     } else {
-        url = Exhibit.findScript(document, "/exhibit-api.js");
-        Exhibit.urlPrefix = url.substr(0, url.indexOf("exhibit-api.js"));
+        url = Exhibit.findScript(document, "/exhibit-api");
+        Exhibit.urlPrefix = url.substr(0, url.indexOf("exhibit-api"));
         Exhibit.parseURLParameters(url, Exhibit.params, paramTypes);
     }
 
@@ -483,10 +483,10 @@ Exhibit.load = function() {
     }
 
     if (Exhibit.params.bundle) {
-        Exhibit.scripts = ["exhibit-scripted-bundle.js"];
-        Exhibit.styles = ["styles/exhibit-scripted-bundle.css"];
+        Exhibit.scripts = ["<%= asset_path('exhibit/exhibit-scripted-bundle.js') %>"];
+        Exhibit.styles = ["<%= asset_path('exhibit/styles/exhibit-scripted-bundle.css') %>"];
     }
-    
+
     if (typeof Exhibit.params.backstage !== "undefined") {
         // If using Backstage, force non-auto creation and force Backstage
         // to load after Exhibit.  If the Backstage install also includes
@@ -509,7 +509,7 @@ Exhibit.load = function() {
         style = document.createElement("link");
         style.setAttribute("rel", "stylesheet");
         style.setAttribute("type", "text/css");
-        style.setAttribute("href", Exhibit.urlPrefix + Exhibit.styles[i]);
+        style.setAttribute("href", Exhibit.styles[i]);
         docHead.appendChild(style);
     }
 
@@ -521,12 +521,12 @@ Exhibit.load = function() {
 
     for (i in Exhibit._dependencies) {
         if (typeof Exhibit._dependencies[i] === "undefined") {
-            Exhibit.includeJavascriptFile(Exhibit.urlPrefix, i);
+            Exhibit.includeJavascriptFile('', i);
         } else if (Exhibit._dependencies.hasOwnProperty(i)) {
             dep = Exhibit._dependencies[i].split(".");
             if (dep.length === 1) {
                 if (!Object.prototype.hasOwnProperty.call(window, dep[0])) {
-                    Exhibit.includeJavascriptFile(Exhibit.urlPrefix, i);
+                    Exhibit.includeJavascriptFile('', i);
                 }
             } else {
                 for (j = 0; j < dep.length; j++) {
@@ -536,7 +536,7 @@ Exhibit.load = function() {
                     }
                     if (!o.hasOwnProperty(dep[j])) {
                         if (j === dep.length - 1) {
-                            Exhibit.includeJavascriptFile(Exhibit.urlPrefix, i);
+                            Exhibit.includeJavascriptFile('', i);
                         } else {
                             break;
                         }
