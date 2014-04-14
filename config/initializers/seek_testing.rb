@@ -52,6 +52,8 @@ SEEK::Application.configure do
       ActionView::Renderer.clear_alternative({:seek_partial=>"projects/resource_list_item"})
       ActionView::Renderer.clear_alternative({:controller=>:people,:seek_partial=>"general/items_related_to"})
 
+      Settings.defaults[:faceted_browsing_enabled] = false
+
     end
   end
 end

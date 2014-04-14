@@ -1,19 +1,9 @@
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_sample_path, :label => "New Sample"} %>
 
-<% if logged_in_and_member? %>
-<ul class="sectionIcons">
-    <li><%= image_tag_for_key "new", new_sample_path, "New sample", nil, "New sample" %></li>
-</ul>
-<% end %>
-<% if @samples.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @samples.pages, :page_totals=>@samples.page_totals,:current_page=>@samples.page } -%>
-<% end %>
-
-<div class="list_items_container">
-  <%= render :partial=>"assets/resource_list_item", :collection=>@samples %>
-</div>
-<% if @samples.page == "latest" && Sample.count > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all"%>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
+    <%= render :partial => "faceted_browsing/facets", :object => @samples %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @samples %>
 <% end %>
 
 

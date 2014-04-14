@@ -15,7 +15,7 @@ class AssaysController < ApplicationController
 
   include Seek::BreadCrumbs
 
-   def new_object_based_on_existing_one
+  def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations
     params[:data_file_ids]=@existing_assay.data_file_masters.collect{|d|"#{d.id},None"}

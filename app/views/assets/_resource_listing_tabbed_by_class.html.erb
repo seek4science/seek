@@ -73,7 +73,7 @@
       <% else %>
         <% resources = {} %>
       <% end%>
-      <% visible_resource_type = resource_tab_item_name(resource_type,!is_external) -%>
+      <% visible_resource_type = internationalized_resource_name(resource_type,!is_external) -%>
       <% tab_title = "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%>
       <% title_class = is_external ? "external_result" : "" %>
       <% if (!resources.empty? || hidden_count > 0) || show_empty_tabs %>

@@ -1,0 +1,6 @@
+Exhibit.jQuery(document).bind("registerLocales.exhibit", function() {
+    Exhibit.jQuery(document).trigger("beforeLocalesRegistered.exhibit");
+    new Exhibit.Locale("default", "<%= asset_path('exhibit/locales/en/locale.js') %>");
+    new Exhibit.Locale("en", "<%= asset_path('exhibit/locales/en/locale.js') %>");
+    Exhibit.jQuery(document).trigger("localesRegistered.exhibit");
+});

@@ -322,10 +322,10 @@ module ApplicationHelper
       :title => link_options[:title] || "",
       :onclick => "if (!#{can_click_var}) {#{can_click_var}=true;return(false);} else {return true;}",
       :onMouseUp => "setTimeout('#{can_click_var} = true;', 200);")
-      html << draggable_element(link_options[:id],
-      :revert => drag_options[:revert] || true,
-      :ghosting => drag_options[:ghosting] || false,
-      :change => "function(element){#{can_click_var} = false;}")
+      #html << draggable_element(link_options[:id],
+      #:revert => drag_options[:revert] || true,
+      #:ghosting => drag_options[:ghosting] || false,
+      #:change => "function(element){#{can_click_var} = false;}")
     return html.html_safe
   end
 
@@ -575,7 +575,7 @@ module ApplicationHelper
     end
   end
 
-  def resource_tab_item_name resource_type,pluralize=true
+  def internationalized_resource_name resource_type,pluralize=true
     resource_type = resource_type.singularize
     if resource_type == "Speciman"
       result = t('biosamples.sample_parent_term')
@@ -683,7 +683,9 @@ module ApplicationHelper
     return text.html_safe
   end
 
-
+  def klass_from_controller controller_name
+    controller_name.singularize.camelize.constantize
+  end
 
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>I18n.t('project').pluralize,"institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search",

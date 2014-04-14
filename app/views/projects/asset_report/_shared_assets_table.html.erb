@@ -1,7 +1,7 @@
-<% asset_name = resource_tab_item_name type.name, false -%>
+<% asset_name = internationalized_resource_name type.name, false -%>
 <h2><%= asset_name.pluralize %></h2>
 <% if items.empty? %>
-    <span class='none_text'>There are no <%= resource_tab_item_name type.name %> <%= no_items_suffix -%></span>
+    <span class='none_text'>There are no <%= internationalized_resource_name type.name %> <%= no_items_suffix -%></span>
 <% else -%>
     <table class='asset_report_table'>
       <thead>

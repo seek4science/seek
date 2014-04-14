@@ -1,0 +1,61 @@
+<div id="data" style="display:none">
+  <%
+     object_type = objects.first.class.name
+     facet_config = YAML.load(File.read(File.join(Rails.root, "config/facets.yml")))
+     facets_for_object = facet_config[object_type] || {}
+
+     exhibit_items = []
+     exhibit_properties = {}
+     facets_for_object.each do |key,value|
+       facet_class = value['facet_class']
+       if facet_class == 'NumericRange'
+         exhibit_properties[key] = {"valueType" => "number"}
+       elsif facet_class == 'Exhibit.HierarchicalFacet'
+         tree_from = value['tree_from']
+         tree_from.split(',').each do |tree_class|
+           exhibit_items |= exhibit_tree(tree_class, key)
+         end
+       end
+     end
+
+     #items
+     objects.each do |object|
+       exhibit_item = {}
+       exhibit_item['item_id'] = object.id
+       #This display_content will be later on replaced by resource_list_item, by using ajax, otherwise it causes speed problem
+       exhibit_item['display_content'] = ''
+       exhibit_item['type'] = object_type
+
+       #generate facet values for each facet based on the facets.yml config file
+       facets_for_object.each do |key, value|
+         facet_values = object
+         value_from = value['value_from']
+         value_from.split(':').each do |field|
+           if facet_values.blank?
+             next
+           elsif facet_values.kind_of?(Array)
+             facet_values = facet_values.collect(&:"#{field}")
+           else
+             facet_values = facet_values.send(field)
+           end
+         end
+         #escape facet_values
+         if facet_values.blank?
+         elsif facet_values.kind_of?(Array)
+           facet_values = facet_values.collect{|v| h(v)}
+         else
+           facet_values = h(facet_values)
+         end
+         exhibit_item[key] = facet_values
+       end
+
+       exhibit_items << exhibit_item
+     end
+  %>
+
+  {
+  "properties": <%= exhibit_properties.to_json %>,
+  "items": <%= exhibit_items.to_json %>
+  }
+
+</div>

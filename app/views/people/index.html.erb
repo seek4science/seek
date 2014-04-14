@@ -14,18 +14,10 @@
   <h2><%= "People with the role '#{h(@project_role.name)}'" %></h2>
 <% end -%>
 
-
-<% if @people.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @people.pages, :page_totals=>@people.page_totals,:current_page=>@people.page } -%>
-<% end %>
-
-<div class="list_items_container">
-  <%= render :partial => "assets/resource_list_item", :collection=>@people %>
-</div>
-
-<% if @people.respond_to?(:page) && @people.page == "latest" && Person.count > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>Person.count} %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
+    <%= render :partial => "faceted_browsing/facets", :object => @people %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @people %>
 <% end %>
 
 

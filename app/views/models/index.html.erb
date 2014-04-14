@@ -1,17 +1,8 @@
-<% if logged_in_and_member? %>
-    <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_model_path, "Upload a #{t('model')}", nil, "Upload a #{t('model')}" %></li>
-        <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
-    </ul>
-<% end %>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_model_path, :label => "Upload a #{t('model')}"} %>
 
-<% if @models.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @models.pages, :page_totals=>@models.page_totals,:current_page=>@models.page } -%>
-<% end %>
 
-<%= render :partial => "assets/resource_list", :locals => { :collection => @models, :authorization_for_showing_already_done=>true } %>
-
-<% if @models.page == "latest" && (n=Model.all_authorized_for("view").count) > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>n} %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
+    <%= render :partial => "faceted_browsing/facets", :object => @models %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @models %>
 <% end %>
