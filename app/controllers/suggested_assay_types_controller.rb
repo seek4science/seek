@@ -1,7 +1,9 @@
 class SuggestedAssayTypesController < ApplicationController
+  # all login users can manage assay types by editing their own ones
+  # admins can even delete them
+  before_filter :check_allowed_to_manage_types, :only => [:destroy]
 
-  before_filter :check_allowed_to_manage_types
-
+  before_filter :project_membership_required, :only => [:new_popup]
 
   def new_popup
     @suggested_assay_type = SuggestedAssayType.new

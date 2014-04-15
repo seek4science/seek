@@ -1,6 +1,6 @@
 #encoding: utf-8
 module SuggestedAssayTypesHelper
-  def create_suggested_assay_type_popup_link is_for_modelling=nil, link_from="assay_types"
+  def create_suggested_assay_type_popup_link is_for_modelling=nil, link_from="suggested_assay_types"
     return link_to_remote_redbox(image("new") + ' new assay type',
                                  {:url => new_popup_suggested_assay_types_path,
                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",

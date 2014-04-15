@@ -64,16 +64,12 @@
 <table class="padded_table">
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
-    <% if User.current_user.try(:can_manage_types?) %>
         <%= create_suggested_assay_type_popup_link @assay.is_modelling?, controller_name %>
 
-      <% end %>
     </td>
     <% unless @assay.is_modelling? -%>
         <td><%= f.label "Technology type: " %>
-       <% if User.current_user.try(:can_manage_types?) %>
               <%= create_suggested_technology_type_popup_link controller_name %>
-          <% end %>
         </td>
 
     <% end -%>
