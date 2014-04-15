@@ -106,12 +106,12 @@ class Assay < ActiveRecord::Base
 
   # overwritten in ontology_type_handling
   def assay_type_label
-      SuggestedAssayType.where(:uri => self.assay_type_uri).first.label
+      SuggestedAssayType.where(:uri => self.assay_type_uri).first.try(:label)
   end
 
   # overwritten in ontology_type_handling
   def technology_type_label
-      SuggestedTechnologyType.where(:uri => self.technology_type_uri).first.label
+      SuggestedTechnologyType.where(:uri => self.technology_type_uri).first.try(:label)
   end
 
   def short_description
