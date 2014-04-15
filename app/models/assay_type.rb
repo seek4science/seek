@@ -71,13 +71,7 @@ class AssayType < ActiveRecord::Base
   end
 
 
-  def can_edit?
-    contributor && User.logged_in_and_member?
-  end
 
-  def can_destroy? user=User.current_user
-   (contributor && (user == contributor.user)) || User.asset_manager_logged_in?
-  end
 
 end
   

@@ -1,0 +1,25 @@
+<%= f.error_messages -%>
+<%= f.hidden_field :is_for_modelling%>
+<%= f.hidden_field :link_from%>
+
+<center>
+  <div style="width: 60%;">
+
+    <p>
+      <%= f.label :label-%>*<br/>
+      <%= f.text_field :label,{:style=>"width: 100%"} -%>
+    </p>
+
+    <p>
+         <%= f.label "Parent" -%><br/>
+         <span style="color: #666666;"> Select parent</span><br/>
+     <%= ontology_selection_list type, "suggested_assay_type[parent_uri]", @suggested_assay_type.parent_uri,{:style=>"width:100%"}  %>
+    </p>
+  </div>
+</center>
+<div align="center" style="margin-top: 1.5em">
+  <%= f.submit(action==:edit ? "Update" : "Create", :id => "create_suggested_assay_type_btn") -%>
+  or <input type=button value='Cancel' onclick="RedBox.close()">
+</div>
+
+

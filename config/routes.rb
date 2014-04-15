@@ -235,28 +235,22 @@ SEEK::Application.routes.draw do
 
    ### ASSAY AND TECHNOLOGY TYPES ###
 
+  resources :suggested_assay_types do
+      collection do
+        post :new_popup
+        get :manage
+      end
+  end
+  resources :suggested_technology_types do
+      collection do
+        post :new_popup
+        get :manage
+      end
+  end
+
   get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
   get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
 
-  resources :assay_types do
-    member do
-      post :new
-      post :update_term_uri
-    end
-    collection do
-      get :manage
-    end
-  end
-
-  resources :technology_types do
-    member do
-      post :new
-      post :update_term_uri
-    end
-    collection do
-      get :manage
-    end
-  end
 
   ### ASSETS ###
 

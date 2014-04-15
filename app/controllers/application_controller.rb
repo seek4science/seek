@@ -1,6 +1,5 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
-  include Recaptcha::Verify
 
 require 'authenticated_system'
 
@@ -8,6 +7,7 @@ class ApplicationController < ActionController::Base
 
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
+  include Recaptcha::Verify
 
   self.mod_porter_secret = PORTER_SECRET
 

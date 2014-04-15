@@ -5,22 +5,22 @@ assay_type_text = @is_modelling ? "Biological problem addressed" : "#{t('assays.
 <%= render :partial => "general/item_title",:locals=>{:title=>"#{assay_type_text} '#{h(@label)}'"} %>
 
 
-<% unless @assay_type.nil? -%>
+<% unless @type_class.nil? -%>
 
     <div class="ontology_nav">
 
       <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
-      <%= parent_assay_types_list_links @parents  -%>
+      <%= parent_assay_types_list_links @type_class.parents  -%>
 
       <br/>
 
       <%= image("current",{:title=>"Current #{assay_type_text}",:alt=>"Current #{assay_type_text}",:style=>"vertical-align:middle"}) -%>
-      <%= displayed_hierarchy_current_label(@label,@assay_type) -%>
+      <%= displayed_hierarchy_current_label(@label,@type_class) -%>
 
       <br/>
 
       <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
-      <%= child_assay_types_list_links @assay_type.children  -%>
+      <%= child_assay_types_list_links @type_class.children  -%>
 
     </div>
 

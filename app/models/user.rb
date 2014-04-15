@@ -223,12 +223,12 @@ class User < ActiveRecord::Base
         end
       when "pals"
         if User.admin_logged_in? || User.pal_logged_in?
-          return true
+          return false
         else
           return false
         end
       when "users"
-        return true
+        return false
       when "none"
         return false
     end

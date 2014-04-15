@@ -19,7 +19,7 @@ module OntologyHelper
 
   def render_ontology_class_options clz,depth=0
     result = [["--"*depth+clz.label,clz.uri.to_s]]
-    clz.subclasses.each do |c|
+    clz.children.each do |c|
       result += render_ontology_class_options(c,depth+1)
     end
     result

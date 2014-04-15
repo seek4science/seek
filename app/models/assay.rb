@@ -4,6 +4,7 @@ class Assay < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::OntologyTypeHandling
+  include Seek::SuggestedType
 
   acts_as_isa
   acts_as_taggable
@@ -28,8 +29,7 @@ class Assay < ActiveRecord::Base
 
   belongs_to :institution
   has_and_belongs_to_many :samples
-  belongs_to :assay_type
-  belongs_to :technology_type
+
   belongs_to :study
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
@@ -104,14 +104,20 @@ class Assay < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
 
-  def assay_type_uri
-      assay_type.term_uri
+  # overwritten in ontology_type_handling
+  def assay_type_label
+      SuggestedAssayType.where(:uri => self.assay_type_uri).first.label
+  end
+
+  # overwritten in ontology_type_handling
+  def technology_type_label
+      SuggestedTechnologyType.where(:uri => self.technology_type_uri).first.label
   end
 
   def short_description
-    type=assay_type.nil? ? "No type" : assay_type.title
+    type= self.assay_type_label.nil? ? "No type" : self.assay_type_label
    
-    "#{title} (#{type})"
+    "#{self.title} (#{type})"
   end
 
   def state_allows_delete? *args
@@ -170,7 +176,7 @@ class Assay < ActiveRecord::Base
     tissue_and_cell_type=nil
     if tissue_and_cell_type_title && !tissue_and_cell_type_title.empty?
       if ( tissue_and_cell_type_id =="0" )
-          found = TissueAndCellType.find(:first,:conditions => {:title => tissue_and_cell_type_title})
+          found = TissueAndCellType.where(:title => tissue_and_cell_type_title).first
           unless found
           tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title) if (!tissue_and_cell_type_title.nil? && tissue_and_cell_type_title!="")
           end

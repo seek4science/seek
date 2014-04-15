@@ -30,7 +30,7 @@
   <% if Seek::Config.is_virtualliver -%>
       <p>
         <%= f.label "Institution" %><br/>
-        <%#= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."},{:style=>"width:90%"}) %>
+        <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."},{:style=>"width:90%"}) %>
       </p>
   <% end -%>
   <% if @assay.study.blank? or @assay.study.can_view? %>
@@ -62,39 +62,35 @@
 <%= f.hidden_field :assay_class_id -%>
 
 <table class="padded_table">
-  <% root_id = @assay.is_modelling? ? AssayType.modelling_assay_type_id : AssayType.experimental_assay_type_id %>
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
     <% if User.current_user.try(:can_manage_types?) %>
-      <%#= link_to (image('new') + " new assay type"), new_assay_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
-        <%= create_assay_type_popup_link root_id, controller_name %>
+        <%= create_suggested_assay_type_popup_link @assay.is_modelling?, controller_name %>
 
       <% end %>
     </td>
     <% unless @assay.is_modelling? -%>
         <td><%= f.label "Technology type: " %>
        <% if User.current_user.try(:can_manage_types?) %>
-           <%#= link_to (image('new') + " new technology type"), new_technology_type_path(:parent_name=>controller_name.underscore.singularize),:onclick => "window.open(this.href);return false;" %>
-              <%= create_technology_type_popup_link controller_name %>
+              <%= create_suggested_technology_type_popup_link controller_name %>
           <% end %>
         </td>
 
     <% end -%>
   </tr>
   <tr>
-        <td style="width:50%">
-         <div id="assay_assay_types_list">
-           <%= render :partial => "assays/assay_types_list", :locals=>{:root_id=> root_id, :assay_type=> @assay.assay_type} %>
-         </div>
-        </td>
-        <% unless @assay.is_modelling? -%>
-
-          <td style="width:50%">
-             <div id="assay_technology_types_list">
-               <%= render :partial => "assays/technology_types_list", :locals=>{:technology_type=> @assay.technology_type} %>
-           </div>
-          </td>
-        <% end -%>
+    <td style="width:50%">
+      <div id="assay_assay_types_list">
+        <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay.assay_type_uri, {:style => "width:100%"} %>
+      </div>
+    </td>
+    <td style="width:50%">
+      <% unless @assay.is_modelling? -%>
+          <div id="assay_technology_types_list">
+            <%= technology_type_select_tag f, "technology_type_uri", @assay.technology_type_uri, {:style => "width:100%"} %>
+          </div>
+      <% end -%>
+    </td>
   </tr>
 </table>
 

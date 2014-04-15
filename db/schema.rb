@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140327111037) do
+ActiveRecord::Schema.define(:version => 20140403123551) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1433,6 +1433,25 @@ ActiveRecord::Schema.define(:version => 20140327111037) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "project_subscription_id"
+  end
+
+  create_table "suggested_assay_types", :force => true do |t|
+    t.string   "label"
+    t.string   "uri"
+    t.string   "parent_uri"
+    t.integer  "contributor_id"
+    t.boolean  "is_for_modelling"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  create_table "suggested_technology_types", :force => true do |t|
+    t.string   "label"
+    t.string   "uri"
+    t.string   "parent_uri"
+    t.integer  "contributor_id"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   create_table "synonyms", :force => true do |t|

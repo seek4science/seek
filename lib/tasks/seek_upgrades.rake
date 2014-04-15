@@ -88,6 +88,75 @@ namespace :seek do
     end
   end
    desc "update assay types from ontology"
+   task :move_new_assay_types => :environment  do
+        #move assay types
+        AssayType.all.each do |at|
+          assays = Assay.where(:assay_type_id=> at.id)
+          assays.each do |a|
+            a.assay_type_label = at.title
+            a.assay_type_uri = at.term_uri
+            disable_authorization_checks do
+              a.save!
+            end
+          end
+        end
+
+        AssayType.user_defined_assay_types.each do |new|
+          new_at = SuggestedAssayType.new :label=> new.title, :parent_uri=> new.parents.first.try(:term_uri)
+          new_at.contributor = Person.where(:id => 241).first
+          new_at.contributor = User.first.person if new == AssayType.user_defined_assay_types.first
+          disable_authorization_checks do
+            new_at.save
+          end
+          puts "new assay type: #{new_at.label}"
+          puts new_at.errors.full_messages.join(",").red
+
+          new.assays.each do |a|
+            a.assay_type_uri = new_at.uri
+            new_at.is_for_modelling = (a.assay_class.key=="MODEL" ? true : false)
+            disable_authorization_checks do
+              a.save!
+              new_at.save!
+            end
+          end
+        end
+
+   end
+
+  desc "updatetechnology types from ontology"
+     task :move_new_technology_types => :environment  do
+          TechnologyType.all.each do |tt|
+            assays = Assay.where(:technology_type_id=> tt.id)
+            assays.each do |a|
+              a.technology_type_label = tt.title
+              a.technology_type_uri = tt.term_uri
+              disable_authorization_checks do
+                a.save!
+              end
+            end
+          end
+
+          TechnologyType.user_defined_technology_types.each do |new|
+            new_tt = SuggestedTechnologyType.new :label=> new.title, :parent_uri=> new.parents.first.try(:term_uri)
+            new_tt.contributor = Person.where(:id => 241).first
+            new_tt.contributor = User.first.person if new == TechnologyType.user_defined_technology_types.first
+            disable_authorization_checks do
+              new_tt.save
+            end
+            puts "new technology type: #{new_tt.label}"
+            puts new_tt.errors.full_messages.join(",").red
+
+            new.assays.each do |a|
+              a.technology_type_uri = new_tt.uri
+              disable_authorization_checks do
+                a.save!
+                new_tt.save!
+              end
+            end
+          end
+
+     end
+   desc "update assay types from ontology"
    task :update_assay_types_from_ontology => :environment  do
 
      #fix spelling error in earlier seed data
@@ -270,8 +339,8 @@ namespace :seek do
     desc "add missing contributor to existing new assay types"
     task :add_missing_contributor_to_assay_types=>:environment do
          AssayType.all.each do |at|
-             label = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[at.term_uri].try(&:label).try(&:to_s).try(&:downcase)
-             label ||= Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[at.term_uri].try(&:label).try(&:to_s).try(&:downcase)
+             label = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[at.term_uri].try(:label).try(:to_s).try(:downcase)
+             label ||= Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[at.term_uri].try(:label).try(:to_s).try(:downcase)
             if at.contributor.nil? && label != at.title.downcase && !["generic experimental assay","generic modelling analysis","assay types"].include?(at.title)
               puts at.title.yellow
               puts label
@@ -289,7 +358,7 @@ namespace :seek do
   desc "add missing contributor to existing new technology types"
     task :add_missing_contributor_to_technology_types=>:environment do
       TechnologyType.all.each do |tt|
-        label = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[tt.term_uri].try(&:label).try(&:to_s).try(&:downcase)
+        label = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[tt.term_uri].try(:label).try(:to_s).try(:downcase)
 
         #Not relate to the contributor, but fixing one technology type from ontology with wrong title in DB
         if label == "enzymatic activity measurements"

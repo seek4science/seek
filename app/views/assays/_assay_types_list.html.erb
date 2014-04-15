@@ -1,1 +1,2 @@
-<%= ontology_select_tag_old nil,AssayType,root_id,"assay_type_id",(assay_type.nil? ? nil : assay_type.id),{:style=>"width:100%", :name => "assay[assay_type_id]"} %>
+<% type = is_for_modelling ? "modelling_analysis" : "assay" %>
+<%= ontology_selection_list type, "assay[assay_type_uri]",suggested_assay_type.uri,{:style=>"width:100%"} %>

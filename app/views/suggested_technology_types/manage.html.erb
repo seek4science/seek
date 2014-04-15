@@ -1,12 +1,12 @@
-<h1>Manage <%= t('assays.assay').downcase %> types</h1>
+<h1>Manage Suggested Technology Types</h1>
 
 <div class="show_basic">
   <div style="float:left">
-    <ul><%= ontology_editor_display AssayType %></ul>
+    <ul><%= ontology_editor_display "technology" %></ul>
   </div>      
   <div style="float:left">
     <ul class="sectionIcons">
-        <li><%= create_assay_type_popup_link nil, nil %> </li>
+        <li><%= create_suggested_technology_type_popup_link  %> </li>
         <li><%= image_tag_for_key "new", new_assay_path, "New #{t('assays.assay').downcase}", nil, "New #{t('assays.assay').downcase}" %></li>
     </ul>
   </div>
