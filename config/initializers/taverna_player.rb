@@ -32,6 +32,9 @@ TavernaPlayer.setup do |config|
   # or use :rails_root for the root directory of your application.
   config.file_store = ":rails_root/filestore"
 
+  # Put Taverna Player's administrative resources in the same scope as SEEK's.
+  config.admin_scope = "admin"
+
   # Callbacks to be run at various points during a workflow run. These can be
   # defined as Proc objects or as methods and referenced by name.
   #
