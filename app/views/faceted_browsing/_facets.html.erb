@@ -8,7 +8,7 @@
 <%
    objects = facets
    object_type = objects.first.class.name
-   facet_config = YAML.load(File.read(File.join(Rails.root, "config/facets.yml")))
+   facet_config = YAML.load(File.read(facet_config_path))
    facets_for_object = facet_config[object_type] || {}
 %>
 
