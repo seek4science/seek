@@ -77,4 +77,18 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
     get "/assays"
     assert_select "div[data-ex-role='exhibit-view'][data-ex-label='Tiles'][data-ex-paginate='true'][data-ex-page-size='10']", :count => 1
   end
+
+  test 'show only authorized items' do
+    Seek::Config.faceted_browsing_enabled = true
+    Seek::Config.set_facet_enable_for_page('assays', true)
+    assay1 = Factory(:assay, :policy => Factory(:public_policy))
+    assay2 = Factory(:assay, :policy => Factory(:private_policy))
+    assert assay1.can_view?
+    assert !assay2.can_view?
+
+    xhr(:get, "/assays/faceted_items",{:item_type => 'Assay', :item_ids => [assay1.id,assay2.id]})
+    resource_list_items =  ActiveSupport::JSON.decode(@response.body)['resource_list_items']
+    assert resource_list_items.include?(assay1.title)
+    assert !resource_list_items.include?(assay2.title)
+  end
 end
