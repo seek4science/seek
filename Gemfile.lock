@@ -463,7 +463,6 @@ GEM
       builder (~> 3.0)
     taverna-t2flow (0.5.1)
       libxml-ruby (>= 1.1.4)
-    test-unit (2.5.5)
     thor (0.19.1)
     tilt (1.4.1)
     treetop (1.4.15)
@@ -571,7 +570,6 @@ DEPENDENCIES
   sunspot_solr
   taverna-player!
   taverna-t2flow
-  test-unit
   turbo-sprockets-rails3
   unicorn-rails
   uuidtools (= 2.1.1)
