@@ -25,7 +25,7 @@
 
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
   <% if Seek::Config.organisms_enabled %>
-    <%= list_item_simple_list(resource.assay_organisms, "Organisms") { |ao| assay_organism_list_item(ao) } %>
+    <%= list_samples_and_assay_organisms("Organisms", resource.samples, resource.assay_organisms,{:class=>"list_item_attribute"}) %>
   <% end %>
 
   <%= list_item_authorized_list resource.sop_masters, t('sop').pluralize, true, 50, true %>

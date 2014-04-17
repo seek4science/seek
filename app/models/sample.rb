@@ -117,7 +117,7 @@ class Sample < ActiveRecord::Base
        tissue_and_cell_type=nil
     if !tissue_and_cell_type_title.blank?
       if ( tissue_and_cell_type_id =="0" )
-          found = TissueAndCellType.find(:first,:conditions => {:title => tissue_and_cell_type_title})
+          found = TissueAndCellType.where(:title => tissue_and_cell_type_title).first
           unless found
           tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title)
           end

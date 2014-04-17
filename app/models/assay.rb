@@ -83,6 +83,7 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
+  validate :either_samples_or_organisms_for_experimental_assay,  :if => "Seek::Config.is_virtualliver"
   validate :no_sample_for_modelling_assay
 
   #a temporary store of added assets - see AssayReindexer
@@ -104,14 +105,14 @@ class Assay < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
 
-  # overwritten in ontology_type_handling
+  # super method defined in ontology_type_handling
   def assay_type_label
-      SuggestedAssayType.where(:uri => self.assay_type_uri).first.try(:label)
+    super ||  SuggestedAssayType.where(:uri => self.assay_type_uri).first.try(:label) || read_attribute(:assay_type_label)
   end
 
   # overwritten in ontology_type_handling
   def technology_type_label
-      SuggestedTechnologyType.where(:uri => self.technology_type_uri).first.try(:label)
+      SuggestedTechnologyType.where(:uri => self.technology_type_uri).first.try(:label) || super
   end
 
   def short_description
@@ -228,6 +229,10 @@ class Assay < ActiveRecord::Base
     new_object.sample_ids = self.try(:sample_ids)
     new_object.assay_organisms = self.try(:assay_organisms)
     return new_object
+  end
+
+  def either_samples_or_organisms_for_experimental_assay
+     errors[:base] << "You should associate a #{I18n.t('assays.experimental_assay')} with either samples or organisms or both" if !is_modelling? && samples.empty? && assay_organisms.empty?
   end
 
   def no_sample_for_modelling_assay

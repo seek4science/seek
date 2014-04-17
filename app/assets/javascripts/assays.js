@@ -414,13 +414,20 @@ function addSelectedOrganism() {
     selected_option=$("possible_organisms").options[selected_option_index];
     title=selected_option.text;
     id=selected_option.value;
-    strain_index = $('strains').selectedIndex;
-    if (strain_index!=0) {
-        strain_info = $('strains')[strain_index].text;
-        strain_id = $('strains')[strain_index].value;
-    } else {
-        strain_id="";
-        strain_info="";
+    //strains selection list can be null when no strains is defined to an organism
+    if($('strains')){
+        strain_index = $('strains').selectedIndex;
+        if (strain_index!=0) {
+            strain_info = $('strains')[strain_index].text;
+            strain_id = $('strains')[strain_index].value;
+        } else {
+            strain_id="";
+            strain_info="";
+        }
+    }
+    else{
+       strain_id="";
+       strain_info="";
     }
 
     selected_option_index=$('culture_growth').selectedIndex;
@@ -431,29 +438,31 @@ function addSelectedOrganism() {
         culture_growth=selected_option.text;
     }
 
+    if($("possible_tissue_and_cell_types")){
 
-    selected_option_index = $("possible_tissue_and_cell_types").selectedIndex;
-    selected_option = $("possible_tissue_and_cell_types").options[selected_option_index];
+        selected_option_index = $("possible_tissue_and_cell_types").selectedIndex;
+        selected_option = $("possible_tissue_and_cell_types").options[selected_option_index];
 
-    t_id = selected_option.value;
+        t_id = selected_option.value;
 
+        if($('tissue_and_cell_type').value=="" && t_id != 0){
+            t_title = selected_option.text;
+            addOrganism(title,id,strain_info,strain_id,culture_growth,t_id,t_title);
 
+        }
+        if($('tissue_and_cell_type').value!="" && t_id == 0) {
+            t_title = $('tissue_and_cell_type').value;
+            addOrganism(title,id,strain_info,strain_id,culture_growth,0,t_title);
+        }
 
-    if($('tissue_and_cell_type').value=="" && t_id != 0){
-        t_title = selected_option.text;
-        addOrganism(title,id,strain_info,strain_id,culture_growth,t_id,t_title);
-
+        if(t_id == 0 && $('tissue_and_cell_type').value=="") {
+            t_title = "";
+            addOrganism(title,id,strain_info,strain_id,culture_growth,t_id,t_title);
+        }
     }
-    if($('tissue_and_cell_type').value!="" && t_id == 0) {
-        t_title = $('tissue_and_cell_type').value;
-        addOrganism(title,id,strain_info,strain_id,culture_growth,0,t_title);
+    else{
+      addOrganism(title,id,strain_info,strain_id,culture_growth, 0, "");
     }
-
-    if(t_id == 0 && $('tissue_and_cell_type').value=="") {
-        t_title = "";
-        addOrganism(title,id,strain_info,strain_id,culture_growth,t_id,t_title);
-    }
-
 
 }
 

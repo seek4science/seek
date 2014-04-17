@@ -1,6 +1,4 @@
 <%= javascript_include_tag 'strain' -%>
-
-
 <%
  select_truncate_length=120
 @assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.assay')}"
@@ -140,10 +138,6 @@
 </p>
 
 <script type="text/javascript">
-
-  function hide_organism_form(){
-      Effect.Fade('add_organism_form');
-  }
   function showTitle(text){
     var elem = document.getElementById("full_study_title");
     elem.style.display = '';
@@ -154,56 +148,4 @@
     var elem = document.getElementById("full_study_title");
     elem.style.display = 'none';
   }
-
-
-  function check_show_organism_form() {
-      if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
-          Effect.Fade('add_organism_form');
-      }
-      else {
-          Effect.Appear('add_organism_form');
-      }
-  }
-
-  function check_show_sample_form() {
-      if ($F('assay_organism_ids') && $F('assay_organism_ids').length > 0) {
-          Effect.Fade('add_samples_form');
-      } else {
-          Effect.Appear('add_samples_form');
-      }
-  }
-  function check_show_organism_form() {
-      if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
-          Effect.Fade('add_organism_form');
-      }
-      else {
-          Effect.Appear('add_organism_form');
-      }
-  }
-
-  function check_show_sample_form() {
-      if ($F('assay_organism_ids') && $F('assay_organism_ids').length > 0) {
-          Effect.Fade('add_samples_form');
-      } else {
-          Effect.Appear('add_samples_form');
-      }
-  }
-
-  <%if @assay.is_modelling?%>
-      Event.observe(window, 'load', function() {
-//          Event.observe('assay_sample_ids', 'fancySelect:update', function(){
-//            check_show_organism_form();
-//          });
-//
-//          var update_organisms_without_check_sample_form = this['updateOrganisms'];
-//          this['updateOrganisms'] = function() {
-//              update_organisms_without_check_sample_form();
-//              check_show_sample_form();
-//          };
-
-          $('assay_sample_ids').fire('fancySelect:update');
-          updateOrganisms();
-      });
-  <% end %>
-
 </script>

@@ -74,16 +74,8 @@ assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('
       <% end -%>
 
       <% if Seek::Config.organisms_enabled %>
-        <p id="organism">
-        <b>Organisms:</b>
-            <%= list_organisms_and_strains( @assay.assay_organisms.collect{|ao| [ao.organism,ao.strain]} | @assay.samples.collect{|s| [s.specimen.organism,s.specimen.strain]}) -%>
-        </p>
+         <%= list_samples_and_assay_organisms("Organisms", @assay.samples, @assay.assay_organisms,{:id=>"organism"}) %>
       <% end %>
-    
-
-
-
-
 
       <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
           <div class="data_model_relationship">
