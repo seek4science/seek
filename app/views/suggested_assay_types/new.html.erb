@@ -25,7 +25,7 @@
     <div style="<%= style %>">
       <%= form_for @suggested_assay_type,
                    :html => {:method => :post, :remote => true} do |f| %>
-          <%= render :partial => "form", :locals => {:f => f, :action => :new_popup, :type => type} -%>
+          <%= render :partial => "form", :locals => {:f => f, :action => :new, :type => type} -%>
       <% end -%>
     </div>
   </div>

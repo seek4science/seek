@@ -3,10 +3,10 @@ class SuggestedTechnologyTypesController < ApplicationController
   # admins can even delete them
   before_filter :check_allowed_to_manage_types, :only=> [:destroy]
 
-   before_filter :project_membership_required, :only=>[:new_popup]
+   before_filter :project_membership_required, :only=>[:new]
 
 
-    def new_popup
+    def new
       @suggested_technology_type = SuggestedTechnologyType.new
       @suggested_technology_type.link_from= params[:link_from]
       respond_to do |format|

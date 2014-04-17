@@ -237,13 +237,11 @@ SEEK::Application.routes.draw do
 
   resources :suggested_assay_types do
       collection do
-        post :new_popup
         get :manage
       end
   end
   resources :suggested_technology_types do
       collection do
-        post :new_popup
         get :manage
       end
   end

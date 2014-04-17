@@ -3,9 +3,9 @@ class SuggestedAssayTypesController < ApplicationController
   # admins can even delete them
   before_filter :check_allowed_to_manage_types, :only => [:destroy]
 
-  before_filter :project_membership_required, :only => [:new_popup]
+  before_filter :project_membership_required, :only => [:new]
 
-  def new_popup
+  def new
     @suggested_assay_type = SuggestedAssayType.new
     @suggested_assay_type.is_for_modelling = string_to_boolean params[:is_for_modelling]
     @suggested_assay_type.link_from= params[:link_from]
