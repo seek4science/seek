@@ -57,4 +57,24 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       assert_select "div.alphabetcal_pagination"
     end
   end
+
+  test 'facet config for Assay' do
+    Seek::Config.faceted_browsing_enabled = true
+    Seek::Config.set_facet_enable_for_page('assays', true)
+
+    get "/assays"
+    assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
+    assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", :count => 1
+    assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
+    assert_select "div[data-ex-role='facet'][data-ex-expression='.technology_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 0
+    assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", :count => 0
+  end
+
+  test 'content config for Assay' do
+    Seek::Config.faceted_browsing_enabled = true
+    Seek::Config.set_facet_enable_for_page('assays', true)
+
+    get "/assays"
+    assert_select "div[data-ex-role='exhibit-view'][data-ex-label='Tiles'][data-ex-paginate='true'][data-ex-page-size='10']", :count => 1
+  end
 end
