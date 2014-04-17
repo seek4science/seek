@@ -20,7 +20,7 @@ module FacetedBrowsingHelper
     unless Rails.env == 'test'
       File.join(Rails.root, "config", "facets.yml")
     else
-      File.join(Rails.root, "test", "fixtures", "facets.yml")
+      File.join(Rails.root, "test", "fixtures", "files", "facets.txt")
     end
   end
 end
