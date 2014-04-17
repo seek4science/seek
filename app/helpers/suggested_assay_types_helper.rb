@@ -1,7 +1,8 @@
 #encoding: utf-8
 module SuggestedAssayTypesHelper
   def create_suggested_assay_type_popup_link is_for_modelling=nil, link_from="suggested_assay_types"
-    return link_to_remote_redbox(image("new") + ' new assay type',
+    link_title = is_for_modelling ? "new modelling analysis type" : "new assay type"
+    return link_to_remote_redbox(image("new") + ' ' + link_title,
                                  {:url => new_suggested_assay_type_path,
                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
                                   :with => "'is_for_modelling=#{is_for_modelling}' +'&link_from=#{link_from}'",
