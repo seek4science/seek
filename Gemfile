@@ -100,6 +100,7 @@ group :test do
   gem "ruby-prof"
   gem "webmock"
   gem 'minitest-reporters','~> 0.14'
+  gem 'test-unit'
 end
 
 group :assets do
