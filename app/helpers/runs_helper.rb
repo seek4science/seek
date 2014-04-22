@@ -26,7 +26,6 @@ module RunsHelper
         end
       end
 
-      action_buttons = render(:partial => "taverna_player/runs/delete_or_cancel_button", :locals => { :run => run, :redirect_to => redirect_to })
       [link_to("#{image(run.is_a?(Sweep) ? 'sweep_run' : 'simple_run')}#{run.name}".html_safe,
                run.is_a?(Sweep) ? main_app.sweep_path(run) : taverna_player.run_path(run),
                :class => 'with_icon'
@@ -39,7 +38,37 @@ module RunsHelper
        run.created_at.to_i,
        finish_time_text,
        finish_time,
-       action_buttons]
+       delete_or_cancel_button(run, redirect_to)]
+    end
+  end
+
+  def delete_or_cancel_button(run, redirect_to)
+    if run.can_delete?
+      if run.complete?
+      # Delete
+        unless current_user.guest?
+          content_tag(:li) do
+            link_to run.is_a?(Sweep) ? main_app.sweep_path(run, :redirect_to => redirect_to) :
+                                       taverna_player.run_path(run, :redirect_to => redirect_to),
+                    :method => :delete, :data => { confirm: "Are you sure?" } do
+              content_tag(:span, :class => 'icon') do
+                image('destroy') + ' Delete'
+              end
+            end
+          end
+        end
+      else
+      # Cancel
+        content_tag(:li) do
+          link_to run.is_a?(Sweep) ? main_app.cancel_sweep_path(run) :
+                                     taverna_player.cancel_run_path(run),
+                  :method => :put, :data => { confirm: "Are you sure?" } do
+            content_tag(:span, :class => 'icon') do
+              image('destroy') + ' Cancel'
+            end
+          end
+        end
+      end
     end
   end
 

@@ -28,6 +28,9 @@ module TavernaPlayer
     # POST /runs
     def create
       @run = Run.new(params[:run])
+      # Need to set workflow and workflow_version incase the create fails and redirects to 'new'
+      @workflow = @run.workflow
+      @workflow_version = @run.executed_workflow
       # Manually add projects of current user, as they aren't prompted for this information in the form
       @run.projects = @run.contributor.person.projects
       @run.policy.set_attributes_with_sharing params[:sharing], @run.projects

@@ -114,7 +114,7 @@ GIT
 
 GIT
   remote: git://github.com/myGrid/taverna-player.git
-  revision: 934f088ee28c9e973898d04eddc88e6e65ffe15c
+  revision: 4e65fca9db7ab794f355d707dc900885184b6eb8
   branch: list-inputs
   specs:
     taverna-player (0.6.0)
@@ -200,10 +200,10 @@ GEM
     curb (0.8.5)
     daemon_controller (1.1.8)
     daemons (1.1.9)
-    delayed_job (4.0.0)
-      activesupport (>= 3.0, < 4.1)
-    delayed_job_active_record (4.0.0)
-      activerecord (>= 3.0, < 4.1)
+    delayed_job (4.0.1)
+      activesupport (>= 3.0, < 4.2)
+    delayed_job_active_record (4.0.1)
+      activerecord (>= 3.0, < 4.2)
       delayed_job (>= 3.0, < 4.1)
     docsplit (0.7.4)
     dynamic_form (1.1.4)
@@ -240,9 +240,9 @@ GEM
       rack
     i18n (0.6.9)
     in_place_editing (1.2.0)
-    jbuilder (2.0.5)
-      activesupport (>= 3.0.0)
-      multi_json (>= 1.2.0)
+    jbuilder (2.0.6)
+      activesupport (>= 3.0.0, < 5)
+      multi_json (~> 1.2)
     journey (1.0.4)
     jquery-rails (3.0.4)
       railties (>= 3.0, < 5.0)
