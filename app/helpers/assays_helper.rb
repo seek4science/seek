@@ -59,14 +59,15 @@ module AssaysHelper
       end
 
       if strain && !strain.is_dummy? && strain.can_view?
-        result += " : "
+        result += " :<span class='strain_info'> "
         result += link_to strain.info, strain, {:class => "strain_info"}
+        result += "</span>"
       end
 
       if sample && sample.tissue_and_cell_types.count > 0
         result += " : "
        # result += link_to sample.title, sample
-        sample.tissue_and_cell_types.sort.each do |tt|
+        sample.tissue_and_cell_types.each do |tt|
           result += "[" if tt== sample.tissue_and_cell_types.first
           result += link_to h(tt.title), tt
           result += "|" unless tt == sample.tissue_and_cell_types.last
@@ -135,8 +136,9 @@ module AssaysHelper
       end
 
       if strain && !strain.is_dummy? && strain.can_view?
-        result += " : "
+        result += " :<span class='strain_info'> "
         result += link_to strain.info, strain, {:class => "strain_info"}
+        result += "</span>"
       end
       if one_group_tissue_and_cell_types.compact.length > 0
         result += " : "
