@@ -13,6 +13,6 @@
             <li><%= image_tag_for_key('manage', main_app.edit_run_path(@run), nil, nil, "Manage run") -%></li>
         <% end -%>
     <% end %>
-    <%= render :partial => "delete_or_cancel_button", :locals => {:run => @run, :redirect_to => redirect_to} %>
+    <%= delete_or_cancel_button(@run, redirect_to) %>
   </ul>
 </div>

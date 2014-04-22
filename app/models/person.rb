@@ -81,7 +81,7 @@ class Person < ActiveRecord::Base
 
   def guest_project_member?
     project = Project.find_by_name('BioVeL Portal Guests')
-    !project.nil? && self.projects.include?(project)
+    !project.nil? && self.projects == [project]
   end
 
   #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp

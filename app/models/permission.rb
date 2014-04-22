@@ -53,8 +53,9 @@ class Permission < ActiveRecord::Base
 
   def access_type_for person
     #FIXME: move the access type out of the favourite group, if possible
-    if contributor_type == 'FavouriteGroup'
-      person.favourite_group_memberships.find_by_favourite_group_id(contributor.id).access_type
+    if !person.nil? && contributor_type == 'FavouriteGroup'
+      group = person.favourite_group_memberships.find_by_favourite_group_id(contributor.id)
+      group.nil? ? self.access_type : group.access_type
     else
       self.access_type
     end

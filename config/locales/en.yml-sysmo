@@ -19,6 +19,7 @@ en:
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
 
+
   #DataFile
   data_file: "Data file"
 
@@ -36,9 +37,6 @@ en:
 
   #Project
   project: "Project"
-
-  #Workflow
-  workflow: "Workflow"
 
   scale: "Scale"
 
@@ -58,16 +56,16 @@ en:
 
   taverna_player/run: "workflow run"
 
-  favourite_group: "collaboration"
+  favourite_group: "favourite groups"
 
   access:
     determined_by_group: "Individual access rights for each member"
     no_access: "No access"
-    visible: "View summary"
     #the appended _downloadable allows a different message for downloadable items - e.g Workflows can be downloaded, assays cannot
+    visible: "View summary"
     visible_downloadable: "View summary only"
-    accessible: "View"
-    accessible_downloadable: "View and download"
-    editing: "View and edit"
-    editing_downloadable: "View, download and edit"
+    accessible: "View summary"
+    accessible_downloadable: "View summary and get contents"
+    editing: "View and edit summary"
+    editing_downloadable: "View and edit summary and contents"
     managing: "Manage"

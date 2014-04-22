@@ -2,6 +2,7 @@
 class SessionsController < ApplicationController
 
   before_filter :signup_admin_if_not_users,:only=>:new
+  skip_before_filter :restrict_guest_user
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:new,:destroy]
   prepend_before_filter :strip_root_for_xml_requests
