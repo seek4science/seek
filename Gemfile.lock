@@ -168,10 +168,8 @@ GEM
     activesupport (3.2.17)
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
-    acts-as-taggable-on (3.1.1)
-      actionpack (>= 3, < 5)
-      activerecord (>= 3, < 5)
-      activesupport (>= 3, < 5)
+    acts-as-taggable-on (3.0.1)
+      rails (>= 3, < 5)
     acts_as_list (0.4.0)
       activerecord (>= 3.0)
     acts_as_tree (0.2.0)
@@ -496,7 +494,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth (= 4.2.9)
-  acts-as-taggable-on
+  acts-as-taggable-on (= 3.0.1)
   acts_as_activity_logged!
   acts_as_list
   acts_as_trashable!

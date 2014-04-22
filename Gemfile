@@ -35,7 +35,7 @@ gem 'docsplit'
 gem "pothoven-attachment_fu"
 gem "exception_notification","3.0.1"
 gem "fssm"
-gem 'acts-as-taggable-on'
+gem 'acts-as-taggable-on',"3.0.1"
 gem 'acts_as_list'
 gem 'acts_as_tree',"0.2.0"
 gem 'country-select'
