@@ -106,13 +106,15 @@ class Assay < ActiveRecord::Base
 
 
   # super method defined in ontology_type_handling
+  # so the query order is: 1. read_attribute(:assay_type_label) 2.Ontology 3. SuggestedAssayType
   def assay_type_label
-    super ||  SuggestedAssayType.where(:uri => self.assay_type_uri).first.try(:label) || read_attribute(:assay_type_label)
+    super ||  SuggestedAssayType.where(:uri => self.assay_type_uri).first.try(:label)
   end
 
-  # overwritten in ontology_type_handling
+  # super method defined in ontology_type_handling
+   # so the query order is: 1. read_attribute(:technology_type_label) 2.Ontology 3. SuggestedTechnologyType
   def technology_type_label
-      SuggestedTechnologyType.where(:uri => self.technology_type_uri).first.try(:label) || super
+      super || SuggestedTechnologyType.where(:uri => self.technology_type_uri).first.try(:label)
   end
 
   def short_description
