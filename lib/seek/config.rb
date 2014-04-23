@@ -214,12 +214,6 @@ module Seek
       self.facet_enable_for_pages[controller.to_sym]
     end
 
-    #FIXME: change to standard setter=
-    def set_facet_enable_for_page (controller, value)
-      merge! :facet_enable_for_pages, {controller => value}
-      value
-    end
-
     def default_page controller
       self.default_pages[controller.to_sym]
     end

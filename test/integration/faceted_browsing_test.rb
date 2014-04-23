@@ -23,13 +23,11 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
   test 'turn on the faceted browsing' do
     with_config_value :faceted_browsing_enabled,true do
       ASSETS_WITH_FACET.each do |type_name|
-        Seek::Config.set_facet_enable_for_page(type_name, true)
-      end
-
-      ASSETS_WITH_FACET.each do |type_name|
-        get "/#{type_name}"
-        assert_select "table[id='exhibit']"
-        assert_select "div.alphabetcal_pagination", :count => 0
+        with_config_value :facet_enable_for_pages,{type_name=>true} do
+          get "/#{type_name}"
+          assert_select "table[id='exhibit']"
+          assert_select "div.alphabetcal_pagination", :count => 0
+        end
       end
     end
 
@@ -68,7 +66,6 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
   test 'facet config for Assay' do
     Factory(:assay, :policy => Factory(:public_policy))
     with_config_value :faceted_browsing_enabled,true do
-      Seek::Config.set_facet_enable_for_page('assays', true)
       get "/assays"
       record_body
       assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
@@ -84,7 +81,6 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
 
   test 'content config for Assay' do
     with_config_value :faceted_browsing_enabled,true do
-      Seek::Config.set_facet_enable_for_page('assays', true)
       get "/assays"
       assert_select "div[data-ex-role='exhibit-view'][data-ex-label='Tiles'][data-ex-paginate='true'][data-ex-page-size='10']", :count => 1
     end
@@ -92,7 +88,6 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
 
   test 'show only authorized items' do
     with_config_value :faceted_browsing_enabled,true do
-      Seek::Config.set_facet_enable_for_page('assays', true)
       assay1 = Factory(:assay, :policy => Factory(:public_policy))
       assay2 = Factory(:assay, :policy => Factory(:private_policy))
       assert assay1.can_view?
