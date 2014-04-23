@@ -66,6 +66,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
   end
 
   test 'facet config for Assay' do
+    Factory(:assay, :policy => Factory(:public_policy))
     with_config_value :faceted_browsing_enabled,true do
       Seek::Config.set_facet_enable_for_page('assays', true)
       get "/assays"
