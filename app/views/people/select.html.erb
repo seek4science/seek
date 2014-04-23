@@ -1,11 +1,20 @@
-<%= javascript_include_tag 'profile_project_selection' -%>
+<%= javascript_include_tag 'profile_project_selection' %>
+
+<% if Seek::Config.profile_select_by_default
+     create_display = "display:none"
+     select_display = "display:block"
+   else
+     create_display = "display:block"
+     select_display = "display:none"
+   end
+%>
 
 <div id="profile_select">
   <div class="show_basic">
-    <div id="profile_selection">
+    <div id="profile_selection" style="<%= select_display %>">
       <%= render :partial => "registration_profile_selection" -%>
     </div>
-    <div id="profile_creation" style="display:none">
+    <div id="profile_creation" style="<%= create_display %>">
       <%= render :partial => "registration_profile_creation" %>
     </div>
   </div>
