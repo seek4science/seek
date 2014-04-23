@@ -63,6 +63,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
     Seek::Config.set_facet_enable_for_page('assays', true)
 
     get "/assays"
+    record_body
     assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
     assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", :count => 1
     assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
