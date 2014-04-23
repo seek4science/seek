@@ -44,12 +44,16 @@ an example towards the end of the this page.
 
 Start the upgrade following the standard steps:
 
+    #if using rvm do:
+    rvm get stable
+    rvm install ruby-1.9.3-p545
+
     export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
 
     ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop
     hg pull https://bitbucket.org/seek4science/seek -r v0.20.0
-    hg update
+    hg update # only if no other changes have been made to your local version, if you get an error ignore it and do merge
     hg merge # only required if you've made changes since installing. If you have, you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
     bundle install --deployment
