@@ -64,6 +64,10 @@ to save restarting your shell run:
 
   source ~/.rvm/scripts/rvm
 
+if you already had RVM installed, bring it up to date with:
+
+  rvm get stable
+
 now install Ruby 1.9.3
 
   rvm install ruby-1.9.3

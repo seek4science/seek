@@ -322,7 +322,7 @@ module Seek
       :authorization_checks_enabled,:magic_guest_enabled,:workflows_enabled,
       :assay_type_ontology_file,:technology_type_ontology_file,:modelling_analysis_type_ontology_file,:assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri,
       :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit,:faceted_browsing_enabled,:facet_enable_for_pages,
-      :css_appended, :css_prepended, :javascript_appended,:javascript_prepended,:main_layout]
+      :css_appended, :css_prepended, :javascript_appended,:javascript_prepended,:main_layout,:profile_select_by_default]
 
 
     #Settings that require a conversion to integer
