@@ -186,7 +186,7 @@ function clickLabelLink(node, mouse_event){
     if (node.data().name != "Hidden item"){
         if (mouseOnLabel(node, mouse_event)){
             var link = document.createElement('a');
-            link.href = node.data().link.split('"')[1];
+            link.href = node.data().item_info.split('"')[1];
             clickLink(link);
         }
     }
