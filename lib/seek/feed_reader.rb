@@ -1,4 +1,4 @@
-require 'feedzirra'
+require 'feedjira'
 
 module Seek
   class FeedReader
@@ -17,7 +17,7 @@ module Seek
             get_feed(url)
           end
         rescue => e
-          Rails.logger.warn("Problem with feed: #{url} - #{e.message}")
+          Rails.logger.error("Problem with feed: #{url} - #{e.message}")
           nil
         end
       end
@@ -50,7 +50,7 @@ module Seek
       unless feed_url.blank?
         #trim the url element
         feed_url.strip!
-        feed = Feedzirra::Feed.fetch_and_parse(feed_url)
+        feed = Feedjira::Feed.fetch_and_parse(feed_url)
         raise "Error reading feed for #{feed_url} error #{feed}" if feed.is_a?(Numeric)
         feed
       end
