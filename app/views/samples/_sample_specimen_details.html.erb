@@ -136,6 +136,7 @@
  <span style="font-size: 120%;">
   <%= list_item_authorized_list (specimen.strain.is_dummy? ? [] : [specimen.strain]),"Strain", true, 50, true %>
  </span>
-
- <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => specimen} %>
 <% end %>
+
+<%= render :partial => "assets/special_auth_code_display", :locals => {:resource => specimen} %>
+
