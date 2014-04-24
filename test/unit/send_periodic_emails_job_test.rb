@@ -223,8 +223,8 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
     person1 = Factory :person
     person2 = Factory :person
-    person3 = Factory :person, :work_groups=>person2.work_groups
-    person4 = Factory :person, :work_groups=>person2.work_groups
+    person3 = Factory :person, :group_memberships=>[Factory(:group_membership, :work_group=>person2.work_groups[0])]
+    person4 = Factory :person, :group_memberships=>[Factory(:group_membership, :work_group=>person2.work_groups[0])]
     person4.notifiee_info.receive_notifications=false
     person4.notifiee_info.save!
     project1 = person1.projects.first

@@ -143,11 +143,23 @@ class AssayTest < ActiveSupport::TestCase
       assay.technology_type_uri=nil
       assay.samples = []
       assert assay.valid?
-    #an experimental assay can be invalid without a sample
+    #an experimental assay can be invalid without a sample nor a organism
     assay.assay_class=assay_classes(:experimental_assay_class)
-    assay.technology_type=nil
+    assay.technology_type_uri=nil
+    assay.organisms = []
     assay.samples = []
     assert !assay.valid?
+
+    assay.assay_organisms = [Factory(:assay_organism)]
+    assert assay.valid?
+    assay.assay_organisms = []
+    assay.samples = [Factory(:sample)]
+    assert assay.valid?
+
+     assay.assay_organisms = [Factory(:assay_organism)]
+     assay.samples = [Factory(:sample)]
+     assert assay.valid?
+
     end
   end
 
@@ -373,10 +385,10 @@ class AssayTest < ActiveSupport::TestCase
       assert_equal assay.contributor.user, assay.contributing_user
   end
 
-  test "assay type label from ontology if missing" do
+  test "assay type label from ontology or suggested assay type if missing" do
 
     assay = Factory(:experimental_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response",assay_type_label:"fish")
-    assert_equal "fish",assay.assay_type_label
+    assert_equal "fish", assay.assay_type_label
     assay.assay_type_label = nil
     assert_equal "Catabolic response",assay.assay_type_label
 
@@ -384,13 +396,35 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal "frog",assay.assay_type_label
     assay.assay_type_label = nil
     assert_equal "Genome scale",assay.assay_type_label
+
+
+    suggested_at = Factory(:suggested_assay_type, :label => "new fluxomics")
+    assay = Factory(:experimental_assay, :assay_type_uri => suggested_at.uri, :assay_type_label=> "fish")
+    assert_equal "fish", assay.assay_type_label
+    assay.assay_type_label = nil
+    assert_equal "new fluxomics", assay.assay_type_label
+
+    suggested_ma = Factory(:suggested_modelling_analysis_type, :label => "new metabolism")
+    assay = Factory(:experimental_assay, :assay_type_uri => suggested_ma.uri, :assay_type_label => "fish")
+    assert_equal "fish", assay.assay_type_label
+    assay.assay_type_label = nil
+    assert_equal "new metabolism", assay.assay_type_label
+
+
   end
 
-  test "technology type label from ontology if missing" do
+  test "technology type label from ontology or suggested technology type if missing" do
     assay = Factory(:experimental_assay,technology_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Binding",technology_type_label:"fish")
     assert_equal "fish",assay.technology_type_label
     assay.technology_type_label = nil
     assert_equal "Binding",assay.technology_type_label
+
+    suggested_tt = Factory(:suggested_technology_type, :label => "new technology type")
+    assay = Factory(:experimental_assay, :technology_type_uri => suggested_tt.uri, :technology_type_label => "fish")
+    assert_equal "fish", assay.technology_type_label
+    assay.technology_type_label = nil
+    assert_equal "new technology type", assay.technology_type_label
+
   end
 
   test "default assay and tech type" do

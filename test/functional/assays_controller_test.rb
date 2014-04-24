@@ -267,11 +267,14 @@ class AssaysControllerTest < ActionController::TestCase
 
 
   test "should create experimental assay with or without sample" do
+    organism = Factory(:organism,:title=>"Frog")
+    strain = Factory(:strain, :title=>"UUU", :organism=>organism)
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
         post :create, :assay => {:title => "test",
                                  :study_id => studies(:metabolomics_study).id,
-                               :assay_class_id=>assay_classes(:experimental_assay_class).id}, :sharing => valid_sharing
+                                 :assay_class_id => assay_classes(:experimental_assay_class).id
+        }, :assay_organism_ids => [organism.id, strain.title, strain.id, ""].join(","), :sharing => valid_sharing
       end
     end
     a=assigns(:assay)
@@ -311,8 +314,8 @@ class AssaysControllerTest < ActionController::TestCase
                         :assay_organism_ids => [organism.id,strain.title, strain.id, ""].join(",")
 
     end
-    assert_response :success
     assay = assigns(:assay)
+    assert_redirected_to assay_path(assay)
     assert_include assay.organisms,organism
     assert_include assay.strains,strain
     assert_include assay.samples,sample
@@ -321,16 +324,25 @@ class AssaysControllerTest < ActionController::TestCase
 
   test "should create experimental assay with/without organisms" do
 
-    tissue_and_cell_type = Factory(:tissue_and_cell_type)
+    #cannot create experimental assay if neither samples nor organisms are associated
+    assert_no_difference("Assay.count") do
+         post :create, :assay=>{:title=>"test",
+                                :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
+                                :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
+                                :study_id=>studies(:metabolomics_study).id,
+                                :assay_class_id=>assay_classes(:experimental_assay_class).id
+                                 }, :sharing => valid_sharing
+    end
+
+    #can create with only samples
     sample = Factory(:sample)
-    #create assay only with organisms
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
                              :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
-                             :sample_ids => [sample]}
+                             :sample_ids => [sample]}, :sharing => valid_sharing
     end
     assay = assigns(:assay)
     refute_nil assay
@@ -338,9 +350,12 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.strains.empty?
     assert_include assay.samples,sample
 
+    #can create with only organisms
     organism = Factory(:organism,:title=>"Frog")
     strain = Factory(:strain, :title=>"UUU", :organism=>organism)
     growth_type = Factory(:culture_growth_type, :title=>"ssdfkhsdfkh")
+    tissue_and_cell_type = Factory(:tissue_and_cell_type)
+
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
@@ -348,7 +363,7 @@ class AssaysControllerTest < ActionController::TestCase
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:experimental_assay_class).id,
                              :sample_ids => [Factory(:sample)] },
-                             :assay_organism_ids => [organism.id, strain.title,strain.id, growth_type.title].join(","), :sharing => valid_sharing
+                             :assay_organism_ids => [organism.id, strain.title,strain.id, growth_type.title,tissue_and_cell_type.id, tissue_and_cell_type.title].join(","), :sharing => valid_sharing
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
@@ -356,8 +371,9 @@ class AssaysControllerTest < ActionController::TestCase
     assert_include a.strains,strain
     assert_equal 1,a.assay_organisms.count
     assert_equal growth_type,a.assay_organisms.last.culture_growth_type
+     assert_equal tissue_and_cell_type,a.assay_organisms.last.tissue_and_cell_type
 
-    #create assay with samples and organisms, but not strain
+    #create assay with both samples and organisms, but not strain
     sample = Factory(:sample)
     assert_difference('ActivityLog.count') do
       assert_difference("Assay.count") do
@@ -365,7 +381,7 @@ class AssaysControllerTest < ActionController::TestCase
                               :study_id=>studies(:metabolomics_study).id,
                               :assay_class_id=>assay_classes(:experimental_assay_class).id,
                               :sample_ids=>[sample.id]
-        },:assay_organism_ids=>[organism.id.to_s,"","",""].join(",")
+        },:assay_organism_ids=>[organism.id.to_s,"","",""].join(","), :sharing => valid_sharing
       end
     end
     a=assigns(:assay)
@@ -417,23 +433,29 @@ class AssaysControllerTest < ActionController::TestCase
                                  },
                                  :sharing => valid_sharing
       end
+      assert_response :success
+      assert assigns(:assay)
+      assay = assigns(:assay)
+      assert_equal 0, assay.samples.count
     end
 
     as_virtualliver do
       assert_difference("Assay.count") do
         post :create, :assay => {:title => "test",
-                                 :technology_type_id => technology_types(:gas_chromatography).id,
-                                 :assay_type_id => assay_types(:metabolomics).id,
+                                 :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
+                                 :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                                  :study_id => studies(:metabolomics_study).id,
                                  :assay_class_id => assay_classes(:modelling_assay_class).id,
                                  :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
                                  :sharing => valid_sharing
       end
+      assert assigns(:assay)
+      assay = assigns(:assay)
+      assert_redirected_to assay_path(assay)
+      assert_equal 2, assay.samples.count
+
     end
-    assert_response :success
-    assert assigns(:assay)
-    assay = assigns(:assay)
-    assert_equal 0, assay.samples.count
+
   end
 
   test "should delete assay with study" do
@@ -852,7 +874,7 @@ class AssaysControllerTest < ActionController::TestCase
               :assay_type_uri=>"http://some-uri#assay",
               :study_id=>studies(:metabolomics_study).id,
               :assay_class_id=>assay_classes(:modelling_assay_class).id
-          },
+          }, :sharing => valid_sharing ,
                :assay_sop_ids=>["#{sop.id}"],
                :model_ids=>["#{model.id}"],
                :data_file_ids=>["#{datafile.id},#{rel.title}"]
@@ -1139,28 +1161,7 @@ class AssaysControllerTest < ActionController::TestCase
     xhr(:get, :preview,{:id=>assay.id})
     assert_response :success
   end
-  test "should not show investigation and study title if they are hidden on assay show page" do
-    investigation = Factory(:investigation,
-                            :policy => Factory(:private_policy),
-                            :contributor => User.current_user)
-    study = Factory(:study,
-                    :policy => Factory(:private_policy),
-                    :contributor => User.current_user,
-                    :investigation => investigation)
-    assay = Factory(:assay,
-                    :policy => Factory(:public_policy),
-                    :study => study)
 
-    logout
-    get :show, :id => assay
-    assert_response :success
-    assert_select "p#investigation" do
-      assert_select "span.none_text", :text => /hidden item/, :count => 1
-    end
-    assert_select "p#study" do
-      assert_select "span.none_text", :text => /hidden item/, :count => 1
-    end
-  end
   test "should not show private data or model title on modelling analysis summary" do
     df = Factory(:data_file, :title=>"private data file", :policy=>Factory(:private_policy))
     df2 = Factory(:data_file, :title=>"public data file", :policy=>Factory(:public_policy))
@@ -1195,7 +1196,6 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
 
-  end
 
   test "should not show investigation and study title if they are hidden on assay show page" do
     investigation = Factory(:investigation,
@@ -1246,7 +1246,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :new_object_based_on_existing_one, :id=>assay.id
     assert_redirected_to assay
     refute_nil flash[:error]
-end
+  end
 
   test "should show experimental assay types for new experimental assay" do
     get :new,:class=>:experimental
@@ -1360,5 +1360,6 @@ end
     end
 
   end
+end
 
 

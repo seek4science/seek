@@ -230,7 +230,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 #others
   test "type_managers" do
-    assert_equal "users",Seek::Config.type_managers
+    assert_equal "admins",Seek::Config.type_managers
   end
 
   test "pubmed_api_email" do

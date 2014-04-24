@@ -55,22 +55,38 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "correct title and text for associating an assay for new" do
     login_as(Factory(:user))
-    get :new
-    assert_response :success
+    as_virtualliver do
+      get :new
+      assert_response :success
+      assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
+    end
+    as_not_virtualliver do
+      get :new
+      assert_response :success
+      assert_select 'div.association_step p', :text => /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
+    end
+
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
   end
 
   test "correct title and text for associating an assay for edit" do
     df = Factory :data_file
     login_as(df.contributor.user)
-    get :edit, :id=>df.id
-    assert_response :success
+    as_virtualliver do
+      get :edit, :id => df.id
+      assert_response :success
+      assert_select 'div.association_step p', :text => /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
+    end
+    as_not_virtualliver do
+      get :edit, :id => df.id
+      assert_response :success
+      assert_select 'div.association_step p', :text => /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
+    end
 
-    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
+    assert_select 'div.foldTitle', :text => /#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div#associate_assay_fold_content p', :text => /The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
+
   end
 
   test "get XML when not logged in" do
@@ -132,10 +148,10 @@ end
     assert_not_nil assigns(:data_files)
   end
 
-  test 'should not show index for non project member, should show for non login user' do
+  test 'should show index for non project member, should show for non login user' do
     login_as(:registered_user_with_no_projects)
     get :index
-    assert_response :redirect
+    assert_response :success
 
     logout
     get :index
@@ -309,13 +325,14 @@ end
   end
 
   test 'test_asset_url' do
-    WebMock.allow_net_connect!
     #http
-    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'http://www.bbc.co.uk'}})
+    mock_http
+    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'http://mockedlocation.com/a-piccy.png'}})
     assert_response :success
     assert @response.body.include?('The URL was accessed successfully')
     #https
-    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'https://seek.sysmo db.org/'}})
+    mock_https
+    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'https://mockedlocation.com/a-piccy.png'}})
     assert_response :success
     assert @response.body.include?('The URL was accessed successfully')
   end
@@ -490,7 +507,7 @@ end
   end
 
   test "should add link to a webpage" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     if Seek::Config.is_virtualliver
       params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
     else
@@ -514,7 +531,7 @@ end
   end
 
   test "should add link to a webpage from windows browser" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     if Seek::Config.is_virtualliver
       params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
     else
@@ -539,7 +556,7 @@ end
   end
 
   test "should show wepage as a link" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     if Seek::Config.is_virtualliver
       df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
     else
@@ -559,7 +576,7 @@ end
   end
 
   test "should not show website link for viewable but inaccessible data but should show request button" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com"),:policy=>Factory(:all_sysmo_viewable_policy)
     user = Factory :user
     assert df.can_view?(user)
@@ -611,7 +628,7 @@ end
   end
 
   test "dont show download button or count for website/external_link data file" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content Type' => 'text/html'}
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
     if Seek::Config.is_virtualliver
       df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
     else
@@ -661,9 +678,9 @@ end
     al=ActivityLog.last
     assert_equal "download",al.action
     assert_equal df,al.activity_loggable
-    assert_equal "attachment; filename=\"rightfield.xls\"",@response.header['Content Disposition']
-    assert_equal "application/excel",@response.header['Content Type']
-    assert_equal "9216",@response.header['Content Length']
+    assert_equal "attachment; filename=\"rightfield.xls\"",@response.header['Content-Disposition']
+    assert_equal "application/excel",@response.header['Content-Type']
+    assert_equal "9216",@response.header['Content-Length']
   end
 
   test "should download" do
@@ -671,9 +688,9 @@ end
       get :download, :id => Factory(:small_test_spreadsheet_datafile,:policy=>Factory(:public_policy), :contributor=>User.current_user).id
     end
     assert_response :success
-    assert_equal "attachment; filename=\"small test spreadsheet.xls\"",@response.header['Content Disposition']
-    assert_equal "application/excel",@response.header['Content Type']
-    assert_equal "7168",@response.header['Content Length']
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"",@response.header['Content-Disposition']
+    assert_equal "application/excel",@response.header['Content-Type']
+    assert_equal "7168",@response.header['Content-Length']
   end
 
   test "should download from url" do
@@ -793,7 +810,7 @@ end
 
     get :download, :id => df, :disposition => 'inline'
     assert_response :success
-    assert @response.header['Content Disposition'].include?('inline')
+    assert @response.header['Content-Disposition'].include?('inline')
   end
 
   test "should handle normal attachment download" do
@@ -804,7 +821,7 @@ end
 
     get :download, :id => df
     assert_response :success
-    assert @response.header['Content Disposition'].include?('attachment')
+    assert @response.header['Content-Disposition'].include?('attachment')
   end
   
   test "shouldn't download" do
@@ -1441,10 +1458,8 @@ end
     assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
     login_as(person.user)
     assert data_file.can_manage?
-    as_not_virtualliver do
-      assert !data_file.can_publish?
+    assert data_file.can_publish?
     assert data_file.gatekeeper_required?
-    end
 
     get :edit, :id => data_file
 
@@ -1731,7 +1746,7 @@ end
 
   def mock_http
     file="#{Rails.root}/test/fixtures/files/file_picture.png"
-    stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content Type' => 'image/png'})
+    stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
     stub_request(:head, "http://mockedlocation.com/a-piccy.png")
 
     stub_request(:any, "http://mocked301.com").to_return(:status=>301)
@@ -1742,7 +1757,7 @@ end
 
   def mock_https
     file="#{Rails.root}/test/fixtures/files/file_picture.png"
-    stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content Type' => 'image/png'})
+    stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
     stub_request(:head, "https://mockedlocation.com/a-piccy.png")
 
     stub_request(:any, "https://mocked301.com").to_return(:status=>301)

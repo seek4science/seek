@@ -14,10 +14,12 @@ class SubMailerTest < ActionMailer::TestCase
     log2 = Factory :activity_log,:activity_loggable=>model,:action=>"update",:controller_name=>"data_files",:created_at=>DateTime.new(2012,12,25,13,15,0), :culprit=>p2.user
     email = nil
 
-    now = Time.now
+    now = Time.zone.now
 
     pretend_now_is(now) do
-      email = SubMailer.send_digest_subscription p, [log,log2], 'daily'
+      with_time_zone("UTC") do
+        email = SubMailer.send_digest_subscription p, [log,log2], 'daily'
+      end
     end
 
     assert_equal "text/html; charset=UTF-8",email.content_type
@@ -61,5 +63,6 @@ class SubMailerTest < ActionMailer::TestCase
     assert email.body.include?("following resources have just been created or updated in")
     assert email.body.include?("Resources Created:")
   end
+
 
 end

@@ -152,30 +152,43 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'select#possible_assays' do
       assert_select "option", :text=>/Select #{I18n.t('assays.assay')} .../,:count=>1
-      assert_select "option", :text=>/Modelling Assay/,:count=>1
+      assert_select "option", :text=>/Modelling Assay/,:count=>5
       assert_select "option", :text=>/Metabolomics Assay/,:count=>0
     end
   end
 
   test "correct title and text for associating a modelling analysis for new" do
     login_as(Factory(:user))
-    get :new
-    assert_response :success
-
-    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
-    assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.assay')} Or create New Assay Here  for the #{I18n.t('model')}./
+    as_virtualliver do
+      get :new
+      assert_response :success
+      assert_select 'div.association_step p', :text => /You may select an existing editable #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+    end
+    as_not_virtualliver do
+      get :new
+      assert_response :success
+      assert_select 'div.association_step p', :text => /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+    end
+    assert_select 'div.foldTitle', :text => /#{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div#associate_assay_fold_content p', :text => /The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
   end
 
   test "correct title and text for associating a modelling analysis for edit" do
     model = Factory :model
     login_as(model.contributor.user)
-    get :edit, :id=>model.id
-    assert_response :success
+    as_virtualliver do
 
+      get :edit, :id=>model.id
+      assert_response :success
+      assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+    end
+    as_not_virtualliver do
+      get :edit, :id=>model.id
+      assert_response :success
+      assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+    end
     assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
-    assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.assay')} Or create New Assay Here  for the #{I18n.t('model')}./
   end
 
   test "fail gracefullly when trying to access a missing model" do

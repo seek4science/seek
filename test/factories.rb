@@ -207,8 +207,7 @@ end
     f.sequence(:description) {|n| "Assay description #{n}"}
     f.association :contributor, :factory => :person
     f.association :study
-    f.association :assay_type
-  f.association :policy, :factory => :private_policy
+    f.association :policy, :factory => :private_policy
   end
 
   Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
@@ -435,7 +434,7 @@ end
   #Publication
   Factory.define(:publication) do |f|
     f.sequence(:title) {|n| "A Publication #{n}"}
-    f.sequence(:pubmed_id) {|n| n}
+    f.sequence(:pubmed_id) {|n| n+1000}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
@@ -889,26 +888,31 @@ end
     f.association :strain, :factory => :strain
     f.specimen { Factory(:specimen, :policy => Factory(:public_policy))}
   end
-
   Factory.define :publication_author do |f|
     f.sequence(:first_name) { |n| "Person#{n}" }
     f.last_name "Last"
   end
 
+  Factory.define :scale do |f|
+    f.sequence(:title) { |n| "scale #{n}" }
+    f.sequence(:pos) { |n| n }
+    f.sequence(:key) { |n| "scale_key #{n}" }
+    f.sequence(:image_name) { |n| "image_#{n}" }
+  end
 
   Factory.define :post do |f|
-    f.body 'post body'
-    f.association :user, :factory => :user
-    f.association :topic, :factory => :topic
-  end
+     f.body 'post body'
+     f.association :user, :factory => :user
+     f.association :topic, :factory => :topic
+   end
 
-  Factory.define :topic do |f|
-    f.title 'a topic'
-    f.body 'topic body'
-    f.association :user, :factory => :user
-    f.association :forum, :factory => :forum
-  end
+   Factory.define :topic do |f|
+     f.title 'a topic'
+     f.body 'topic body'
+     f.association :user, :factory => :user
+     f.association :forum, :factory => :forum
+   end
 
-  Factory.define :forum do |f|
-    f.name 'a forum'
-  end
+   Factory.define :forum do |f|
+     f.name 'a forum'
+   end

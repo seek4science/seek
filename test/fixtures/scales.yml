@@ -1,0 +1,24 @@
+Cell:
+ title: "Cell"
+ pos: 1
+ key: "cell"
+
+Intercellular:
+ title: "Intercellular"
+ pos: 2
+ key: "intercellular"
+
+LiverLobule:
+  title: "LiverLobule"
+  pos: 3
+  key:  "liverLobule"
+
+Liver:
+ title: "Liver"
+ pos: 4
+ key: "liver"
+
+Organism:
+ title: "Organism"
+ pos: 5
+ key: "organism"
