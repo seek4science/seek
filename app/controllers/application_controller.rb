@@ -198,32 +198,21 @@ class ApplicationController < ActionController::Base
   end
 
   def check_allowed_to_manage_types
-      unless Seek::Config.type_managers_enabled
-        error("Type management disabled", "...")
-        return false
-      end
-      if User.current_user
-        if User.current_user.can_manage_types?
-          return true
-        else
-          case Seek::Config.type_managers
-            when "admins"
-              error("Admin rights required to manage types", "...")
-              return false
-
-            when "pals"
-              error("Admin or PAL rights required to manage types", "...")
-              return false
-
-            when "none"
-              error("Type management disabled", "...")
-              return false
-          end
-        end
+    unless Seek::Config.type_managers_enabled
+      error("Type management disabled", "...")
+      return false
+    end
+    if User.current_user
+      if User.current_user.can_manage_types?
+        return true
       else
-        error("You need to login first.","...")
+        error("Admin rights required to manage types", "...")
         return false
       end
+    else
+      error("You need to login first.", "...")
+      return false
+    end
   end
 
   def currently_logged_in
