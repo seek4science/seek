@@ -67,12 +67,21 @@ class SuggestedAssayType < ActiveRecord::Base
   end
 
   def can_edit?
-      contributor==User.current_user.person || User.admin_logged_in?
+      contributor==User.current_user.try(:person) || User.admin_logged_in?
   end
 
-  def can_destroy? user=User.current_user
+  def can_destroy?
   auth = User.admin_logged_in?
   auth && self.assays.count == 0 && self.children.empty?
+  end
+
+  def get_child_assays suggested_assay_type=self
+      result = suggested_assay_type.assays
+      suggested_assay_type.children.each do |child|
+        result = result | child.assays
+        result = result | get_child_assays(child) if !child.children.empty?
+      end
+      return result
   end
 
 end
