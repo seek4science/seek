@@ -189,16 +189,23 @@ end
     f.access_type Policy::NO_ACCESS
   end
 
-#Assay and Technology types
+#Suggested Assay and Technology types
 
-  Factory.define(:technology_type, :class=>TechnologyType) do |f|
-    f.sequence(:title) {|n| "A TechnologyType#{n}"}
-    f.sequence(:term_uri) {|n| "http://technology_types/term##{n}"}
+  Factory.define(:suggested_technology_type) do |f|
+    f.sequence(:label) {|n| "A TechnologyType#{n}"}
+    f.parent_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
   end
 
-  Factory.define(:assay_type) do |f|
-    f.sequence(:title) {|n| "An AssayType#{n}"}
-    f.sequence(:term_uri) {|n| "http://assay_types/term##{n}"}
+  Factory.define(:suggested_assay_type) do |f|
+    f.sequence(:label) {|n| "An AssayType#{n}"}
+    f.is_for_modelling false
+    f.parent_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
+  end
+
+   Factory.define(:suggested_modelling_analysis_type, :class=> SuggestedAssayType) do |f|
+    f.sequence(:label) {|n| "An Modelling Analysis Type#{n}"}
+    f.is_for_modelling true
+    f.parent_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
   end
 
   #Assay
