@@ -203,7 +203,9 @@ SEEK::Application.routes.draw do
 
   resources :investigations do
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
+    collection do
       post :resource_in_tab
+    end
     member do
       get :new_object_based_on_existing_one
     end
