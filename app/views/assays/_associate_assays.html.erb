@@ -32,6 +32,12 @@
         single_assay_class_text = "#{t('assays.experimental_assay')}"
       end
     end
+
+    if Seek::Config.is_virtualliver
+      add_new_assay_title = " or create #{link_to(h("new #{single_assay_class_text}"), new_assay_path(:create_from_asset => :true), :onclick => "window.open(this.href);return false;")}".html_safe
+    else
+      add_new_assay_title = ""
+    end
 %>
 
 <div class="fold">
@@ -52,7 +58,7 @@
       </div>
       <div class="association_step">
         <p style="color: #666666;">
-          You may select an existing editable Assay or create <%= link_to h("New Assay Here"), new_assay_path(:create_from_asset => :true), :onclick => "window.open(this.href);return false;" %>  for the <%= resource_text -%>.
+          You may select an existing editable <%= single_assay_class_text -%><%= add_new_assay_title -%> to associate with this <%= resource_text -%>.
         </p>
 
         <% if show_relationships -%>
