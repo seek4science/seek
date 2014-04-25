@@ -4,13 +4,10 @@ class Investigation < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
 
   acts_as_isa
-  acts_as_authorized
-
 
   attr_accessor :new_link_from_study
 
   has_many :studies
-
 
   validates_presence_of :projects
   validates_presence_of :title
