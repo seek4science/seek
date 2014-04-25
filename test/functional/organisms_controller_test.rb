@@ -13,7 +13,7 @@ class OrganismsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object=organisms(:yeast)
+    @object=Factory(:organism,:bioportal_concept=>Factory(:bioportal_concept))
   end
   
   test "admin can get edit" do
