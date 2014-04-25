@@ -65,7 +65,7 @@ class Assay < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   def projects
-    study.investigation.projects
+    study.try(:investigation).try(:projects) || []
   end
 
   def project_ids
