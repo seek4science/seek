@@ -6,14 +6,12 @@ class Assay < ActiveRecord::Base
   include Seek::OntologyTypeHandling
   include Seek::Taggable
 
-  acts_as_isa
-
-  #FIXME: needs to be declared before acts_as_authorized, else ProjectCompat module gets pulled in
+  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in
   def projects
     study.try(:investigation).try(:projects) || []
   end
 
-  acts_as_authorized
+  acts_as_isa
 
   acts_as_annotatable :name_field=>:title
 
