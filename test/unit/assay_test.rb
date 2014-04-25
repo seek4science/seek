@@ -477,4 +477,18 @@ class AssayTest < ActiveSupport::TestCase
 
   end
 
+  test "destroy" do
+    a = Factory(:assay,:study=>Factory(:study))
+    refute_nil a.study
+    refute_empty a.projects
+    assert_difference("Assay.count",-1) do
+      assert_no_difference("Study.count") do
+        disable_authorization_checks do
+          a.destroy
+        end
+      end
+    end
+
+  end
+
 end

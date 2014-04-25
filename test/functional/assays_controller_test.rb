@@ -420,10 +420,11 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should delete assay with study" do
+    a = assays(:assay_with_just_a_study)
     login_as(:model_owner)
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count', -1) do
-        delete :destroy, :id => assays(:assay_with_just_a_study).id
+        delete :destroy, :id => a
       end
     end
 
