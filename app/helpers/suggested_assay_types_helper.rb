@@ -47,8 +47,8 @@ module SuggestedAssayTypesHelper
         cache_key = [:ontology_editor_display, SuggestedAssayType.modelling_types.order('updated_at').last.try(:cache_key)]
         list += cached_list("modelling_analysis", cache_key, selected_uri)
       when "all_assay_type"
-        exp_cache_key = [:ontology_editor_display, SuggestedAssayType.exp_types.order('updated_at').last.try(:cache_key)]
-        modelling_cache_key = [:ontology_editor_display, SuggestedAssayType.modelling_types.order('updated_at').last.try(:cache_key)]
+        exp_cache_key = [:ontology_editor_display, SuggestedAssayType.exp_types.order('updated_at').last.try(:cache_key),"EXP"]
+        modelling_cache_key = [:ontology_editor_display, SuggestedAssayType.modelling_types.order('updated_at').last.try(:cache_key),"MODEL"]
         list += cached_list("assay", exp_cache_key, selected_uri)
         list += cached_list("modelling_analysis", modelling_cache_key, selected_uri)
 
