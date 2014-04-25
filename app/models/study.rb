@@ -3,29 +3,18 @@ class Study < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
 
+  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in
+  def projects
+    investigation.try(:projects) || []
+  end
+
   acts_as_isa
 
   attr_accessor :new_link_from_assay
 
   belongs_to :investigation
-
-
-
-  def projects
-    investigation.try(:projects) || []
-  end
-
-  def project_ids
-    projects.map(&:id)
-  end
-
-  acts_as_authorized
-
   has_many :assays
-
   belongs_to :person_responsible, :class_name => "Person"
-
-
   validates_presence_of :investigation
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
@@ -51,6 +40,10 @@ class Study < ActiveRecord::Base
         #{type}_masters
       end
     END_EVAL
+  end
+
+  def project_ids
+    projects.map(&:id)
   end
 
   def state_allows_delete? *args
