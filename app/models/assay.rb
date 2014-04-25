@@ -8,6 +8,11 @@ class Assay < ActiveRecord::Base
 
   acts_as_isa
 
+  #FIXME: needs to be declared before acts_as_authorized, else ProjectCompat module gets pulled in
+  def projects
+    study.try(:investigation).try(:projects) || []
+  end
+
   acts_as_authorized
 
   acts_as_annotatable :name_field=>:title
@@ -64,9 +69,7 @@ class Assay < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
-  def projects
-    study.try(:investigation).try(:projects) || []
-  end
+
 
   def project_ids
     projects.map(&:id)
