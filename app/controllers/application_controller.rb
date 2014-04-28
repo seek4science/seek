@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
 
   around_filter :with_current_user
 
-  rescue_from "ActionController::RoutingError", :with=>:render_routing_error
+  #rescue_from "ActionController::RoutingError", :with=>:render_routing_error
 
   before_filter :profile_for_login_required
 

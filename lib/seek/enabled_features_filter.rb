@@ -8,7 +8,7 @@ module Seek
         true
       else
         flash[:error] = "#{feature.capitalize} are disabled"
-        redirect_to :root
+        redirect_to main_app.root_path
         false
       end
     end
