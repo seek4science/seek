@@ -40,11 +40,11 @@ module SuggestedAssayTypesHelper
     list = []
     case type
       when "assay"
-        cache_key = [:ontology_editor_display, SuggestedAssayType.exp_types.order('updated_at').last.try(:cache_key)]
+        cache_key = [:ontology_editor_display, SuggestedAssayType.exp_types.order('updated_at').last.try(:cache_key),"EXP"]
         list += cached_list("assay", cache_key, selected_uri)
       #roots =   classes.hash_by_uri[reader.default_parent_class_uri.try(:to_s)]
       when "modelling_analysis"
-        cache_key = [:ontology_editor_display, SuggestedAssayType.modelling_types.order('updated_at').last.try(:cache_key)]
+        cache_key = [:ontology_editor_display, SuggestedAssayType.modelling_types.order('updated_at').last.try(:cache_key),"MODEL"]
         list += cached_list("modelling_analysis", cache_key, selected_uri)
       when "all_assay_type"
         exp_cache_key = [:ontology_editor_display, SuggestedAssayType.exp_types.order('updated_at').last.try(:cache_key),"EXP"]
@@ -53,7 +53,7 @@ module SuggestedAssayTypesHelper
         list += cached_list("modelling_analysis", modelling_cache_key, selected_uri)
 
       when "technology"
-        cache_key = [:ontology_editor_display, SuggestedTechnologyType.order('updated_at').last.try(:cache_key)]
+        cache_key = [:ontology_editor_display, SuggestedTechnologyType.order('updated_at').last.try(:cache_key), "TECHNOLOGY"]
         list += cached_list("technology", cache_key, selected_uri)
 
       else
