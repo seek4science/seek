@@ -3,11 +3,11 @@
 <%
    if f ||= nil
      resource_type ||= f.object.class.name
-     existing_attributions ||= try_block{f.object.attributions_objects.select &:can_view?}
+     existing_attributions ||= f.try(:object).respond_to?(:attributions_objects) ? f.object.attributions_objects.select &:can_view? : nil
 	 existing_creators ||= f.object.try(:creators)
      existing_creators =  [current_user.person] if existing_creators.blank?
 	 other_creators ||= f.object.try :other_creators
-	 related_publications ||= try_block { f.object.related_publications }
+	 related_publications ||= f.try(:object).respond_to?(:related_publications) ? f.object.related_publications : nil
    end
    existing_attributions||=[]
    existing_creators||=[current_user.person]

@@ -1,6 +1,6 @@
 <%
    #this is use for correct display the access_type dropdown list, which depending on the type of resource
-   resource = try_block{resource_type.constantize.send 'new'}
+   resource = instance_of_resource_type(resource_type)
 %>
 <div id="redbox_contents_div" class="redbox_contents" style="width:500px;">
 	<div class="head">
