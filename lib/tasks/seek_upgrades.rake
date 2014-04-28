@@ -103,8 +103,7 @@ namespace :seek do
 
         AssayType.user_defined_assay_types.each do |new|
           new_at = SuggestedAssayType.new :label=> new.title, :parent_uri=> new.parents.first.try(:term_uri)
-          new_at.contributor = Person.where(:id => 241).first
-          new_at.contributor = User.first.person if new == AssayType.user_defined_assay_types.first
+          new_at.contributor = new.assays.first.try(:contributor) ||  User.first.person
           disable_authorization_checks do
             new_at.save
           end
@@ -123,7 +122,7 @@ namespace :seek do
 
    end
 
-  desc "updatetechnology types from ontology"
+  desc "update technology types from ontology"
      task :move_new_technology_types => :environment  do
           TechnologyType.all.each do |tt|
             assays = Assay.where(:technology_type_id=> tt.id)
@@ -138,8 +137,7 @@ namespace :seek do
 
           TechnologyType.user_defined_technology_types.each do |new|
             new_tt = SuggestedTechnologyType.new :label=> new.title, :parent_uri=> new.parents.first.try(:term_uri)
-            new_tt.contributor = Person.where(:id => 241).first
-            new_tt.contributor = User.first.person if new == TechnologyType.user_defined_technology_types.first
+            new_tt.contributor = new.assays.first.try(:contributor) ||  User.first.person
             disable_authorization_checks do
               new_tt.save
             end
