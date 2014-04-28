@@ -1,6 +1,12 @@
 <%
    #this is use for correct display the access_type dropdown list, which depending on the type of resource
-   resource = try_block{params[:resource_type].constantize.send 'new'}
+   resource = nil
+   begin
+        resource_class = params[:resource_type].constantize unless params[:resource_type].nil?
+        resource = resource_class.send(:new) if !resource_class.nil? && resource_class.respond_to?(:new)
+   rescue NameError=>e
+     logger.error("Unable to find constant for #{params[:resource_type]}")
+   end
 %>
 <div id="redbox_contents_div" class="redbox_contents" style="width:500px;">
 	<div class="head">
