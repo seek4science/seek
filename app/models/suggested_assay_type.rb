@@ -1,7 +1,6 @@
 
 class SuggestedAssayType < ActiveRecord::Base
 
- # include Seek::Ontologies::SuggestedType
 
   #initial(invalid) unique uri before added to ontology, it can be updated when sync with ontology
   alias_attribute :uuid, :uri

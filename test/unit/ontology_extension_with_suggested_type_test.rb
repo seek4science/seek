@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SuggestedTypeTest < ActiveSupport::TestCase
+class OntologyExtensionWithSuggestedTypeTest < ActiveSupport::TestCase
   test "assay types from ontology cannot be edited or deleted" do
          Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri.each do |uri, clazz|
              User.current_user = Factory :user, :person => Factory(:admin)

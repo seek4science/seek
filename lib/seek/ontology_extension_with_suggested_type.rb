@@ -1,5 +1,5 @@
 module Seek
-  module SuggestedType
+  module OntologyExtensionWithSuggestedType
     # To enable adding suggested assay types or technology types by: include Seek::SuggestedType
     #OntologyClass is extended
     #OntologyClass#children is overridden to include children suggested

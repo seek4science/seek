@@ -4,7 +4,7 @@ class Assay < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::OntologyTypeHandling
-  include Seek::SuggestedType
+  include Seek::OntologyExtensionWithSuggestedType
 
   acts_as_isa
   acts_as_taggable
