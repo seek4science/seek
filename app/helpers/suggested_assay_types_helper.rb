@@ -40,21 +40,16 @@ module SuggestedAssayTypesHelper
     list = []
     case type
       when "assay"
-        cache_key = [:ontology_editor_display, SuggestedAssayType.exp_types.order('updated_at').last.try(:cache_key),"EXP"]
-        list += cached_list("assay", cache_key, selected_uri)
+        list += render_list("assay", selected_uri)
       #roots =   classes.hash_by_uri[reader.default_parent_class_uri.try(:to_s)]
       when "modelling_analysis"
-        cache_key = [:ontology_editor_display, SuggestedAssayType.modelling_types.order('updated_at').last.try(:cache_key),"MODEL"]
-        list += cached_list("modelling_analysis", cache_key, selected_uri)
+        list += render_list("modelling_analysis",  selected_uri)
       when "all_assay_type"
-        exp_cache_key = [:ontology_editor_display, SuggestedAssayType.exp_types.order('updated_at').last.try(:cache_key),"EXP"]
-        modelling_cache_key = [:ontology_editor_display, SuggestedAssayType.modelling_types.order('updated_at').last.try(:cache_key),"MODEL"]
-        list += cached_list("assay", exp_cache_key, selected_uri)
-        list += cached_list("modelling_analysis", modelling_cache_key, selected_uri)
+        list += render_list("assay", selected_uri)
+        list += render_list("modelling_analysis", selected_uri)
 
       when "technology"
-        cache_key = [:ontology_editor_display, SuggestedTechnologyType.order('updated_at').last.try(:cache_key), "TECHNOLOGY"]
-        list += cached_list("technology", cache_key, selected_uri)
+        list += render_list("technology", selected_uri)
 
       else
         return nil
@@ -64,15 +59,12 @@ module SuggestedAssayTypesHelper
     list
   end
 
-  def cached_list type, cache_key,selected_uri=nil
-
-    list = Rails.cache.fetch(cache_key) do
+  def render_list type, selected_uri=nil
       reader = reader_for_type(type)
       classes = reader.class_hierarchy
       model_class_pre = type=="modelling_analysis" ? "assay" : type
-      render_ontology_class_tree(classes, model_class_pre, selected_uri)
-    end
-    list.nil? ? [] : list
+      list = render_ontology_class_tree(classes, model_class_pre, selected_uri)
+      list
   end
 
   def render_ontology_class_tree clz, type, selected_uri,depth=0
