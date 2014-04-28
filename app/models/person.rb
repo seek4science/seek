@@ -338,7 +338,7 @@ class Person < ActiveRecord::Base
 
 
   def can_manage? user = User.current_user
-    try_block{user.is_admin?}
+    user.try(:is_admin?)
   end
 
   def can_destroy? user = User.current_user
