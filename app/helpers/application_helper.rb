@@ -10,7 +10,7 @@ module ApplicationHelper
 
 
   def is_front_page?
-    current_page?(root_url)
+    current_page?(main_app.root_url)
   end
 
   def seek_stylesheet_tags main='application'
