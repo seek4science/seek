@@ -24,6 +24,41 @@ class ProgrammeTest < ActiveSupport::TestCase
     p = Factory :programme
     refute_nil p.title
     refute_nil p.uuid
+    refute_empty p.projects
   end
+
+  test "people via projects" do
+    person1 = Factory :person
+    person2 = Factory :person
+    person3 = Factory :person
+    assert_equal 1,person1.projects.size
+    assert_equal 1,person2.projects.size
+    projects = person1.projects | person2.projects
+    prog = Factory :programme,:projects=>projects
+    assert_equal 2,prog.projects.size
+    peeps = prog.people
+    assert_equal 2,peeps.size
+    assert_includes peeps,person1
+    assert_includes peeps,person2
+    refute_includes peeps,person3
+  end
+
+  test "institutions via projects" do
+
+    person1 = Factory :person
+    person2 = Factory :person
+    person3 = Factory :person
+
+    projects = person1.projects | person2.projects
+    prog = Factory :programme,:projects=>projects
+    assert_equal 2,prog.projects.size
+    inst = prog.institutions
+    assert_equal 2,inst.size
+    assert_includes inst,person1.institutions.first
+    assert_includes inst,person2.institutions.first
+    refute_includes inst,person3.institutions.first
+
+  end
+
 
 end

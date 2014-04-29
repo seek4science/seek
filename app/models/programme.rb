@@ -6,10 +6,18 @@ class Programme < ActiveRecord::Base
 
   #associations
   belongs_to :avatar
+  has_many :projects
 
   #validations
   validates :title,:presence=>true
   validates :avatar,:associated=>true
 
+  def people
+    projects.collect{|p| p.people}.flatten.uniq
+  end
+
+  def institutions
+    projects.collect{|p| p.institutions}.flatten.uniq
+  end
 
 end
