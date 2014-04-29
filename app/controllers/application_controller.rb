@@ -139,12 +139,18 @@ class ApplicationController < ActionController::Base
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do
-          #FIXME: remove the try_block{}
           object = eval("@"+controller_name.singularize)
           if !object.nil? && object.try(:can_view?)
             redirect_to object
           else
-            try_block { redirect_to eval("#{controller_name}_path") } or redirect_to root_url
+            path = nil
+            begin
+              path = eval("main_app.#{controller_name}_path")
+            rescue Exception=>e
+              logger.error("No path found for controller - #{controller_name}",e)
+              path = main_app.root_path
+            end
+            redirect_to path
           end
 
         end
