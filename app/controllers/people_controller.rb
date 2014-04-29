@@ -138,7 +138,7 @@ class PeopleController < ApplicationController
       !proj.people.find{|person| !person.email.nil? && person.user.nil?}.nil?
     end
 
-    @userless_projects.sort!{|a,b|a.name<=>b.name}
+    @userless_projects.sort!{|a,b|a.title<=>b.title}
     @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
 
   end
