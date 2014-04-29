@@ -190,7 +190,7 @@ module ApiHelper
       end
     end
     
-    policy_xml builder,object if try_block{current_user.person.is_admin?} && object.respond_to?("policy")
+    policy_xml builder,object if User.admin_logged_in? && object.respond_to?("policy")
     if object.respond_to?("content_blobs")
       builder.tag! "blobs" do
         object.content_blobs.each do |cb|

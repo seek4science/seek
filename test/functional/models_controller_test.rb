@@ -1075,8 +1075,47 @@ class ModelsControllerTest < ActionController::TestCase
     get :compare_versions,:id=>model,:other_version=>model.versions.last.version
     assert_response :redirect
     refute_nil flash[:error]
-
   end
+
+  test "compare versions option on page" do
+    p  = Factory(:person)
+    login_as(p)
+
+    model = Factory(:teusink_model,:contributor=>p,:policy=>Factory(:public_policy))
+    model.save_as_new_version
+    Factory(:cronwright_model_content_blob,:asset_version=>model.version,:asset=>model)
+    model.reload
+    assert_equal 2,model.version
+    assert model.can_download?
+    assert_equal 2, model.versions.select{|v| v.contains_sbml?}.count
+    get :show,:id=>model
+    assert_response :success
+
+    assert_select "select#compare_versions",:count=>1 do
+      assert_select "option[value=?]",compare_versions_model_path(model,:other_version=>1,:version=>2)
+    end
+  end
+
+  test "compare versions option not shown when not downloadable" do
+    p  = Factory(:person)
+    login_as(Factory(:person))
+    model = Factory(:teusink_model,:contributor=>p,:policy=>Factory(:publicly_viewable_policy))
+    disable_authorization_checks do
+      model.save_as_new_version
+      Factory(:cronwright_model_content_blob,:asset_version=>model.version,:asset=>model)
+    end
+
+    model.reload
+    assert_equal 2,model.version
+    refute model.can_download?
+
+    assert_equal 2, model.versions.select{|v| v.contains_sbml?}.count
+    get :show,:id=>model
+    assert_response :success
+
+    assert_select "select#compare_versions",:count=>0
+  end
+
 
   test "gracefully handle error when other version missing" do
     model = Factory :model,:contributor=>User.current_user.person

@@ -11,6 +11,21 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "a: b: c and d",join_with_and(["a","b","c","d"],": ")
   end
 
+  test "instance of resource_type" do
+    m = instance_of_resource_type("model")
+    assert m.is_a?(Model)
+    assert m.new_record?
+
+    p = instance_of_resource_type("Presentation")
+    assert p.is_a?(Presentation)
+    assert p.new_record?
+
+    assert_nil instance_of_resource_type(nil)
+    assert_nil instance_of_resource_type("mushypeas")
+    assert_nil instance_of_resource_type({})
+
+  end
+
   test "force to treat 1 Jan as year only" do
     date = Date.new(2012,1,1)
     text = date_as_string(date,false,true)

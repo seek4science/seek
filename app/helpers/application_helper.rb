@@ -677,6 +677,18 @@ module ApplicationHelper
     params
   end
 
+  #returns a new instance of the string describing a resource type, or nil if it is not applicable
+  def instance_of_resource_type resource_type
+    resource = nil
+    begin
+      resource_class = resource_type.classify.constantize unless resource_type.nil?
+      resource = resource_class.send(:new) if !resource_class.nil? && resource_class.respond_to?(:new)
+    rescue NameError=>e
+      logger.error("Unable to find constant for resource type #{resource_type}")
+    end
+    resource
+  end
+
 
   def unable_to_delete_text model_item
     text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"

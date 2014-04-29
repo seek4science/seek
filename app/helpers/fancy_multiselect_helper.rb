@@ -13,7 +13,12 @@ module FancyMultiselectHelper
       return super if options.delete :preview_disabled
 
       #skip if controller class does not define a preview method
-      return super unless try_block{"#{association.to_s.classify.pluralize}Controller".constantize.method_defined?(:preview)}
+      begin
+        const = "#{association.to_s.classify.pluralize}Controller".constantize
+        return super unless const.method_defined?(:preview)
+      rescue NameError=>e
+        return super
+      end
 
       #adds options to the dropdown used to select items to add to the multiselect.
       options[:possibilities_options] = {} unless options[:possibilities_options]

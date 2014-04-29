@@ -32,10 +32,12 @@
     <h2>Tagged items (<%= @tag.annotations.size -%>)</h2>
     <ul>
       <% @tag.annotations.each do |a| -%>
-          <li>
-            <%= link_to "#{try_block{a.annotatable.title}} ( #{a.annotatable_type} )", a.annotatable -%>
-            context = <%= a.attribute.name -%>
-          </li>
+          <% unless a.nil? || a.annotatable.nil? %>
+              <li>
+                <%= link_to "#{a.annotatable.title} ( #{a.annotatable_type} )", a.annotatable -%>
+                context = <%= a.attribute.name -%>
+              </li>
+          <% end %>
       <% end -%>
     </ul>
 
