@@ -18,6 +18,13 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute p.valid?
     p.title="frog"
     assert p.valid?
+    p.save!
+
+    #title must be unique
+    p2 = Programme.new :title=>p.title
+    refute p2.valid?
+    p2.title="sdfsdfsdf"
+    assert p2.valid?
   end
 
   test "factory" do

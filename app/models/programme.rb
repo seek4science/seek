@@ -9,7 +9,7 @@ class Programme < ActiveRecord::Base
   has_many :projects
 
   #validations
-  validates :title,:presence=>true
+  validates :title,:presence=>true, :uniqueness=>true
   validates :avatar,:associated=>true
 
   def people
@@ -22,3 +22,4 @@ class Programme < ActiveRecord::Base
 
 
 end
+
