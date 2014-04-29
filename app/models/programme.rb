@@ -20,4 +20,5 @@ class Programme < ActiveRecord::Base
     projects.collect{|p| p.institutions}.flatten.uniq
   end
 
+
 end
