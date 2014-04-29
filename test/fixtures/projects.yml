@@ -2,40 +2,40 @@
 
 one:
   id: 1
-  name: Project1
+  title: Project1
   web_page: "http://www.goggle.com"
   wiki_page: "http://www.goggle.com"
 
 two:
   id: 2
-  name: Project2
+  title: Project2
   
 
 three:
   id: 3
-  name: Project3
+  title: Project3
   
 #a project not associated with any Workgroups or People
 four:
   id: 4
-  name: Project4
+  title: Project4
 
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
 
 myexperiment_project:
-  name: "myExperiment"
+  title: "myExperiment"
 
 moses_project:
-  name: "Moses"
+  title: "Moses"
 
 
 sysmo_project:
-  name: "SysMO"
+  title: "SysMO"
   organisms: organism_linked_project_only
 
 empty_project:
-  name: "empty project with no members..."
+  title: "empty project with no members..."
   
 other_project:
-  name: "junk goes here"
+  title: "junk goes here"

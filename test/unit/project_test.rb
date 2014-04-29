@@ -91,12 +91,7 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_ordered_by_name
-    assert Project.all.sort_by {|p| p.name.downcase} == Project.default_order || Project.all.sort_by {|p| p.name} == Project.default_order
-  end
-
-  def test_title_alias_for_name
-    p=projects(:sysmo_project)
-    assert_equal p.name,p.title
+    assert Project.all.sort_by {|p| p.title.downcase} == Project.default_order || Project.all.sort_by {|p| p.title} == Project.default_order
   end
 
   def test_title_trimmed 
@@ -218,7 +213,7 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_update_first_letter
-    p=Project.new(:name=>"test project")
+    p=Project.new(:title=>"test project")
     p.save
     assert_equal "T",p.first_letter
   end
@@ -274,13 +269,13 @@ class ProjectTest < ActiveSupport::TestCase
     p.wiki_page="http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110"
     assert p.valid?
 
-    p.name=nil
+    p.title=nil
     assert !p.valid?
 
-    p.name=""
+    p.title=""
     assert !p.valid?
 
-    p.name="fred"
+    p.title="fred"
     assert p.valid?
   end
 
@@ -300,8 +295,8 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test "Should order Latest list of projects by updated_at" do
-    project1 = Factory(:project, :name => 'C', :updated_at => 2.days.ago)
-    project2 = Factory(:project, :name => 'B', :updated_at => 1.days.ago)
+    project1 = Factory(:project, :title => 'C', :updated_at => 2.days.ago)
+    project2 = Factory(:project, :title => 'B', :updated_at => 1.days.ago)
 
     latest_projects = Project.paginate_after_fetch([project1,project2], :page=>'latest')
     assert_equal project2, latest_projects.first

@@ -20,7 +20,7 @@
      parent_id_prefix = "specimen"
    end
 
-   all_institutions = Institution.order(:name)
+   all_institutions = Institution.order(:title)
    existing_creators = []
    if action == :new
      existing_creators = [current_user.person]
@@ -49,7 +49,7 @@
                   </span><br/>
 
   <%= f.select :institution_id,
-               options_for_select([["Please Select ...", 0]]|all_institutions.collect { |o| [h(o.name), o.id] }, current_user.try(:person).try(:institutions).try(:first).try(:id)), {}, :style => "width:350px;" %>
+               options_for_select([["Please Select ...", 0]]|all_institutions.collect { |o| [h(o.title), o.id] }, current_user.try(:person).try(:institutions).try(:first).try(:id)), {}, :style => "width:350px;" %>
 </p>
 <% unless Seek::Config.is_virtualliver %>
 <p>

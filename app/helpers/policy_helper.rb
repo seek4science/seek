@@ -102,7 +102,7 @@ module PolicyHelper
       html = "<h3>Fine-grained sharing permissions:</h3>"
       permissions.each do |p|
         contributor = p.contributor
-        group_name = (p.contributor_type == 'WorkGroup') ? (h(contributor.project.name) + ' @ ' + h(contributor.institution.name)) : h(contributor.name)
+        group_name = (p.contributor_type == 'WorkGroup') ? (h(contributor.project.title) + ' @ ' + h(contributor.institution.title)) : h(contributor.title)
         prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
         html << "<p class='permission'>#{prefix_text + group_name}"
         html << ((p.access_type == Policy::DETERMINED_BY_GROUP) ? ' have ' : ' can ')

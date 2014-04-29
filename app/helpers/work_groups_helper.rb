@@ -10,7 +10,7 @@ module WorkGroupsHelper
     attr_writer :options
     def initialize(project,editable)
       @project=project
-      @project_name=project.name
+      @project_name=project.title
       @options = []
       @editable = editable
     end
@@ -35,8 +35,8 @@ module WorkGroupsHelper
     work_groups = work_groups | person.work_groups
 
     work_groups = work_groups.sort do |a,b|
-      x=a.project.name <=> b.project.name
-      x=a.institution.name <=> b.institution.name if x.zero?
+      x=a.project.title <=> b.project.title
+      x=a.institution.title <=> b.institution.title if x.zero?
       x
     end
     
@@ -45,7 +45,7 @@ module WorkGroupsHelper
         options << last_project unless last_project.nil?
         last_project=ProjectType.new(wg.project,wg.project.can_be_administered_by?(current_user))
       end
-      last_project << WorkGroupOption.new(wg.id, wg.institution.name)
+      last_project << WorkGroupOption.new(wg.id, wg.institution.title)
     end
     
     options << last_project unless last_project.nil?

@@ -54,7 +54,7 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
   </tr>
   <% stats.each do |stat| %>
   <tr>
-    <td><%= link_to stat.project.name, stat.project -%></td>
+    <td><%= link_to stat.project.title, stat.project -%></td>
     <% registered_people = stat.registered_people.count %>
     <td><%= stat.people.count -%> (<%= registered_people -%>)</td>
     <% authorised_types.each do |type| %>

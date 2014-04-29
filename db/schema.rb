@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140429102909) do
+ActiveRecord::Schema.define(:version => 20140429150534) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -584,7 +584,7 @@ ActiveRecord::Schema.define(:version => 20140429102909) do
   end
 
   create_table "institutions", :force => true do |t|
-    t.string   "name"
+    t.string   "title"
     t.text     "address"
     t.string   "city"
     t.string   "web_page"
@@ -984,7 +984,7 @@ ActiveRecord::Schema.define(:version => 20140429102909) do
   add_index "project_subscriptions", ["person_id", "project_id"], :name => "index_project_subscriptions_on_person_id_and_project_id"
 
   create_table "projects", :force => true do |t|
-    t.string   "name"
+    t.string   "title"
     t.string   "web_page"
     t.string   "wiki_page"
     t.datetime "created_at"

@@ -6,6 +6,8 @@ class Person < ActiveRecord::Base
   include Seek::Taggable
   include Seek::AdminDefinedRoles
 
+  alias_attribute :title, :name
+
   acts_as_yellow_pages
   scope :default_order, order("last_name, first_name")
 

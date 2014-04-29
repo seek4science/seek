@@ -262,11 +262,11 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert pageA_items.index(event2) < pageA_items.index(event1)
   end
 
-  test 'order by name for projects and institutions, for -all- and -alphabet- pagnation' do
+  test 'order by title for projects and institutions, for -all- and -alphabet- pagnation' do
     yellow_pages = [:project, :institution]
     yellow_pages.each do |type|
-      item1 = Factory(type, :name => 'AB', :updated_at => 2.days.ago)
-      item2 = Factory(type, :name => 'AC', :updated_at => 1.days.ago)
+      item1 = Factory(type, :title => 'AB', :updated_at => 2.days.ago)
+      item2 = Factory(type, :title => 'AC', :updated_at => 1.days.ago)
 
       klass = type.to_s.camelize.constantize
       all_items = klass.paginate_after_fetch(klass.default_order, :page=>'all')

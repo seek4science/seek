@@ -32,7 +32,7 @@
       </p>
     <% else %>
       <%= select_tag "project_id",
-        options_for_select([["Select #{t('project')}..",0]]|@userless_projects.collect {|p| [p.name,p.id]}),
+        options_for_select([["Select #{t('project')}..",0]]|@userless_projects.collect {|p| [p.title,p.id]}),
         {:onchange=>remote_function(
           :update=>:people_list,
           :url=>{:action=>"userless_project_selected_ajax"},

@@ -245,7 +245,7 @@ module ApplicationHelper
     else
       list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
     end
-    item_caption = " " + (caption.blank? ? item.name : caption)
+    item_caption = " " + (caption.blank? ? item.title : caption)
     list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += "</li>"
     
@@ -478,14 +478,7 @@ module ApplicationHelper
   end    
   
   def get_object_title(item)
-    title = ""
-    
-    if ["Person", "Institution", "Project"].include? item.class.name
-      title = h(item.name)          
-    else
-      title = h(item.title)
-    end
-    return title
+    return h(item.title)
   end
 
   def can_manage_announcements?

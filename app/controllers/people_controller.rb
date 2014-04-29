@@ -158,7 +158,7 @@ class PeopleController < ApplicationController
     if registration    
       current_user.person=@person      
       @userless_projects=Project.with_userless_people
-      @userless_projects.sort!{|a,b|a.name<=>b.name}
+      @userless_projects.sort!{|a,b|a.title<=>b.title}
       is_sysmo_member=params[:sysmo_member]
 
       if (is_sysmo_member)

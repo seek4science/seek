@@ -47,7 +47,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
 	def test_should_create_project
 		assert_difference('Project.count') do
-			post :create, :project => {:name=>"test"}
+			post :create, :project => {:title=>"test"}
 		end
 
 		assert_redirected_to project_path(assigns(:project))
@@ -527,7 +527,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :admin, :id => project
     assert_response :success
 
-    new_institution = Institution.create(:name => 'a test institution')
+    new_institution = Institution.create(:title => 'a test institution')
     put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
     assert_redirected_to project_path(project)
     project.reload
@@ -548,7 +548,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    new_institution = Institution.create(:name => 'a test institution')
+    new_institution = Institution.create(:title => 'a test institution')
     put :update, :id => a_project, :project => {:institution_ids => (a_project.institutions + [new_institution]).collect(&:id)}
     assert_redirected_to :root
     assert_not_nil flash[:error]
