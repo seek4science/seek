@@ -3,7 +3,7 @@
 <%
    if f ||= nil
      resource_type ||= f.object.class.name
-     existing_attributions ||= f.try(:object).respond_to?(:attributions_objects) ? f.object.attributions_objects.select &:can_view? : nil
+     existing_attributions ||= f.try(:object).respond_to?(:attributions_objects) ? f.object.attributions_objects.select(&:can_view?) : nil
 	 existing_creators ||= f.object.try(:creators)
      existing_creators =  [current_user.person] if existing_creators.blank?
 	 other_creators ||= f.object.try :other_creators
