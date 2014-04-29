@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140403092453) do
+ActiveRecord::Schema.define(:version => 20140429094203) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -936,6 +936,17 @@ ActiveRecord::Schema.define(:version => 20140403092453) do
 
   add_index "presentations_projects", ["presentation_id", "project_id"], :name => "index_presentations_projects_on_presentation_id_and_project_id"
   add_index "presentations_projects", ["project_id"], :name => "index_presentations_projects_on_project_id"
+
+  create_table "programmes", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.integer  "avatar_id"
+    t.string   "web_page"
+    t.string   "first_letter", :limit => 1
+    t.string   "uuid"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
 
   create_table "project_folder_assets", :force => true do |t|
     t.integer  "asset_id"

@@ -14,7 +14,7 @@ module Acts #:nodoc:
       def acts_as_yellow_pages
         acts_as_favouritable
 
-        validates_presence_of :name
+        validates :name,:presence=>true
 
         #TODO: refactor to remove :name entirely
         alias_attribute :title, :name
