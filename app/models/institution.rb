@@ -9,9 +9,8 @@ class Institution < ActiveRecord::Base
 
   acts_as_yellow_pages
 
-  scope :default_order, order("name")
-
-  validates_uniqueness_of :name
+  validates :title, :uniqueness=>true
+  scope :default_order, order("title")
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   
@@ -20,7 +19,7 @@ class Institution < ActiveRecord::Base
   has_many :specimens
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :name,:country,:city, :address
+    text :title,:country,:city, :address
   end if Seek::Config.solr_enabled
 
   def people

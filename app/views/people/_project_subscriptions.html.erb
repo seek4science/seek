@@ -15,7 +15,7 @@
           </tr>
           <% project_subscriptions.each do |project_subscription| %>
               <tr>
-                <td style="text-align: left"> <%= link_to project_subscription.project.name, project_subscription.project %> </td>
+                <td style="text-align: left"> <%= link_to project_subscription.project.title, project_subscription.project %> </td>
                 <td> <%= project_subscription.frequency %> </td>
               </tr>
           <% end %>

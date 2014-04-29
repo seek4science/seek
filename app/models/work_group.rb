@@ -16,7 +16,7 @@ class WorkGroup < ActiveRecord::Base
   end
 
   def description
-    project.name + " at " + institution.name
+    project.title + " at " + institution.title
   end
 
 end

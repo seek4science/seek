@@ -9,7 +9,9 @@ class FavouriteGroup < ActiveRecord::Base
   has_many :people, :through => :favourite_group_memberships
   
   has_many :permissions, :as => :contributor, :dependent => :destroy
-  
+
+  #TODO: update to title in the table
+  alias_attribute :title,:name
   
   # constants containing names of white/black list groups;
   # these groups are to be stored per user within favourite_groups table -

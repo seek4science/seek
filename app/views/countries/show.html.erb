@@ -9,7 +9,7 @@
 		  <% @institutions.each do |i| -%>
 			  <p style="margin-top: 1em; padding-left: 2em;">
 				  <%= image_tag_for_key(i.class.name.downcase, nil, i.class.name.downcase.camelize, nil, "") -%>
-					<%= link_to i.name, institution_path(i) -%>
+					<%= link_to i.title, institution_path(i) -%>
 					
 					<% inst_members = i.people -%>
 					<% unless inst_members.empty? -%>

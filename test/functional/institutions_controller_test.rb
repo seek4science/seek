@@ -34,7 +34,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   def test_should_create_institution
     assert_difference('Institution.count') do
-      post :create, :institution => {:name=>"test" }
+      post :create, :institution => {:title=>"test" }
     end
 
     assert_redirected_to institution_path(assigns(:institution))
@@ -150,7 +150,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_difference("Institution.count") do
-      post :create, :institution => {:name=>"a test institution"}
+      post :create, :institution => {:title=>"a test institution"}
     end
   end
 
@@ -168,10 +168,10 @@ class InstitutionsControllerTest < ActionController::TestCase
     get :edit, :id => institution
     assert_response :success
 
-    put :update, :id => institution, :institution => {:name => 'test'}
+    put :update, :id => institution, :institution => {:title => 'test'}
     assert_redirected_to institution
     institution.reload
-    assert_equal 'test', institution.name
+    assert_equal 'test', institution.title
   end
 
   test "project manager has a 'New Institution' link in the institution index" do

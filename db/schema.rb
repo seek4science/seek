@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140403092453) do
+ActiveRecord::Schema.define(:version => 20140429150534) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -584,7 +584,7 @@ ActiveRecord::Schema.define(:version => 20140403092453) do
   end
 
   create_table "institutions", :force => true do |t|
-    t.string   "name"
+    t.string   "title"
     t.text     "address"
     t.string   "city"
     t.string   "web_page"
@@ -938,6 +938,17 @@ ActiveRecord::Schema.define(:version => 20140403092453) do
   add_index "presentations_projects", ["presentation_id", "project_id"], :name => "index_presentations_projects_on_presentation_id_and_project_id"
   add_index "presentations_projects", ["project_id"], :name => "index_presentations_projects_on_project_id"
 
+  create_table "programmes", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.integer  "avatar_id"
+    t.string   "web_page"
+    t.string   "first_letter", :limit => 1
+    t.string   "uuid"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
+
   create_table "project_folder_assets", :force => true do |t|
     t.integer  "asset_id"
     t.string   "asset_type"
@@ -974,7 +985,7 @@ ActiveRecord::Schema.define(:version => 20140403092453) do
   add_index "project_subscriptions", ["person_id", "project_id"], :name => "index_project_subscriptions_on_person_id_and_project_id"
 
   create_table "projects", :force => true do |t|
-    t.string   "name"
+    t.string   "title"
     t.string   "web_page"
     t.string   "wiki_page"
     t.datetime "created_at"
@@ -987,6 +998,7 @@ ActiveRecord::Schema.define(:version => 20140403092453) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
+    t.integer  "programme_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|

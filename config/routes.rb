@@ -1,5 +1,8 @@
 SEEK::Application.routes.draw do
 
+  resources :programmes
+
+
   mount TavernaPlayer::Engine, :at => "/"
 
   resources :scales do

@@ -7,15 +7,14 @@ class Project < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::Rdf::ReactToAssociatedChange
 
-  acts_as_yellow_pages 
+  acts_as_yellow_pages
+  validates :title, :uniqueness=>true
 
   include SimpleCrypt
 
   title_trimmer
 
-  scope :default_order, order('name')
-
-  validates_uniqueness_of :name
+  scope :default_order, order('title')
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
@@ -34,6 +33,8 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :strains
   has_and_belongs_to_many :organisms
+
+  belongs_to :programme
 
   def studies
     investigations.collect(&:studies).flatten.uniq
@@ -74,7 +75,7 @@ class Project < ActiveRecord::Base
   has_many :project_subscriptions,:dependent => :destroy
   
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :name , :description, :locations
+    text :title , :description, :locations
   end if Seek::Config.solr_enabled
 
   attr_accessor :site_username,:site_password

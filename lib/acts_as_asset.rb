@@ -152,7 +152,7 @@ module Acts #:nodoc:
             begin
               p=self.projects.first
               p.decrypt_credentials
-              downloader            =Jerm::DownloaderFactory.create p.name
+              downloader            =Jerm::DownloaderFactory.create p.title
               resource_type         = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
               data_hash             = downloader.get_remote_data blob.url, p.site_username, p.site_password, resource_type
               blob.tmp_io_object = File.open data_hash[:data_tmp_path],"r"

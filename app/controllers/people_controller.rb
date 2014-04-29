@@ -141,7 +141,7 @@ class PeopleController < ApplicationController
       !proj.people.find{|person| !person.email.nil? && person.user.nil?}.nil?
     end
 
-    @userless_projects.sort!{|a,b|a.name<=>b.name}
+    @userless_projects.sort!{|a,b|a.title<=>b.title}
     @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
 
   end
@@ -161,7 +161,7 @@ class PeopleController < ApplicationController
     if registration    
       current_user.person=@person      
       @userless_projects=Project.with_userless_people
-      @userless_projects.sort!{|a,b|a.name<=>b.name}
+      @userless_projects.sort!{|a,b|a.title<=>b.title}
       is_sysmo_member=params[:sysmo_member]
 
       if (is_sysmo_member)

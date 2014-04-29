@@ -94,6 +94,12 @@
     f.association :person, :factory => :person_in_project
   end
 
+#Programme
+  Factory.define(:programme) do |f|
+    f.sequence(:title) { |n| "A Programme: #{n}"}
+    f.projects {[Factory.build(:project)]}
+  end
+
 #Project
   Factory.define(:project) do |f|
     f.sequence(:title) { |n| "A Project: #{n}" }
