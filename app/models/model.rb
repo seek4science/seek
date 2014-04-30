@@ -32,8 +32,6 @@ class Model < ActiveRecord::Base
 
   validates_presence_of :title
 
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
-
   before_save :check_for_sbml_format
   
   # allow same titles, but only if these belong to different users

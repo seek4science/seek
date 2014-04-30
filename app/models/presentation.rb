@@ -15,8 +15,6 @@ class Presentation < ActiveRecord::Base
 
    scope :default_order, order("title")
 
-   after_save :queue_background_reindexing if Seek::Config.solr_enabled
-
    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 
    explicit_versioning(:version_column => "version") do

@@ -12,8 +12,6 @@ class Programme < ActiveRecord::Base
 
   scope :default_order, order('title')
 
-  #TODO: why wasn't this added to the BackgroundReindexing module?
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   searchable(:auto_index=>false) do
     text :title,:description

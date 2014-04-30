@@ -21,7 +21,6 @@ class Workflow < ActiveRecord::Base
                                              :message => "is invalid, please make sure the URL is in the format: http://www.myexperiment.org/workflows/...",
                                              :allow_blank => true }
 
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   belongs_to :category, :class_name => 'WorkflowCategory'
   has_many :input_ports, :class_name => 'WorkflowInputPort',

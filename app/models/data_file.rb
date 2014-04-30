@@ -26,8 +26,6 @@ class DataFile < ActiveRecord::Base
 
   validates_presence_of :title
 
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
-
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
