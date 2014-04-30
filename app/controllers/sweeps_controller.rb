@@ -139,11 +139,11 @@ class SweepsController < ApplicationController
     params[:sweep][:runs_attributes].each_with_index do |(run_id, run_attributes), iteration_index|
       run_attributes[:workflow_id] = params[:sweep][:workflow_id]
       run_attributes[:workflow_version] = params[:sweep][:workflow_version]
-      run_attributes[:name] = "#{params[:sweep][:name]} ##{iteration_index + 1}"
-      run_attributes[:project_ids] = current_user.person.projects.map { |p| p.id }
+
       # Set parent ID to replay interactions
       run_attributes[:parent_id] = params[:run_id].to_i unless params[:run_id].blank?
       run_attributes[:project_ids] = current_user.person.projects.map { |p| p.id }
+
       # Copy shared inputs from "parent" run
       if !shared_input_values_for_all_runs.blank?
         base_index = run_attributes[:inputs_attributes].keys.map { |k| k.to_i }.max + 1
@@ -153,6 +153,22 @@ class SweepsController < ApplicationController
           end
         end
       end
+
+      # Set the runlet names based on their input data, or just number them
+      unless params[:name_input].blank?
+        i = run_attributes[:inputs_attributes].values.detect {|v| v[:name] == params[:name_input]}
+        if i[:file]
+          identifier = "#{i[:file].original_filename}"
+        elsif !i[:value].blank?
+          identifier = "#{i[:value][0...32]}"
+          identifier << '...' if i[:value].length > 32
+        end
+      end
+      identifier ||= "(#{iteration_index + 1})"
+      run_attributes[:name] = "#{params[:sweep][:name]} - #{identifier}"
+
+      # Set the project for each runlet
+      run_attributes[:project_ids] = current_user.person.projects.map { |p| p.id }
     end
   end
 
