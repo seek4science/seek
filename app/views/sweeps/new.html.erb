@@ -101,6 +101,19 @@
           <% end %>
         </div>
       </div>
+
+      <div class="fold">
+        <div class="foldTitle">
+          Run Naming
+        </div>
+        <div class="foldContent" id="parameters">
+          Choose how to name the runs in this sweep. By default runs are labelled numerically, however you may wish to
+          append the value or filename of a certain input to each run name to help distinguish between them.
+          <p>
+            <%= select_tag :name_input, options_for_select([["(Numeric)",""]] + @workflow_version.input_ports.map {|i| ["Append input: #{i.name}", i.name]}) %>
+          </p>
+        </div>
+      </div>
     <% end %>
     <br/>
 
