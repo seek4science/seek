@@ -2,7 +2,6 @@ class Programme < ActiveRecord::Base
   attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page
 
   acts_as_yellow_pages
-  include BackgroundReindexing
 
   #associations
   has_many :projects

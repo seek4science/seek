@@ -5,7 +5,6 @@ class Person < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::Taggable
   include Seek::AdminDefinedRoles
-  include BackgroundReindexing
 
   alias_attribute :title, :name
 

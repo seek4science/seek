@@ -36,6 +36,7 @@ module Acts #:nodoc:
           extend Acts::Yellow_Pages::SingletonMethods
         end
         include Acts::Yellow_Pages::InstanceMethods
+        include BackgroundReindexing
 
       end
 

@@ -18,7 +18,7 @@ class Institution < ActiveRecord::Base
   has_many :projects, :through=>:work_groups
   has_many :specimens
 
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+  searchable(:auto_index=>false) do
     text :title,:country,:city, :address
   end if Seek::Config.solr_enabled
 
