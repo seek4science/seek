@@ -22,7 +22,7 @@ module Acts #:nodoc:
 
         has_many :activity_logs, :as => :activity_loggable
 
-        validates_associated :avatars
+        validates :avatar,:associated=>true
 
         belongs_to :avatar
 

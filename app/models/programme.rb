@@ -1,16 +1,13 @@
 class Programme < ActiveRecord::Base
   attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page
 
-  acts_as_favouritable
-  acts_as_uniquely_identifiable
+  acts_as_yellow_pages
 
   #associations
-  belongs_to :avatar
   has_many :projects
 
   #validations
-  validates :title,:presence=>true, :uniqueness=>true
-  validates :avatar,:associated=>true
+  validates :title,:uniqueness=>true
 
   def people
     projects.collect{|p| p.people}.flatten.uniq
