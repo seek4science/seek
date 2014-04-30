@@ -9,6 +9,8 @@ class Programme < ActiveRecord::Base
   #validations
   validates :title,:uniqueness=>true
 
+  scope :default_order, order('title')
+
   def people
     projects.collect{|p| p.people}.flatten.uniq
   end
