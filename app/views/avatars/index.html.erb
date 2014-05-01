@@ -8,7 +8,7 @@
 </ul>
 
 
-<h1><%= @avatar_for.humanize -%> Pictures: <%= link_to @avatar_owner_instance.name, url_for(@avatar_owner_instance) -%></h1>
+<h1><%= @avatar_for.humanize -%> Pictures: <%= link_to @avatar_owner_instance.title, url_for(@avatar_owner_instance) -%></h1>
 
 <% unless @avatars.empty? %>
 
@@ -25,7 +25,7 @@
       <% end -%>
     </td>
     <td>
-      <%= image_tag avatar_url(@avatar_owner_instance, avatar.id, 100), :alt => @avatar_owner_instance.name, :class => 'framed' -%>
+      <%= image_tag avatar_url(@avatar_owner_instance, avatar.id, 100), :alt => @avatar_owner_instance.title, :class => 'framed' -%>
     </td>
     <td class="actions">
 			<% if avatar_can_be_edited_by_current_user -%>

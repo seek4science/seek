@@ -30,6 +30,10 @@ class Programme < ActiveRecord::Base
     projects.collect{|p| p.institutions}.flatten.uniq
   end
 
+  def can_be_edited_by?(user)
+    !user.nil? && user.is_admin?
+  end
+
 
 end
 

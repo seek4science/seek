@@ -46,7 +46,10 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_should_get_edit
-    get :edit, :id => institutions(:one).id
+    i = Factory(:institution)
+    Factory(:avatar,:owner=>i)
+    get :edit, :id => i
+
     assert_response :success
   end
 

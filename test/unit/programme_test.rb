@@ -67,5 +67,15 @@ class ProgrammeTest < ActiveSupport::TestCase
 
   end
 
+  test "can be edited by" do
+    #for now programmes can only be created and editing by an admin
+    person = Factory(:person)
+    admin = Factory(:admin)
+    programme = Factory(:programme)
+    assert programme.can_be_edited_by?(admin)
+    refute programme.can_be_edited_by?(person)
+    refute programme.can_be_edited_by?(nil)
+  end
+
 
 end

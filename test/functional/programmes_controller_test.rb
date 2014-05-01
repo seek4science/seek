@@ -18,10 +18,21 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test "update" do
+    login_as(Factory(:admin))
+    prog = Factory(:programme,:description=>"ggggg")
+    put :update, :id=>prog, :programme=>{:title=>"fish"}
+    prog = assigns(:programme)
+    refute_nil prog
+    assert_redirected_to prog
+    assert_equal "fish",prog.title
+    assert_equal "ggggg",prog.description
+  end
 
   test "edit page accessible to admin" do
     login_as(Factory(:admin))
     p = Factory(:programme)
+    Factory(:avatar,:owner=>p)
     get :edit, :id=>p
     assert_response :success
 
