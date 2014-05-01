@@ -8,7 +8,9 @@ class ProgrammesController < ApplicationController
   respond_to :html
 
   def create
-
+    @programme = Programme.new(params[:programme])
+    flash[:notice] = "The #{t('programme').capitalize} was successfully created." if @programme.save
+    respond_with(@programme)
   end
 
   def edit

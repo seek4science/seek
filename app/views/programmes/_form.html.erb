@@ -1,0 +1,34 @@
+<%= javascript_include_tag "projects" %>
+
+<%= f.error_messages %>
+
+<h2><%= t('programme') %> Details</h2>
+
+<div>
+  <div style="width: 95%;">
+    <p>
+      <%= f.label :title -%><br />
+      <%= f.text_field :title, :style => "width: 350px;" -%>
+    </p>
+    <p>
+      <%= f.label "Web page"-%><br />
+      <%= f.text_field :web_page, :style => "width: 350px;" -%>
+    </p>
+
+    <p>
+      <%= f.label :description -%><br/>
+      <%= f.text_area :description, :style => "width: 85%;", :rows => 10 -%>
+    </p>
+  </div>
+</div>
+
+
+<% if programme -%>
+    <h2 style="margin-top: 1.5em;"><%= t('project') %> Picture</h2>
+    <%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => programme, :form_instance => f } -%>
+<% end -%>
+
+<p>
+  <%= f.submit(programme ? "Update" : "Create",:disable_with=>(programme ? "Updating..." : "Creating...")) -%>
+  or <%= link_to 'Cancel', (programme ? programme_path(programme.id) : programmes_path) -%>
+</p>
