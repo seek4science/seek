@@ -67,4 +67,16 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "update to default avatar" do
+    p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
+    avatar = Factory(:avatar,:owner=>p)
+    p.avatar = avatar
+    p.save!
+    login_as(Factory(:admin))
+    put :update, :id=>p, :programme=>{:avatar_id=>"0"}
+    prog = assigns(:programme)
+    refute_nil prog
+    assert_nil prog.avatar
+  end
+
 end
