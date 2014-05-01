@@ -27,7 +27,7 @@ module AvatarsHelper
     end
 
     case object.class.name.downcase
-      when "person", "institution", "project"
+      when "person", "institution", "project", "programme"
         if object.avatar_selected?
           img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed'
         else

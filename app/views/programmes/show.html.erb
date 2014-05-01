@@ -1,0 +1,44 @@
+<% drag_id = model_to_drag_id(@programme) %>
+
+<% truncate_length_for_boxes = 22 -%>
+
+<%= render :partial => "general/item_title",:locals=>{:item=>@programme} %>
+
+<ul class="sectionIcons">
+
+  <% if @programme.can_be_edited_by?(current_user) -%>
+
+      <li><%= image_tag_for_key('edit', edit_programme_path(@programme), "Edit #{t('programme')} Details", nil, "Edit #{t('programme')} Details") -%></li>
+
+
+      <% if admin_logged_in? -%>
+          <%= delete_icon(@programme,current_user) %>
+      <% end -%>
+
+  <% end -%>
+</ul>
+
+<div class="show_basic">
+
+  <div class="main_content_left_box">
+
+    <div class="box_about_actor">
+      <%=  item_description @programme.description -%>
+      <p>
+        <label>Web page:</label>
+        <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>
+      </p>
+    </div>
+  </div>
+
+  <div class="main_content_right_box">
+    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @programme, :drag_id => drag_id } -%>
+  </div>
+
+  <div style="clear:both;">
+    <%# get, classify and authorize all assets for this project -%>
+    <%= render :partial=>"general/items_related_to",:object => @programme %>
+
+  </div>
+
+</div>

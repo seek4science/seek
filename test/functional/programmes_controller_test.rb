@@ -47,12 +47,22 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test "should show index" do
+    p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
+    avatar = Factory(:avatar,:owner=>p)
+    p.avatar = avatar
+    p.save!
+    Factory(:programme)
+
     get :index
     assert_response :success
   end
 
   test "should get show" do
-    p = Factory(:programme)
+    p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
+    avatar = Factory(:avatar,:owner=>p)
+    p.avatar = avatar
+    p.save!
+
     get :show,:id=>p
     assert_response :success
   end
