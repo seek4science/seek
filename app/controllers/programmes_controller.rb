@@ -19,7 +19,6 @@ class ProgrammesController < ApplicationController
 
     flash[:notice] = "The #{t('programme').capitalize} was successfully updated." if @programme.update_attributes(params[:programme])
     respond_with(@programme)
-
   end
 
   def edit
@@ -29,10 +28,6 @@ class ProgrammesController < ApplicationController
   def new
     @programme=Programme.new
     respond_with(@programme)
-  end
-
-  def index
-    respond_with(@programmes)
   end
 
   def show
