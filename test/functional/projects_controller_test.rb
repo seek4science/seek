@@ -54,7 +54,13 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_should_show_project
-		get :show, :id => Factory(:project,:avatar=>Factory(:avatar))
+
+    proj = Factory(:project)
+    avatar = Factory(:avatar,:owner=>proj)
+    proj.avatar = avatar
+    proj.save!
+
+		get :show, :id => proj
 		assert_response :success
 	end
 
