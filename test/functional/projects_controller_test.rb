@@ -54,12 +54,12 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_should_show_project
-		get :show, :id => projects(:four)
+		get :show, :id => Factory(:project,:avatar=>Factory(:avatar))
 		assert_response :success
 	end
 
 	def test_should_get_edit
-		get :edit, :id => projects(:four)
+		get :edit, :id => Factory(:project,:avatar=>Factory(:avatar))
 		assert_response :success
 	end
 
