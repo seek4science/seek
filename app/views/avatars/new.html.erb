@@ -1,5 +1,5 @@
 <% avatar_for_object = eval("#{@avatar_for}.find(#{@avatar_for_id})") -%>
-<h1>Upload <%= @avatar_for.humanize -%> Picture: <%= link_to avatar_for_object.name, url_for(avatar_for_object) -%></h1>
+<h1>Upload <%= @avatar_for.humanize -%> Picture: <%= link_to avatar_for_object.title, url_for(avatar_for_object) -%></h1>
 
 <%= error_messages_for :avatar -%>
 

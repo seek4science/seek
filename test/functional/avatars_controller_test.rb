@@ -59,6 +59,7 @@ class AvatarsControllerTest < ActionController::TestCase
   test 'breadcrumb for uploading new avatar' do
     login_as @admin.user
     person = Factory(:person)
+    Factory(:avatar,:owner=>person)
     get :new,:person_id => person.id
     assert_response :success
     assert_select 'div.breadcrumbs', :text => /Home > People Index > #{person.title} > Edit > Avatars Index > New/, :count => 1 do
@@ -90,6 +91,14 @@ class AvatarsControllerTest < ActionController::TestCase
     Factory(:avatar,:owner=>i)
     login_as(@admin)
     get :index, :institution_id=>i.id
+    assert_response :success
+  end
+
+  test "new avatar for programme" do
+    programme = Factory(:programme,:avatar=>Factory(:avatar))
+    Factory(:avatar,:owner=>programme)
+    login_as(@admin)
+    get :new, :programme_id=>programme
     assert_response :success
   end
   
