@@ -524,10 +524,6 @@ class ModelsController < ApplicationController
       flash[:error]="Unable to save new version"          
     end    
   end
-  
-  def default_items_per_page
-    return 2
-  end
 
   def translate_action action
     action="download" if action == "simulate"

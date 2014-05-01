@@ -184,11 +184,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  #The default for the number items in a page when paginating
-  def default_items_per_page
-    7
-  end
-
   #required for the Savage Beast
   def admin?
     User.admin_logged_in?
