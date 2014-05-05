@@ -56,6 +56,8 @@ img.exhibit-facet-header-expand {
 
 div.exhibit-viewPanel {
     margin-top : -2em;
+    margin-left : 1em;
+    text-align: center;
 }
 
 ul.align_new_button {
