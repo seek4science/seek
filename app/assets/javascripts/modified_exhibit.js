@@ -6,6 +6,7 @@ function updateFirstPage(){
     var item_ids = getItemIds(items);
 
     if (item_type != null && item_ids.length > 0){
+        Exhibit.jQuery('.exhibit-collectionView-body').html(' ');
         Exhibit.jQuery.ajax({
             url: faceted_items_url,
             data: {item_ids: item_ids, item_type: item_type}
