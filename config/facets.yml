@@ -16,7 +16,7 @@ Assay:
       label: Project
       value_from: projects:title
   created_at:
-      label: Created At
+      label: Created In
       value_from: created_at:year
   contributor:
       label: Contributor
@@ -37,7 +37,7 @@ DataFile:
         facet_class: Exhibit.HierarchicalFacet
         tree_from: Seek::Ontologies::TechnologyTypeReader
   created_at:
-      label: Created At
+      label: Created In
       value_from: created_at:year
   contributor:
       label: Contributor
@@ -65,7 +65,7 @@ Model:
       label: Project
       value_from: projects:title
   created_at:
-      label: Created At
+      label: Created In
       value_from: created_at:year
   contributor:
       label: Contributor
@@ -86,7 +86,7 @@ Sop:
         facet_class: Exhibit.HierarchicalFacet
         tree_from: Seek::Ontologies::AssayTypeReader,Seek::Ontologies::ModellingAnalysisTypeReader
   created_at:
-      label: Created At
+      label: Created In
       value_from: created_at:year
   contributor:
       label: Contributor
