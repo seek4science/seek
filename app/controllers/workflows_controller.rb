@@ -271,7 +271,20 @@ class WorkflowsController < ApplicationController
 
     @workflow.title = @t2flow.annotations.titles.last
     @workflow.description = @t2flow.annotations.descriptions.last
-    # Needs to create ports here
+
+    @t2flow.sources.each do |source|
+      @workflow.input_ports.build(:name => source.name,
+                                  :description => (source.descriptions || []).last,
+                                  :example_value => (source.example_values || []).last,
+                                  :port_type_id => WorkflowInputPortType.first.id)
+    end
+    @workflow.t2flow.sinks.each do |sink|
+      @workflow.output_ports.build(:name => sink.name,
+                                   :description => (sink.descriptions || []).last,
+                                   :example_value => (sink.example_values || []).last,
+                                   :port_type_id => WorkflowOutputPortType.first.id)
+    end
+
     @workflow.save
 
     # Manually set workflow content type
