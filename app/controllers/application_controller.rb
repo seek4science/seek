@@ -425,7 +425,7 @@ class ApplicationController < ActionController::Base
   end
 
   def permitted_filters
-    #placed this in a seperate method so that other controllers could override it if necessary
+    #placed this in a separate method so that other controllers could override it if necessary
     Seek::Util.persistent_classes.select {|c| c.respond_to? :find_by_id}.map {|c| c.name.underscore}
   end
 

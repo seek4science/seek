@@ -375,6 +375,7 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
+    resources :people,:projects, :institutions
   end
 
   resources :publications do

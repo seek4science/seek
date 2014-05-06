@@ -31,6 +31,10 @@ class Institution < ActiveRecord::Base
     return res.sort{|a,b| a.last_name <=> b.last_name}
   end
 
+  def programmes
+    projects.collect{|p| p.programme}.uniq
+  end
+
    def can_be_edited_by?(subject)
     return false if subject.nil?
     subject.is_admin? || (subject.can_edit_institutions? && self.people.include?(subject.person)) || self.is_managed_by?(subject)

@@ -131,7 +131,10 @@ class Person < ActiveRecord::Base
     result.uniq
   end
 
+  def programmes
+    self.projects.collect{|p| p.programme}.uniq
 
+  end
 
   def set_default_subscriptions
     projects.each do |proj|
