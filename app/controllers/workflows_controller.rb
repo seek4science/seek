@@ -204,20 +204,6 @@ class WorkflowsController < ApplicationController
   end
 
   def describe_ports
-    if @workflow.input_ports.empty? && @workflow.output_ports.empty?
-      @workflow.t2flow.sources.each do |source|
-        @workflow.input_ports.build(:name => source.name,
-                                    :description => (source.descriptions || []).last,
-                                    :example_value => (source.example_values || []).last,
-                                    :port_type_id => WorkflowInputPortType.first.id)
-      end
-      @workflow.t2flow.sinks.each do |sink|
-        @workflow.output_ports.build(:name => sink.name,
-                                    :description => (sink.descriptions || []).last,
-                                    :example_value => (sink.example_values || []).last,
-                                    :port_type_id => WorkflowOutputPortType.first.id)
-      end
-    end
   end
 
   def favourite
@@ -269,20 +255,25 @@ class WorkflowsController < ApplicationController
   def extract_workflow_metadata
     @t2flow = T2Flow::Parser.new.parse(@workflow.content_blob.data_io_object.read)
 
-    @workflow.title = @t2flow.annotations.titles.last
+    @workflow.title = @t2flow.annotations.titles.last unless @t2flow.annotations.titles.last.blank?
     @workflow.description = @t2flow.annotations.descriptions.last
 
     @t2flow.sources.each do |source|
-      @workflow.input_ports.build(:name => source.name,
-                                  :description => (source.descriptions || []).last,
-                                  :example_value => (source.example_values || []).last,
-                                  :port_type_id => WorkflowInputPortType.first.id)
+      unless @workflow.input_ports.detect { |i| i.name == source.name && i.workflow_version == @workflow.version }
+        @workflow.input_ports.build(:name => source.name,
+                                    :description => (source.descriptions || []).last,
+                                    :example_value => (source.example_values || []).last,
+                                    :port_type_id => WorkflowInputPortType.first.id)
+      end
     end
-    @workflow.t2flow.sinks.each do |sink|
-      @workflow.output_ports.build(:name => sink.name,
-                                   :description => (sink.descriptions || []).last,
-                                   :example_value => (sink.example_values || []).last,
-                                   :port_type_id => WorkflowOutputPortType.first.id)
+
+    @t2flow.sinks.each do |sink|
+      unless @workflow.output_ports.detect { |o| o.name == sink.name && o.workflow_version == @workflow.version }
+        @workflow.output_ports.build(:name => sink.name,
+                                     :description => (sink.descriptions || []).last,
+                                     :example_value => (sink.example_values || []).last,
+                                     :port_type_id => WorkflowOutputPortType.first.id)
+      end
     end
 
     @workflow.save
