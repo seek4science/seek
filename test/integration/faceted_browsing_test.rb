@@ -12,7 +12,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
     Seek::Config.faceted_browsing_enabled = false
     ASSETS_WITH_FACET.each do |type_name|
       get "/#{type_name}"
-      assert_select "table[id='exhibit']", :count => 0
+      assert_select "div[id='exhibit']", :count => 0
       assert_select "div.alphabetcal_pagination"
     end
   end
@@ -25,7 +25,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
 
     ASSETS_WITH_FACET.each do |type_name|
       get "/#{type_name}"
-      assert_select "table[id='exhibit']"
+      assert_select "div[id='exhibit']"
       assert_select "div.alphabetcal_pagination", :count => 0
     end
   end
@@ -47,13 +47,13 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
 
     facet_enabled_pages.keys.each do |type_name|
       get "/#{type_name}"
-      assert_select "table[id='exhibit']"
+      assert_select "div[id='exhibit']"
       assert_select "div.alphabetcal_pagination", :count => 0
     end
 
     facet_disabled_pages.keys.each do |type_name|
       get "/#{type_name}"
-      assert_select "table[id='exhibit']", :count => 0
+      assert_select "div[id='exhibit']", :count => 0
       assert_select "div.alphabetcal_pagination"
     end
   end
