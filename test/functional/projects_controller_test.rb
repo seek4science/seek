@@ -54,18 +54,30 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_should_show_project
-		get :show, :id => projects(:four)
+
+    proj = Factory(:project)
+    avatar = Factory(:avatar,:owner=>proj)
+    proj.avatar = avatar
+    proj.save!
+
+		get :show, :id => proj
 		assert_response :success
 	end
 
 	def test_should_get_edit
-		get :edit, :id => projects(:four)
+    p = Factory(:project,:avatar=>Factory(:avatar))
+    Factory(:avatar,:owner=>p)
+		get :edit, :id => p
+
 		assert_response :success
 	end
 
 	def test_should_update_project
-		put :update, :id => projects(:four), :project => valid_project
+		put :update, :id => Factory(:project,:description=>"ffffff"), :project => {:title=>"pppp"}
 		assert_redirected_to project_path(assigns(:project))
+    proj = assigns(:project)
+    assert_equal "pppp",proj.title
+    assert_equal "ffffff",proj.description
 	end
 
 	def test_should_destroy_project

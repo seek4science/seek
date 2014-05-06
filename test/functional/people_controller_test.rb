@@ -1285,6 +1285,22 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test "filtered by programme via nested route" do
+    assert_routing 'programmes/4/people',{controller:"people",action:"index",programme_id:"4"}
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    prog1 = Factory(:programme,:projects=>[person1.projects.first])
+    prog2 = Factory(:programme,:projects=>[person2.projects.first])
+
+    get :index,programme_id:prog1.id
+    assert_response :success
+
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",person_path(person1),:text=>person1.name
+      assert_select "p > a[href=?]",person_path(person2),:text=>person2.name,:count=>0
+    end
+  end
+
   test "should show personal tags according to config" do
     p = Factory(:person)
     get :show,:id=>p.id

@@ -34,6 +34,10 @@ class Avatar < ActiveRecord::Base
   has_many :institutions,
            :foreign_key => :avatar_id,
            :dependent => :nullify
+
+  has_many :programmes,
+           :foreign_key => :avatar_id,
+           :dependent => :nullify
   
   
   def select!

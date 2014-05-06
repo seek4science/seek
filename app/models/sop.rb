@@ -19,8 +19,6 @@ class Sop < ActiveRecord::Base
 
   title_trimmer
 
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
-
   validates_presence_of :title
 
   # allow same titles, but only if these belong to different users

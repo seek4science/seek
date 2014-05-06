@@ -207,11 +207,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  #The default for the number items in a page when paginating
-  def default_items_per_page
-    7
-  end
-
   #required for the Savage Beast
   def admin?
     User.admin_logged_in?
@@ -453,7 +448,7 @@ class ApplicationController < ActionController::Base
   end
 
   def permitted_filters
-    #placed this in a seperate method so that other controllers could override it if necessary
+    #placed this in a separate method so that other controllers could override it if necessary
     Seek::Util.persistent_classes.select {|c| c.respond_to? :find_by_id}.map {|c| c.name.underscore}
   end
 

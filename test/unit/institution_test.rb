@@ -19,8 +19,23 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal nil, WorkGroup.find_by_id(wg.id), "the workgroup should also have been destroyed"
   end
 
+  test "programmes" do
+    proj1=Factory(:work_group).project
+    proj2=Factory(:work_group).project
+    proj3=Factory(:work_group).project
+
+    refute_empty proj1.institutions
+    refute_empty proj2.institutions
+    refute_empty proj3.institutions
+
+    prog1 = Factory(:programme,:projects=>[proj1,proj2])
+    assert_includes proj1.institutions.first.programmes,prog1
+    assert_includes proj2.institutions.first.programmes,prog1
+    refute_includes proj3.institutions.first.programmes,prog1
+  end
+
   def test_ordered_by_title
-    assert Institution.find(:all).sort_by {|i| i.title.downcase} == Institution.default_order || Institution.all.sort_by {|i|i.title} == Institution.default_order
+    assert Institution.all.sort_by {|i| i.title.downcase} == Institution.default_order || Institution.all.sort_by {|i|i.title} == Institution.default_order
   end
 
   test "to_rdf" do

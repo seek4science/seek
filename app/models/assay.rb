@@ -49,7 +49,6 @@ class Assay < ActiveRecord::Base
   validates_presence_of :assay_class
   validate :no_sample_for_modelling_assay
 
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
   before_validation :default_assay_and_technology_type
 
   #a temporary store of added assets - see AssayReindexer

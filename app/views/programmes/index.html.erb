@@ -1,0 +1,16 @@
+<% if @organisms -%>
+    <h2><%= "#{t('project').pluralize} involved with the organism '"+h(@organisms)+"' ... " -%></h2>
+<% end %>
+
+<% if @programmes.public_methods.include?(:page_totals) %>
+    <!-- only do the page links if the collection supports it -->
+    <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @programmes.pages, :page_totals=>@programmes.page_totals,:current_page=>@programmes.page } -%>
+<% end %>
+
+<div class="list_items_container">
+  <%= render :partial=>"assets/resource_list_item", :collection=>@programmes %>
+</div>
+
+<% if @programmes.public_methods.include?(:page_totals) && @programmes.page == "latest" && Programme.count > Seek::Config.limit_latest%>
+    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>Programme.count}%>
+<% end %>

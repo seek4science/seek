@@ -52,7 +52,7 @@ class Person < ActiveRecord::Base
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+  searchable(:auto_index => false) do
     text :first_name, :last_name,:description, :searchable_tags,:locations, :project_roles
     text :disciplines do
       disciplines.map{|d| d.title}
@@ -131,7 +131,10 @@ class Person < ActiveRecord::Base
     result.uniq
   end
 
+  def programmes
+    self.projects.collect{|p| p.programme}.uniq
 
+  end
 
   def set_default_subscriptions
     projects.each do |proj|

@@ -38,6 +38,9 @@ en:
   #Project
   project: "Project"
 
+  #Programme
+  programme: "Programme"
+
   scale: "Scale"
 
   menu:

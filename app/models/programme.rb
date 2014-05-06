@@ -1,16 +1,26 @@
 class Programme < ActiveRecord::Base
   attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page
 
-  acts_as_favouritable
-  acts_as_uniquely_identifiable
+  acts_as_yellow_pages
 
   #associations
-  belongs_to :avatar
   has_many :projects
 
   #validations
-  validates :title,:presence=>true, :uniqueness=>true
-  validates :avatar,:associated=>true
+  validates :title,:uniqueness=>true
+
+  scope :default_order, order('title')
+
+
+  searchable(:auto_index=>false) do
+    text :title,:description
+    text :projects do
+      projects.compact.map(&:title)
+    end
+    text :institutions do
+      institutions.compact.map(&:title)
+    end
+  end if Seek::Config.solr_enabled
 
   def people
     projects.collect{|p| p.people}.flatten.uniq
@@ -18,6 +28,10 @@ class Programme < ActiveRecord::Base
 
   def institutions
     projects.collect{|p| p.institutions}.flatten.uniq
+  end
+
+  def can_be_edited_by?(user)
+    !user.nil? && user.is_admin?
   end
 
 

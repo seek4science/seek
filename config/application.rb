@@ -62,6 +62,7 @@ module SEEK
         :compound_reindexer,
         :synonym_reindexer,
         :person_reindexer,
+        :programme_reindexer,
         :assets_creator_reindexer
 
     config.action_view.sanitized_allowed_attributes = ['rel']

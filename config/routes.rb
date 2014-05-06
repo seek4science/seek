@@ -1,8 +1,5 @@
 SEEK::Application.routes.draw do
 
-  resources :programmes
-
-
   mount TavernaPlayer::Engine, :at => "/"
 
   resources :scales do
@@ -382,6 +379,15 @@ SEEK::Application.routes.draw do
       end
     end
     resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
+  end
+
+  resources :programmes do
+    resources :avatars do
+      member do
+        post :select
+      end
+    end
+    resources :people,:projects, :institutions
   end
 
   resources :publications do

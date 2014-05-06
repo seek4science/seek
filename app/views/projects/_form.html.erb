@@ -4,7 +4,7 @@
   
 <h2><%= t('project') %> Details</h2>
 
-<div style="text-align: center;">
+<div>
 	<div style="width: 95%;">
 		<p>
 		  <%= f.label :name -%><br />
@@ -39,7 +39,7 @@
 
 
 
-<p style="margin-top: 2em; text-align: center;">
+<p>
   <%= f.submit(project ? "Update" : "Create",:disable_with=>(project ? "Updating..." : "Creating...")) -%>
 	or <%= link_to 'Cancel', (project ? project_path(project.id) : projects_path) -%>
 </p>

@@ -11,7 +11,10 @@
   </span>
 <% else %>
   <%= "<ul class='favourites'>"  if show_as_list -%>
-  <% favourites.sort_by{|a| ASSET_ORDER.index(a.resource_type.chomp('::Version'))}.each do |fav| %>
+  <% favourites.sort_by do |a|
+        ASSET_ORDER.index(a.resource_type.chomp('::Version')) || 0
+    end.each do |fav|
+  %>
     <% if show_as_list -%>
       <li class="fav_list_item">
         <%= fav_line_tag(fav) %>

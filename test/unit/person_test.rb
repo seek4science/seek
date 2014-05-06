@@ -30,6 +30,14 @@ class PersonTest < ActiveSupport::TestCase
 
   end
 
+  test "programmes" do
+    person1=Factory(:person)
+    prog = Factory(:programme,:projects=>person1.projects)
+    prog2 = Factory(:programme)
+    assert_includes person1.programmes,prog
+    refute_includes person1.programmes,prog2
+  end
+
   test "can be administered by" do
     admin = Factory(:admin)
     admin2 = Factory(:admin)

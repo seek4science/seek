@@ -17,7 +17,7 @@
 	    </li>
 	    <% avatar_for_instance.avatars.each do |a| -%>
 	      <li style="text-align: center;">
-	      	<%= image_tag avatar_url(avatar_for_instance, a.id, 60), :alt => h(avatar_for_instance.name), :onclick => "$('#{object_type}_avatar_id_#{a.id}').checked = true;" -%>
+	      	<%= image_tag avatar_url(avatar_for_instance, a.id, 60), :alt => h(avatar_for_instance.title), :onclick => "$('#{object_type}_avatar_id_#{a.id}').checked = true;" -%>
 					<br/>
 					<%= form_instance.radio_button :avatar_id, a.id -%>
 	      </li>

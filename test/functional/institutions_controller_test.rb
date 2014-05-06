@@ -46,7 +46,10 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_should_get_edit
-    get :edit, :id => institutions(:one).id
+    i = Factory(:institution)
+    Factory(:avatar,:owner=>i)
+    get :edit, :id => i
+
     assert_response :success
   end
 
@@ -151,6 +154,22 @@ class InstitutionsControllerTest < ActionController::TestCase
 
     assert_difference("Institution.count") do
       post :create, :institution => {:title=>"a test institution"}
+    end
+  end
+
+  test "filtered by programme via nested route" do
+    assert_routing 'programmes/4/institutions',{controller:"institutions",action:"index",programme_id:"4"}
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+    prog1 = Factory(:programme,:projects=>[person1.projects.first])
+    prog2 = Factory(:programme,:projects=>[person2.projects.first])
+
+    get :index,programme_id:prog1.id
+    assert_response :success
+
+    assert_select "div.list_item_title" do
+      assert_select "p > a[href=?]",institution_path(person1.institutions.first),:text=>person1.institutions.first.title
+      assert_select "p > a[href=?]",institution_path(person2.institutions.first),:text=>person2.institutions.first.title,:count=>0
     end
   end
 

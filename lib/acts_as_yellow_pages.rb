@@ -22,7 +22,7 @@ module Acts #:nodoc:
 
         has_many :activity_logs, :as => :activity_loggable
 
-        validates_associated :avatars
+        validates :avatar,:associated=>true
 
         belongs_to :avatar
 
@@ -36,6 +36,7 @@ module Acts #:nodoc:
           extend Acts::Yellow_Pages::SingletonMethods
         end
         include Acts::Yellow_Pages::InstanceMethods
+        include BackgroundReindexing
 
       end
 

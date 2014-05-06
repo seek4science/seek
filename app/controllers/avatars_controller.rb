@@ -159,6 +159,9 @@ class AvatarsController < ApplicationController
     elsif params[:institution_id]
       avatar_for = "Institution"
       id = params[:institution_id]
+    elsif params[:programme_id]
+      avatar_for = "Programme"
+      id = params[:programme_id]
     end
     
     return [avatar_for, id]
@@ -172,7 +175,7 @@ class AvatarsController < ApplicationController
     
     # check that nested route is used, not a direct link
     if (@avatar_for.nil? || @avatar_for_id.nil?)
-      flash[:error] = "Avatars are only available for people, #{t('project').pluralize} and institutions."
+      flash[:error] = "Avatars are only available for people, #{t('project').pluralize.downcase} and institutions."
       redirect_to(root_path)
       return false
     end
