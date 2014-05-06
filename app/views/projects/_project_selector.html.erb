@@ -5,8 +5,9 @@
 
 <%
    allow_nil ||= false
+   allow_all ||= Seek::Config.is_virtualliver
 
-   possibilities = Seek::Config.is_virtualliver ? Project.all : (User.current_user.person.projects + resource.try(:projects)).uniq
+   possibilities = allow_all  ? Project.all : (User.current_user.person.projects + resource.try(:projects)).uniq
 
    resource ||= nil
    if resource       
