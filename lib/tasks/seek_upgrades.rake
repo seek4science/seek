@@ -93,7 +93,6 @@ namespace :seek do
         AssayType.all.each do |at|
           assays = Assay.where(:assay_type_id=> at.id)
           assays.each do |a|
-            a.assay_type_label = at.title
             a.assay_type_uri = at.term_uri
             disable_authorization_checks do
               a.save!
@@ -127,7 +126,6 @@ namespace :seek do
           TechnologyType.all.each do |tt|
             assays = Assay.where(:technology_type_id=> tt.id)
             assays.each do |a|
-              a.technology_type_label = tt.title
               a.technology_type_uri = tt.term_uri
               disable_authorization_checks do
                 a.save!
