@@ -213,3 +213,6 @@ class ActiveSupport::TestCase
   end
   
 end
+
+# Load seed data
+load "#{Rails.root}/db/seeds.rb"
