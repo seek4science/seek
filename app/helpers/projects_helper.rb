@@ -62,4 +62,15 @@ module ProjectsHelper
     end
     html.html_safe
   end
+
+  def programme_link project
+    if project.try(:programme).nil?
+      html = "<span class='none_text'>This #{t('project')} is not associated with a #{t('programme')}</span>"
+    else
+      html = "<span>" + link_to(h(project.programme.title),project.programme) + "</span>"
+    end
+    html.html_safe
+  end
+
+
 end

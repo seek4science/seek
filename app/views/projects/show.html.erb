@@ -32,6 +32,10 @@
 
     <div class="box_about_actor">
       <%=  item_description @project.description -%>
+      <p>
+        <label><%= t('programme') -%>:</label>
+        <%= programme_link(@project) -%>
+      </p>
         <p>
           <label>Public web page:</label>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
