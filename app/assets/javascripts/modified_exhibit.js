@@ -9,6 +9,7 @@ function updateFirstPage(){
         $j('.exhibit-collectionView-body').html(' ');
         $j.ajax({
             url: faceted_items_url,
+            async: false,
             data: {item_ids: item_ids, item_type: item_type}
         })
         .done(function( data ) {
