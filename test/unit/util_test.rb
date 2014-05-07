@@ -17,4 +17,15 @@ class UtilTest < ActiveSupport::TestCase
     assert types.include?(DataFile)
     assert !types.include?(Policy)
   end
+
+  test "searchable types" do
+    types = Seek::Util.searchable_types
+    expected = [Assay,DataFile,Event,Institution,Investigation,Model,Person,Presentation,Programme,Project,Publication,Sample,Sop,Specimen,Strain,Study,Workflow]
+
+    #first as strings for more readable failed assertion message
+    assert_equal expected.collect{|t| t.to_s},types.collect{|t| t.to_s}
+
+    #double check they are actual types
+    assert_equal expected,types
+  end
 end

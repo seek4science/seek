@@ -23,8 +23,11 @@
 </div>
 
 
+<%= render :partial => "projects/project_selector", :locals => { :resource => @programme, :allow_nil => true, :allow_all => true } -%>
+
+
 <% if programme -%>
-    <h2 style="margin-top: 1.5em;"><%= t('project') %> Picture</h2>
+    <h2><%= t('programme') %> Picture</h2>
     <%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => programme, :form_instance => f } -%>
 <% end -%>
 

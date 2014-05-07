@@ -1,10 +1,11 @@
 class Programme < ActiveRecord::Base
-  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page
+  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids
 
   acts_as_yellow_pages
 
   #associations
   has_many :projects
+  accepts_nested_attributes_for :projects
 
   #validations
   validates :title,:uniqueness=>true
