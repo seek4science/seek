@@ -499,7 +499,7 @@ module ApplicationHelper
     if actions.nil?
       count = ActivityLog.count(:conditions => {:activity_loggable_type => object.class.name, :activity_loggable_id => object.id})
     else
-      count = ActivityLog.count(:conditions => {:action => actions, :activity_loggable_type => object.class.name, :activity_loggable_id => object.id})
+      count = ActivityLog.no_spider.count(:conditions => {:action => actions, :activity_loggable_type => object.class.name, :activity_loggable_id => object.id})
     end
     count
   end
