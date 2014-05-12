@@ -34,10 +34,10 @@ $j(document).ready(function(){
 
     $j(document).on("onItemsChanged.exhibit", function() {
         updateFirstPage();
-    });
+    });  
 });
 
-function defaultSearchText(default_text){
+function defaultSearchText(){
     var default_text = 'Search filters below';
     $j('div[id="facet_search_box"] input').each(function(){
         $j(this).attr('placeholder',default_text);
