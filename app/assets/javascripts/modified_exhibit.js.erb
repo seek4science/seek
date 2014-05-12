@@ -35,6 +35,13 @@ $j(document).ready(function(){
     $j(document).on("onItemsChanged.exhibit", function() {
         updateFirstPage();
     });
+    
+    $j(document).bind("registerLocales.exhibit", function() {
+    	$j(document).trigger("beforeLocalesRegistered.exhibit");
+    	new Exhibit.Locale("default", "<%= asset_path('exhibit/locales/en/locale.js') %>");
+    	new Exhibit.Locale("en", "<%= asset_path('exhibit/locales/en/locale.js') %>");
+    	$j(document).trigger("localesRegistered.exhibit");
+    });
 });
 
 function defaultSearchText(){
