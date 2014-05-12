@@ -75,4 +75,16 @@ class ActivityLogTest < ActiveSupport::TestCase
       assert ac.errors.full_messages.empty?
     end
   end
+
+  test "no spider" do
+    sop = Factory(:sop)
+    al1 = Factory(:activity_log,:activity_loggable=>sop,:user_agent=>nil)
+    al2 = Factory(:activity_log,:activity_loggable=>sop,:user_agent=>"Mozilla")
+    al3 = Factory(:activity_log,:activity_loggable=>sop,:user_agent=>"Some spIder")
+    logs = ActivityLog.no_spider
+
+    assert_includes logs,al1
+    assert_includes logs,al2
+    refute_includes logs,al3
+  end
 end
