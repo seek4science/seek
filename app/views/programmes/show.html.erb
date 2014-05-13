@@ -28,6 +28,12 @@
         <label>Web page:</label>
         <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>
       </p>
+      <p>
+        <label>Funding details:</label>
+        <div id="description" class="box_normal curved">
+            <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>
+        </div>
+      </p>
     </div>
   </div>
 

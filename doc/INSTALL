@@ -44,7 +44,7 @@ The remaining packages are:
 
 Installing these packages now will make installing Ruby 1.9.3 easier later on:
 
-  sudo apt-get install gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
+  sudo apt-get install libtool gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
 
 == Development or Production?
 

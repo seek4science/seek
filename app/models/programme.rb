@@ -1,5 +1,5 @@
 class Programme < ActiveRecord::Base
-  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids
+  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details
 
   acts_as_yellow_pages
 
@@ -14,7 +14,7 @@ class Programme < ActiveRecord::Base
 
 
   searchable(:auto_index=>false) do
-    text :title,:description
+    text :title,:description, :funding_details
     text :projects do
       projects.compact.map(&:title)
     end

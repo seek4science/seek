@@ -7,7 +7,7 @@
       <div style="width: 95%;">
         <p>
           <%= f.label :display_name -%><span class="required">*</span><br/>
-          <%= f.text_field :title, :style => "width: 350px;" -%>
+          <%= f.text_field :title, :class=>"text_entry" -%>
         </p>
 
         <h2>BioPortal ontology details</h2>
@@ -21,12 +21,12 @@
 
         <p>
           <label>Ontology acroymn</label> <br/>
-          <%= f.text_field :ontology_id, :style => "width: 350px;" -%>
+          <%= f.text_field :ontology_id, :class=>"text_entry" -%>
         </p>
 
         <p>
           <label>Class uri</label><br/>
-          <%= f.text_field :concept_uri, :style => "width: 350px;" -%>
+          <%= f.text_field :concept_uri, :class=>"text_entry" -%>
         </p>
       </div>
       <%= f.submit @organism.id ? "Update" : "Create", :disable_with=>@organism.id ? "Updating..." : "Creating..." -%>

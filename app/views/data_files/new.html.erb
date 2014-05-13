@@ -14,7 +14,7 @@
             <span class="required">*</span>
             <br/>
             <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
-            <%= text_area_tag 'data_file[title]', data_file_title_value, :style => "width: 100%;", :rows=>2 -%>
+            <%= text_area_tag 'data_file[title]', data_file_title_value, :class=>"title_text_entry" -%>
         </p>
         <% if @data_file.is_with_sample? %>
         <p style="margin-top: 0.5em;">
@@ -41,7 +41,7 @@
             <b>Description</b>
             <br/>
             <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
-            <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 10 -%>
+            <%= text_area_tag 'data_file[description]', data_file_description_value, :class=>"large_text_entry" -%>
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file } -%>
 

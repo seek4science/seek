@@ -20,19 +20,19 @@
 
   <p>
     <%= f.label "Sample name:" -%><span class="required">*</span><br/>
-    <%= f.text_field :title, :style => "width: 350px;" -%>
+    <%= f.text_field :title, :class=>"text_entry" -%>
   </p>
 
   <% if Seek::Config.is_virtualliver %>
 
       <p>
           <%= f.label :description -%><br/>
-          <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
+          <%= f.text_area :comments, :class=>"large_text_entry" -%>
       </p>
 
       <p>
         <%= f.label "Explantation time" -%><br/>
-        <%= f.text_field :explantation, :style => "width: 350px;" -%>
+        <%= f.text_field :explantation, :class=>"text_entry" -%>
       </p>
 
       <p>
@@ -43,32 +43,32 @@
 
   <p>
     <%= f.label :lab_internal_identifier -%><span class="required">*</span><br/>
-    <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
+    <%= f.text_field :lab_internal_number, :class=>"text_entry" -%>
   </p>
 
   <p>
     <%= f.label :sampling_date -%><br/>
-    <%= f.calendar_date_select :sampling_date, :time => "mixed", :style=>"width:350px;" -%>
+    <%= f.calendar_date_select :sampling_date, :time => "mixed", :class=>"text_entry" -%>
   </p>
 
   <p>
     <%= f.label :age_at_sampling -%><br/>
-    <%= f.text_field :age_at_sampling, :style=>"width:350px;", :onkeypress => "javascript: return onlyFloatNumbers(event);" -%> <%= f.select :age_at_sampling_unit_id, options_for_select(Unit.time_units.sort_by(&:order).collect{|u| [u.title, u.id]}, @sample.age_at_sampling_unit_id) -%>
+    <%= f.text_field :age_at_sampling, :class=>"text_entry", :onkeypress => "javascript: return onlyFloatNumbers(event);" -%> <%= f.select :age_at_sampling_unit_id, options_for_select(Unit.time_units.sort_by(&:order).collect{|u| [u.title, u.id]}, @sample.age_at_sampling_unit_id) -%>
   </p>
 
   <p>
     <%= f.label :provider_name -%><br/>
-    <%= f.text_field :provider_name, :style=>"width:350px;" -%>
+    <%= f.text_field :provider_name, :class=>"text_entry" -%>
   </p>
 
   <p>
     <%= f.label "Provider's sample identifier" -%><br/>
-    <%= f.text_field :provider_id, :style=>"width:350px;" -%>
+    <%= f.text_field :provider_id, :class=>"text_entry" -%>
   </p>
 
   <p>
     <%= f.label "Comment" -%><br/>
-    <%= f.text_field :comments, :style=>"width:350px;" -%>
+    <%= f.text_field :comments, :class=>"text_entry" -%>
   </p>
 
   <p>
