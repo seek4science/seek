@@ -14,7 +14,7 @@ class Programme < ActiveRecord::Base
 
 
   searchable(:auto_index=>false) do
-    text :title,:description
+    text :title,:description, :funding_details
     text :projects do
       projects.compact.map(&:title)
     end
