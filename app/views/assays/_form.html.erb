@@ -166,16 +166,6 @@
 
   <%if @assay.is_modelling?%>
       Event.observe(window, 'load', function() {
-//          Event.observe('assay_sample_ids', 'fancySelect:update', function(){
-//            check_show_organism_form();
-//          });
-//
-//          var update_organisms_without_check_sample_form = this['updateOrganisms'];
-//          this['updateOrganisms'] = function() {
-//              update_organisms_without_check_sample_form();
-//              check_show_sample_form();
-//          };
-
           $('assay_sample_ids').fire('fancySelect:update');
           updateOrganisms();
       });
