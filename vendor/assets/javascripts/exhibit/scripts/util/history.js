@@ -235,7 +235,8 @@ Exhibit.History.pushState = function(data, subtitle) {
             title += " {" + subtitle + "}";
         }
         
-        url = Exhibit.History._originalLocation;
+        //if HTML4 is emulating pushstate, a # in the URL will break it
+        url = document.location.href.replace(/#.*/,"");
         
         History.pushState(data, title, url);
     }
@@ -282,7 +283,7 @@ Exhibit.History.replaceState = function(data, subtitle, url) {
  * @static
  */
 Exhibit.History.eraseState = function() {
-    Exhibit.History.pushState({});
+    Exhibit.History.pushState({"components": {}});
 };
 
 Exhibit.jQuery(document).bind(

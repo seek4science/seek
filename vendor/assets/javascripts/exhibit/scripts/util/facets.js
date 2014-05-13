@@ -23,7 +23,7 @@ Exhibit.FacetUtilities = {};
 Exhibit.FacetUtilities.constructFacetFrame = function(forFacet, div, facetLabel, onClearAllSelections, uiContext, collapsible, collapsed) {
     var dom, resizableDivWidget;
 
-    Exhibit.jQuery(div).attr("class", "exhibit-facet");
+    Exhibit.jQuery(div).addClass("exhibit-facet");
     dom = Exhibit.jQuery.simileDOM("string", div,
             '<div class="exhibit-facet-header">' +
             '<div class="exhibit-facet-header-filterControl" id="clearSelectionsDiv" title="' + Exhibit._("%facets.clearSelectionsTooltip") + '">' +
@@ -33,7 +33,7 @@ Exhibit.FacetUtilities.constructFacetFrame = function(forFacet, div, facetLabel,
             ((collapsible) ?
              '<img src="' + Exhibit.urlPrefix + 'images/collapse.png" class="exhibit-facet-header-collapse" id="collapseImg" />' :
                 '') +
-            '<span class="exhibit-facet-header-title">' + facetLabel + '</span>' +
+            '<span class="exhibit-facet-header-title" id="title">' + facetLabel + '</span>' +
         '</div>' +
         '<div class="exhibit-facet-body-frame" id="frameDiv"></div>',
         { checkImage: Exhibit.UI.createTranslucentImage("images/black-check.png") }
@@ -41,7 +41,7 @@ Exhibit.FacetUtilities.constructFacetFrame = function(forFacet, div, facetLabel,
     resizableDivWidget = Exhibit.ResizableDivWidget.create({}, dom.frameDiv, uiContext);
     
     dom.valuesContainer = resizableDivWidget.getContentDiv();
-    Exhibit.jQuery(dom.valuesContainer).attr("class", "exhibit-facet-body");
+    Exhibit.jQuery(dom.valuesContainer).addClass("exhibit-facet-body");
     
     dom.setSelectionCount = function(count) {
         Exhibit.jQuery(this.filterCountSpan).html(count);
@@ -50,7 +50,8 @@ Exhibit.FacetUtilities.constructFacetFrame = function(forFacet, div, facetLabel,
     Exhibit.jQuery(dom.clearSelectionsDiv).bind("click", onClearAllSelections);
     
     if (collapsible) {
-        Exhibit.jQuery(dom.collapseImg).bind("click", function(evt) {
+        Exhibit.jQuery(dom.collapseImg).add(Exhibit.jQuery(dom.title))
+            .bind("click", function(evt) {
             Exhibit.FacetUtilities.toggleCollapse(dom, forFacet);
         });
         
@@ -134,7 +135,7 @@ Exhibit.FacetUtilities.constructFacetItem = function(
         "</div>"
     );
 
-    Exhibit.jQuery(dom.elmt).attr("class", selected ? "exhibit-facet-value exhibit-facet-value-selected" : "exhibit-facet-value");
+    Exhibit.jQuery(dom.elmt).addClass(selected ? "exhibit-facet-value exhibit-facet-value-selected" : "exhibit-facet-value");
     if (typeof label === "string") {
         Exhibit.jQuery(dom.elmt).attr("title", label);
         Exhibit.jQuery(dom.link).html(label);
@@ -167,14 +168,14 @@ Exhibit.FacetUtilities.constructFacetItem = function(
  * @returns {Object}
  */
 Exhibit.FacetUtilities.constructFlowingFacetFrame = function(forFacet, div, facetLabel, onClearAllSelections, uiContext, collapsible, collapsed) {
-    Exhibit.jQuery(div).attr("class", "exhibit-flowingFacet");
+    Exhibit.jQuery(div).addClass("exhibit-flowingFacet");
     var dom = Exhibit.jQuery.simileDOM("string",
         div,
         '<div class="exhibit-flowingFacet-header">' +
             ((collapsible) ?
                 '<img src="' + Exhibit.urlPrefix + 'images/collapse.png" class="exhibit-facet-header-collapse" id="collapseImg" />' :
                 "") +
-            '<span class="exhibit-flowingFacet-header-title">' + facetLabel + "</span>" +
+            '<span class="exhibit-flowingFacet-header-title" id="title">' + facetLabel + "</span>" +
         "</div>" +
         '<div id="frameDiv"><div class="exhibit-flowingFacet-body" id="valuesContainer"></div></div>'
     );
@@ -184,7 +185,8 @@ Exhibit.FacetUtilities.constructFlowingFacetFrame = function(forFacet, div, face
     };
 
     if (collapsible) {
-        Exhibit.jQuery(dom.collapseImg).bind("click", function(evt) {
+        Exhibit.jQuery(dom.collapseImg).add(Exhibit.jQuery(dom.title))
+            .bind("click", function(evt) {
             Exhibit.FacetUtilities.toggleCollapse(dom, forFacet);
         });
         
@@ -502,14 +504,14 @@ Exhibit.FacetUtilities.Cache.prototype.dispose = function() {
  */
 Exhibit.FacetUtilities.Cache.prototype.getItemsFromValues = function(values, filter) {
     var set, valueToItem;
-    if (this._expression.isPath()) {
-        set = this._expression.getPath().walkBackward(
-            values, 
-            "item",
-            filter, 
-            this._database
-        ).getSet();
-    } else {
+    // if (this._expression.isPath()) {
+    //     set = this._expression.getPath().walkBackward(
+    //         values, 
+    //         "item",
+    //         filter, 
+    //         this._database
+    //     ).getSet();
+    // } else {
         this._buildMaps();
         
         set = new Exhibit.Set();
@@ -517,7 +519,7 @@ Exhibit.FacetUtilities.Cache.prototype.getItemsFromValues = function(values, fil
         valueToItem = this._valueToItem;
         values.visit(function(value) {
             var itemA, i, item;
-            if (typeof valuetoItem[value] !== "undefined") {
+            if (typeof valueToItem[value] !== "undefined") {
                 itemA = valueToItem[value];
                 for (i = 0; i < itemA.length; i++) {
                     item = itemA[i];
@@ -527,7 +529,7 @@ Exhibit.FacetUtilities.Cache.prototype.getItemsFromValues = function(values, fil
                 }
             }
         });
-    }
+//    }
     return set;
 };
 
@@ -560,18 +562,6 @@ Exhibit.FacetUtilities.Cache.prototype.getValueCountsFromItems = function(items)
     database = this._database;
     valueType = "text";
     
-    if (this._expression.isPath()) {
-        path = this._expression.getPath();
-        facetValueResult = path.walkForward(items, "item", database);
-        valueType = facetValueResult.valueType;
-        
-        if (facetValueResult.size > 0) {
-            facetValueResult.forEachValue(function(facetValue) {
-                var itemSubcollection = path.evaluateBackward(facetValue, valueType, items, database);
-                entries.push({ value: facetValue, count: itemSubcollection.size });
-            });
-        }
-    } else {
         this._buildMaps();
         
         valueType = this._valueType;
@@ -590,7 +580,6 @@ Exhibit.FacetUtilities.Cache.prototype.getValueCountsFromItems = function(items)
                 }
             }
         }
-    }
     return { entries: entries, valueType: valueType };
 };
 
@@ -601,9 +590,6 @@ Exhibit.FacetUtilities.Cache.prototype.getValueCountsFromItems = function(items)
 Exhibit.FacetUtilities.Cache.prototype.getValuesFromItems = function(items) {
     var set, itemToValue;
 
-    if (this._expression.isPath()) {
-        return this._expression.getPath().walkForward(items, "item", database).getSet();
-    } else {
         this._buildMaps();
         
         set = new Exhibit.Set();
@@ -619,7 +605,7 @@ Exhibit.FacetUtilities.Cache.prototype.getValuesFromItems = function(items) {
         });
         
         return set;
-    }
+
 };
 
 /**
@@ -646,7 +632,8 @@ Exhibit.FacetUtilities.Cache.prototype.countItemsMissingValue = function(items) 
  *
  */
 Exhibit.FacetUtilities.Cache.prototype._buildMaps = function() {
-    var itemToValue, valueToItem, missingItems, valueType, insert, expression, database;
+    var itemToValue, valueToItem, missingItems, valueType, getter
+    , insert, expression, database, perItem, fastEval, property;
 
     if (typeof this._itemToValue === "undefined") {
         itemToValue = {};
@@ -655,7 +642,7 @@ Exhibit.FacetUtilities.Cache.prototype._buildMaps = function() {
         valueType = "text";
         
         insert = function(x, y, map) {
-            if (typeof map.x !== "undefined") {
+            if (typeof map[x] !== "undefined") {
                 map[x].push(y);
             } else {
                 map[x] = [ y ];
@@ -664,20 +651,58 @@ Exhibit.FacetUtilities.Cache.prototype._buildMaps = function() {
         
         expression = this._expression;
         database = this._database;
-        
-        this._collection.getAllItems().visit(function(item) {
-            var results = expression.evaluateOnItem(item, database);
-            if (results.values.size() > 0) {
-                valueType = results.valueType;
-                results.values.visit(function(value) {
-                    insert(item, value, itemToValue);
-                    insert(value, item, valueToItem);
-                });
+
+        fastEval = function(items, path) {
+            //rapid eval for length-one paths
+            var write = {}
+            , item, missing
+            , segment;
+            segment = path.getSegment(0);
+            if (segment.forward) {
+                getter = database.visitObjects;
             } else {
-                missingItems[item] = true;
+                getter = database.visitSubjects;
             }
-        });
+            items.visit(function (item) {
+                missing = true;
+                getter.call(database, item, segment.property, 
+                            function (value) {
+                                insert(item, value, itemToValue);
+                                insert(value, item, valueToItem);
+                                missing = false;
+                                return true;
+                            }, 
+                           items);
+                if (missing) {
+                    missingItems[item] = true;
+                }
+            }); 
+            if (segment.forward) {
+                property = database.getProperty(segment.property);
+                valueType = (typeof property !== "undefined" && property !== null) ? property.getValueType() : "text";
+            } else {
+                valueType = "item";
+            }
+
+        };
         
+        if (expression.isPath() &&
+            expression.getPath().getSegmentCount() == 1) {
+            fastEval(this._collection.readAllItems(), expression.getPath());
+        } else {
+            this._collection.readAllItems().visit(function(item) {
+                var results = expression.evaluateOnItem(item, database);
+                if (results.values.size() > 0) {
+                    valueType = results.valueType;
+                    results.values.visit(function(value) {
+                        insert(item, value, itemToValue);
+                        insert(value, item, valueToItem);
+                    });
+                } else {
+                    missingItems[item] = true;
+                }
+            });
+        }
         this._itemToValue = itemToValue;
         this._valueToItem = valueToItem;
         this._missingItems = missingItems;

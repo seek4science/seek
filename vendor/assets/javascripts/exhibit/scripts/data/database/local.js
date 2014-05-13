@@ -19,7 +19,7 @@ Exhibit.Database._LocalImpl = function() {
     /*
      *  Predefined types and properties
      */
-    var itemType, labelProperty, typeProperty, uriProperty;
+    var itemType, labelProperty, idProperty, typeProperty, uriProperty;
      
     itemType = new Exhibit.Database.Type("Item");
     itemType._custom = {
@@ -39,6 +39,16 @@ Exhibit.Database._LocalImpl = function() {
     labelProperty._groupingLabel        = Exhibit._("%database.labelProperty.groupingLabel");
     labelProperty._reverseGroupingLabel = Exhibit._("%database.labelProperty.reverseGroupingLabel");
     this._properties.label              = labelProperty;
+
+    idProperty = new Exhibit.Database.Property("id", this);
+    idProperty._uri = "http://purl.org/dc/terms/identifier";
+    idProperty._valueType            = "text";
+    idProperty._label                = Exhibit._("%database.idProperty.label");
+    idProperty._pluralLabel          = Exhibit._("%database.idProperty.pluralLabel");
+    idProperty._reverseLabel         = Exhibit._("%database.idProperty.reverseLabel");
+    idProperty._reversePluralLabel   = Exhibit._("%database.idProperty.reversePluralLabel");
+    this._properties.id                 = idProperty;
+
     
     typeProperty = new Exhibit.Database.Property("type", this);
     typeProperty._uri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
@@ -87,9 +97,9 @@ Exhibit.Database._LocalImpl.prototype.loadLinks = function() {
  * @param {Object} o An object that reflects the Exhibit JSON form.
  * @param {String} baseURI The base URI for normalizing URIs in the object.
  */
-Exhibit.Database._LocalImpl.prototype.loadData = function(o, baseURI) {
+Exhibit.Database._LocalImpl.prototype.loadData = function(o, baseURI, finish) {
     if (typeof o === "undefined" || o === null) {
-        throw Error(Exhibit._("%database.error.unloadable"));
+        throw new Error(Exhibit._("%database.error.unloadable"));
     }
     if (typeof baseURI === "undefined") {
         baseURI = location.href;
@@ -101,7 +111,9 @@ Exhibit.Database._LocalImpl.prototype.loadData = function(o, baseURI) {
         this.loadProperties(o.properties, baseURI);
     }
     if (typeof o.items !== "undefined") {
-        this.loadItems(o.items, baseURI);
+        this.loadItems(o.items, baseURI, finish);
+    } else {
+        finish();
     }
 };
 
@@ -166,8 +178,16 @@ Exhibit.Database._LocalImpl.prototype.loadTypes = function(typeEntries, baseURI)
  * @param {String} baseURI The base URI for normalizing URIs in the object.
  */
 Exhibit.Database._LocalImpl.prototype.loadProperties = function(propertyEntries, baseURI) {
+    var lastChar, propertyID, propertyEntry, property
+    , setIf = function(field, val, def) {
+        //field <---- val || field || def
+        if (typeof(val) !== "undefined") {
+            property[field] = val;
+        } else if (def && !property.hasOwnProperty(field)) {
+            property[field] = def;
+        }
+    };
     Exhibit.jQuery(document).trigger("onBeforeLoadingProperties.exhibit");
-    var lastChar, propertyID, propertyEntry, property;
     try {
         lastChar = baseURI.substr(baseURI.length - 1);
         if (lastChar === "#") {
@@ -175,7 +195,7 @@ Exhibit.Database._LocalImpl.prototype.loadProperties = function(propertyEntries,
         } else if (lastChar !== "/" && lastChar !== ":") {
             baseURI += "/";
         }
-    
+        
         for (propertyID in propertyEntries) {
             if (propertyEntries.hasOwnProperty(propertyID)) {
                 if (typeof propertyID === "string") {
@@ -187,39 +207,30 @@ Exhibit.Database._LocalImpl.prototype.loadProperties = function(propertyEntries,
                             property = new Exhibit.Database.Property(propertyID, this);
                             this._properties[propertyID] = property;
                         }
-            
-                        property._uri = typeof propertyEntry.uri !== "undefined" ?
-                            propertyEntry.uri :
-                            (baseURI + "property#" + encodeURIComponent(propertyID));
+                        
+                        setIf("_uri", propertyEntry.uri,
+                              baseURI + "property#" + 
+                              encodeURIComponent(propertyID));
 
-                        property._valueType = typeof propertyEntry.valueType !== "undefined" ?
-                            propertyEntry.valueType :
-                            "text";
-            
-                        property._label = typeof propertyEntry.label !== "undefined" ?
-                            propertyEntry.label :
-                            propertyID;
+                        setIf("_valueType", propertyEntry.valueType, "text");
+                        setIf("_label", propertyEntry.label, propertyID);
+                        setIf("_pluralLabel", propertyEntry.pluralLabel,
+                              property._label);
+                        
+                        setIf("_reverseLabel", propertyEntry.reverseLabel,
+                              "!" + property._label);
 
-                        property._pluralLabel = typeof propertyEntry.pluralLabel !== "undefined" ?
-                            propertyEntry.pluralLabel :
-                            property._label;
-            
-                        property._reverseLabel = typeof propertyEntry.reverseLabel !== "undefined" ?
-                            propertyEntry.reverseLabel :
-                            ("!" + property._label);
+                        setIf("_reversePluralLabel", 
+                              propertyEntry.reversePluralLabel,
+                              "!" + property._pluralLabel);
+                        
+                        setIf("_groupingLabel", propertyEntry.groupingLabel,
+                              property._label);
 
-                        property._reversePluralLabel = typeof propertyEntry.reversePluralLabel !== "undefined" ?
-                            propertyEntry.reversePluralLabel :
-                            ("!" + property._pluralLabel);
-            
-                        property._groupingLabel = typeof propertyEntry.groupingLabel !== "undefined" ?
-                            propertyEntry.groupingLabel :
-                            property._label;
-
-                        property._reverseGroupingLabel = typeof propertyEntry.reverseGroupingLabel !== "undefined" ?
-                            propertyEntry.reverseGroupingLabel :
-                            property._reverseLabel;
-            
+                        setIf("_reverseGroupingLabel", 
+                              propertyEntry.reverseGroupingLabel,
+                              property._reverseLabel);
+                        
                         if (typeof propertyEntry.origin !== "undefined") {
                             property._origin = propertyEntry.origin;
                         }
@@ -249,22 +260,25 @@ Exhibit.Database._LocalImpl.prototype.loadProperties = function(propertyEntries,
  * @param {Function} [complete] Method to call when done with all data
  */
 Exhibit.Database._LocalImpl._loadChunked = function(worker, data, size, timeout, complete) {
-    var index, length;
+    var index, length, chunker;
     index = 0;
     length = data.length;
-    (function() {
+    chunker = function() {
         var remnant, currentSize;
         remnant = length - index;
+        Exhibit.UI.busyMessage(remnant + " items");
         currentSize = (remnant >= size) ? size : remnant;
         if (index < length) {
             while (currentSize-- > 0) {
                 worker(data[index++]);
             }
-            setTimeout(arguments.callee, timeout);
+            setTimeout(chunker, timeout);
         } else if (typeof complete === "function") {
-            complete();
+            Exhibit.UI.busyMessage("load complete")
+            setTimeout(complete, timeout);
         }
-    }());
+    };
+    chunker();
 };
 
 /**
@@ -273,10 +287,16 @@ Exhibit.Database._LocalImpl._loadChunked = function(worker, data, size, timeout,
  * @param {Object} itemEntries The "items" subsection of Exhibit JSON.
  * @param {String} baseURI The base URI for normalizing URIs in the object.
  */
-Exhibit.Database._LocalImpl.prototype.loadItems = function(itemEntries, baseURI) {
+Exhibit.Database._LocalImpl.prototype.loadItems = function(itemEntries, baseURI, finish) {
+    var self, lastChar, indexTriple, wrapFinish, loader;
     Exhibit.jQuery(document).trigger("onBeforeLoadingItems.exhibit");
-    var self, lastChar, spo, ops, indexPut, indexTriple, finish, loader;
+    Exhibit.UI.busyMessage('items');
     self = this;
+    wrapFinish = function() {
+        self._propertyArray = null;
+        Exhibit.jQuery(document).trigger("onAfterLoadingItems.exhibit");
+        finish();
+    };
     try {
         lastChar = baseURI.substr(baseURI.length - 1);
         if (lastChar === "#") {
@@ -284,19 +304,7 @@ Exhibit.Database._LocalImpl.prototype.loadItems = function(itemEntries, baseURI)
         } else if (lastChar !== "/" && lastChar !== ":") {
             baseURI += "/";
         }
-        
-        spo = this._spo;
-        ops = this._ops;
-        indexPut = Exhibit.Database._indexPut;
-        indexTriple = function(s, p, o) {
-            indexPut(spo, s, p, o);
-            indexPut(ops, o, p, s);
-        };
-
-        finish = function() {
-            self._propertyArray = null;
-            Exhibit.jQuery(document).trigger("onAfterLoadingItems.exhibit");
-        };
+        indexTriple = function(s,p,o) { self.addStatement(s,p,o); };
 
         loader = function(item) {
             if (typeof item === "object") {
@@ -304,9 +312,11 @@ Exhibit.Database._LocalImpl.prototype.loadItems = function(itemEntries, baseURI)
             }
         };
 
-        Exhibit.Database._LocalImpl._loadChunked(loader, itemEntries, 1000, 10, finish);
+        Exhibit.Database._LocalImpl
+            ._loadChunked(loader, itemEntries, 2000, 10, wrapFinish);
     } catch(e) {
         Exhibit.Debug.exception(e, Exhibit._("%database.error.loadItemsFailure"));
+        wrapFinish();
     }
 };
 
@@ -462,6 +472,10 @@ Exhibit.Database._LocalImpl.prototype.getObjects = function(s, p, set, filter) {
     return this._get(this._spo, s, p, set, filter);
 };
 
+Exhibit.Database._LocalImpl.prototype.visitObjects = function(s, p, f) {
+    return Exhibit.Database._indexVisit(this._spo, s, p, f);
+};
+
 /**
  * Count the distinct, unique objects (any repeated objects count as one)
  * for a subject-predicate pair. 
@@ -516,6 +530,10 @@ Exhibit.Database._LocalImpl.prototype.getSubjects = function(o, p, set, filter) 
     return this._get(this._ops, o, p, set, filter);
 };
 
+Exhibit.Database._LocalImpl.prototype.visitSubjects = function(o, p, f) {
+    return Exhibit.Database._indexVisit(this._ops, o, p, f);
+};
+
 /**
  * Count the distinct, unique subjects (any repeated subjects count as one)
  * for an object-predicate pair.
@@ -565,16 +583,13 @@ Exhibit.Database._LocalImpl.prototype.countDistinctSubjectsUnion = function(obje
  * @returns {String} One matching object.
  */
 Exhibit.Database._LocalImpl.prototype.getObject = function(s, p) {
-    var hash, array;
+    var o = null;
 
-    hash = this._spo[s];
-    if (hash) {
-        array = hash[p];
-        if (array) {
-            return array[0];
-        }
-    }
-    return null;
+    Exhibit.Database._indexVisit(this._spo, s, p, function (v) {
+        o=v;
+        return false; //terminate iteration
+    });
+    return o;
 };
 
 /**
@@ -586,16 +601,13 @@ Exhibit.Database._LocalImpl.prototype.getObject = function(s, p) {
  * @returns {String} One matching subject identifier.
  */
 Exhibit.Database._LocalImpl.prototype.getSubject = function(o, p) {
-    var hash, array;
+    var s = null;
 
-    hash = this._ops[o];
-    if (hash) {
-        array = hash[p];
-        if (array) {
-            return array[0];
-        }
-    }
-    return null;
+    Exhibit.Database._indexVisit(this._ops, o, p, function (v) {
+        s=v;
+        return false; //terminate iteration
+    });
+    return s;
 };
 
 /**
@@ -700,8 +712,10 @@ Exhibit.Database._LocalImpl.prototype.removeObjects = function(s, p) {
     if (objects === null) {
         return false;
     } else {
-        for (i = 0; i < objects.length; i++) {
-            indexRemove(this._ops, objects[i], p, s);
+        for (i in objects) {
+            if (objects.hasOwnProperty(i)) {
+                indexRemove(this._ops, objects[i], p, s);
+            }
         }
         return true;
     }
@@ -723,8 +737,10 @@ Exhibit.Database._LocalImpl.prototype.removeSubjects = function(o, p) {
     if (subjects === null) {
         return false;
     } else {
-        for (i = 0; i < subjects.length; i++) {
-            indexRemove(this._spo, subjects[i], p, o);
+        for (i in subjects) {
+            if (subjects.hasOwnProperty(i)) {
+                indexRemove(this._spo, subjects[i], p, o);
+            }
         }
         return true;
     }
@@ -794,13 +810,13 @@ Exhibit.Database._LocalImpl.prototype._loadLinks = function(links, database) {
  * @param {String} baseURI The base URI to resolve URI fragments against.
  */
 Exhibit.Database._LocalImpl.prototype._loadItem = function(itemEntry, indexFunction, baseURI) {
-    var id, label, uri, type, isArray, p, v, j;
+    var id, label, uri, type, isArray = Array.isArray, p, v, j;
 
     if (typeof itemEntry.label === "undefined" &&
         typeof itemEntry.id === "undefined") {
         Exhibit.Debug.warn(Exhibit._("%database.error.itemSyntaxError",
                                      JSON.stringify(itemEntry)));
-	    itemEntry.label = "item" + Math.ceil(Math.random()*1000000);
+            itemEntry.label = "item" + Math.ceil(Math.random()*1000000);
     }
     
     if (typeof itemEntry.label === "undefined") {
@@ -823,13 +839,6 @@ Exhibit.Database._LocalImpl.prototype._loadItem = function(itemEntry, indexFunct
             itemEntry.type :
             "Item";
                 
-        isArray = function(obj) {
-            if (obj.constructor.toString().indexOf("Array") === -1) {
-                return false;
-            } else {
-                return true;
-            }
-        };
 
         if (isArray(label)) {
             label = label[0];
@@ -863,7 +872,7 @@ Exhibit.Database._LocalImpl.prototype._loadItem = function(itemEntry, indexFunct
                     this._ensurePropertyExists(p, baseURI)._onNewData();
                                     
                     v = itemEntry[p];
-                    if (v instanceof Array) {
+                    if (isArray(v)) {
                         for (j = 0; j < v.length; j++) {
                             indexFunction(id, p, v[j]);
                         }
@@ -940,25 +949,12 @@ Exhibit.Database._LocalImpl.prototype._ensurePropertyExists = function(propertyI
  * @param {Exhibit.Set} [filter] Only include values in this filter.
  */
 Exhibit.Database._LocalImpl.prototype._indexFillSet = function(index, x, y, set, filter) {
-    var hash, array, i, z;
-    hash = index[x];
-    if (typeof hash !== "undefined") {
-        array = hash[y];
-        if (typeof array !== "undefined") {
-            if (filter) {
-                for (i = 0; i < array.length; i++) {
-                    z = array[i];
-                    if (filter.contains(z)) {
-                        set.add(z);
-                    }
-                }
-            } else {
-                for (i = 0; i < array.length; i++) {
-                    set.add(array[i]);
-                }
-            }
+    Exhibit.Database._indexVisit(index, x, y, function(z) {
+        if (!filter || filter.contains(z)) {
+            set.add(z);
         }
-    }
+        return true;
+    });
 };
 
 /**
@@ -972,23 +968,13 @@ Exhibit.Database._LocalImpl.prototype._indexFillSet = function(index, x, y, set,
  * @returns {Number} The count of values.
  */
 Exhibit.Database._LocalImpl.prototype._indexCountDistinct = function(index, x, y, filter) {
-    var count, hash, array, i;
-    count = 0;
-    hash = index[x];
-    if (hash) {
-        array = hash[y];
-        if (array) {
-            if (filter) {
-                for (i = 0; i < array.length; i++) {
-                    if (filter.contains(array[i])) {
-                        count++;
-                    }
-                }
-            } else {
-                count = array.length;
-            }
+    var count = 0;
+    Exhibit.Database._indexVisit(index, x, y, function (z) {
+        if (!filter || filter.contains(z)) {
+            count++;
         }
-    }
+        return true;
+    });
     return count;
 };
 
@@ -1078,15 +1064,11 @@ Exhibit.Database._LocalImpl.prototype._countDistinct = function(index, x, y, fil
  */
 Exhibit.Database._LocalImpl.prototype._getProperties = function(index, x) {
     var hash, properties, p;
-    hash = index[x];
     properties = [];
-    if (typeof hash !== "undefined") {
-        for (p in hash) {
-            if (hash.hasOwnProperty(p)) {
-                properties.push(p);
-            }
-        }
-    }
+    Exhibit.Database._indexVisitKeys(index, x, function (p) {
+        properties.push(p);
+        return true;
+    });
     return properties;
 };
 
@@ -1098,14 +1080,14 @@ Exhibit.Database._LocalImpl.prototype._getProperties = function(index, x) {
  */
 Exhibit.Database._LocalImpl.prototype.labelItemsOfType = function(count, typeID, countStyleClass) {
     var label, type, pluralLabel, span;
-    label = Exhibit._((count === 1) ? "" : "");
+    label = Exhibit._("");
     type = this.getType(typeID);
     if (typeof type !== "undefined" && type !== null) {
         label = type.getLabel();
         if (count !== 1) {
             pluralLabel = type.getProperty("pluralLabel");
             if (typeof pluralLabel !== "undefined" && pluralLabel !== null) {
-                label = pluralLabel
+                label = pluralLabel;
             }
         }
     }

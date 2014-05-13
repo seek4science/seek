@@ -54,6 +54,7 @@ Exhibit.Localization.importLocale("en", {
     "%export.smwExporterLabel": "Semantic wikitext",
     "%export.exhibitJsonExporterLabel": "Exhibit JSON",
     "%export.tsvExporterLabel": "Tab Separated Values",
+    "%export.htmlTableExporterLabel": "HTML Table",
     "%export.htmlExporterLabel": "Generated HTML of this view",
     "%export.bibtexExporterLabel": "BibTeX",
 
@@ -71,6 +72,10 @@ Exhibit.Localization.importLocale("en", {
     "%database.labelProperty.pluralLabel": "labels",
     "%database.labelProperty.reverseLabel": "label of",
     "%database.labelProperty.reversePluralLabel": "labels of",
+    "%database.idProperty.label": "id",
+    "%database.idProperty.pluralLabel": "ids",
+    "%database.idProperty.reverseLabel": "id of",
+    "%database.idProperty.reversePluralLabel": "ids of",
     "%database.typeProperty.label": "type",
     "%database.typeProperty.pluralLabel": "types",
     "%database.typeProperty.reverseLabel": "type of",
