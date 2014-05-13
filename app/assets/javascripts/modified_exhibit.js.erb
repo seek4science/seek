@@ -1,89 +1,223 @@
-function updateFirstPage(){
-    //temporary put this function here, need to find better place or rename the updateFirstPage
-    renameHFMissingField();
-    var items = $j('div[itemid]');
-    var item_type = getItemType(items);
-    var item_ids = getItemIds(items);
+Exhibit.load = function() {
+    var i, j, k, o, dep, url, paramTypes, scr, docHead, style, linkElmts, link;
 
-    if (item_type != null && item_ids.length > 0){
-        $j('.exhibit-collectionView-body').html(' ');
-        $j.ajax({
-            url: faceted_items_url,
-            async: false,
-            data: {item_ids: item_ids, item_type: item_type}
-        })
-        .done(function( data ) {
-                updateContent(data.resource_list_items);
+    paramTypes = {
+        "bundle": Boolean,
+        "js": Array,
+        "postLoad": Boolean,
+        "css": Array,
+        "autoCreate": Boolean,
+        "safe": Boolean,
+        "babel": String,
+        "backstage": String,
+        "locale": String,
+        "persist": Boolean
+    };
 
-                $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
-                $j('.exhibit-collectionView-header-groupControl').hide();
-                $j('.exhibit-toolboxWidget-button').hide();
-                decodeValueTooltip();
-
-                $j('.exhibit-viewPanel-viewContainer').show();
-        });
+    if (typeof Exhibit_urlPrefix === "string") {
+        Exhibit.urlPrefix = Exhibit_urlPrefix;
+        if (Object.prototype.hasOwnProperty.call(
+                window,
+                "Exhibit_parameters"
+        )) {
+            Exhibit.parseURLParameters(Exhibit_parameters,
+                    Exhibit.params,
+                    paramTypes);
+        }
+    } else {
+        url = Exhibit.findScript(document, "/exhibit-api");
+        Exhibit.urlPrefix = url.substr(0, url.indexOf("exhibit-api"));
+        Exhibit.parseURLParameters(url, Exhibit.params, paramTypes);
     }
-}
 
-jQuery.noConflict();
-var $j = jQuery;
-$j(document).ready(function(){
-    $j(document).on("exhibitConfigured.exhibit", function() {
-        defaultSearchText();
+    if (typeof Exhibit.params.babel !== "undefined") {
+        Exhibit.babelPrefix = Exhibit.params.babel;
+    }
+
+    // Using the <link> version takes precedence; this is a holdover from
+    // the Babel-based importer where only Babel's translator URL mattered,
+    // but here the root of Babel is more important.
+    // <link rel="exhibit/babel-translator" src="..." />
+    //   or
+    // <link rel="exhibit-babel" src="..." />
+    // will do it.
+    linkElmts = document.getElementsByTagName("link");
+    for (i = 0; i < linkElmts.length; i++) {
+        link = linkElmts[i];
+        if (link.rel.search(/\b(exhibit\/babel-translator|exhibit-babel)\b/) > 0) {
+            Exhibit.babelPrefix = link.href.replace(/\/translator\/$/, "");
+        }
+    }
+
+    if (Exhibit.params.bundle) {
+        Exhibit.scripts = ["<%= asset_path('exhibit/exhibit-scripted-bundle.js') %>"];
+        Exhibit.styles = ["<%= asset_path('exhibit/styles/exhibit-scripted-bundle.css') %>"];
+    }
+
+    if (typeof Exhibit.params.backstage !== "undefined") {
+        // If using Backstage, force non-auto creation and force Backstage
+        // to load after Exhibit.  If the Backstage install also includes
+        // Babel, the Backstage scripts should set Exhibit.babelPrefix.
+        Exhibit.params.autoCreate = false;
+        Exhibit.scripts = Exhibit.scripts.concat(Exhibit.params.backstage);
+    }
+
+    if (typeof Exhibit.params.js === "object") {
+        if (Exhibit.params.postLoad) {
+            Exhibit.scripts = Exhibit.scripts.concat(Exhibit.params.js);
+        } else {
+            Exhibit.scripts = Exhibit.params.js.concat(Exhibit.scripts);
+        }
+    };
+
+    // load styles first
+    docHead = document.getElementsByTagName("head")[0];
+    for (i = 0; i < Exhibit.styles.length; i++) {
+        style = document.createElement("link");
+        style.setAttribute("rel", "stylesheet");
+        style.setAttribute("type", "text/css");
+        style.setAttribute("href", Exhibit.styles[i]);
+        docHead.appendChild(style);
+    }
+
+    $LAB.setGlobalDefaults({
+        UseLocalXHR: false,
+        AllowDuplicates: false
     });
+    Exhibit.loader = $LAB.setOptions({"AlwaysPreserveOrder": true});
 
-    $j(document).on("onItemsChanged.exhibit", function() {
-        updateFirstPage();
-    });
-    
-    $j(document).bind("registerLocales.exhibit", function() {
-    	$j(document).trigger("beforeLocalesRegistered.exhibit");
-    	new Exhibit.Locale("default", "<%= asset_path('exhibit/locales/en/locale.js') %>");
-    	new Exhibit.Locale("en", "<%= asset_path('exhibit/locales/en/locale.js') %>");
-    	$j(document).trigger("localesRegistered.exhibit");
-    });
-});
+    for (i in Exhibit._dependencies) {
+        if (typeof Exhibit._dependencies[i] === "undefined") {
+            Exhibit.includeJavascriptFile('', i);
+        } else if (Exhibit._dependencies.hasOwnProperty(i)) {
+            dep = Exhibit._dependencies[i].split(".");
+            if (dep.length === 1) {
+                if (!Object.prototype.hasOwnProperty.call(window, dep[0])) {
+                    Exhibit.includeJavascriptFile('', i);
+                }
+            } else {
+                for (j = 0; j < dep.length; j++) {
+                    o = window;
+                    for (k = 0; k < j; k++) {
+                        o = o[dep[k]];
+                    }
+                    if (!o.hasOwnProperty(dep[j])) {
+                        if (j === dep.length - 1) {
+                            Exhibit.includeJavascriptFile('', i);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-function defaultSearchText(){
-    var default_text = 'Search filters below';
-    $j('div[id="facet_search_box"] input').each(function(){
-        $j(this).attr('placeholder',default_text);
-    });
+    scr = Exhibit.scripts;
+    for (i = 0; i < scr.length; i++) {
+        if (scr[i].indexOf("/") === 0 ||
+                (scr[i].indexOf(":") > 0 && scr[i].indexOf("//") > 0)) {
+            Exhibit.includeJavascriptFile(null, scr[i]);
+        } else {
+            Exhibit.includeJavascriptFile(Exhibit.urlPrefix, scr[i]);
+        }
+    }
+
+};
+
+Exhibit._dependencies = {
+    "<%= asset_path('exhibit/lib/json2.js') %>": "JSON",
+    "<%= asset_path('exhibit/lib/base64.js') %>": "Base64",
+    "<%= asset_path('exhibit/lib/sprintf.js') %>": "sprintf",
+    // History fails to load correctly in Safari through this mechanism
+    "<%= asset_path('exhibit/lib/jquery.history.js') %>": undefined, // "History.init",
+    "<%= asset_path('exhibit/lib/jquery.history.shim.js') %>": undefined, //always load?
+    // SIMILE jQuery plugins fail to load under nonconflicting
+    // circumstances because jQuery hasn't been made available yet
+    "<%= asset_path('exhibit/lib/jquery.simile.dom.js') %>": undefined, // "jQuery.simileDOM",
+    "<%= asset_path('exhibit/lib/jquery.simile.bubble.js') %>": undefined // "jQuery.simileBubble"
 }
 
-function getItemIds(items){
-    var item_ids = items.map(function(){
-        var exhibit_item_id = $j(this).attr("itemid");
-        return database.getObject(exhibit_item_id, 'item_id');
-    }).get();
+Exhibit.scripts = [
+    "scripts/exhibit.js",
+    "scripts/bc/bc.js",
+    "scripts/bc/attributes.js",
+    "scripts/registry.js",
+    "scripts/util/util.js",
+    "scripts/util/debug.js",
+    "scripts/util/html.js",
+    "scripts/util/set.js",
+    "scripts/util/date-time.js",
+    "scripts/util/units.js",
+    "scripts/util/persistence.js",
+    "scripts/util/history.js",
+    "scripts/util/bookmark.js",
+    "scripts/util/localization.js",
+    "scripts/util/settings.js",
+    "scripts/util/coders.js",
+    "scripts/util/facets.js",
+    "scripts/util/views.js",
+    "scripts/data/database.js",
+    "scripts/data/database/local.js",
+    "scripts/data/database/type.js",
+    "scripts/data/database/property.js",
+    "scripts/data/database/range-index.js",
+    "scripts/data/collection.js",
+    "scripts/data/expression.js",
+    "scripts/data/expression/collection.js",
+    "scripts/data/expression/path.js",
+    "scripts/data/expression/constant.js",
+    "scripts/data/expression/operator.js",
+    "scripts/data/expression/function-call.js",
+    "scripts/data/expression/control-call.js",
+    "scripts/data/expression/functions.js",
+    "scripts/data/expression/controls.js",
+    "scripts/data/expression-parser.js",
+    "scripts/data/exporter.js",
+    "scripts/data/exporters/json.js",
+    "scripts/data/importer.js",
+    "scripts/data/importers/json.js",
+    "scripts/ui/ui.js",
+    "scripts/ui/ui-context.js",
+    "scripts/ui/lens-registry.js",
+    "scripts/ui/lens.js",
+    "scripts/ui/coordinator.js",
+    "scripts/ui/formatter.js",
+    "scripts/ui/format-parser.js",
+    "scripts/ui/facets/facet.js",
+    "scripts/ui/facets/enumerated-facet.js",
+    "scripts/ui/facets/list-facet.js",
+    "scripts/ui/facets/numeric-range-facet.js",
+    "scripts/ui/facets/alpha-range-facet.js",
+    "scripts/ui/facets/cloud-facet.js",
+    "scripts/ui/facets/text-search-facet.js",
+    "scripts/ui/facets/hierarchical-facet.js",
+    "scripts/ui/views/view.js",
+    "scripts/ui/views/view-panel.js",
+    "scripts/ui/views/ordered-view-frame.js",
+    "scripts/ui/views/tile-view.js",
+    "scripts/ui/views/tabular-view.js",
+    "scripts/ui/views/thumbnail-view.js",
+    "scripts/ui/coders/coder.js",
+    "scripts/ui/coders/color-coder.js",
+    "scripts/ui/coders/default-color-coder.js",
+    "scripts/ui/coders/ordered-color-coder.js",
+    "scripts/ui/coders/color-gradient-coder.js",
+    "scripts/ui/coders/icon-coder.js",
+    "scripts/ui/coders/size-coder.js",
+    "scripts/ui/coders/size-gradient-coder.js",
+    "scripts/ui/control-panel.js",
+    "scripts/ui/widgets/collection-summary-widget.js",
+    "scripts/ui/widgets/option-widget.js",
+    "scripts/ui/widgets/resizable-div-widget.js",
+    "scripts/ui/widgets/toolbox-widget.js",
+    "scripts/ui/widgets/bookmark-widget.js",
+    "scripts/ui/widgets/reset-history-widget.js",
+    "scripts/ui/widgets/logo.js",
+    "scripts/ui/widgets/legend-widget.js",
+    "scripts/ui/widgets/legend-gradient-widget.js",
+    "scripts/final.js"
+]
 
-    return item_ids;
-}
-
-function getItemType(items){
-    return database.getObject(items.attr("itemid"), 'type');
-}
-
-function updateContent(resource_list_items){
-    var collection_view_body = $j('.exhibit-collectionView-body');
-    collection_view_body.html(resource_list_items);
-}
-
-function decodeValueTooltip(){
-    $j('.exhibit-facet-value').map(function(){
-        var title = $j(this).attr("title");
-        $j(this).attr("title", decodeHTML(title));
-    })
-}
-
-//rename Hierachical Facet Missing Field of the root level: from others to missing this field
-function renameHFMissingField(){
-    var missing_field_elements = $j('.exhibit-flowingFacet-body').children("[title='(others)']");
-    var replaced_term = "(missing this field)";
-    missing_field_elements.map(function(){
-        $j(this).attr("title", replaced_term);
-        var value_link = $j(this).children('.exhibit-flowingFacet-value-link');
-        value_link.html("<span class='exhibit-facet-value-missingThisField'>(missing this field)</span>");
-    })
-}
+Exhibit.load();
 
