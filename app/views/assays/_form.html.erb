@@ -18,12 +18,12 @@
 
   <p>
     <%= f.label :title-%><span class="required">*</span><br/>
-    <%= f.text_area :title,:style => "width: 100%;", :rows=>2 -%>
+    <%= f.text_area :title,:class=>"title_text_entry" -%>
   </p>
 
   <p>
     <%= f.label :description -%><br/>
-    <%= f.text_area :description,:style => "width: 100%;", :rows => 10 -%>
+    <%= f.text_area :description,:class=>"large_text_entry" -%>
   </p>
   <% if Seek::Config.is_virtualliver -%>
       <p>

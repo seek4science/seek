@@ -8,20 +8,20 @@
   <div style="width: 95%;">
     <p>
       <%= f.label :title -%><br />
-      <%= f.text_field :title, :style => "width: 350px;" -%>
+      <%= f.text_field :title, :class=>"title_text_entry" -%>
     </p>
     <p>
       <%= f.label "Web page"-%><br />
-      <%= f.text_field :web_page, :style => "width: 350px;" -%>
+      <%= f.text_field :web_page, :class=>"text_entry" -%>
     </p>
 
     <p>
       <%= f.label :description -%><br/>
-      <%= f.text_area :description, :style => "width: 85%;", :rows => 10 -%>
+      <%= f.text_area :description, :class=>"large_text_entry"  %>
     </p>
     <p>
       <%= f.label :funding_details -%></br>
-      <%= f.text_area :funding_details, :style=>"width: 85%",:rows => 10 -%>
+      <%= f.text_area :funding_details, :class=>"large_text_entry" -%>
     </p>
   </div>
 </div>

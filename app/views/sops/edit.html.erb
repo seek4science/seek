@@ -8,12 +8,12 @@
         <p>
             <b>Title:</b>
             <br/>
-            <%= f.text_area :title, :style=>"width: 100%", :rows=>2 -%>
+            <%= f.text_area :title, :class=>"title_text_entry" -%>
         </p>
         <p>
             <b>Description:</b>
             <br/>
-            <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
+            <%= f.text_area :description, :class=>"large_text_entry" -%>
         </p>        
       
         <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
