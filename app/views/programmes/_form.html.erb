@@ -27,7 +27,7 @@
 </div>
 
 
-<%= render :partial => "projects/project_selector", :locals => { :resource => @programme, :allow_nil => true, :allow_all => true } -%>
+<%= render :partial => "projects/project_selector", :locals => { :resource => @programme, :allow_nil => true, :possibilities=>(Project.without_programme | @programme.projects) } -%>
 
 
 <% if programme -%>

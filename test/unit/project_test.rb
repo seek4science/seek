@@ -378,4 +378,12 @@ class ProjectTest < ActiveSupport::TestCase
       assert !proj2.pals.include?(person)
     end
   end
+
+  test "without programme" do
+    p1 = Factory(:project)
+    p2 = Factory(:project,:programme=>Factory(:programme))
+    ps = Project.without_programme
+    assert_includes ps,p1
+    refute_includes ps,p2
+  end
 end

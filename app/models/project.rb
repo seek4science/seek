@@ -36,6 +36,8 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
+  scope :without_programme,:conditions=>"programme_id IS NULL"
+
   def studies
     investigations.collect(&:studies).flatten.uniq
   end
