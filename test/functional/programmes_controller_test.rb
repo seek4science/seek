@@ -79,4 +79,13 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_nil prog.avatar
   end
 
+  test "can be disabled" do
+    p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
+    with_config_value :programmes_enabled,false do
+      get :show,:id=>p
+      assert_redirected_to :root
+      refute_nil flash[:error]
+    end
+  end
+
 end

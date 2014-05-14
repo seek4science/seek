@@ -1,6 +1,7 @@
 class ProgrammesController < ApplicationController
   include IndexPager
 
+  before_filter :programmes_enabled?
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy]
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth,:only=>[:destroy,:new, :create, :edit, :update]
