@@ -6,7 +6,6 @@ function updateFirstPage(){
     var item_ids = getItemIds(items);
 
     if (item_type != null && item_ids.length > 0){
-        $j('.exhibit-collectionView-body').html(' ');
         $j.ajax({
             url: faceted_items_url,
             async: false,
@@ -19,8 +18,6 @@ function updateFirstPage(){
                 $j('.exhibit-collectionView-header-groupControl').hide();
                 $j('.exhibit-toolboxWidget-button').hide();
                 decodeValueTooltip();
-
-                $j('.exhibit-viewPanel-viewContainer').show();
             });
     }
 }
@@ -30,10 +27,6 @@ var $j = jQuery;
 $j(document).ready(function(){
     $j(document).on("exhibitConfigured.exhibit", function() {
         defaultSearchText();
-    });
-
-    $j(document).on("onItemsChanged.exhibit", function() {
-        updateFirstPage();
     });
 
     $j(document).bind("registerLocales.exhibit", function() {
