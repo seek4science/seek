@@ -386,4 +386,43 @@ class ProjectTest < ActiveSupport::TestCase
     assert_includes ps,p1
     refute_includes ps,p2
   end
+
+
+
+  test "ancestor and dependant" do
+    p=Factory(:project)
+    p2 = Factory(:project)
+
+    assert_nil p2.ancestor
+    assert_nil p.descendant
+
+    p.ancestor = p
+    refute p.valid?
+
+    p2.ancestor = p
+    assert p2.valid?
+    p2.save!
+    p2.reload
+    p.reload
+
+    assert_equal p,p2.ancestor
+    assert_equal p2,p.descendant
+
+    #repeat, but assigning the other way around
+    p=Factory(:project)
+    p2 = Factory(:project)
+
+    assert_nil p2.ancestor
+    assert_nil p.descendant
+
+    p2.descendant = p
+    assert p2.valid?
+    p2.save!
+    p2.reload
+    p.reload
+
+    assert_equal p,p2.descendant
+    assert_equal p2,p.ancestor
+
+  end
 end

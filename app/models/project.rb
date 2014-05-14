@@ -14,11 +14,6 @@ class Project < ActiveRecord::Base
 
   title_trimmer
 
-  scope :default_order, order('title')
-
-  validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
-  validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
-
   has_and_belongs_to_many :investigations
 
   has_and_belongs_to_many :data_files
@@ -36,7 +31,22 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
+  belongs_to :ancestor,:class_name=>"Project",:foreign_key => :ancestor_id
+  has_one :descendant,:class_name=>"Project",:foreign_key => :ancestor_id
+
+  scope :default_order, order('title')
   scope :without_programme,:conditions=>"programme_id IS NULL"
+
+  validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
+  validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
+
+  validate :ancestor_cannot_be_self
+
+  def ancestor_cannot_be_self
+    if ancestor==self
+      errors.add(:ancestor, "cannot be the same as itself")
+    end
+  end
 
   def studies
     investigations.collect(&:studies).flatten.uniq

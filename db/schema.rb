@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140513124340) do
+ActiveRecord::Schema.define(:version => 20140514144438) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -999,6 +999,7 @@ ActiveRecord::Schema.define(:version => 20140513124340) do
     t.datetime "last_jerm_run"
     t.string   "uuid"
     t.integer  "programme_id"
+    t.integer  "ancestor_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
