@@ -121,11 +121,13 @@ class ProgrammesControllerTest < ActionController::TestCase
     end
     new_proj = assigns(:project)
     refute_nil new_proj
-    assert_redirected_to edit_project_path(new_proj)
+    assert_redirected_to project_path(new_proj)
     assert_equal prog,new_proj.programme
     assert_equal "cheese",new_proj.title
     assert_equal "mmmmmm",new_proj.description
     assert_equal "http://google.com",new_proj.web_page
+
+    refute_nil flash[:notice]
 
     ancestor = assigns(:ancestor_project)
     assert_equal proj,ancestor

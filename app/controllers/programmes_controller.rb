@@ -6,6 +6,8 @@ class ProgrammesController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth,:except=>[:show,:index]
 
+  include Seek::BreadCrumbs
+
   respond_to :html
 
   def create
@@ -45,7 +47,8 @@ class ProgrammesController < ApplicationController
     @ancestor_project = Project.find(proj_params[:ancestor_id])
     @project = @ancestor_project.spawn({:title=>proj_params[:title],:description=>proj_params[:description],:web_page=>proj_params[:web_page],:programme=>@programme})
     if @project.save
-      redirect_to edit_project_path(@project)
+      flash[:notice]="The #{t('project')} '#{@ancestor_project.title}' was successfully spawned for the '#{t('programme')}' #{@programme.title}"
+      redirect_to project_path(@project)
     else
       @available_projects = Project.where('programme_id != ? OR programme_id IS NULL',@programme.id)
       render :action=>:initiate_spawn_project
