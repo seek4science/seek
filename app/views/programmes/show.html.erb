@@ -13,6 +13,7 @@
 
       <% if admin_logged_in? -%>
           <%= delete_icon(@programme,current_user) %>
+          <li><%= image_tag_for_key('edit',initiate_spawn_project_programme_path(@programme),"Spawn an existing #{t('project')}",nil,"Spawn an existing #{t('project')}") -%></li>
       <% end -%>
 
   <% end -%>

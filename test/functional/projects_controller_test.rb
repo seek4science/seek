@@ -813,6 +813,14 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test "get as json" do
+    proj = Factory(:project,:title=>"fishing project",:description=>"investigating fishing")
+    get :show,:id=>proj,:format=>"json"
+    assert_response :success
+    json = JSON.parse(@response.body)
+    assert_equal "fishing project",json["title"]
+    assert_equal "investigating fishing",json["description"]
+  end
 
 	private
 

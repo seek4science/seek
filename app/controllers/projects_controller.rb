@@ -92,6 +92,7 @@ class ProjectsController < ApplicationController
       format.html # show.html.erb
       format.rdf { render :template=>'rdf/show'}
       format.xml
+      format.json { render :text=>@project.to_json}
     end
   end
 
