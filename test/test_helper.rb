@@ -94,7 +94,7 @@ class ActiveSupport::TestCase
   teardown :clear_current_user
 
   def skip_jws_tests?
-    false
+    true
   end
 
   def skip_rest_schema_check?
