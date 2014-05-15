@@ -73,9 +73,10 @@ class AuthLookupUpdateJob
 
       disable_authorization_checks do
         items.uniq.each do |item|
-          #immediately update for the current user
+          #immediately update for the current user and anonymous user
           if item.respond_to?(:authorization_supported?) && item.authorization_supported?
             item.update_lookup_table(User.current_user)
+            item.update_lookup_table(nil) unless User.current_user.nil?
           end
           # Could potentially delete the records for this item (either by asset_id or user_id) to ensure an immediate reflection of the change,
           # but with some slowdown until the changes have been reapplied.
