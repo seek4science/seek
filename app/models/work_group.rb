@@ -19,4 +19,5 @@ class WorkGroup < ActiveRecord::Base
     project.title + " at " + institution.title
   end
 
+
 end
