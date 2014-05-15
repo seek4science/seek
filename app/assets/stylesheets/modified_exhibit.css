@@ -74,4 +74,11 @@ div.exhibit-collectionView-header{
     text-align: center;
 }
 
+.exhibit-busyIndicator {
+    position:   absolute;
+    left:       35%;
+    width:      29.5%;
+    z-index:    1000;
+}
+
 
