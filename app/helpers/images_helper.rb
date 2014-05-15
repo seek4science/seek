@@ -252,7 +252,7 @@ module ImagesHelper
       when "institution_avatar"
       "institution_64x64.png"
       when "programme_avatar"
-        "crystal_project/64x64/filesystems/desktop.png"
+        "crystal_project/64x64/filesystems/folder_favorites.png"
       when "organism_avatar"
       "misc_icons/cell3.png"
       when 'strain_avatar'
