@@ -14,11 +14,6 @@ class Project < ActiveRecord::Base
 
   title_trimmer
 
-  scope :default_order, order('title')
-
-  validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
-  validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
-
   has_and_belongs_to_many :investigations
 
   has_and_belongs_to_many :data_files
@@ -34,7 +29,22 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :strains
   has_and_belongs_to_many :organisms
 
+  has_many :work_groups, :dependent=>:destroy
+  has_many :institutions, :through=>:work_groups, :before_remove => :group_memberships_empty?
+
   belongs_to :programme
+
+  belongs_to :ancestor,:class_name=>"Project",:foreign_key => :ancestor_id
+  has_one :descendant,:class_name=>"Project",:foreign_key => :ancestor_id
+
+  scope :default_order, order('title')
+  scope :without_programme,:conditions=>"programme_id IS NULL"
+
+  validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
+  validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
+
+  validate :ancestor_cannot_be_self
+
 
   def studies
     investigations.collect(&:studies).flatten.uniq
@@ -56,9 +66,6 @@ class Project < ActiveRecord::Base
   def default_default_policy_if_new
     self.default_policy = Policy.default if new_record?
   end
-
-  has_many :work_groups, :dependent=>:destroy
-  has_many :institutions, :through=>:work_groups, :before_remove => :group_memberships_empty?
 
   def group_memberships_empty? institution
     work_group = WorkGroup.where(['project_id=? AND institution_id=?', self.id, institution.id]).first
@@ -217,6 +224,31 @@ class Project < ActiveRecord::Base
 
   def can_delete?(user=User.current_user)
     user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
+  end
+
+  def ancestor_cannot_be_self
+    if ancestor==self
+      errors.add(:ancestor, "cannot be the same as itself")
+    end
+  end
+
+  #allows a new project to be spawned off as a descendant of this project, retaining the same membership but existing
+  #as a new project entity. attributes may be passed to override those being copied. The ancestor and memberships will
+  #automatically be assigned and carried over, and the avatar will be set to nil
+  def spawn attributes={}
+    child = self.dup
+    self.work_groups.each do |wg|
+      new_wg = WorkGroup.new(:institution=>wg.institution)
+      child.work_groups << new_wg
+      wg.group_memberships.each do |gm|
+        new_gm = GroupMembership.new(:person=>gm.person)
+        new_wg.group_memberships << new_gm
+      end
+    end
+    child.assign_attributes(attributes)
+    child.avatar=nil
+    child.ancestor=self
+    child
   end
 
 end

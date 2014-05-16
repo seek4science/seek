@@ -387,6 +387,10 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
+    member do
+      get :initiate_spawn_project
+      post :spawn_project
+    end
     resources :people,:projects, :institutions
   end
 

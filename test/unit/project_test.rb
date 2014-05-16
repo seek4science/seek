@@ -378,4 +378,137 @@ class ProjectTest < ActiveSupport::TestCase
       assert !proj2.pals.include?(person)
     end
   end
+
+  test "without programme" do
+    p1 = Factory(:project)
+    p2 = Factory(:project,:programme=>Factory(:programme))
+    ps = Project.without_programme
+    assert_includes ps,p1
+    refute_includes ps,p2
+  end
+
+
+
+  test "ancestor and dependant" do
+    p=Factory(:project)
+    p2 = Factory(:project)
+
+    assert_nil p2.ancestor
+    assert_nil p.descendant
+
+    p.ancestor = p
+    refute p.valid?
+
+    p2.ancestor = p
+    assert p2.valid?
+    p2.save!
+    p2.reload
+    p.reload
+
+    assert_equal p,p2.ancestor
+    assert_equal p2,p.descendant
+
+    #repeat, but assigning the other way around
+    p=Factory(:project)
+    p2 = Factory(:project)
+
+    assert_nil p2.ancestor
+    assert_nil p.descendant
+
+    p2.descendant = p
+    assert p2.valid?
+    p2.save!
+    p2.reload
+    p.reload
+
+    assert_equal p,p2.descendant
+    assert_equal p2,p.ancestor
+  end
+
+  test "spawn" do
+    p = Factory(:programme,:projects=>[Factory(:project,:avatar=>Factory(:avatar))]).projects.first
+    wg1 = Factory(:work_group,:project=>p)
+    wg2 = Factory(:work_group,:project=>p)
+    person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg1)])
+    person2 = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg1)])
+    person3 = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg2)])
+
+    assert_equal 3,p.people.size
+    assert_equal 2,p.work_groups.size
+    assert_includes p.people,person
+    assert_includes p.people,person2
+    assert_includes p.people,person3
+    refute_nil p.avatar
+
+    p2 = p.spawn
+    assert p2.new_record?
+
+    assert_equal p2.title,p.title
+    assert_equal p2.description,p.description
+    assert_equal p2.programme,p.programme
+
+    p2.title="sdfsdflsdfoosdfsdf" #to allow it to save
+
+    p2.save!
+    p2.reload
+    p.reload
+
+    assert_nil p2.avatar
+    refute_equal p,p2
+    refute_includes p2.work_groups,wg1
+    refute_includes p2.work_groups,wg2
+
+    assert_equal 2,p2.work_groups.size
+
+    assert_equal p.institutions,p2.institutions
+    assert_equal p.people,p2.people
+    assert_equal 3,p2.people.size
+
+    assert_includes p2.people,person
+    assert_includes p2.people,person2
+    assert_includes p2.people,person3
+
+    assert_equal p,p2.ancestor
+    assert_equal p2,p.descendant
+
+    prog2=Factory(:programme)
+    p2=p.spawn({:title=>"fish project",:programme=>prog2,:description=>"about doing fishing"})
+    assert p2.new_record?
+
+    assert_equal "fish project",p2.title
+    assert_equal prog2,p2.programme
+    assert_equal "about doing fishing",p2.description
+
+  end
+
+  test "spawn consolidates workgroups" do
+    p = Factory(:programme,:projects=>[Factory(:project,:avatar=>Factory(:avatar))]).projects.first
+    wg1 = Factory(:work_group,:project=>p)
+    wg2 = Factory(:work_group,:project=>p)
+    Factory(:group_membership,:work_group=>wg1,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg1,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg1,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg2,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg2,:person=>Factory(:person))
+    p.reload
+    assert_equal 5,p.people.count
+    assert_equal 2,p.work_groups.count
+    p2=nil
+    assert_difference("WorkGroup.count",2) do
+      assert_difference("GroupMembership.count",5) do
+        assert_difference("Project.count",1) do
+          assert_no_difference("Person.count") do
+            p2 = p.spawn(:title=>"sdfsdfsdfsdf")
+            p2.save!
+          end
+        end
+      end
+    end
+    p2.reload
+    assert_equal 5,p2.people.count
+    assert_equal 2,p2.work_groups.count
+    refute_equal p.work_groups,p2.work_groups
+    assert_equal p.people,p2.people
+  end
+
 end

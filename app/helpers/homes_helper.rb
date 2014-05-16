@@ -149,7 +149,7 @@ module HomesHelper
 
   def recently_added_item_logs_hash time=1.month.ago, number_of_item=10
     Rails.cache.fetch("create_activity_#{current_user_id}") do
-      item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
+      item_types = Seek::Util.user_creatable_types.collect{|type| type.name} | [Project,Programme]
       activity_logs = ActivityLog.where(["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types]).order("created_at DESC")
       selected_activity_logs = []
       count = 0

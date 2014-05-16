@@ -792,6 +792,35 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test "programme shown" do
+    prog = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
+    get :index
+    assert_select "p.list_item_attribute" do
+      assert_select "b",:text=>/#{I18n.t('programme')}/i
+      assert_select "a[href=?]",programme_path(prog),:text=>prog.title,:count=>2
+    end
+
+  end
+
+  test "programme not shown when disabled" do
+    prog = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
+    with_config_value :programmes_enabled,false do
+      get :index
+      assert_select "p.list_item_attribute" do
+        assert_select "b",:text=>/#{I18n.t('programme')}/i,:count=>0
+        assert_select "a[href=?]",programme_path(prog),:text=>prog.title,:count=>0
+      end
+    end
+  end
+
+  test "get as json" do
+    proj = Factory(:project,:title=>"fishing project",:description=>"investigating fishing")
+    get :show,:id=>proj,:format=>"json"
+    assert_response :success
+    json = JSON.parse(@response.body)
+    assert_equal "fishing project",json["title"]
+    assert_equal "investigating fishing",json["description"]
+  end
 
 	private
 
