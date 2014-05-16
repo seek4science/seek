@@ -35,7 +35,7 @@ class Project < ActiveRecord::Base
   belongs_to :programme
 
   belongs_to :ancestor,:class_name=>"Project",:foreign_key => :ancestor_id
-  has_one :descendant,:class_name=>"Project",:foreign_key => :ancestor_id
+  has_many :descendants,:class_name=>"Project",:foreign_key => :ancestor_id
 
   scope :default_order, order('title')
   scope :without_programme,:conditions=>"programme_id IS NULL"
