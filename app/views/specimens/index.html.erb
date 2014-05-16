@@ -1,6 +1,6 @@
 <%= render :partial => "assets/new_button", :locals => {:new_object_path => new_specimen_path, :label => "New #{(I18n.t 'biosamples.sample_parent_term').capitalize}"} %>
 
-<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name]  %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing %>
     <%= render :partial => "faceted_browsing/facets", :object => @specimens %>
 <% else %>
     <%= render :partial => "assets/resources_alphabetical_paginated", :object => @specimens %>

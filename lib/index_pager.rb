@@ -1,8 +1,9 @@
 module IndexPager    
+  include Seek::FacetedBrowsing
 
   def index
-    controller = self.controller_name.downcase    
-    unless Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller]
+    controller = self.controller_name.downcase
+    unless Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller] && ie_support_faceted_browsing?
       model_name=controller.classify
       model_class=eval(model_name)
       objects = eval("@"+controller)
@@ -35,5 +36,5 @@ module IndexPager
     
     eval("@" + controller + " = found")
   end
-  
+
 end
