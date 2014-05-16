@@ -19,12 +19,20 @@
      end
 
      #items
+     i=1
      objects.each do |object|
        exhibit_item = {}
-       exhibit_item['item_id'] = object.id
+
+       #this is to avoid exhibit warning messages
+       exhibit_item['id'] = i
+       exhibit_item['label'] = "#{i}"
+       i += 1
+
        #This display_content will be later on replaced by resource_list_item, by using ajax, otherwise it causes speed problem
        exhibit_item['display_content'] = ''
+
        exhibit_item['type'] = object_type
+       exhibit_item['item_id'] = object.id
 
        #generate facet values for each facet based on the facets.yml config file
        facets_for_object.each do |key, value|
