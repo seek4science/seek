@@ -1,6 +1,7 @@
 function updateFirstPage(){
     //temporary put this function here, need to find better place or rename the updateFirstPage
     renameHFMissingField();
+    renameOtherField()
     var items = $j('div[itemid]');
     var item_type = getItemType(items);
     var item_ids = getItemIds(items);
@@ -76,6 +77,19 @@ function renameHFMissingField(){
     missing_field_elements.map(function(){
         $j(this).attr("title", replaced_term);
         var value_link = $j(this).children('.exhibit-flowingFacet-value-link');
-        value_link.html("<span class='exhibit-facet-value-missingThisField'>(missing this field)</span>");
+        value_link.html("<span class='exhibit-facet-value-missingThisField'>" + replaced_term + "</span>");
+    })
+}
+
+//rename Hierachical Facet (others) Field of the children levels: from others to Undefined in -parent term-
+function renameOtherField(){
+    var missing_field_elements = $j('.exhibit-flowingFacet-childrenContainer').children("[title='(others)']");
+    missing_field_elements.map(function(){
+        var parent_term = this.parentNode.parentNode.title;
+        var replaced_term = "Undefined in " + parent_term;
+
+        $j(this).attr("title", replaced_term);
+        var value_link = $j(this).children('.exhibit-flowingFacet-value-link');
+        value_link.html(replaced_term);
     })
 }
