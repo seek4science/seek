@@ -481,4 +481,34 @@ class ProjectTest < ActiveSupport::TestCase
 
   end
 
+  test "spawn consolidates workgroups" do
+    p = Factory(:programme,:projects=>[Factory(:project,:avatar=>Factory(:avatar))]).projects.first
+    wg1 = Factory(:work_group,:project=>p)
+    wg2 = Factory(:work_group,:project=>p)
+    Factory(:group_membership,:work_group=>wg1,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg1,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg1,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg2,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg2,:person=>Factory(:person))
+    p.reload
+    assert_equal 5,p.people.count
+    assert_equal 2,p.work_groups.count
+    p2=nil
+    assert_difference("WorkGroup.count",2) do
+      assert_difference("GroupMembership.count",5) do
+        assert_difference("Project.count",1) do
+          assert_no_difference("Person.count") do
+            p2 = p.spawn(:title=>"sdfsdfsdfsdf")
+            p2.save!
+          end
+        end
+      end
+    end
+    p2.reload
+    assert_equal 5,p2.people.count
+    assert_equal 2,p2.work_groups.count
+    refute_equal p.work_groups,p2.work_groups
+    assert_equal p.people,p2.people
+  end
+
 end
