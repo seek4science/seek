@@ -5,11 +5,11 @@ class ProjectsController < ApplicationController
   include IndexPager
   include CommonSweepers
 
-  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report]
+  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members]
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :administerable_by_user, :only =>[:admin]
+  before_filter :administerable_by_user, :only =>[:admin,:admin_members]
   before_filter :auth_params,:only=>[:update]
   before_filter :member_of_this_project, :only=>[:asset_report],:unless=>:admin?
 
@@ -17,6 +17,8 @@ class ProjectsController < ApplicationController
 
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
   include Seek::BreadCrumbs
+
+  respond_to :html
 
   def auto_complete_for_organism_name
     render :json => Project.organism_counts.map(&:name).to_json
@@ -251,6 +253,10 @@ class ProjectsController < ApplicationController
         end
       }
     end
+  end
+
+  def admin_members
+    respond_with(@project)
   end
 
   private  

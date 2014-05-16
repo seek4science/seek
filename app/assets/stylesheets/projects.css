@@ -1,0 +1,12 @@
+div#project_institutions {
+    margin-top: 1em;
+    margin-bottom: 2em;
+    margin-left: 2em;
+    width: 90%;
+    height: 30em;
+    overflow: auto;
+}
+
+#person_autocomplete_input{
+    font-size: 22em;
+}

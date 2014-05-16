@@ -822,6 +822,20 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal "investigating fishing",json["description"]
   end
 
+  test "admin members available to admin" do
+    login_as(Factory(:admin))
+    p=Factory(:project)
+    get :admin_members,:id=>p
+    assert_response :success
+  end
+
+  test "admin members not available to normal person" do
+    login_as(Factory(:person))
+    p=Factory(:project)
+    get :admin_members,:id=>p
+    assert_redirected_to :root
+  end
+
 	private
 
 	def valid_project

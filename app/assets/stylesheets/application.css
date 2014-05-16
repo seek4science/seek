@@ -20,5 +20,6 @@
 *= require easytabs
 *= require taverna_player/application
 *= require data_tables
+*= require projects
 *= require jquery.bxslider
 */

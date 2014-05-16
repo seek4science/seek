@@ -1,0 +1,130 @@
+<div id="project_institutions">
+<% @project.work_groups.sort{|a,b| a.institution.title <=> b.institution.title}.each do |work_group| %>
+    <%
+        institution_label_id = "institution_label_#{work_group.institution.id}"
+        ul_id = "institution_block_#{work_group.institution.id}"
+    %>
+    <ul class="institution_members" id="<%= ul_id %>">
+    <span class="institution_label" id="<%= institution_label_id %>"><%= work_group.institution.title %></span>
+
+      <% work_group.group_memberships.select{|gm| !gm.person.nil?}.each do |gm| %>
+          <li class="institution_member" id="group_membership_<%= gm.id %>">
+            <%= gm.person.name %>&nbsp;<%= link_to_function "remove","remove_group_membership(#{gm.id})" %>
+          </li>
+      <% end %>
+    </ul>
+    <br>
+<% end %>
+</div>
+
+Add people
+<p>
+  Institution:<%= select_tag :institution_ids,options_from_collection_for_select(Institution.order(:title),"id","title") %>
+  <br/>
+  People:
+
+<table id="facebook" class="">
+  <tr>
+    <td>
+      <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('person_autocomplete_input').focus();" style="width: 400px;">
+        <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="people_hidden_input" tabindex="-1" ></span>
+
+        <div id="person_autocomplete_display" class="tokenizer_input">
+          <input type="text" size="1" tabindex="" id="person_autocomplete_input" />
+        </div>
+      </div>
+      <div id="person_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
+        <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
+      </div>
+    </td>
+  </tr>
+</table>
+<%= link_to_function "Add","add_person()"%>
+</p>
+
+<div style="display:block;border:black">
+  <div>Techy stuff should be hidden</div>
+  Groups to remove:<%= select_tag :group_memberships_to_remove -%><br/>
+  People and institution to add:<%= select_tag :people_and_institutions_to_add %>
+</div>
+
+<script type="application/javascript">
+
+  setup_autocompleter();
+
+  function remove_group_membership(id) {
+      var element_id = "#group_membership_"+id;
+      $j(element_id).hide();
+      $j("#group_memberships_to_remove").append("<option val="+id+">"+id+"</option");
+      //need to also remove people added in this session
+  }
+
+  function add_person() {
+      var people = determine_people();
+
+
+      $j.each(people,function(index,value) {
+          var person_id=value["person_id"];
+          var person_name=value["person_name"];
+          var institution_id=$j("#institution_ids").val();
+          var institution_title=$j("#institution_ids option:selected").text();
+          var json=JSON.stringify({person_id:person_id,institution_id:institution_id,institution_title:institution_title});
+          $j("#people_and_institutions_to_add").append("<option val="+json+">"+json+"</option");
+          $j("#person_id").val("");
+
+          var block = $j("#institution_block_"+institution_id);
+          if (block.length==0) {
+              var ul = "<ul class='institution_members' id='institution_block_" + institution_id + "'>";
+              ul = ul + "<span class='institution_label' id='institution_label_"+institution_id+"'>";
+              ul = ul + institution_title;
+              ul = ul + "<//span><//ul>";
+              $j("#project_institutions").append(ul);
+              block = $j("#institution_block_"+institution_id);
+          }
+          var dummy_id=guid();
+          var li = "<li class='institution_member' id='group_membership_"+dummy_id+"'>"+person_name;
+          var onclick = "'remove_group_membership(\""+dummy_id+"\"); return false;'"
+          li = li + "&nbsp;" + "<a href='#' onclick="+onclick+">remove<//a>";
+          li = li + '<//li>';
+          block.append(li);
+      });
+
+  }
+
+  function determine_people() {
+      var people_ids = autocompleters["person_autocompleter"].getRecognizedSelectedIDs();
+      var result = [];
+      for(var i = 0; i < people_ids.length; i++) {
+        id = parseInt(people_ids[i]);
+        var name = autocompleters["person_autocompleter"].getValueFromJsonArray(autocompleters["person_autocompleter"].itemIDsToJsonArrayIDs([id])[0], 'name');
+        result.push({person_id:id,person_name:name});
+      }
+      return result;
+  }
+
+  // taken from stack overflow - http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+  function guid() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+          return v.toString(16);
+      });
+  }
+
+  function setup_autocompleter() {
+      var suggestion_list = <%= Person.get_all_as_json.html_safe  -%>;
+      var prepopulate_with = [];
+
+      var person_autocompleter = new Autocompleter.LocalAdvanced(
+              'person_autocompleter', 'person_autocomplete_input', 'person_autocomplete_display', 'person_autocomplete_populate', suggestion_list, prepopulate_with, {
+                  frequency: 0.1,
+                  updateElement: addAction,
+                  search_field: "name",
+                  hint_field: "email",
+                  id_field: "id",
+                  validation_type: "only_suggested"
+              });
+      var hidden_input = new HiddenInput('people_hidden_input', person_autocompleter);
+
+      autocompleters["person_autocompleter"] = person_autocompleter;
+  }
+</script>
