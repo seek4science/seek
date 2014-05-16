@@ -75,20 +75,33 @@ Add people
           var block = $j("#institution_block_"+institution_id);
           if (block.length==0) {
               var ul = "<ul class='institution_members' id='institution_block_" + institution_id + "'>";
-              ul = ul + "<span class='institution_label' id='institution_label_"+institution_id+"'>";
-              ul = ul + institution_title;
-              ul = ul + "<//span><//ul>";
+              ul += "<span class='institution_label' id='institution_label_"+institution_id+"'>";
+              ul += institution_title;
+              ul += "<//span><//ul>";
               $j("#project_institutions").append(ul);
               block = $j("#institution_block_"+institution_id);
           }
           var dummy_id=guid();
-          var li = "<li class='institution_member' id='group_membership_"+dummy_id+"'>"+person_name;
-          var onclick = "'remove_group_membership(\""+dummy_id+"\"); return false;'"
-          li = li + "&nbsp;" + "<a href='#' onclick="+onclick+">remove<//a>";
-          li = li + '<//li>';
+          var li_id = "group_membership_"+dummy_id;
+          var li = "<li class='institution_member' id='"+li_id+"'>"+person_name;
+          var onclick = "'remove_group_membership(\""+dummy_id+"\");";
+          onclick+="remove_from_to_add("+person_id+","+institution_id+");";
+          onclick+="return false;'"
+          li += "&nbsp;" + "<a href='#' onclick="+onclick+">remove<//a>";
+          li += '<//li>';
           block.append(li);
+          $j('html,body,#project_institutions').animate({scrollTop: $j("#"+li_id).offset().top },2000);
       });
 
+  }
+
+  function remove_from_to_add(person_id,institution_id) {
+    $j("#people_and_institutions_to_add > option").each(function(index,value){
+        var json = JSON.parse(value.value);
+        if (json["person_id"]==person_id && json["institution_id"]==institution_id) {
+            value.remove();
+        }
+    })
   }
 
   function determine_people() {
