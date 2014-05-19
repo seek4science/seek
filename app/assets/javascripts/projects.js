@@ -100,7 +100,7 @@ function mark_group_membership_for_removal(id) {
     var element_id = "#group_membership_"+id;
     $j(element_id).hide();
     if ($j.isNumeric(id)) {
-        $j("#group_memberships_to_remove").append("<option val="+id+">"+id+"</option");
+        $j("#group_memberships_to_remove").append("<option val="+id+" selected>"+id+"</option>");
     }
 
 
@@ -117,7 +117,7 @@ function add_selected_people() {
         var institution_id = $j("#institution_ids").val();
         var institution_title = $j("#institution_ids option:selected").text();
         var json = JSON.stringify({person_id: person_id, institution_id: institution_id, institution_title: institution_title});
-        $j("#people_and_institutions_to_add").append("<option val=" + json + ">" + json + "</option");
+        $j("#people_and_institutions_to_add").append("<option val=" + json + " selected>" + json + "</option>");
         $j("#person_id").val("");
 
         var block = $j("#institution_block_" + institution_id);
@@ -138,8 +138,9 @@ function add_selected_people() {
         li += "&nbsp;" + "<a href='#' onclick=" + onclick + "><span class='remove_member_icon'><//a>";
         li += '<//li>';
         block.append(li);
-        $j('html,body,#project_institutions').animate({scrollTop: $j("#" + li_id).offset().top }, 2000);
     });
+
+    autocompleters["person_autocompleter"].deleteAllTokens();
 
 }
 

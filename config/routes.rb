@@ -162,6 +162,7 @@ SEEK::Application.routes.draw do
       get :asset_report
       get :admin
       get :admin_members
+      post :update_members
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:only=>[:index]

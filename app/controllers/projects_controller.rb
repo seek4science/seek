@@ -5,11 +5,11 @@ class ProjectsController < ApplicationController
   include IndexPager
   include CommonSweepers
 
-  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members]
+  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:update_members]
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :administerable_by_user, :only =>[:admin,:admin_members]
+  before_filter :administerable_by_user, :only =>[:admin,:admin_members,:update_members]
   before_filter :auth_params,:only=>[:update]
   before_filter :member_of_this_project, :only=>[:asset_report],:unless=>:admin?
 
@@ -257,6 +257,34 @@ class ProjectsController < ApplicationController
 
   def admin_members
     respond_with(@project)
+  end
+
+  def update_members
+    groups_to_remove = params[:group_memberships_to_remove] || []
+    people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
+    groups_to_remove.each do |group|
+      g = GroupMembership.find(group)
+      g.destroy unless g.nil?
+    end
+
+    people_and_institutions_to_add.each do |new_info|
+      json = JSON.parse(new_info)
+      person_id = json["person_id"]
+      institution_id = json["institution_id"]
+      person = Person.find(person_id)
+      institution = Institution.find(institution_id)
+      unless person.nil? || institution.nil?
+        work_group = WorkGroup.where(:project_id=>@project.id,:institution_id => institution_id).first
+        work_group ||= WorkGroup.new(:project=>@project,:institution=>institution)
+        group_membership = GroupMembership.new :work_group=>work_group,:person=>person
+        group_membership.save!
+        work_group.save!
+      end
+    end
+
+    respond_with(@project) do |format|
+      format.html {redirect_to project_path(@project)}
+    end
   end
 
   private  
