@@ -282,6 +282,8 @@ class ProjectsController < ApplicationController
       end
     end
 
+    flash[:notice]="The members and institutions of #{t('project')} #{@project.title} were updated"
+
     respond_with(@project) do |format|
       format.html {redirect_to project_path(@project)}
     end

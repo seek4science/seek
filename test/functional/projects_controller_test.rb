@@ -869,7 +869,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes new_person2.projects,project
     assert_includes new_person.institutions,new_institution
     assert_includes new_person2.institutions,new_institution
-    assert_includes project.work_groups,work_group
+    assert_includes project.work_groups,wg
 
   end
 
