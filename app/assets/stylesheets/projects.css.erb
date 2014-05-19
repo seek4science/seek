@@ -1,0 +1,37 @@
+div#project_institutions {
+    margin-top: 0.5em;
+    margin-left: 2em;
+    width: 90%;
+    max-height: 50em;
+    overflow: auto;
+}
+
+#person_autocomplete_input{
+    font-size: 22em;
+}
+
+ul.institution_members {
+
+}
+
+ul.institution_members .institution_label {
+    font-size: larger;
+    font-weight: bolder;
+    display:inline-block;
+    margin-bottom: 0.5em;
+}
+
+ul.institution_members li.institution_member {
+    padding-left: 1em;
+    list-style-type: none;
+}
+
+
+
+.remove_member_icon {
+    display: inline-block;
+    background: url(<%= asset_path(icon_filename_for_key("destroy")) %>) left center no-repeat;
+    background-size: 12px;
+    vertical-align: middle;
+    padding: 6px 6px;
+}

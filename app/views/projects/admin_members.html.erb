@@ -12,11 +12,10 @@
 
       <% work_group.group_memberships.select{|gm| !gm.person.nil?}.each do |gm| %>
           <li class="institution_member" id="group_membership_<%= gm.id %>">
-            <%= gm.person.name %>&nbsp;<%= link_to_function "remove","mark_group_membership_for_removal(#{gm.id})" %>
+            <%= gm.person.name %>&nbsp;<%= link_to_function content_tag(:span,"",:class=>"remove_member_icon").html_safe,"mark_group_membership_for_removal(#{gm.id})" %>
           </li>
       <% end %>
     </ul>
-    <br>
 <% end %>
 </div>
 
@@ -45,7 +44,7 @@ Add people
 <%= link_to_function "Add","add_selected_people()"%>
 </p>
 
-<div style="display:block;border:black">
+<div style="display:none">
   <div>Techy stuff should be hidden</div>
   Groups to remove:<%= select_tag :group_memberships_to_remove -%><br/>
   People and institution to add:<%= select_tag :people_and_institutions_to_add %>

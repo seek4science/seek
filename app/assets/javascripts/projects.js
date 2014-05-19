@@ -134,8 +134,8 @@ function add_selected_people() {
         var li = "<li class='institution_member' id='" + li_id + "'>" + person_name;
         var onclick = "'mark_group_membership_for_removal(\"" + dummy_id + "\");";
         onclick += "remove_from_people_to_add(" + person_id + "," + institution_id + ");";
-        onclick += "return false;'"
-        li += "&nbsp;" + "<a href='#' onclick=" + onclick + ">remove<//a>";
+        onclick += "return false;'";
+        li += "&nbsp;" + "<a href='#' onclick=" + onclick + "><span class='remove_member_icon'><//a>";
         li += '<//li>';
         block.append(li);
         $j('html,body,#project_institutions').animate({scrollTop: $j("#" + li_id).offset().top }, 2000);

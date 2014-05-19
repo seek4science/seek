@@ -72,5 +72,9 @@ module ProjectsHelper
     html.html_safe
   end
 
+  def remove_member_icon
+    simple_image_tag_for_key("destroy",{class:"remove_member_icon"})
+  end
+
 
 end
