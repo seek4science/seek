@@ -389,12 +389,12 @@ class ProjectTest < ActiveSupport::TestCase
 
 
 
-  test "ancestor and dependant" do
+  test "ancestor and dependants" do
     p=Factory(:project)
     p2 = Factory(:project)
 
     assert_nil p2.ancestor
-    assert_nil p.descendant
+    assert_empty p.descendants
 
     p.ancestor = p
     refute p.valid?
@@ -406,23 +406,29 @@ class ProjectTest < ActiveSupport::TestCase
     p.reload
 
     assert_equal p,p2.ancestor
-    assert_equal p2,p.descendant
+    assert_equal [p2],p.descendants
 
     #repeat, but assigning the other way around
     p=Factory(:project)
     p2 = Factory(:project)
 
     assert_nil p2.ancestor
-    assert_nil p.descendant
+    assert_empty p.descendants
 
-    p2.descendant = p
+    p2.descendants << p
     assert p2.valid?
     p2.save!
     p2.reload
     p.reload
 
-    assert_equal p,p2.descendant
+    assert_equal [p],p2.descendants
     assert_equal p2,p.ancestor
+
+    p3=Factory(:project)
+    p2.descendants << p3
+    p2.save!
+    p2.reload
+    assert_equal [p,p3],p2.descendants.sort_by(&:id)
   end
 
   test "spawn" do
@@ -469,7 +475,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_includes p2.people,person3
 
     assert_equal p,p2.ancestor
-    assert_equal p2,p.descendant
+    assert_equal [p2],p.descendants
 
     prog2=Factory(:programme)
     p2=p.spawn({:title=>"fish project",:programme=>prog2,:description=>"about doing fishing"})

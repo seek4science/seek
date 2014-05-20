@@ -72,5 +72,8 @@ module ProjectsHelper
     html.html_safe
   end
 
+  def remove_member_icon_filename
+    icon_filename_for_key("destroy")
+  end
 
 end

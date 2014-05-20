@@ -822,6 +822,92 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal "investigating fishing",json["description"]
   end
 
+  test "admin members available to admin" do
+    login_as(Factory(:admin))
+    p=Factory(:project)
+    get :admin_members,:id=>p
+    assert_response :success
+  end
+
+  test "admin members not available to normal person" do
+    login_as(Factory(:person))
+    p=Factory(:project)
+    get :admin_members,:id=>p
+    assert_redirected_to :root
+  end
+
+  test "update members" do
+    login_as(Factory(:admin))
+    project = Factory(:project)
+    wg = Factory(:work_group, :project => project)
+    group_membership = Factory(:group_membership, :work_group => wg)
+    person = Factory(:person, :group_memberships => [group_membership])
+    group_membership2 = Factory(:group_membership, :work_group => wg)
+    person2 = Factory(:person, :group_memberships => [group_membership2])
+    new_institution = Factory(:institution)
+    new_person = Factory(:person)
+    new_person2 = Factory(:person)
+    assert_no_difference("GroupMembership.count") do #2 deleted, 2 added
+      assert_difference("WorkGroup.count",1) do
+        post :update_members,
+             :id=>project,
+             :group_memberships_to_remove=>[group_membership.id,group_membership2.id],
+             :people_and_institutions_to_add=>[{"person_id"=>new_person.id,"institution_id"=>new_institution.id}.to_json,{"person_id"=>new_person2.id,"institution_id"=>new_institution.id}.to_json]
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
+    end
+
+    person.reload
+    new_person.reload
+    new_person2.reload
+
+    refute_includes person.projects,project
+    refute_includes person2.projects,project
+    assert_includes new_person.projects,project
+    assert_includes new_person2.projects,project
+    assert_includes new_person.institutions,new_institution
+    assert_includes new_person2.institutions,new_institution
+    assert_includes project.work_groups,wg
+
+  end
+
+  test "person who cannot administer project cannot update members" do
+    login_as(Factory(:person))
+    project = Factory(:project)
+    wg = Factory(:work_group, :project => project)
+    group_membership = Factory(:group_membership, :work_group => wg)
+    person = Factory(:person, :group_memberships => [group_membership])
+    group_membership2 = Factory(:group_membership, :work_group => wg)
+    person2 = Factory(:person, :group_memberships => [group_membership2])
+    new_institution = Factory(:institution)
+    new_person = Factory(:person)
+    new_person2 = Factory(:person)
+    assert_no_difference("GroupMembership.count") do
+      assert_no_difference("WorkGroup.count") do
+        post :update_members,
+             :id=>project,
+             :group_memberships_to_remove=>[group_membership.id,group_membership2.id],
+             :people_and_institutions_to_add=>[{"person_id"=>new_person.id,"institution_id"=>new_institution.id}.to_json,{"person_id"=>new_person2.id,"institution_id"=>new_institution.id}.to_json]
+        assert_redirected_to :root
+        refute_nil flash[:error]
+      end
+    end
+
+    person.reload
+    new_person.reload
+    new_person2.reload
+
+    assert_includes person.projects,project
+    assert_includes person2.projects,project
+    refute_includes new_person.projects,project
+    refute_includes new_person2.projects,project
+    refute_includes new_person.institutions,new_institution
+    refute_includes new_person2.institutions,new_institution
+
+  end
+
 	private
 
 	def valid_project

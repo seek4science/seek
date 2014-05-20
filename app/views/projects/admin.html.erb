@@ -15,7 +15,7 @@
       <% institution_list = Institution.order(:title) %>
 
       <% chosen_institutions = @project.institutions %>
-      <div style="margin-top: 1em; margin-bottom: 2em; margin-left: 2em; width: 90%; height: 500px; overflow: auto;">
+      <div id="project_institutions">
           <% institution_list.each do |institution| %>
               <%= check_box_tag "institution_#{institution.id}", institution.id, chosen_institutions.include?(institution), :class => 'institution_checkbox' %>
               <%= institution.title %>

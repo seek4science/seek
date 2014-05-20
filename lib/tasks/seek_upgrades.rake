@@ -13,14 +13,9 @@ namespace :seek do
             :environment,
             :resynchronise_assay_types,
             :resynchronise_technology_types,
-            :increase_sheet_empty_rows,
+            :remove_invalid_group_memberships,
             :clear_filestore_tmp,
-            :remove_non_seek_authors,
-            :clean_up_sop_specimens,
-            :update_jws_online_root,
-            :update_bioportal_concepts,
             :repopulate_auth_lookup_tables,
-            :drop_solr_index
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -41,48 +36,15 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
-  task(:update_bioportal_concepts=>:environment) do
-    BioportalConcept.all.each do |concept|
-      uri = concept.concept_uri
-      unless uri.include?("purl")
-        uri = uri.gsub(":","_")
-        concept.concept_uri = "http://purl.obolibrary.org/obo/#{uri}"
-      end
-      concept.ontology_id = "NCBITAXON"
-      concept.cached_concept_yaml=nil
-      concept.save!
+  desc("Cleans out group memberships where the person no longer exists")
+  task(:remove_invalid_group_memberships => :environment) do
+    invalid = GroupMembership.select{|gm| gm.person.nil? || gm.work_group.nil?}
+    invalid.each do |inv|
+      inv.destroy
     end
   end
 
-  task(:drop_solr_index=>:environment) do
-    dir = File.join(Rails.root,"solr","data")
-    if File.exists?(dir)
-      FileUtils.remove_dir(dir)
-    end
-  end
 
-  task(:clean_up_sop_specimens=>:environment) do
-    broken = SopSpecimen.all.select{|ss| ss.sop.nil? || ss.specimen.nil?}
-    disable_authorization_checks do
-      broken.each{|b| b.destroy}
-    end
-  end
-
-  task(:update_jws_online_root => :environment) do
-    Seek::Config.jws_online_root = 'https://jws.sysmo-db.org/'
-  end
-
-  desc("Increase the min rows from 10 to 35")
-  task(:increase_sheet_empty_rows => :environment) do
-    worksheets = Worksheet.all.compact
-    min_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS
-    worksheets.each do |ws|
-      if ws.last_row < min_rows
-        ws.last_row = min_rows
-        ws.save
-      end
-    end
-  end
 
   desc("Synchronised the assay types assigned to assays according to the current ontology")
   task(:resynchronise_assay_types => :environment) do
