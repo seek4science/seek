@@ -207,14 +207,10 @@ Exhibit.Importer.prototype._loadURL = function(url, database, callback) {
                 callbackOrig(fragment.html(), status, jqxhr);
             }
         };
-    }
 
-    Exhibit.jQuery.ajax({
-        "url": url,
-        "dataType": "text",
-        "error": fError,
-        "success": callback
-    });
+        data = Exhibit.jQuery(fragmentId);
+        callback(data, 'success', '');
+    }
 };
 
 /**
