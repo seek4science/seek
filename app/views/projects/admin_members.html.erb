@@ -14,9 +14,7 @@
           <li class="institution_member" id="membership_<%= gm.person_id %>_<%= gm.work_group.institution_id %>">
             <%= gm.person.name %>&nbsp;<%= link_to_function content_tag(:span,"",:class=>"remove_member_icon").html_safe,"mark_group_membership_for_removal(#{gm.person.id},#{gm.work_group.institution_id},#{gm.id})" %>
           </li>
-          <script>
-            existingGroupMemberships.push({"person_id":<%=gm.person.id%>,"institution_id":<%= gm.work_group.institution.id %>});
-          </script>
+
       <% end %>
     </ul>
 <% end %>

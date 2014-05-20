@@ -96,13 +96,14 @@ function updateInstitutionIds(){
 }
 
 //project membership administration stuff
-
+var previouslyRemoved = {}
 
 function mark_group_membership_for_removal(person_id,institution_id,group_id) {
     var element_id = "#membership_"+person_id+"_"+institution_id;
     $j(element_id).remove();
     if ($j.isNumeric(group_id)) {
         $j("#group_memberships_to_remove").append("<option val="+group_id+" selected>"+group_id+"</option>");
+        previouslyRemoved[person_id+"_"+institution_id]=group_id;
     }
 }
 
@@ -116,9 +117,19 @@ function add_selected_people() {
         var institution_title = $j("#institution_ids option:selected").text();
         var li_id = "membership_" + person_id+"_"+institution_id;
         if ($j("#"+li_id).length==0) {
-            var json = JSON.stringify({person_id: person_id, institution_id: institution_id, institution_title: institution_title});
-            $j("#people_and_institutions_to_add").append("<option val=" + json + " selected>" + json + "</option>");
-            $j("#person_id").val("");
+            var group_id = previouslyRemoved[person_id+"_"+institution_id];
+            if (group_id) {
+                $j("#group_memberships_to_remove option[val="+group_id+"]").remove();
+                var onclick = "'mark_group_membership_for_removal("+person_id+","+institution_id+",\"" + group_id + "\");";
+                onclick += "return false;'";
+            }
+            else {
+                var json = JSON.stringify({person_id: person_id, institution_id: institution_id, institution_title: institution_title});
+                $j("#people_and_institutions_to_add").append("<option val=" + json + " selected>" + json + "</option>");
+                var onclick = "'mark_group_membership_for_removal("+person_id+","+institution_id+",\"" + dummy_id + "\");";
+                onclick += "remove_from_people_to_add(" + person_id + "," + institution_id + ");";
+                onclick += "return false;'";
+            }
 
             var block = $j("#institution_block_" + institution_id);
             if (block.length == 0) {
@@ -132,9 +143,7 @@ function add_selected_people() {
             var dummy_id = guid();
 
             var li = "<li class='institution_member' id='" + li_id + "'>" + person_name;
-            var onclick = "'mark_group_membership_for_removal("+person_id+","+institution_id+",\"" + dummy_id + "\");";
-            onclick += "remove_from_people_to_add(" + person_id + "," + institution_id + ");";
-            onclick += "return false;'";
+
             li += "&nbsp;" + "<a href='#' onclick=" + onclick + "><span class='remove_member_icon'><//a>";
             li += '<//li>';
             block.append(li);
