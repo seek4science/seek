@@ -1,30 +1,10 @@
+<h1>New technology type</h1>
 
-
-<!--empty form tag is added here, so that the new_suggested_technology_types form below wont be ignored by some browsers, e.g. Chrome,-->
-<form></form>
-<div id="redbox_contents_div" class="redbox_contents " style="width:800px;">
-  <div class="head">
-    <%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
-    <span style="vertical-align:middle;">
-          Create new technology type
-    </span>
+<div class="show_basic">
+  <div style="float:left;">
+    <ul><%= ontology_editor_display "technology", (@suggested_technology_type.uri.blank? ? @suggested_technology_type.default_parent_uri : @suggested_technology_type.uri) %></ul>
   </div>
-  <div class="body">
-    <% if @suggested_technology_type.link_from == "suggested_technology_types"
-            show_editor = false
-            style = ""
-         else
-            show_editor = true
-           style = "float:left;width: 50%"
-        %>
-        <% end %>
-
-    <div style="<%= style %>">
-      <ul><%= ontology_editor_display "technology", (@suggested_technology_type.uri.blank? ? @suggested_technology_type.default_parent_uri : @suggested_technology_type.uri) if show_editor %></ul>
-    </div>
-    <div style="<%= style %>">
-      <%= render :partial =>  'form', :locals => { :action => :new} %>
-    </div>
+  <div style="float:left;">
+    <%= render :partial =>  'form', :locals => { :action => :new} %>
   </div>
 </div>
-

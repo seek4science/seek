@@ -1,4 +1,4 @@
-<h1>Manage suggested <%= t('assays.assay').downcase %> types</h1>
+<h1>Manage <%= t('assays.assay').downcase %> types</h1>
 
 <div class="show_basic">
   <div style="float:left">
@@ -6,7 +6,7 @@
   </div>      
   <div style="float:left">
     <ul class="sectionIcons">
-        <li><%= create_suggested_assay_type_popup_link  %> </li>
+        <li><%= link_to image('new') + " New assay type", new_suggested_assay_type_path %> </li>
         <li><%= image_tag_for_key "new", new_assay_path, "New #{t('assays.assay').downcase}", nil, "New #{t('assays.assay').downcase}" %></li>
     </ul>
   </div>

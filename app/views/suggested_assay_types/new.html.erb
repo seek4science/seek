@@ -1,33 +1,10 @@
-<%  if @suggested_assay_type.link_from == "suggested_assay_types"
-      type = "all_assay_type"
-      show_editor = false
-           style = ""
-    else
-      type = @suggested_assay_type.is_for_modelling ? "modelling_analysis" : "assay"
-      show_editor = true
-          style = "float:left;width: 50%"
-    end
- %>
-
-<!--empty form tag is added here, so that the new_suggested_assay_types form below wont be ignored by some browsers, e.g. Chrome,-->
-<form></form>
-<div id="redbox_contents_div" class="redbox_contents " style="width:800px;">
-  <div class="head">
-    <%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
-    <span style="vertical-align:middle;">
-          Create new <%= t('assays.assay').downcase %> type
-    </span>
+<h1>Create new <%= t('assays.assay').downcase %> type</h1>
+<div class="show_basic">
+  <div style="float:left;">
+    <ul><%= ontology_editor_display "all_assay_type", (@suggested_assay_type.uri.blank? ? @suggested_assay_type.default_parent_uri : @suggested_assay_type.uri) %></ul>
   </div>
-  <div class="body">
-    <div style="<%= style %>">
-      <ul><%= ontology_editor_display type, (@suggested_assay_type.uri.blank? ? @suggested_assay_type.default_parent_uri : @suggested_assay_type.uri) if show_editor %></ul>
-    </div>
-    <div style="<%= style %>">
-      <%= form_for @suggested_assay_type,
-                   :html => {:method => :post, :remote => true} do |f| %>
-          <%= render :partial => "form", :locals => {:f => f, :action => :new, :type => type} -%>
-      <% end -%>
-    </div>
+  <div style="float:left;">
+    <%= render :partial =>  'form', :locals => { :action => :new, :type=> "all_assay_type"} %>
   </div>
 </div>
 

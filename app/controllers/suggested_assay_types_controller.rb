@@ -5,7 +5,7 @@ class SuggestedAssayTypesController < ApplicationController
 
   before_filter :project_membership_required, :only => [:new]
 
-  def new
+  def new_popup
     @suggested_assay_type = SuggestedAssayType.new
     @suggested_assay_type.is_for_modelling = string_to_boolean params[:is_for_modelling]
     @suggested_assay_type.link_from= params[:link_from]
@@ -15,45 +15,84 @@ class SuggestedAssayTypesController < ApplicationController
     end
   end
 
+  def edit_popup
+      @suggested_assay_type=SuggestedAssayType.find(params[:id])
+      respond_to do |format|
+        format.js
+        format.xml { render :xml => @suggested_assay_type }
+      end
+    end
+
+  def new
+     @suggested_assay_type = SuggestedAssayType.new
+     respond_to do |format|
+       format.html
+       format.xml { render :xml => @suggested_assay_type }
+     end
+  end
+
   def edit
     @suggested_assay_type=SuggestedAssayType.find(params[:id])
-    respond_to do |format|
-      format.html
-      format.xml { render :xml => @suggested_assay_type }
-    end
+     respond_to do |format|
+        format.html
+        format.xml { render :xml => @suggested_assay_type }
+     end
   end
 
   def create
     @suggested_assay_type = SuggestedAssayType.new(params[:suggested_assay_type])
     @suggested_assay_type.contributor_id= User.current_user.try(:person_id)
-    render :update do |page|
-      if @suggested_assay_type.save
-        page.call "RedBox.close"
-        if @suggested_assay_type.link_from == "assays"
+    saved = @suggested_assay_type.save
+    if @suggested_assay_type.link_from == "assays"
+      if saved
+        render :update do |page|
+          page.call "RedBox.close"
           page.replace_html 'assay_assay_types_list', :partial => "assays/assay_types_list", :locals => {:suggested_assay_type => @suggested_assay_type, :is_for_modelling => @suggested_assay_type.is_for_modelling}
-        elsif @suggested_assay_type.link_from == "suggested_assay_types"
-          page.redirect_to( :action => "manage")
         end
       else
         page.alert("Fail to create new assay type. #{@suggested_assay_type.errors.full_messages}")
       end
-
+    else
+      respond_to do |format|
+        if saved
+          flash[:notice] = "#{t('assays.assay')} type was successfully created."
+          format.html { redirect_to( :action => "manage") }
+          format.xml { head :ok }
+        else
+          format.html { render :action => :new }
+          format.xml { render :xml => @suggested_assay_type.errors, :status => :unprocessable_entity }
+        end
+      end
     end
+
+
 
   end
 
   def update
     @suggested_assay_type=SuggestedAssayType.find(params[:id])
     @suggested_assay_type.attributes = params[:suggested_assay_type]
-    respond_to do |format|
-      if @suggested_assay_type.save
+    saved = @suggested_assay_type.save
+    if params[:commit_popup]
+      render :update do |page|
+        if saved
+          page.replace_html 'assay_assay_types_list', :partial => "assays/assay_types_list", :locals => {:suggested_assay_type => @suggested_assay_type, :is_for_modelling => @suggested_assay_type.is_for_modelling}
+          page.call "RedBox.close"
+        else
+           page.alert("Fail to edit assay type. #{@suggested_assay_type.errors.full_messages}")
+        end
+      end
 
-        flash[:notice] = "#{t('assays.assay')} type was successfully updated."
-        format.html { redirect_to( :action => "manage") }
-        format.xml { head :ok }
-      else
-        format.html { render :action => :edit }
-        format.xml { render :xml => @suggested_assay_type.errors, :status => :unprocessable_entity }
+    else
+      respond_to do |format|
+        if saved
+          flash[:notice] = "#{t('assays.assay')} type was successfully updated."
+          format.html { redirect_to( :action => "manage") }
+          format.xml { head :ok }
+        else
+          format.html { render :action => :edit }
+          format.xml { render :xml => @suggested_assay_type.errors, :status => :unprocessable_entity }
+        end
       end
     end
   end

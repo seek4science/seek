@@ -240,12 +240,20 @@ SEEK::Application.routes.draw do
   resources :suggested_assay_types do
       collection do
         get :manage
+        get :new_popup
+      end
+      member do
+        get :edit_popup
       end
   end
   resources :suggested_technology_types do
-      collection do
-        get :manage
-      end
+    collection do
+      get :manage
+      get :new_popup
+    end
+    member do
+      get :edit_popup
+    end
   end
 
   get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"

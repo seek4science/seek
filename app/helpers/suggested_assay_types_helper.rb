@@ -3,7 +3,7 @@ module SuggestedAssayTypesHelper
   def create_suggested_assay_type_popup_link is_for_modelling=nil, link_from="suggested_assay_types"
     link_title = is_for_modelling ? "new modelling analysis type" : "new assay type"
     return link_to_remote_redbox(image("new") + ' ' + link_title,
-                                 {:url => new_suggested_assay_type_path,
+                                 {:url => new_popup_suggested_assay_types_path,
                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
                                   :with => "'is_for_modelling=#{is_for_modelling}' +'&link_from=#{link_from}'",
                                   :method=> :get
@@ -12,7 +12,7 @@ module SuggestedAssayTypesHelper
   end
 
   #select tag without form
-  def ontology_selection_list type, element_name, selected_uri, html_options={}
+  def ontology_selection_list type, element_name, selected_uri, disabled_uris={}, html_options={}
     case type
       when "assay", "modelling_analysis", "technology"
         reader = reader_for_type(type)
@@ -30,7 +30,7 @@ module SuggestedAssayTypesHelper
         options = []
     end
 
-    select_tag element_name, options_for_select(options, :selected => selected_uri), html_options
+    select_tag element_name, options_for_select(options, :selected => selected_uri, :disabled=> disabled_uris), html_options
   end
 
   # type: assay type,technology type
@@ -41,7 +41,6 @@ module SuggestedAssayTypesHelper
     case type
       when "assay"
         list += render_list("assay", selected_uri)
-      #roots =   classes.hash_by_uri[reader.default_parent_class_uri.try(:to_s)]
       when "modelling_analysis"
         list += render_list("modelling_analysis",  selected_uri)
       when "all_assay_type"
@@ -73,8 +72,18 @@ module SuggestedAssayTypesHelper
     path = send("#{type}_types_path", :uri => uri, :label => clz.label)
     assays = clz.assays
     assay_stat = assays.size == 0 ? "" : "<span style='color: #666666;'>(#{assays.size} assays)</span>".html_safe
+    popup_edit_link = link_to_with_callbacks(image("edit"), :html => {:remote => true },
+                                        :url=> send("edit_popup_suggested_#{type}_type_path", :id => clz),
+                                        :method => :get,
+                                        :loading=> "$('RB_redbox').scrollTo();Element.show('edit_suggested_type_spinner'); Element.hide('new_suggested_#{type}_type_form')",
+                                        :loaded => "Element.hide('edit_suggested_type_spinner'); Element.show('new_suggested_#{type}_type_form')"
+                                       )
+    edit_link = link_to(image("edit"),send("edit_suggested_#{type}_type_path", :id => clz) , { :style => "vertical-align:middle"})
+    edit_path = action_name == "new_popup" ? popup_edit_link : edit_link if clz.can_edit?
+
+
     clz_link = is_suggested?(clz) ? link_to(clz.label, path, {:style => "color:green;font-style:italic"}) + "*" + " " +
-        (clz.can_edit? ? link_to(image("edit"), edit_polymorphic_path(clz), {:style => "vertical-align:middle"}) : "") + " " +
+        (clz.can_edit? ? edit_path : "") + " " +
         (clz.can_destroy? && action_name =="manage" ? link_to(image("destroy"), clz, :confirm =>
             "Are you sure you want to remove this #{type} type?  This cannot be undone.", :method => :delete, :style => "vertical-align:middle") : "").html_safe : link_to(clz.label, path)
     clz_li = "<li style=\"margin-left:#{12*depth}px;#{uri == selected_uri ? "background-color: lightblue;" : ""}\">" + (depth>0 ? "└ " : " ")+ clz_link + assay_stat + "</li>"

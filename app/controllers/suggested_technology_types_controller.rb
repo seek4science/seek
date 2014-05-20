@@ -6,7 +6,7 @@ class SuggestedTechnologyTypesController < ApplicationController
    before_filter :project_membership_required, :only=>[:new]
 
 
-    def new
+    def new_popup
       @suggested_technology_type = SuggestedTechnologyType.new
       @suggested_technology_type.link_from= params[:link_from]
       respond_to do |format|
@@ -14,6 +14,22 @@ class SuggestedTechnologyTypesController < ApplicationController
         format.xml { render :xml => @suggested_technology_type }
       end
     end
+
+     def new
+       @suggested_technology_type = SuggestedTechnologyType.new
+       respond_to do |format|
+         format.html
+         format.xml { render :xml => @suggested_technology_type }
+       end
+     end
+
+  def edit_popup
+    @suggested_technology_type=SuggestedTechnologyType.find(params[:id])
+    respond_to do |format|
+      format.js
+      format.xml { render :xml => @suggested_technology_type }
+    end
+  end
 
     def edit
       @suggested_technology_type=SuggestedTechnologyType.find(params[:id])
@@ -29,18 +45,27 @@ class SuggestedTechnologyTypesController < ApplicationController
     def create
       @suggested_technology_type = SuggestedTechnologyType.new(params[:suggested_technology_type])
       @suggested_technology_type.contributor_id= User.current_user.try(:person_id)
-      render :update do |page|
-        if @suggested_technology_type.save
-          page.call "RedBox.close"
-          if @suggested_technology_type.link_from == "assays"
+      saved = @suggested_technology_type.save
+      if @suggested_technology_type.link_from == "assays"
+        if saved
+          render :update do |page|
+            page.call "RedBox.close"
             page.replace_html 'assay_technology_types_list', :partial => "assays/technology_types_list", :locals => {:suggested_technology_type => @suggested_technology_type}
-          elsif @suggested_technology_type.link_from == "suggested_technology_types"
-            page.redirect_to( :action => "manage")
           end
         else
           page.alert("Fail to create new technology type. #{@suggested_technology_type.errors.full_messages}")
         end
-
+      else
+        respond_to do |format|
+          if saved
+            flash[:notice] = "technology type was successfully created."
+            format.html { redirect_to( :action => "manage") }
+            format.xml { head :ok }
+          else
+            format.html { render :action => :new }
+            format.xml { render :xml => @suggested_technology_type.errors, :status => :unprocessable_entity }
+          end
+        end
       end
 
     end
@@ -48,15 +73,27 @@ class SuggestedTechnologyTypesController < ApplicationController
     def update
       @suggested_technology_type=SuggestedTechnologyType.find(params[:id])
       @suggested_technology_type.attributes = params[:suggested_technology_type]
-      respond_to do |format|
-        if @suggested_technology_type.save
+      saved = @suggested_technology_type.save
+      if params[:commit_popup]
+        render :update do |page|
+          if saved
+            page.replace_html 'assay_technology_types_list', :partial => "assays/technology_types_list", :locals => {:suggested_technology_type => @suggested_technology_type}
+            page.call "RedBox.close"
+          else
+            page.alert("Fail to edit technology type. #{@suggested_technology_type.errors.full_messages}")
+          end
+        end
 
-          flash[:notice] = "Technology type was successfully updated."
-          format.html { redirect_to(:action => "manage") }
-          format.xml { head :ok }
-        else
-          format.html { render :action => :edit }
-          format.xml { render :xml => @suggested_technology_type.errors, :status => :unprocessable_entity }
+      else
+        respond_to do |format|
+          if saved
+            flash[:notice] = "technology type was successfully updated."
+            format.html { redirect_to( :action => "manage") }
+            format.xml { head :ok }
+          else
+            format.html { render :action => :edit }
+            format.xml { render :xml => @suggested_technology_type.errors, :status => :unprocessable_entity }
+          end
         end
       end
     end

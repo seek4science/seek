@@ -1,0 +1,8 @@
+#page << '$$("div#RB_redbox div.head span")[0].textContent = "Edit assay type"';
+
+
+page.select('div#RB_redbox div.head span').first.textContent = "Edit assay type";
+type = @suggested_assay_type.is_for_modelling ? "modelling_analysis" : "assay"
+page.replace_html :new_suggested_assay_type_form, :partial => "form", :locals=> {:action=> :edit_popup, :type => type}
+page[:suggested_assay_type_label].focus
+
