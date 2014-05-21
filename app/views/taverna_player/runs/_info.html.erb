@@ -8,6 +8,12 @@
     </p>
   <% end %>
 
+  <% if run.can_manage? && !current_user.guest? -%>
+      <p>
+        <%= describe_visibility(run) -%>
+      </p>
+  <% end %>
+
   <div style="float: left; width: 300px; margin-right: 50px;">
     <p>
       <b>Workflow:</b>

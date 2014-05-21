@@ -25,6 +25,12 @@
 <%= render :partial => "assets/simple_new_version_form", :locals => {:resource => @workflow} -%>
 
 <div class="main_content_left_box">
+  <% if @workflow.can_manage? && !current_user.guest? -%>
+      <p>
+        <%= describe_visibility(@workflow) -%>
+      </p>
+  <% end %>
+
   <% if @workflow.version > 1 %>
       <span style="font-weight: bold;">Version: </span>
       <%= resource_version_selection @workflow, @display_workflow -%>
