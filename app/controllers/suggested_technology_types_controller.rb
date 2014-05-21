@@ -40,14 +40,15 @@ class SuggestedTechnologyTypesController < ApplicationController
     @suggested_technology_type.contributor_id= User.current_user.try(:person_id)
     saved = @suggested_technology_type.save
     if @suggested_technology_type.link_from == "assays"
-      if saved
-        render :update do |page|
+      render :update do |page|
+        if saved
           page.call "RedBox.close"
           page.replace_html 'assay_technology_types_list', :partial => "assays/technology_types_list", :locals => {:suggested_technology_type => @suggested_technology_type}
+        else
+          page.alert("Fail to create new technology type. #{@suggested_technology_type.errors.full_messages}")
         end
-      else
-        page.alert("Fail to create new technology type. #{@suggested_technology_type.errors.full_messages}")
       end
+
     else
       respond_to do |format|
         if saved

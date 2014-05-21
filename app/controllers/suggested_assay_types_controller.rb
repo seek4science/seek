@@ -42,13 +42,14 @@ class SuggestedAssayTypesController < ApplicationController
     @suggested_assay_type.contributor_id= User.current_user.try(:person_id)
     saved = @suggested_assay_type.save
     if @suggested_assay_type.link_from == "assays"
-      if saved
-        render :update do |page|
+      render :update do |page|
+        if saved
           page.call "RedBox.close"
           page.replace_html 'assay_assay_types_list', :partial => "assays/assay_types_list", :locals => {:suggested_assay_type => @suggested_assay_type, :is_for_modelling => @suggested_assay_type.is_for_modelling}
+
+        else
+          page.alert("Fail to create new assay type. #{@suggested_assay_type.errors.full_messages}")
         end
-      else
-        page.alert("Fail to create new assay type. #{@suggested_assay_type.errors.full_messages}")
       end
     else
       respond_to do |format|
