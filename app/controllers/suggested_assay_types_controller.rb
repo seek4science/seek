@@ -1,9 +1,13 @@
 class SuggestedAssayTypesController < ApplicationController
-  # all login users can manage assay types by editing their own ones
-  # admins can even delete them
-  before_filter :check_allowed_to_manage_types, :only => [:destroy]
+  # all login users can edit their OWN created assay types
+  # only admins can manage(i.e. edit and delete)
 
-  before_filter :project_membership_required, :only => [:new]
+  before_filter :check_allowed_to_manage_types, :only => [:destroy, :manage]
+
+  before_filter :project_membership_required_appended, :only => [:new_popup, :manage]
+
+  before_filter :find_and_authorize_requested_item, :only => [:edit, :edit_popup, :destroy]
+
 
   def new_popup
     @suggested_assay_type = SuggestedAssayType.new
@@ -16,27 +20,25 @@ class SuggestedAssayTypesController < ApplicationController
   end
 
   def edit_popup
-      @suggested_assay_type=SuggestedAssayType.find(params[:id])
-      respond_to do |format|
-        format.js
-        format.xml { render :xml => @suggested_assay_type }
-      end
+    respond_to do |format|
+      format.js
+      format.xml { render :xml => @suggested_assay_type }
     end
+  end
 
   def new
-     @suggested_assay_type = SuggestedAssayType.new
-     respond_to do |format|
-       format.html
-       format.xml { render :xml => @suggested_assay_type }
-     end
+    @suggested_assay_type = SuggestedAssayType.new
+    respond_to do |format|
+      format.html
+      format.xml { render :xml => @suggested_assay_type }
+    end
   end
 
   def edit
-    @suggested_assay_type=SuggestedAssayType.find(params[:id])
-     respond_to do |format|
-        format.html
-        format.xml { render :xml => @suggested_assay_type }
-     end
+    respond_to do |format|
+      format.html
+      format.xml { render :xml => @suggested_assay_type }
+    end
   end
 
   def create
@@ -56,7 +58,7 @@ class SuggestedAssayTypesController < ApplicationController
       respond_to do |format|
         if saved
           flash[:notice] = "#{t('assays.assay')} type was successfully created."
-          format.html { redirect_to( :action => "manage") }
+          format.html { redirect_to(:action => "manage") }
           format.xml { head :ok }
         else
           format.html { render :action => :new }
@@ -64,7 +66,6 @@ class SuggestedAssayTypesController < ApplicationController
         end
       end
     end
-
 
 
   end
@@ -79,7 +80,7 @@ class SuggestedAssayTypesController < ApplicationController
           page.replace_html 'assay_assay_types_list', :partial => "assays/assay_types_list", :locals => {:suggested_assay_type => @suggested_assay_type, :is_for_modelling => @suggested_assay_type.is_for_modelling}
           page.call "RedBox.close"
         else
-           page.alert("Fail to edit assay type. #{@suggested_assay_type.errors.full_messages}")
+          page.alert("Fail to edit assay type. #{@suggested_assay_type.errors.full_messages}")
         end
       end
 
@@ -87,7 +88,7 @@ class SuggestedAssayTypesController < ApplicationController
       respond_to do |format|
         if saved
           flash[:notice] = "#{t('assays.assay')} type was successfully updated."
-          format.html { redirect_to( :action => "manage") }
+          format.html { redirect_to(:action => "manage") }
           format.xml { head :ok }
         else
           format.html { render :action => :edit }
@@ -98,20 +99,19 @@ class SuggestedAssayTypesController < ApplicationController
   end
 
   def manage
-     respond_to do |format|
-       format.html
-       format.xml
-     end
+    respond_to do |format|
+      format.html
+      format.xml
+    end
   end
 
   def destroy
-    @suggested_assay_type=SuggestedAssayType.find(params[:id])
     respond_to do |format|
       if @suggested_assay_type.can_destroy?
         title = @suggested_assay_type.label
         @suggested_assay_type.destroy
         flash[:notice] = "#{t('assays.assay')} type #{title} was deleted."
-        format.html { redirect_to( :action => "manage") }
+        format.html { redirect_to(:action => "manage") }
         format.xml { head :ok }
       else
         if !@suggested_assay_type.children.empty?
@@ -126,7 +126,6 @@ class SuggestedAssayTypesController < ApplicationController
       end
     end
   end
-
 
 
   private
