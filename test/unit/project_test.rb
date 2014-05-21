@@ -330,6 +330,7 @@ class ProjectTest < ActiveSupport::TestCase
   test "gatekeepers" do
     User.with_current_user(Factory(:admin)) do
       person=Factory(:person_in_multiple_projects)
+      assert_equal 3,person.projects.count
       proj1 = person.projects.first
       proj2 = person.projects.last
       person.is_gatekeeper=true,proj1

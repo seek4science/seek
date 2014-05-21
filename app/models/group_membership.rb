@@ -8,6 +8,8 @@ class GroupMembership < ActiveRecord::Base
   after_save :queue_update_auth_table
   after_destroy :queue_update_auth_table
 
+  validates :work_group,:presence => true
+
   def queue_update_auth_table
     people = [Person.find_by_id(person_id)]
     people << Person.find_by_id(person_id_was) unless person_id_was.blank?

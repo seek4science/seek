@@ -1,65 +1,69 @@
 <%= javascript_include_tag 'projects' %>
 <%= stylesheet_link_tag 'projects' %>
 
-<div id="project_institutions">
-<% @project.work_groups.sort{|a,b| a.institution.title <=> b.institution.title}.each do |work_group| %>
-    <%
-        institution_label_id = "institution_label_#{work_group.institution.id}"
-        ul_id = "institution_block_#{work_group.institution.id}"
-    %>
-    <ul class="institution_members" id="<%= ul_id %>">
-    <span class="institution_label" id="<%= institution_label_id %>"><%= work_group.institution.title %></span>
+<div id="admin_members">
+  <div id="project_institutions">
+    <% @project.work_groups.sort { |a, b| a.institution.title <=> b.institution.title }.each do |work_group| %>
+        <%
+           institution_label_id = "institution_label_#{work_group.institution.id}"
+           ul_id = "institution_block_#{work_group.institution.id}"
+        %>
+        <ul class="institution_members" id="<%= ul_id %>">
+          <span class="institution_label" id="<%= institution_label_id %>"><%= work_group.institution.title %></span>
 
-      <% work_group.group_memberships.select{|gm| !gm.person.nil?}.each do |gm| %>
-          <li class="institution_member" id="group_membership_<%= gm.id %>">
-            <%= gm.person.name %>&nbsp;<%= link_to_function content_tag(:span,"",:class=>"remove_member_icon").html_safe,"mark_group_membership_for_removal(#{gm.id})" %>
-          </li>
-      <% end %>
-    </ul>
-<% end %>
+          <% work_group.group_memberships.select { |gm| !gm.person.nil? }.each do |gm| %>
+              <li class="institution_member" id="membership_<%= gm.person_id %>_<%= gm.work_group.institution_id %>">
+                <%= gm.person.name %>&nbsp;<%= link_to_function content_tag(:span, "", :class => "remove_member_icon").html_safe, "mark_group_membership_for_removal(#{gm.person.id},#{gm.work_group.institution_id},#{gm.id})" %>
+              </li>
 
+          <% end %>
+        </ul>
+    <% end %>
 
+  </div>
+
+  <%= form_tag(update_members_project_path(@project)) do %>
+      <div style="display:none">
+        <div>Techy stuff should be hidden</div>
+        Groups to remove:<%= select_tag :group_memberships_to_remove, [], :multiple => true -%>
+        <br/>
+        People and institution to add:<%= select_tag :people_and_institutions_to_add, [], :multiple => true %>
+      </div>
+      <%= submit_tag "Submit" %>
+  <% end -%>
 </div>
 
-<h2>Add members</h2>
+
 <div id="add_member">
+  <h3>Add members</h3>
 
+  Select the institution, and the additional people from that institution for this <%= t('project').downcase %></strong>
+  <br/>
+  <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title") %>
+  <br/>
 
-  Select the institution, and the additional people from that institution for this <%= t('project').downcase %></strong><br/>
-  <%= select_tag :institution_ids,options_from_collection_for_select(Institution.order(:title),"id","title") %><br/>
+  <table id="facebook">
+    <tr>
+      <td>
+        <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('person_autocomplete_input').focus();" style="width: 400px;">
+          <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="people_hidden_input" tabindex="-1"></span>
 
-<table id="facebook" class="">
-  <tr>
-    <td>
-      <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('person_autocomplete_input').focus();" style="width: 400px;">
-        <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="people_hidden_input" tabindex="-1" ></span>
-
-        <div id="person_autocomplete_display" class="tokenizer_input">
-          <input type="text" size="1" tabindex="" id="person_autocomplete_input" />
+          <div id="person_autocomplete_display" class="tokenizer_input">
+            <input type="text" size="1" tabindex="" id="person_autocomplete_input"/>
+          </div>
         </div>
-      </div>
-      <div id="person_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
-        <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
-      </div>
-    </td>
-  </tr>
-</table>
-<%= link_to_function (image("new") + " Add") ,"add_selected_people()",:class=>"block_link"  %>
+        <div id="person_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
+          <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <%= link_to_function (image("new") + " Add"), "add_selected_people()", :class => "block_link" %>
 </div>
 
 
-<%= form_tag(update_members_project_path(@project)) do %>
-<div style="display:ndone">
-  <div>Techy stuff should be hidden</div>
-  Groups to remove:<%= select_tag :group_memberships_to_remove,[],:multiple=>true -%><br/>
-  People and institution to add:<%= select_tag :people_and_institutions_to_add,[],:multiple=>true %>
-</div>
-    <%= submit_tag "Submit" %>
-<% end -%>
+
 
 <script type="application/javascript">
-
-  setup_autocompleter(<%= Person.get_all_as_json.html_safe  -%>);
-
-
+    setup_autocompleter(<%= Person.get_all_as_json.html_safe  -%>);
 </script>

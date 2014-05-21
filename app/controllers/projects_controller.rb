@@ -277,12 +277,12 @@ class ProjectsController < ApplicationController
         work_group = WorkGroup.where(:project_id=>@project.id,:institution_id => institution_id).first
         work_group ||= WorkGroup.new(:project=>@project,:institution=>institution)
         group_membership = GroupMembership.new :work_group=>work_group,:person=>person
-        group_membership.save!
         work_group.save!
+        group_membership.save!
       end
     end
 
-    flash[:notice]="The members and institutions of #{t('project')} #{@project.title} were updated"
+    flash[:notice]="The members and institutions of the #{t('project')}.downcase '#{@project.title}' have been updated"
 
     respond_with(@project) do |format|
       format.html {redirect_to project_path(@project)}

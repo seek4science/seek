@@ -96,48 +96,84 @@ function updateInstitutionIds(){
 }
 
 //project membership administration stuff
-function mark_group_membership_for_removal(id) {
-    var element_id = "#group_membership_"+id;
-    $j(element_id).hide();
-    if ($j.isNumeric(id)) {
-        $j("#group_memberships_to_remove").append("<option val="+id+" selected>"+id+"</option>");
+var previouslyRemoved = {}
+
+function mark_group_membership_for_removal(person_id,institution_id,group_id) {
+    var element_id = "#membership_"+person_id+"_"+institution_id;
+    $j(element_id).remove();
+    if ($j.isNumeric(group_id)) {
+        var option = document.createElement("option");
+        option.value = group_id;
+        option.text = group_id;
+        option.selected=true;
+        $j("#group_memberships_to_remove").append(option);
+        previouslyRemoved[person_id+"_"+institution_id]=group_id;
     }
-
-
-    //need to also remove people added in this session
 }
 
 function add_selected_people() {
     var people = determine_selected_people();
-
 
     $j.each(people, function (index, value) {
         var person_id = value["person_id"];
         var person_name = value["person_name"];
         var institution_id = $j("#institution_ids").val();
         var institution_title = $j("#institution_ids option:selected").text();
-        var json = JSON.stringify({person_id: person_id, institution_id: institution_id, institution_title: institution_title});
-        $j("#people_and_institutions_to_add").append("<option val=" + json + " selected>" + json + "</option>");
-        $j("#person_id").val("");
+        var li_id = "membership_" + person_id+"_"+institution_id;
+        if ($j("#"+li_id).length==0) {
+            var group_id = previouslyRemoved[person_id+"_"+institution_id];
+            if (group_id) {
+                $j("#group_memberships_to_remove option[value="+group_id+"]").remove();
+                var onclick = function () {
+                    mark_group_membership_for_removal(person_id,institution_id,group_id);
+                    return false;
+                }
+            }
+            else {
+                var dummy_id = guid();
+                var json = JSON.stringify({person_id: person_id, institution_id: institution_id, institution_title: institution_title});
+                var option = document.createElement('option');
+                option.value=json;
+                option.text=json;
+                option.selected=true;
+                $j("#people_and_institutions_to_add").append(option);
+                var onclick = "'mark_group_membership_for_removal("+person_id+","+institution_id+",\"" + dummy_id + "\");";
+                onclick = function() {
+                    remove_from_people_to_add(person_id,institution_id);
+                    mark_group_membership_for_removal(person_id,institution_id,dummy_id);
+                    return false;
+                }
+            }
 
-        var block = $j("#institution_block_" + institution_id);
-        if (block.length == 0) {
-            var ul = "<ul class='institution_members' id='institution_block_" + institution_id + "'>";
-            ul += "<span class='institution_label' id='institution_label_" + institution_id + "'>";
-            ul += institution_title;
-            ul += "<//span><//ul>";
-            $j("#project_institutions").append(ul);
-            block = $j("#institution_block_" + institution_id);
+            var block = $j("#institution_block_" + institution_id);
+            if (block.length == 0) {
+                var ul = document.createElement('ul');
+                ul.className = "institution_members";
+                ul.id = 'institution_block_' + institution_id;
+                var span = document.createElement('span');
+                span.className="institution_label";
+                span.id="institution_label_" + institution_id;
+                span.innerHTML = institution_title;
+                ul.appendChild(span);
+                $j("#project_institutions").append(ul);
+                block = $j("#institution_block_" + institution_id);
+            }
+
+            var li = document.createElement('li');
+            li.id=li_id;
+            li.className="institution_member";
+            li.innerHTML = person_name+"&nbsp;";
+            var a = document.createElement('a');
+            var icon_span = document.createElement("span");
+            icon_span.className='remove_member_icon';
+            a.appendChild(icon_span);
+            a.href="#";
+            a.onclick=onclick;
+            li.appendChild(a);
+
+            block.append(li);
         }
-        var dummy_id = guid();
-        var li_id = "group_membership_" + dummy_id;
-        var li = "<li class='institution_member' id='" + li_id + "'>" + person_name;
-        var onclick = "'mark_group_membership_for_removal(\"" + dummy_id + "\");";
-        onclick += "remove_from_people_to_add(" + person_id + "," + institution_id + ");";
-        onclick += "return false;'";
-        li += "&nbsp;" + "<a href='#' onclick=" + onclick + "><span class='remove_member_icon'><//a>";
-        li += '<//li>';
-        block.append(li);
+
     });
 
     autocompleters["person_autocompleter"].deleteAllTokens();

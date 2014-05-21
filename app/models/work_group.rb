@@ -4,6 +4,8 @@ class WorkGroup < ActiveRecord::Base
   has_many :group_memberships, :dependent => :destroy
   has_many :people, :through=>:group_memberships
 
+  validates :project,:institution,:presence => true
+
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :institution, :project
 
@@ -18,6 +20,5 @@ class WorkGroup < ActiveRecord::Base
   def description
     project.title + " at " + institution.title
   end
-
 
 end
