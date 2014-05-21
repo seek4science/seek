@@ -6,7 +6,7 @@ class SuggestedAssayTypesController < ApplicationController
 
   before_filter :project_membership_required_appended, :only => [:new_popup, :manage]
 
-  before_filter :find_and_authorize_requested_item, :only => [:edit, :edit_popup, :destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:edit, :destroy]
 
 
   def new_popup
@@ -19,12 +19,7 @@ class SuggestedAssayTypesController < ApplicationController
     end
   end
 
-  def edit_popup
-    respond_to do |format|
-      format.js
-      format.xml { render :xml => @suggested_assay_type }
-    end
-  end
+
 
   def new
     @suggested_assay_type = SuggestedAssayType.new
@@ -37,6 +32,7 @@ class SuggestedAssayTypesController < ApplicationController
   def edit
     respond_to do |format|
       format.html
+      format.js
       format.xml { render :xml => @suggested_assay_type }
     end
   end

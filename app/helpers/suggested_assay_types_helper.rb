@@ -72,14 +72,14 @@ module SuggestedAssayTypesHelper
     path = send("#{type}_types_path", :uri => uri, :label => clz.label)
     assays = clz.assays
     assay_stat = assays.size == 0 ? "" : "<span style='color: #666666;'>(#{assays.size} assays)</span>".html_safe
-    popup_edit_link = link_to_with_callbacks(image("edit"), :html => {:remote => true },
-                                        :url=> send("edit_popup_suggested_#{type}_type_path", :id => clz),
+    edit_link_remote = link_to_with_callbacks(image("edit"), :html => {:remote => true,:method=> :get},#:href=> send("edit_suggested_#{type}_type_path", :id => clz)},
+                                        :url=> send("edit_suggested_#{type}_type_path", :id => clz),
                                         :method => :get,
                                         :loading=> "$('RB_redbox').scrollTo();Element.show('edit_suggested_type_spinner'); Element.hide('new_suggested_#{type}_type_form')",
                                         :loaded => "Element.hide('edit_suggested_type_spinner'); Element.show('new_suggested_#{type}_type_form')"
                                        )
     edit_link = link_to(image("edit"),send("edit_suggested_#{type}_type_path", :id => clz) , { :style => "vertical-align:middle"})
-    edit_path = action_name == "new_popup" ? popup_edit_link : edit_link if clz.can_edit?
+    edit_path = action_name == "new_popup" ? edit_link_remote : edit_link if clz.can_edit?
 
 
     clz_link = is_suggested?(clz) ? link_to(clz.label, path, {:style => "color:green;font-style:italic"}) + "*" + " " +

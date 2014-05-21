@@ -242,17 +242,12 @@ SEEK::Application.routes.draw do
         get :manage
         get :new_popup
       end
-      member do
-        get :edit_popup
-      end
+
   end
   resources :suggested_technology_types do
     collection do
       get :manage
       get :new_popup
-    end
-    member do
-      get :edit_popup
     end
   end
 

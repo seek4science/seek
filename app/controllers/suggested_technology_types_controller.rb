@@ -5,7 +5,7 @@ class SuggestedTechnologyTypesController < ApplicationController
   before_filter :check_allowed_to_manage_types, :only => [:destroy, :manage]
 
   before_filter :project_membership_required_appended, :only => [:new_popup, :manage]
-  before_filter :find_and_authorize_requested_item, :only => [:edit, :edit_popup, :destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:edit, :destroy]
 
   def new_popup
     @suggested_technology_type = SuggestedTechnologyType.new
@@ -24,18 +24,12 @@ class SuggestedTechnologyTypesController < ApplicationController
     end
   end
 
-  def edit_popup
-    respond_to do |format|
-      format.js
-      format.xml { render :xml => @suggested_technology_type }
-    end
-  end
 
   def edit
     @suggested_technology_type.link_from= params[:link_from]
-    @suggested
     respond_to do |format|
       format.html
+      format.js
       format.xml { render :xml => @suggested_technology_type }
     end
   end
