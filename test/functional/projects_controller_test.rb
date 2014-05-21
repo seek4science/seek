@@ -10,7 +10,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	fixtures :all
 
 	def setup
-		login_as(Factory(:admin).user)
+		login_as(Factory(:admin))
   end
 
   def rest_api_test_object

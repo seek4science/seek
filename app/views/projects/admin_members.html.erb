@@ -50,7 +50,7 @@
 
 
 <%= form_tag(update_members_project_path(@project)) do %>
-<div style="display:ndone">
+<div style="display:block">
   <div>Techy stuff should be hidden</div>
   Groups to remove:<%= select_tag :group_memberships_to_remove,[],:multiple=>true -%><br/>
   People and institution to add:<%= select_tag :people_and_institutions_to_add,[],:multiple=>true %>
