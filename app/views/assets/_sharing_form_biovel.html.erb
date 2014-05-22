@@ -291,7 +291,7 @@
                         </div>
 
                         <select name="individual_people_access_type_select" id="individual_people_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;">
-                          <%= policy_selection_options nil, @resource -%>
+                          <%= policy_selection_options nil, @resource, Policy::ACCESSIBLE -%>
                         </select>
                       </td>
 
