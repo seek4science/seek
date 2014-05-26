@@ -340,7 +340,7 @@ Exhibit.ControlPanel.prototype.reconstruct = function() {
     }
 };
 
-Exhibit.jQuery(document).one(
+Exhibit.jQuery(document).bind(
     "registerComponents.exhibit",
     Exhibit.ControlPanel.registerComponent
 );
