@@ -29,7 +29,7 @@
         <div class="yui-u" style="float:right;width: 15%;">
           <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
           <br/>
-          <b>Filter items by:</b>
+          <b>Filter <%= internationalized_resource_name(object_type)%> by:</b>
           <hr/>
           <% count = 0 %>
           <% facet_config.each do |key, value| %>
