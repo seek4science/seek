@@ -517,6 +517,8 @@ SEEK::Application.routes.draw do
   match '/search/' => 'search#index', :as => :search
   match '/search/save' => 'search#save', :as => :save_search
   match '/search/delete' => 'search#delete', :as => :delete_search
+  match '/search/faceted_items' => 'search#faceted_items', :via => :get
+  match '/search/search_items' => 'search#search_items', :via => :get
   match 'svg/:id.:format' => 'svg#show', :as => :svg
   match '/tags' => 'tags#index', :as => :all_tags
   match '/tags/:id' => 'tags#show', :as => :show_tag
