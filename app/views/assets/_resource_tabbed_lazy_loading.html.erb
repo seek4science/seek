@@ -1,0 +1,60 @@
+<% tabs_id ||= "resource_list_by_class" -%>
+<% scale_title ||= "all" -%>
+<% external_resource_hash ||= {} %>
+<% actions_partial_disable ||=false%>
+<script type="text/javascript">
+    tabber_ids.push("<%= tabs_id -%>");
+</script>
+
+<% if !resource_hash.blank? || !external_resource_hash.blank? -%>
+    <div id='<%= "#{tabs_id}_spinner" -%>'>
+      <center>
+        <%= image_tag "ajax-loader-large.gif" -%>
+      </center>
+    </div>
+    <div <%= "id= #{tabs_id}" if tabs_id -%> class="tabber" style="display:none;">
+      <%
+         sorted_result_keys = resource_hash.keys.sort_by do |key|
+           ASSET_ORDER.index(key)
+         end
+      %>
+
+      <% sorted_result_keys.each do |key| -%>
+          <% visible_resource_type = key -%>
+          <div class="tabbertab">
+            <% tab_title = "#{visible_resource_type} (#{resource_hash[key].count})" -%>
+            <h3 class="<%= scale_title %>_<%= key %>"><%= tab_title -%></h3>
+          </div>
+      <% end %>
+
+      <% if !external_resource_hash.blank? %>
+          <%= render :partial => "assets/external_search_result_tab", :locals => {:external_resource_hash => external_resource_hash,
+                                                                                  :scale_title => scale_title} %>
+      <% end %>
+
+    </div>
+    <% sorted_result_keys.each do |key| -%>
+        <div id="<%= scale_title %>_<%= key %>_view_some"></div>
+        <div id="<%= scale_title %>_<%= key %>_view_all"></div>
+    <% end %>
+
+    <script type="text/javascript">
+        load_tabs();
+        <% sorted_result_keys.each do |key| %>
+        tab_on_click('<%= scale_title %>', '<%= key %>', '<%=resource_hash[key].collect(&:id).join(',') %>' ,'<%=actions_partial_disable%>');
+        <% end %>
+
+        //Load content for first tab
+        var first_tab = document.getElementsByClassName('<%= scale_title %>' + '_' + '<%= sorted_result_keys.first %>')[0];
+        if (first_tab != null){
+            first_tab.click();
+        }
+    </script>
+
+<% else -%>
+    <span class="none_text">No items.</span>
+<% end -%>
+
+
+
+

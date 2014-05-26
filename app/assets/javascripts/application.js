@@ -29,7 +29,7 @@
 //= require fancy_multiselect
 //= require parseuri
 //= require folds
-//= require tabber-minimized
+// require tabber-minimized
 //= require detect_browser
 //= require easytabs
 
