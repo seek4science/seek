@@ -1,7 +1,6 @@
 <% tabs_id ||= "resource_list_by_class" -%>
 <% scale_title ||= "all" -%>
 <% external_resource_hash ||= {} %>
-<% actions_partial_disable ||=false%>
 <script type="text/javascript">
     tabber_ids.push("<%= tabs_id -%>");
 </script>
@@ -33,15 +32,13 @@
       <% end %>
 
     </div>
-    <% sorted_result_keys.each do |key| -%>
-        <div id="<%= scale_title %>_<%= key %>_view_some"></div>
-        <div id="<%= scale_title %>_<%= key %>_view_all"></div>
-    <% end %>
+
+    <div id="<%= scale_title %>_faceted_search_result"></div>
 
     <script type="text/javascript">
         load_tabs();
         <% sorted_result_keys.each do |key| %>
-        tab_on_click('<%= scale_title %>', '<%= key %>', '<%=resource_hash[key].collect(&:id).join(',') %>' ,'<%=actions_partial_disable%>');
+            tab_on_click('<%= scale_title %>', '<%= key %>', '<%= resource_hash[key].collect(&:id).join(',') %>');
         <% end %>
 
         //Load content for first tab
@@ -51,9 +48,9 @@
         }
     </script>
 
-<% else -%>
+<% else %>
     <span class="none_text">No items.</span>
-<% end -%>
+<% end %>
 
 
 
