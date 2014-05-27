@@ -1,6 +1,8 @@
 <%= javascript_include_tag 'projects' %>
 <%= stylesheet_link_tag 'projects' %>
 
+<%= render :partial => "general/item_title",:locals=>{:title=>"Administering the #{t('project').downcase} members of #{link_to(h(@project.title),@project)}".html_safe} %>
+
 <div id="admin_members">
   <div id="project_institutions">
     <% @project.work_groups.sort { |a, b| a.institution.title <=> b.institution.title }.each do |work_group| %>
@@ -37,7 +39,7 @@
 <div id="add_member">
   <h3>Add members</h3>
 
-  Select the institution, and the additional people from that institution for this <%= t('project').downcase %></strong>
+  Select the institution, and type the names of the people from that institution that need adding for this <%= t('project').downcase %></strong>
   <br/>
   <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title") %>
   <br/>
