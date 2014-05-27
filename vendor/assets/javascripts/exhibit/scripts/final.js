@@ -2,7 +2,7 @@
  * @fileOverview Load locales, any dynamic post-script loading activities.
  */
 
-Exhibit.jQuery(document).ready(initializationFunction);
+//Exhibit.jQuery(document).ready(initializationFunction);
 
 function initializationFunction() {
     var delays, localeLoaded;
