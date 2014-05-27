@@ -4,7 +4,8 @@ class WorkGroup < ActiveRecord::Base
   has_many :group_memberships, :dependent => :destroy
   has_many :people, :through=>:group_memberships
 
-  validates :project,:institution,:presence => true
+  validates :project,:presence => {:message=>"A project is required"}
+  validates :institution,:presence => {:message=>"An institution is required"}
 
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :institution, :project

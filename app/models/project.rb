@@ -238,10 +238,10 @@ class Project < ActiveRecord::Base
   def spawn attributes={}
     child = self.dup
     self.work_groups.each do |wg|
-      new_wg = WorkGroup.new(:institution=>wg.institution)
+      new_wg = WorkGroup.new(:institution=>wg.institution,:project=>child)
       child.work_groups << new_wg
       wg.group_memberships.each do |gm|
-        new_gm = GroupMembership.new(:person=>gm.person)
+        new_gm = GroupMembership.new(:person=>gm.person, :work_group=>wg)
         new_wg.group_memberships << new_gm
       end
     end
