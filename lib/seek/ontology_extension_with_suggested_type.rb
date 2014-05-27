@@ -23,7 +23,7 @@ module Seek
       end
 
       def assays
-        Assay.find_all_by_assay_type_uri(self.uri.try(:to_s))
+        Assay.find_all_by_assay_type_uri(self.uri.try(:to_s)) |  Assay.find_all_by_technology_type_uri(self.uri.try(:to_s))
       end
 
     end
