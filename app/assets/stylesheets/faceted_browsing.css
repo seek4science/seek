@@ -1,0 +1,11 @@
+div.exhibit-viewPanel {
+    margin-top : -2em;
+    margin-left : 1em;
+    text-align: center;
+}
+
+ul.align_new_button {
+    text-align:left;
+    margin-left: 1.5em;
+    margin-bottom: -2em;
+}
