@@ -121,6 +121,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     end
     new_proj = assigns(:project)
     refute_nil new_proj
+
     assert_redirected_to project_path(new_proj)
     assert_equal prog,new_proj.programme
     assert_equal "cheese",new_proj.title
