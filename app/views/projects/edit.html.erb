@@ -1,4 +1,5 @@
-<h1>Edit <%= t('project') %>: <%= link_to @project.title, project_path(@project) -%></h1>
+
+<%= render :partial => "general/item_title",:locals=>{:title=>"Edit #{t('project') } #{link_to(h(@project.title), @project)}".html_safe} %>
 
 <div class="show_basic">
   <%= form_for(@project) do |f| %>
