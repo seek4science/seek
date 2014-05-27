@@ -14,19 +14,24 @@
       </div>
 <% end %>
 
+<script type="text/javascript">
+    var search_items_url = '<%= url_for(:action => 'search_items') %>'
+    var faceted_items_url = '<%= url_for(:action => 'faceted_items') %>'
+</script>
+
 <%= javascript_include_tag "tabber-minimized.js" %>
 <%= javascript_include_tag "tab_lazy_load.js" %>
 
 <% if !@results.blank? %>
     <% resource_hash = @results.group_by{|r| r.class.name} -%>
-      <%= render :partial => "assets/resource_tabbed_lazy_loading",
-                 :locals => {   :scale_title => 'all',
-                                :tabs_id => "resource_tabbed_lazy_loading_all",
-                                :resource_hash => resource_hash
-                             } -%>
+      <div id="all_results" class="scaled_items">
+          <%= render :partial => "assets/resource_tabbed_lazy_loading",
+                   :locals => {:scale_title => "all",
+                               :tabs_id => "resource_tabbed_lazy_loading_all",
+                               :resource_hash => resource_hash
+                               } -%>
+      </div>
 <% end %>
 </div>
 
-<script type="text/javascript">
-   var search_items_url = '<%= url_for(:action => 'search_items') %>'
-</script>
+
