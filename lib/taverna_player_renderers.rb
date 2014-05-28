@@ -3,7 +3,7 @@ def format_csv(output, index = [])
   html = ''
 
   begin
-    value = output.value(index).encode('UTF-8', invalid: :replace, undef: :replace)
+    value = output.value(index).encode('UTF-8', 'binary', :invalid => :replace, :undef => :replace)
 
     csv = CSV.parse(value)
     if csv.size > (row_limit + 1)
@@ -32,13 +32,13 @@ def format_csv(output, index = [])
 end
 
 def format_json(port, index = [])
-  value = port.value(index).encode('UTF-8', invalid: :replace, undef: :replace)
+  value = port.value(index).encode('UTF-8', 'binary', :invalid => :replace, :undef => :replace)
 
   CodeRay.scan(value, :json).div(:css => :class)
 end
 
 def format_xml(port, index = [])
-  value = port.value(index).encode('UTF-8', invalid: :replace, undef: :replace)
+  value = port.value(index).encode('UTF-8', 'binary', :invalid => :replace, :undef => :replace)
 
   out = String.new
   REXML::Document.new(value).write(out, 1)

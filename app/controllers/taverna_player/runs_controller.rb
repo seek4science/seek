@@ -12,6 +12,7 @@ module TavernaPlayer
     before_filter :add_sweeps, :only => :index
     before_filter :filter_users_runs_and_sweeps, :only => :index
     before_filter :find_workflow_and_version, :only => :new
+    before_filter :auth_workflow, :only => :new
 
     def update
       @run.update_attributes(params[:run])
@@ -31,6 +32,7 @@ module TavernaPlayer
       # Need to set workflow and workflow_version incase the create fails and redirects to 'new'
       @workflow = @run.workflow
       @workflow_version = @run.executed_workflow
+      auth_workflow
       # Manually add projects of current user, as they aren't prompted for this information in the form
       @run.projects = @run.contributor.person.projects
       @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
@@ -62,6 +64,15 @@ module TavernaPlayer
     def find_workflow_and_version
       @workflow = @run.workflow || TavernaPlayer.workflow_proxy.class_name.find(params[:workflow_id])
       @workflow_version = params[:version].blank? ? @workflow.latest_version : @workflow.find_version(params[:version])
+    end
+
+    def auth_workflow
+      unless @workflow.can_perform?("view")
+        flash[:error] = "You are not authorized to run this workflow."
+        respond_to do |format|
+          format.html { redirect_to main_app.workflows_path }
+        end
+      end
     end
 
     def choose_layout

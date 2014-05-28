@@ -57,7 +57,6 @@ module Seek #:nodoc:
   end
 end
 
-#require 'seek/permissions/authorization_enforcement'
 require 'seek/permissions/policy_based_authorization'
 require 'seek/permissions/code_based_authorization'
 require 'seek/permissions/state_based_permissions'
