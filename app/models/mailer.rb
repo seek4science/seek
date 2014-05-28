@@ -174,6 +174,15 @@ class Mailer < ActionMailer::Base
          :subject=>"SEEK Configuration Email Test")
   end
 
+  def notify_user_projects_assigned(person)
+    @name = person.name
+    @projects = person.projects
+
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>person.email_with_name,
+         :subject=>"You have been assigned to a #{Seek::Config.application_name} project")
+  end
+
   private
   
   def admin_emails
