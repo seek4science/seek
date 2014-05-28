@@ -261,7 +261,7 @@ class PeopleController < ApplicationController
         set_roles(@person, params) if User.admin_logged_in?
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
-        if had_no_projects && !@person.work_groups.empty? && @person != current_user.person
+        if Seek::Config.email_enabled && had_no_projects && !@person.work_groups.empty? && @person != current_user.person
           Mailer.notify_user_projects_assigned(@person).deliver
         end
 
