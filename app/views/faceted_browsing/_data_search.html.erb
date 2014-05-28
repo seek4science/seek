@@ -1,10 +1,12 @@
 <div id="data" style="display:none">
   <%
-     facet_config = YAML.load(File.read(faceted_search_config_path)) || {}
+     object_type = objects.first.class.name
+     facet_config = YAML.load(File.read(facet_config_path))
+     facets_for_object = facet_config[object_type] || {}
 
      exhibit_items = []
      exhibit_properties = {}
-     facet_config.each do |key,value|
+     facets_for_object.each do |key,value|
        facet_class = value['facet_class']
        if facet_class == 'NumericRange'
          exhibit_properties[key] = {"valueType" => "number"}
@@ -29,11 +31,11 @@
        #This display_content will be later on replaced by resource_list_item, by using ajax, otherwise it causes speed problem
        exhibit_item['display_content'] = ''
 
-       #exhibit_item['type'] = object.class.name
+       exhibit_item['type'] = object_type
        exhibit_item['item_id'] = object.id
 
        #generate facet values for each facet based on the facets.yml config file
-       facet_config.each do |key, value|
+       facets_for_object.each do |key, value|
          facet_values = object
          value_from = value['value_from']
          value_from.split(':').each do |field|
