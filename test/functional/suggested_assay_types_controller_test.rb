@@ -7,9 +7,15 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     login_as Factory(:user)
   end
 
-  test "should show manage page" do
+  test "should not show manage page for normal user, but show for admins" do
+    get :manage
+    assert_redirected_to root_url
+
+    logout
+    login_as Factory(:user, :person_id => Factory(:admin).id)
     get :manage
     assert_response :success
+
   end
 
 

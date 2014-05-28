@@ -9,7 +9,12 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     @suggested_technology_type = Factory(:suggested_technology_type, :contributor_id => User.current_user.person.try(:id)).id
   end
 
-  test "should show manage page" do
+
+  test "should not show manage page for normal user, but show for admins" do
+    get :manage
+    assert_redirected_to root_url
+    logout
+    login_as Factory(:user, :person_id => Factory(:admin).id)
     get :manage
     assert_response :success
   end
