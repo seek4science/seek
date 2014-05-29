@@ -1,4 +1,5 @@
-<h1>Administer <%= t('project') %>: <%= link_to @project.title, project_path(@project) -%></h1>
+
+<%= render :partial => "general/item_title",:locals=>{:title=>"Administer #{t('project').downcase} #{link_to(h(@project.title), @project)}".html_safe} %>
 
 <div class="show_basic">
   <%= form_for(@project) do |f| -%>
@@ -8,6 +9,10 @@
     <%= f.hidden_field :avatar_id -%>
   
     <%= f.error_messages %>
+
+    <h2>Administer indivudial members</h2>
+
+    To add and remove members to this <%= t('project').downcase %> please go to the <%= link_to "Administer #{t('project')} Members",admin_members_project_path(@project) %> page.
 
     <h2>Participating Institutions</h2>
 
