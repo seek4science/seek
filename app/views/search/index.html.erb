@@ -4,6 +4,7 @@
 <%= javascript_include_tag 'faceted_browsing' %>
 <%= stylesheet_link_tag 'modified_exhibit' %>
 <%= stylesheet_link_tag 'faceted_search' %>
+<%= javascript_include_tag 'jquery.ajaxy' %>
 
 
 <div class="show_basic">
@@ -16,11 +17,10 @@
 <% end %>
 
 <script type="text/javascript">
-    var items_for_facets_url = '<%= url_for(:action => 'items_for_facets') %>'
     var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>'
 </script>
 
-<%= javascript_include_tag "tabber-minimized.js" %>
+<%#= javascript_include_tag "tabber-minimized.js" %>
 <%= javascript_include_tag "tab_lazy_load.js" %>
 
 <% if !@results.blank? %>

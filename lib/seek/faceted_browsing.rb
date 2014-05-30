@@ -26,7 +26,7 @@ module Seek
 
     def get_items
       item_type = params[:item_type]
-      item_ids = (params[:item_ids] || []).collect(&:to_i)
+      item_ids = (params[:item_ids] || '').split(',')
 
       items = []
       if !item_type.blank?

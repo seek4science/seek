@@ -10,7 +10,7 @@ function updateFirstPage(){
         $j.ajax({
             url: items_for_result_url,
             async: false,
-            data: {item_ids: item_ids, item_type: item_type}
+            data: {item_ids: item_ids.join(','), item_type: item_type}
         })
             .done(function( data ) {
                 updateContent(data.resource_list_items);

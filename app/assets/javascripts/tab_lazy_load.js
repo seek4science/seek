@@ -1,3 +1,49 @@
+jQuery.noConflict();
+var $j = jQuery;
+$j( document ).ready(function() {
+    $j.Ajaxy.configure({
+        'method': 'get',
+        'root_url': 'http://localhost:3001',
+        'Controllers': {
+            '_generic': {
+                request: function(){
+                    return true;
+                },
+                response: function(){
+                    return true;
+                },
+                error: function(){
+                    // Prepare
+                    var Ajaxy = $j.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
+                    // Error
+                    var error = data.error||data.responseText||'Unknown Error.';
+                    var error_message = data.content||error;
+                    // Log what is happening
+                    window.console.error('$j.Ajaxy.Controllers._generic.error', [this, arguments], error_message);
+                    return true;
+                }
+            },
+            'search': {
+                classname: 'ajaxy-search',
+                matches: /^\/search\/?/,
+                request: function(){
+                    // Prepare
+                    var Ajaxy = $j.Ajaxy;
+                    return true;
+                },
+                response: function(){
+                    // Prepare
+                    var data = this.State.Response.data;
+                    var tab_content_id = 'all_faceted_search_result';
+                    $j('#' + tab_content_id).html(data.facets_for_items);
+                    Exhibit.jQuery(document).trigger("scriptsLoaded.exhibit");
+                    return true;
+                }
+            }
+        }
+    });
+});
+
 function load_tabs() {
     var tabberOptions = {'onLoad':function() {
         displayTabs();
@@ -10,19 +56,6 @@ function tab_on_click(scale_title, resource_type, resource_ids){
     click_tab.onclick = function(){
         deactivate_previous_tab(scale_title);
         click_tab.parentElement.className = 'tabberactive';
-        jQuery.noConflict();
-        var $j = jQuery;
-        $j.ajax({
-            url: search_items_url,
-            async: false,
-            data: { item_ids: resource_ids.split(','),
-                    item_type: resource_type}
-        })
-        .done(function( data ) {
-            var tab_content_id = scale_title + '_' + 'faceted_search_result';
-            $j('#' + tab_content_id).html(data.facets_for_items);
-            Exhibit.jQuery(document).trigger("scriptsLoaded.exhibit");
-        });
     }
 }
 
