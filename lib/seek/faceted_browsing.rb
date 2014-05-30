@@ -2,21 +2,25 @@ module Seek
 
   module FacetedBrowsing
 
-    def faceted_items
+    def items_for_result
       items = get_items
       resource_list_items = items.collect{|item| render_to_string :partial => "assets/resource_list_item", :object => item}
 
       respond_to do |format|
-        format.json {render :json => {:resource_list_items => resource_list_items.join(' ')}}
+        format.json {
+          render :json => {:status => 200, :resource_list_items => resource_list_items.join(' ')}
+        }
       end
     end
 
-    def search_items
+    def items_for_facets
       items = get_items
       facets_for_items = render_to_string :partial => "faceted_browsing/faceted_search",:object=>items
 
       respond_to do |format|
-        format.json {render :json => {:facets_for_items => facets_for_items}}
+        format.json {
+          render :json => {:status => 200, :facets_for_items => facets_for_items}
+        }
       end
     end
 

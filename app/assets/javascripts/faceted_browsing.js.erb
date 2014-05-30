@@ -8,7 +8,7 @@ function updateFirstPage(){
 
     if (item_type != null && item_ids.length > 0){
         $j.ajax({
-            url: faceted_items_url,
+            url: items_for_result_url,
             async: false,
             data: {item_ids: item_ids, item_type: item_type}
         })

@@ -71,7 +71,7 @@
 </div>
 
 <script type="text/javascript">
-   var faceted_items_url = '<%= url_for(:action => 'faceted_items') %>'
+   var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>'
 </script>
 
 <%= render :partial => "faceted_browsing/data", :locals => {:objects => objects} %>

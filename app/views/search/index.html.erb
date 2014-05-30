@@ -16,8 +16,8 @@
 <% end %>
 
 <script type="text/javascript">
-    var search_items_url = '<%= url_for(:action => 'search_items') %>'
-    var faceted_items_url = '<%= url_for(:action => 'faceted_items') %>'
+    var items_for_facets_url = '<%= url_for(:action => 'items_for_facets') %>'
+    var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>'
 </script>
 
 <%= javascript_include_tag "tabber-minimized.js" %>
