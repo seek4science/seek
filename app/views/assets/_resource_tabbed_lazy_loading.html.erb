@@ -14,7 +14,7 @@
       <% sorted_result_keys.each do |key| -%>
           <% visible_resource_type = key -%>
 
-          <li>
+          <li id="tab_<%= key%>">
             <% tab_title = "#{visible_resource_type} (#{resource_hash[key].count})" -%>
               <a href="./search/items_for_facets?item_type=<%= key %>&item_ids=<%= resource_hash[key].collect(&:id).join(',') %>" class="ajaxy ajaxy-search">
                 <%= tab_title -%>

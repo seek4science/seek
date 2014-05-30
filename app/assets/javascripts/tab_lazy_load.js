@@ -29,6 +29,8 @@ $j( document ).ready(function() {
                 request: function(){
                     // Prepare
                     var Ajaxy = $j.Ajaxy;
+                    deactivate_previous_tab();
+                    activate_clicked_tab();
                     return true;
                 },
                 response: function(){
@@ -51,19 +53,27 @@ function load_tabs() {
     tabberAutomatic(tabberOptions);
 }
 
-function tab_on_click(scale_title, resource_type, resource_ids){
-    var click_tab = document.getElementsByClassName(scale_title + '_' + resource_type)[0];
-    click_tab.onclick = function(){
-        deactivate_previous_tab(scale_title);
-        click_tab.parentElement.className = 'tabberactive';
-    }
+function deactivate_previous_tab(){
+    //First change the color of the previous chosen tab
+    var previous_active_tab = document.getElementsByClassName('tabberactive')[0];
+    if (previous_active_tab != null)
+        previous_active_tab.className = '';
 }
 
-function deactivate_previous_tab(scale_title){
-    //First change the color of the previous chosen tab
-    var scale_result = $(scale_title + '_results');
-    var previous_active_tab = scale_result.getElementsByClassName('tabberactive')[0];
-    previous_active_tab.className = '';
+function activate_clicked_tab(){
+    var clicked_tab_id = "tab_"
+    var href = document.location.href;
+    var url_elements = href.split('&');
+    for (var i=0; i<url_elements.length; i++){
+        if (url_elements[i].match('item_type=') != null){
+            clicked_tab_id = clicked_tab_id + url_elements[i].split('item_type=')[1] ;
+            break;
+        }
+    }
+
+    var clicked_tab = document.getElementById(clicked_tab_id);
+    if (clicked_tab != null)
+        clicked_tab.className = 'tabberactive';
 }
 
 function check_tab_content(show_tab_content_id, hide_tab_content_id){
