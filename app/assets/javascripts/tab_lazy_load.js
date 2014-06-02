@@ -30,7 +30,7 @@ $j( document ).ready(function() {
                     // Prepare
                     var Ajaxy = $j.Ajaxy;
                     deactivate_previous_tab();
-                    activate_clicked_tab();
+                    activate_clicking_tab();
                     return true;
                 },
                 response: function(){
@@ -60,20 +60,20 @@ function deactivate_previous_tab(){
         previous_active_tab.className = '';
 }
 
-function activate_clicked_tab(){
-    var clicked_tab_id = "tab_"
+function activate_clicking_tab(){
+    var clicking_tab_id = "tab_"
     var href = document.location.href;
     var url_elements = href.split('&');
     for (var i=0; i<url_elements.length; i++){
         if (url_elements[i].match('item_type=') != null){
-            clicked_tab_id = clicked_tab_id + url_elements[i].split('item_type=')[1] ;
+            clicking_tab_id = clicking_tab_id + url_elements[i].split('item_type=')[1] ;
             break;
         }
     }
 
-    var clicked_tab = document.getElementById(clicked_tab_id);
-    if (clicked_tab != null)
-        clicked_tab.className = 'tabberactive';
+    var clicking_tab = document.getElementById(clicking_tab_id);
+    if (clicking_tab != null)
+        clicking_tab.className = 'tabberactive';
 }
 
 function check_tab_content(show_tab_content_id, hide_tab_content_id){
