@@ -41,8 +41,8 @@ class Publication < ActiveRecord::Base
 
   has_many :publication_authors, :dependent => :destroy, :autosave => true
 
-  after_update :update_creators_from_publication_authors
-  after_update :update_policy_from_publication_authors
+  after_update :update_creators_from_publication_authors , :if => "Seek::Config.is_virtualliver"
+  after_update :update_policy_from_publication_authors , :if=> "false"
 
   def update_creators_from_publication_authors
     self.creators = publication_authors.map(&:person).compact
