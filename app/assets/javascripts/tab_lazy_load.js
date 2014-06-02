@@ -7,9 +7,16 @@ $j( document ).ready(function() {
         'Controllers': {
             '_generic': {
                 request: function(){
+                    var Ajaxy = $j.Ajaxy;
+                    deactivate_previous_tab();
+                    activate_clicking_tab();
                     return true;
                 },
                 response: function(){
+                    var data = this.State.Response.data;
+                    var tab_content_id = 'faceted_search_result';
+                    $j('#' + tab_content_id).html(data.facets_for_items);
+                    Exhibit.jQuery(document).trigger("scriptsLoaded.exhibit");
                     return true;
                 },
                 error: function(){
@@ -27,23 +34,20 @@ $j( document ).ready(function() {
                 classname: 'ajaxy-search',
                 matches: /^\/search\/?/,
                 request: function(){
-                    // Prepare
-                    var Ajaxy = $j.Ajaxy;
-                    deactivate_previous_tab();
-                    activate_clicking_tab();
                     return true;
                 },
                 response: function(){
-                    // Prepare
-                    var data = this.State.Response.data;
-                    var tab_content_id = 'faceted_search_result';
-                    $j('#' + tab_content_id).html(data.facets_for_items);
-                    Exhibit.jQuery(document).trigger("scriptsLoaded.exhibit");
                     return true;
                 }
             }
         }
     });
+
+    //Load content for first tab
+    var first_tab = document.getElementsByClassName('ajaxy')[0];
+    if (first_tab != null){
+        first_tab.click();
+    }
 });
 
 function load_tabs() {
