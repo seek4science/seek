@@ -25,13 +25,11 @@
 
 <% if !@results.blank? %>
     <% resource_hash = @results.group_by{|r| r.class.name} -%>
-      <div id="all_results" class="scaled_items">
           <%= render :partial => "assets/resource_tabbed_lazy_loading",
                    :locals => {:scale_title => "all",
                                :tabs_id => "resource_tabbed_lazy_loading_all",
                                :resource_hash => resource_hash
                                } -%>
-      </div>
 <% end %>
 </div>
 
