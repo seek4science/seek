@@ -74,6 +74,16 @@ class SpecimensControllerTest < ActionController::TestCase
     assert_not_nil assigns(:specimen)
   end
 
+  test "should show as virtual liver config" do
+    with_config_value :is_virtualliver,true do
+      get :show, :id => Factory(:specimen,
+                                :title=>"running mouse NO2",
+                                :policy =>policies(:editing_for_all_sysmo_users_policy))
+      assert_response :success
+      assert_not_nil assigns(:specimen)
+    end
+  end
+
   test "should get edit" do
     get :edit, :id=> Factory(:specimen, :policy => policies(:editing_for_all_sysmo_users_policy))
     assert_response :success
