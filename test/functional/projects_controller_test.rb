@@ -681,9 +681,12 @@ test 'should get index for non-project member, should for non-login user' do
     project = wg.project
 
     login_as(:quentin)
-    assert_raise(Exception){
-      put :update, :id => project, :project => {:institution_ids => []}
-    }
+    #exception is rescued
+    assert_no_difference('WorkGroup.count') do
+        post :update, :id => project, :project => {:institution_ids => []}
+        assert_redirected_to project
+        assert_not_nil flash[:error]
+    end
     project.reload
     assert !project.institutions.empty?
   end

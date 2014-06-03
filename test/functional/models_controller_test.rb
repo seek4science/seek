@@ -152,7 +152,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'select#possible_assays' do
       assert_select "option", :text=>/Select #{I18n.t('assays.assay')} .../,:count=>1
-      assert_select "option", :text=>/Modelling Assay/,:count=>5
+      assert_select "option", :text=>/Modelling Assay/,:count=>1
       assert_select "option", :text=>/Metabolomics Assay/,:count=>0
     end
   end
@@ -436,7 +436,6 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "default policy is nil when sharing is missing in VLN"  do
-    skip("test default policy is nil when sharing is missing in VLN") if !Seek::Config.is_virtualliver
     assert_difference('Model.count', 0) do
           assert_difference('ContentBlob.count', 0) do
             post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
@@ -444,30 +443,7 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
 
-  def test_missing_sharing_should_default_to_private
-    skip("default policy is nil when sharing is missing in VLN") if Seek::Config.is_virtualliver
 
-    assert_difference('Model.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
-      end
-    end
-    assert_redirected_to model_path(assigns(:model))
-    assert_equal users(:model_owner),assigns(:model).contributor
-    assert assigns(:model)
-    
-    model=assigns(:model)
-    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
-    assert_equal private_policy.sharing_scope,model.policy.sharing_scope
-    assert_equal private_policy.access_type,model.policy.access_type
-    assert_equal private_policy.use_whitelist,model.policy.use_whitelist
-    assert_equal private_policy.use_blacklist,model.policy.use_blacklist
-    assert model.policy.permissions.empty?
-    
-    #check it doesn't create an error when retrieving the index
-    get :index
-    assert_response :success    
-  end
   
   test "should create model with url" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
@@ -490,8 +466,7 @@ class ModelsControllerTest < ActionController::TestCase
   
   test "should create model and store with url and store flag" do
     model_details=valid_model_with_url
-    key = Seek::Config.is_virtualliver ? :external_link : :local_copy
-    model_details[key]="1"
+    model_details[:external_link]="0"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => model_details,:content_blob=>{:url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}, :sharing=>valid_sharing
@@ -504,8 +479,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert !model.content_blobs.first.url.blank?
 
 
-    assert !model.content_blobs.first.data_io_object.read.nil? unless Seek::Config.is_virtualliver
-    assert model.content_blobs.first.file_exists? unless Seek::Config.is_virtualliver
+    assert !model.content_blobs.first.data_io_object.nil?
+    assert model.content_blobs.first.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
     assert_equal "image/png", model.content_blobs.first.content_type
   end
@@ -517,12 +492,9 @@ class ModelsControllerTest < ActionController::TestCase
     stub_request(:head, "http://news.bbc.co.uk").to_return(:status=>301,:headers=>{'Location'=>'http://bbc.co.uk/news'})
     stub_request(:head, "http://bbc.co.uk/news").to_return(:status=>200,:headers=>{'Content-Type' => 'text/html'})
 
-    key = Seek::Config.is_virtualliver ? :external_link : :local_copy
-    model_details=valid_model_with_url
-    model_details[key]="0"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => model_details,:content_blob=>{:url_0=>"http://news.bbc.co.uk"}, :sharing=>valid_sharing
+        post :create, :model => valid_model_with_url,:content_blob=>{:url_0=>"http://news.bbc.co.uk"}, :sharing=>valid_sharing
       end
     end
     model = assigns(:model)
@@ -530,21 +502,9 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal users(:model_owner),model.contributor
     assert_equal 1,model.content_blobs.count
     assert_equal "http://news.bbc.co.uk",model.content_blobs.first.url
-    assert model.content_blobs.first.is_webpage? unless Seek::Config.is_virtualliver
+    assert model.content_blobs.first.is_webpage?
 
 
-    model_details[key]="1"
-    assert_difference('Model.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :model => model_details, :content_blob => {:url_0 => "http://news.bbc.co.uk"}, :sharing => valid_sharing
-      end
-    end
-    model = assigns(:model)
-    assert_redirected_to model_path(model)
-    assert_equal users(:model_owner), model.contributor
-    assert_equal 1, model.content_blobs.count
-    assert_equal "http://news.bbc.co.uk", model.content_blobs.first.url
-    assert model.content_blobs.first.is_webpage? if Seek::Config.is_virtualliver
 
   end
   

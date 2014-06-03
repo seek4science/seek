@@ -191,10 +191,9 @@ class PublicationTest < ActiveSupport::TestCase
         p.creators << p4
       end
       p.save!
-
+      assert_equal 4,p.creators.size
+      assert_equal [p1,p2,p3,p4],p.creators
     end
-    assert_equal 4,p.creators.size
-    assert_equal [p1,p2,p3,p4],p.creators
 
   end
   

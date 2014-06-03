@@ -278,20 +278,23 @@ class DataFileTest < ActiveSupport::TestCase
         Factory :attribution,:subject=>data_file,:other_object=>attribution_df
         Factory :relationship,:subject=>data_file,:other_object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
         data_file.creators = [Factory(:person),Factory(:person)]
+        #tag
         Factory :annotation,:attribute_name=>"tag",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tag").id
         data_file.events = [Factory(:event)]
-        Factory :scaling, :person=> Factory(:person),:scalable=>data_file, :scale => Factory(:scale) if data_file.is_scalable?
+        data_file.scales = [Factory(:scale)]
         data_file.save!
 
         data_file.reload
 
-        #I want to compare data_file.scales to data_file_converted.scales later. If I don't load data_file.scales now,
-        #then it will try to load them when I do the comparison. Since that will be after I've updated the database from converting, it would return [].
-        #to avoid this, I will preload scales and similar through_associations now.
+        #I want to compare data_file.creators & assays to data_file_converted.creators & assays later. If I don't load data_file.creators & assays now,
+        #then it will try to load them when I do the comparison. Since that will be [] after I've updated the database from converting.
+        #to avoid this, I will preload creators & assays (which are through_associations) now.
         through_associations_to_test_later = [:creators, :assays]
-        through_associations_to_test_later << :scales  if data_file.is_scalable?
         through_associations_to_test_later.each {|a| data_file.send(a).send(:load_target)}
 
+        #tags ans scales stored in annotations
+        data_file_tag_text_array = data_file.annotations.with_attribute_name("tag").include_values.collect{|a| a.value.text}
+        data_file_scales =  data_file.scales.map(&:text)
         presentation = Factory.build :presentation,:contributor=>user
 
         data_file_converted = data_file.to_presentation
@@ -317,12 +320,11 @@ class DataFileTest < ActiveSupport::TestCase
         assert_equal data_file.attributions , data_file_converted.attributions
         assert_equal data_file.related_publications, data_file_converted.related_publications
         assert_equal data_file.creators, data_file_converted.creators
-        assert_equal data_file.annotations, data_file_converted.annotations
+        assert_equal data_file_tag_text_array, data_file_converted.annotations.with_attribute_name("tag").include_values.collect{|a| a.value.text}
         assert_equal data_file.project_ids,data_file_converted.project_ids
         assert_equal data_file.assays,data_file_converted.assays
         assert_equal data_file.event_ids, data_file_converted.event_ids
-        assert_equal data_file.scalings,data_file_converted.scalings if data_file.is_scalable?
-        assert_equal data_file.scales,data_file_converted.scales  if data_file.is_scalable?
+        assert_equal data_file_scales, data_file_converted.scales.map(&:text)
         #assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
 
       }

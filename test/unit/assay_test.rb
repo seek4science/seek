@@ -148,7 +148,13 @@ class AssayTest < ActiveSupport::TestCase
     assay.technology_type_uri=nil
     assay.organisms = []
     assay.samples = []
-    assert !assay.valid?
+    as_virtualliver do
+      assert !assay.valid?
+    end
+
+    as_not_virtualliver do
+       assert assay.valid?
+    end
 
     assay.assay_organisms = [Factory(:assay_organism)]
     assert assay.valid?

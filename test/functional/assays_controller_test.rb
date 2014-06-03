@@ -304,35 +304,37 @@ class AssaysControllerTest < ActionController::TestCase
     assert_empty assay.strains
     assert_empty assay.samples
 
+
     organism = Factory(:organism,:title=>"Frog")
     strain = Factory(:strain, :title=>"UUU", :organism=>organism)
     sample = Factory(:sample)
 
     assert_difference("AssayOrganism.count") do
-      put :update, :id=>assay.id,:assay => {:title => "test",
-                                            :sample_ids => [sample.id]},
-                        :assay_organism_ids => [organism.id,strain.title, strain.id, ""].join(",")
+      put :update, :id=>assay.id,:assay => {:title => "test"},
+                        :assay_organism_ids => [organism.id,strain.title, strain.id, ""].join(",")#,
+                        # :sharing => valid_sharing
 
     end
     assay = assigns(:assay)
     assert_redirected_to assay_path(assay)
     assert_include assay.organisms,organism
     assert_include assay.strains,strain
-    assert_include assay.samples,sample
   end
 
 
   test "should create experimental assay with/without organisms" do
 
     #cannot create experimental assay if neither samples nor organisms are associated
-    assert_no_difference("Assay.count") do
-         post :create, :assay=>{:title=>"test",
-                                :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
-                                :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
-                                :study_id=>studies(:metabolomics_study).id,
-                                :assay_class_id=>assay_classes(:experimental_assay_class).id
-                                 }, :sharing => valid_sharing
-    end
+   as_virtualliver do
+     assert_no_difference("Assay.count") do
+       post :create, :assay=>{:title=>"test",
+                              :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",
+                              :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
+                              :study_id=>studies(:metabolomics_study).id,
+                              :assay_class_id=>assay_classes(:experimental_assay_class).id
+       }, :sharing => valid_sharing
+     end
+   end
 
     #can create with only samples
     sample = Factory(:sample)

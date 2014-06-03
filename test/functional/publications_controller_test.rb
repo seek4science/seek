@@ -268,13 +268,15 @@ class PublicationsControllerTest < ActionController::TestCase
     
     #Associate a non-seek author to a seek person
     login_as p.contributor
-    assert_difference('PublicationAuthor.count', 0) do
-      assert_difference('AssetsCreator.count', 2) do
-        put :update, :id => p.id, :author => {p.publication_authors[1].id => seek_author2.id,p.publication_authors[0].id => seek_author1.id}
+    as_virtualliver do
+      assert_difference('PublicationAuthor.count', 0) do
+        assert_difference('AssetsCreator.count', 2) do
+          put :update, :id => p.id, :author => {p.publication_authors[1].id => seek_author2.id,p.publication_authors[0].id => seek_author1.id}
+        end
       end
+
     end
-    
-    assert_redirected_to publication_path(p)    
+    assert_redirected_to publication_path(p)
     p.reload
   end
   
@@ -341,16 +343,10 @@ class PublicationsControllerTest < ActionController::TestCase
     seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
 
     #Associate a non-seek author to a seek person
-    if Seek::Config.is_virtualliver
+    as_virtualliver do
       assert_difference('publication.non_seek_authors.count', -2) do
         assert_difference('AssetsCreator.count', 2) do
           put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id}
-        end
-      end
-    else
-      assert_difference('PublicationAuthor.count', -2) do
-        assert_difference('AssetsCreator.count', 2) do
-          put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
         end
       end
     end
@@ -391,19 +387,18 @@ class PublicationsControllerTest < ActionController::TestCase
     original_authors[15] = %!<a href="/people/#{seek_author2.id}">#{publication.non_seek_authors[15].first_name + " " + publication.non_seek_authors[15].last_name}</a>!
 
     #Associate a non-seek author to a seek person
-    assert_difference('publication.non_seek_authors.count', -2) do
-      assert_difference('AssetsCreator.count', 2) do
-        put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
+    as_virtualliver do
+      assert_difference('publication.non_seek_authors.count', -2) do
+        assert_difference('AssetsCreator.count', 2) do
+          put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
+        end
       end
+      publication.reload
+      joined_original_authors = original_authors.join(', ')
+      get :show, :id => publication.id
+      assert_equal true, @response.body.include?(joined_original_authors)
     end
 
-    publication.reload
-
-
-    joined_original_authors = original_authors.join(', ')
-    get :show, :id => publication.id
-
-    assert_equal true, @response.body.include?(joined_original_authors)
   end
 
   test 'should update page pagination when changing the setting from admin' do

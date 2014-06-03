@@ -99,17 +99,20 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "data files tab should be selected" do
     get :index
-    if !Seek::Config.is_virtualliver
-     #VLN uses drop down menu, while SysMO uses tabs
-    assert_select "ul.tabnav" do
-      assert_select "li#selected_tabnav" do
-        assert_select "a[href=?]",data_files_path,:text=>I18n.t('data_file').pluralize
-
+    as_not_virtualliver do
+      #VLN uses drop down menu, while SysMO uses two level menus
+      assert_select "span#assets_menu_section" do
+        assert_select "li.selected_menu" do
+          assert_select "a[href=?]", data_files_path, :text => I18n.t('data_file').pluralize
+        end
+      end
+      assert_select "ul.menutabs" do
+        assert_select "li#selected_tabnav" do
+          assert_select "a", :text => I18n.t("menu.assets")
+        end
       end
     end
-    else
-      assert_select "div.breadcrumbs", :text => "Home > Data files Index"
-    end
+
 
 end
 
@@ -508,11 +511,9 @@ end
 
   test "should add link to a webpage" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
-    if Seek::Config.is_virtualliver
-      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
-    else
-      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}
-    end
+
+    params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
+
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         post :create, :data_file => params_data_file, :sharing=>valid_sharing
@@ -532,11 +533,8 @@ end
 
   test "should add link to a webpage from windows browser" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
-    if Seek::Config.is_virtualliver
-      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
-    else
-      params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}
-    end
+    params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
+
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         @request.env['HTTP_USER_AGENT']="Windows"
@@ -557,11 +555,9 @@ end
 
   test "should show wepage as a link" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
-    if Seek::Config.is_virtualliver
-      df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
-    else
-      df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
-    end
+
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
     get :show,:id=>df
@@ -629,11 +625,7 @@ end
 
   test "dont show download button or count for website/external_link data file" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
-    if Seek::Config.is_virtualliver
-      df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
-    else
-      df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
-    end
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
     assert df.can_download?(df.contributor.user)

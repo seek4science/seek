@@ -1236,10 +1236,11 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
 
       logout
-      #in vln, people are not shown when logged out
-      get :show, :id => a_person
-      assert_response :redirect
-      assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
+      as_virtualliver do
+        get :show, :id => a_person
+        assert_response :redirect
+        assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
+      end
   end
 
   test 'should update page limit_latest when changing the setting from admin' do
