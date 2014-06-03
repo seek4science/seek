@@ -12,6 +12,7 @@
     if (!Exhibit._jQueryExists) {
         jQuery.noConflict();
     }
+    Exhibit.triggerjQueryLoaded();
 }());
 
 /**
@@ -103,13 +104,20 @@ Exhibit.checkBackwardsCompatibility = function() {
  * @returns {String|Array}
  */
 Exhibit.getAttribute = function(elmt, name, splitOn) {
-    var value, i, values;
+    var value, i,
 
+    //hyphenate will also put a hyphen before an initial capital
+    //AbC --> -ab-c
+    //but this obeys the  html5 spec for data-attributes
+    hyphenate = function(str) {
+        return str.replace(/([A-Z])/g, "-$1").toLowerCase();
+    };
+    
     try {
         value = Exhibit.jQuery(elmt).attr(name);
-        if (typeof value === "undefined" || value === null || value.length === 0) {
-            value = Exhibit.jQuery(elmt).data("ex-"+name);
-            if (typeof value === "undefined" || value === null || value.length === 0) {
+        if (typeof value === "undefined" || value.length === 0) {
+            value = Exhibit.jQuery(elmt).attr("data-ex-"+hyphenate(name));
+            if (typeof value === "undefined" || value.length === 0) {
                 return null;
             }
         }
@@ -119,11 +127,11 @@ Exhibit.getAttribute = function(elmt, name, splitOn) {
         if (typeof splitOn === "undefined" || splitOn === null) {
             return value;
         }
-        values = value.split(splitOn);
-        for (i = 0; i < values.length; i++) {
-            values[i] = values[i].trim();
+        value = value.split(splitOn);
+        for (i = 0; i < value.length; i++) {
+            value[i] = value[i].trim();
         }
-        return values;
+        return value;
     } catch(e) {
         return null;
     }
@@ -427,7 +435,7 @@ Exhibit._Impl.prototype.configureFromDOM = function(root) {
             try {
                 Exhibit.UI.createFromDOM(elmt, uiContext);
             } catch (ex1) {
-                Exhibit.Debug.exception(ex1);
+                Exhibit.Debug.warn(ex1);
             }
         }
     };
@@ -501,7 +509,7 @@ Exhibit._Impl.prototype._showFocusDialogOnItem = function(itemID) {
             "</button>" +
         "</div>"
     );
-    Exhibit.jQuery(dom.elmt).attr("class", "exhibit-focusDialog exhibit-ui-protection");
+    Exhibit.jQuery(dom.elmt).addClass("exhibit-focusDialog exhibit-ui-protection");
     Exhibit.UI.setupDialog(dom, true);
     
     itemLens = this._uiContext.getLensRegistry().createLens(itemID, dom.lensContainer, this._uiContext);

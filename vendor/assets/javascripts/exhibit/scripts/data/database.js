@@ -28,18 +28,18 @@ Exhibit.Database.create = function(type) {
 };
 
 /**
- * Add or initialize an array entry in a two-level hash, such that
- * index[x][y].push(z), given z isn't already in index[x][y].
+ * Add or initialize a subhash entry in a two-level hash, such that
+ * index[x][y][z] = true, given z isn't already in index[x][y].
  *
  * @static
  * @private
  * @param {Object} index Base hash; may be modified as a side-effect.
  * @param {String} x First tier entry key in the base hash.
  * @param {String} y Second tier entry key in a subhash of the base hash.
- * @param {String} z Value to put into an array in the subhash key.
+ * @param {String} z Value to put into the subhash.
  */
 Exhibit.Database._indexPut = function(index, x, y, z) {
-    var hash, array, i;
+    var hash, subhash, nextsub;
 
     hash = index[x];
     if (typeof hash === "undefined") {
@@ -47,23 +47,21 @@ Exhibit.Database._indexPut = function(index, x, y, z) {
         index[x] = hash;
     }
 
-    array = hash[y];
-    if (typeof array === "undefined") {
-        array = [];
-        hash[y] = array;
-    } else {
-        for (i = 0; i < array.length; i++) {
-            if (z === array[i]) {
-                return;
-            }
-        }
+    subhash = hash[y];
+    if (typeof subhash === "undefined") {
+        hash[y] = z;  //store bare single value without new object
+    } else if (typeof subhash === "object") {
+        subhash[z] = true; //already storing multiple values
+    } else if (subhash !== z) { 
+        nextsub = {}; //switch from single to multi-value (object) store
+        nextsub[subhash] = true;
+        nextsub[z] = true;
+        hash[y] = nextsub;
     }
-
-    array.push(z);
 };
 
 /**
- * Add or initialize an array entry in a two-level hash, such that
+ * Add or initialize an subhash entry in a two-level hash, such that
  * index[x][y] = list if undefined or index[x][y].concat(list) if already
  * defined. 
  *
@@ -72,10 +70,10 @@ Exhibit.Database._indexPut = function(index, x, y, z) {
  * @param {Object} index Base hash; may be modified as a side-effect.
  * @param {String} x First tier entry key in the base hash.
  * @param {String} y Second tier entry key in a subhash of the base hash.
- * @param {Array} list List of values to add or assign to the subhash key.
+ * @param {Array} list List of values to add to the subhash key.
  */
 Exhibit.Database._indexPutList = function(index, x, y, list) {
-    var hash, array;
+    var hash, subhash, i;
 
     hash = index[x];
     if (typeof hash === "undefined") {
@@ -83,17 +81,25 @@ Exhibit.Database._indexPutList = function(index, x, y, list) {
         index[x] = hash;
     }
     
-    array = hash[y];
-    if (typeof array === "undefined") {
-        hash[y] = list;
-    } else {
-        hash[y] = hash[y].concat(list);
+    subhash = hash[y];
+    if (typeof subhash === "undefined") {
+        hash[y] = {};
+        subhash = hash[y];
+    } else if (typeof subhash !== "object") {
+        //storing bare singleton; must move to object
+        hash[y] = {};
+        hash[y][subhash] = true;
+        subhash = hash[y];
+    }
+
+    for (i=0; i<list.length; i++) {
+        subhash[list[i]] = true;
     }
 };
 
 /**
- * Remove the element z from the array index[x][y]; also remove
- * index[x][y] if the array becomes empty and index[x] if the hash becomes
+ * Remove the element z from the subhash index[x][y]; also remove
+ * index[x][y] if the subhash becomes empty and index[x] if the hash becomes
  * empty as a result.
  *
  * @static
@@ -101,44 +107,48 @@ Exhibit.Database._indexPutList = function(index, x, y, list) {
  * @param {Object} index Base hash; may be modified as a side-effect.
  * @param {String} x First tier entry key in the base hash.
  * @param {String} y Second tier entry key in a subhash of the base hash.
- * @param {String} z Value to remove from an array in the subhash key.
+ * @param {String} z Value to remove from an subhash in the subhash key.
  * @returns {Boolean} True if value removed, false if not.
  */
 Exhibit.Database._indexRemove = function(index, x, y, z) {
-    var hash, array, i, prop, empty;
+    var hash, subhash,
+    isEmpty = function(x) {
+        var p;
+        for (p in x) {
+            if (x.hasOwnProperty(p)) {
+                return false;
+            }
+        }
+        return true;
+    };
 
     hash = index[x];
     if (typeof hash === "undefined") {
         return false;
     }
 
-    array = hash[y];
-    if (typeof array === "undefined") {
+    subhash = hash[y];
+
+    if (typeof subhash === "undefined") {
         return false;
     }
 
-    for (i = 0; i < array.length; i++) {
-        if (z === array[i]) {
-            array.splice(i, 1);
-
-            if (array.length === 0) {
-                delete hash[y];
-
-                empty = true;
-                for (prop in hash) {
-                    if (hash.hasOwnProperty(prop)) {
-                        empty = false;
-                        break;
-                    }
-                }
-                if (empty) {
-                    delete index[x];
-                }
-            }
-
+    if (typeof subhash !== "object") {
+        if (subhash !== z) {
+            return false;
+        }
+    } else {
+        delete subhash[z];
+        if (!isEmpty(subhash)) {
             return true;
         }
     }
+
+    delete hash[y];
+    if (isEmpty(hash)) {
+        delete index[x];
+    }
+    return true;
 };
 
 /**
@@ -149,18 +159,18 @@ Exhibit.Database._indexRemove = function(index, x, y, z) {
  * @param {Object} index Base hash; may be modified as a side-effect.
  * @param {String} x First tier entry key in the base hash.
  * @param {String} y Second tier entry key in a subhash of the base hash.
- * @returns {Array} The removed array, or null if nothing was removed.
+ * @returns {Object} The removed object, or null if nothing was removed.
  */
 Exhibit.Database._indexRemoveList = function(index, x, y) {
-    var hash, array, prop, empty;
+    var hash, res, prop, empty;
 
     hash = index[x];
     if (typeof hash === "undefined") {
         return null;
     }
 
-    array = hash[y];
-    if (typeof array === "undefined") {
+    res = hash[y];
+    if (typeof res === "undefined") {
         return null;
     }
 
@@ -177,5 +187,82 @@ Exhibit.Database._indexRemoveList = function(index, x, y) {
         delete index[x];
     }
     
-    return array;
+    return res;
+};
+
+
+/**
+ * Iterates over values that are contained in the two-level index,
+ * index[x][y], exiting early if the iterator function returns false
+ *
+ * @param {Object} index The two-level index.
+ * @param {String} x The first level key.
+ * @param {String} y The second level key.
+ * @param {Function} f The function to execute on each item
+ */
+Exhibit.Database._indexVisit = function(index, x, y, f) {
+    var hash, subhash, z;
+    hash = index[x];
+    if (typeof hash !== "undefined") {
+        subhash = hash[y];
+        if (typeof subhash !== "undefined") {
+            if (typeof subhash !== "object") {
+                //stored single object
+                f(subhash);
+            } else {
+                for (z in subhash) {
+                    if (subhash.hasOwnProperty(z)) {
+                        if (!f(z)) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
+
+
+/**
+ * Returns a count of the number of objects that would be visited by
+ * _indexFillVisit.
+ *
+ * @param {Object} index The two-level index.
+ * @param {String} x The first-level key.
+ * @param {String} y The second-level key.
+ * @param {Function} [filter] Only include values in this filter.
+ * @returns {Number} The count of values.
+ */
+Exhibit.Database._indexCountDistinct = function(index, x, y, filter) {
+    var count, hash, subhash, z;
+    count = 0;
+    Exhibit.Database._indexVisit(index, x, y, function(v) {
+        if (filter(v)) {
+            count++;
+        }
+        return true;
+    });
+    return count;
+};
+
+/**
+ * Given an index, iterate over all 2d tier keys associated with index[x].
+ * Exiting early if the function returns false
+ *
+ * @param {Object} index The two-level index.
+ * @param {String} x The first-level key.
+ * @param {Function} f The function to execute on each key
+ */
+Exhibit.Database._indexVisitKeys = function (index, x, f) {
+    var hash, key;
+    hash = index[x];
+    if (typeof hash !== "undefined") {
+        for (key in hash) {
+            if (hash.hasOwnProperty(key)) {
+                if (!f(key)) {
+                    break;
+                }
+            }
+        }
+    }
 };

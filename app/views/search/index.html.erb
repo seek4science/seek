@@ -1,3 +1,12 @@
+<%= javascript_include_tag 'exhibit/exhibit-api' %>
+<%= javascript_include_tag 'exhibit/lib/jquery-1.7.2.min' %>
+<%= javascript_include_tag 'modified_exhibit' %>
+<%= javascript_include_tag 'faceted_browsing' %>
+<%= stylesheet_link_tag 'modified_exhibit' %>
+<%= stylesheet_link_tag 'faceted_search' %>
+<%= javascript_include_tag 'jquery.ajaxy' %>
+
+
 <div class="show_basic">
 <% unless !logged_in? || params[:saved_search] %>
       <div class="box_standout curved with_smaller_shadow">
@@ -5,13 +14,23 @@
         <%= link_to_draggable(tiny_image, search_path, :title=>tooltip_title_attrib("Drag to Favourites to save this search"), :class=>"search", :id => "drag_search") %>
         Drag this icon over to your Favourites to save this search.
       </div>
-
 <% end %>
+
+<script type="text/javascript">
+    var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>'
+</script>
+
+<%#= javascript_include_tag "tabber-minimized.js" %>
+<%= javascript_include_tag "tab_lazy_load.js" %>
+
 <% if !@results.blank? %>
-    <% resource_hash = classify_for_tabs @results -%>
-    <%= render :partial => "assets/resource_listing_tabbed_by_class",
-               :locals => {:resource_hash => resource_hash,
-                           :narrow_view => true,
-                           :authorization_already_done => true} -%>
+    <% resource_hash = @results.group_by{|r| r.class.name} -%>
+          <%= render :partial => "assets/resource_tabbed_lazy_loading",
+                   :locals => {:scale_title => "all",
+                               :tabs_id => "resource_tabbed_lazy_loading_all",
+                               :resource_hash => resource_hash
+                               } -%>
 <% end %>
 </div>
+
+

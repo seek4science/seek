@@ -251,7 +251,7 @@ Exhibit.Facet.registerComponent = function(evt, reg) {
     }
 };
 
-Exhibit.jQuery(document).one(
+Exhibit.jQuery(document).bind(
     "registerComponents.exhibit",
     Exhibit.Facet.registerComponent
 );

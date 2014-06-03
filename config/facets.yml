@@ -16,11 +16,14 @@ Assay:
       label: Project
       value_from: projects:title
   created_at:
-      label: Created At
+      label: Created In
       value_from: created_at:year
   contributor:
       label: Contributor
       value_from: contributor:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
 
 DataFile:
   project:
@@ -37,11 +40,14 @@ DataFile:
         facet_class: Exhibit.HierarchicalFacet
         tree_from: Seek::Ontologies::TechnologyTypeReader
   created_at:
-      label: Created At
+      label: Created In
       value_from: created_at:year
   contributor:
       label: Contributor
       value_from: creators:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
 
 Model:
   organism:
@@ -65,11 +71,14 @@ Model:
       label: Project
       value_from: projects:title
   created_at:
-      label: Created At
+      label: Created In
       value_from: created_at:year
   contributor:
       label: Contributor
       value_from: creators:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
 
 Sop:
   project:
@@ -86,11 +95,14 @@ Sop:
         facet_class: Exhibit.HierarchicalFacet
         tree_from: Seek::Ontologies::AssayTypeReader,Seek::Ontologies::ModellingAnalysisTypeReader
   created_at:
-      label: Created At
+      label: Created In
       value_from: created_at:year
   contributor:
       label: Contributor
       value_from: creators:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
 
 Publication:
   project:
@@ -105,6 +117,9 @@ Publication:
   organism:
       label: Organism
       value_from: related_organisms:title
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
 
 Person:
   project:
@@ -131,3 +146,6 @@ Person:
   name:
       label: Name
       value_from: name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array

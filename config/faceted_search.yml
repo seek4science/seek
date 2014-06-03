@@ -1,0 +1,9 @@
+type:
+    label: Type
+    value_from: class:name
+project:
+    label: Project
+    value_from: projects:title
+created_at:
+    label: Created In
+    value_from: created_at:year

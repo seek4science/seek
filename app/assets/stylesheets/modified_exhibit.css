@@ -54,18 +54,19 @@ img.exhibit-facet-header-expand {
     padding-left: 3px;
 }
 
-div.exhibit-viewPanel {
-    margin-top : -2em;
-}
-
-ul.align_new_button {
-    text-align:left;
-    margin-left: 1.5em;
-    margin-bottom: -2em;
-}
-
 img.exhibit-bookmarkWidget-button {
     margin-right: 2.3em;
+}
+
+div.exhibit-collectionView-header{
+    text-align: center;
+}
+
+.exhibit-busyIndicator {
+    position:   absolute;
+    left:       35%;
+    width:      29.5%;
+    z-index:    1000;
 }
 
 

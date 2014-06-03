@@ -1,8 +1,9 @@
-<%= javascript_include_tag 'exhibit/exhibit-api.js' %>
-<%#<script src="/assets/exhibit/exhibit-api.js"></script>%>
-<%#need to go after exhibit lib %>
+<%= javascript_include_tag 'exhibit/exhibit-api' %>
+<%= javascript_include_tag 'exhibit/lib/jquery-1.7.2.min' %>
 <%= javascript_include_tag 'modified_exhibit' %>
+<%= javascript_include_tag 'faceted_browsing' %>
 <%= stylesheet_link_tag 'modified_exhibit' %>
+<%= stylesheet_link_tag 'faceted_browsing' %>
 
 
 <%
@@ -14,9 +15,8 @@
 
 <div style="width: 100%">
     <div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_type%>"></div>
-    <table cellpadding="0" cellspacing="10" border="0" id="exhibit" width="100%">
-      <tr>
-        <td style="width: 85%;">
+    <div class="yui-g" id="exhibit">
+        <div class="yui-u first" style="width: 85%;">
           <div id="content-area">
             <div data-ex-role="exhibit-lens" style="display: none">
               <span data-ex-content=".display_content"></span>
@@ -32,8 +32,8 @@
               ></div>
             </div>
           </div>
-        </td>
-        <td style="float:right;">
+        </div>
+        <div class="yui-u" style="float:right;width: 15%;">
           <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
           <br/>
           <b>Filter <%= internationalized_resource_name(object_type)%> by:</b>
@@ -66,13 +66,12 @@
               </div>
               <br/>
           <% end %>
-        </td>
-      </tr>
-    </table>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">
-   var faceted_items_url = '<%= url_for(:action => 'faceted_items') %>'
+   var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>'
 </script>
 
 <%= render :partial => "faceted_browsing/data", :locals => {:objects => objects} %>

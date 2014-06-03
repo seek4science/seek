@@ -1,0 +1,35 @@
+<% tabs_id ||= "resource_list_by_class" -%>
+<% scale_title ||= "all" -%>
+<% external_resource_hash ||= {} %>
+
+
+<% if !resource_hash.blank? || !external_resource_hash.blank? -%>
+    <ul class="tabbernav">
+      <%
+         sorted_result_keys = resource_hash.keys.sort_by do |key|
+           ASSET_ORDER.index(key)
+         end
+      %>
+
+      <% sorted_result_keys.each do |key| -%>
+          <% visible_resource_type = key -%>
+
+          <li id="tab_<%= key%>">
+            <% tab_title = "#{visible_resource_type} (#{resource_hash[key].count})" -%>
+              <a href="./search/items_for_facets?item_type=<%= key %>&item_ids=<%= resource_hash[key].collect(&:id).join(',') %>" class="ajaxy ajaxy-search">
+                <%= tab_title -%>
+              </a>
+          </li>
+      <% end %>
+
+      <% if !external_resource_hash.blank? %>
+          <%= render :partial => "assets/external_search_result_tab", :locals => {:external_resource_hash => external_resource_hash,
+                                                                                  :scale_title => scale_title} %>
+      <% end %>
+
+    </ul>
+
+    <div id="faceted_search_result"></div>
+<% else %>
+    <span class="none_text">No items.</span>
+<% end %>
