@@ -25,7 +25,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       ASSETS_WITH_FACET.each do |type_name|
         with_config_value :facet_enable_for_pages,{type_name=>true} do
           get "/#{type_name}"
-      assert_select "div[id='exhibit']"
+          assert_select "div[id='exhibit']"
           assert_select "div.alphabetcal_pagination", :count => 0
         end
       end
@@ -50,13 +50,13 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
 
       facet_enabled_pages.keys.each do |type_name|
         get "/#{type_name}"
-      assert_select "div[id='exhibit']"
+        assert_select "div[id='exhibit']"
         assert_select "div.alphabetcal_pagination", :count => 0
       end
 
       facet_disabled_pages.keys.each do |type_name|
         get "/#{type_name}"
-      assert_select "div[id='exhibit']", :count => 0
+        assert_select "div[id='exhibit']", :count => 0
         assert_select "div.alphabetcal_pagination"
       end
     end
@@ -93,7 +93,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       assert assay1.can_view?
       assert !assay2.can_view?
 
-    xhr(:get, "/assays/items_for_result",{:item_type => 'Assay', :item_ids => [assay1.id,assay2.id]})
+      xhr(:get, "/assays/items_for_result",{:item_type => 'Assay', :item_ids => [assay1.id,assay2.id]})
       resource_list_items =  ActiveSupport::JSON.decode(@response.body)['resource_list_items']
       assert resource_list_items.include?(assay1.title)
       assert !resource_list_items.include?(assay2.title)
