@@ -297,6 +297,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'covert_office should doc to pdf and then docslit convert pdf to txt' do
+    check_for_soffice
     content_blob = Factory(:doc_content_blob, :uuid => 'doc_1')
     assert File.exists? content_blob.filepath
     pdf_path = content_blob.filepath('pdf')
@@ -316,6 +317,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert docx to pdf and then docsplit convert pdf to txt' do
+    check_for_soffice
     content_blob = Factory(:docx_content_blob, :uuid => 'docx_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -334,6 +336,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert odt to pdf and then docsplit converts pdf to txt' do
+    check_for_soffice
     content_blob = Factory(:odt_content_blob, :uuid => 'odt_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -352,6 +355,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert ppt to pdf and then docsplit converts pdf to txt' do
+    check_for_soffice
     content_blob = Factory(:ppt_content_blob, :uuid => 'ppt_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -370,6 +374,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert pptx to pdf and then docsplit converts pdf to txt' do
+    check_for_soffice
     content_blob = Factory(:pptx_content_blob, :uuid => 'pptx_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -388,6 +393,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert odp to pdf and then docsplit converts pdf to txt' do
+    check_for_soffice
     content_blob = Factory(:odp_content_blob, :uuid => 'odp_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -406,6 +412,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert rtf to pdf and then docsplit converts pdf to txt' do
+    check_for_soffice
     content_blob = Factory(:rtf_content_blob, :uuid => 'rtf_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -424,6 +431,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert txt to pdf' do
+    check_for_soffice
     content_blob = Factory(:txt_content_blob, :uuid => 'txt_1')
     assert File.exists? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exists? content_blob.filepath('pdf')
@@ -488,6 +496,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'filter_text_content' do
+    check_for_soffice
     ms_word_sop_cb = Factory(:doc_content_blob)
     content = "test \n content \f only"
     filtered_content = ms_word_sop_cb.send(:filter_text_content,content)
@@ -496,6 +505,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'pdf_contents_for_search for a doc file' do
+    check_for_soffice
     ms_word_sop_content_blob = Factory(:doc_content_blob)
     assert ms_word_sop_content_blob.is_pdf_convertable?
     content = ms_word_sop_content_blob.pdf_contents_for_search
@@ -503,6 +513,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'pdf_contents_for_search for a pdf file' do
+    check_for_soffice
     pdf_content_blob = Factory(:pdf_content_blob)
     content = pdf_content_blob.pdf_contents_for_search
     assert_equal ['This is a pdf format'], content
