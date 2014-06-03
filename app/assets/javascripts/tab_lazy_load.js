@@ -16,7 +16,7 @@ $j( document ).ready(function() {
                     var data = this.State.Response.data;
                     var tab_content_id = 'faceted_search_result';
                     $j('#' + tab_content_id).html(data.facets_for_items);
-                    Exhibit.jQuery(document).trigger("scriptsLoaded.exhibit");
+                    $j(document).trigger("scriptsLoaded.exhibit");
                     return true;
                 },
                 error: function(){
