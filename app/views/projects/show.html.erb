@@ -54,10 +54,12 @@
           <label><%= Seek::Config.dm_project_name %> PALs:</label>
           <%= pals_link_list @project -%>
         </p>
+        <% if @project.respond_to?(:project_coordinators)%>
         <p class="project_coordinators">
           <label>Project Coordinators:</label>
           <%= project_coordinators_link_list @project -%>
         </p>
+        <% end%>
  <% if @project.has_member?(current_user)%>
         <p class="asset_managers">
           <label>Asset Managers:</label>
