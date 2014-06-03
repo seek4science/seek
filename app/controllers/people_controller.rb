@@ -58,7 +58,7 @@ class PeopleController < ApplicationController
       @people=@people.select{|p| !p.group_memberships.empty?}
       @people = apply_filters(@people).select(&:can_view?)#.select{|p| !p.group_memberships.empty?}
 
-      unless Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[:people] && ie_support_faceted_browsing?
+      unless Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages["people"] && ie_support_faceted_browsing?
         @people=Person.paginate_after_fetch(@people,
                                             :page=>(params[:page] || Seek::Config.default_page('people')),
                                             :reorder=>false,
