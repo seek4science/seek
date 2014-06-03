@@ -64,13 +64,20 @@ class HomesControllerTest < ActionController::TestCase
   end
 
 
-  test "SOP tab should be capitalized" do
+  test "SOP menu item should be capitalized" do
     login_as(:quentin)
-    get :index
-    if Seek::Config.is_virtualliver
+
+    as_virtualliver do
+      get :index
       assert_select "div.section>li>a[href=?]", "/sops", :text => "SOPs", :count => 1
-    else
-      assert_select "ul.tabnav>li>a[href=?]", "/sops", :text => "SOPs", :count => 1
+    end
+    as_not_virtualliver do
+      get :index
+      assert_select "span#assets_menu_section" do
+        assert_select "li" do
+          assert_select "a[href=?]", sops_path, :text => "SOPs"
+        end
+      end
     end
 
   end
