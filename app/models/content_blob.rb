@@ -31,16 +31,12 @@ class ContentBlob < ActiveRecord::Base
 
   before_save :check_version
 
-  before_create :check_url_content_type, :unless =>  "Seek::Config.is_virtualliver"
+  #is_webpage: whether text/html
+  #external_link: true means no local copy, false means local copy. Set true by default on upload page.
+  before_create :check_url_content_type
 
   has_many :worksheets, :dependent => :destroy
 
-
-  # For VL, asset uploaded with url can be manually marked as an external link or not, and NO asset will be stored in both cases.
-  #User can go to the url if it is an external link, otherwise use can directly download the asset from that url.
-  #While for SysMO, asset uploaded with url with text/html format(checked with call_back functions before content_blob is created)) is tagged to be is_webpage, and asset will be stored if user ticks make_a_copy checkbox
-  # this should be removed when external_link is merged with is_webpage in db schema
-  alias_attribute :is_webpage, :external_link if Seek::Config.is_virtualliver
 
   validate :original_filename_or_url
 
