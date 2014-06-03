@@ -96,7 +96,7 @@
                           strains, :id, :info, :include_blank => "Not specified" -%>
 </div>
 </p>
-  <%= render :partial => "scales/scales_selector",:locals=>{:object=>specimen} if show_scales?%>
+  <%= render :partial => "scales/scales_selector",:locals=>{:object=>specimen} if specimen.respond_to?(:scales) && show_scales?%>
 <% if Seek::Config.is_virtualliver %>
     <div class="yui-g" style="width:700px;">
       <%= f.label "Genotypes and Phenotypes:" -%>

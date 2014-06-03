@@ -1,6 +1,5 @@
 require 'grouped_pagination'
 require 'subscribable'
-require 'acts_as_scalable'
 class Specimen < ActiveRecord::Base
   include Subscribable
   include Seek::Rdf::RdfGeneration

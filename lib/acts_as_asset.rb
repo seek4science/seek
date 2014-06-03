@@ -41,8 +41,6 @@ module Acts #:nodoc:
 
         validates_presence_of :title
 
-        acts_as_scalable if Seek::Config.is_virtualliver
-
         has_many :relationships,
                  :class_name => 'Relationship',
                  :as         => :subject,

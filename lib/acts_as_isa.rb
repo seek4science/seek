@@ -16,8 +16,6 @@ module Acts #:nodoc:
       def acts_as_isa
         acts_as_favouritable
         acts_as_scalable
-
-        acts_as_scalable if Seek::Config.is_virtualliver
         scope :default_order, order("title")
 
 

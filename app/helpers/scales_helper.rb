@@ -101,7 +101,7 @@ module ScalesHelper
   end
 
   def scales_list_for_list_item entity
-    if show_scales?
+    if entity.respond_to?(:scales) && show_scales?
       render :partial=>"scales/asset_scales_list",:object=>entity, :locals=>{:list_item=>true}
     else
       ""

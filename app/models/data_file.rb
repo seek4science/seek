@@ -202,7 +202,7 @@ class DataFile < ActiveRecord::Base
 
       #copying annotations has to be done after saving the presentation due to limitations of the annotation plugin
       disable_authorization_checks do #disabling because annotations should be copied over even if the user would normally lack permission to do so
-        presentation.annotations = self.annotations.select{|a| a.attribute_name == 'tag'}
+        presentation.annotations = self.annotations.select{|a| a.attribute_name == 'tag' || a.attribute_name == "scale"}
         presentation.save!
       end
     end

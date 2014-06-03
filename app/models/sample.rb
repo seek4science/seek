@@ -1,6 +1,5 @@
 require 'grouped_pagination'
 
-require "acts_as_scalable"
 class Sample < ActiveRecord::Base
   include Subscribable
 
