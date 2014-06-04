@@ -118,6 +118,29 @@ distributions.</p>
 distribution packages, and any other differences we are aware of from our
 general install guide.</p>
 
+<h2 id="label-Ubuntu+14.04+%28LTS%29+and+Linux+Mint+16">Ubuntu 14.04 (LTS) and Linux Mint 16</h2>
+
+<p>Ubuntu 14.04 has only recently been released and we haven’t yet fully
+migrated over to testing on that platform. These differences also relate to
+Linux Mint 16. We don’t expect any particular problems once SEEK is
+installed and running, but there are a couple of minor differences that
+need to be followed.</p>
+
+<p>First, there is an additional package required:</p>
+
+<pre>sudo apt-get install libcurl4-gnutls-dev</pre>
+
+<p>then proceed to install SEEK as normal, however after running bundle
+install to install the gems you may encounter a problem with the
+<em>Nokogiri</em> gem. This is because it is statically linked to an older
+version of <em>LibXML</em>. To solve this, after you have run bundle
+install do:</p>
+
+<pre>export NOKOGIRI_USE_SYSTEM_LIBRARIES=1
+gem pristine nokogiri</pre>
+
+<p>Following this you can proceed with the standard installation steps.</p>
+
 <h2 id="label-Ubuntu+10.04+%28LTS%29">Ubuntu 10.04 (LTS)</h2>
 
 <p>The general packages:</p>
