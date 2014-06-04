@@ -16,11 +16,9 @@ module Seek
         extend CallBackMethods
 
         after_add :institutions, :create_ancestor_workgroups
-        before_remove :institutions, :check_workgroup_is_empty
 
         after_update :touch_for_hierarchy_updates
         #when I have a new ancestor, subscribe to items in that project
-        #write_inheritable_array :before_add_for_ancestors, [:add_indirect_subscriptions]
         self.class_attribute :before_add_for_ancestors
 
         self.before_add_for_ancestors = Array.wrap(:add_indirect_subscriptions)
@@ -29,13 +27,7 @@ module Seek
           parent.institutions << institution unless parent.nil? || parent.institutions.include?(institution)
         end
 
-        def check_workgroup_is_empty institution
-          work_groups_of_institution = work_groups.select { |wg| wg.institution == institution }
-          people = work_groups_of_institution.collect { |wg| wg.people }.flatten
-          if !people.empty?
-            raise Exception.new("Cannot delete with associated people. This WorkGroup has "+people.size.to_s+" people associated with it")
-          end
-        end
+
 
         def touch_for_hierarchy_updates
           if changed_attributes.include? :parent_id
