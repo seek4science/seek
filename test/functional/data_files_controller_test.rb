@@ -98,8 +98,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "data files tab should be selected" do
-    get :index
     as_not_virtualliver do
+      get :index
       #VLN uses drop down menu, while SysMO uses two level menus
       assert_select "span#assets_menu_section" do
         assert_select "li.selected_menu" do
