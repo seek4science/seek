@@ -5,12 +5,7 @@
 <%= render :partial => "general/item_title",:locals=>{:item=>@data_file } -%>
 
 <ul class="sectionIcons">
-<%= asset_buttons @data_file,@display_data_file.version -%>
-  <% if Seek::Config.solr_enabled && @display_data_file.latest_version? && @data_file.contains_extractable_spreadsheet? -%>
-      <li>
-        <%= image_tag_for_key("search",matching_models_data_file_path(@data_file),nil,nil,"Find related #{t('model').pluralize}") -%>
-      </li>
-  <% end -%>
+    <%= asset_buttons @data_file,@display_data_file.version -%>
 </ul>
 <br/>
 
