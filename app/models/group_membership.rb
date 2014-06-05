@@ -5,8 +5,7 @@ class GroupMembership < ActiveRecord::Base
 
   has_and_belongs_to_many :project_roles
 
-  after_save :queue_update_auth_table
-  after_destroy :queue_update_auth_table
+  after_commit :queue_update_auth_table
 
   validates :work_group,:presence => {:message=>"A workgroup is required"}
 

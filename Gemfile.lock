@@ -462,6 +462,8 @@ GEM
       libxml-ruby (>= 1.1.4)
     thor (0.19.1)
     tilt (1.4.1)
+    transaction_isolation (1.0.3)
+      activerecord (>= 3.0.11)
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
@@ -566,6 +568,7 @@ DEPENDENCIES
   sunspot_solr
   taverna-player!
   taverna-t2flow
+  transaction_isolation
   turbo-sprockets-rails3
   unicorn-rails
   uuidtools (= 2.1.1)

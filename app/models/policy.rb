@@ -6,12 +6,6 @@ class Policy < ActiveRecord::Base
            :autosave => true,
            :after_add => proc {|policy, perm| perm.policy = policy}
 
-  before_save :update_timestamp_if_permissions_change
-
-  def update_timestamp_if_permissions_change
-    update_timestamp if changed_for_autosave?
-  end
-
   #basically the same as validates_numericality_of :sharing_scope, :access_type
   #but with a more generic error message because our users don't know what
   #sharing_scope and access_type are.
@@ -26,10 +20,17 @@ class Policy < ActiveRecord::Base
   
   alias_attribute :title, :name
 
-  after_save :queue_update_auth_table
+  after_commit :queue_update_auth_table
+  before_save :update_timestamp_if_permissions_change
+
+  def update_timestamp_if_permissions_change
+    update_timestamp if changed_for_autosave?
+  end
 
   def queue_update_auth_table
-    AuthLookupUpdateJob.add_items_to_queue(assets) unless assets.empty?
+    unless (previous_changes.keys - ["updated_at"]).empty?
+      AuthLookupUpdateJob.add_items_to_queue(assets) unless assets.empty?
+    end
   end
 
   def assets

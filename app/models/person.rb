@@ -17,7 +17,7 @@ class Person < ActiveRecord::Base
   acts_as_notifiee
   acts_as_annotatable :name_field=>:name
 
-  after_save :queue_update_auth_table
+  after_commit :queue_update_auth_table
 
   validates_presence_of :email
 
