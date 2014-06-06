@@ -9,6 +9,14 @@ class SuggestedAssayTypesController < ApplicationController
   before_filter :find_and_authorize_requested_item, :only => [:edit, :destroy]
 
 
+
+  def set_is_modelling
+     uri = params[:uri]
+     is_modelling = ontology_hash_for_is_modelling[uri]
+     render :update do |page|
+       page['suggested_assay_type_is_for_modelling'].value = is_modelling
+     end
+  end
   def new_popup
     @suggested_assay_type = SuggestedAssayType.new
     @suggested_assay_type.is_for_modelling = string_to_boolean params[:is_for_modelling]
@@ -136,6 +144,41 @@ class SuggestedAssayTypesController < ApplicationController
 
     end
   end
+
+  def ontology_hash_for_is_modelling
+      @hash ||= build_is_modelling_hash
+  end
+
+  def build_is_modelling_hash
+    result = {}
+    Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri.each do |uri, clz|
+      result[uri] = false
+      clz.suggested_children.each do |child|
+        result[child.uri] = false
+        result.merge! build_suggested_children_hash(child, false)
+      end
+    end
+
+    Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri.each do |uri, clz|
+      result[uri] = true
+      clz.suggested_children.each do |child|
+        result[child.uri] = true
+        result.merge! build_suggested_children_hash(child, true)
+      end
+    end
+
+    result
+  end
+
+  def build_suggested_children_hash suggested_type, is_for_modelling
+    result = {}
+    suggested_type.children.each do |child|
+        result[child.uri] = is_for_modelling
+        result.merge!(build_suggested_children_hash child, is_for_modelling)
+      end
+    result
+  end
+
 
 
 end

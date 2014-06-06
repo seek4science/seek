@@ -22,7 +22,15 @@
     <p>
          <%= f.label "Parent" -%><br/>
          <span style="color: #666666;"> Select parent</span><br/>
-     <%= ontology_selection_list type, "suggested_assay_type[parent_uri]", @suggested_assay_type.parent_uri, ([@suggested_assay_type] + @suggested_assay_type.children).map(&:uri),{:style=>"width:100%"}  %>
+     <%= ontology_selection_list type, "suggested_assay_type[parent_uri]",
+                                 @suggested_assay_type.parent_uri,
+                                 ([@suggested_assay_type] + @suggested_assay_type.children).map(&:uri),
+                                 {:style=>"width:100%",
+                                  :onchange=> remote_function(
+                                         :method => "put",
+                                         :url=> set_is_modelling_suggested_assay_types_path,
+                                         :with=> "'uri=' + this.value",
+                                 )}  %>
     </p>
   </div>
 </center>

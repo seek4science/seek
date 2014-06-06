@@ -241,6 +241,7 @@ SEEK::Application.routes.draw do
       collection do
         get :manage
         get :new_popup
+        put :set_is_modelling
       end
 
   end
