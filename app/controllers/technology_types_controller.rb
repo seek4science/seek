@@ -1,7 +1,6 @@
 class TechnologyTypesController < ApplicationController
   before_filter :find_ontology_class, :only=>[:show]
   before_filter :find_and_authorize_assays, :only=>[:show]
-
   def show
     respond_to do |format|
       format.html
@@ -17,16 +16,18 @@ class TechnologyTypesController < ApplicationController
     cls ||= SuggestedTechnologyType.where(:uri => uri).first
     if cls.nil?
       flash.now[:error] = "Unrecognised technology type"
+    elsif params[:label] != cls.label
+      flash.now[:error] = "Undefined technology type with label <b> #{params[:label]} </b>. Did you mean #{view_context.link_to(cls.label, technology_types_path(:uri=>uri, :label=> cls.label),{:style=> "font-style:italic;font-weight:bold;"})}?".html_safe
     else
       @type_class=cls
     end
-    @label = params[:label] || @type_class.try(:label)
+    @label = params[:label]
   end
 
   def find_and_authorize_assays
     @assays=[]
     if @type_class
-      if is_suggested?(@type_class)
+      if view_context.is_suggested?(@type_class)
          uris = ([@type_class] +@type_class.children).map(&:uri)
       else
          uris=@type_class.flatten_hierarchy.collect{|o| o.uri.to_s}
@@ -37,8 +38,5 @@ class TechnologyTypesController < ApplicationController
     end
   end
 
-  def is_suggested? clz
-        clz.is_a?(SuggestedTechnologyType)
-  end
-  
+
 end

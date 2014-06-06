@@ -16,23 +16,34 @@ class AssayTypesController < ApplicationController
   def find_ontology_class
     uri = params[:uri] || Seek::Ontologies::AssayTypeReader.instance.default_parent_class_uri.to_s
 
+    @is_modelling = false
     cls = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[uri]
-    cls ||= SuggestedAssayType.where(:uri => uri).first
-    @is_modelling = cls.nil?
-    cls ||= Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[uri]
+
+    if cls.nil?
+      cls = Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[uri]
+      @is_modelling = true
+    end
+
+    if cls.nil?
+      cls = SuggestedAssayType.where(:uri => uri).first
+      @is_modelling = cls.try(:is_for_modelling)
+    end
+
     if cls.nil?
       flash.now[:error] = "Unrecognised assay type"
+    elsif params[:label] != cls.label
+      flash.now[:error] = "Undefined assay type with label <b> #{params[:label]} </b>. Did you mean #{view_context.link_to(cls.label, assay_types_path(:uri=>uri, :label=> cls.label),{:style=> "font-style:italic;font-weight:bold;"})}?".html_safe
     else
       @type_class=cls
     end
-    @label = params[:label] || @type_class.try(:label)
+    @label = params[:label]
 
   end
 
   def find_and_authorize_assays
     @assays=[]
     if @type_class
-      if is_suggested?(@type_class)
+      if view_context.is_suggested?(@type_class)
         uris = ([@type_class] +@type_class.children).map(&:uri)
       else
         uris=@type_class.flatten_hierarchy.collect { |o| o.uri.to_s }
@@ -52,7 +63,5 @@ class AssayTypesController < ApplicationController
   end
 
 
-  def is_suggested? clz
-      clz.is_a?(SuggestedAssayType)
-  end
+
 end
