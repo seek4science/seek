@@ -97,6 +97,7 @@ group :development do
 end
 
 group :test do
+  gem 'test_after_commit'
   gem "sqlite3","1.3.7"
   gem "ruby-prof"
   gem "webmock"

@@ -238,7 +238,7 @@ module Seek
 
       #triggers a background task to update or create the authorization lookup table records for this item
       def check_to_queue_update_auth_table
-        unless (self.previous_changes.keys & ["contributor_id"]).empty?
+        unless (self.previous_changes.keys & ["contributor_id","owner_id"]).empty?
           AuthLookupUpdateJob.add_items_to_queue self
         end
       end

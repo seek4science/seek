@@ -17,8 +17,6 @@ class Person < ActiveRecord::Base
   acts_as_notifiee
   acts_as_annotatable :name_field=>:name
 
-  after_commit :queue_update_auth_table
-
   validates_presence_of :email
 
   #FIXME: consolidate these regular expressions into 1 holding class
@@ -74,9 +72,10 @@ class Person < ActiveRecord::Base
   has_many :subscriptions,:dependent => :destroy
 
   before_create :set_default_subscriptions
+  after_commit :queue_update_auth_table
 
   def queue_update_auth_table
-    if changes.include?("roles_mask")
+    if previous_changes.keys.include?("roles_mask")
       AuthLookupUpdateJob.add_items_to_queue self
     end
   end
