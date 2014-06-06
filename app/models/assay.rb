@@ -104,7 +104,30 @@ class Assay < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
+  #uri for generating rdf for suggested assay type,
+  #if uri is valid, this will be ignored, as it is already added by assay_type_uri
+  #otherwise use the uri of parent in ontology
+  def suggested_assay_type_ontology_uri
+     uri = RDF::URI.new SuggestedAssayType.where(:uri=> assay_type_uri).first.try(:uri)
+     if uri.valid?
+       nil
+     else
+       SuggestedAssayType.where(:uri=> assay_type_uri).first.try(:ontology_uri)
+     end
+  end
 
+  #uri for generating rdf for suggested technology type,
+  #if uri is valid, this will be ignored, as it is already added by technology_type_uri
+  #otherwise use the uri of parent in ontology
+
+  def suggested_technology_type_ontology_uri
+    uri = RDF::URI.new SuggestedTechnologyType.where(:uri=> technology_type_uri).first.try(:uri)
+    if uri.valid?
+      nil
+    else
+      SuggestedTechnologyType.where(:uri=> technology_type_uri).first.try(:ontology_uri)
+    end
+  end
   # super method defined in ontology_type_handling
   # so the query order is: 1. read_attribute(:assay_type_label) 2.Ontology 3. SuggestedAssayType
   def assay_type_label

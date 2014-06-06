@@ -31,6 +31,12 @@ class SuggestedTechnologyType < ActiveRecord::Base
       errors[:base] << "Technology type with label #{self.label} already exists!" if ontology_labels.each(&:downcase).include?(self.label.downcase)
   end
 
+  def ontology_uri
+    ontology_uri = RDF::URI.new uri
+    parent_ontology_uri =  parent.respond_to?(:ontology_uri) ?  parent.ontology_uri : parent.uri.try(:to_s)
+    return ontology_uri.valid? ?  ontology_uri.to_s :  parent_ontology_uri
+  end
+
 
   def parents
     Array(parent)
