@@ -56,9 +56,7 @@
 
   </div>
   </div>
-  <div class="main_content_right_box_wider">
-      <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @study}-%>
-  </div>
+
 <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => [@study.contributing_user.try(:person)] } %>
 
   <div style="clear:both">
