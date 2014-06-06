@@ -23,7 +23,7 @@ module Seek
           enforce_required_access_for_owner :policy,:manage
 
 
-          after_save :queue_update_auth_table
+          after_commit :check_to_queue_update_auth_table
           after_destroy :remove_from_lookup_table
           before_save :update_timestamp_if_policy_was_saved, :if => "Seek::Config.is_virtualliver"
 
@@ -237,34 +237,40 @@ module Seek
       end
 
       #triggers a background task to update or create the authorization lookup table records for this item
-      def queue_update_auth_table
-        #FIXME: somewhat aggressively does this after every save can be refined in the future
-        unless (self.changed - ["updated_at", "last_used_at"]).empty?
+      def check_to_queue_update_auth_table
+        unless (self.previous_changes.keys & ["contributor_id","owner_id"]).empty?
           AuthLookupUpdateJob.add_items_to_queue self
         end
       end
 
       #updates or creates the authorization lookup entries for this item and the provided user (nil indicating anonymous user)
       def update_lookup_table user=nil
-        user_id = user.nil? ? 0 : user.id
+        self.class.isolation_level( :repeatable_read ) do #ensure it allows it see another worker may have inserted a record already
+          self.class.transaction do
+            user_id = user.nil? ? 0 : user.id
 
-        can_view = ActiveRecord::Base.connection.quote authorized_for_action(user,"view")
-        can_edit = ActiveRecord::Base.connection.quote authorized_for_action(user,"edit")
-        can_download = ActiveRecord::Base.connection.quote authorized_for_action(user,"download")
-        can_manage = ActiveRecord::Base.connection.quote authorized_for_action(user,"manage")
-        can_delete = ActiveRecord::Base.connection.quote authorized_for_action(user,"delete")
+            can_view = ActiveRecord::Base.connection.quote authorized_for_action(user,"view")
+            can_edit = ActiveRecord::Base.connection.quote authorized_for_action(user,"edit")
+            can_download = ActiveRecord::Base.connection.quote authorized_for_action(user,"download")
+            can_manage = ActiveRecord::Base.connection.quote authorized_for_action(user,"manage")
+            can_delete = ActiveRecord::Base.connection.quote authorized_for_action(user,"delete")
 
-        #check to see if an insert of update is needed, action used is arbitary
-        lookup = self.class.lookup_for_asset("view",user_id,self.id)
-        insert = lookup.nil?
+            #check to see if an insert of update is needed, action used is arbitary
+            lookup = self.class.lookup_for_asset("view",user_id,self.id)
+            insert = lookup.nil?
 
-        if insert
-          sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
-        else
-          sql = "update #{self.class.lookup_table_name} set can_view=#{can_view}, can_edit=#{can_edit}, can_download=#{can_download},can_manage=#{can_manage},can_delete=#{can_delete} where user_id=#{user_id} and asset_id=#{id}"
+            if insert
+              sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
+            else
+              sql = "update #{self.class.lookup_table_name} set can_view=#{can_view}, can_edit=#{can_edit}, can_download=#{can_download},can_manage=#{can_manage},can_delete=#{can_delete} where user_id=#{user_id} and asset_id=#{id}"
+            end
+
+            ActiveRecord::Base.connection.execute(sql)
+          end
         end
 
-        ActiveRecord::Base.connection.execute(sql)
+
+
 
       end
 

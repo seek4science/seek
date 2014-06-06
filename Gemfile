@@ -51,6 +51,7 @@ gem 'cocaine'
 gem 'colorize'
 gem 'lograge'
 gem 'psych'
+gem 'transaction_isolation'
 
 #gem for BiVeS and BudHat
 gem 'bives'
@@ -97,6 +98,7 @@ group :development do
 end
 
 group :test do
+  gem 'test_after_commit'
   gem "sqlite3","1.3.7"
   gem "ruby-prof"
   gem "webmock"

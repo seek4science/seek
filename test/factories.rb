@@ -102,7 +102,7 @@
 
 #Project
   Factory.define(:project) do |f|
-    f.sequence(:title) { |n| "A Project: #{n}" }
+    f.sequence(:title) { |n| "A Project: -#{n}" }
   end
 
 #Institution
