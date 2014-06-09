@@ -62,7 +62,7 @@
       }
     </style>
 
-    <div id='simple sharing' class="sharing_box_form">
+    <div id='simple_sharing' class="sharing_box_form">
         <!-- private -->
         <p><label for="sharing_scope_<%= Policy::PRIVATE -%>">
             <input type="hidden" id='access_type_select_<%= Policy::PRIVATE -%>' name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
@@ -99,7 +99,7 @@
             - All visitors (including anonymous visitors with no login):
           </label>
            <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
-            :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
+            :sharing_scope => @sharing_mode, :access_type => @access_mode, :default_access_type=>Policy::ACCESSIBLE } -%>
            <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
           <br/>
         </p>
