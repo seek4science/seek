@@ -15,7 +15,7 @@
                 <br/>
                 <%= text_field_tag 'temp_link', temporary_link, :size => 70 -%>
                 <br/>
-                <span class='none_text'>(If this is the first time you generate this link, the link is not valid until you click 'Save Changes')</span>
+                <span class='none_text'>(If this is the first time you generate this link, the link is not valid until you update)</span>
                 <%= sub_form.hidden_field :code %>
               </p>
 
@@ -25,10 +25,10 @@
                 <br/>
                 <span class='none_text'>(After this date, the link is not accessible anymore)</span>
               </p>
-              <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show(); flipSaveEnable();"}, :class => 'hidden_destroy_field' %>
+              <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show(); "}, :class => 'hidden_destroy_field' %>
             </fieldset>
         <% end %>
-        <%= link_to_function "Add a Sharing Link", "addTempLink(); flipSaveEnable();", :id => "add_a_temporary_link", :style => "display: #{f.object.special_auth_codes.empty? ? 'block' : 'none'}" %>
+        <%= link_to_function "Add a Sharing Link", "addTempLink();", :id => "add_a_temporary_link", :style => "display: #{f.object.special_auth_codes.empty? ? 'block' : 'none'}" %>
    <% end %>
   <%= render :partial => 'assets/folding_box', :locals => {:hidden =>  false, :fold_id => 'temporary_links', :fold_title => title_and_help, :contents => content} %>
 <% end %>

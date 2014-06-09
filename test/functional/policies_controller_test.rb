@@ -55,9 +55,9 @@ class PoliciesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "h3",:text=>"Fine-grained sharing permissions:", :count=>1
 
-    assert_select 'p', :text=>"#{person.name} can #{Policy.get_access_type_wording(Policy::MANAGING, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
-    assert_select 'p', :text=>"Members of Favourite group #{favorite_group.title} have #{Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
-    assert_select 'p', :text=>"Members of #{I18n.t('project')} #{project.title} can #{Policy.get_access_type_wording(Policy::ACCESSIBLE, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
+    assert_select 'p', :text=>"#{person.name} can #{Policy.get_access_type_wording(Policy::MANAGING, 'data_file'.camelize.constantize.new().try(:is_downloadable?)).downcase}", :count => 1
+    assert_select 'p', :text=>"Members of Favourite group #{favorite_group.title} have #{Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP, 'data_file'.camelize.constantize.new().try(:is_downloadable?)).downcase}", :count => 1
+    assert_select 'p', :text=>"Members of #{I18n.t('project')} #{project.title} can #{Policy.get_access_type_wording(Policy::ACCESSIBLE, 'data_file'.camelize.constantize.new().try(:is_downloadable?)).downcase}", :count => 1
   end
 
   test 'should show the correct manager(contributor) when updating a study' do

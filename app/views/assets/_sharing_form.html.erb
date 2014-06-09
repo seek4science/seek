@@ -333,6 +333,8 @@
 <script type="text/javascript">
   init_sharing();
 
+  downloadable_asset = <%= @resource.try(:is_downloadable?) %>;
+
   GET_INSTITUTIONS_LINK = '<%= request_institutions_projects_path -%>';
   GET_ALL_INSTITUTIONS_LINK = '<%= request_all_institutions_path -%>';
 

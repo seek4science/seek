@@ -46,15 +46,17 @@ var receivedProjectInstitutions = null;
 
 var currentFavouriteGroupSettings = {};
 
-var people_in_group = null
+var people_in_group = null;
+
+var downloadable_asset=true;
 
 function init_sharing() {
-    DETERMINED_BY_GROUP = parseInt($('const_determined_by_group').value);
-    NO_ACCESS = parseInt($('const_no_access').value);
-    VIEWING = parseInt($('const_viewing').value);
-    DOWNLOADING = parseInt($('const_downloading').value);
-    EDITING = parseInt($('const_editing').value);
-    MANAGING = parseInt($('const_managing').value);
+    DETERMINED_BY_GROUP = <%= Policy::DETERMINED_BY_GROUP %>;
+    NO_ACCESS = <%= Policy::NO_ACCESS %>;
+    VIEWING = <%= Policy::VISIBLE %>;
+    DOWNLOADING = <%= Policy::ACCESSIBLE %>;
+    EDITING = <%= Policy::EDITING %>;
+    MANAGING = <%= Policy::MANAGING %>;
 
 }
 	
@@ -77,8 +79,8 @@ function updateCustomSharingSettings() {
             }else{
                 shared_with += permission_settings[contributor_type][i][0]
             }
-            + '&nbsp;&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(permission_settings[contributor_type][i][2]) +')</span>'
-            + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
+            shared_with += '&nbsp;&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(permission_settings[contributor_type][i][2]) +')</span>'
+            shared_with += '&nbsp;&nbsp;<small style="vertical-align: middle;">'
             if (permission_settings[contributor_type][i].length<4 || permission_settings[contributor_type][i][3]==true) {
                 shared_with += '[<a href="" onclick="javascript:deleteContributor(\''+ contributor_type +'\', '+ permission_settings[contributor_type][i][1] +'); return(false);">remove</a>]'
             }
@@ -126,29 +128,57 @@ function updateCustomSharingSettings() {
 }
 
 
+
 function accessTypeTranslation(access_type) {
     txt = '';
-  
-    switch(access_type) {
-        case DETERMINED_BY_GROUP:
-            txt = "<%= Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP) %>";
+    switch(downloadable_asset) {
+        case true:
+            switch (access_type) {
+                case DETERMINED_BY_GROUP:
+                    txt = "<%= Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP,true) %>";
+                    break;
+                case NO_ACCESS:
+                    txt = "<%= Policy.get_access_type_wording(Policy::NO_ACCESS,true) %>";
+                    break;
+                case VIEWING:
+                    txt = "<%= Policy.get_access_type_wording(Policy::VISIBLE,true) %>";
+                    break;
+                case DOWNLOADING:
+                    txt = "<%= Policy.get_access_type_wording(Policy::ACCESSIBLE,true) %>";
+                    break;
+                case EDITING:
+                    txt = "<%= Policy.get_access_type_wording(Policy::EDITING,true) %>";
+                    break;
+                case MANAGING:
+                    txt = "<%= Policy.get_access_type_wording(Policy::MANAGING,true) %>";
+                    break;
+            }
             break;
-        case NO_ACCESS:
-            txt = "<%= Policy.get_access_type_wording(Policy::NO_ACCESS) %>";
+        case false:
+            switch (access_type) {
+                case DETERMINED_BY_GROUP:
+                    txt = "<%= Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP,false) %>";
+                    break;
+                case NO_ACCESS:
+                    txt = "<%= Policy.get_access_type_wording(Policy::NO_ACCESS,false) %>";
+                    break;
+                case VIEWING:
+                    txt = "<%= Policy.get_access_type_wording(Policy::VISIBLE,false) %>";
+                    break;
+                case DOWNLOADING:
+                    txt = "<%= Policy.get_access_type_wording(Policy::ACCESSIBLE,false) %>";
+                    break;
+                case EDITING:
+                    txt = "<%= Policy.get_access_type_wording(Policy::EDITING,false) %>";
+                    break;
+                case MANAGING:
+                    txt = "<%= Policy.get_access_type_wording(Policy::MANAGING,false) %>";
+                    break;
+            }
             break;
-        case VIEWING:
-            txt = "<%= Policy.get_access_type_wording(Policy::VISIBLE) %>";
-            break;
-        case DOWNLOADING:
-            txt = "<%= Policy.get_access_type_wording(Policy::ACCESSIBLE) %>";
-            break;
-        case EDITING:
-            txt = "<%= Policy.get_access_type_wording(Policy::EDITING) %>";
-            break;
-        case MANAGING:
-            txt = "<%= Policy.get_access_type_wording(Policy::MANAGING) %>";
-            break;
+
     }
+
   
     return(txt);
 }
