@@ -62,6 +62,18 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
   end
 
+  test "download and view options for anonymous sharing" do
+    login_as(Factory(:user))
+    get :new
+    assert_response :success
+    assert_select "#simple_sharing" do
+      assert_select "select#access_type_select_4" do
+        assert_select "option[value=?]",1,:text=>/#{I18n.t('access.visible_downloadable')}/i
+        assert_select "option[value=?][selected='selected']",2,:text=>/#{I18n.t('access.accessible_downloadable')}/i
+      end
+    end
+  end
+
   test "correct title and text for associating an assay for edit" do
     df = Factory :data_file
     login_as(df.contributor.user)
