@@ -1591,6 +1591,28 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test "description formatting" do
+    desc = "This is <b>Bold</b> - this is <em>emphasised</em> - this is super<sup>script</sup> - "
+    desc << "This is <u>underlined</u> - "
+    desc << "this is link to goole: http://google.com - "
+    desc << "this is some nasty javascript <script>alert('fred');</script>"
+
+    df = Factory(:data_file,:description=>desc,:policy=>Factory(:public_policy))
+
+    get :show,:id=>df
+    assert_response :success
+    assert_select "div#description" do
+      assert_select "p"
+      assert_select "b", :text=>"Bold"
+      assert_select "em", :text=>"emphasised"
+      assert_select "u", :text=>"underlined"
+      assert_select "sup", :text=>"script"
+      assert_select "script",:count=>0
+      assert_select "a[href=?]","http://google.com",:text=>"http://google.com"
+    end
+
+  end
+
   test "filter by people, including creators, using nested routes" do
     assert_routing "people/7/presentations",{controller:"presentations",action:"index",person_id:"7"}
 
