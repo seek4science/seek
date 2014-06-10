@@ -15,7 +15,7 @@ $j( document ).ready(function() {
                 response: function(){
                     var data = this.State.Response.data;
                     var tab_content_id = 'faceted_search_result';
-                    $j('#' + tab_content_id).html(data.facets_for_items);
+                    $j('#' + tab_content_id).html(data.items_for_facets);
                     $j(document).trigger("scriptsLoaded.exhibit");
                     return true;
                 },
@@ -79,7 +79,7 @@ function tab_on_click(resource_type, resource_ids) {
                 if (with_facets == true)
                     tab_content.html(data.items_for_facets);
                 else
-                    tab_content.html(data.resource_list_items);
+                    tab_content.html(data.items_for_result);
                 //$j(document).ready(initializationFunction);
                 //$j(document).trigger("scriptsLoaded.exhibit");
             });

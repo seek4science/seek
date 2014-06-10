@@ -13,7 +13,7 @@ function updateFirstPage(){
             data: {item_ids: item_ids.join(','), item_type: item_type}
         })
             .done(function( data ) {
-                updateContent(data.resource_list_items);
+                updateContent(data.items_for_result);
 
                 $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
                 $j('.exhibit-collectionView-header-groupControl').hide();
@@ -58,9 +58,9 @@ function getItemType(items){
     return database.getObject(items.attr("itemid"), 'type');
 }
 
-function updateContent(resource_list_items){
+function updateContent(items_for_result){
     var collection_view_body = $j('.exhibit-collectionView-body');
-    collection_view_body.html(resource_list_items);
+    collection_view_body.html(items_for_result);
 }
 
 function decodeValueTooltip(){

@@ -94,9 +94,9 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       assert !assay2.can_view?
 
       xhr(:get, "/assays/items_for_result",{:item_type => 'Assay', :item_ids => [assay1.id,assay2.id]})
-      resource_list_items =  ActiveSupport::JSON.decode(@response.body)['resource_list_items']
-      assert resource_list_items.include?(assay1.title)
-      assert !resource_list_items.include?(assay2.title)
+      items_for_result =  ActiveSupport::JSON.decode(@response.body)['items_for_result']
+      assert items_for_result.include?(assay1.title)
+      assert !items_for_result.include?(assay2.title)
     end
   end
 end
