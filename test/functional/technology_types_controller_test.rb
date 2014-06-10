@@ -61,15 +61,21 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   end
 
 
-  test "label passed overrides" do
+  test "unmatched label passed redirect to term suggestion page with ontology label or suggested_assay_type_label" do
     assay = Factory :experimental_assay,:policy=>Factory(:public_policy)
 
     get :show, :uri=>assay.technology_type_uri,:label=>"frog"
-    assert_response :success
+    # undefined label with uri in ontology will go to suggestion page pointing to term with ontology label
+    assert_not_nil flash[:error]
     assert_select "h1",:text=>/Technology type &#x27;frog&#x27;/
-    assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
-    end
+
+
+    suggested_technology_type = Factory(:suggested_technology_type)
+    assay = Factory :experimental_assay,:technology_type_uri => suggested_technology_type.uri,:policy=>Factory(:public_policy)
+    get :show, :uri=> assay.technology_type_uri,:label=>"frog"
+
+    assert_not_nil flash[:error]
+    assert_select "h1",:text=>/Technology type &#x27;frog&#x27;/
   end
 
 end
