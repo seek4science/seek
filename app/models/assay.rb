@@ -108,7 +108,7 @@ class Assay < ActiveRecord::Base
   #if uri is valid, this will be ignored, as it is already added by assay_type_uri
   #otherwise use the uri of parent in ontology
   def suggested_assay_type_ontology_uri
-     uri = RDF::URI.new SuggestedAssayType.where(:uri=> assay_type_uri).first.try(:uri)
+     uri = RDF::URI.new assay_type_uri
      if uri.valid?
        nil
      else
@@ -121,7 +121,7 @@ class Assay < ActiveRecord::Base
   #otherwise use the uri of parent in ontology
 
   def suggested_technology_type_ontology_uri
-    uri = RDF::URI.new SuggestedTechnologyType.where(:uri=> technology_type_uri).first.try(:uri)
+    uri = RDF::URI.new technology_type_uri
     if uri.valid?
       nil
     else

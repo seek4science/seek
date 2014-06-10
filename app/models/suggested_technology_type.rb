@@ -12,8 +12,8 @@ class SuggestedTechnologyType < ActiveRecord::Base
   attr_accessor  :link_from
 
 
-  validates_presence_of :label
-  validates_uniqueness_of :label
+  validates_presence_of :label,:uri
+  validates_uniqueness_of :label, :uri
   validate :label_not_defined_in_ontology
   before_validation :default_parent
 
@@ -31,12 +31,18 @@ class SuggestedTechnologyType < ActiveRecord::Base
       errors[:base] << "Technology type with label #{self.label} already exists!" if ontology_labels.each(&:downcase).include?(self.label.downcase)
   end
 
-  def ontology_uri
-    ontology_uri = RDF::URI.new uri
-    parent_ontology_uri =  parent.respond_to?(:ontology_uri) ?  parent.ontology_uri : parent.uri.try(:to_s)
-    return ontology_uri.valid? ?  ontology_uri.to_s :  parent_ontology_uri
+  #parent with valid uri
+  def ontology_parent term=self
+    return nil if term.nil?
+    rdf_uri = RDF::URI.new term.parent_uri
+    rdf_uri.valid? ? term.parent : ontology_parent(parent)
   end
 
+  # its own valid uri or its parent with valid uri
+  def ontology_uri
+    rdf_uri = RDF::URI.new uri
+    return rdf_uri.valid? ?  rdf_uri.to_s : ontology_parent.try(:uri).try(:to_s)
+  end
 
   def parents
     Array(parent)
