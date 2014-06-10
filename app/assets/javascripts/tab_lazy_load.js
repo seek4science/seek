@@ -59,18 +59,27 @@ function load_tabs() {
 
 function tab_on_click(resource_type, resource_ids) {
     var click_tab = document.getElementById('tab_' + resource_type);
+    var url = items_for_facets_url;
+    var with_facets = resource_ids.split(',').length >= 10;
+    if (with_facets == false){
+        url = items_for_result_url;
+    }
     click_tab.onclick = function () {
         deactivate_previous_tab();
         click_tab.className = 'tabberactive';
         $j.ajax({
-            url: items_for_facets_url,
+            url: url,
             async: false,
             data: { item_ids: resource_ids,
                 item_type: resource_type}
         })
             .done(function (data) {
                 var tab_content_id = 'faceted_search_result';
-                $j('#' + tab_content_id).html(data.items_for_facets);
+                var tab_content = $j('#' + tab_content_id);
+                if (with_facets == true)
+                    tab_content.html(data.items_for_facets);
+                else
+                    tab_content.html(data.resource_list_items);
                 //$j(document).ready(initializationFunction);
                 //$j(document).trigger("scriptsLoaded.exhibit");
             });
