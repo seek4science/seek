@@ -27,31 +27,26 @@ class AssayTest < ActiveSupport::TestCase
     Factory :assay_asset, :assay=>assay
     assay.reload
     assert_equal 1,assay.assets.size
-    begin
-      rdf = assay.to_rdf
-      RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-        assert reader.statements.count > 1
-        assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
-      end
-
-      #try modelling, with tech type nil
-      assay = Factory :modelling_assay, :organisms=>[Factory(:organism)], :technology_type_uri=>nil
-      #rdf = assay.to_rdf
-
-      # assay with suggested assay/technology types
-      suggested_assay_type = Factory(:suggested_assay_type)
-      suggested_tech_type =  Factory(:suggested_technology_type)
-      assay = Factory :experimental_assay, :assay_type_uri=> suggested_assay_type.uri, :technology_type_uri =>  suggested_tech_type.uri
-      rdf = assay.to_rdf
-
-      RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-        reader.statements.map(&:object).include? suggested_assay_type.ontology_uri
-        reader.statements.map(&:object).include? suggested_tech_type.ontology_uri
-      end
-    rescue Exception => e
-      puts e.stacktrace
+    rdf = assay.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 1
+      assert_equal RDF::URI.new("http://localhost:3000/assays/#{assay.id}"), reader.statements.first.subject
     end
 
+    #try modelling, with tech type nil
+    assay = Factory :modelling_assay, :organisms => [Factory(:organism)], :technology_type_uri => nil
+    rdf = assay.to_rdf
+
+    # assay with suggested assay/technology types
+    suggested_assay_type = Factory(:suggested_assay_type)
+    suggested_tech_type = Factory(:suggested_technology_type)
+    assay = Factory :experimental_assay, :assay_type_uri => suggested_assay_type.uri, :technology_type_uri => suggested_tech_type.uri
+    rdf = assay.to_rdf
+
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      reader.statements.map(&:object).include? suggested_assay_type.ontology_uri
+      reader.statements.map(&:object).include? suggested_tech_type.ontology_uri
+    end
   end
 
   test "is_asset?" do
