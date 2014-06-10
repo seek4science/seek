@@ -31,12 +31,12 @@ class AssayTypesController < ApplicationController
 
     if cls.nil?
       flash.now[:error] = "Unrecognised assay type"
-    elsif params[:label] != cls.label
+    elsif !params[:label].blank? && params[:label] != cls.label
       flash.now[:error] = "Undefined assay type with label <b> #{params[:label]} </b>. Did you mean #{view_context.link_to(cls.label, assay_types_path(:uri=>uri, :label=> cls.label),{:style=> "font-style:italic;font-weight:bold;"})}?".html_safe
     else
       @type_class=cls
     end
-    @label = params[:label]
+    @label = params[:label] || @type_class.try(:label)
 
   end
 
