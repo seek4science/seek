@@ -36,7 +36,8 @@
         var $j = jQuery;
 
         <% sorted_result_keys.each do |key| %>
-            tab_on_click('<%= key %>', '<%= resource_hash[key].collect(&:id).join(',') %>');
+            var with_facets = <%= Seek::Config.facet_enable_for_pages[key] && resource_hash[key].count > 10 %>
+            tab_on_click('<%= key %>', '<%= resource_hash[key].collect(&:id).join(',') %>', with_facets);
         <% end %>
 
         //Load content for first tab

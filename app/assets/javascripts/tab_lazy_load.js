@@ -57,13 +57,14 @@ function load_tabs() {
     tabberAutomatic(tabberOptions);
 }
 
-function tab_on_click(resource_type, resource_ids) {
+function tab_on_click(resource_type, resource_ids, with_facets) {
     var click_tab = document.getElementById('tab_' + resource_type);
-    var url = items_for_facets_url;
-    var with_facets = resource_ids.split(',').length >= 10;
-    if (with_facets == false){
+    var url = '';
+    if (with_facets == true)
+        url = items_for_facets_url;
+    else
         url = items_for_result_url;
-    }
+
     click_tab.onclick = function () {
         deactivate_previous_tab();
         click_tab.className = 'tabberactive';
