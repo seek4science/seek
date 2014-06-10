@@ -16,7 +16,7 @@
 
           <li id="tab_<%= key%>">
             <% tab_title = "#{visible_resource_type} (#{resource_hash[key].count})" -%>
-              <a href="./search/items_for_facets?item_type=<%= key %>&item_ids=<%= resource_hash[key].collect(&:id).join(',') %>" class="ajaxy ajaxy-search">
+              <a>
                 <%= tab_title -%>
               </a>
           </li>
@@ -30,6 +30,23 @@
     </ul>
 
     <div id="faceted_search_result"></div>
+    <script type="text/javascript">
+        //load_tabs();
+        jQuery.noConflict();
+        var $j = jQuery;
+
+        <% sorted_result_keys.each do |key| %>
+            tab_on_click('<%= key %>', '<%= resource_hash[key].collect(&:id).join(',') %>');
+        <% end %>
+
+        //Load content for first tab
+        window.onload = function(){
+            var first_tab = document.getElementById('tab_' + '<%= sorted_result_keys.first %>');
+            if (first_tab != null) {
+                first_tab.click();
+            }
+        };
+    </script>
 <% else %>
     <span class="none_text">No items.</span>
 <% end %>

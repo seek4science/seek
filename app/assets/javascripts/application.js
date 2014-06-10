@@ -1,7 +1,7 @@
 // ...
-//= require jquery
-//= require jquery_no_conflict
-//= require taverna_player/application
+// require jquery
+// require jquery_no_conflict
+// require taverna_player/application
 //= require savage_beast/application
 //= require prototype
 //= require prototype_ujs
@@ -31,4 +31,4 @@
 //= require folds
 // require tabber-minimized
 //= require detect_browser
-//= require easytabs
+// require easytabs

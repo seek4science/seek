@@ -1,4 +1,4 @@
-jQuery.noConflict();
+/*jQuery.noConflict();
 var $j = jQuery;
 $j( document ).ready(function() {
     $j.Ajaxy.configure({
@@ -48,13 +48,33 @@ $j( document ).ready(function() {
     if (first_tab != null){
         first_tab.click();
     }
-});
+});*/
 
 function load_tabs() {
     var tabberOptions = {'onLoad':function() {
         displayTabs();
     }};
     tabberAutomatic(tabberOptions);
+}
+
+function tab_on_click(resource_type, resource_ids) {
+    var click_tab = document.getElementById('tab_' + resource_type);
+    click_tab.onclick = function () {
+        deactivate_previous_tab();
+        click_tab.className = 'tabberactive';
+        $j.ajax({
+            url: items_for_facets_url,
+            async: false,
+            data: { item_ids: resource_ids,
+                item_type: resource_type}
+        })
+            .done(function (data) {
+                var tab_content_id = 'faceted_search_result';
+                $j('#' + tab_content_id).html(data.items_for_facets);
+                //$j(document).ready(initializationFunction);
+                //$j(document).trigger("scriptsLoaded.exhibit");
+            });
+    }
 }
 
 function deactivate_previous_tab(){

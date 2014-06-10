@@ -63,9 +63,13 @@
   <%= render :partial => "faceted_browsing/data_search", :locals => {:objects => objects} %>
 </div>
 
+<%= javascript_include_tag 'exhibit/locales/en/locale'%>
+<%#= javascript_include_tag 'exhibit/lib/jquery-1.7.2.min'%>
+
 <script type="text/javascript">
     Exhibit.jQuery(document).ready(initializationFunction);
+    Exhibit.jQuery(document).trigger("scriptsLoaded.exhibit");
 </script>
 
-<%= javascript_include_tag 'exhibit/locales/en/locale'%>
+
 

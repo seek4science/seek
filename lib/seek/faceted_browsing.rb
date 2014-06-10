@@ -19,7 +19,7 @@ module Seek
 
       respond_to do |format|
         format.json {
-          render :json => {:status => 200, :facets_for_items => facets_for_items}
+          render :json => {:status => 200, :items_for_facets => facets_for_items}
         }
       end
     end
