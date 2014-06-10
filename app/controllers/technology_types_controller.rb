@@ -16,8 +16,8 @@ class TechnologyTypesController < ApplicationController
     cls ||= SuggestedTechnologyType.where(:uri => uri).first
     if cls.nil?
       flash.now[:error] = "Unrecognised technology type"
-    elsif !params[:label].blank? && params[:label] != cls.label
-      flash.now[:error] = "Undefined technology type with label <b> #{params[:label]} </b>. Did you mean #{view_context.link_to(cls.label, technology_types_path(:uri=>uri, :label=> cls.label),{:style=> "font-style:italic;font-weight:bold;"})}?".html_safe
+    elsif !params[:label].blank? && params[:label].downcase != cls.label.downcase
+      flash.now[:notice] = "Undefined technology type with label <b> #{params[:label]} </b>. Did you mean #{view_context.link_to(cls.label, technology_types_path(:uri=>uri, :label=> cls.label),{:style=> "font-style:italic;font-weight:bold;"})}?".html_safe
     else
       @type_class=cls
     end
