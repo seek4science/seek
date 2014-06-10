@@ -1579,6 +1579,13 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test "handles nil description" do
+    df = Factory(:data_file,:description=>nil,:policy=>Factory(:public_policy))
+
+    get :show,:id=>df
+    assert_response :success
+  end
+
   test "description formatting" do
     desc = "This is <b>Bold</b> - this is <em>emphasised</em> - this is super<sup>script</sup> - "
     desc << "This is <u>underlined</u> - "
