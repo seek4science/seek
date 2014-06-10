@@ -205,7 +205,7 @@ module ApplicationHelper
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length])  if options[:length]
       res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true  
-      res = simple_format(res) if options[:description]==true || options[:address]==true
+      res = simple_format(res).html_safe if options[:description]==true || options[:address]==true
       
       res=mail_to(res) if options[:email]==true
       res=link_to(res,res,:popup=>true) if options[:external_link]==true
