@@ -3,6 +3,8 @@
    object_type = objects.first.class.name
    facet_config = YAML.load(File.read(facet_config_path))
    facets_for_object = facet_config[object_type] || {}
+   expand_facet_count = 1
+   display_facet_count = 3
 %>
 
 <div style="width: 100%">
@@ -34,6 +36,7 @@
       <% facets_for_object.each do |key, value| %>
           <% label = value['label'] %>
           <% facet_class = value['facet_class'] %>
+
           <div data-ex-role="facet"
                data-ex-expression=".<%= key %>"
                data-ex-facet-label="<%= label %>"
@@ -42,22 +45,51 @@
                data-ex-collapsible="true"
 
                <% if facet_class == "NumericRange" %>
-               <% interval = value['interval'] %>
-               data-ex-interval="<%= interval %>"
+                    <% interval = value['interval'] %>
+                    data-ex-interval="<%= interval %>"
                <% end %>
 
                <% if facet_class == "Exhibit.HierarchicalFacet" %>
-               data-ex-uniform-grouping=".subclassOf"
-               data-ex-scroll="false"
+                    data-ex-uniform-grouping=".subclassOf"
+                    data-ex-scroll="false"
                <% end %>
                <% count += 1%>
-               <% if count > 1 %>
-               data-ex-collapsed="true"
+               <% if count > expand_facet_count %>
+                    data-ex-collapsed="true"
+               <% end %>
+               <% if count > display_facet_count %>
+                    style="display:none"
+                    id="toogle_facet_<%= count %>"
                <% end %>
                >
           </div>
           <br/>
       <% end %>
+
+      <% if facets_for_object.keys.count > display_facet_count %>
+          <%= link_to_function ("More "+image("expand")).html_safe, :id => 'more_facets', :style => "float:right;margin-top:-2em;" do |page|
+            page["more_facets"].toggle
+            page["less_facets"].toggle
+            facets_for_object.keys.each_with_index do |key, index|
+              if (index + 1) > display_facet_count
+                page.visual_effect(:toggle_appear, "toogle_facet_#{index + 1}", :duration => 0.3)
+                #page["toogle_facet_#{index + 1}"].data-ex-collapsed="true"
+              end
+            end
+          end
+          -%>
+          <%= link_to_function ("Less "+image("collapse")).html_safe, :id => 'less_facets', :style => "float:right;display:none" do |page|
+            page["more_facets"].toggle
+            page["less_facets"].toggle
+            facets_for_object.keys.each_with_index do |key, index|
+              if (index + 1) > display_facet_count
+                page.visual_effect(:toggle_appear, "toogle_facet_#{index + 1}", :duration => 0.3)
+              end
+            end
+          end
+          -%>
+      <% end %>
+
     </div>
   </div>
   <%= render :partial => "faceted_browsing/data_search", :locals => {:objects => objects} %>
