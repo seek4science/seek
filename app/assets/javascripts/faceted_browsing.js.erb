@@ -1,7 +1,7 @@
 function updateFirstPage(){
     //temporary put this function here, need to find better place or rename the updateFirstPage
     renameHFMissingField();
-    renameOtherField()
+    renameOtherField();
     var items = $j('div[itemid]');
     var item_type = getItemType(items);
     var item_ids = getItemIds(items);
@@ -28,6 +28,7 @@ var $j = jQuery;
 $j(document).ready(function(){
     $j(document).on("exhibitConfigured.exhibit", function() {
         defaultSearchText();
+        hideFacets();
     });
 
     $j(document).bind("registerLocales.exhibit", function() {
@@ -91,5 +92,15 @@ function renameOtherField(){
         $j(this).attr("title", replaced_term);
         var value_link = $j(this).children('.exhibit-flowingFacet-value-link');
         value_link.html(replaced_term);
+    })
+}
+
+function hideFacets(){
+    $j('.exhibit-facet-header-collapse').map(function(){
+        var grand_parent = this.parentNode.parentNode;
+        var id = grand_parent.id;
+        if (id != null && id.match('toogle_facet_') != null){
+            grand_parent.hide();
+        }
     })
 }
