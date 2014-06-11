@@ -47,13 +47,6 @@
              facet_values = facet_values.send(field)
            end
          end
-         #escape facet_values
-         if facet_values.blank?
-         elsif facet_values.kind_of?(Array)
-           facet_values = facet_values.collect{|v| h(v)}
-         else
-           facet_values = h(facet_values)
-         end
          exhibit_item[key] = facet_values
        end
 
