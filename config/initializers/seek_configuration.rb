@@ -96,6 +96,7 @@ SEEK::Application.configure do
 # Faceted Browsing
   Seek::Config.default :faceted_browsing_enabled, true
   Seek::Config.default :facet_enable_for_pages, {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
+  Seek::Config.default :faceted_search_enabled, true
 
 # Others
   Seek::Config.default :type_managers_enabled,true
