@@ -53,12 +53,11 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_equal sop, AuthLookupUpdateQueue.last(:order=>:id).item
     AuthLookupUpdateQueue.destroy_all
     sop.title = Time.now.to_s
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
+    assert_difference("AuthLookupUpdateQueue.count", 0) do
       disable_authorization_checks do
         sop.save!
       end
     end
-    assert_equal sop, AuthLookupUpdateQueue.last(:order=>:id).item
   end
 
   test "updates to queue for assay" do
@@ -66,7 +65,9 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     #otherwise a study and investigation are also created and triggers inserts to queue
     assay = Factory :assay, :contributor=>user.person, :policy=>Factory(:private_policy)
     assert_difference("AuthLookupUpdateQueue.count", 1) do
-      assay = Factory :assay, :contributor=>user.person, :policy=>Factory(:private_policy), :study=>assay.study
+      disable_authorization_checks do
+        assay = Factory :assay, :contributor=>user.person, :policy=>Factory(:private_policy), :study=>assay.study
+      end
     end
     assert_equal assay, AuthLookupUpdateQueue.last(:order=>:id).item
 
@@ -79,12 +80,12 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_equal assay, AuthLookupUpdateQueue.last(:order=>:id).item
     AuthLookupUpdateQueue.destroy_all
     assay.title = Time.now.to_s
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
+    assert_no_difference("AuthLookupUpdateQueue.count") do
       disable_authorization_checks do
         assay.save!
       end
     end
-    assert_equal assay, AuthLookupUpdateQueue.last(:order=>:id).item
+
   end
 
   test "updates to queue for study" do
@@ -105,12 +106,11 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_equal study, AuthLookupUpdateQueue.last(:order=>:id).item
     AuthLookupUpdateQueue.destroy_all
     study.title = Time.now.to_s
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
+    assert_no_difference("AuthLookupUpdateQueue.count") do
       disable_authorization_checks do
         study.save!
       end
     end
-    assert_equal study, AuthLookupUpdateQueue.last(:order=>:id).item
   end
 
   test "updates to queue for sample" do
@@ -133,12 +133,11 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     AuthLookupUpdateQueue.destroy_all
     sample.title = Time.now.to_s
 
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
+    assert_no_difference("AuthLookupUpdateQueue.count") do
       disable_authorization_checks do
         sample.save!
       end
     end
-    assert_equal [sample], AuthLookupUpdateQueue.all(:order=>:id).collect{|a| a.item}
   end
 
   test "updates to queue for specimen" do
@@ -160,12 +159,11 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
     AuthLookupUpdateQueue.destroy_all
     specimen.title = Time.now.to_s
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
+    assert_no_difference("AuthLookupUpdateQueue.count") do
       disable_authorization_checks do
         specimen.save!
       end
     end
-    assert_equal specimen, AuthLookupUpdateQueue.last(:order=>:id).item
   end
 
   test "updates to queue for sweep" do
@@ -187,12 +185,11 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
     AuthLookupUpdateQueue.destroy_all
     sweep.title = Time.now.to_s
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
+    assert_no_difference("AuthLookupUpdateQueue.count") do
       disable_authorization_checks do
         sweep.save!
       end
     end
-    assert_equal sweep, AuthLookupUpdateQueue.last(:order=>:id).item
   end
 
   test "updates for remaining authorized assets" do
@@ -213,12 +210,11 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
       assert_equal entity, AuthLookupUpdateQueue.last(:order=>:id).item
       AuthLookupUpdateQueue.destroy_all
       entity.title = Time.now.to_s
-      assert_difference("AuthLookupUpdateQueue.count", 1) do
+      assert_no_difference("AuthLookupUpdateQueue.count") do
         disable_authorization_checks do
           entity.save
         end
       end
-      assert_equal entity, AuthLookupUpdateQueue.last(:order=>:id).item
     end
   end
 

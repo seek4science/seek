@@ -6,12 +6,6 @@ class Policy < ActiveRecord::Base
            :autosave => true,
            :after_add => proc {|policy, perm| perm.policy = policy}
 
-  before_save :update_timestamp_if_permissions_change
-
-  def update_timestamp_if_permissions_change
-    update_timestamp if changed_for_autosave?
-  end
-
   #basically the same as validates_numericality_of :sharing_scope, :access_type
   #but with a more generic error message because our users don't know what
   #sharing_scope and access_type are.
@@ -26,10 +20,17 @@ class Policy < ActiveRecord::Base
   
   alias_attribute :title, :name
 
-  after_save :queue_update_auth_table
+  after_commit :queue_update_auth_table
+  before_save :update_timestamp_if_permissions_change
+
+  def update_timestamp_if_permissions_change
+    update_timestamp if changed_for_autosave?
+  end
 
   def queue_update_auth_table
-    AuthLookupUpdateJob.add_items_to_queue(assets) unless assets.empty?
+    unless (previous_changes.keys - ["updated_at"]).empty?
+      AuthLookupUpdateJob.add_items_to_queue(assets) unless assets.empty?
+    end
   end
 
   def assets
@@ -203,18 +204,18 @@ class Policy < ActiveRecord::Base
   end
    
   # translates access type codes into human-readable form
-  def self.get_access_type_wording(access_type, resource=nil)
+  def self.get_access_type_wording(access_type, downloadable=false)
     case access_type
       when Policy::DETERMINED_BY_GROUP
         return I18n.t('access.determined_by_group')
       when Policy::NO_ACCESS
         return I18n.t("access.no_access")
       when Policy::VISIBLE
-        return resource.try(:is_downloadable?) ? I18n.t('access.visible_downloadable') : I18n.t('access.visible')
+        return downloadable ? I18n.t('access.visible_downloadable') : I18n.t('access.visible')
       when Policy::ACCESSIBLE
-        return resource.try(:is_downloadable?) ? I18n.t('access.accessible_downloadable') : I18n.t('access.accessible')
+        return downloadable ? I18n.t('access.accessible_downloadable') : I18n.t('access.accessible')
       when Policy::EDITING
-        return resource.try(:is_downloadable?) ? I18n.t('access.editing_downloadable') : I18n.t('access.editing')
+        return downloadable ? I18n.t('access.editing_downloadable') : I18n.t('access.editing')
       when Policy::MANAGING
         return I18n.t('access.managing')
       else

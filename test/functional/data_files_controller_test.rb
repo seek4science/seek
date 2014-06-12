@@ -62,6 +62,18 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
   end
 
+  test "download and view options for anonymous sharing" do
+    login_as(Factory(:user))
+    get :new
+    assert_response :success
+    assert_select "#simple_sharing" do
+      assert_select "select#access_type_select_4" do
+        assert_select "option[value=?]",1,:text=>/#{I18n.t('access.visible_downloadable')}/i
+        assert_select "option[value=?][selected='selected']",2,:text=>/#{I18n.t('access.accessible_downloadable')}/i
+      end
+    end
+  end
+
   test "correct title and text for associating an assay for edit" do
     df = Factory :data_file
     login_as(df.contributor.user)
@@ -1541,49 +1553,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div', :text => /another creator/, :count => 1
   end
 
-  test "should display find matching model button for spreadsheet" do
-    with_config_value :solr_enabled,true do
-      d = Factory(:xlsx_spreadsheet_datafile)
-      login_as(d.contributor.user)
-      get :show,:id=>d
-      assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related #{I18n.t('model').pluralize}/
-    end
-  end
-
-  test "should not display find matching model button for non spreadsheet" do
-    with_config_value :solr_enabled,true do
-      d = Factory(:non_spreadsheet_datafile)
-      login_as(d.contributor.user)
-      get :show,:id=>d
-      assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:count=>0
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('model').pluralize}/,:count=>0
-    end
-  end
-
-  test "only show the matching model button for the latest version" do
-    d = Factory(:xlsx_spreadsheet_datafile, :policy => Factory(:public_policy))
-
-    d.save_as_new_version
-    Factory(:xlsx_content_blob, :asset => d, :asset_version => d.version)
-    d.reload
-    login_as(d.contributor.user)
-    assert_equal 2,d.version
-    with_config_value :solr_enabled,true do
-      get :show,:id=>d,:version=>2
-      assert_response :success
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('model').pluralize}/,:count=>1
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:text=>/Find related #{I18n.t('model').pluralize}/
-
-      get :show,:id=>d,:version=>1
-      assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_models_data_file_path(d),:count=>0
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('model').pluralize}/,:count=>0
-    end
-  end
-
-
   test "you should not subscribe to the asset created by the person whose projects overlap with you" do
     proj = Factory(:project)
     current_person = User.current_user.person
@@ -1620,6 +1589,35 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "p > a[href=?]",data_file_path(df),:text=>df.title
       assert_select "p > a[href=?]",data_file_path(df2),:text=>df2.title,:count=>0
     end
+  end
+
+  test "handles nil description" do
+    df = Factory(:data_file,:description=>nil,:policy=>Factory(:public_policy))
+
+    get :show,:id=>df
+    assert_response :success
+  end
+
+  test "description formatting" do
+    desc = "This is <b>Bold</b> - this is <em>emphasised</em> - this is super<sup>script</sup> - "
+    desc << "This is <u>underlined</u> - "
+    desc << "this is link to goole: http://google.com - "
+    desc << "this is some nasty javascript <script>alert('fred');</script>"
+
+    df = Factory(:data_file,:description=>desc,:policy=>Factory(:public_policy))
+
+    get :show,:id=>df
+    assert_response :success
+    assert_select "div#description" do
+      assert_select "p"
+      assert_select "b", :text=>"Bold"
+      assert_select "em", :text=>"emphasised"
+      assert_select "u", :text=>"underlined"
+      assert_select "sup", :text=>"script"
+      assert_select "script",:count=>0
+      assert_select "a[href=?]","http://google.com",:text=>"http://google.com"
+    end
+
   end
 
   test "filter by people, including creators, using nested routes" do

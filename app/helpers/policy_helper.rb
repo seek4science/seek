@@ -1,11 +1,12 @@
 module PolicyHelper
   
   def policy_selection_options policies = nil, resource = nil, access_type = nil
-    policies ||= [Policy::NO_ACCESS,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING]
+    policies ||= [Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING]
+    policies.delete(Policy::ACCESSIBLE) unless resource.try(:is_downloadable?)
     options=""
     policies.each do |policy|
-      options << "<option value='#{policy}' #{"selected='selected'" if access_type == policy}>#{Policy.get_access_type_wording(policy, resource)} </option>"
-    end      
+      options << "<option value='#{policy}' #{"selected='selected'" if access_type == policy}>#{Policy.get_access_type_wording(policy, resource.try(:is_downloadable?))} </option>"
+    end
     options.html_safe
   end
 
@@ -40,7 +41,7 @@ module PolicyHelper
     if policy.access_type != Policy::NO_ACCESS
       html << "<h3>You will share this #{resource_name.humanize} with:</h3>"
       html << "<p class='shared'>All the #{t('project')} members within the network can "
-      html << Policy.get_access_type_wording(policy.access_type, resource_name.camelize.constantize.new()).downcase
+      html << Policy.get_access_type_wording(policy.access_type, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase
       html << "</p>"
       html << process_permissions(permissions, resource_name, true)
     else
@@ -106,7 +107,7 @@ module PolicyHelper
         prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
         html << "<p class='permission'>#{prefix_text + group_name}"
         html << ((p.access_type == Policy::DETERMINED_BY_GROUP) ? ' have ' : ' can ')
-        html << Policy.get_access_type_wording(p.access_type, resource_name.camelize.constantize.new()).downcase
+        html << Policy.get_access_type_wording(p.access_type, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase
         html << "</p>"
       end
     end
@@ -122,11 +123,11 @@ module PolicyHelper
         value.each do |v|
           html << "<p class='privileged_person'>"
           if key == 'contributor'
-            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::MANAGING, resource_name.camelize.constantize.new()).downcase} as an uploader"
+            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::MANAGING, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase} as an uploader"
           elsif key == 'creators'
-            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::EDITING, resource_name.camelize.constantize.new()).downcase} as a creator"
+            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::EDITING, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase} as a creator"
           elsif key == 'asset_managers'
-            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::MANAGING, resource_name.camelize.constantize.new()).downcase} as an asset manager"
+            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::MANAGING, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase} as an asset manager"
           end
           html << "</p>"
         end

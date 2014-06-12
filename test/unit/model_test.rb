@@ -55,6 +55,7 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "content blob search terms" do
+    check_for_soffice
     m = Factory :teusink_model
     m.content_blobs << Factory.create(:doc_content_blob,:original_filename=>"word.doc",:asset=>m,:asset_version=>m.version)
     m.reload
