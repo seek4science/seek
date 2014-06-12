@@ -59,7 +59,6 @@ function load_tabs() {
 
 function tab_on_click(resource_type, resource_ids, with_facets) {
     var tab_content_id = 'faceted_search_result';
-    var tab_content = $j('#' + tab_content_id);
 
     var click_tab = document.getElementById('tab_' + resource_type);
     var url = '';
@@ -72,6 +71,8 @@ function tab_on_click(resource_type, resource_ids, with_facets) {
         show_large_ajax_loader(tab_content_id);
         deactivate_previous_tab();
         click_tab.className = 'tabberactive';
+        jQuery.noConflict();
+        var $j = jQuery;
         $j.ajax({
             url: url,
             async: false,
@@ -79,6 +80,7 @@ function tab_on_click(resource_type, resource_ids, with_facets) {
                 item_type: resource_type}
         })
             .done(function (data) {
+                var tab_content = $j('#' + tab_content_id);
                 if (with_facets == true)
                     tab_content.html(data.items_for_facets);
                 else

@@ -32,9 +32,6 @@
     <div id="faceted_search_result"></div>
     <script type="text/javascript">
         //load_tabs();
-        jQuery.noConflict();
-        var $j = jQuery;
-
         <% sorted_result_keys.each do |key| %>
             var with_facets = <%= Seek::Config.facet_enable_for_pages[key.underscore.pluralize] && resource_hash[key].count > 10 %>
             tab_on_click('<%= key %>', '<%= resource_hash[key].collect(&:id).join(',') %>', with_facets);
