@@ -1343,11 +1343,9 @@
   </xsd:complexType>
   <xsd:complexType name="BioportalConcept">
     <xsd:sequence>
-      <xsd:element name="ontology_id" type="xsd:positiveInteger"
+      <xsd:element name="ontology_id" type="xsd:string"
                    maxOccurs="1" minOccurs="1"></xsd:element>
-      <xsd:element name="ontology_version_id" type="xsd:positiveInteger"
-                   maxOccurs="1" minOccurs="1"></xsd:element>
-      <xsd:element name="concept_id" type="xsd:string"
+      <xsd:element name="concept_uri" type="xsd:anyURI"
                    maxOccurs="1" minOccurs="1"></xsd:element>
     </xsd:sequence>
   </xsd:complexType>

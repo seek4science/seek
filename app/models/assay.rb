@@ -5,27 +5,17 @@ class Assay < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::OntologyTypeHandling
   include Seek::OntologyExtensionWithSuggestedType
+  include Seek::Taggable
+
+  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in
+  acts_as_taggable
+  def projects
+    study.try(:investigation).try(:projects) || []
+  end
 
   acts_as_isa
-  acts_as_taggable
-
-  def projects
-    try_block {study.investigation.projects} || []
-  end
-
-  def project_ids
-    projects.map(&:id)
-  end
-
-  alias_attribute :contributor, :owner
-  acts_as_authorized
-
-  def default_contributor
-    User.current_user.try :person
-  end
 
   acts_as_annotatable :name_field=>:title
-  include Seek::Taggable
 
   belongs_to :institution
   has_and_belongs_to_many :samples
@@ -40,9 +30,56 @@ class Assay < ActiveRecord::Base
 
   has_many :assay_assets, :dependent => :destroy
 
-  before_validation :default_assay_and_technology_type
+  #FIXME: These should be reversed, with the concrete version becoming the primary case, and versioned assets becoming secondary
+  # i.e. - so data_files returnes [DataFile], and data_file_masters is replaced with versioned_data_files, returning [DataFile::Version]
+  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
+  has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new{self.asset_sql("Sop")}
+  has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
+
+  has_many :data_file_masters, :through => :assay_assets, :source => :asset, :source_type => "DataFile"
+  has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"
+  has_many :model_masters, :through => :assay_assets, :source => :asset, :source_type => "Model"
+  has_many :relationships,
+           :class_name => 'Relationship',
+           :as => :subject,
+           :dependent => :destroy
+
+  has_one :investigation,:through=>:study
+  validates_presence_of :assay_type_uri
+  validates_presence_of :technology_type_uri, :unless=>:is_modelling?
+  validates_presence_of :study, :message=>" must be selected"
+  validates_presence_of :owner
+  validates_presence_of :assay_class
+  validate :either_samples_or_organisms_for_experimental_assay,  :if => "Seek::Config.is_virtualliver"
+  validate :no_sample_for_modelling_assay
 
   after_save :queue_background_reindexing if Seek::Config.solr_enabled
+  before_validation :default_assay_and_technology_type
+
+  #a temporary store of added assets - see AssayReindexer
+  attr_reader :pending_related_assets
+
+  alias_attribute :contributor, :owner
+
+  searchable(:auto_index=>false) do
+    text :description, :title, :searchable_tags, :organism_terms, :assay_type_label,:technology_type_label
+    text :contributor do
+      contributor.try(:person).try(:name)
+    end
+    text :strains do
+      strains.compact.map{|s| s.title}
+    end
+  end if Seek::Config.solr_enabled
+
+
+
+  def project_ids
+    projects.map(&:id)
+  end
+
+  def default_contributor
+    User.current_user.try :person
+  end
 
   def asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
@@ -54,15 +91,7 @@ class Assay < ActiveRecord::Base
     "AND assay_assets.assay_id = #{self.id})"
   end
 
-  #FIXME: These should be reversed, with the concrete version becoming the primary case, and versioned assets becoming secondary
-  # i.e. - so data_files returnes [DataFile], and data_file_masters is replaced with versioned_data_files, returning [DataFile::Version]
-  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
-  has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new{self.asset_sql("Sop")}
-  has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
-  
-  has_many :data_file_masters, :through => :assay_assets, :source => :asset, :source_type => "DataFile"
-  has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"
-  has_many :model_masters, :through => :assay_assets, :source => :asset, :source_type => "Model"
+
 
   ["data_file","sop","publication"].each do |type|
     eval <<-END_EVAL
@@ -77,32 +106,7 @@ class Assay < ActiveRecord::Base
     is_modelling? ? model_masters : []
   end
 
-  has_one :investigation,:through=>:study
-  validates_presence_of :assay_type_uri
-  validates_presence_of :technology_type_uri, :unless=>:is_modelling?
-  validates_presence_of :study, :message=>" must be selected"
-  validates_presence_of :owner
-  validates_presence_of :assay_class
-  validate :either_samples_or_organisms_for_experimental_assay,  :if => "Seek::Config.is_virtualliver"
-  validate :no_sample_for_modelling_assay
 
-  #a temporary store of added assets - see AssayReindexer
-  attr_reader :pending_related_assets
-
-  has_many :relationships, 
-    :class_name => 'Relationship',
-    :as => :subject,
-    :dependent => :destroy
-          
-  searchable(:auto_index=>false) do
-    text :description, :title, :searchable_tags, :organism_terms, :assay_type_label,:technology_type_label
-    text :contributor do
-      contributor.try(:person).try(:name)
-    end
-    text :strains do
-        strains.compact.map{|s| s.title}
-    end
-  end if Seek::Config.solr_enabled
 
   #uri for generating rdf for suggested assay type,
   #if uri is valid, this will be ignored, as it is already added by assay_type_uri

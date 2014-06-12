@@ -171,7 +171,7 @@ sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-de
 <p>Installing these packages now will make installing Ruby 1.9.3 easier later
 on:</p>
 
-<pre>sudo apt-get install gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev</pre>
+<pre>sudo apt-get install libtool gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev</pre>
 
 <h2 id="label-Development+or+Production%3F">Development or Production?</h2>
 
@@ -209,12 +209,6 @@ basic installation method is to run:</p>
 installed. You will then need to wait for Ruby to be downloaded and
 compiled.</p>
 
-<p>This version of SEEK has been developed and tested using Rubygems version
-1.8.25. This is the version installed with Ruby 1.9.3 at the time of
-writing this, but to be sure run:</p>
-
-<pre>rvm rubygems 1.8.25</pre>
-
 <p>Now you just need to create the <em>Gemset</em> for SEEK. RVM allows what
 it calls <em>Gemsets</em> to seperate the gems installed, in isolation from
 each other, for different applications. To create the gemset run:</p>
@@ -233,7 +227,7 @@ cd seek/</pre>
 <p>Now to install the ruby gems SEEK needs:</p>
 
 <pre>gem install bundler
-bundle install  --deployment</pre>
+bundle install</pre>
 
 <h2 id="label-Setting+up+the+Database">Setting up the Database</h2>
 

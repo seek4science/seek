@@ -44,7 +44,7 @@ The remaining packages are:
 
 Installing these packages now will make installing Ruby 1.9.3 easier later on:
 
-  sudo apt-get install gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
+  sudo apt-get install libtool gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
 
 == Development or Production?
 
@@ -74,9 +74,6 @@ now install Ruby 1.9.3
 
 you may be asked for your password so that some additional packages can be installed. You will then need to wait for Ruby to be downloaded and compiled.
 
-This version of SEEK has been developed and tested using Rubygems version 1.8.25. This is the version installed with Ruby 1.9.3 at the time of writing this, but to be sure run:
-
-  rvm rubygems 1.8.25
 
 Now you just need to create the <em>Gemset</em> for SEEK. RVM allows what it calls <em>Gemsets</em> to seperate the gems installed, in isolation from each other, for different applications.
 To create the gemset run:
@@ -95,7 +92,7 @@ Now you are ready for installing SEEK. To fetch the latest version of SEEK <em>(
 Now to install the ruby gems SEEK needs:
 
   gem install bundler
-  bundle install  --deployment
+  bundle install
 
 == Setting up the Database
 

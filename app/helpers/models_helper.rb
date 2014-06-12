@@ -72,8 +72,9 @@ module ModelsHelper
     JWS_ERROR_TO_PREFIX[key]  
   end
 
-  def allow_model_comparison model,displayed_model
+  def allow_model_comparison model,displayed_model,user=User.current_user
     return false unless model.is_a?(Model)
+    return false unless model.can_download?(user)
     return false unless displayed_model.contains_sbml?
     return false unless model.versions.select{|v| v.contains_sbml?}.count > 1
     true
