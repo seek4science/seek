@@ -248,9 +248,7 @@ Exhibit.History.pushState = function(data, subtitle) {
         url = document.location.href.replace(/#.*/,"");
         
         //History.pushState(data, title, url);
-        var currentAssetType = Exhibit.SelectionState.currentAssetType;
-        if (currentAssetType != null)
-            Exhibit.SelectionState[currentAssetType] = {'data' : data, 'title' : title, 'url' : url};
+        Exhibit.History.seekUpdateState(data, title, url);
         History.Adapter.trigger(window,'statechange');
     }
 };
@@ -286,11 +284,18 @@ Exhibit.History.replaceState = function(data, subtitle, url) {
         }
         
         //(History.replaceState(data, title, url);
-        var currentAssetType = Exhibit.SelectionState.currentAssetType;
-        if (currentAssetType != null)
-            Exhibit.SelectionState[currentAssetType] = {'data' : data, 'title' : title, 'url' : url};
+        Exhibit.History.seekUpdateState(data, title, url);
     }
 };
+
+/**
+ * Do not use History of browser, just use the runtime variable to store the state of selection for multiple exhibits
+ */
+Exhibit.History.seekUpdateState = function(data, title, url) {
+    var currentAssetType = Exhibit.SelectionState.currentAssetType;
+    if (currentAssetType != null)
+        Exhibit.SelectionState[currentAssetType] = {'data' : data, 'title' : title, 'url' : url};
+}
 
 /**
  * Pushes an empty state into the history state tracker so the next refresh
