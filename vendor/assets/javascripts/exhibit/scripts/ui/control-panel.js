@@ -26,7 +26,7 @@ Exhibit.ControlPanel = function(elmt, uiContext) {
  * @private
  */
 Exhibit.ControlPanel._settingSpecs = {
-    "showBookmark":         { type: "boolean", defaultValue: true },
+    "showBookmark":         { type: "boolean", defaultValue: false },
     "developerMode":        { type: "boolean", defaultvalue: false },
     "hoverReveal":          { type: "boolean", defaultValue: false }
 };
