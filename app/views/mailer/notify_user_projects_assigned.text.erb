@@ -2,7 +2,7 @@ Hi <%= @name %>,
 
 An administrator has assigned you to the following project<%= 's' if @projects.size > 1 -%>:
 <% @projects.each do |project| %>
-    * <%= project.name -%>
+    * <%= project.title -%>
 <% end %>
 
 You may now upload and execute workflows.
