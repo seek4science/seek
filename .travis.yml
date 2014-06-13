@@ -2,9 +2,13 @@ language: ruby
 rvm:
   - 1.9.3
   - 2.1.2
+env
+  - SUITE="units"
+  - SUITE="functionals"
+  - SUITE="integration"
 before_install:
   - sudo apt-get update -qq
 script:
   - mv config/database.cc.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:schema:load
-  - bundle exec rake test
+  - bundle exec rake test:$SUITE
