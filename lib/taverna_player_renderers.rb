@@ -1,10 +1,18 @@
 def format_csv(output, index = [])
+  row_limit = 500
   html = ''
 
   begin
-    csv = CSV.parse(output.value(index))
+    value = output.value(index).encode('UTF-8', 'binary', :invalid => :replace, :undef => :replace)
+
+    csv = CSV.parse(value)
+    if csv.size > (row_limit + 1)
+      html << "<strong>Please note:</strong> Only the first #{row_limit} rows of the CSV are displayed here.
+               To see the full document, please click the download link."
+    end
+
     html << '<div class="csv"><table>'
-    csv.each do |row|
+    csv[0...row_limit].each do |row|
       html << '<tr>'
       row.each do |cell|
         if cell && cell.size > 50
@@ -24,12 +32,16 @@ def format_csv(output, index = [])
 end
 
 def format_json(port, index = [])
-  CodeRay.scan(port.value(index), :json).div(:css => :class)
+  value = port.value(index).encode('UTF-8', 'binary', :invalid => :replace, :undef => :replace)
+
+  CodeRay.scan(value, :json).div(:css => :class)
 end
 
 def format_xml(port, index = [])
+  value = port.value(index).encode('UTF-8', 'binary', :invalid => :replace, :undef => :replace)
+
   out = String.new
-  REXML::Document.new(port.value(index)).write(out, 1)
+  REXML::Document.new(value).write(out, 1)
   CodeRay.scan(out, :xml).div(:css => :class)
 end
 
