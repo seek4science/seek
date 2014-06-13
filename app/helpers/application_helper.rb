@@ -690,6 +690,7 @@ module ApplicationHelper
 
   def klass_from_controller controller_name
     controller_name.singularize.camelize.constantize
+  end
 
   def describe_visibility(model)
     text = '<strong>Visibility:</strong> '
