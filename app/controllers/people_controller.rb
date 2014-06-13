@@ -245,6 +245,8 @@ class PeopleController < ApplicationController
     # PUT /people/1
   # PUT /people/1.xml
   def administer_update
+    had_no_projects = @person.work_groups.empty?
+
     passed_params=    {:roles                 =>  User.admin_logged_in?,
                        :roles_mask            => User.admin_logged_in?,
                        :can_edit_projects     => (User.admin_logged_in? || (User.project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?)),
@@ -263,6 +265,10 @@ class PeopleController < ApplicationController
         set_roles(@person, params) if User.admin_logged_in?
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
+        if Seek::Config.email_enabled && had_no_projects && !@person.work_groups.empty? && @person != current_user.person
+          Mailer.notify_user_projects_assigned(@person).deliver
+        end
+
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }

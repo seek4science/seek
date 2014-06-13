@@ -74,8 +74,8 @@
             {
               modal: true,
               autoOpen: true,
-              width: 1000,
-              height: $j(window).height() - 100,
+              width: $j(window).width() - 50,
+              height: $j(window).height() - 50,
               marginTop: 20,
               draggable: true,
               resizable: true,
@@ -98,7 +98,7 @@ a modal dialog and will be populated via an AJAX call. -->
     <div style="display:none;">
       <div>
         <div id="modal-interaction-dialog" title="Run Interaction">
-          <div class="modal-interaction-body" style="width:auto; height: 85%">
+          <div class="modal-interaction-body" style="width:auto; height: 98%">
             <%= content_tag(:iframe, "", {:width => "100%", :height => "100%",
                                           :src => interaction_redirect(interaction)}) %>
           </div>

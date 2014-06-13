@@ -2,30 +2,30 @@
 # Seeds the database with BioVeL-specific data
 
 # Seeds projects
-biovel = Project.find_by_name('BioVeL') || Project.create(:name => 'BioVeL')
+biovel = Project.find_by_title('BioVeL') || Project.create(:title => 'BioVeL')
 puts 'Seeded the BioVeL project.'
 
 # Seeds institutions
-institutions = [{:name => 'University of Manchester', :country => 'United Kingdom'},
-{:name => 'Cardiff University', :country => 'United Kingdom'},
-{:name => 'Centro de Referência em Informação Ambiental', :country => 'Brazil'},
-{:name => 'Foundation for Research on Biodiversity', :country => 'France'},
-{:name => 'Fraunhofer-Gesellschaft Institute IAIS', :country => 'Germany'},
-{:name => 'Berlin Botanical Gardens and Botanical Museum', :country => 'Germany'},
-{:name => 'Hungarian Academy of Sciences Institute of Ecology and Botany', :country => 'Hungary'},
-{:name => 'Max Planck Society, MPI for Marine Microbiology', :country => 'Germany'},
-{:name => 'National Institute of Nuclear Physics', :country => 'Italy'},
-{:name => 'National Research Council: Institute for Biomedical Technologies and Institute of Biomembrane and Bioenergetics', :country => 'Italy'},
-{:name => 'Netherlands Centre for Biodiversity ', :country => 'Netherlands'},
-{:name => 'Stichting European Grid Initiative', :country => 'Netherlands'},
-{:name => 'University of Amsterdam', :country => 'Netherlands'},
-{:name => 'University of Eastern Finland', :country => 'Finland'},
-{:name => 'University of Gothenburg', :country => 'Sweden'}]
+institutions = [{:title => 'University of Manchester', :country => 'United Kingdom'},
+{:title => 'Cardiff University', :country => 'United Kingdom'},
+{:title => 'Centro de Referência em Informação Ambiental', :country => 'Brazil'},
+{:title => 'Foundation for Research on Biodiversity', :country => 'France'},
+{:title => 'Fraunhofer-Gesellschaft Institute IAIS', :country => 'Germany'},
+{:title => 'Berlin Botanical Gardens and Botanical Museum', :country => 'Germany'},
+{:title => 'Hungarian Academy of Sciences Institute of Ecology and Botany', :country => 'Hungary'},
+{:title => 'Max Planck Society, MPI for Marine Microbiology', :country => 'Germany'},
+{:title => 'National Institute of Nuclear Physics', :country => 'Italy'},
+{:title => 'National Research Council: Institute for Biomedical Technologies and Institute of Biomembrane and Bioenergetics', :country => 'Italy'},
+{:title => 'Netherlands Centre for Biodiversity ', :country => 'Netherlands'},
+{:title => 'Stichting European Grid Initiative', :country => 'Netherlands'},
+{:title => 'University of Amsterdam', :country => 'Netherlands'},
+{:title => 'University of Eastern Finland', :country => 'Finland'},
+{:title => 'University of Gothenburg', :country => 'Sweden'}]
 
 count = 0
 institutions.each do |inst|
-  institution = Institution.where(:name => inst[:name], :country => inst[:country]).first ||
-                Institution.create(:name => inst[:name], :country => inst[:country])
+  institution = Institution.where(:title => inst[:title], :country => inst[:country]).first ||
+                Institution.create(:title => inst[:title], :country => inst[:country])
   unless WorkGroup.where(:project_id => biovel.id, :institution_id => institution.id).exists?
     WorkGroup.create(:project_id => biovel.id, :institution_id => institution.id)
     count += 1
@@ -75,10 +75,10 @@ end
 puts "Seeded #{count} workflow output port types."
 
 # Admin User
-admin_inst = {:name => 'University of Manchester', :country => 'United Kingdom'}
+admin_inst = {:title => 'University of Manchester', :country => 'United Kingdom'}
 
-admin_institution = Institution.where(:name => admin_inst[:name], :country => admin_inst[:country]).first ||
-    Institution.create(:name => admin_inst[:name], :country => admin_inst[:country])
+admin_institution = Institution.where(:title => admin_inst[:title], :country => admin_inst[:country]).first ||
+    Institution.create(:title => admin_inst[:title], :country => admin_inst[:country])
 
 admin_workgroup = WorkGroup.where(:project_id => biovel.id, :institution_id => admin_institution.id).first ||
     WorkGroup.create(:project_id => biovel.id, :institution_id => admin_institution.id)
@@ -99,12 +99,12 @@ admin_person.save
 puts 'Seeded the Admin user.'
 
 # Guest User
-guest_project = Project.find_by_name('BioVeL Portal Guests') || Project.create(:name => 'BioVeL Portal Guests')
+guest_project = Project.find_by_title('BioVeL Portal Guests') || Project.create(:title => 'BioVeL Portal Guests')
 
-guest_inst = {:name => 'Example Institution', :country => 'United Kingdom'}
+guest_inst = {:title => 'Example Institution', :country => 'United Kingdom'}
 
-guest_institution = Institution.where(:name => guest_inst[:name], :country => guest_inst[:country]).first ||
-    Institution.create(:name => guest_inst[:name], :country => guest_inst[:country])
+guest_institution = Institution.where(:title => guest_inst[:title], :country => guest_inst[:country]).first ||
+    Institution.create(:title => guest_inst[:title], :country => guest_inst[:country])
 
 guest_workgroup = WorkGroup.where(:project_id => guest_project.id, :institution_id => guest_institution.id).first ||
     WorkGroup.create(:project_id => guest_project.id, :institution_id => guest_institution.id)

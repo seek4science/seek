@@ -1,10 +1,8 @@
 <div id="buttons">
   <ul class="sectionIcons">
-    <% if sweep.complete? %>
-        <% if sweep.can_manage? && !current_user.guest? -%>
-            <li><%= image_tag_for_key('manage', main_app.edit_sweep_path(sweep), nil, nil, "Manage sweep") -%></li>
-        <% end -%>
-    <% end %>
+    <% if sweep.can_manage? && !current_user.guest? -%>
+        <li><%= image_tag_for_key('manage', main_app.edit_sweep_path(sweep), nil, nil, "Manage sweep") -%></li>
+    <% end -%>
     <% if sweep.runs.all? { |r| r.can_delete? } -%>
         <% if sweep.complete?  %>
             <% unless current_user.guest? %>
