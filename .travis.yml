@@ -2,7 +2,7 @@ language: ruby
 rvm:
   - 1.9.3
   - 2.1.2
-env
+env:
   - SUITE="units"
   - SUITE="functionals"
   - SUITE="integration"
