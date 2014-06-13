@@ -1,0 +1,9 @@
+language: ruby
+rvm:
+  - 2.1.2
+before_install:
+  - sudo apt-get update -qq
+script:
+  - mv config/database.cc.yml config/database.yml
+  - RAILS_ENV=test bundle exec rake db:schema:load
+  - bundle exec rake test
