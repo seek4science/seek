@@ -163,7 +163,16 @@ Exhibit.History.componentStateListener = function(evt, type, id) {
  */
 Exhibit.History.getState = function() {
     if (Exhibit.History.enabled) {
-        return History.getState();
+        var currentAssetType = Exhibit.SelectionState.currentAssetType
+        if (currentAssetType == null){
+            return {'data' : {}};
+        }
+        else if (typeof Exhibit.SelectionState[currentAssetType] === "undefined"){
+            return {'data' : {}};
+        }
+        else {
+            return Exhibit.SelectionState[currentAssetType];
+        }
     } else {
         return null;
     }
@@ -224,7 +233,7 @@ Exhibit.History.pushState = function(data, subtitle) {
     var title, url;
 
     if (Exhibit.History.enabled) {
-        Exhibit.History._state++;
+        //Exhibit.History._state++;
         data.state = Exhibit.History._state;
 
         title = Exhibit.History._originalTitle;
@@ -238,7 +247,11 @@ Exhibit.History.pushState = function(data, subtitle) {
         //if HTML4 is emulating pushstate, a # in the URL will break it
         url = document.location.href.replace(/#.*/,"");
         
-        History.pushState(data, title, url);
+        //History.pushState(data, title, url);
+        var currentAssetType = Exhibit.SelectionState.currentAssetType;
+        if (currentAssetType != null)
+            Exhibit.SelectionState[currentAssetType] = {'data' : data, 'title' : title, 'url' : url};
+        History.Adapter.trigger(window,'statechange');
     }
 };
 
@@ -272,7 +285,10 @@ Exhibit.History.replaceState = function(data, subtitle, url) {
             url = currentState.url;
         }
         
-        History.replaceState(data, title, url);
+        //(History.replaceState(data, title, url);
+        var currentAssetType = Exhibit.SelectionState.currentAssetType;
+        if (currentAssetType != null)
+            Exhibit.SelectionState[currentAssetType] = {'data' : data, 'title' : title, 'url' : url};
     }
 };
 

@@ -71,6 +71,9 @@ function tab_on_click(resource_type, resource_ids, with_facets) {
         show_large_ajax_loader(tab_content_id);
         deactivate_previous_tab();
         click_tab.className = 'tabberactive';
+
+        Exhibit.SelectionState.currentAssetType = resource_type;
+
         jQuery.noConflict();
         var $j = jQuery;
         $j.ajax({
