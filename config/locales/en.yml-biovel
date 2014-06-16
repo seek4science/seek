@@ -37,6 +37,9 @@ en:
   #Project
   project: "Project"
 
+  #Programme
+  programme: "Programme"
+
   #Workflow
   workflow: "Workflow"
 

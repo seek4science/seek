@@ -216,7 +216,7 @@ module ApplicationHelper
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
       text.capitalize! if options[:capitalize]            
-      res = text.html_safe? ? text : h(text)
+      res = text.html_safe
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length])  if options[:length]
       res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true  
@@ -690,6 +690,26 @@ module ApplicationHelper
 
   def klass_from_controller controller_name
     controller_name.singularize.camelize.constantize
+  end
+
+  def describe_visibility(model)
+    text = '<strong>Visibility:</strong> '
+
+    if model.policy.sharing_scope == 0
+      css_class = 'private'
+      text << "Private "
+      text << "with some exceptions " unless model.policy.permissions.empty?
+      text << image('lock', :style => 'vertical-align: middle')
+    elsif model.policy.sharing_scope == 2 && model.policy.access_type == 0
+      css_class = 'group'
+      text << "Only visible to members of "
+      text << model.policy.permissions.select {|p| p.contributor_type == 'Project'}.map {|p| p.contributor.name}.to_sentence
+    else
+      css_class = 'public'
+      text << "Public #{image('world', :style => 'vertical-align: middle')}"
+    end
+
+    "<span class='visibility #{css_class}'>#{text}</span>".html_safe
   end
 
   private  

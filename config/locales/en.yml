@@ -41,6 +41,9 @@ en:
   #Programme
   programme: "Programme"
 
+  #Workflow
+  workflow: "Workflow"
+
   scale: "Scale"
 
   menu:

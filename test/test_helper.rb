@@ -225,3 +225,6 @@ class ActiveSupport::TestCase
   end
   
 end
+
+# Load seed data
+load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
