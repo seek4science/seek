@@ -4,7 +4,7 @@
 
 
 <% if !resource_hash.blank? || !external_resource_hash.blank? -%>
-    <ul class="tabbernav">
+    <ul class="tabbernav" style="margin-top: 1em;">
       <%
          sorted_result_keys = resource_hash.keys.sort_by do |key|
            ASSET_ORDER.index(key)
