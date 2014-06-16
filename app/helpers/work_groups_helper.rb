@@ -1,6 +1,6 @@
 module WorkGroupsHelper
   def work_group_select_choices
-    WorkGroup.all.map{|wg| [wg.project.name+" at "+wg.institution.name,wg.id]}
+    WorkGroup.all.map{|wg| [wg.project.title+" at "+wg.institution.title,wg.id]}
   end
   
   WorkGroupOption = Struct.new(:id, :institution_name)

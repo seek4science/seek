@@ -120,7 +120,7 @@ class ContentBlobsController < ApplicationController
   def get_data_hash_from_jerm
     project=@asset_version.projects.first
     project.decrypt_credentials
-    downloader=Jerm::DownloaderFactory.create project.name
+    downloader=Jerm::DownloaderFactory.create project.title
     resource_type = @asset_version.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
     begin
       data_hash = downloader.get_remote_data @content_blob.url,project.site_username,project.site_password, resource_type

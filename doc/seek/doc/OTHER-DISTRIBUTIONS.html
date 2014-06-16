@@ -130,14 +130,16 @@ need to be followed.</p>
 
 <pre>sudo apt-get install libcurl4-gnutls-dev</pre>
 
-<p>then proceed to install SEEK as normal, however after running bundle
-install to install the gems you may encounter a problem with the
-<em>Nokogiri</em> gem. This is because it is statically linked to an older
-version of <em>LibXML</em>. To solve this, after you have run bundle
-install do:</p>
+<p>before running bundle install set the variable:</p>
 
-<pre>export NOKOGIRI_USE_SYSTEM_LIBRARIES=1
-gem pristine nokogiri</pre>
+<pre>export NOKOGIRI_USE_SYSTEM_LIBRARIES=1</pre>
+
+<p>This forces the <em>nokogiri</em> gem to rebuild against the newer
+installed version of <em>LibXML</em>. If you have already run bundle
+install before reading this, set that variable and then run:</p>
+
+<pre>gem uninstall nokogiri
+bundle install</pre>
 
 <p>Following this you can proceed with the standard installation steps.</p>
 
