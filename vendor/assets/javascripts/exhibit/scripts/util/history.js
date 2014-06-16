@@ -140,7 +140,7 @@ Exhibit.History.stateListener = function(evt) {
 Exhibit.History.componentStateListener = function(evt, type, id) {
     var fullState, components, componentState, component;
     fullState = Exhibit.History.getState();
-    if (fullState !== null) {
+    if (fullState !== null && typeof fullState.data.components !== 'undefined') {
         components = fullState.data.components;
         if (typeof components[id] !== "undefined") {
             componentState = components[id].state;

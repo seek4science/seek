@@ -294,7 +294,7 @@ Exhibit.View.addViewState = function(id, state) {
 
     fullState = Exhibit.History.getState();
     // If History has been initialized already; don't worry if not
-    if (fullState !== null) {
+    if (fullState !== null && typeof fullState.data.components !== 'undefined') {
         if (typeof fullState.data.components[id] === "undefined") {
             fullState.data.components[id] = {
                 "state": state,
