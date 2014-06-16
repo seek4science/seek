@@ -212,7 +212,7 @@
                       <%= image_tag icon_filename_for_key("spinner"), :id => "institutions_loading_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
                       <span class="note_text" style="line-height: 1.5;">Step 1:</span> Select a <%= t('project') %>
                       <%= select("proj_project", "select",
-                                 Project.all.collect { |p| [p.name, p.id] },
+                                 Project.all.collect { |p| [p.title, p.id] },
                                  {:include_blank => "All #{t('project').pluralize} @ Institution (from Step 2)"}, {:style => "width: 100%; vertical-align: middle; margin: 0.3em 0;"}) -%>
                     </div>
 
