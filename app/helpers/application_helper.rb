@@ -201,11 +201,11 @@ module ApplicationHelper
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
       text.capitalize! if options[:capitalize]            
-      res = text.html_safe? ? text : h(text)
+      res = text.html_safe
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length])  if options[:length]
       res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true  
-      res = simple_format(res) if options[:description]==true || options[:address]==true
+      res = simple_format(res).html_safe if options[:description]==true || options[:address]==true
       
       res=mail_to(res) if options[:email]==true
       res=link_to(res,res,:popup=>true) if options[:external_link]==true

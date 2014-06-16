@@ -65,6 +65,8 @@ module SEEK
         :assets_creator_reindexer
 
     config.action_view.sanitized_allowed_attributes = ['rel']
+    config.action_view.sanitized_allowed_tags = ["u"]
+    WhiteListHelper.tags.merge %w(u)
 
     config.middleware.use Rack::Deflater
 

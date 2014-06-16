@@ -8,6 +8,6 @@ none_text||=nil
     <b><%= label -%>:</b>
   <% end %>
     <div id="description" class="box_standout curved">
-        <%= text_or_not_specified(h(item_description), :description=>true,:auto_link=>true, :none_text=>none_text) %>
+        <%= text_or_not_specified(item_description, :description=>true,:auto_link=>true, :none_text=>none_text) %>
     </div>
 </p>
