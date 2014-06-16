@@ -24,6 +24,9 @@ SEEK::Application.configure do
   # Generate digests for assets URLs
   config.assets.digest = true
 
+  # this config is set in order to use assets:clean_expired, to remove expired assets
+  config.assets.handle_expiration = true
+
   # Defaults to nil and saved in location specified by config.assets.prefix
   # config.assets.manifest = YOUR_PATH
 
