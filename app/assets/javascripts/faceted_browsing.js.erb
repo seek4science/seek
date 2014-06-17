@@ -1,4 +1,4 @@
-function updateFirstPage(){
+/*function updateFirstPage(){
     //temporary put this function here, need to find better place or rename the updateFirstPage
     renameHFMissingField();
     renameOtherField();
@@ -20,6 +20,30 @@ function updateFirstPage(){
                 $j('.exhibit-toolboxWidget-button').hide();
                 decodeValueTooltip();
             });
+    }
+}*/
+
+function updateFirstPage() {
+    //temporary put this function here, need to find better place or rename the updateFirstPage
+    renameHFMissingField();
+    renameOtherField();
+    var items = $j('div[itemid]');
+    var seek_items = getItems(items);
+
+    if (seek_items.length > 0) {
+        $j.ajax({
+            url: items_for_all_tabs_url,
+            async: false,
+            data: {items: seek_items.join(',')}
+        })
+                .done(function (data) {
+                    updateContent(data.items_for_all_tabs);
+
+                    $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
+                    $j('.exhibit-collectionView-header-groupControl').hide();
+                    $j('.exhibit-toolboxWidget-button').hide();
+                    decodeValueTooltip();
+                });
     }
 }
 
@@ -53,6 +77,17 @@ function getItemIds(items){
     }).get();
 
     return item_ids;
+}
+
+function getItems(items){
+    var items = items.map(function(){
+        var exhibit_item_id = $j(this).attr("itemid");
+        var type = database.getObject(exhibit_item_id, 'type');
+        var id = database.getObject(exhibit_item_id, 'item_id');
+        return type + '_' + id;
+    }).get();
+
+    return items;
 }
 
 function getItemType(items){

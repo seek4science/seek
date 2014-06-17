@@ -21,10 +21,7 @@
           <%= stylesheet_link_tag 'faceted_search' %>
 
           <% if Seek::Config.is_one_facet_instance %>
-              <% resource_hash = classify_for_tabs @results -%>
-              <%= render :partial => "assets/resource_tabbed_one_facet",
-                         :locals => {:resource_hash => resource_hash,
-                                     :authorization_already_done => true} -%>
+              <%= render :partial => "faceted_browsing/faceted_search_one_instance" -%>
           <% else %>
               <%= javascript_include_tag "tab_lazy_load.js" %>
 

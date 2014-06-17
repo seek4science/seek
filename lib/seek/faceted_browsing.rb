@@ -24,6 +24,28 @@ module Seek
       end
     end
 
+    def items_for_all_tabs
+      items_type_id = (params[:items] || '').split(',')
+      items = []
+      items_type_id.each do |type_id|
+         type, id = type_id.split('_')
+         items << type.constantize.find(id)
+      end
+
+
+      resource_hash = classify_for_tabs items
+      items_for_all_tabs = render_to_string :partial => "assets/resource_tabbed_one_facet",
+                                            :locals => {:resource_hash => resource_hash,
+                                                        :narrow_view => true,
+                                                        :authorization_already_done => true}
+
+      respond_to do |format|
+        format.json {
+          render :json => {:status => 200, :items_for_all_tabs => items_for_all_tabs}
+        }
+      end
+    end
+
     def get_items
       item_type = params[:item_type]
       item_ids = (params[:item_ids] || '').split(',')
@@ -54,6 +76,18 @@ module Seek
         end
       end
       @ie_support_faceted_browsing
+    end
+
+    def classify_for_tabs result_collection
+      results={}
+
+      result_collection.each do |res|
+        tab = res.respond_to?(:tab) ? res.tab : res.class.name
+        results[tab] = {:items => [], :hidden_count => 0, :is_external=>(res.respond_to?(:is_external_search_result?) && res.is_external_search_result?)} unless results[tab]
+        results[tab][:items] << res
+      end
+
+      return results
     end
 
   end
