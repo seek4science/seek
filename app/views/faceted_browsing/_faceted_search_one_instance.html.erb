@@ -1,0 +1,46 @@
+<%
+   resource_hash = faceted_search_one_instance
+   object_types = resource_hash.keys
+   facet_config = YAML.load(File.read(one_instance_facet_config_path))
+   expand_facet_count = 1
+%>
+
+<div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_types.join(',')%>"></div>
+
+<div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
+<br/>
+<b>Filter items by:</b>
+<hr/>
+<% count = 0 %>
+<% facet_config.each do |key, value| %>
+    <% label = value['label'] %>
+    <% facet_class = value['facet_class'] %>
+
+    <div data-ex-role="facet"
+         data-ex-expression=".<%= key %>"
+         data-ex-facet-label="<%= label %>"
+         data-ex-facet-class="<%= facet_class %>"
+         data-ex-height="13em"
+         data-ex-collapsible="true"
+
+         <% if facet_class == "NumericRange" %>
+         <% interval = value['interval'] %>
+         data-ex-interval="<%= interval %>"
+         <% end %>
+
+         <% if facet_class == "Exhibit.HierarchicalFacet" %>
+         data-ex-uniform-grouping=".subclassOf"
+         data-ex-scroll="false"
+         <% end %>
+         <% count += 1%>
+         <% if count > expand_facet_count %>
+         data-ex-collapsed="true"
+         <% end %>
+         >
+    </div>
+    <br/>
+<% end %>
+
+<%= render :partial => "faceted_browsing/data_search_one_instance", :object => resource_hash %>
+
+
