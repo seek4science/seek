@@ -206,9 +206,6 @@ GEM
     delayed_job_active_record (4.0.1)
       activerecord (>= 3.0, < 4.2)
       delayed_job (>= 3.0, < 4.1)
-    delayed_job_admin (1.0.3)
-      delayed_job
-      rails
     docsplit (0.7.5)
     dynamic_form (1.1.4)
     ebnf (0.3.6)
@@ -518,7 +515,6 @@ DEPENDENCIES
   country-select
   daemons
   delayed_job_active_record
-  delayed_job_admin
   docsplit
   doi_query_tool!
   dynamic_form

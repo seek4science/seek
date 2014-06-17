@@ -28,7 +28,6 @@ gem "daemons"
 gem "cancan"
 gem "in_place_editing"
 gem "linkeddata"
-gem "delayed_job_admin"
 
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
