@@ -293,7 +293,7 @@ GEM
     modporter-plugin (0.1.0)
     multi_json (1.10.1)
     multi_xml (0.5.5)
-    mysql2 (0.3.15)
+    mysql2 (0.3.16)
     net-http-persistent (2.9.4)
     nokogiri (1.6.2.1)
       mini_portile (= 0.6.0)
