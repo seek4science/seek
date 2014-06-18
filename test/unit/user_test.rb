@@ -230,6 +230,15 @@ class UserTest < ActiveSupport::TestCase
     assert !x.show_guide_box?
   end
 
+  test "reset password" do
+    user = Factory(:user)
+    assert_nil user.reset_password_code
+    assert_nil user.reset_password_code_until
+    user.reset_password
+    refute_nil user.reset_password_code
+    refute_nil user.reset_password_code_until
+  end
+
 protected
   def create_user(options = {})
     record = User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' }.merge(options))

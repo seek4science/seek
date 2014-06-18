@@ -231,6 +231,11 @@ class User < ActiveRecord::Base
     self.person.try(:guest_project_member?)
   end
 
+  def reset_password
+    self.reset_password_code_until = 1.day.from_now
+    self.reset_password_code =  Digest::SHA1.hexdigest( "#{user.email}#{Time.now.to_s.split(//).sort_by {rand}.join}" )
+  end
+
   protected
   # before filter
   def encrypt_password
