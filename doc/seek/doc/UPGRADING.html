@@ -109,8 +109,8 @@
   
 <h1 id="label-Upgrading+SEEK">Upgrading SEEK</h1>
 
-<p>If you have an existing SEEK installation, and you haven’t done so already,
-please take a moment to fill out our very short,optional <a
+<p>If you have an existing SEEK installation, and you haven&#39;t done so
+already, please take a moment to fill out our very short,optional <a
 href="http://www.sysmo-db.org/seek-registration">SEEK Registration
 Form</a>. Doing so will be very useful to us in the future when we try and
 raise further funding to develop and support SEEK and the associated tools.</p>
@@ -145,9 +145,9 @@ patch: 2</pre>
 
 <h2 id="label-General+notes+about+versions+and+upgrading">General notes about versions and upgrading</h2>
 
-<p><strong>If upgrading from a version earlier than v0.11.x please contact our
-GoogleGroup at <a
-href="http://groups.google.com/group/seek-developers">groups.google.com/group/seek-developers</a></strong></p>
+<p>&lt;b&gt;If upgrading from a version earlier than v0.11.x please contact
+us. You can find details on how to contact us at: <a
+href="http://seek4science.org/contact">seek4science.org/contact</a></p>
 
 <p>When upgrading between versions greater than v0.11.x you need to upgrade to
 each released minor version in order incrementally (i.e. 0.13.x -&gt;
@@ -186,7 +186,7 @@ export RAILS_ENV=production # if upgrading a production server - remember to set
 bundle exec rake sunspot:solr:stop
 hg pull https://bitbucket.org/seek4science/seek -r v0.20.0
 hg update # only if no other changes have been made to your local version, if you get an error ignore it and do merge
-hg merge # only required if you've made changes since installing. If you have, you may need to deal with conflicts.
+hg merge # only required if you&#39;ve made changes since installing. If you have, you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment
 bundle exec rake seek:upgrade</pre>
@@ -250,7 +250,7 @@ sudo a2enmod expires</pre>
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
 hg pull https://bitbucket.org/seek4science/seek -r v0.19.1
 hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+hg merge # only required if you&#39;ve made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment
 bundle exec rake seek:upgrade RAILS_ENV=production
@@ -280,7 +280,7 @@ details of how to do this upgrade.</p>
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
 hg pull https://bitbucket.org/seek4science/seek -r v0.17.1
 hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+hg merge # only required if you&#39;ve made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment
 bundle exec rake seek:upgrade RAILS_ENV=production

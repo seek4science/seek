@@ -120,9 +120,9 @@ general install guide.</p>
 
 <h2 id="label-Ubuntu+14.04+%28LTS%29+and+Linux+Mint+16">Ubuntu 14.04 (LTS) and Linux Mint 16</h2>
 
-<p>Ubuntu 14.04 has only recently been released and we haven’t yet fully
+<p>Ubuntu 14.04 has only recently been released and we haven&#39;t yet fully
 migrated over to testing on that platform. These differences also relate to
-Linux Mint 16. We don’t expect any particular problems once SEEK is
+Linux Mint 16. We don&#39;t expect any particular problems once SEEK is
 installed and running, but there are a couple of minor differences that
 need to be followed.</p>
 
@@ -130,9 +130,9 @@ need to be followed.</p>
 
 <pre>sudo apt-get install libcurl4-gnutls-dev</pre>
 
-<p>before running bundle install set the variable:</p>
+<p>before running bundle install run the following:</p>
 
-<pre>export NOKOGIRI_USE_SYSTEM_LIBRARIES=1</pre>
+<pre>bundle config build.nokogiri --use-system-libraries</pre>
 
 <p>This forces the <em>nokogiri</em> gem to rebuild against the newer
 installed version of <em>LibXML</em>. If you have already run bundle
@@ -142,6 +142,154 @@ install before reading this, set that variable and then run:</p>
 bundle install</pre>
 
 <p>Following this you can proceed with the standard installation steps.</p>
+
+<h2 id="label-Fedora+20+%2F+RHEL+%2F+CentOS">Fedora 20 / RHEL / CentOS</h2>
+
+<p>This installation was carried out using Fedora 20, but most likely also
+applies, or is a good starting point, for Red Hat Enterprise Linux, CentOS
+and other Red Hat based Linux distributions.</p>
+
+<p>Many thanks to <strong>Jay Moore</strong> for his contributed feedback from
+his own experiences installing SEEK on RHEL.</p>
+
+<h3 id="label-Packages">Packages</h3>
+
+<p>The package names are quite different for Red Hat and are installed using
+<em>Yum</em>. The packages you need to install are</p>
+
+<pre>sudo yum install mysql-server</pre>
+
+<p>This actually installed <em>MariaDB</em>, but it is compatible and not a
+problem. The rest of the packages (included those for running SEEK with
+Apache) are installed as follows</p>
+
+<pre>sudo yum groupinstall &quot;Development Tools&quot; &quot;Development Libraries&quot;
+sudo yum install wget curl mercurial ruby openssl-devel  openssh-server git readline-devel
+sudo yum install libxml2-devel libxml++-devel java-1.7.0-openjdk-devel sqlite-devel
+sudo yum install poppler-utils libreoffice mysql-devel mysql-libs ImageMagick-c++-devel libxslt-devel
+sudo yum install libtool gawk libyaml-devel autoconf gdbm-devel ncurses-devel automake bison libffi-devel
+sudo yum install httpd-itk httpd-devel</pre>
+
+<h3 id="label-Installing+RVM">Installing RVM</h3>
+
+<p>Install as usual following the <a href="INSTALL.html">INSTALL guide</a> but
+pay particular attention to any messages it reports about updating your
+.profile or .bash_profile</p>
+
+<h3 id="label-Installing+Gems">Installing Gems</h3>
+
+<p>As with Linux Mint and Ubuntu 14.04, you should run the following command
+before running <em>bundle install</em> to make sure <em>Nokogiri</em> is
+compiled using the installed version of <em>LibXML</em></p>
+
+<pre>bundle config build.nokogiri --use-system-libraries</pre>
+
+<h3 id="label-Setting+up+the+database">Setting up the database</h3>
+
+<p>Fedora installs <em>MariaDB</em> instead of <em>Mysql</em>. You may need to
+start up the database with:</p>
+
+<pre>sudo service mariadb start</pre>
+
+<p>To make it start at boot-time (this wasn&#39;t enabled by default for me)
+you should run:</p>
+
+<pre>sudo chkconfig mariadb on</pre>
+
+<p>To connect to the database to setup the user for SEEK do:</p>
+
+<pre>sudo mariadb</pre>
+
+<p>Otherwise everything else is the same.</p>
+
+<h3 id="label-Setting+up+for+production+with+Passenger+Phusion">Setting up for production with Passenger Phusion</h3>
+
+<p>To start and stop <em>Apache</em> you need to use</p>
+
+<pre>sudo apachectl start
+sudo apachectl stop</pre>
+
+<p>Also, as with MariaDB, it wasn&#39;t set to start at boot-time, so to fix
+this run:</p>
+
+<pre>sudo chkconfig httpd on</pre>
+
+<p>The user apache runs under is <em>apache</em> rather than <em>www-data</em>
+so to create a home directory for that user do:</p>
+
+<pre>sudo apachectl stop
+sudo usermod -d /home/apache apache
+sudo usermod -s /bin/bash apache
+sudo mkdir /home/apache
+sudo chown apache /home/apache
+sudo apachectl start</pre>
+
+<p>and instead of using www-data, to switch to that user use:</p>
+
+<pre>sudo su - apache</pre>
+
+<p>and then proceed with the normal installation, along with the differences
+to installing the gems and setting up the database described earlier, until
+you get to install and setup Passenger Phusion.</p>
+
+<p>Before creating the Passenger module, I first need to set the following
+variable to ensure it was built using a 64bit architecture</p>
+
+<pre>export ARCHFLAGS=&quot;-arch x86_64&quot;</pre>
+
+<p>and then proceed to run</p>
+
+<pre class="ruby"><span class="ruby-identifier">bundle</span> <span class="ruby-identifier">exec</span> <span class="ruby-identifier">passenger</span><span class="ruby-operator">-</span><span class="ruby-identifier">install</span><span class="ruby-operator">-</span><span class="ruby-identifier">apache2</span><span class="ruby-operator">-</span><span class="ruby-keyword">module</span>
+</pre>
+
+<p>I got some warnings about <em>FORTIFY_SOURCE requires compiling with
+optimization</em> which I ignored and didn&#39;t seem to cause any
+problems.</p>
+
+<p>At the end compiling and setting up Passenger Phusion, some details about
+the configuration to apply to Apache are displayed. This should be applied
+to a config file in <em>/etc/httpd/conf.d/</em>. For e.g. I used a file
+<em>/etc/httpd/conf.d/seek.conf</em>. You should also remove the other conf
+files that are put there by default. The contents of this file ended up
+looking like the following, although yours may differ slightly in terms of
+the versions used.</p>
+
+<pre>LoadModule passenger_module &quot;/home/apache/.rvm/gems/ruby-2.1.2@seek/gems/passenger-4.0.45/buildout/apache2/mod_passenger.so&quot;
+&lt;IfModule mod_passenger.c&gt;
+   PassengerRoot /home/apache/.rvm/gems/ruby-2.1.2@seek/gems/passenger-4.0.45
+   PassengerDefaultRuby /home/apache/.rvm/gems/ruby-2.1.2@seek/wrappers/ruby
+&lt;/IfModule&gt;
+
+&lt;VirtualHost *:80&gt;
+    # !!! Be sure to point DocumentRoot to &#39;public&#39;!
+    DocumentRoot /srv/rails/seek/public
+    &lt;Directory /srv/rails/seek/public&gt;
+       # This relaxes Apache security settings.
+       AllowOverride all
+       # MultiViews must be turned off.
+       Options -MultiViews
+       # Uncomment this if you&#39;re on Apache &gt;= 2.4:
+       Require all granted
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;</pre>
+
+<p>Afterwards, apache should be restarted with</p>
+
+<pre>sudo apachectl restart</pre>
+
+<p>Now, I encountered a permission error with loading the module, which I
+tracked down as being related to SELinux. To get around this I turned off
+SELinux with</p>
+
+<pre>sudo setenforce 0</pre>
+
+<p>There is a description of how to be able to re-enable this at <a
+href="http://sergiy.kyrylkov.name/2012/02/26/phusion-passenger-with-apache-on-rhel-6-centos-6-sl-6-with-selinux">sergiy.kyrylkov.name/2012/02/26/phusion-passenger-with-apache-on-rhel-6-centos-6-sl-6-with-selinux</a>
+but we have been unable to get this to work.</p>
+
+<p>If you have a solution on how to re-enable SELinux, please contact us. You
+can find details about how to contact us at <a
+href="http://seek4science.org/contact">seek4science.org/contact</a></p>
 
 <h2 id="label-Ubuntu+10.04+%28LTS%29">Ubuntu 10.04 (LTS)</h2>
 
@@ -175,7 +323,7 @@ sudo add-apt-repository ppa:libreoffice/libreoffice-3-5
 sudo apt-get update
 sudo apt-get install libreoffice</pre>
 
-<h2 id="label-Debian+Wheezy+%28+version+7.1+%29">Debian Wheezy ( version 7.1 )</h2>
+<h2 id="label-Debian">Debian</h2>
 
 <p>By default, the user you create for Debian during the installation is not
 added to the sudoers list. You may want to add your user to the
