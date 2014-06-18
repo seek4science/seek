@@ -172,7 +172,8 @@ GEM
       rails (>= 3, < 5)
     acts_as_list (0.4.0)
       activerecord (>= 3.0)
-    acts_as_tree (0.2.0)
+    acts_as_tree (1.6.1)
+      activerecord (>= 3.0.0)
     addressable (2.3.6)
     akami (1.2.2)
       gyoku (>= 0.4.0)
@@ -193,7 +194,7 @@ GEM
     cocaine (0.5.4)
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.0)
-    colorize (0.7.2)
+    colorize (0.7.3)
     country-select (1.1.1)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
@@ -205,10 +206,7 @@ GEM
     delayed_job_active_record (4.0.1)
       activerecord (>= 3.0, < 4.2)
       delayed_job (>= 3.0, < 4.1)
-    delayed_job_admin (1.0.3)
-      delayed_job
-      rails
-    docsplit (0.7.4)
+    docsplit (0.7.5)
     dynamic_form (1.1.4)
     ebnf (0.3.6)
       haml (~> 4.0)
@@ -221,9 +219,9 @@ GEM
       actionmailer (>= 3.0.4)
     factory_girl (2.6.4)
       activesupport (>= 2.3.9)
-    feedjira (1.2.0)
+    feedjira (1.3.0)
       curb (~> 0.8.1)
-      loofah (~> 1.2.1)
+      loofah (~> 2.0.0)
       sax-machine (~> 0.2.1)
     fssm (0.2.10)
     google-analytics-rails (0.0.6)
@@ -246,7 +244,7 @@ GEM
       activesupport (>= 3.0.0, < 5)
       multi_json (~> 1.2)
     journey (1.0.4)
-    jquery-rails (3.0.4)
+    jquery-rails (3.1.0)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
     json (1.8.1)
@@ -275,8 +273,8 @@ GEM
       actionpack (>= 3)
       activesupport (>= 3)
       railties (>= 3)
-    loofah (1.2.1)
-      nokogiri (>= 1.4.4)
+    loofah (2.0.0)
+      nokogiri (>= 1.5.9)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -292,7 +290,7 @@ GEM
     modporter-plugin (0.1.0)
     multi_json (1.10.1)
     multi_xml (0.5.5)
-    mysql2 (0.3.15)
+    mysql2 (0.3.16)
     net-http-persistent (2.9.4)
     nokogiri (1.6.2.1)
       mini_portile (= 0.6.0)
@@ -310,7 +308,7 @@ GEM
     pmrpc-rails (1.0.1)
       railties (>= 3.1.0)
     polyglot (0.3.5)
-    pothoven-attachment_fu (3.2.12)
+    pothoven-attachment_fu (3.2.13)
     powerbar (1.0.11)
       ansi (~> 1.4.0)
       hashie (>= 1.1.0)
@@ -482,7 +480,7 @@ GEM
     unicorn-rails (2.1.1)
       rack
       unicorn
-    uuidtools (2.1.1)
+    uuidtools (2.1.4)
     wasabi (2.5.1)
       httpi (~> 1.0)
       nokogiri (>= 1.4.0)
@@ -503,7 +501,7 @@ DEPENDENCIES
   acts_as_activity_logged!
   acts_as_list
   acts_as_trashable!
-  acts_as_tree (= 0.2.0)
+  acts_as_tree
   app_version!
   bio
   bioportal (>= 2.2)
@@ -517,7 +515,6 @@ DEPENDENCIES
   country-select
   daemons
   delayed_job_active_record
-  delayed_job_admin
   docsplit
   doi_query_tool!
   dynamic_form
@@ -531,7 +528,7 @@ DEPENDENCIES
   google-analytics-rails
   hpricot (~> 0.8.2)
   in_place_editing
-  jquery-rails (~> 3.0.4)
+  jquery-rails (~> 3)
   libxml-ruby (>= 2.6.0)
   linkeddata
   lograge
@@ -577,7 +574,7 @@ DEPENDENCIES
   transaction_isolation
   turbo-sprockets-rails3
   unicorn-rails
-  uuidtools (= 2.1.1)
+  uuidtools
   webmock
   white_list!
   white_list_formatted_content!

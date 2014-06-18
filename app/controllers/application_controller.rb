@@ -38,10 +38,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def delayed_job_admin_authentication
-    is_user_admin_auth
-  end
-
   def strip_root_for_xml_requests
     #intended to use as a before filter on requests that lack a single root model.
     #XML requests are required to have a single root node. This assumes the root node
