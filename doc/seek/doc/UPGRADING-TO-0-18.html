@@ -193,7 +193,7 @@ your <em>RAILS_ENV</em> is still set to <em>production</em> if necessary.</p>
 
 <pre>hg pull https://bitbucket.org/seek4science/seek -r v0.18.3
 hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+hg merge # only required if you&#39;ve made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment</pre>
 
@@ -216,7 +216,7 @@ bundle exec rake tmp:clear</pre>
 correctly report UTF-8. If you know of a cleaner way to do this then please
 let us know!</p>
 
-<p>If your database is already UTF-8 encoded, you don’t need to convert.</p>
+<p>If your database is already UTF-8 encoded, you don&#39;t need to convert.</p>
 
 <p>First refer to <em>config/database.yml</em> to check the database name, and
 the username and password you use.</p>
@@ -225,7 +225,7 @@ the username and password you use.</p>
 replacing &lt;mysql_username&gt; and &lt;database_name&gt;:</p>
 
 <pre>mysql -u &lt;mysql_username&gt; -p &lt;database_name&gt;
-SHOW VARIABLES LIKE 'character_set%';</pre>
+SHOW VARIABLES LIKE &#39;character_set%&#39;;</pre>
 
 <p>If the value of variable character_set_connection is not UTF-8, you need to
 convert.</p>
@@ -239,8 +239,8 @@ it to UTF-8.</p>
 
 <p>Now a couple of commands to change the contents of the dump</p>
 
-<pre>sed -e 's/CHARSET=latin1/CHARSET=utf8/g' seek_db.sql &gt; seek_db_utf8.sql
-sed -e 's/COLLATE=utf8_unicode_ci//g' seek_db_utf8.sql &gt; seek_db_converted.sql</pre>
+<pre>sed -e &#39;s/CHARSET=latin1/CHARSET=utf8/g&#39; seek_db.sql &gt; seek_db_utf8.sql
+sed -e &#39;s/COLLATE=utf8_unicode_ci//g&#39; seek_db_utf8.sql &gt; seek_db_converted.sql</pre>
 
 <p>Now refresh the database from the dump:</p>
 
@@ -278,7 +278,7 @@ running:</p>
 <pre>bundle exec rake sunspot:solr:start
 ./script/delayed_job start</pre>
 
-<p>If you don’t use SEEK with Apache, the command to start it is now:</p>
+<p>If you don&#39;t use SEEK with Apache, the command to start it is now:</p>
 
 <pre>bundle exec rails server</pre>
 

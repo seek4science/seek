@@ -144,8 +144,8 @@ to what they were originally.</p>
 
 <pre>nohup sudo -H -u www-data soffice --headless --accept=&quot;socket,host=127.0.0.1,port=8100;urp;&quot; --nofirststartwizard &gt; /dev/null 2&gt;&amp;1</pre>
 
-<p>The 8100 port is used by default, if you’d like to run on another port, you
-need also to synchronize the changed port with the default soffice_port
+<p>The 8100 port is used by default, if you&#39;d like to run on another port,
+you need also to synchronize the changed port with the default soffice_port
 setting for convert_office plugin in config/environment.rb</p>
 
 <p>We recommend the Libre Office service is setup using an init.d script,
@@ -170,7 +170,7 @@ previous versions:</p>
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
 hg pull https://bitbucket.org/seek4science/seek -r v0.16.3
 hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+hg merge # only required if you&#39;ve made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment
 bundle exec rake seek:upgrade RAILS_ENV=production
@@ -207,7 +207,7 @@ installed, the upgrade is the typical:</p>
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
 hg pull https://bitbucket.org/seek4science/seek -r v0.15.4
 hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+hg merge # only required if you&#39;ve made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment
 bundle exec rake seek:upgrade RAILS_ENV=production
@@ -229,7 +229,7 @@ subscriptions (for email notifications).</p>
 bundle exec rake sunspot:solr:stop RAILS_ENV=production
 hg pull https://bitbucket.org/seek4science/seek -r v0.14.1
 hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+hg merge # only required if you&#39;ve made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment
 bundle exec rake seek:upgrade RAILS_ENV=production
@@ -262,7 +262,7 @@ processing.</p>
 <pre>bundle exec rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
 hg pull https://bitbucket.org/seek4science/seek -r v0.13.3
 hg update
-hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
+hg merge # only required if you&#39;ve made changes since installing. If you have you may need to deal with conflicts.
 hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
 bundle install --deployment
 bundle exec rake seek:upgrade RAILS_ENV=production
