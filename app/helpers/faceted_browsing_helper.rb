@@ -32,9 +32,17 @@ module FacetedBrowsingHelper
     end
   end
 
-  def one_instance_facet_config_path
+  def one_instance_common_facet_config_path
     unless Rails.env == 'test'
-      File.join(Rails.root, "config", "one_instance_faceted_search.yml")
+      File.join(Rails.root, "config", "one_instance_common_facets.yml")
+    else
+      File.join(Rails.root, "test", "fixtures", "files", "faceted_search.txt")
+    end
+  end
+
+  def one_instance_specified_facet_config_path
+    unless Rails.env == 'test'
+      File.join(Rails.root, "config", "one_instance_specified_facets.yml")
     else
       File.join(Rails.root, "test", "fixtures", "files", "faceted_search.txt")
     end

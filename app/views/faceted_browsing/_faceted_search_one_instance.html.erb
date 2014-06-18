@@ -1,7 +1,7 @@
 <%
    resource_hash = classify_for_tabs @results
    object_types = resource_hash.keys
-   facet_config = YAML.load(File.read(one_instance_facet_config_path))
+   facet_config = YAML.load(File.read(one_instance_common_facet_config_path))
    expand_facet_count = 1
 %>
 

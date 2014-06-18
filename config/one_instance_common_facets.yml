@@ -10,3 +10,7 @@ created_at:
 tag:
     label: Tag
     value_from: tags_as_text_array
+
+author:
+    label: Author
+    value_from: publication_author_names

@@ -2,7 +2,7 @@
   <%
      resource_hash = data_search_one_instance
      object_types = resource_hash.keys
-     facet_config = YAML.load(File.read(one_instance_facet_config_path))
+     facet_config = YAML.load(File.read(one_instance_common_facet_config_path))
 
      exhibit_items = []
      exhibit_properties = {}
