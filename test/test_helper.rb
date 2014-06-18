@@ -15,6 +15,9 @@ require 'action_view/test_case'
 require 'tmpdir'
 require 'authenticated_test_helper'
 
+require 'coveralls'
+Coveralls.wear!
+
 module ActionView
   class Renderer
     def self.get_alternative key
