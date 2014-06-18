@@ -23,7 +23,7 @@ Assay:
       value_from: contributor:name
   tag:
       label: Tag
-      value_from: annotations_as_text_array
+      value_from: tags_as_text_array
 
 DataFile:
   project:
@@ -47,7 +47,7 @@ DataFile:
       value_from: creators:name
   tag:
       label: Tag
-      value_from: annotations_as_text_array
+      value_from: tags_as_text_array
 
 Model:
   organism:
@@ -78,7 +78,7 @@ Model:
       value_from: creators:name
   tag:
       label: Tag
-      value_from: annotations_as_text_array
+      value_from: tags_as_text_array
 
 Sop:
   project:
@@ -102,7 +102,7 @@ Sop:
       value_from: creators:name
   tag:
       label: Tag
-      value_from: annotations_as_text_array
+      value_from: tags_as_text_array
 
 Publication:
   project:
@@ -119,7 +119,7 @@ Publication:
       value_from: related_organisms:title
   tag:
       label: Tag
-      value_from: annotations_as_text_array
+      value_from: tags_as_text_array
 
 Person:
   project:
@@ -148,4 +148,4 @@ Person:
       value_from: name
   tag:
       label: Tag
-      value_from: annotations_as_text_array
+      value_from: tags_as_text_array
