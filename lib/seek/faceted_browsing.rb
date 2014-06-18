@@ -3,18 +3,33 @@ module Seek
   module FacetedBrowsing
 
     def items_for_result
-      items = get_items
-      resource_list_items = items.collect{|item| render_to_string :partial => "assets/resource_list_item", :object => item}
+      type_id_hash = get_type_id_hash
+      items = []
+      type_id_hash.each do |type, ids|
+        items |= get_items type, ids
+      end
+
+      if type_id_hash.keys.count > 1
+        resource_hash = classify_for_tabs items
+        items_for_result = render_to_string :partial => "assets/resource_tabbed_one_facet",
+                                            :locals => {:resource_hash => resource_hash,
+                                                        :narrow_view => true,
+                                                        :authorization_already_done => true}
+      else
+        items_for_result = items.collect{|item| render_to_string :partial => "assets/resource_list_item", :object => item}.join(' ')
+      end
 
       respond_to do |format|
         format.json {
-          render :json => {:status => 200, :items_for_result => resource_list_items.join(' ')}
+          render :json => {:status => 200, :items_for_result => items_for_result}
         }
       end
     end
 
     def items_for_facets
-      items = get_items
+      item_type ||= params[:item_type]
+      item_ids ||= (params[:item_ids] || '').split(',')
+      items = get_items item_type, item_ids
       items_for_facets = render_to_string :partial => "faceted_browsing/faceted_search",:object=>items
 
       respond_to do |format|
@@ -24,32 +39,9 @@ module Seek
       end
     end
 
-    def items_for_all_tabs
-      items_type_id = (params[:items] || '').split(',')
-      items = []
-      items_type_id.each do |type_id|
-         type, id = type_id.split('_')
-         items << type.constantize.find(id)
-      end
+    private
 
-
-      resource_hash = classify_for_tabs items
-      items_for_all_tabs = render_to_string :partial => "assets/resource_tabbed_one_facet",
-                                            :locals => {:resource_hash => resource_hash,
-                                                        :narrow_view => true,
-                                                        :authorization_already_done => true}
-
-      respond_to do |format|
-        format.json {
-          render :json => {:status => 200, :items_for_all_tabs => items_for_all_tabs}
-        }
-      end
-    end
-
-    def get_items
-      item_type = params[:item_type]
-      item_ids = (params[:item_ids] || '').split(',')
-
+    def get_items item_type, item_ids
       items = []
       if !item_type.blank?
         clazz = item_type.constantize
@@ -88,6 +80,21 @@ module Seek
       end
 
       return results
+    end
+
+    def get_type_id_hash
+      items_type_id = (params[:items] || '').split(',')
+      type_id_hash = {}
+      items_type_id.each do |type_id|
+        type, id = type_id.split('_')
+        id = id.to_i
+        if type_id_hash[type].nil?
+          type_id_hash[type] = [id]
+        else
+          type_id_hash[type] << id
+        end
+      end
+      type_id_hash
     end
 
   end

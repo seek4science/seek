@@ -1,28 +1,3 @@
-/*function updateFirstPage(){
-    //temporary put this function here, need to find better place or rename the updateFirstPage
-    renameHFMissingField();
-    renameOtherField();
-    var items = $j('div[itemid]');
-    var item_type = getItemType(items);
-    var item_ids = getItemIds(items);
-
-    if (item_type != null && item_ids.length > 0){
-        $j.ajax({
-            url: items_for_result_url,
-            async: false,
-            data: {item_ids: item_ids.join(','), item_type: item_type}
-        })
-            .done(function( data ) {
-                updateContent(data.items_for_result);
-
-                $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
-                $j('.exhibit-collectionView-header-groupControl').hide();
-                $j('.exhibit-toolboxWidget-button').hide();
-                decodeValueTooltip();
-            });
-    }
-}*/
-
 function updateFirstPage() {
     //temporary put this function here, need to find better place or rename the updateFirstPage
     renameHFMissingField();
@@ -32,12 +7,12 @@ function updateFirstPage() {
 
     if (seek_items.length > 0) {
         $j.ajax({
-            url: items_for_all_tabs_url,
+            url: items_for_result_url,
             async: false,
             data: {items: seek_items.join(',')}
         })
                 .done(function (data) {
-                    updateContent(data.items_for_all_tabs);
+                    updateContent(data.items_for_result);
 
                     $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
                     $j('.exhibit-collectionView-header-groupControl').hide();
