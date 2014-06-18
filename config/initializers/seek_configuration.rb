@@ -110,21 +110,9 @@ SEEK::Application.configure do
   #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
   Seek::Config.default :magic_guest_enabled,false
 
-<<<<<<< HEAD
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,''
   Seek::Config.fixed :main_layout,'application'
-=======
-
-  #alternative views and partials
-  ActionView::Renderer.define_alternative({:seek_partial=>"layouts/error_logo"},"")
-  ActionView::Renderer.define_alternative({:controller=>:people,:seek_partial=>"general/items_related_to"},"")
-  ActionView::Renderer.define_alternative({:controller=>:homes,:seek_template=>:index},:index_biovel)
-  ActionView::Renderer.define_alternative({:seek_partial=>"people/resource_list_item"},"people/resource_list_item_biovel")
-  ActionView::Renderer.define_alternative({:seek_partial=>"projects/resource_list_item"},"projects/resource_list_item_biovel")
-  ActionView::Renderer.define_alternative({:seek_partial=>"assets/sharing_form"},"assets/sharing_form_biovel")
->>>>>>> 5da4de6... fix to error with tests runnign with biovel config, as it wasn#t being overridden in the tests. Tests now run with all alternative views cleared. Tests that require a particular alternative can be added using with_alternative_rendering
-
 
 end
 
