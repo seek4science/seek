@@ -130,7 +130,7 @@ SEEK::Application.routes.draw do
       get :select
       get :get_work_group
       post :userless_project_selected_ajax
-      get :items_for_result
+      post :items_for_result
     end
     member do
       post :check_related_items
@@ -158,7 +158,7 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
-      get :items_for_result
+      post :items_for_result
     end
     member do
       get :asset_report
@@ -192,7 +192,7 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       get :request_all
-      get :items_for_result
+      post :items_for_result
     end
     resources :people,:projects,:specimens,:only=>[:index]
     resources :avatars do
@@ -206,7 +206,7 @@ SEEK::Application.routes.draw do
 
   resources :investigations do
     collection do
-      get :items_for_result
+      post :items_for_result
     end
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
     member do
@@ -217,7 +217,7 @@ SEEK::Application.routes.draw do
   resources :studies do
     collection do
       post :investigation_selected_ajax
-      get :items_for_result
+      post :items_for_result
     end
     member do
       get :new_object_based_on_existing_one
@@ -228,7 +228,7 @@ SEEK::Application.routes.draw do
   resources :assays do
     collection do
       get :preview
-      get :items_for_result
+      post :items_for_result
     end
     member do
       post :update_annotations_ajax
@@ -245,7 +245,7 @@ SEEK::Application.routes.draw do
       post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
-      get :items_for_result
+      post :items_for_result
     end
     member do
       post :check_related_items
@@ -282,7 +282,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :test_asset_url
-      get :items_for_result
+      post :items_for_result
     end
     member do
       post :check_related_items
@@ -310,7 +310,7 @@ SEEK::Application.routes.draw do
       get :build
       get :preview
       post :test_asset_url
-      get :items_for_result
+      post :items_for_result
     end
     member do
       get :compare_versions
@@ -355,7 +355,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :test_asset_url
-      get :items_for_result
+      post :items_for_result
     end
     member do
       post :check_related_items
@@ -400,7 +400,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :fetch_preview
-      get :items_for_result
+      post :items_for_result
     end
     member do
       post :update_annotations_ajax
@@ -412,7 +412,7 @@ SEEK::Application.routes.draw do
   resources :events do
     collection do
       get :preview
-      get :items_for_result
+      post :items_for_result
     end
     resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
@@ -429,7 +429,7 @@ SEEK::Application.routes.draw do
 
   resources :specimens do
     collection do
-      get :items_for_result
+      post :items_for_result
     end
     resources :projects,:people,:samples,:strains,:institutions,:sops,:only=>[:index]
     member do
@@ -440,7 +440,7 @@ SEEK::Application.routes.draw do
   resources :samples do
     collection do
       get :preview
-      get :items_for_result
+      post :items_for_result
     end
     member do
       get :new_object_based_on_existing_one
@@ -451,7 +451,7 @@ SEEK::Application.routes.draw do
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
-      get :items_for_result
+      post :items_for_result
     end
     member do
       post :update_annotations_ajax
