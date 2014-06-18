@@ -9,6 +9,10 @@ module ActionView
       @@alternative_map.delete(key)
     end
 
+    def self.clear_alternatives
+      @@alternative_map.clear
+    end
+
     def self.define_alternative key,value
       key = stringify_values(key)
       @@alternative_map[key]=value
