@@ -14,7 +14,8 @@ module Seek
         items_for_result = render_to_string :partial => "assets/resource_tabbed_one_facet",
                                             :locals => {:resource_hash => resource_hash,
                                                         :narrow_view => true,
-                                                        :authorization_already_done => true}
+                                                        :authorization_already_done => true,
+                                                        :display_immediately => true}
       else
         items_for_result = items.collect{|item| render_to_string :partial => "assets/resource_list_item", :object => item}.join(' ')
       end
