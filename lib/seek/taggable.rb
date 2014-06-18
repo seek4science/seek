@@ -96,10 +96,10 @@ module Seek
     end
 
     def searchable_tags
-      tags_as_text_array
+      annotations_as_text_array
     end
 
-    def tags_as_text_array
+    def annotations_as_text_array
       self.annotations.include_values.collect{|a| a.value.text}
     end
 

@@ -212,7 +212,7 @@ module ApiHelper
 
   def tags_xml builder,object
     object = object.parent if object.class.name.include?("::Version")
-    if object.respond_to?(:tags_as_text_array)
+    if object.respond_to?(:annotations_as_text_array)
       builder.tag! "tags" do
         object.annotations.each do |annotation|
           builder.tag! "tag",annotation.value.text,{:context=>annotation.attribute.name}
