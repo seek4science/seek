@@ -41,7 +41,7 @@
          value_from = value['value_from']
          value_from.split(':').each do |field|
            if facet_values.blank?
-             next
+             break
            elsif facet_values.kind_of?(Array)
              facet_values = facet_values.collect(&:"#{field}")
            else
