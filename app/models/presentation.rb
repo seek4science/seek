@@ -45,7 +45,7 @@ class Presentation < ActiveRecord::Base
   # Parameters:
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
-    all = Presentation.all_authorized_for "view",user
+    all = self.all_authorized_for "view",user
     with_contributors = all.collect{ |d|
         contributor = d.contributor;
         { "id" => d.id,

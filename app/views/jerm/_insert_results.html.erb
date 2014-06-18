@@ -12,7 +12,7 @@
   <div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">    
     <%= white_list flash[:error] %>
     <p>
-  It is possible that the <%= t('project') %> needs configuring: <%= link_to "Configure #{h(@project.name)}",admin_project_path(@project) %>
+  It is possible that the <%= t('project') %> needs configuring: <%= link_to "Configure #{h(@project.title)}",admin_project_path(@project) %>
 </p>
   </div>
 

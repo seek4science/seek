@@ -9,7 +9,7 @@ gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'
 gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
-gem 'uuidtools',"2.1.1"
+gem 'uuidtools'
 gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"~>0.13.3"
 gem "rmagick","2.13.2"
@@ -28,7 +28,6 @@ gem "daemons"
 gem "cancan"
 gem "in_place_editing"
 gem "linkeddata"
-gem "delayed_job_admin"
 
 gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
@@ -38,7 +37,7 @@ gem "exception_notification","3.0.1"
 gem "fssm"
 gem 'acts-as-taggable-on',"3.0.1"
 gem 'acts_as_list'
-gem 'acts_as_tree',"0.2.0"
+gem 'acts_as_tree'
 gem 'country-select'
 gem 'modporter-plugin'
 gem "will_paginate", "~> 3.0.4"
@@ -82,13 +81,15 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'passenger'
 gem 'unicorn-rails'
 
+gem 'coveralls', require: false
+
 group :assets do
   gem 'turbo-sprockets-rails3'
 end
 
 gem 'taverna-t2flow'
 gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
-gem 'jquery-rails', '~> 3.0.4'
+gem 'jquery-rails', '~> 3'
 
 group :development do
   gem "pry"
