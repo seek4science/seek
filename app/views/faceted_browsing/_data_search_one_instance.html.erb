@@ -46,6 +46,8 @@
              facet_values = facet_values.collect(&:"#{field}")
            elsif facet_values.respond_to?field
              facet_values = facet_values.send(field)
+           elsif !value['rails_class'].nil? and facet_values.class.name == value['rails_class']
+             next
            else
              facet_values = nil
            end
