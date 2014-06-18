@@ -9,6 +9,7 @@ function updateFirstPage() {
         $j.ajax({
             url: items_for_result_url,
             async: false,
+            type: 'POST',
             data: {items: seek_items.join(',')}
         })
                 .done(function (data) {
