@@ -68,3 +68,5 @@ syntax: regexp
 \Thumbs\.db$
 
 db-dump.sql
+
+coverage/
