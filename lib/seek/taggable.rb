@@ -104,7 +104,7 @@ module Seek
     end
 
     def tags_as_text_array
-      self.annotations.include_values.with_attribute_name('tag')collect{|a| a.value.text}
+      self.annotations.include_values.with_attribute_name('tag').collect{|a| a.value.text}
     end
 
     module ClassMethods
