@@ -117,9 +117,9 @@ class WorkGroupsController < ApplicationController
       @group_instance = group_instance
       case @group_instance.class.name
         when "WorkGroup"
-          @group_name = @group_instance.project.name + " @ " + @group_instance.institution.name
+          @group_name = @group_instance.project.title + " @ " + @group_instance.institution.title
         when "Project", "Institution"
-          @group_name = @group_instance.name
+          @group_name = @group_instance.title
         else
           @group_name = "unknown"
       end

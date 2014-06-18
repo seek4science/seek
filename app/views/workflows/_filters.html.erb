@@ -56,7 +56,7 @@
     <ul>
       <li><%= workflow_filter  'Your private workflows', params, :visibility, "private" -%></li>
       <% current_user.person.projects.each do |project| %>
-        <li><%= workflow_filter  "Only visible to #{project.name} members", params, :visibility, "Project:#{project.id}" -%></li>
+        <li><%= workflow_filter  "Only visible to #{project.title} members", params, :visibility, "Project:#{project.id}" -%></li>
       <% end %>
       <li><%= workflow_filter  'Only visible to registered users', params, :visibility, "registered" -%></li>
       <li><%= workflow_filter  "Public workflows", params, :visibility, "public" -%></li>
