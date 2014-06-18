@@ -36,6 +36,8 @@
        exhibit_item['item_id'] = object.id
 
        #generate facet values for each facet based on the facets.yml config file
+       #TODO:   put this part into a function
+       #        need comment and some tests for this part
        facet_config.each do |key, value|
          facet_values = object
          value_from = value['value_from']
