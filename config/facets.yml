@@ -1,3 +1,4 @@
+#TODO: need some comment to explain the config fields
 Assay:
   organism:
       label: Organism
