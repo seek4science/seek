@@ -42,10 +42,12 @@
          value_from.split(':').each do |field|
            if facet_values.blank?
              break
-           elsif facet_values.kind_of?(Array)
+           elsif facet_values.kind_of?(Array) and facet_values.first.respond_to?field
              facet_values = facet_values.collect(&:"#{field}")
-           else
+           elsif facet_values.respond_to?field
              facet_values = facet_values.send(field)
+           else
+             facet_values = nil
            end
          end
          exhibit_item[key] = facet_values

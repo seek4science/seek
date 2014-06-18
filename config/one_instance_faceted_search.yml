@@ -1,3 +1,7 @@
 created_at:
     label: Created In
     value_from: created_at:year
+
+tag:
+    label: Tag
+    value_from: tags_as_text_array
