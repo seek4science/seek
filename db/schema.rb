@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140516131826) do
+ActiveRecord::Schema.define(:version => 20140619133724) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1593,6 +1593,7 @@ ActiveRecord::Schema.define(:version => 20140516131826) do
     t.text     "description"
     t.integer  "user_id"
     t.integer  "workflow_version",                :default => 1
+    t.boolean  "reported",                        :default => false
   end
 
   add_index "taverna_player_runs", ["parent_id"], :name => "index_taverna_player_runs_on_parent_id"
