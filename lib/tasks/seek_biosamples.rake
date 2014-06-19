@@ -37,21 +37,20 @@ namespace :seek_biosamples do
     pp "Making concrete"
 
     make_concrete strains,specimens,samples,treatments
-    pp "------ Strain"
-    pp strains.first
-    pp "------ Specimen"
-    pp specimens.first
-    pp "------ Sample"
-    pp samples.first
-    pp "------ Treatment"
-    pp treatments.first
-    pp "------"
+    tie_together strains,specimens,samples,treatments
 
 
 
   end
 
   private
+
+  def tie_together *definitions
+    strains = definitions[0]
+    specimens = definitions[1]
+    samples = definitions[2]
+    treatments = definitions[3]
+  end
 
   def make_concrete *definitions
     people = Person.all
