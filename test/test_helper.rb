@@ -111,7 +111,8 @@ class ActiveSupport::TestCase
   end
 
   def skip_jws_tests?
-    false
+    #skip if running in travis
+    !ENV["TRAVIS"].nil?
   end
 
   def skip_rest_schema_check?
