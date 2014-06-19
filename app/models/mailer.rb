@@ -188,7 +188,7 @@ class Mailer < ActionMailer::Base
     @run = run
     @error_outputs = run.outputs.select { |o| o.value_is_error? }
 
-    attachments['taverna_server_log.txt'] = File.read(run.log.path)
+    attachments['taverna_server_log.txt'] = File.read(run.log.path) unless run.log.path.nil?
     attachments['portal_log.txt'] = run.failure_message unless run.failure_message.nil?
 
     mail(:from=>Seek::Config.noreply_sender,

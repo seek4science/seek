@@ -11,8 +11,8 @@
         <% end %>
     <% end %>
     <% if @run.complete? && @run.can_manage? %>
-        <% if !@run.reported? && @run.reportable? %>
-            <li><%= image_tag_for_key('report', '', nil, nil, "Report a problem with this run") -%></li>
+        <% if !@run.reported? && @run.reportable? && Seek::Config.email_enabled%>
+            <li><%= image_tag_for_key('report', main_app.report_problem_run_path(@run), nil, {:method=>:post}, "Report a problem with this run") -%></li>
         <% end %>
     <% end %>
     <% if @run.can_manage? and !current_user.guest? -%>

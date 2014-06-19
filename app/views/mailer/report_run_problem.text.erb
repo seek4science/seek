@@ -2,7 +2,7 @@
     <%= link_to @run.name, @run -%>
 
 of workflow:
-    <%= link_to @workflow.title, @workflow -%>
+    <%= link_to @run.workflow.title, @run.workflow -%>
 
 Run status: <%= @run.status_message -%>
 Started at: <%= @run.start_time -%>

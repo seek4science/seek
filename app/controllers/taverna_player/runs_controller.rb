@@ -60,9 +60,21 @@ module TavernaPlayer
     end
 
     def report_problem
-      Mailer.report_run_problem(current_user.person, @run).deliver
-      flash[:notice] = "Your report has been submitted to the support team, thank you."
-      respond_with(@run)
+      if @run.reported?
+        flash[:error] = "This run has already been reported."
+        respond_with(@run, :status => 400)
+      elsif !@run.reportable?
+        flash[:error] = "This run contains no errors."
+        respond_with(@run, :status => 400)
+      else
+        if Seek::Config.email_enabled
+          Mailer.report_run_problem(current_user.person, @run).deliver
+          @run.reported = true
+          @run.save
+          flash[:notice] = "Your report has been submitted to the support team, thank you."
+        end
+        respond_with(@run)
+      end
     end
 
     private

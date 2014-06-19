@@ -487,10 +487,10 @@ SEEK::Application.routes.draw do
       delete :favourite_delete
     end
 
-    resources :runs, :controller => 'TavernaPlayer::Runs'
+    resources :runs, :controller => 'taverna_player/runs'
   end
 
-  resources :runs, :controller => 'TavernaPlayer::Runs', :only => ['edit', 'update'] do
+  resources :runs, :controller => 'taverna_player/runs', :only => ['edit', 'update'] do
     member do
       post :report_problem
     end

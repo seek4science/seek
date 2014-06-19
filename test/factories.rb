@@ -928,3 +928,8 @@ end
       end
     end
   end
+
+  Factory.define(:failed_run, :parent => :taverna_player_run) do |f|
+    f.status_message_key 'failed'
+    f.state :failed
+  end
