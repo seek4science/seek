@@ -490,7 +490,11 @@ SEEK::Application.routes.draw do
     resources :runs, :controller => 'TavernaPlayer::Runs'
   end
 
-  resources :runs, :controller => 'TavernaPlayer::Runs', :only => ['edit', 'update']
+  resources :runs, :controller => 'TavernaPlayer::Runs', :only => ['edit', 'update'] do
+    member do
+      post :report_problem
+    end
+  end
 
   resources :group_memberships
 

@@ -59,6 +59,12 @@ module TavernaPlayer
       end
     end
 
+    def report_problem
+      Mailer.report_run_problem(current_user.person, @run).deliver
+      flash[:notice] = "Your report has been submitted to the support team, thank you."
+      respond_with(@run)
+    end
+
     private
 
     def find_workflow_and_version
