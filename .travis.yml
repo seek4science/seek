@@ -2,17 +2,9 @@ language: ruby
 rvm:
   - 1.9.3
   - 2.1.2
-env:
-  - SUITE="units"
-  - SUITE="functionals"
-  - SUITE="integration"
 before_install:
-  - #sudo apt-get update -qq
-  - #sudo apt-get install -qq libreoffice openjdk-7-jdk
   - bundle config build.nokogiri --use-system-libraries
-before_script:
-  - #/usr/bin/soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1 &
 script:
   - mv config/database.cc.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:schema:load
-  - bundle exec rake test:$SUITE
+  - bundle exec rake test
