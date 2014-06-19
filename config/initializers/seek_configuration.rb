@@ -104,6 +104,7 @@ SEEK::Application.configure do
   Seek::Config.default :crossref_api_email,nil
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
+  Seek::Config.default :support_email_address, 'support@biovel.eu'
 
   Seek::Config.default :max_attachments_num,100
 

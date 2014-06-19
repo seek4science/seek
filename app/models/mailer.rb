@@ -192,7 +192,7 @@ class Mailer < ActionMailer::Base
     attachments['portal_log.txt'] = run.failure_message unless run.failure_message.nil?
 
     mail(:from=>Seek::Config.noreply_sender,
-         :to=>admin_emails,
+         :to=>Seek::Config.support_email_address,
          :subject=>"#{Seek::Config.application_name} user has reported a problem with a workflow run")
   end
 

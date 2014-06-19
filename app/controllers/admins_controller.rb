@@ -54,6 +54,8 @@ class AdminsController < ApplicationController
     Seek::Config.set_smtp_settings 'password', params[:password]
     Seek::Config.set_smtp_settings 'enable_starttls_auto',params[:enable_starttls_auto]=="1"
 
+    Seek::Config.support_email_address= params[:support_email_address]
+
     Seek::Config.solr_enabled= string_to_boolean params[:solr_enabled]
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root= params[:jws_online_root]
