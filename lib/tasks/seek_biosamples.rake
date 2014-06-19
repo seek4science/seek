@@ -17,30 +17,104 @@ namespace :seek_biosamples do
     strain_csv = spreadsheet_to_csv open(template_name),1,true
     pp "Parsing strain csv"
     strains = parse_strain_csv(strain_csv)
-    pp strains.last
 
     pp "Reading specimen data"
     spec_csv = spreadsheet_to_csv open(template_name),2,true
     pp "Parsing specimen data"
     specimens = parse_specimen_csv(spec_csv)
-    pp specimens.last
+
 
     pp "Reading sample data"
     sample_csv = spreadsheet_to_csv open(template_name),3,true
     pp "Parsing samples"
     samples = parse_sample_csv(sample_csv)
-    pp samples.last
+
 
     pp "Reading treatement data"
     treatment_csv = spreadsheet_to_csv open(template_name),4,true
     treatments = parse_treatment_csv(treatment_csv)
-    pp treatments.last
+
+    pp "Making concrete"
+
+    make_concrete strains,specimens,samples,treatments
+    pp "------ Strain"
+    pp strains.first
+    pp "------ Specimen"
+    pp specimens.first
+    pp "------ Sample"
+    pp samples.first
+    pp "------ Treatment"
+    pp treatments.first
+    pp "------"
 
 
 
   end
 
   private
+
+  def make_concrete *definitions
+    people = Person.all
+    definitions.each do |definition|
+      definition.each do |element|
+        #do project
+        if element.has_key?(:projects) && !element[:projects].nil?
+          project_titles = element[:projects].split(",")
+          projects = project_titles.collect do |project_title|
+            project = Project.find_by_title(project_title)
+            project ||= Project.where("lower(title) LIKE ?","%#{project_title.downcase}%").first
+            raise "Unable to find project to match '#{project_title}'" if project.nil?
+            project
+          end
+          element[:projects]=projects
+        end
+
+        #do contributor
+        if element.has_key?(:contributor) && !element[:contributor].nil?
+          contributor_name = element[:contributor].strip
+          person = people.find do |person|
+            person.name =~ /#{contributor_name}/i
+          end
+          raise "Unable to find person to match '#{contributor_name}'" if person.nil?
+          element[:contributor]=person
+        end
+
+        #data files
+        if element.has_key?(:data_files) && !element[:data_files].nil?
+          ids = element[:data_files].split(",")
+          data_files = ids.collect do |id|
+            df = DataFile.find(id)
+            raise "Unable to find data file for id #{id}" if df.nil?
+            df
+          end
+          element[:data_files]=data_files
+        end
+
+        #sops
+        if element.has_key?(:sops) && !element[:sops].nil?
+          ids = element[:sops].split(",")
+          sops = ids.collect do |id|
+            sop = Sop.find(id)
+            raise "Unable to find SOP for id #{id}" if sop.nil?
+            sop
+          end
+          element[:sops]=sops
+        end
+
+        #assays
+        if element.has_key?(:assays) && !element[:assays].nil?
+          ids = element[:assays].split(",")
+          assays = ids.collect do |id|
+            assay = Assay.find(id)
+            raise "Unable to find Assay for id #{id}" if assay.nil?
+            assay
+          end
+          element[:assays]=assays
+        end
+
+      end
+    end
+  end
 
   def parse_treatment_csv csv
 
@@ -58,7 +132,7 @@ namespace :seek_biosamples do
   end
 
   def parse_sample_csv csv
-    keys = [:key, :title, :lab_internal_id, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_file_ids, :assay_ids, :sop_ids]
+    keys = [:key, :title, :lab_internal_id, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
     x=0
     result = CSV.parse(csv).collect.with_index do |row,x|
       if x==0
