@@ -150,19 +150,10 @@ class Assay < ActiveRecord::Base
   #culture_growth should be the culture growth instance
   def associate_organism(organism,strain_id=nil,culture_growth_type=nil)
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
-    assay_organism=AssayOrganism.new
-    assay_organism.assay = self
-    assay_organism.organism = organism
-    strain=nil
+    strain=organism.strains.find_by_id(strain_id)
+    assay_organism=AssayOrganism.new(:assay=>self,:organism=>organism,:culture_growth_type=>culture_growth_type,:strain=>strain)
 
-    if (!strain_id.blank?)
-      strain=organism.strains.find(strain_id)
-    end
-    assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
-    assay_organism.strain=strain
-
-    existing = AssayOrganism.all.select{|ao|ao.organism==organism and ao.assay == self and ao.strain==strain and ao.culture_growth_type==culture_growth_type}
-    if existing.blank?
+    unless AssayOrganism.exists_for?(strain,organism,self,culture_growth_type)
       self.assay_organisms << assay_organism
     end
 
