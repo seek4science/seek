@@ -33,7 +33,7 @@ gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
 gem 'docsplit'
 gem "pothoven-attachment_fu"
-gem "exception_notification","3.0.1"
+gem "exception_notification"
 gem "fssm"
 gem 'acts-as-taggable-on',"3.0.1"
 gem 'acts_as_list'
