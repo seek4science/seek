@@ -383,10 +383,9 @@ module ImagesHelper
       return ''
     end
   end
-  
 
 
-    def model_image_url(model_instance, model_image_id, size=nil)
+  def model_image_url(model_instance, model_image_id, size=nil)
     basic_url = eval("model_model_image_path(#{model_instance.id}, #{model_image_id})")
 
     if size
@@ -395,10 +394,9 @@ module ImagesHelper
     end
 
     return basic_url
-    end
+  end
 
 
-  
   def file_type_icon(item)
     url = file_type_icon_url(item)
     image_tag url, :class => "icon"
