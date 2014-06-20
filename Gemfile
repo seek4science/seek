@@ -99,7 +99,7 @@ end
 
 group :test do
   gem 'test_after_commit'
-  gem "sqlite3","1.3.7"
+  gem "sqlite3"
   gem "ruby-prof"
   gem "webmock"
   gem 'minitest-reporters','~> 0.14'
