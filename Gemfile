@@ -18,7 +18,7 @@ gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
 gem 'rubyzip',"0.9.9"
 gem 'bio'
-gem 'sunspot_rails','2.1.0'
+gem 'sunspot_rails'
 gem 'sunspot_solr'
 gem 'savon',"1.1.0"
 gem "dynamic_form"
