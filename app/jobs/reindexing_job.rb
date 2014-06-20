@@ -16,7 +16,7 @@ class ReindexingJob
         begin
           item.solr_index!
         rescue Exception => e
-          ReindexingJob.add_items_to_queue(item)
+          #ReindexingJob.add_items_to_queue(item)
         end
       end
     end
