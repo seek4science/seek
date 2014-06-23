@@ -4,6 +4,7 @@ class ReindexingJob
 
   BATCHSIZE=10
   DEFAULT_PRIORITY=2
+  TIMELIMIT = 15.minutes
 
   def perform
     todo = ReindexingQueue.order("id ASC").limit(BATCHSIZE).collect do |queued|
@@ -14,7 +15,9 @@ class ReindexingJob
     if Seek::Config.solr_enabled
       todo.uniq.each do |item|
         begin
-          item.solr_index!
+          Timeout::timeout(TIMELIMIT) do
+            item.solr_index!
+          end
         rescue Exception => e
           Rails.logger.error(e)
           if Seek::Config.exception_notification_enabled
