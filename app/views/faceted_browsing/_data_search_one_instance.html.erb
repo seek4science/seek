@@ -2,11 +2,12 @@
   <%
      resource_hash = data_search_one_instance
      object_types = resource_hash.keys
-     facet_config = YAML.load(File.read(one_instance_common_facet_config_path))
+     common_facet_config = YAML.load(File.read(one_instance_common_facet_config_path))
+     specified_facet_config = YAML.load(File.read(one_instance_specified_facet_config_path))
 
      exhibit_items = []
      exhibit_properties = {}
-     facet_config.each do |key,value|
+     common_facet_config.each do |key,value|
        facet_class = value['facet_class']
        if facet_class == 'NumericRange'
          exhibit_properties[key] = {"valueType" => "number"}
@@ -18,46 +19,35 @@
        end
      end
 
-     #items
      i=1
-     objects = resource_hash.values.collect{|value| value[:items]}.flatten
-     objects.each do |object|
-       exhibit_item = {}
+     #generate facet values for each facet based on the config files
+     resource_hash.each do |key,value|
+       objects = value[:items]
+       facets_for_object = specified_facet_config[key] || {}
+       objects.each do |object|
+         exhibit_item = {}
+         #this is to avoid exhibit warning messages
+         exhibit_item['id'] = i
+         exhibit_item['label'] = "#{i}"
+         i += 1
 
-       #this is to avoid exhibit warning messages
-       exhibit_item['id'] = i
-       exhibit_item['label'] = "#{i}"
-       i += 1
+         #This display_content will be later on replaced by resource_list_item, by using ajax, otherwise it causes speed problem
+         exhibit_item['display_content'] = ''
 
-       #This display_content will be later on replaced by resource_list_item, by using ajax, otherwise it causes speed problem
-       exhibit_item['display_content'] = ''
+         exhibit_item['type'] = object.class.name
+         exhibit_item['item_id'] = object.id
 
-       exhibit_item['type'] = object.class.name
-       exhibit_item['item_id'] = object.id
 
-       #generate facet values for each facet based on the facets.yml config file
-       #TODO:   put this part into a function
-       #        need comment and some tests for this part
-       facet_config.each do |key, value|
-         facet_values = object
-         value_from = value['value_from']
-         value_from.split(':').each do |field|
-           if facet_values.blank?
-             break
-           elsif facet_values.kind_of?(Array) and facet_values.first.respond_to?field
-             facet_values = facet_values.collect(&:"#{field}")
-           elsif facet_values.respond_to?field
-             facet_values = facet_values.send(field)
-           elsif !value['rails_class'].nil? and facet_values.class.name == value['rails_class']
-             next
-           else
-             facet_values = nil
-           end
+         common_facet_config.each do |key, config_for_key|
+           exhibit_item[key] = value_for_key key, config_for_key, object
          end
-         exhibit_item[key] = facet_values
-       end
 
-       exhibit_items << exhibit_item
+         facets_for_object.each do |key, config_for_key|
+           exhibit_item[key] = value_for_key key, config_for_key, object
+         end
+
+         exhibit_items << exhibit_item
+       end
      end
   %>
 

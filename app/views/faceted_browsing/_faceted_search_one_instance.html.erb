@@ -1,7 +1,8 @@
 <%
    resource_hash = classify_for_tabs @results
    object_types = resource_hash.keys
-   facet_config = YAML.load(File.read(one_instance_common_facet_config_path))
+   common_facet_config = YAML.load(File.read(one_instance_common_facet_config_path))
+   specified_facet_config = YAML.load(File.read(one_instance_specified_facet_config_path))
    expand_facet_count = 1
 %>
 
@@ -16,7 +17,7 @@
       <div data-ex-role="exhibit-viewPanel">
         <div data-ex-role="exhibit-view"
              data-ex-label="Tiles"
-             data-ex-possible-orders=".<%= facet_config.keys.join(',.') %>"
+             data-ex-possible-orders=".<%= common_facet_config.keys.join(',.') %>"
              data-ex-paginate="false"
              data-ex-show-all="true"
         ></div>
@@ -29,7 +30,7 @@
     <b>Filter items by:</b>
     <hr/>
     <% count = 0 %>
-    <% facet_config.each do |key, value| %>
+    <% common_facet_config.each do |key, value| %>
         <% label = value['label'] %>
         <% facet_class = value['facet_class'] %>
 
@@ -57,6 +58,38 @@
         </div>
         <br/>
     <% end %>
+
+      <% object_types.each do |object_type| %>
+          <% facets_for_object = specified_facet_config[object_type] || {} %>
+
+              <% facets_for_object.each do |key, value| %>
+                  <% label = value['label'] %>
+                  <% facet_class = value['facet_class'] %>
+
+                  <div data-ex-role="facet"
+                       data-ex-expression=".<%= key %>"
+                       data-ex-facet-label="<%= label %>"
+                       data-ex-facet-class="<%= facet_class %>"
+                       data-ex-height="13em"
+                       data-ex-collapsible="true"
+                       data-ex-collapsed="true"
+
+                       <% if facet_class == "NumericRange" %>
+                       <% interval = value['interval'] %>
+                       data-ex-interval="<%= interval %>"
+                       <% end %>
+
+                       <% if facet_class == "Exhibit.HierarchicalFacet" %>
+                       data-ex-uniform-grouping=".subclassOf"
+                       data-ex-scroll="false"
+                       <% end %>
+                       >
+                  </div>
+                  <br/>
+              <% end %>
+
+      <% end %>
+
   </div>
 </div>
 
