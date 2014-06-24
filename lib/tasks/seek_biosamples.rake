@@ -9,6 +9,11 @@ namespace :seek_biosamples do
   STRAIN_HEADINGS = ["id", "title", "contributor name", "project name(s)", "organism", "ncbi", "provider name", "providers id", "comments", "genotypes-gene", "genotypes-modification", "phenotypes"]
   TREATMENT_HEADINGS = ["treatment type", "substance", "value", "unit", "belongs to parsed sample"]
 
+  SAMPLE_KEYS = [:key, :title, :lab_internal_id, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
+  SPECIMEN_KEYS = [:key,:title,:lab_internal_id,:start_date,:provider_name,:provider_id,:contributor,:projects,:institution,:growth_type,:strain]
+  STRAIN_KEYS = [:key,:title,:contributor,:projects,:organism,:ncbi,:provider_name,:provider_id,:comments,:genotypes,:genotype_modification,:phenotypes]
+  TREATMENT_KEYS = [:treatment_type,:substance,:value,:unit,:sample]
+
   class Array
     def find_by_key(key)
       self.find do |x|
@@ -27,10 +32,9 @@ namespace :seek_biosamples do
     strains = parse_strain_csv(strain_csv)
 
     pp "Reading specimen data"
-    spec_csv = spreadsheet_to_csv open(template_name),2,true
+    spec_csv = spreadsheet_to_csv open(template_name),2
     pp "Parsing specimen data"
     specimens = parse_specimen_csv(spec_csv)
-
 
     pp "Reading sample data"
     sample_csv = spreadsheet_to_csv open(template_name),3,true
@@ -47,9 +51,25 @@ namespace :seek_biosamples do
     make_concrete strains,specimens,samples,treatments
     tie_together strains,specimens,samples,treatments
 
+    insert_data strains
+
   end
 
   private
+
+  def insert_data strains
+    ActiveRecord::Base.transaction do
+      strains.each do |strain_hash|
+        pp strain_hash
+        title = strain_hash[:title]
+        projects = strain_hash[:projects]
+        #will need to adapt this if we encounter and entry with multiple projects, but this isn't expected.
+        raise "Expected 1 project" unless projects.count==1
+
+        raise ActiveRecord::Rollback
+      end
+    end
+  end
 
   def tie_together strains,specimens,samples,treatments
     treatments.each do |treatment|
@@ -137,19 +157,29 @@ namespace :seek_biosamples do
           element[:assays]=assays
         end
 
+        #organism
+        if element.has_key?(:organism) && element.has_key?(:ncbi)
+          title = element[:organism]
+          title = title.gsub("_"," ")
+          title = "Lactococcus lactis" if title.downcase == "lactococus lactis"
+          organism = Organism.where("lower(title) LIKE ?","%#{title.downcase}%").first
+          raise "Unable to find Organism for '#{title}'" if organism.nil?
+          raise "NCBI doesn't match organism - '#{organism.title} , #{organism.ncbi_id} != #{element[:ncbi]}" if organism.ncbi_id.to_i != element[:ncbi].to_i
+          element[:organism]=organism
+        end
+
       end
     end
   end
 
   def parse_treatment_csv csv
 
-    keys = [:treatment_type,:substance,:value,:unit,:sample]
     result = CSV.parse(csv).collect.with_index do |row,x|
       if x==0 #skip the first row but test
         check_treatment_headings row
       else
         Hash[row.map.with_index do |val,i|
-          [keys[i],val]
+          [TREATMENT_KEYS[i],val]
         end]
       end
     end
@@ -157,14 +187,13 @@ namespace :seek_biosamples do
   end
 
   def parse_sample_csv csv
-    keys = [:key, :title, :lab_internal_id, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
     x=0
     result = CSV.parse(csv).collect.with_index do |row,x|
       if x==0
         check_sample_headings row
       else
         Hash[row.map.with_index do |val,i|
-          [keys[i],val]
+          [SAMPLE_KEYS[i],val]
         end]
       end
     end
@@ -172,14 +201,13 @@ namespace :seek_biosamples do
   end
 
   def parse_strain_csv csv
-    keys = [:key,:title,:contributor,:projects,:organism,:provider_name,:provider_id,:comments,:genotypes,:genotype_modification,:phenotypes]
     x=0
     result = CSV.parse(csv).collect.with_index do |row,x|
       if x==0
         check_strain_headings row
       else
         Hash[row.map.with_index do |val,i|
-          [keys[i],val]
+          [STRAIN_KEYS[i],val]
         end]
       end
     end
@@ -187,14 +215,13 @@ namespace :seek_biosamples do
   end
 
   def parse_specimen_csv csv
-    keys = [:key,:title,:lab_internal_id,:start_date,:provider_name,:provider_id,:contributor,:projects,:institution,:growth_type,:strain]
     x=0
     result = CSV.parse(csv).collect.with_index do |row,x|
       if x==0
         check_specimen_headings row
       else
         Hash[row.map.with_index do |val,i|
-          [keys[i],val]
+          [SPECIMEN_KEYS[i],val]
         end]
       end
     end
