@@ -11,7 +11,7 @@ namespace :seek_biosamples do
 
   SAMPLE_KEYS = [:key, :title, :lab_internal_id, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
   SPECIMEN_KEYS = [:key,:title,:lab_internal_id,:start_date,:provider_name,:provider_id,:contributor,:projects,:institution,:growth_type,:strain]
-  STRAIN_KEYS = [:key,:title,:contributor,:projects,:organism,:ncbi,:provider_name,:provider_id,:comments,:genotypes,:genotype_modification,:phenotypes]
+  STRAIN_KEYS = [:key,:title,:contributor,:projects,:organism,:ncbi,:provider_name,:provider_id,:comment,:genes,:genotype_modification,:phenotypes]
   TREATMENT_KEYS = [:treatment_type,:substance,:value,:unit,:sample]
 
   class Array
@@ -47,28 +47,75 @@ namespace :seek_biosamples do
     treatments = parse_treatment_csv(treatment_csv)
 
     pp "Making concrete"
-
     make_concrete strains,specimens,samples,treatments
+
+    pp "Tying things together"
     tie_together strains,specimens,samples,treatments
 
+    pp "Inserting"
     insert_data strains
 
+    pp "Finished"
   end
 
   private
 
   def insert_data strains
     ActiveRecord::Base.transaction do
-      strains.each do |strain_hash|
-        pp strain_hash
-        title = strain_hash[:title]
-        projects = strain_hash[:projects]
-        #will need to adapt this if we encounter and entry with multiple projects, but this isn't expected.
-        raise "Expected 1 project" unless projects.count==1
+      disable_authorization_checks do
+        strains.each do |strain_hash|
+          strain = insert_strain strain_hash
 
-        raise ActiveRecord::Rollback
+        end
       end
+      raise ActiveRecord::Rollback
     end
+  end
+
+  def insert_strain strain_hash
+    title = strain_hash[:title]
+    organism = strain_hash[:organism]
+    projects = strain_hash[:projects]
+    project = projects[0]
+    contributor = strain_hash[:contributor]
+
+    gene_titles = strain_hash[:genes].split(",")
+    gene_modifications = strain_hash[:gene_modifications]
+
+
+    raise "Should be at least 1 project" if projects.count<1
+    raise "More than one project encountered, with although possible wasn't anticipated" if projects.count>1
+    raise "There must be a contributor for the strain" if contributor.nil?
+    raise "Still need to handle gene modifications (not implemented)" unless gene_modifications.nil? #don't need to handle these yet, since they are not in the data
+
+    strain = Strain.all.detect do |str|
+      match = str.title==title && str.projects.include?(project) && gene_titles.count==str.genotypes.count
+      if match
+        match = str.genotypes.detect do |gt|
+          !gene_titles.include?(gt.gene.title)
+        end.nil?
+      end
+      match
+    end
+
+    if strain.nil?
+      new_strain_attributes = strain_hash.slice(:title,:lab_internal_id,:provider_id,:provider_name,:comment)
+      strain = Strain.new new_strain_attributes
+      strain.contributor = contributor
+      strain.organism = organism
+      strain.projects = [project]
+      gene_titles.each do |gene_title|
+        strain.genotypes << Genotype.new(:gene=>Gene.new(:title=>gene_title),:strain=>strain)
+      end
+    else
+      puts "Strain found: #{strain.inspect}"
+      raise "Organism doesn't match strain" if strain.organism != organism
+      raise "Project doesn't match strain" if !strain.projects.include?(project)
+    end
+
+    strain.save!
+
+    strain
   end
 
   def tie_together strains,specimens,samples,treatments
