@@ -59,7 +59,7 @@ Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
   Seek::Config.default :profile_select_by_default,true
 
-  Seek::Config.default :header_tagline_text_enabled, true
+  Seek::Config.default :header_tagline_text_enabled, false
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2
 
