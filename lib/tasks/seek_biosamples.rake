@@ -10,7 +10,7 @@ namespace :seek_biosamples do
   TREATMENT_HEADINGS = ["treatment type", "substance", "value", "unit", "belongs to parsed sample"]
 
   SAMPLE_KEYS = [:key, :title, :lab_internal_id, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
-  SPECIMEN_KEYS = [:key,:title,:lab_internal_id,:start_date,:provider_name,:provider_id,:contributor,:projects,:institution,:growth_type,:strain]
+  SPECIMEN_KEYS = [:key,:title,:lab_internal_number,:born,:provider_name,:provider_id,:contributor,:projects,:institution,:culture_growth_type,:strain]
   STRAIN_KEYS = [:key,:title,:contributor,:projects,:organism,:ncbi,:provider_name,:provider_id,:comment,:genes,:genotype_modification,:phenotypes]
   TREATMENT_KEYS = [:treatment_type,:substance,:value,:unit,:sample]
 
@@ -65,11 +65,32 @@ namespace :seek_biosamples do
       disable_authorization_checks do
         strains.each do |strain_hash|
           strain = insert_strain strain_hash
+          strain_hash[:specimens].each do |specimen_hash|
+            specimen_hash[:strain]=strain
+            insert_specimen specimen_hash
+          end
 
         end
       end
-      raise ActiveRecord::Rollback
+      #raise ActiveRecord::Rollback
     end
+  end
+
+  def insert_specimen specimen_hash
+    raise "Was expecting 1 project for specimen" if specimen_hash[:projects].count!=1
+    raise "Was expecting a contributor" if specimen_hash[:contributor].nil?
+    raise "Was expecting a strain" if specimen_hash[:strain].nil?
+    raise "Strain should already be saved" unless specimen_hash[:strain].is_a?(Strain)
+    specimen = Specimen.all.detect do |spec|
+      spec.title == specimen_hash[:title] && spec.projects && spec.strain==specimen_hash[:strain]
+    end
+    if specimen.nil?
+      specimen = Specimen.new specimen_hash.slice(:title,:lab_internal_number,:born,:provider_name,:provider_id,:contributor,:projects,:institution,:culture_growth_type,:strain)
+    else
+      pp "Specimen found: #{specimen.inspect}"
+    end
+    specimen.save!
+    specimen
   end
 
   def insert_strain strain_hash
@@ -149,6 +170,26 @@ namespace :seek_biosamples do
     people = Person.all
     definitions.each do |definition|
       definition.each do |element|
+
+        #make born date a datetime
+        if element.has_key?(:born) && !element[:born].nil?
+          element[:born]=DateTime.parse(element[:born])
+        end
+
+        #the culture growth type
+        if element.has_key?(:culture_growth_type) && !element[:culture_growth_type].nil?
+          type = CultureGrowthType.find_by_title(element[:culture_growth_type])
+          raise "Unable to find culture growth type for #{element[:culture_growth_type]}" if type.nil?
+          element[:culture_growth_type]=type
+        end
+
+        #institution
+        if element.has_key?(:institution) && !element[:institution].nil?
+          institution = Institution.find_by_title(element[:institution])
+          raise "Unable to find institution for #{element[:institution]}" if institution.nil?
+          element[:institution]=institution
+        end
+
         #do project
         if element.has_key?(:projects) && !element[:projects].nil?
           project_titles = element[:projects].split(",")
