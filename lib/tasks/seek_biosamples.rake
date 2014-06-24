@@ -9,6 +9,14 @@ namespace :seek_biosamples do
   STRAIN_HEADINGS = ["id", "title", "contributor name", "project name(s)", "organism", "ncbi", "provider name", "providers id", "comments", "genotypes-gene", "genotypes-modification", "phenotypes"]
   TREATMENT_HEADINGS = ["treatment type", "substance", "value", "unit", "belongs to parsed sample"]
 
+  class Array
+    def find_by_key(key)
+      self.find do |x|
+        x[:key]==key
+      end
+    end
+  end
+
   task :parse,[:template_name]=>:environment do |t,args|
     template_name = args[:template_name]
     puts "Working from the template #{template_name}"
@@ -39,17 +47,35 @@ namespace :seek_biosamples do
     make_concrete strains,specimens,samples,treatments
     tie_together strains,specimens,samples,treatments
 
-
-
   end
 
   private
 
-  def tie_together *definitions
-    strains = definitions[0]
-    specimens = definitions[1]
-    samples = definitions[2]
-    treatments = definitions[3]
+  def tie_together strains,specimens,samples,treatments
+    treatments.each do |treatment|
+      sample_key = treatment[:sample]
+      sample = samples.find_by_key(sample_key)
+      raise "Unable to find sample for key '#{sample_key}'" if sample.nil?
+      treatment[:sample]=sample
+      sample[:treatments]||=[]
+      sample[:treatments] << treatment
+    end
+    samples.each do |sample|
+      spec_key = sample[:specimen]
+      spec = specimens.find_by_key(spec_key)
+      raise "Unable to find specimen for key '#{spec_key}'" if spec.nil?
+      sample[:specimen]=spec
+      spec[:samples]||=[]
+      spec[:samples] << sample
+    end
+    specimens.each do |spec|
+      strain_key = spec[:strain]
+      strain = strains.find_by_key(strain_key)
+      raise "Unable to find strain for key '#{strain_key}'" if strain.nil?
+      spec[:strain]=strain
+      strain[:specimens]||=[]
+      strain[:specimens] << spec
+    end
   end
 
   def make_concrete *definitions
@@ -82,7 +108,7 @@ namespace :seek_biosamples do
         if element.has_key?(:data_files) && !element[:data_files].nil?
           ids = element[:data_files].split(",")
           data_files = ids.collect do |id|
-            df = DataFile.find(id)
+            df = DataFile.find_by_id(id)
             raise "Unable to find data file for id #{id}" if df.nil?
             df
           end
@@ -93,7 +119,7 @@ namespace :seek_biosamples do
         if element.has_key?(:sops) && !element[:sops].nil?
           ids = element[:sops].split(",")
           sops = ids.collect do |id|
-            sop = Sop.find(id)
+            sop = Sop.find_by_id(id)
             raise "Unable to find SOP for id #{id}" if sop.nil?
             sop
           end
@@ -104,7 +130,7 @@ namespace :seek_biosamples do
         if element.has_key?(:assays) && !element[:assays].nil?
           ids = element[:assays].split(",")
           assays = ids.collect do |id|
-            assay = Assay.find(id)
+            assay = Assay.find_by_id(id)
             raise "Unable to find Assay for id #{id}" if assay.nil?
             assay
           end
