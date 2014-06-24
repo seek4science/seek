@@ -9,7 +9,7 @@ namespace :seek_biosamples do
   STRAIN_HEADINGS = ["id", "title", "contributor name", "project name(s)", "organism", "ncbi", "provider name", "providers id", "comments", "genotypes-gene", "genotypes-modification", "phenotypes"]
   TREATMENT_HEADINGS = ["treatment type", "substance", "value", "unit", "belongs to parsed sample"]
 
-  SAMPLE_KEYS = [:key, :title, :lab_internal_id, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
+  SAMPLE_KEYS = [:key, :title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
   SPECIMEN_KEYS = [:key,:title,:lab_internal_number,:born,:provider_name,:provider_id,:contributor,:projects,:institution,:culture_growth_type,:strain]
   STRAIN_KEYS = [:key,:title,:contributor,:projects,:organism,:ncbi,:provider_name,:provider_id,:comment,:genes,:genotype_modification,:phenotypes]
   TREATMENT_KEYS = [:treatment_type,:substance,:value,:unit,:sample]
@@ -67,13 +67,39 @@ namespace :seek_biosamples do
           strain = insert_strain strain_hash
           strain_hash[:specimens].each do |specimen_hash|
             specimen_hash[:strain]=strain
-            insert_specimen specimen_hash
+            specimen = insert_specimen specimen_hash
+            specimen_hash[:samples].each do |sample_hash|
+              sample_hash[:specimen]=specimen
+              insert_sample sample_hash
+            end
           end
 
         end
       end
-      #raise ActiveRecord::Rollback
+      raise ActiveRecord::Rollback
     end
+  end
+
+  def insert_sample sample_hash
+    raise "Was expecting a contributor" if sample_hash[:contributor].nil?
+    raise "Was expecting a specimen" if sample_hash[:specimen].nil?
+    raise "Specimen should already be saved" unless sample_hash[:specimen].is_a?(Specimen)
+    raise "Handling assays not yet implemented" if !sample_hash[:assays].blank?
+    sample = Sample.all.detect do |sample|
+      sample.title == sample_hash[:title] && sample.specimen == sample_hash[:specimen]
+    end
+    if sample.nil?
+      sample = Sample.new sample_hash.slice(:title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :comments)
+      #FIXME: need to handle :age_at_sampling
+      sample.projects = sample_hash[:projects] || sample_hash[:specimen].projects
+      (Array(sample_hash[:data_files]) & Array(sample_hash[:sops])).each do |asset|
+        sample.associate_asset asset
+      end
+    else
+      pp "Sample found: #{sample.inspect}"
+    end
+    sample.save!
+    sample
   end
 
   def insert_specimen specimen_hash
@@ -82,7 +108,7 @@ namespace :seek_biosamples do
     raise "Was expecting a strain" if specimen_hash[:strain].nil?
     raise "Strain should already be saved" unless specimen_hash[:strain].is_a?(Strain)
     specimen = Specimen.all.detect do |spec|
-      spec.title == specimen_hash[:title] && spec.projects && spec.strain==specimen_hash[:strain]
+      spec.title == specimen_hash[:title] && spec.projects.sort==specimen_hash[:projects].sort && spec.strain==specimen_hash[:strain]
     end
     if specimen.nil?
       specimen = Specimen.new specimen_hash.slice(:title,:lab_internal_number,:born,:provider_name,:provider_id,:contributor,:projects,:institution,:culture_growth_type,:strain)
@@ -174,6 +200,11 @@ namespace :seek_biosamples do
         #make born date a datetime
         if element.has_key?(:born) && !element[:born].nil?
           element[:born]=DateTime.parse(element[:born])
+        end
+
+        #make sampling date a datetime
+        if element.has_key?(:sampling_date) && !element[:sampling_date].nil?
+          element[:sampling_date]=DateTime.parse(element[:sampling_date])
         end
 
         #the culture growth type
