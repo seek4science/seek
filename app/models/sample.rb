@@ -5,6 +5,7 @@ class Sample < ActiveRecord::Base
   include Subscribable
 
   include Seek::Rdf::RdfGeneration
+  include BackgroundReindexing
 
   acts_as_authorized
   acts_as_favouritable
@@ -42,6 +43,9 @@ class Sample < ActiveRecord::Base
 
   scope :default_order, order("title")
 
+  searchable(:auto_index=>false) do
+    text :searchable_terms
+  end if Seek::Config.solr_enabled
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 
@@ -54,9 +58,7 @@ class Sample < ActiveRecord::Base
      END_EVAL
   end
 
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :searchable_terms
-  end if Seek::Config.solr_enabled
+
 
   def self.sop_sql()
     'SELECT sop_versions.* FROM sop_versions ' +
