@@ -35,7 +35,7 @@ class SuggestedTechnologyType < ActiveRecord::Base
   def ontology_parent term=self
     return nil if term.nil?
     rdf_uri = RDF::URI.new term.parent_uri
-    rdf_uri.valid? ? term.parent : ontology_parent(parent)
+    rdf_uri.valid? ? term.parent : ontology_parent(term.parent)
   end
 
   # its own valid uri or its parent with valid uri
