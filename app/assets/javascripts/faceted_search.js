@@ -8,13 +8,7 @@ function load_tabs() {
 //this is for the case of multiple exhibit instance.
 function tab_on_click(resource_type, resource_ids, with_facets) {
     var tab_content_id = 'faceted_search_result';
-
     var click_tab = document.getElementById('tab_' + resource_type);
-    var url = '';
-    if (with_facets == true)
-        url = items_for_facets_url;
-    else
-        url = items_for_result_url;
 
     click_tab.onclick = function () {
         show_large_ajax_loader(tab_content_id);
@@ -25,24 +19,40 @@ function tab_on_click(resource_type, resource_ids, with_facets) {
 
         jQuery.noConflict();
         var $j = jQuery;
-        $j.ajax({
-            url: url,
-            async: false,
-            data: { item_ids: resource_ids,
-                item_type: resource_type}
-        })
-            .done(function (data) {
-                var tab_content = $j('#' + tab_content_id);
-                if (with_facets == true)
+        if (with_facets == true){
+            $j.ajax({
+                url: items_for_facets_url,
+                async: false,
+                data: { item_ids: resource_ids,
+                    item_type: resource_type}
+            })
+                .done(function (data) {
+                    var tab_content = $j('#' + tab_content_id);
                     tab_content.html(data.items_for_facets);
-                else
+                });
+
+        }else{
+            $j.ajax({
+                url: items_for_result_url,
+                async: false,
+                type: "POST",
+                data: { items: generateParamItems(resource_type, resource_ids)}
+            })
+                .done(function (data) {
+                    var tab_content = $j('#' + tab_content_id);
                     tab_content.html(data.items_for_result);
-                //$j(document).ready(initializationFunction);
-                //$j(document).trigger("scriptsLoaded.exhibit");
-            });
+                });
+
+        }
     }
 }
 
+//params items: e.g. Model_1,Model_2,...
+function generateParamItems(resource_type, resource_ids){
+    var items = resource_type + '_';
+    items = items + resource_ids.replace(/,/g, ',' + resource_type + '_');
+    return items;
+}
 
 //this is for the case of multiple exhibit instance.
 function hideFacets(){
