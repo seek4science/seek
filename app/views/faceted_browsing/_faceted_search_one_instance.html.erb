@@ -59,55 +59,57 @@
         <br/>
     <% end %>
 
-      <% object_types.each do |object_type| %>
-          <% facets_for_object = specified_facet_config[object_type] || {} %>
-        <div class="specified_facets" id="specified_<%= object_type %>_facets">
-          <div class="specified_facet_list" id="<%= object_type %>_facet">
-              <% facets_for_object.each do |key, value| %>
-                  <% label = value['label'] %>
-                  <% facet_class = value['facet_class'] %>
+    <% object_types.each do |object_type| %>
+        <% facets_for_object = specified_facet_config[object_type] || {} %>
+        <% unless facets_for_object.blank? %>
+            <div class="specified_facets" id="specified_<%= object_type %>_facets">
+              <div class="specified_facet_list" id="<%= object_type %>_facet">
+                <% facets_for_object.each do |key, value| %>
+                    <% label = value['label'] %>
+                    <% facet_class = value['facet_class'] %>
 
-                  <div data-ex-role="facet"
-                       data-ex-expression=".<%= key %>"
-                       data-ex-facet-label="<%= label %>"
-                       data-ex-facet-class="<%= facet_class %>"
-                       data-ex-height="13em"
-                       data-ex-collapsible="true"
-                       data-ex-collapsed="true"
+                    <div data-ex-role="facet"
+                         data-ex-expression=".<%= key %>"
+                         data-ex-facet-label="<%= label %>"
+                         data-ex-facet-class="<%= facet_class %>"
+                         data-ex-height="13em"
+                         data-ex-collapsible="true"
+                         data-ex-collapsed="true"
 
-                       <% if facet_class == "NumericRange" %>
-                       <% interval = value['interval'] %>
-                       data-ex-interval="<%= interval %>"
-                       <% end %>
+                         <% if facet_class == "NumericRange" %>
+                         <% interval = value['interval'] %>
+                         data-ex-interval="<%= interval %>"
+                         <% end %>
 
-                       <% if facet_class == "Exhibit.HierarchicalFacet" %>
-                       data-ex-uniform-grouping=".subclassOf"
-                       data-ex-scroll="false"
-                       <% end %>
-                       >
-                  </div>
-                  <br/>
-            <% end %>
-          </div>
+                         <% if facet_class == "Exhibit.HierarchicalFacet" %>
+                         data-ex-uniform-grouping=".subclassOf"
+                         data-ex-scroll="false"
+                         <% end %>
+                         >
+                    </div>
+                    <br/>
+                <% end %>
+              </div>
 
-          <%
-             more_id = "more_#{object_type}"
-             less_id = "less_#{object_type}"
-             facet_type_id = "#{object_type}_facet"
-          %>
-          <%= link_to_function ("More "+image("expand")).html_safe, :id => more_id, :style => "float:right;" do |page|
-            page[more_id].toggle
-            page[less_id].toggle
-            page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
-          end
-          -%>
-          <%= link_to_function ("Less "+image("collapse")).html_safe, :id => less_id, :style => "float:right;display:none" do |page|
-            page[more_id].toggle
-            page[less_id].toggle
-            page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
-          end
-          -%>
-        </div>
+              <%
+                 more_id = "more_#{object_type}"
+                 less_id = "less_#{object_type}"
+                 facet_type_id = "#{object_type}_facet"
+              %>
+              <%= link_to_function ("More "+image("expand")).html_safe, :id => more_id, :style => "float:right;" do |page|
+                page[more_id].toggle
+                page[less_id].toggle
+                page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
+              end
+              -%>
+              <%= link_to_function ("Less "+image("collapse")).html_safe, :id => less_id, :style => "float:right;display:none" do |page|
+                page[more_id].toggle
+                page[less_id].toggle
+                page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
+              end
+              -%>
+            </div>
+        <% end %>
     <% end %>
 
   </div>
