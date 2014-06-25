@@ -33,7 +33,7 @@ gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
 gem 'docsplit'
 gem "pothoven-attachment_fu"
-gem "exception_notification","3.0.1"
+gem "exception_notification"
 gem "fssm"
 gem 'acts-as-taggable-on',"3.0.1"
 gem 'acts_as_list'
@@ -99,7 +99,7 @@ end
 
 group :test do
   gem 'test_after_commit'
-  gem "sqlite3","1.3.7"
+  gem "sqlite3"
   gem "ruby-prof"
   gem "webmock"
   gem 'minitest-reporters','~> 0.14'

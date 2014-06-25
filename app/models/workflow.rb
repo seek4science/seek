@@ -105,23 +105,8 @@ class Workflow < ActiveRecord::Base
     text :title , :description, :category, :uploader
   end if Seek::Config.solr_enabled
 
-
-
   def self.user_creatable?
     Seek::Config.workflows_enabled
-  end
-
-  def self.get_all_as_json(user)
-    all = Workflow.all_authorized_for "view", user
-    with_contributors = all.collect { |d|
-      contributor = d.contributor;
-      {"id" => d.id,
-       "title" => h(d.title),
-       "contributor" => contributor.nil? ? "" : "by " + h(contributor.person.name),
-       "type" => self.name
-      }
-    }
-    return with_contributors.to_json
   end
 
   def t2flow

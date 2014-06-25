@@ -215,8 +215,9 @@ GEM
     equivalent-xml (0.4.3)
       nokogiri (>= 1.4.3)
     erubis (2.7.0)
-    exception_notification (3.0.1)
+    exception_notification (4.0.1)
       actionmailer (>= 3.0.4)
+      activesupport (>= 3.0.4)
     factory_girl (2.6.4)
       activesupport (>= 2.3.9)
     feedjira (1.3.0)
@@ -443,7 +444,7 @@ GEM
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    sqlite3 (1.3.7)
+    sqlite3 (1.3.9)
     sunspot (2.1.1)
       pr_geohash (~> 1.0)
       rsolr (~> 1.0.7)
@@ -520,7 +521,7 @@ DEPENDENCIES
   doi_query_tool!
   dynamic_form
   equivalent-xml
-  exception_notification (= 3.0.1)
+  exception_notification
   factory_girl (= 2.6.4)
   feedjira (~> 1)
   fleximage!
@@ -567,7 +568,7 @@ DEPENDENCIES
   search_biomodel (= 2.2.1)!
   simple-spreadsheet-extractor (~> 0.13.3)
   site_announcements!
-  sqlite3 (= 1.3.7)
+  sqlite3
   sunspot_rails
   sunspot_solr
   taverna-player!

@@ -87,6 +87,19 @@ module Acts #:nodoc:
         include Acts::Asset::InstanceMethods
         include BackgroundReindexing
         include Subscribable
+
+        def get_all_as_json(user)
+          all = self.all_authorized_for "view",user
+          with_contributors = all.collect{ |d|
+            contributor = d.contributor;
+            { "id" => d.id,
+              "title" => h(d.title),
+              "contributor" => contributor.nil? ? "" : "by " + h(contributor.person.name),
+              "type" => self.name
+            }
+          }
+          return with_contributors.to_json
+        end
       end
 
 

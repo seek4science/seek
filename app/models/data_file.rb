@@ -65,25 +65,6 @@ class DataFile < ActiveRecord::Base
     end
   end
 
-  # get a list of DataFiles with their original uploaders - for autocomplete fields
-  # (authorization is done immediately to save from iterating through the collection again afterwards)
-  #
-  # Parameters:
-  # - user - user that performs the action; this is required for authorization
-  def self.get_all_as_json(user)
-    #FIXME: could probably be moved into a mixin rather than being dupilcated across assets
-    all = DataFile.all_authorized_for "view",user
-    with_contributors = all.collect{ |d|
-        contributor = d.contributor;
-        { "id" => d.id,
-          "title" => h(d.title),
-          "contributor" => contributor.nil? ? "" : "by " + h(contributor.person.name),
-          "type" => self.name
-        }
-    }
-    return with_contributors.to_json
-  end
-
   def included_to_be_copied? symbol
      case symbol.to_s
        when "activity_logs","versions","attributions","relationships","inverse_relationships", "annotations"
