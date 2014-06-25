@@ -64,13 +64,14 @@ namespace :seek_biosamples do
     ActiveRecord::Base.transaction do
       disable_authorization_checks do
         strains.each do |strain_hash|
-          strain = insert_strain strain_hash
+          policy = determine_policy(strain_hash)
+          strain = insert_strain strain_hash,policy
           strain_hash[:specimens].each do |specimen_hash|
             specimen_hash[:strain]=strain
-            specimen = insert_specimen specimen_hash
+            specimen = insert_specimen specimen_hash,policy
             specimen_hash[:samples].each do |sample_hash|
               sample_hash[:specimen]=specimen
-              sample = insert_sample sample_hash
+              sample = insert_sample sample_hash,policy
               sample_hash[:treatments].each do |treatment_hash|
                 treatment_hash[:sample]=sample
                 insert_treatment treatment_hash
@@ -80,8 +81,23 @@ namespace :seek_biosamples do
 
         end
       end
-      #raise ActiveRecord::Rollback
+      raise ActiveRecord::Rollback
     end
+  end
+
+  def determine_policy strain_hash
+    data_file = strain_hash[:specimens].first[:samples].first[:data_files].first
+    policy = Policy.public_policy
+    if data_file.nil?
+      puts "Unable to find data file to determine policy, using public policy"
+    else
+      if data_file.is_a?(DataFile)
+        policy = data_file.policy
+      else
+        raise "Expected to find DataFile but was #{data_file.inspect}"
+      end
+    end
+    policy
   end
 
   def insert_treatment treatment_hash
@@ -103,7 +119,7 @@ namespace :seek_biosamples do
     treatment.save!
   end
 
-  def insert_sample sample_hash
+  def insert_sample sample_hash,policy
     raise "Was expecting a contributor" if sample_hash[:contributor].nil?
     raise "Was expecting a specimen" if sample_hash[:specimen].nil?
     raise "Specimen should already be saved" unless sample_hash[:specimen].is_a?(Specimen)
@@ -113,6 +129,7 @@ namespace :seek_biosamples do
     end
     if sample.nil?
       sample = Sample.new sample_hash.slice(:title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :comments)
+      sample.policy = policy.deep_copy
       #FIXME: need to handle :age_at_sampling
       sample.projects = sample_hash[:projects] || sample_hash[:specimen].projects
       (Array(sample_hash[:data_files]) & Array(sample_hash[:sops])).each do |asset|
@@ -125,7 +142,7 @@ namespace :seek_biosamples do
     sample
   end
 
-  def insert_specimen specimen_hash
+  def insert_specimen specimen_hash, policy
     raise "Was expecting 1 project for specimen" if specimen_hash[:projects].count!=1
     raise "Was expecting a contributor" if specimen_hash[:contributor].nil?
     raise "Was expecting a strain" if specimen_hash[:strain].nil?
@@ -135,6 +152,7 @@ namespace :seek_biosamples do
     end
     if specimen.nil?
       specimen = Specimen.new specimen_hash.slice(:title,:lab_internal_number,:born,:provider_name,:provider_id,:contributor,:projects,:institution,:culture_growth_type,:strain)
+      specimen.policy = policy.deep_copy
     else
       pp "Specimen found: #{specimen.inspect}"
     end
@@ -142,7 +160,7 @@ namespace :seek_biosamples do
     specimen
   end
 
-  def insert_strain strain_hash
+  def insert_strain strain_hash, policy
     title = strain_hash[:title]
     organism = strain_hash[:organism]
     projects = strain_hash[:projects]
@@ -174,6 +192,7 @@ namespace :seek_biosamples do
       strain.contributor = contributor
       strain.organism = organism
       strain.projects = [project]
+      strain.policy = policy.deep_copy
       gene_titles.each do |gene_title|
         strain.genotypes << Genotype.new(:gene=>Gene.new(:title=>gene_title),:strain=>strain)
       end
