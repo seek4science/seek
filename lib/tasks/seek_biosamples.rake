@@ -7,12 +7,12 @@ namespace :seek_biosamples do
   SAMPLE_HEADINGS = ['id', 'title', 'lab internal id', 'providers id', 'provider name', 'belongs to parsed specimen', 'contributor name', 'organism part', 'sampling date', 'age at sampling (hours)', 'comments', 'orginating data file id', "associated assays id's", "associated sop id's"]
   SPECIMEN_HEADINGS = ['id', 'title', 'lab internal id', 'start date / born date', 'provider name', 'providers id', 'contributor name', 'project name(s)', 'institution name', 'growth type', 'belongs to parsed strain']
   STRAIN_HEADINGS = ['id', 'title', 'contributor name', 'project name(s)', 'organism', 'ncbi', 'provider name', 'providers id', 'comments', 'genotypes-gene', 'genotypes-modification', 'phenotypes']
-  TREATMENT_HEADINGS = ['treatment type', 'substance', 'value', 'medium_title', 'unit', 'belongs to parsed sample']
+  TREATMENT_HEADINGS = ['treatment type', 'substance', 'value', 'medium_title', 'unit','time after treatment','time after treatment unit', 'belongs to parsed sample']
 
   SAMPLE_KEYS = [:key, :title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
   SPECIMEN_KEYS = [:key, :title, :lab_internal_number, :born, :provider_name, :provider_id, :contributor, :projects, :institution, :culture_growth_type, :strain]
   STRAIN_KEYS = [:key, :title, :contributor, :projects, :organism, :ncbi, :provider_name, :provider_id, :comment, :genes, :genotype_modification, :phenotypes]
-  TREATMENT_KEYS = [:treatment_type, :substance, :value, :medium_title, :unit, :sample]
+  TREATMENT_KEYS = [:treatment_type, :substance, :value, :medium_title, :unit, :time_after_treatment, :time_after_treatment_unit,:sample]
 
   class Array
     def find_by_key(key)
