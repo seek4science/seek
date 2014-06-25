@@ -136,7 +136,7 @@ class Project < ActiveRecord::Base
     return locations
   end
 
-  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
+  #OVERRIDDEN in Seek::ProjectHierarchies if Seek::Config.project_hierarchy_enabled
   def people
       #TODO: look into doing this with a named_scope or direct query
       res = work_groups.collect(&:people).flatten.uniq.compact
@@ -218,5 +218,5 @@ class Project < ActiveRecord::Base
 
    #should put below at the bottom in order to override methods for hierarchies,
    #Try to find a better way for overriding methods regardless where to include the module
-    include Seek::ProjectHierarchies if Seek::Config.is_virtualliver
+    include Seek::ProjectHierarchies if Seek::Config.project_hierarchy_enabled
 end

@@ -62,7 +62,7 @@ Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :header_tagline_text_enabled, false
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2
-
+  Seek::Config.default :project_hierarchy_enabled, true
 Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
 # Branding
   Seek::Config.default :project_name,'SysMO'

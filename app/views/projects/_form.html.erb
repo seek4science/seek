@@ -23,7 +23,7 @@
 		  <%= f.label :description -%><br/>
 		  <%= f.text_area :description, :style => "width: 85%;", :rows => 10 -%>
 		</p>
-      <% if Project.is_hierarchical? -%>
+      <% if Seek::Config.project_hierarchy_enabled -%>
       <p>
         <%= f.label "Parent" -%><br/>
         <%= tree_single_select_tag Project, "id", @project ? @project.parent : nil, [@project] + @project.descendants, "parent_id" %>

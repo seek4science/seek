@@ -5,7 +5,7 @@ module ProjectCompat
       has_and_belongs_to_many :projects, :join_table => "#{join_table_name}",
                               :before_add => :react_to_project_addition ,
                               :before_remove => :react_to_project_removal
-      if Project.is_hierarchical?
+      if Seek::Config.project_hierarchy_enabled
           def projects_and_ancestors
             self.projects.collect { |proj| [proj]+proj.ancestors }.flatten.uniq
           end

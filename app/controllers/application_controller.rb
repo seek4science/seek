@@ -511,8 +511,8 @@ class ApplicationController < ActionController::Base
             res.assays.collect { |a| a.study_id }.include? value.id
          
         when (filter == 'project' && res.respond_to?(:projects_and_ancestors)) then res.projects_and_ancestors.include? value
-        when (filter == 'project' && res.class.name == "Assay") then Project.is_hierarchical? ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
-        when (filter == 'project' && res.class.name == "Study") then Project.is_hierarchical? ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
+        when (filter == 'project' && res.class.name == "Assay") then Seek::Config.project_hierarchy_enabled ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
+        when (filter == 'project' && res.class.name == "Study") then Seek::Config.project_hierarchy_enabled ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
             when filter == 'person' && res.class.is_asset?
 
              (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
