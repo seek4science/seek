@@ -1,5 +1,3 @@
-require 'zip/zip'
-require 'zip/zipfilesystem'
 require 'libxml'
 require 'bives'
 
