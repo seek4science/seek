@@ -6,6 +6,7 @@ class Specimen < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::Biosamples::PhenoTypesAndGenoTypes
+  include BackgroundReindexing
 
   acts_as_authorized
   acts_as_favouritable
@@ -57,6 +58,25 @@ class Specimen < ActiveRecord::Base
   "AND sop_specimens.specimen_id = #{self.id})"
   end
 
+  searchable(:auto_index=>false) do
+    text :searchable_terms
+    text :culture_growth_type do
+      culture_growth_type.try :title
+    end
+
+    text :strain do
+      strain.try :title
+      strain.try(:organism).try(:title).to_s
+    end
+
+    text :institution do
+      institution.try :name
+    end if Seek::Config.is_virtualliver
+
+    text :creators do
+      creators.compact.map(&:name)
+    end
+  end if Seek::Config.solr_enabled
 
 
   def build_sop_masters sop_ids
@@ -80,25 +100,7 @@ class Specimen < ActiveRecord::Base
     sop_masters.collect(&:sop)
   end
   
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :searchable_terms
-    text :culture_growth_type do
-      culture_growth_type.try :title
-    end
 
-    text :strain do
-      strain.try :title
-      strain.try(:organism).try(:title).to_s
-    end
-    
-    text :institution do
-      institution.try :name
-    end if Seek::Config.is_virtualliver
-
-    text :creators do
-      creators.compact.map(&:name)
-    end
-  end if Seek::Config.solr_enabled
 
   def searchable_terms
       text=[title,description,lab_internal_number,other_creators]

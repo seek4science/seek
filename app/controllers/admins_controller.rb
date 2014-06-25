@@ -173,10 +173,11 @@ class AdminsController < ApplicationController
     error = nil
     if Rails.env!="test"
       begin
-        Delayed::Command.new(["restart"]).daemonize
+        Seek::Workers.restart
 
         #give it up to 5 seconds to start up, otherwise the page reloads too quickly and says it is not running
-        pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job")
+        sleep(0.5)
+        pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job.0")
         x=0
         while !pid.running? && (x<10)
           sleep(0.5)
