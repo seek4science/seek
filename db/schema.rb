@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140625100641) do
+ActiveRecord::Schema.define(:version => 20140625104050) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1185,7 +1185,7 @@ ActiveRecord::Schema.define(:version => 20140625100641) do
     t.string   "organism_part"
     t.string   "provider_id"
     t.string   "provider_name"
-    t.float    "age_at_sampling"
+    t.string   "age_at_sampling"
     t.string   "uuid"
     t.integer  "age_at_sampling_unit_id"
     t.string   "sample_type"

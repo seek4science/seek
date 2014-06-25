@@ -128,9 +128,11 @@ namespace :seek_biosamples do
       sample.title == sample_hash[:title] && sample.specimen == sample_hash[:specimen]
     end
     if sample.nil?
-      sample = Sample.new sample_hash.slice(:title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :comments)
+      age_unit=Unit.where(:title=>"hour").first
+      raise "Unable to find hours unit" if age_unit.nil?
+      sample_hash[:age_at_sampling_unit]=age_unit
+      sample = Sample.new sample_hash.slice(:title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :comments, :age_at_sampling,:age_at_sampling_unit)
       sample.policy = policy.deep_copy
-      #FIXME: need to handle :age_at_sampling
       sample.projects = sample_hash[:projects] || sample_hash[:specimen].projects
       (Array(sample_hash[:data_files]) & Array(sample_hash[:sops])).each do |asset|
         sample.associate_asset asset

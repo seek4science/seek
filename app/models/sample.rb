@@ -34,7 +34,6 @@ class Sample < ActiveRecord::Base
   alias_attribute :description, :comments
 
   validates_uniqueness_of :title
-  validates_numericality_of :age_at_sampling, :greater_than => 0, :allow_nil => true, :message => "is invalid value", :unless => "Seek::Config.is_virtualliver"
 
   validates_presence_of :title
   validates_presence_of :specimen, :lab_internal_number
