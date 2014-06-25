@@ -1,55 +1,3 @@
-/*jQuery.noConflict();
-var $j = jQuery;
-$j( document ).ready(function() {
-    $j.Ajaxy.configure({
-        'method': 'get',
-        'root_url': 'http://localhost:3001',
-        'Controllers': {
-            '_generic': {
-                request: function(){
-                    var Ajaxy = $j.Ajaxy;
-                    deactivate_previous_tab();
-                    activate_clicking_tab();
-                    return true;
-                },
-                response: function(){
-                    var data = this.State.Response.data;
-                    var tab_content_id = 'faceted_search_result';
-                    $j('#' + tab_content_id).html(data.items_for_facets);
-                    $j(document).trigger("scriptsLoaded.exhibit");
-                    return true;
-                },
-                error: function(){
-                    // Prepare
-                    var Ajaxy = $j.Ajaxy; var data = this.State.Error.data||this.State.Response.data; var state = this.state||'unknown';
-                    // Error
-                    var error = data.error||data.responseText||'Unknown Error.';
-                    var error_message = data.content||error;
-                    // Log what is happening
-                    window.console.error('$j.Ajaxy.Controllers._generic.error', [this, arguments], error_message);
-                    return true;
-                }
-            },
-            'search': {
-                classname: 'ajaxy-search',
-                matches: /^\/search\/?/,
-                request: function(){
-                    return true;
-                },
-                response: function(){
-                    return true;
-                }
-            }
-        }
-    });
-
-    //Load content for first tab
-    var first_tab = document.getElementsByClassName('ajaxy')[0];
-    if (first_tab != null){
-        first_tab.click();
-    }
-});*/
-
 function load_tabs() {
     var tabberOptions = {'onLoad':function() {
         displayTabs();
@@ -101,21 +49,6 @@ function deactivate_previous_tab(){
         previous_active_tab.className = '';
 }
 
-function activate_clicking_tab(){
-    var clicking_tab_id = "tab_"
-    var href = document.location.href;
-    var url_elements = href.split('&');
-    for (var i=0; i<url_elements.length; i++){
-        if (url_elements[i].match('item_type=') != null){
-            clicking_tab_id = clicking_tab_id + url_elements[i].split('item_type=')[1] ;
-            break;
-        }
-    }
-
-    var clicking_tab = document.getElementById(clicking_tab_id);
-    if (clicking_tab != null)
-        clicking_tab.className = 'tabberactive';
-}
 
 function check_tab_content(show_tab_content_id, hide_tab_content_id){
     var tab_content = $(show_tab_content_id);
