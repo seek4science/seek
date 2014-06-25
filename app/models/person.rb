@@ -33,15 +33,15 @@ class Person < ActiveRecord::Base
   has_many :favourite_groups, :through => :favourite_group_memberships
 
   has_many :work_groups, :through=>:group_memberships, :before_add => [:subscribe_to_work_group_project, :touch_work_group_project],
-  :before_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
+  :after_remove  => [:unsubscribe_to_work_group_project, :touch_work_group_project]
   has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"
-  def subscribe_to_work_group_project wg
 
+  def subscribe_to_work_group_project wg
     #subscribe direct project
     project_subscriptions.build :project => wg.project unless project_subscriptions.detect {|ps| ps.project == wg.project}
 
     #subscribe to ancestor projects
-    if Project.is_hierarchical?
+    if Seek::Config.project_hierarchy_enabled
        wg.project.ancestors.each do |ancestor_proj|
          project_subscriptions.build :project => ancestor_proj unless project_subscriptions.detect {|ps| ps.project == ancestor_proj}
        end
@@ -50,12 +50,25 @@ class Person < ActiveRecord::Base
   end
 
   def unsubscribe_to_work_group_project wg
-
-    #FIXME: ONLY direct project subscriptions are deleted, the related parent projects subscriptions remains there.
-    # people have to manually unsubscribe them on profle_edit_page
-    if ps = project_subscriptions.detect {|ps| ps.project == wg.project}
-      project_subscriptions.delete ps
+     # clear_subscriptions_if_empty
+    if work_groups.empty?
+          project_subscriptions.delete_all
+          subscriptions.delete_all
+    else
+      #Direct project subscriptions are deleted
+      if ps = project_subscriptions.detect {|ps| ps.project == wg.project}
+        project_subscriptions.delete ps
+      end
+      #unsubscribe ancestor projects
+      #if person does not subscribe any sub-projects of parent projects of the unsubscribed project , then parent project subscriptions will be deleted
+      if Seek::Config.project_hierarchy_enabled
+        wg.project.ancestors.each do |ancestor_proj|
+          ancestor_proj_sub = project_subscriptions.where(:project_id => ancestor_proj.id).first
+          project_subscriptions.delete ancestor_proj_sub if !ancestor_proj_sub.has_children?
+        end
+      end
     end
+
   end
 
   def touch_work_group_project wg
@@ -235,7 +248,7 @@ class Person < ActiveRecord::Base
     work_groups.collect {|wg| wg.institution }.uniq
   end
 
-  #Person#projects is OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
+  #Person#projects is OVERRIDDEN in Seek::ProjectHierarchies if Seek::Config.project_hierarchy_enabled
   def projects
       #updating workgroups doesn't change groupmemberships until you save. And vice versa.
       work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}

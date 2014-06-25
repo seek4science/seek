@@ -18,6 +18,14 @@ class ProjectSubscription < ActiveRecord::Base
   #so that if a new subscribable type is added, people are subscribed to it by default
   serialize :unsubscribed_types
 
+  # Project subscription can be deleted if the person of this project subscription subscribes none of descendants of the project
+  def has_children?
+     if Seek::Config.project_hierarchy_enabled
+        !ProjectSubscription.where( "person_id = #{person_id}").where("project_id  IN (?)", project.descendants.map(&:id)).empty?
+     else
+       false
+     end
+  end
   #accessors for 'subscribed types' which is just the inverse of unsubscribed_types
   def subscribed_types
     subscribable_types - unsubscribed_types
