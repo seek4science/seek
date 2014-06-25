@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140516131826) do
+ActiveRecord::Schema.define(:version => 20140625100641) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -347,7 +347,7 @@ ActiveRecord::Schema.define(:version => 20140516131826) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version"
+    t.integer  "version",                       :default => 1
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -732,7 +732,7 @@ ActiveRecord::Schema.define(:version => 20140516131826) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version"
+    t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1304,7 +1304,7 @@ ActiveRecord::Schema.define(:version => 20140516131826) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version"
+    t.integer  "version",                       :default => 1
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1689,6 +1689,7 @@ ActiveRecord::Schema.define(:version => 20140516131826) do
     t.text     "comments"
     t.integer  "compound_id"
     t.integer  "specimen_id"
+    t.string   "medium_title"
   end
 
   create_table "units", :force => true do |t|

@@ -7,12 +7,12 @@ namespace :seek_biosamples do
   SAMPLE_HEADINGS = ["id", "title", "lab internal id", "providers id", "provider name", "belongs to parsed specimen", "contributor name", "organism part", "sampling date", "age at sampling (hours)", "comments", "orginating data file id", "associated assays id's", "associated sop id's"]
   SPECIMEN_HEADINGS = ["id", "title", "lab internal id", "start date / born date", "provider name", "providers id", "contributor name", "project name(s)", "institution name", "growth type", "belongs to parsed strain"]
   STRAIN_HEADINGS = ["id", "title", "contributor name", "project name(s)", "organism", "ncbi", "provider name", "providers id", "comments", "genotypes-gene", "genotypes-modification", "phenotypes"]
-  TREATMENT_HEADINGS = ["treatment type", "substance", "value", "unit", "belongs to parsed sample"]
+  TREATMENT_HEADINGS = ["treatment type", "substance", "value", "medium_title","unit", "belongs to parsed sample"]
 
   SAMPLE_KEYS = [:key, :title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
   SPECIMEN_KEYS = [:key,:title,:lab_internal_number,:born,:provider_name,:provider_id,:contributor,:projects,:institution,:culture_growth_type,:strain]
   STRAIN_KEYS = [:key,:title,:contributor,:projects,:organism,:ncbi,:provider_name,:provider_id,:comment,:genes,:genotype_modification,:phenotypes]
-  TREATMENT_KEYS = [:treatment_type,:substance,:value,:unit,:sample]
+  TREATMENT_KEYS = [:treatment_type,:substance,:value,:medium_title,:unit,:sample]
 
   class Array
     def find_by_key(key)
@@ -42,7 +42,7 @@ namespace :seek_biosamples do
     samples = parse_sample_csv(sample_csv)
 
 
-    pp "Reading treatement data"
+    pp "Reading treatment data"
     treatment_csv = spreadsheet_to_csv open(template_name),4,true
     treatments = parse_treatment_csv(treatment_csv)
 
@@ -70,14 +70,37 @@ namespace :seek_biosamples do
             specimen = insert_specimen specimen_hash
             specimen_hash[:samples].each do |sample_hash|
               sample_hash[:specimen]=specimen
-              insert_sample sample_hash
+              sample = insert_sample sample_hash
+              sample_hash[:treatments].each do |treatment_hash|
+                treatment_hash[:sample]=sample
+                insert_treatment treatment_hash
+              end
             end
           end
 
         end
       end
-      raise ActiveRecord::Rollback
+      #raise ActiveRecord::Rollback
     end
+  end
+
+  def insert_treatment treatment_hash
+    raise "substance is not yet handled and needs implementing" unless treatment_hash[:substance].nil?
+    raise "unit is not yet handled and needs implementing" unless treatment_hash[:unit].nil?
+    #add medium as a new measured item
+    if MeasuredItem.where(:title=>"Medium",:factors_studied=>true).nil?
+      mi = MeasuredItem.new(:title=>"Medium",:factors_studied=>true)
+      mi.save!
+    end
+    sample = treatment_hash[:sample]
+    treatment_type = treatment_hash[:treatment_type]
+    measured_item = MeasuredItem.where("lower(title) LIKE ? AND factors_studied = ?","%#{treatment_type.downcase}%",true).first
+    raise "Unable to find measured item for treatment type #{treatment_type}" if measured_item.nil?
+
+    attributes={:sample=>treatment_hash[:sample],:measured_item=>measured_item,:start_value=>treatment_hash[:value],:medium_title=>treatment_hash[:medium_title]}
+
+    treatment = Treatment.new attributes
+    treatment.save!
   end
 
   def insert_sample sample_hash
