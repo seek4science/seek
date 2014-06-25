@@ -94,6 +94,8 @@ group :development do
   gem "pry-doc"
   gem "pry-remote"
   gem "request-log-analyzer"
+  gem "rubocop",:require=>false
+  gem "reek",:require=>false
 end
 
 group :test do
