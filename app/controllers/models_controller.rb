@@ -1,7 +1,7 @@
- require 'zip/zip'
- require 'zip/zipfilesystem'
- require 'libxml'
- require 'bives'
+require 'zip/zip'
+require 'zip/zipfilesystem'
+require 'libxml'
+require 'bives'
 
 class ModelsController < ApplicationController
 
@@ -15,7 +15,7 @@ class ModelsController < ApplicationController
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml,:compare_versions]
-    
+
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
   before_filter :find_other_version,:only=>[:compare_versions]
@@ -96,7 +96,7 @@ class ModelsController < ApplicationController
 
   # GET /models
   # GET /models.xml
-  
+
   def new_version
     if (handle_batch_data nil)
       comments = params[:revision_comment]
@@ -111,8 +111,8 @@ class ModelsController < ApplicationController
       flash[:error]=flash.now[:error]
       redirect_to @model
     end
-  end    
-  
+  end
+
   def delete_model_metadata
     attribute=params[:attribute]
     if attribute=="model_type"
@@ -121,7 +121,7 @@ class ModelsController < ApplicationController
       delete_model_format params
     end
   end
-  
+
   def builder
     saved_file=params[:saved_file]
     error=nil
@@ -142,22 +142,22 @@ class ModelsController < ApplicationController
       logger.error "Error submitting to JWS Online OneStop - #{e.message}"
       raise e unless Rails.env=="production"
     end
-    
+
     respond_to do |format|
       if error
         flash[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to model_path(@model,:version=>@display_model.version)}
       elsif !supported
         flash[:error]="This #{t('model')} is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
-        format.html { redirect_to model_path(@model,:version=>@display_model.version)}        
+        format.html { redirect_to model_path(@model,:version=>@display_model.version)}
       else
         format.html
       end
     end
-  end    
+  end
 
   def submit_to_jws
-    following_action=params.delete("following_action")    
+    following_action=params.delete("following_action")
     error=nil
 
     #FIXME: currently we have to assume that a model with multiple files only contains 1 model file that would be executed on jws online, and only the first one is chosen
@@ -214,7 +214,7 @@ class ModelsController < ApplicationController
         format.html {redirect_to  model_path(@model,:version=>@model.version) }
       else
         format.html { render :action=>"builder" }
-      end      
+      end
     end
   end
 
@@ -263,7 +263,7 @@ class ModelsController < ApplicationController
       end
     end
   end
-  
+
   def update_model_metadata
     attribute=params[:attribute]
     if attribute=="model_type"
@@ -272,7 +272,7 @@ class ModelsController < ApplicationController
       update_model_format params
     end
   end
-  
+
   def delete_model_type params
     id=params[:selected_model_type_id]
     model_type=ModelType.find(id)
@@ -287,7 +287,7 @@ class ModelsController < ApplicationController
     else
       msg="ERROR - Cannot delete #{model_type.title} because it is in use."
     end
-    
+
     render :update do |page|
       page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
       page.replace_html "model_type_info","#{msg}<br/>"
@@ -295,9 +295,9 @@ class ModelsController < ApplicationController
       page << "$('model_type_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_type_info"
     end
-    
+
   end
-  
+
   def delete_model_format params
     id=params[:selected_model_format_id]
     model_format=ModelFormat.find(id)
@@ -312,17 +312,17 @@ class ModelsController < ApplicationController
     else
       msg="ERROR - Cannot delete #{model_format.title} because it is in use."
     end
-    
+
     render :update do |page|
       page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.all, :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
       page.replace_html "model_format_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_format_info').style.color='#{info_colour}';"
-      page.visual_effect :appear, "model_format_info"      
-    end    
+      page.visual_effect :appear, "model_format_info"
+    end
   end
 
-  
+
   # GET /models/1
   # GET /models/1.xml
   def show
@@ -331,17 +331,17 @@ class ModelsController < ApplicationController
 
 
     @model.just_used
-    
+
     respond_to do |format|
       format.html # show.html.erb
       format.xml
       format.rdf { render :template=>'rdf/show'}
     end
   end
-  
+
   # GET /models/new
   # GET /models/new.xml
-  def new    
+  def new
     @model=Model.new
     @content_blob= ContentBlob.new
     respond_to do |format|
@@ -353,12 +353,12 @@ class ModelsController < ApplicationController
       end
     end
   end
-  
+
   # GET /models/1/edit
   def edit
 
   end
-  
+
   # POST /models
   # POST /models.xml
   def create
@@ -377,13 +377,13 @@ class ModelsController < ApplicationController
           create_content_blobs
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
-          
+
           # update related publications
           Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-          
+
           #Add creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
-          
+
           flash[:notice] = "#{t('model')} was successfully uploaded and saved."
           format.html { redirect_to model_path(@model) }
           Assay.find(assay_ids).each do |assay|
@@ -398,7 +398,7 @@ class ModelsController < ApplicationController
         end
       end
     end
-    
+
   end
 
   # PUT /models/1
@@ -460,12 +460,12 @@ class ModelsController < ApplicationController
       end
     end
   end
-  
+
   # DELETE /models/1
   # DELETE /models/1.xml
   def destroy
     @model.destroy
-    
+
     respond_to do |format|
       format.html { redirect_to(models_path) }
       format.xml  { head :ok }
@@ -473,10 +473,10 @@ class ModelsController < ApplicationController
   end
 
   def preview
-    
+
     element = params[:element]
     model = Model.find_by_id(params[:id])
-    
+
     render :update do |page|
       if model.try :can_view?
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>model}
@@ -485,13 +485,13 @@ class ModelsController < ApplicationController
       end
     end
   end
-  
+
   def request_resource
     resource = Model.find(params[:id])
     details = params[:details]
-    
+
     Mailer.request_resource(current_user,resource,details,base_host).deliver
-    
+
     render :update do |page|
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
@@ -516,13 +516,13 @@ class ModelsController < ApplicationController
 
 
   protected
-  
+
   def create_new_version comments
     if @model.save_as_new_version(comments)
       flash[:notice]="New version uploaded - now on version #{@model.version}"
     else
-      flash[:error]="Unable to save new version"          
-    end    
+      flash[:error]="Unable to save new version"
+    end
   end
 
   def translate_action action
@@ -531,7 +531,7 @@ class ModelsController < ApplicationController
     action="view" if ["matching_data"].include?(action)
     super action
   end
-  
+
   def jws_enabled
     unless Seek::Config.jws_enabled
       respond_to do |format|
