@@ -1,3 +1,29 @@
+def build_treatment_units(attributes, treatment_hash)
+  unless treatment_hash[:unit].nil?
+    unit_title = treatment_hash[:unit]
+    unit = Unit.where(:title => unit_title).first || Unit.where(:symbol => unit_title).first
+    fail "Unable to find treatment unit for '#{treatment_hash[:unit]}'" if unit.nil?
+    attributes[:unit]=unit
+  end
+
+  unless treatment_hash[:time_after_treatment].nil?
+    raise "There should be a unit defined for time after treatment" if treatment_hash[:time_after_treatment_unit].nil?
+    unit_title = treatment_hash[:time_after_treatment_unit]
+    unit_title = "second" if unit_title=="sec"
+    unit = Unit.where(:title => unit_title).first || Unit.where(:symbol => unit_title).first
+    fail "Unable to find time after treatment unit for '#{treatment_hash[:time_after_treatment_unit]}'" if unit.nil?
+    attributes[:time_after_treatment_unit]=unit
+  end
+end
+
+def build_treatment_substance(attributes, treatment_hash)
+  unless treatment_hash[:substance].nil?
+    substance = Compound.where("lower(name) LIKE ?", "%#{treatment_hash[:substance].downcase}%").first
+    fail "Unable to find the compound for substance '#{treatment_hash[:substance]}'" if substance.nil?
+    attributes[:compound]=substance
+  end
+end
+
 # Some tasks specifically for parsing and inserting biosamples and treatements, from a specific custom template
 
 namespace :seek_biosamples do
@@ -99,8 +125,6 @@ namespace :seek_biosamples do
   end
 
   def insert_treatment(treatment_hash)
-    fail 'substance is not yet handled and needs implementing' unless treatment_hash[:substance].nil?
-    fail 'unit is not yet handled and needs implementing' unless treatment_hash[:unit].nil?
     fail 'a sample should be provided and it should be of type Sample' unless treatment_hash[:sample].is_a?(Sample)
     # add medium as a new measured item
     if MeasuredItem.where(title: 'Medium', factors_studied: true).nil?
@@ -108,21 +132,40 @@ namespace :seek_biosamples do
       mi.save!
     end
 
-    treatment_type = treatment_hash[:treatment_type]
-    measured_item = MeasuredItem.where('lower(title) LIKE ? AND factors_studied = ?', "%#{treatment_type.downcase}%", true).first
-    fail "Unable to find measured item for treatment type #{treatment_type}" if measured_item.nil?
 
-    attributes = { sample: treatment_hash[:sample], measured_item: measured_item, start_value: treatment_hash[:value], medium_title: treatment_hash[:medium_title] }
+    attributes = build_treatment_attributes(treatment_hash)
 
     treatment = Treatment.new attributes
     treatment.save!
   end
 
+  def build_treatment_attributes(treatment_hash)
+    treatment_type = treatment_hash[:treatment_type]
+    measured_item = MeasuredItem.where('lower(title) LIKE ? AND factors_studied = ?', "%#{treatment_type.downcase}%", true).first
+    fail "Unable to find measured item for treatment type #{treatment_type}" if measured_item.nil?
+
+    attributes = {sample: treatment_hash[:sample],
+                  measured_item: measured_item,
+                  start_value: treatment_hash[:value],
+                  medium_title: treatment_hash[:medium_title],
+                  time_after_treatment: treatment_hash[:time_after_treatment]}
+
+    build_treatment_units(attributes, treatment_hash)
+
+    build_treatment_substance(attributes, treatment_hash)
+
+    attributes
+  end
+
   def insert_sample(sample_hash, policy)
+    sample = detect_from_key(sample_hash[:key])
+    return sample unless sample.nil?
+
     fail 'Was expecting a contributor' if sample_hash[:contributor].nil?
     fail 'Was expecting a specimen' if sample_hash[:specimen].nil?
     fail 'Specimen should already be saved' unless sample_hash[:specimen].is_a?(Specimen)
     fail 'Handling assays not yet implemented' unless sample_hash[:assays].blank?
+
     sample = find_matching_sample(sample_hash)
     if sample.nil?
       age_unit = Unit.where(title: 'hour').first
@@ -142,6 +185,9 @@ namespace :seek_biosamples do
   end
 
   def insert_specimen(specimen_hash, policy)
+    specimen = detect_from_key(specimen_hash[:key])
+    return specimen unless specimen.nil?
+
     fail 'Was expecting 1 project for specimen' if specimen_hash[:projects].count != 1
     fail 'Was expecting a contributor' if specimen_hash[:contributor].nil?
     fail 'Was expecting a strain' if specimen_hash[:strain].nil?
@@ -160,6 +206,9 @@ namespace :seek_biosamples do
   end
 
   def insert_strain(strain_hash, policy)
+    strain = detect_from_key(strain_hash[:key])
+    return strain unless strain.nil?
+
     title = strain_hash[:title]
     organism = strain_hash[:organism]
     projects = strain_hash[:projects]
@@ -195,6 +244,17 @@ namespace :seek_biosamples do
     strain.save!
 
     strain
+  end
+
+  def detect_from_key key
+    object = nil
+    if (key =~ /SEEK-.*-.*/)==0
+      split = key.split("-")
+      raise "the key '#{key}' looks like it indicates an existing asset, but doesn't quite match SEEK-<class>-<id>" unless split.length==3
+      object=split[1].constantize.find(split[2])
+      pp "Existing entry found from key '#{key}'"
+    end
+    object
   end
 
   def find_matching_strain(gene_titles, project, title)
@@ -296,7 +356,7 @@ namespace :seek_biosamples do
 
   def discover_culture_growth_type(element)
     if element.key?(:culture_growth_type) && !element[:culture_growth_type].nil?
-      type = CultureGrowthType.find_by_title(element[:culture_growth_type])
+      type = CultureGrowthType.where(title:element[:culture_growth_type]).first
       fail "Unable to find culture growth type for #{element[:culture_growth_type]}" if type.nil?
       element[:culture_growth_type] = type
     end
@@ -304,7 +364,7 @@ namespace :seek_biosamples do
 
   def discover_institutions(element)
     if element.key?(:institution) && !element[:institution].nil?
-      institution = Institution.find_by_title(element[:institution])
+      institution = Institution.where(title:element[:institution]).first
       fail "Unable to find institution for #{element[:institution]}" if institution.nil?
       element[:institution] = institution
     end
@@ -314,7 +374,7 @@ namespace :seek_biosamples do
     if element.key?(:projects) && !element[:projects].nil?
       project_titles = element[:projects].split(',')
       projects = project_titles.map do |project_title|
-        project = Project.find_by_title(project_title)
+        project = Project.where(title:project_title).first
         project ||= Project.where('lower(title) LIKE ?', "%#{project_title.downcase}%").first
         fail "Unable to find project to match '#{project_title}'" if project.nil?
         project
