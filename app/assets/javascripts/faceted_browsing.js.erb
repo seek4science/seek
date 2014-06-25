@@ -30,6 +30,8 @@ $j(document).ready(function(){
     $j(document).on("exhibitConfigured.exhibit", function() {
         defaultSearchText();
         hideFacets();
+        hide_specified_facets();
+        hide_specified_facet_list();
     });
 
     $j(document).bind("registerLocales.exhibit", function() {
@@ -107,6 +109,7 @@ function renameOtherField(){
     })
 }
 
+//this is for the case of multiple exhibit instance.
 function hideFacets(){
     $j('.exhibit-facet-header-collapse').map(function(){
         var grand_parent = this.parentNode.parentNode;

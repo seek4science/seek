@@ -77,9 +77,9 @@
           <% tab_title = "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%>
           <% title_class = is_external ? "external_result" : "" %>
           <% if (!resources.empty? || hidden_count > 0) || show_empty_tabs %>
-              <div id="<%= resource_type.downcase.pluralize.html_safe -%>" class="tabbertab">
+              <div id="<%= resource_type -%>" class="tabbertab">
                 <% unless resources.empty? && extra_count < 1 %>
-                    <h3 class='<%= title_class -%>'><%= tab_title -%></h3>
+                    <h3 class='<%= resource_type -%>'><%= tab_title -%></h3>
                     <%= render :partial => "assets/resource_list", :locals => { :collection => resources,
                                                                                 :narrow_view => narrow_view,
                                                                                 :authorization_for_showing_already_done => true,
@@ -135,13 +135,19 @@
     </div>
 <% end -%>
 
-<% if display_immediately %>
-    <script>
-        displayTabs();
-    </script>
-<% end %>
-
 <script type="text/javascript">
+    load_tabs();
+
+    <% assets.each do |key| %>
+        tab_on_click_one_facet('<%= key %>');
+    <% end %>
+
+    //Load content for first tab
+    var first_tab = document.getElementsByClassName('<%= assets.first %>')[0];
+    if (first_tab != null){
+        first_tab.click();
+    }
+
     function check_tab_content(show_tab_content_id, hide_tab_content_id, resource_type){
         var tab_content = $(show_tab_content_id);
         if (tab_content.childNodes.length > 0){
@@ -164,4 +170,21 @@
             boxover_tooltip.parentNode.style['top']='0px';
         }
     }
+
+/*    function showMoreFacetsForActiveTab(){
+        var allTabs = $j('.tabbertab');
+        var hidenTabs = $j('.tabbertabhide');
+        for (var i=0; i<allTabs.length; i++){
+            var tab = allTabs[i];
+            var className = tab.className;
+            if (className.match('tabbertabhide') == null){
+                var activeType = tab.id;
+                var more_id = "more_" + activeType + "_facets";
+                $j('#' + more_id).show();
+                break;
+            }
+        }
+    }*/
+
+
 </script>

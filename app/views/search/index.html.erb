@@ -20,11 +20,11 @@
           <%= stylesheet_link_tag 'modified_exhibit' %>
           <%= stylesheet_link_tag 'faceted_search' %>
 
+          <%= javascript_include_tag "tab_lazy_load.js" %>
+
           <% if Seek::Config.is_one_facet_instance %>
               <%= render :partial => "faceted_browsing/faceted_search_one_instance" -%>
           <% else %>
-              <%= javascript_include_tag "tab_lazy_load.js" %>
-
               <% resource_hash = @results.group_by{|r| r.class.name} -%>
               <%= render :partial => "assets/resource_tabbed_lazy_loading",
                          :locals => {:scale_title => "all",
