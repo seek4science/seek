@@ -5,6 +5,7 @@ function load_tabs() {
     tabberAutomatic(tabberOptions);
 }
 
+//this is for the case of multiple exhibit instance.
 function tab_on_click(resource_type, resource_ids, with_facets) {
     var tab_content_id = 'faceted_search_result';
 
@@ -40,6 +41,18 @@ function tab_on_click(resource_type, resource_ids, with_facets) {
                 //$j(document).trigger("scriptsLoaded.exhibit");
             });
     }
+}
+
+
+//this is for the case of multiple exhibit instance.
+function hideFacets(){
+    $j('.exhibit-facet-header-collapse').map(function(){
+        var grand_parent = this.parentNode.parentNode;
+        var id = grand_parent.id;
+        if (id != null && id.match('toogle_facet_') != null){
+            grand_parent.hide();
+        }
+    })
 }
 
 function deactivate_previous_tab(){
