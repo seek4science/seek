@@ -1,26 +1,26 @@
 def build_treatment_units(attributes, treatment_hash)
   unless treatment_hash[:unit].nil?
     unit_title = treatment_hash[:unit]
-    unit = Unit.where(:title => unit_title).first || Unit.where(:symbol => unit_title).first
+    unit = Unit.where(title: unit_title).first || Unit.where(symbol: unit_title).first
     fail "Unable to find treatment unit for '#{treatment_hash[:unit]}'" if unit.nil?
-    attributes[:unit]=unit
+    attributes[:unit] = unit
   end
 
   unless treatment_hash[:time_after_treatment].nil?
-    raise "There should be a unit defined for time after treatment" if treatment_hash[:time_after_treatment_unit].nil?
+    fail 'There should be a unit defined for time after treatment' if treatment_hash[:time_after_treatment_unit].nil?
     unit_title = treatment_hash[:time_after_treatment_unit]
-    unit_title = "second" if unit_title=="sec"
-    unit = Unit.where(:title => unit_title).first || Unit.where(:symbol => unit_title).first
+    unit_title = 'second' if unit_title == 'sec'
+    unit = Unit.where(title: unit_title).first || Unit.where(symbol: unit_title).first
     fail "Unable to find time after treatment unit for '#{treatment_hash[:time_after_treatment_unit]}'" if unit.nil?
-    attributes[:time_after_treatment_unit]=unit
+    attributes[:time_after_treatment_unit] = unit
   end
 end
 
 def build_treatment_substance(attributes, treatment_hash)
   unless treatment_hash[:substance].nil?
-    substance = Compound.where("lower(name) LIKE ?", "%#{treatment_hash[:substance].downcase}%").first
+    substance = Compound.where('lower(name) LIKE ?', "%#{treatment_hash[:substance].downcase}%").first
     fail "Unable to find the compound for substance '#{treatment_hash[:substance]}'" if substance.nil?
-    attributes[:compound]=substance
+    attributes[:compound] = substance
   end
 end
 
@@ -33,12 +33,12 @@ namespace :seek_biosamples do
   SAMPLE_HEADINGS = ['id', 'title', 'lab internal id', 'providers id', 'provider name', 'belongs to parsed specimen', 'contributor name', 'organism part', 'sampling date', 'age at sampling (hours)', 'comments', 'orginating data file id', "associated assays id's", "associated sop id's"]
   SPECIMEN_HEADINGS = ['id', 'title', 'lab internal id', 'start date / born date', 'provider name', 'providers id', 'contributor name', 'project name(s)', 'institution name', 'growth type', 'belongs to parsed strain']
   STRAIN_HEADINGS = ['id', 'title', 'contributor name', 'project name(s)', 'organism', 'ncbi', 'provider name', 'providers id', 'comments', 'genotypes-gene', 'genotypes-modification', 'phenotypes']
-  TREATMENT_HEADINGS = ['treatment type', 'substance', 'value', 'medium_title', 'unit','time after treatment','time after treatment unit', 'belongs to parsed sample']
+  TREATMENT_HEADINGS = ['treatment type', 'substance', 'value', 'medium_title', 'unit', 'time after treatment', 'time after treatment unit', 'belongs to parsed sample']
 
   SAMPLE_KEYS = [:key, :title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :age_at_sampling, :comments, :data_files, :assays, :sops]
   SPECIMEN_KEYS = [:key, :title, :lab_internal_number, :born, :provider_name, :provider_id, :contributor, :projects, :institution, :culture_growth_type, :strain]
   STRAIN_KEYS = [:key, :title, :contributor, :projects, :organism, :ncbi, :provider_name, :provider_id, :comment, :genes, :genotype_modification, :phenotypes]
-  TREATMENT_KEYS = [:treatment_type, :substance, :value, :medium_title, :unit, :time_after_treatment, :time_after_treatment_unit,:sample]
+  TREATMENT_KEYS = [:treatment_type, :substance, :value, :medium_title, :unit, :time_after_treatment, :time_after_treatment_unit, :sample]
 
   class Array
     def find_by_key(key)
@@ -132,7 +132,6 @@ namespace :seek_biosamples do
       mi.save!
     end
 
-
     attributes = build_treatment_attributes(treatment_hash)
 
     treatment = Treatment.new attributes
@@ -144,11 +143,11 @@ namespace :seek_biosamples do
     measured_item = MeasuredItem.where('lower(title) LIKE ? AND factors_studied = ?', "%#{treatment_type.downcase}%", true).first
     fail "Unable to find measured item for treatment type #{treatment_type}" if measured_item.nil?
 
-    attributes = {sample: treatment_hash[:sample],
-                  measured_item: measured_item,
-                  start_value: treatment_hash[:value],
-                  medium_title: treatment_hash[:medium_title],
-                  time_after_treatment: treatment_hash[:time_after_treatment]}
+    attributes = { sample: treatment_hash[:sample],
+                   measured_item: measured_item,
+                   start_value: treatment_hash[:value],
+                   medium_title: treatment_hash[:medium_title],
+                   time_after_treatment: treatment_hash[:time_after_treatment] }
 
     build_treatment_units(attributes, treatment_hash)
 
@@ -246,12 +245,12 @@ namespace :seek_biosamples do
     strain
   end
 
-  def detect_from_key key
+  def detect_from_key(key)
     object = nil
-    if (key =~ /SEEK-.*-.*/)==0
-      split = key.split("-")
-      raise "the key '#{key}' looks like it indicates an existing asset, but doesn't quite match SEEK-<class>-<id>" unless split.length==3
-      object=split[1].constantize.find(split[2])
+    if (key =~ /SEEK-.*-.*/) == 0
+      split = key.split('-')
+      fail "the key '#{key}' looks like it indicates an existing asset, but doesn't quite match SEEK-<class>-<id>" unless split.length == 3
+      object = split[1].constantize.find(split[2])
       pp "Existing entry found from key '#{key}'"
     end
     object
@@ -356,7 +355,7 @@ namespace :seek_biosamples do
 
   def discover_culture_growth_type(element)
     if element.key?(:culture_growth_type) && !element[:culture_growth_type].nil?
-      type = CultureGrowthType.where(title:element[:culture_growth_type]).first
+      type = CultureGrowthType.where(title: element[:culture_growth_type]).first
       fail "Unable to find culture growth type for #{element[:culture_growth_type]}" if type.nil?
       element[:culture_growth_type] = type
     end
@@ -364,7 +363,7 @@ namespace :seek_biosamples do
 
   def discover_institutions(element)
     if element.key?(:institution) && !element[:institution].nil?
-      institution = Institution.where(title:element[:institution]).first
+      institution = Institution.where(title: element[:institution]).first
       fail "Unable to find institution for #{element[:institution]}" if institution.nil?
       element[:institution] = institution
     end
@@ -374,7 +373,7 @@ namespace :seek_biosamples do
     if element.key?(:projects) && !element[:projects].nil?
       project_titles = element[:projects].split(',')
       projects = project_titles.map do |project_title|
-        project = Project.where(title:project_title).first
+        project = Project.where(title: project_title).first
         project ||= Project.where('lower(title) LIKE ?', "%#{project_title.downcase}%").first
         fail "Unable to find project to match '#{project_title}'" if project.nil?
         project
