@@ -140,28 +140,3 @@
       displayTabs();
     </script>
 <% end %>
-
-<script type="text/javascript">
-    function check_tab_content(show_tab_content_id, hide_tab_content_id, resource_type){
-        var tab_content = $(show_tab_content_id);
-        if (tab_content.childNodes.length > 0){
-            tab_content.show();
-            $(hide_tab_content_id).hide();
-            //toggle the view all and view some items link
-            Effect.toggle("view_" + resource_type + "s", 'appear', {duration:0.05})
-            Effect.toggle("view_" + resource_type + "s_and_extra", 'appear', {duration:0.05})
-            //refresh_boxover_tooltip_position, so it does not create the blank at the end of the page when switching from -view all- to -view some- items
-            refresh_boxover_tooltip_position();
-            return false;
-        }else{
-            return true;
-        }
-    }
-
-    function refresh_boxover_tooltip_position(){
-        var boxover_tooltip = document.getElementsByClassName('boxoverTooltipBody')[0];
-        if (boxover_tooltip != null){
-            boxover_tooltip.parentNode.style['top']='0px';
-        }
-    }
-</script>
