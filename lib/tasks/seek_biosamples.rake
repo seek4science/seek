@@ -89,25 +89,25 @@ namespace :seek_biosamples do
     policy = Policy.public_policy
     if data_file.nil?
       puts 'Unable to find data file to determine policy, using public policy'
+    elsif data_file.is_a?(DataFile)
+      policy = data_file.policy
     else
-      if data_file.is_a?(DataFile)
-        policy = data_file.policy
-      else
-        fail "Expected to find DataFile but was #{data_file.inspect}"
-      end
+      fail "Expected to find DataFile but was #{data_file.inspect}"
     end
+
     policy
   end
 
   def insert_treatment(treatment_hash)
     fail 'substance is not yet handled and needs implementing' unless treatment_hash[:substance].nil?
     fail 'unit is not yet handled and needs implementing' unless treatment_hash[:unit].nil?
+    fail 'a sample should be provided and it should be of type Sample' unless treatment_hash[:sample].is_a?(Sample)
     # add medium as a new measured item
     if MeasuredItem.where(title: 'Medium', factors_studied: true).nil?
       mi = MeasuredItem.new(title: 'Medium', factors_studied: true)
       mi.save!
     end
-    sample = treatment_hash[:sample]
+
     treatment_type = treatment_hash[:treatment_type]
     measured_item = MeasuredItem.where('lower(title) LIKE ? AND factors_studied = ?', "%#{treatment_type.downcase}%", true).first
     fail "Unable to find measured item for treatment type #{treatment_type}" if measured_item.nil?
@@ -123,9 +123,7 @@ namespace :seek_biosamples do
     fail 'Was expecting a specimen' if sample_hash[:specimen].nil?
     fail 'Specimen should already be saved' unless sample_hash[:specimen].is_a?(Specimen)
     fail 'Handling assays not yet implemented' unless sample_hash[:assays].blank?
-    sample = Sample.all.find do |sample|
-      sample.title == sample_hash[:title] && sample.specimen == sample_hash[:specimen]
-    end
+    sample = find_matching_sample(sample_hash)
     if sample.nil?
       age_unit = Unit.where(title: 'hour').first
       fail 'Unable to find hours unit' if age_unit.nil?
@@ -148,9 +146,9 @@ namespace :seek_biosamples do
     fail 'Was expecting a contributor' if specimen_hash[:contributor].nil?
     fail 'Was expecting a strain' if specimen_hash[:strain].nil?
     fail 'Strain should already be saved' unless specimen_hash[:strain].is_a?(Strain)
-    specimen = Specimen.all.find do |spec|
-      spec.title == specimen_hash[:title] && spec.projects.sort == specimen_hash[:projects].sort && spec.strain == specimen_hash[:strain]
-    end
+
+    specimen = find_matching_specimen(specimen_hash)
+
     if specimen.nil?
       specimen = Specimen.new specimen_hash.slice(:title, :lab_internal_number, :born, :provider_name, :provider_id, :contributor, :projects, :institution, :culture_growth_type, :strain)
       specimen.policy = policy.deep_copy
@@ -176,15 +174,7 @@ namespace :seek_biosamples do
     fail 'There must be a contributor for the strain' if contributor.nil?
     fail 'Still need to handle gene modifications (not implemented)' unless gene_modifications.nil? # don't need to handle these yet, since they are not in the data
 
-    strain = Strain.all.find do |str|
-      match = str.title == title && str.projects.include?(project) && gene_titles.count == str.genotypes.count
-      if match
-        match = str.genotypes.find do |gt|
-          !gene_titles.include?(gt.gene.title)
-        end.nil?
-      end
-      match
-    end
+    strain = find_matching_strain(gene_titles, project, title)
 
     if strain.nil?
       new_strain_attributes = strain_hash.slice(:title, :lab_internal_id, :provider_id, :provider_name, :comment)
@@ -205,6 +195,30 @@ namespace :seek_biosamples do
     strain.save!
 
     strain
+  end
+
+  def find_matching_strain(gene_titles, project, title)
+    Strain.all.find do |str|
+      match = str.title == title && str.projects.include?(project) && gene_titles.count == str.genotypes.count
+      if match
+        match = str.genotypes.find do |gt|
+          !gene_titles.include?(gt.gene.title)
+        end.nil?
+      end
+      match
+    end
+  end
+
+  def find_matching_specimen(specimen_hash)
+    Specimen.all.find do |spec|
+      spec.title == specimen_hash[:title] && spec.projects.sort == specimen_hash[:projects].sort && spec.strain == specimen_hash[:strain]
+    end
+  end
+
+  def find_matching_sample(sample_hash)
+    Sample.all.find do |sample|
+      sample.title == sample_hash[:title] && sample.specimen == sample_hash[:specimen]
+    end
   end
 
   def tie_together(strains, specimens, samples, treatments)
@@ -239,97 +253,132 @@ namespace :seek_biosamples do
     definitions.each do |definition|
       definition.each do |element|
 
-        # make born date a datetime
-        if element.key?(:born) && !element[:born].nil?
-          element[:born] = DateTime.parse(element[:born])
-        end
-
-        # make sampling date a datetime
-        if element.key?(:sampling_date) && !element[:sampling_date].nil?
-          element[:sampling_date] = DateTime.parse(element[:sampling_date])
-        end
+        convert_dates(element)
 
         # the culture growth type
-        if element.key?(:culture_growth_type) && !element[:culture_growth_type].nil?
-          type = CultureGrowthType.find_by_title(element[:culture_growth_type])
-          fail "Unable to find culture growth type for #{element[:culture_growth_type]}" if type.nil?
-          element[:culture_growth_type] = type
-        end
+        discover_culture_growth_type(element)
 
         # institution
-        if element.key?(:institution) && !element[:institution].nil?
-          institution = Institution.find_by_title(element[:institution])
-          fail "Unable to find institution for #{element[:institution]}" if institution.nil?
-          element[:institution] = institution
-        end
+        discover_institutions(element)
 
         # do project
-        if element.key?(:projects) && !element[:projects].nil?
-          project_titles = element[:projects].split(',')
-          projects = project_titles.map do |project_title|
-            project = Project.find_by_title(project_title)
-            project ||= Project.where('lower(title) LIKE ?', "%#{project_title.downcase}%").first
-            fail "Unable to find project to match '#{project_title}'" if project.nil?
-            project
-          end
-          element[:projects] = projects
-        end
+        discover_projects(element)
 
         # do contributor
-        if element.key?(:contributor) && !element[:contributor].nil?
-          contributor_name = element[:contributor].strip
-          person = people.find do |person|
-            person.name =~ /#{contributor_name}/i
-          end
-          fail "Unable to find person to match '#{contributor_name}'" if person.nil?
-          element[:contributor] = person
-        end
+        discover_contributors(element, people)
 
         # data files
-        if element.key?(:data_files) && !element[:data_files].nil?
-          ids = element[:data_files].split(',')
-          data_files = ids.map do |id|
-            df = DataFile.find_by_id(id)
-            fail "Unable to find data file for id #{id}" if df.nil?
-            df
-          end
-          element[:data_files] = data_files
-        end
+        discover_data_files(element)
 
         # sops
-        if element.key?(:sops) && !element[:sops].nil?
-          ids = element[:sops].split(',')
-          sops = ids.map do |id|
-            sop = Sop.find_by_id(id)
-            fail "Unable to find SOP for id #{id}" if sop.nil?
-            sop
-          end
-          element[:sops] = sops
-        end
+        discover_sops(element)
 
         # assays
-        if element.key?(:assays) && !element[:assays].nil?
-          ids = element[:assays].split(',')
-          assays = ids.map do |id|
-            assay = Assay.find_by_id(id)
-            fail "Unable to find Assay for id #{id}" if assay.nil?
-            assay
-          end
-          element[:assays] = assays
-        end
+        discover_assays(element)
 
         # organism
-        if element.key?(:organism) && element.key?(:ncbi)
-          title = element[:organism]
-          title = title.gsub('_', ' ')
-          title = 'Lactococcus lactis' if title.downcase == 'lactococus lactis'
-          organism = Organism.where('lower(title) LIKE ?', "%#{title.downcase}%").first
-          fail "Unable to find Organism for '#{title}'" if organism.nil?
-          fail "NCBI doesn't match organism - '#{organism.title} , #{organism.ncbi_id} != #{element[:ncbi]}" if organism.ncbi_id.to_i != element[:ncbi].to_i
-          element[:organism] = organism
-        end
+        discover_organisms(element)
 
       end
+    end
+  end
+
+  def convert_dates(element)
+    if element.key?(:born) && !element[:born].nil?
+      element[:born] = DateTime.parse(element[:born])
+    end
+
+    # make sampling date a datetime
+    if element.key?(:sampling_date) && !element[:sampling_date].nil?
+      element[:sampling_date] = DateTime.parse(element[:sampling_date])
+    end
+  end
+
+  def discover_culture_growth_type(element)
+    if element.key?(:culture_growth_type) && !element[:culture_growth_type].nil?
+      type = CultureGrowthType.find_by_title(element[:culture_growth_type])
+      fail "Unable to find culture growth type for #{element[:culture_growth_type]}" if type.nil?
+      element[:culture_growth_type] = type
+    end
+  end
+
+  def discover_institutions(element)
+    if element.key?(:institution) && !element[:institution].nil?
+      institution = Institution.find_by_title(element[:institution])
+      fail "Unable to find institution for #{element[:institution]}" if institution.nil?
+      element[:institution] = institution
+    end
+  end
+
+  def discover_projects(element)
+    if element.key?(:projects) && !element[:projects].nil?
+      project_titles = element[:projects].split(',')
+      projects = project_titles.map do |project_title|
+        project = Project.find_by_title(project_title)
+        project ||= Project.where('lower(title) LIKE ?', "%#{project_title.downcase}%").first
+        fail "Unable to find project to match '#{project_title}'" if project.nil?
+        project
+      end
+      element[:projects] = projects
+    end
+  end
+
+  def discover_contributors(element, people)
+    if element.key?(:contributor) && !element[:contributor].nil?
+      contributor_name = element[:contributor].strip
+      person = people.find do |person|
+        person.name =~ /#{contributor_name}/i
+      end
+      fail "Unable to find person to match '#{contributor_name}'" if person.nil?
+      element[:contributor] = person
+    end
+  end
+
+  def discover_data_files(element)
+    if element.key?(:data_files) && !element[:data_files].nil?
+      ids = element[:data_files].split(',')
+      data_files = ids.map do |id|
+        df = DataFile.find_by_id(id)
+        fail "Unable to find data file for id #{id}" if df.nil?
+        df
+      end
+      element[:data_files] = data_files
+    end
+  end
+
+  def discover_sops(element)
+    if element.key?(:sops) && !element[:sops].nil?
+      ids = element[:sops].split(',')
+      sops = ids.map do |id|
+        sop = Sop.find_by_id(id)
+        fail "Unable to find SOP for id #{id}" if sop.nil?
+        sop
+      end
+      element[:sops] = sops
+    end
+  end
+
+  def discover_assays(element)
+    if element.key?(:assays) && !element[:assays].nil?
+      ids = element[:assays].split(',')
+      assays = ids.map do |id|
+        assay = Assay.find_by_id(id)
+        fail "Unable to find Assay for id #{id}" if assay.nil?
+        assay
+      end
+      element[:assays] = assays
+    end
+  end
+
+  def discover_organisms(element)
+    if element.key?(:organism) && element.key?(:ncbi)
+      title = element[:organism]
+      title = title.gsub('_', ' ')
+      title = 'Lactococcus lactis' if title.downcase == 'lactococus lactis'
+      organism = Organism.where('lower(title) LIKE ?', "%#{title.downcase}%").first
+      fail "Unable to find Organism for '#{title}'" if organism.nil?
+      fail "NCBI doesn't match organism - '#{organism.title} , #{organism.ncbi_id} != #{element[:ncbi]}" if organism.ncbi_id.to_i != element[:ncbi].to_i
+      element[:organism] = organism
     end
   end
 
