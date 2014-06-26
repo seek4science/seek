@@ -19,7 +19,6 @@ function updateFirstPage() {
                     $j('.exhibit-collectionView-header-groupControl').hide();
                     $j('.exhibit-toolboxWidget-button').hide();
                     decodeValueTooltip();
-                    load_tabs();
                 });
     }
 }
@@ -29,9 +28,6 @@ var $j = jQuery;
 $j(document).ready(function(){
     $j(document).on("exhibitConfigured.exhibit", function() {
         defaultSearchText();
-        hideFacets();
-        hide_specified_facets();
-        hide_specified_facet_list();
     });
 
     $j(document).bind("registerLocales.exhibit", function() {
