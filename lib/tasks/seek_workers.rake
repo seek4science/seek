@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'rake'
-require 'delayed/command'
 
 namespace :seek do
   namespace :workers do
@@ -8,25 +7,24 @@ namespace :seek do
     desc "Start the delayed job workers"
     task :start, [:number] => [:environment] do |t, args|
       args.with_defaults(:number => "0")
-      number = Seek::Config.workflows_enabled ? args.number.to_i : 0
-      commands =
-        ["--queue=#{Delayed::Worker.default_queue_name} -i #{number} start"]
-
-      if number > 0
-        commands << "--queue=#{TavernaPlayer.job_queue_name} -n #{number} start"
-      end
-
-      commands.map { |c| Delayed::Command.new(c.split).daemonize }
+      number = args.number.to_i
+      Seek::Workers.start(number)
     end
 
     desc "Stop the delayed job workers"
     task :stop => :environment do
-      Delayed::Command.new(["stop"]).daemonize
+      Seek::Workers.stop
     end
 
     desc "Get the status of the delayed job workers"
     task :status => :environment do
-      Delayed::Command.new(["status"]).daemonize
+      Seek::Workers.status
+    end
+
+    task :restart, [:number] => [:environment] do |t, args|
+      args.with_defaults(:number => "0")
+      number = args.number.to_i
+      Seek::Workers.restart(number)
     end
 
   end

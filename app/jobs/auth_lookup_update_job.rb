@@ -6,11 +6,14 @@ class AuthLookupUpdateJob
 
   BATCHSIZE=3
 
+  mattr_accessor :job_queue_name
+  @@job_queue_name = "authlookup"
+
   def perform
     process_queue
 
     if AuthLookupUpdateQueue.count>0 && !AuthLookupUpdateJob.exists?
-      Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>0, :run_at=>1.seconds.from_now)
+      Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>0, :queue=>AuthLookupUpdateJob.job_queue_name,:run_at=>1.seconds.from_now)
     end
   end
 
@@ -84,7 +87,7 @@ class AuthLookupUpdateJob
           # for users some additional simple code is required.
           AuthLookupUpdateQueue.create(:item=>item, :priority=>queuepriority) unless AuthLookupUpdateQueue.exists?(item)
         end
-        Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>priority, :run_at=>t) unless AuthLookupUpdateJob.count>10
+        Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>priority, :queue=>AuthLookupUpdateJob.job_queue_name,:run_at=>t) unless AuthLookupUpdateJob.count>10
       end
     end
   end
