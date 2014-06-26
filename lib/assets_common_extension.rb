@@ -326,7 +326,7 @@ module AssetsCommonExtension
 
     t = File.new(zip_path,"w+")
     # Give the path of the temp file to the zip outputstream, it won't try to open it as an archive.
-    Zip::ZipOutputStream.open(t.path) do |zos|
+    Zip::OutputStream.open(t.path) do |zos|
       files_to_download.each do |filename,filepath|
         zos.put_next_entry(filename)
         zos.print IO.read(filepath)

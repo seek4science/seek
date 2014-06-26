@@ -1,4 +1,4 @@
-require 'zip/zip'
+require 'zip'
 
 class Sweep < ActiveRecord::Base
   acts_as_asset
@@ -57,7 +57,7 @@ class Sweep < ActiveRecord::Base
     path = "#{Rails.root}/tmp/#{name.parameterize('_')}_results_#{unique_id}.zip"
 
     unless File.exists?(path)
-      Zip::ZipFile.open(path, Zip::ZipFile::CREATE) do |zip_file|
+      Zip::File.open(path, Zip::File::CREATE) do |zip_file|
         output_list.group_by {|o| o.name}.each do |output_name, outputs|
           output_dir_name = output_name
           zip_file.mkdir(output_dir_name) # Make folder for outputs
