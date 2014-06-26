@@ -1,5 +1,6 @@
 class ModelImage < ActiveRecord::Base
 
+  DEFAULT_SIZE = "200x200"
   LARGE_SIZE = "1000x1000"
   belongs_to :model
   after_create :change_filename unless Rails.env=="test"

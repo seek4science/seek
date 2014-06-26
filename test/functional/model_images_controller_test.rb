@@ -5,39 +5,41 @@ class ModelImagesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
-  test "get model image" do
-    model = Factory(:model_with_image,:policy=>Factory(:public_policy))
-    get :show,:model_id=>model.id,:id=>model.model_image.id
+  test 'get model image' do
+    model = Factory(:model_with_image, policy: Factory(:public_policy))
+    get :show, model_id: model.id, id: model.model_image.id
     assert_response :success
-    assert_equal "image/jpeg",@response.header["Content-Type"]
-    assert_equal "inline; filename=\"#{model.model_image.id}.jpg\"",@response.header["Content-Disposition"]
-    assert_equal "5821",@response.header["Content-Length"]
+    assert_equal 'image/jpeg', @response.header['Content-Type']
+    assert_equal "inline; filename=\"#{model.model_image.id}.jpg\"", @response.header['Content-Disposition']
+    expected_size = File.size(model.model_image.full_cache_path(ModelImage::DEFAULT_SIZE)).to_s
+    assert_equal expected_size, @response.header['Content-Length']
   end
 
-  test "get model image with size" do
-    model = Factory(:model_with_image,:policy=>Factory(:public_policy))
-    get :show,:model_id=>model.id,:id=>model.model_image.id, :size=>"10x10"
+  test 'get model image with size' do
+    model = Factory(:model_with_image, policy: Factory(:public_policy))
+    get :show, model_id: model.id, id: model.model_image.id, size: '10x10'
     assert_response :success
-    assert_equal "image/jpeg",@response.header["Content-Type"]
-    assert_equal "inline; filename=\"#{model.model_image.id}.jpg\"",@response.header["Content-Disposition"]
-    assert_equal "393",@response.header["Content-Length"]
+    assert_equal 'image/jpeg', @response.header['Content-Type']
+    assert_equal "inline; filename=\"#{model.model_image.id}.jpg\"", @response.header['Content-Disposition']
+    expected_size = File.size(model.model_image.full_cache_path('10x10')).to_s
+    assert_equal expected_size, @response.header['Content-Length']
   end
 
-  test "model_image is authorised by model" do
-    model = Factory(:model_with_image,:policy=>Factory(:private_policy))
-    get :show,:model_id=>model.id,:id=>model.model_image.id
+  test 'model_image is authorised by model' do
+    model = Factory(:model_with_image, policy: Factory(:private_policy))
+    get :show, model_id: model.id, id: model.model_image.id
     assert_redirected_to root_path
     assert_not_nil flash[:error]
-    assert_equal "You can only view images for #{I18n.t('model').pluralize} you can access",flash[:error]
+    assert_equal "You can only view images for #{I18n.t('model').pluralize} you can access", flash[:error]
   end
 
-  test "get the maximum size for the image" do
-    model = Factory(:model_with_image,:policy=>Factory(:public_policy))
-    get :show,:model_id=>model.id,:id=>model.model_image.id, :size=>"5000x5000"
+  test 'get the maximum size for the image' do
+    model = Factory(:model_with_image, policy: Factory(:public_policy))
+    get :show, model_id: model.id, id: model.model_image.id, size: '5000x5000'
     assert_response :success
-    assert_equal "image/jpeg",@response.header["Content-Type"]
-    assert_equal "inline; filename=\"#{model.model_image.id}.jpg\"",@response.header["Content-Disposition"]
-    #maximum width of 1500 pixels
-    assert_equal "80376",@response.header["Content-Length"]
+    assert_equal 'image/jpeg', @response.header['Content-Type']
+    assert_equal "inline; filename=\"#{model.model_image.id}.jpg\"", @response.header['Content-Disposition']
+    expected_size = File.size(model.model_image.full_cache_path('5000x5000')).to_s
+    assert_equal expected_size, @response.header['Content-Length']
   end
 end
