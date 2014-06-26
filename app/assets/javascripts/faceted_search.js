@@ -23,6 +23,7 @@ function tab_on_click(resource_type, resource_ids, with_facets) {
             $j.ajax({
                 url: items_for_facets_url,
                 async: false,
+                type: 'POST',
                 data: { item_ids: resource_ids,
                     item_type: resource_type}
             })
