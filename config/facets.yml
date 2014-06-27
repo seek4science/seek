@@ -1,0 +1,152 @@
+#TODO: need some comment to explain the config fields
+Assay:
+  organism:
+      label: Organism
+      value_from: organisms:title
+  assay_type:
+      label: Assay Type
+      value_from: assay_type_label
+      facet_class: Exhibit.HierarchicalFacet
+      tree_from: Seek::Ontologies::AssayTypeReader,Seek::Ontologies::ModellingAnalysisTypeReader
+  technology_type:
+      label: Technology Type
+      value_from: technology_type_label
+      facet_class: Exhibit.HierarchicalFacet
+      tree_from: Seek::Ontologies::TechnologyTypeReader
+  project:
+      label: Project
+      value_from: projects:title
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: contributor:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
+
+DataFile:
+  project:
+      label: Project
+      value_from: projects:title
+  assay_type:
+        label: Assay Type
+        value_from: assay_type_titles
+        facet_class: Exhibit.HierarchicalFacet
+        tree_from: Seek::Ontologies::AssayTypeReader,Seek::Ontologies::ModellingAnalysisTypeReader
+  technology_type:
+        label: Technology Type
+        value_from: technology_type_titles
+        facet_class: Exhibit.HierarchicalFacet
+        tree_from: Seek::Ontologies::TechnologyTypeReader
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: creators:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
+
+Model:
+  organism:
+      label: Organism
+      value_from: organism:title
+  model_type:
+      label: Model Type
+      value_from: model_type:title
+  model_format:
+      label: Model Format
+      value_from: model_format:title
+  recommended_environment:
+      label: Execution or Visualization Environment
+      value_from: recommended_environment:title
+  modelling_analysis_type:
+      label: Modelling Analysis Type
+      value_from: assay_type_titles
+      facet_class: Exhibit.HierarchicalFacet
+      tree_from: Seek::Ontologies::ModellingAnalysisTypeReader
+  project:
+      label: Project
+      value_from: projects:title
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: creators:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
+
+Sop:
+  project:
+      label: Project
+      value_from: projects:title
+  technology_type:
+        label: Technology Type
+        value_from: technology_type_titles
+        facet_class: Exhibit.HierarchicalFacet
+        tree_from: Seek::Ontologies::TechnologyTypeReader
+  assay_type:
+        label: Assay Type
+        value_from: assay_type_titles
+        facet_class: Exhibit.HierarchicalFacet
+        tree_from: Seek::Ontologies::AssayTypeReader,Seek::Ontologies::ModellingAnalysisTypeReader
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: creators:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
+
+Publication:
+  project:
+      label: Project
+      value_from: projects:title
+  author:
+      label: Author
+      value_from: publication_author_names
+  published_year:
+      label: Published Year
+      value_from: published_date:year
+  organism:
+      label: Organism
+      value_from: related_organisms:title
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
+
+Person:
+  project:
+      label: Project
+      value_from: projects:title
+  discipline:
+      label: Discipline
+      value_from: disciplines:title
+  expertise:
+      label: Expertise
+      value_from: expertise:text
+  tool:
+      label: Tool
+      value_from: tools:text
+  role:
+      label: Role
+      value_from: project_roles:title
+  institution:
+      label: Institution
+      value_from: institutions:title
+  location:
+      label: Location
+      value_from: locations
+  name:
+      label: Name
+      value_from: name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array

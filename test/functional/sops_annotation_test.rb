@@ -202,7 +202,7 @@ class SopsAnnotationTest < ActionController::TestCase
 
     assert_redirected_to sop_path(assigns(:sop))
     sop=assigns(:sop)
-    assert_equal ["fish","golf"],sop.tags_as_text_array.sort
+    assert_equal ["fish","golf"],sop.annotations_as_text_array.sort
   end
 
   test "tag cloud shown on show page" do

@@ -1,6 +1,7 @@
 class SearchController < ApplicationController
 
   include Seek::ExternalSearch
+  include Seek::FacetedBrowsing
 
   def index
 

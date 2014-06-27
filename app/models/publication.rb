@@ -144,6 +144,18 @@ class Publication < ActiveRecord::Base
    bio_reference.endnote
   end
 
+  def publication_author_names
+    author_names = []
+    publication_author_orders.sort_by(&:order).collect(&:author).each do |author|
+      if author.kind_of?(Person)
+        author_names << author.name
+      else
+        author_names << author.first_name + " " + author.last_name
+      end
+    end
+    author_names
+  end
+
   private
 
   def bio_reference

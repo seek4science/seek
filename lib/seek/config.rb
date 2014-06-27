@@ -212,6 +212,10 @@ module Seek
       value
     end
 
+    def facet_enable_for_page controller
+      self.facet_enable_for_pages[controller.to_sym]
+    end
+
     def default_page controller
       self.default_pages[controller.to_sym]
     end
@@ -313,7 +317,8 @@ module Seek
       :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,:tagging_enabled,
       :authorization_checks_enabled,:magic_guest_enabled,:workflows_enabled,:programmes_enabled,
       :assay_type_ontology_file,:technology_type_ontology_file,:modelling_analysis_type_ontology_file,:assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri,
-      :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit,:css_appended, :css_prepended, :javascript_appended,:javascript_prepended,:main_layout,:profile_select_by_default]
+      :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit,:faceted_browsing_enabled,:facet_enable_for_pages,:faceted_search_enabled,:is_one_facet_instance,
+      :css_appended, :css_prepended, :javascript_appended,:javascript_prepended,:main_layout,:profile_select_by_default]
 
 
     #Settings that require a conversion to integer

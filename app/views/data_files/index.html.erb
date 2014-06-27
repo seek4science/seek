@@ -1,15 +1,7 @@
-<% if logged_in_and_member? %>
-    <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_data_file_path, "Upload a #{t('data_file')}", nil, "Upload a #{t('data_file')}" %></li>
-    </ul>
-<% end %>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_data_file_path, :label => "Upload a #{t('data_file')}"} %>
 
-<% if @data_files.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @data_files.pages, :page_totals=>@data_files.page_totals,:current_page=>@data_files.page } -%>
-<% end %>
-<%= render :partial => "assets/resource_list", :locals => { :collection => @data_files, :authorization_for_showing_already_done=>true } %>
-
-<% if @data_files.page == "latest" && (n=DataFile.all_authorized_for("view").count) > Seek::Config.limit_latest%>
-   <%= render :partial => "general/paginate_see_all",:locals=>{:total=>n}%>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
+    <%= render :partial => "faceted_browsing/facets", :object => @data_files %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @data_files %>
 <% end %>

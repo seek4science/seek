@@ -130,6 +130,7 @@ SEEK::Application.routes.draw do
       get :select
       get :get_work_group
       post :userless_project_selected_ajax
+      post :items_for_result
     end
     member do
       post :check_related_items
@@ -157,6 +158,7 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
+      post :items_for_result
     end
     member do
       get :asset_report
@@ -190,6 +192,7 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       get :request_all
+      post :items_for_result
     end
     resources :people,:projects,:specimens,:only=>[:index]
     resources :avatars do
@@ -202,6 +205,9 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations do
+    collection do
+      post :items_for_result
+    end
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
     member do
       get :new_object_based_on_existing_one
@@ -211,6 +217,7 @@ SEEK::Application.routes.draw do
   resources :studies do
     collection do
       post :investigation_selected_ajax
+      post :items_for_result
     end
     member do
       get :new_object_based_on_existing_one
@@ -221,6 +228,7 @@ SEEK::Application.routes.draw do
   resources :assays do
     collection do
       get :preview
+      post :items_for_result
     end
     member do
       post :update_annotations_ajax
@@ -237,6 +245,7 @@ SEEK::Application.routes.draw do
       post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
+      post :items_for_result
     end
     member do
       post :check_related_items
@@ -273,6 +282,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :test_asset_url
+      post :items_for_result
     end
     member do
       post :check_related_items
@@ -300,6 +310,7 @@ SEEK::Application.routes.draw do
       get :build
       get :preview
       post :test_asset_url
+      post :items_for_result
     end
     member do
       get :compare_versions
@@ -344,6 +355,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :test_asset_url
+      post :items_for_result
     end
     member do
       post :check_related_items
@@ -388,6 +400,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :fetch_preview
+      post :items_for_result
     end
     member do
       post :update_annotations_ajax
@@ -399,6 +412,7 @@ SEEK::Application.routes.draw do
   resources :events do
     collection do
       get :preview
+      post :items_for_result
     end
     resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
@@ -414,6 +428,9 @@ SEEK::Application.routes.draw do
   ### BIOSAMPLES AND ORGANISMS ###
 
   resources :specimens do
+    collection do
+      post :items_for_result
+    end
     resources :projects,:people,:samples,:strains,:institutions,:sops,:only=>[:index]
     member do
       get :new_object_based_on_existing_one
@@ -423,6 +440,7 @@ SEEK::Application.routes.draw do
   resources :samples do
     collection do
       get :preview
+      post :items_for_result
     end
     member do
       get :new_object_based_on_existing_one
@@ -433,6 +451,7 @@ SEEK::Application.routes.draw do
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
+      post :items_for_result
     end
     member do
       post :update_annotations_ajax
@@ -513,6 +532,8 @@ SEEK::Application.routes.draw do
   match '/search/' => 'search#index', :as => :search
   match '/search/save' => 'search#save', :as => :save_search
   match '/search/delete' => 'search#delete', :as => :delete_search
+  match '/search/items_for_facets' => 'search#items_for_facets', :via => :post
+  match '/search/items_for_result' => 'search#items_for_result', :via => :post
   match 'svg/:id.:format' => 'svg#show', :as => :svg
   match '/tags' => 'tags#index', :as => :all_tags
   match '/tags/:id' => 'tags#show', :as => :show_tag

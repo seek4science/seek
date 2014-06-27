@@ -565,7 +565,7 @@ module ApplicationHelper
     end
   end
 
-  def resource_tab_item_name resource_type,pluralize=true
+  def internationalized_resource_name resource_type,pluralize=true
     resource_type = resource_type.singularize
     if resource_type == "Speciman"
       result = t('biosamples.sample_parent_term')
@@ -683,6 +683,10 @@ module ApplicationHelper
   def unable_to_delete_text model_item
     text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
     return text.html_safe
+  end
+
+  def klass_from_controller controller_name
+    controller_name.singularize.camelize.constantize
   end
 
   def describe_visibility(model)

@@ -47,7 +47,7 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
     <th><%= t('project') %></th>
     <th>People (Registered)</th>
     <% authorised_types.each do |type| %>
-        <th><%= resource_tab_item_name(type.name) -%></th>
+        <th><%= internationalized_resource_name(type.name) -%></th>
     <% end %>
 
     <th>Publications</th>

@@ -344,6 +344,7 @@ GEM
     pry-remote (0.1.8)
       pry (~> 0.9)
       slop (~> 3.0)
+    psych (2.0.5)
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -597,6 +598,7 @@ DEPENDENCIES
   pry
   pry-doc
   pry-remote
+  psych
   rack-openid
   rails (= 3.2.17)
   rails_autolink

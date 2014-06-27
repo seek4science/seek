@@ -1,17 +1,7 @@
-<% if logged_in_and_member? %>
-    <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_presentation_path, "Upload a #{t('presentation')}", nil, "Upload a #{t('presentation')}" %></li>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_presentation_path, :label => "Upload a #{t('presentation')}"} %>
 
-    </ul>
-<% end %>
-
-<% if @presentations.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @presentations.pages, :page_totals=>@presentations.page_totals,:current_page=>@presentations.page } -%>
-<% end %>
-
-<%= render :partial => "assets/resource_list", :locals => { :collection => @presentations, :authorization_for_showing_already_done=>true } %>
-
-<% if @presentations.page == "latest" && (n=Presentation.all_authorized_for("view").count) > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all", :locals=>{:total=>n} %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
+    <%= render :partial => "faceted_browsing/facets", :object => @presentations %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @presentations %>
 <% end %>

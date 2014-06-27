@@ -48,7 +48,15 @@ SEEK::Application.configure do
       Seek::Config.fixed :main_layout,'application'
 
       #force back to using the defaults
-      ActionView::Renderer.clear_alternatives
+      ActionView::Renderer.clear_alternative({:controller=>:homes,:seek_template=>:index})
+      ActionView::Renderer.clear_alternative({:seek_partial=>"people/resource_list_item"})
+      ActionView::Renderer.clear_alternative({:seek_partial=>"projects/resource_list_item"})
+      ActionView::Renderer.clear_alternative({:controller=>:people,:seek_partial=>"general/items_related_to"})
+
+      Settings.defaults[:faceted_browsing_enabled] = false
+      Settings.defaults[:facet_enable_for_pages] = {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
+      Settings.defaults[:faceted_search_enabled] = false
+
     end
   end
 end

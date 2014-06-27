@@ -1,0 +1,162 @@
+<%# this partial will display a dynamically generated view of all assets from a collection; -%>
+<%# different types of assets will be placed in different tabs based on their class; -%>
+<%# the partial requires 3 parameters to be defined: -%>
+<%# - resource_hash: a hash of all resource instances, where keys are resource class names and values are arrays of resource instances of that class -%>
+<%# - narrow_view: type of the partial to use for asset listings: 'false' to use the same partial with much info as on SOPs listing page -%>
+<%#                                                               'true' to use a partial with fewer information; suitable for 'show' pages for people/projects -%>
+<%# - authorization_already_done: boolean value indicating whether all items in the collection have already been authorized for the current user to view or not -%>
+<% tabs_id ||= "resource_list_by_class" -%>
+<% narrow_view ||= false -%>
+<% authorization_already_done ||= false -%>
+<% actions_partial_disable ||= false %>
+<% display_immediately ||= false %>
+<% show_empty_tabs ||= false %>
+
+<% unless authorization_already_done
+     resource_hash.each_value do |res|
+       unless res[:items].empty?
+         total_count = res[:items].size
+         total = res[:items]
+         res[:items] = res[:items].select &:can_view?
+         res[:hidden_items] = total - res[:items]
+         res[:hidden_count] = total_count - res[:items].size
+       end
+     end
+   end
+%>
+<% limit ||= nil
+   if limit
+     resource_hash.each_key do |key|
+       if limit && resource_hash[key][:items].size > limit
+         resource_hash[key][:extra_count] = resource_hash[key][:items].size - limit
+         resource_hash[key][:extra_items] = resource_hash[key][:items][limit...(resource_hash[key][:items].size)]
+         resource_hash[key][:items] = resource_hash[key][:items][0...limit]
+       end
+     end
+   end
+%>
+
+<script type="text/javascript">
+    tabber_ids.push("<%= tabs_id -%>");
+</script>
+
+<% total_count = 0 %>
+<% resource_hash.each_key do |k| %>
+    <% count = resource_hash[k][:items].size + resource_hash[k][:hidden_count] %>
+    <% resource_hash.delete(k) if (!show_empty_tabs && count == 0) %>
+    <% total_count += count %>
+<% end %>
+<% if total_count > 0 || show_empty_tabs -%>
+    <div id='<%= "#{tabs_id}_spinner".html_safe -%>' style="width:100%;text-align:center">
+      <%= image_tag "ajax-loader-large.gif" -%>
+    </div>
+    <div <%= "id='#{tabs_id}'".html_safe if tabs_id -%> class="tabber" style="display:none;">
+      <% assets = resource_hash.keys.sort_by do |asset|
+        ASSET_ORDER.index(asset) || (resource_hash[asset][:is_external] ? 10000 : 1000)
+      end
+      %>
+      <% assets.each do |resource_type| -%>
+
+          <% hidden_count = 0 %>
+          <% extra_count = 0 %>
+          <% is_external = false -%>
+
+          <% unless resource_hash[resource_type].nil? %>
+              <% if resource_hash.class == Hash %>
+                  <% hidden_count = resource_hash[resource_type][:hidden_count] %>
+                  <% resources = resource_hash[resource_type][:items] %>
+                  <% extra_count = resource_hash[resource_type][:extra_count] || 0 %>
+                  <% is_external = resource_hash[resource_type][:is_external] -%>
+              <% else %>
+                  <% resources = resource_hash %>
+              <% end %>
+          <% else %>
+              <% resources = {} %>
+          <% end%>
+          <% visible_resource_type = internationalized_resource_name(resource_type,!is_external) -%>
+          <% tab_title = "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%>
+          <% title_class = is_external ? "external_result" : "" %>
+          <% if (!resources.empty? || hidden_count > 0) || show_empty_tabs %>
+              <div id="<%= resource_type -%>" class="tabbertab">
+                <% unless resources.empty? && extra_count < 1 %>
+                    <h3 class='<%= resource_type -%>'><%= tab_title -%></h3>
+                    <%= render :partial => "assets/resource_list", :locals => { :collection => resources,
+                                                                                :narrow_view => narrow_view,
+                                                                                :authorization_for_showing_already_done => true,
+                                                                                :actions_partial_disable => actions_partial_disable} -%>
+
+                    <div id="<%= resource_type %>_view_all"></div>
+                <% else %>
+                    <h3><%= "#{visible_resource_type} (0#{'+'+hidden_count.to_s if hidden_count>0})".html_safe -%></h3>
+                    <% if hidden_count==0 -%>
+                        <div class="list_items_container">
+                          <div class="hidden_list_item">
+                            <span class="none_text">There are no matching items</span>
+                          </div>
+                        </div>
+                    <% end %>
+                <% end %>
+                <% unless extra_count < 1 %>
+                    <div class="list_items_container">
+                      <div class="hidden_list_item" id ="view_list_items" style="color:#000">
+                        <%
+                           tab_content_view_all = resource_type + '_view_all'
+                           tab_content_view_some = resource_type + '_view_some'
+                        %>
+                        <% item ||= nil
+                           if item %>
+                            <%= link_to "View all "+(extra_count + resources.size).to_s+" items", [item,resource_type.tableize] -%>
+                        <% else
+                             link_to "View all items", eval("#{resource_type.pluralize.underscore}_path")
+                           end
+                        -%>
+                      </div>
+                      <br style="clear:both"/>
+                    </div>
+                <% end %>
+                <% unless hidden_count < 1 %>
+                    <div class="list_items_container">
+                      <div class="hidden_list_item">
+                        <% text_for_hidden =  "#{hidden_count} hidden #{hidden_count > 1 ? 'items' : 'item'}"%>
+                        <%= hidden_items_html(resource_hash[resource_type][:hidden_items], text_for_hidden)  %>
+                      </div>
+                      <br style="clear:both"/>
+                    </div>
+                <% end %>
+              </div>
+          <% end -%>
+      <% end -%>
+    </div>
+<% else -%>
+    <div class="list_items_container">
+      <div class="hidden_list_item">
+        <span class="none_text">No items found.</span>
+      </div>
+    </div>
+<% end -%>
+
+<% if display_immediately %>
+     <script>
+         displayTabs();
+     </script>
+<% end %>
+
+
+<script type="text/javascript">
+    load_tabs();
+
+    <% assets.each do |key| %>
+        tab_on_click_one_facet('<%= key %>');
+    <% end %>
+
+    //Stay the same tab selection otherwise first tab
+    var active_tab =  document.getElementsByClassName('<%= active_tab %>')[0];
+    if (active_tab != null){
+        active_tab.click();
+    }else{
+        var first_tab = document.getElementsByClassName('<%= assets.first %>')[0];
+        if (first_tab != null){
+            first_tab.click();
+        }
+    }
+</script>
