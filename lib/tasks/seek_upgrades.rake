@@ -192,7 +192,6 @@ namespace :seek do
           author.delete
         end
       end
-    end
   end
 
   private
