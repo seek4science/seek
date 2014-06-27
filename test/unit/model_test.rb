@@ -122,14 +122,15 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    asset=Model.new :title=>"fred",:projects=>[projects(:sysmo_project)]
+    asset=Model.new :title=>"fred",:projects=>[projects(:sysmo_project)], :policy => Factory(:private_policy)
     assert asset.valid?
 
-    asset=Model.new :projects=>[projects(:sysmo_project)]
+    asset=Model.new :projects=>[projects(:sysmo_project)], :policy => Factory(:private_policy)
     assert !asset.valid?
 
-    asset=Model.new :title=>"fred"
-    assert !asset.valid?
+    #VL only: allow no projects
+    asset=Model.new :title=>"fred", :policy => Factory(:private_policy)
+    assert asset.valid?
   end
 
   test "is asset?" do
@@ -173,16 +174,15 @@ class ModelTest < ActiveSupport::TestCase
 
   end
   
-  def test_defaults_to_private_policy
+  def test_defaults_to_blank_policy
     model=Model.new Factory.attributes_for(:model, :policy => nil)
-    model.save!
-    model.reload
-    assert_not_nil model.policy
-    assert_equal Policy::PRIVATE, model.policy.sharing_scope
-    assert_equal Policy::NO_ACCESS, model.policy.access_type
+    assert !model.valid?
+    assert !model.policy.valid?
+    assert_blank model.policy.sharing_scope
+    assert_blank model.policy.access_type
     assert_equal false,model.policy.use_whitelist
     assert_equal false,model.policy.use_blacklist
-    assert model.policy.permissions.empty?
+    assert_blank model.policy.permissions
   end
 
   test "creators through asset" do

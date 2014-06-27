@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
 
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
+  include Recaptcha::Verify
 
   self.mod_porter_secret = PORTER_SECRET
 
@@ -134,11 +135,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  private
+
   def project_membership_required
     unless User.logged_in_and_member? || User.admin_logged_in?
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
-        format.html do
+        format.html do          
           object = eval("@"+controller_name.singularize)
           if !object.nil? && object.try(:can_view?)
             redirect_to object
@@ -170,6 +173,23 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def check_allowed_to_manage_types
+    unless Seek::Config.type_managers_enabled
+      error("Type management disabled", "...")
+      return false
+    end
+    if User.current_user
+      if User.current_user.can_manage_types?
+        return true
+      else
+        error("Admin rights required to manage types", "...")
+        return false
+      end
+    else
+      error("You need to login first.", "...")
+      return false
+    end
+  end
 
   def currently_logged_in
     current_user.person
@@ -261,6 +281,8 @@ class ApplicationController < ActionController::Base
         params.delete :sharing unless object.can_manage?(current_user)
       else
         respond_to do |format|
+          #MERGENOTE - what's this?
+          store_location
           #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
           if User.current_user.nil?
             flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
@@ -459,8 +481,12 @@ class ApplicationController < ActionController::Base
             res.assays.collect { |a| a.study.investigation_id }.include? value.id
           when filter == 'study' && res.respond_to?(:assays)
             res.assays.collect { |a| a.study_id }.include? value.id
-          when filter == 'person' && res.class.is_asset?
-            (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
+        #MERGENOTE - this looks like it needs some refactoring 
+        when (filter == 'project' && res.respond_to?(:projects_and_ancestors)) then res.projects_and_ancestors.include? value
+        when (filter == 'project' && res.class.name == "Assay") then Project.is_hierarchical? ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
+        when (filter == 'project' && res.class.name == "Study") then Project.is_hierarchical? ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
+            when filter == 'person' && res.class.is_asset?
+             (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
           when filter == 'person' && (res.respond_to?(:contributor) || res.respond_to?(:creators) || res.respond_to?(:owner))
             people = [res.contributor,res.contributor.try(:person)]
             people = people | res.creators if res.respond_to?(:creators)

@@ -1,7 +1,7 @@
 body {
 	font-family: arial,sans-serif;
     font-size: 14px;
-    line-height: 1.0;
+	line-height: 1.0;
     border-left: #8e8e8e solid 10px;
     border-right: #8e8e8e solid 10px;
     min-width: 1024px;
@@ -870,6 +870,7 @@ img.badge {
 }
 
 #topbar {
+    text-align: center;
     height: 20px;
     background-image: url("<%= asset_path('searchfade-repeat.png') %>");
     background-repeat: repeat-x;
@@ -1484,6 +1485,9 @@ a.block_link_active {
   margin-top: 0.3em;
   text-align: left;
   vertical-align: middle;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
 }
 
 a:hover.block_link {
@@ -1555,10 +1559,8 @@ div.email_configuration{
 
 
 
-a.advanced_sharing_link {
-    float: none;
-    display: inline-block;
-    padding: 7px 0;
+a.advanced_sharing_link{
+   float:right;
 }
 
 .sharing_box_form {
@@ -1920,6 +1922,7 @@ ul.model_scales_list {
 }
 
 
+
 .sectionIcons li:hover {
 }
 
@@ -2181,25 +2184,6 @@ div#profile_select {
     margin:auto;
     text-align:left;
 }
-
-.field_with_errors > input {
-    border: 2px solid red;
-}
-
-.large_text_entry {
-    width: 99%;
-    height: 10em;
-}
-
-.title_text_entry {
-    width: 99%;
-    height: 2em;
-}
-
-.text_entry {
-    width: 40em;
-}
-
 
 
 

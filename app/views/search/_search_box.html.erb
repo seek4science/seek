@@ -1,13 +1,27 @@
-<% @search_query="" unless @search_query %>
+<%= javascript_include_tag 'default_text_search' %>
+<% @search_query="Search here..." unless @search_query %>
 <% @search_type="All" unless @search_type %>
+
+
+<% search_type_options.each do |s|
+     if s == "People" || s == "Projects" || s == "Institutions"
+       current_page?("/"+s.downcase)? @search_type=s : @search_type=@search_type
+     else
+       current_page?("/"+s[1].to_s)? @search_type=s[1].to_s : @search_type=@search_type
+     end
+end %>
+
+
 
 
 <% if Seek::Config.solr_enabled -%>
 
   <%= form_tag main_app.search_path do -%>
     <div id="search_box">
-      <%= text_field_tag :search_query, @search_query,:class=>"curved", :style=>"display:none;" -%>
+      <font color="white"><b> <%= "Search:" %> </b></font>
+      <%= text_field_tag :search_query, @search_query, :onclick => "clickclear(this, 'Search here...')", :onblur => "clickrecall(this, 'Search here...')" ,:class=>"curved", :style=>"display:none;"-%>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
+      <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])) %>
       <% if Seek::Config.external_search_enabled %>
         <span title='<%= tooltip_title_attrib(external_search_tooltip_text) -%>' >
           <%= check_box_tag :include_external_search, 1, @include_external_search -%>External
@@ -17,5 +31,4 @@
     </div>
   <% end  -%>
 <% end %>
-
 

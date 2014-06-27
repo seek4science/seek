@@ -9,20 +9,11 @@ class PresentationTest < ActiveSupport::TestCase
    assert !presentation.valid?
 
    presentation.reload
+
+   # VL only:allow no projects
    presentation.projects.clear
-   assert !presentation.valid?
+   assert presentation.valid?
  end
-
-  test "default_policy_is_private" do
-    presentation = Factory :presentation
-    assert_not_nil presentation.policy
-
-    assert_equal presentation.policy.sharing_scope , Policy::PRIVATE
-    assert_equal presentation.policy.access_type , Policy::NO_ACCESS
-    assert_equal false, presentation.policy.use_whitelist
-    assert_equal false, presentation.policy.use_blacklist
-    assert presentation.policy.permissions.empty?
-  end
 
   test "new presentation's version is 1" do
     presentation = Factory :presentation

@@ -16,6 +16,9 @@
         false #defaults to false, unless it includes Taggable which will override this and check the configuration
       end
 
+      def self.is_hierarchical?
+           include? ActsAsCachedTree if defined? ActsAsCachedTree
+      end
     end
 
 

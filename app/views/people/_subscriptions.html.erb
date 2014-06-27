@@ -55,6 +55,10 @@
 </div>
 
 <script type="text/javascript">
+    <%# MERGENOTE - whats this? and why use .invoke? (similar later on) %>
+    <% project_subscriptions_with_unsubscribed.map(&:project_id).each do |proj_id| %>
+      $$('#subscription<%= proj_id %> input').invoke('disable');
+    <% end %>
 
     var project_subscription = "subscription";
 
@@ -66,6 +70,7 @@
         var new_div = $(new_div_id);
         if (new_div && new_div.style.display == "none") {
             new_div.style.display = "block";
+            new_div.select('input').invoke('enable');
         }
     }
 

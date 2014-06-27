@@ -7,6 +7,7 @@ module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
   include TavernaPlayer::RunsHelper
+  include Recaptcha::ClientHelper
 
 
   def is_front_page?
@@ -491,6 +492,12 @@ module ApplicationHelper
     "Effect.toggle('#{block_id}','slide',{duration:0.5})".html_safe
   end
 
+  def toggle_appear_with_image_javascript block_id
+      toggle_appear_javascript block_id
+      #MERGENOTE - this appears to do nothing, since it returns an empty string
+      ""
+  end
+
   def count_actions(object, actions=nil)
     count = 0
     if actions.nil?
@@ -565,6 +572,19 @@ module ApplicationHelper
     end
   end
 
+  def resource_tab_item_name resource_type,pluralize=true
+    resource_type = resource_type.singularize
+    if resource_type == "Speciman"
+      result = t('biosamples.sample_parent_term')
+    elsif resource_type == "Assay"
+      result = t('assays.assay')
+    else
+      translated_resource_type = translate_resource_type(resource_type)
+      result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
+    end
+    pluralize ? result.pluralize : result
+  end
+
   def internationalized_resource_name resource_type,pluralize=true
     resource_type = resource_type.singularize
     if resource_type == "Speciman"
@@ -608,6 +628,7 @@ module ApplicationHelper
     end
   end
 
+  #MERGENOTE - do these need to be oustide the method, or be defined elsewhere?
   NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
                          Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
                          Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
@@ -618,6 +639,7 @@ module ApplicationHelper
                          Institution=>"You cannot delete this Institution. It might has people associated with it."
   }
 
+  #MERGENOTE - should go in image_helper
   def delete_icon model_item, user
     item_name = text_for_resource model_item
     if model_item.can_delete?(user)
@@ -630,7 +652,7 @@ module ApplicationHelper
     end
   end
 
-
+  #MERGENOTE - should go in image_helper
   def share_icon
     icon = simple_image_tag_for_key('share').html_safe
     html = link_to_remote_redbox(icon + "Share workflow".html_safe,
@@ -638,6 +660,11 @@ module ApplicationHelper
                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();"}
     )
     return html.html_safe
+  end
+  
+  def unable_to_delete_text model_item
+    text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
+    return text.html_safe
   end
 
   #
@@ -680,10 +707,7 @@ module ApplicationHelper
   end
 
 
-  def unable_to_delete_text model_item
-    text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
-    return text.html_safe
-  end
+  
 
   def klass_from_controller controller_name
     controller_name.singularize.camelize.constantize

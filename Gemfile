@@ -53,6 +53,8 @@ gem 'lograge'
 gem 'psych'
 gem 'transaction_isolation'
 
+#MERGENOTE - needed?
+gem 'newrelic_rpm'
 #gem for BiVeS and BudHat
 gem 'bives'
 
@@ -81,8 +83,10 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 
 gem 'passenger'
 gem 'unicorn-rails'
+gem "recaptcha", '0.3.1'
 
-gem 'coveralls', require: false
+#MERGENOTE - needed?
+gem 'rb-readline', '~> 0.4.2'
 
 group :assets do
   gem 'turbo-sprockets-rails3'
@@ -109,6 +113,7 @@ group :test do
   gem "ruby-prof"
   gem "webmock"
   gem 'minitest-reporters','~> 0.14'
+  gem 'coveralls', require: false
 end
 
 group :assets do

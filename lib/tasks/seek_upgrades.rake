@@ -11,6 +11,10 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
+            :update_assay_types_from_ontology,
+            :update_technology_types_from_ontology,
+             :update_top_level_assay_type_titles,
+            :repopulate_missing_publication_book_titles,
             :resynchronise_assay_types,
             :resynchronise_technology_types,
             :remove_invalid_group_memberships,
@@ -142,27 +146,17 @@ namespace :seek do
     Assay.record_timestamps = true
   end
 
-  desc("Some publication authors are associated with seek_authors, but the original authors are still in non_seek_authors")
-  task(:remove_non_seek_authors=>:environment) do
-    #get the publications where the seek_authors are associated but still full non_seek_authors
-    p1 = Publication.all.select{|p| !p.seek_authors.empty?}
-    p2 = Publication.all.select{|p| p.publication_author_orders.size == p.non_seek_authors.size}
-
-    #Improve the matching algorithm to solve the remaining unmatched names
-    (p1&p2).each do |publication|
-      non_seek_authors = publication.non_seek_authors
-      seek_authors = publication.seek_authors
-      non_seek_authors.each do |author|
-
-        #Get author by last name
-        matches = seek_authors.select{|seek_author| seek_author.last_name == author.last_name}
-
-        #If more than one result, filter by first initial
-        if matches.size > 1
-          first_and_last_name_matches = matches.select{|p| p.first_name.at(0).upcase == author.first_name.at(0).upcase}
-
-          if first_and_last_name_matches.size >= 1  #use this result unless it resulted in no matches
-            matches = first_and_last_name_matches
+  desc "repopulate missing book titles for publications"
+    task(:repopulate_missing_publication_book_titles => :environment) do
+      disable_authorization_checks do
+        Publication.all.select { |p| p.publication_type ==3 && p.journal.blank? }.each do |pub|
+          if pub.doi
+            query = DoiQuery.new(Seek::Config.crossref_api_email)
+            result = query.fetch(pub.doi)
+            unless result.nil? || !result.error.nil?
+              pub.extract_doi_metadata(result)
+              pub.save
+            end
           end
         end
 

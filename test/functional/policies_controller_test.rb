@@ -83,23 +83,24 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should show notice message when an item is requested to be published' do
-      gatekeeper = Factory(:gatekeeper)
-      sop = Factory(:sop)
-      login_as(sop.contributor)
-      post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
-
-      assert_select "p",:text=>"(An email will be sent to the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>1
+    gatekeeper = Factory(:gatekeeper)
+    sop = Factory(:sop,:project_ids => gatekeeper.projects.map(&:id))
+    login_as(sop.contributor)
+     post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
+     assert_select "p",:text=>"(An email will be sent to the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>1
   end
+
 
   test 'should show notice message when an item is requested to be published and the request was alread sent by this user' do
     gatekeeper = Factory(:gatekeeper)
-    sop = Factory(:sop)
+    sop = Factory(:sop,:project_ids => gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
     ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
     post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :resource_name => 'sop', :resource_id => sop.id,:project_ids => gatekeeper.projects.first.id.to_s
 
     assert_select "p",:text=>"(You requested the publishing approval from the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", :count=>1
   end
+
 
   test 'should not show notice message when an item can be published right away' do
       post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "true", :resource_name => 'sop', :project_ids => Factory(:project).id.to_s
@@ -128,34 +129,38 @@ class PoliciesControllerTest < ActionController::TestCase
 
         updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(sample, Factory(:project).id.to_s)
         assert updated_can_publish_immediately
-    end
+  end
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
-    gatekeeper = Factory(:gatekeeper)
-    a_person = Factory(:person)
-    sample = Factory(:sample, :policy => Factory(:policy))
-    Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
-    sample.reload
+    as_not_virtualliver do
+      gatekeeper = Factory(:gatekeeper)
+      a_person = Factory(:person)
+      sample = Factory(:sample, :policy => Factory(:policy))
+      Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
+      sample.reload
 
-    login_as(a_person.user)
-    assert sample.can_manage?
+      login_as(a_person.user)
+      assert sample.can_manage?
 
     updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(sample, gatekeeper.projects.first.id.to_s)
     assert !updated_can_publish_immediately
+    end
   end
 
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
-        gatekeeper = Factory(:gatekeeper)
-        a_person = Factory(:person)
+    as_not_virtualliver do
+      gatekeeper = Factory(:gatekeeper)
+      a_person = Factory(:person)
         sample = Factory(:sample, :policy => Factory(:policy), :project_ids => gatekeeper.projects.collect(&:id))
-        Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
-        sample.reload
+      Factory(:permission, :contributor => a_person, :access_type => Policy::MANAGING, :policy => sample.policy)
+      sample.reload
 
-        login_as(a_person.user)
-        assert sample.can_manage?
+      login_as(a_person.user)
+      assert sample.can_manage?
 
         updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(sample, Factory(:project).id.to_s)
         assert updated_can_publish_immediately
+    end
   end
 
   test 'can publish assay without study' do
@@ -170,16 +175,18 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'can not publish assay having project with gatekeeper' do
-    gatekeeper = Factory(:gatekeeper)
-    a_person = Factory(:person)
-    assay = Assay.new
+    as_not_virtualliver do
+      gatekeeper = Factory(:gatekeeper)
+      a_person = Factory(:person)
+      assay = Assay.new
     assay.study = Factory(:study, :investigation => Factory(:investigation, :project_ids => gatekeeper.projects.collect(&:id)))
 
-    login_as(a_person.user)
-    assert assay.can_manage?
+      login_as(a_person.user)
+      assert assay.can_manage?
 
     updated_can_publish_immediately = PoliciesController.new().updated_can_publish_immediately(assay, assay.study.id.to_s)
     assert !updated_can_publish_immediately
+    end
   end
 
   test 'always can publish for the published item' do

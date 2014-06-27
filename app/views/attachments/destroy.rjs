@@ -1,6 +1,0 @@
-page.hide "attachment_#{@attachment.id.to_s}"
-page.remove "attachment_#{@attachment.id.to_s}"
-page.assign 'multi_selector.max', @allowed
-if @allowed < Seek::Config.max_attachments_num
-  page << "if ($('new_attachment_data').disabled) { $('new_attachment_data').disabled = false };"
-end

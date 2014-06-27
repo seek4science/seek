@@ -40,7 +40,7 @@ class StudyTest < ActiveSupport::TestCase
     study = Factory :study, :contributor => Factory(:person), :investigation => Factory(:investigation, :projects => project_member.projects)
     assert !study.can_delete?(Factory(:user))
     assert !study.can_delete?(project_member.user)
-    assert study.can_delete?(study.contributor)
+    assert study.can_delete?(study.contributor.user)
 
     study=Factory :study, :contributor => Factory(:person), :assays => [Factory(:assay)]
     assert !study.can_delete?(study.contributor)
@@ -104,7 +104,7 @@ class StudyTest < ActiveSupport::TestCase
   
 
   test "validation" do
-    s=Study.new(:title=>"title",:investigation=>investigations(:metabolomics_investigation))
+    s=Study.new(:title=>"title",:investigation=>investigations(:metabolomics_investigation), :policy => Factory(:private_policy))
     assert s.valid?
 
     s.title=nil

@@ -41,7 +41,7 @@
 
     <div>
       <p>
-        <label>Person responsible:</label>
+        <label>Contributor:</label>
         <% if @study.person_responsible.try :can_view? -%>
           <%= link_to @study.person_responsible.name,@study.person_responsible %>
         <% else -%>
@@ -53,14 +53,11 @@
       <b>Experimentalists:</b>
       <%= text_or_not_specified(@study.experimentalists) %>
     </p>
-    <% if show_scales? -%>
-        <%= render :partial=>"scales/asset_scales_list",:object=>@study -%>
-    <% end %>
 
   </div>
   </div>
 
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => [@study.contributing_user.try(:person)] } %>
+<%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => [@study.contributing_user.try(:person)] } %>
 
   <div style="clear:both">
     <%= render :partial=>"general/isa_graph", :locals => {:root_item => @study.investigation, :current_item => @study, :deep => false} %>

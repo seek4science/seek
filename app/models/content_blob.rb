@@ -31,9 +31,12 @@ class ContentBlob < ActiveRecord::Base
 
   before_save :check_version
 
+  #is_webpage: whether text/html
+  #external_link: true means no local copy, false means local copy. Set true by default on upload page.
   before_create :check_url_content_type
 
   has_many :worksheets, :dependent => :destroy
+
 
   validate :original_filename_or_url
 

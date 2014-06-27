@@ -1,8 +1,11 @@
 require 'rubygems'
 require 'rake'
+require 'time'
 require 'active_record/fixtures'
 
 
+
+require 'csv'
 
 namespace :seek do
 
@@ -31,6 +34,13 @@ namespace :seek do
     end
   end
 
+  task(:tissue_and_cell_types=>:environment) do
+    revert_fixtures_identify
+    TissueAndCellType.delete_all
+    Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "tissue_and_cell_types")
+  end
+
+
   desc "Create rebranded default help documents"
   task :rebrand_help_docs => :environment do
     template = ERB.new File.new("config/rebrand/help_documents.erb").read, nil, "%"
@@ -43,12 +53,12 @@ namespace :seek do
     skip_tags = []
     tags.each do |tag|
       unless skip_tags.include? tag
-        matching = tags.select{|t| t.name.downcase.strip == tag.name.downcase.strip && t.id != tag.id}
+        matching = tags.select { |t| t.name.downcase.strip == tag.name.downcase.strip && t.id != tag.id }
         unless matching.empty?
           matching.each do |m|
             puts "#{m.name}(#{m.id}) - #{tag.name}(#{tag.id})"
             m.taggings.each do |tagging|
-              unless tag.taggings.detect{|t| t.context==tagging.context && t.taggable==tagging.taggable}
+              unless tag.taggings.detect { |t| t.context==tagging.context && t.taggable==tagging.taggable }
                 puts "Updating tagging #{tagging.id} to point to #{tag.name}:#{tag.id}"
                 tagging.tag = tag
                 tagging.save!
@@ -58,7 +68,7 @@ namespace :seek do
               end
             end
             m.delete
-            skip_tags << m  
+            skip_tags << m
           end
         end
       end
@@ -75,14 +85,101 @@ namespace :seek do
   desc "Replace Sysmo specific files with rebranded alternatives"
   task :rebrand => [:rebrand_help_docs, :rebrand_layouts]
 
+  desc "projects hierarchies only for existing Virtual Liver SEEK projects "
+  task :projects_hierarchies =>:environment do
+    root = Project.find_by_name "Virtual Liver"
+
+    irreg_projects = [
+        ctu = Project.find_by_name("CTUs"),
+        show_case = Project.find_by_name("Show cases"),
+        project_mt = Project.find_by_name("Project Management"),
+        interleukin = Project.find_by_name("Interleukin-6 signalling"),
+        pals = Project.find_by_name("PALs Team"),
+        hepatosys = Project.find_by_name("HepatoSys")
+    ].compact
+
+    #root as parent
+    reg_projects = Project.find(:all, :conditions=>["name REGEXP?", "^[A-Z][:]"])
+    (irreg_projects + reg_projects).each do |proj|
+      proj.parent = root
+      puts "#{proj.name} |has parent|  #{root.name}"
+      proj.save!
+    end
+
+    #ctus
+    sub_ctus = Project.find(:all, :conditions=>["name REGEXP?", "^CTU[^s]"])
+    sub_ctus.each do |proj|
+      if ctu
+        proj.parent = ctu
+        puts "#{proj.name} |has parent|  #{ctu.name}"
+        proj.save!
+      end
+    end
+    #show cases
+    ["Showcase HGF and Regeneration", "Showcase LPS and Inflammation", "Showcase Steatosis", "Showcase LIAM (Liver Image Analysis Based Model)"].each do |name|
+      proj = Project.find_by_name name
+      if proj and show_case
+        proj.parent = show_case
+        puts "#{proj.name} |has parent| #{show_case.name}"
+        proj.save!
+      else
+        puts "Project #{name} or #{show_case.name} not found!"
+      end
+    end
+    #project management
+    ["Admin:Administration",
+     "PtJ",
+     "Virtual Liver Management Team",
+     "Virtual Liver Scientific Advisory Board"].each do |name|
+      proj = Project.find_by_name name
+      if proj and project_mt
+        proj.parent = project_mt
+        puts "#{proj.name} |has parent| #{project_mt.name}"
+        proj.save!
+      else
+        puts "Project #{name} or #{project_mt.name} not found!"
+      end
+    end
+    #set parents for children of A-G,e.g.A,A1,A1.1
+    reg_projects.each do |proj|
+      init_char = proj.name[0].chr
+      Project.find(:all, :conditions=>["name REGEXP?", "^#{init_char}[0-9][^.]"]).each do |sub_proj|
+        if sub_proj
+          sub_proj.parent = proj
+          puts "#{sub_proj.name} |has parent| #{proj.name}"
+          sub_proj.save!
+          num = sub_proj.name[1].chr # get the second char of the name
+          Project.find(:all, :conditions=>["name REGEXP?", "^#{init_char}[#{num}][.]"]).each { |sub_sub_proj|
+            if sub_sub_proj
+              sub_sub_proj.parent = sub_proj
+              puts "#{sub_sub_proj.name} |has parent| #{sub_proj.name}"
+              sub_sub_proj.save!
+            end
+          }
+        end
+      end
+    end
+
+    ######update work groups##############
+    puts "update work groups,it may take some time..."
+    disable_authorization_checks do
+      Project.all.each do |proj|
+        proj.institutions.each do |i|
+          proj.parent.institutions << i unless proj.parent.nil? || proj.parent.institutions.include?(i)
+        end
+      end
+    end
+
+  end
+
   private
 
   desc "Subscribes users to the items they would normally be subscribed to by default"
   #Run this after the subscriptions, and all subscribable classes have had their tables created by migrations
   #You can also run it any time you want to force everyone to subscribe to something they would be subscribed to by default
   task :create_default_subscriptions => :environment do
-    People.each do |p|
-      p.set_default_subscriptions
+    Person.all.each do |p|
+      set_default_subscriptions  p
       disable_authorization_checks {p.save(:validate=>false)}
     end
   end
@@ -119,7 +216,6 @@ namespace :seek do
       puts "inserted #{count} records for #{type.name}"
       GC.start
     end
-
   end
 
   desc "Creates background jobs to reindex all searchable things"
@@ -167,4 +263,62 @@ namespace :seek do
     FileUtils.rm_r(Dir["#{Seek::Config.temporary_filestore_path}/*"])
   end
 
+  
+  desc "warm authorization memcache"
+  task :warm_memcache=> :environment do
+    klasses = Seek::Util.persistent_classes.select { |klass| klass.reflect_on_association(:policy) }.reject { |klass| klass.name == 'Permission' || klass.name.match(/::Version$/) }
+    items = klasses.map(&:all).flatten
+    users = User.all.select(&:person)
+    actions = Acts::Authorized::AUTHORIZATION_ACTIONS.map {|a| "can_#{a}?"}
+
+    Rails.logger.silence do
+      items.product(users).each do |i, u|
+        actions.each do |a|
+          i.send a, u
+        end
+      end
+    end
+  end
+
+  desc "dump policy authorization caching"
+  task :dump_policy_authorization_caching, [:filename] => :environment do |t, args|
+    filename = args[:filename] ? args[:filename].to_s : 'cache_dump.yaml'
+
+    klasses = Seek::Util.persistent_classes.select { |klass| klass.reflect_on_association(:policy) }.reject { |klass| klass.name == 'Permission' || klass.name.match(/::Version$/) }
+    items = klasses.map(&:all).flatten.map(&:cache_key)
+    people = User.all.map(&:person).compact.map(&:cache_key)
+    actions = Acts::Authorized::AUTHORIZATION_ACTIONS.map {|action| "can_#{action}?"}
+    auth_keys = people.product(actions, items).map(&:to_s)
+    auth_hash = {}
+    auth_keys.each_slice(150000) {|keys| auth_hash.merge! Rails.cache.read_multi(*keys)}
+    puts "Printing"
+    File.open(filename, 'w') do |f|
+      f.print(YAML::dump(auth_hash))
+    end
+  end
+
+
+  desc "load policy authorization caching"
+  task :load_policy_authorization_caching,[:filename] => :environment do |t,args|
+    filename = args[:filename] ? args[:filename].to_s : 'cache_dump.yaml'
+    YAML.load(File.read(filename.to_s)).each_pair {|k,v| Rails.cache.write(k,v)}
+  end
+
+
+  def set_projects_parent array, parent
+    array.each do |proj|
+      unless proj.nil?
+        proj.parent = parent
+        proj.save!
+      end
+
+    end
+  end
+  def set_default_subscriptions person
+    person.projects.each do |proj|
+      person.project_subscriptions.build :project => proj
+    end
+  end
+
 end
+

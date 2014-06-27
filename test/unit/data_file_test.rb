@@ -87,23 +87,25 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    asset=DataFile.new :title=>"fred",:projects=>[projects(:sysmo_project)]
+    asset=DataFile.new :title=>"fred",:projects=>[projects(:sysmo_project)], :policy => Factory(:private_policy)
     assert asset.valid?
 
-    asset=DataFile.new :projects=>[projects(:sysmo_project)]
+    asset=DataFile.new :projects=>[projects(:sysmo_project)], :policy => Factory(:private_policy)
     assert !asset.valid?
 
-    asset=DataFile.new :title=>"fred"
-    assert !asset.valid?
+    #VL only:allow no projects
+    asset=DataFile.new :title=>"fred", :policy => Factory(:private_policy)
+    assert asset.valid?
 
-    asset = DataFile.new :title => "fred", :projects => []
-    assert !asset.valid?
+
+    asset = DataFile.new :title => "fred", :projects => [], :policy => Factory(:private_policy)
+    assert asset.valid?
   end
 
   test "version created on save" do
     User.current_user = Factory(:user)
-    df = DataFile.new(:title=>"testing versions",:projects=>[Factory(:project)])
-    assert df.valid?
+    df = DataFile.new(:title=>"testing versions",:projects=>[Factory(:project)],:policy => Factory(:private_policy))
+    assert_equal true,  df.valid?
     df.save!
     df = DataFile.find(df.id)
     assert_equal 1, df.version
@@ -129,18 +131,18 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal [p],df.latest_version.projects
   end
 
-  def test_defaults_to_private_policy
+  def test_defaults_to_blank_policy
     df_hash = Factory.attributes_for(:data_file)
     df_hash[:policy] = nil
     df=DataFile.new(df_hash)
-    df.save!
-    df.reload
-    assert_not_nil df.policy
-    assert_equal Policy::PRIVATE, df.policy.sharing_scope
-    assert_equal Policy::NO_ACCESS, df.policy.access_type
+
+    assert !df.valid?
+    assert !df.policy.valid?
+    assert_blank df.policy.sharing_scope
+    assert_blank df.policy.access_type
     assert_equal false,df.policy.use_whitelist
     assert_equal false,df.policy.use_blacklist
-    assert df.policy.permissions.empty?
+    assert_blank df.policy.permissions
   end
 
   test "data_file with no contributor" do
@@ -255,7 +257,7 @@ class DataFileTest < ActiveSupport::TestCase
   test "to rdf" do
     df=Factory :data_file, :assay_ids=>[Factory(:assay,:technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type").id,Factory(:assay).id]
     pub = Factory :publication
-    Factory :relationship,:subject=>df,:predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
+    Factory :relationship, :subject => df, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object => pub
     df.reload
     rdf = df.to_rdf
     assert_not_nil rdf
@@ -263,7 +265,135 @@ class DataFileTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 0
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+
     end
+  end
+
+  test "convert to presentation" do
+      user = Factory :user
+      attribution_df = Factory :data_file
+      User.with_current_user(user) {
+        data_file = Factory :data_file,:contributor=>user,:version=>2,
+                            :assay_ids=>[Factory(:modelling_assay).id,Factory(:experimental_assay).id]
+        Factory :content_blob,:asset=>data_file
+        Factory :attribution,:subject=>data_file,:other_object=>attribution_df
+        Factory :relationship,:subject=>data_file,:other_object=>Factory(:publication),:predicate=>Relationship::RELATED_TO_PUBLICATION
+        data_file.creators = [Factory(:person),Factory(:person)]
+        #tag
+        Factory :annotation,:attribute_name=>"tag",:annotatable=> data_file,:attribute_id => AnnotationAttribute.create(:name=>"tag").id
+        data_file.events = [Factory(:event)]
+        data_file.scales = [Factory(:scale)]
+        data_file.save!
+
+        data_file.reload
+
+        #I want to compare data_file.creators & assays to data_file_converted.creators & assays later. If I don't load data_file.creators & assays now,
+        #then it will try to load them when I do the comparison. Since that will be [] after I've updated the database from converting.
+        #to avoid this, I will preload creators & assays (which are through_associations) now.
+        through_associations_to_test_later = [:creators, :assays]
+        through_associations_to_test_later.each {|a| data_file.send(a).send(:load_target)}
+
+        #tags ans scales stored in annotations
+        data_file_tag_text_array = data_file.annotations.with_attribute_name("tag").include_values.collect{|a| a.value.text}
+        data_file_scales =  data_file.scales.map(&:text)
+        presentation = Factory.build :presentation,:contributor=>user
+
+        data_file_converted = data_file.to_presentation
+        data_file_converted = data_file_converted.reload
+
+
+        assert_equal presentation.class.name, data_file_converted.class.name
+        assert_equal presentation.attributes.keys.sort!, data_file_converted.attributes.keys.sort!
+
+        #data_file.reload
+        #data file still has some associations that are assigned to data_file_converted, as it is NOT reloaded
+        assert_equal data_file.version, data_file_converted.version
+        assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
+        assert_equal data_file.policy.access_type, data_file_converted.policy.access_type
+        assert_equal data_file.policy.use_whitelist, data_file_converted.policy.use_whitelist
+        assert_equal data_file.policy.use_blacklist, data_file_converted.policy.use_blacklist
+        assert_equal data_file.policy.permissions, data_file_converted.policy.permissions
+        assert data_file.policy.id != data_file_converted.policy.id
+        assert_equal data_file.content_blob, data_file_converted.content_blob
+
+        assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
+        assert_equal data_file.projects,data_file_converted.projects
+        assert_equal data_file.attributions , data_file_converted.attributions
+        assert_equal data_file.related_publications, data_file_converted.related_publications
+        assert_equal data_file.creators, data_file_converted.creators
+        assert_equal data_file_tag_text_array, data_file_converted.annotations.with_attribute_name("tag").include_values.collect{|a| a.value.text}
+        assert_equal data_file.project_ids,data_file_converted.project_ids
+        assert_equal data_file.assays,data_file_converted.assays
+        assert_equal data_file.event_ids, data_file_converted.event_ids
+        assert_equal data_file_scales, data_file_converted.scales.map(&:text)
+        #assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
+
+      }
+    end
+  test "convert to presentation when linked to project folder" do
+    user = Factory :user
+    project = user.person.projects.first
+    User.with_current_user(user) do
+      project_folder = Factory :project_folder,:project=>project
+      data_file = Factory :data_file,:contributor=>user, :projects=>[project]
+      pfa=ProjectFolderAsset.create :asset=>data_file,:project_folder=>project_folder
+
+      data_file.reload
+      assert_equal [project_folder],data_file.folders
+      presentation = Factory.build :presentation,:contributor=>user
+      data_file_converted = data_file.to_presentation
+
+      data_file_converted.save!
+      assert_equal [project_folder],data_file_converted.folders
+    end
+  end
+
+  test 'should convert tag from datafile to presentation' do
+      user = Factory :user
+      User.with_current_user(user) {
+        data_file = Factory :data_file,:contributor=>user
+        Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
+
+        assert_equal 1, data_file.annotations.count
+        assert_equal 0, data_file.annotations.first.versions.count
+        assert 'fish', data_file.annotations.first.value.text
+
+        data_file_converted = data_file.to_presentation
+        data_file_converted.reload
+        data_file.reload
+
+        assert_equal [], data_file.annotations
+        assert_equal [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
+        assert_equal 1, data_file_converted.annotations.count
+        assert_equal 0, data_file_converted.annotations.first.versions.count
+        assert 'fish', data_file_converted.annotations.first.value.text
+      }
+  end
+
+  test 'should not convert other annotation types but tag from datafile to presentation' do
+      user = Factory :user
+      User.with_current_user(user) {
+        data_file = Factory :data_file,:contributor=>user
+       tag =  Factory :tag,:annotatable=>data_file,:source=>user,:value=>"fish"
+       annotation =  Factory :annotation, :annotatable => data_file, :source=>user,:value=>"cat"
+
+        assert_equal 2, data_file.annotations.count
+        assert_equal 0, data_file.annotations.first.versions.count
+        assert_equal 0, data_file.annotations.last.versions.count
+        assert data_file.annotations.collect(&:value).collect(&:text).include?('fish')
+        assert data_file.annotations.collect(&:value).collect(&:text).include?('cat')
+
+        data_file_converted = data_file.to_presentation
+        data_file_converted.reload
+        data_file.reload
+
+        assert_equal [annotation], data_file.annotations
+        assert_equal [tag], data_file_converted.annotations
+        assert_equal [], Annotation::Version.find(:all, :conditions => ['annotatable_type=? and annotatable_id=?', 'DataFile', data_file.id])
+        assert_equal 1, data_file_converted.annotations.count
+        assert_equal 0, data_file_converted.annotations.first.versions.count
+        assert 'fish', data_file_converted.annotations.first.value.text
+      }
   end
 
   test "fs_search_fields" do
@@ -329,8 +459,7 @@ class DataFileTest < ActiveSupport::TestCase
         assert_equal 0,df.treatments.values.keys.count
       end
   end
-
-  test "cache_remote_content" do
+ test "cache_remote_content" do
     user = Factory :user
     User.with_current_user(user) do
       mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://mockedlocation.com/picture.png"
@@ -347,6 +476,91 @@ class DataFileTest < ActiveSupport::TestCase
     end
 
 
+  end
+
+=begin
+  test "populate samples database with parser" do
+    user = Factory :user
+    User.with_current_user user do
+      #clean sample database
+      disable_authorization_checks do
+        Unit.destroy_all
+        Treatment.destroy_all
+        Sample.destroy_all
+        Specimen.destroy_all
+        DataFile.destroy_all
+        DataFile::Version.destroy_all
+        AssayAsset.destroy_all
+        Assay.destroy_all
+        Study.destroy_all
+        Investigation.destroy_all
+      end
+
+       #create creator in the database
+      creator = Factory :person, :first_name => "Tester", :last_name => "SEEK", :email => "SEEK.tester@test.com"
+      Factory :user, :person_id => creator.id
+
+      filepath =  "#{Rails.root}/test/fixtures/files/parser/jenage-excel_template.xlsm"
+      filename =  "jenage-excel_template"
+      content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+      data_file, assay, bio_samples = data_file_with_sample_parser filepath,filename,content_type
+      assert data_file.is_excel?
+      assert data_file.is_extractable_spreadsheet?
+      assert_not_nil bio_samples
+      assert_not_nil assay
+      assert_equal true, data_file.assays.include?(assay)
+      assay.samples.each{|s|assert_equal true, Sample.all.include?(s)}
+      assert_equal false, bio_samples.instance_values["specimen_names"].blank?
+      assert_equal false, bio_samples.instance_values["treatments"].blank?
+      assert_equal false, bio_samples.instance_values["rna_extractions"].blank?
+      assert_equal true, bio_samples.instance_values["sequencing"].blank?
+
+      #test data file with empty cells which return nil in the parsed xml
+      filepath =  "#{Rails.root}/test/fixtures/files/parser/error.xlsx"
+      filename =  "error"
+      content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+      data_file, assay, bio_samples = data_file_with_sample_parser filepath,filename,content_type
+      assert data_file.is_excel?
+      assert data_file.is_extractable_spreadsheet?
+      assert_not_nil bio_samples
+      assert_not_nil assay
+      assert_equal true, data_file.assays.include?(assay)
+      assay.samples.each{|s|assert_equal true, Sample.all.include?(s)}
+      assert_equal false, bio_samples.instance_values["specimen_names"].blank?
+      assert_equal false, bio_samples.instance_values["treatments"].blank?
+      assert_equal false, bio_samples.instance_values["rna_extractions"].blank?
+      assert_equal true, bio_samples.instance_values["sequencing"].blank?
+
+    end
+  end
+=end
+
+  private
+
+  def data_file_with_sample_parser filepath,filename,content_type
+      user = User.current_user
+      data=File.new("#{filepath}","rb").read
+      df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data,:content_type=>content_type,:original_filename=>filename)
+      xml = df.spreadsheet_xml
+      doc = LibXML::XML::Parser.string(xml).parse
+      doc.root.namespaces.default_prefix = "ss"
+      template_sheet = doc.find_first("//ss:sheet[@name='IDF']")
+
+      bio_samples =  df.bio_samples_population
+
+      assay_type_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Class"
+      study_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Description"
+
+      study = Study.find_by_title_and_contributor_id study_title, user.id
+      assay_title = filename
+      assay_class = AssayClass.find_by_title("Experimental Assay")
+      assay_type = AssayType.find_by_title(assay_type_title)
+      assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == user.person.id}
+
+
+      return df, assay, bio_samples
   end
 
 end

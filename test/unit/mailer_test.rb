@@ -206,7 +206,7 @@ class MailerTest < ActionMailer::TestCase
 
   test "contact_admin_new_user_no_profile" do
     @expected.subject = 'SEEK member signed up'
-    @expected.to = "Quentin Jones <quentin@email.com>"
+    @expected.to =  "Quentin Jones <quentin@email.com>"
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 

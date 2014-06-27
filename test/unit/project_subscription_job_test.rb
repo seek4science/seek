@@ -48,11 +48,11 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
   test "all_in_project" do
     project = Factory(:project)
     ps = Factory(:project_subscription, :project => project)
-    assets = ProjectSubscriptionJob.new.all_in_project ps
+    assets = ProjectSubscriptionJob.new.all_in_project project
     assert assets.empty?
 
     #create items for project
-    ps.subscribable_types.reject{|t| t=='Assay' || t=='Study'}.each do |type|
+    ps.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study'}.each do |type|
       Factory("#{type.underscore.gsub('/','_')}", :projects => [project])
     end
     project.reload
@@ -61,7 +61,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     #assay
     Factory(:assay, :study => study)
 
-    assets = ProjectSubscriptionJob.new.all_in_project ps
+    assets = ProjectSubscriptionJob.new.all_in_project project
     assert_equal ps.subscribable_types.count, assets.count
   end
 

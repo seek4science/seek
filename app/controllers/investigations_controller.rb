@@ -28,7 +28,7 @@ class InvestigationsController < ApplicationController
 
   end
 
-  def destroy    
+  def destroy
     @investigation.destroy
 
     respond_to do |format|

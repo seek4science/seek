@@ -29,7 +29,7 @@ class SessionsController < ApplicationController
       open_id_authentication
     else      
       password_authentication
-    end   
+    end
   end
 
   def destroy    
@@ -111,10 +111,10 @@ class SessionsController < ApplicationController
           return_to_url = session[:return_to]
         end
       end
-      
-      format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == root_url || return_to_url.normalize_trailing_slash == search_url.normalize_trailing_slash) ? redirect_to(root_url) : redirect_to(return_to_url) }
+      format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == root_url || return_to_url.normalize_trailing_slash == search_url.normalize_trailing_slash) ? redirect_to(root_url) : redirect_back_or_default(return_to_url) }
       format.xml {session[:xml_login] = true; head :ok }
     end
+    clear_return_to
   end
 
   def failed_login(message)

@@ -1,0 +1,3 @@
+page << '$$("div#RB_redbox div.head span")[0].textContent = "Edit technology type"'
+page.replace_html :new_suggested_technology_type_form, :partial => "form", :locals=> {:action=> :edit_popup}
+page[:suggested_technology_type_label].focus

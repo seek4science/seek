@@ -7,9 +7,60 @@ copasi:
 matlab:
   title: Matlab
 
-flame:
-  title: FLAME
+celldesigner:
+  title: CellDesigner (SBML ODE Solver)
 
-jade:
-  title: JADE
+SBTOOLBOX2:
+  title: Systems Biology Toolbox 2
+
+VCELL:
+  title: Virtual Cell
+
+Jarnac:
+  title: Jarnac (Systems Biology Workbench)
+
+roadrunner:
+  title: roadrunner (Systems Biology Workbench)
+
+PottersWheel:
+  title: PottersWheel
+
+CellNetAnalyzer:
+  title: CellNetAnalyzer
+
+insilico discovery:
+  title: Insilico Discovery
+
+CPLEX:
+  title: CPLEX Interactive Optimizer
+
+PySCeS:
+  title: Python Simulator for Cellular Systems (PySCeS)
+
+PathwayLab:
+  title: PathwayLab
+
+Gromacs:
+  title: Gromacs
+
+XPPAUT:
+  title: XPP-Aut
+
+AUTO2000:
+  title: AUTO2000
+
+CellSys:
+  title: CellSys
+
+Mathematica:
+  title: Mathematica
+
+MeVisLab:
+  title: MeVisLab
+
+MoBi:
+  title: MoBi
+
+PKSim:
+  title: PK-Sim
 

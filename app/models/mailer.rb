@@ -130,7 +130,7 @@ class Mailer < ActionMailer::Base
     @user = user
     @host = base_host
     mail(:from=>Seek::Config.noreply_sender,
-         :to=>admin_emails,
+          :to=> admin_emails,
          :reply_to=>user.person.email_with_name,
          :subject=>"#{Seek::Config.application_name} member signed up")
 

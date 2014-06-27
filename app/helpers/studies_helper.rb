@@ -25,7 +25,7 @@ module StudiesHelper
     studies=studies.sort{|a,b| a.title<=>b.title} if sorted
     studies.each do |study|
       if study.can_view?
-        result += link_to study.title.capitalize,study
+        result += link_to study.title.capitalize, study
       else
         result += hidden_items_html [study]
       end

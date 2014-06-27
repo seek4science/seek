@@ -69,6 +69,16 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
       SendAnnouncementEmailsJob.new(site_announcement.id, first_id).perform
     end
   end
+
+  test "should handle deleted notifiee person" do
+    person = Person.with_group.select{|p| p.notifiee_info.try :receive_notifications?}.first
+    if person
+      person.delete
+      assert_emails(NotifieeInfo.find(:all, :conditions=>["receive_notifications=?",true]).count - 1) do
+        post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
+      end
+    end
+  end
   
   test "should not destroy" do
     ann = Factory(:feed_announcement)
@@ -141,7 +151,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     assert !SiteAnnouncement.all.select(&:is_headline).empty?
     get :index
     assert_response :success
-    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => "a headline announcement", :count => 1
+    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => /a headline announcement/, :count => 1
   end
 
   test "should only show feeds when feed_only passed" do

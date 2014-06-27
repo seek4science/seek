@@ -90,12 +90,14 @@ class SamplesController < ApplicationController
       end
       #add policy to specimen
       @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-      #get SOPs
+      #get specimen SOPs
       specimen_sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
       #add creators
       AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
       @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
     end
+
+    tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
 
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
 
@@ -109,6 +111,10 @@ class SamplesController < ApplicationController
         deliver_request_publish_approval [@sample.specimen]
       end
 
+        tissue_and_cell_types.each do |t|
+          t_id, t_title = t.split(",")
+          @sample.associate_tissue_and_cell_type(t_id, t_title)
+        end if @sample.respond_to?(:tissue_and_cell_types)
       @sample.create_or_update_assets data_file_ids, "DataFile"
       @sample.create_or_update_assets model_ids, "Model"
       @sample.create_or_update_assets sop_ids, "Sop"
@@ -141,11 +147,23 @@ class SamplesController < ApplicationController
     model_ids = (params[:sample_model_ids].nil? ? [] : params[:sample_model_ids].reject(&:blank?)) || []
     sop_ids = (params[:sample_sop_ids].nil? ? [] : params[:sample_sop_ids].reject(&:blank?)) || []
     @sample.attributes = params[:sample]
+      tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
+
     #update policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
 
 
       if @sample.save
+        #TODO CONFIG improve configurability. Configuration currently is deduced from other parameters
+        if tissue_and_cell_types.blank?
+          @sample.tissue_and_cell_types= tissue_and_cell_types
+          @sample.save
+        else
+          tissue_and_cell_types.each do |t|
+          t_id, t_title = t.split(",")
+          @sample.associate_tissue_and_cell_type(t_id, t_title)
+          end
+        end
           @sample.create_or_update_assets data_file_ids,"DataFile"
           @sample.create_or_update_assets model_ids,"Model"
           @sample.create_or_update_assets sop_ids,"Sop"

@@ -1,0 +1,46 @@
+<% options = (action == :new_popup || action == :edit_popup) ? {:remote=> true} : {}%>
+
+<%= form_for @suggested_assay_type, options do |f| %>
+    <div id="error_explanation">
+      <ul>
+        <% @suggested_assay_type.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+<%= f.hidden_field :is_for_modelling%>
+<%= f.hidden_field :link_from%>
+
+<center>
+  <div style="width: 60%;">
+
+    <p>
+      <%= f.label :label-%>*<br/>
+      <%= f.text_field :label,{:style=>"width: 100%"} -%>
+    </p>
+
+    <p>
+         <%= f.label "Parent" -%><br/>
+         <span style="color: #666666;"> Select parent</span><br/>
+     <%= ontology_selection_list type, "suggested_assay_type[parent_uri]",
+                                 @suggested_assay_type.parent_uri,
+                                 ([@suggested_assay_type] + @suggested_assay_type.children).map(&:uri),
+                                 {:style=>"width:100%",
+                                  :onchange=> remote_function(
+                                         :method => "put",
+                                         :url=> set_is_modelling_suggested_assay_types_path,
+                                         :with=> "'uri=' + this.value",
+                                 )}  %>
+    </p>
+  </div>
+</center>
+<div align="center" style="margin-top: 1.5em">
+  <% submit_btn_title = action==:edit || action==:edit_popup ? "Update" : "Create"
+     submit_btn_name = action==:new_popup || action==:edit_popup ? "commit_popup" : "commit"
+     cancel_link = action==:new_popup || action==:edit_popup ?  link_to_function("Cancel",  "RedBox.close()") :  link_to("Cancel", manage_suggested_assay_types_path)
+  %>
+  <%= f.submit(submit_btn_title, :name => submit_btn_name) -%>
+  or <%= cancel_link %>
+</div>
+
+<% end -%>

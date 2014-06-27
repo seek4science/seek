@@ -18,6 +18,7 @@ class ModelsController < ApplicationController
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
 
+  before_filter :experimental_features, :only=>[:matching_data]
   before_filter :find_other_version,:only=>[:compare_versions]
 
   include Seek::Publishing::PublishingCommon
@@ -227,7 +228,6 @@ class ModelsController < ApplicationController
     elsif !@model.can_download? && (params[:code].nil? || (params[:code] && !@model.auth_by_code?(params[:code])))
       error_message = "You are not allowed to simulate this #{t('model')} with Sycamore"
     end
-
     render :update do |page|
       if error_message.blank?
         page['sbml_model'].value = IO.read(@display_model.sbml_content_blobs.first.filepath).gsub(/\n/, '')
@@ -516,6 +516,13 @@ class ModelsController < ApplicationController
 
 
   protected
+
+  def experimental_features
+    if !Seek::Config.experimental_features_enabled
+      flash[:error]="Not available"
+      redirect_to @model
+    end
+  end
   
   def create_new_version comments
     if @model.save_as_new_version(comments)
@@ -542,18 +549,18 @@ class ModelsController < ApplicationController
     end
   end
 
-   def build_model_image model_object, params_model_image
-      unless params_model_image.blank? || params_model_image[:image_file].blank?
+ def build_model_image model_object, params_model_image
+   unless params_model_image.blank? || params_model_image[:image_file].blank?
 
-      # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
-      @model_image = ModelImage.new(params_model_image)
-      @model_image.model_id = model_object.id
-      @model_image.content_type = params_model_image[:image_file].content_type
-      @model_image.original_filename = params_model_image[:image_file].original_filename
-      model_object.model_image = @model_image
-    end
-
+     # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
+     @model_image = ModelImage.new(params_model_image)
+     @model_image.model_id = model_object.id
+     @model_image.content_type = params_model_image[:image_file].content_type
+     @model_image.original_filename = params_model_image[:image_file].original_filename
+     model_object.model_image = @model_image
    end
+
+ end
 
     def find_xgmml_doc model
       xgmml_content_blob = model.xgmml_content_blobs.first
@@ -562,11 +569,12 @@ class ModelsController < ApplicationController
       doc
     end
 
-  def create_model_image model_object, params_model_image
-    build_model_image model_object, params_model_image
+ def create_model_image model_object, params_model_image
+   build_model_image model_object, params_model_image
     model_object.save(:validate=>false)
-    latest_version = model_object.latest_version
-    latest_version.model_image_id = model_object.model_image_id
-    latest_version.save
-  end
+   latest_version = model_object.latest_version
+   latest_version.model_image_id = model_object.model_image_id
+   latest_version.save
+ end
+
 end

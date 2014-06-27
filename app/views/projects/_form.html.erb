@@ -18,11 +18,17 @@
 		  <%= f.label "Internal Web page" -%><br />
 		  <%= f.text_field :wiki_page, :class=>"text_entry" -%>
 		</p>
-		
+
 		<p>
 		  <%= f.label :description -%><br/>
 		  <%= f.text_area :description, :class=>"large_text_entry" -%>
 		</p>
+      <% if Project.is_hierarchical? -%>
+      <p>
+        <%= f.label "Parent" -%><br/>
+        <%= tree_single_select_tag Project, "id", @project ? @project.parent : nil, [@project] + @project.descendants, "parent_id" %>
+      </p>
+      <% end -%>
 	</div>
 </div>
 

@@ -1,7 +1,7 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
-  <%= list_item_authorized_attribute "Creator", resource.contributor.try(:person) %>
+  <%= list_item_authorized_attribute "Contributor", resource.contributor.try(:person) %>
   <%= list_item_attribute "Provider Name", text_or_not_specified(resource.provider_name) -%>
   <%= list_item_attribute "Provider's strain ID", text_or_not_specified(resource.provider_id) %>
   <%= list_item_attribute "Organism", organisms_link_list([resource.organism]) -%>

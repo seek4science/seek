@@ -34,7 +34,7 @@
         <p style="margin-top: 0.5em;">
           <b>Template</b>
           <br>
-          <%=  select_tag 'data_file[template_name]', options_for_select(["Autodetect by filename", "Jena", "Duesseldorf_Bode", "Dortmund_Hengstler", "Dortmund_BCat_KO"], "Autodetect by filename") %>
+          <%=  select_tag 'data_file[template_name]', options_for_select(["Autodetect by filename", "Jena", "Duesseldorf_Bode", "Duesseldorf_Bode_Surgical","Dortmund_Hengstler", "Dortmund_BCat_KO"], "Autodetect by filename") %>
         </p>
        <% end %>
         <p style="margin-top: 0.5em;">
@@ -43,14 +43,13 @@
             <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
             <%= text_area_tag 'data_file[description]', data_file_description_value, :class=>"large_text_entry" -%>
         </p>
-        <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file } -%>
+        <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file,:allow_nil=>true } -%>
+      <p>
+        <%= render :partial => "scales/scales_selector",:locals=>{:object=>@data_file} if show_scales?%>
+      </p>
 
-      <% if show_scales? %>
-          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@data_file} %>
-      <% end %>
-
-        <%= fields_for(@data_file) {|f|render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
-
+      <%= fields_for(@data_file) {|f|render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
+      
         <p>
             <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file} -%>
         </p>

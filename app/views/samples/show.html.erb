@@ -28,6 +28,13 @@
         <label>Seek ID:</label>
         <%= text_or_not_specified(@sample.id) %>
       </p>
+
+      <% if Seek::Config.is_virtualliver %>
+      <p>
+        <label>Tissue and cell types:</label>
+        <%= sample_tissue_and_cell_types_list @sample.tissue_and_cell_types -%>
+       </p>
+      <% end %>
       <p>
         <label>Lab internal identifier:</label>
         <%= text_or_not_specified(@sample.lab_internal_number) %>
@@ -36,6 +43,12 @@
         <label>Date at sampling:</label>
         <%= text_or_not_specified @sample.sampling_date.nil? ? nil : date_as_string(@sample.sampling_date) -%>
       </p>
+      <% if Seek::Config.is_virtualliver %>
+          <p>
+            <label>Donation date:</label>
+            <%= text_or_not_specified @sample.donation_date.nil? ? nil : date_as_string(@sample.donation_date.utc) -%>
+          </p>
+      <% end %>
       <p>
         <label>Age at sampling:</label>
         <%= text_or_not_specified @sample.age_at_sampling_info -%>
@@ -61,7 +74,7 @@
 
   </div>
 
-  <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample, :title => 'Owner'} %>
+  <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample, :title => 'Contributor'} %>
 
   <div style="clear:both">
     <br/>
@@ -71,7 +84,7 @@
             <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
         </div>
         <br/>
-        <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen, :title => 'Owner and creators'} %>
+    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen, :title => 'Contributor and creators'} %>
     <% else %>
         <%= hidden_items_html([@sample.specimen], "This item is hidden")  %>
     <% end %>

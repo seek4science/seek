@@ -63,7 +63,7 @@ class StrainsController < ApplicationController
   end
 
   def existing_strains_for_assay_organism
-    if User.current_user
+    if User.current_user && !Seek::Config.is_virtualliver
       #restrict strains to those of that persons project
       projects = User.current_user.person.projects
       @strains = @strains.select{|s| !(s.projects & projects).empty?}

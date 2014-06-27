@@ -1,5 +1,5 @@
 class HomesController < ApplicationController
-  
+
 
   before_filter :redirect_to_sign_up_when_no_user
   before_filter :login_required, :only=>[:feedback,:send_feedback]
@@ -25,21 +25,25 @@ class HomesController < ApplicationController
   end
 
   def send_feedback
-    subject=params[:subject]
-    anon=params[:anon]
-    details=params[:details]
+    @subject=params[:subject]
+    @anon=params[:anon]
+    @details=params[:details]
 
-    anon=anon=="true"
+    @anon=@anon=="true"
 
-    if subject.nil? or details.nil?
+    if @anon.nil? or @anon.nil?
       flash[:error]="You must provide a Subject and details"
       render :action=>:feedback
     else
-      if (Seek::Config.email_enabled)
-        Mailer.feedback(current_user,subject,details,anon,base_host).deliver
+      if ( Seek::Config.recaptcha_enabled ? verify_recaptcha : true) && Seek::Config.email_enabled
+        Mailer.feedback(current_user,@subject,@details,@anon,base_host).deliver
+        flash[:notice]="Your feedback has been delivered. Thank You."
+        redirect_to root_path
+      else
+        flash[:error] = "Your word verification failed to be validated. Please try again."
+        flash[:error] = "SEEK email functionality is not enabled yet" unless Seek::Config.email_enabled
+        render :action=>:feedback
       end
-      flash[:notice]="Your feedback has been delivered. Thank You."
-      redirect_to root_path
     end
   end
 
@@ -70,8 +74,6 @@ class HomesController < ApplicationController
   private
 
   RECENT_SIZE=3
-
- 
 
   def classify_for_tabs result_collection
     #FIXME: this is duplicated in application_helper - but of course you can't call that from within controller

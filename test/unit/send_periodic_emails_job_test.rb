@@ -3,6 +3,7 @@ require 'test_helper'
 class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
   def setup
+    User.current_user = Factory(:user)
     @val = Seek::Config.email_enabled
     Seek::Config.email_enabled=true
     Delayed::Job.delete_all

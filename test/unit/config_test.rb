@@ -23,6 +23,14 @@ class ConfigTest < ActiveSupport::TestCase
     Seek::Config.is_virtualliver = original_value
   end
 
+  test "scales" do
+    assert_equal ["organism","liver","liverLobule","intercellular","cell"],Seek::Config.scales
+  end
+
+  test "seek_video_link" do
+    assert_equal "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u", Seek::Config.seek_video_link
+  end
+
   test "external search" do
     with_config_value :external_search_enabled,true do
       assert Seek::Config.external_search_enabled
@@ -76,6 +84,9 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal true ,Seek::Config.pdf_conversion_enabled
   end
 
+  test "delete asset version enabled" do
+      assert_equal false ,Seek::Config.delete_asset_version_enabled
+      end
   test "forum_enabled" do
     assert_equal false ,Seek::Config.forum_enabled
   end
@@ -217,6 +228,10 @@ class ConfigTest < ActiveSupport::TestCase
   test "limit_latest" do
     assert_equal 7,Seek::Config.limit_latest
   end
+#others
+  test "type_managers" do
+    assert_equal "admins",Seek::Config.type_managers
+  end
 
   test "pubmed_api_email" do
     assert_equal nil,Seek::Config.pubmed_api_email
@@ -270,6 +285,10 @@ class ConfigTest < ActiveSupport::TestCase
 
   test "publish_button_enabled" do
     assert_equal true,Seek::Config.publish_button_enabled
+  end
+
+  test "recaptcha enabled" do
+    assert_equal true, Seek::Config.recaptcha_enabled
   end
 
   test 'propagate bioportal api key' do

@@ -19,15 +19,21 @@ require "attachment_fu_extension"
 require 'seek/taggable'
 require "bio"
 require 'assets_common_extension'
+
+#MERGENOTE - why is this needed for VLN
+require 'acts_as_cached_tree'
+
 require 'sunspot_rails'
 require 'cancan'
 require 'in_place_editing'
 require 'seek/breadcrumbs'
 require 'string_extension'
+require 'seek/project_hierarchies'
+require 'recaptcha'
 require 'acts_as_list'
 require 'acts_as_trashable'
 require 'acts_as_tree'
-#require 'fleximage'
+
 require 'country-select'
 require 'will_paginate'
 require 'piwik_analytics'
@@ -44,6 +50,10 @@ require 'seek/scalable'
 
 require 'taverna_player_callbacks'
 require 'taverna_player_renderers'
+
+#MERGENOTE - what's this?
+require 'doi_query_tool_extension'
+
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
@@ -85,6 +95,8 @@ SEEK::Application.configure do
   Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
   Annotations::Config.versioning_enabled = false
 
+  #MERGENOTE - should not be needed anymore, en.yml handles this
+  CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
   ENV['LANG'] = 'en_US.UTF-8'
 
   begin

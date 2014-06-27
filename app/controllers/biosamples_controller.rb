@@ -218,6 +218,4 @@ class BiosamplesController < ApplicationController
     end
   end
 
-
-
 end

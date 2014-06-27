@@ -13,14 +13,22 @@ class PeopleController < ApplicationController
   before_filter :administerable_by_user, :only => [:admin, :administer_update]
   before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
-
-  skip_before_filter :project_membership_required
+  skip_before_filter :project_membership_required, :only => [:create, :new]
   skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
   skip_after_filter :request_publish_approval,:log_publishing, :only => [:create,:update]
+
+  after_filter :reset_notifications, :only => [:administer_update]
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   include Seek::BreadCrumbs
 
+  def reset_notifications
+    # disable sending notifications for non_project members
+    if !@person.member? && @person.notifiee_info.receive_notifications
+      @person.notifiee_info.receive_notifications = false
+      @person.notifiee_info.save
+    end
+  end
   def auto_complete_for_tools_name
     render :json => Person.tool_counts.map(&:name).to_json
   end
@@ -65,7 +73,7 @@ class PeopleController < ApplicationController
                                             :latest_limit => Seek::Config.limit_latest)
       end
     else
-      @people = @people.select(&:can_view?)
+      @people = @people.select(&:can_view?).reject {|p| p.projects.empty?}
     end
 
     respond_to do |format|
@@ -88,7 +96,6 @@ class PeopleController < ApplicationController
   # GET /people/new.xml
   def new    
     @person = Person.new
-
     respond_to do |format|
       format.html { render :action=>"new" }
       format.xml  { render :xml => @person }
@@ -259,10 +266,14 @@ class PeopleController < ApplicationController
       params["#{param}"] = temp["#{param}"] if temp["#{param}"] and allowed
     end
 
-
     respond_to do |format|
       if @person.update_attributes(params[:person])
         set_roles(@person, params) if User.admin_logged_in?
+        #clear subscriptions for non_project members
+        if @person.projects.empty?
+             @person.project_subscriptions = []
+             @person.subscriptions = []
+        end
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
         if Seek::Config.email_enabled && had_no_projects && !@person.work_groups.empty? && @person != current_user.person
@@ -418,26 +429,26 @@ class PeopleController < ApplicationController
   end
 
   def do_projects_belong_to_project_manager_projects
-    if (params[:person] and params[:person][:work_group_ids])
-      if User.project_manager_logged_in? && !User.admin_logged_in?
-        projects = []
-        params[:person][:work_group_ids].each do |id|
-          work_group = WorkGroup.find_by_id(id)
-          project = work_group.try(:project)
-          projects << project unless project.nil?
-        end
-        project_manager_projects = current_user.person.projects
-        flag = true
-        projects.each do |project|
+      if (params[:person] and params[:person][:work_group_ids])
+        if User.project_manager_logged_in? && !User.admin_logged_in?
+          projects = []
+          params[:person][:work_group_ids].each do |id|
+            work_group = WorkGroup.find_by_id(id)
+            project = work_group.try(:project)
+            projects << project unless project.nil?
+          end
+        project_manager_projects = Project.is_hierarchical?? current_user.person.projects_and_descendants : current_user.person.projects
+          flag = true
+          projects.each do |project|
           unless @person.projects.include?(project) || project.can_be_administered_by?(current_user)
             flag = false
           end
-        end
-        if flag == false
+          end
+          if flag == false
           error("#{t('project')} manager can not assign person to the #{t('project').pluralize} that they are not in","Is invalid")
+          end
+          return flag
         end
-        return flag
-      end
     end
   end
 

@@ -7,7 +7,7 @@ class AssetTest < ActiveSupport::TestCase
 
   test "default contributor or nil" do
     User.current_user = users(:owner_of_my_first_sop)
-    model = Model.new(Factory.attributes_for(:model).tap{|h|h[:contributor] = nil})
+    model = Model.new(Factory.attributes_for(:model).tap{|h|h[:contributor] = nil; h[:policy] = Factory(:private_policy)})
     assert_equal users(:owner_of_my_first_sop),model.contributor
     model.contributor = nil
     model.save!
@@ -73,15 +73,15 @@ class AssetTest < ActiveSupport::TestCase
     assert df.contains_downloadable_items?
     assert df.latest_version.contains_downloadable_items?
 
-    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
     assert !df.contains_downloadable_items?
     assert !df.latest_version.contains_downloadable_items?
 
     Factory.define(:model_with_urls,:parent=>:model) do |f|
       f.after_create do |model|
         model.content_blobs = [
-            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version),
-            Factory.create(:content_blob, :url=>"http://webpage2.com", :asset => model,:asset_version=>model.version)
+            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version, :external_link => true),
+            Factory.create(:content_blob, :url=>"http://webpage2.com", :asset => model,:asset_version=>model.version, :external_link => true)
         ]
       end
     end
@@ -97,7 +97,7 @@ class AssetTest < ActiveSupport::TestCase
     Factory.define(:model_with_urls_and_files,:parent=>:model) do |f|
       f.after_create do |model|
         model.content_blobs = [
-            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version),
+            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version, :external_link => true),
             Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version)
         ]
       end
@@ -119,7 +119,7 @@ class AssetTest < ActiveSupport::TestCase
     disable_authorization_checks do
       model.save_as_new_version
       model.reload
-      model.content_blobs=[Factory.create(:content_blob, :url=>"http://webpage.com",:asset => model,:asset_version=>model.version)]
+      model.content_blobs=[Factory.create(:content_blob, :url=>"http://webpage.com",:asset => model,:asset_version=>model.version,:external_link=>true)]
       model.save!
       model.reload
     end

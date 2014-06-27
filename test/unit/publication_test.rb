@@ -136,7 +136,7 @@ class PublicationTest < ActiveSupport::TestCase
   test "sort by published_date" do
     assert_equal Publication.find(:all).sort_by { |p| p.published_date}.reverse, Publication.default_order
   end
-  
+
   test "title trimmed" do
     x = Factory :publication, :title => " a pub"
     assert_equal("a pub",x.title)
@@ -157,7 +157,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert !asset.valid?
 
     asset=Publication.new :title=>"fred",:doi=>"111"
-    assert !asset.valid?
+    assert asset.valid?
 
     #cant have both a pubmed and doi
     asset = Publication.new :title=>"bob",:doi=>"777",:projects=>[project]
@@ -177,17 +177,24 @@ class PublicationTest < ActiveSupport::TestCase
     p3=Factory(:person)
     p4=Factory(:person)
 
-    User.with_current_user(p.contributor) do
-      p.creators << p1
-      p.creators << p2
-      p.creators << p3
-      p.creators << p4
 
+    User.with_current_user(p.contributor) do
+
+      if Seek::Config.is_virtualliver
+        [p1,p2,p3,p4].each_with_index do|author, index|
+          p.publication_authors.create :person_id=>author.id, :first_name => author.first_name, :last_name=>author.last_name, :author_index => index
+        end
+      else
+        p.creators << p1
+        p.creators << p2
+        p.creators << p3
+        p.creators << p4
+      end
       p.save!
+      assert_equal 4,p.creators.size
+      assert_equal [p1,p2,p3,p4],p.creators
     end
-    
-    assert_equal 4,p.creators.size
-    assert_equal [p1,p2,p3,p4],p.creators
+
   end
   
   test "uuid doesn't change" do
@@ -198,51 +205,61 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal x.uuid, uuid
   end
   
-  def test_project_required
+  def test_project_not_required
     p=Publication.new(:title=>"blah blah blah",:pubmed_id=>"123")
-    assert !p.valid?
-    p.projects=[projects(:sysmo_project)]
     assert p.valid?
   end
 
-  test 'validate uniqueness of pubmed_id and doi within project only' do
-    project1=Factory :project
-    pub=Publication.new(:title=>"test1",:pubmed_id=>"1234", :projects => [project1])
-    assert pub.valid?
-    assert pub.save
-    pub=Publication.new(:title=>"test2",:pubmed_id=>"1234", :projects => [project1])
-    assert !pub.valid?
+  test 'validate uniqueness of pubmed_id and doi' do
+      project1=Factory :project
+      pub=Publication.new(:title=>"test1",:pubmed_id=>"1234", :projects => [project1])
+      assert pub.valid?
+      assert pub.save
+      pub=Publication.new(:title=>"test2",:pubmed_id=>"1234", :projects => [project1])
+      assert !pub.valid?
 
-    pub=Publication.new(:title=>"test3",:doi=>"1234", :projects => [project1])
-    assert pub.valid?
-    assert pub.save
-    pub=Publication.new(:title=>"test4",:doi=>"1234", :projects => [project1])
-    assert !pub.valid?
+      #unique pubmed_id and doi not only in one project
+      as_virtualliver do
+         pub=Publication.new(:title=>"test2",:pubmed_id=>"1234", :projects => [Factory(:project)])
+         assert !pub.valid?
+      end
 
-    #should be allowed for another project, but only that project on its own
-    project2=Factory :project
-    pub=Publication.new(:title=>"test5",:pubmed_id=>"1234", :projects => [project2])
-    assert pub.valid?
-    pub=Publication.new(:title=>"test5",:pubmed_id=>"1234", :projects => [project1,project2])
-    assert !pub.valid?
+      pub=Publication.new(:title=>"test3",:doi=>"1234", :projects => [project1])
+      assert pub.valid?
+      assert pub.save
+      pub=Publication.new(:title=>"test4",:doi=>"1234", :projects => [project1])
+      assert !pub.valid?
 
-    pub=Publication.new(:title=>"test5",:doi=>"1234", :projects => [project2])
-    assert pub.valid?
-    pub=Publication.new(:title=>"test5",:doi=>"1234", :projects => [project1,project2])
-    assert !pub.valid?
+      as_virtualliver do
+        pub=Publication.new(:title => "test4", :doi => "1234", :projects => [Factory(:project)])
+        assert !pub.valid?
+      end
 
-    #make sure you can edit yourself!
-    p=Factory :publication
-    User.with_current_user p.contributor do
-      p.save!
-      p.abstract="an abstract"
-      assert p.valid?
-      p.save!
-    end
+      #should be allowed for another project, but only that project on its own
+      as_not_virtualliver do
+        project2=Factory :project
+        pub=Publication.new(:title=>"test5",:pubmed_id=>"1234", :projects => [project2])
+        assert pub.valid?
+        pub=Publication.new(:title=>"test5",:pubmed_id=>"1234", :projects => [project1,project2])
+        assert !pub.valid?
 
+        pub=Publication.new(:title=>"test5",:doi=>"1234", :projects => [project2])
+        assert pub.valid?
+        pub=Publication.new(:title=>"test5",:doi=>"1234", :projects => [project1,project2])
+        assert !pub.valid?
+      end
+
+      #make sure you can edit yourself!
+      p=Factory :publication
+      User.with_current_user p.contributor do
+        p.save!
+        p.abstract="an abstract"
+        assert p.valid?
+        p.save!
+      end
   end
 
-  test "validate uniqueness of title in project only" do
+  test "validate uniqueness of title" do
     project1=Factory :project
     pub=Publication.new(:title=>"test1",:pubmed_id=>"1234", :projects => [project1])
     assert pub.valid?
@@ -250,9 +267,15 @@ class PublicationTest < ActiveSupport::TestCase
     pub=Publication.new(:title=>"test1",:pubmed_id=>"33343", :projects => [project1])
     assert !pub.valid?
 
+
     project2=Factory :project
     pub=Publication.new(:title=>"test1",:pubmed_id=>"234", :projects => [project2])
-    assert pub.valid?
+    as_virtualliver do
+      assert !pub.valid?
+    end
+    as_not_virtualliver do
+      assert pub.valid?
+    end
 
     #make sure you can edit yourself!
     p=Factory :publication

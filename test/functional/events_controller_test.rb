@@ -4,6 +4,7 @@ class EventsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include FunctionalAuthorizationTests
+  include SharingFormTestHelper
 
   def setup
     login_as(:datafile_owner)
@@ -56,11 +57,6 @@ class EventsControllerTest < ActionController::TestCase
     assert assigns(:events).count < Event.find(:all).count #fails if all events are assigned to @events
   end
 
-  test "should create hidden event by default" do
-    post :create, :event => valid_event
-    assert !assigns(:event).can_view?(users(:aaron)) #must be a user other than the one you are logged in as
-  end
-
   test "xml for projectless event" do
     id = Factory(:event, :policy => Factory(:public_policy)).id
     get :show, :id => id, :format => "xml"
@@ -88,13 +84,13 @@ class EventsControllerTest < ActionController::TestCase
   test "should get unauthorized message" do
     login_as :registered_user_with_no_projects
     get :new
-    assert_redirected_to events_path
+    assert_response :redirect
     assert_not_nil flash[:error]
   end
 
   test "should create valid event" do
     assert_difference('Event.count', 1) do
-      post :create, :event => valid_event
+      post :create, :event => valid_event, :sharing => valid_sharing
     end
   end
 
@@ -150,7 +146,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test "should create and show event without end_date" do
     assert_difference('Event.count', 1) do
-      post :create, :event => {:title => "Barn Raising", :start_date => DateTime.now}
+      post :create, :event => {:title => "Barn Raising", :start_date => DateTime.now},:sharing => valid_sharing
     end
     assert_redirected_to assigns(:event)
 

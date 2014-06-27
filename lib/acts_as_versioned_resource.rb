@@ -39,10 +39,10 @@ module Acts #:nodoc:
     module InstanceMethods
 
       def content_type
-          self.content_blob.content_type
+          self.content_blob.content_type if self.respond_to?(:content_blob)
       end
       def original_filename
-          self.content_blob.original_filename
+          self.content_blob.original_filename  if self.respond_to?(:content_blob)
       end
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
@@ -63,6 +63,10 @@ module Acts #:nodoc:
           self.parent.tag_counts
       end
 
+      def scales
+        self.parent.scales
+
+      end 
       def contains_downloadable_items?
         blobs = []
         blobs << self.content_blob if self.respond_to?(:content_blob)

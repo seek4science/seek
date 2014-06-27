@@ -15,13 +15,21 @@
             <ul id="my_project_menu" class='dynamic_menu with_smaller_shadow' style="display:none;">
 
                 <% current_user.person.projects.each do |p| %>
-                    <li class='dynamic_menu_li' onclick="javascript:location.href='<%= project_path(p) -%>';"><%= h(p.title) %></li>
+ 					<%# #MERGENOTE - move hard-coded styling into CSS -%>
+                    <li style="border-bottom: 1px dotted grey;" class='dynamic_menu_li' onclick="javascript:location.href='<%= project_path(p) -%>';"><%= h(p.name) %></li>
                 <% end %>
             </ul>
 
         </div>
       </div>
     </div>
+
+    <%# #MERGENOTE - don't want this old fashioned drop down icon for SEEK, either wrap with is_virtual_liver or modify css %>
+    <script type="text/javascript">
+        <% if current_user.person.projects.size>1 -%>
+            $(document.getElementById("my_project_button")).classList.add('gadget_button_menu');
+        <% end -%>
+    </script>
 
     <script type="text/javascript">
         function myProjectClicked() {

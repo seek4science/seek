@@ -1,5 +1,7 @@
 require 'seek/annotation_common'
 
+#MERGENOTE - need to check these changes form local_copy to external_link, since they mean different things but are beign used as local_copy
+#MERGENOTE - yep, seems to make a local copy everytime it is not an external link, without asking the user.
 module Seek
   module AssetsCommon
     require 'net/ftp'
@@ -9,15 +11,15 @@ module Seek
     include ImagesHelper
 
     #this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page
-    def init_asset_for_render params
-        c     = self.controller_name.singularize
-        model = c.camelize.constantize
-        symb  =c.to_sym
-        params[symb].delete 'data_url'
+    def init_asset_for_render params                                                            
+        c     = self.controller_name.singularize                                                  
+        model = c.camelize.constantize                                                            
+        symb  =c.to_sym                                                                           
+        params[symb].delete 'data_url'                                                            
         params[symb].delete 'data'
-        params[symb].delete 'local_copy'
-        obj=model.new params[symb]
-        eval "@#{c.singularize} = obj"
+        params[symb].delete 'external_link'
+        obj=model.new params[symb]                                                                
+        eval "@#{c.singularize} = obj"                                                            
     end
 
     def url_response_code asset_url
@@ -92,10 +94,10 @@ module Seek
           page.show 'test_url_msg'
           page.visual_effect :highlight,"test_url_msg"
           if code=="200"
-            page['local_copy'].enable
+              page['external_link'].enable
           else
-            page['local_copy'].checked=false
-            page['local_copy'].disable
+            page['external_link'].checked=true
+            page['external_link'].disable
           end
         end
       end
@@ -142,7 +144,8 @@ module Seek
             params[symb][:original_filename] = (params[symb][:data]).original_filename if params[symb][:original_filename].blank?
             @tmp_io_object = params[symb][:data]
           elsif !(params[symb][:data_url]).blank?
-            make_local_copy = (params[symb][:local_copy]=="1")
+            @external_link = (params[symb][:external_link]=="1")
+            make_local_copy = !@external_link
             @data_url=params[symb][:data_url]
             code = url_response_code @data_url
             if (code == "200")
@@ -194,7 +197,7 @@ module Seek
         end
         params[symb].delete 'data_url'
         params[symb].delete 'data'
-        params[symb].delete 'local_copy'
+        params[symb].delete 'external_link'
         return true
       end
     end

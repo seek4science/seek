@@ -4,6 +4,7 @@ class BioSamplesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+  include SharingFormTestHelper
 
   def setup
     login_as(:aaron)

@@ -23,7 +23,8 @@
     }
 
     function updateFancyMultiselect(multiselect) {
-        multiselect = $(multiselect);
+        var possible_multiselect = $("possible_" + multiselect);
+        var multiselect = $(multiselect);
         var display_area = $(multiselect.id + '_display_area');
         var selected_options = multiselect.childElements().select(function(c){return c.selected});
         if(selected_options.length > 0) {
@@ -34,6 +35,7 @@
             });
         } else {
             display_area.innerHTML = '<span class="none_text">None</span>';
+             possible_multiselect.setValue([]);
         }
         multiselect.fire('fancySelect:update');
     }

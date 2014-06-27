@@ -1,3 +1,4 @@
+require 'thread'
 require 'rubygems'
 
 # Set up gems listed in the Gemfile.

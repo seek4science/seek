@@ -45,6 +45,13 @@ class Project < ActiveRecord::Base
 
   validate :ancestor_cannot_be_self
 
+  #MERGENOTE - would like to get rid of this, or move into a shared module
+  RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
+  RELATED_RESOURCE_TYPES.each do |type|
+    define_method "related_#{type.underscore.pluralize}" do
+      send "#{type.underscore.pluralize}"
+    end
+  end
 
   def studies
     investigations.collect(&:studies).flatten.uniq
@@ -147,6 +154,7 @@ class Project < ActiveRecord::Base
     return locations
   end
 
+  #OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
   def people
     #TODO: look into doing this with a scope or direct query
     res = work_groups.collect(&:people).flatten.uniq.compact
@@ -251,4 +259,8 @@ class Project < ActiveRecord::Base
     child
   end
 
+   #MERGENOTE - don't like this
+   #should put below at the bottom in order to override methods for hierarchies,
+   #Try to find a better way for overriding methods regardless where to include the module
+   include Seek::ProjectHierarchies if Seek::Config.is_virtualliver
 end

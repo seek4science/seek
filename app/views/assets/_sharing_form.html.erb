@@ -4,7 +4,7 @@
    disable_advanced_view ||= nil
    show_advanced_permissions = !@resource.respond_to?(:has_advanced_permissions?) || @resource.has_advanced_permissions?
    default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::EDITING
-   default_consortium_access_type = Policy::VISIBLE
+   default_consortium_access_type = Policy::ACCESSIBLE
    can_publish = @resource.respond_to?(:can_publish?) ? @resource.can_publish? : true
 %>
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
@@ -78,14 +78,15 @@
         <!-- within your project ... and with all sysmo project members ...-->
         <p>
           <label>
+          <%# #MERGENOTE - need to take a closer look at the change here, and if it indicates a bug in 0.21 updated 0.21
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
-            - Members of <%= t('project').pluralize %> associated with this <%= @resource_type -%>:
+            - All <%= t('project').pluralize %> members:
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
                  <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource) || default_projects_access_type) -%>
              </select>
              <br/>
-            <span style="margin-left:10em;">... and all other <%= t('project') %> members:</span>
+            <span style="margin-left:10em;">... members of  <%= t('project').pluralize %> associated with this <%= @resource_type -%>:</span>
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
                :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => (@resource.respond_to?(:policy) && @resource.policy.try(:sharing_scope)==Policy::ALL_SYSMO_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] } -%>
              <%= additional_advanced_permissions_included @resource, Policy::ALL_SYSMO_USERS -%>
@@ -360,7 +361,7 @@
               <% if p.contributor_type == "Person" -%>
                 <%
                 contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
-                allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
+                allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING && @resource_type != "Project"
                 -%>
               <% elsif p.contributor_type == "WorkGroup" -%>
                 <% contributor_name = p.contributor.project.title + " @ " + p.contributor.institution.title -%>

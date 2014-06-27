@@ -5,12 +5,16 @@ module Seek
       def reference_with_additional_fields
         reference = reference_without_additional_fields
         reference.published_date = published_date
+        reference.citation = citation
         reference.error = error
         reference
       end
 
       alias_method_chain :reference, :additional_fields
 
+      def citation
+        @pubmed['SO']
+      end
       def published_date
         published_date = nil
         #first parse published date on PHST - Publication History Status Date
@@ -55,7 +59,7 @@ module Seek
       end
       alias_method_chain :authors, :reformat
 
-      attr_accessor :published_date, :error
+      attr_accessor :published_date, :citation,:error
     end
 
     class Author

@@ -35,3 +35,4 @@ module ActsAsCachedTree
     end
   end
 end
+

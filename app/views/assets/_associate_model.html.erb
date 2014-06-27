@@ -19,28 +19,27 @@
         The following  <%= t('model').pluralize %> are involved in this <%= resource_text -%>:
       </p>
       <div id="model_to_list" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="models">Loading...</span>
+        <span class="none_text" id="models">Loading ...</span>
       </div>
       <br/>
       <div id="add_model_elements">
         <div class="association_step">
           <%= select_tag :possible_models,
             options_for_select([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
-            {:style=>"width:90%",:onchange=>remote_function(
+            {:style=>"width:90%",:onchange=>"addSelectedModel();"+remote_function(
                     :method=>:get,
               :url=>preview_models_path(:element=>"model_preview"),
               :with=>"'id='+this.value",
               :before=>"show_ajax_loader('model_preview')"
-            )+";check_show_add_model();return(false);"
+            )+";return(false);"
           } -%>
 
           <%= select_tag :model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
           <br/>
-          <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate <%=  t('model').pluralize %> from other <%= t('project').pluralize %>?
+          <%= check_box_tag :include_other_project_models, nil, true, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate Models from other projects?
         </div>
 		<br/>
-        <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link" %>
       </div>
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'model'} %>
@@ -81,11 +80,20 @@
             }
         <% end -%>
         }
-        selection_box.selectedIndex=0;
-        selection_box.onchange();
+        //selection_box.onchange();
     }
+    function check_show_add_model() {
+    i = $('possible_models').selectedIndex;
+    selected_id = $('possible_models').options[i].value;
+    if (selected_id == '0') {
+      $('add_model_link').hide();
+    }
+    else {
+      $('add_model_link').show();
+    }
+  }
 
-<% models = resource.is_a?(Publication) ? resource.related_models : resource.model_masters %>
+    <% models = resource.is_a?(Publication) ? resource.related_models : resource.model_masters %>
 <% models.each do |model| -%>
   <% if model.can_view? -%>
       model_id = '<%= model.id -%>';
@@ -105,19 +113,7 @@
   <% end -%>
 <% end -%>
 
+
   updateModels();
-
-
-  function check_show_add_model() {
-    i = $('possible_models').selectedIndex;
-    selected_id = $('possible_models').options[i].value;
-    if (selected_id == '0') {
-      $('add_model_link').hide();
-    }
-    else {
-      $('add_model_link').show();
-    }
-  }
-
-  check_show_add_model();
+  toggle_model_list()
 </script>

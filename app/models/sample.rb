@@ -4,6 +4,7 @@ require 'grouped_pagination'
 class Sample < ActiveRecord::Base
   include Subscribable
 
+  acts_as_scalable if Seek::Config.is_virtualliver
   include Seek::Rdf::RdfGeneration
   include BackgroundReindexing
 
@@ -26,8 +27,10 @@ class Sample < ActiveRecord::Base
   has_many :treatments, :dependent=>:destroy
 
   has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
+  has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
   has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new { self.asset_sql("Sop") }
   has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
+  has_many :model_masters, :through => :sample_assets, :source => :asset, :source_type => 'Model'
   has_many :sop_masters, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
 
   accepts_nested_attributes_for :specimen
@@ -48,7 +51,7 @@ class Sample < ActiveRecord::Base
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 
-  ["data_file","sop"].each do |type|
+  ["data_file","sop","model"].each do |type|
      eval <<-END_EVAL
        #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
        def related_#{type.pluralize}
@@ -105,6 +108,32 @@ class Sample < ActiveRecord::Base
     Seek::Config.biosamples_enabled
   end
 
+  def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
+       tissue_and_cell_type=nil
+    if !tissue_and_cell_type_title.blank?
+      if ( tissue_and_cell_type_id =="0" )
+          found = TissueAndCellType.where(:title => tissue_and_cell_type_title).first
+          unless found
+          tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title)
+          end
+      else
+          tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+      end
+
+      if tissue_and_cell_type
+       existing = false
+       self.tissue_and_cell_types.each do |t|
+         if t == tissue_and_cell_type
+           existing = true
+           break
+         end
+       end
+       unless existing
+         self.tissue_and_cell_types << tissue_and_cell_type
+       end
+      end
+    end
+  end
 
   def associate_asset asset
     sample_asset = sample_assets.detect { |sa| sa.asset == asset }
@@ -140,7 +169,9 @@ class Sample < ActiveRecord::Base
     new_object= self.dup
     new_object.policy = self.policy.deep_copy
     new_object.data_file_masters = self.data_file_masters.select(&:can_view?)
+   new_object.model_masters = self.model_masters.select(&:can_view?)  
     new_object.sop_masters = self.sop_masters.select(&:can_view?)
+   new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
     new_object.project_ids = self.project_ids
     return new_object
   end

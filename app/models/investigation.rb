@@ -9,7 +9,6 @@ class Investigation < ActiveRecord::Base
 
   has_many :studies
 
-  validates_presence_of :projects
   validates_presence_of :title
 
   has_many :assays,:through=>:studies

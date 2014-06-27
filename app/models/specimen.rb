@@ -8,6 +8,8 @@ class Specimen < ActiveRecord::Base
   include Seek::Biosamples::PhenoTypesAndGenoTypes
   include BackgroundReindexing
 
+   acts_as_scalable if Seek::Config.is_virtualliver
+
   acts_as_authorized
   acts_as_favouritable
   acts_as_uniquely_identifiable
@@ -101,6 +103,19 @@ class Specimen < ActiveRecord::Base
   end
   
 
+    text :strain do
+      strain.try :title
+      strain.try(:organism).try(:title).to_s
+    end
+    
+    text :institution do
+      institution.try :name
+    end if Seek::Config.is_virtualliver
+
+    text :creators do
+      creators.compact.map(&:name).join(' ')
+    end
+  end if Seek::Config.solr_enabled
 
   def searchable_terms
       text=[title,description,lab_internal_number,other_creators]

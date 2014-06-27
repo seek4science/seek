@@ -58,8 +58,13 @@
           <label><%= Seek::Config.dm_project_name %> PALs:</label>
           <%= pals_link_list @project -%>
         </p>
-
-        <% if @project.has_member?(current_user)%>
+        <% if @project.respond_to?(:project_coordinators)%>
+        <p class="project_coordinators">
+          <label>Project Coordinators:</label>
+          <%= project_coordinators_link_list @project -%>
+        </p>
+        <% end%>
+ <% if @project.has_member?(current_user)%>
         <p class="asset_managers">
           <label>Asset Managers:</label>
           <%= asset_managers_link_list @project -%>
@@ -83,8 +88,19 @@
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
   </div>
 
-  <% if Seek::Config.is_virtualliver && logged_in_and_member? -%>
-      <div style="clear:both;">
+  <% if Project.is_hierarchical? && logged_in_and_member? -%>
+  <br/>
+  <div style="clear:both;">
+    <b>Project Hierarchies
+      (<%= link_to_function "hide", visual_effect(:toggle_appear, "project_hierarchy")+"$('project_hierarchy').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>
+      ):</b><br/><br/>
+
+    <div id="project_hierarchy" style="display: block;">
+      <ul><%= Rails.cache.fetch([:project_tree_editor, @project.cache_key]) { tree_editor_display Project, false, false, @project.id, "Person", true, true } %></ul>
+    </div>
+  </div>
+  <br/>
+   <div style="clear:both;">
           <b><%= t('project') %> Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
           <div id="project_mailing_list" style="display: none;">
             <%= project_mailing_list @project %>

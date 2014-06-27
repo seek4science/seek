@@ -5,19 +5,17 @@ require 'libxml'
 
 class Publication < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
-  include Subscribable
-
   title_trimmer
-
   alias_attribute :description, :abstract
-
   #searchable must come before acts_as_asset is called
   searchable(:ignore_attribute_changes_of=>[:updated_at,:last_used_at]) do
-    text :journal,:pubmed_id, :doi
-    text :non_seek_authors do
-      non_seek_authors.compact.map(&:first_name) + non_seek_authors.compact.map(&:last_name)
+    text :journal,:pubmed_id, :doi, :published_date
+    text :publication_authors do
+      publication_authors.compact.map(&:first_name) + publication_authors.compact.map(&:last_name)
     end
   end if Seek::Config.solr_enabled
+
+
 
   acts_as_asset
 
@@ -34,11 +32,31 @@ class Publication < ActiveRecord::Base
   end
 
   validate :check_identifier_present
-  validate :check_uniqueness_of_identifier_within_project
-  validate :check_uniqueness_of_title_within_project
+  validate :check_uniqueness_of_identifier_within_project, :unless => "Seek::Config.is_virtualliver"
+  validate :check_uniqueness_of_title_within_project, :unless => "Seek::Config.is_virtualliver"
 
-  has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
-  has_many :publication_author_orders, :dependent => :destroy
+  validates_uniqueness_of :pubmed_id , :allow_nil => true, :allow_blank => true, :if => "Seek::Config.is_virtualliver"
+  validates_uniqueness_of :doi ,:allow_nil => true, :allow_blank => true, :if => "Seek::Config.is_virtualliver"
+  validates_uniqueness_of :title , :if => "Seek::Config.is_virtualliver"
+
+  has_many :publication_authors, :dependent => :destroy, :autosave => true
+
+  after_update :update_creators_from_publication_authors , :if => "Seek::Config.is_virtualliver"
+  after_update :update_policy_from_publication_authors , :if=> "false"
+
+  def update_creators_from_publication_authors
+    self.creators = publication_authors.map(&:person).compact
+  end
+
+  def update_policy_from_publication_authors
+    #Update policy so current authors have manage permissions
+    policy.permissions.clear
+    creators.each do |author|
+      policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
+    end
+    #Add contributor
+   policy.permissions << Permission.create(:contributor => contributor.person, :policy => policy, :access_type => Policy::MANAGING) unless contributor.nil?
+  end
 
   has_many :backwards_relationships,
     :class_name => 'Relationship',
@@ -67,6 +85,11 @@ class Publication < ActiveRecord::Base
 
   scope :default_order, order("published_date DESC")
 
+  def non_seek_authors
+    publication_authors.find_all_by_person_id nil
+  end
+
+
   def self.sort publications
     publications.sort_by &:published_date
   end
@@ -75,12 +98,15 @@ class Publication < ActiveRecord::Base
     false
   end
 
+
+
   def extract_pubmed_metadata(reference)
-    self.title = reference.title.chop #remove full stop
-    self.abstract = reference.abstract
-    self.journal = reference.journal
-    self.pubmed_id = reference.pubmed
-    self.published_date = reference.published_date
+        self.title = reference.title.chop #remove full stop
+        self.abstract = reference.abstract
+        self.journal = reference.journal
+        self.pubmed_id = reference.pubmed
+        self.published_date = reference.published_date
+      self.citation = reference.citation
   end
 
   def extract_doi_metadata(doi_record)
@@ -89,6 +115,7 @@ class Publication < ActiveRecord::Base
     self.journal = doi_record.journal
     self.doi = doi_record.doi
     self.publication_type = doi_record.publication_type
+    self.citation = doi_record.citation
   end
 
   def related_data_files
@@ -159,18 +186,12 @@ class Publication < ActiveRecord::Base
   private
 
   def bio_reference
-    #FIXME: after merging with VL code to have author index on publication_authors, will use dirrectly publication info from seek, to avoid exception when fetching live
     if pubmed_id
-      begin
-        Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
-      rescue
-        Bio::Reference.new({})
-      end
+      Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
     else
       #TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
-      authors = publication_author_orders.sort_by(&:order).collect(&:author)
       Bio::Reference.new({:title => title, :journal => journal, :abstract => abstract,
-                          :authors => authors.map {|a| [a.last_name, a.first_name].join(', ')},
+                          :authors => publication_authors.map {|e| e.person ? [e.person.last_name, e.person.first_name].join(', ') : [e.last_name, e.first_name].join(', ')},
                           :year => published_date.year}.with_indifferent_access)
     end
   end
@@ -230,5 +251,4 @@ class Publication < ActiveRecord::Base
     true
   end
 end
-
 

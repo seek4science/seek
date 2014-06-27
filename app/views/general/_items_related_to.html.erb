@@ -1,12 +1,20 @@
 <% item = items_related_to %>
-<% resource_hash = get_related_resources(item) %>
+<%  resource_hash = {}
+   all_related_items_hash = collect_related_items(item)
+    all_related_items_hash.each_key do |resource_type|
+      all_related_items_hash[resource_type][:items].uniq!
+      all_related_items_hash[resource_type][:items].compact!
+      unless all_related_items_hash[resource_type][:items].empty?
+        resource_hash[resource_type] = all_related_items_hash[resource_type][:items]
+      end
+    end
+
+%>
 <h2 style="margin-top: 3em;">
   Related items
 </h2>
 
-<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :resource_hash => resource_hash,
-  :narrow_view => true,
-  :authorization_already_done => true,
-  :item => item,
-  :actions_partial_disable=>false,
-  :limit => Seek::Config.related_items_limit } -%>
+<%= render :partial => "scales/scale_search_results_tabs", :locals => {:resource_hash=>resource_hash,
+                                                                          :scale_title=> "all",
+                                                                          :scaled_results_disabled => true,
+                                                                          :actions_partial_disable => false} %>

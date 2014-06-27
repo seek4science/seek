@@ -37,11 +37,11 @@ class PolicyTest < ActiveSupport::TestCase
 
   test "default policy" do
     pol=Policy.default
-    assert_equal Policy::PRIVATE, pol.sharing_scope
-    assert_equal Policy::NO_ACCESS, pol.access_type
+    assert_blank pol.sharing_scope
+    assert_blank pol.access_type
     assert_equal false,pol.use_whitelist
     assert_equal false,pol.use_blacklist
-    assert pol.permissions.empty?
+    assert_blank pol.permissions
   end
 
   test "policy access type presedence" do

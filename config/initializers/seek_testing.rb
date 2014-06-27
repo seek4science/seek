@@ -2,6 +2,7 @@
 SEEK::Application.configure do
   if Rails.env.test?
     silence_warnings do
+      Settings.defaults[:is_virtualliver] = false
       Settings.defaults[:application_title] = 'The Sysmo SEEK'
       Settings.defaults[:project_name] = 'Sysmo'
       Settings.defaults[:project_title] = 'The Sysmo Consortium'

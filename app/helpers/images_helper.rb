@@ -309,6 +309,10 @@ module ImagesHelper
         "misc_icons/1315482798_presentation-slides.png"
       when 'endnote'
         "famfamfam_silk/script_go.png"
+      when 'expand_plus'
+        "toggle_expand_64x64.png"
+      when 'collapse_minus'
+        "toggle_collapse_64x64.png"
       when 'cytoscape_web'
         "famfamfam_silk/chart_line.png"
       when "graph"
@@ -417,7 +421,14 @@ module ImagesHelper
   def collapse_image(margin_left="0.3em")
     image_tag icon_filename_for_key("collapse"), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
   end
-  
+  def expand_plus_image(size="18x18")
+    image_tag icon_filename_for_key("expand_plus"),:size=>size,:alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
+  end
+
+  def collapse_minus_image(size="18x18")
+    image_tag icon_filename_for_key("collapse_minus"),:size=>size,:alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
+  end
+
 
   
 end

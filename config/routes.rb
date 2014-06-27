@@ -5,6 +5,7 @@ SEEK::Application.routes.draw do
   resources :scales do
     collection do
       post :search
+      post :search_and_lazy_load_results
     end
   end
 
@@ -158,6 +159,7 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
+      get :manage
       post :items_for_result
     end
     member do
@@ -237,6 +239,29 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
 
+
+   ### ASSAY AND TECHNOLOGY TYPES ###
+
+  resources :suggested_assay_types do
+      collection do
+        get :manage
+        get :new_popup
+        put :set_is_modelling
+      end
+
+  end
+  resources :suggested_technology_types do
+    collection do
+      get :manage
+      get :new_popup
+    end
+  end
+
+  #MERGENOTE - why are these hard-coded routes?
+  get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
+  get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
+
+
   ### ASSETS ###
 
   resources :data_files do
@@ -262,6 +287,8 @@ SEEK::Application.routes.draw do
       post :convert_to_presentation
       post :update_annotations_ajax
       post :new_version
+      #MERGENOTE - this is a destroy, and should be the destory method, not post since we are not updating or creating something.
+      post :destroy_version
     end
     resources :studied_factors do
       collection do
@@ -294,6 +321,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :destroy_version
     end
     resources :content_blobs do
       member do
@@ -332,6 +360,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :execute
       post :request_resource
+      post :destroy_version
     end
     resources :model_images do
       collection do
@@ -367,6 +396,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :destroy_version
     end
     resources :experimental_conditions do
       collection do
@@ -485,6 +515,9 @@ SEEK::Application.routes.draw do
 
   end
 
+  resources :tissue_and_cell_types
+  resources :statistics, :only => [:index]
+
   resources :workflows do
     collection do
       post :test_asset_url
@@ -527,6 +560,8 @@ SEEK::Application.routes.draw do
   get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
   get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
 
+
+  resources :statistics, :only => [:index]
   ### MISC MATCHES ###
 
   match '/search/' => 'search#index', :as => :search
@@ -566,6 +601,12 @@ SEEK::Application.routes.draw do
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
 
   match '/contact' => 'contact#index', :as => :contact, :via => :get
+
+  #feedback
+  match '/home/feedback' => 'homes#feedback', :as=> :feedback, :via=>:get
+
+  #tabber lazy load
+  match 'application/resource_in_tab' => 'application#resource_in_tab'
 
   #error rendering
   match "/404" => "errors#error_404"

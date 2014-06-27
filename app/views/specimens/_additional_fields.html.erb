@@ -50,7 +50,7 @@
 
     <tr>
       <td style="text-align:left;"><%= f.label "Birthday" -%></td>
-      <td style="text-align:left;"> <%= f.calendar_date_select :born, :time => "mixed" -%></td>
+      <td style="text-align:left;"> <%= f.calendar_date_select :born, :year_range => 100, :time => "mixed" -%></td>
     </tr>
   </table>
 </div>

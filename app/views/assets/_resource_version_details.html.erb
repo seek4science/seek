@@ -4,13 +4,25 @@
     <table>
       <tbody>
       <tr>
-        <td class="heading">
+        <td class="heading" width="33%">
           <span><%= "Version #{displayed_resource.version.to_s} #{resource.describe_version(displayed_resource.version.to_s)}" -%></span>
-          <span class="count_text">(of <%= resource.versions.length -%>)</span>
+          <span class="count_text">(of <%= resource.versions.length -%>
+            <% if displayed_resource.version > resource.versions.length %>
+                *
+            <% end -%>
+             )</span>
           <a name="versions"></a>
         </td>
-        <td style="text-align:right">
-          <% if resource.version > 1 %>
+
+        <td style="text-align:center;width:33%">
+          <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && resource.versions.length > 1 %>
+              <% path = polymorphic_path(resource, :version => displayed_resource.version, :action => :destroy_version) %>
+              <%= image_tag_for_key('destroy', path, nil, {:confirm => "This deletes version #{displayed_resource.version.to_s} of the #{text_for_resource resource}. Are you sure?", :method => :delete, :style => "padding:0.5em; line-height:2;border: 1px solid #BBBBBB;width:100%;"}, "Delete version #{displayed_resource.version.to_s}") -%>
+          <% end -%>
+        </td>
+
+        <td style="text-align:right;width:33%">
+          <% if resource.versions.length > 1 %>
               <span>View version: </span>
               <%= resource_version_selection resource, displayed_resource -%>
               <% if allow_model_comparison(resource,displayed_resource) -%>
@@ -45,6 +57,11 @@
               end
               -%>
             </span>
+        <% end -%>
+      </p>
+      <p>
+        <% if displayed_resource.version > resource.versions.length %>
+            <span> * This indicates that some version of this <%= text_for_resource resource %> was deleted.</span>
         <% end -%>
       </p>
     </div>

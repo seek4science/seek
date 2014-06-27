@@ -18,12 +18,13 @@
             <% presentation_description_value = (params[:presentation].blank? || params[:presentation][:description].blank?) ? nil : params[:presentation][:description] -%>
             <%= text_area_tag "presentation[description]", presentation_description_value,:class=>"large_text_entry" -%>
         </p>
-        <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation} -%>
-      <% if show_scales? %>
-          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} %>
-      <% end %>
-
-		<%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
+        <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
+          <p>
+            <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} if show_scales?%>
+          </p>
+		<%= fields_for(@presentation) {|f|  f.hidden_field :parent_name } -%>
+  	<%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
+       
         <p>
             <% if Seek::Config.events_enabled -%>
                 <%= render :partial => "assets/associate_event", :locals=>{:resource => @presentation} -%>

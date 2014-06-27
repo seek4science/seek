@@ -17,6 +17,7 @@
 //= require autocompleter_advanced
 //= require publication
 //= require top_menu
+//= require dropMenu
 //= require dynamic_menu
 //= require batch_upload
 //= require assays

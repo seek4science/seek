@@ -1,0 +1,13 @@
+<div class="contribution_section_box curved with_shadow" style="padding: 0.5em 0 1em 0;">
+  <p class="heading">
+    <%= help_icon("Scales of different level for this item.") -%>
+    Scales
+  </p>
+  <br/>
+  <%if resource.scales.blank?%>
+      <span class='none_text'>Not Specified</span>
+  <% else %>
+      <%= show_item_scales resource-%>
+  <% end %>
+
+</div>
