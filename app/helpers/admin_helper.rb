@@ -25,12 +25,18 @@ module AdminHelper
   def delayed_job_status
     status = ""
     begin
-      pid = Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job")
-      if pid.running?
-        status = "Running [Process ID: #{pid.pid}]"
-      else
-        status = "<span class='error_text'>Not running</span>"
+      pids = [0,1].collect do |n|
+        Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job.#{n.to_s}")
       end
+      pids.each do |pid|
+        if pid.running?
+          status << "Running [Process ID: #{pid.pid}]"
+        else
+          status << "<span class='error_text'>Not running</span>"
+        end
+        status << "&nbsp;:&nbsp;" unless pid == pids.last
+      end
+
     rescue Exception=>e
       status = "<span class='error_text'>Unable to determine current status - #{e.message}</span>"
     end

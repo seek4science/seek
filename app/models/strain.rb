@@ -7,6 +7,7 @@ class Strain < ActiveRecord::Base
   include ActsAsCachedTree
   include Subscribable
   include Seek::Biosamples::PhenoTypesAndGenoTypes
+  include BackgroundReindexing
 
   acts_as_authorized
   acts_as_uniquely_identifiable
@@ -32,7 +33,7 @@ class Strain < ActiveRecord::Base
 
   scope :default_order, order("title")
 
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+  searchable(:auto_index=>false) do
       text :searchable_terms
   end if Seek::Config.solr_enabled
 
