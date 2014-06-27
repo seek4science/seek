@@ -100,8 +100,6 @@ GIT
   specs:
     white_list_formatted_content (1.0.0)
 
-
-
 GIT
   remote: git://github.com/myGrid/annotations.git
   revision: d33e78993ee957fa12d71cbe9f03100dd9b0ad15
@@ -309,6 +307,7 @@ GEM
     multi_xml (0.5.5)
     mysql2 (0.3.16)
     net-http-persistent (2.9.4)
+    newrelic_rpm (3.9.0.229)
     nokogiri (1.6.2.1)
       mini_portile (= 0.6.0)
     nori (1.1.5)
@@ -379,6 +378,7 @@ GEM
     rake (10.3.2)
     ratom (0.8.2)
       libxml-ruby (~> 2.6.0)
+    rb-readline (0.4.2)
     rdf (1.1.3)
     rdf-aggregate-repo (1.1.0)
       rdf (>= 1.1)
@@ -419,6 +419,7 @@ GEM
       rdf (>= 1.1)
     rdoc (3.12.2)
       json (~> 1.4)
+    recaptcha (0.3.1)
     reek (1.3.7)
       rainbow
       ruby2ruby (~> 2.0.8)
@@ -591,6 +592,7 @@ DEPENDENCIES
   my_responds_to_parent!
   my_savage_beast!
   mysql2
+  newrelic_rpm
   nokogiri
   open_id_authentication!
   passenger
@@ -604,8 +606,10 @@ DEPENDENCIES
   rack-openid
   rails (= 3.2.17)
   rails_autolink
+  rb-readline (~> 0.4.2)
   rdf-virtuoso (>= 0.1.6)
   rdoc
+  recaptcha (= 0.3.1)
   redbox!
   reek
   request-log-analyzer
