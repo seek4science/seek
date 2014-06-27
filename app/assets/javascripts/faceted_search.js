@@ -92,6 +92,7 @@ function tab_on_click_one_facet(resource_type) {
         hide_specified_facets();
         //Activate the clicking tab
         click_tab.parentElement.className = 'tabberactive';
+        active_tab = resource_type;
         //Show the content of clicking tab
         $j('#' + resource_type).removeClass('tabbertabhide');
 

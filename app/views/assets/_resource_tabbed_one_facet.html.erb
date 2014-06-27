@@ -149,9 +149,14 @@
         tab_on_click_one_facet('<%= key %>');
     <% end %>
 
-    //Load content for first tab
-    var first_tab = document.getElementsByClassName('<%= assets.first %>')[0];
-    if (first_tab != null){
-        first_tab.click();
+    //Stay the same tab selection otherwise first tab
+    var active_tab =  document.getElementsByClassName('<%= active_tab %>')[0];
+    if (active_tab != null){
+        active_tab.click();
+    }else{
+        var first_tab = document.getElementsByClassName('<%= assets.first %>')[0];
+        if (first_tab != null){
+            first_tab.click();
+        }
     }
 </script>

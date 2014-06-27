@@ -10,7 +10,10 @@ function updateFirstPage() {
             url: items_for_result_url,
             async: false,
             type: 'POST',
-            data: {items: seek_items.join(',')}
+            data: {
+                    items: seek_items.join(','),
+                    active_tab: active_tab
+                  }
         })
                 .done(function (data) {
                     updateContent(data.items_for_result);
@@ -104,3 +107,7 @@ function renameOtherField(){
         value_link.html(replaced_term);
     })
 }
+
+//use in the case of one instance faceted search
+//use active_tab to send this info to the server, in order to keep the same selection after the server response
+var active_tab = null;

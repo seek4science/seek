@@ -11,11 +11,13 @@ module Seek
 
       if type_id_hash.keys.count > 1
         resource_hash = classify_for_tabs items
+        active_tab = params[:active_tab]
         items_for_result = render_to_string :partial => "assets/resource_tabbed_one_facet",
                                             :locals => {:resource_hash => resource_hash,
                                                         :narrow_view => true,
                                                         :authorization_already_done => true,
-                                                        :display_immediately => true}
+                                                        :display_immediately => true,
+                                                        :active_tab => active_tab}
       else
         items_for_result = items.collect{|item| render_to_string :partial => "assets/resource_list_item", :object => item}.join(' ')
       end
