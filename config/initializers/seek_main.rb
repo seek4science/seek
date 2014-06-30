@@ -3,7 +3,6 @@
 
 require 'object'
 require 'asset'
-require 'object'
 require 'active_record_extensions'
 require 'acts_as_taggable_extensions'
 require 'acts_as_isa'
@@ -20,9 +19,6 @@ require 'seek/taggable'
 require "bio"
 require 'assets_common_extension'
 
-#MERGENOTE - why is this needed for VLN
-require 'acts_as_cached_tree'
-
 require 'sunspot_rails'
 require 'cancan'
 require 'in_place_editing'
@@ -32,7 +28,6 @@ require 'seek/project_hierarchies'
 require 'recaptcha'
 require 'acts_as_list'
 require 'acts_as_trashable'
-require 'acts_as_tree'
 
 require 'country-select'
 require 'will_paginate'
