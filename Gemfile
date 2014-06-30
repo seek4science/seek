@@ -85,8 +85,6 @@ gem 'passenger'
 gem 'unicorn-rails'
 gem "recaptcha", '0.3.1'
 
-#MERGENOTE - needed?
-gem 'rb-readline', '~> 0.4.2'
 
 group :assets do
   gem 'turbo-sprockets-rails3'
