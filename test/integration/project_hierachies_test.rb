@@ -1,14 +1,31 @@
 require 'test_helper'
-class ProjectHierarchiesTest < ActiveSupport::TestCase
+class ProjectHierarchiesTest < ActionController::IntegrationTest
   fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :publications, :assets, :organisms
 
   def setup
 
-    User.current_user = Factory(:user)
+    skip("tests are skipped as projects are NOT hierarchical") unless Seek::Config.project_hierarchy_enabled
+
+    User.current_user = Factory(:user, :login => 'test')
+    #test actions in controller with User.current_user not nil
+    post '/session', :login => 'test', :password => 'blah'
+
+
     @proj = Factory(:project)
     @subscribables_in_proj = [Factory(:subscribable, :projects => [Factory(:project), @proj]), Factory(:subscribable, :projects => [@proj, Factory(:project), Factory(:project)]), Factory(:subscribable, :projects => [@proj])]
 
-    skip("tests are skipped as projects are NOT hierarchical") unless Seek::Config.project_hierarchy_enabled
+    @person = Factory(:brand_new_person)
+    #add 2 work_groups directly
+    @proj_child1 = Factory :project, :parent => @proj
+    @proj_child2 = Factory :project, :parent => @proj
+    @proj.reload
+    @person.work_groups.create :project => @proj_child1, :institution => Factory(:institution)
+    @person.work_groups.create :project => @proj_child2, :institution => Factory(:institution)
+    disable_authorization_checks do
+      #save person in order to save built project subscriptions
+      @person.save!
+    end
+    @person.reload
 
   end
 
@@ -57,22 +74,11 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
     assert_equal [parent_proj, proj].map(&:id).sort, p.projects.map(&:id).sort
   end
 
-  test 'people subscribe to their projects and parent projects by default' do
-    #when created without a project
-    person = Factory(:brand_new_person)
+  test 'people subscribe to their projects and parent projects when their projects are assigned' do
+      person = Factory(:brand_new_person)
+      assert_equal 0, person.project_subscriptions.count
+      work_group_ids  = [Factory(:work_group).id, Factory(:work_group).id ]
 
-    assert_equal person.project_subscriptions.map(&:project), []
-
-    #when joining a project
-    project = Factory :project, :parent => @proj
-    person.work_groups.create :project => project, :institution => Factory(:institution)
-    disable_authorization_checks do
-      #save person in order to save built project subscriptions
-      person.save!
-    end
-    person.reload
-    assert_equal person.projects.sort_by(&:title), person.project_subscriptions.map(&:project).sort_by(&:title)
-    assert_equal true, person.project_subscriptions.map(&:project).include?(@proj)
   end
 
   test 'subscribing to a project subscribes ONLY direct subscribable items in this project rather than subscribes to those in its ancestors' do
@@ -151,38 +157,75 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
     end
   end
 
-  test "unsubscribe a project will unsubscribe its parent projects unless the person also subscribes other sub-projects of the parent projects" do
-    person = Factory(:brand_new_person)
+  test "subscribe/unsubscribe a project should subscribe/unsubscribe only itself rather that its parents" do
+    add_project_subscriptions_attributes =  {"2"=>{"project_id"=> @proj_child1.id.to_s, "_destroy"=>"0", "frequency"=>"daily"}, "22"=>{"project_id"=>@proj_child2.id.to_s, "_destroy"=>"0", "frequency"=>"weekly"}}
+    person = User.current_user.person
     assert_equal 0, person.project_subscriptions.count
-    @proj = Factory :project
-    #add 2 work_groups directly
-    project1 = Factory :project, :parent => @proj
-    project2 = Factory :project, :parent => @proj
-    person.work_groups.create :project => project1, :institution => Factory(:institution)
-    person.work_groups.create :project => project2, :institution => Factory(:institution)
-    disable_authorization_checks do
-      #save person in order to save built project subscriptions
-      person.save!
-    end
-    assert_equal 3, person.project_subscriptions.count
+
+    put "/people/#{person.id}", id: person.id, person:{"project_subscriptions_attributes"=> add_project_subscriptions_attributes}
+
+    person.reload
+    assert_equal 2, person.project_subscriptions.count
+
+    remove_project_subscriptions_attributes =  {"2"=>{"id"=>person.project_subscriptions.first.id,"project_id"=> @proj_child1.id.to_s, "_destroy"=>"1", "frequency"=>"daily"}, "22"=>{"id"=>person.project_subscriptions.last.id, "project_id"=>@proj_child2.id.to_s, "_destroy"=>"1", "frequency"=>"weekly"}}
+    put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes"=> remove_project_subscriptions_attributes}
+    person.reload
+    assert_equal 0, person.project_subscriptions.count
+  end
+  test "unassign a project will unsubscribe its parent projects unless the person also subscribes other sub-projects of the parent projects" do
+
+    assert_equal 3, @person.project_subscriptions.count
 
     # unassign one child project of @proj,
     #subscription of @proj is not deleted as there is still another child project subscribed
-    person.work_groups.delete WorkGroup.where(:project_id=> project1.id).first
+    @person.work_groups.delete WorkGroup.where(:project_id=> @proj_child1.id).first
     disable_authorization_checks do
-      person.save
+      @person.save
     end
-    assert_equal 2, person.project_subscriptions.count
+    @person.reload
+    assert_equal 2, @person.project_subscriptions.count
 
     #unassign all child projects
-    person.work_groups.delete WorkGroup.where(:project_id=> project2.id).first
+    @person.work_groups.delete WorkGroup.where(:project_id=> @proj_child2.id).first
     disable_authorization_checks do
-      person.save
+      @person.save
     end
-    assert_equal 0, person.project_subscriptions.count
+    @person.reload
+    assert_equal 0, @person.project_subscriptions.count
 
   end
 
+  test "clear all subscriptions when no project is assigned to person" do
+
+    #subscribe an individual item in another project
+    @person.subscriptions.build :subscribable => Factory(:subscribable)
+
+    disable_authorization_checks do
+      #save person in order to save built project subscriptions
+      @person.save!
+    end
+
+    #@proj,@proj_child1,@proj_child2 are subscribed
+    assert_equal 3, @person.project_subscriptions.count
+
+
+    @person.project_subscriptions.each do |ps|
+      ProjectSubscriptionJob.new(ps.id).perform
+    end
+    @person.reload
+   # 3 subscriptions from project subscription for @proj + 1 individual subscription
+    assert_equal 4, @person.subscriptions.count
+
+    # unassign all related projects
+    @person.work_groups.delete_all
+   disable_authorization_checks do
+      @person.save
+   end
+    @person.reload
+    assert_equal 0, @person.project_subscriptions.count
+    assert_equal 0, @person.subscriptions.count
+
+  end
 
 
   private
