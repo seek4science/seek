@@ -1,7 +1,6 @@
 jQuery(document).ready(function(){
     jQuery(document).on("exhibitConfigured.exhibit", function() {
         hideFacets();
-        hide_specified_facets();
         hide_specified_facet_list();
     });
 });
