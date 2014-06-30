@@ -46,7 +46,7 @@ class Project < ActiveRecord::Base
   validate :ancestor_cannot_be_self
 
   #MERGENOTE - temporary alias
-  alias_attribute :title, :name
+  alias_attribute :name, :title
 
   #MERGENOTE - would like to get rid of this, or move into a shared module
   RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
