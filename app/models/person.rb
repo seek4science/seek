@@ -31,50 +31,6 @@ class Person < ActiveRecord::Base
 
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
-
-  has_many :work_groups, :through=>:group_memberships, :before_add => [:subscribe_to_work_group_project, :touch_work_group_project],
-  :after_remove  => [:unsubscribe_to_work_group_project, :touch_work_group_project]
-  has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"
-
-  def subscribe_to_work_group_project wg
-    #subscribe direct project
-    project_subscriptions.build :project => wg.project unless project_subscriptions.detect {|ps| ps.project == wg.project}
-
-    #subscribe to ancestor projects
-    if Seek::Config.project_hierarchy_enabled
-       wg.project.ancestors.each do |ancestor_proj|
-         project_subscriptions.build :project => ancestor_proj unless project_subscriptions.detect {|ps| ps.project == ancestor_proj}
-       end
-    end
-
-  end
-
-  def unsubscribe_to_work_group_project wg
-     # clear_subscriptions_if_empty
-    if work_groups.empty?
-          project_subscriptions.delete_all
-          subscriptions.delete_all
-    else
-      #Direct project subscriptions are deleted
-      if ps = project_subscriptions.detect {|ps| ps.project == wg.project}
-        project_subscriptions.delete ps
-      end
-      #unsubscribe ancestor projects
-      #if person does not subscribe any sub-projects of parent projects of the unsubscribed project , then parent project subscriptions will be deleted
-      if Seek::Config.project_hierarchy_enabled
-        wg.project.ancestors.each do |ancestor_proj|
-          ancestor_proj_sub = project_subscriptions.where(:project_id => ancestor_proj.id).first
-          project_subscriptions.delete ancestor_proj_sub if !ancestor_proj_sub.has_children?
-        end
-      end
-    end
-
-  end
-
-  def touch_work_group_project wg
-    wg.project.touch
-  end
-
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
   has_many :presentations_for_person,:as=>:contributor, :class_name=>"Presentation"
@@ -106,10 +62,67 @@ class Person < ActiveRecord::Base
 
   alias_attribute :webpage,:web_page
 
-  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person},:uniq=> true, :dependent => :destroy
+
+
+  has_many :work_groups, :through=>:group_memberships, :after_add => [:subscribe_to_work_group_project, :touch_work_group_project],
+  :after_remove  => [:unsubscribe_to_work_group_project, :touch_work_group_project]
+  has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"
+
+  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person} ,:uniq=> true, :dependent => :destroy
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions,:dependent => :destroy
+
+  RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
+  RELATED_RESOURCE_TYPES.each do |type|
+    define_method "related_#{type}" do
+      user_items = []
+      user_items =  user.try(:send,type) if user.respond_to?(type) && [:events,:investigations].include?(type)
+      user_items =  user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
+      user_items = user_items | self.send("#{type}_for_person".to_sym) if self.respond_to? "#{type}_for_person".to_sym
+      user_items.uniq
+    end
+  end
+
+
+
+  def subscribe_to_work_group_project wg
+    #subscribe direct project
+    project_subscriptions.build :project => wg.project unless project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
+    #subscribe parent projects
+    wg.project.ancestors.each do |ancestor_proj|
+      project_subscriptions.build :project => ancestor_proj unless project_subscriptions.detect{|ps| ps.project_id == ancestor_proj.id}
+    end
+  end
+
+  def unsubscribe_to_work_group_project wg
+     # clear project_subscriptions and all subscriptions if person is not project member
+    if work_groups.empty?
+          project_subscriptions.delete_all
+          subscriptions.delete_all
+    else
+      #unsunscribe direct project subscriptions
+      if ps = project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
+        project_subscriptions.delete ps
+      end
+      #unsubscirbe parent project subscriptions
+      if Seek::Config.project_hierarchy_enabled
+        wg.project.ancestors.each do |ancestor_proj|
+          ancestor_proj_sub = project_subscriptions.detect{|ps| ps.project_id == ancestor_proj.id}
+          project_subscriptions.delete ancestor_proj_sub if ancestor_proj_sub && !ancestor_proj_sub.has_children?
+        end
+      end
+
+
+    end
+
+  end
+
+  #touch project to expire cache for project members on project show page?
+  def touch_work_group_project wg
+    wg.project.touch
+  end
+
 
   def queue_update_auth_table
     if changes.include?("roles_mask")
@@ -166,17 +179,6 @@ class Person < ActiveRecord::Base
     user_items = []
     user_items =  user.try(:send,:samples) if user.respond_to?(:samples)
     user_items
-  end
-
-  RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
-  RELATED_RESOURCE_TYPES.each do |type|
-    define_method "related_#{type}" do
-      user_items = []
-      user_items =  user.try(:send,type) if user.respond_to?(type) && [:events,:investigations].include?(type)
-      user_items =  user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
-      user_items = user_items | self.send("#{type}_for_person".to_sym) if self.respond_to? "#{type}_for_person".to_sym
-      user_items.uniq
-    end
   end
 
 
