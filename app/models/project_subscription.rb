@@ -20,11 +20,7 @@ class ProjectSubscription < ActiveRecord::Base
 
   # Project subscription can be deleted if the person of this project subscription subscribes none of descendants of the project
   def has_children?
-     if Seek::Config.project_hierarchy_enabled
-        !ProjectSubscription.where( "person_id = #{person_id}").where("project_id  IN (?)", project.descendants.map(&:id)).empty?
-     else
-       false
-     end
+     Seek::Config.project_hierarchy_enabled &&  !ProjectSubscription.where( "person_id = #{person_id}").where("project_id  IN (?)", project.descendants.map(&:id)).empty?
   end
   #accessors for 'subscribed types' which is just the inverse of unsubscribed_types
   def subscribed_types
