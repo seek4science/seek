@@ -339,6 +339,12 @@ end
     end
   end
 
+  #Treatment
+  Factory.define(:treatment) do |f|
+    f.association :sample, :factory=>:sample
+    f.association :specimen, :factory=>:specimen
+  end
+
   Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
     f.association :content_blob,:factory=>:rightfield_content_blob
   end
