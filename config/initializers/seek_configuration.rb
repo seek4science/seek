@@ -41,6 +41,7 @@ SEEK::Application.configure do
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
+  Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
   Seek::Config.default :biosamples_enabled, true
@@ -107,8 +108,15 @@ SEEK::Application.configure do
 
   Seek::Config.default :datacite_url,"https://mds.datacite.org/"
 
+  #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
+  Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
+
   #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
   Seek::Config.default :magic_guest_enabled,false
+
+  Seek::Config.default :recaptcha_enabled, true
+
+  Seek::Config.default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
 
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,''
