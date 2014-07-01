@@ -61,17 +61,34 @@ class SopTest < ActiveSupport::TestCase
     assert_nil sop_versions(:my_first_sop_v1).avatar_key
     assert sop_versions(:my_first_sop_v1).use_mime_type_for_avatar?
   end
-  
-  def test_defaults_to_blank_policy
-    sop=Sop.new Factory.attributes_for(:sop).tap{|h|h[:policy] = nil}
-    sop.save
-    assert !sop.valid?
-    assert !sop.policy.valid?
-    assert_blank sop.policy.sharing_scope
-    assert_blank sop.policy.access_type
-    assert_equal false,sop.policy.use_whitelist
-    assert_equal false,sop.policy.use_blacklist
-    assert_blank sop.policy.permissions
+
+  def test_defaults_to_private_policy
+    with_config_value "is_virtualliver",false do
+      sop=Sop.new Factory.attributes_for(:sop,:policy=>nil)
+      sop.save!
+      sop.reload
+      assert sop.valid?
+      assert sop.policy.valid?
+      assert_equal Policy::PRIVATE, sop.policy.sharing_scope
+      assert_equal Policy::NO_ACCESS, sop.policy.access_type
+      assert_equal false,sop.policy.use_whitelist
+      assert_equal false,sop.policy.use_blacklist
+      assert_blank sop.policy.permissions
+    end
+  end
+
+  def test_defaults_to_blank_policy_for_vln
+    with_config_value "is_virtualliver",true do
+      sop=Sop.new Factory.attributes_for(:sop,:policy=>nil)
+      sop.save
+      assert !sop.valid?
+      assert !sop.policy.valid?
+      assert_blank sop.policy.sharing_scope
+      assert_blank sop.policy.access_type
+      assert_equal false,sop.policy.use_whitelist
+      assert_equal false,sop.policy.use_blacklist
+      assert_blank sop.policy.permissions
+    end
   end
 
   def test_version_created_for_new_sop
