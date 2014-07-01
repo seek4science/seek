@@ -17,7 +17,7 @@ class Study < ActiveRecord::Base
   belongs_to :person_responsible, :class_name => "Person"
   validates :investigation, :presence => true
 
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+  searchable(:auto_index => false) do
     text :description,:title, :experimentalists
     text :contributor do
       [contributor.try(:person).try(:name),person_responsible.try(:name)]

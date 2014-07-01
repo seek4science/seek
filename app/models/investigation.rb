@@ -13,7 +13,7 @@ class Investigation < ActiveRecord::Base
 
   validates :projects,:presence => true
 
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+  searchable(:auto_index=>false) do
     text :description,:title
     text :contributor do
       contributor.try(:person).try(:name)
