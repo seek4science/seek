@@ -24,7 +24,7 @@ module Acts #:nodoc:
 
         attr_accessor :create_from_asset
 
-        validates_presence_of :title
+        validates :title,:presence => true
 
         has_many :favourites,
                  :as        => :resource,

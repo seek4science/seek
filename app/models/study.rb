@@ -15,7 +15,7 @@ class Study < ActiveRecord::Base
   belongs_to :investigation
   has_many :assays
   belongs_to :person_responsible, :class_name => "Person"
-  validates_presence_of :investigation
+  validates :investigation, :presence => true
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :description,:title, :experimentalists

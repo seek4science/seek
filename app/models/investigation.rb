@@ -9,9 +9,9 @@ class Investigation < ActiveRecord::Base
 
   has_many :studies
 
-  validates_presence_of :title
-
   has_many :assays,:through=>:studies
+
+  validates :projects,:presence => true
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :description,:title
