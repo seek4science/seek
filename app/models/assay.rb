@@ -7,8 +7,6 @@ class Assay < ActiveRecord::Base
   include Seek::OntologyExtensionWithSuggestedType
   include Seek::Taggable
 
-  acts_as_taggable
-
   #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in  
   def projects
     study.try(:investigation).try(:projects) || []
