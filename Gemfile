@@ -54,7 +54,7 @@ gem 'psych'
 gem 'transaction_isolation'
 
 #MERGENOTE - needed?
-gem 'newrelic_rpm'
+#gem 'newrelic_rpm'
 #gem for BiVeS and BudHat
 gem 'bives'
 

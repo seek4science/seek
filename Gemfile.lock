@@ -307,7 +307,6 @@ GEM
     multi_xml (0.5.5)
     mysql2 (0.3.16)
     net-http-persistent (2.9.4)
-    newrelic_rpm (3.9.0.229)
     nokogiri (1.6.2.1)
       mini_portile (= 0.6.0)
     nori (1.1.5)
@@ -591,7 +590,6 @@ DEPENDENCIES
   my_responds_to_parent!
   my_savage_beast!
   mysql2
-  newrelic_rpm
   nokogiri
   open_id_authentication!
   passenger
