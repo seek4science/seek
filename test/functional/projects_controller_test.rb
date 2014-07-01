@@ -83,8 +83,8 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_should_update_project
-		put :update, :id => projects(:four), :project => valid_project
-		assert_redirected_to project_path(assigns(:project))
+    put :update, :id => Factory(:project,:description=>"ffffff"), :project => {:title=>"pppp"}
+    assert_redirected_to project_path(assigns(:project))
     proj = assigns(:project)
     assert_equal "pppp",proj.title
     assert_equal "ffffff",proj.description
