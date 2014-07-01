@@ -1,6 +1,6 @@
 #commented out, since it leads to functional tests always giving exit code 0 even with errors
-#require "coveralls"
-#Coveralls.wear!("rails")
+require "coveralls"
+Coveralls.wear!("rails")
 
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'rails/test_help'
