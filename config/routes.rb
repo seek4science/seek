@@ -132,6 +132,7 @@ SEEK::Application.routes.draw do
       get :get_work_group
       post :userless_project_selected_ajax
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :check_related_items
@@ -161,6 +162,7 @@ SEEK::Application.routes.draw do
       get :request_institutions
       get :manage
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       get :asset_report
@@ -195,6 +197,7 @@ SEEK::Application.routes.draw do
     collection do
       get :request_all
       post :items_for_result
+      post :resource_in_tab
     end
     resources :people,:projects,:specimens,:only=>[:index]
     resources :avatars do
@@ -209,6 +212,7 @@ SEEK::Application.routes.draw do
   resources :investigations do
     collection do
       post :items_for_result
+      post :resource_in_tab
     end
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
     member do
@@ -220,6 +224,7 @@ SEEK::Application.routes.draw do
     collection do
       post :investigation_selected_ajax
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       get :new_object_based_on_existing_one
@@ -231,6 +236,8 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :items_for_result
+      #MERGENOTE - these should be gets and are tested as gets, using post to fix later
+      post :resource_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -271,6 +278,7 @@ SEEK::Application.routes.draw do
       post :upload_for_tool
       post :upload_from_email
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :check_related_items
@@ -310,6 +318,7 @@ SEEK::Application.routes.draw do
       get :preview
       post :test_asset_url
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :check_related_items
@@ -339,6 +348,7 @@ SEEK::Application.routes.draw do
       get :preview
       post :test_asset_url
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       get :compare_versions
@@ -385,6 +395,7 @@ SEEK::Application.routes.draw do
       get :preview
       post :test_asset_url
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :check_related_items
@@ -431,6 +442,7 @@ SEEK::Application.routes.draw do
       get :preview
       post :fetch_preview
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -443,6 +455,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :items_for_result
+      post :resource_in_tab
     end
     resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
@@ -471,6 +484,7 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       get :new_object_based_on_existing_one
@@ -482,6 +496,7 @@ SEEK::Application.routes.draw do
     collection do
       get :existing_strains_for_assay_organism
       post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -507,6 +522,7 @@ SEEK::Application.routes.draw do
   resources :organisms do
     collection do
       post :search_ajax
+      post :resource_in_tab
     end
     resources :projects,:assays,:studies,:models,:strains,:specimens,:only=>[:index]
     member do

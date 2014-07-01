@@ -122,6 +122,43 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
+  #MERGENOTE - put back for now, but needs modularizing, refactoring, and possibly replacing
+  def resource_in_tab
+    resource_type = params[:resource_type]
+    view_type = params[:view_type]
+    scale_title = params[:scale_title] || ''
+
+    if params[:actions_partial_disable] == "true"
+      actions_partial_disable = true
+    else
+      actions_partial_disable = false
+    end
+
+    #params[:resource_ids] is passed as string, e.g. "id1, id2, ..."
+    resource_ids = (params[:resource_ids] || '').split(',')
+    clazz = resource_type.constantize
+    resources = clazz.find_all_by_id(resource_ids)
+    if clazz.respond_to?(:authorized_partial_asset_collection)
+      authorized_resources = clazz.authorized_partial_asset_collection(resources,"view")
+    elsif resource_type == 'Project' || resource_type == 'Institution'
+      authorized_resources = resources
+    elsif resource_type == "Person" && Seek::Config.is_virtualliver && User.current_user.nil?
+      authorized_resources = []
+    else
+      authorized_resources = resources.select &:can_view?
+    end
+
+    render :update do |page|
+      page.replace_html "#{scale_title}_#{resource_type}_#{view_type}",
+                        :partial => "assets/resource_in_tab",
+                        :locals => {:resources => resources,
+                                    :scale_title => scale_title,
+                                    :authorized_resources => authorized_resources,
+                                    :view_type => view_type,
+                                    :actions_partial_disable => actions_partial_disable}
+    end
+  end
+
   private
 
   def restrict_guest_user
@@ -509,6 +546,8 @@ class ApplicationController < ActionController::Base
       end
     end
   end
+
+
 
   def log_extra_exception_data
       request.env["exception_notifier.exception_data"] = {

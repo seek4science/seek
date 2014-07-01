@@ -687,6 +687,7 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  #MERGENOTE - this isn't what this test, and later tests are actually testing, there is no version tested
   test "download link for sop in tab has version" do
     login_as(:owner_of_my_first_sop)
     assert_difference('ActivityLog.count') do
