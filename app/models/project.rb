@@ -66,7 +66,7 @@ class Project < ActiveRecord::Base
   #  necessary, deep copies of it will be made to ensure that all settings get
   #  fully copied and assigned to belong to owners of assets, where identical policy
   #  is to be used)
-  belongs_to :default_policy, 
+  belongs_to :default_policy,
     :class_name => 'Policy',
     :dependent => :destroy,
     :autosave => true
@@ -74,7 +74,12 @@ class Project < ActiveRecord::Base
   after_initialize :default_default_policy_if_new
 
   def default_default_policy_if_new
-    self.default_policy = Policy.default if new_record?
+    unless Seek::Config.is_virtualliver
+      self.default_policy = Policy.default if new_record?
+    else
+      self.default_policy = Policy.private_policy if new_record?
+    end
+
   end
 
   def group_memberships_empty? institution
