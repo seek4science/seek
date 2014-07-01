@@ -35,8 +35,8 @@ class TagsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.list_items_container" do
-      assert_select "a",:text=>p.name,:count=>1
-      assert_select "a",:text=>df.title,:count=>1
+      assert_select "a[href=?]",person_path(p),:text=>p.name,:count=>1
+      assert_select "a[href=?]",data_file_path(df),:text=>df.title,:count=>1
     end
 
   end
@@ -48,7 +48,7 @@ class TagsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "div#notice_flash",:text=>/1 item tagged with 'golf'/,:count=>1
     assert_select "div.list_items_container" do
-      assert_select "a",:text=>p.name,:count=>1
+      assert_select "a[href=?]",person_path(p),:text=>p.name,:count=>1
     end
   end
 
@@ -58,7 +58,7 @@ class TagsControllerTest < ActionController::TestCase
     get :show,:id=>tool.value
     assert_response :success
     assert_select "div.list_items_container" do
-      assert_select "a",:text=>p.name,:count=>1
+      assert_select "a[href=?]",person_path(p),:text=>p.name,:count=>1
     end
   end
 
