@@ -694,8 +694,9 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    #MERGENOTE - we will need to add a specific test for the resource_in_tab if VLN want to keep them?
+    #assert_response :success
+    #get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
     assert_select "div.list_item div.list_item_actions" do
       path=download_sop_path(sops(:my_first_sop))
@@ -709,8 +710,6 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     assert_select "div.list_item div.list_item_actions" do
       path=sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum => 1
@@ -723,8 +722,6 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id=>assays(:metabolomics_assay)
     end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     assert_select "div.list_item div.list_item_actions" do
       path=edit_sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum=>1
@@ -737,8 +734,6 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     assert_select "div.list_item div.list_item_actions" do
       path=download_data_file_path(data_files(:picture))
       assert_select "a[href=?]", path, :minumum => 1
@@ -751,8 +746,6 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
     assert_select "div.list_item div.list_item_actions" do
       path=data_file_path(data_files(:picture))
@@ -766,8 +759,6 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
     assert_select "div.list_item div.list_item_actions" do
       path=edit_data_file_path(data_files(:picture))
@@ -783,7 +774,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
     end
-    get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
     assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]", "nofollow", :text=>/news\.bbc\.co\.uk/, :minimum=>1
@@ -798,7 +788,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
     end
-    get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
     assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]", "nofollow", :text=>/news\.bbc\.co\.uk/, :minimum=>1
@@ -840,8 +829,6 @@ class AssaysControllerTest < ActionController::TestCase
 
     #assay.data_files is data_file_versions
     data_file_ids = assay.data_files.map &:data_file_id
-    get :resource_in_tab, {:resource_ids => data_file_ids.join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-    assert_response :success
     assert_select "div.list_item" do
       assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
       assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
@@ -850,8 +837,7 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     sop_ids = assay.sops.map &:sop_id
-    get :resource_in_tab, {:resource_ids => sop_ids.join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-    assert_response :success
+
     assert_select "div.list_item" do
       assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
       assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
