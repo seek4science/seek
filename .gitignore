@@ -63,3 +63,5 @@ vendor/cache/
 *.orig
 
 coverage/
+
+Test\ Results*.html

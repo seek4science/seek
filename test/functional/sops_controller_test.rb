@@ -235,16 +235,18 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_missing_sharing_should_not_default
-    assert_no_difference('Sop.count') do
-      assert_no_difference('ContentBlob.count') do
-        post :create, :sop => valid_sop
+    with_config_value "is_virtualliver",true do
+      assert_no_difference('Sop.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :create, :sop => valid_sop
+        end
       end
+      s = assigns(:sop)
+      assert !s.valid?
+      assert !s.policy.valid?
+      assert_blank s.policy.sharing_scope
+      assert_blank s.policy.access_type
     end
-    s = assigns(:sop)
-    assert !s.valid?
-    assert !s.policy.valid?
-    assert_blank s.policy.sharing_scope
-    assert_blank s.policy.access_type
   end
 
   test "should create sop with url" do

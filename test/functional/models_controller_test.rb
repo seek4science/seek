@@ -354,26 +354,45 @@ class ModelsControllerTest < ActionController::TestCase
     assert assay.related_asset_ids('Model').include? assigns(:model).id
   end
 
-  def test_missing_sharing_should_default_to_blank
-    assert_no_difference('Model.count') do
-      assert_no_difference('ContentBlob.count') do
-        post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+  def test_missing_sharing_should_default_to_blank_for_vln
+    with_config_value "is_virtualliver",true do
+      assert_no_difference('Model.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+        end
       end
+
+      m = assigns(:model)
+      assert !m.valid?
+      assert !m.policy.valid?
+      assert_blank m.policy.sharing_scope
+      assert_blank m.policy.access_type
+      assert_blank m.policy.permissions
     end
+  end
 
-    m = assigns(:model)
-    assert !m.valid?
-    assert !m.policy.valid?
-    assert_blank m.policy.sharing_scope
-    assert_blank m.policy.access_type
-    assert_blank m.policy.permissions
+  def test_missing_sharing_should_default_to_private
+    with_config_value "is_virtualliver",false do
+      assert_difference('Model.count',1) do
+        assert_difference('ContentBlob.count',1) do
+          post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
+        end
+      end
 
+      m = assigns(:model)
+      assert m.valid?
+      assert m.policy.valid?
+      assert_equal Policy::PRIVATE, m.policy.sharing_scope
+      assert_equal Policy::NO_ACCESS, m.policy.access_type
+      assert_blank m.policy.permissions
+    end
   end
   
 
   test "should create model with image" do
       login_as(:model_owner)
       assert_difference('Model.count') do
+        #MERGENOTE - should this be commented out? either its needed or remove
         #assert_difference('ModelImage.count') do
           post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
         #end
@@ -447,16 +466,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal "http://biomodels/model.xml",model.imported_url
     assert_equal user, model.contributor
   end
-  
-  test "default policy is nil when sharing is missing in VLN"  do
-    assert_difference('Model.count', 0) do
-          assert_difference('ContentBlob.count', 0) do
-            post :create, :model => valid_model,:content_blob=>{:file_0=>fixture_file_upload('files/little_file.txt',Mime::TEXT)}
-          end
-    end
-  end
-
-
   
   test "should create model with url" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"

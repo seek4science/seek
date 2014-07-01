@@ -486,21 +486,48 @@ end
     Seek::Config.admin_impersonation_enabled = old_admin_impersonation
   end
 
-  def test_missing_sharing_should_default_to_blank
-    assert_no_difference('ActivityLog.count') do
-      assert_no_difference('DataFile.count') do
-        assert_no_difference('ContentBlob.count') do
+  def test_missing_sharing_should_default_to_private
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
           post :create, :data_file => valid_data_file
         end
       end
     end
-    
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert assigns(:data_file)
+
     df=assigns(:data_file)
-    assert !df.valid?
-    assert !df.policy.valid?
-    assert_blank df.policy.sharing_scope
-    assert_blank df.policy.access_type
-    assert_blank df.policy.permissions
+    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
+    assert_equal private_policy.sharing_scope,df.policy.sharing_scope
+    assert_equal private_policy.access_type,df.policy.access_type
+    assert_equal private_policy.use_whitelist,df.policy.use_whitelist
+    assert_equal private_policy.use_blacklist,df.policy.use_blacklist
+    assert df.policy.permissions.empty?
+
+    #check it doesn't create an error when retreiving the index
+    get :index
+    assert_response :success
+  end
+
+  def test_missing_sharing_should_default_to_blank_for_vln
+    with_config_value "is_virtualliver",true do
+      assert_no_difference('ActivityLog.count') do
+        assert_no_difference('DataFile.count') do
+          assert_no_difference('ContentBlob.count') do
+            post :create, :data_file => valid_data_file
+          end
+        end
+      end
+
+      df=assigns(:data_file)
+      assert !df.valid?
+      assert !df.policy.valid?
+      assert_blank df.policy.sharing_scope
+      assert_blank df.policy.access_type
+      assert_blank df.policy.permissions
+    end
   end
   
   test "should show data file" do
@@ -1595,9 +1622,10 @@ end
     assert_response :success
 
     assert_select 'select#access_type_select_4' do
-      assert_select "option[selected='selected']", :text => /Download/
+      assert_select "option[selected='selected']", :text => /#{I18n.t("access.accessible_downloadable")}/
     end
   end
+
   test "you should not subscribe to the asset created by the person whose projects overlap with you" do
     proj = Factory(:project)
     current_person = User.current_user.person
