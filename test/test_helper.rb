@@ -1,7 +1,6 @@
-ENV["RAILS_ENV"] = "test"
-
-require "coveralls"
-Coveralls.wear!("rails")
+#commented out, since it leads to functional tests always giving exit code 0 even with errors
+#require "coveralls"
+#Coveralls.wear!("rails")
 
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'rails/test_help'
@@ -233,4 +232,4 @@ class ActiveSupport::TestCase
 end
 
 # Load seed data
-load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
+#load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
