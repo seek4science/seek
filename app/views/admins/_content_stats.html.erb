@@ -88,8 +88,8 @@
               <% authorised_types.each do |type| %>
                   <% if stat.project.children.empty? %>
                       <% type_str = type.name.underscore.pluralize
-                         pub_vis = stat.send("publicly_visible_#{type_str}", [stat.project])
-                         pub_acc = stat.send("publicly_accessible_#{type_str}", [stat.project])
+                         pub_vis = stat.send("publicly_visible_#{type_str}")
+                         pub_acc = stat.send("publicly_accessible_#{type_str}")
                          total = stat.send("#{type_str}").count
                          eval("total_publicly_visible_#{type_str} |= pub_vis")
                          eval("total_publicly_accessible_#{type_str} |= pub_acc")

@@ -25,20 +25,20 @@ module Seek
       AUTHORISED_TYPES.each do |type|
         type_class_name = type.name
         type_str=type_class_name.underscore.pluralize
-        define_method "visible_#{type_str}" do |projects|
-          authorised_assets type_class_name,"view",projects, @user
+        define_method "visible_#{type_str}" do
+          authorised_assets type_class_name,"view",@user
         end
 
-        define_method "accessible_#{type_str}" do |projects|
-          authorised_assets type_class_name,"download",projects, @user
+        define_method "accessible_#{type_str}" do
+          authorised_assets type_class_name,"download",@user
         end
 
-        define_method "publicly_visible_#{type_str}" do |projects|
-          authorised_assets type_class_name,"view",projects, nil
+        define_method "publicly_visible_#{type_str}" do
+          authorised_assets type_class_name,"view", nil
         end
 
-        define_method "publicly_accessible_#{type_str}" do |projects|
-          authorised_assets type_class_name,"download",projects, nil
+        define_method "publicly_accessible_#{type_str}" do
+          authorised_assets type_class_name,"download",nil
         end
 
       end
@@ -49,8 +49,10 @@ module Seek
       
       private
 
-      def authorised_assets asset_type,action, projects, user
-       assets = asset_type.constantize.all_authorized_for(action, user,projects)
+      def authorised_assets asset_type,action, user
+       assets = asset_type.constantize.all_authorized_for(action, user,self.project)
+
+       #MERGENOTE - I'm not sure why this extra filtering is needed here, rather than just getting the information in the earlier call
        assets = assets.select{|asset| asset.is_downloadable?} if action=="download"
        assets
       end
