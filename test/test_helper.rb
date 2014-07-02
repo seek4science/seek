@@ -1,4 +1,5 @@
-#commented out, since it leads to functional tests always giving exit code 0 even with errors
+ENV['RAILS_ENV'] ||= 'test'
+
 require "coveralls"
 Coveralls.wear!("rails")
 
