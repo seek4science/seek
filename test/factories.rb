@@ -2,7 +2,6 @@
 #:pal relies on Role.pal_role being able to find an appropriate role in the db.
 #:assay_modelling and :assay_experimental rely on the existence of the AssayClass's
 
-#MERGENOTE - a lot of factories for assets are enforcing a private prolicy, rather than using the default. This changes the behaviour of the tests from normal behaviour and weakens the tests. These should be removed from the factories.
 #Person
   Factory.define(:admin_defined_role_project, :class=>AdminDefinedRoleProject) do |f|
 
@@ -220,7 +219,6 @@ end
     f.sequence(:description) {|n| "Assay description #{n}"}
     f.association :contributor, :factory => :person
     f.association :study
-    f.association :policy, :factory => :private_policy
   end
 
   Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
@@ -263,14 +261,12 @@ end
     f.sequence(:title) { |n| "Study#{n}" }
     f.association :investigation
     f.association :contributor, :factory => :person
-  f.association :policy, :factory => :private_policy
   end
 
   #Investigation
   Factory.define(:investigation) do |f|
     f.projects {[Factory.build(:project)]}
     f.sequence(:title) { |n| "Investigation#{n}" }
-  f.association :policy, :factory => :private_policy
   end
 
   #Strain
@@ -279,7 +275,6 @@ end
     f.association :organism
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-    f.association :policy, :factory => :public_policy
   end
 
   #Culture growth type
@@ -308,7 +303,6 @@ end
     f.projects {[Factory.build(:project)]}
     f.association :institution
     f.association :strain
-  f.association :policy, :factory => :private_policy
   end
 
   #Sample
@@ -318,7 +312,6 @@ end
     f.projects {[Factory.build(:project)]}
     f.donation_date Date.today
     f.specimen { Factory(:specimen, :policy => Factory(:public_policy))}
-    f.association :policy, :factory => :private_policy
   end
 
 
@@ -327,7 +320,6 @@ end
     f.sequence(:title) {|n| "A Data File_#{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-    f.association :policy, :factory => :private_policy
     f.after_create do |data_file|
       if data_file.content_blob.blank?
         data_file.content_blob = Factory.create(:pdf_content_blob, :asset => data_file, :asset_version=>data_file.version)
@@ -370,7 +362,6 @@ end
     f.sequence(:title) {|n| "A Model #{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
-    f.association :policy, :factory => :private_policy
     f.after_create do |model|
        model.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
     end
@@ -462,9 +453,7 @@ end
   Factory.define(:presentation) do |f|
     f.sequence(:title) { |n| "A Presentation #{n}" }
     f.projects { [Factory.build(:project)] }
-    # f.data_url "http://www.virtual-liver.de/images/logo.png"
     f.association :contributor, :factory => :user
-  f.association :policy, :factory => :private_policy
     f.after_create do |presentation|
       if presentation.content_blob.blank?
         presentation.content_blob = Factory.create(:content_blob, :original_filename => "test.pdf", :content_type => "application/pdf", :asset => presentation, :asset_version => presentation.version)
@@ -578,7 +567,6 @@ end
     f.title "An Event"
     f.start_date Time.now
     f.end_date 1.days.from_now
-    f.association :policy, :factory => :private_policy
     f.projects { [Factory.build(:project)] }
   end
 
