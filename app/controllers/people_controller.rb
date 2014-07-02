@@ -269,11 +269,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.update_attributes(params[:person])
         set_roles(@person, params) if User.admin_logged_in?
-        #clear subscriptions for non_project members
-        if @person.projects.empty?
-             @person.project_subscriptions = []
-             @person.subscriptions = []
-        end
+
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
         if Seek::Config.email_enabled && had_no_projects && !@person.work_groups.empty? && @person != current_user.person
@@ -437,7 +433,7 @@ class PeopleController < ApplicationController
             project = work_group.try(:project)
             projects << project unless project.nil?
           end
-        project_manager_projects = Project.is_hierarchical?? current_user.person.projects_and_descendants : current_user.person.projects
+        project_manager_projects = Seek::Config.project_hierarchy_enabled==true ? current_user.person.projects_and_descendants : current_user.person.projects
           flag = true
           projects.each do |project|
           unless @person.projects.include?(project) || project.can_be_administered_by?(current_user)

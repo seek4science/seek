@@ -220,7 +220,7 @@ class ProjectsController < ApplicationController
   # DELETE /projects/1.xml
   def destroy
     respond_to do |format|
-      if @project.can_delete? && ((Project.is_hierarchical? && @project.children.empty?) || !Project.is_hierarchical?)
+      if @project.can_delete? && ((Seek::Config.project_hierarchy_enabled && @project.children.empty?) || !Seek::Config.project_hierarchy_enabled)
         @project.destroy
         format.html { redirect_to(projects_path) }
         format.xml { head :ok }
