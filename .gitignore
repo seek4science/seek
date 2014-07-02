@@ -60,13 +60,8 @@ vendor/bundle/
 vendor/cache/
 *.~lock*
 
-syntax: regexp
-\.orig$
-\.orig\..*$
-\.chg\..*$
-\.rej$
-\Thumbs\.db$
-
-db-dump.sql
+*.orig
 
 coverage/
+
+Test\ Results*.html
