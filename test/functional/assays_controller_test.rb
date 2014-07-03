@@ -424,23 +424,23 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
-  test "should not create modelling assay with sample for SysMO, but for VL" do
+  test "should not create modelling assay with sample" do
     person = Factory(:person)
-    as_not_virtualliver do
-      assert_no_difference("Assay.count") do
-        post :create, :assay => {:title => "test",
-                                 :study_id => studies(:metabolomics_study).id,
-                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :sample_ids=>[Factory(:sample).id, Factory(:sample).id].join(",")
-                                 },
-                                 :sharing => valid_sharing
-      end
-      assert_response :success
-      assert assigns(:assay)
-      assay = assigns(:assay)
-      assert_equal 0, assay.samples.count
+    assert_no_difference("Assay.count") do
+      post :create, :assay => {:title => "test",
+                               :study_id => studies(:metabolomics_study).id,
+                           :assay_class_id=>assay_classes(:modelling_assay_class).id,
+                           :sample_ids=>[Factory(:sample).id, Factory(:sample).id].join(",")
+                               },
+                               :sharing => valid_sharing
     end
+    assert_response :success
+    assert assigns(:assay)
+    assay = assigns(:assay)
+    assert_equal 0, assay.samples.count
+  end
 
+  test "should create modelling assay with sample for virtual liver" do
     as_virtualliver do
       assert_difference("Assay.count") do
         post :create, :assay => {:title => "test",
@@ -448,7 +448,7 @@ class AssaysControllerTest < ActionController::TestCase
                                  :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                                  :study_id => studies(:metabolomics_study).id,
                                  :assay_class_id => assay_classes(:modelling_assay_class).id,
-                                 :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
+                                 :sample_ids => [Factory(:sample, :policy=>Factory(:public_policy)).id, Factory(:sample,:policy=>Factory(:public_policy)).id]},
                                  :sharing => valid_sharing
       end
       assert assigns(:assay)

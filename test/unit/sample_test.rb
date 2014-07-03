@@ -7,7 +7,7 @@ class SampleTest < ActiveSupport::TestCase
   # to set up fixture information.
   test "validation" do
 
-    s = Factory :sample,:title =>"TestSample"
+    s = Factory :sample,:title =>"TestSample",:policy=>Factory(:private_policy)
     assert s.valid?
 
     s.title= nil
@@ -28,7 +28,7 @@ class SampleTest < ActiveSupport::TestCase
       s.donation_date=nil
       assert !s.valid?
       #for projects, it doesnt work by doing s.projects=[]
-      assert Factory.build(:sample, :projects => []).valid?
+      assert Factory.build(:sample, :projects => [],:policy=>Factory(:private_policy)).valid?
     end
 
     as_not_virtualliver do
@@ -36,7 +36,7 @@ class SampleTest < ActiveSupport::TestCase
       s.donation_date=nil
       assert s.valid?
       #for projects, it doesnt work by doing s.projects=[]
-      assert !Factory.build(:sample, :projects => []).valid?
+      assert !Factory.build(:sample, :projects => [],:policy=>Factory(:private_policy)).valid?
     end
 
     s.reload
