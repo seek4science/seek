@@ -101,6 +101,13 @@ GIT
     white_list_formatted_content (1.0.0)
 
 GIT
+  remote: git://github.com/amerine/acts_as_tree.git
+  revision: 2d3051098003e86808c9939fde8b4fd2eec74a2d
+  specs:
+    acts_as_tree (1.6.1)
+      activerecord (>= 3.0.0)
+
+GIT
   remote: git://github.com/myGrid/annotations.git
   revision: d33e78993ee957fa12d71cbe9f03100dd9b0ad15
   specs:
@@ -172,8 +179,6 @@ GEM
       rails (>= 3, < 5)
     acts_as_list (0.4.0)
       activerecord (>= 3.0)
-    acts_as_tree (1.6.1)
-      activerecord (>= 3.0.0)
     addressable (2.3.6)
     akami (1.2.2)
       gyoku (>= 0.4.0)
@@ -549,7 +554,7 @@ DEPENDENCIES
   acts_as_activity_logged!
   acts_as_list
   acts_as_trashable!
-  acts_as_tree
+  acts_as_tree!
   app_version!
   bio
   bioportal (>= 2.2)
