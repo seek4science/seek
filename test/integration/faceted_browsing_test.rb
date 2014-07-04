@@ -67,7 +67,6 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
     Factory(:assay, :policy => Factory(:public_policy))
     with_config_value :faceted_browsing_enabled,true do
       get "/assays"
-      record_body
       assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
       assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", :count => 1
       assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
