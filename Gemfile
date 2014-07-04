@@ -38,7 +38,7 @@ gem "fssm"
 gem 'acts-as-taggable-on',"3.0.1"
 gem 'acts_as_list'
 #MERGENOTE - check for released gem, using fix directly from github for now after raising issue
-gem 'acts_as_tree', :git=>'git://github.com/amerine/acts_as_tree.git'
+gem 'acts_as_tree'
 gem 'country-select'
 gem 'modporter-plugin'
 gem "will_paginate", "~> 3.0.4"
