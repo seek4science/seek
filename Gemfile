@@ -37,7 +37,6 @@ gem "exception_notification"
 gem "fssm"
 gem 'acts-as-taggable-on',"3.0.1"
 gem 'acts_as_list'
-#MERGENOTE - check for released gem, using fix directly from github for now after raising issue
 gem 'acts_as_tree'
 gem 'country-select'
 gem 'modporter-plugin'
@@ -54,8 +53,6 @@ gem 'lograge'
 gem 'psych'
 gem 'transaction_isolation'
 
-#MERGENOTE - needed?
-#gem 'newrelic_rpm'
 #gem for BiVeS and BudHat
 gem 'bives'
 
