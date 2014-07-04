@@ -162,6 +162,7 @@ module ProjectsHelper
         end
 
         folder_tag =  expand_link + collapse_link
+        #MERGENOTE - why have these funny characters only just started causing a problem with 1.9.3 and needing the utf-8 comment?
         if foldable
           folder = child.has_children? ? folder_tag : " └ "
         else
