@@ -65,7 +65,7 @@ module AuthenticatedSystem
 
     respond_to do |format|
       format.html do
-        store_location
+        store_return_to_location
         redirect_to main_app.root_path
       end
       format.any do
@@ -77,20 +77,19 @@ module AuthenticatedSystem
   # Store the URI of the current request in the session.
   #
   # We can return to this location by calling #redirect_back_or_default.
-  def store_location
+  def store_return_to_location
     session[:return_to] = request.fullpath
   end
 
-  #MERGENOTE - what's this?
   def clear_return_to
     session.delete(:return_to)
   end
   
-  # Redirect to the URI stored by the most recent store_location call or
+  # Redirect to the URI stored by the most recent store_return_to_location call or
   # to the passed default.
   def redirect_back_or_default(default)
     redirect_to(session[:return_to] || default)
-    session[:return_to] = nil
+    clear_return_to
   end
 
   def redirect_back
