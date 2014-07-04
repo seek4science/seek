@@ -23,8 +23,8 @@ end
 def fix_file_extensions(run)
   Dir.mktmpdir("#{run.id}", Rails.root.join("tmp")) do |tmp_dir|
     tmp_zip = File.join(tmp_dir, "all.zip")
-    Zip::ZipFile.open(run.results.path) do |old_zip|
-      Zip::ZipFile.open(tmp_zip, Zip::ZipFile::CREATE) do |new_zip|
+    Zip::File.open(run.results.path) do |old_zip|
+      Zip::File.open(tmp_zip, Zip::File::CREATE) do |new_zip|
         old_zip.each do |file|
           output = run.outputs.detect { |o| o.name == file.name.split('/').first }
           ext = output.nil? ? nil : output.file_extension
@@ -40,8 +40,8 @@ def fix_file_extensions(run)
     run.outputs.select { |o| o.depth > 0 }.each do |output|
       ext = output.file_extension
       tmp_zip = File.join(tmp_dir, File.basename(output.file.path))
-      Zip::ZipFile.open(output.file.path) do |old_zip|
-        Zip::ZipFile.open(tmp_zip, Zip::ZipFile::CREATE) do |new_zip|
+      Zip::File.open(output.file.path) do |old_zip|
+        Zip::File.open(tmp_zip, Zip::File::CREATE) do |new_zip|
           old_zip.each do |file|
             copy_file_between_zips(old_zip, new_zip, file.name, ext)
           end

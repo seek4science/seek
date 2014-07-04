@@ -366,7 +366,7 @@
               <% elsif p.contributor_type == "WorkGroup" -%>
                 <% contributor_name = p.contributor.project.title + " @ " + p.contributor.institution.title -%>
               <% else -%>
-                <% contributor_name = p.contributor.name -%>
+                <% contributor_name = p.contributor.title -%>
               <% end -%>
 
               // Need to decodeHTML for person name, as it comes from the autocompleter
