@@ -390,11 +390,13 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test "finding by role" do
-    role=project_roles(:member)
-    get :index, :project_role_id=>role.id
+    p1 = Factory(:pal)
+    p2 = Factory(:person)
+    get :index, :project_role_id=>ProjectRole.pal_role.id
     assert_response :success
     assert assigns(:people)
-    assert assigns(:people).include?(people(:person_for_model_owner))
+    assert assigns(:people).include?(p1)
+    refute assigns(:people).include?(p2)
   end
 
   test "admin can manage person" do
