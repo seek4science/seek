@@ -186,13 +186,6 @@ class Project < ActiveRecord::Base
     p=Project.all(:include=>:work_groups)
     return p.select { |proj| proj.includes_userless_people? }
   end
-  
-  
-  # get a listing of institutions for this project
-  def get_institutions_listing
-    workgroups_for_project = WorkGroup.where(:project_id => self.id)
-    return workgroups_for_project.collect { |w| [w.institution.title, w.institution.id, w.id] }
-  end
 
   def assays
     studies.collect{|s| s.assays}.flatten.uniq

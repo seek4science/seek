@@ -243,7 +243,7 @@ class ProjectsController < ApplicationController
     
     begin
       project = Project.find(project_id)
-      institution_list = project.get_institutions_listing
+      institution_list = project.work_groups.collect{|w| [w.institution.title, w.institution.id, w.id]}
       success = true
     rescue ActiveRecord::RecordNotFound
       # project wasn't found
