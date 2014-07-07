@@ -733,7 +733,7 @@ end
   end
 
   test "should gracefully handle when downloading a unknown host url" do
-    WebMock.allow_net_connect!
+    stub_request(:any, "http://sdkfhsdfkhskfj.com/pic.png").to_raise(SocketError)
     df=data_files(:url_no_host_data_file)
     get :download,:id=>df
     assert_redirected_to data_file_path(df,:version=>df.version)
