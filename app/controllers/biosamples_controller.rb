@@ -106,7 +106,7 @@ class BiosamplesController < ApplicationController
     specimens_of_strains = []
     strains = []
     specimens_with_default_strain =[]
-    if params[:strain_ids]
+    if !params[:strain_ids].blank?
       strain_ids = params[:strain_ids].split(',')
       strain_ids.each do |strain_id|
         strain=Strain.find_by_id(strain_id)
@@ -116,8 +116,7 @@ class BiosamplesController < ApplicationController
           specimens_of_strains |= specimens.select(&:can_view?)
         end
       end
-    end
-    if Seek::Config.is_virtualliver && params[:organism_ids]
+    elsif Seek::Config.is_virtualliver && params[:organism_ids]
       organism_ids = params[:organism_ids].split(",")
       organism_ids.each do |organism_id|
        default_strains = Strain.find_all_by_title_and_organism_id "default", organism_id

@@ -22,7 +22,9 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.is_virtualliver
     Seek::Config.is_virtualliver = original_value
   end
-
+  test 'project_hierarchy_enabled' do
+    assert_equal true ,Seek::Config.project_hierarchy_enabled
+  end
   test "scales" do
     assert_equal ["organism","liver","liverLobule","intercellular","cell"],Seek::Config.scales
   end

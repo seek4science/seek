@@ -94,7 +94,7 @@
         if (table_name == 'strain_table') {
         <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'},
                            :method => :get,
-                           :with => "'strain_ids=' + getSelectedStrains()",
+                           :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')",
                            :before=>"show_large_ajax_loader('existing_specimens')");%>
             show_existing_specimens();
             hide_existing_samples();

@@ -69,7 +69,7 @@ SEEK::Application.configure do
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2
-
+  Seek::Config.default :project_hierarchy_enabled, false
 # Branding
   Seek::Config.default :project_name,'SysMO'
   Seek::Config.default :project_type,'Consortium'
