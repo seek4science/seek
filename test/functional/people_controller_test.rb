@@ -1116,49 +1116,47 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'unsubscribe to a project should unsubscribe all the items of that project' do
-    temp = Seek::Config.email_enabled
-    Seek::Config.email_enabled=true
+    with_config_value "email_enabled",true do
+      proj = Factory(:project)
+      sop = Factory(:sop, :project_ids => [proj.id], :policy => Factory(:public_policy))
+      df = Factory(:data_file, :project_ids => [proj.id], :policy => Factory(:public_policy))
 
-    proj = Factory(:project)
-    sop = Factory(:sop, :project_ids => [proj.id], :policy => Factory(:public_policy))
-    df = Factory(:data_file, :project_ids => [proj.id], :policy => Factory(:public_policy))
+      #subscribe to project
+      current_person=User.current_user.person
+      put :update, :id => current_person, :receive_notifications => true, :person => {:project_subscriptions_attributes => {'0' => {:project_id => proj.id, :frequency => 'weekly', :_destroy => '0'}}}
+      assert_redirected_to current_person
 
-    #subscribe to project
-    current_person=User.current_user.person
-    put :update, :id => current_person, :receive_notifications => true, :person => {:project_subscriptions_attributes => {'0' => {:project_id => proj.id, :frequency => 'weekly', :_destroy => '0'}}}
-    assert_redirected_to current_person
+      project_subscription_id = ProjectSubscription.find_by_project_id(proj.id).id
+      assert_difference "Subscription.count",2 do
+        ProjectSubscriptionJob.new(project_subscription_id).perform
+      end
+      assert sop.subscribed?(current_person)
+      assert df.subscribed?(current_person)
+      assert current_person.receive_notifications?
 
-    project_subscription_id = ProjectSubscription.find_by_project_id(proj.id).id
-    assert_difference "Subscription.count",2 do
-      ProjectSubscriptionJob.new(project_subscription_id).perform
-    end
-    assert sop.subscribed?(current_person)
-    assert df.subscribed?(current_person)
-    assert current_person.receive_notifications?
-
-    assert_emails 1 do
-      Factory(:activity_log, :activity_loggable => sop, :action => 'update')
-      Factory(:activity_log, :activity_loggable => df, :action => 'update')
-      SendPeriodicEmailsJob.new('weekly').perform
-    end
-
-    #unsubscribe to project
-    put :update, :id => current_person, :receive_notifications => true, :person => {:project_subscriptions_attributes => {'0' => {:id => current_person.project_subscriptions.first.id, :project_id => proj.id, :frequency => 'weekly', :_destroy => '1'}}}
-    assert_redirected_to current_person
-    assert current_person.project_subscriptions.empty?
-
-    sop.reload
-    df.reload
-    assert !sop.subscribed?(current_person)
-    assert !df.subscribed?(current_person)
-    assert current_person.receive_notifications?
-
-    assert_emails 0 do
+      assert_emails 1 do
         Factory(:activity_log, :activity_loggable => sop, :action => 'update')
         Factory(:activity_log, :activity_loggable => df, :action => 'update')
         SendPeriodicEmailsJob.new('weekly').perform
+      end
+
+      #unsubscribe to project
+      put :update, :id => current_person, :receive_notifications => true, :person => {:project_subscriptions_attributes => {'0' => {:id => current_person.project_subscriptions.first.id, :project_id => proj.id, :frequency => 'weekly', :_destroy => '1'}}}
+      assert_redirected_to current_person
+      assert current_person.project_subscriptions.empty?
+
+      sop.reload
+      df.reload
+      assert !sop.subscribed?(current_person)
+      assert !df.subscribed?(current_person)
+      assert current_person.receive_notifications?
+
+      assert_emails 0 do
+        Factory(:activity_log, :activity_loggable => sop, :action => 'update')
+        Factory(:activity_log, :activity_loggable => df, :action => 'update')
+        SendPeriodicEmailsJob.new('weekly').perform
+      end
     end
-    Seek::Config.email_enabled=temp
   end
 
   test 'should subscribe a person to a project when assign a person to that project' do
