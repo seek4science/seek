@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
 
-  fixtures :people,:users, :projects, :work_groups, :group_memberships, :project_roles
+  fixtures :people,:users, :projects, :work_groups, :group_memberships, :project_roles, :institutions
 
   include AuthenticatedTestHelper
   include RestTestCases
