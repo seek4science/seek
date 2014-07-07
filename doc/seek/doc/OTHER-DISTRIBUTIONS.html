@@ -130,9 +130,9 @@ need to be followed.</p>
 
 <pre>sudo apt-get install libcurl4-gnutls-dev</pre>
 
-<p>before running bundle install set the variable:</p>
+<p>before running bundle install run the following:</p>
 
-<pre>export NOKOGIRI_USE_SYSTEM_LIBRARIES=1</pre>
+<pre>bundle config build.nokogiri --use-system-libraries</pre>
 
 <p>This forces the <em>nokogiri</em> gem to rebuild against the newer
 installed version of <em>LibXML</em>. If you have already run bundle
