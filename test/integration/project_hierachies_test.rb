@@ -8,6 +8,7 @@ class ProjectHierarchiesTest < ActiveSupport::TestCase
     @subscribables_in_proj = [Factory(:subscribable, :projects => [Factory(:project), @proj]), Factory(:subscribable, :projects => [@proj, Factory(:project), Factory(:project)]), Factory(:subscribable, :projects => [@proj])]
   end
 
+  #MERGENOTE - needs to explicitly test this case rather than skipping if not enabled
   if Project.is_hierarchical?
 
     test "person's projects include direct projects and parent projects" do
