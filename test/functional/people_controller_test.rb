@@ -171,22 +171,16 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  #MERGENOTE - the test wont run, needs wrapping with as_virtualliver
-  if Seek::Config.is_virtualliver
-    test 'anonymous user cannot view people' do
-        logout
-        get :show, :id => people(:quentin_person)
-        assert_not_nil flash[:error]
-      end
-
-
-    test 'anonymous user doesnt see people in index' do
+  test "virtual liver hides access to index people page for logged out user" do
+    with_config_value "is_virtualliver",true do
       Factory :person, :first_name => 'Invisible', :last_name => ''
       logout
       get :index
       assert_select 'a', :text => /Invisible/, :count => 0
     end
+
   end
+
 
   def test_should_get_edit
     get :edit, :id => people(:quentin_person)
@@ -1242,13 +1236,16 @@ class PeopleControllerTest < ActionController::TestCase
       get :show, :id => a_person
       assert_response :success
       assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
-	  
-      #MERGENOTE - virtualliver changed this to test only VLN with the following, needs putting in a new test
-      #as_virtualliver do
-      #  get :show, :id => a_person
-      #  assert_response :redirect
-      #  assert_select "div.foldTitle", :text => "Subscriptions", :count => 0
-      #end
+  end
+
+  test "virtual liver blocks access to profile page whilst logged out" do
+    a_person = Factory(:person)
+    logout
+    as_virtualliver do
+      get :show, :id => a_person
+      assert_response :redirect
+      refute_nil flash[:error]
+    end
   end
 
   test 'should update page limit_latest when changing the setting from admin' do
