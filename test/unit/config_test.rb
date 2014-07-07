@@ -17,14 +17,17 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test "is_virtualliver" do
-    original_value = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = true
-    assert Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = original_value
+    with_config_value "is_virtualliver",true do
+      assert Seek::Config.is_virtualliver
+    end
   end
+
   test 'project_hierarchy_enabled' do
-    assert_equal true ,Seek::Config.project_hierarchy_enabled
+    with_config_value "project_hierarchy_enabled",true do
+      assert_equal true ,Seek::Config.project_hierarchy_enabled
+    end
   end
+
   test "scales" do
     assert_equal ["organism","liver","liverLobule","intercellular","cell"],Seek::Config.scales
   end
