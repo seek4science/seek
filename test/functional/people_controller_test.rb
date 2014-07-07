@@ -1162,12 +1162,15 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should subscribe a person to a project when assign a person to that project' do
-      a_person = Factory(:person)
+      a_person = Factory(:brand_new_person)
       project = Factory(:project)
       work_group = Factory(:work_group, :project => project)
+      refute a_person.work_groups.include?(work_group)
+      refute a_person.project_subscriptions.collect(&:project).include?(project)
 
-      #assign a person to a project
-      put :administer_update, :id => a_person, :person =>{:work_group_ids => [work_group.id]}
+      assert_difference("ProjectSubscription.count",1) do
+        put :administer_update, :id => a_person, :person =>{:work_group_ids => [work_group.id]}
+      end
 
       assert_redirected_to a_person
       a_person.reload
@@ -1176,39 +1179,27 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should unsubscribe a person to a project when unassign a person to that project' do
-      #MERGENOTE - needs putting back to the original test, and splitting up. trying to test too much in one test
-	  a_person = Factory(:brand_new_person)
-      #no default subscriptions for new created person,as no projects related to the new person
-      assert a_person.project_subscriptions.empty?
-      work_groups = a_person.work_groups
-      projects = a_person.projects
-      assert_equal 0, projects.count
-      assert_equal 0, work_groups.count
+	    person = Factory(:person)
+      project = person.projects.first
+      assert person.project_subscriptions.collect(&:project).include?(project)
 
-      # create default project subscriptions when the person becomes member of projects
-      put :administer_update, :id => a_person, :person =>{:work_group_ids => [Factory(:work_group).id]}
-      assert_redirected_to a_person
-      a_person.reload
-      work_groups = a_person.work_groups
-      projects = a_person.projects
-      assert_equal 1, projects.count
-      assert_equal 1, work_groups.count
-      assert a_person.project_subscriptions.collect(&:project).include?(projects.first)
-
-      s=Factory(:subscribable, :project_ids => projects.collect(&:id))
-      SetSubscriptionsForItemJob.new(s.class.name, s.id, projects.collect(&:id)).perform
-      assert s.subscribed?(a_person)
+      s=Factory(:subscribable, :project_ids => [project.id])
+      SetSubscriptionsForItemJob.new(s.class.name, s.id, [project.id]).perform
+      assert s.subscribed?(person)
 
       #unassign a person to a project
-      put :administer_update, :id => a_person, :person =>{:work_group_ids => []}
+      assert_difference("ProjectSubscription.count",-1) do
+        put :administer_update, :id => person, :person =>{:work_group_ids => []}
+      end
 
-      assert_redirected_to a_person
-      a_person.reload
-      assert_empty a_person.work_groups
-      assert_empty a_person.projects
-      assert !a_person.project_subscriptions.collect(&:project).include?(projects.first)
+
+      assert_redirected_to person
+      person.reload
+      assert_empty person.work_groups
+      assert_empty person.projects
+      refute person.project_subscriptions.collect(&:project).include?(projects.first)
       s.reload
-      assert !s.subscribed?(a_person)
+      refute s.subscribed?(person)
   end
 
   test 'should show subscription list to only yourself and admin' do
