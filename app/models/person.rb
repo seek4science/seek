@@ -76,8 +76,10 @@ class Person < ActiveRecord::Base
     #subscribe direct project
     project_subscriptions.build :project => wg.project unless project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
     #subscribe parent projects
-    wg.project.ancestors.each do |ancestor_proj|
-      project_subscriptions.build :project => ancestor_proj unless project_subscriptions.detect{|ps| ps.project_id == ancestor_proj.id}
+    if Seek::Config.project_hierarchy_enabled
+      wg.project.ancestors.each do |ancestor_proj|
+        project_subscriptions.build :project => ancestor_proj unless project_subscriptions.detect{|ps| ps.project_id == ancestor_proj.id}
+      end
     end
   end
 
