@@ -6,7 +6,6 @@ class Post < ActiveRecord::Base
   belongs_to :topic
   has_many :attachments, :class_name => "ForumAttachment", :dependent => :destroy
 
-  format_attribute :body
   before_create { |r| r.forum_id = r.topic.forum_id }
   after_create  :update_cached_fields
   after_destroy :update_cached_fields
