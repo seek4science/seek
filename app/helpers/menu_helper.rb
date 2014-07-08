@@ -100,7 +100,7 @@ module MenuHelper
 
   def current_second_level_section sections
     section = sections.find do |section|
-      request.path.end_with?(section[:path])
+      !section[:path].nil? && request.path.end_with?(section[:path])
     end
 
     c = controller.controller_name.to_s
@@ -118,7 +118,7 @@ module MenuHelper
     path = request.path
 
     menu = definitions.find do |menu|
-      !menu[:sections].nil? && !menu[:sections].select{|section| !section[:path].nil? && section[:path].end_with?(path)}.empty?
+      !menu[:sections].nil? && !menu[:sections].select{|section| !section[:path].nil? && !path.nil? && section[:path].end_with?(path)}.empty?
     end
 
     menu ||= definitions.find do |menu|
