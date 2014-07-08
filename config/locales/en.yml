@@ -46,6 +46,10 @@ en:
 
   scale: "Scale"
 
+  gadget:
+    new_heading: "New or upload"
+    create_button: "CREATE"
+
   menu:
     yellow_pages: "Yellow pages"
     isa:  "Experiment details"

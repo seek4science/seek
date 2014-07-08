@@ -48,6 +48,10 @@ en:
   #Feedback
   feedback_bar: "Provide Feedback"
 
+  gadget:
+      new_heading: ""
+      create_button: "NEW/Upload"
+
   menu:
     yellow_pages: "Yellow pages"
     isa:  "Experiment details"
