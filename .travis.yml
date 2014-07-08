@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - ruby-1.9.3-p547
+  - ruby-2.1.2
 before_install:
   - bundle config build.nokogiri --use-system-libraries
 script:
