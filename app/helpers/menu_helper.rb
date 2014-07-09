@@ -119,7 +119,7 @@ module MenuHelper
     path = request.path
 
     menu = definitions.find do |menu|
-      !menu[:sections].nil? && !menu[:sections].select{|section| !section[:path].nil? && section[:path].end_with?(path)}.empty?
+      !menu[:sections].nil? && !menu[:sections].select{|section| !section[:path].nil? && !path.nil? && section[:path].end_with?(path)}.empty?
     end
 
     menu ||= definitions.find do |menu|
