@@ -883,8 +883,25 @@ end
     f.sequence(:image_name) {|n| "image_#{n}"}
   end
 
+  Factory.define :post do |f|
+    f.body 'post body'
+    f.association :user, :factory => :user
+    f.association :topic, :factory => :topic
+  end
 
-  #Workflow
+  Factory.define :topic do |f|
+    f.title 'a topic'
+    f.body 'topic body'
+    f.association :user, :factory => :user
+    f.association :forum, :factory => :forum
+  end
+
+  Factory.define :forum do |f|
+    f.name 'a forum'
+  end
+
+
+#Workflow
   Factory.define(:workflow) do |f|
     f.sequence(:title) {|n| "A Workflow_#{n}"}
     f.projects {[Factory.build(:project)]}
