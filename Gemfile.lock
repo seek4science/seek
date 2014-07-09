@@ -37,6 +37,12 @@ GIT
     fleximage (0.1)
 
 GIT
+  remote: git://github.com/SysMO-DB/gibberish.git
+  revision: d24c42b9608f39f82e37e757f530d8199049c557
+  specs:
+    gibberish (1.0.0)
+
+GIT
   remote: git://github.com/SysMO-DB/my_rails_settings.git
   revision: e3f7fe9625ea27fea42b02c95e30cb4f1341655b
   specs:
@@ -563,6 +569,7 @@ DEPENDENCIES
   fleximage!
   flog
   fssm
+  gibberish!
   google-analytics-rails
   hpricot (~> 0.8.2)
   in_place_editing
