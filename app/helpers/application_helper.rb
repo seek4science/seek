@@ -72,20 +72,17 @@ module ApplicationHelper
     if items.empty? && title_only_items.empty? && hidden_items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else
-
       items = items.sort_by { |i| get_object_title(i) } if sort
       title_only_items = title_only_items.sort_by { |i| get_object_title(i) } if sort
 
       list = items.collect { |i| link_to truncate(i.title, :length => max_length), show_resource_path(i), :title => get_object_title(i) }
       list = list + title_only_items.collect { |i| h(truncate(i.title, :length => max_length)) }
       html << list.join(', ')
-
-
-        if count_hidden_items && !hidden_items.empty?
-          text = items.size > 0 ? " and " : ""
-          text << "#{hidden_items.size} hidden #{hidden_items.size > 1 ? 'items' :'item'}"
-          html << hidden_items_html(hidden_items,text)
-        end
+      if count_hidden_items && !hidden_items.empty?
+        text = items.size > 0 ? " and " : ""
+        text << "#{hidden_items.size} hidden #{hidden_items.size > 1 ? 'items' : 'item'}"
+        html << hidden_items_html(hidden_items, text)
+      end
 
     end
     html.html_safe
@@ -713,7 +710,7 @@ module ApplicationHelper
                "assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>I18n.t('sop').pluralize,"models"=>I18n.t('model').pluralize,"data_files"=>I18n.t('data_file').pluralize,
                "publications"=>"Publications","investigations"=>I18n.t('investigation').pluralize,"studies"=>I18n.t('study').pluralize,
                "specimens"=>I18n.t('biosamples.sample_parent_term').pluralize,"samples"=>"Samples","strains"=>"Strains","organisms"=>"Organisms","biosamples"=>"Biosamples",
-               "presentations"=>I18n.t('presentation').pluralize,"events"=>I18n.t('event').pluralize,"help_documents"=>"Help"}
+               "presentations"=>I18n.t('presentation').pluralize,"programmes"=>I18n.t('programme').pluralize,"events"=>I18n.t('event').pluralize,"help_documents"=>"Help"}
 end
 
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder

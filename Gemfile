@@ -16,7 +16,7 @@ gem "rmagick","2.13.2"
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
-gem 'rubyzip',"0.9.9"
+gem 'rubyzip', "~> 1.1.4"
 gem 'bio'
 gem 'sunspot_rails'
 gem 'sunspot_solr'
@@ -33,7 +33,7 @@ gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
 gem 'docsplit'
 gem "pothoven-attachment_fu"
-gem "exception_notification","3.0.1"
+gem "exception_notification"
 gem "fssm"
 gem 'acts-as-taggable-on',"3.0.1"
 gem 'acts_as_list'
@@ -96,11 +96,15 @@ group :development do
   gem "pry-doc"
   gem "pry-remote"
   gem "request-log-analyzer"
+  gem "rubocop",:require=>false
+  gem "reek",:require=>false
+  gem "flog",:require=>false
+  gem "flay",:require=>false
 end
 
 group :test do
   gem 'test_after_commit'
-  gem "sqlite3","1.3.7"
+  gem "sqlite3"
   gem "ruby-prof"
   gem "webmock"
   gem 'minitest-reporters','~> 0.14'
