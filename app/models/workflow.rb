@@ -9,7 +9,6 @@ require 't2flow/dot'
 class Workflow < ActiveRecord::Base
 
   acts_as_asset
-  acts_as_trashable
 
   scope :default_order, order('title')
 

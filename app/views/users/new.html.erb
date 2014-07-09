@@ -1,5 +1,5 @@
 <center>
-  <div id="signup" style="width: 700px; margin-top: 0.5em;">
+  <div id="signup">
 
     <h1>Signup for <%= Seek::Config.application_name %></h1>
 
@@ -17,7 +17,7 @@
     <% if User.count == 0 -%>
       <br/>
       <p class="box_infotext system_message">
-        There are currently no Users defined in the system. You should now register an initial user.
+        There are currently no users defined in the system. You should now register an initial user.
         This initial user will become the Administrator of the system.
       </p>
     <% end -%>

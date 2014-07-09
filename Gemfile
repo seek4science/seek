@@ -12,7 +12,7 @@ gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
 gem 'uuidtools'
 gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"~>0.13.3"
-gem "rmagick","2.13.2"
+gem "rmagick","2.13.2", :require => 'RMagick'
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
@@ -58,9 +58,7 @@ gem 'bives'
 
 
 #Linked to SysMO Git repositories
-gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "git://github.com/SysMO-DB/white_list.git"
-gem 'white_list_formatted_content', :git => "git://github.com/SysMO-DB/white_list_formatted_content.git"
 gem 'my_rails_settings', :git => "git://github.com/SysMO-DB/my_rails_settings.git", :require=>"settings"
 gem 'piwik_analytics',:git=>"git://github.com/SysMO-DB/piwik-ruby-tracking.git"
 gem 'my_savage_beast', :git => "git://github.com/SysMO-DB/my_savage_beast"
