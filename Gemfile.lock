@@ -95,6 +95,12 @@ GIT
     white_list (1.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/white_list_formatted_content.git
+  revision: c02bea47e477c1ac59e45a2a8a51aaa2c8e6b72f
+  specs:
+    white_list_formatted_content (1.0.0)
+
+GIT
   remote: git://github.com/myGrid/annotations.git
   revision: d33e78993ee957fa12d71cbe9f03100dd9b0ad15
   specs:
@@ -606,6 +612,7 @@ DEPENDENCIES
   uuidtools
   webmock
   white_list!
+  white_list_formatted_content!
   will_paginate (~> 3.0.4)
   yaml_db
   yui-compressor
