@@ -35,6 +35,7 @@ module Acts #:nodoc:
         acts_as_uniquely_identifiable
         acts_as_annotatable :name_field=>:title
         acts_as_favouritable
+        acts_as_trashable
 
         attr_writer :original_filename,:content_type
         does_not_require_can_edit :last_used_at

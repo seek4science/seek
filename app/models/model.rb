@@ -24,7 +24,6 @@ class Model < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   acts_as_asset
-  acts_as_trashable
 
   scope :default_order, order("title")
 

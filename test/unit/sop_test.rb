@@ -189,6 +189,7 @@ class SopTest < ActiveSupport::TestCase
 
   test "is restorable after destroy" do
     sop = Factory :sop, :policy => Factory(:all_sysmo_viewable_policy), :title => 'is it restorable?'
+    blob_path = sop.content_blob.filepath
     User.current_user = sop.contributor
     assert_difference("Sop.count",-1) do
       sop.destroy
@@ -197,7 +198,11 @@ class SopTest < ActiveSupport::TestCase
     assert_difference("Sop.count",1) do
       disable_authorization_checks {Sop.restore_trash!(sop.id)}
     end
-    assert_not_nil Sop.find_by_title 'is it restorable?'
+    sop = Sop.find_by_title('is it restorable?')
+    refute_nil sop
+    refute_nil sop.content_blob
+    assert_equal blob_path,sop.content_blob.filepath
+    assert File.exist?(blob_path)
   end
 
   test 'failing to delete due to can_delete still creates trash' do
