@@ -699,7 +699,7 @@ module ApplicationHelper
     elsif model.policy.sharing_scope == 2 && model.policy.access_type == 0
       css_class = 'group'
       text << "Only visible to members of "
-      text << model.policy.permissions.select {|p| p.contributor_type == 'Project'}.map {|p| p.contributor.name}.to_sentence
+      text << model.policy.permissions.select {|p| p.contributor_type == 'Project'}.map {|p| p.contributor.title}.to_sentence
     else
       css_class = 'public'
       text << "Public #{image('world', :style => 'vertical-align: middle')}"
