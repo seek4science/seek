@@ -204,8 +204,6 @@ class AssaysController < ApplicationController
 
         Relationship.create_or_update_attributions(@assay,publication_params, Relationship::RELATED_TO_PUBLICATION)
 
-        #FIXME: required to update timestamp. :touch=>true on AssayAsset association breaks acts_as_trashable
-        @assay.updated_at=Time.now
         @assay.save!
 
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
