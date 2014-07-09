@@ -1,11 +1,11 @@
 language: ruby
 rvm:
   - 1.9.3
-  - 2.1.2
 env:
   - SUITE="units"
   - SUITE="functionals"
   - SUITE="integration"
+
 before_install:
   - bundle config build.nokogiri --use-system-libraries
 script:

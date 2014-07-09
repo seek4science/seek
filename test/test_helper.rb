@@ -72,6 +72,18 @@ class ActiveSupport::TestCase
   setup :clear_rails_cache
   teardown :clear_current_user
 
+  def check_for_soffice
+    port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
+    @@soffice_available ||= begin
+      soc = TCPSocket.new("localhost", port)
+      soc.close
+      true
+    rescue
+      false
+    end
+    skip("soffice is not available on port #{port}, skipping test") unless @@soffice_available
+  end
+
   def skip_jws_tests?
     false
   end
