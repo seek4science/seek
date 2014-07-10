@@ -287,6 +287,7 @@ class PublicationsController < ApplicationController
 
 
 
+  #MERGENOTE - this and the next method are almost identical and could be combined
   def fetch_pubmed_or_doi_result pubmed_id,doi
     result = nil
     if pubmed_id
@@ -300,16 +301,6 @@ class PublicationsController < ApplicationController
       result = query.fetch(doi)
     end
     result
-  end
-        
-
-  private
-
-  def preprocess_doi_or_pubmed pubmed_id,doi
-    doi = doi.sub(%r{doi\.*:}i,"").strip unless doi.nil?
-    doi.strip! unless doi.nil?
-    pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Fixnum)
-    return pubmed_id,doi
   end
 
   def get_data(publication, pubmed_id, doi=nil)
@@ -334,6 +325,18 @@ class PublicationsController < ApplicationController
       return result
     end
   end
+        
+
+  private
+
+  def preprocess_doi_or_pubmed pubmed_id,doi
+    doi = doi.sub(%r{doi\.*:}i,"").strip unless doi.nil?
+    doi.strip! unless doi.nil?
+    pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Fixnum)
+    return pubmed_id,doi
+  end
+
+
 
   def create_or_update_associations asset_ids, asset_type, required_action
     asset_ids.each do |id|
