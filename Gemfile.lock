@@ -201,6 +201,7 @@ GEM
     delayed_job_active_record (4.0.1)
       activerecord (>= 3.0, < 4.2)
       delayed_job (>= 3.0, < 4.1)
+    diff-lcs (1.2.5)
     docile (1.1.5)
     docsplit (0.7.5)
     dynamic_form (1.1.4)
@@ -418,6 +419,22 @@ GEM
     rmagick (2.13.2)
     rsolr (1.0.10)
       builder (>= 2.1.2)
+    rspec-core (3.0.2)
+      rspec-support (~> 3.0.0)
+    rspec-expectations (3.0.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.0.0)
+    rspec-mocks (3.0.2)
+      rspec-support (~> 3.0.0)
+    rspec-rails (3.0.1)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      railties (>= 3.0)
+      rspec-core (~> 3.0.0)
+      rspec-expectations (~> 3.0.0)
+      rspec-mocks (~> 3.0.0)
+      rspec-support (~> 3.0.0)
+    rspec-support (3.0.2)
     rubocop (0.24.0)
       json (>= 1.7.7, < 2)
       parser (>= 2.2.0.pre.2, < 3.0)
@@ -597,6 +614,7 @@ DEPENDENCIES
   rest-client (>= 1.6.1)
   rfc-822
   rmagick (= 2.13.2)
+  rspec-rails
   rubocop
   ruby-openid
   ruby-prof
