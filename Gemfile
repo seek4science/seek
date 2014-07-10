@@ -108,6 +108,7 @@ group :test do
   gem "webmock"
   gem 'minitest-reporters','~> 0.14'
   gem 'rspec-rails'
+  gem 'sunspot_matchers'
 end
 
 group :assets do
