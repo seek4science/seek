@@ -191,10 +191,6 @@ module Seek
         end
       end
 
-      def auth_key user, action
-        [user.try(:person).try(:cache_key), "can_#{action}?", cache_key]
-      end
-
       #removes all entries related to this item from the authorization lookup table
       def remove_from_lookup_table
         id=self.id

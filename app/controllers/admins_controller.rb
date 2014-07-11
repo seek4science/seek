@@ -188,6 +188,9 @@ class AdminsController < ApplicationController
         end
       rescue Exception=>e
         error=e.message
+        if Seek::Config.exception_notification_enabled
+          ExceptionNotifier.notify_exception(e,:data=>{:message=>'Problem restarting delayed job'})
+        end
       end
     end
 
