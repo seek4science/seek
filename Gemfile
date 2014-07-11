@@ -82,6 +82,7 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'passenger'
 gem 'unicorn-rails'
 gem "recaptcha", '0.3.1'
+gem 'metainspector'
 
 
 group :assets do
