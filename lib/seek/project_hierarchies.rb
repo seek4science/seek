@@ -52,6 +52,7 @@ module Seek
           res.sort_by { |a| (a.last_name.blank? ? a.name : a.last_name) }
         end
 
+        #this is project role
         def project_coordinators
           coordinator_role = ProjectRole.project_coordinator_role
           projects = [self] + descendants
@@ -59,24 +60,36 @@ module Seek
 
         end
         #
-        ##this is the intersection of project role and seek role
-        #def pals
-        #  people_with_the_role("pal")
-        #
-        #  pal_role=ProjectRole.pal_role
-        #  projects = [self] + descendants
-        #  people.select { |p| p.is_pal? }.select do |possible_pal|
-        #    possible_pal.project_roles_of_project(projects).include?(pal_role)
-        #  end
-        #end
-        #
         #this is project role
         def pis
           pi_role = ProjectRole.find_by_name('PI')
           projects = [self] + descendants
-          people.select { |p| p.project_roles_of_project(projects).include?(pi_role) }
+          people.select{|p| p.project_roles_of_project(projects).include?(pi_role)}
         end
 
+        #this is admin defined project role
+        def asset_managers
+          projects = [self] + ancestors
+          projects.map{|proj| proj.people_with_the_role("asset_manager")}.flatten.uniq
+        end
+
+        #this is admin defined project role
+        def project_managers
+          projects = [self] + ancestors
+          projects.map{|proj| proj.people_with_the_role("project_manager")}.flatten.uniq
+        end
+
+        #this is admin defined project role
+        def gatekeepers
+          projects = [self] + ancestors
+          projects.map{|proj| proj.people_with_the_role("gatekeeper")}.flatten.uniq
+        end
+
+        #this is admin defined project role
+        def pals
+          projects = [self] + ancestors
+          projects.map{|proj| proj.people_with_the_role("pal")}.flatten.uniq
+        end
 
         Project::RELATED_RESOURCE_TYPES.each do |type|
           define_method "related_#{type.underscore.pluralize}" do
@@ -117,10 +130,7 @@ module Seek
           direct_projects.collect { |proj| [proj] + proj.descendants }.flatten.uniq
         end
       end
-
     end
-
-
   end
   module CallBackMethods
      # dynamically add before_add callback to associations

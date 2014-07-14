@@ -554,6 +554,39 @@ namespace :seek do
       end
     end
 
+
+  task(:update_admin_assigned_roles=>:environment) do
+    Person.where("roles_mask > 0").each do |p|
+      if p.admin_defined_role_projects.empty?
+        roles = []
+        (p.role_names & Person::PROJECT_DEPENDENT_ROLES).each do |role|
+          projects =  Seek::Config.project_hierarchy_enabled ? p.direct_projects : p.projects
+          #update admin defined roles only if person has any project role in his project
+          projects = projects.select{|proj| p.project_roles.map(&:group_memberships).flatten.map(&:project).include? proj}
+          msg =  "Updating #{p.name} for - '#{role}' - adding to #{projects.count} projects"
+          msg += " and #{projects.map(&:descendants).flatten.count} sub projects" if  Seek::Config.project_hierarchy_enabled
+          puts msg
+
+          roles << [role, projects]
+        end
+        roles << ["admin"] if p.is_admin?
+        unless roles.empty?
+          Person.record_timestamps = false
+          begin
+            p.roles = roles
+            disable_authorization_checks do
+              p.save!
+            end
+          rescue Exception=>e
+            puts "Error saving #{p.name} - #{p.id}: #{e.message}"
+          ensure
+            Person.record_timestamps = true
+          end
+        end
+      end
+    end
+  end
+
   private
 
   def read_label_map type
