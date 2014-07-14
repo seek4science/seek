@@ -15,10 +15,6 @@
       def self.is_taggable?
         self.ancestors.include?(Seek::Taggable)
       end
-
-      def self.is_hierarchical?
-           include? ActsAsCachedTree if defined? ActsAsCachedTree
-      end
     end
 
 
