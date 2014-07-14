@@ -11,6 +11,7 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks=>[
             :environment,
+            :update_admin_assigned_roles,
             :update_assay_types_from_ontology,
             :update_technology_types_from_ontology,
              :update_top_level_assay_type_titles,
