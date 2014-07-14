@@ -186,21 +186,45 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
 
   test 'add roles for a person' do
     User.with_current_user Factory(:admin).user do
-      person = Factory(:admin)
+      person = Factory(:person)
       assert_equal 1,person.projects.count
       project = person.projects.first
-      assert_equal ['admin'], person.roles
+      assert person.roles.empty?
       assert person.can_manage?
-      person.add_roles [['admin'],['pal',project]]
+      person.add_roles [['pal',project]]
       person.save!
       person.reload
-      assert_equal ['admin', 'pal'].sort, person.roles(project).sort
-      assert person.is_admin?
+      assert_equal ['pal'], person.roles(project)
       assert person.is_pal?(project)
       assert !person.is_pal?
     end
   end
 
+  test 'add roles for admin' do
+     User.with_current_user Factory(:admin).user do
+       person = Factory(:admin)
+       project = person.projects.first
+       assert_equal ['admin'], person.roles
+
+       #pass admin role
+       person.roles = [['admin'],['pal',project]]
+       person.save!
+       person.reload
+       assert_equal ['admin', 'pal'].sort, person.roles(project).sort
+       assert person.is_admin?
+       assert person.is_pal?(project)
+       assert !person.is_pal?
+
+      #pass not admin role
+       person.roles =[['pal',project]]
+       person.save!
+       person.reload
+       assert_equal ['admin', 'pal'].sort, person.roles(project).sort
+       assert person.is_admin?
+       assert person.is_pal?(project)
+       assert !person.is_pal?
+     end
+  end
   test 'update roles directly' do
     User.with_current_user Factory(:admin).user do
       person = Factory(:person)
