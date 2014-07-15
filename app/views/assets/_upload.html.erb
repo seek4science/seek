@@ -79,22 +79,39 @@ original_filename=nil
           <span class="required">*</span>
           <%= text_field upload_field, :data_url, :size => 55 -%>
           <span style="display:inline-block;">
-                        <%= link_to_with_callbacks image("test", :title => "Test", :alt => "Test")+" Test",
-                                           {:url => {:action => :test_asset_url},
-                                            :method => :post,
-                                            :type => :synchronous,
-                                            :with => "$('#{upload_field}_data_url').serialize()",
-                                            :before => "$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
-                                           {:id => 'test', :remote => true} -%>
+                        <%= link_to image("test", :title => "Test", :alt => "Test")+" Test",
+                                    "#",
+                                    :id=>"examine_url" %>
                     </span>
+          <script>
+
+              var upload_url_field;
+              var examine_url_href;
+              setup_url_field("<%= upload_field %>","<%= examine_url_content_blobs_path %>","examine_url");
+
+              function setup_url_field(upload_field, examine_url_path,examine_button_id) {
+                  upload_url_field = $j('#'+upload_field+'_data_url');
+                  examine_url_href = examine_url_path;
+                  $j('#'+examine_button_id).on('click', function(event){
+                      submit_url_for_examination();
+                  });
+                  upload_url_field.on('paste', function(event) {
+                      setTimeout(function(e){
+                          submit_url_for_examination();
+                      },0);
+                      return true;
+                  });
+              };
+              function submit_url_for_examination() {
+                  var data_url = upload_url_field.val();
+                  $j.post(examine_url_href + "?data_url=" + data_url, function(data){} );
+              }
+
+          </script>
+
 
           <p style="clear:both;">
-                      <b>Make an external link?</b>
-                      <%= check_box upload_field, :external_link,:id=>"external_link" -%>
-          </p>
-          <p>
-            <span id="test_url_result_icon"></span>
-            <span id="test_url_msg" style="display:none;"></span>
+            <span id="test_url_result" style="display:none;"></span>
           </p>
           <%= hidden_field_tag "#{upload_field}[original_filename]", original_filename -%>
         </div>

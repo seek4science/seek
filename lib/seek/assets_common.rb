@@ -56,6 +56,7 @@ module Seek
       return code
     end
 
+
     def test_asset_url
       c = self.controller_name.downcase
       symb= params[:symb].nil?? c.singularize.to_sym : params[:symb].to_sym

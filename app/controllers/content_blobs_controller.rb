@@ -1,3 +1,4 @@
+require 'seek/upload_handling'
 class ContentBlobsController < ApplicationController
 
   before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_pdf_content, :download]
@@ -5,6 +6,7 @@ class ContentBlobsController < ApplicationController
   before_filter :set_asset_version, :only=>[:get_pdf, :download]
 
   include Seek::AssetsCommon
+  include Seek::UploadHandling
   include AssetsCommonExtension
   include Seek::ContentBlobCommon
 
@@ -15,6 +17,26 @@ class ContentBlobsController < ApplicationController
       format.html { render :layout=>false }
     end
   end
+
+  def examine_url
+    #check content type and size
+    url = params[:data_url]
+    begin
+      raise Seek::UploadHandling::InvalidSchemeException unless valid_scheme?(url)
+      code = check_url_response_code(url)
+      if code == 200
+        process_view_for_successful_url(url)
+      else
+        #react to non 200 response code
+        raise "Not 200 code"
+      end
+    rescue Exception=>e
+      raise e
+    end
+    puts "--- #{@content_type} ---"
+  end
+
+
 
   def get_pdf
     if @content_blob.url.blank?
