@@ -21,11 +21,13 @@ class UploadHandingTest < ActiveSupport::TestCase
     stub_request(:head, 'http://not-there.com').to_return(status: 404, body: '', headers: {})
     stub_request(:head, 'http://server-error.com').to_return(status: 500, body: '', headers: {})
     stub_request(:head, 'http://forbidden.com').to_return(status: 403, body: '', headers: {})
+    stub_request(:head, 'http://unauthorized.com').to_return(status: 401, body: '', headers: {})
 
     assert_equal 200, check_url_response_code('http://bbc.co.uk')
     assert_equal 404, check_url_response_code('http://not-there.com')
     assert_equal 500, check_url_response_code('http://server-error.com')
     assert_equal 403, check_url_response_code('http://forbidden.com')
+    assert_equal 401, check_url_response_code('http://unauthorized.com')
 
     # redirection will be followed
     stub_request(:head, 'http://moved.com').to_return(status: 301, body: '', headers: { location: 'http://bbc.co.uk' })
@@ -68,6 +70,12 @@ class UploadHandingTest < ActiveSupport::TestCase
     assert content_is_webpage?("text/html; charset=UTF-8")
     refute content_is_webpage?("application/zip")
     refute content_is_webpage?(nil)
+  end
+
+  test "valid uri?" do
+    assert valid_uri?("http://fish.com")
+    assert valid_uri?("http://fish.com")
+    refute valid_uri?("x dd s")
   end
 
 end

@@ -33,7 +33,7 @@ class ContentBlobsController < ApplicationController
     rescue Exception=>e
       raise e
     end
-    puts "--- #{@content_type} ---"
+
   end
 
 

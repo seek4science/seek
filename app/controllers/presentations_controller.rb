@@ -6,7 +6,7 @@ class PresentationsController < ApplicationController
   include DotGenerator
 
   include Seek::AssetsCommon
-  include AssetsCommonExtension
+  include Seek::UploadHandling
 
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]
@@ -17,7 +17,7 @@ class PresentationsController < ApplicationController
   include Seek::BreadCrumbs
 
   def new_version
-    if (handle_data nil)
+    if handle_upload_data
       comments=params[:revision_comment]
 
       #@presentation.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
@@ -59,7 +59,7 @@ class PresentationsController < ApplicationController
   # POST /presentations
   # POST /presentations.xml
   def create
-    if handle_data
+    if handle_upload_data
       @presentation = Presentation.new(params[:presentation])
 
       @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.projects
@@ -101,7 +101,8 @@ class PresentationsController < ApplicationController
             }
           end
         end
-
+    else
+      handle_upload_data_failure
     end
 
   end

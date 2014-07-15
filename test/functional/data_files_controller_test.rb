@@ -260,7 +260,9 @@ end
 
 
   test "should correctly handle bad data url" do
-    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:project_ids=>[projects(:sysmo_project).id]}
+    stub_request(:head, "http://sdfsdfds.com/sdf.png").
+        to_raise(SocketError)
+    df={:title=>"Test",:data_url=>"http://sdfsdfds.com/sdf.png",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
@@ -299,8 +301,8 @@ end
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
     assert_equal "image/png", assigns(:data_file).content_blob.content_type
+    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
   end
   
   test "should create data file with ftp_url" do
@@ -337,19 +339,6 @@ end
       assert !assigns(:data_file).content_blob.file_exists?
       assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
       assert_equal "image/png", assigns(:data_file).content_blob.content_type
-  end
-
-  test 'test_asset_url' do
-    #http
-    mock_http
-    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'http://mockedlocation.com/a-piccy.png'}})
-    assert_response :success
-    assert @response.body.include?('The URL was accessed successfully')
-    #https
-    mock_https
-    xhr(:post, :test_asset_url, {:data_file => {:data_url => 'https://mockedlocation.com/a-piccy.png'}})
-    assert_response :success
-    assert @response.body.include?('The URL was accessed successfully')
   end
   
   test "should not create data file with file url" do
@@ -1817,10 +1806,10 @@ end
   def mock_http
     file="#{Rails.root}/test/fixtures/files/file_picture.png"
     stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
-    stub_request(:head, "http://mockedlocation.com/a-piccy.png")
+    stub_request(:head, "http://mockedlocation.com/a-piccy.png").to_return(:status=>200,headers: { content_type: 'image/png' })
 
-    stub_request(:any, "http://mocked301.com").to_return(:status=>301)
-    stub_request(:any, "http://mocked302.com").to_return(:status=>302)
+    stub_request(:any, "http://mocked301.com").to_return(:status=>301, :headers=>{:location=>"http://mockedlocation.com/a-piccy.png"})
+    stub_request(:any, "http://mocked302.com").to_return(:status=>302, :headers=>{:location=>"http://mockedlocation.com/a-piccy.png"})
     stub_request(:any, "http://mocked401.com").to_return(:status=>401)
     stub_request(:any, "http://mocked404.com").to_return(:status=>404)
   end
@@ -1828,10 +1817,10 @@ end
   def mock_https
     file="#{Rails.root}/test/fixtures/files/file_picture.png"
     stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
-    stub_request(:head, "https://mockedlocation.com/a-piccy.png")
+    stub_request(:head, "https://mockedlocation.com/a-piccy.png").to_return(:status=>200,headers: { content_type: 'image/png' })
 
-    stub_request(:any, "https://mocked301.com").to_return(:status=>301)
-    stub_request(:any, "https://mocked302.com").to_return(:status=>302)
+    stub_request(:any, "https://mocked301.com").to_return(:status=>301, :headers=>{:location=>"https://mockedlocation.com/a-piccy.png"})
+    stub_request(:any, "https://mocked302.com").to_return(:status=>302, :headers=>{:location=>"https://mockedlocation.com/a-piccy.png"})
     stub_request(:any, "https://mocked401.com").to_return(:status=>401)
     stub_request(:any, "https://mocked404.com").to_return(:status=>404)
   end

@@ -107,10 +107,9 @@ class PresentationsControllerTest < ActionController::TestCase
 
 
   test "cannot upload file with invalid url" do
+    stub_request(:head,"http://www.blah.de/images/logo.png").to_raise(SocketError)
     presentation_attrs = Factory.build(:presentation, :contributor=>User.current_user).attributes #.symbolize_keys(turn string key to symbol)
     presentation_attrs[:data_url] = "http://www.blah.de/images/logo.png"
-    #
-    #register_url  "http://www.blah.de/images/logo.png"
 
     assert_no_difference "Presentation.count" do
      post :create, :presentation=>presentation_attrs
@@ -119,6 +118,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "cannot upload new version with invalid url" do
+    stub_request(:any,"http://www.blah.de/images/liver-illustration.png").to_raise(SocketError)
     presentation = Factory :presentation,:contributor=>User.current_user
     new_data_url = "http://www.blah.de/images/liver-illustration.png"
     assert_no_difference "presentation.version" do

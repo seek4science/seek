@@ -1,5 +1,15 @@
 module Seek
   module ContentBlobCommon
+
+    def redirect_on_error asset,msg=nil
+      flash[:error]=msg if !msg.nil?
+      if (asset.class.name.include?("::Version"))
+        redirect_to asset.parent,:version=>asset.version
+      else
+        redirect_to asset
+      end
+    end
+
     def handle_download disposition='attachment', image_size=nil
       if @content_blob.url.blank?
         if @content_blob.file_exists?

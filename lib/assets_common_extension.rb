@@ -59,6 +59,40 @@ module AssetsCommonExtension
     end
   end
 
+  def url_response_code asset_url
+    url = URI.parse(URI.encode(asset_url.strip))
+    code=""
+    begin
+      if (["http","https"].include?(url.scheme))
+        http =  Net::HTTP.new(url.host, url.port)
+        http.use_ssl=true if url.scheme=="https"
+        http.start do |http|
+          code = http.head(url.request_uri).code
+        end
+      elsif (url.scheme=="ftp")
+        username = 'anonymous'
+        password = nil
+        username, password = url.userinfo.split(/:/) if url.userinfo
+
+        ftp = Net::FTP.new(url.host)
+        ftp.login(username,password)
+        ftp.getbinaryfile(url.path, '/dev/null', 20) { break }
+        ftp.close
+        code="200"
+      else
+        raise Seek::IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")
+      end
+    rescue Net::FTPPermError
+      code="401"
+    rescue Errno::ECONNREFUSED,SocketError,Errno::EHOSTUNREACH
+      #FIXME:also using 404 for uknown host, which wouldn't actually really be a http response code
+      #indicating that using response codes is not the best approach here.
+      code="404"
+    end
+
+    return code
+  end
+
   def show_via_url asset, content_blob=nil
     content_blob = content_blob.nil? ? asset.content_blob : content_blob
     code = url_response_code(content_blob.url)
@@ -112,6 +146,16 @@ module AssetsCommonExtension
     end
   end
 
+  def init_asset_for_render params
+    c     = self.controller_name.singularize
+    model = c.camelize.constantize
+    symb  =c.to_sym
+    params[symb].delete 'data_url'
+    params[symb].delete 'data'
+    params[symb].delete 'external_link'
+    obj=model.new params[symb]
+    eval "@#{c.singularize} = obj"
+  end
 
   def handle_batch_data render_action_on_error=:new
     #FIXME: too many nested if,else and rescue blocks. This method needs refactoring.

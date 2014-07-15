@@ -6,7 +6,7 @@ class WorkflowsController < ApplicationController
 
   include IndexPager
   include Seek::AssetsCommon
-  include AssetsCommonExtension
+  include Seek::UploadHandling
 
   before_filter :workflows_enabled?
   before_filter :find_and_filter_workflows, :only => [ :index ]
@@ -59,7 +59,7 @@ class WorkflowsController < ApplicationController
   end
 
   def create
-    if handle_data
+    if handle_upload_data
 
       @workflow = Workflow.new params[:workflow]
       @workflow.policy.set_attributes_with_sharing params[:sharing], @workflow.projects
@@ -100,6 +100,8 @@ class WorkflowsController < ApplicationController
           }
         end
       end
+    else
+      handle_upload_data_failure
     end
   end
 

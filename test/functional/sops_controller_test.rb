@@ -143,7 +143,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should correctly handle bad data url" do
-    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:project_ids=>[projects(:sysmo_project).id]}
+    stub_request(:any,"http://sdfsdfds.com/sdf.png").to_raise(SocketError)
+    sop={:title=>"Test", :data_url=>"http://sdfsdfds.com/sdf.png",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
