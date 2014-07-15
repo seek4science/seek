@@ -45,6 +45,8 @@ require 'seek/scalable'
 require 'taverna_player_callbacks'
 require 'taverna_player_renderers'
 
+require 'seek/search/search_sunspot'
+
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
