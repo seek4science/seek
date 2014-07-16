@@ -1,3 +1,4 @@
+
 <%
 # determine the asset type from the controller
 upload_field = controller_name.downcase.singularize.underscore
@@ -61,9 +62,9 @@ original_filename=nil
 <div>
   <div id="upload_type_selection">
     <ul id="switch_upload_buttons">
-      <li>
-        <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class => "block_link_active", :id => "upload_from_file_button", :title => tooltip_title_attrib('Add from a local file') -%>
-        <br>
+      <li style="float:left;height:100%;">
+        <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class => "block_link block_link_active", :id => "upload_from_file_button", :title => tooltip_title_attrib('Add from a local file') -%>
+
         <%= link_to_function image("internet_large"), "from_url_selected(); return (false);", :class => "block_link", :id => "upload_from_url_button", :title => tooltip_title_attrib('Add from a remote URL') -%>
       </li>
       <li>
@@ -74,45 +75,17 @@ original_filename=nil
           <%= file_field upload_field, :data -%>
         </div>
         <div id="upload_from_url" style="display:none;">
-          <br>
+          <br/>
           <b>URL:</b>
           <span class="required">*</span>
           <%= text_field upload_field, :data_url, :size => 55 -%>
-          <span style="display:inline-block;">
-                        <%= link_to image("test", :title => "Test", :alt => "Test")+" Test",
-                                    "#",
-                                    :id=>"examine_url" %>
-                    </span>
-          <script>
 
-              var upload_url_field;
-              var examine_url_href;
-              setup_url_field("<%= upload_field %>","<%= examine_url_content_blobs_path %>","examine_url");
+            <%= link_to image("test", :title => "Test", :alt => "Test")+" Test",
+                        "#",
+                        :id=>"examine_url" %>
+          <br/>
+          <div id="test_url_result" style="max-width:50%;"></div>
 
-              function setup_url_field(upload_field, examine_url_path,examine_button_id) {
-                  upload_url_field = $j('#'+upload_field+'_data_url');
-                  examine_url_href = examine_url_path;
-                  $j('#'+examine_button_id).on('click', function(event){
-                      submit_url_for_examination();
-                  });
-                  upload_url_field.on('paste', function(event) {
-                      setTimeout(function(e){
-                          submit_url_for_examination();
-                      },0);
-                      return true;
-                  });
-              };
-              function submit_url_for_examination() {
-                  var data_url = upload_url_field.val();
-                  $j.post(examine_url_href + "?data_url=" + data_url, function(data){} );
-              }
-
-          </script>
-
-
-          <p style="clear:both;">
-            <span id="test_url_result" style="display:none;"></span>
-          </p>
           <%= hidden_field_tag "#{upload_field}[original_filename]", original_filename -%>
         </div>
       </li>
@@ -121,12 +94,12 @@ original_filename=nil
 </div>
 
 <script type="text/javascript">
+  setup_url_field("<%= upload_field %>","<%= examine_url_content_blobs_path %>","examine_url");
+
   <% if obj.data_url.blank? -%>
-  from_file_selected();
+    from_file_selected();
   <% else -%>
-  from_url_selected();
-  clickLink($('test'));
+    from_url_selected();
   <% end -%>
 
 </script>
-

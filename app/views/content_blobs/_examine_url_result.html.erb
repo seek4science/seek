@@ -1,17 +1,19 @@
 <% if @is_webpage %>
-image is <%= @image %>
-<p>
-  <ul>
-    This is a webpage, and a link to this page will be registered
-    <li><b>Title:</b><%= @title %></li>
-    <li><b>Description:</b><%= @description %></li>
-    <% if @image %>
-    <li>image:<img src='<%=@image%>'/></li>
-    <% end %>
-  </ul>
 
 
-</p>
+
+This is a webpage, and a link to this page will be registered
+    <br/>
+<b>Title:</b><%= @title %>
+    <br/>
+<b>Description:</b><%= @description %>
+<% if false && @image %>
+image:<img src='<%=@image%>'/>
+<% end %>
+
+
+
+
 <% else %>
 <p>
   This link is a file and is expected to be of size <%= number_to_human_size(@size) %>.<br/>

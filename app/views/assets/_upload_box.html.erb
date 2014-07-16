@@ -1,3 +1,4 @@
+<%= javascript_include_tag "upload_url" %>
 <%
     new_version ||= false
 %>
@@ -7,8 +8,8 @@
             duration: 0.0
         });
         Effect.Appear("upload_from_url");
-		$('upload_from_file_button').className="block_link";
-		$('upload_from_url_button').className="block_link_active";
+        $j('#upload_from_file_button').removeClass("block_link_active");
+        $j('#upload_from_url_button').addClass("block_link_active");
     }
     
     function from_file_selected(){
@@ -16,8 +17,8 @@
             duration: 0.0
         });
         Effect.Appear("upload_from_file");
-		$('upload_from_file_button').className="block_link_active";
-		$('upload_from_url_button').className="block_link";  
+		$j('#upload_from_file_button').addClass("block_link_active");
+		$j('#upload_from_url_button').removeClass("block_link_active");
     }
 </script>
  <% resource ||=nil %>
