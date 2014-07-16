@@ -1,27 +1,5 @@
 <% if @is_webpage %>
-
-
-
-This is a webpage, and a link to this page will be registered
-    <br/>
-<b>Title:</b><%= @title %>
-    <br/>
-<b>Description:</b><%= @description %>
-<% if false && @image %>
-image:<img src='<%=@image%>'/>
-<% end %>
-
-
-
-
+    <%= render :partial=>"examine_url_wepage_result" %>
 <% else %>
-<p>
-  This link is a file and is expected to be of size <%= number_to_human_size(@size) %>.<br/>
-  Check the following checkbox to transfer a copy of this data into SEEK, otherwise leave unchecked to register a link to the data.
-  <p style="clear:both;">
-    <b>Upload a copy?</b>
-    <%= check_box_tag :copy_data,:id=>"copy_data" %>
-  </p>
-</p>
-
+    <%= render :partial=>"examine_url_file_result" %>
 <% end %>
