@@ -2,6 +2,7 @@ jQuery(document).ready(function(){
     jQuery(document).on("exhibitConfigured.exhibit", function() {
         hideFacets();
         hide_specified_facet_list();
+        displayMoreLink();
     });
 });
 
@@ -97,6 +98,10 @@ function tab_on_click_one_facet(resource_type) {
 
         show_specified_facets_for_active_tab(resource_type);
     }
+}
+
+function displayMoreLink(){
+    $j(".more_link").show();
 }
 
 //this is for the case of one exhibit instance.
