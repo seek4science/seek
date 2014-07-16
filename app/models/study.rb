@@ -20,7 +20,10 @@ class Study < ActiveRecord::Base
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
     text :description,:title, :experimentalists
     text :contributor do
-      [contributor.try(:person).try(:name),person_responsible.try(:name)]
+      contributor.try(:person).try(:name)
+    end
+    text :person_responsible do
+      person_responsible.try(:name)
     end
   end if Seek::Config.solr_enabled
 
