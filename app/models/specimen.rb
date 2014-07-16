@@ -59,7 +59,7 @@ class Specimen < ActiveRecord::Base
   end
 
   searchable(:auto_index=>false) do
-    text :searchable_terms
+    text :other_creators
     text :culture_growth_type do
       culture_growth_type.try :title
     end
@@ -68,10 +68,6 @@ class Specimen < ActiveRecord::Base
       strain.try :title
       strain.try(:organism).try(:title).to_s
     end
-
-    text :institution do
-      institution.try :name
-    end if Seek::Config.is_virtualliver
 
     text :creators do
       creators.compact.map(&:name)
@@ -98,17 +94,6 @@ class Specimen < ActiveRecord::Base
 
   def related_sops
     sop_masters.collect(&:sop)
-  end
-  
-
-
-  def searchable_terms
-      text=[lab_internal_number,other_creators]
-      if (strain)
-        text << strain.info
-        text << strain.try(:organism).try(:title).to_s
-      end
-      text.compact
   end
 
   def age_with_unit

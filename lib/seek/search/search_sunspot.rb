@@ -1,6 +1,6 @@
 module Seek
   module Search
-    module SearchSunspot
+    module CommonFields
       def self.included klass
         klass.class_eval do
           searchable do
@@ -33,11 +33,63 @@ module Seek
         end
       end
     end
+
+    module BiosampleFields
+      def self.included klass
+        klass.class_eval do
+          searchable do
+=begin
+            text :treatment do
+              if self.respond_to?(:treatment)
+                treatment
+              end
+            end
+=end
+            text :genotype_info do
+              if self.respond_to?(:genotype_info)
+                genotype_info
+              end
+            end
+            text :phenotype_info do
+              if self.respond_to?(:phenotype_info)
+                phenotype_info
+              end
+            end
+            text :provider_name do
+              if self.respond_to?(:provider_name)
+                provider_name
+              end
+            end
+            text :provider_id do
+              if self.respond_to?(:provider_id)
+                provider_id
+              end
+            end
+            text :lab_internal_number do
+              if self.respond_to?(:lab_internal_number)
+                lab_internal_number
+              end
+            end
+            text :institution do
+              if self.respond_to?(:institution)
+                institution.try :name
+              end
+            end
+          end if Seek::Config.solr_enabled
+        end
+      end
+    end
   end
 end
 
-["Assay", "DataFile", "Event", "Institution", "Investigation", "Model", "Person", "Presentation", "Programme", "Project", "Publication", "Sample", "Sop", "Specimen", "Strain", "Study", "Workflow"].each do |klass|
-  klass.constantize.class_eval do
-    include Seek::Search::SearchSunspot
+[Assay, DataFile, Event, Institution, Investigation, Model, Person, Presentation, Programme, Project, Publication, Sample, Sop, Specimen, Strain, Study, Workflow].each do |klass|
+  klass.class_eval do
+    include Seek::Search::CommonFields
+  end
+end
+
+[Strain, Specimen, Sample].each do |klass|
+  klass.class_eval do
+    include Seek::Search::BiosampleFields
   end
 end

@@ -33,20 +33,11 @@ class Strain < ActiveRecord::Base
 
   scope :default_order, order("title")
 
-  searchable(:auto_index=>false) do
-      text :searchable_terms
-  end if Seek::Config.solr_enabled
+  alias_attribute :description, :comment
 
-  def searchable_terms
-      text=[synonym,comment,provider_name,provider_id]
-      text |= genotypes.compact.collect do |g|
-        g.gene.try(:title)
-      end
-      text |= phenotypes.compact.collect do |p|
-        p.description
-      end
-      text.compact
-  end
+  searchable(:auto_index=>false) do
+      text :synonym
+  end if Seek::Config.solr_enabled
 
   def is_default?
     title=="default" && is_dummy==true
