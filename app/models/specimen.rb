@@ -103,7 +103,7 @@ class Specimen < ActiveRecord::Base
 
 
   def searchable_terms
-      text=[title,description,lab_internal_number,other_creators]
+      text=[lab_internal_number,other_creators]
       if (strain)
         text << strain.info
         text << strain.try(:organism).try(:title).to_s

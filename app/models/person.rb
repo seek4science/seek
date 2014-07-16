@@ -51,7 +51,7 @@ class Person < ActiveRecord::Base
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
   searchable(:auto_index => false) do
-    text :first_name, :last_name,:description, :searchable_tags,:locations, :project_roles
+    text :locations, :project_roles
     text :disciplines do
       disciplines.map{|d| d.title}
     end

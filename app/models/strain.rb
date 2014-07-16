@@ -38,7 +38,7 @@ class Strain < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   def searchable_terms
-      text=[title,synonym,comment,provider_name,provider_id,searchable_tags]
+      text=[synonym,comment,provider_name,provider_id]
       text |= genotypes.compact.collect do |g|
         g.gene.try(:title)
       end

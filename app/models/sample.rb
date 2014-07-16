@@ -79,8 +79,6 @@ class Sample < ActiveRecord::Base
 
   def searchable_terms
     text=[]
-    text << title
-    text << description
     text << lab_internal_number
     text << provider_name
     text << provider_id

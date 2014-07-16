@@ -82,7 +82,7 @@ class Project < ActiveRecord::Base
   has_many :project_subscriptions,:dependent => :destroy
   
   searchable(:auto_index=>false) do
-    text :title , :description, :locations
+    text :locations
   end if Seek::Config.solr_enabled
 
   attr_accessor :site_username,:site_password

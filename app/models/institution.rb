@@ -19,7 +19,7 @@ class Institution < ActiveRecord::Base
   has_many :specimens
 
   searchable(:auto_index=>false) do
-    text :title,:country,:city, :address
+    text :country,:city, :address
   end if Seek::Config.solr_enabled
 
   def people

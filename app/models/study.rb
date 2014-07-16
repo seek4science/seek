@@ -18,10 +18,7 @@ class Study < ActiveRecord::Base
   validates_presence_of :investigation
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :description,:title, :experimentalists
-    text :contributor do
-      contributor.try(:person).try(:name)
-    end
+    text :experimentalists
     text :person_responsible do
       person_responsible.try(:name)
     end

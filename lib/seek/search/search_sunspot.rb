@@ -21,7 +21,7 @@ module Seek
             end
             text :contributor do
               if self.respond_to?(:contributor)
-                contributor.try(:name)
+                contributor.try(:person).try(:name)
               end
             end
             text :projects do
