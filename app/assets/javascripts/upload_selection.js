@@ -17,3 +17,21 @@ function submit_url_for_examination() {
     var data_url = upload_url_field.val();
     $j.post(examine_url_href + "?data_url=" + data_url, function(data){} );
 }
+
+function from_url_selected(){
+    Effect.Fade("upload_from_file", {
+        duration: 0.0
+    });
+    Effect.Appear("upload_from_url");
+    $j('#upload_from_file_button').removeClass("block_link_active");
+    $j('#upload_from_url_button').addClass("block_link_active");
+}
+
+function from_file_selected(){
+    Effect.Fade("upload_from_url", {
+        duration: 0.0
+    });
+    Effect.Appear("upload_from_file");
+    $j('#upload_from_file_button').addClass("block_link_active");
+    $j('#upload_from_url_button').removeClass("block_link_active");
+}

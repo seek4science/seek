@@ -1,25 +1,9 @@
-<%= javascript_include_tag "upload_url" %>
+<%= javascript_include_tag "upload_selection" %>
 <%
     new_version ||= false
 %>
 <script type="text/javascript">
-    function from_url_selected(){
-        Effect.Fade("upload_from_file", {
-            duration: 0.0
-        });
-        Effect.Appear("upload_from_url");
-        $j('#upload_from_file_button').removeClass("block_link_active");
-        $j('#upload_from_url_button').addClass("block_link_active");
-    }
-    
-    function from_file_selected(){
-        Effect.Fade("upload_from_url", {
-            duration: 0.0
-        });
-        Effect.Appear("upload_from_file");
-		$j('#upload_from_file_button').addClass("block_link_active");
-		$j('#upload_from_url_button').removeClass("block_link_active");
-    }
+
 </script>
  <% resource ||=nil %>
 <div class="fold">
