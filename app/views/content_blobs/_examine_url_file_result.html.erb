@@ -1,0 +1,32 @@
+<% app_name = Seek::Config.application_name %>
+<p id="url_type">
+  This link points to a downloadable file, and not a webpage.
+</p>
+<p id="url_info">
+  The size of the file is expected to be <%= number_to_human_size(@size) %>.
+</p>
+<p>
+<div>
+  <p>
+    You can either upload this file to <%= app_name %> using this URL, or you can register a link to the file.
+  </p>
+
+  <p>
+    By selecting the option below, a copy of the file will be made. This is recommended, and is equivalent to uploading
+    a file from your disk. It also means that should the data behind the URL become unavailable, the data is still
+    available from <%= app_name %>.
+    However, you should be sure that the copyright on the file allows you to do this.
+  </p>
+
+  <p>
+    If you do not select the option below <%= app_name %> will store only the URL. In this case, when another user
+    selects to download the Data file then they will simply directed to the URL (for example, so that they can login to
+    access the file).
+  </p>
+</div>
+<b>Upload a copy?</b>
+<%= check_box_tag :copy_data, :id => "copy_data" %>
+</p>
+
+
+
