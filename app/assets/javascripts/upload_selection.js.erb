@@ -1,3 +1,5 @@
+
+
 var upload_url_field;
 var examine_url_href;
 function setup_url_field(upload_field, examine_url_path,examine_button_id) {
@@ -15,6 +17,7 @@ function setup_url_field(upload_field, examine_url_path,examine_button_id) {
 };
 function submit_url_for_examination() {
     var data_url = upload_url_field.val();
+    $j('#test_url_result')[0].innerHTML="<p id='large_spinner'/>";
     $j.post(examine_url_href + "?data_url=" + data_url, function(data){} );
 }
 

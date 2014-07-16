@@ -1,4 +1,4 @@
 el = $j('#test_url_result')[0];
-<% ccc = render(:partial=>'examine_url_result') %>
-el.innerHTML="<%= escape_javascript(ccc) %>";
+<% content = render(:partial=>'examine_url_result') %>
+el.innerHTML="<%= escape_javascript(content) %>";
 el.show();
