@@ -51,7 +51,7 @@ class Person < ActiveRecord::Base
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
   searchable(:auto_index => false) do
-    text :locations, :project_roles
+    text :project_roles
     text :disciplines do
       disciplines.map{|d| d.title}
     end
@@ -249,12 +249,7 @@ class Person < ActiveRecord::Base
 
   def locations
     # infer all person's locations from the institutions where the person is member of
-    locations = self.institutions.collect { |i| i.country unless i.country.blank? }
-
-    # make sure this list is unique and (if any institutions didn't have a country set) that 'nil' element is deleted
-    locations = locations.uniq
-    locations.delete(nil)
-
+    locations = self.institutions.collect(&:country).select { |l| !l.blank? }
     return locations
   end
 

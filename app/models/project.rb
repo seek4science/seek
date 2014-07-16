@@ -80,10 +80,6 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :organisms, :before_add=>:update_rdf_on_associated_change, :before_remove=>:update_rdf_on_associated_change
   has_many :project_subscriptions,:dependent => :destroy
-  
-  searchable(:auto_index=>false) do
-    text :locations
-  end if Seek::Config.solr_enabled
 
   attr_accessor :site_username,:site_password
 
@@ -138,12 +134,7 @@ class Project < ActiveRecord::Base
 
   def locations
     # infer all project's locations from the institutions where the person is member of
-    locations = self.institutions.collect { |i| i.country unless i.country.blank? }
-
-    # make sure this list is unique and (if any institutions didn't have a country set) that 'nil' element is deleted
-    locations = locations.uniq
-    locations.delete(nil)
-
+    locations = self.institutions.collect(&:country).select { |l| !l.blank? }
     return locations
   end
 

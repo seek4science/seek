@@ -198,7 +198,7 @@ describe Institution do
   #it { should have_searchable_field(:contributor) }
   it { should have_searchable_field(:projects) }
 
-  it { should have_searchable_field(:country) }
+  it { should have_searchable_field(:locations) }
   it { should have_searchable_field(:city) }
   it { should have_searchable_field(:address) }
   it { should have_searchable_field(:web_page) }
