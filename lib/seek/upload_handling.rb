@@ -9,7 +9,7 @@ module Seek
 
     def check_url_response_code(url)
       RestClient.head(url).code
-    #FIXME: catching SocketError is a temporary hack, unable to resovle url and connect is not the same as a 404
+    # FIXME: catching SocketError is a temporary hack, unable to resovle url and connect is not the same as a 404
     rescue RestClient::ResourceNotFound, SocketError
       404
     rescue RestClient::InternalServerError
@@ -29,7 +29,7 @@ module Seek
     end
 
     def fetch_url_headers(url)
-      RestClient.head(url,{:accept => :html}).headers
+      RestClient.head(url, accept: :html).headers
     end
 
     def summarize_webpage(url)
@@ -158,8 +158,8 @@ module Seek
       end
     end
 
-    def valid_uri? uri
-      uri =~ /\A#{URI::regexp}\z/
+    def valid_uri?(uri)
+      uri =~ /\A#{URI.regexp}\z/
     end
 
     def check_for_valid_uri(asset_params)
