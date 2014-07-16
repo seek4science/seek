@@ -29,7 +29,7 @@ module Seek
     end
 
     def fetch_url_headers(url)
-      RestClient.head(url).headers
+      RestClient.head(url,{:accept => :html}).headers
     end
 
     def summarize_webpage(url)
