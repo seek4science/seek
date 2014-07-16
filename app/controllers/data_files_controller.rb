@@ -118,7 +118,7 @@ class DataFilesController < ApplicationController
 
   def upload_for_tool
 
-    if handle_data
+    if handle_upload_data
       params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
@@ -143,7 +143,7 @@ class DataFilesController < ApplicationController
   def upload_from_email
     if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
       User.with_current_user Person.find(params[:sender_id]).user do
-        if handle_data
+        if handle_upload_data
           @data_file = DataFile.new params[:data_file]
 
           @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
