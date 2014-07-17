@@ -9,6 +9,8 @@ module Seek
 
     def check_url_response_code(url)
       RestClient.head(url).code
+    rescue RestClient::MethodNotAllowed
+      405
     # FIXME: catching SocketError is a temporary hack, unable to resovle url and connect is not the same as a 404
     rescue RestClient::ResourceNotFound, SocketError
       404
@@ -71,7 +73,10 @@ module Seek
 
     def handle_non_200_response(code)
       if code == 403
-        @unauthorized=true
+        @unauthorized = true
+      elsif code == 405
+        @error = true
+        @error_msg = "We can't find out information about this URL - Method not allowed response."
       end
     end
 
@@ -178,8 +183,8 @@ module Seek
       end
     end
 
-    def determine_filename_from_disposition disposition
-      disposition||=""
+    def determine_filename_from_disposition(disposition)
+      disposition ||= ''
       Mechanize::HTTP::ContentDispositionParser.parse(disposition).try(:filename)
     end
 

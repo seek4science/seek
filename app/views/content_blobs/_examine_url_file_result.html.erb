@@ -1,5 +1,5 @@
 <% app_name = Seek::Config.application_name %>
-<% copy_allowed = !@unauthorized %>
+<% copy_allowed = !@unauthorized && !@error %>
 
 <p id="url_type">
   This link points to a downloadable file, and not a webpage.
@@ -14,6 +14,8 @@
 <div>
   <% if @unauthorized %>
     <span id="warning_icon"></span>Access to this link is unauthorized. You can still register it as a link, but somebody wishing to access it may need a username and password to login to the site and download the file.
+  <% elsif @error %>
+    <span id="error_icon"></span><%= @error_msg %>
   <% else %>
   <p>
     You can either upload this file to <%= app_name %> using this URL, or you can register a link to the file.

@@ -22,12 +22,14 @@ class UploadHandingTest < ActiveSupport::TestCase
     stub_request(:head, 'http://server-error.com').to_return(status: 500, body: '', headers: {})
     stub_request(:head, 'http://forbidden.com').to_return(status: 403, body: '', headers: {})
     stub_request(:head, 'http://unauthorized.com').to_return(status: 401, body: '', headers: {})
+    stub_request(:head, 'http://methodnotallowed.com').to_return(status: 405, body: '', headers: {})
 
     assert_equal 200, check_url_response_code('http://bbc.co.uk')
     assert_equal 404, check_url_response_code('http://not-there.com')
     assert_equal 500, check_url_response_code('http://server-error.com')
     assert_equal 403, check_url_response_code('http://forbidden.com')
     assert_equal 401, check_url_response_code('http://unauthorized.com')
+    assert_equal 405, check_url_response_code('http://methodnotallowed.com')
 
     # redirection will be followed
     stub_request(:head, 'http://moved.com').to_return(status: 301, body: '', headers: { location: 'http://bbc.co.uk' })
@@ -65,25 +67,24 @@ class UploadHandingTest < ActiveSupport::TestCase
 
   end
 
-  test "content is webpage?" do
-    assert content_is_webpage?("text/html")
-    assert content_is_webpage?("text/html; charset=UTF-8")
-    refute content_is_webpage?("application/zip")
+  test 'content is webpage?' do
+    assert content_is_webpage?('text/html')
+    assert content_is_webpage?('text/html; charset=UTF-8')
+    refute content_is_webpage?('application/zip')
     refute content_is_webpage?(nil)
   end
 
-  test "valid uri?" do
-    assert valid_uri?("http://fish.com")
-    assert valid_uri?("http://fish.com")
-    refute valid_uri?("x dd s")
+  test 'valid uri?' do
+    assert valid_uri?('http://fish.com')
+    assert valid_uri?('http://fish.com')
+    refute valid_uri?('x dd s')
   end
 
-  test "determine_filename_from_disposition" do
-    assert_equal '_form.html.erb',determine_filename_from_disposition('inline; filename="_form.html.erb"')
-    assert_equal '_form.html.erb',determine_filename_from_disposition('inline; filename=_form.html.erb')
-    assert_equal '_form.html.erb',determine_filename_from_disposition('attachment;    filename="_form.html.erb"')
+  test 'determine_filename_from_disposition' do
+    assert_equal '_form.html.erb', determine_filename_from_disposition('inline; filename="_form.html.erb"')
+    assert_equal '_form.html.erb', determine_filename_from_disposition('inline; filename=_form.html.erb')
+    assert_equal '_form.html.erb', determine_filename_from_disposition('attachment;    filename="_form.html.erb"')
     assert_nil determine_filename_from_disposition(nil)
-    assert_nil determine_filename_from_disposition("")
+    assert_nil determine_filename_from_disposition('')
   end
-
 end
