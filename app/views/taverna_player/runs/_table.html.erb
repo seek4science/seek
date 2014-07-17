@@ -14,7 +14,8 @@
     $j('#<%= id -%>').data('poller', null);
     $j(document).ready(function () {
         workflow_runs_table = $j('#<%= id -%>').dataTable({
-            "bPaginate":false,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength" : 15,
             "bLengthChange":false,
             "bFilter":true,
             "bSort":true,
