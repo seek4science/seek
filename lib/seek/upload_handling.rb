@@ -51,6 +51,7 @@ module Seek
         @image ||= page.images[0] unless page.images.blank?
       else
         @is_webpage = false
+        @filename = determine_filename_from_disposition(headers[:content_disposition])
       end
     end
 
@@ -169,6 +170,11 @@ module Seek
       else
         true
       end
+    end
+
+    def determine_filename_from_disposition disposition
+      disposition||=""
+      Mechanize::HTTP::ContentDispositionParser.parse(disposition).try(:filename)
     end
 
     def asset_params(params)

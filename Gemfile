@@ -83,6 +83,7 @@ gem 'passenger'
 gem 'unicorn-rails'
 gem "recaptcha", '0.3.1'
 gem 'metainspector'
+gem 'mechanize'
 
 
 group :assets do

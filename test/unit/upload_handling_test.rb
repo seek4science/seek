@@ -78,4 +78,12 @@ class UploadHandingTest < ActiveSupport::TestCase
     refute valid_uri?("x dd s")
   end
 
+  test "determine_filename_from_disposition" do
+    assert_equal '_form.html.erb',determine_filename_from_disposition('inline; filename="_form.html.erb"')
+    assert_equal '_form.html.erb',determine_filename_from_disposition('inline; filename=_form.html.erb')
+    assert_equal '_form.html.erb',determine_filename_from_disposition('attachment;    filename="_form.html.erb"')
+    assert_nil determine_filename_from_disposition(nil)
+    assert_nil determine_filename_from_disposition("")
+  end
+
 end

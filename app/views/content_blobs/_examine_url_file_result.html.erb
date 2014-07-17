@@ -4,6 +4,9 @@
 </p>
 <p id="url_info">
   The size of the file <%= @size ? "is expected to be #{number_to_human_size(@size)}" : content_tag(:span,"unknown",class:"none_text") %>.
+  <% if @filename %>
+    The filename is <%= @filename %>.
+  <% end %>
 </p>
 <p>
 <div>
@@ -27,6 +30,6 @@
 <b>Upload a copy?</b>
 <%= check_box_tag :copy_data, :id => "copy_data" %>
 </p>
-
+<%= hidden_field_tag "#{controller_name.downcase.singularize.underscore}[original_filename]", @filename %>
 
 
