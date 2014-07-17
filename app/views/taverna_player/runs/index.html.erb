@@ -11,12 +11,12 @@
       <% if logged_in? %>
         <div class="easytabs-pane">
           <%= render :partial => 'table', :locals => {:runs => @user_runs, :polling_url => taverna_player.runs_path,
-                                                      :id => 'workflow_user_runs_table' } %>
+                                                      :id => 'workflow_user_runs_table', :poll => @user_runs.any? {|r| !r.complete?} } %>
         </div>
       <% end %>
       <div class="easytabs-pane">
         <%= render :partial => 'table', :locals => {:runs => @extra_runs, :polling_url => taverna_player.runs_path,
-                                                    :id => 'workflow_runs_table',
+                                                    :id => 'workflow_runs_table', :poll => @extra_runs.any? {|r| !r.complete?},
                                                     :redirect_to => taverna_player.runs_path, :show_user => true
         } %>
       </div>
