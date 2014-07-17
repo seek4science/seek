@@ -553,7 +553,7 @@ end
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal nil, assigns(:data_file).content_blob.original_filename
+    assert_equal "", assigns(:data_file).content_blob.original_filename
     assert assigns(:data_file).content_blob.is_webpage?
     assert_equal "http://webpage.com", assigns(:data_file).content_blob.url
     assert_equal "text/html", assigns(:data_file).content_blob.content_type
@@ -575,7 +575,7 @@ end
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal nil, assigns(:data_file).content_blob.original_filename
+    assert_equal "", assigns(:data_file).content_blob.original_filename
     assert assigns(:data_file).content_blob.is_webpage?
     assert_equal "http://webpage.com", assigns(:data_file).content_blob.url
     assert_equal "text/html", assigns(:data_file).content_blob.content_type
@@ -761,11 +761,9 @@ end
     assert_redirected_to "http://mocked401.com"
   end
 
-
-
-  test "should create and redirect on download for 302 url" do
+  test "should create and redirect on download for 403 url" do
     mock_http
-    df = {:title=>"302",:data_url=>"http://mocked302.com",:project_ids=>[projects(:sysmo_project).id]}
+    df = {:title=>"401",:data_url=>"http://mocked403.com",:project_ids=>[projects(:sysmo_project).id]}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -783,12 +781,14 @@ end
     assert_equal "",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked302.com"
+    assert_redirected_to "http://mocked403.com"
   end
 
-  test "should create and redirect on download for 301 url" do
+
+
+  test "should create and redirect on download for 302 url" do
     mock_http
-    df = {:title=>"301",:data_url=>"http://mocked301.com",:project_ids=>[projects(:sysmo_project).id]}
+    df = {:title=>"302",:data_url=>"http://mocked302.com",:project_ids=>[projects(:sysmo_project).id], :external_link=>"1"}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -803,7 +803,30 @@ end
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
     assert_equal "",assigns(:data_file).content_blob.original_filename
-    assert_equal "",assigns(:data_file).content_blob.content_type
+    assert_equal "text/html",assigns(:data_file).content_blob.content_type
+
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://mocked302.com"
+  end
+
+  test "should create and redirect on download for 301 url" do
+    mock_http
+    df = {:title=>"301",:data_url=>"http://mocked301.com",:project_ids=>[projects(:sysmo_project).id],:external_link=>"1"}
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).content_blob.original_filename
+    assert_equal "text/html",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
     assert_redirected_to "http://mocked301.com"
@@ -1808,9 +1831,13 @@ end
     stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
     stub_request(:head, "http://mockedlocation.com/a-piccy.png").to_return(:status=>200,headers: { content_type: 'image/png' })
 
-    stub_request(:any, "http://mocked301.com").to_return(:status=>301, :headers=>{:location=>"http://mockedlocation.com/a-piccy.png"})
-    stub_request(:any, "http://mocked302.com").to_return(:status=>302, :headers=>{:location=>"http://mockedlocation.com/a-piccy.png"})
+    stub_request(:head, "http://redirectlocation.com").to_return(:status=>200,headers: {content_type: 'text/html'})
+    stub_request(:get, "http://redirectlocation.com").to_return(:body=>"<html><head></head><body></body></html>",:status=>200,headers: {content_type: 'text/html'})
+
+    stub_request(:any, "http://mocked301.com").to_return(:status=>301, :headers=>{:location=>"http://redirectlocation.com"})
+    stub_request(:any, "http://mocked302.com").to_return(:status=>302, :headers=>{:location=>"http://redirectlocation.com"})
     stub_request(:any, "http://mocked401.com").to_return(:status=>401)
+    stub_request(:any, "http://mocked403.com").to_return(:status=>403)
     stub_request(:any, "http://mocked404.com").to_return(:status=>404)
   end
 
@@ -1819,8 +1846,10 @@ end
     stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
     stub_request(:head, "https://mockedlocation.com/a-piccy.png").to_return(:status=>200,headers: { content_type: 'image/png' })
 
-    stub_request(:any, "https://mocked301.com").to_return(:status=>301, :headers=>{:location=>"https://mockedlocation.com/a-piccy.png"})
-    stub_request(:any, "https://mocked302.com").to_return(:status=>302, :headers=>{:location=>"https://mockedlocation.com/a-piccy.png"})
+    stub_request(:head, "https://redirectlocation.com").to_return(:status=>200,headers: {content_type: 'text/html'})
+
+    stub_request(:any, "https://mocked301.com").to_return(:status=>301, :headers=>{:location=>"https://redirectlocation.com"})
+    stub_request(:any, "https://mocked302.com").to_return(:status=>302, :headers=>{:location=>"https://redirectlocation.com"})
     stub_request(:any, "https://mocked401.com").to_return(:status=>401)
     stub_request(:any, "https://mocked404.com").to_return(:status=>404)
   end

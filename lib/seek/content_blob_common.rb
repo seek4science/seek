@@ -84,7 +84,7 @@ module Seek
           redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
           return_file_or_redirect_to redirected_url, error_message
         end
-      elsif (["301","302","401"].include?(code))
+      elsif (["301","302","401","403"].include?(code))
         return_file_or_redirect_to @content_blob.url
       elsif code=="404"
         error_message = "This item is referenced at a remote location, which is currently unavailable"

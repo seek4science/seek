@@ -82,8 +82,8 @@ module Seek
           @error = true
           @error_msg = "Nothing can be found at that URL. Please check the address and try again"
         else
-                  @error = true
-                  @error_msg = "We can't find out information about this URL - unhandled response code: #{code}"
+          @error = true
+          @error_msg = "We can't find out information about this URL - unhandled response code: #{code}"
       end
     end
 
@@ -97,18 +97,22 @@ module Seek
       @data_url = asset_params[:data_url]
       code = check_url_response_code(@data_url)
       make_local_copy = !asset_params[:external_link]
-      if code == 200
-        # FIXME: refactor this, the downloader is only being used to make a local copy and get the original filename
-        downloader = RemoteDownloader.new
-        data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
+      case code
+        when 200
+          # FIXME: refactor this, the downloader is only being used to make a local copy and get the original filename
+          downloader = RemoteDownloader.new
+          data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
 
-        @tmp_io_object = File.open data_hash[:data_tmp_path], 'r' if make_local_copy
+          @tmp_io_object = File.open data_hash[:data_tmp_path], 'r' if make_local_copy
 
-        asset_params[:content_type] = data_hash[:content_type]
-        asset_params[:original_filename] = data_hash[:filename] if asset_params[:original_filename].blank?
-      else
-        flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the URL is inaccessible."
-        return false
+          asset_params[:content_type] = (data_hash[:content_type] || "")
+          asset_params[:original_filename] = (data_hash[:filename] || "") if asset_params[:original_filename].blank?
+        when 401, 403
+          asset_params[:content_type]=""
+          asset_params[:original_filename]=""
+        else
+          flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the URL is inaccessible."
+          return false
       end
       true
     end
