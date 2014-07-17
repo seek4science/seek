@@ -92,6 +92,7 @@ describe Publication do
   it { should have_searchable_field(:doi) }
   it { should have_searchable_field(:non_seek_authors) }
   it { should have_searchable_field(:published_date) }
+  it { should have_searchable_field(:organism_terms) }
 end
 
 describe Workflow do
@@ -235,7 +236,7 @@ describe Strain do
   it { should have_searchable_field(:phenotype_info) }
 
   it { should have_searchable_field(:specimens) }
-  it { should have_searchable_field(:organism) }
+  it { should have_searchable_field(:organism_terms) }
   it { should have_searchable_field(:synonym) }
   it { should have_searchable_field(:parent) }
   it { should have_searchable_field(:children) }
