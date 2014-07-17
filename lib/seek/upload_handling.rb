@@ -72,11 +72,18 @@ module Seek
     end
 
     def handle_non_200_response(code)
-      if code == 403
-        @unauthorized = true
-      elsif code == 405
-        @error = true
-        @error_msg = "We can't find out information about this URL - Method not allowed response."
+      case code
+        when 403
+          @unauthorized = true
+        when 405
+          @error = true
+          @error_msg = "We can't find out information about this URL - Method not allowed response."
+        when 404
+          @error = true
+          @error_msg = "Nothing can be found at that URL. Please check the address and try again"
+        else
+                  @error = true
+                  @error_msg = "We can't find out information about this URL - unhandled response code: #{code}"
       end
     end
 

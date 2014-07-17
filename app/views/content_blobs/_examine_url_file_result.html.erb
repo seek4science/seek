@@ -1,6 +1,7 @@
 <% app_name = Seek::Config.application_name %>
 <% copy_allowed = !@unauthorized && !@error %>
 
+<% unless @error %>
 <p id="url_type">
   This link points to a downloadable file, and not a webpage.
 </p>
@@ -10,6 +11,7 @@
     The filename is <%= @filename %>.
   <% end %>
 </p>
+<% end %>
 <p>
 <div>
   <% if @unauthorized %>
