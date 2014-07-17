@@ -3,7 +3,7 @@
   This link points to a downloadable file, and not a webpage.
 </p>
 <p id="url_info">
-  The size of the file is expected to be <%= number_to_human_size(@size) %>.
+  The size of the file <%= @size ? "is expected to be #{number_to_human_size(@size)}" : content_tag(:span,"unknown",class:"none_text") %>.
 </p>
 <p>
 <div>
