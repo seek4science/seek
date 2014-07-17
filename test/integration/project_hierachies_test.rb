@@ -279,7 +279,7 @@ class ProjectHierarchiesTest < ActionController::IntegrationTest
     @person.reload
     assert @person.is_admin?
 
-    @person.roles = [["asset_manager", @proj.id.to_s]]
+    @person.roles = [["admin"],["asset_manager", @proj.id.to_s]]
     disable_authorization_checks do
       @person.save!
     end

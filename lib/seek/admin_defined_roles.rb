@@ -84,7 +84,7 @@ module Seek
 
     def roles=(roles)
       #TODO a bit heavy handed, but works for the moment
-      self.roles_mask= self.is_admin? && !roles.include?("admin") ? 1 : 0
+      self.roles_mask= 0
       self.admin_defined_role_projects.destroy_all
 
       add_roles(roles)
