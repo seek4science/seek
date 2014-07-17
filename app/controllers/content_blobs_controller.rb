@@ -27,8 +27,7 @@ class ContentBlobsController < ApplicationController
       if code == 200
         process_view_for_successful_url(url)
       else
-        #react to non 200 response code
-        raise "Not 200 code - was #{code}"
+        handle_non_200_response(code)
       end
     rescue Exception=>e
       raise e

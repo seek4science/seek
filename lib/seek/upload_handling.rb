@@ -69,6 +69,12 @@ module Seek
       clean_params
     end
 
+    def handle_non_200_response(code)
+      if code == 403
+        @unauthorized=true
+      end
+    end
+
     def process_upload(asset_params)
       asset_params[:content_type] = (asset_params[:data]).content_type
       asset_params[:original_filename] = (asset_params[:data]).original_filename if asset_params[:original_filename].blank?
