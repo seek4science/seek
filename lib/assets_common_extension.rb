@@ -1,6 +1,7 @@
 require 'seek/mime_types'
 require 'seek/content_blob_common'
 require 'seek/assets_common'
+require 'net/ftp'
 
 
 module AssetsCommonExtension
