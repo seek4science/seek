@@ -10,7 +10,6 @@ module TavernaPlayer
     before_filter :check_project_membership_unless_embedded, :only => [:create, :new]
     before_filter :auth, :except => [ :index, :new, :create ]
     before_filter :add_sweeps, :only => :index
-    before_filter :filter_users_runs_and_sweeps, :only => :index
     before_filter :find_workflow_and_version, :only => :new
     before_filter :auth_workflow, :only => :new
 
@@ -84,13 +83,23 @@ module TavernaPlayer
     end
 
     def find_runs
-      select = params[:workflow_id] ? { :workflow_id => params[:workflow_id] } : {}
-      @runs = Run.where(select).where(:embedded => :false).
+      @runs = Run.where(:embedded => :false).
           includes(:sweep => [:workflow, :policy, :contributor]).
           includes(:workflow => [:policy, :contributor, :category]).
-          includes(:policy).
-          all
-      @runs = @runs & Run.all_authorized_for('view', current_user)
+          includes(:policy)
+
+      @runs = @runs.where(:workflow_id => params[:workflow_id]) if params[:workflow_id]
+
+      if request.format.to_s.include?("json")
+        @runs = Run.authorize_asset_collection(@runs.all, 'view', current_user)
+      else
+        @user_runs  = @runs.where(:contributor_id => current_user, :contributor_type => 'User').all # Don't need to auth, because contributor can always view!
+        limit = (params[:limit] || '75').to_i
+        @extra_runs = @runs.where("contributor_id != ? AND contributor_type = 'User'", current_user).order('created_at DESC').limit(limit).all
+        @extra_runs = Run.authorize_asset_collection(@extra_runs, 'view', current_user)
+
+        @runs = @user_runs + @extra_runs
+      end
     end
 
     # Overrides the method from TavernaPlayer::Concerns::Controllers::RunsController
@@ -111,17 +120,11 @@ module TavernaPlayer
     # to group sweeps when serving json, though. There may be a better way...
     def add_sweeps
       return if request.format.to_s.include?("json")
-      @runs = @runs.group_by { |run| run.sweep }
-      @runs = (@runs[nil] || []) + @runs.keys
-      @runs.compact! # to ignore 'nil' key
-    end
-
-    def filter_users_runs_and_sweeps
-      @user_runs = @runs.select do |run|
-        run.contributor == current_user
+      @extra_runs, @user_runs = [@extra_runs, @user_runs].map do |coll|
+        coll = coll.group_by { |run| run.sweep } # Create a hash of Sweep => [Runs]
+        coll = (coll[nil] || []) + coll.keys # Get an array of all the runs without sweeps, and then all the sweeps
+        coll.compact! # to ignore 'nil' key
       end
-
-      @extra_runs = @runs - @user_runs
     end
 
     def auth

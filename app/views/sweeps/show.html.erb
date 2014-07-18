@@ -20,7 +20,12 @@
   <% end %>
 
   <h2 class="standout">Runs</h2>
-  <%= render :partial => 'taverna_player/runs/table', :locals => {:runs => @runs, :polling_url => runs_sweep_path(@sweep), :redirect_to => sweep_path(@sweep), :default_sort => [0, 'asc'], :poll => !@sweep.complete? } %>
+  <%= render :partial => 'taverna_player/runs/table', :locals => {:runs => @runs,
+                                                                  :polling_url => runs_sweep_path(@sweep),
+                                                                  :redirect_to => sweep_path(@sweep),
+                                                                  :default_sort => [0, 'asc'],
+                                                                  :poll => !@sweep.complete?,
+                                                                  :poll_interval => 5000} %>
 
   <div id="sweep_results_table" style="<%= 'display: none' unless @sweep.complete? -%>">
     <h2 class="standout">Results</h2>

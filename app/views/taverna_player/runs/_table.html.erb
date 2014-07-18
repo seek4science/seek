@@ -1,7 +1,7 @@
 <%= javascript_include_tag 'DataTables-1.8.2/jquery.js', 'DataTables-1.8.2/jquery.dataTables.js', 'DataTables-1.8.2/jquery.dataTables.rowGrouping.js', 'DataTables-1.8.2/Scroller.js' %>
 <% id ||= 'workflow_runs_table' %>
 <% default_sort ||= [6, 'desc'] %>
-<% poll_interval = 20000 %>
+<% poll_interval ||= 20000 %>
 <% show_user ||= false %>
 <%
   unless defined?(poll)
@@ -14,8 +14,9 @@
     $j('#<%= id -%>').data('poller', null);
     $j(document).ready(function () {
         workflow_runs_table = $j('#<%= id -%>').dataTable({
-            "sPaginationType": "full_numbers",
-            "iDisplayLength" : 15,
+//            "sPaginationType": "full_numbers",
+//            "iDisplayLength" : 15,
+            "bPaginate":false,
             "bLengthChange":false,
             "bFilter":true,
             "bSort":true,
@@ -47,7 +48,7 @@
             ]
         });
         <% if poll %>
-          $j('#<%= id -%>').data('poller', window.setInterval(function () { $j.get("<%= polling_url %>", null, null, "script") }, <%= poll_interval -%>));
+          $j('#<%= id -%>').data('poller', window.setInterval(function () { $j.get("<%= polling_url.html_safe %>", null, null, "script") }, <%= poll_interval -%>));
         <% end %>
     });
 </script>

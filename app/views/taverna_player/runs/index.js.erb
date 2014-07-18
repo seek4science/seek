@@ -8,20 +8,17 @@ $j('#workflow_runs_table').dataTable().fnAddData(json);
 
   $j('#workflow_user_runs_table').dataTable().fnClearTable();
   $j('#workflow_user_runs_table').dataTable().fnAddData(user_json);
-  <% unless @user_runs.any? {|r| !r.complete?} %>
-    window.clearInterval($j('#workflow_user_runs_table').data('poller'));
-  <% end %>
 <% end %>
 
 <% if @sweep %>
-  $j("#sweep_results").replaceWith('<%= escape_javascript(render(:partial => "sweeps/results_table")) -%>');
   <% if @sweep.complete? %>
+    $j("#sweep_results").replaceWith('<%= escape_javascript(render(:partial => "sweeps/results_table")) -%>');
     $j('#sweep_results_table').fadeIn();
     $j("#buttons").replaceWith('<%= escape_javascript(render(:partial => "sweeps/buttons", :locals => {:sweep => @sweep})) %>');
     window.clearInterval($j('#workflow_runs_table').data('poller')); //stop refresh after sweep has finished
   <% end %>
 <% else %>
-    <% unless @extra_runs.any? {|r| !r.complete?} %>
+    <% unless @runs.any? {|r| !r.complete?} %>
       window.clearInterval($j('#workflow_runs_table').data('poller'));
     <% end %>
 <% end %>

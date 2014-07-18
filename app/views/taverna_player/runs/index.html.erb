@@ -9,16 +9,19 @@
           <li>Other Runs</li>
       </ul>
       <% if logged_in? %>
-        <div class="easytabs-pane">
-          <%= render :partial => 'table', :locals => {:runs => @user_runs, :polling_url => taverna_player.runs_path,
-                                                      :id => 'workflow_user_runs_table', :poll => @user_runs.any? {|r| !r.complete?} } %>
+        <div class="easytabs-pane" id="users-runs">
+          <%= render :partial => 'table', :locals => {:runs => @user_runs,
+                                                      :id => 'workflow_user_runs_table', :poll => false } %>
+          <%# Only one of the tables need to poll, because both will be updated with the response %>
         </div>
       <% end %>
-      <div class="easytabs-pane">
-        <%= render :partial => 'table', :locals => {:runs => @extra_runs, :polling_url => taverna_player.runs_path,
-                                                    :id => 'workflow_runs_table', :poll => @extra_runs.any? {|r| !r.complete?},
+      <div class="easytabs-pane" id="other-runs">
+        <%= render :partial => 'table', :locals => {:runs => @extra_runs, :polling_url => request.url,
+                                                    :id => 'workflow_runs_table', :poll => @runs.any? {|r| !r.complete?},
                                                     :redirect_to => taverna_player.runs_path, :show_user => true
         } %>
+        Showing a maximum of <%= params[:limit] ||= '75' -%> runs.
+        <%= link_to('Show more', taverna_player.runs_path(:tab => 'other', :limit => (params[:limit].to_i + 75))) -%>
       </div>
   </div>
 
@@ -26,6 +29,14 @@
   <script type="text/javascript">
       $j(function (){
           $j('.easytabs-container').easyTabs();
+
+          <% if params[:tab] == 'other' %>
+          $j('ul.easytabs-nav > li').removeClass('active');
+          $j('.easytabs-pane').removeClass('active');
+          $j('ul.easytabs-nav > li:eq(1)').addClass('active');
+          $j('.easytabs-pane:eq(1)').addClass('active');
+          <% end %>
       });
+
   </script>
 </div>
