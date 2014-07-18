@@ -20,8 +20,14 @@
                                                     :id => 'workflow_runs_table', :poll => @runs.any? {|r| !r.complete?},
                                                     :redirect_to => taverna_player.runs_path, :show_user => true
         } %>
-        Showing a maximum of <%= params[:limit] ||= '75' -%> runs.
-        <%= link_to('Show more', taverna_player.runs_path(:tab => 'other', :limit => (params[:limit].to_i + 75))) -%>
+        <% if params[:no_limit] %>
+            Showing all runs.
+            <%= link_to('Show less', taverna_player.runs_path(:tab => 'other')) -%>
+        <% else %>
+            Showing a maximum of 75 runs.
+            <%= link_to('Show all', taverna_player.runs_path(:tab => 'other', :no_limit => true)) -%>
+        <% end %>
+
       </div>
   </div>
 

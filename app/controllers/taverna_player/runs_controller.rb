@@ -94,9 +94,12 @@ module TavernaPlayer
         @runs = Run.authorize_asset_collection(@runs.all, 'view', current_user)
       else
         @user_runs  = @runs.where(:contributor_id => current_user, :contributor_type => 'User').all # Don't need to auth, because contributor can always view!
-        limit = (params[:limit] || '75').to_i
-        @extra_runs = @runs.where("contributor_id != ? AND contributor_type = 'User'", current_user).order('created_at DESC').limit(limit).all
-        @extra_runs = Run.authorize_asset_collection(@extra_runs, 'view', current_user)
+        @extra_runs = @runs.where("contributor_id != ? AND contributor_type = 'User'", current_user).order('created_at DESC')
+        unless params[:no_limit]
+          @extra_runs = @extra_runs.limit(75)
+        end
+
+        @extra_runs = Run.authorize_asset_collection(@extra_runs.all, 'view', current_user)
 
         @runs = @user_runs + @extra_runs
       end
