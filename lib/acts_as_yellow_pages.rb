@@ -40,7 +40,7 @@ module Acts #:nodoc:
               locations
             end
           end
-        end
+        end if Seek::Config.solr_enabled
 
         class_eval do
           extend Acts::Yellow_Pages::SingletonMethods
