@@ -7,6 +7,9 @@ en:
     sample_age: "Age at sampling"
     specimen_creators: "Creators"
 
+  search_label: ""
+  search_prompt: "Search here..."
+
   #Investigation
   investigation: "Investigation"
 
