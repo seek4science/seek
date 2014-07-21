@@ -2,8 +2,6 @@ require 'rails_helper'
 
 #acts_as_asset
 describe DataFile do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -22,8 +20,6 @@ describe DataFile do
 end
 
 describe Sop do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -40,8 +36,6 @@ describe Sop do
 end
 
 describe Model do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -62,8 +56,6 @@ describe Model do
 end
 
 describe Presentation do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -77,8 +69,6 @@ end
 
 
 describe Publication do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -96,8 +86,6 @@ describe Publication do
 end
 
 describe Workflow do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -113,8 +101,6 @@ end
 
 #acts_as_isa
 describe Assay do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -128,8 +114,6 @@ describe Assay do
 end
 
 describe Study do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -141,8 +125,6 @@ describe Study do
 end
 
 describe Investigation do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -152,8 +134,6 @@ end
 
 #acts_as_yellow_pages
 describe Person do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -173,8 +153,6 @@ describe Person do
 end
 
 describe Project do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -191,8 +169,6 @@ describe Project do
 end
 
 describe Institution do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   #it { should have_searchable_field(:description) }
   #it { should have_searchable_field(:searchable_tags) }
@@ -206,8 +182,6 @@ describe Institution do
 end
 
 describe Programme do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   #it { should have_searchable_field(:searchable_tags) }
@@ -222,8 +196,6 @@ end
 
 #biosamples
 describe Strain do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -243,8 +215,6 @@ describe Strain do
 end
 
 describe Specimen do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -276,8 +246,6 @@ describe Specimen do
 end
 
 describe Sample do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
@@ -301,8 +269,6 @@ end
 
 #others
 describe Event do
-  before(:all) { Seek::Config.solr_enabled = true }
-
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
