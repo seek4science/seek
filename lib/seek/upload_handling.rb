@@ -60,8 +60,8 @@ module Seek
     def handle_upload_data
       asset_params = asset_params(params)
       return false unless validate_params(asset_params)
-      return false unless check_for_empty_data(asset_params)
-      return false unless check_for_valid_uri(asset_params)
+      return false unless check_for_empty_data_if_present(asset_params)
+      return false unless check_for_valid_uri_if_present(asset_params)
       return false unless check_for_valid_scheme(asset_params)
       if add_from_upload?(asset_params)
         return false unless process_upload(asset_params)
@@ -166,7 +166,7 @@ module Seek
       end
     end
 
-    def check_for_empty_data(asset_params)
+    def check_for_empty_data_if_present(asset_params)
       if !(asset_params[:data]).blank? && (asset_params[:data]).size == 0 && (asset_params[:data_url]).blank?
         flash.now[:error] = 'The file that you are uploading is empty. Please check your selection and try again!'
         false
@@ -176,7 +176,7 @@ module Seek
     end
 
     def check_for_valid_scheme(asset_params)
-      if (!asset_params[:data_url]).blank? && !valid_scheme?(asset_params[:data_url])
+      if !asset_params[:data_url].blank? && !valid_scheme?(asset_params[:data_url])
         flash.now[:error] = "The URL type is invalid, only URLs of type #{VALID_SCHEMES.map { |s| "#{s}" }.join', '} are valid"
         false
       else
@@ -188,8 +188,8 @@ module Seek
       uri =~ /\A#{URI.regexp}\z/
     end
 
-    def check_for_valid_uri(asset_params)
-      if (!asset_params[:data_url]).blank? && !valid_uri?(asset_params[:data_url])
+    def check_for_valid_uri_if_present(asset_params)
+      if !asset_params[:data_url].blank? && !valid_uri?(asset_params[:data_url])
         flash.now[:error] = "The URL '#{asset_params[:data_url]}' is not valid"
         false
       else
