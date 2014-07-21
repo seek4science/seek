@@ -1,8 +1,8 @@
 
 <%
-# determine the asset type from the controller
-upload_field = controller_name.downcase.singularize.underscore
+
 # inject the attributes data_url and external_link in the asset type, e.g. @model. This keeps the form clean.
+upload_field = asset_field_prefix
 obj=eval("@"+upload_field)
 class << obj
 attr_accessor :data_url,:external_link
@@ -80,12 +80,15 @@ original_filename=nil
           <span class="required">*</span>
           <%= text_field upload_field, :data_url, :size => 55 -%>
 
-            <%= link_to image("test", :title => "Test", :alt => "Test")+" Test",
-                        "#",
-                        :id=>"examine_url" %>
+          <%= link_to image("test", :title => "Test", :alt => "Test")+" Test", "#", :id=>"examine_url" %>
           <br/>
           <div id="test_url_result"></div>
+          <div id="copy_option" style="display:none;">
+              <b>Upload a copy?</b>
+              <%= check_box_tag "#{asset_field_prefix}[make_local_copy]" %>
+          </div>
 
+          <%= hidden_field_tag "#{asset_field_prefix}[original_filename]", @filename %>
 
         </div>
       </li>

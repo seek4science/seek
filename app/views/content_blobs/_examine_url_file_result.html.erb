@@ -1,5 +1,5 @@
 <% app_name = Seek::Config.application_name %>
-<% copy_allowed = !@unauthorized && !@error %>
+
 
 <% unless @error %>
 <p id="url_type">
@@ -34,13 +34,6 @@
   </p>
   <% end %>
 </div>
-<% if copy_allowed %>
-<b>Upload a copy?</b>
-<%= check_box_tag :copy_data, :id => "copy_data" %>
-</p>
-<% else %>
-    <%= hidden_field_tag :copy_data,:id=>"copy_data",:value=>0 %>
-<% end %>
-<%= hidden_field_tag "#{controller_name.downcase.singularize.underscore}[original_filename]", @filename %>
+
 
 

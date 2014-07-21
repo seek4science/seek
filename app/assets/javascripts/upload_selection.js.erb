@@ -38,3 +38,12 @@ function from_file_selected(){
     $j('#upload_from_file_button').addClass("block_link_active");
     $j('#upload_from_url_button').removeClass("block_link_active");
 }
+
+function allow_copy_option() {
+    $j("#copy_option").show();
+}
+
+function disallow_copy_option() {
+    $j("#copy_option").hide();
+    $j("#copy_option input").prop("checked",false);
+}

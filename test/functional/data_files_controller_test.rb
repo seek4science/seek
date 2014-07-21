@@ -292,7 +292,7 @@ end
     
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file_with_http_url.tap {|df|df[:external_link] = "1"}, :sharing=>valid_sharing
+        post :create, :data_file => valid_data_file_with_http_url.tap {|df|df[:make_local_copy] = "0"}, :sharing=>valid_sharing
       end
     end
       
@@ -328,7 +328,7 @@ end
 
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => valid_data_file_with_https_url.tap {|df| df[:external_link] = "1"}, :sharing=>valid_sharing
+          post :create, :data_file => valid_data_file_with_https_url.tap {|df| df[:make_local_copy] = "0"}, :sharing=>valid_sharing
         end
       end
 
@@ -360,6 +360,7 @@ end
   test "should create data file and store with url" do
     mock_http
     datafile_details = valid_data_file_with_http_url
+    datafile_details[:make_local_copy]="1"
 
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
@@ -540,7 +541,7 @@ end
   test "should add link to a webpage" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
 
-    params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
+    params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
@@ -561,7 +562,7 @@ end
 
   test "should add link to a webpage from windows browser" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
-    params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id], :external_link => "1"}
+    params_data_file = { :title=>"Test HTTP",:data_url=>"http://webpage.com",:project_ids=>[projects(:sysmo_project).id]}
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
@@ -788,7 +789,7 @@ end
 
   test "should create and redirect on download for 302 url" do
     mock_http
-    df = {:title=>"302",:data_url=>"http://mocked302.com",:project_ids=>[projects(:sysmo_project).id], :external_link=>"1"}
+    df = {:title=>"302",:data_url=>"http://mocked302.com",:project_ids=>[projects(:sysmo_project).id], :make_local_copy => "0"}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -811,7 +812,7 @@ end
 
   test "should create and redirect on download for 301 url" do
     mock_http
-    df = {:title=>"301",:data_url=>"http://mocked301.com",:project_ids=>[projects(:sysmo_project).id],:external_link=>"1"}
+    df = {:title=>"301",:data_url=>"http://mocked301.com",:project_ids=>[projects(:sysmo_project).id], :make_local_copy => "0"}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do

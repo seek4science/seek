@@ -96,7 +96,10 @@ module Seek
     def process_from_url(asset_params)
       @data_url = asset_params[:data_url]
       code = check_url_response_code(@data_url)
-      make_local_copy = !asset_params[:external_link]
+      make_local_copy = asset_params[:make_local_copy]=="1"
+
+      #MERGENOTE, FIXME: An external link is not the same as the reverse of a local copy. An external link is not nessarily desirable for a non copied URL that has been registered, but for now we will keep this behaviour
+      @external_link = !make_local_copy
       case code
         when 200
           # FIXME: refactor this, the downloader is only being used to make a local copy and get the original filename
@@ -130,7 +133,7 @@ module Seek
 
     def clean_params
       asset_params = asset_params(params)
-      %w(data_url data external_link).each do |key|
+      %w(data_url data make_local_copy).each do |key|
         asset_params.delete(key)
       end
     end
