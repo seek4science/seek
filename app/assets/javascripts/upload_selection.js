@@ -18,7 +18,9 @@ function setup_url_field(upload_field, examine_url_path,examine_button_id) {
         update_url_checked_status(false);
     });
 };
+
 function submit_url_for_examination() {
+    disallow_copy_option();
     $j('#test_url_result')[0].innerHTML="<p id='large_spinner'/>";
     var data_url = upload_url_field.val();
     $j.post(examine_url_href + "?data_url=" + data_url, function(data){} );
