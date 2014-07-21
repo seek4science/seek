@@ -871,7 +871,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def valid_sop
-    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[projects(:sysmo_project).id]}
+    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[projects(:sysmo_project).id], :data_url=>""}
   end
 
 end
