@@ -11,3 +11,7 @@ el.show();
 <% else %>
     disallow_copy_option();
 <% end %>
+
+<% if @filename %>
+   set_original_filename_for_upload('<%= @filename %>');
+<% end %>

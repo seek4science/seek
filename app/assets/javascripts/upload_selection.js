@@ -47,3 +47,7 @@ function disallow_copy_option() {
     $j("#copy_option").hide();
     $j("#copy_option input").prop("checked",false);
 }
+
+function set_original_filename_for_upload(filename) {
+    $j("#original_filename")[0].value=filename;
+}

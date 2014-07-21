@@ -1,13 +1,13 @@
 
 <%
-
-# inject the attributes data_url and external_link in the asset type, e.g. @model. This keeps the form clean.
 upload_field = asset_field_prefix
 obj=eval("@"+upload_field)
+
+# inject the attributes data_url in the asset type, e.g. @model. This keeps the form clean.
 class << obj
-attr_accessor :data_url,:external_link
+attr_accessor :data_url
 end unless obj.nil?
-obj.external_link = 1 unless obj.nil?
+
 asset_name = text_for_resource upload_field
 new_version ||= false
 original_filename=nil
@@ -88,7 +88,7 @@ original_filename=nil
               <%= check_box_tag "#{asset_field_prefix}[make_local_copy]" %>
           </div>
 
-          <%= hidden_field_tag "#{asset_field_prefix}[original_filename]", @filename %>
+          <%= hidden_field_tag "#{asset_field_prefix}[original_filename]", original_filename, :id=>:original_filename %>
 
         </div>
       </li>
