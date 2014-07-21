@@ -202,8 +202,6 @@ class SopsControllerTest < ActionController::TestCase
 
      assert_difference("Sop.count") do
        post :create,:sop => sop_with_samples, :sharing => valid_sharing
-       puts assigns(:sop).errors.full_messages
-       puts assigns(:sop).valid?
      end
 
     s = assigns(:sop)
