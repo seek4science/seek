@@ -14,6 +14,9 @@ function setup_url_field(upload_field, examine_url_path,examine_button_id) {
         },0);
         return true;
     });
+    upload_url_field.on('keypress',function(event) {
+        update_url_checked_status(false);
+    });
 };
 function submit_url_for_examination() {
     $j('#test_url_result')[0].innerHTML="<p id='large_spinner'/>";
@@ -50,4 +53,8 @@ function disallow_copy_option() {
 
 function set_original_filename_for_upload(filename) {
     $j("#original_filename")[0].value=filename;
+}
+
+function update_url_checked_status(url_ok) {
+    $j("#url_checked")[0].value=url_ok;
 }

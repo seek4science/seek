@@ -11,8 +11,8 @@ module Seek
       RestClient.head(url).code
     rescue RestClient::MethodNotAllowed
       405
-    # FIXME: catching SocketError is a temporary hack, unable to resovle url and connect is not the same as a 404
-    rescue RestClient::ResourceNotFound, SocketError
+    # FIXME: catching SocketError and Errno::ECONNREFUSED is a temporary hack, unable to resovle url and connect is not the same as a 404
+    rescue RestClient::ResourceNotFound, SocketError,Errno::ECONNREFUSED
       404
     rescue RestClient::InternalServerError
       500
