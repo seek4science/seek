@@ -22,7 +22,7 @@ class ContentBlobsController < ApplicationController
     #check content type and size
     url = params[:data_url]
     begin
-      raise Seek::UploadHandling::InvalidSchemeException unless valid_scheme?(url)
+      #raise Seek::Exceptions::InvalidSchemeException unless valid_scheme?(url)
       code = check_url_response_code(url)
       if code == 200
         process_view_for_successful_url(url)
@@ -30,7 +30,7 @@ class ContentBlobsController < ApplicationController
         handle_non_200_response(code)
       end
     rescue Exception=>e
-      raise e
+      handle_exception_response(e)
     end
 
   end

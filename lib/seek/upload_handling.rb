@@ -87,6 +87,16 @@ module Seek
       end
     end
 
+    def handle_exception_response(exception)
+      case exception
+        when Seek::Exceptions::InvalidSchemeException, URI::InvalidURIError
+          @error=true
+          @error_msg="The URL appears to be invalid"
+        else
+          raise exception
+      end
+    end
+
     def process_upload(asset_params)
       asset_params[:content_type] = (asset_params[:data]).content_type
       asset_params[:original_filename] = (asset_params[:data]).original_filename if asset_params[:original_filename].blank?
