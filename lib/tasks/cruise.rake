@@ -2,6 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'fileutils'
 require 'bundler'
+require 'rspec/core/rake_task'
 
 
 
@@ -20,4 +21,7 @@ task :cruise do |t,args|
   Rake::Task["db:test:prepare"].invoke
   Rake::Task["seek:seed_testing"].invoke
   Rake::Task["test"].invoke
+
+  RSpec::Core::RakeTask.new(:spec)
+  Rake::Task["spec"].invoke
 end
