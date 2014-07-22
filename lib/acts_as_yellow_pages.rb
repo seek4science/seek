@@ -32,6 +32,8 @@ module Acts #:nodoc:
         #load the configuration for the pagination
         grouped_pagination :pages=>("A".."Z").to_a
 
+        include Seek::Search::CommonFields
+
         searchable do
           text :locations do
             if self.respond_to?(:country)

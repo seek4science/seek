@@ -37,6 +37,8 @@ module Seek
     module BiosampleFields
       def self.included klass
         klass.class_eval do
+          include Seek::Search::CommonFields
+
           searchable do
 =begin
             text :treatment do
@@ -79,17 +81,5 @@ module Seek
         end
       end
     end
-  end
-end
-
-[Assay, DataFile, Event, Institution, Investigation, Model, Person, Presentation, Programme, Project, Publication, Sample, Sop, Specimen, Strain, Study, Workflow].each do |klass|
-  klass.class_eval do
-    include Seek::Search::CommonFields
-  end
-end
-
-[Strain, Specimen, Sample].each do |klass|
-  klass.class_eval do
-    include Seek::Search::BiosampleFields
   end
 end

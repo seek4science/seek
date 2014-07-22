@@ -72,6 +72,8 @@ module Acts #:nodoc:
 
         grouped_pagination
 
+        include Seek::Search::CommonFields
+
         searchable do
           text :creators do
             if self.respond_to?(:creators)
