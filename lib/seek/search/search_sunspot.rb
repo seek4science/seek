@@ -40,13 +40,6 @@ module Seek
           include Seek::Search::CommonFields
 
           searchable do
-=begin
-            text :treatment do
-              if self.respond_to?(:treatment)
-                treatment
-              end
-            end
-=end
             text :genotype_info do
               if self.respond_to?(:genotype_info)
                 genotype_info
