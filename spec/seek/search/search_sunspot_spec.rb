@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'sunspot_matchers'
 
 #acts_as_asset
 describe DataFile do
