@@ -141,12 +141,7 @@ module Seek
           current_projects_ids = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project.id}
 
           (project_ids - current_projects_ids).each do |project_id|
-            self.admin_defined_role_projects << self.admin_defined_role_projects.where(project_id: project_id, role_mask: mask).first_or_initialize
-            if Seek::Config.project_hierarchy_enabled
-              Project.where(:id=> project_id).first.descendants.each do |sub_proj|
-                self.admin_defined_role_projects << self.admin_defined_role_projects.where(project_id: sub_proj.id, role_mask: mask).first_or_initialize
-              end
-            end
+            self.admin_defined_role_projects << AdminDefinedRoleProject.new(project_id: project_id, role_mask: mask)
           end
         end
         new_mask += mask if (new_mask & mask).zero?
@@ -164,11 +159,6 @@ module Seek
           current_projects_ids = self.admin_defined_role_projects.where(role_mask: mask).collect{|r|r.project.id}
           project_ids.each do |project_id|
             AdminDefinedRoleProject.where(project_id: project_id,role_mask: mask, person_id: self.id).destroy_all
-            if Seek::Config.project_hierarchy_enabled
-               Project.where(:id=> project_id).first.descendants.each do |sub_proj|
-                 AdminDefinedRoleProject.where(project_id: sub_proj.id,role_mask: mask, person_id: self.id).destroy_all
-               end
-            end
           end
           new_mask -= mask if (current_projects_ids - project_ids).empty?
         else
@@ -177,6 +167,7 @@ module Seek
       end
       self.roles_mask = new_mask
     end
+
 
     #called as callback after save, to make sure the role project records are aligned with the current projects, deleting
     #any for projects that have been removed, and resolving the mask
