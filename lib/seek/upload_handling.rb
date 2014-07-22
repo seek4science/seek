@@ -23,11 +23,14 @@ module Seek
     end
 
     def content_is_webpage?(content_type)
-      content_type ||= ''
+      extract_mime_content_type(content_type) == 'text/html'
+    end
+
+    def extract_mime_content_type(content_type)
+      return nil if content_type.nil?
       # remove charset, e.g. "text/html; charset=UTF-8"
       raw_type = content_type.split(';')[0] || ''
       raw_type = raw_type.strip.downcase
-      raw_type == 'text/html'
     end
 
     def fetch_url_headers(url)
@@ -121,7 +124,7 @@ module Seek
             data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
             @tmp_io_object = File.open data_hash[:data_tmp_path], 'r'
           end
-          asset_params[:content_type] = (headers[:content_type] || "")
+          asset_params[:content_type] = (extract_mime_content_type(headers[:content_type]) || '')
           asset_params[:original_filename] = filename || ""
         when 401, 403
           asset_params[:content_type]=""

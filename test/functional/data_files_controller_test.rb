@@ -301,8 +301,8 @@ end
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "image/png", assigns(:data_file).content_blob.content_type
-    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
+    assert_equal "text/plain", assigns(:data_file).content_blob.content_type
+    assert_equal "txt_test.txt", assigns(:data_file).content_blob.original_filename
   end
   
   test "should create data file with ftp_url" do
@@ -337,8 +337,8 @@ end
       assert !assigns(:data_file).content_blob.url.blank?
       assert assigns(:data_file).content_blob.data_io_object.nil?
       assert !assigns(:data_file).content_blob.file_exists?
-      assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
-      assert_equal "image/png", assigns(:data_file).content_blob.content_type
+      assert_equal "txt_test.txt", assigns(:data_file).content_blob.original_filename
+      assert_equal "text/plain", assigns(:data_file).content_blob.content_type
   end
   
   test "should not create data file with file url" do
@@ -375,8 +375,8 @@ end
     assert !assigns(:data_file).content_blob.url.blank?
     assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.file_exists?
-    assert_equal "a-piccy.png", assigns(:data_file).content_blob.original_filename
-    assert_equal "image/png", assigns(:data_file).content_blob.content_type
+    assert_equal "txt_test.txt", assigns(:data_file).content_blob.original_filename
+    assert_equal "text/plain", assigns(:data_file).content_blob.content_type
   end
 
   test "should correctly handle 404 url" do
@@ -1828,9 +1828,11 @@ end
   private
 
   def mock_http
-    file="#{Rails.root}/test/fixtures/files/file_picture.png"
-    stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
-    stub_request(:head, "http://mockedlocation.com/a-piccy.png").to_return(:status=>200,headers: { content_type: 'image/png' })
+    stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new("#{Rails.root}/test/fixtures/files/file_picture.png"), :status => 200, :headers=>{'Content-Type' => 'image/png'})
+    stub_request(:head, "http://mockedlocation.com/a-piccy.png").to_return(:status => 200, :headers=>{'Content-Type' => 'image/png'})
+
+    stub_request(:get, "http://mockedlocation.com/txt_test.txt").to_return(:body => File.new("#{Rails.root}/test/fixtures/files/txt_test.txt"), :status => 200, :headers=>{'Content-Type' => 'text/plain; charset=UTF-8'})
+    stub_request(:head, "http://mockedlocation.com/txt_test.txt").to_return(:status=>200,headers: { content_type: 'text/plain; charset=UTF-8' })
 
     stub_request(:head, "http://redirectlocation.com").to_return(:status=>200,headers: {content_type: 'text/html'})
     stub_request(:get, "http://redirectlocation.com").to_return(:body=>"<html><head></head><body></body></html>",:status=>200,headers: {content_type: 'text/html'})
@@ -1843,9 +1845,9 @@ end
   end
 
   def mock_https
-    file="#{Rails.root}/test/fixtures/files/file_picture.png"
-    stub_request(:get, "https://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
-    stub_request(:head, "https://mockedlocation.com/a-piccy.png").to_return(:status=>200,headers: { content_type: 'image/png' })
+    file="#{Rails.root}/test/fixtures/files/txt_test.txt"
+    stub_request(:get, "https://mockedlocation.com/txt_test.txt").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'text/plain; charset=UTF-8'})
+    stub_request(:head, "https://mockedlocation.com/txt_test.txt").to_return(:status=>200,headers: { content_type: 'text/plain; charset=UTF-8' })
 
     stub_request(:head, "https://redirectlocation.com").to_return(:status=>200,headers: {content_type: 'text/html'})
 
@@ -1860,15 +1862,15 @@ end
   end
   
   def valid_data_file_with_http_url
-    { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/a-piccy.png",:project_ids=>[projects(:sysmo_project).id]}
+    { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/txt_test.txt",:project_ids=>[projects(:sysmo_project).id]}
   end
 
   def valid_data_file_with_https_url
-    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/a-piccy.png",:project_ids=>[projects(:sysmo_project).id]}
+    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/txt_test.txt",:project_ids=>[projects(:sysmo_project).id]}
   end
 
   def valid_data_file_with_https_url
-    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/a-piccy.png",:project_ids=>[projects(:sysmo_project).id]}
+    { :title=>"Test HTTPS",:data_url=>"https://mockedlocation.com/txt_test.txt",:project_ids=>[projects(:sysmo_project).id]}
   end
   
   def valid_data_file_with_ftp_url
