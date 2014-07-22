@@ -58,7 +58,7 @@ SEEK::Application.configure do
       Settings.defaults[:faceted_search_enabled] = false
 
       #enable solr for testing, but use mockup sunspot session
-      Seek::Config.solr_enabled = false
+      Seek::Config.solr_enabled = true
       Sunspot.session = SunspotMatchers::SunspotSessionSpy.new(Sunspot.session)
 
     end
