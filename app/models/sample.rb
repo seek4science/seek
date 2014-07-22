@@ -42,6 +42,8 @@ class Sample < ActiveRecord::Base
 
   scope :default_order, order("title")
 
+  include Seek::Search::BiosampleFields
+
   searchable(:auto_index=>false) do
     text :specimen do
       if specimen

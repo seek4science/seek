@@ -58,6 +58,8 @@ class Specimen < ActiveRecord::Base
   "AND sop_specimens.specimen_id = #{self.id})"
   end
 
+  include Seek::Search::BiosampleFields
+
   searchable(:auto_index=>false) do
     text :other_creators
     text :culture_growth_type do

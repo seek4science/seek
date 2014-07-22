@@ -35,6 +35,8 @@ class Strain < ActiveRecord::Base
 
   alias_attribute :description, :comment
 
+  include Seek::Search::BiosampleFields
+
   searchable(:auto_index=>false) do
       text :synonym
   end if Seek::Config.solr_enabled
