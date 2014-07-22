@@ -81,7 +81,7 @@ class Person < ActiveRecord::Base
   end
 
   def guest_project_member?
-    project = Project.find_by_name('BioVeL Portal Guests')
+    project = Project.find_by_title('BioVeL Portal Guests')
     !project.nil? && self.projects == [project]
   end
 
