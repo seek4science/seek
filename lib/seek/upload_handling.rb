@@ -121,7 +121,7 @@ module Seek
             data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
             @tmp_io_object = File.open data_hash[:data_tmp_path], 'r'
           end
-          asset_params[:content_type] = (data_hash[:content_type] || "")
+          asset_params[:content_type] = (headers[:content_type] || "")
           asset_params[:original_filename] = filename || ""
         when 401, 403
           asset_params[:content_type]=""
