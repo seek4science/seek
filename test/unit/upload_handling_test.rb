@@ -77,7 +77,11 @@ class UploadHandingTest < ActiveSupport::TestCase
   test 'valid uri?' do
     assert valid_uri?('http://fish.com')
     assert valid_uri?('http://fish.com')
+    assert valid_uri?('http://fish.com   ')
+    assert valid_uri?('http://fish.com/fish.txt')
+    assert valid_uri?('http://fish.com/fish.txt    ')
     refute valid_uri?('x dd s')
+    refute valid_uri?(nil)
   end
 
   test 'determine_filename_from_disposition' do
@@ -86,5 +90,16 @@ class UploadHandingTest < ActiveSupport::TestCase
     assert_equal '_form.html.erb', determine_filename_from_disposition('attachment;    filename="_form.html.erb"')
     assert_nil determine_filename_from_disposition(nil)
     assert_nil determine_filename_from_disposition('')
+  end
+
+  test "determine filename from url" do
+    assert_equal 'fred.txt',determine_filename_from_url("http://place.com/fred.txt")
+    assert_equal 'fred.txt',determine_filename_from_url("http://place.com/fred.txt   ")
+    assert_equal 'jenny.txt',determine_filename_from_url("http://place.com/here/he%20/jenny.txt")
+    assert_nil determine_filename_from_url('http://place.com')
+    assert_nil determine_filename_from_url('http://place.com/')
+    assert_nil determine_filename_from_url('')
+    assert_nil determine_filename_from_url('sdfsdf')
+    assert_nil determine_filename_from_url(nil)
   end
 end

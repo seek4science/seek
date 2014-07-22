@@ -54,6 +54,7 @@ module Seek
       else
         @is_webpage = false
         @filename = determine_filename_from_disposition(headers[:content_disposition])
+        @filename ||= determine_filename_from_url(url)
       end
     end
 
@@ -112,14 +113,16 @@ module Seek
       @external_link = !make_local_copy
       case code
         when 200
-          # FIXME: refactor this, the downloader is only being used to make a local copy and get the original filename
-          downloader = RemoteDownloader.new
-          data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
-
-          @tmp_io_object = File.open data_hash[:data_tmp_path], 'r' if make_local_copy
-
+          headers = fetch_url_headers(@data_url)
+          filename = determine_filename_from_disposition(headers[:content_disposition])
+          filename ||= determine_filename_from_url(@data_url)
+          if make_local_copy
+            downloader = RemoteDownloader.new
+            data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
+            @tmp_io_object = File.open data_hash[:data_tmp_path], 'r'
+          end
           asset_params[:content_type] = (data_hash[:content_type] || "")
-          asset_params[:original_filename] = (data_hash[:filename] || "") if asset_params[:original_filename].blank?
+          asset_params[:original_filename] = filename || ""
         when 401, 403
           asset_params[:content_type]=""
           asset_params[:original_filename]=""
@@ -195,7 +198,7 @@ module Seek
     end
 
     def valid_uri?(uri)
-      uri =~ /\A#{URI.regexp}\z/
+      uri.try(:strip) =~ /\A#{URI.regexp}\z/
     end
 
     def check_for_valid_uri_if_present(asset_params)
@@ -210,6 +213,16 @@ module Seek
     def determine_filename_from_disposition(disposition)
       disposition ||= ''
       Mechanize::HTTP::ContentDispositionParser.parse(disposition).try(:filename)
+    end
+
+    def determine_filename_from_url(url)
+      filename=nil
+      if valid_uri?(url)
+        path = URI.parse(url).path
+        filename = path.split("/").last unless path.nil?
+        filename = filename.strip unless filename.nil?
+      end
+      filename
     end
 
     def asset_params(params)
