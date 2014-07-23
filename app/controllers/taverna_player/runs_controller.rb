@@ -126,7 +126,7 @@ module TavernaPlayer
       @extra_runs, @user_runs = [@extra_runs, @user_runs].map do |coll|
         coll = coll.group_by { |run| run.sweep } # Create a hash of Sweep => [Runs]
         coll = (coll[nil] || []) + coll.keys # Get an array of all the runs without sweeps, and then all the sweeps
-        coll.compact! # to ignore 'nil' key
+        coll.compact # to ignore 'nil' key
       end
     end
 
