@@ -26,24 +26,22 @@ class PresentationsControllerTest < ActionController::TestCase
   test "can create with valid url" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://somewhere.com/piccy.png"
     presentation_attrs =   Factory.attributes_for(:presentation,
-                                                  :project_ids => [Factory(:project).id],
-                                                  :data => nil,
-                                                  :data_url => "http://somewhere.com/piccy.png")
+                                                  :project_ids => [Factory(:project).id]
+                                                  )
 
     assert_difference "Presentation.count" do
-      post :create,:presentation => presentation_attrs, :sharing => valid_sharing
+      post :create,:presentation => presentation_attrs,:content_blob=>{:data_url => "http://somewhere.com/piccy.png",:data=>nil}, :sharing => valid_sharing
     end
   end
 
   test "can create with local file" do
     presentation_attrs = Factory.attributes_for(:presentation,
                                                 :contributor=>User.current_user,
-                                                :project_ids => [Factory(:project).id],
-                                                :data => fixture_file_upload('files/file_picture.png'))
+                                                :project_ids => [Factory(:project).id])
 
     assert_difference "Presentation.count" do
       assert_difference "ActivityLog.count" do
-        post :create,:presentation => presentation_attrs, :sharing => valid_sharing
+        post :create,:presentation => presentation_attrs,:content_blob=>{:data => fixture_file_upload('files/file_picture.png')}, :sharing => valid_sharing
       end
     end
   end
@@ -84,7 +82,8 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory :presentation,:contributor=>User.current_user
 
     assert_difference "presentation.version" do
-       post :new_version,:id => presentation,:presentation=>{:data_url=>"http://somewhere.com/piccy.png"}
+       post :new_version,:id => presentation,:presentation=>{},
+            :content_blob=>{:data_url=>"http://somewhere.com/piccy.png"}
        presentation.reload
     end
     assert_redirected_to presentation_path(presentation)
@@ -99,7 +98,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
     new_file_path = fixture_file_upload("files/little_file_v2.txt")
     assert_difference "presentation.version" do
-       post :new_version,:id => presentation,:presentation=>{:data=>new_file_path}
+       post :new_version,:id => presentation,:presentation=>{},:content_blob=>{:data=>new_file_path}
        presentation.reload
     end
     assert_redirected_to presentation_path(presentation)
@@ -109,10 +108,9 @@ class PresentationsControllerTest < ActionController::TestCase
   test "cannot upload file with invalid url" do
     stub_request(:head,"http://www.blah.de/images/logo.png").to_raise(SocketError)
     presentation_attrs = Factory.build(:presentation, :contributor=>User.current_user).attributes #.symbolize_keys(turn string key to symbol)
-    presentation_attrs[:data_url] = "http://www.blah.de/images/logo.png"
 
     assert_no_difference "Presentation.count" do
-     post :create, :presentation=>presentation_attrs
+     post :create, :presentation=>presentation_attrs,:content_blob=>{:data_url=>"http://www.blah.de/images/logo.png"}
     end
     assert_not_nil flash[:error]
   end
@@ -122,7 +120,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory :presentation,:contributor=>User.current_user
     new_data_url = "http://www.blah.de/images/liver-illustration.png"
     assert_no_difference "presentation.version" do
-       post :new_version,:id => presentation,:presentation=>{:data_url=>new_data_url}
+       post :new_version,:id => presentation,:presentation=>{},:content_blob=>{:data_url=>new_data_url}
        presentation.reload
     end
     assert_not_nil flash[:error]

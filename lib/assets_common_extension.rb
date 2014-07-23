@@ -286,16 +286,16 @@ module AssetsCommonExtension
     version = asset.version
     if asset.respond_to?(:content_blob) && !asset.respond_to?(:content_blobs)
       #if request is sent from a browser running on window, take the content type from the filename instead
-      if request.headers['HTTP_USER_AGENT'].include?('Win') || params[sym][:content_type].nil?
-        content_type = content_type_from_filename params[sym][:original_filename]
+      if request.headers['HTTP_USER_AGENT'].include?('Win') || params[:content_blob][:content_type].nil?
+        content_type = content_type_from_filename params[:content_blob][:original_filename]
       else
-        content_type = params[sym][:content_type]
+        content_type = params[:content_blob][:content_type]
       end
       # create new /new version
       asset.create_content_blob(:tmp_io_object => @tmp_io_object,
                                 :url=>@data_url,
                                 :external_link=>@external_link,
-                                :original_filename=>params[sym][:original_filename],
+                                :original_filename=>params[:content_blob][:original_filename],
                                 :content_type=>content_type,
                                 :asset_version=>version
       )

@@ -229,7 +229,7 @@ module Seek
     end
 
     def asset_params(params)
-      params[symbol_for_controller]
+      params[:content_blob]
     end
 
     def symbol_for_controller
