@@ -13,7 +13,7 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal false ,Seek::Config.jerm_enabled
   end
   test "solr enabled" do
-    assert_equal false ,Seek::Config.solr_enabled
+    assert_equal true ,Seek::Config.solr_enabled
   end
 
   test "is_virtualliver" do
