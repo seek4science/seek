@@ -12,3 +12,4 @@ script:
   - mv config/database.cc.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:schema:load
   - bundle exec rake test:$SUITE
+  - bundle exec rspec spec
