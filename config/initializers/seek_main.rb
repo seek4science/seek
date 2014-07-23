@@ -24,7 +24,6 @@ require 'cancan'
 require 'in_place_editing'
 require 'seek/breadcrumbs'
 require 'string_extension'
-require 'seek/project_hierarchies'
 require 'recaptcha'
 require 'acts_as_list'
 require 'acts_as_trashable'
@@ -49,6 +48,7 @@ require 'taverna_player_renderers'
 #MERGENOTE - what's this?
 require 'doi_query_tool_extension'
 
+require 'seek/project_hierarchies/project_extension'
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE

@@ -75,12 +75,7 @@ class Person < ActiveRecord::Base
   def subscribe_to_work_group_project wg
     #subscribe direct project
     project_subscriptions.build :project => wg.project unless project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
-    #subscribe parent projects
-    if Seek::Config.project_hierarchy_enabled
-      wg.project.ancestors.each do |ancestor_proj|
-        project_subscriptions.build :project => ancestor_proj unless project_subscriptions.detect{|ps| ps.project_id == ancestor_proj.id}
-      end
-    end
+
   end
 
   def unsubscribe_to_work_group_project wg
@@ -88,20 +83,9 @@ class Person < ActiveRecord::Base
     if work_groups.empty?
           project_subscriptions.delete_all
           subscriptions.delete_all
-    else
+    elsif ps = project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
       #unsunscribe direct project subscriptions
-      if ps = project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
-        project_subscriptions.delete ps
-      end
-      #unsubscirbe parent project subscriptions
-      if Seek::Config.project_hierarchy_enabled
-        wg.project.ancestors.each do |ancestor_proj|
-          ancestor_proj_sub = project_subscriptions.detect{|ps| ps.project_id == ancestor_proj.id}
-          project_subscriptions.delete ancestor_proj_sub if ancestor_proj_sub && !ancestor_proj_sub.has_children?
-        end
-      end
-
-
+      project_subscriptions.delete ps
     end
 
   end
@@ -282,10 +266,10 @@ class Person < ActiveRecord::Base
     work_groups.collect {|wg| wg.institution }.uniq
   end
 
-  #Person#projects is OVERRIDDEN in Seek::ProjectHierarchies if Project.is_hierarchical?
+
   def projects
-    #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}.uniq
+      #updating workgroups doesn't change groupmemberships until you save. And vice versa.
+      work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
   end
 
   def member?

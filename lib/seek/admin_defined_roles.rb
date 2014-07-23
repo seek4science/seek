@@ -84,7 +84,7 @@ module Seek
 
     def roles=(roles)
       #TODO a bit heavy handed, but works for the moment
-      self.roles_mask=0
+      self.roles_mask= 0
       self.admin_defined_role_projects.destroy_all
 
       add_roles(roles)
@@ -168,10 +168,11 @@ module Seek
       self.roles_mask = new_mask
     end
 
+
     #called as callback after save, to make sure the role project records are aligned with the current projects, deleting
     #any for projects that have been removed, and resolving the mask
     def resolve_admin_defined_role_projects
-      projects = self.projects
+      projects = Seek::Config.project_hierarchy_enabled ? self.projects_and_descendants : self.projects
 
       admin_defined_role_projects.each do |role|
         unless projects.include?(role.project)

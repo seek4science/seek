@@ -16,10 +16,6 @@
         false #defaults to false, unless it includes Taggable which will override this and check the configuration
       end
 
-      #MERGENOTE - this is being added to every active-record, not just Project :-(
-      def self.is_hierarchical?
-           include? ActsAsCachedTree if defined? ActsAsCachedTree
-      end
     end
 
 

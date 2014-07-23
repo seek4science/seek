@@ -200,7 +200,6 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       assert !person.is_pal?
     end
   end
-
   test 'update roles directly' do
     User.with_current_user Factory(:admin).user do
       person = Factory(:person)
