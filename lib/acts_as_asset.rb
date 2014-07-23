@@ -74,7 +74,7 @@ module Acts #:nodoc:
 
         include Seek::Search::CommonFields
 
-        searchable do
+        searchable(:auto_index=>false) do
           text :creators do
             if self.respond_to?(:creators)
               creators.compact.map(&:name)
