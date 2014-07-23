@@ -15,10 +15,10 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'log when creating the public item' do
     @controller = SopsController.new()
-    sop_params = valid_sop
+    sop_params,blob = valid_sop
     sop_params[:project_ids] = [Factory(:project).id] #this project has no gatekeeper
     assert_difference ('ResourcePublishLog.count') do
-      post :create, :sop => sop_params, :sharing => public_sharing
+      post :create, :sop => sop_params,:content_blob=>blob, :sharing => public_sharing
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
@@ -28,9 +28,10 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when creating item and request publish it' do
+    sop,blob = valid_sop
     @controller = SopsController.new()
     assert_difference ('ResourcePublishLog.count') do
-      post :create, :sop => valid_sop, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      post :create, :sop => sop,:content_blob=>blob, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -41,8 +42,9 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'dont log when creating the non-public item' do
     @controller = SopsController.new()
+    sop,blob = valid_sop
     assert_no_difference ('ResourcePublishLog.count') do
-      post :create, :sop => valid_sop
+      post :create, :sop => sop, :content_blob=>blob
     end
 
     assert_not_equal Policy::EVERYONE, assigns(:sop).policy.sharing_scope
@@ -210,7 +212,7 @@ class LogPublishingTest < ActionController::TestCase
   private
 
   def valid_sop
-    {:title => "Test", :data => fixture_file_upload('files/file_picture.png'), :project_ids => [@gatekeeper.projects.first.id]}
+    return {:title => "Test", :project_ids => [@gatekeeper.projects.first.id]},{:data => fixture_file_upload('files/file_picture.png')}
   end
 
   def public_sharing

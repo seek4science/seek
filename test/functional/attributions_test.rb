@@ -19,7 +19,9 @@ class AttributionsTest < ActionController::TestCase
     assert !users(:owner_of_my_first_sop).person.projects.empty?
     assert users(:owner_of_my_first_sop).person.projects.include?(projects(:myexperiment_project))
     assert_difference ['Sop.count', 'Relationship.count'] do
-      post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
+      post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
+           :content_blob=>{:data => fixture_file_upload('files/little_file.txt')},
+           :sharing=> valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
     end
     assert_redirected_to sop_path(assigns(:sop))
   end
@@ -29,7 +31,8 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP and verify that both SOP and attribution get created
     # (two identical attributions will be posted, but only one needs to be created)
     assert_difference ['Sop.count', 'Relationship.count'] do
-      post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 1]])
+      post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
+           :content_blob=>{:data => fixture_file_upload('files/little_file.txt')},:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 1]])
     end
     assert_redirected_to sop_path(assigns(:sop))
   end
@@ -38,7 +41,8 @@ class AttributionsTest < ActionController::TestCase
   def test_should_remove_attribution_on_update
     # create a SOP / attribution first
     assert_difference ['Sop.count', 'Relationship.count'] do
-      post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
+      post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
+           :content_blob=>{:data => fixture_file_upload('files/little_file.txt')},:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
     end
     assert_redirected_to sop_path(assigns(:sop))
     
@@ -56,7 +60,8 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP and verify that both SOP and attributions get created
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
-        post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 111], ["Sop", 222]])
+        post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
+             :content_blob=>{:data => fixture_file_upload('files/little_file.txt')},:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 111], ["Sop", 222]])
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -82,7 +87,8 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP / attributions first
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
-        post :create, :sop => {:data => fixture_file_upload('files/little_file.txt'), :title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]}, :sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 2]])
+        post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
+             :content_blob=>{:data => fixture_file_upload('files/little_file.txt')},:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 2]])
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
