@@ -13,7 +13,7 @@ function MultiSelector(list_target,object_name,method) {
 
     this.addElement = function(element) {
         if (element.tagName == 'INPUT' && element.type == 'file') {
-            element.name = 'content_blob[file_' + (this.id_file++) + ']';
+            element.name = 'content_blob[data_' + (this.id_file++) + ']';
             element.multi_selector = this;
             element.onchange = function() {
                 var new_element = document.createElement('input');
@@ -29,7 +29,7 @@ function MultiSelector(list_target,object_name,method) {
             this.current_element  = element;
         } else{
             if (element.tagName == 'INPUT' && element.type == 'text') {
-                element.name = 'content_blob[url_' + (this.id_url++) + ']';
+                element.name = 'content_blob[data_url_' + (this.id_url++) + ']';
                 var original_filename_element = document.getElementsByName('content_blob[original_filename_' + (this.id_url -1) + ']')[0];
                 element.multi_selector = this;
 

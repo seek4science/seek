@@ -280,70 +280,70 @@ module AssetsCommonExtension
     end
   end
 
-  def create_content_blobs
-    asset = eval "@#{self.controller_name.downcase.singularize}"
-    sym = self.controller_name.downcase.singularize.to_sym
-    version = asset.version
-    if asset.respond_to?(:content_blob) && !asset.respond_to?(:content_blobs)
-      #if request is sent from a browser running on window, take the content type from the filename instead
-      if request.headers['HTTP_USER_AGENT'].include?('Win') || params[:content_blob][:content_type].nil?
-        content_type = content_type_from_filename params[:content_blob][:original_filename]
-      else
-        content_type = params[:content_blob][:content_type]
-      end
-      # create new /new version
-      asset.create_content_blob(:tmp_io_object => @tmp_io_object,
-                                :url=>@data_url,
-                                :external_link=>@external_link,
-                                :original_filename=>params[:content_blob][:original_filename],
-                                :content_type=>content_type,
-                                :asset_version=>version
-      )
-
-    elsif asset.respond_to? :content_blobs
-      # create new /new version
-      @tmp_io_objects_localfile.each do |tmp_io_object|
-        #if request is sent from a browser running on window, take the content type from the filename instead
-        if request.headers['HTTP_USER_AGENT'].include?('Win') || @content_types[0].nil?
-          content_type = content_type_from_filename @original_filenames[0]
-        else
-          content_type = @content_types[0].to_s
-        end
-        asset.content_blobs.create(:tmp_io_object => tmp_io_object,
-                                   :original_filename=>@original_filenames[0],
-                                   :content_type=>content_type,
-                                   :asset_version=>version)
-        @original_filenames.delete_at(0)
-        @content_types.delete_at(0)
-      end
-
-      @data_urls.each_with_index do |data_url, index|
-        asset.content_blobs.create(:tmp_io_object => @tmp_io_objects_url[index],
-                                   :url=>data_url,
-                                   :original_filename=>@original_filenames[index],
-                                   :external_link => @external_link,
-                                   :content_type=>@content_types[index],
-                                   :asset_version=>version)
-      end
-
-      #create content_blobs and files, based on previous version chosen content_blobs
-      previous_version_asset= asset.find_version(version - 1)
-      if previous_version_asset
-        previous_version_content_blobs = previous_version_asset.content_blobs
-        copying_content_blobs = previous_version_content_blobs.select{|cb| @retained_content_blob_ids.include?(cb.id)}
-
-        copying_content_blobs.each do |cb|
-            new_content_blob= asset.content_blobs.build(:url=>cb.url,
-                                                         :original_filename=>cb.original_filename,
-                                                         :content_type=>cb.content_type,
-                                                         :asset_version=>version)
-            FileUtils.cp(cb.filepath, new_content_blob.filepath) if File.exists?(cb.filepath)
-            #need to save after copying the file, coz an after_save on contentblob relies on the file
-            new_content_blob.save
-        end
-      end
-    end
-  end
+  # def create_content_blobs
+  #   asset = eval "@#{self.controller_name.downcase.singularize}"
+  #   sym = self.controller_name.downcase.singularize.to_sym
+  #   version = asset.version
+  #   if asset.respond_to?(:content_blob) && !asset.respond_to?(:content_blobs)
+  #     #if request is sent from a browser running on window, take the content type from the filename instead
+  #     if request.headers['HTTP_USER_AGENT'].include?('Win') || params[:content_blob][:content_type].nil?
+  #       content_type = content_type_from_filename params[:content_blob][:original_filename]
+  #     else
+  #       content_type = params[:content_blob][:content_type]
+  #     end
+  #     # create new /new version
+  #     asset.create_content_blob(:tmp_io_object => @tmp_io_object,
+  #                               :url=>@data_url,
+  #                               :external_link=>@external_link,
+  #                               :original_filename=>params[:content_blob][:original_filename],
+  #                               :content_type=>content_type,
+  #                               :asset_version=>version
+  #     )
+  #
+  #   elsif asset.respond_to? :content_blobs
+  #     # create new /new version
+  #     @tmp_io_objects_localfile.each do |tmp_io_object|
+  #       #if request is sent from a browser running on window, take the content type from the filename instead
+  #       if request.headers['HTTP_USER_AGENT'].include?('Win') || @content_types[0].nil?
+  #         content_type = content_type_from_filename @original_filenames[0]
+  #       else
+  #         content_type = @content_types[0].to_s
+  #       end
+  #       asset.content_blobs.create(:tmp_io_object => tmp_io_object,
+  #                                  :original_filename=>@original_filenames[0],
+  #                                  :content_type=>content_type,
+  #                                  :asset_version=>version)
+  #       @original_filenames.delete_at(0)
+  #       @content_types.delete_at(0)
+  #     end
+  #
+  #     @data_urls.each_with_index do |data_url, index|
+  #       asset.content_blobs.create(:tmp_io_object => @tmp_io_objects_url[index],
+  #                                  :url=>data_url,
+  #                                  :original_filename=>@original_filenames[index],
+  #                                  :external_link => @external_link,
+  #                                  :content_type=>@content_types[index],
+  #                                  :asset_version=>version)
+  #     end
+  #
+  #     #create content_blobs and files, based on previous version chosen content_blobs
+  #     previous_version_asset= asset.find_version(version - 1)
+  #     if previous_version_asset
+  #       previous_version_content_blobs = previous_version_asset.content_blobs
+  #       copying_content_blobs = previous_version_content_blobs.select{|cb| @retained_content_blob_ids.include?(cb.id)}
+  #
+  #       copying_content_blobs.each do |cb|
+  #           new_content_blob= asset.content_blobs.build(:url=>cb.url,
+  #                                                        :original_filename=>cb.original_filename,
+  #                                                        :content_type=>cb.content_type,
+  #                                                        :asset_version=>version)
+  #           FileUtils.cp(cb.filepath, new_content_blob.filepath) if File.exists?(cb.filepath)
+  #           #need to save after copying the file, coz an after_save on contentblob relies on the file
+  #           new_content_blob.save
+  #       end
+  #     end
+  #   end
+  # end
 
   def handle_download_zip asset
     #get the list of filename and filepath, {:filename => filepath}

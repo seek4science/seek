@@ -67,6 +67,69 @@ class UploadHandingTest < ActiveSupport::TestCase
 
   end
 
+  test 'update params for batch' do
+    p = {:data=>"some data",:data_url=>"some url",:original_filename=>"file.txt"}
+    #not batch so shouldn't be affected
+    expected = {:data=>"some data",:data_url=>"some url",:original_filename=>"file.txt"}
+    assert_equal expected,update_params_for_batch(p)
+
+    p = {:data_0=>"a",:data_1=>"b",:data_2=>"c"}
+    expected = {:data=>["a","b","c"]}
+    assert_equal expected,update_params_for_batch(p)
+
+    #order preserved
+    p = {:data_3=>"d",:data_0=>"a",:data_2=>"c",:data_1=>"b"}
+    expected = {:data=>["a","b","c","d"]}
+    assert_equal expected,update_params_for_batch(p)
+
+    p = {:data_url_3=>"d",:data_url_0=>"a",:data_url_2=>"c",:data_url_1=>"b"}
+    expected = {:data_url=>["a","b","c","d"]}
+    assert_equal expected,update_params_for_batch(p)
+
+    #strip blank
+    p = {:data_url_3=>"d",:data_url_0=>"",:data_url_2=>"c",:data_url_1=>"b"}
+    expected = {:data_url=>["b","c","d"]}
+    assert_equal expected,update_params_for_batch(p)
+  end
+
+  test "arrayify params" do
+    file_with_content = ActionDispatch::Http::UploadedFile.new({
+                                                                   :filename => 'file',
+                                                                   :content_type => 'text/plain',
+                                                                   :tempfile => StringIO.new("fish")
+                                                               })
+    p = {:data_url=>["b","c","d"],:original_filename=>["1","2","3"], :make_local_copy=>["1","0","1"]}
+    expected = [{:data_url=>"b",:original_filename=>"1",:make_local_copy=>"1"},
+                {:data_url=>"c",:original_filename=>"2",:make_local_copy=>"0"},
+                {:data_url=>"d",:original_filename=>"3",:make_local_copy=>"1"}]
+    assert_equal expected,arrayify_params(p)
+
+    p = {:data_url=>"some url",:original_filename=>"file.txt", :make_local_copy=>"1"}
+    expected = [{:data_url=>"some url",:original_filename=>"file.txt",:make_local_copy=>"1"}]
+    assert_equal expected,arrayify_params(p)
+
+    p = {:data=>file_with_content}
+    expected = [{:data=>file_with_content}]
+    assert_equal expected,arrayify_params(p)
+
+    p = {:data=>[file_with_content,file_with_content]}
+    expected = [{:data=>file_with_content},:data=>file_with_content]
+    assert_equal expected,arrayify_params(p)
+
+    p = {:data_url=>["b","c"],:original_filename=>["1","2"],:data=>[file_with_content],:make_local_copy=>["0","1"]}
+    expected = [{:data_url=>"b",:original_filename=>"1",:make_local_copy=>"0"},{:data_url=>"c",:original_filename=>"2",:make_local_copy=>"1"},{:data=>file_with_content}]
+    assert_equal expected,arrayify_params(p)
+
+    #remvoves blank urls or data
+    p = {:data_url=>"",:data=>file_with_content}
+    expected = [{:data=>file_with_content}]
+    assert_equal expected,arrayify_params(p)
+
+    p = {:data_url=>"http://fish.com",:original_filename=>"dd",:make_local_copy=>"1",:data=>""}
+    expected = [{:data_url=>"http://fish.com",:original_filename=>"dd",:make_local_copy=>"1"}]
+    assert_equal expected,arrayify_params(p)
+  end
+
   test 'content is webpage?' do
     assert content_is_webpage?('text/html')
     assert content_is_webpage?('text/html; charset=UTF-8')
@@ -101,5 +164,52 @@ class UploadHandingTest < ActiveSupport::TestCase
     assert_nil determine_filename_from_url('')
     assert_nil determine_filename_from_url('sdfsdf')
     assert_nil determine_filename_from_url(nil)
+  end
+
+  test "validate params" do
+
+    refute validate_params({:data=>"",:data_url=>""})
+    assert validate_params({:data=>"hhhh"})
+    assert validate_params({:data_url=>"hhhh"})
+
+    refute validate_params({:data=>[],:data_url=>[]})
+    assert validate_params({:data=>["hhhh"]})
+    assert validate_params({:data_url=>["hhhh"]})
+
+  end
+
+  test "check for data if present" do
+    file_with_content = ActionDispatch::Http::UploadedFile.new({
+                                                                   :filename => 'file',
+                                                                   :content_type => 'text/plain',
+                                                                   :tempfile => StringIO.new("fish")
+                                                               })
+    empty_content = ActionDispatch::Http::UploadedFile.new({
+                                                               :filename => 'file',
+                                                               :content_type => 'text/plain',
+                                                               :tempfile => StringIO.new("")
+                                                           })
+    assert check_for_empty_data_if_present({:data=>"",:data_url=>"http://fish"})
+    assert check_for_empty_data_if_present({:data=>file_with_content,:data_url=>""})
+    assert check_for_empty_data_if_present({:data=>file_with_content,:data_url=>[]})
+    refute check_for_empty_data_if_present({:data=>empty_content,:data_url=>""})
+    refute check_for_empty_data_if_present({:data=>empty_content,:data_url=>[]})
+    refute check_for_empty_data_if_present({:data=>empty_content})
+
+    assert check_for_empty_data_if_present({:data=>[],:data_url=>"http://fish"})
+    assert check_for_empty_data_if_present({:data=>[file_with_content],:data_url=>""})
+    assert check_for_empty_data_if_present({:data=>[file_with_content],:data_url=>[]})
+    refute check_for_empty_data_if_present({:data=>[empty_content],:data_url=>""})
+    refute check_for_empty_data_if_present({:data=>[empty_content],:data_url=>[]})
+    refute check_for_empty_data_if_present({:data=>[empty_content]})
+    refute check_for_empty_data_if_present({:data=>[empty_content,file_with_content]})
+
+
+
+  end
+
+  #allows some methods to be tested the rely on flash.now[:error]
+  def flash
+    ActionDispatch::Flash::FlashHash.new
   end
 end

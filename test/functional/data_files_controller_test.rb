@@ -424,7 +424,7 @@ end
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
         post :upload_for_tool, :data_file => { :title=>"Test",:project_id=>projects(:sysmo_project).id},
-             :content_blob=>{:data=>fixture_file_upload('files/file_picture.png')},
+             :content_blob=>{:data=>file_for_upload},
              :recipient_id => people(:quentin_person).id
       end
     end
@@ -451,7 +451,7 @@ end
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
         post :upload_from_email, :data_file => { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]},
-             :content_blob=>{:data=>fixture_file_upload('files/file_picture.png')},:recipient_ids => [people(:quentin_person).id], :sender_id => users(:datafile_owner).person_id
+             :content_blob=>{:data=>file_for_upload},:recipient_ids => [people(:quentin_person).id], :sender_id => users(:datafile_owner).person_id
       end
     end
 
@@ -972,7 +972,7 @@ end
     assert d.can_manage?
     assert_difference("DataFile::Version.count", 1) do
       assert_difference("StudiedFactor.count",1) do
-        post :new_version, :id=>d.id, :data_file=>{},:content_blob=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>d.id, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
       end
     end
 
@@ -1002,9 +1002,9 @@ end
       #upload a data file
       df = Factory :data_file, :contributor => User.current_user
       #upload new version 1 of the data file
-      post :new_version, :id=>df, :data_file=>{},:content_blob=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision 1"
+      post :new_version, :id=>df, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision 1"
       #upload new version 2 of the data file
-      post :new_version, :id=>df, :data_file=>{},:content_blob=>{:data=>fixture_file_upload('files/txt_test.txt')}, :revision_comment=>"This is a new revision 2"
+      post :new_version, :id=>df, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision 2"
 
       df.reload
       assert_equal 3, df.versions.length
@@ -1027,7 +1027,7 @@ end
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
     assert_difference("DataFile::Version.count", 1) do
       assert_difference("StudiedFactor.count",1) do
-        post :new_version, :id=>d, :data_file=>{},:content_blob=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>d, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
       end
     end
     
@@ -1654,7 +1654,7 @@ end
     assert Subscription.all.empty?
 
     df_param = { :title=>"Test",:project_ids=>[proj.id]}
-    blob = {:data=>fixture_file_upload('files/file_picture.png')}
+    blob = {:data=>file_for_upload}
     post :create, :data_file => df_param,:content_blob=>blob, :sharing=>valid_sharing
 
     df = assigns(:data_file)
@@ -1861,8 +1861,15 @@ end
     stub_request(:any, "https://mocked404.com").to_return(:status=>404)
   end
 
+  def file_for_upload
+    ActionDispatch::Http::UploadedFile.new({
+                                               :filename => 'file_picture.png',
+                                               :content_type => 'image/png',
+                                               :tempfile => fixture_file_upload('files/file_picture.png')
+                                           })
+  end
   def valid_data_file
-    return { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]},{:data=>fixture_file_upload('files/file_picture.png')}
+    return { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]},{:data=>file_for_upload}
   end
   
   def valid_data_file_with_http_url

@@ -63,16 +63,42 @@ module Seek
 
     def handle_upload_data
       asset_params = asset_params(params)
+      asset_params = update_params_for_batch(asset_params)
+
       return false unless validate_params(asset_params)
-      return false unless check_for_empty_data_if_present(asset_params)
-      return false unless check_for_valid_uri_if_present(asset_params)
-      return false unless check_for_valid_scheme(asset_params)
-      if add_from_upload?(asset_params)
-        return false unless process_upload(asset_params)
-      else
-        return false unless process_from_url(asset_params)
+      asset_params = arrayify_params(asset_params)
+      asset_params.each do |item_params|
+
+        return false unless check_for_empty_data_if_present(item_params)
+        return false unless check_for_valid_uri_if_present(item_params)
+        return false unless check_for_valid_scheme(item_params)
+
+        if add_from_upload?(item_params)
+          return false unless process_upload(item_params)
+        else
+          return false unless process_from_url(item_params)
+        end
       end
+
       clean_params
+      params[:content_blob]=asset_params
+    end
+
+    def create_content_blobs
+      asset = eval "@#{self.controller_name.downcase.singularize}"
+      version = asset.version
+
+      content_blob_params = asset_params(params)
+      content_blob_params.each do |item_params|
+        content_type = item_params[:content_type] || content_type_from_filename(item_params[:original_filename])
+        asset.create_content_blob(:tmp_io_object => item_params[:tmp_io_object],
+                                      :url=>item_params[:data_url],
+                                      :external_link=>!item_params[:make_local_copy]=="1",
+                                      :original_filename=>item_params[:original_filename],
+                                      :content_type=>content_type,
+                                      :asset_version=>version
+            )
+      end
     end
 
     def handle_non_200_response(code)
@@ -91,6 +117,24 @@ module Seek
       end
     end
 
+    def arrayify_params asset_params
+      result = []
+      Array(asset_params[:data_url]).each.with_index do |url,i|
+        unless url.blank?
+          result << {:data_url=>url,
+                     :original_filename=>Array(asset_params[:original_filename])[i],
+                     :make_local_copy=>Array(asset_params[:make_local_copy])[i]}
+        end
+
+      end
+      Array(asset_params[:data]).each do |data|
+        unless data.blank?
+          result << {:data=>data}
+        end
+      end
+      result
+    end
+
     def handle_exception_response(exception)
       case exception
         when Seek::Exceptions::InvalidSchemeException, URI::InvalidURIError
@@ -104,7 +148,7 @@ module Seek
     def process_upload(asset_params)
       asset_params[:content_type] = (asset_params[:data]).content_type
       asset_params[:original_filename] = (asset_params[:data]).original_filename if asset_params[:original_filename].blank?
-      @tmp_io_object = asset_params[:data]
+      asset_params[:tmp_io_object] = asset_params[:data]
     end
 
     def process_from_url(asset_params)
@@ -122,7 +166,7 @@ module Seek
           if make_local_copy
             downloader = RemoteDownloader.new
             data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
-            @tmp_io_object = File.open data_hash[:data_tmp_path], 'r'
+            asset_params[:tmp_io_object] = File.open data_hash[:data_tmp_path], 'r'
           end
           asset_params[:content_type] = (extract_mime_content_type(headers[:content_type]) || '')
           asset_params[:original_filename] = filename || ""
@@ -183,12 +227,14 @@ module Seek
     end
 
     def check_for_empty_data_if_present(asset_params)
-      if !(asset_params[:data]).blank? && (asset_params[:data]).size == 0 && (asset_params[:data_url]).blank?
-        flash.now[:error] = 'The file that you are uploading is empty. Please check your selection and try again!'
-        false
-      else
-        true
+      return true unless asset_params[:data_url].blank?
+      Array(asset_params[:data]).each do |data|
+        if !data.blank? && data.size == 0
+          flash.now[:error] = 'The file that you are uploading is empty. Please check your selection and try again!'
+          return false
+        end
       end
+      true
     end
 
     def check_for_valid_scheme(asset_params)
@@ -232,9 +278,21 @@ module Seek
       params[:content_blob]
     end
 
-    def symbol_for_controller
-      c = controller_name.downcase
-      c.singularize.to_sym
+    def update_params_for_batch(params)
+      data=[]
+      data_urls = []
+      params.keys.collect{|k| k}.sort.each do |k|
+        if k.to_s =~ /data_\d{1,2}\z/
+          val = params.delete(k)
+          data << val unless val.blank?
+        elsif k.to_s =~ /data_url_\d{1,2}\z/
+          val = params.delete(k)
+          data_urls << val unless val.strip.blank?
+        end
+      end
+      params[:data]=data unless data.empty?
+      params[:data_url]=data_urls unless data_urls.empty?
+      params
     end
   end
 

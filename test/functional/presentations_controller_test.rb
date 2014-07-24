@@ -41,7 +41,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
     assert_difference "Presentation.count" do
       assert_difference "ActivityLog.count" do
-        post :create,:presentation => presentation_attrs,:content_blob=>{:data => fixture_file_upload('files/file_picture.png')}, :sharing => valid_sharing
+        post :create,:presentation => presentation_attrs,:content_blob=>{:data => file_for_upload}, :sharing => valid_sharing
       end
     end
   end
@@ -93,10 +93,10 @@ class PresentationsControllerTest < ActionController::TestCase
     #by default, valid data_url is provided by content_blob in Factory
     presentation = Factory :presentation,:contributor=>User.current_user
     presentation.content_blob.url = nil
-    presentation.content_blob.data = fixture_file_upload("files/little_file.txt")
+    presentation.content_blob.data = file_for_upload
     presentation.reload
 
-    new_file_path = fixture_file_upload("files/little_file_v2.txt")
+    new_file_path = file_for_upload
     assert_difference "presentation.version" do
        post :new_version,:id => presentation,:presentation=>{},:content_blob=>{:data=>new_file_path}
        presentation.reload
@@ -270,5 +270,7 @@ class PresentationsControllerTest < ActionController::TestCase
     end
 
   end
+
+
 end
 

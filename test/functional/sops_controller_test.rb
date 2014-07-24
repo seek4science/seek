@@ -379,7 +379,7 @@ class SopsControllerTest < ActionController::TestCase
 
 
     #create new version
-    post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>fixture_file_upload('files/little_file_v2.txt',(Mime::TEXT).to_s)}
+    post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload(:tempfile_fixture=>'files/little_file_v2.txt',:content_type=>"text/plain",:filename=>"little_file_v2.txt")}
     assert_redirected_to sop_path(assigns(:sop))
 
     s=Sop.find(s.id)
@@ -421,7 +421,7 @@ class SopsControllerTest < ActionController::TestCase
     s=sops(:editable_sop)
 
     assert_difference("Sop::Version.count", 1) do
-      post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision"
+      post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision"
     end
 
     assert_redirected_to sop_path(s)
@@ -466,7 +466,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1,s.experimental_conditions.count
     assert_difference("Sop::Version.count", 1) do
      assert_difference("ExperimentalCondition.count",1) do
-        post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
      end
     end
 
@@ -481,7 +481,7 @@ class SopsControllerTest < ActionController::TestCase
                                               :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
       assert_difference("ExperimentalCondition.count",1) do
-        post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
       end
     end
 
@@ -662,7 +662,7 @@ class SopsControllerTest < ActionController::TestCase
   test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
     as_not_virtualliver do
       gatekeeper = Factory(:gatekeeper)
-    post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id)},:content_blob=>{:data => fixture_file_upload('files/file_picture.png')},
+    post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id)},:content_blob=>{:data => file_for_upload},
          :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
       sop = assigns(:sop)
       assert_redirected_to (sop)
@@ -741,7 +741,7 @@ class SopsControllerTest < ActionController::TestCase
     s=assigns(:sop)
     assert_difference('ActivityLog.count', 1) do
       assert_difference("Sop::Version.count", 1) do
-        post :new_version, :id => s, :sop => {},:content_blob=>{:data => fixture_file_upload('files/file_picture.png')}, :revision_comment => "This is a new revision"
+        post :new_version, :id => s, :sop => {},:content_blob=>{:data => file_for_upload}, :revision_comment => "This is a new revision"
       end
     end
     al2=ActivityLog.last
@@ -754,7 +754,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not create duplication sop_versions_projects when uploading new version' do
     sop = Factory(:sop)
     login_as(sop.contributor)
-    post :new_version, :id => sop, :sop => {},:content_blob=>{:data => fixture_file_upload('files/file_picture.png')}, :revision_comment => "This is a new revision"
+    post :new_version, :id => sop, :sop => {},:content_blob=>{:data => file_for_upload}, :revision_comment => "This is a new revision"
 
     sop.reload
     assert_equal 2, sop.versions.count
@@ -871,13 +871,23 @@ class SopsControllerTest < ActionController::TestCase
 
   private
 
+  def file_for_upload options={}
+    default={:filename=>'file_picture.png',:content_type=>'image/png',:tempfile_fixture=>'files/file_picture.png'}
+    options = default.merge(options)
+    ActionDispatch::Http::UploadedFile.new({
+                                               :filename => options[:filename],
+                                               :content_type => options[:content_type],
+                                               :tempfile => fixture_file_upload(options[:tempfile_fixture])
+                                           })
+  end
+
   def valid_sop_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
     return {:title=>"Test", :project_ids=>[projects(:sysmo_project).id]},{:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}
   end
 
   def valid_sop
-    return {:title=>"Test", :project_ids=>[projects(:sysmo_project).id]},{:data=>fixture_file_upload('files/file_picture.png'),:data_url=>""}
+    return {:title=>"Test", :project_ids=>[projects(:sysmo_project).id]},{:data=>file_for_upload,:data_url=>""}
   end
 
 end

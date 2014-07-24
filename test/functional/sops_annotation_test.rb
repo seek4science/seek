@@ -195,7 +195,7 @@ class SopsAnnotationTest < ActionController::TestCase
     golf = Factory :tag,:source=>p.user,:annotatable=>another_sop,:value=>"golf"
 
     sop={:title=>"Test", :project_ids=>[p.projects.first.id]}
-    blob={:data=>fixture_file_upload('files/file_picture.png')}
+    blob={:data=>file_for_upload}
 
     assert_difference("Sop.count") do
       put :create,:sop=>sop,:content_blob=>blob,:sharing=>valid_sharing,:tag_autocompleter_unrecognized_items=>["fish"],:tag_autocompleter_selected_ids=>[golf.value.id]
