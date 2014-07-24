@@ -88,7 +88,7 @@ batch||=false
           <div id="test_url_result"></div>
           <div id="copy_option" style="display:none;">
               <b>Upload a copy?</b>
-              <%= check_box_tag "content_blob[make_local_copy]" %>
+              <%= check_box_tag "content_blob[make_local_copy]","0",false,:id=>"make_local_copy" %>
           </div>
 
           <%= hidden_field_tag "content_blob[original_filename]", original_filename, :id=>:original_filename %>
@@ -97,69 +97,20 @@ batch||=false
       </li>
     </ul>
   </div>
-  <table id='pending_files'>
+  <div id="batch_items_list">
 
-  </table>
+  </div>
+
+  <ul id='pending_files'>
+
+  </ul>
 </div>
 
+<% if batch %>
+    <%= javascript_include_tag "batch_upload.js" %>
+<% end %>
+
 <script type="text/javascript">
-  <% if batch %>
-    var multi_selector = new MultiSelector($j('#pending_files')[0]);
-
-    multi_selector.addElement($j('#content_blob_data')[0]);
-    multi_selector.addElement($j('#data_url_field')[0]);
-
-    function addToList() {
-        var url = multi_selector.current_url_element.value;
-        var error=false;
-        var parsed = parseUri(url);
-
-        if (!parsed.protocol || !parsed.host || parsed.host=="null") {
-            error=true;
-        }
-        else {
-            var new_element = document.createElement('input');
-            new_element.type = 'text';
-            var old_element = document.getElementsByName('content_blob[url_' + (multi_selector.id_url - 1) + ']')[0];
-            new_element.size = old_element.size
-            var original_filename_element = document.createElement('input');
-            original_filename_element.type = 'hidden';
-            original_filename_element.name = 'content_blob[original_filename_' + (multi_selector.id_url) + ']';
-
-            $('upload_from_url').appendChild(original_filename_element);
-            if (old_element.value != "") {
-                old_element.parentNode.insertBefore(new_element, old_element);
-                old_element.multi_selector.addElement(new_element);
-                old_element.multi_selector.addListRow(old_element);
-                old_element.type = 'hidden';
-            } else {
-                old_element.focus();
-            }
-
-        }
-
-        if (error) {
-            alert("An invalid URL was provided");
-        }
-    }
-
-    function listFilesOfPreviousVersion(){
-        <% content_blobs = obj.latest_version.try(:content_blobs) %>
-        <% unless content_blobs.blank? %>
-        <% content_blobs.each do |cb| %>
-        var element = document.createElement('input');
-        element.name = "content_blobs[id][<%= cb.id%>]";
-        element.value = "<%= (cb.original_filename || cb.url) + " (original)" %>";
-        element.type = 'hidden';
-        var current_element = multi_selector.current_element;
-        current_element.parentNode.insertBefore(element, current_element);
-        multi_selector.addListRow(element);
-        <% end %>
-        <% end %>
-    }
-
-    <% end %>
-
 
   setup_url_field("<%= examine_url_content_blobs_path %>","examine_url");
 

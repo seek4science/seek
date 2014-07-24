@@ -87,17 +87,30 @@ module Seek
     def create_content_blobs
       asset = eval "@#{self.controller_name.downcase.singularize}"
       version = asset.version
+      multiple = asset.respond_to?(:content_blobs)
 
       content_blob_params = asset_params(params)
       content_blob_params.each do |item_params|
+        #MERGENOTE - move this to the upload handing and param manipulation during tidying up
         content_type = item_params[:content_type] || content_type_from_filename(item_params[:original_filename])
-        asset.create_content_blob(:tmp_io_object => item_params[:tmp_io_object],
-                                      :url=>item_params[:data_url],
-                                      :external_link=>!item_params[:make_local_copy]=="1",
-                                      :original_filename=>item_params[:original_filename],
-                                      :content_type=>content_type,
-                                      :asset_version=>version
-            )
+        if multiple
+          asset.content_blobs.create(:tmp_io_object => item_params[:tmp_io_object],
+                                     :url=>item_params[:data_url],
+                                     :external_link=>!item_params[:make_local_copy]=="1",
+                                     :original_filename=>item_params[:original_filename],
+                                     :content_type=>content_type,
+                                     :asset_version=>version
+          )
+        else
+          asset.create_content_blob(:tmp_io_object => item_params[:tmp_io_object],
+                                    :url=>item_params[:data_url],
+                                    :external_link=>!item_params[:make_local_copy]=="1",
+                                    :original_filename=>item_params[:original_filename],
+                                    :content_type=>content_type,
+                                    :asset_version=>version
+          )
+        end
+
       end
     end
 

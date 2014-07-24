@@ -158,127 +158,127 @@ module AssetsCommonExtension
     eval "@#{c.singularize} = obj"
   end
 
-  def handle_batch_data render_action_on_error=:new
-    #FIXME: too many nested if,else and rescue blocks. This method needs refactoring.
-    c = self.controller_name.downcase
-    @content_types = []
-    @original_filenames = []
-    @tmp_io_objects_localfile = []
-    @tmp_io_objects_url = []
-    @data_urls = []
-    @external_link = false
-    symb = c.singularize.to_sym
-    object = eval("@#{c.singularize}")
-    params_files = calculate_params(:content_blob)
-    params_data = params_files.first
-    params_url = params_files.second
-    params_original_filename_from_ulr = params_files.third
-    params_image_file = params[controller_name.singularize+'_image'].nil? ? nil : params[controller_name.singularize+'_image']['image_file']
-    params_previous_image = params[:previous_version_image]
-    #ids of selected content_blobs of previous version, when uploading new version
-    @retained_content_blob_ids = retained_content_blob_ids
-
-    if render_action_on_error==:new || render_action_on_error.nil?
-      params_files = params_data + params_url
-    elsif render_action_on_error==:edit
-      params_files = object.content_blobs
-    end
-    if params_files.blank? && params_image_file.blank? && @retained_content_blob_ids.blank? && params_previous_image.blank?
-      flash.now[:error] = "Please select at least a file/image to upload or provide a URL to the data."
-      if render_action_on_error
-        init_asset_for_render params
-        respond_to do |format|
-          format.html do
-            render :action => render_action_on_error
-          end
-        end
-      end
-      return false
-    elsif !params_data.blank? && !params_data.detect { |data| data.size == 0 }.nil? && params_url.blank?
-      flash.now[:error] = "At least one file that you are uploading is empty. Please check your selection and try again!"
-      if render_action_on_error
-        init_asset_for_render params
-        respond_to do |format|
-          format.html do
-            render :action => render_action_on_error
-          end
-        end
-      end
-      return false
-    else
-      #upload takes precedence if both params are present
-      begin
-        if !params_data.blank?
-          # store properties and contents of the file temporarily and remove the latter from params[],
-          # so that when saving main object params[] wouldn't contain the binary data anymore
-          @content_types = params_data.collect(&:content_type)
-          @original_filenames = params_data.collect(&:original_filename)
-          @tmp_io_objects_localfile = params_data
-        end
-        if !params_url.blank?
-
-          @data_urls=params_url
-          @external_link = (params[symb][:external_link]=="1")
-          make_local_copy = !@external_link
-          @data_urls.each_with_index do |data_url,index|
-
-            code = url_response_code data_url
-            if (code == "200")
-              downloader=Seek::RemoteDownloader.new
-              data_hash = downloader.get_remote_data data_url, nil, nil, nil, make_local_copy
-
-              @tmp_io_objects_url << File.open(data_hash[:data_tmp_path], "r") if make_local_copy
-
-              @content_types << data_hash[:content_type]
-              @original_filenames << (params_original_filename_from_ulr[index] || data_hash[:filename])
-            elsif (["301","302", "401"].include?(code))
-              @tmp_io_objects_url << nil
-              @content_types << ""
-              @original_filenames << ""
-            else
-              flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the <a href= \'#{data_url}\'>URL</a>  is inaccessible."
-              if render_action_on_error
-                init_asset_for_render params
-                respond_to do |format|
-                  format.html do
-                    render :action => render_action_on_error
-                  end
-                end
-              end
-              return false
-            end
-          end
-        end
-      rescue Seek::IncompatibleProtocolException=>e
-        flash.now[:error] = e.message
-        if render_action_on_error
-          init_asset_for_render params
-          respond_to do |format|
-            format.html do
-              render :action => render_action_on_error
-            end
-          end
-        end
-        return false
-      rescue Exception=>e
-        flash.now[:error] = "Unable to read from the URL."
-        flash.now[:error] <<   e.message
-        if render_action_on_error
-          init_asset_for_render params
-          respond_to do |format|
-            format.html do
-              render :action => render_action_on_error
-            end
-          end
-        end
-        return false
-      end
-      params[symb].delete 'data_url'
-      params[symb].delete 'data'
-      params[symb].delete 'external_link'
-      return true
-    end
-  end
+  # def handle_batch_data render_action_on_error=:new
+  #   #FIXME: too many nested if,else and rescue blocks. This method needs refactoring.
+  #   c = self.controller_name.downcase
+  #   @content_types = []
+  #   @original_filenames = []
+  #   @tmp_io_objects_localfile = []
+  #   @tmp_io_objects_url = []
+  #   @data_urls = []
+  #   @external_link = false
+  #   symb = c.singularize.to_sym
+  #   object = eval("@#{c.singularize}")
+  #   params_files = calculate_params(:content_blob)
+  #   params_data = params_files.first
+  #   params_url = params_files.second
+  #   params_original_filename_from_ulr = params_files.third
+  #   params_image_file = params[controller_name.singularize+'_image'].nil? ? nil : params[controller_name.singularize+'_image']['image_file']
+  #   params_previous_image = params[:previous_version_image]
+  #   #ids of selected content_blobs of previous version, when uploading new version
+  #   @retained_content_blob_ids = retained_content_blob_ids
+  #
+  #   if render_action_on_error==:new || render_action_on_error.nil?
+  #     params_files = params_data + params_url
+  #   elsif render_action_on_error==:edit
+  #     params_files = object.content_blobs
+  #   end
+  #   if params_files.blank? && params_image_file.blank? && @retained_content_blob_ids.blank? && params_previous_image.blank?
+  #     flash.now[:error] = "Please select at least a file/image to upload or provide a URL to the data."
+  #     if render_action_on_error
+  #       init_asset_for_render params
+  #       respond_to do |format|
+  #         format.html do
+  #           render :action => render_action_on_error
+  #         end
+  #       end
+  #     end
+  #     return false
+  #   elsif !params_data.blank? && !params_data.detect { |data| data.size == 0 }.nil? && params_url.blank?
+  #     flash.now[:error] = "At least one file that you are uploading is empty. Please check your selection and try again!"
+  #     if render_action_on_error
+  #       init_asset_for_render params
+  #       respond_to do |format|
+  #         format.html do
+  #           render :action => render_action_on_error
+  #         end
+  #       end
+  #     end
+  #     return false
+  #   else
+  #     #upload takes precedence if both params are present
+  #     begin
+  #       if !params_data.blank?
+  #         # store properties and contents of the file temporarily and remove the latter from params[],
+  #         # so that when saving main object params[] wouldn't contain the binary data anymore
+  #         @content_types = params_data.collect(&:content_type)
+  #         @original_filenames = params_data.collect(&:original_filename)
+  #         @tmp_io_objects_localfile = params_data
+  #       end
+  #       if !params_url.blank?
+  #
+  #         @data_urls=params_url
+  #         @external_link = (params[symb][:external_link]=="1")
+  #         make_local_copy = !@external_link
+  #         @data_urls.each_with_index do |data_url,index|
+  #
+  #           code = url_response_code data_url
+  #           if (code == "200")
+  #             downloader=Seek::RemoteDownloader.new
+  #             data_hash = downloader.get_remote_data data_url, nil, nil, nil, make_local_copy
+  #
+  #             @tmp_io_objects_url << File.open(data_hash[:data_tmp_path], "r") if make_local_copy
+  #
+  #             @content_types << data_hash[:content_type]
+  #             @original_filenames << (params_original_filename_from_ulr[index] || data_hash[:filename])
+  #           elsif (["301","302", "401"].include?(code))
+  #             @tmp_io_objects_url << nil
+  #             @content_types << ""
+  #             @original_filenames << ""
+  #           else
+  #             flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the <a href= \'#{data_url}\'>URL</a>  is inaccessible."
+  #             if render_action_on_error
+  #               init_asset_for_render params
+  #               respond_to do |format|
+  #                 format.html do
+  #                   render :action => render_action_on_error
+  #                 end
+  #               end
+  #             end
+  #             return false
+  #           end
+  #         end
+  #       end
+  #     rescue Seek::IncompatibleProtocolException=>e
+  #       flash.now[:error] = e.message
+  #       if render_action_on_error
+  #         init_asset_for_render params
+  #         respond_to do |format|
+  #           format.html do
+  #             render :action => render_action_on_error
+  #           end
+  #         end
+  #       end
+  #       return false
+  #     rescue Exception=>e
+  #       flash.now[:error] = "Unable to read from the URL."
+  #       flash.now[:error] <<   e.message
+  #       if render_action_on_error
+  #         init_asset_for_render params
+  #         respond_to do |format|
+  #           format.html do
+  #             render :action => render_action_on_error
+  #           end
+  #         end
+  #       end
+  #       return false
+  #     end
+  #     params[symb].delete 'data_url'
+  #     params[symb].delete 'data'
+  #     params[symb].delete 'external_link'
+  #     return true
+  #   end
+  # end
 
   # def create_content_blobs
   #   asset = eval "@#{self.controller_name.downcase.singularize}"

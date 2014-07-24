@@ -96,7 +96,7 @@ class ModelsController < ApplicationController
   # GET /models.xml
 
   def new_version
-    if (handle_batch_data nil)
+    if handle_upload_data
       comments = params[:revision_comment]
 
       respond_to do |format|
