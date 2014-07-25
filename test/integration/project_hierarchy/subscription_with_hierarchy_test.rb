@@ -3,11 +3,11 @@ require 'integration/project_hierarchy/project_hierarchy_test_helper'
 class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
   include ProjectHierarchyTestHelper
   def setup
-        skip("tests are skipped as projects are NOT hierarchical") unless Seek::Config.project_hierarchy_enabled
         sync_delayed_jobs
         login_as_test_user
         initialize_hierarchical_projects
   end
+
 
   test "rails 3 bug: before_add is not fired before the record is saved on `has_many :through` associations" do
       # no problem in the application, as work_groups are added directly with UI
@@ -30,19 +30,21 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
   end
 
   test "add/remove_project_subscriptions_for_subscriber when adding/removing ancestors" do
-         person = new_person_with_hierarchical_projects
-         assert person.project_subscriptions.map(&:project).include?(@proj)
 
-         new_parent_proj = Factory :project
-         @proj_child1.parent = new_parent_proj
-         @proj_child1.save
-         @proj_child2.parent = new_parent_proj
-         @proj_child2.save
-         person.reload
+    person = new_person_with_hierarchical_projects
+    assert person.project_subscriptions.map(&:project).include?(@proj)
 
-         assert !person.project_subscriptions.map(&:project).include?(@proj)
-         assert person.project_subscriptions.map(&:project).include?(new_parent_proj)
-    end
+    new_parent_proj = Factory :project
+    @proj_child1.parent = new_parent_proj
+    @proj_child1.save
+    @proj_child2.parent = new_parent_proj
+    @proj_child2.save
+    person.reload
+
+    assert !person.project_subscriptions.map(&:project).include?(@proj)
+    assert person.project_subscriptions.map(&:project).include?(new_parent_proj)
+
+  end
     test "people subscribe to their projects and parent projects when their projects are assigned" do
       #when created without a project
       person = Factory(:brand_new_person)
@@ -157,6 +159,5 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
       assert_equal 0, person.subscriptions.count
 
     end
-
 
 end

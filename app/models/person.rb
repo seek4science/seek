@@ -474,4 +474,5 @@ class Person < ActiveRecord::Base
     end
   end
 
+  include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled
 end

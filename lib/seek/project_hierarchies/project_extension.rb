@@ -12,9 +12,6 @@
 # - subscribe only project when person subscribe via editing the profile
 
 
-require "person_extension"
-require "assay_extension"
-require 'study_extension'
 module Seek
   module ProjectHierarchies
     module ProjectExtension
@@ -22,10 +19,7 @@ module Seek
       def self.included klass
         klass.class_eval do
           include ActsAsCachedTree
-          include RolesExtension
-
           after_update :touch_for_hierarchy_updates
-
           #add institution to ancestor projects
           after_add_for_institutions << :create_ancestor_workgroups
           after_add_for_ancestors << :add_project_subscriptions_for_subscriber
@@ -46,7 +40,7 @@ module Seek
           def add_project_subscriptions_for_subscriber ancestor
             subscribers = project_subscriptions.includes(:person).map(&:person)
             subscribers.each do |person|
-               person.project_subscriptions.where(:project_id => ancestor.id).first_or_create
+              person.project_subscriptions.where(:project_id => ancestor.id).first_or_create
             end
           end
 
@@ -76,12 +70,41 @@ module Seek
             end
           end
 
-          def can_delete_with_hierarchy? user=User.current_user
-              can_delete_without_hierarchy?(user) && children.empty?
+          #project role, in project and its descendants
+          def pis
+            pi_role = ProjectRole.find_by_name('PI')
+            projects = [self] + descendants
+            people.select { |p| p.project_roles_of_project(projects).include?(pi_role) }
           end
+
+          #admin defined project roles, in the project and its ancestors
+          Person::PROJECT_DEPENDENT_ROLES.each do |role|
+            define_method "#{role.pluralize}" do
+              self_and_ancestors = [self] + self.ancestors
+              self_and_ancestors.map { |proj| proj.people_with_the_role(role) }.flatten.uniq
+            end
+          end
+
+          #project role, in the project and its descendants
+          def project_coordinators
+            coordinator_role = ProjectRole.project_coordinator_role
+            projects = [self] + descendants
+            people.select { |p| p.project_roles_of_project(projects).include?(coordinator_role) }
+
+          end
+
+
+          def can_delete_with_hierarchy? user=User.current_user
+            can_delete_without_hierarchy?(user) && children.empty?
+          end
+
           alias_method_chain :can_delete?, :hierarchy
-        end
+        end  if Seek::Config.project_hierarchy_enabled
+
       end
+
     end
+
+
   end
 end

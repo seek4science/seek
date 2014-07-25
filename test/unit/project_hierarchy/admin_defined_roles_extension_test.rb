@@ -1,12 +1,7 @@
 require 'test_helper'
 require 'integration/project_hierarchy/project_hierarchy_test_helper'
-class RolesExtensionTest < ActionController::IntegrationTest
+class AdminDefinedRolesExtensionTest < ActiveSupport::TestCase
   include ProjectHierarchyTestHelper
-  def setup
-        skip("tests are skipped as projects are NOT hierarchical") unless Seek::Config.project_hierarchy_enabled
-        initialize_hierarchical_projects
-  end
-
 
 
 test "admin defined roles in projects should be also the roles in sub projects" do
