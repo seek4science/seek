@@ -38,8 +38,21 @@
 #generic_file_icon {
     background: url(<%= asset_path('file_icons/small/genericGray.png') %>);
     background-repeat: no-repeat;
-    width: 31px; /*or your image's width*/
-    height: 35px; /*or your image's height*/
+    width: 24px; /*or your image's width*/
+    height: 27px; /*or your image's height*/
+    background-size: 22px 25px;
+    margin: 0;
+    padding: 0;
+    border-width: 0px;
+    vertical-align: middle;
+    display:inline-block;
+}
+
+#remove_icon {
+    background: url(<%= asset_path(icon_filename_for_key('destroy')) %>);
+    background-repeat: no-repeat;
+    width: 22px; /*or your image's width*/
+    height: 22px; /*or your image's height*/
     margin: 0;
     padding: 0;
     border-width: 0px;

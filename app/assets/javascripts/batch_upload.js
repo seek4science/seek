@@ -44,11 +44,16 @@ function removeBatchFormItem(index) {
 }
 
 function showInList(text, index) {
-    //FIXME: improve this by constucting using jquery
-    var pending_id = "'pending_item_" + index + "'";
-    var new_element = $j("<li id=" + pending_id + "><span id='generic_file_icon'></span>&nbsp;" + text + "</li>").appendTo($j('#pending_files'));
-    new_element.append($j("<a href='#' onclick='removeBatchFormItem(" + index + ");return false;'>Remove</a>"));
-
+    var remove_link = $j('<a>',{href: '#'}).append($j('<span>',{id:'remove_icon'}));
+    remove_link.on('click',function(event){
+        removeBatchFormItem(index);
+        return false;
+    });
+    file_icon = $j('<span>',{id:'generic_file_icon'});
+    new_element=$j('<li>', {
+        id:'pending_item_'+index,
+        text:text
+    }).appendTo('#pending_files').prepend(file_icon).append(remove_link);
 }
 
 function addToList() {
