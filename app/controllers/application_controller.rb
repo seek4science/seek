@@ -322,7 +322,6 @@ class ApplicationController < ActionController::Base
       #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
       return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
-
       case c
         when "sessions"
           if ["create", "destroy"].include?(a)
@@ -332,19 +331,23 @@ class ApplicationController < ActionController::Base
                                :activity_loggable => object,
                                :user_agent => request.env["HTTP_USER_AGENT"])
           end
-        when "investigations", "studies", "assays", "specimens", "samples"
-          if ["show", "create", "update", "destroy"].include?(a)
-            check_log_exists(a, c, object)
-            ActivityLog.create(:action => a,
-                               :culprit => current_user,
-                               :referenced => object.projects.first,
-                               :controller_name => c,
-                               :activity_loggable => object,
-                               :data => object.title,
-                               :user_agent => request.env["HTTP_USER_AGENT"])
-
+        when "sweeps", "runs"
+          if ["show", "update", "destroy", "download"].include?(a)
+            ref = object.projects.first
+          elsif a == "create"
+            ref = object.workflow
           end
-        when "data_files", "models", "sops", "publications", "presentations", "events"
+
+          check_log_exists(a, c, object)
+          ActivityLog.create(:action => a,
+                             :culprit => current_user,
+                             :referenced => ref,
+                             :controller_name => c,
+                             :activity_loggable => object,
+                             :data => object.title,
+                             :user_agent => request.env["HTTP_USER_AGENT"])
+          break
+        when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
           a = "create" if a == "upload_for_tool"
           a = "update" if a == "new_version"
           a = "inline_view" if a == "explore"

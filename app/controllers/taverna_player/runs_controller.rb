@@ -6,6 +6,7 @@ module TavernaPlayer
 
     skip_before_filter :project_membership_required
     skip_before_filter :restrict_guest_user, :only => :new
+    skip_after_filter :log_event, :only => :show, :if => proc {|_| request.xhr?}
 
     before_filter :check_project_membership_unless_embedded, :only => [:create, :new]
     before_filter :auth, :except => [ :index, :new, :create ]

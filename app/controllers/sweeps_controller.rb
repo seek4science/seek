@@ -3,6 +3,8 @@ class SweepsController < ApplicationController
   before_filter :workflows_enabled?
 
   skip_before_filter :restrict_guest_user, :only => :new
+  skip_after_filter :log_event, :only => :runs
+
   before_filter :find_sweep, :except => [:create, :new, :index]
   before_filter :find_run, :only => :new
   before_filter :set_runlet_parameters, :only => :create
