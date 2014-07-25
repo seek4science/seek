@@ -16,6 +16,19 @@ class UploadHandingTest < ActiveSupport::TestCase
     refute valid_scheme?(nil)
   end
 
+  test "content_blob_params" do
+    @params = {:content_blob=>{:fish=>1,:soup=>2},:data_file=>{:title=>"george"}}
+    assert_equal({:fish=>1,:soup=>2},content_blob_params)
+  end
+
+  test "asset params" do
+    @params = {:content_blob=>{:fish=>1,:soup=>2},:data_file=>{:title=>"george"},:sop=>{:title=>"mary"}}
+    assert_equal({:title=>"george"},asset_params)
+    @controller_name="sops"
+    assert_equal({:title=>"mary"},asset_params)
+  end
+
+
   test 'check url response code' do
     stub_request(:head, 'http://bbc.co.uk/').to_return(status: 200, body: '', headers: { content_type: 'text/html', content_length: '555' })
     stub_request(:head, 'http://not-there.com').to_return(status: 404, body: '', headers: {})
@@ -130,6 +143,17 @@ class UploadHandingTest < ActiveSupport::TestCase
     assert_equal expected,arrayify_params(p)
   end
 
+  test "content type from filename" do
+    assert_equal "text/html",content_type_from_filename(nil)
+    assert_equal "image/png",content_type_from_filename("fish.png")
+    assert_equal "application/msword",content_type_from_filename("fish.doc")
+    assert_equal "application/vnd.openxmlformats-officedocument.wordprocessingml.document",content_type_from_filename("fish.docx")
+    #FIXME: , MERGENOTE - this gives an incorrect mime type of sbml+xml due to the ordering
+    #assert_equal "image/png",content_type_from_filename("fish.xml")
+    assert_equal "text/html",content_type_from_filename("fish.html")
+    assert_equal "application/octet-stream",content_type_from_filename("fish")
+  end
+
   test 'content is webpage?' do
     assert content_is_webpage?('text/html')
     assert content_is_webpage?('text/html; charset=UTF-8')
@@ -211,5 +235,15 @@ class UploadHandingTest < ActiveSupport::TestCase
   #allows some methods to be tested the rely on flash.now[:error]
   def flash
     ActionDispatch::Flash::FlashHash.new
+  end
+
+  #mock out the params method, set @params for the desired params for the test
+  def params
+    @params
+  end
+
+  #mocks out the controller name, defaults to data_files, but can be changed by setting @controller_name
+  def controller_name
+    @controller_name || "data_files"
   end
 end

@@ -1,5 +1,7 @@
 module Seek
   module UploadHandling
+    include Seek::MimeTypes
+
     VALID_SCHEMES = %w(http https ftp)
     def valid_scheme?(url)
       uri = URI.encode((url || '').strip)
@@ -12,7 +14,7 @@ module Seek
     rescue RestClient::MethodNotAllowed
       405
     # FIXME: catching SocketError and Errno::ECONNREFUSED is a temporary hack, unable to resovle url and connect is not the same as a 404
-    rescue RestClient::ResourceNotFound, SocketError,Errno::ECONNREFUSED
+    rescue RestClient::ResourceNotFound, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
       404
     rescue RestClient::InternalServerError
       500
@@ -62,12 +64,12 @@ module Seek
     end
 
     def handle_upload_data
-      asset_params = asset_params(params)
-      asset_params = update_params_for_batch(asset_params)
+      blob_params = content_blob_params
+      blob_params = update_params_for_batch(blob_params)
 
-      return false unless validate_params(asset_params)
-      asset_params = arrayify_params(asset_params)
-      asset_params.each do |item_params|
+      return false unless validate_params(blob_params)
+      blob_params = arrayify_params(blob_params)
+      blob_params.each do |item_params|
 
         return false unless check_for_empty_data_if_present(item_params)
         return false unless check_for_valid_uri_if_present(item_params)
@@ -80,37 +82,47 @@ module Seek
         end
       end
 
+      params[:content_blob] = blob_params
       clean_params
-      params[:content_blob]=asset_params
     end
 
     def create_content_blobs
-      asset = eval "@#{self.controller_name.downcase.singularize}"
+      asset = eval "@#{controller_name.downcase.singularize}"
       version = asset.version
       multiple = asset.respond_to?(:content_blobs)
 
-      content_blob_params = asset_params(params)
       content_blob_params.each do |item_params|
-        #MERGENOTE - move this to the upload handing and param manipulation during tidying up
+        # MERGENOTE - move this to the upload handing and param manipulation during tidying up
         content_type = item_params[:content_type] || content_type_from_filename(item_params[:original_filename])
         if multiple
-          asset.content_blobs.create(:tmp_io_object => item_params[:tmp_io_object],
-                                     :url=>item_params[:data_url],
-                                     :external_link=>!item_params[:make_local_copy]=="1",
-                                     :original_filename=>item_params[:original_filename],
-                                     :content_type=>content_type,
-                                     :asset_version=>version
+          asset.content_blobs.create(tmp_io_object: item_params[:tmp_io_object],
+                                     url: item_params[:data_url],
+                                     external_link: !item_params[:make_local_copy] == '1',
+                                     original_filename: item_params[:original_filename],
+                                     content_type: content_type,
+                                     asset_version: version
           )
         else
-          asset.create_content_blob(:tmp_io_object => item_params[:tmp_io_object],
-                                    :url=>item_params[:data_url],
-                                    :external_link=>!item_params[:make_local_copy]=="1",
-                                    :original_filename=>item_params[:original_filename],
-                                    :content_type=>content_type,
-                                    :asset_version=>version
+          asset.create_content_blob(tmp_io_object: item_params[:tmp_io_object],
+                                    url: item_params[:data_url],
+                                    external_link: !item_params[:make_local_copy] == '1',
+                                    original_filename: item_params[:original_filename],
+                                    content_type: content_type,
+                                    asset_version: version
           )
         end
 
+      end
+    end
+
+    def content_type_from_filename(filename)
+      if filename.nil?
+        'text/html' # assume it points to a webpage if there is no filename
+      else
+        file_format = filename.split('.').last.try(:strip)
+        possible_mime_types = mime_types_for_extension file_format
+        type = possible_mime_types.sort.first || 'application/octet-stream'
+        type
       end
     end
 
@@ -123,26 +135,26 @@ module Seek
           @error_msg = "We can't find out information about this URL - Method not allowed response."
         when 404
           @error = true
-          @error_msg = "Nothing can be found at that URL. Please check the address and try again"
+          @error_msg = 'Nothing can be found at that URL. Please check the address and try again'
         else
           @error = true
           @error_msg = "We can't find out information about this URL - unhandled response code: #{code}"
       end
     end
 
-    def arrayify_params asset_params
+    def arrayify_params(blob_params)
       result = []
-      Array(asset_params[:data_url]).each.with_index do |url,i|
+      Array(blob_params[:data_url]).each.with_index do |url, i|
         unless url.blank?
-          result << {:data_url=>url,
-                     :original_filename=>Array(asset_params[:original_filename])[i],
-                     :make_local_copy=>Array(asset_params[:make_local_copy])[i]}
+          result << { data_url: url,
+                      original_filename: Array(blob_params[:original_filename])[i],
+                      make_local_copy: Array(blob_params[:make_local_copy])[i] }
         end
 
       end
-      Array(asset_params[:data]).each do |data|
+      Array(blob_params[:data]).each do |data|
         unless data.blank?
-          result << {:data=>data}
+          result << { data: data }
         end
       end
       result
@@ -151,25 +163,25 @@ module Seek
     def handle_exception_response(exception)
       case exception
         when Seek::Exceptions::InvalidSchemeException, URI::InvalidURIError
-          @error=true
-          @error_msg="The URL appears to be invalid"
+          @error = true
+          @error_msg = 'The URL appears to be invalid'
         else
-          raise exception
+          fail exception
       end
     end
 
-    def process_upload(asset_params)
-      asset_params[:content_type] = (asset_params[:data]).content_type
-      asset_params[:original_filename] = (asset_params[:data]).original_filename if asset_params[:original_filename].blank?
-      asset_params[:tmp_io_object] = asset_params[:data]
+    def process_upload(blob_params)
+      blob_params[:content_type] = (blob_params[:data]).content_type
+      blob_params[:original_filename] = (blob_params[:data]).original_filename if blob_params[:original_filename].blank?
+      blob_params[:tmp_io_object] = blob_params[:data]
     end
 
-    def process_from_url(asset_params)
-      @data_url = asset_params[:data_url]
+    def process_from_url(blob_params)
+      @data_url = blob_params[:data_url]
       code = check_url_response_code(@data_url)
-      make_local_copy = asset_params[:make_local_copy]=="1"
+      make_local_copy = blob_params[:make_local_copy] == '1'
 
-      #MERGENOTE, FIXME: An external link is not the same as the reverse of a local copy. An external link is not nessarily desirable for a non copied URL that has been registered, but for now we will keep this behaviour
+      # MERGENOTE, FIXME: An external link is not the same as the reverse of a local copy. An external link is not nessarily desirable for a non copied URL that has been registered, but for now we will keep this behaviour
       @external_link = !make_local_copy
       case code
         when 200
@@ -179,13 +191,13 @@ module Seek
           if make_local_copy
             downloader = RemoteDownloader.new
             data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
-            asset_params[:tmp_io_object] = File.open data_hash[:data_tmp_path], 'r'
+            blob_params[:tmp_io_object] = File.open data_hash[:data_tmp_path], 'r'
           end
-          asset_params[:content_type] = (extract_mime_content_type(headers[:content_type]) || '')
-          asset_params[:original_filename] = filename || ""
+          blob_params[:content_type] = (extract_mime_content_type(headers[:content_type]) || '')
+          blob_params[:original_filename] = filename || ''
         when 401, 403
-          asset_params[:content_type]=""
-          asset_params[:original_filename]=""
+          blob_params[:content_type] = ''
+          blob_params[:original_filename] = ''
         else
           flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the URL is inaccessible."
           return false
@@ -193,19 +205,18 @@ module Seek
       true
     end
 
-    def add_from_upload?(asset_params)
-      !asset_params[:data].blank?
+    def add_from_upload?(blob_params)
+      !blob_params[:data].blank?
     end
 
     def init_asset_for_render
       clean_params
       c     = controller_name.singularize
-      obj = c.camelize.constantize.new(asset_params(params))
+      obj = c.camelize.constantize.new(asset_params)
       eval "@#{c} = obj"
     end
 
     def clean_params
-      asset_params = asset_params(params)
       %w(data_url data make_local_copy).each do |key|
         asset_params.delete(key)
       end
@@ -226,9 +237,9 @@ module Seek
       action_name == 'create'
     end
 
-    def validate_params(asset_params)
-      if (asset_params[:data]).blank? && (asset_params[:data_url]).blank?
-        if asset_params.include?(:data_url)
+    def validate_params(blob_params)
+      if (blob_params[:data]).blank? && (blob_params[:data_url]).blank?
+        if blob_params.include?(:data_url)
           flash.now[:error] = 'Please select a file to upload or provide a URL to the data.'
         else
           flash.now[:error] = 'Please select a file to upload.'
@@ -239,9 +250,9 @@ module Seek
       end
     end
 
-    def check_for_empty_data_if_present(asset_params)
-      return true unless asset_params[:data_url].blank?
-      Array(asset_params[:data]).each do |data|
+    def check_for_empty_data_if_present(blob_params)
+      return true unless blob_params[:data_url].blank?
+      Array(blob_params[:data]).each do |data|
         if !data.blank? && data.size == 0
           flash.now[:error] = 'The file that you are uploading is empty. Please check your selection and try again!'
           return false
@@ -250,8 +261,8 @@ module Seek
       true
     end
 
-    def check_for_valid_scheme(asset_params)
-      if !asset_params[:data_url].blank? && !valid_scheme?(asset_params[:data_url])
+    def check_for_valid_scheme(blob_params)
+      if !blob_params[:data_url].blank? && !valid_scheme?(blob_params[:data_url])
         flash.now[:error] = "The URL type is invalid, only URLs of type #{VALID_SCHEMES.map { |s| "#{s}" }.join', '} are valid"
         false
       else
@@ -263,9 +274,9 @@ module Seek
       uri.try(:strip) =~ /\A#{URI.regexp}\z/
     end
 
-    def check_for_valid_uri_if_present(asset_params)
-      if !asset_params[:data_url].blank? && !valid_uri?(asset_params[:data_url])
-        flash.now[:error] = "The URL '#{asset_params[:data_url]}' is not valid"
+    def check_for_valid_uri_if_present(blob_params)
+      if !blob_params[:data_url].blank? && !valid_uri?(blob_params[:data_url])
+        flash.now[:error] = "The URL '#{blob_params[:data_url]}' is not valid"
         false
       else
         true
@@ -278,23 +289,27 @@ module Seek
     end
 
     def determine_filename_from_url(url)
-      filename=nil
+      filename = nil
       if valid_uri?(url)
         path = URI.parse(url).path
-        filename = path.split("/").last unless path.nil?
+        filename = path.split('/').last unless path.nil?
         filename = filename.strip unless filename.nil?
       end
       filename
     end
 
-    def asset_params(params)
+    def asset_params
+      params[controller_name.downcase.singularize.to_sym]
+    end
+
+    def content_blob_params
       params[:content_blob]
     end
 
     def update_params_for_batch(params)
-      data=[]
+      data = []
       data_urls = []
-      params.keys.collect{|k| k}.sort.each do |k|
+      params.keys.map { |k| k }.sort.each do |k|
         if k.to_s =~ /data_\d{1,2}\z/
           val = params.delete(k)
           data << val unless val.blank?
@@ -303,8 +318,8 @@ module Seek
           data_urls << val unless val.strip.blank?
         end
       end
-      params[:data]=data unless data.empty?
-      params[:data_url]=data_urls unless data_urls.empty?
+      params[:data] = data unless data.empty?
+      params[:data_url] = data_urls unless data_urls.empty?
       params
     end
   end
