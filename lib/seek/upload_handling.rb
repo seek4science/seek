@@ -309,19 +309,33 @@ module Seek
     def update_params_for_batch(params)
       data = []
       data_urls = []
+      original_filenames = []
+      make_local_copy = []
       params.keys.map { |k| k }.sort.each do |k|
-        if k.to_s =~ /data_\d{1,2}\z/
-          val = params.delete(k)
-          data << val unless val.blank?
-        elsif k.to_s =~ /data_url_\d{1,2}\z/
-          val = params.delete(k)
-          data_urls << val unless val.strip.blank?
+      if k.to_s =~ /data_\d{1,2}\z/
+        val = params.delete(k)
+        data << val unless val.blank?
+      elsif k.to_s =~ /data_url_\d{1,2}\z/
+        url = params.delete(k)
+        k = k.to_s.gsub('data_url', 'original_filename')
+        filename = params.delete(k.to_sym)
+        k = k.gsub('original_filename', 'make_local_copy')
+        copy = params.delete(k.to_sym)
+        unless url.strip.blank?
+          original_filenames << filename
+          data_urls << url
+          make_local_copy << copy
         end
       end
+
+    end
+
       params[:data] = data unless data.empty?
       params[:data_url] = data_urls unless data_urls.empty?
+      params[:original_filename] = original_filenames unless data_urls.empty?
+      params[:make_local_copy] = make_local_copy unless data_urls.empty?
       params
-    end
+  end
   end
 
   module Exceptions
