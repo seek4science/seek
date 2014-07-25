@@ -347,7 +347,7 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -733,7 +733,7 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1305,7 +1305,7 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1593,6 +1593,7 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.text     "description"
     t.integer  "user_id"
     t.integer  "workflow_version",                :default => 1
+    t.boolean  "reported",                        :default => false
   end
 
   add_index "taverna_player_runs", ["parent_id"], :name => "index_taverna_player_runs_on_parent_id"

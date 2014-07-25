@@ -29,6 +29,7 @@
     <p>
       <b>Status:</b>
       <%= run.status_message %> <%= image_tag('ajax-loader.gif', :style => "vertical-align: middle") unless run.complete? %>
+      <%= "(Report submitted)" if @run.reported? %>
     </p>
   </div>
 

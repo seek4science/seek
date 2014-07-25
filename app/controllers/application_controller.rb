@@ -222,7 +222,7 @@ class ApplicationController < ActionController::Base
       when 'destroy', 'destroy_item', 'cancel'
         'delete'
 
-      when 'manage', 'notification', 'read_interaction', 'write_interaction'
+      when 'manage', 'notification', 'read_interaction', 'write_interaction', 'report_problem'
           'manage'
       else
         nil

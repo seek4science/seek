@@ -1,0 +1,18 @@
+<%= @person.name -%> has reported an error with run:
+    <%= link_to @run.name, @run -%>
+
+of workflow:
+    <%= link_to @run.workflow.title, @run.workflow -%>
+
+Run status: <%= @run.status_message -%>
+Started at: <%= @run.start_time -%>
+Finished at: <%= @run.finish_time -%>
+
+Outputs containing errors:
+<% if @error_outputs.empty? %>
+    None
+<% else %>
+    <% @error_outputs.each do |output| %>
+    <%= output.name %>
+    <% end %>
+<% end %>
