@@ -212,7 +212,7 @@ class LogPublishingTest < ActionController::TestCase
   private
 
   def valid_sop
-    return {:title => "Test", :project_ids => [@gatekeeper.projects.first.id]},{:data => fixture_file_upload('files/file_picture.png')}
+    return {:title => "Test", :project_ids => [@gatekeeper.projects.first.id]},{:data => file_for_upload}
   end
 
   def public_sharing
