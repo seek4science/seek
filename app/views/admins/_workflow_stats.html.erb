@@ -1,5 +1,6 @@
 <%
    workflows = Workflow.includes(:policy => :permissions, :runs => :contributor).all
+   workflows = Workflow.authorize_asset_collection(workflows, 'view')
    workflows.sort_by! { |w| -w.runs.count }
 %>
 
