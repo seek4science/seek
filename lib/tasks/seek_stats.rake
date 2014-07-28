@@ -77,6 +77,40 @@ namespace :seek_stats do
     end
   end
 
+  desc "Create retrospective ActivityLog entries for the creation of Runs and Sweeps."
+  task(:retrospectively_log_run_and_sweep_creation => :environment) do
+    # Disable timestamps so we can set the log entry time to the same time that the run/sweep was created, rather than the current time
+    ActiveRecord::Base.record_timestamps = false
+
+    # Log single runs (not part of a sweep)
+    TavernaPlayer::Run.where(:sweep_id => nil).all.each do |run|
+      unless ActivityLog.where(:activity_loggable_id => run.id, :activity_loggable_type => 'TavernaPlayer::Run', :action => 'create').exists?
+        ActivityLog.create(:activity_loggable => run, :action => 'create', :culprit => run.contributor,
+                           :referenced => run.workflow, :user_agent => 'script', :created_at => run.created_at,
+                           :updated_at => run.created_at, :controller_name => 'runs')
+        puts "Logged creation of Run #{run.id}"
+      else
+        puts "Skipping Run #{run.id} (log entry exists)"
+      end
+    end
+
+    # Log sweeps
+    Sweep.all.each do |sweep|
+      unless ActivityLog.where(:activity_loggable_id => sweep.id, :activity_loggable_type => 'Sweep', :action => 'create').exists?
+        ActivityLog.create(:activity_loggable => sweep, :action => 'create', :culprit => sweep.contributor,
+                           :referenced => sweep.workflow, :user_agent => 'script', :created_at => sweep.created_at,
+                           :updated_at => sweep.created_at, :controller_name => 'sweeps')
+        puts "Logged creation of Sweep #{sweep.id}"
+      else
+        puts "Skipping Sweep #{sweep.id} (log entry exists)"
+      end
+    end
+
+    ActiveRecord::Base.record_timestamps = true
+
+    puts "Done"
+  end
+
 
   #things linked to publications
 
