@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
     t.string   "controller_name"
   end
 
@@ -259,8 +259,8 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.integer "asset_id"
     t.string  "asset_type"
     t.integer "asset_version"
-    t.boolean "is_webpage",                              :default => false
     t.boolean "external_link"
+    t.boolean "is_webpage",                              :default => false
   end
 
   add_index "content_blobs", ["asset_id", "asset_type"], :name => "index_content_blobs_on_asset_id_and_asset_type"
@@ -368,9 +368,9 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.datetime "locked_at"
     t.datetime "failed_at"
     t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "queue"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
@@ -690,9 +690,9 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
-    t.integer  "model_image_id"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -721,9 +721,9 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
-    t.integer  "model_image_id"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
@@ -987,9 +987,9 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
+    t.integer  "parent_id"
     t.integer  "programme_id"
     t.integer  "ancestor_id"
-    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -1179,10 +1179,10 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.string   "age_at_sampling"
-    t.string   "uuid"
-    t.integer  "age_at_sampling_unit_id"
     t.string   "sample_type"
     t.string   "treatment"
+    t.string   "uuid"
+    t.integer  "age_at_sampling_unit_id"
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
@@ -1201,11 +1201,11 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
 
   create_table "scales", :force => true do |t|
     t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "key"
     t.integer  "pos",        :default => 1
     t.string   "image_name"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
   end
 
   create_table "scalings", :force => true do |t|
@@ -1213,8 +1213,8 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.integer  "scalable_id"
     t.integer  "person_id"
     t.string   "scalable_type"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "sessions", :force => true do |t|
@@ -1367,8 +1367,8 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.boolean  "is_dummy",               :default => false
-    t.string   "uuid"
     t.string   "age_unit"
+    t.string   "uuid"
   end
 
   create_table "strain_auth_lookup", :id => false, :force => true do |t|
@@ -1670,6 +1670,8 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.datetime "updated_at"
   end
 
+  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
+
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"
     t.integer  "user_id"
@@ -1704,14 +1706,13 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.string   "treatment_protocol"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "sample_id"
-    t.integer  "measured_item_id"
     t.float    "start_value"
     t.float    "end_value"
     t.float    "standard_deviation"
     t.text     "comments"
-    t.integer  "compound_id"
+    t.integer  "sample_id"
     t.integer  "specimen_id"
+    t.integer  "compound_id"
     t.string   "medium_title"
     t.float    "time_after_treatment"
     t.integer  "time_after_treatment_unit_id"
