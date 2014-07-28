@@ -297,6 +297,8 @@ class AdminsController < ApplicationController
       when "monthly_stats"
         monthly_stats = get_monthly_stats
         type = "monthly_statistics"
+      when "workflow_stats"
+        type = "workflow_stats"
       when "none"
         type = "none"
     end
@@ -318,6 +320,8 @@ class AdminsController < ApplicationController
           format.html { render :partial => "admins/auth_consistency" }
         when "monthly_statistics"
           format.html { render :partial => "admins/monthly_statistics", :locals => {:stats => monthly_stats}}
+        when "workflow_stats"
+          format.html { render :partial => "admins/workflow_stats" }
         when "none"
           format.html { render :text=>"" }
       end

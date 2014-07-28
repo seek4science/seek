@@ -1,0 +1,28 @@
+<%
+   workflows = Workflow.includes(:policy => :permissions, :runs => :contributor).all
+   workflows.sort_by! { |w| -w.runs.count }
+%>
+
+<p>
+  Total workflows = <%= workflows.count -%>
+</p>
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Public?</th>
+    <th>Total Runs (inc. sweep runs)</th>
+    <th># Single Runs (non-sweep runs)</th>
+    <th># Sweeps</th>
+    <th># Unique Users</th>
+  </tr>
+  <% workflows.each do |workflow| %>
+      <tr>
+        <td style="text-align: left"><%= link_to workflow.title, workflow -%></td>
+        <td><%= workflow.can_view?(nil) -%></td>
+        <td><%= workflow.runs.count -%></td>
+        <td><%= workflow.runs.select {|r| !r.sweep_id}.count %></td>
+        <td><%= workflow.sweeps.count -%></td>
+        <td><%= workflow.runs.map { |r| r.contributor }.uniq.count -%></td>
+      </tr>
+  <% end -%>
+</table>
