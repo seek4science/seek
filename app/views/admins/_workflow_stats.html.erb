@@ -20,7 +20,7 @@
 %>
 
 <p>
-  Total workflows = <%= stats.count -%>
+  Total workflows = <%= Workflow.count -%> (<%= stats.count -%> visible to you)
 </p>
 <table>
   <tr>
