@@ -93,27 +93,20 @@ module Seek
     def create_content_blobs
       asset = eval "@#{controller_name.downcase.singularize}"
       version = asset.version
-      multiple = asset.respond_to?(:content_blobs)
 
       content_blob_params.each do |item_params|
         # MERGENOTE - move this to the upload handing and param manipulation during tidying up
         content_type = item_params[:content_type] || content_type_from_filename(item_params[:original_filename])
-        if multiple
-          asset.content_blobs.create(tmp_io_object: item_params[:tmp_io_object],
-                                     url: item_params[:data_url],
-                                     external_link: !item_params[:make_local_copy] == '1',
-                                     original_filename: item_params[:original_filename],
-                                     content_type: content_type,
-                                     asset_version: version
-          )
+        attributes = { tmp_io_object: item_params[:tmp_io_object],
+                       url: item_params[:data_url],
+                       external_link: !item_params[:make_local_copy] == '1',
+                       original_filename: item_params[:original_filename],
+                       content_type: content_type,
+                       asset_version: version }
+        if asset.respond_to?(:content_blobs)
+          asset.content_blobs.create(attributes)
         else
-          asset.create_content_blob(tmp_io_object: item_params[:tmp_io_object],
-                                    url: item_params[:data_url],
-                                    external_link: !item_params[:make_local_copy] == '1',
-                                    original_filename: item_params[:original_filename],
-                                    content_type: content_type,
-                                    asset_version: version
-          )
+          asset.create_content_blob(attributes)
         end
 
       end
@@ -123,13 +116,13 @@ module Seek
     def retain_previous_content_blobs(asset)
       retained_ids = retained_content_blob_ids
       if retained_ids.present? && (previous_version = asset.find_version(asset.version - 1))
-        previous_version.content_blobs.select{|blob| retained_ids.include?(blob.id)}.each do |blob|
-          new_blob= asset.content_blobs.build(:url=>blob.url,
-                                                      :original_filename=>blob.original_filename,
-                                                      :content_type=>blob.content_type,
-                                                      :asset_version=>asset.version)
-          FileUtils.cp(blob.filepath, new_blob.filepath) if File.exists?(blob.filepath)
-          #need to save after copying the file, coz an after_save on contentblob relies on the file
+        previous_version.content_blobs.select { |blob| retained_ids.include?(blob.id) }.each do |blob|
+          new_blob = asset.content_blobs.build(url: blob.url,
+                                               original_filename: blob.original_filename,
+                                               content_type: blob.content_type,
+                                               asset_version: asset.version)
+          FileUtils.cp(blob.filepath, new_blob.filepath) if File.exist?(blob.filepath)
+          # need to save after copying the file, coz an after_save on contentblob relies on the file
           new_blob.save
 
         end
@@ -149,7 +142,7 @@ module Seek
 
     def retained_content_blob_ids
       if params[:content_blobs] && params[:content_blobs][:id]
-        params[:content_blobs][:id].keys.collect{|id| id.to_i}.sort
+        params[:content_blobs][:id].keys.map { |id| id.to_i }.sort
       else
         []
       end
