@@ -239,6 +239,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should correctly handle bad data url" do
+    stub_request(:any,"http://sdfsdfkh.com/sdfsd.png").to_raise(SocketError)
     model={:title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
     blob={:data_url_0=>"http://sdfsdfkh.com/sdfsd.png",:original_filename_0=>"",:make_local_copy_0=>"0"}
     assert_no_difference('Model.count') do
@@ -253,7 +254,7 @@ class ModelsControllerTest < ActionController::TestCase
     model={:title=>"Test"}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :model => model,:content_blob=>{:data_0=>file_for_upload}, :sharing=>valid_sharing
+        post :create, :model => model,:content_blob=>{}, :sharing=>valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -492,7 +493,7 @@ class ModelsControllerTest < ActionController::TestCase
   
   test "should create model and store with url and store flag" do
     model_details,blob=valid_model_with_url
-    model_details[:external_link]="0"
+    blob[:make_local_copy_0]="1"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
         post :create, :model => model_details,:content_blob=>blob, :sharing=>valid_sharing
