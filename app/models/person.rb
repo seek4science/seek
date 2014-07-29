@@ -33,8 +33,8 @@ class Person < ActiveRecord::Base
   has_many :favourite_groups, :through => :favourite_group_memberships
 
   #MERGENOTE - needs checking
-  has_many :work_groups, :through=>:group_memberships, :before_add => [:subscribe_to_work_group_project, :touch_work_group_project],
-  :before_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
+  has_many :work_groups, :through=>:group_memberships, :after_add => [:subscribe_to_work_group_project, :touch_work_group_project],
+  :after_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
   has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"  
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
