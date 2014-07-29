@@ -150,13 +150,28 @@ class UploadHandingTest < ActiveSupport::TestCase
 
   test 'content type from filename' do
     assert_equal 'text/html', content_type_from_filename(nil)
-    assert_equal 'image/png', content_type_from_filename('fish.png')
-    assert_equal 'application/msword', content_type_from_filename('fish.doc')
-    assert_equal 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', content_type_from_filename('fish.docx')
-    # FIXME: , MERGENOTE - this gives an incorrect mime type of sbml+xml due to the ordering
-    # assert_equal "image/png",content_type_from_filename("fish.xml")
-    assert_equal 'text/html', content_type_from_filename('fish.html')
-    assert_equal 'application/octet-stream', content_type_from_filename('fish')
+    # FIXME: , MERGENOTE - .xml gives an incorrect mime type of sbml+xml due to the ordering
+    checks = [
+        {:f=>"test.jpg",:t=>"image/jpeg"},
+        {:f=>"test.JPG",:t=>"image/jpeg"},
+        {:f=>"test.png",:t=>"image/png"},
+        {:f=>"test.PNG",:t=>"image/png"},
+        {:f=>"test.jpeg",:t=>"image/jpeg"},
+        {:f=>"test.JPEG",:t=>"image/jpeg"},
+        {:f=>"test.xls",:t=>"application/excel"},
+        {:f=>"test.doc",:t=>"application/msword"},
+        {:f=>"test.xlsx",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+        {:f=>"test.docx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        {:f=>"test.XLs",:t=>"application/excel"},
+        {:f=>"test.Doc",:t=>"application/msword"},
+        {:f=>"test.XLSX",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+        {:f=>"test.dOCx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        {:f=>"unknown.xxx",:t=>"application/octet-stream"},
+        {:f=>nil,:t=>"text/html"}
+    ]
+    checks.each do |check|
+      assert_equal check[:t],content_type_from_filename(check[:f]),"Expected #{check[:t]} for #{check[:f]}"
+    end
   end
 
   test 'content is webpage?' do
