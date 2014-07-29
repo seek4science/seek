@@ -96,8 +96,6 @@ class Person < ActiveRecord::Base
     wg.project.touch
   end
 
-  before_create :set_default_subscriptions
-
   #MERGENOTE - why are we not inculding AuthLookup module?
   after_commit :queue_update_auth_table
 
@@ -167,11 +165,6 @@ class Person < ActiveRecord::Base
     self.projects.collect{|p| p.programme}.uniq
   end
 
-  def set_default_subscriptions
-    projects.each do |proj|
-      project_subscriptions.build :project => proj
-    end
-  end
 
   #MERGENOTE - perhaps need programmes in here too
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
