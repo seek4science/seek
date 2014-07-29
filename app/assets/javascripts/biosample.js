@@ -115,11 +115,26 @@ function fnGetSelected( oTableLocal )
 }
 
 function checkSelectOneStrain(){
-   if (getSelectedStrains().split(',').length > 1){
-       alert('Please select only ONE strain for this new strain to base on.');
-       return false;
-   }else
+    var selected_strains = getSelectedStrains().split(',');
+    if (selected_strains.length > 1){
+        alert('Please select only ONE strain for this new strain to base on.');
+        return false;
+    }else if (selected_strains.length == 1 && selected_strains[0] != "" ){
+        //add selected specimen_id to the link param
+        var old_link = $('new_strain_link').href;
+        var new_link = old_link.split('?')[0];
+        new_link = new_link.concat('?parent_id=' + selected_strains[0]);
+        new_link = new_link.concat('&from_biosamples=true');
+        $('new_strain_link').href = new_link;
         return true;
+    }else{
+        var old_link = $('new_strain_link').href;
+        var new_link = old_link.split('?')[0];
+        new_link = new_link.concat('?from_biosamples=true');
+        $('new_strain_link').href = new_link;
+        return true;
+    }
+
 }
 
 //if more than one specimen are selected, display the notice message

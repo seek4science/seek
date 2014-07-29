@@ -261,4 +261,27 @@ class StrainsControllerTest < ActionController::TestCase
     assert_equal strain, publish_log.resource
     assert_equal strain.contributor, publish_log.user
   end
+
+  test 'should fill in the based-on strain if chosen' do
+    strain = Factory(:strain,
+                     :genotypes => [Factory(:genotype)],
+                     :phenotypes => [Factory(:phenotype)] )
+
+    get :new, :parent_id => strain.id
+    assert_response :success
+
+    assert_select 'input[id=?][value=?]','strain_title',strain.title
+    assert_select 'select[id=?]','strain_parent_id' do
+      assert_select 'option[value=?][selected=?]',strain.id,'selected',:text=>strain.info
+    end
+    assert_select 'select[id=?]','strain_organism_id' do
+      assert_select 'option[value=?][selected=?]',strain.organism.id,'selected',:text=>strain.organism.title
+    end
+    genotype = strain.genotypes.first
+    phenotype = strain.phenotypes.first
+
+    assert_select 'td input[value=?]', genotype.gene.title
+    assert_select 'td input[value=?]', genotype.modification.title
+    assert_select 'td input[value=?]', phenotype.description
+  end
 end

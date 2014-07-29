@@ -83,4 +83,14 @@ class Strain < ActiveRecord::Base
   def self.user_creatable?
     Seek::Config.organisms_enabled
   end
+
+  def clone_with_associations
+    new_object= self.dup
+    new_object.policy = self.policy.deep_copy
+    new_object.projects = self.projects
+    new_object.genotypes = self.genotypes
+    new_object.phenotypes = self.phenotypes
+
+    return new_object
+  end
 end

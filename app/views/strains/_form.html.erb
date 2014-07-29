@@ -94,7 +94,7 @@
 </div>
 
 <script type="text/javascript">
-    if ('<%= action.to_s%>' == 'create' && <%= f.error_messages.blank?%>) {
+    if ('<%= action.to_s%>' == 'create' && <%= @strain.parent_id.nil?%> && <%= f.error_messages.blank?%>) {
         show_ajax_loader('strains_of_selected_organism');
         strains_of_selected_organism($F('strain_organism_id'), 'strain_parent_id', 'strain[parent_id]');
     }

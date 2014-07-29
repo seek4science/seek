@@ -1,15 +1,6 @@
 module BiosamplesHelper
   def create_strain_popup_link
-     return link_to_remote_redbox(image_tag("famfamfam_silk/add.png") + 'Create new strain',
-      { :url => create_strain_popup_biosamples_path ,
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-        :with => "'strain_id=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')",
-        :condition => "checkSelectOneStrain()"
-      }
-      #,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-    )
+    link_to image("new") + "Create new strain", new_strain_path(), {:id => 'new_strain_link', :target => '_blank', :onclick => "if (checkSelectOneStrain()) {return(true);} else {return(false);}"}
   end
 
   
