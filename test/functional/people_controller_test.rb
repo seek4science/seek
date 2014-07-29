@@ -1168,12 +1168,12 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should unsubscribe a person to a project when unassign a person to that project' do
-	   person = Factory(:person)
-    project = person.projects.first
+    sync_delayed_jobs
+    project = Factory :project
+	  person = Factory(:brand_new_person,:work_groups => [Factory(:work_group, :project => project)])
+    assert_equal  project , person.projects.first
     assert person.project_subscriptions.map(&:project).include?(project)
-
     s = Factory(:subscribable, project_ids: [project.id])
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, [project.id]).perform
     assert s.subscribed?(person)
 
     # unassign a person to a project
