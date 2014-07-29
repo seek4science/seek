@@ -3,13 +3,13 @@ rvm:
   - 1.9.3
   - 2.1.2
 env:
-  - SUITE="test:units"
-  - SUITE="test:functionals"
-  - SUITE="test:integration"
+  - SUITE="rake test:units"
+  - SUITE="rake test:functionals"
+  - SUITE="rake test:integration"
   - SUITE="rspec spec"
 before_install:
   - bundle config build.nokogiri --use-system-libraries
 script:
   - mv config/database.cc.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:schema:load
-  - bundle exec rake $SUITE
+  - bundle exec $SUITE
