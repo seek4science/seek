@@ -195,16 +195,30 @@ class UploadHandingTest < ActiveSupport::TestCase
     assert_nil determine_filename_from_url(nil)
   end
 
-  test 'validate params' do
+  test 'check for data or url' do
 
-    refute validate_params(data: '', data_url: '')
-    assert validate_params(data: 'hhhh')
-    assert validate_params(data_url: 'hhhh')
+    refute check_for_data_or_url(data: '', data_url: '')
+    assert check_for_data_or_url(data: 'hhhh')
+    assert check_for_data_or_url(data_url: 'hhhh')
 
-    refute validate_params(data: [], data_url: [])
-    assert validate_params(data: ['hhhh'])
-    assert validate_params(data_url: ['hhhh'])
+    refute check_for_data_or_url(data: [], data_url: [])
+    assert check_for_data_or_url(data: ['hhhh'])
+    assert check_for_data_or_url(data_url: ['hhhh'])
 
+  end
+
+  test "model image present?" do
+    file_with_content = ActionDispatch::Http::UploadedFile.new(
+        filename: 'file',
+        content_type: 'text/plain',
+        tempfile: StringIO.new('fish')
+    )
+    @params={:model_image=>{:image_file=>file_with_content},:content_blob=>{},:model=>{:title=>"fish"}}
+    assert model_image_present?
+    @params={:model_image=>{},:content_blob=>{},:model=>{:title=>"fish"}}
+    refute model_image_present?
+    @params={:content_blob=>{},:model=>{:title=>"fish"}}
+    refute model_image_present?
   end
 
   test 'check for data if present' do

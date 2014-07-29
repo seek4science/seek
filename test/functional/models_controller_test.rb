@@ -396,10 +396,9 @@ class ModelsControllerTest < ActionController::TestCase
   test "should create model with image" do
       login_as(:model_owner)
       assert_difference('Model.count') do
-        #MERGENOTE - should this be commented out? either its needed or remove
-        #assert_difference('ModelImage.count') do
+        assert_difference('ModelImage.count') do
           post :create, :model => valid_model,:content_blob=>{:data_0=>file_for_upload}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
-        #end
+        end
       end
 
       model = assigns(:model)
@@ -411,11 +410,9 @@ class ModelsControllerTest < ActionController::TestCase
   test "should create model with image and without content_blob" do
       login_as(:model_owner)
       assert_difference('Model.count') do
-        #TODO: the model image is not created because the file created by fixture_file_upload doesn't respond_to(:read), so the image file can't be created
-        #need a way to create a file that is the same as the file sent from browser.
-        #assert_difference('ModelImage.count') do
+        assert_difference('ModelImage.count') do
           post :create, :model => valid_model,:content_blob=>{}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
-        #end
+        end
       end
 
       model = assigns(:model)

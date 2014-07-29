@@ -66,11 +66,11 @@ module Seek
     def handle_upload_data
       blob_params = content_blob_params
       blob_params = update_params_for_batch(blob_params)
-
-      return false unless validate_params(blob_params)
+      allow_empty_content_blob = model_image_present?
+      return false unless check_for_data_or_url(blob_params) unless allow_empty_content_blob
       blob_params = arrayify_params(blob_params)
       blob_params.each do |item_params|
-
+        return false unless check_for_data_or_url(item_params) unless allow_empty_content_blob
         return false unless check_for_empty_data_if_present(item_params)
         return false unless check_for_valid_uri_if_present(item_params)
         return false unless check_for_valid_scheme(item_params)
@@ -84,6 +84,10 @@ module Seek
 
       params[:content_blob] = blob_params
       clean_params
+    end
+
+    def model_image_present?
+      !params[:model_image].nil? && !params[:model_image][:image_file].nil?
     end
 
     def create_content_blobs
@@ -237,7 +241,7 @@ module Seek
       action_name == 'create'
     end
 
-    def validate_params(blob_params)
+    def check_for_data_or_url(blob_params)
       if (blob_params[:data]).blank? && (blob_params[:data_url]).blank?
         if blob_params.include?(:data_url)
           flash.now[:error] = 'Please select a file to upload or provide a URL to the data.'
