@@ -94,15 +94,19 @@ function addToList() {
     }
     else {
         //create elements for form
-        addBatchFormElement("data_url", url, item_index);
-        addBatchFormElement("original_filename", original_filename, item_index);
-        addBatchFormElement("make_local_copy", make_local_copy, item_index);
+        createElementsForNewItem(url,original_filename,make_local_copy);
         url_element.value = "";
         original_filename_element.value = "";
-        $j("#test_url_result")[0].innerHTML = "";
-        var display_name = original_filename.blank() ? url : original_filename;
-        showInList(display_name, item_index);
-        item_index++;
-
     }
+}
+
+function createElementsForNewItem(url,original_filename,make_local_copy) {
+    addBatchFormElement("data_url", url, item_index);
+    addBatchFormElement("original_filename", original_filename, item_index);
+    addBatchFormElement("make_local_copy", make_local_copy, item_index);
+
+    $j("#test_url_result")[0].innerHTML = "";
+    var display_name = original_filename.blank() ? url : original_filename;
+    showInList(display_name, item_index);
+    item_index++;
 }

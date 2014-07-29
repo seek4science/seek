@@ -226,17 +226,6 @@ class ModelsControllerTest < ActionController::TestCase
     get :new
     assert_response :success
   end
-
-  test "should get new populated from params" do
-    get :new, :model=>{:title=>"the title",:description=>"the description"},:content_blob=>{:data_url_0=>"wibblebibble", :original_filename_0 => "afile.xml",:make_local_copy_0=>"0"}
-    assert_response :success
-    assert_select "textarea#model_title",:text=>"the title"
-    assert_select "textarea#model_description",:text=>"the description"
-    assert_select "input#content_blob_data_url",:value=>"wibblebibble"
-    assert_select "input#content_blob_original_filename_0[type='hidden']",:value=>"afile.xml"
-    assert_select "input#model_imported_source[type='hidden']",:value=>"BioModels"
-    assert_select "input#model_imported_url[type='hidden']",:value=>"http://biomodels/model.xml"
-  end
   
   test "should correctly handle bad data url" do
     stub_request(:any,"http://sdfsdfkh.com/sdfsd.png").to_raise(SocketError)

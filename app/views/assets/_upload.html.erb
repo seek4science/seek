@@ -3,10 +3,7 @@
 upload_field = asset_field_prefix
 obj=eval("@"+upload_field)
 
-# inject the attributes data_url in the asset type, e.g. @model. This keeps the form clean.
-class << obj
-attr_accessor :data_url
-end unless obj.nil?
+
 
 asset_name = text_for_resource upload_field
 new_version ||= false
@@ -20,10 +17,11 @@ with_image_file ||= false
 
 <%
    if params[upload_field.to_sym]
-     obj.data_url=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
-     original_filename = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
+     url_from_params=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
+     original_filename_from_params = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
    end
 -%>
+
 <%# MERGENOTE - need to pluralize text for batch upload %>
 <div class="box_infotext">
     <p>
@@ -76,7 +74,7 @@ with_image_file ||= false
           <br/>
           <b>URL:</b>
           <span class="required">*</span>
-          <%= text_field_tag "content_blob[data_url]", obj.data_url, :size => 55, :id => "data_url_field" -%>
+          <%= text_field_tag "content_blob[data_url]", "", :size => 55, :id => "data_url_field" -%>
           <% if batch %>
               <%= link_to_function (image("new") + "Add"), "addToList()" %>
           <% end %>
@@ -112,11 +110,10 @@ with_image_file ||= false
 
   setup_url_field("<%= examine_url_content_blobs_path %>","examine_url");
 
-  <% if obj.data_url.blank? -%>
-    from_file_selected();
-  <% else -%>
-    from_url_selected();
-  <% end -%>
+  <% if url_from_params && original_filename_from_params %>
+    createElementsForNewItem('<%= url_from_params %>','<%= original_filename_from_params %>',"1");
+  <% end %>
+
 
 <% if batch %>
   <% obj.content_blobs.each do |blob| %>
