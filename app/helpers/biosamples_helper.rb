@@ -10,19 +10,9 @@ module BiosamplesHelper
 
   def edit_strain_popup_link strain
     if strain.can_manage?
-      return link_to_remote_redbox(image_tag("famfamfam_silk/wrench.png"),
-                                   {:url => edit_strain_popup_biosamples_path,
-                                    :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-                                    :with => "'strain_id=' + #{strain.id}"
-                                   },
-                                   :title => "Manage this strain")
+      return link_to image("manage"), edit_strain_path(strain) + "?from_biosamples=true", {:title => "Manage this strain", :target => '_blank'}
     elsif strain.can_edit?
-      return link_to_remote_redbox(image_tag("famfamfam_silk/page_white_edit.png"),
-                                   {:url => edit_strain_popup_biosamples_path,
-                                    :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-                                    :with => "'strain_id=' + #{strain.id}"
-                                   },
-                                   :title => "Edit this strain")
+      return link_to image("edit"), edit_strain_path(strain) + "?from_biosamples=true", {:title => "Edit this strain", :target => '_blank'}
     else
       explanation = "You are not authorized to edit this Strain"
       return image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
