@@ -117,6 +117,23 @@ module Seek
         end
 
       end
+      retain_previous_content_blobs(asset)
+    end
+
+    def retain_previous_content_blobs(asset)
+      retained_ids = retained_content_blob_ids
+      if retained_ids.present? && (previous_version = asset.find_version(asset.version - 1))
+        previous_version.content_blobs.select{|blob| retained_ids.include?(blob.id)}.each do |blob|
+          new_blob= asset.content_blobs.build(:url=>blob.url,
+                                                      :original_filename=>blob.original_filename,
+                                                      :content_type=>blob.content_type,
+                                                      :asset_version=>asset.version)
+          FileUtils.cp(blob.filepath, new_blob.filepath) if File.exists?(blob.filepath)
+          #need to save after copying the file, coz an after_save on contentblob relies on the file
+          new_blob.save
+
+        end
+      end
     end
 
     def content_type_from_filename(filename)
@@ -127,6 +144,14 @@ module Seek
         possible_mime_types = mime_types_for_extension file_format
         type = possible_mime_types.sort.first || 'application/octet-stream'
         type
+      end
+    end
+
+    def retained_content_blob_ids
+      if params[:content_blobs] && params[:content_blobs][:id]
+        params[:content_blobs][:id].keys.collect{|id| id.to_i}.sort
+      else
+        []
       end
     end
 

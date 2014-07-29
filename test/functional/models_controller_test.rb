@@ -432,7 +432,7 @@ class ModelsControllerTest < ActionController::TestCase
        m=models(:model_with_format_and_type)
        assert_difference("Model::Version.count", 1) do
          #assert_difference('ModelImage.count') do
-          post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload}, :revision_comment=>"This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+          post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}, :revision_comment=>"This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
          #end
        end
 
@@ -470,7 +470,6 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should create model with url" do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
     model,blob = valid_model_with_url
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
@@ -666,7 +665,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     #create new version
     assert_difference("Model::Version.count", 1) do
-      post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload}
+      post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}
     end
     assert_redirected_to model_path(assigns(:model))
     m = Model.find(m.id)
@@ -692,7 +691,7 @@ class ModelsControllerTest < ActionController::TestCase
   def test_should_create_new_version
     m=models(:model_with_format_and_type)
     assert_difference("Model::Version.count", 1) do
-      post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload}, :revision_comment=>"This is a new revision"
+      post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}, :revision_comment=>"This is a new revision"
     end
     
     assert_redirected_to model_path(m)

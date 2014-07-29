@@ -207,6 +207,20 @@ class UploadHandingTest < ActiveSupport::TestCase
 
   end
 
+  test "retained content blob ids" do
+
+    @params={:content_blobs=>{:id=>{1=>"fish.png",2=>"2.png"}}}
+    assert_equal [1,2],retained_content_blob_ids
+    @params={}
+    assert_equal [],retained_content_blob_ids
+    @params={:content_blobs=>nil}
+    assert_equal [],retained_content_blob_ids
+    @params={:content_blobs=>{:id=>{"3"=>"bob.png","1"=>"fish.png","2"=>"2.png"}}}
+    assert_equal [1,2,3],retained_content_blob_ids
+
+
+  end
+
   test "model image present?" do
     file_with_content = ActionDispatch::Http::UploadedFile.new(
         filename: 'file',
