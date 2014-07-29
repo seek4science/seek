@@ -1,14 +1,14 @@
 module BiosamplesHelper
-  def create_strain_popup_link
+  def create_strain_link
     link_to image("new") + "Create new strain", new_strain_path(), {:id => 'new_strain_link', :target => '_blank', :onclick => "if (checkSelectOneStrain()) {return(true);} else {return(false);}"}
   end
 
   
-   def create_sample_popup_link
+   def create_sample_link
      link_to image("new") + "Create new sample", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{I18n.t "biosamples.sample_parent_term"}')) {return(true);} else {return(false);}"}
    end
 
-  def edit_strain_popup_link strain
+  def edit_strain_link strain
     if strain.can_manage?
       return link_to image("manage"), edit_strain_path(strain) + "?from_biosamples=true", {:title => "Manage this strain", :target => '_blank'}
     elsif strain.can_edit?
@@ -33,7 +33,7 @@ module BiosamplesHelper
         explanation=unable_to_delete_text strain
         image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
       end ),
-     edit_strain_popup_link(strain)]
+     edit_strain_link(strain)]
   end
   
   def organism_selection_onchange_function
