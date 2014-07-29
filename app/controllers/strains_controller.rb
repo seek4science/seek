@@ -21,17 +21,33 @@ class StrainsController < ApplicationController
       @strain = Strain.new()
     end
 
+    @strain.from_biosamples = params[:from_biosamples]
+  end
+
+  def edit
+    @strain.from_biosamples = params[:from_biosamples]
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml
+    end
   end
 
   def create
     @strain = new_strain(params[:strain])
     @strain.policy.set_attributes_with_sharing params[:sharing], @strain.projects
     update_annotations @strain
+
     if @strain.save
-      respond_to do |format|
-        flash[:notice] = 'Strain was successfully created.'
-        format.html { redirect_to(@strain) }
-        format.xml { render :xml => @strain, :status => :created, :location => @strain }
+      if @strain.from_biosamples=='true'
+        #reload to get updated nested attributes,e.g. genotypes/phenotypes
+        @strain.reload
+        render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'create', :object => @strain}
+      else
+        respond_to do |format|
+          flash[:notice] = 'Strain was successfully created.'
+          format.html { redirect_to(@strain) }
+          format.xml { render :xml => @strain, :status => :created, :location => @strain }
+        end
       end
     else
       respond_to do |format|
@@ -56,10 +72,16 @@ class StrainsController < ApplicationController
     end
     @strain.attributes = params[:strain]
     if @strain.save
-      respond_to do |format|
-        flash[:notice] = 'Strain was successfully updated.'
-        format.html { redirect_to(@strain) }
-        format.xml { render :xml => @strain, :status => :created, :location => @strain }
+      if @strain.from_biosamples=='true'
+        #reload to get updated nested attributes,e.g. genotypes/phenotypes
+        @strain.reload
+        render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @strain}
+      else
+        respond_to do |format|
+          flash[:notice] = 'Strain was successfully updated.'
+          format.html { redirect_to(@strain) }
+          format.xml { render :xml => @strain, :status => :created, :location => @strain }
+        end
       end
     else
       respond_to do |format|
