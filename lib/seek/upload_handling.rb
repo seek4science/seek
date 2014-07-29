@@ -65,10 +65,13 @@ module Seek
 
     def handle_upload_data
       blob_params = content_blob_params
+
+      #MERGENOTE - the manipulation and validation of the params still needs a bit of cleaning up
       blob_params = update_params_for_batch(blob_params)
       allow_empty_content_blob = model_image_present?
-      return false unless check_for_data_or_url(blob_params) unless allow_empty_content_blob
+      return false unless check_for_data_or_url(blob_params) unless allow_empty_content_blob || retained_content_blob_ids.present?
       blob_params = arrayify_params(blob_params)
+
       blob_params.each do |item_params|
         return false unless check_for_data_or_url(item_params) unless allow_empty_content_blob
         return false unless check_for_empty_data_if_present(item_params)
@@ -84,6 +87,7 @@ module Seek
 
       params[:content_blob] = blob_params
       clean_params
+      true
     end
 
     def model_image_present?
@@ -239,8 +243,10 @@ module Seek
     end
 
     def clean_params
-      %w(data_url data make_local_copy).each do |key|
-        asset_params.delete(key)
+      if asset_params
+        %w(data_url data make_local_copy).each do |key|
+          asset_params.delete(key)
+        end
       end
     end
 

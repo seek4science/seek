@@ -11,7 +11,7 @@
 
     <div class="foldContent" style="display: block;">
       <% if !resource.nil? && resource.respond_to?(:content_blobs) %>
-          <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version,:batch=>true} -%>
+          <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version,:batch=>true, :with_image_file=>resource.is_a?(Model)} -%>
       <% else %>
           <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version} -%>
       <% end %>

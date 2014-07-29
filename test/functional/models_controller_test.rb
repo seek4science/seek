@@ -431,9 +431,9 @@ class ModelsControllerTest < ActionController::TestCase
   test "should create model version with image" do
        m=models(:model_with_format_and_type)
        assert_difference("Model::Version.count", 1) do
-         #assert_difference('ModelImage.count') do
-          post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}, :revision_comment=>"This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
-         #end
+         assert_difference('ModelImage.count') do
+          post :new_version, :id=>m, :content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}, :revision_comment=>"This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+         end
        end
 
        assert_redirected_to model_path(m)
@@ -665,7 +665,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     #create new version
     assert_difference("Model::Version.count", 1) do
-      post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}
+      post :new_version, :id=>m, :content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}
     end
     assert_redirected_to model_path(assigns(:model))
     m = Model.find(m.id)

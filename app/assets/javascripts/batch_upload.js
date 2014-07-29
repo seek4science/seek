@@ -43,10 +43,23 @@ function removeBatchFormItem(index) {
     }
 }
 
+function removeFromRetainedContentBlobs(index) {
+    var element = $j('#retained_blob_'+index)[0];
+    if (element) {
+        element.remove();
+    }
+}
+
+function showExistingInList(text,index,content_blob_id) {
+    showInList(text,index);
+    addToRetainedContentBlobs(content_blob_id,text,index);
+}
+
 function showInList(text, index) {
     var remove_link = $j('<a>',{href: '#'}).append($j('<span>',{id:'remove_icon'}));
     remove_link.on('click',function(event){
         removeBatchFormItem(index);
+        removeFromRetainedContentBlobs(index);
         return false;
     });
     file_icon = $j('<span>',{id:'generic_file_icon'});
@@ -54,6 +67,15 @@ function showInList(text, index) {
         id:'pending_item_'+index,
         text:text
     }).appendTo('#pending_files').prepend(file_icon).append(remove_link);
+}
+
+function addToRetainedContentBlobs(id,text,index) {
+    var element = $j('<input>',{
+        name:'content_blobs[id]['+id+']',
+        value:text,
+        type:'hidden',
+        id:'retained_blob_'+index
+    }).appendTo('#existing_content_blobs');
 }
 
 function addToList() {

@@ -12,8 +12,11 @@ asset_name = text_for_resource upload_field
 new_version ||= false
 original_filename=nil
 batch ||= false
-include_image_upload ||= false
+with_image_file ||= false
+
 -%>
+
+
 
 <%
    if params[upload_field.to_sym]
@@ -36,7 +39,26 @@ include_image_upload ||= false
 </div>
 
 <div>
+  <% if with_image_file -%>
+      <div id="image_file_box" style="float:right;">
+        <% resource_name = obj.class.name.underscore %>
+        <%= hidden_field_tag("#{resource_name}_id", obj.id) -%>
+        <p>
+          <br/>
+          <b>Image file: </b>
+          <br/>
+          <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
+        </p>
+        <% if new_version && previous_version_image_file = obj.latest_version.model_image.try(:original_filename) -%>
+            <p>
+              The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %> </span> will be used if you dont specify the image file
+              <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
+            </p>
+        <% end -%>
+      </div>
+  <% end -%>
   <div id="upload_type_selection">
+
     <ul id="switch_upload_buttons">
       <li style="float:left;height:100%;">
         <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class => "block_link block_link_active", :id => "upload_from_file_button", :title => tooltip_title_attrib('Add from a local file') -%>
@@ -54,29 +76,33 @@ include_image_upload ||= false
           <br/>
           <b>URL:</b>
           <span class="required">*</span>
-          <%= text_field_tag "content_blob[data_url]",obj.data_url, :size => 55, :id=>"data_url_field" -%>
+          <%= text_field_tag "content_blob[data_url]", obj.data_url, :size => 55, :id => "data_url_field" -%>
           <% if batch %>
-            <%= link_to_function (image("new") + "Add"), "addToList()" %>
+              <%= link_to_function (image("new") + "Add"), "addToList()" %>
           <% end %>
-          <%= link_to image("test", :title => "Test", :alt => "Test")+" Test", "#", :id=>"examine_url" %>
+          <%= link_to image("test", :title => "Test", :alt => "Test")+" Test", "#", :id => "examine_url" %>
           <br/>
+
           <div id="test_url_result"></div>
           <div id="copy_option" style="display:none;">
-              <b>Upload a copy?</b>
-              <%= check_box_tag "content_blob[make_local_copy]","0",false,:id=>"make_local_copy" %>
+            <b>Upload a copy?</b>
+            <%= check_box_tag "content_blob[make_local_copy]", "0", false, :id => "make_local_copy" %>
           </div>
 
-          <%= hidden_field_tag "content_blob[original_filename]", original_filename, :id=>:original_filename %>
-          <%= hidden_field_tag "url_checked",false %>
+          <%= hidden_field_tag "content_blob[original_filename]", original_filename, :id => :original_filename %>
+          <%= hidden_field_tag "url_checked", false %>
         </div>
       </li>
     </ul>
   </div>
-  <br/>
-  <ul id='pending_files'></ul>
-  <div id='batch_items_list' style='display:none;'></div>
+
 
 </div>
+
+<br/>
+<ul id='pending_files'></ul>
+<div id='batch_items_list' style='display:none;'></div>
+<div id='existing_content_blobs' style="display:none;"></div>
 
 <% if batch %>
     <%= javascript_include_tag "batch_upload.js" %>
@@ -91,5 +117,16 @@ include_image_upload ||= false
   <% else -%>
     from_url_selected();
   <% end -%>
+
+<% if batch %>
+  <% obj.content_blobs.each do |blob| %>
+    <%
+    text = blob.url ? blob.url : blob.original_filename
+    text = text + " (original)"
+    %>
+    showExistingInList('<%= text %>',item_index++,<%= blob.id %>);
+
+  <% end %>
+<% end %>
 
 </script>
