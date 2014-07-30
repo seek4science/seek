@@ -1,6 +1,12 @@
 module ProjectHierarchyTestHelper
 
+  def skip?
+    #MERGENOTE - skipping
+    skip('skipping hierarchical project tests') unless Seek::Config.project_hierarchy_enabled
+  end
+
   def setup
+        skip?
         sync_delayed_jobs
         initialize_hierarchical_projects
   end

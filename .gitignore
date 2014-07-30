@@ -27,6 +27,7 @@ tmp/avatars/*
 tmp/models/*
 tmp/model_images/*
 tmp/restart.txt
+tmp/rubycritic/*
 tmp/profile-*
 tmp/test_content_blobs/*
 tmp/rdf/
