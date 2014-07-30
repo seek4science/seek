@@ -1,15 +1,7 @@
 require 'test_helper'
 require 'integration/project_hierarchy/project_hierarchy_test_helper'
-class ProjectExtensionTest < ActionController::IntegrationTest
+class ProjectExtensionTest <  ActiveSupport::TestCase
   include ProjectHierarchyTestHelper
-
-  def setup
-    skip("tests are skipped as projects are NOT hierarchical") unless Seek::Config.project_hierarchy_enabled
-    sync_delayed_jobs
-    login_as_test_user
-    initialize_hierarchical_projects
-  end
-
 
   test "change parent" do
     parent_proj = Factory(:project, :title => "test parent")
@@ -55,6 +47,15 @@ class ProjectExtensionTest < ActionController::IntegrationTest
     end
   end
 
+   test "project roles of child project is also of parent project" do
+     # PIs
+     # Project Coordinators
+   end
+
+   test "admin defined roles of parent project is also of child project" do
+      # pal project_manager asset_manager gatekeeper
+
+   end
   test "projects with children cannot be deleted" do
 
     assert !@proj.children.empty?

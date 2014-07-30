@@ -172,7 +172,7 @@ module Seek
     #called as callback after save, to make sure the role project records are aligned with the current projects, deleting
     #any for projects that have been removed, and resolving the mask
     def resolve_admin_defined_role_projects
-      projects = Seek::Config.project_hierarchy_enabled ? self.projects_and_descendants : self.projects
+      projects =  Seek::Config.project_hierarchy_enabled ? self.projects_and_descendants : self.projects
 
       admin_defined_role_projects.each do |role|
         unless projects.include?(role.project)
@@ -190,5 +190,6 @@ module Seek
 
     end
 
+  include Seek::ProjectHierarchies::AdminDefinedRolesExtension if Seek::Config.project_hierarchy_enabled
   end
 end

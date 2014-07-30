@@ -28,7 +28,7 @@ SEEK::Application.configure do
       Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:workflows_enabled] = true
       Settings.defaults[:programmes_enabled] = true
-      Settings.defaults[:project_hierarchy_enabled] = false
+      Settings.defaults[:project_hierarchy_enabled] = true
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'SEEK'

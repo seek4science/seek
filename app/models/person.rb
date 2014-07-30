@@ -33,8 +33,8 @@ class Person < ActiveRecord::Base
   has_many :favourite_groups, :through => :favourite_group_memberships
 
   #MERGENOTE - needs checking
-  has_many :work_groups, :through=>:group_memberships, :before_add => [:subscribe_to_work_group_project, :touch_work_group_project],
-  :before_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
+  has_many :work_groups, :through=>:group_memberships, :after_add => [:subscribe_to_work_group_project, :touch_work_group_project],
+  :after_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
   has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"  
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
@@ -95,8 +95,6 @@ class Person < ActiveRecord::Base
   def touch_work_group_project wg
     wg.project.touch
   end
-
-  before_create :set_default_subscriptions
 
   #MERGENOTE - why are we not inculding AuthLookup module?
   after_commit :queue_update_auth_table
@@ -167,11 +165,6 @@ class Person < ActiveRecord::Base
     self.projects.collect{|p| p.programme}.uniq
   end
 
-  def set_default_subscriptions
-    projects.each do |proj|
-      project_subscriptions.build :project => proj
-    end
-  end
 
   #MERGENOTE - perhaps need programmes in here too
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
@@ -505,4 +498,5 @@ class Person < ActiveRecord::Base
     end
   end
 
+  include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled
 end

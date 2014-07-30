@@ -98,6 +98,17 @@ class ActiveSupport::TestCase
   setup :clear_rails_cache
   teardown :clear_current_user
 
+   #perform delayed jobs when they are created for easy test
+  def sync_delayed_jobs
+    Delayed::Job.class_eval do
+      def self.enqueue(*args)
+        obj = args.shift
+        #puts "Delayed job #{obj.inspect}" unless obj.is_a? RdfGenerationJob
+        obj.perform
+      end
+    end
+  end
+
   def check_for_soffice
     port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
     @@soffice_available ||= begin
