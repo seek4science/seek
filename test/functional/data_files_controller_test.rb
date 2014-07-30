@@ -529,7 +529,7 @@ end
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/Spreadsheet/
       assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/9\.2 KB/
+      assert_select "p",:text=>/9 KB/
     end
 
   end

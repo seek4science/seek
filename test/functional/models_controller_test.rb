@@ -549,7 +549,7 @@ class ModelsControllerTest < ActionController::TestCase
             assert_select "p > b",:text=>"Format:"
             assert_select "p > span.format",:text=>"XML document"
             assert_select "p > b",:text=>"Size:"
-            assert_select "p > span.filesize",:text=>"5.9 KB"
+            assert_select "p > span.filesize",:text=>"5.79 KB"
         end
       end
     end
@@ -577,8 +577,8 @@ class ModelsControllerTest < ActionController::TestCase
           assert_select "p > span.format",:text=>"XML document"
           assert_select "p > span.format",:text=>"Spreadsheet"
           assert_select "p > b",:text=>"Size:",:count=>2
-          assert_select "p > span.filesize",:text=>"5.9 KB"
-          assert_select "p > span.filesize",:text=>"9.2 KB"
+          assert_select "p > span.filesize",:text=>"5.79 KB"
+          assert_select "p > span.filesize",:text=>"9 KB"
         end
       end
     end
