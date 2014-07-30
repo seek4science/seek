@@ -111,13 +111,14 @@ class ActiveSupport::TestCase
 
    #perform delayed jobs when they are created for easy test
   def sync_delayed_jobs
-    Delayed::Job.class_eval do
-      def self.enqueue(*args)
-        obj = args.shift
-        #puts "Delayed job #{obj.inspect}" unless obj.is_a? RdfGenerationJob
-        obj.perform
-      end
-    end
+    #MERGENOTE - this permanently interferes with the behaviour of delayed job, slowing down tests and causing future test failures
+    # Delayed::Job.class_eval do
+    #   def self.enqueue(*args)
+    #     obj = args.shift
+    #     #puts "Delayed job #{obj.inspect}" unless obj.is_a? RdfGenerationJob
+    #     obj.perform
+    #   end
+    # end
   end
 
   def check_for_soffice
