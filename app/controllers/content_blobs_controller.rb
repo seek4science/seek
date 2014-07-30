@@ -7,7 +7,6 @@ class ContentBlobsController < ApplicationController
 
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
-  include AssetsCommonExtension
   include Seek::ContentBlobCommon
 
   def view_pdf_content
@@ -122,8 +121,8 @@ class ContentBlobsController < ApplicationController
   end
 
   def get_data_hash_from_url
-    code = url_response_code(@content_blob.url)
-    if code == "200"
+    code = check_url_response_code(@content_blob.url)
+    if code == 200
       downloader=Seek::RemoteDownloader.new
       begin
         data_hash = downloader.get_remote_data @content_blob.url

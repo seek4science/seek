@@ -36,14 +36,7 @@ module Seek
         version = asset.version
 
         content_blob_params.each do |item_params|
-          # MERGENOTE - move this to the upload handing and param manipulation during tidying up
-          content_type = item_params[:content_type] || content_type_from_filename(item_params[:original_filename])
-          attributes = { tmp_io_object: item_params[:tmp_io_object],
-                         url: item_params[:data_url],
-                         external_link: !item_params[:make_local_copy] == '1',
-                         original_filename: item_params[:original_filename],
-                         content_type: content_type,
-                         asset_version: version }
+          attributes = build_attributes_hash_for_content_blob(item_params,version)
           if asset.respond_to?(:content_blobs)
             asset.content_blobs.create(attributes)
           else
@@ -52,6 +45,15 @@ module Seek
 
         end
         retain_previous_content_blobs(asset)
+      end
+
+      def build_attributes_hash_for_content_blob item_params,version
+        { tmp_io_object: item_params[:tmp_io_object],
+          url: item_params[:data_url],
+          external_link: !item_params[:make_local_copy] == '1',
+          original_filename: item_params[:original_filename],
+          content_type: item_params[:content_type] ,
+          asset_version: version }
       end
 
       def retain_previous_content_blobs(asset)
@@ -71,9 +73,9 @@ module Seek
       end
 
       def process_upload(blob_params)
-        blob_params[:content_type] = (blob_params[:data]).content_type
         blob_params[:original_filename] = (blob_params[:data]).original_filename if blob_params[:original_filename].blank?
         blob_params[:tmp_io_object] = blob_params[:data]
+        blob_params[:content_type] = (blob_params[:data]).content_type || content_type_from_filename(blob_params[:original_filename])
       end
 
       def process_from_url(blob_params)
@@ -91,8 +93,8 @@ module Seek
               data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
               blob_params[:tmp_io_object] = File.open data_hash[:data_tmp_path], 'r'
             end
-            blob_params[:content_type] = (extract_mime_content_type(headers[:content_type]) || '')
             blob_params[:original_filename] = filename || ''
+            blob_params[:content_type] = (extract_mime_content_type(headers[:content_type]) || content_type_from_filename(filename) || '')
           when 401, 403
             blob_params[:content_type] = ''
             blob_params[:original_filename] = ''

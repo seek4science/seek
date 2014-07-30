@@ -47,17 +47,14 @@ module Seek
             data << val unless val.blank?
           elsif key_str.to_s =~ /data_url_\d{1,2}\z/
             url = params.delete(key)
-            key = key_str.gsub('data_url', 'original_filename')
-            filename = params.delete(key.to_sym)
-            key = key.gsub('original_filename', 'make_local_copy')
-            copy = params.delete(key.to_sym)
+            filename = params.delete(key_str.gsub('data_url', 'original_filename').to_sym)
+            copy = params.delete(key_str.gsub('data_url', 'make_local_copy').to_sym)
             unless url.strip.blank?
               original_filenames << filename
               data_urls << url
               make_local_copy << copy
             end
           end
-
         end
 
         params[:data] = data unless data.empty?

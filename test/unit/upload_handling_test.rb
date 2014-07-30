@@ -53,6 +53,7 @@ class UploadHandingTest < ActiveSupport::TestCase
     stub_request(:head, 'http://moved2.com').to_return(status: 302, body: '', headers: { location: 'http://forbidden.com' })
     assert_equal 200, check_url_response_code('http://moved.com')
     assert_equal 403, check_url_response_code('http://moved2.com')
+        
   end
 
   test 'fetch url headers' do

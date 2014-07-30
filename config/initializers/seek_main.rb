@@ -17,7 +17,6 @@ require 'modporter_extensions'
 require "attachment_fu_extension"
 require 'seek/taggable'
 require "bio"
-require 'assets_common_extension'
 
 require 'sunspot_rails'
 require 'cancan'

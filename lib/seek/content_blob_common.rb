@@ -1,5 +1,6 @@
 module Seek
   module ContentBlobCommon
+    include Seek::UploadHandling::ContentInspection
 
     def redirect_on_error asset,msg=nil
       flash[:error]=msg if !msg.nil?
