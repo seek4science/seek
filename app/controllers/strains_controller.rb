@@ -14,7 +14,7 @@ class StrainsController < ApplicationController
 
   def new
     parent_strain = Strain.find_by_id(params[:parent_id])
-    unless parent_strain.nil?
+    if !parent_strain.nil? && parent_strain.can_view?
       @strain = parent_strain.clone_with_associations
       @strain.parent_id = parent_strain.id
     else

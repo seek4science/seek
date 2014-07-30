@@ -284,4 +284,23 @@ class StrainsControllerTest < ActionController::TestCase
     assert_select 'td input[value=?]', genotype.modification.title
     assert_select 'td input[value=?]', phenotype.description
   end
+
+  test 'authorization for based-on strain' do
+    unauthorized_parent_strain = Factory(:strain,
+                                         :policy => Factory(:private_policy))
+    assert !unauthorized_parent_strain.can_view?
+
+    get :new, :parent_id => unauthorized_parent_strain.id
+    assert_response :success
+
+    assert_select 'input[id=?][value=?]','strain_title',unauthorized_parent_strain.title,:count => 0
+
+    authorized_parent_strain = Factory(:strain)
+    assert authorized_parent_strain.can_view?
+
+    get :new, :parent_id => authorized_parent_strain.id
+    assert_response :success
+
+    assert_select 'input[id=?][value=?]','strain_title',authorized_parent_strain.title
+  end
 end
