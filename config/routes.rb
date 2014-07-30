@@ -389,6 +389,9 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
+    collection do
+      post :items_for_result
+    end
     member do
       get :initiate_spawn_project
       post :spawn_project

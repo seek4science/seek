@@ -73,7 +73,6 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
       assert_select "div[data-ex-role='facet'][data-ex-expression='.technology_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
       assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", :count => 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", :count => 1
       assert_select "div[data-ex-role='facet'][data-ex-expression='.for_test']", :count => 0
     end
   end
@@ -105,6 +104,8 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
         with_config_value :facet_enable_for_pages,{type_name=>true} do
           get "/#{type_name}"
           assert_response :success
+          record_body
+          assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
         end
       end
     end
