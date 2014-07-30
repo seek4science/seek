@@ -9,7 +9,6 @@ class DataFilesController < ApplicationController
   include DotGenerator
 
   include Seek::AssetsCommon
-  include Seek::UploadHandling
 
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
@@ -169,13 +168,10 @@ class DataFilesController < ApplicationController
     if handle_upload_data
 
       @data_file = DataFile.new params[:data_file]
-      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
-
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
       assay_ids = params[:assay_ids] || []
-
 
       if @data_file.save
         update_annotations @data_file

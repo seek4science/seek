@@ -4,7 +4,6 @@ class SopsController < ApplicationController
   include DotGenerator
 
   include Seek::AssetsCommon
-  include Seek::UploadHandling
   
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]

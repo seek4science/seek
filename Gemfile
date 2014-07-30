@@ -100,9 +100,8 @@ group :development do
   gem "pry-remote"
   gem "request-log-analyzer"
   gem "rubocop",:require=>false
-  gem "reek",:require=>false
-  gem "flog",:require=>false
-  gem "flay",:require=>false
+  gem "rubycritic",:require=>false
+  gem "guard-rubycritic",:require=>false
 end
 
 group :test do

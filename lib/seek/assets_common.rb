@@ -4,6 +4,7 @@ module Seek
   module AssetsCommon
 
     include Seek::AnnotationCommon
+    include Seek::UploadHandling::DataUpload
 
     def find_display_asset asset=eval("@#{self.controller_name.singularize}");
       name = asset.class.name.underscore

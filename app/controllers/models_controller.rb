@@ -7,7 +7,6 @@ class ModelsController < ApplicationController
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
-  include Seek::UploadHandling
 
   before_filter :models_enabled?
   before_filter :find_assets, :only => [ :index ]

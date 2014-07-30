@@ -6,7 +6,6 @@ class PresentationsController < ApplicationController
   include DotGenerator
 
   include Seek::AssetsCommon
-  include Seek::UploadHandling
 
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview,:update_annotations_ajax]

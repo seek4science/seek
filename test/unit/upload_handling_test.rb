@@ -1,10 +1,15 @@
 require 'test_helper'
 
+require 'seek/upload_handling/data_upload'
+require 'seek/upload_handling/examine_url'
+
 class UploadHandingTest < ActiveSupport::TestCase
-  include Seek::UploadHandling
+
+  include Seek::UploadHandling::DataUpload
+  include Seek::UploadHandling::ExamineUrl
 
   test 'valid scheme?' do
-    assert_equal %w(http https ftp).sort, Seek::UploadHandling::VALID_SCHEMES.sort
+    assert_equal %w(http https ftp).sort, Seek::UploadHandling::ContentInspection::VALID_SCHEMES.sort
     assert valid_scheme?('http://bbc.co.uk')
     assert valid_scheme?('https://bbc.co.uk')
     assert valid_scheme?('ftp://bbc.co.uk')

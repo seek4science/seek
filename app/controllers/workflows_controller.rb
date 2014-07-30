@@ -6,7 +6,6 @@ class WorkflowsController < ApplicationController
 
   include IndexPager
   include Seek::AssetsCommon
-  include Seek::UploadHandling
 
   before_filter :workflows_enabled?
   before_filter :find_and_filter_workflows, :only => [ :index ]
