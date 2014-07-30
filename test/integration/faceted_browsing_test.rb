@@ -100,4 +100,15 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       assert !items_for_result.include?(assay2.title)
     end
   end
+
+  test 'generate faceted browsing for all types' do
+    with_config_value :faceted_browsing_enabled,true do
+      ASSETS_WITH_FACET.each do |type_name|
+        with_config_value :facet_enable_for_pages,{type_name=>true} do
+          get "/#{type_name}"
+          assert_response :success
+        end
+      end
+    end
+  end
 end

@@ -37,11 +37,7 @@ module FacetedBrowsingHelper
   end
 
   def facet_config_path
-    unless Rails.env == 'test'
-      File.join(Rails.root, "config", "facets.yml")
-    else
-      File.join(Rails.root, "test", "fixtures", "files", "facets.txt")
-    end
+    File.join(Rails.root, "config", "facets.yml")
   end
 
   def faceted_search_config_path
