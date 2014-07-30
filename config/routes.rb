@@ -381,6 +381,7 @@ SEEK::Application.routes.draw do
       end
     end
     resources :content_blobs do
+
       member do
         get :view_pdf_content
         get :get_pdf
@@ -424,6 +425,11 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
+  resources :content_blobs, :except => [:show, :index, :update, :create, :destroy] do
+    collection do
+      post :examine_url
+    end
+  end
   resources :programmes do
     resources :avatars do
       member do

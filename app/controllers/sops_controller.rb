@@ -4,7 +4,6 @@ class SopsController < ApplicationController
   include DotGenerator
 
   include Seek::AssetsCommon
-  include AssetsCommonExtension
   
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
@@ -16,7 +15,7 @@ class SopsController < ApplicationController
   include Seek::BreadCrumbs
 
   def new_version
-    if (handle_data nil)      
+    if handle_upload_data
       comments=params[:revision_comment]
 
 
@@ -84,7 +83,7 @@ class SopsController < ApplicationController
   # POST /sops
   def create    
 
-    if handle_data            
+    if handle_upload_data
       @sop = Sop.new(params[:sop])
       @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
@@ -115,6 +114,8 @@ class SopsController < ApplicationController
           }
         end
       end
+    else
+      handle_upload_data_failure
     end
   end
   

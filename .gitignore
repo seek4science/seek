@@ -30,6 +30,7 @@ tmp/restart.txt
 tmp/rubycritic/*
 tmp/profile-*
 tmp/test_content_blobs/*
+tmp/rubycritic/*
 tmp/rdf/
 tmp/*.csv
 tmp/*.zip

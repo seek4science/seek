@@ -9,7 +9,6 @@ class DataFilesController < ApplicationController
   include DotGenerator
 
   include Seek::AssetsCommon
-  include AssetsCommonExtension
 
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
@@ -57,7 +56,7 @@ class DataFilesController < ApplicationController
   end
     
   def new_version
-    if (handle_data nil)          
+    if handle_upload_data
       comments=params[:revision_comment]
 
       respond_to do |format|
@@ -118,7 +117,7 @@ class DataFilesController < ApplicationController
 
   def upload_for_tool
 
-    if handle_data
+    if handle_upload_data
       params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
@@ -143,7 +142,7 @@ class DataFilesController < ApplicationController
   def upload_from_email
     if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
       User.with_current_user Person.find(params[:sender_id]).user do
-        if handle_data
+        if handle_upload_data
           @data_file = DataFile.new params[:data_file]
 
           @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
@@ -166,16 +165,13 @@ class DataFilesController < ApplicationController
   end
 
   def create
-    if handle_data
+    if handle_upload_data
 
       @data_file = DataFile.new params[:data_file]
-      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
-
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
       assay_ids = params[:assay_ids] || []
-
 
       if @data_file.save
         update_annotations @data_file
@@ -229,6 +225,8 @@ class DataFilesController < ApplicationController
         end
 
       end
+    else
+      handle_upload_data_failure
     end
   end
 
