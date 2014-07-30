@@ -59,7 +59,7 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_redirected_to presentation_path(presentation)
   end
 
-  test "can show" do
+  test "should show presentation" do
     presentation = Factory :ppt_presentation,:contributor=>User.current_user
     assert_difference "ActivityLog.count" do
       get :show,:id=>presentation
@@ -73,7 +73,7 @@ class PresentationsControllerTest < ActionController::TestCase
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/PowerPoint presentation/
       assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/82\.4 KB/
+      assert_select "p",:text=>/80.5 KB/
     end
   end
 

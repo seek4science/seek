@@ -294,13 +294,14 @@ class SopsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
+    
     assert_select "div.box_about_actor" do
       assert_select "p > b",:text=>/Filename:/
       assert_select "p",:text=>/a_pdf_file\.pdf/
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/PDF document/
       assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/8.8 KB/
+      assert_select "p",:text=>/8.62 KB/
     end
 
     al = ActivityLog.last
