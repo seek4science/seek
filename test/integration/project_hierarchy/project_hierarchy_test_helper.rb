@@ -1,7 +1,6 @@
 module ProjectHierarchyTestHelper
 
   def setup
-        sync_delayed_jobs
         initialize_hierarchical_projects
   end
 

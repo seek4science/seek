@@ -99,15 +99,14 @@ class ActiveSupport::TestCase
   teardown :clear_current_user
 
    #perform delayed jobs when they are created for easy test
-  def sync_delayed_jobs
-    Delayed::Job.class_eval do
+  def sync_delayed_jobs  delayed_job_classes=[]
+    Delayed::Job.class_eval %Q{
       def self.enqueue(*args)
         obj = args.shift
-        #puts "Delayed job #{obj.inspect}" unless obj.is_a? RdfGenerationJob
-        obj.perform
+        obj.perform if #{delayed_job_classes}.detect{|job_class| obj.is_a? job_class}
       end
-    end
-  end
+    }
+   end
 
   def check_for_soffice
     port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]

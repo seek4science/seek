@@ -3,7 +3,7 @@ require 'integration/project_hierarchy/project_hierarchy_test_helper'
 class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
   include ProjectHierarchyTestHelper
   def setup
-        sync_delayed_jobs
+        sync_delayed_jobs [ProjectSubscriptionJob, SetSubscriptionsForItemJob, RemoveSubscriptionsForItemJob]
         login_as_test_user
         initialize_hierarchical_projects
   end
