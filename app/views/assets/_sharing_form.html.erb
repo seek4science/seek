@@ -78,7 +78,7 @@
         <!-- within your project ... and with all sysmo project members ...-->
         <p>
           <label>
-          <%# #MERGENOTE - need to take a closer look at the change here, and if it indicates a bug in 0.21 updated 0.21
+          <%# #MERGENOTE - need to take a closer look at the change here, and if it indicates a bug in 0.21 update 0.21 %>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
             - All <%= t('project').pluralize %> members:
           </label>

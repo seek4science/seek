@@ -7,7 +7,6 @@ class ModelsController < ApplicationController
   include IndexPager
   include DotGenerator
   include Seek::AssetsCommon
-  include AssetsCommonExtension
 
   before_filter :models_enabled?
   before_filter :find_assets, :only => [ :index ]
@@ -96,7 +95,7 @@ class ModelsController < ApplicationController
   # GET /models.xml
 
   def new_version
-    if (handle_batch_data nil)
+    if handle_upload_data
       comments = params[:revision_comment]
 
       respond_to do |format|
@@ -360,7 +359,7 @@ class ModelsController < ApplicationController
   # POST /models
   # POST /models.xml
   def create
-    if handle_batch_data
+    if handle_upload_data
       @model = Model.new(params[:model])
 
       @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
@@ -395,6 +394,8 @@ class ModelsController < ApplicationController
           }
         end
       end
+    else
+      handle_upload_data_failure
     end
 
   end

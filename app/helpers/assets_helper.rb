@@ -1,6 +1,11 @@
 module AssetsHelper
   include ApplicationHelper
 
+  #the prefix used on some field id's, e.g. data_files_data_url
+  def asset_field_prefix
+    controller_name.downcase.singularize.underscore
+  end
+
   def request_request_label resource
     icon_filename=icon_filename_for_key("message")
     resource_type=text_for_resource(resource)
@@ -12,8 +17,7 @@ module AssetsHelper
     if size.nil?
       html = "<span class='none_text'>Unknown</span>"
     else
-      size = size/1000.0
-      html = "%.1f KB" % size
+      html = number_to_human_size(size)
     end
     html.html_safe
   end

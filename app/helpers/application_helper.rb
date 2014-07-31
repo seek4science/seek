@@ -706,9 +706,6 @@ module ApplicationHelper
     resource
   end
 
-
-  
-
   def klass_from_controller controller_name
     controller_name.singularize.camelize.constantize
   end

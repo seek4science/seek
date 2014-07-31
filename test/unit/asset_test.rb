@@ -151,69 +151,6 @@ class AssetTest < ActiveSupport::TestCase
 
   end
 
-  test "content type from filename" do
-    #to allow us to test the private method in isolation
-    class TTT
-      include AssetsCommonExtension
-      def content_type_for_test filename
-        content_type_from_filename filename
-      end
-    end
-
-    ttt=TTT.new
-    type = ttt.content_type_for_test "test.jpg"
-    checks = [
-        {:f=>"test.jpg",:t=>"image/jpeg"},
-        {:f=>"test.JPG",:t=>"image/jpeg"},
-        {:f=>"test.png",:t=>"image/png"},
-        {:f=>"test.PNG",:t=>"image/png"},
-        {:f=>"test.jpeg",:t=>"image/jpeg"},
-        {:f=>"test.JPEG",:t=>"image/jpeg"},
-        {:f=>"test.xls",:t=>"application/excel"},
-        {:f=>"test.doc",:t=>"application/msword"},
-        {:f=>"test.xlsx",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-        {:f=>"test.docx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-        {:f=>"test.XLs",:t=>"application/excel"},
-        {:f=>"test.Doc",:t=>"application/msword"},
-        {:f=>"test.XLSX",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-        {:f=>"test.dOCx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-        {:f=>"unknown.xxx",:t=>"application/octet-stream"},
-        {:f=>nil,:t=>"text/html"}
-    ]
-    checks.each do |check|
-      assert_equal check[:t],ttt.content_type_for_test(check[:f]),"Expected #{check[:t]} for #{check[:f]}"
-    end
-
-  end
-
-  test "classifying and authorizing resources" do
-    resource_array = []
-    sop=sops(:my_first_sop)
-    model=models(:teusink)
-    data_file=data_files(:picture)
-    user=users(:owner_of_my_first_sop)        
-    
-    sop_version1 = sop.find_version(1)
-    model_version2 = model.find_version(2)
-    
-    resource_array << sop_version1
-    resource_array << model_version2
-    resource_array << data_file
-    
-    assert_equal 1, sop.version
-    assert_equal 2, model.version
-    assert_equal 1, data_file.version
-    
-        
-    result = Asset.classify_and_authorize_resources(resource_array, true, user)    
-    
-    assert_equal 3, result.length
-    
-    assert result["Sop"].include?(sop_version1)    
-    assert result["Model"].include?(model_version2)
-    assert result["DataFile"].include?(data_file)
-  end
-
   test "managers" do
     person=Factory(:person)
     person2=Factory(:person,:first_name=>"fred",:last_name=>"bloggs")

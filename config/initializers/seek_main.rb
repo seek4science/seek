@@ -2,7 +2,6 @@
 #TO MODIFY THE DEFAULT SETTINGS, COPY seek_local.rb.pre to seek_local.rb AND EDIT THAT FILE INSTEAD
 
 require 'object'
-require 'asset'
 require 'active_record_extensions'
 require 'acts_as_taggable_extensions'
 require 'acts_as_isa'
@@ -17,7 +16,6 @@ require 'modporter_extensions'
 require "attachment_fu_extension"
 require 'seek/taggable'
 require "bio"
-require 'assets_common_extension'
 
 require 'sunspot_rails'
 require 'cancan'

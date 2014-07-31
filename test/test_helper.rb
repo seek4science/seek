@@ -98,15 +98,18 @@ class ActiveSupport::TestCase
   setup :clear_rails_cache
   teardown :clear_current_user
 
-   #perform delayed jobs when they are created for easy test
-  def sync_delayed_jobs  delayed_job_classes=[]
-    Delayed::Job.class_eval %Q{
-      def self.enqueue(*args)
-        obj = args.shift
-        obj.perform if #{delayed_job_classes}.detect{|job_class| obj.is_a? job_class}
-      end
-    }
-   end
+
+  def file_for_upload options={}
+    default={:filename=>'little_file_v2.txt',:content_type=>'text/plain',:tempfile_fixture=>'files/little_file_v2.txt'}
+    options = default.merge(options)
+    ActionDispatch::Http::UploadedFile.new({
+                                               :filename => options[:filename],
+                                               :content_type => options[:content_type],
+                                               :tempfile => fixture_file_upload(options[:tempfile_fixture])
+                                           })
+  end
+
+
 
   def check_for_soffice
     port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
