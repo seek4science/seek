@@ -9,18 +9,6 @@ module Seek
         @user = User.first
       end
 
-      def data_files_size
-        assets_size data_files
-      end
-
-      def sops_size
-        assets_size sops
-      end
-
-      def models_size
-        assets_size models
-      end
-
       AUTHORISED_TYPES.each do |type|
         type_class_name = type.name
         type_str = type_class_name.underscore.pluralize
@@ -59,13 +47,6 @@ module Seek
         end
       end
 
-      def assets_size(assets)
-        size = 0
-        assets.each do |asset|
-          size += asset.content_blob.data.size unless !asset.content_blob.data
-        end
-        size
-      end
     end
 
     def self.generate
