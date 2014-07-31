@@ -1,7 +1,6 @@
 module ProjectHierarchyTestHelper
 
   def setup
-        sync_delayed_jobs
         initialize_hierarchical_projects
   end
 
@@ -53,15 +52,14 @@ module ProjectHierarchyTestHelper
   end
 
   #perform delayed jobs when they are created for easy test
-  def sync_delayed_jobs
-    Delayed::Job.class_eval do
-      def self.enqueue(*args)
-        obj = args.shift
-        #puts "Delayed job #{obj.inspect}" unless obj.is_a? RdfGenerationJob
-        obj.perform
-      end
+  def sync_delayed_jobs  delayed_job_classes=[]
+     Delayed::Job.class_eval %Q{
+       def self.enqueue(*args)
+         obj = args.shift
+         obj.perform if #{delayed_job_classes}.detect{|job_class| obj.is_a? job_class}
+       end
+     }
     end
-  end
 
   def current_person
     User.current_user.person
