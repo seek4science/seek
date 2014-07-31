@@ -221,6 +221,9 @@ GEM
     delayed_job_active_record (4.0.1)
       activerecord (>= 3.0, < 4.2)
       delayed_job (>= 3.0, < 4.1)
+    descendants_tracker (0.0.4)
+      thread_safe (~> 0.3, >= 0.3.1)
+    diff-lcs (1.2.5)
     docile (1.1.5)
     docsplit (0.7.5)
     domain_name (0.5.19)
@@ -480,6 +483,22 @@ GEM
     rmagick (2.13.2)
     rsolr (1.0.10)
       builder (>= 2.1.2)
+    rspec-core (3.0.3)
+      rspec-support (~> 3.0.0)
+    rspec-expectations (3.0.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.0.0)
+    rspec-mocks (3.0.3)
+      rspec-support (~> 3.0.0)
+    rspec-rails (3.0.2)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      railties (>= 3.0)
+      rspec-core (~> 3.0.0)
+      rspec-expectations (~> 3.0.0)
+      rspec-mocks (~> 3.0.0)
+      rspec-support (~> 3.0.0)
+    rspec-support (3.0.3)
     rubocop (0.24.0)
       json (>= 1.7.7, < 2)
       parser (>= 2.2.0.pre.2, < 3.0)
@@ -547,6 +566,7 @@ GEM
     sunspot (2.1.1)
       pr_geohash (~> 1.0)
       rsolr (~> 1.0.7)
+    sunspot_matchers (2.1.1.0)
     sunspot_rails (2.1.1)
       nokogiri
       rails (>= 3)
@@ -679,6 +699,7 @@ DEPENDENCIES
   rest-client (>= 1.6.1)
   rfc-822
   rmagick (= 2.13.2)
+  rspec-rails
   rubocop
   ruby-openid
   ruby-prof
@@ -689,6 +710,7 @@ DEPENDENCIES
   simple-spreadsheet-extractor (~> 0.13.3)
   site_announcements!
   sqlite3
+  sunspot_matchers
   sunspot_rails
   sunspot_solr
   taverna-player!
