@@ -436,6 +436,9 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
+    collection do
+      post :items_for_result
+    end
     member do
       get :initiate_spawn_project
       post :spawn_project
@@ -516,12 +519,6 @@ SEEK::Application.routes.draw do
       get :existing_specimens
       get :strains_of_selected_organism
       get :existing_samples
-      get :strain_form
-      put :update_strain
-      post :create_specimen_sample
-      post :create_strain
-      post :create_strain_popup
-      post :edit_strain_popup
     end
   end
 

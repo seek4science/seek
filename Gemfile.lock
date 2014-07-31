@@ -221,8 +221,6 @@ GEM
     delayed_job_active_record (4.0.1)
       activerecord (>= 3.0, < 4.2)
       delayed_job (>= 3.0, < 4.1)
-    descendants_tracker (0.0.4)
-      thread_safe (~> 0.3, >= 0.3.1)
     docile (1.1.5)
     docsplit (0.7.5)
     domain_name (0.5.19)

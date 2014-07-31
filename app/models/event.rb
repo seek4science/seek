@@ -11,8 +11,10 @@ class Event < ActiveRecord::Base
 
   scope :default_order, order("start_date DESC")
 
+  include Seek::Search::CommonFields
+
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :address,:city,:country,:url,:description,:title
+    text :address,:city,:country,:url
   end if Seek::Config.solr_enabled
 
   def self.sort events

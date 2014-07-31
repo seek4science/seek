@@ -36,6 +36,7 @@ module Acts #:nodoc:
 
         acts_as_uniquely_identifiable
 
+        include Seek::Search::CommonFields
 
         class_eval do
           extend Acts::Isa::SingletonMethods

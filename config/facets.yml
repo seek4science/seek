@@ -1,4 +1,27 @@
 #TODO: need some comment to explain the config fields
+#isa
+Investigation:
+  project:
+      label: Project
+      value_from: projects:title
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: contributor:person:name
+
+Study:
+  project:
+      label: Project
+      value_from: projects:title
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: contributor:person:name
+
 Assay:
   organism:
       label: Organism
@@ -26,6 +49,7 @@ Assay:
       label: Tag
       value_from: tags_as_text_array
 
+#assets
 DataFile:
   project:
       label: Project
@@ -122,6 +146,21 @@ Publication:
       label: Tag
       value_from: tags_as_text_array
 
+Presentation:
+  project:
+      label: Project
+      value_from: projects:title
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: creators:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
+
+#yellow pages
 Person:
   project:
       label: Project
@@ -150,3 +189,111 @@ Person:
   tag:
       label: Tag
       value_from: tags_as_text_array
+
+Project:
+  name:
+      label: Name
+      value_from: title
+  organism:
+      label: Organism
+      value_from: organisms:title
+  institution:
+      label: Institution
+      value_from: institutions:title
+  location:
+      label: Location
+      value_from: locations
+
+Institution:
+  name:
+      label: Name
+      value_from: title
+  project:
+      label: Project
+      value_from: projects:title
+  location:
+      label: Location
+      value_from: country
+
+Programme:
+  name:
+      label: Name
+      value_from: title
+
+#biosamples
+Strain:
+  organism:
+      label: Organism
+      value_from: organism:title
+  project:
+      label: Project
+      value_from: projects:title
+  gene:
+      label: Modified Gene
+      value_from: genotypes:gene:title
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: contributor:person:name
+  tag:
+      label: Tag
+      value_from: tags_as_text_array
+
+Specimen:
+  organism:
+      label: Organism
+      value_from: strain:organism:title
+  strain:
+      label: Strain
+      value_from: strain:info
+  culture_growth_type:
+      label: Culture growth type
+      value_from: culture_growth_type:title
+  project:
+      label: Project
+      value_from: projects:title
+  institution:
+      label: Institution
+      value_from: institution:title
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: creators:name
+
+Sample:
+  organism:
+      label: Organism
+      value_from: specimen:strain:organism:title
+  strain:
+      label: Strain
+      value_from: specimen:strain:info
+  specimen:
+      label: Specimen
+      value_from: specimen:title
+  organism_part:
+      label: Organism part
+      value_from: organism_part
+  project:
+      label: Project
+      value_from: projects:title
+  created_at:
+      label: Created In
+      value_from: created_at:year
+  contributor:
+      label: Contributor
+      value_from: contributor:person:name
+
+Event:
+  project:
+      label: Project
+      value_from: projects:title
+  start_date:
+      label: Event date
+      value_from: start_date:year
+  country:
+      label: Country
+      value_from: country

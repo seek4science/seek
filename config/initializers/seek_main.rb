@@ -43,6 +43,8 @@ require 'seek/scalable'
 require 'taverna_player_callbacks'
 require 'taverna_player_renderers'
 
+require 'seek/search/search_sunspot'
+
 #MERGENOTE - what's this?
 require 'doi_query_tool_extension'
 
@@ -110,5 +112,3 @@ SEEK::Application.configure do
       }
 
 end
-
-

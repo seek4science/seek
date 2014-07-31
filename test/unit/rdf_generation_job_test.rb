@@ -13,16 +13,21 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
   test "rdf generation job created after save" do
     item = nil
 
-    assert_difference("Delayed::Job.count",1) do
+    assert_difference("Delayed::Job.count",2) do
       item = Factory :project
     end
+    handlers = Delayed::Job.all.collect(&:handler).join(',')
+    assert_includes(handlers, 'RdfGenerationJob')
 
     Delayed::Job.delete_all #necessary, otherwise the next assert will fail since it won't create a new job if it already exists as pending
 
-    assert_difference("Delayed::Job.count",1) do
+    assert_difference("Delayed::Job.count",2) do
       item.title="sdfhsdfkhsdfklsdf2"
       item.save!
     end
+    handlers = Delayed::Job.all.collect(&:handler).join(',')
+    assert_includes(handlers, 'RdfGenerationJob')
+
     item = Factory :model
     item.last_used_at=Time.now
     assert_no_difference("Delayed::Job.count") do

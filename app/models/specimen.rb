@@ -8,7 +8,7 @@ class Specimen < ActiveRecord::Base
   include Seek::Biosamples::PhenoTypesAndGenoTypes
   include BackgroundReindexing
 
-   acts_as_scalable if Seek::Config.is_virtualliver
+  acts_as_scalable if Seek::Config.is_virtualliver
 
   acts_as_authorized
   acts_as_favouritable
@@ -60,8 +60,10 @@ class Specimen < ActiveRecord::Base
   "AND sop_specimens.specimen_id = #{self.id})"
   end
 
+  include Seek::Search::BiosampleFields
+
   searchable(:auto_index=>false) do
-    text :searchable_terms
+    text :other_creators
     text :culture_growth_type do
       culture_growth_type.try :title
     end
@@ -69,11 +71,7 @@ class Specimen < ActiveRecord::Base
     text :strain do
       strain.try :title
       strain.try(:organism).try(:title).to_s
-    end
-
-    text :institution do
-      institution.try :name
-    end if Seek::Config.is_virtualliver
+    end    
 
     text :creators do
       creators.compact.map(&:name)
@@ -101,15 +99,7 @@ class Specimen < ActiveRecord::Base
   def related_sops
     sop_masters.collect(&:sop)
   end
-
-  def searchable_terms
-      text=[title,description,lab_internal_number,other_creators]
-      if (strain)
-        text << strain.info
-        text << strain.try(:organism).try(:title).to_s
-      end
-      text.compact
-  end
+  
 
   def age_with_unit
       age.nil? ? "" : "#{age}(#{age_unit}s)"

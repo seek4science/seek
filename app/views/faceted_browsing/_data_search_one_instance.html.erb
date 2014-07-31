@@ -7,7 +7,14 @@
 
      exhibit_items = []
      exhibit_properties = {}
-     common_facet_config.each do |key,value|
+
+     #generate properties for NumericRange facet and tree for HierarchicalFacet
+     all_facet_config = common_facet_config
+     resource_hash.keys.each do |object_type|
+       all_facet_config.merge!(specified_facet_config[object_type] || {})
+     end
+
+     all_facet_config.each do |key,value|
        facet_class = value['facet_class']
        if facet_class == 'NumericRange'
          exhibit_properties[key] = {"valueType" => "number"}

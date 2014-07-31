@@ -19,9 +19,9 @@ class Study < ActiveRecord::Base
   validates :investigation, :presence => true
 
   searchable(:auto_index => false) do
-    text :description,:title, :experimentalists
-    text :contributor do
-      [contributor.try(:person).try(:name),person_responsible.try(:name)]
+    text :experimentalists
+    text :person_responsible do
+      person_responsible.try(:name)
     end
   end if Seek::Config.solr_enabled
 

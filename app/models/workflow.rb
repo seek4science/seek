@@ -101,7 +101,7 @@ class Workflow < ActiveRecord::Base
   end
 
   searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :title , :description, :category, :uploader
+    text :category
   end if Seek::Config.solr_enabled
 
   def self.user_creatable?

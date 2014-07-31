@@ -70,13 +70,10 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
       assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", :count => 1
       assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
-      #these facets are not defined in test/fixtures/files/facets.txt
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.technology_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 0
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", :count => 0
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.technology_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.for_test']", :count => 0
     end
-
-
-
   end
 
   test 'content config for Assay' do
@@ -97,6 +94,19 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       items_for_result =  ActiveSupport::JSON.decode(@response.body)['items_for_result']
       assert items_for_result.include?(assay1.title)
       assert !items_for_result.include?(assay2.title)
+    end
+  end
+
+  test 'generate faceted browsing for all types' do
+    with_config_value :faceted_browsing_enabled,true do
+      ASSETS_WITH_FACET.each do |type_name|
+        with_config_value :facet_enable_for_pages,{type_name=>true} do
+          get "/#{type_name}"
+          assert_response :success
+          record_body
+          assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
+        end
+      end
     end
   end
 end

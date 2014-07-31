@@ -60,10 +60,8 @@ class Assay < ActiveRecord::Base
   alias_attribute :contributor, :owner
 
   searchable(:auto_index=>false) do
-    text :description, :title, :searchable_tags, :organism_terms, :assay_type_label,:technology_type_label
-    text :contributor do
-      contributor.try(:person).try(:name)
-    end
+    text :organism_terms, :assay_type_label,:technology_type_label
+
     text :strains do
       strains.compact.map{|s| s.title}
     end
