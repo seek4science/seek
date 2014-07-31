@@ -22,6 +22,73 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test "examine url to file" do
+    #test successful request to file
+    stub_request(:head, "http://mockedlocation.com/a-piccy.png").to_return(:status => 200, :headers=>{'Content-Type' => 'image/png'})
+    xml_http_request :get, :examine_url, :data_url=>"http://mockedlocation.com/a-piccy.png"
+    assert_response :success
+    assert @response.body.include?("not a webpage")
+    refute assigns(:error)
+    refute assigns(:error_msg)
+    refute assigns(:unauthorized)
+    refute assigns(:is_webpage)
+  end
+
+  test "examine url to webpage" do
+    #successful request to webpage
+    stub_request(:any, "http://somewhere.com").to_return(:body => "", :status => 200, :headers=>{'Content-Type' => 'text/html'})
+    xml_http_request :get, :examine_url, :data_url=>"http://somewhere.com"
+    assert_response :success
+    assert @response.body.include?("This is a webpage")
+    refute assigns(:error)
+    refute assigns(:error_msg)
+    refute assigns(:unauthorized)
+    assert assigns(:is_webpage)
+  end
+
+  test "examine url unauthorized" do
+    #unauthorized
+    stub_request(:head, "http://unauth.com/file.pdf").to_return(:status => 403, :headers=>{'Content-Type' => 'application/pdf'})
+    xml_http_request :get, :examine_url, :data_url=>"http://unauth.com/file.pdf"
+    assert_response :success
+    assert @response.body.include?("Access to this link is unauthorized")
+    refute assigns(:error)
+    refute assigns(:error_msg)
+    assert assigns(:unauthorized)
+  end
+
+  test "examine url 404" do
+    #404
+    stub_request(:head, "http://missing.com").to_return(:status => 404, :headers=>{'Content-Type' => 'text/html'})
+    xml_http_request :get, :examine_url, :data_url=>"http://missing.com"
+    assert_response :success
+    assert @response.body.include?("Nothing can be found at that URL")
+    assert assigns(:error)
+    assert assigns(:error_msg)
+    refute assigns(:unauthorized)
+  end
+
+  test "examine url host not found" do
+    #doesn't exist
+    stub_request(:head, "http://nohost.com").to_raise(SocketError)
+    xml_http_request :get, :examine_url, :data_url=>"http://nohost.com"
+    assert_response :success
+    assert @response.body.include?("Nothing can be found at that URL")
+    assert assigns(:error)
+    assert assigns(:error_msg)
+    refute assigns(:unauthorized)
+  end
+
+  test "examine url bad uri" do
+    #bad uri
+    xml_http_request :get, :examine_url, :data_url=>"this is not a uri"
+    assert_response :success
+    assert @response.body.include?("The URL appears to be invalid")
+    assert assigns(:error)
+    assert assigns(:error_msg)
+    refute assigns(:unauthorized)
+  end
+
   test 'should find_and_auth_asset for download' do
     sop1 = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
 
