@@ -6,20 +6,17 @@ module ProjectHierarchyTestHelper
   end
 
   #perform delayed jobs when they are created for easy test
-  def sync_delayed_jobs
-    #FIXME: - this is a bit dangerous because it changes the behaviour of Delayed::Job for future tests, and could affect the test and slow things down (since it will always try and perform)
-    #.. for now it is just used for the hierarchy tests
-    Delayed::Job.class_eval do
-      def self.enqueue(*args)
+  def sync_delayed_jobs delayed_job_classes=[]
+      Delayed::Job.class_eval %Q{
+        def self.enqueue(*args)
         obj = args.shift
-        obj.perform
-      end
-    end
+        obj.perform if #{delayed_job_classes}.detect{|job_class| obj.is_a? job_class}
+        end
+      }
   end
 
   def setup
-    skip_hierarchy_tests?
-        sync_delayed_jobs
+        skip_hierarchy_tests?
         initialize_hierarchical_projects
   end
 
