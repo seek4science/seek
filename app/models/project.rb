@@ -34,8 +34,12 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
-  belongs_to :ancestor,:class_name=>"Project",:foreign_key => :ancestor_id
-  has_many :descendants,:class_name=>"Project",:foreign_key => :ancestor_id
+  # SEEK projects suffer from having 2 types of ancestor and descendant,that were added separately - those from the historical lineage of the project, and also from
+  # the hierarchical tree structure that can be. For this reason and to avoid the clash, these anscestors and descendants have been renamed.
+  # However, in the future it would probably be more appropriate to change these back to simply ancestor and descendant, and rename the hierarchy struture
+  # to use parents/children.
+  belongs_to :lineage_ancestor,:class_name=>"Project",:foreign_key => :ancestor_id
+  has_many :lineage_descendants,:class_name=>"Project",:foreign_key => :ancestor_id
 
   scope :default_order, order('title')
   scope :without_programme,:conditions=>"programme_id IS NULL"
@@ -43,7 +47,7 @@ class Project < ActiveRecord::Base
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
 
-  validate :ancestor_cannot_be_self
+  validate :lineage_ancestor_cannot_be_self
 
   #MERGENOTE - temporary alias
   alias_attribute :name, :title
@@ -235,9 +239,9 @@ class Project < ActiveRecord::Base
     user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
   end
 
-  def ancestor_cannot_be_self
-    if ancestor==self
-      errors.add(:ancestor, "cannot be the same as itself")
+  def lineage_ancestor_cannot_be_self
+    if lineage_ancestor==self
+      errors.add(:lineage_ancestor, "cannot be the same as itself")
     end
   end
 
@@ -256,7 +260,7 @@ class Project < ActiveRecord::Base
     end
     child.assign_attributes(attributes)
     child.avatar=nil
-    child.ancestor=self
+    child.lineage_ancestor=self
     child
   end
 
