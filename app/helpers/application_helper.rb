@@ -492,12 +492,6 @@ module ApplicationHelper
     "Effect.toggle('#{block_id}','slide',{duration:0.5})".html_safe
   end
 
-  def toggle_appear_with_image_javascript block_id
-      toggle_appear_javascript block_id
-      #MERGENOTE - this appears to do nothing, since it returns an empty string
-      ""
-  end
-
   def count_actions(object, actions=nil)
     count = 0
     if actions.nil?
@@ -628,43 +622,26 @@ module ApplicationHelper
     end
   end
 
-  #MERGENOTE - do these need to be oustide the method, or be defined elsewhere?
-  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
-                         Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
-                         Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
-                         Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
-                         Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
-                         Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
-                         Project=>"You cannot delete this #{I18n.t 'project'}. It might has people associated with it.",
-                         Institution=>"You cannot delete this Institution. It might has people associated with it."
-  }
-
-  #MERGENOTE - should go in image_helper
-  def delete_icon model_item, user
-    item_name = text_for_resource model_item
-    if model_item.can_delete?(user)
-      html = "<li>"+image_tag_for_key('destroy',url_for(model_item),"Delete #{item_name.downcase}", {:confirm=>"Are you sure?",:method=>:delete },"Delete #{item_name.downcase}") + "</li>"
-      return html.html_safe
-    elsif model_item.can_manage?(user)
-      explanation=unable_to_delete_text model_item
-      html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span></li>"
-      return html.html_safe
-    end
+  def no_deletion_explanation_message(clz)
+    no_deletion_explanation_messages[clz] || "You are unable to delete this #{clz.name}. It might be published"
   end
 
-  #MERGENOTE - should go in image_helper
-  def share_icon
-    icon = simple_image_tag_for_key('share').html_safe
-    html = link_to_remote_redbox(icon + "Share workflow".html_safe,
-                                 {:url => url_for(:action => 'temp_link'),
-                                  :failure => "alert('Sorry, an error has occurred.'); RedBox.close();"}
-    )
-    return html.html_safe
+  def no_deletion_explanation_messages
+    {Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
+     Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
+     Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
+     Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
+     Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
+     Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
+     Project=>"You cannot delete this #{I18n.t 'project'}. It might has people associated with it.",
+     Institution=>"You cannot delete this Institution. It might has people associated with it."
+    }
   end
+
+
   
   def unable_to_delete_text model_item
-    text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
-    return text.html_safe
+    no_deletion_explanation_message(model_item.class).html_safe
   end
 
   #
