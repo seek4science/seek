@@ -102,14 +102,21 @@ class Publication < ActiveRecord::Base
   end
 
 
+  def extract_metadata(reference)
+    if reference.respond_to?(:pubmed)
+      extract_pubmed_metadata(reference)
+    else
+      extract_doi_metadata(reference)
+    end
+  end
 
   def extract_pubmed_metadata(reference)
-        self.title = reference.title.chop #remove full stop
-        self.abstract = reference.abstract
-        self.journal = reference.journal
-        self.pubmed_id = reference.pubmed
-        self.published_date = reference.published_date
-      self.citation = reference.citation
+    self.title = reference.title.chop #remove full stop
+    self.abstract = reference.abstract
+    self.journal = reference.journal
+    self.pubmed_id = reference.pubmed
+    self.published_date = reference.published_date
+    self.citation = reference.citation
   end
 
   def extract_doi_metadata(doi_record)
