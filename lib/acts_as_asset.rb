@@ -41,7 +41,9 @@ module Acts #:nodoc:
         does_not_require_can_edit :last_used_at
 
         validates_presence_of :title
-        validates_presence_of :projects
+
+        #MERGENOTE - this was removed by VLN at some point, possibly needs some configuration setting
+        #validates_presence_of :projects
 
         has_many :relationships,
                  :class_name => 'Relationship',
