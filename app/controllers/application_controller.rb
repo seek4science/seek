@@ -513,41 +513,42 @@ class ApplicationController < ActionController::Base
         klass = filter.camelize.constantize
         value = klass.find_by_id value.to_i
 
-        case
-          #first the special cases
-          when filter == 'investigation' && res.respond_to?(:assays)
-            res.assays.collect { |a| a.study.investigation_id }.include? value.id
-          when filter == 'study' && res.respond_to?(:assays)
-            res.assays.collect { |a| a.study_id }.include? value.id
-        #MERGENOTE - this looks like it needs some refactoring 
-        when (filter == 'project' && res.respond_to?(:projects_and_ancestors)) then res.projects_and_ancestors.include? value
-        when (filter == 'project' && res.class.name == "Assay") then Seek::Config.project_hierarchy_enabled ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
-        when (filter == 'project' && res.class.name == "Study") then Seek::Config.project_hierarchy_enabled ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
-            when filter == 'person' && res.class.is_asset?
-             (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
-          when filter == 'person' && (res.respond_to?(:contributor) || res.respond_to?(:creators) || res.respond_to?(:owner))
-            people = [res.contributor,res.contributor.try(:person)]
-            people = people | res.creators if res.respond_to?(:creators)
-            people << res.owner if res.respond_to?(:owner)
-            people.compact!
-            people.include?(value)
-          #then the general case
-          when res.respond_to?("all_related_#{filter.pluralize}")
-            res.send("all_related_#{filter.pluralize}").include?(value)
-          when res.respond_to?("related_#{filter.pluralize}")
-            res.send("related_#{filter.pluralize}").include?(value)
-          when res.respond_to?(filter)
-            res.send(filter) == value
-          when res.respond_to?(filter.pluralize)
-            res.send(filter.pluralize).include? value
-          #defaults to false, if a filter is not recognised then nothing is return
-          else
-            false
-        end
+        detect_for_filter(filter, res, value)
       end
     end
   end
 
+  def detect_for_filter(filter, resource, value)
+    case
+      #first the special cases
+      when filter == 'investigation' && resource.respond_to?(:assays)
+        resource.assays.collect { |a| a.study.investigation_id }.include? value.id
+      when filter == 'study' && resource.respond_to?(:assays)
+        resource.assays.collect { |a| a.study_id }.include? value.id
+      when (filter == 'project' && resource.respond_to?(:projects_and_ancestors))
+        resource.projects_and_ancestors.include? value
+      when filter == 'person' && resource.class.is_asset?
+        (resource.creators.include?(value) || resource.contributor== value || resource.contributor.try(:person) == value)
+      when filter == 'person' && (resource.respond_to?(:contributor) || resource.respond_to?(:creators) || resource.respond_to?(:owner))
+        people = [resource.contributor, resource.contributor.try(:person)]
+        people = people | resource.creators if resource.respond_to?(:creators)
+        people << resource.owner if resource.respond_to?(:owner)
+        people.compact!
+        people.include?(value)
+      #then the general case
+      when resource.respond_to?("all_related_#{filter.pluralize}")
+        resource.send("all_related_#{filter.pluralize}").include?(value)
+      when resource.respond_to?("related_#{filter.pluralize}")
+        resource.send("related_#{filter.pluralize}").include?(value)
+      when resource.respond_to?(filter)
+        resource.send(filter) == value
+      when resource.respond_to?(filter.pluralize)
+        resource.send(filter.pluralize).include? value
+      #defaults to false, if a filter is not recognised then nothing is return
+      else
+        false
+    end
+  end
 
 
   def log_extra_exception_data

@@ -44,6 +44,7 @@ module Acts #:nodoc:
         include Acts::Isa::InstanceMethods
         include BackgroundReindexing
         include Subscribable
+        include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
       end
 
       def is_isa?
