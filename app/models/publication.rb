@@ -13,6 +13,9 @@ class Publication < ActiveRecord::Base
     text :publication_authors do
       publication_authors.compact.map(&:first_name) + publication_authors.compact.map(&:last_name)
     end
+    text :non_seek_authors do
+      non_seek_authors.compact.map(&:first_name) + non_seek_authors.compact.map(&:last_name)
+    end
   end if Seek::Config.solr_enabled
 
 

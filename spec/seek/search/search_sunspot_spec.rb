@@ -81,6 +81,7 @@ describe Publication do
   it { should have_searchable_field(:pubmed_id) }
   it { should have_searchable_field(:doi) }
   it { should have_searchable_field(:non_seek_authors) }
+  it { should have_searchable_field(:publication_authors) }
 #  it { should have_searchable_field(:published_date) }
 #  it { should have_searchable_field(:organism_terms) }
 end
