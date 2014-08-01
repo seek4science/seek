@@ -103,7 +103,6 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
         with_config_value :facet_enable_for_pages,{type_name=>true} do
           get "/#{type_name}"
           assert_response :success
-          record_body
           assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
         end
       end
