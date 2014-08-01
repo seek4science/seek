@@ -46,11 +46,11 @@
 
 
          common_facet_config.each do |key, config_for_key|
-           exhibit_item[key] = value_for_key key, config_for_key, object
+           exhibit_item[key] = value_for_key config_for_key, object
          end
 
          facets_for_object.each do |key, config_for_key|
-           exhibit_item[key] = value_for_key key, config_for_key, object
+           exhibit_item[key] = value_for_key config_for_key, object
          end
 
          exhibit_items << exhibit_item

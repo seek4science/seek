@@ -1,4 +1,15 @@
 #TODO: need some comment to explain the config fields
+#isa
+Investigation:
+  contributor:
+      label: Contributor
+      value_from: contributor:person:name
+
+Study:
+  contributor:
+      label: Contributor
+      value_from: contributor:person:name
+
 Assay:
   organism:
       label: Organism
@@ -17,6 +28,7 @@ Assay:
       label: Contributor
       value_from: contributor:name
 
+#assets
 DataFile:
   assay_type:
         label: Assay Type
@@ -80,6 +92,12 @@ Publication:
       label: Organism
       value_from: related_organisms:title
 
+Presentation:
+  contributor:
+      label: Contributor
+      value_from: creators:name
+
+#yellow pages
 Person:
   discipline:
       label: Discipline
@@ -102,3 +120,84 @@ Person:
   name:
       label: Name
       value_from: name
+
+Project:
+  name:
+      label: Name
+      value_from: title
+  organism:
+      label: Organism
+      value_from: organisms:title
+  institution:
+      label: Institution
+      value_from: institutions:title
+  location:
+      label: Location
+      value_from: locations
+
+Institution:
+  name:
+      label: Name
+      value_from: title
+  location:
+      label: Location
+      value_from: country
+
+Programme:
+  name:
+      label: Name
+      value_from: title
+
+#biosamples
+Strain:
+  organism:
+      label: Organism
+      value_from: organism:title
+  gene:
+      label: Modified Gene
+      value_from: genotypes:gene:title
+  contributor:
+      label: Contributor
+      value_from: contributor:person:name
+
+Specimen:
+  organism:
+      label: Organism
+      value_from: strain:organism:title
+  strain:
+      label: Strain
+      value_from: strain:info
+  culture_growth_type:
+      label: Culture growth type
+      value_from: culture_growth_type:title
+  institution:
+      label: Institution
+      value_from: institution:title
+  contributor:
+      label: Contributor
+      value_from: creators:name
+
+Sample:
+  organism:
+      label: Organism
+      value_from: specimen:strain:organism:title
+  strain:
+      label: Strain
+      value_from: specimen:strain:info
+  specimen:
+      label: Specimen
+      value_from: specimen:title
+  organism_part:
+      label: Organism part
+      value_from: organism_part
+  contributor:
+      label: Contributor
+      value_from: contributor:person:name
+
+Event:
+  start_date:
+      label: Event date
+      value_from: start_date:year
+  country:
+      label: Country
+      value_from: country

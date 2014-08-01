@@ -17,7 +17,7 @@ module FacetedBrowsingHelper
   end
 
   #TODO:   need comment and some tests for this part
-  def value_for_key key, config_for_key, object
+  def value_for_key config_for_key, object
       facet_value = object
       value_from = config_for_key['value_from']
       value_from.split(':').each do |field|
