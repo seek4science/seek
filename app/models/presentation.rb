@@ -6,11 +6,6 @@ class Presentation < ActiveRecord::Base
 
    attr_accessor :orig_data_file_id
 
-   #searchable must come before acts_as_asset is called
-   searchable(:auto_index => false) do
-     text :other_creators
-   end if Seek::Config.solr_enabled
-
    acts_as_asset
 
    scope :default_order, order("title")

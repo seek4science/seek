@@ -45,8 +45,28 @@ class Sample < ActiveRecord::Base
 
   scope :default_order, order("title")
 
+  include Seek::Search::BiosampleFields
+
   searchable(:auto_index=>false) do
-    text :searchable_terms
+    text :specimen do
+      if specimen
+        text=[]
+        text << specimen.lab_internal_number
+        text << specimen.provider_name
+        text << specimen.title
+        text << specimen.provider_id
+        text
+      end
+    end
+
+    text :strain do
+      if (specimen.strain)
+        text = []
+        text << specimen.strain.info
+        text << specimen.strain.try(:organism).try(:title).to_s
+        text
+      end
+    end
   end if Seek::Config.solr_enabled
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
@@ -78,26 +98,6 @@ class Sample < ActiveRecord::Base
         'AND sample_assets.asset_type=\'' + asset_class + '\' ' +
         'WHERE (sample_assets.version= ' + asset_class_underscored + '_versions.version ' +
         "AND sample_assets.sample_id= #{self.id})"
-  end
-
-  def searchable_terms
-    text=[]
-    text << title
-    text << description
-    text << lab_internal_number
-    text << provider_name
-    text << provider_id
-    if (specimen)
-      text << specimen.lab_internal_number
-      text << specimen.provider_id
-      text << specimen.title
-      text << specimen.provider_id
-      if (specimen.strain)
-        text << specimen.strain.info
-        text << specimen.strain.try(:organism).try(:title).to_s
-      end
-    end
-    text
   end
 
   def state_allows_delete? *args

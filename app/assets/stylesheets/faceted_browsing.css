@@ -9,3 +9,8 @@ ul.align_new_button {
     margin-left: 1.5em;
     margin-bottom: -2em;
 }
+
+div.faceted_browsing {
+    width: 100%;
+    margin-left: 1em;
+}

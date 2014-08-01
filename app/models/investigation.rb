@@ -13,13 +13,6 @@ class Investigation < ActiveRecord::Base
 
   validates :projects,:presence => true
 
-  searchable(:auto_index=>false) do
-    text :description,:title
-    text :contributor do
-      contributor.try(:person).try(:name)
-    end
-  end if Seek::Config.solr_enabled
-
   def state_allows_delete? *args
     studies.empty? && super
   end

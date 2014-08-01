@@ -439,6 +439,7 @@ class ProjectTest < ActiveSupport::TestCase
     person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg1)])
     person2 = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg1)])
     person3 = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg2)])
+    p.reload
 
     assert_equal 3,p.people.size
     assert_equal 2,p.work_groups.size

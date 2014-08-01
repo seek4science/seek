@@ -620,7 +620,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :admin, :id => project
     assert_response :success
     Institution.all.each do |institution|
-      assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 1
+      assert_select "input[type='checkbox'][id='institution_#{institution.id}'][value='#{institution.id}']", :count => 1
     end
   end
 
@@ -882,6 +882,14 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "admin_members available to project manager" do
+    person = Factory(:project_manager)
+    login_as(person)
+    project = person.projects.first
+    get :admin_members,:id=>project
+    assert_response :success
+  end
+
   test "admin members not available to normal person" do
     login_as(Factory(:person))
     p=Factory(:project)
@@ -892,6 +900,45 @@ class ProjectsControllerTest < ActionController::TestCase
   test "update members" do
     login_as(Factory(:admin))
     project = Factory(:project)
+    wg = Factory(:work_group, :project => project)
+    group_membership = Factory(:group_membership, :work_group => wg)
+    person = Factory(:person, :group_memberships => [group_membership])
+    group_membership2 = Factory(:group_membership, :work_group => wg)
+    person2 = Factory(:person, :group_memberships => [group_membership2])
+    new_institution = Factory(:institution)
+    new_person = Factory(:person)
+    new_person2 = Factory(:person)
+    assert_no_difference("GroupMembership.count") do #2 deleted, 2 added
+      assert_difference("WorkGroup.count",1) do
+        post :update_members,
+             :id=>project,
+             :group_memberships_to_remove=>[group_membership.id,group_membership2.id],
+             :people_and_institutions_to_add=>[{"person_id"=>new_person.id,"institution_id"=>new_institution.id}.to_json,{"person_id"=>new_person2.id,"institution_id"=>new_institution.id}.to_json]
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
+    end
+
+    person.reload
+    new_person.reload
+    new_person2.reload
+
+    refute_includes person.projects,project
+    refute_includes person2.projects,project
+    assert_includes new_person.projects,project
+    assert_includes new_person2.projects,project
+    assert_includes new_person.institutions,new_institution
+    assert_includes new_person2.institutions,new_institution
+    assert_includes project.work_groups,wg
+
+  end
+
+  test "update members as project manager" do
+    person = Factory(:project_manager)
+    project = person.projects.first
+    login_as(person)
+
     wg = Factory(:work_group, :project => project)
     group_membership = Factory(:group_membership, :work_group => wg)
     person = Factory(:person, :group_memberships => [group_membership])

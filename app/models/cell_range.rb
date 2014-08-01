@@ -1,5 +1,3 @@
-require 'seek/data/spreadsheet_explorer_representation'
-
 class CellRange < ActiveRecord::Base
 
   unloadable

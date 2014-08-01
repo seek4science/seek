@@ -7,7 +7,7 @@ class ProjectsController < ApplicationController
 
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:update_members]
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report, :resource_in_tab]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report,:admin_members,:update_members,:resource_in_tab]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin,:admin_members,:update_members]
   before_filter :auth_params,:only=>[:update]
@@ -164,13 +164,14 @@ class ProjectsController < ApplicationController
   # POST /projects.xml
   def create
     @project = Project.new(params[:project])
+
     @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]
 
 
     respond_to do |format|
       if @project.save
         flash[:notice] = "#{t('project')} was successfully created."
-         format.html { redirect_to(@project) }
+        format.html { redirect_to(@project) }
         format.xml  { render :xml => @project, :status => :created, :location => @project }
       else
         format.html { render :action => "new" }
@@ -232,7 +233,7 @@ class ProjectsController < ApplicationController
     end
   end
   
-
+  
   # returns a list of institutions for a project in JSON format
   def request_institutions
     # listing institutions for a project is public data, but still
