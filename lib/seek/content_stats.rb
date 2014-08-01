@@ -37,16 +37,16 @@ module Seek
       private
 
       def authorised_assets(asset_type, action, user)
-        assets = asset_type.constantize.all_authorized_for(action, user, project)
+        asset_class = asset_type.constantize
+        assets = asset_class.all_authorized_for(action, user, project)
         # this is necessary because some non downloadable items (such as assay) can possible be marked as downloadable in the
         # authorization info due to an earlier bug
-        if action == 'download' && asset_type.new.is_downloadable?
+        if action == 'download' && asset_class.new.is_downloadable?
           []
         else
           assets
         end
       end
-
     end
 
     def self.generate
