@@ -63,7 +63,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
 
   end
 
-  test 'facet config for Assay' do
+  test 'faceted browsing config for Assay' do
     Factory(:assay, :policy => Factory(:public_policy))
     with_config_value :faceted_browsing_enabled,true do
       get "/assays"
@@ -95,19 +95,6 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       items_for_result =  ActiveSupport::JSON.decode(@response.body)['items_for_result']
       assert items_for_result.include?(assay1.title)
       assert !items_for_result.include?(assay2.title)
-    end
-  end
-
-  test 'generate faceted browsing for all types' do
-    with_config_value :faceted_browsing_enabled,true do
-      ASSETS_WITH_FACET.each do |type_name|
-        with_config_value :facet_enable_for_pages,{type_name=>true} do
-          get "/#{type_name}"
-          assert_response :success
-          record_body
-          assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
-        end
-      end
     end
   end
 end
