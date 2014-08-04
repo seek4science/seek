@@ -11,7 +11,6 @@
       <% if Seek::Config.faceted_search_enabled %>
           <script type="text/javascript">
               var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>'
-              var items_for_facets_url = '<%= url_for(:action => 'items_for_facets') %>'
           </script>
           <%= javascript_include_tag 'exhibit/exhibit-api' %>
           <%= javascript_include_tag 'exhibit/lib/jquery-1.7.2.min'%>

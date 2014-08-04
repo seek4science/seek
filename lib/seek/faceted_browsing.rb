@@ -29,19 +29,6 @@ module Seek
       end
     end
 
-    def items_for_facets
-      item_type ||= params[:item_type]
-      item_ids ||= (params[:item_ids] || '').split(',')
-      items = get_items item_type, item_ids
-      items_for_facets = render_to_string :partial => "faceted_browsing/faceted_search",:object=>items
-
-      respond_to do |format|
-        format.json {
-          render :json => {:status => 200, :items_for_facets => items_for_facets}
-        }
-      end
-    end
-
     private
 
     def get_items item_type, item_ids
