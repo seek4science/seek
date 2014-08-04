@@ -22,16 +22,7 @@
 
           <%= javascript_include_tag "faceted_search" %>
 
-          <% if Seek::Config.is_one_facet_instance %>
-              <%= render :partial => "faceted_browsing/faceted_search_one_instance" -%>
-          <% else %>
-              <% resource_hash = @results.group_by{|r| r.class.name} -%>
-              <%= render :partial => "assets/resource_tabbed_lazy_loading",
-                         :locals => {:scale_title => "all",
-                                     :tabs_id => "resource_tabbed_lazy_loading_all",
-                                     :resource_hash => resource_hash
-                         } -%>
-          <% end %>
+          <%= render :partial => "faceted_browsing/faceted_search_one_instance" -%>
 
       <% else %>
           <% resource_hash = classify_for_tabs @results -%>

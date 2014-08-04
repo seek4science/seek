@@ -1,6 +1,5 @@
 jQuery(document).ready(function(){
     jQuery(document).on("exhibitConfigured.exhibit", function() {
-        hideFacets();
         hide_specified_facet_list();
         displayMoreLink();
     });
@@ -13,65 +12,11 @@ function load_tabs() {
     tabberAutomatic(tabberOptions);
 }
 
-//this is for the case of multiple exhibit instance.
-function tab_on_click(resource_type, resource_ids, with_facets) {
-    var tab_content_id = 'faceted_search_result';
-    var click_tab = document.getElementById('tab_' + resource_type);
-
-    click_tab.onclick = function () {
-        show_large_ajax_loader(tab_content_id);
-        deactivate_previous_tab();
-        click_tab.className = 'tabberactive';
-
-        Exhibit.SelectionState.currentAssetType = resource_type;
-
-        jQuery.noConflict();
-        var $j = jQuery;
-        if (with_facets == true){
-            $j.ajax({
-                url: items_for_facets_url,
-                async: false,
-                type: 'POST',
-                data: { item_ids: resource_ids,
-                    item_type: resource_type}
-            })
-                .done(function (data) {
-                    var tab_content = $j('#' + tab_content_id);
-                    tab_content.html(data.items_for_facets);
-                });
-
-        }else{
-            $j.ajax({
-                url: items_for_result_url,
-                async: false,
-                type: "POST",
-                data: { items: generateParamItems(resource_type, resource_ids)}
-            })
-                .done(function (data) {
-                    var tab_content = $j('#' + tab_content_id);
-                    tab_content.html(data.items_for_result);
-                });
-
-        }
-    }
-}
-
 //params items: e.g. Model_1,Model_2,...
 function generateParamItems(resource_type, resource_ids){
     var items = resource_type + '_';
     items = items + resource_ids.replace(/,/g, ',' + resource_type + '_');
     return items;
-}
-
-//this is for the case of multiple exhibit instance.
-function hideFacets(){
-    $j('.exhibit-facet-header-collapse').map(function(){
-        var grand_parent = this.parentNode.parentNode;
-        var id = grand_parent.id;
-        if (id != null && id.match('toogle_facet_') != null){
-            grand_parent.hide();
-        }
-    })
 }
 
 function deactivate_previous_tab(){
