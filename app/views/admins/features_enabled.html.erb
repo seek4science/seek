@@ -85,12 +85,6 @@
       <span class="setting_description">The URL to your Piwik installation, withouth the http:// or https://, e.g. 'localhost/piwikfolder/'</span>
     </li>
 
-    <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether faceted search one instance is enabled, otherwise multiple instances is enabled",
-            :name=>"Faceted search one instance",
-            :field=>check_box_tag(:is_one_facet_instance, 1, Seek::Config.is_one_facet_instance)
-    } -%>
-
     <li>
       <%= render :partial => 'admins/email'  %>
     </li>
