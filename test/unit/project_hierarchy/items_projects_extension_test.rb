@@ -1,22 +1,40 @@
 require 'test_helper'
 require 'project_hierarchy_test_helper'
-
 class ItemsProjectsExtensionTest < ActiveSupport::TestCase
   include ProjectHierarchyTestHelper
 
-  test "projects and descendants" do
-    assay = Factory :experimental_assay, :study => Factory(:study, :investigation => Factory(:investigation, :projects => [@proj]))
-    assert_equal [@proj, @proj_child1, @proj_child2].sort, assay.projects_and_descendants.sort
+  def setup
+    skip_hierarchy_tests?
+    @parent = Factory :project, :title => "New test project"
+    @child1 = Factory :project, :title => "first child of new test project", :parent_id => @parent.id
+    @child2 = Factory :project, :title => "second child of new test project", :parent_id => @parent.id
+  end
 
-    study = Factory(:study, :investigation => Factory(:investigation, :projects => [@proj]))
-    assert_equal [@proj, @proj_child1, @proj_child2].sort, study.projects_and_descendants.sort
+  test "projects and descendants" do
+    class ItemWithProjects
+      def projects
+        Array(Project.where(title: "New test project").first)
+      end
+
+      include Seek::ProjectHierarchies::ItemsProjectsExtension
+    end
+
+    assert_equal [@parent, @child1, @child2].sort, ItemWithProjects.new.projects_and_descendants.sort
   end
 
   test "projects and ancestors" do
-    assay = Factory :experimental_assay, :study => Factory(:study, :investigation => Factory(:investigation, :projects => [@proj_child1]))
-    assert_equal [@proj, @proj_child1].sort, assay.projects_and_ancestors.sort
+    class ItemWithProjects
+      def projects
+        Array(Project.where(title: "first child of new test project").first)
+      end
 
-    study = Factory(:study, :investigation => Factory(:investigation, :projects => [@proj_child1]))
-    assert_equal [@proj, @proj_child1].sort, study.projects_and_ancestors.sort
+      include Seek::ProjectHierarchies::ItemsProjectsExtension
+    end
+
+    assert_equal [@parent, @child1].sort, ItemWithProjects.new.projects_and_ancestors.sort
   end
+
+
+
+
 end
