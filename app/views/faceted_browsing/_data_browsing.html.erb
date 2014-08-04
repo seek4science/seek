@@ -1,6 +1,6 @@
 <div id="data" style="display:none">
   <%
-     objects = data
+     objects = data_browsing
      object_type = objects.first.class.name
      facet_config = YAML.load(File.read(faceted_browsing_config_path))
      facets_for_object = facet_config[object_type] || {}

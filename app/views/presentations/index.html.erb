@@ -1,7 +1,7 @@
 <%= render :partial => "assets/new_button", :locals => {:new_object_path => new_presentation_path, :label => "Upload a #{t('presentation')}"} %>
 
 <% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
-    <%= render :partial => "faceted_browsing/facets", :object => @presentations %>
+    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @presentations %>
 <% else %>
     <%= render :partial => "assets/resources_alphabetical_paginated", :object => @presentations %>
 <% end %>

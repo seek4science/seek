@@ -7,7 +7,7 @@
 
 
 <%
-   objects = facets
+   objects = faceted_browsing
    object_type = objects.first.class.name
    facet_config = YAML.load(File.read(faceted_browsing_config_path))
    facets_for_object = facet_config[object_type] || {}
@@ -75,4 +75,4 @@
    Exhibit.SelectionState.currentAssetType = "<%= object_type %>";
 </script>
 
-<%= render :partial => "faceted_browsing/data", :object => objects %>
+<%= render :partial => "faceted_browsing/data_browsing", :object => objects %>

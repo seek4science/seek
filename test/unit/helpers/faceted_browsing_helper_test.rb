@@ -12,7 +12,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
 
   end
 
-  test 'generating facet search value for one_facet_instance' do
+  test 'generating facet search value' do
     items = []
     ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
     ASSETS_WITH_FACET.each do |type_name|
