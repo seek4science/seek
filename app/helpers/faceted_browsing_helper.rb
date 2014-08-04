@@ -36,19 +36,15 @@ module FacetedBrowsingHelper
       facet_value
   end
 
-  def facet_config_path
-    File.join(Rails.root, "config", "facets.yml")
+  def faceted_browsing_config_path
+    File.join(Rails.root, "config", "faceted_browsing.yml")
   end
 
-  def faceted_search_config_path
-    File.join(Rails.root, "config", "faceted_search.yml")
+  def common_faceted_search_config_path
+    File.join(Rails.root, "config", "common_faceted_search.yml")
   end
 
-  def one_instance_common_facet_config_path
-    File.join(Rails.root, "config", "one_instance_common_facets.yml")
-  end
-
-  def one_instance_specified_facet_config_path
-    File.join(Rails.root, "config", "one_instance_specified_facets.yml")
+  def specified_faceted_search_config_path
+    File.join(Rails.root, "config", "specified_faceted_search.yml")
   end
 end

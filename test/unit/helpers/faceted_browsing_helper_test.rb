@@ -5,7 +5,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     project = Factory(:project)
     item = Factory(:data_file, :projects => [project])
 
-    common_facet_config = YAML.load(File.read(one_instance_common_facet_config_path))
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
 
     value_for_project = value_for_key common_facet_config['project'], item
     assert_equal [project.title], value_for_project
@@ -19,8 +19,8 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
       items << Factory(type_name.singularize.to_sym)
     end
 
-    common_facet_config = YAML.load(File.read(one_instance_common_facet_config_path))
-    specified_facet_config = YAML.load(File.read(one_instance_specified_facet_config_path))
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+    specified_facet_config = YAML.load(File.read(specified_faceted_search_config_path))
 
     items.each do |item|
       common_facet_config.each do |key, config_for_key|
