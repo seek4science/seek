@@ -1,16 +1,6 @@
 # See the explanation in faceted_browsing.yml
 
 #isa
-Investigation:
-  contributor:
-      label: Contributor
-      value_from: contributor:person:name
-
-Study:
-  contributor:
-      label: Contributor
-      value_from: contributor:person:name
-
 Assay:
   organism:
       label: Organism
@@ -25,9 +15,6 @@ Assay:
       value_from: technology_type_label
       facet_class: Exhibit.HierarchicalFacet
       tree_from: Seek::Ontologies::TechnologyTypeReader
-  contributor:
-      label: Contributor
-      value_from: contributor:name
 
 #assets
 DataFile:
@@ -41,9 +28,6 @@ DataFile:
         value_from: technology_type_titles
         facet_class: Exhibit.HierarchicalFacet
         tree_from: Seek::Ontologies::TechnologyTypeReader
-  contributor:
-      label: Contributor
-      value_from: creators:name
 
 Model:
   organism:
@@ -63,9 +47,6 @@ Model:
       value_from: assay_type_titles
       facet_class: Exhibit.HierarchicalFacet
       tree_from: Seek::Ontologies::ModellingAnalysisTypeReader
-  contributor:
-      label: Contributor
-      value_from: creators:name
 
 Sop:
   technology_type:
@@ -78,9 +59,6 @@ Sop:
         value_from: assay_type_titles
         facet_class: Exhibit.HierarchicalFacet
         tree_from: Seek::Ontologies::AssayTypeReader,Seek::Ontologies::ModellingAnalysisTypeReader
-  contributor:
-      label: Contributor
-      value_from: creators:name
 
 Publication:
   author:
@@ -92,11 +70,6 @@ Publication:
   organism:
       label: Organism
       value_from: related_organisms:title
-
-Presentation:
-  contributor:
-      label: Contributor
-      value_from: creators:name
 
 #yellow pages
 Person:
@@ -157,9 +130,6 @@ Strain:
   gene:
       label: Modified Gene
       value_from: genotypes:gene:title
-  contributor:
-      label: Contributor
-      value_from: contributor:person:name
 
 Specimen:
   organism:
@@ -174,9 +144,6 @@ Specimen:
   institution:
       label: Institution
       value_from: institution:title
-  contributor:
-      label: Contributor
-      value_from: creators:name
 
 Sample:
   organism:
@@ -191,9 +158,6 @@ Sample:
   organism_part:
       label: Organism part
       value_from: organism_part
-  contributor:
-      label: Contributor
-      value_from: contributor:person:name
 
 Event:
   start_date:

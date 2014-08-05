@@ -9,6 +9,10 @@ created_at:
     label: Created In
     value_from: created_at:year
 
+contributor:
+    label: Contributor
+    value_from: contributor:person:name
+
 tag:
     label: Tag
     value_from: tags_as_text_array
