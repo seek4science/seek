@@ -66,20 +66,28 @@ module FacetedBrowsingHelper
   # then the value generated is: data_file.projects.collect(&:title)
 
   def value_for_key config_for_key, object
-      facet_value = object
-      value_from = config_for_key['value_from']
-      value_from.split(':').each do |field|
-        if facet_value.blank?
-          break
-        elsif facet_value.kind_of?(Array) and facet_value.first.respond_to?field
-          facet_value = facet_value.collect(&:"#{field}")
-        elsif facet_value.respond_to?field
-          facet_value = facet_value.send(field)
+    facet_values = []
+    value_from = config_for_key['value_from']
+      value_from.split(',').each do |from|
+        facet_value = object
+        from.split(':').each do |field|
+          if facet_value.blank?
+            break
+          elsif facet_value.kind_of?(Array) and facet_value.first.respond_to?field
+            facet_value = facet_value.collect(&:"#{field}")
+          elsif facet_value.respond_to?field
+            facet_value = facet_value.send(field)
+          else
+            facet_value = nil
+          end
+        end
+        if facet_value.kind_of?(Array)
+          facet_values |= facet_value
         else
-          facet_value = nil
+          facet_values << facet_value
         end
       end
-      facet_value
+      facet_values.compact
   end
 
   def faceted_browsing_config_path

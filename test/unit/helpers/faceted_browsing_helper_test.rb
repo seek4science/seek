@@ -9,15 +9,25 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
 
     #single value
     value_for_created_date = value_for_key common_facet_config['created_at'], item
-    assert_equal item.created_at.year, value_for_created_date
+    assert_equal [item.created_at.year], value_for_created_date
 
-    #array value
+    #multiple value
+    project1 = Factory(:project)
+    item.projects << project1
     value_for_project = value_for_key common_facet_config['project'], item
-    assert_equal [project.title], value_for_project
+    assert_includes(value_for_project, project.title)
+    assert_includes(value_for_project, project1.title)
 
     #value through multiple associations
     value_for_contributor = value_for_key common_facet_config['contributor'], item
-    assert_equal item.contributor.person.name, value_for_contributor
+    assert_equal [item.contributor.person.name], value_for_contributor
+
+    #value from multiple places
+    a_person = Factory(:person)
+    item.creators = [a_person]
+    value_for_multiple_contributors = value_for_key common_facet_config['contributor'], item
+    assert_includes(value_for_multiple_contributors, item.contributor.person.name)
+    assert_includes(value_for_multiple_contributors, a_person.name)
   end
 
   test 'exhibit_item_for an data_file' do
