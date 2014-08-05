@@ -7,13 +7,63 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
 
     common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
 
+    #single value
+    value_for_created_date = value_for_key common_facet_config['created_at'], item
+    assert_equal item.created_at.year, value_for_created_date
+
+    #array value
     value_for_project = value_for_key common_facet_config['project'], item
     assert_equal [project.title], value_for_project
 
+    #value through multiple associations
+    value_for_contributor = value_for_key common_facet_config['contributor'], item
+    assert_equal item.contributor.person.name, value_for_contributor
   end
 
-  test 'generating facet search value' do
+  test 'exhibit_item_for an data_file' do
+    df = Factory(:data_file)
+    facet_config = YAML.load(File.read(faceted_browsing_config_path))
+    facet_config_for_DF = facet_config['DataFile']
+    exhibit_item = exhibit_item_for df, facet_config_for_DF
+
+    assert_equal "#{df.class.name}#{df.id}", exhibit_item['id']
+    assert_equal "#{df.class.name}#{df.id}", exhibit_item['label']
+    assert_equal df.class.name, exhibit_item['type']
+    assert_equal df.id, exhibit_item['item_id']
+    assert_equal df.projects.collect(&:title), exhibit_item['project']
+    assert_equal df.assay_type_titles, exhibit_item['assay_type']
+    assert_equal df.technology_type_titles, exhibit_item['technology_type']
+    assert_equal df.created_at.year, exhibit_item['created_at']
+    assert_equal df.creators.collect(&:name), exhibit_item['contributor']
+    assert_equal df.tags_as_text_array, exhibit_item['tag']
+
+  end
+
+  test 'exhibit_items for all types of faceted browsing' do
     items = []
+    exhibit_items = []
+
+    ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
+    ASSETS_WITH_FACET.each do |type_name|
+      items << Factory(type_name.singularize.to_sym)
+    end
+
+    facet_config = YAML.load(File.read(faceted_browsing_config_path))
+    items.each do |item|
+      facet_config_for_item = facet_config[item.class.name] || {}
+      exhibit_items << exhibit_item_for(item, facet_config_for_item)
+    end
+
+    exhibit_item_types = exhibit_items.collect{|ei| ei['type']}
+    ASSETS_WITH_FACET.each do |type_name|
+      klass = type_name.singularize.camelize
+      assert_includes exhibit_item_types, klass
+    end
+  end
+
+  test 'exhibit_items for all types of faceted search' do
+    items = []
+    exhibit_items= []
     ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
     ASSETS_WITH_FACET.each do |type_name|
       items << Factory(type_name.singularize.to_sym)
@@ -23,15 +73,20 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     specified_facet_config = YAML.load(File.read(specified_faceted_search_config_path))
 
     items.each do |item|
-      common_facet_config.each do |key, config_for_key|
-        value_for_key config_for_key, item
-      end
-
       facets_for_object = specified_facet_config[item.class.name] || {}
-
-      facets_for_object.each do |key, config_for_key|
-        value_for_key config_for_key, item
-      end
+      exhibit_items << exhibit_item_for(item, common_facet_config.merge(facets_for_object))
     end
+
+    exhibit_item_types = exhibit_items.collect{|ei| ei['type']}
+    ASSETS_WITH_FACET.each do |type_name|
+      klass = type_name.singularize.camelize
+      assert_includes exhibit_item_types, klass
+    end
+  end
+
+  test 'exhibit_tree' do
+    exhibit_items = exhibit_tree 'Seek::Ontologies::AssayTypeReader', 'assay_type'
+    assert_includes(exhibit_items, {'type' => 'assay_type', 'label' => 'Experimental assay type'})
+    assert_includes(exhibit_items, {'type' => 'assay_type', 'label' => 'Metabolite profiling', 'subclassOf' => 'Metabolomics'})
   end
 end

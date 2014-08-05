@@ -1,4 +1,13 @@
-#TODO: need some comment to explain the config fields
+# This configuration file is used to generate the list of  filters (facets) for each asset type
+# The configuration for each facet are:
+#   label:  The name of filter to display in UI
+#   value_from: How to generate the value inside the filter, can be done through model's association, attribute or method
+#               e.g. value_from: projects:title => will generate object.projects.collect(&:title)
+#   facet_class:  exhibit library provide different ways to browse through filters, like list, hierarchy, numeric-range
+#                 if not defined it is list by default
+#   tree_from:  if the facet_class is Exhibit.HierarchicalFacet you have to define the source to generate the hierarchy tree
+
+
 #isa
 Investigation:
   project:

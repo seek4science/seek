@@ -1,3 +1,5 @@
+# See the explanation in faceted_browsing.yml
+
 project:
     label: Project
     value_from: projects:title

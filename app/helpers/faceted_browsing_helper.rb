@@ -1,4 +1,18 @@
 module FacetedBrowsingHelper
+  def exhibit_trees facet_config
+    exhibit_items = []
+    facet_config.each do |key,value|
+      facet_class = value['facet_class']
+      if facet_class == 'Exhibit.HierarchicalFacet'
+        tree_from = value['tree_from']
+        tree_from.split(',').each do |tree_class|
+          exhibit_items |= exhibit_tree(tree_class, key)
+        end
+      end
+    end
+    exhibit_items
+  end
+
   def exhibit_tree tree_class, facet
     tree = []
     class_hierarchy = tree_class.constantize.instance.class_hierarchy
@@ -16,7 +30,41 @@ module FacetedBrowsingHelper
     result
   end
 
-  #TODO:   need comment and some tests for this part
+  def exhibit_item_for object, facets_for_object
+    exhibit_item = {}
+    object_type = object.class.name
+    object_id = object.id
+
+    #this is to avoid exhibit warning messages
+    exhibit_item['id'] = "#{object_type}#{object_id}"
+    exhibit_item['label'] = "#{object_type}#{object_id}"
+
+    #This display_content will be later on replaced by resource_list_item, by using ajax, otherwise it causes speed problem
+    exhibit_item['display_content'] = ''
+
+    exhibit_item['type'] = object_type
+    exhibit_item['item_id'] = object_id
+
+    #generate facet values for each facet based on the config file
+    facets_for_object.each do |key, value|
+      #special case when generating project filter for project itself from common_faceted_search.yml
+      if object.kind_of?(Project) && key == 'project'
+        exhibit_item[key] = object.title
+      else
+        exhibit_item[key] = value_for_key value, object
+      end
+    end
+    exhibit_item
+  end
+
+  # generate value for each facet of each object based on configuration file
+  # e.g. the configuration for project facet of DataFile is:
+  # DataFile:
+  #    project:
+  #     label: Project
+  #     value_from: projects:title
+  # then the value generated is: data_file.projects.collect(&:title)
+
   def value_for_key config_for_key, object
       facet_value = object
       value_from = config_for_key['value_from']
@@ -27,8 +75,6 @@ module FacetedBrowsingHelper
           facet_value = facet_value.collect(&:"#{field}")
         elsif facet_value.respond_to?field
           facet_value = facet_value.send(field)
-        elsif !config_for_key['rails_class'].nil? and facet_value.class.name == config_for_key['rails_class']
-          next
         else
           facet_value = nil
         end

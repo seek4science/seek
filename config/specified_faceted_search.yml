@@ -1,4 +1,5 @@
-#TODO: need some comment to explain the config fields
+# See the explanation in faceted_browsing.yml
+
 #isa
 Investigation:
   contributor:
