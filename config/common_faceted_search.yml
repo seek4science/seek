@@ -11,7 +11,7 @@ created_at:
 
 contributor:
     label: Contributor
-    value_from: contributor:person:name,creators:name
+    value_from: contributor:person:name,creators:name,contributor:name
 
 tag:
     label: Tag

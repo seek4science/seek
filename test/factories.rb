@@ -244,13 +244,14 @@ end
   Factory.define(:study) do |f|
     f.sequence(:title) { |n| "Study#{n}" }
     f.association :investigation
-    f.association :contributor, :factory => :person
+    f.association :contributor, :factory => :user
   end
 
   #Investigation
   Factory.define(:investigation) do |f|
     f.projects {[Factory.build(:project)]}
     f.sequence(:title) { |n| "Investigation#{n}" }
+    f.association :contributor, :factory => :user
   end
 
   #Strain
@@ -288,6 +289,7 @@ end
   Factory.define(:sample) do |f|
     f.sequence(:title) { |n| "Sample#{n}" }
     f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
+    f.association :contributor, :factory => :user
     f.projects {[Factory.build(:project)]}
     f.donation_date Date.today
     f.association :specimen
@@ -548,6 +550,7 @@ end
     f.start_date Time.now
     f.end_date 1.days.from_now
     f.projects { [Factory.build(:project)] }
+    f.association :contributor, :factory => :user
   end
 
   Factory.define(:saved_search) do |f|

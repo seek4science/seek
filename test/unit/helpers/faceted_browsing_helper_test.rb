@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class FacetedBrowsingHelperTest < ActionView::TestCase
+
+  ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
+
   test 'value_for_key' do
     project = Factory(:project)
     item = Factory(:data_file, :projects => [project])
@@ -30,6 +33,22 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_includes(value_for_multiple_contributors, a_person.name)
   end
 
+  test 'generate contributor value' do
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+    ASSETS_WITH_FACET.each do |type_name|
+      item = Factory(type_name.singularize.to_sym)
+      contributor_value = value_for_key common_facet_config['contributor'], item
+      if item.kind_of?(Assay)
+        assert_equal [item.contributor.name], contributor_value
+      elsif item.respond_to?(:contributor)
+        assert_equal [item.contributor.person.name], contributor_value
+      else
+        assert contributor_value.empty?
+      end
+    end
+
+  end
+
   test 'exhibit_item_for an data_file' do
     df = Factory(:data_file)
     facet_config = YAML.load(File.read(faceted_browsing_config_path))
@@ -43,8 +62,8 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_equal df.projects.collect(&:title), exhibit_item['project']
     assert_equal df.assay_type_titles, exhibit_item['assay_type']
     assert_equal df.technology_type_titles, exhibit_item['technology_type']
-    assert_equal df.created_at.year, exhibit_item['created_at']
-    assert_equal df.creators.collect(&:name), exhibit_item['contributor']
+    assert_equal [df.created_at.year], exhibit_item['created_at']
+    assert_equal df.creators.collect(&:name) + [df.contributor.person.name], exhibit_item['contributor']
     assert_equal df.tags_as_text_array, exhibit_item['tag']
 
   end
@@ -53,7 +72,6 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     items = []
     exhibit_items = []
 
-    ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
     ASSETS_WITH_FACET.each do |type_name|
       items << Factory(type_name.singularize.to_sym)
     end
@@ -74,7 +92,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
   test 'exhibit_items for all types of faceted search' do
     items = []
     exhibit_items= []
-    ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
+
     ASSETS_WITH_FACET.each do |type_name|
       items << Factory(type_name.singularize.to_sym)
     end

@@ -87,7 +87,7 @@ module FacetedBrowsingHelper
           facet_values << facet_value
         end
       end
-      facet_values.compact
+      facet_values.compact.uniq
   end
 
   def faceted_browsing_config_path

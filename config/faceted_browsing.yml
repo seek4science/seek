@@ -1,5 +1,5 @@
 # This configuration file is used to generate the list of  filters (facets) for each asset type
-# The configuration for each facet are:
+# The configuration for each filter are:
 #   label:  The name of filter to display in UI
 #   value_from: How to generate the value inside the filter, can be done through model's association, attribute or method
 #               value can be taken from multiple places, separated by comma
@@ -80,7 +80,7 @@ DataFile:
       value_from: created_at:year
   contributor:
       label: Contributor
-      value_from: creators:name
+      value_from: contributor:person:name,creators:name
   tag:
       label: Tag
       value_from: tags_as_text_array
@@ -111,7 +111,7 @@ Model:
       value_from: created_at:year
   contributor:
       label: Contributor
-      value_from: creators:name
+      value_from: contributor:person:name,creators:name
   tag:
       label: Tag
       value_from: tags_as_text_array
@@ -135,7 +135,7 @@ Sop:
       value_from: created_at:year
   contributor:
       label: Contributor
-      value_from: creators:name
+      value_from: contributor:person:name,creators:name
   tag:
       label: Tag
       value_from: tags_as_text_array
@@ -166,7 +166,7 @@ Presentation:
       value_from: created_at:year
   contributor:
       label: Contributor
-      value_from: creators:name
+      value_from: contributor:person:name,creators:name
   tag:
       label: Tag
       value_from: tags_as_text_array
@@ -273,7 +273,7 @@ Specimen:
       value_from: created_at:year
   contributor:
       label: Contributor
-      value_from: creators:name
+      value_from: contributor:person:name,creators:name
 
 Sample:
   organism:
