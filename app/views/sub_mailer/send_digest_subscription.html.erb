@@ -47,10 +47,10 @@ The following resources have just been created or updated in <%= Seek::Config.ap
              <tr>
                <td><%= project_names.blank? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : project_names %></td>
                <td><%= log.activity_loggable_type.humanize %></td>
-               <td><%= try_block { link_to(log.activity_loggable.title, send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable)) } || log.activity_loggable.title %></td>
+               <td><%= try_block { link_to(log.activity_loggable.title, polymorphic_url(log.activity_loggable)) } || log.activity_loggable.title %></td>
                <td><%= link_to try_block { log.culprit.person.name }, person_url(log.culprit.person.id) %></td>
                <td> <%= date_as_string(log.created_at,true) %></td>
-               <td> <%= link_to "Unsubscribe", send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable) %></td>
+               <td> <%= link_to "Unsubscribe", polymorphic_url(log.activity_loggable) %></td>
              </tr>
 
          <% end %>
