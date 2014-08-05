@@ -11,27 +11,14 @@
    object_type = objects.first.class.name
    facet_config = YAML.load(File.read(faceted_browsing_config_path))
    facets_for_object = facet_config[object_type] || {}
+   expand_facet_count = 1
 %>
 
 <div class="faceted_browsing">
     <div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_type%>"></div>
     <div class="yui-g" id="exhibit">
         <div class="yui-u first" style="width: 85%;">
-          <div id="content-area">
-            <div data-ex-role="exhibit-lens" style="display: none">
-              <span data-ex-content=".display_content"></span>
-            </div>
-
-            <div data-ex-role="exhibit-viewPanel">
-              <div data-ex-role="exhibit-view"
-                   data-ex-label="Tiles"
-                   data-ex-possible-orders=".<%= facets_for_object.keys.join(',.') %>"
-                   data-ex-paginate="true"
-                   data-ex-page-size="10"
-                   data-ex-show-all="true"
-              ></div>
-            </div>
-          </div>
+          <%= render :partial => 'faceted_browsing/content_element', :locals => {:possible_orders => facets_for_object.keys.join(',.')} %>
         </div>
         <div class="yui-u" style="float:right;width: 15%;">
           <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
@@ -40,30 +27,11 @@
           <hr/>
           <% count = 0 %>
           <% facets_for_object.each do |key, value| %>
-              <% label = value['label'] %>
-              <% facet_class = value['facet_class'] %>
-              <div data-ex-role="facet"
-                   data-ex-expression=".<%= key %>"
-                   data-ex-facet-label="<%= label %>"
-                   data-ex-facet-class="<%= facet_class %>"
-                   data-ex-height="13em"
-                   data-ex-collapsible="true"
-
-                   <% if facet_class == "NumericRange" %>
-                        <% interval = value['interval'] %>
-                        data-ex-interval="<%= interval %>"
-                   <% end %>
-
-                   <% if facet_class == "Exhibit.HierarchicalFacet" %>
-                        data-ex-uniform-grouping=".subclassOf"
-                        data-ex-scroll="false"
-                   <% end %>
-                   <% count += 1%>
-                   <% if count > 1 %>
-                        data-ex-collapsed="true"
-                   <% end %>
-              >
-              </div>
+              <%
+                 count += 1
+                 collapsed = count > expand_facet_count ? true : false
+              %>
+              <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => collapsed} %>
               <br/>
           <% end %>
         </div>
