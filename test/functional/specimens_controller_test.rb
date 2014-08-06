@@ -153,7 +153,7 @@ class SpecimensControllerTest < ActionController::TestCase
     assert_redirected_to s
   end
   test "should not destroy specimen related to an existing sample" do
-    sample = Factory :sample
+    sample = Factory :sample, :policy => Factory(:public_policy)
     specimen = Factory :specimen
     specimen.samples = [sample]
     assert_no_difference("Specimen.count") do

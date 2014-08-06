@@ -1198,7 +1198,8 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "new object based on existing one" do
-    study = Factory(:study,:policy=>Factory(:public_policy))
+    investigation = Factory(:investigation,:policy=>Factory(:public_policy))
+    study = Factory(:study,:policy=>Factory(:public_policy), :investigation => investigation)
     assay = Factory(:assay,:policy=>Factory(:public_policy),:title=>"the assay",:study=>study)
     assert assay.can_view?
     assert assay.study.can_edit?
