@@ -1,4 +1,5 @@
 <% possible_orders ||= '' %>
+<% page_size ||= '' %>
 
 <div id="content-area">
   <div data-ex-role="exhibit-lens" style="display: none">
@@ -10,7 +11,7 @@
          data-ex-label="Tiles"
          data-ex-possible-orders=".<%= possible_orders %>"
          data-ex-paginate="<%= paginated %>"
-         data-ex-page-size="10"
+         data-ex-page-size="<%= page_size %>"
          data-ex-show-all="true"
     ></div>
   </div>
