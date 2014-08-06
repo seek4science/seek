@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'seek/biomodels_search/search_biomodels_adaptor'
 
 class FacetedBrowsingHelperTest < ActionView::TestCase
 
@@ -135,5 +136,59 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     exhibit_items = exhibit_tree 'Seek::Ontologies::AssayTypeReader', 'assay_type'
     assert_includes(exhibit_items, {'type' => 'assay_type', 'label' => 'Experimental assay type'})
     assert_includes(exhibit_items, {'type' => 'assay_type', 'label' => 'Metabolite profiling', 'subclassOf' => 'Metabolomics'})
+  end
+
+  test 'exhibit_item_for_biomodel' do
+    mock_service_calls
+    adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path" => "lib/test-partial.erb", "name" => "EBI Biomodels"})
+    results = adaptor.search("yeast")
+    a_biomodel = results.first
+
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+    specified_facet_config_for_BM = YAML.load(File.read(specified_faceted_search_config_path))['BiomodelsSearchResult']
+
+    exhibit_item = exhibit_item_for_biomodel a_biomodel, common_facet_config.merge(specified_facet_config_for_BM)
+
+    assert_equal "#{a_biomodel.class.name}#{a_biomodel.model_id}", exhibit_item['id']
+    assert_equal "#{a_biomodel.class.name}#{a_biomodel.model_id}", exhibit_item['label']
+    assert_equal a_biomodel.class.name, exhibit_item['type']
+    assert_equal a_biomodel.model_id, exhibit_item['item_id']
+    assert_equal [], exhibit_item['project']
+    assert_equal [], exhibit_item['created_at']
+    assert_equal [], exhibit_item['contributor']
+    assert_equal [], exhibit_item['tag']
+    assert_equal  [a_biomodel.published_date.to_date.year], exhibit_item['published_year']
+    assert_equal a_biomodel.authors, exhibit_item['author']
+  end
+
+  private
+
+  def mock_service_calls
+    wsdl = File.new("#{Rails.root}/test/fixtures/files/mocking/biomodels.wsdl")
+    stub_request(:get, "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl").to_return(wsdl)
+
+    response = File.new("#{Rails.root}/test/fixtures/files/mocking/biomodels_mock_response.xml")
+    stub_request(:post, "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices").
+        with(:headers => {'Soapaction'=>'"getModelsIdByName"'}).
+        to_return(:status=>200,:body => response)
+
+    response2 = File.new("#{Rails.root}/test/fixtures/files/mocking/biomodels_mock_response2.xml")
+    stub_request(:post, "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices").
+        with(:headers => {'Soapaction'=>'"getModelsIdByChEBIId"'}).
+        to_return(:status=>200,:body => response2)
+
+    response3 = File.new("#{Rails.root}/test/fixtures/files/mocking/biomodels_mock_response3.xml")
+    stub_request(:post, "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices").
+        with(:headers => {'Soapaction'=>'"getModelsIdByPerson"'}).
+        to_return(:status=>200,:body => response3)
+
+    response4 = File.new("#{Rails.root}/test/fixtures/files/mocking/biomodels_mock_response4.xml")
+    stub_request(:post, "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices").
+        with(:headers => {'Soapaction'=>'"getSimpleModelById"'}).
+        to_return(:status=>200,:body => response4.read)
+
+    pub_response = File.new("#{Rails.root}/test/fixtures/files/mocking/pubmed_18846089.txt")
+    stub_request(:post,"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi").
+        to_return(:body=>pub_response)
   end
 end
