@@ -20,7 +20,7 @@
             Only visible to <strong>registered users</strong>
           <%= workflow_filter('(clear)', params, :visibility, nil) -%>
         <% elsif params[:visibility].starts_with?('Project') %>
-          Only visible to members of <strong><%= Project.find_by_id(params[:visibility].split(':').last).name-%></strong>
+          Only visible to members of <strong><%= Project.find_by_id(params[:visibility].split(':').last).title-%></strong>
           <%= workflow_filter('(clear)', params, :visibility, nil) -%>
         <% end %>
         </li>
