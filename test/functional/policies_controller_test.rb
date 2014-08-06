@@ -65,7 +65,7 @@ class PoliciesControllerTest < ActionController::TestCase
     contributor = study.contributor
     post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :contributor_id => contributor.user.id, :resource_name => 'study'
 
-    assert_select "p",:text=>"#{contributor.name} can manage as an uploader", :count=>1
+    assert_select "p",:text=>"#{contributor.person.name} can manage as an uploader", :count=>1
   end
 
   test 'should show asset managers for not entirely private item' do
