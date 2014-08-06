@@ -18,7 +18,7 @@
 <div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_types.join(',') %>"></div>
 <div class="yui-g" id="exhibit">
   <div class="yui-u first" style="width: 85%;">
-    <%= render :partial => 'faceted_browsing/content_element', :locals => {:possible_orders => common_facet_config.keys.join(',.')} %>
+    <%= render :partial => 'faceted_browsing/content_element', :locals => {:possible_orders => common_facet_config.keys.join(',.'), :paginated => false} %>
   </div>
   <div class="yui-u facet_list" style="float:right;width: 15%;">
     <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
