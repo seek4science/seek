@@ -48,7 +48,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
 
   end
 
-  test 'exhibit_item_for an data_file' do
+  test 'exhibit_item_for an data_file in case of faceted browsing' do
     df = Factory(:data_file)
     facet_config = YAML.load(File.read(faceted_browsing_config_path))
     facet_config_for_DF = facet_config['DataFile']
@@ -86,6 +86,26 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
       klass = type_name.singularize.camelize
       assert_includes exhibit_item_types, klass
     end
+  end
+
+  test 'exhibit_item_for an data_file in case of faceted search' do
+    df = Factory(:data_file)
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+    specified_facet_config_for_DF = YAML.load(File.read(specified_faceted_search_config_path))['DataFile']
+
+    exhibit_item = exhibit_item_for df, common_facet_config.merge(specified_facet_config_for_DF)
+
+    assert_equal "#{df.class.name}#{df.id}", exhibit_item['id']
+    assert_equal "#{df.class.name}#{df.id}", exhibit_item['label']
+    assert_equal df.class.name, exhibit_item['type']
+    assert_equal df.id, exhibit_item['item_id']
+    assert_equal df.projects.collect(&:title), exhibit_item['project']
+    assert_equal df.assay_type_titles, exhibit_item['assay_type']
+    assert_equal df.technology_type_titles, exhibit_item['technology_type']
+    assert_equal [df.created_at.year], exhibit_item['created_at']
+    assert_equal df.creators.collect(&:name) + [df.contributor.person.name], exhibit_item['contributor']
+    assert_equal df.tags_as_text_array, exhibit_item['tag']
+
   end
 
   test 'exhibit_items for all types of faceted search' do

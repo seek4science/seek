@@ -16,7 +16,7 @@
        objects = value[:items]
        facets_for_object = specified_facet_config[key] || {}
        objects.each do |object|
-         exhibit_item = exhibit_item_for object, facets_for_object
+         exhibit_item = exhibit_item_for object, common_facet_config.merge(facets_for_object)
          exhibit_items << exhibit_item
        end
      end
