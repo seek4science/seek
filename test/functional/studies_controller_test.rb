@@ -332,7 +332,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_routing "people/2/studies",{controller:"studies",action:"index",person_id:"2"}
     study = Factory(:study,:policy=>Factory(:public_policy))
     study2 = Factory(:study,:policy=>Factory(:public_policy))
-    person = study.contributor
+    person = study.contributor.person
     refute_equal study.contributor,study2.contributor
     assert person.is_a?(Person)
     get :index,person_id:person.id
@@ -366,7 +366,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'object based on existing study' do
-    study = Factory :study,:title=>"the study",:policy=>Factory(:public_policy)
+    study = Factory :study,:title=>"the study",:policy=>Factory(:public_policy),
+                    :investigation => Factory(:investigation, :policy => Factory(:public_policy))
     get :new_object_based_on_existing_one,:id=>study.id
     assert_response :success
     assert_select "textarea#study_title",:text=>"the study"
