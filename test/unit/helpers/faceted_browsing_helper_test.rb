@@ -5,9 +5,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
   ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
 
   test 'value_for_key' do
-    project = Factory(:project)
-    item = Factory(:data_file, :projects => [project])
-
+    item = Factory(:data_file)
     common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
 
     #single value
@@ -16,10 +14,11 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
 
     #multiple value
     project1 = Factory(:project)
-    item.projects << project1
+    project2 = Factory(:project)
+    item.projects = [project1, project2]
     value_for_project = value_for_key common_facet_config['project'], item
-    assert_includes(value_for_project, project.title)
     assert_includes(value_for_project, project1.title)
+    assert_includes(value_for_project, project2.title)
 
     #value through multiple associations
     value_for_contributor = value_for_key common_facet_config['contributor'], item
