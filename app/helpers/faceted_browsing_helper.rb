@@ -35,15 +35,7 @@ module FacetedBrowsingHelper
     object_type = object.class.name
     object_id = object.id
 
-    #this is to avoid exhibit warning messages
-    exhibit_item['id'] = "#{object_type}#{object_id}"
-    exhibit_item['label'] = "#{object_type}#{object_id}"
-
-    #This display_content will be later on replaced by resource_list_item, by using ajax, otherwise it causes speed problem
-    exhibit_item['display_content'] = ''
-
-    exhibit_item['type'] = object_type
-    exhibit_item['item_id'] = object_id
+    exhibit_item.merge!(exhibit_item_general_part(object_type, object_id))
 
     #generate facet values for each facet based on the config file
     facets_for_object.each do |key, value|
@@ -57,11 +49,22 @@ module FacetedBrowsingHelper
     exhibit_item
   end
 
-  def exhibit_item_for_biomodel object, facets_for_object
+  def exhibit_item_for_external_resource object, facets_for_object
     exhibit_item = {}
-    object_type = object.class.name
-    object_id = object.model_id
+    object_type = object.tab
+    object_id = object.id
 
+    exhibit_item.merge!(exhibit_item_general_part(object_type, object_id))
+
+    #generate facet values for each facet based on the config file
+    facets_for_object.each do |key, value|
+      exhibit_item[key] = value_for_key value, object
+    end
+    exhibit_item
+  end
+
+  def exhibit_item_general_part object_type, object_id
+    exhibit_item = {}
     #this is to avoid exhibit warning messages
     exhibit_item['id'] = "#{object_type}#{object_id}"
     exhibit_item['label'] = "#{object_type}#{object_id}"
@@ -71,11 +74,6 @@ module FacetedBrowsingHelper
 
     exhibit_item['type'] = object_type
     exhibit_item['item_id'] = object_id
-
-    #generate facet values for each facet based on the config file
-    facets_for_object.each do |key, value|
-      exhibit_item[key] = value_for_key value, object
-    end
     exhibit_item
   end
 

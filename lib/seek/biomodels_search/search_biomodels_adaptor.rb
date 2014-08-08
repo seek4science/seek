@@ -29,6 +29,8 @@ module Seek
       include Seek::ExternalSearchResult
       include Seek::BioExtension
 
+      alias_attribute :id, :model_id
+
       def initialize biomodels_search_result
         self.authors = []
         self.model_id=biomodels_search_result[:model_id]

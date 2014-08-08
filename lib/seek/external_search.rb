@@ -56,7 +56,7 @@ module Seek
   end
 
   module ExternalSearchResult
-    attr_accessor :tab, :partial_path
+    attr_accessor :tab, :partial_path, :id
 
     def can_view?
       true

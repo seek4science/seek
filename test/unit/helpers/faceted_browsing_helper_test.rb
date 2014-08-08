@@ -138,20 +138,20 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_includes(exhibit_items, {'type' => 'assay_type', 'label' => 'Metabolite profiling', 'subclassOf' => 'Metabolomics'})
   end
 
-  test 'exhibit_item_for_biomodel' do
+  test 'exhibit_item_for_external_resource: biomodel' do
     mock_service_calls
     adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path" => "lib/test-partial.erb", "name" => "EBI Biomodels"})
     results = adaptor.search("yeast")
     a_biomodel = results.first
 
     common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
-    specified_facet_config_for_BM = YAML.load(File.read(specified_faceted_search_config_path))['BiomodelsSearchResult']
+    specified_facet_config_for_BM = YAML.load(File.read(specified_faceted_search_config_path))['BioModels Database']
 
-    exhibit_item = exhibit_item_for_biomodel a_biomodel, common_facet_config.merge(specified_facet_config_for_BM)
+    exhibit_item = exhibit_item_for_external_resource a_biomodel, common_facet_config.merge(specified_facet_config_for_BM)
 
-    assert_equal "#{a_biomodel.class.name}#{a_biomodel.model_id}", exhibit_item['id']
-    assert_equal "#{a_biomodel.class.name}#{a_biomodel.model_id}", exhibit_item['label']
-    assert_equal a_biomodel.class.name, exhibit_item['type']
+    assert_equal "EBI Biomodels#{a_biomodel.model_id}", exhibit_item['id']
+    assert_equal "EBI Biomodels#{a_biomodel.model_id}", exhibit_item['label']
+    assert_equal "EBI Biomodels", exhibit_item['type']
     assert_equal a_biomodel.model_id, exhibit_item['item_id']
     assert_equal [], exhibit_item['project']
     assert_equal [], exhibit_item['created_at']

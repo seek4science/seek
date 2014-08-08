@@ -168,7 +168,7 @@ Event:
       value_from: country
 
 #external resource
-BiomodelsSearchResult:
+BioModels Database:
   author:
       label: Author
       value_from: authors
