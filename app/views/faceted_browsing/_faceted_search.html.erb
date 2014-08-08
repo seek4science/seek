@@ -12,6 +12,7 @@
    object_types = resource_hash.keys
    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
    specified_facet_config = YAML.load(File.read(specified_faceted_search_config_path))
+   external_faceted_config = YAML.load(File.read(external_faceted_search_config_path))
    expand_facet_count = 1
 %>
 
@@ -38,6 +39,7 @@
 
     <% object_types.each do |object_type| %>
         <% facets_for_object = specified_facet_config[object_type] || {} %>
+        <% facets_for_object.merge!(external_faceted_config[object_type] || {}) %>
         <% unless facets_for_object.blank? %>
             <div class="specified_facets" id="specified_<%= object_type %>_facets">
               <div class="specified_facet_list" id="<%= object_type %>_facet">

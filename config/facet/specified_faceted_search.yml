@@ -166,12 +166,3 @@ Event:
   country:
       label: Country
       value_from: country
-
-#external resource
-BioModels Database:
-  author:
-      label: Author
-      value_from: authors
-  published_year:
-      label: Published Year
-      value_from: published_date:to_date:year

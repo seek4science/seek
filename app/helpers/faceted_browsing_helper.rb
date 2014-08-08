@@ -111,14 +111,18 @@ module FacetedBrowsingHelper
   end
 
   def faceted_browsing_config_path
-    File.join(Rails.root, "config", "faceted_browsing.yml")
+    File.join(Rails.root, "config/facet", "faceted_browsing.yml")
   end
 
   def common_faceted_search_config_path
-    File.join(Rails.root, "config", "common_faceted_search.yml")
+    File.join(Rails.root, "config/facet", "common_faceted_search.yml")
   end
 
   def specified_faceted_search_config_path
-    File.join(Rails.root, "config", "specified_faceted_search.yml")
+    File.join(Rails.root, "config/facet", "specified_faceted_search.yml")
+  end
+
+  def external_faceted_search_config_path
+    File.join(Rails.root, "config/facet", "external_faceted_search.yml")
   end
 end
