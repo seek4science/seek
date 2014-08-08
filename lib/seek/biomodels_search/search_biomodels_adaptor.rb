@@ -22,6 +22,26 @@ module Seek
           YAML::load(yaml)
       end
 
+      def fetch_item item_id
+        yaml = Rails.cache.fetch("biomodels_search_#{item_id}",:expires_in=>1.day) do
+          connection = SysMODB::SearchBiomodel.instance
+          biomodel_result = connection.getSimpleModel(item_id)
+          unless biomodel_result.blank?
+            hash_result = Nori.parse(biomodel_result)[:simple_models][:simple_model]
+          end
+
+          unless hash_result[:publication_id].nil?
+            result = BiomodelsSearchResult.new hash_result
+            result = result.title.blank? ? nil : result
+          else
+            result = nil
+          end
+          result.to_yaml
+        end
+
+        YAML::load(yaml)
+      end
+
     end
 
     class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :published_date, :publication_id, :publication_title,:model_id, :last_modification_date)

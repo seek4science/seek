@@ -16,6 +16,13 @@ module Seek
       end
     end
 
+    def get_item item_id
+      item = fetch_item item_id
+      item.partial_path ||= partial_path
+      item.tab ||= name
+      item
+    end
+
     def enabled?
       @enabled
     end

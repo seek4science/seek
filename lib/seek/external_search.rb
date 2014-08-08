@@ -28,6 +28,18 @@ module Seek
     end
 
 
+    def external_item item_id,type='all'
+      search_adaptors(type).collect do |adaptor|
+        begin
+          adaptor.get_item item_id
+        rescue Exception=>e
+          Rails.logger.error("Error getting external item #{item_id} with #{adaptor} - #{e.class.name}:#{e.message}")
+          []
+          raise e if Rails.env=="development"
+        end
+      end.flatten.uniq
+    end
+
     def external_search query,type='all'
       search_adaptors(type).collect do |adaptor|
         begin
