@@ -8,7 +8,7 @@
 
   <% end %>
   <% if !@results.blank? %>
-      <% if Seek::Config.faceted_search_enabled %>
+      <% if Seek::Config.faceted_search_enabled && @ie_support_faceted_browsing %>
           <%= render :partial => "faceted_browsing/faceted_search" -%>
       <% else %>
           <% resource_hash = classify_for_tabs @results -%>
