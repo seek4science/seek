@@ -3,27 +3,10 @@ module Seek
   module FacetedBrowsing
 
     def items_for_result
-      type_id_hash = get_type_id_hash
-      items = []
-      type_id_hash.each do |type, ids|
-        if Seek::Util.searchable_types.collect{|t| t.name}.include?(type)
-          items |= get_items type, ids
-        else
-          items |= get_external_items type, ids
-        end
-      end
-
-      if type_id_hash.keys.count > 1
-        resource_hash = classify_for_tabs items
-        active_tab = params[:active_tab]
-        items_for_result = render_to_string :partial => "assets/resource_tabbed_one_facet",
-                                            :locals => {:resource_hash => resource_hash,
-                                                        :narrow_view => true,
-                                                        :authorization_already_done => true,
-                                                        :display_immediately => true,
-                                                        :active_tab => active_tab}
+      if request.env['HTTP_REFERER'].include?('/search')
+        items_for_result = items_for_search_result
       else
-        items_for_result = items.collect{|item| render_to_string :partial => "assets/resource_list_item", :object => item}.join(' ')
+        items_for_result = items_for_browsing_result
       end
 
       respond_to do |format|
@@ -34,6 +17,38 @@ module Seek
     end
 
     private
+
+    def items_for_search_result
+      type_id_hash = get_type_id_hash
+      items = []
+      type_id_hash.each do |type, ids|
+        if Seek::Util.searchable_types.collect{|t| t.name}.include?(type)
+          items |= get_items type, ids
+        else
+          items |= get_external_items ids
+        end
+      end
+
+      resource_hash = classify_for_tabs items
+      active_tab = params[:active_tab]
+
+      render_to_string :partial => "assets/resource_tabbed_one_facet",
+                                          :locals => {:resource_hash => resource_hash,
+                                                      :narrow_view => true,
+                                                      :authorization_already_done => true,
+                                                      :display_immediately => true,
+                                                      :active_tab => active_tab}
+    end
+
+    def items_for_browsing_result
+      type_id_hash = get_type_id_hash
+      items = []
+      type_id_hash.each do |type, ids|
+        items |= get_items type, ids
+      end
+
+      items.collect{|item| render_to_string :partial => "assets/resource_list_item", :object => item}.join(' ')
+    end
 
     def get_items item_type, item_ids
       items = []
@@ -90,7 +105,7 @@ module Seek
       type_id_hash
     end
 
-    def get_external_items type, ids
+    def get_external_items ids
       external_items = []
       ids.each do |id|
         external_items << SearchController.new().external_item(id)
