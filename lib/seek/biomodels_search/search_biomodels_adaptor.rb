@@ -23,7 +23,7 @@ module Seek
       end
 
       def fetch_item item_id
-        yaml = Rails.cache.fetch("biomodels_search_#{item_id}",:expires_in=>1.day) do
+        yaml = Rails.cache.fetch("biomodels_search_#{item_id}") do
           connection = SysMODB::SearchBiomodel.instance
           biomodel_result = connection.getSimpleModel(item_id)
           unless biomodel_result.blank?
