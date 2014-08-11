@@ -74,5 +74,5 @@ function hide_all_tabs_content(){
 //this is for the case of one exhibit instance.
 function show_specified_facets_for_active_tab(active_tab) {
     var more_facet_id = "specified_" + active_tab + "_facets";
-    $j('#' + more_facet_id).show();
+    document.getElementById(more_facet_id).show();
 }
