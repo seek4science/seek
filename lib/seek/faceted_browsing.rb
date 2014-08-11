@@ -6,7 +6,11 @@ module Seek
       type_id_hash = get_type_id_hash
       items = []
       type_id_hash.each do |type, ids|
-        items |= get_items type, ids
+        if Seek::Util.searchable_types.collect{|t| t.name}.include?(type)
+          items |= get_items type, ids
+        else
+          items |= get_external_items type, ids
+        end
       end
 
       if type_id_hash.keys.count > 1
@@ -35,7 +39,7 @@ module Seek
       items = []
       if !item_type.blank?
         clazz = item_type.constantize
-        items = clazz.find_all_by_id(item_ids)
+        items = clazz.find_all_by_id(item_ids.collect(&:to_i))
         if clazz.respond_to?(:authorize_asset_collection)
           items = clazz.authorize_asset_collection(items,"view")
         else
@@ -77,7 +81,6 @@ module Seek
       type_id_hash = {}
       items_type_id.each do |type_id|
         type, id = type_id.split('_')
-        id = id.to_i
         if type_id_hash[type].nil?
           type_id_hash[type] = [id]
         else
@@ -87,5 +90,12 @@ module Seek
       type_id_hash
     end
 
+    def get_external_items type, ids
+      external_items = []
+      ids.each do |id|
+        external_items << SearchController.new().external_item(id)
+      end
+      external_items.compact.flatten.uniq
+    end
   end
 end

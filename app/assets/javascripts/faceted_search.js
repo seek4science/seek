@@ -39,7 +39,7 @@ function tab_on_click_one_facet(resource_type) {
         click_tab.parentElement.className = 'tabberactive';
         active_tab = resource_type;
         //Show the content of clicking tab
-        $j('#' + resource_type).removeClass('tabbertabhide');
+        document.getElementById(resource_type).className = 'tabbertab';
 
         show_specified_facets_for_active_tab(resource_type);
     }
