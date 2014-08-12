@@ -6,12 +6,12 @@ require 'seek/seek_render_override'
 SEEK::Application.configure do
   #Main settings
   Seek::Config.default :public_seek_enabled,true
-  Seek::Config.default :sycamore_enabled,false
+  Seek::Config.default :sycamore_enabled,true
   Seek::Config.default :events_enabled,true
   Seek::Config.default :jerm_enabled,false
   Seek::Config.default :email_enabled,false
   Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
-  Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
+  Seek::Config.default :noreply_sender, 'seek1@virtual-liver.de'
   Seek::Config.default :solr_enabled,false
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"https://jws.sysmo-db.org/"
@@ -34,12 +34,12 @@ SEEK::Application.configure do
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
-  Seek::Config.default :publish_button_enabled, true
+  Seek::Config.default :publish_button_enabled, false
   Seek::Config.default :auth_lookup_enabled,true
-  Seek::Config.default :sample_parser_enabled,false
+  Seek::Config.default :sample_parser_enabled,true
   Seek::Config.default :external_search_enabled, true
-  Seek::Config.default :project_browser_enabled,false
-  Seek::Config.default :experimental_features_enabled,false
+  Seek::Config.default :project_browser_enabled,true
+  Seek::Config.default :experimental_features_enabled,true
   Seek::Config.default :pdf_conversion_enabled,true
   Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :forum_enabled,false
@@ -64,12 +64,13 @@ SEEK::Application.configure do
   Seek::Config.default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
   Seek::Config.default :profile_select_by_default,true
   Seek::Config.default :programmes_enabled, true
+  Seek::Config.default :project_hierarchy_enabled, true
 
-  Seek::Config.default :header_tagline_text_enabled, true
+  Seek::Config.default :header_tagline_text_enabled, false
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,2
-  Seek::Config.default :project_hierarchy_enabled, false
+
 # Branding
   Seek::Config.default :project_name,'SysMO'
   Seek::Config.default :project_type,'Consortium'
@@ -86,7 +87,7 @@ SEEK::Application.configure do
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
-  Seek::Config.default :is_virtualliver, false
+  Seek::Config.default :is_virtualliver, true
 
 # Pagination
   Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
@@ -95,7 +96,7 @@ SEEK::Application.configure do
   Seek::Config.default :related_items_limit,5
 
 # Faceted Browsing and Faceted Search
-  Seek::Config.default :faceted_browsing_enabled, true
+  Seek::Config.default :faceted_browsing_enabled, false
   Seek::Config.default :facet_enable_for_pages, {:specimens => true,:samples => true, :people => true, :projects => true, :institutions => true, :programmes => true, :investigations => true,:studies => true, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => true, :strains => true, :presentations => true}
   Seek::Config.default :faceted_search_enabled, true
   Seek::Config.default :is_one_facet_instance, true
@@ -110,12 +111,8 @@ SEEK::Application.configure do
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
 
-  Seek::Config.default :max_attachments_num,100
 
   Seek::Config.default :datacite_url,"https://mds.datacite.org/"
-
-  #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
-  Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
 
   #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
   Seek::Config.default :magic_guest_enabled,false
