@@ -5,7 +5,7 @@
   </div>
 <% end -%>
 <% if show_scales? %>
-         <%= render :partial=>"scales/scale_display_lazy_load" -%>
+    <%= tabs_lazy_loaded? ? render(:partial => "scales/scale_display_lazy_load") : render(:partial => "scales/scale_display") -%>
 <% end %>
 
 
