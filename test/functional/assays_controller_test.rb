@@ -1339,5 +1339,38 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
+  test 'faceted browsing config for Assay' do
+    Factory(:assay, :policy => Factory(:public_policy))
+    with_config_value :faceted_browsing_enabled,true do
+      get :index
+      record_body
+      assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.technology_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.for_test']", :count => 0
+    end
+  end
 
+  test 'content config for Assay' do
+    with_config_value :faceted_browsing_enabled,true do
+      get :index
+      assert_select "div[data-ex-role='exhibit-view'][data-ex-label='Tiles'][data-ex-paginate='true']", :count => 1
+    end
+  end
+
+  test 'show only authorized items for faceted browsing' do
+    with_config_value :faceted_browsing_enabled,true do
+      assay1 = Factory(:assay, :policy => Factory(:public_policy))
+      assay2 = Factory(:assay, :policy => Factory(:private_policy))
+      assert assay1.can_view?
+      assert !assay2.can_view?
+      @request.env['HTTP_REFERER'] = '/assays/items_for_result'
+      xhr :post, "/items_for_result",{:items => "Assay_#{assay1.id},Assay_#{assay2.id}"}
+      items_for_result =  ActiveSupport::JSON.decode(@response.body)['items_for_result']
+      assert items_for_result.include?(assay1.title)
+      assert !items_for_result.include?(assay2.title)
+    end
+  end
 end

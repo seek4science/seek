@@ -145,7 +145,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     a_biomodel = results.first
 
     common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
-    specified_facet_config_for_BM = YAML.load(File.read(specified_faceted_search_config_path))['BioModels Database']
+    specified_facet_config_for_BM = YAML.load(File.read(external_faceted_search_config_path))['BioModels Database']
 
     exhibit_item = exhibit_item_for_external_resource a_biomodel, common_facet_config.merge(specified_facet_config_for_BM)
 
