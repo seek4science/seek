@@ -28,9 +28,7 @@ class ConfigTest < ActiveSupport::TestCase
     end
   end
 
-  test "scales" do
-    assert_equal ["organism","liver","liverLobule","intercellular","cell"],Seek::Config.scales
-  end
+
 
   test "seek_video_link" do
     assert_equal "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u", Seek::Config.seek_video_link
