@@ -113,6 +113,7 @@ SEEK::Application.configure do
 
 
   Seek::Config.default :datacite_url,"https://mds.datacite.org/"
+  Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
 
   #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
   Seek::Config.default :magic_guest_enabled,false
