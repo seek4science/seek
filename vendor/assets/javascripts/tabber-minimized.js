@@ -14,7 +14,7 @@ childNodes,i,i2,t,defaultTab=0,DOM_ul,DOM_li,DOM_a,aId,headingElement;if(!docume
 this.tabs.length=0;childNodes=e.childNodes;for(i=0;i<childNodes.length;i++){if(childNodes[i].className&&childNodes[i].className.match(this.REclassTab)){t=new Object();t.div=childNodes[i];this.tabs[this.tabs.length]=t;if(childNodes[i].className.match(this.REclassTabDefault)){defaultTab=this.tabs.length-1;}}}
   DOM_ul=document.createElement("ul");
   DOM_ul.className=this.classNav;
-  row_max = 11;
+  row_max = 12;
   row_length = this.tabs.length % row_max;
   if(row_length == 0){row_length = row_max}
   first_child = e.firstChild;
