@@ -72,7 +72,6 @@ class AdminsController < ApplicationController
     Seek::Config.piwik_analytics_id_site= params[:piwik_analytics_id_site]
     Seek::Config.piwik_analytics_url= params[:piwik_analytics_url]
 
-    Seek::Config.is_one_facet_instance= string_to_boolean(params[:is_one_facet_instance] || true)
 
     Seek::Config.set_smtp_settings 'port', params[:port] if only_integer params[:port], 'port'
     Seek::Util.clear_cached

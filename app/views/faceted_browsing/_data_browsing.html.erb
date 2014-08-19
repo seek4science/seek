@@ -1,0 +1,22 @@
+<div id="data" style="display:none">
+  <%
+     objects = data_browsing
+     object_type = objects.first.class.name
+     facet_config = YAML.load(File.read(faceted_browsing_config_path))
+     facets_for_object = facet_config[object_type] || {}
+
+     #generate tree for HierarchicalFacet
+     exhibit_items = exhibit_trees facets_for_object
+
+     #generate exhibit_items
+     objects.each do |object|
+       exhibit_item = exhibit_item_for object, facets_for_object
+       exhibit_items << exhibit_item
+     end
+  %>
+
+  {
+    "items": <%= exhibit_items.to_json %>
+  }
+
+</div>

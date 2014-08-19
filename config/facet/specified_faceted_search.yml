@@ -1,4 +1,6 @@
-#TODO: need some comment to explain the config fields
+# See the explanation in faceted_browsing.yml
+
+#isa
 Assay:
   organism:
       label: Organism
@@ -13,10 +15,8 @@ Assay:
       value_from: technology_type_label
       facet_class: Exhibit.HierarchicalFacet
       tree_from: Seek::Ontologies::TechnologyTypeReader
-  contributor:
-      label: Contributor
-      value_from: contributor:name
 
+#assets
 DataFile:
   assay_type:
         label: Assay Type
@@ -28,9 +28,6 @@ DataFile:
         value_from: technology_type_titles
         facet_class: Exhibit.HierarchicalFacet
         tree_from: Seek::Ontologies::TechnologyTypeReader
-  contributor:
-      label: Contributor
-      value_from: creators:name
 
 Model:
   organism:
@@ -50,9 +47,6 @@ Model:
       value_from: assay_type_titles
       facet_class: Exhibit.HierarchicalFacet
       tree_from: Seek::Ontologies::ModellingAnalysisTypeReader
-  contributor:
-      label: Contributor
-      value_from: creators:name
 
 Sop:
   technology_type:
@@ -65,9 +59,6 @@ Sop:
         value_from: assay_type_titles
         facet_class: Exhibit.HierarchicalFacet
         tree_from: Seek::Ontologies::AssayTypeReader,Seek::Ontologies::ModellingAnalysisTypeReader
-  contributor:
-      label: Contributor
-      value_from: creators:name
 
 Publication:
   author:
@@ -80,6 +71,7 @@ Publication:
       label: Organism
       value_from: related_organisms:title
 
+#yellow pages
 Person:
   discipline:
       label: Discipline
@@ -102,3 +94,75 @@ Person:
   name:
       label: Name
       value_from: name
+
+Project:
+  name:
+      label: Name
+      value_from: title
+  organism:
+      label: Organism
+      value_from: organisms:title
+  institution:
+      label: Institution
+      value_from: institutions:title
+  location:
+      label: Location
+      value_from: locations
+
+Institution:
+  name:
+      label: Name
+      value_from: title
+  location:
+      label: Location
+      value_from: country
+
+Programme:
+  name:
+      label: Name
+      value_from: title
+
+#biosamples
+Strain:
+  organism:
+      label: Organism
+      value_from: organism:title
+  gene:
+      label: Modified Gene
+      value_from: genotypes:gene:title
+
+Specimen:
+  organism:
+      label: Organism
+      value_from: strain:organism:title
+  strain:
+      label: Strain
+      value_from: strain:info
+  culture_growth_type:
+      label: Culture growth type
+      value_from: culture_growth_type:title
+  institution:
+      label: Institution
+      value_from: institution:title
+
+Sample:
+  organism:
+      label: Organism
+      value_from: specimen:strain:organism:title
+  strain:
+      label: Strain
+      value_from: specimen:strain:info
+  specimen:
+      label: Specimen
+      value_from: specimen:title
+  organism_part:
+      label: Organism part
+      value_from: organism_part
+
+Event:
+  start_date:
+      label: Event date
+      value_from: start_date:year
+  country:
+      label: Country
+      value_from: country
