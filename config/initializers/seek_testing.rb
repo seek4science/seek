@@ -58,7 +58,7 @@ SEEK::Application.configure do
 
       Seek::Config.fixed :faceted_browsing_enabled, false
       Seek::Config.fixed :facet_enable_for_pages, {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
-      Settings.defaults[:faceted_search_enabled] = false
+      Seek::Config.fixed :faceted_search_enabled,  false
 
       #enable solr for testing, but use mockup sunspot session
       Seek::Config.solr_enabled = true
