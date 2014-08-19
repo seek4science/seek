@@ -99,6 +99,7 @@ SEEK::Application.configure do
   Seek::Config.fixed :related_items_limit,5
 
 # Faceted Browsing and Faceted Search
+  Seek::Config.fixed :faceted_browsing_enabled, true
   Seek::Config.fixed :facet_enable_for_pages, {:specimens => true,:samples => true, :people => true, :projects => true, :institutions => true, :programmes => true, :investigations => true,:studies => true, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => true, :strains => true, :presentations => true}
   Seek::Config.fixed :faceted_search_enabled, true
   Seek::Config.default :is_one_facet_instance, true
