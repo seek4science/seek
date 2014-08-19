@@ -69,7 +69,7 @@ SEEK::Application.configure do
   Seek::Config.fixed :programmes_enabled, true
   Seek::Config.fixed :project_hierarchy_enabled, true
 
-  Seek::Config.fixed :header_tagline_text_enabled, true
+  Seek::Config.fixed :header_tagline_text_enabled, false
 
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.fixed :home_feeds_cache_timeout,2
