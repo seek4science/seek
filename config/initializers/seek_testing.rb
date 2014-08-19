@@ -2,7 +2,7 @@
 SEEK::Application.configure do
   if Rails.env.test?
     silence_warnings do
-      Settings.defaults[:is_virtualliver] = false
+      Settings.fixed :is_virtualliver, false
       Settings.defaults[:application_title] = 'The Sysmo SEEK'
       Settings.defaults[:project_name] = 'Sysmo'
       Settings.defaults[:project_title] = 'The Sysmo Consortium'
@@ -17,18 +17,19 @@ SEEK::Application.configure do
 
       Settings.defaults[:email_enabled] = true
       Settings.defaults[:solr_enabled] = false
-      Settings.defaults[:publish_button_enabled] = true
-      Settings.defaults[:auth_lookup_enabled] = false
-      Settings.defaults[:sample_parser_enabled] = true
-      Settings.defaults[:project_browser_enabled] = true
-      Settings.defaults[:experimental_features_enabled] = true
-      Settings.defaults[:filestore_path] = "tmp/testing-filestore"
-      Settings.defaults[:tagging_enabled] = true
-      Settings.defaults[:authorization_checks_enabled] = true
-      Settings.defaults[:magic_guest_enabled] = false
-      Settings.defaults[:workflows_enabled] = true
-      Settings.defaults[:programmes_enabled] = true
-      Settings.defaults[:project_hierarchy_enabled] = true
+
+      Settings.fixed :publish_button_enabled, true
+      Settings.fixed :auth_lookup_enabled, false
+      Settings.fixed :sample_parser_enabled, true
+      Settings.fixed :project_browser_enabled, true
+      Settings.fixed :experimental_features_enabled, true
+      Settings.fixed :filestore_path, "tmp/testing-filestore"
+      Settings.fixed :tagging_enabled, true
+      Settings.fixed :authorization_checks_enabled, true
+      Settings.fixed :magic_guest_enabled, false
+      Settings.fixed :workflows_enabled, true
+      Settings.fixed :programmes_enabled, true
+      Settings.fixed :project_hierarchy_enabled, true
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'SEEK'
@@ -41,9 +42,9 @@ SEEK::Application.configure do
       Settings.defaults[:header_image] = 'sysmo-db-logo_smaller.png'
       Settings.defaults[:bioportal_api_key]="fish"
 
-      Settings.defaults[:technology_type_ontology_file]= "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
-      Settings.defaults[:modelling_analysis_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
-      Settings.defaults[:assay_type_ontology_file]="file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Settings.fixed :technology_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Settings.fixed :modelling_analysis_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Settings.fixed :assay_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
 
       Seek::Config.fixed :css_prepended,''
       Seek::Config.fixed :css_appended,''
@@ -55,8 +56,8 @@ SEEK::Application.configure do
       ActionView::Renderer.clear_alternative({:seek_partial=>"projects/resource_list_item"})
       ActionView::Renderer.clear_alternative({:controller=>:people,:seek_partial=>"general/items_related_to"})
 
-      Settings.defaults[:faceted_browsing_enabled] = false
-      Settings.defaults[:facet_enable_for_pages] = {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
+      Settings.fixed :faceted_browsing_enabled, false
+      Settings.fixed :facet_enable_for_pages, {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
       Settings.defaults[:faceted_search_enabled] = false
 
       #enable solr for testing, but use mockup sunspot session
