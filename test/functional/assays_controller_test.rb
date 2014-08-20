@@ -1375,7 +1375,6 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
   end
-end
 
   test 'faceted browsing config for Assay' do
     Factory(:assay, :policy => Factory(:public_policy))
