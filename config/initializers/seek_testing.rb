@@ -2,7 +2,7 @@
 SEEK::Application.configure do
   if Rails.env.test?
     silence_warnings do
-      Seek::Config.fixed :is_virtualliver, false
+      Seek::Config.forced_default :is_virtualliver, false
       Settings.defaults[:application_title] = 'The Sysmo SEEK'
       Settings.defaults[:project_name] = 'Sysmo'
       Settings.defaults[:project_title] = 'The Sysmo Consortium'
@@ -18,18 +18,18 @@ SEEK::Application.configure do
       Settings.defaults[:email_enabled] = true
       Settings.defaults[:solr_enabled] = false
 
-      Seek::Config.fixed :publish_button_enabled, true
-      Seek::Config.fixed :auth_lookup_enabled, false
-      Seek::Config.fixed :sample_parser_enabled, true
-      Seek::Config.fixed :project_browser_enabled, true
-      Seek::Config.fixed :experimental_features_enabled, true
-      Seek::Config.fixed :filestore_path, "tmp/testing-filestore"
-      Seek::Config.fixed :tagging_enabled, true
-      Seek::Config.fixed :authorization_checks_enabled, true
-      Seek::Config.fixed :magic_guest_enabled, false
-      Seek::Config.fixed :workflows_enabled, true
-      Seek::Config.fixed :programmes_enabled, true
-      Seek::Config.fixed :project_hierarchy_enabled, true
+      Seek::Config.forced_default :publish_button_enabled, true
+      Seek::Config.forced_default :auth_lookup_enabled, false
+      Seek::Config.forced_default :sample_parser_enabled, true
+      Seek::Config.forced_default :project_browser_enabled, true
+      Seek::Config.forced_default :experimental_features_enabled, true
+      Seek::Config.forced_default :filestore_path, "tmp/testing-filestore"
+      Seek::Config.forced_default :tagging_enabled, true
+      Seek::Config.forced_default :authorization_checks_enabled, true
+      Seek::Config.forced_default :magic_guest_enabled, false
+      Seek::Config.forced_default :workflows_enabled, true
+      Seek::Config.forced_default :programmes_enabled, true
+      Seek::Config.forced_default :project_hierarchy_enabled, true
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'SEEK'
@@ -42,9 +42,9 @@ SEEK::Application.configure do
       Settings.defaults[:header_image] = 'sysmo-db-logo_smaller.png'
       Settings.defaults[:bioportal_api_key]="fish"
 
-      Seek::Config.fixed :technology_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
-      Seek::Config.fixed :modelling_analysis_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
-      Seek::Config.fixed :assay_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Seek::Config.forced_default :technology_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Seek::Config.forced_default :modelling_analysis_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Seek::Config.forced_default :assay_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
 
       Seek::Config.fixed :css_prepended,''
       Seek::Config.fixed :css_appended,''
@@ -56,9 +56,9 @@ SEEK::Application.configure do
       ActionView::Renderer.clear_alternative({:seek_partial=>"projects/resource_list_item"})
       ActionView::Renderer.clear_alternative({:controller=>:people,:seek_partial=>"general/items_related_to"})
 
-      Seek::Config.fixed :faceted_browsing_enabled, false
-      Seek::Config.fixed :facet_enable_for_pages, {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
-      Seek::Config.fixed :faceted_search_enabled,  false
+      Seek::Config.forced_default :faceted_browsing_enabled, false
+      Seek::Config.forced_default :facet_enable_for_pages, {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
+      Seek::Config.forced_default :faceted_search_enabled,  false
 
       #enable solr for testing, but use mockup sunspot session
       Seek::Config.solr_enabled = true

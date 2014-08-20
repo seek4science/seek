@@ -5,11 +5,10 @@ require 'seek/seek_render_override'
 
 SEEK::Application.configure do
   #Main settings
-
   #NOTE: Seek::Config.public_seek_enabled is still needed? it is always true in SEEK via resetting true even it is false here
-  Seek::Config.fixed :public_seek_enabled,true
+  Seek::Config.forced_default :public_seek_enabled,true
 
-  Seek::Config.fixed :sycamore_enabled,true
+  Seek::Config.forced_default :sycamore_enabled,true
   Seek::Config.default :events_enabled,true
   Seek::Config.default :jerm_enabled,false
   Seek::Config.default :email_enabled,false
@@ -36,44 +35,43 @@ SEEK::Application.configure do
   Seek::Config.default :community_news_feed_urls,''
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
-  Seek::Config.fixed :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
-  Seek::Config.fixed :publish_button_enabled, true
-  Seek::Config.fixed :auth_lookup_enabled,true
-  Seek::Config.fixed :sample_parser_enabled,true
-  Seek::Config.fixed :external_search_enabled, true
-  Seek::Config.fixed :project_browser_enabled,true
-  Seek::Config.fixed :experimental_features_enabled,true
+  Seek::Config.forced_default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
+  Seek::Config.forced_default :publish_button_enabled, true
+  Seek::Config.forced_default :auth_lookup_enabled,true
+  Seek::Config.forced_default :sample_parser_enabled,true
+  Seek::Config.forced_default :external_search_enabled, true
+  Seek::Config.forced_default :project_browser_enabled,true
+  Seek::Config.forced_default :experimental_features_enabled,true
   Seek::Config.default :pdf_conversion_enabled,true
   Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :forum_enabled,false
-  Seek::Config.fixed :filestore_path,"filestore"
-  Seek::Config.fixed :biosamples_enabled, true
-  Seek::Config.fixed :modelling_analysis_enabled,true
-  Seek::Config.fixed :organisms_enabled,true
-  Seek::Config.fixed :models_enabled,true
-  Seek::Config.fixed :guide_box_enabled,true
-  Seek::Config.fixed :treatments_enabled,true
-  Seek::Config.fixed :factors_studied_enabled,true
-  Seek::Config.fixed :experimental_conditions_enabled,true
-  Seek::Config.fixed :tagging_enabled, true
-  Seek::Config.fixed :workflows_enabled,true
-  Seek::Config.fixed :authorization_checks_enabled, true
-  Seek::Config.fixed :documentation_enabled,true
-  Seek::Config.fixed :assay_type_ontology_file, "JERM-RDFXML.owl"
-  Seek::Config.fixed :technology_type_ontology_file, "JERM-RDFXML.owl"
-  Seek::Config.fixed :modelling_analysis_type_ontology_file, "JERM-RDFXML.owl"
-  Seek::Config.fixed :assay_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
-  Seek::Config.fixed :technology_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
-  Seek::Config.fixed :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
-  Seek::Config.fixed :profile_select_by_default,true
-  Seek::Config.fixed :programmes_enabled, true
-  Seek::Config.fixed :project_hierarchy_enabled, true
+  Seek::Config.forced_default :filestore_path,"filestore"
+  Seek::Config.forced_default :biosamples_enabled, true
+  Seek::Config.forced_default :modelling_analysis_enabled,true
+  Seek::Config.forced_default :organisms_enabled,true
+  Seek::Config.forced_default :models_enabled,true
+  Seek::Config.forced_default :guide_box_enabled,true
+  Seek::Config.forced_default :treatments_enabled,true
+  Seek::Config.forced_default :factors_studied_enabled,true
+  Seek::Config.forced_default :experimental_conditions_enabled,true
+  Seek::Config.forced_default :tagging_enabled, true
+  Seek::Config.forced_default :workflows_enabled,true
+  Seek::Config.forced_default :authorization_checks_enabled, true
+  Seek::Config.forced_default :documentation_enabled,true
+  Seek::Config.forced_default :assay_type_ontology_file, "JERM-RDFXML.owl"
+  Seek::Config.forced_default :technology_type_ontology_file, "JERM-RDFXML.owl"
+  Seek::Config.forced_default :modelling_analysis_type_ontology_file, "JERM-RDFXML.owl"
+  Seek::Config.forced_default :assay_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
+  Seek::Config.forced_default :technology_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
+  Seek::Config.forced_default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
+  Seek::Config.forced_default :profile_select_by_forced_default,true
+  Seek::Config.forced_default :programmes_enabled, true
+  Seek::Config.forced_default :project_hierarchy_enabled, true
 
-  Seek::Config.fixed :header_tagline_text_enabled, false
+  Seek::Config.forced_default :header_tagline_text_enabled, false
 
 #time in minutes that the feeds on the front page are cached for
-  Seek::Config.fixed :home_feeds_cache_timeout,2
-
+  Seek::Config.forced_default :home_feeds_cache_timeout,2
 # Branding
   Seek::Config.default :project_name,'SysMO'
   Seek::Config.default :project_type,'Consortium'
@@ -86,44 +84,46 @@ SEEK::Application.configure do
   Seek::Config.default :header_image_title, "SysMO-DB"
   Seek::Config.default :header_image_link,"http://www.sysmo-db.org"
   Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
-  Seek::Config.fixed :header_home_logo_image,'seek-logo-smaller.png'
+  Seek::Config.forced_default :header_home_logo_image,'seek-logo-smaller.png'
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
-  Seek::Config.fixed :is_virtualliver, true
+  Seek::Config.forced_default :is_virtualliver, true
 
 # Pagination
   Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
   Seek::Config.default :limit_latest,7
 
-  Seek::Config.fixed :related_items_limit,5
+  Seek::Config.forced_default :related_items_limit,5
 
 # Faceted Browsing and Faceted Search
-  Seek::Config.fixed :faceted_browsing_enabled, true
-  Seek::Config.fixed :facet_enable_for_pages, {:specimens => true,:samples => true, :people => true, :projects => true, :institutions => true, :programmes => true, :investigations => true,:studies => true, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => true, :strains => true, :presentations => true}
-  Seek::Config.fixed :faceted_search_enabled, true
+  Seek::Config.forced_default :faceted_browsing_enabled, true
+  Seek::Config.forced_default :facet_enable_for_pages, {:specimens => true,:samples => true, :people => true, :projects => true, :institutions => true, :programmes => true, :investigations => true,:studies => true, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => true, :strains => true, :presentations => true}
+  Seek::Config.forced_default :faceted_search_enabled, true
   Seek::Config.default :is_one_facet_instance, true
 
 # Others
-  Seek::Config.fixed :type_managers_enabled,true
-  Seek::Config.fixed :type_managers,'admins'
+  Seek::Config.forced_default :type_managers_enabled,true
+  Seek::Config.forced_default :type_managers,'admins'
   Seek::Config.default :tag_threshold,1
   Seek::Config.default :max_visible_tags,20
   Seek::Config.default :pubmed_api_email,nil
   Seek::Config.default :crossref_api_email,nil
   Seek::Config.default :site_base_host,"http://localhost:3000"
-  Seek::Config.fixed :open_id_authentication_store,:memory
+  Seek::Config.forced_default :open_id_authentication_store,:memory
 
 
-  Seek::Config.fixed :datacite_url,"https://mds.datacite.org/"
-  Seek::Config.fixed :scales,["organism","liver","liverLobule","intercellular","cell"]
+  Seek::Config.forced_default :datacite_url,"https://mds.datacite.org/"
+
+  #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
+  Seek::Config.forced_default :scales,["organism","liver","liverLobule","intercellular","cell"]
 
   #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
-  Seek::Config.fixed :magic_guest_enabled,false
+  Seek::Config.forced_default :magic_guest_enabled,false
 
-  Seek::Config.fixed :recaptcha_enabled, true
+  Seek::Config.forced_default :recaptcha_enabled, true
 
-  Seek::Config.fixed :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
+  Seek::Config.forced_default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
 
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,''
