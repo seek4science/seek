@@ -2,7 +2,7 @@
 en:
   #Biosamples renaming
   biosamples:
-    sample_parent_term: "Cell culture"
+    sample_parent_term: "Specimen"
     specimen_culture_starting_date: "Culture starting date"
     sample_age: "Age at sampling"
     specimen_creators: "Creators"
