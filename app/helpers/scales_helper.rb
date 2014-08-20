@@ -78,26 +78,27 @@ module ScalesHelper
     else
       if list_item
         links = scales.collect do |scale|
-          model.fetch_additional_scale_info(scale.id).collect do |info|
-
           link = link_to(scale.title, scale)
+          link_with_params = model.fetch_additional_scale_info(scale.id).collect do |info|
           param = content_tag(:em, info["param"])
           unit = content_tag(:em, info["unit"])
           "#{link} (param:#{param} unit:#{unit})"
           end
+          link_with_params.empty?? link : link_with_params
         end.flatten
         links = join_with_and(links)
         links.html_safe
       else
         content_tag (:ul), :class => "model_scales_list" do
           scales.collect do |scale|
-            model.fetch_additional_scale_info(scale.id).collect do |info|
-              link = link_to(scale.title, scale)
+            link = link_to(scale.title, scale)
+            link_with_params = model.fetch_additional_scale_info(scale.id).collect do |info|
               param = content_tag(:em, info["param"])
               unit = content_tag(:em, info["unit"])
               line = "for scale #{link} passes #{param} with unit of #{unit}"
               concat(content_tag(:li, line.html_safe))
             end
+             concat(content_tag(:li, link.html_safe)) if link_with_params.empty?
           end
         end
       end
