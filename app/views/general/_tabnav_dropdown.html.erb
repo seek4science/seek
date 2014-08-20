@@ -10,6 +10,10 @@
       <a class="item1 curved_top" href="javascript:void(0)">Yellow Pages <%=image_tag('misc_icons/arrow_down_small_white.png')%></a>
 
       <div class="section">
+        <!-- Programme  tab -->
+        <%= tab_definition :controllers=>["programmes"], :title=>t('programme').pluralize if Seek::Config.programmes_enabled -%>
+
+        <!-- people tab-->
         <%= tab_definition :controllers=>["people"] -%>
 
         <!-- Projects tab -->
