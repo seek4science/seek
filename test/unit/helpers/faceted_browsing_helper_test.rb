@@ -43,7 +43,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
       elsif item.respond_to?(:contributor)
         assert_equal [item.contributor.person.name], contributor_value
       else
-        assert contributor_value.empty?
+        assert_equal "Missing value", contributor_value
       end
     end
 
@@ -60,11 +60,11 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_equal df.class.name, exhibit_item['type']
     assert_equal df.id, exhibit_item['item_id']
     assert_equal df.projects.collect(&:title), exhibit_item['project']
-    assert_equal df.assay_type_titles, exhibit_item['assay_type']
-    assert_equal df.technology_type_titles, exhibit_item['technology_type']
+    assert_equal "Missing value", exhibit_item['assay_type']
+    assert_equal "Missing value", exhibit_item['technology_type']
     assert_equal [df.created_at.year], exhibit_item['created_at']
     assert_equal df.creators.collect(&:name) + [df.contributor.person.name], exhibit_item['contributor']
-    assert_equal df.tags_as_text_array, exhibit_item['tag']
+    assert_equal "Missing value", exhibit_item['tag']
 
   end
 
@@ -101,11 +101,11 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_equal df.class.name, exhibit_item['type']
     assert_equal df.id, exhibit_item['item_id']
     assert_equal df.projects.collect(&:title), exhibit_item['project']
-    assert_equal df.assay_type_titles, exhibit_item['assay_type']
-    assert_equal df.technology_type_titles, exhibit_item['technology_type']
+    assert_equal "Missing value", exhibit_item['assay_type']
+    assert_equal "Missing value", exhibit_item['technology_type']
     assert_equal [df.created_at.year], exhibit_item['created_at']
     assert_equal df.creators.collect(&:name) + [df.contributor.person.name], exhibit_item['contributor']
-    assert_equal df.tags_as_text_array, exhibit_item['tag']
+    assert_equal "Missing value", exhibit_item['tag']
 
   end
 
@@ -167,10 +167,10 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_equal "EBI Biomodels#{a_biomodel.model_id}", exhibit_item['label']
     assert_equal "EBI Biomodels", exhibit_item['type']
     assert_equal a_biomodel.model_id, exhibit_item['item_id']
-    assert_equal [], exhibit_item['project']
-    assert_equal [], exhibit_item['created_at']
-    assert_equal [], exhibit_item['contributor']
-    assert_equal [], exhibit_item['tag']
+    assert_equal "Missing value", exhibit_item['project']
+    assert_equal "Missing value", exhibit_item['created_at']
+    assert_equal "Missing value", exhibit_item['contributor']
+    assert_equal "Missing value", exhibit_item['tag']
     assert_equal  [a_biomodel.published_date.to_date.year], exhibit_item['published_year']
     assert_equal a_biomodel.authors, exhibit_item['author']
   end
