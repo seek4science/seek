@@ -49,6 +49,24 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
 
   end
 
+  test 'generate contributor value for a Person object' do
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+
+    a_person = Factory(:person)
+
+    exhibit_item = exhibit_item_for a_person, common_facet_config
+    assert_equal a_person.name, exhibit_item['contributor']
+  end
+
+  test 'generate project value for a Project object' do
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+
+    a_project = Factory(:project)
+
+    exhibit_item = exhibit_item_for a_project, common_facet_config
+    assert_equal a_project.title, exhibit_item['project']
+  end
+
   test 'exhibit_item_for an data_file in case of faceted browsing' do
     df = Factory(:data_file)
     facet_config = YAML.load(File.read(faceted_browsing_config_path))

@@ -42,6 +42,8 @@ module FacetedBrowsingHelper
       #special case when generating project filter for project itself from common_faceted_search.yml
       if object.kind_of?(Project) && key == 'project'
         exhibit_item[key] = object.title
+      elsif object.kind_of?(Person) && key == 'contributor'
+        exhibit_item[key] = object.name
       else
         exhibit_item[key] = value_for_key value, object
       end
