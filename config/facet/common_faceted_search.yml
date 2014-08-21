@@ -3,7 +3,6 @@
 project:
     label: Project
     value_from: projects:title
-    rails_class: Project
 
 created_at:
     label: Created In

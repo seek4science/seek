@@ -138,6 +138,20 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_includes(exhibit_items, {'type' => 'assay_type', 'label' => 'Metabolite profiling', 'subclassOf' => 'Metabolomics'})
   end
 
+  test '-Missing value- for the attribute which value is not assigned' do
+    df = Factory(:data_file)
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+    exhibit_item = exhibit_item_for df, common_facet_config
+    assert_equal 'Missing value', exhibit_item['tag']
+  end
+
+  test "if the asset does not have this attribute, the respective value is nil" do
+    df = Factory(:data_file)
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+    exhibit_item = exhibit_item_for df, common_facet_config
+    assert_equal nil, exhibit_item['a_field']
+  end
+
   test 'exhibit_item_for_external_resource: biomodel' do
     mock_service_calls
     adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path" => "lib/test-partial.erb", "name" => "EBI Biomodels"})

@@ -129,7 +129,7 @@ Exhibit.Localization.importLocale("en", {
     "%facets.facetClearSelectionsActionTitle": "Clear selections in facet %1$s",
     "%facets.facetTextSearchActionTitle": "Text search %1$s",
     "%facets.facetClearTextSearchActionTitle": "Clear text search",
-    "%facets.missingThisField": "(missing this field)",
+    "%facets.missingThisField": "(don't have this field)",
     "%facets.missingLabel": "missing %1$s",
     "%facets.error.configuration": "%1$s: Error processing configuration of facet",
     "%facets.numeric.rangeShort": "%1$d - %2$d",

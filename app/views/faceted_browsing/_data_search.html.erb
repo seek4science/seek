@@ -8,7 +8,7 @@
      #generate tree for HierarchicalFacet
      all_facet_config = common_facet_config
      resource_hash.keys.each do |object_type|
-       all_facet_config.merge!(specified_facet_config[object_type] || {})
+       all_facet_config = all_facet_config.merge(specified_facet_config[object_type] || {})
      end
      exhibit_items = exhibit_trees all_facet_config
 
