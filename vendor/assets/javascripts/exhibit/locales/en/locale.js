@@ -196,7 +196,7 @@ Exhibit.Localization.importLocale("en", {
     "%widget.collectionSummary.resetActionTitle": "Reset all filters",
     "%widget.collectionSummary.allResultsTemplate": "<span class=\"%1$s\" id=\"resultDescription\"></span>",
     "%widget.collectionSummary.noResultsTemplate": "<span class=\"%1$s\"><span class=\"%2$s\">0</span> results</span> (<span id=\"resetActionLink\"></span>)",
-    "%widget.collectionSummary.filteredResultsTemplate": "<span class=\"%1$s\" id=\"resultDescription\"></span> filtered from <span id=\"originalCountSpan\">0</span> originally (<span id=\"resetActionLink\"></span>)",
+    "%widget.collectionSummary.filteredResultsTemplate": "<span class=\"%1$s\" id=\"resultDescription\"></span> filtered from <span id=\"originalCountSpan\">0</span> Items originally (<span id=\"resetActionLink\"></span>)",
 
     "%formatter.listSeparator": ", ",
     "%formatter.listLastSeparator": ", and ",
