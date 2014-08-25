@@ -22,6 +22,7 @@ function updateFirstPage() {
                     $j('.exhibit-collectionView-header-groupControl').hide();
                     $j('.exhibit-toolboxWidget-button').hide();
                     decodeValueTooltip();
+                    selectedFacets();
                 });
     }
 }
@@ -98,3 +99,29 @@ function renameOtherField(){
 //use in the case of one instance faceted search
 //use active_tab to send this info to the server, in order to keep the same selection after the server response
 var active_tab = null;
+
+function selectedFacets(){
+    var selected_facets = [];
+
+    $j(".exhibit-facet-value-selected").map(function(){
+        var value = $j(this).attr("title");
+        var facet =  $j(this).parents("div[data-ex-role='facet']").attr('data-ex-facet-label');
+        selected_facets.push(facet + ':' + value);
+    });
+
+    $j(".exhibit-flowingFacet-value-selected").map(function(){
+        var value = $j(this).attr("title");
+        var facet =  $j(this).parents("div[data-ex-role='facet']").attr('data-ex-facet-label');
+        selected_facets.push(facet + ':' + value);
+    });
+
+    var element = $j(".selected_facets");
+    var selected_facets_string = selected_facets.join('; ');
+    if (element.length == 0){
+        element = "<span class='selected_facets'>" + selected_facets_string + '</span>';
+    }else{
+        element.html(selected_facets_string);
+    }
+
+    $j(element).insertBefore( ".exhibit-collectionView-header-sortControls" );
+}
