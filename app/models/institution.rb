@@ -50,7 +50,7 @@ class Institution < ActiveRecord::Base
 
   # get a listing of all known institutions
   def self.get_all_institutions_listing
-    Institution.all.collect { |i| [i.name, i.id] }
+    Institution.all.collect { |i| [i.title, i.id] }
   end
 
   def can_delete?(user=User.current_user)

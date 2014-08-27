@@ -74,7 +74,7 @@ function decodeValueTooltip(){
 //rename Hierachical Facet Missing Field of the root level: from others to missing this field
 function renameHFMissingField(){
     var missing_field_elements = $j('.exhibit-flowingFacet-body').children("[title='(others)']");
-    var replaced_term = "(missing this field)";
+    var replaced_term = "(don't have this field)";
     missing_field_elements.map(function(){
         $j(this).attr("title", replaced_term);
         var value_link = $j(this).children('.exhibit-flowingFacet-value-link');

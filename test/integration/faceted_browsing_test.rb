@@ -11,6 +11,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
 
   test 'turn off the faceted browsing' do
     with_config_value :faceted_browsing_enabled,false do
+      example_items
       ASSETS_WITH_FACET.each do |type_name|
         get "/#{type_name}"
         assert_select "table[id='exhibit']", :count => 0
@@ -22,6 +23,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
 
   test 'turn on the faceted browsing' do
     with_config_value :faceted_browsing_enabled,true do
+      example_items
       ASSETS_WITH_FACET.each do |type_name|
         with_config_value :facet_enable_for_pages,{type_name=>true} do
           get "/#{type_name}"
@@ -35,6 +37,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
 
   test 'partly turn on the faceted browsing' do
     with_config_value :faceted_browsing_enabled,true do
+      example_items
       facet_enabled_pages = {}
       facet_disabled_pages = {}
       Seek::Config.facet_enable_for_pages.each do |key,value|
@@ -61,5 +64,20 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       end
     end
 
+  end
+
+  private
+
+  def example_items
+    ASSETS_WITH_FACET.each do |type_name|
+      item = Factory(type_name.singularize.to_sym)
+      if item.respond_to?(:policy)
+        policy = item.policy
+        policy.sharing_scope = Policy::EVERYONE
+        policy.access_type = Policy::VISIBLE
+        policy.save
+        item.reload
+      end
+    end
   end
 end

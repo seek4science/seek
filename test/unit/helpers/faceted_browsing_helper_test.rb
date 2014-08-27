@@ -43,10 +43,28 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
       elsif item.respond_to?(:contributor)
         assert_equal [item.contributor.person.name], contributor_value
       else
-        assert contributor_value.empty?
+        assert_equal "Missing value", contributor_value
       end
     end
 
+  end
+
+  test 'generate contributor value for a Person object' do
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+
+    a_person = Factory(:person)
+
+    exhibit_item = exhibit_item_for a_person, common_facet_config
+    assert_equal a_person.name, exhibit_item['contributor']
+  end
+
+  test 'generate project value for a Project object' do
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+
+    a_project = Factory(:project)
+
+    exhibit_item = exhibit_item_for a_project, common_facet_config
+    assert_equal a_project.title, exhibit_item['project']
   end
 
   test 'exhibit_item_for an data_file in case of faceted browsing' do
@@ -60,11 +78,11 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_equal df.class.name, exhibit_item['type']
     assert_equal df.id, exhibit_item['item_id']
     assert_equal df.projects.collect(&:title), exhibit_item['project']
-    assert_equal df.assay_type_titles, exhibit_item['assay_type']
-    assert_equal df.technology_type_titles, exhibit_item['technology_type']
+    assert_equal "Missing value", exhibit_item['assay_type']
+    assert_equal "Missing value", exhibit_item['technology_type']
     assert_equal [df.created_at.year], exhibit_item['created_at']
     assert_equal df.creators.collect(&:name) + [df.contributor.person.name], exhibit_item['contributor']
-    assert_equal df.tags_as_text_array, exhibit_item['tag']
+    assert_equal "Missing value", exhibit_item['tag']
 
   end
 
@@ -101,11 +119,11 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_equal df.class.name, exhibit_item['type']
     assert_equal df.id, exhibit_item['item_id']
     assert_equal df.projects.collect(&:title), exhibit_item['project']
-    assert_equal df.assay_type_titles, exhibit_item['assay_type']
-    assert_equal df.technology_type_titles, exhibit_item['technology_type']
+    assert_equal "Missing value", exhibit_item['assay_type']
+    assert_equal "Missing value", exhibit_item['technology_type']
     assert_equal [df.created_at.year], exhibit_item['created_at']
     assert_equal df.creators.collect(&:name) + [df.contributor.person.name], exhibit_item['contributor']
-    assert_equal df.tags_as_text_array, exhibit_item['tag']
+    assert_equal "Missing value", exhibit_item['tag']
 
   end
 
@@ -138,6 +156,20 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_includes(exhibit_items, {'type' => 'assay_type', 'label' => 'Metabolite profiling', 'subclassOf' => 'Metabolomics'})
   end
 
+  test '-Missing value- for the attribute which value is not assigned' do
+    df = Factory(:data_file)
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+    exhibit_item = exhibit_item_for df, common_facet_config
+    assert_equal 'Missing value', exhibit_item['tag']
+  end
+
+  test "if the asset does not have this attribute, the respective value is nil" do
+    df = Factory(:data_file)
+    common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+    exhibit_item = exhibit_item_for df, common_facet_config
+    assert_equal nil, exhibit_item['a_field']
+  end
+
   test 'exhibit_item_for_external_resource: biomodel' do
     mock_service_calls
     adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path" => "lib/test-partial.erb", "name" => "EBI Biomodels"})
@@ -153,10 +185,10 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     assert_equal "EBI Biomodels#{a_biomodel.model_id}", exhibit_item['label']
     assert_equal "EBI Biomodels", exhibit_item['type']
     assert_equal a_biomodel.model_id, exhibit_item['item_id']
-    assert_equal [], exhibit_item['project']
-    assert_equal [], exhibit_item['created_at']
-    assert_equal [], exhibit_item['contributor']
-    assert_equal [], exhibit_item['tag']
+    assert_equal "Missing value", exhibit_item['project']
+    assert_equal "Missing value", exhibit_item['created_at']
+    assert_equal "Missing value", exhibit_item['contributor']
+    assert_equal "Missing value", exhibit_item['tag']
     assert_equal  [a_biomodel.published_date.to_date.year], exhibit_item['published_year']
     assert_equal a_biomodel.authors, exhibit_item['author']
   end

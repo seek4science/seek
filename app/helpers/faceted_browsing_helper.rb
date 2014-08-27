@@ -42,6 +42,8 @@ module FacetedBrowsingHelper
       #special case when generating project filter for project itself from common_faceted_search.yml
       if object.kind_of?(Project) && key == 'project'
         exhibit_item[key] = object.title
+      elsif object.kind_of?(Person) && key == 'contributor'
+        exhibit_item[key] = object.name
       else
         exhibit_item[key] = value_for_key value, object
       end
@@ -88,26 +90,30 @@ module FacetedBrowsingHelper
   def value_for_key config_for_key, object
     facet_values = []
     value_from = config_for_key['value_from']
-      value_from.split(',').each do |from|
-        facet_value = object
-        from.split(':').each do |field|
-          if facet_value.blank?
-            break
-          elsif facet_value.kind_of?(Array) and facet_value.first.respond_to?field
-            facet_value = facet_value.collect(&:"#{field}")
-          elsif facet_value.respond_to?field
-            facet_value = facet_value.send(field)
-          else
-            facet_value = nil
-          end
-        end
-        if facet_value.kind_of?(Array)
-          facet_values |= facet_value
+    value_from.split(',').each do |from|
+      facet_value = object
+      from.split(':').each do |field|
+        if facet_value.blank?
+          break
+        elsif facet_value.kind_of?(Array) and facet_value.first.respond_to?field
+          facet_value = facet_value.collect(&:"#{field}")
+        elsif facet_value.respond_to?field
+          facet_value = facet_value.send(field)
         else
-          facet_values << facet_value
+          facet_value = nil
         end
       end
-      facet_values.compact.uniq
+      if facet_value.kind_of?(Array)
+        facet_values |= facet_value
+      else
+        facet_values << facet_value
+      end
+    end
+    facet_values.compact!
+    facet_values.uniq!
+    facet_values = 'Missing value' if facet_values.blank?
+
+    facet_values
   end
 
   def faceted_browsing_config_path
