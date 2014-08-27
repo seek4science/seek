@@ -183,7 +183,7 @@ class Publication < ActiveRecord::Base
 
   def publication_author_names
     author_names = []
-    publication_author_orders.sort_by(&:order).collect(&:author).each do |author|
+    publication_authors.each do |author|
       if author.kind_of?(Person)
         author_names << author.name
       else
