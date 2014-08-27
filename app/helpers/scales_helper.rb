@@ -1,5 +1,9 @@
 module ScalesHelper
 
+  def tabs_lazy_loaded?
+      false
+  end
+
   def all_scaled_items_hash
     #key: item_type, value: items
     resource_hash = {}
