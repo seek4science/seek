@@ -63,6 +63,9 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select "div.tabbertab" do
       assert_select "h3", :text=>/#{I18n.t('biosamples.sample_parent_term')}s/ ,:count => 1
     end
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [s.specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
 
     assert_select "div.list_item" do
       assert_select "div.list_item_title a[href=?]", specimen_path(s.specimen), :text=>s.specimen.title,:count => 1
@@ -325,8 +328,9 @@ test "should show organism and strain information of a sample if there is organi
     assert_not_nil assigns(:sample)
 
     #lazy load related cell cultures /speicmens
-    #MERGENOTE - why does this test fail with this line removed?
-    get :resource_in_tab, {:resource_ids => [specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
 
 
     assert_select 'p a[href=?]', organism_path(sample.specimen.strain.organism), :count => 1 # one in the show page of sample

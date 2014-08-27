@@ -694,10 +694,9 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
-    #MERGENOTE - we will need to add a specific test for the resource_in_tab if VLN want to keep them?
-    #assert_response :success
-    #get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_actions" do
       path=download_sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum => 1
@@ -710,6 +709,9 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_actions" do
       path=sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum => 1
@@ -721,7 +723,9 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
     end
-
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_actions" do
       path=edit_sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum=>1
@@ -734,9 +738,12 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_actions" do
-      path=download_data_file_path(data_files(:picture))
-      assert_select "a[href=?]", path, :minumum => 1
+    path=download_data_file_path(data_files(:picture))
+    assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
@@ -746,7 +753,9 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
-
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_actions" do
       path=data_file_path(data_files(:picture))
       assert_select "a[href=?]", path, :minumum => 1
@@ -759,6 +768,9 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, :id => assays(:metabolomics_assay)
     end
 
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
 
     assert_select "div.list_item div.list_item_actions" do
       path=edit_data_file_path(data_files(:picture))
@@ -774,6 +786,9 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
     end
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
 
     assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]", "nofollow", :text=>/news\.bbc\.co\.uk/, :minimum=>1
@@ -787,6 +802,9 @@ class AssaysControllerTest < ActionController::TestCase
     data_file_version.save!
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
+    end
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     end
 
     assert_select "div.list_item div.list_item_desc" do
@@ -836,6 +854,51 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
+  def test_authorization_of_sops_and_datafiles_links_with_lazy_load
+    #sanity check the fixtures are correct
+    check_fixtures_for_authorization_of_sops_and_datafiles_links
+    login_as(:model_owner)
+    assay=assays(:assay_with_public_and_private_sops_and_datafiles)
+
+    with_config_value :tabs_lazy_load_enabled, true do
+
+      assert_difference('ActivityLog.count') do
+        get :show, :id => assay.id
+      end
+
+      assert_response :success
+
+      # tabs lazy loading: only first tab with items, and other tabs only item types and counts are shown.
+      assert_select "div.tabbertab" do
+        assert_select "h3", :text => "#{I18n.t('sop').pluralize} (2)", :count => 1
+        assert_select "h3", :text => "#{I18n.t('data_file').pluralize} (2)", :count => 1
+      end
+
+      #Other items are only shown when the tab is clicked
+      #TODO: better method to test clicking link?
+
+      #assay.data_files is data_file_versions
+      data_file_ids = assay.data_files.map &:data_file_id
+      get :resource_in_tab, {:resource_ids => data_file_ids.join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      assert_response :success
+      assert_select "div.list_item" do
+        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
+        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
+        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
+        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
+      end
+
+      sop_ids = assay.sops.map &:sop_id
+      get :resource_in_tab, {:resource_ids => sop_ids.join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      assert_response :success
+      assert_select "div.list_item" do
+        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
+        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
+        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+      end
+    end
+  end
   test "associated assets aren't lost on failed validation in create" do
     sop=sops(:sop_with_all_sysmo_users_policy)
     model=models(:model_with_links_in_description)

@@ -330,6 +330,11 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show,:id=>project
     assert_response :success
 
+    #MERGENOTE - all this resource in tab should have gone now
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [sop.id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
+
     assert_select "div.list_item  div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
     end
@@ -342,7 +347,9 @@ class ProjectsControllerTest < ActionController::TestCase
     df = Factory :data_file,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
     assert_response :success
-
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [df.id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
     end
@@ -354,6 +361,9 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(user)
     model = Factory :model,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [model.id].join(","), :resource_type => "Model", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item  div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
     end

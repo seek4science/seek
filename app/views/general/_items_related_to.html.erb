@@ -1,13 +1,21 @@
-<%# #MERGENOTE - we may want to put back the ajax resource_in_tab for VL if they still want it %>
 <% item = items_related_to %>
 <% resource_hash = get_related_resources(item) %>
 <h2 style="margin-top: 3em;">
   Related items
 </h2>
+<% if Seek::Config.tabs_lazy_load_enabled %>
+    <div id="all_results">
+      <%= render :partial => "assets/resource_tabbed_lazy_loading",
+                 :locals => { :resource_hash => resource_hash,
+                              :actions_partial_disable => false} -%>
+    </div>
 
-<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :resource_hash => resource_hash,
-                                                                               :narrow_view => true,
-                                                                               :authorization_already_done => true,
-                                                                               :item => item,
-                                                                               :actions_partial_disable=>false,
-                                                                               :limit => Seek::Config.related_items_limit } -%>
+<% else %>
+    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => {:resource_hash => resource_hash,
+                                                                                  :narrow_view => true,
+                                                                                  :authorization_already_done => true,
+                                                                                  :item => item,
+                                                                                  :actions_partial_disable => false,
+                                                                                  :limit => Seek::Config.related_items_limit} -%>
+
+<% end %>
