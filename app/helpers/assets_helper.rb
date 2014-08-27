@@ -9,7 +9,7 @@ module AssetsHelper
   def request_request_label resource
     icon_filename=icon_filename_for_key("message")
     resource_type=text_for_resource(resource)
-    image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}"
+    image_tag(icon_filename, :alt => "Request", :title => "Request") + " Request #{resource_type}"
   end
 
   def filesize_as_text content_blob
@@ -22,8 +22,8 @@ module AssetsHelper
     html.html_safe
   end
 
-  def item_description item_description,options={}
-    render :partial=>"assets/item_description",:object=>item_description,:locals=>options
+  def item_description item_description, options={}
+    render :partial => "assets/item_description", :object => item_description, :locals => options
   end
 
   #returns all the classes for models that return true for is_asset?
@@ -61,9 +61,9 @@ module AssetsHelper
     options=""
     versions.each do |v|
       if (v.version==versioned_resource.version)
-        options << "<option value='#{url_for(:id=>versioned_resource)}'"
+        options << "<option value='#{url_for(:id => versioned_resource)}'"
       else
-        options << "<option value='#{url_for(:id=>versioned_resource, :version=>v.version)}'"
+        options << "<option value='#{url_for(:id => versioned_resource, :version => v.version)}'"
       end
 
       options << " selected='selected'" if v.version==displayed_resource_version.version
@@ -71,14 +71,13 @@ module AssetsHelper
     end
     select_tag(:resource_versions,
                options.html_safe,
-               :disabled=>disabled,
-               :onchange=>"showResourceVersion($('show_version_form'));"
+               :disabled => disabled,
+               :onchange => "showResourceVersion($('show_version_form'));"
     ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
   end
 
 
-
-  def resource_title_draggable_avatar resource,version=nil
+  def resource_title_draggable_avatar resource, version=nil
 
     icon=""
     image=nil
@@ -91,12 +90,12 @@ module AssetsHelper
       if resource.use_mime_type_for_avatar?
         image = image file_type_icon_key(resource_version), {}
       end
-      icon = link_to_draggable(image, show_resource_path(resource_version), :id=>model_to_drag_id(resource_version), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+      icon = link_to_draggable(image, show_resource_path(resource_version), :id => model_to_drag_id(resource_version), :class => "asset", :title => tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     else
       if resource.use_mime_type_for_avatar?
         image = image file_type_icon_key(resource), {}
       end
-      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+      icon = link_to_draggable(image, show_resource_path(resource), :id => model_to_drag_id(resource), :class => "asset", :title => tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     end
     icon.html_safe
   end
@@ -111,9 +110,9 @@ module AssetsHelper
 
   def download_resource_path(resource, code=nil)
     if resource.class.name.include?("::Version")
-      polymorphic_path(resource.parent, :version=>resource.version, :action=>:download,:code=>params[:code])
+      polymorphic_path(resource.parent, :version => resource.version, :action => :download, :code => params[:code])
     else
-      polymorphic_path(resource, :action=>:download, :code=>params[:code])
+      polymorphic_path(resource, :action => :download, :code => params[:code])
     end
   end
 
@@ -127,7 +126,7 @@ module AssetsHelper
   def show_resource_path(resource)
     path = ""
     if resource.class.name.include?("::Version")
-      path = polymorphic_path(resource.parent, :version=>resource.version)
+      path = polymorphic_path(resource.parent, :version => resource.version)
     else
       path = polymorphic_path(resource)
     end
@@ -180,15 +179,16 @@ module AssetsHelper
     end
 
     return related
-    end
+  end
 
   def relatable_types
-       {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-                   "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {},
-                   "Workflow" => {}, "TavernaPlayer::Run" => {}, "Sweep" => {}, "Strain" => {}
-        }
+    {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
+     "Study" => {}, "Assay" => {}, "Specimen" => {}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Presentation" => {}, "Event" => {},
+     "Workflow" => {}, "TavernaPlayer::Run" => {}, "Sweep" => {}, "Strain" => {}
+    }
 
-   end
+  end
+
   def related_items_method(resource, item_type)
     if item_type == "TavernaPlayer::Run"
       method_name = 'runs'
@@ -197,13 +197,13 @@ module AssetsHelper
     end
 
     if resource.respond_to? "all_related_#{method_name}"
-        resource.send "all_related_#{method_name}"
+      resource.send "all_related_#{method_name}"
     elsif resource.respond_to? "related_#{method_name}"
-        resource.send "related_#{method_name}"
+      resource.send "related_#{method_name}"
     elsif resource.respond_to? method_name
-        resource.send method_name
+      resource.send method_name
     elsif resource.respond_to? "related_#{method_name.singularize}"
-        Array(resource.send("related_#{method_name.singularize}"))
+      Array(resource.send("related_#{method_name.singularize}"))
     elsif resource.respond_to? method_name.singularize
       Array(resource.send(method_name.singularize))
     else
@@ -213,7 +213,7 @@ module AssetsHelper
 
   def order_related_items(related)
     related.each do |key, res|
-      res[:items].sort!{|item,item2| item2.updated_at <=> item.updated_at}
+      res[:items].sort! { |item, item2| item2.updated_at <=> item.updated_at }
     end
   end
 
@@ -244,10 +244,10 @@ module AssetsHelper
 
 
   def collect_related_items(resource)
-    related = relatable_types.delete_if{|k,v| k==resource.class.name}
+    related = relatable_types.delete_if { |k, v| k==resource.class.name }
 
     related.each_key do |type|
-      related[type][:items] =  related_items_method(resource, type)
+      related[type][:items] = related_items_method(resource, type)
       related[type][:hidden_items] = []
       related[type][:hidden_count] = 0
       related[type][:extra_count] = 0
@@ -259,17 +259,17 @@ module AssetsHelper
   #provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view
   #if projects is provided, only authorizes the assets for that project
   # assets are sorted by title except if they are projects and scales (because of hierarchies)
-  def authorised_assets asset_class,projects=nil, action="view"
+  def authorised_assets asset_class, projects=nil, action="view"
     assets = asset_class.all_authorized_for action, User.current_user, projects
-    assets = assets.sort_by &:title if !assets.blank?  && !["Project","Scale"].include?(assets.first.class.name)
+    assets = assets.sort_by &:title if !assets.blank? && !["Project", "Scale"].include?(assets.first.class.name)
     assets
   end
 
-  def asset_buttons asset,version=nil,delete_confirm_message=nil
-     human_name = text_for_resource asset
-     delete_confirm_message ||= "This deletes the #{human_name} and all metadata. Are you sure?"
+  def asset_buttons asset, version=nil, delete_confirm_message=nil
+    human_name = text_for_resource asset
+    delete_confirm_message ||= "This deletes the #{human_name} and all metadata. Are you sure?"
 
-     render :partial=>"assets/asset_buttons",:locals=>{:asset=>asset,:version=>version,:human_name=>human_name,:delete_confirm_message=>delete_confirm_message}
+    render :partial => "assets/asset_buttons", :locals => {:asset => asset, :version => version, :human_name => human_name, :delete_confirm_message => delete_confirm_message}
   end
 
   def asset_version_links asset_versions
@@ -282,21 +282,22 @@ module AssetsHelper
   end
 
   #code is for authorization of temporary link
-  def can_download_asset? asset, code=params[:code],can_download=asset.can_download?
+  def can_download_asset? asset, code=params[:code], can_download=asset.can_download?
     can_download || (code && asset.auth_by_code?(code))
   end
 
   #code is for authorization of temporary link
-  def can_view_asset? asset, code=params[:code],can_view=asset.can_view?
+  def can_view_asset? asset, code=params[:code], can_view=asset.can_view?
     can_view || (code && asset.auth_by_code?(code))
   end
 
 
-  def link_to_view_all_in_new_window item,  resource_type
-      path = item ? [item, resource_type.tableize] :  eval("#{resource_type.pluralize.underscore}_path")
-      link_text = item ?  "View all items with nested url in new window" : "View all items in new window"
-      link_to link_text, path, {:target => "_blank"}
+  def link_to_view_all_in_new_window item, resource_type
+    path = item ? [item, resource_type.tableize] : eval("#{resource_type.pluralize.underscore}_path")
+    link_text = item ? "View all items with nested url in new window" : "View all items in new window"
+    link_to link_text, path, {:target => "_blank"}
   end
+
   def link_to_view_all_related_items item, resources, authorized_resources, scale_title
     link = ""
     resource_type = resources.first.class.name
@@ -304,18 +305,18 @@ module AssetsHelper
     tab_content_view_all = scale_title + '_' + resource_type + '_view_all'
     tab_content_view_some = scale_title + '_' + resource_type + '_view_some'
     ajax_link_to_view_in_current_window =
-      link_to_with_callbacks "View all #{count} items here",
-                                   {:url => url_for(:action => 'related_items_tab_ajax'),
-                                    :method => "get",
-                                   :condition => "check_tab_content('#{tab_content_view_all}', '#{tab_content_view_some}')",
-                                   :with => "'resource_type=' + '#{resource_type}'
+        link_to_with_callbacks "View all #{count} items here",
+                               {:url => url_for(:action => 'related_items_tab_ajax'),
+                                :method => "get",
+                                :condition => "check_tab_content('#{tab_content_view_all}', '#{tab_content_view_some}')",
+                                :with => "'resource_type=' + '#{resource_type}'
                                           +  '&scale_title=' + '#{scale_title}'
                                           +  '&view_type=' + 'view_all'
                                           +  '#{item ? '&item_id='+ item.id.to_s + '&item_type=' + item.class.name : ''}'",
-                                   :before => "$('#{tab_content_view_some}').hide();
+                                :before => "$('#{tab_content_view_some}').hide();
                                                    $('#{tab_content_view_all}').show();
                                                    show_large_ajax_loader('#{tab_content_view_all}');"},
-                                   {:remote=> true}
+                               {:remote => true}
 
     link << ajax_link_to_view_in_current_window
     link << " || "
@@ -323,23 +324,23 @@ module AssetsHelper
     link.html_safe
   end
 
-  def ajax_link_to_view_limited_related_items  item, resources, scale_title, limit
+  def ajax_link_to_view_limited_related_items item, resources, scale_title, limit
     resource_type = resources.first.class.name
     tab_content_view_all = scale_title + '_' + resource_type + '_view_all'
     tab_content_view_some = scale_title + '_' + resource_type + '_view_some'
     link =
-      link_to_with_callbacks "View only " + limit.to_s + " items",
+        link_to_with_callbacks "View only " + limit.to_s + " items",
                                {:url => url_for(:action => 'related_items_tab_ajax'),
                                 :method => "get",
-                               :condition => "check_tab_content('#{tab_content_view_some}', '#{tab_content_view_all}')",
-                               :with =>  "'resource_type=' + '#{resource_type}'
+                                :condition => "check_tab_content('#{tab_content_view_some}', '#{tab_content_view_all}')",
+                                :with => "'resource_type=' + '#{resource_type}'
                                                                          +  '&scale_title=' + '#{scale_title}'
                                                                          +  '&view_type=' + 'view_some'
                                                                          +  '#{item ? '&item_id='+ item.id.to_s + '&item_type=' + item.class.name : ''}'",
-                               :before => "$('#{tab_content_view_all}').hide();
+                                :before => "$('#{tab_content_view_all}').hide();
                                                $('#{tab_content_view_some}').show();
                                                show_large_ajax_loader('#{tab_content_view_some}');"},
-                               {:remote=> true}
+                               {:remote => true}
     link.html_safe
   end
 end
