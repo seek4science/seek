@@ -69,7 +69,7 @@ SEEK::Application.configure do
   Seek::Config.forced_default :project_hierarchy_enabled, true
 
   Seek::Config.forced_default :header_tagline_text_enabled, false
-
+  Seek::Config.forced_default :tabs_lazy_load_enabled, true
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.forced_default :home_feeds_cache_timeout,2
 # Branding
