@@ -171,4 +171,14 @@ class InstitutionTest < ActiveSupport::TestCase
     assert user.is_admin?
     assert institution.can_delete?(user)
   end
+  test "get_all_institutions_listing" do
+    disable_authorization_checks do
+      Person.destroy_all
+      Project.destroy_all
+      Institution.destroy_all
+    end
+    institution1 = Factory(:institution)
+    institution2 = Factory(:institution)
+    assert_equal [[institution1.title, institution1.id], [institution2.title, institution2.id]], Institution.get_all_institutions_listing
+  end
 end

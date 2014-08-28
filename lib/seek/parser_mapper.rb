@@ -113,7 +113,7 @@ module Seek
               :"tissue_and_cell_types.title" => mapping_entry("Organism Part"),
 
               :"sop.title" => mapping_entry("Storage Protocol"),
-              :"institution.name" => mapping_entry("Storage Location")
+              :"institution.title" => mapping_entry("Storage Location")
 
 
           },
@@ -267,7 +267,7 @@ module Seek
               :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
               :"sop.title" => mapping_entry("FIXED", proc {""}),
-              :"institution.name" => mapping_entry("FIXED", proc{""}),
+              :"institution.title" => mapping_entry("FIXED", proc{""}),
 
 
 
@@ -425,7 +425,7 @@ module Seek
               :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
               :"sop.title" => mapping_entry("FIXED", proc {""}),
-              :"institution.name" => mapping_entry("FIXED", proc {""})
+              :"institution.title" => mapping_entry("FIXED", proc {""})
           },
 
 
@@ -506,7 +506,7 @@ module Seek
                   :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
                   :"sop.title" => mapping_entry("FIXED", proc {""}),
-                  :"institution.name" => mapping_entry("FIXED", proc {""})
+                  :"institution.title" => mapping_entry("FIXED", proc {""})
               },
 
 
@@ -601,7 +601,7 @@ module Seek
               :"tissue_and_cell_types.title" => mapping_entry("FIXED", proc {"Liver"}),
 
               :"sop.title" => mapping_entry("FIXED", proc {""}),
-              :"institution.name" => mapping_entry("FIXED", proc {""})
+              :"institution.title" => mapping_entry("FIXED", proc {""})
           },
 
 
@@ -683,7 +683,7 @@ module Seek
               :"tissue_and_cell_types.title" => mapping_entry(""),
 
               :"sop.title" => mapping_entry(""),
-              :"institution.name" => mapping_entry("")
+              :"institution.title" => mapping_entry("")
           },
 
 

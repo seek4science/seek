@@ -51,8 +51,8 @@ module Seek
       @mock_json_import = {}
       @assay_json = {}
 
-      @institution_name = ""
-      @institution_name = Institution.find(institution_id).try(:name) if institution_id
+      @institution_title = ""
+      @institution_title = Institution.find(institution_id).try(:title) if institution_id
 
       if xml
         begin
@@ -64,7 +64,7 @@ module Seek
         end
         if doc
           template = @file.template_name
-          Rails.logger.warn "Template = #{template}, Institution name = " + @institution_name
+          Rails.logger.warn "Template = #{template}, Institution name = " + @institution_title
           filename = @file.content_blob.original_filename
           parser_mapper = Seek::ParserMapper.new
           @parser_mapping = parser_mapper.mapping(template.downcase != "autodetect by filename" ? template.downcase : parser_mapper.filename_to_mapping_name(filename))
@@ -405,12 +405,12 @@ module Seek
           sample_organism_parts = hunt_for_field_values_mapped sheet, :"samples.organism_part", @samples_mapping
           tissue_and_cell_types = hunt_for_field_values_mapped sheet, :"tissue_and_cell_types.title", @samples_mapping
           sop_titles = hunt_for_field_values_mapped sheet, :"sop.title", @samples_mapping
-          institution_names = hunt_for_field_values_mapped sheet, :"institution.name", @samples_mapping
+          institution_titles = hunt_for_field_values_mapped sheet, :"institution.title", @samples_mapping
 
 
-          samples_data = sample_titles.zip(sample_types, sample_donation_dates, sample_comments, sample_organism_parts, tissue_and_cell_types, sop_titles, institution_names, specimen_titles).map do |sample_title, sample_type, sample_donation_date, sample_comment, sample_organism_part, tissue_and_cell_type, sop_title, institution_name, specimen_title|
+          samples_data = sample_titles.zip(sample_types, sample_donation_dates, sample_comments, sample_organism_parts, tissue_and_cell_types, sop_titles, institution_titles, specimen_titles).map do |sample_title, sample_type, sample_donation_date, sample_comment, sample_organism_part, tissue_and_cell_type, sop_title, institution_title, specimen_title|
             {:sample_title => sample_title, :sample_type => sample_type, :sample_donation_date => sample_donation_date, :sample_comment => sample_comment, :sample_organism_part => sample_organism_part,
-             :tissue_and_cell_type => tissue_and_cell_type, :sop_title => sop_title, :institution_name => institution_name, :specimen_title => specimen_title}
+             :tissue_and_cell_type => tissue_and_cell_type, :sop_title => sop_title, :institution_title => institution_title, :specimen_title => specimen_title}
           end
 
           Rails.logger.warn "$$$$$$$$$$$$$$ samples_comments #{sample_comments}"
@@ -789,7 +789,7 @@ module Seek
 
         specimen = Specimen.find_by_title specimen_title
 
-        institution = Institution.find_by_name @institution_name
+        institution = Institution.find_by_title @institution_title
 
         unless specimen
           specimen = Specimen.new :title => specimen_title, :lab_internal_number => specimen_title
@@ -867,7 +867,7 @@ module Seek
       tissue_and_cell_type_title = sample_data[:tissue_and_cell_type][:value]
       sop_title = sample_data[:sop_title][:value]
       donation_date = sample_data[:sample_donation_date][:value]
-      institution_name = sample_data[:institution_name][:value]
+      institution_title = sample_data[:institution_title][:value]
       comments = sample_data[:sample_comment][:value]
       organism_part = sample_data[:sample_organism_part][:value]
 
@@ -878,7 +878,7 @@ module Seek
                 "tissue and cell type" => tissue_and_cell_type_title,
                 "sop" => sop_title,
                 "donation date" => donation_date.to_s,
-                "institution" => institution_name,
+                "institution" => institution_title,
                 "comments" => comments,
                 "organism part" => organism_part}
 
@@ -900,12 +900,12 @@ module Seek
         tissue_and_cell_type_title = sample_json["tissue and cell type"]
         sop_title = sample_json["sop"]
         donation_date = sample_json["donation date"] + " UTC +00.00"
-        institution_name = sample_json["institution"]
+        institution_title = sample_json["institution"]
         comments = sample_json["comments"]
         organism_part = sample_json["organism part"]
 
         sop_title = nil if sop_title=="NO STORAGE"
-        institution_name = @institution_name if (institution_name=="" || institution_name.nil?)
+        institution_title = @institution_title if (institution_title=="" || institution_title.nil?)
 
 
         #Rails.logger.warn "TISSUE AND CELL TYPE TITLE : #{tissue_and_cell_type_title}"
@@ -919,7 +919,7 @@ module Seek
         end
 
         sop = Sop.find_by_title sop_title
-        institution = Institution.find_by_name institution_name
+        institution = Institution.find_by_name institution_title
 
         #specimen_title = @specimen_names[row]
         #specimen = Specimen.find_by_title specimen_title

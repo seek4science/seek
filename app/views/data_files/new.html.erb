@@ -1,7 +1,7 @@
 
 <% @page_title ||= "New #{t('data_file')}" %>
 <h1><%= @page_title %></h1>
-<% all_institutions = Institution.order(:name) %>
+<% all_institutions = Institution.order(:title) %>
 <div class="show_basic">
     <%= form_tag({:action => :create}, :multipart => true) do -%>
       <%= hidden_field_tag 'data_file[parent_name]', @data_file.parent_name%>
@@ -19,13 +19,12 @@
         <% if @data_file.is_with_sample? %>
         <p style="margin-top: 0.5em;">
           <b>Institution</b>
-          <span class="required">
-                    <% if Seek::Config.is_virtualliver %>
-                    *
-                    <% end %>
-          </span><br/>
+          <% if Seek::Config.is_virtualliver %>
+              <span class="required"> * </span>
+          <% end %>
+          <br/>
           <%= select_tag :institution_id,
-                       options_for_select(all_institutions.collect { |o| [h(o.name), o.id] }, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)), {} %>
+                       options_for_select(all_institutions.collect { |o| [h(o.title), o.id] }, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)), {} %>
 
 
         </p>
