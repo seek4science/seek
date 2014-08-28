@@ -50,8 +50,8 @@ en:
   scale: "Scale"
 
   gadget:
-    new_heading: "New or upload"
-    create_button: "CREATE"
+    new_heading: ""
+    create_button: "NEW/Upload"
 
   menu:
     yellow_pages: "Yellow pages"
