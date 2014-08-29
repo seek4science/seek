@@ -129,7 +129,7 @@ Exhibit.Localization.importLocale("en", {
     "%facets.facetClearSelectionsActionTitle": "Clear selections in facet %1$s",
     "%facets.facetTextSearchActionTitle": "Text search %1$s",
     "%facets.facetClearTextSearchActionTitle": "Clear text search",
-    "%facets.missingThisField": "(missing this field)",
+    "%facets.missingThisField": "(don't have this field)",
     "%facets.missingLabel": "missing %1$s",
     "%facets.error.configuration": "%1$s: Error processing configuration of facet",
     "%facets.numeric.rangeShort": "%1$d - %2$d",
@@ -196,7 +196,7 @@ Exhibit.Localization.importLocale("en", {
     "%widget.collectionSummary.resetActionTitle": "Reset all filters",
     "%widget.collectionSummary.allResultsTemplate": "<span class=\"%1$s\" id=\"resultDescription\"></span>",
     "%widget.collectionSummary.noResultsTemplate": "<span class=\"%1$s\"><span class=\"%2$s\">0</span> results</span> (<span id=\"resetActionLink\"></span>)",
-    "%widget.collectionSummary.filteredResultsTemplate": "<span class=\"%1$s\" id=\"resultDescription\"></span> filtered from <span id=\"originalCountSpan\">0</span> originally (<span id=\"resetActionLink\"></span>)",
+    "%widget.collectionSummary.filteredResultsTemplate": "<span class=\"%1$s\" id=\"resultDescription\"></span> filtered from <span id=\"originalCountSpan\">0</span> Items originally (<span id=\"resetActionLink\"></span>)",
 
     "%formatter.listSeparator": ", ",
     "%formatter.listLastSeparator": ", and ",

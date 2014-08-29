@@ -1,11 +1,16 @@
+# See the explanation in faceted_browsing.yml
+
 project:
     label: Project
     value_from: projects:title
-    rails_class: Project
 
 created_at:
     label: Created In
     value_from: created_at:year
+
+contributor:
+    label: Contributor
+    value_from: contributor:person:name,creators:name,contributor:name
 
 tag:
     label: Tag

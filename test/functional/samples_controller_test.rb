@@ -409,7 +409,8 @@ test "should show organism and strain information of a sample if there is organi
     assert_response :success
     assert_select 'input#sample_age_at_sampling', :count => 1
 
-    sample = Factory(:sample, :age_at_sampling => 4, :age_at_sampling_unit => Factory(:unit, :symbol => 's'))
+    sample = Factory(:sample, :policy => Factory(:public_policy),
+                     :age_at_sampling => 4, :age_at_sampling_unit => Factory(:unit, :symbol => 's'))
     get :show, :id => sample.id
     assert_response :success
     assert_select "label", :text => /Age at sampling/

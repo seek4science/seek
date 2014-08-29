@@ -16,7 +16,7 @@
 <% end -%>
 
 <% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
-    <%= render :partial => "faceted_browsing/facets", :object => @people %>
+    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @people %>
 <% else %>
     <%= render :partial => "assets/resources_alphabetical_paginated", :object => @people %>
 <% end %>

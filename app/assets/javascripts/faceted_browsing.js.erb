@@ -48,15 +48,6 @@ function defaultSearchText(){
     });
 }
 
-function getItemIds(items){
-    var item_ids = items.map(function(){
-        var exhibit_item_id = $j(this).attr("itemid");
-        return database.getObject(exhibit_item_id, 'item_id');
-    }).get();
-
-    return item_ids;
-}
-
 function getItems(items){
     var items = items.map(function(){
         var exhibit_item_id = $j(this).attr("itemid");
@@ -66,10 +57,6 @@ function getItems(items){
     }).get();
 
     return items;
-}
-
-function getItemType(items){
-    return database.getObject(items.attr("itemid"), 'type');
 }
 
 function updateContent(items_for_result){
@@ -87,7 +74,7 @@ function decodeValueTooltip(){
 //rename Hierachical Facet Missing Field of the root level: from others to missing this field
 function renameHFMissingField(){
     var missing_field_elements = $j('.exhibit-flowingFacet-body').children("[title='(others)']");
-    var replaced_term = "(missing this field)";
+    var replaced_term = "(don't have this field)";
     missing_field_elements.map(function(){
         $j(this).attr("title", replaced_term);
         var value_link = $j(this).children('.exhibit-flowingFacet-value-link');

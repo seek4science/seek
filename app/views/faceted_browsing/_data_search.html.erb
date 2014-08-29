@@ -1,62 +1,37 @@
 <div id="data" style="display:none">
   <%
-     objects = data_search
-     object_type = objects.first.class.name
-     facet_config = YAML.load(File.read(facet_config_path))
-     facets_for_object = facet_config[object_type] || {}
+     resource_hash = data_search
+     common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+     specified_facet_config = YAML.load(File.read(specified_faceted_search_config_path))
+     external_faceted_config = YAML.load(File.read(external_faceted_search_config_path))
 
-     exhibit_items = []
-     exhibit_properties = {}
-     facets_for_object.each do |key,value|
-       facet_class = value['facet_class']
-       if facet_class == 'NumericRange'
-         exhibit_properties[key] = {"valueType" => "number"}
-       elsif facet_class == 'Exhibit.HierarchicalFacet'
-         tree_from = value['tree_from']
-         tree_from.split(',').each do |tree_class|
-           exhibit_items |= exhibit_tree(tree_class, key)
-         end
-       end
+     #generate tree for HierarchicalFacet
+     all_facet_config = common_facet_config
+     resource_hash.keys.each do |object_type|
+       all_facet_config = all_facet_config.merge(specified_facet_config[object_type] || {})
      end
+     exhibit_items = exhibit_trees all_facet_config
 
-     #items
-     i=1
-     objects.each do |object|
-       exhibit_item = {}
+     #generate exhibit_items
+     resource_hash.each do |key,value|
+       objects = value[:items]
+       objects.each do |object|
+        if object.respond_to?(:is_external_search_result?) && object.is_external_search_result?
+           facets_for_object = external_faceted_config[key] || {}
+           config = common_facet_config.merge(facets_for_object)
+           exhibit_item = exhibit_item_for_external_resource object, config
+        else
+          facets_for_object = specified_facet_config[key] || {}
+          config = common_facet_config.merge(facets_for_object)
+          exhibit_item = exhibit_item_for object, config
+        end
 
-       #this is to avoid exhibit warning messages
-       exhibit_item['id'] = i
-       exhibit_item['label'] = "#{i}"
-       i += 1
-
-       #This display_content will be later on replaced by resource_list_item, by using ajax, otherwise it causes speed problem
-       exhibit_item['display_content'] = ''
-
-       exhibit_item['type'] = object_type
-       exhibit_item['item_id'] = object.id
-
-       #generate facet values for each facet based on the facets.yml config file
-       facets_for_object.each do |key, value|
-         facet_values = object
-         value_from = value['value_from']
-         value_from.split(':').each do |field|
-           if facet_values.blank?
-             break
-           elsif facet_values.kind_of?(Array)
-             facet_values = facet_values.collect(&:"#{field}")
-           else
-             facet_values = facet_values.send(field)
-           end
-         end
-         exhibit_item[key] = facet_values
+        exhibit_items << exhibit_item
        end
-
-       exhibit_items << exhibit_item
      end
   %>
 
   {
-  "properties": <%= exhibit_properties.to_json %>,
   "items": <%= exhibit_items.to_json %>
   }
 

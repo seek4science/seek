@@ -1,0 +1,50 @@
+<% objects = faceted_browsing %>
+
+<% unless objects.empty? %>
+    <%= javascript_include_tag 'exhibit/exhibit-api' %>
+    <%= javascript_include_tag 'exhibit/lib/jquery-1.7.2.min' %>
+    <%= javascript_include_tag 'modified_exhibit' %>
+    <%= javascript_include_tag 'faceted_browsing' %>
+    <%= stylesheet_link_tag 'modified_exhibit' %>
+    <%= stylesheet_link_tag 'faceted_browsing' %>
+
+    <%
+       object_type = objects.first.class.name
+       facet_config = YAML.load(File.read(faceted_browsing_config_path))
+       facets_for_object = facet_config[object_type] || {}
+       expand_facet_count = 1
+    %>
+
+    <div class="faceted_browsing">
+        <div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_type%>"></div>
+        <div class="yui-g" id="exhibit">
+            <div class="yui-u first" style="width: 85%;">
+              <%= render :partial => 'faceted_browsing/content_element', :locals => {:possible_orders => facets_for_object.keys.join(',.'), :paginated => true} %>
+            </div>
+            <div class="yui-u" style="float:right;width: 15%;">
+              <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
+              <br/>
+              <b>Filter <%= internationalized_resource_name(object_type)%> by:</b>
+              <hr/>
+              <% count = 0 %>
+              <% facets_for_object.each do |key, value| %>
+                  <%
+                     count += 1
+                     collapsed = count > expand_facet_count ? true : false
+                  %>
+                  <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => collapsed} %>
+                  <br/>
+              <% end %>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+       var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>'
+       Exhibit.SelectionState.currentAssetType = "<%= object_type %>";
+    </script>
+
+    <%= render :partial => "faceted_browsing/data_browsing", :object => objects %>
+<% else %>
+    <div class="box_infotext" style="margin:1em;">There is no <%= internationalized_resource_name(controller_name.singularize.camelize, false) %> in the system yet.</div>
+<% end %>

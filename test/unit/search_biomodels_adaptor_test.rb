@@ -35,6 +35,24 @@ class SearchBiomodelsAdaptorTest < ActiveSupport::TestCase
     assert_equal "EBI Biomodels", result.tab
   end
 
+  test "fetch_item" do
+    adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path" => "lib/test-partial.erb", "name" => "EBI Biomodels"})
+    result = adaptor.get_item("MODEL0072364382")
+    assert result.kind_of?(Seek::BiomodelsSearch::BiomodelsSearchResult)
+
+    #results will all be the same due to the mocking of getSimpleModelById webservice call
+    assert_equal 34, result.authors.count
+    assert_equal "M. J. Herrgard", result.authors.first
+    assert_equal "Herrgård2008_MetabolicNetwork_Yeast", result.title
+    assert_equal "18846089", result.publication_id
+    assert_match /Genomic data allow the large-scale manual or semi-automated assembly/, result.abstract
+    assert_equal DateTime.parse("2008-10-11"), result.published_date
+    assert_equal "MODEL0072364382", result.model_id
+    assert_equal DateTime.parse("2012-02-03T13:12:17+00:00"), result.last_modification_date
+    assert_equal "lib/test-partial.erb", result.partial_path
+    assert_equal "EBI Biomodels", result.tab
+  end
+
   test "search does not need pubmed email" do
     adaptor = Seek::BiomodelsSearch::SearchBiomodelsAdaptor.new({"partial_path" => "lib/test-partial.erb"})
     results = adaptor.search("yeast")

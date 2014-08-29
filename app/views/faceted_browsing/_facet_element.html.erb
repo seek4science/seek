@@ -1,0 +1,20 @@
+<% label = value['label'] %>
+<% facet_class = value['facet_class'] %>
+
+<div data-ex-role="facet"
+     data-ex-expression=".<%= key %>"
+     data-ex-facet-label="<%= label %>"
+     data-ex-facet-class="<%= facet_class %>"
+     data-ex-height="13em"
+     data-ex-collapsible="true"
+
+     <% if facet_class == "Exhibit.HierarchicalFacet" %>
+        data-ex-uniform-grouping=".subclassOf"
+        data-ex-scroll="false"
+     <% end %>
+
+     data-ex-collapsed="<%= collapsed %>"
+
+     >
+</div>
+
