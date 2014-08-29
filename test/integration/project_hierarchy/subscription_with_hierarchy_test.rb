@@ -10,7 +10,9 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
         initialize_hierarchical_projects
   end
 
-
+  def teardown
+    desync_delayed_jobs
+  end
   test "rails 3 bug: before_add is not fired before the record is saved on `has_many :through` associations" do
       # no problem in the application, as work_groups are added directly with UI
       #problem in test is caused that the group_memberships instead of work_groups are assigned to person when created

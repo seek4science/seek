@@ -7,12 +7,24 @@ module ProjectHierarchyTestHelper
 
   #perform delayed jobs when they are created for easy test
   def sync_delayed_jobs delayed_job_classes=[]
-      Delayed::Job.class_eval %Q{
-        def self.enqueue(*args)
-        obj = args.shift
-        obj.perform if #{delayed_job_classes}.detect{|job_class| obj.is_a? job_class}
-        end
-      }
+    eval <<-END_EVAL
+        class << Delayed::Job
+              alias_method :enqueue_not_perform, :enqueue
+              def enqueue(*args)
+                   obj ||= args.shift
+                  obj.perform if #{delayed_job_classes}.detect{|job_class| obj.is_a? job_class}
+              end
+          end
+    END_EVAL
+  end
+
+  def desync_delayed_jobs
+    eval <<-END_EVAL
+      class << Delayed::Job
+        alias_method :enqueue_perform, :enqueue
+        alias_method :enqueue, :enqueue_not_perform
+      end
+    END_EVAL
   end
 
   def setup
