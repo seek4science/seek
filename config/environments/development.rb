@@ -38,12 +38,10 @@ SEEK::Application.configure do
   config.active_record.auto_explain_threshold_in_seconds = 0.5
 
   #Avoid development mode using precompiled assets
-  #config.assets.prefix = "/assets_dev"
+  config.assets.prefix = "/assets_dev"
 
   # Do not compress assets
   config.assets.compress = false
-
-  config.assets.prefix = "/assets_dev"
 
   # Expands the lines which load the assets
   config.assets.debug = true

@@ -8,7 +8,7 @@ SEEK::Application.configure do
   #NOTE: Seek::Config.public_seek_enabled is still needed? it is always true in SEEK via resetting true even it is false here
   Seek::Config.forced_default :public_seek_enabled,true
 
-  Seek::Config.forced_default :sycamore_enabled,false
+  Seek::Config.forced_default :sycamore_enabled,true
   Seek::Config.default :events_enabled,true
   Seek::Config.default :jerm_enabled,false
   Seek::Config.default :email_enabled,false
@@ -38,10 +38,10 @@ SEEK::Application.configure do
   Seek::Config.forced_default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.forced_default :publish_button_enabled, true
   Seek::Config.forced_default :auth_lookup_enabled,true
-  Seek::Config.forced_default :sample_parser_enabled,false
+  Seek::Config.forced_default :sample_parser_enabled,true
   Seek::Config.forced_default :external_search_enabled, true
-  Seek::Config.forced_default :project_browser_enabled,false
-  Seek::Config.forced_default :experimental_features_enabled,false
+  Seek::Config.forced_default :project_browser_enabled,true
+  Seek::Config.forced_default :experimental_features_enabled,true
   Seek::Config.default :pdf_conversion_enabled,true
   Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :forum_enabled,false
@@ -55,7 +55,7 @@ SEEK::Application.configure do
   Seek::Config.forced_default :factors_studied_enabled,true
   Seek::Config.forced_default :experimental_conditions_enabled,true
   Seek::Config.forced_default :tagging_enabled, true
-  Seek::Config.forced_default :workflows_enabled,false
+  Seek::Config.forced_default :workflows_enabled,true
   Seek::Config.forced_default :authorization_checks_enabled, true
   Seek::Config.forced_default :documentation_enabled,true
   Seek::Config.forced_default :assay_type_ontology_file, "JERM-RDFXML.owl"
@@ -66,7 +66,7 @@ SEEK::Application.configure do
   Seek::Config.forced_default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
   Seek::Config.forced_default :profile_select_by_forced_default,true
   Seek::Config.forced_default :programmes_enabled, true
-  Seek::Config.forced_default :project_hierarchy_enabled, false
+  Seek::Config.forced_default :project_hierarchy_enabled, true
 
   Seek::Config.forced_default :header_tagline_text_enabled, false
   Seek::Config.forced_default :tabs_lazy_load_enabled, true
@@ -88,7 +88,7 @@ SEEK::Application.configure do
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
-  Seek::Config.forced_default :is_virtualliver, false
+  Seek::Config.forced_default :is_virtualliver, true
 
 # Pagination
   Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
