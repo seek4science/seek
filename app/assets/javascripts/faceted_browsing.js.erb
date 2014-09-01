@@ -8,7 +8,7 @@ function updateFirstPage() {
     if (seek_items.length > 0) {
         $j.ajax({
             url: items_for_result_url,
-            async: false,
+            //async: false,
             type: 'POST',
             data: {
                     items: seek_items.join(','),
@@ -17,6 +17,7 @@ function updateFirstPage() {
         })
                 .done(function (data) {
                     updateContent(data.items_for_result);
+                    $j("div[data-ex-role='exhibit-view']").children().show();
 
                     $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
                     $j('.exhibit-collectionView-header-groupControl').hide();
@@ -29,6 +30,15 @@ function updateFirstPage() {
 
 jQuery.noConflict();
 var $j = jQuery;
+
+$j(document).ajaxStart(function () {
+    $j("#loading").show();
+});
+
+$j(document).ajaxComplete(function () {
+    $j("#loading").hide();
+});
+
 $j(document).ready(function(){
     $j(document).on("exhibitConfigured.exhibit", function() {
         defaultSearchText();
