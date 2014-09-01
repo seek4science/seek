@@ -231,8 +231,8 @@ class SopTest < ActiveSupport::TestCase
   test "contributing_user" do
     sop = Factory :sop
     assert sop.contributor
-    assert_equal sop.contributor, sop.contributing_user
-    assert_equal sop.contributor,sop.latest_version.contributing_user
+    assert_equal sop.contributor.user, sop.contributing_user
+    assert_equal sop.contributor.user,sop.latest_version.contributing_user
     sop_without_contributor = Factory :sop, :contributor => nil
     assert_equal nil, sop_without_contributor.contributing_user
   end

@@ -37,6 +37,7 @@ tmp/*.zip
 tmp/zip-files
 tmp/testing-filestore
 tmp/testing-seek-cache
+tmp/rubycritic
 *.tmp*
 *~
 
