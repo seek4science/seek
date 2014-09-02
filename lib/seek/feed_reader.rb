@@ -3,28 +3,49 @@ require 'feedjira'
 module Seek
   class FeedReader
 
+    BLACKLIST_TIME=1.day
     #Fetches the feed entries - aggregated and ordered, for a particular category
     #the category may be either :project_news or :community_news
     def self.fetch_entries_for category
       raise ArgumentError.new("Invalid category - should be either :project_news or :community_news") unless [:project_news,:community_news].include? category
 
-      urls = Seek::Config.send("#{category.to_s}_feed_urls")
-      n = Seek::Config.send("#{category.to_s}_number_of_entries")
-
-      feeds = urls.split(",").select{|url| !url.blank?}.collect do |url|
+      feeds = determine_feed_urls(category).collect do |url|
         begin
           Rails.cache.fetch(cache_key(url),:expires_in=>Seek::Config.home_feeds_cache_timeout.minutes) do
             get_feed(url)
           end
-        rescue => e
-          Rails.logger.error("Problem with feed: #{url} - #{e.message}")
+        rescue => exception
+          Rails.logger.error("Problem with feed: #{url} - #{exception.message}")
+          blacklist(url)
           nil
         end
       end
       feeds.compact!
 
-      filter_feeds_entries_with_chronological_order(feeds, n)
-      
+      filter_feeds_entries_with_chronological_order(feeds, Seek::Config.send("#{category.to_s}_number_of_entries"))
+    end
+
+    def self.blacklist url
+      blacklisted = Seek::Config.blacklisted_feeds || {}
+      blacklisted[url]=Time.now
+      Seek::Config.blacklisted_feeds = blacklisted
+    end
+
+    def self.is_blacklisted? url
+      list = Seek::Config.blacklisted_feeds || {}
+      return false if list[url].nil?
+      if list[url] < BLACKLIST_TIME.ago
+        list.delete(url)
+        Seek::Config.blacklisted_feeds=list
+        false
+      else
+        true
+      end
+    end
+
+    def self.determine_feed_urls category
+      urls = Seek::Config.send("#{category.to_s}_feed_urls")
+      urls.split(",").select{|url| !url.blank? && !is_blacklisted?(url)}
     end
 
     #deletes the cache directory, along with any files in it
