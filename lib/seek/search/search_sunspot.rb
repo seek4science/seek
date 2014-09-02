@@ -67,7 +67,7 @@ module Seek
             end
             text :institution do
               if self.respond_to?(:institution)
-                institution.try :name
+                institution.try :title
               end
             end
           end if Seek::Config.solr_enabled
