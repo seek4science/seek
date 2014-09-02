@@ -203,7 +203,34 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-
+  test "should create sample specimen with tissue and cell types" do
+     existing_tissue_and_cell_type = Factory(:tissue_and_cell_type, :title=> "test tissue")
+     new_tissue_and_cell_types = ["0,new_tissue", "0,new_cell_type"]
+     assert_difference(["Sample.count","Specimen.count"]) do
+           post :create,
+                :organism_id => Factory(:organism).id,
+                :tissue_and_cell_type_ids => ["#{existing_tissue_and_cell_type.id},#{existing_tissue_and_cell_type.title}"] + new_tissue_and_cell_types,
+                :sample => {
+                    :title => "test",
+                    :project_ids => [Factory(:project).id],
+                    :lab_internal_number => "Do232",
+                    :donation_date => Date.today,
+                    :specimen_attributes => {
+                        :strain_id => Factory(:strain).id,
+                        :lab_internal_number => "Lab number",
+                        :institution_id =>Factory(:institution).id,
+                        :title => "Donor number"
+                        }
+                    },
+                :sharing => valid_sharing
+     end
+     s = assigns(:sample)
+     assert_redirected_to sample_path(s)
+     assert_equal "test", s.title
+     assert_not_nil s.specimen
+     assert_equal "Donor number", s.specimen.title
+     assert_equal ["test tissue", "new_tissue", "new_cell_type"], s.tissue_and_cell_types.map(&:title)
+   end
 
   test "should get show" do
     get :show, :id => Factory(:sample, :title=>"test", :policy =>policies(:editing_for_all_sysmo_users_policy))

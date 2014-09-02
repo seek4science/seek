@@ -285,7 +285,7 @@ end
 
 #Tissue and cell type
 Factory.define(:tissue_and_cell_type) do |f|
-  f.title "a tissue and cell type"
+  f.sequence(:title){|n| "Tisse and cell type #{n}"}
 end
 
 
