@@ -34,6 +34,12 @@ class ConfigTest < ActiveSupport::TestCase
 
   end
 
+  test "blacklisted feeds" do
+    Seek::Config.blacklisted_feeds = {"http://google.com"=>Time.parse("1 Sep 2014"),"http://fish.com"=>Time.parse("1 June 2014")}
+    assert_equal Time.parse("1 Sep 2014"),Seek::Config.blacklisted_feeds["http://google.com"]
+    assert_equal Time.parse("1 June 2014"),Seek::Config.blacklisted_feeds["http://fish.com"]
+  end
+
   test "filestore_location" do
     cb = Factory :content_blob
 
