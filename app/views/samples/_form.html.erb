@@ -95,6 +95,7 @@
   <% end %>      
 
   <%= fancy_multiselect @sample, :data_files,  {:name => 'sample_data_file_ids', :association_class => DataFile,:selected => (params[:sample_data_file_ids] || []).map(&:to_i) | @sample.data_file_masters.map(&:id), :hidden=> @sample.data_file_masters.blank? ? true : false, :other_projects_checkbox => true} %>
+  <%= fancy_multiselect @sample, :models, :name => 'sample_model_ids', :association_class => Model,:selected => (params[:sample_model_ids] || []).map(&:to_i) | @sample.model_masters.map(&:id) %>
   <%= fancy_multiselect @sample, :sops,  {:name => 'sample_sop_ids', :association_class => Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:id), :hidden=> @sample.sop_masters.blank?  ? true : false, :other_projects_checkbox => true} %>
 </div>
 
