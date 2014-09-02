@@ -1,5 +1,7 @@
 jQuery(document).ready(function(){
     jQuery(document).on("exhibitConfigured.exhibit", function() {
+        //need to show those facet list from beginning for exhibit to construct them, otherwise it can not
+        //after that hide them here
         hide_specified_facet_list();
         displayMoreLink();
     });
@@ -39,6 +41,7 @@ function tab_on_click_one_facet(resource_type) {
         click_tab.parentElement.className = 'tabberactive';
         active_tab = resource_type;
         //Show the content of clicking tab
+        //(does not work with jquery)
         document.getElementById(resource_type).className = 'tabbertab';
 
         show_specified_facets_for_active_tab(resource_type);
