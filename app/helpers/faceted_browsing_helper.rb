@@ -111,7 +111,7 @@ module FacetedBrowsingHelper
     end
     facet_values.compact!
     facet_values.uniq!
-    facet_values = 'Missing value' if facet_values.blank?
+    facet_values = '(Missing value)' if facet_values.blank?
 
     facet_values
   end

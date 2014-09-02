@@ -15,15 +15,19 @@
      #generate exhibit_items
      resource_hash.each do |key,value|
        objects = value[:items]
+       if objects.first.respond_to?(:is_external_search_result?) && objects.first.is_external_search_result?
+         facets_for_object = external_faceted_config[key] || {}
+         config = common_facet_config.merge(facets_for_object)
+       else
+         facets_for_object = specified_facet_config[key] || {}
+         config = common_facet_config.merge(facets_for_object)
+       end
+
        objects.each do |object|
         if object.respond_to?(:is_external_search_result?) && object.is_external_search_result?
-           facets_for_object = external_faceted_config[key] || {}
-           config = common_facet_config.merge(facets_for_object)
            exhibit_item = exhibit_item_for_external_resource object, config
         else
-          facets_for_object = specified_facet_config[key] || {}
-          config = common_facet_config.merge(facets_for_object)
-          exhibit_item = exhibit_item_for object, config
+           exhibit_item = exhibit_item_for object, config
         end
 
         exhibit_items << exhibit_item

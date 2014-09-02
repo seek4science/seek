@@ -86,6 +86,7 @@ gem 'metainspector'
 gem 'mechanize'
 
 
+
 group :assets do
   gem 'turbo-sprockets-rails3'
 end
