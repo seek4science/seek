@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "rails", "3.2.17"
+gem "rails", "3.2.19"
 gem "rdoc"
 
 gem "feedjira","~>1"
@@ -97,9 +97,7 @@ group :development do
   gem "pry-remote"
   gem "request-log-analyzer"
   gem "rubocop",:require=>false
-  gem "reek",:require=>false
-  gem "flog",:require=>false
-  gem "flay",:require=>false
+  gem "rubycritic",:require=>false
 end
 
 group :test do

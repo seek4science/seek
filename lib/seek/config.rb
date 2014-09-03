@@ -147,6 +147,8 @@ module Seek
   module CustomAccessors
     include SimpleCrypt
 
+
+
     def rdf_filestore_path
       append_filestore_path "rdf"
     end
@@ -306,7 +308,7 @@ module Seek
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
       :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
       :google_analytics_tracker_id,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
-      :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver, :sabiork_ws_base_url,:filestore_path,
+      :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:blacklisted_feeds,:is_virtualliver, :sabiork_ws_base_url,:filestore_path,
       :tagline_prefix,
       :biosamples_enabled,:events_enabled,:modelling_analysis_enabled,:organisms_enabled,:models_enabled,:forum_enabled,:jerm_enabled,:email_enabled,:jws_enabled,:external_search_enabled,:piwik_analytics_enabled,
       :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,

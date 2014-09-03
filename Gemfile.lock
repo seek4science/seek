@@ -141,12 +141,12 @@ GEM
   remote: https://rubygems.org/
   specs:
     RedCloth (4.2.9)
-    actionmailer (3.2.17)
-      actionpack (= 3.2.17)
+    actionmailer (3.2.19)
+      actionpack (= 3.2.19)
       mail (~> 2.5.4)
-    actionpack (3.2.17)
-      activemodel (= 3.2.17)
-      activesupport (= 3.2.17)
+    actionpack (3.2.19)
+      activemodel (= 3.2.19)
+      activesupport (= 3.2.19)
       builder (~> 3.0.0)
       erubis (~> 2.7.0)
       journey (~> 1.0.4)
@@ -154,18 +154,18 @@ GEM
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.2.1)
-    activemodel (3.2.17)
-      activesupport (= 3.2.17)
+    activemodel (3.2.19)
+      activesupport (= 3.2.19)
       builder (~> 3.0.0)
-    activerecord (3.2.17)
-      activemodel (= 3.2.17)
-      activesupport (= 3.2.17)
+    activerecord (3.2.19)
+      activemodel (= 3.2.19)
+      activesupport (= 3.2.19)
       arel (~> 3.0.2)
       tzinfo (~> 0.3.29)
-    activeresource (3.2.17)
-      activemodel (= 3.2.17)
-      activesupport (= 3.2.17)
-    activesupport (3.2.17)
+    activeresource (3.2.19)
+      activemodel (= 3.2.19)
+      activesupport (= 3.2.19)
+    activesupport (3.2.19)
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
     acts-as-taggable-on (3.0.1)
@@ -184,6 +184,10 @@ GEM
       httparty
     arel (3.0.3)
     ast (2.0.0)
+    axiom-types (0.1.1)
+      descendants_tracker (~> 0.0.4)
+      ice_nine (~> 0.11.0)
+      thread_safe (~> 0.3, >= 0.3.1)
     bio (1.4.3.0001)
     bioportal (2.2)
     bives (0.10)
@@ -195,14 +199,10 @@ GEM
     cocaine (0.5.4)
       climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.0)
+    coercible (1.0.0)
+      descendants_tracker (~> 0.0.1)
     colorize (0.7.3)
     country-select (1.1.1)
-    coveralls (0.7.0)
-      multi_json (~> 1.3)
-      rest-client
-      simplecov (>= 0.7)
-      term-ansicolor
-      thor
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     curb (0.8.5)
@@ -213,13 +213,13 @@ GEM
     delayed_job_active_record (4.0.1)
       activerecord (>= 3.0, < 4.2)
       delayed_job (>= 3.0, < 4.1)
-    docile (1.1.5)
     docsplit (0.7.5)
     dynamic_form (1.1.4)
     ebnf (0.3.6)
       haml (~> 4.0)
       rdf (~> 1.1)
       sxp (~> 0.1, >= 0.1.3)
+    equalizer (0.0.9)
     equivalent-xml (0.4.3)
       nokogiri (>= 1.4.3)
     erubis (2.7.0)
@@ -232,7 +232,7 @@ GEM
       curb (~> 0.8.1)
       loofah (~> 2.0.0)
       sax-machine (~> 0.2.1)
-    flay (2.5.0)
+    flay (2.4.0)
       ruby_parser (~> 3.0)
       sexp_processor (~> 4.0)
     flog (4.2.1)
@@ -253,7 +253,8 @@ GEM
       multi_xml (>= 0.5.2)
     httpi (1.1.1)
       rack
-    i18n (0.6.9)
+    i18n (0.6.11)
+    ice_nine (0.11.0)
     in_place_editing (1.2.0)
     jbuilder (2.0.7)
       activesupport (>= 3.0.0, < 5)
@@ -354,19 +355,19 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
-    rails (3.2.17)
-      actionmailer (= 3.2.17)
-      actionpack (= 3.2.17)
-      activerecord (= 3.2.17)
-      activeresource (= 3.2.17)
-      activesupport (= 3.2.17)
+    rails (3.2.19)
+      actionmailer (= 3.2.19)
+      actionpack (= 3.2.19)
+      activerecord (= 3.2.19)
+      activeresource (= 3.2.19)
+      activesupport (= 3.2.19)
       bundler (~> 1.0)
-      railties (= 3.2.17)
+      railties (= 3.2.19)
     rails_autolink (1.1.6)
       rails (> 3.1)
-    railties (3.2.17)
-      actionpack (= 3.2.17)
-      activesupport (= 3.2.17)
+    railties (3.2.19)
+      actionpack (= 3.2.19)
+      activesupport (= 3.2.19)
       rack-ssl (~> 1.3.2)
       rake (>= 0.8.7)
       rdoc (~> 3.4)
@@ -416,9 +417,9 @@ GEM
       rdf (>= 1.1)
     rdoc (3.12.2)
       json (~> 1.4)
-    reek (1.3.7)
-      rainbow
-      ruby2ruby (~> 2.0.8)
+    reek (1.3.8)
+      rainbow (>= 1.99, < 3.0)
+      ruby2ruby (>= 2.0.8, < 3.0)
       ruby_parser (~> 3.3)
       sexp_processor
     request-log-analyzer (1.13.0)
@@ -438,11 +439,18 @@ GEM
     ruby-openid (2.5.0)
     ruby-prof (0.15.1)
     ruby-progressbar (1.5.1)
-    ruby2ruby (2.0.8)
+    ruby2ruby (2.1.2)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.0)
-    ruby_parser (3.6.1)
+    ruby_parser (3.6.2)
       sexp_processor (~> 4.1)
+    rubycritic (1.1.1)
+      flay (= 2.4.0)
+      flog (= 4.2.1)
+      parser (~> 2.1)
+      reek (= 1.3.8)
+      ruby2ruby (>= 2.1.1, < 3.0)
+      virtus (~> 1.0)
     rubyzip (0.9.9)
     safe_yaml (1.0.3)
     savon (1.1.0)
@@ -455,17 +463,12 @@ GEM
       wasabi (~> 2.5.0)
     sax-machine (0.2.1)
       nokogiri (~> 1.6.0)
-    sexp_processor (4.4.3)
+    sexp_processor (4.4.4)
     simple-spreadsheet-extractor (0.13.3)
       libxml-ruby (~> 2.6.0)
       libxml-ruby (~> 2.6.0)
       open4 (= 1.3.0)
       open4 (= 1.3.0)
-    simplecov (0.8.2)
-      docile (~> 1.1.0)
-      multi_json
-      simplecov-html (~> 0.8.0)
-    simplecov-html (0.8.0)
     slop (3.5.0)
     sparql (1.1.2.1)
       builder (>= 3.0)
@@ -504,12 +507,10 @@ GEM
       builder (~> 3.0)
     taverna-t2flow (0.5.1)
       libxml-ruby (>= 1.1.4)
-    term-ansicolor (1.3.0)
-      tins (~> 1.0)
     test_after_commit (0.2.3)
     thor (0.19.1)
+    thread_safe (0.3.4)
     tilt (1.4.1)
-    tins (1.3.0)
     transaction_isolation (1.0.3)
       activerecord (>= 3.0.11)
     treetop (1.4.15)
@@ -518,7 +519,7 @@ GEM
     turbo-sprockets-rails3 (0.3.11)
       railties (> 3.2.8, < 4.0.0)
       sprockets (>= 2.2.0)
-    tzinfo (0.3.39)
+    tzinfo (0.3.41)
     unicorn (4.8.3)
       kgio (~> 2.6)
       rack
@@ -527,6 +528,11 @@ GEM
       rack
       unicorn
     uuidtools (2.1.4)
+    virtus (1.0.3)
+      axiom-types (~> 0.1)
+      coercible (~> 1.0)
+      descendants_tracker (~> 0.0, >= 0.0.3)
+      equalizer (~> 0.0, >= 0.0.9)
     wasabi (2.5.1)
       httpi (~> 1.0)
       nokogiri (>= 1.4.0)
@@ -559,7 +565,6 @@ DEPENDENCIES
   colorize
   convert_office!
   country-select
-  coveralls
   daemons
   delayed_job_active_record
   docsplit
@@ -569,9 +574,7 @@ DEPENDENCIES
   exception_notification
   factory_girl (= 2.6.4)
   feedjira (~> 1)
-  flay
   fleximage!
-  flog
   fssm
   gibberish!
   google-analytics-rails
@@ -598,12 +601,11 @@ DEPENDENCIES
   pry-doc
   pry-remote
   rack-openid
-  rails (= 3.2.17)
+  rails (= 3.2.19)
   rails_autolink
   rdf-virtuoso (>= 0.1.6)
   rdoc
   redbox!
-  reek
   request-log-analyzer
   rest-client (>= 1.6.1)
   rfc-822
@@ -611,6 +613,7 @@ DEPENDENCIES
   rubocop
   ruby-openid
   ruby-prof
+  rubycritic
   rubyzip (= 0.9.9)
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
