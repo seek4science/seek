@@ -38,17 +38,10 @@ module ResourceListItemHelper
       html = "<div class=\"list_item_title\">"
 
       if resource.class.name.split("::")[0] == "Person"
-        icons = seek_role_icons(resource)
-        html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{icons}</p>"
+        html = list_item_title_for_person(html, resource, title, url)
       else
         if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
-          image=resource_avatar resource,:style=>"width: 24px; height: 24px; vertical-align: middle"
-
-          icon  = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-
-          html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
-          html << "#item_visibility"
-          html << "<br style=\"clear:both\"/>"
+          html = list_item_title_with_avatar(html, resource, title, url)
         else
           html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
         end
@@ -58,6 +51,24 @@ module ResourceListItemHelper
     visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ""
     result = result.gsub("#item_visibility",visibility)
     result.html_safe
+  end
+
+  def list_item_title_for_person(html, person, title, url)
+    icons = seek_role_icons(person)
+    html << "<p>#{link_to title, (url.nil? ? show_resource_path(person) : url)} #{icons}</p>"
+    html
+  end
+
+  def list_item_title_with_avatar(html, resource, title, url)
+    resource_path = show_resource_path(resource)
+    image=resource_avatar resource, :style => "width: 24px; height: 24px; vertical-align: middle"
+
+    icon = link_to_draggable(image, resource_path, :id => model_to_drag_id(resource), :class => "asset", :title => tooltip_title_attrib(get_object_title(resource)))
+
+    html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? resource_path : url)}</p>"
+    html << "#item_visibility"
+    html << "<br style=\"clear:both\"/>"
+    html
   end
 
   def list_item_tag_list resource
