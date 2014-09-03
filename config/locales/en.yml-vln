@@ -48,8 +48,6 @@ en:
   workflow: "Workflow"
 
   scale: "Scale"
-  #Feedback
-  feedback_bar: "Provide Feedback"
 
   gadget:
       new_heading: ""
