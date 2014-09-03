@@ -55,7 +55,7 @@ SEEK::Application.configure do
   Seek::Config.forced_default :factors_studied_enabled,true
   Seek::Config.forced_default :experimental_conditions_enabled,true
   Seek::Config.forced_default :tagging_enabled, true
-  Seek::Config.forced_default :workflows_enabled,true
+  Seek::Config.forced_default :workflows_enabled,false
   Seek::Config.forced_default :authorization_checks_enabled, true
   Seek::Config.forced_default :documentation_enabled,true
   Seek::Config.forced_default :assay_type_ontology_file, "JERM-RDFXML.owl"
