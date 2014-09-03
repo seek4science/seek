@@ -157,10 +157,7 @@ module ResourceListItemHelper
   end
 
   def small_list_item_description text, auto_link=true, length=150
-    html = "<div class='list_item_desc curved'>"
-    html << text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
-    html << "</div>"
-    html.html_safe
+    list_item_description text,auto_link,length
   end
 
   def list_item_contributor resource
