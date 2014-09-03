@@ -6,34 +6,34 @@ function updateFirstPage() {
     var seek_items = getItems(items);
 
     if (seek_items.length > 0) {
-        $j.ajax({
-            url: items_for_result_url,
-            //async: false,
-            type: 'POST',
-            data: {
+        $j("#loading").show();
+
+        setTimeout(function() {
+            $j.ajax({
+                url: items_for_result_url,
+                async: false,
+                type: 'POST',
+                data: {
                     items: seek_items.join(','),
                     active_tab: active_tab
-                  }
-        })
-                .done(function (data) {
-                    updateContent(data.items_for_result);
-                    $j("div[data-ex-role='exhibit-view']").children().show();
+                }
+            })
+                    .done(function (data) {
+                        updateContent(data.items_for_result);
+                        $j("div[data-ex-role='exhibit-view']").children().show();
 
-                    $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
-                    $j('.exhibit-collectionView-header-groupControl').hide();
-                    $j('.exhibit-toolboxWidget-button').hide();
-                    decodeValueTooltip();
-                    selectedFacets();
-                });
+                        $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
+                        $j('.exhibit-collectionView-header-groupControl').hide();
+                        $j('.exhibit-toolboxWidget-button').hide();
+                        decodeValueTooltip();
+                        selectedFacets();
+                    });
+        }, 0);
     }
 }
 
 jQuery.noConflict();
 var $j = jQuery;
-
-$j(document).ajaxStart(function () {
-    $j("#loading").show();
-});
 
 $j(document).ajaxComplete(function () {
     $j("#loading").hide();
