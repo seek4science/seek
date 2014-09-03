@@ -114,7 +114,7 @@
   Factory.define(:sop) do |f|
     f.title "This Sop"
     f.projects { [Factory.build(:project)] }
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
 
     f.after_create do |sop|
       if sop.content_blob.blank?
@@ -219,6 +219,7 @@ end
     f.sequence(:description) {|n| "Assay description #{n}"}
     f.association :contributor, :factory => :person
     f.association :study
+
   end
 
   Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
@@ -232,7 +233,7 @@ end
   end
 
   Factory.define(:modelling_assay, :parent => :assay_base) do |f|
-    f.association :assay_class, :factory => :modelling_assay_class
+    f.association :assay_class, :factory => :modelling_assay_class    
   end
 
   Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
@@ -246,7 +247,6 @@ end
     f.technology_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
     f.technology_type_label "Technology type"
     f.samples {[Factory.build(:sample, :policy => Factory(:public_policy))]}
-
   end
 
     Factory.define(:assay, :parent => :modelling_assay) {}
@@ -260,14 +260,14 @@ end
   Factory.define(:study) do |f|
     f.sequence(:title) { |n| "Study#{n}" }
     f.association :investigation
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
   end
 
   #Investigation
   Factory.define(:investigation) do |f|
     f.projects {[Factory.build(:project)]}
     f.sequence(:title) { |n| "Investigation#{n}" }
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
   end
 
   #Strain
@@ -275,7 +275,7 @@ end
     f.sequence(:title) { |n| "Strain#{n}" }
     f.association :organism
     f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
   end
 
   #Culture growth type
@@ -300,7 +300,7 @@ end
   Factory.define(:specimen) do |f|
     f.sequence(:title) { |n| "Specimen#{n}" }
     f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
     f.projects {[Factory.build(:project)]}
     f.association :institution
     f.association :strain
@@ -310,7 +310,7 @@ end
   Factory.define(:sample) do |f|
     f.sequence(:title) { |n| "Sample#{n}" }
     f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
     f.projects {[Factory.build(:project)]}
     f.donation_date Date.today
     f.specimen { Factory(:specimen, :policy => Factory(:public_policy))}
@@ -321,7 +321,7 @@ end
   Factory.define(:data_file) do |f|
     f.sequence(:title) {|n| "A Data File_#{n}"}
     f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
     f.after_create do |data_file|
       if data_file.content_blob.blank?
         data_file.content_blob = Factory.create(:pdf_content_blob, :asset => data_file, :asset_version=>data_file.version)
@@ -363,7 +363,7 @@ end
   Factory.define(:model) do |f|
     f.sequence(:title) {|n| "A Model #{n}"}
     f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
     f.after_create do |model|
        model.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
     end
@@ -372,7 +372,7 @@ end
   Factory.define(:model_2_files,:class=>Model) do |f|
     f.sequence(:title) {|n| "A Model #{n}"}
     f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
     f.after_create do |model|
       model.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version),Factory.create(:rightfield_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
     end
@@ -448,14 +448,14 @@ end
     f.sequence(:title) {|n| "A Publication #{n}"}
     f.sequence(:pubmed_id) {|n| n}
     f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
   end
 
   #Presentation
   Factory.define(:presentation) do |f|
     f.sequence(:title) { |n| "A Presentation #{n}" }
-    f.projects { [Factory.build(:project)] }
-    f.association :contributor, :factory => :user
+    f.projects { [Factory.build(:project)] }    
+    f.association :contributor, :factory => :person
     f.after_create do |presentation|
       if presentation.content_blob.blank?
         presentation.content_blob = Factory.create(:content_blob, :original_filename => "test.pdf", :content_type => "application/pdf", :asset => presentation, :asset_version => presentation.version)
@@ -570,7 +570,7 @@ end
     f.start_date Time.now
     f.end_date 1.days.from_now
     f.projects { [Factory.build(:project)] }
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
   end
 
   Factory.define(:saved_search) do |f|
@@ -933,7 +933,7 @@ end
   Factory.define(:workflow) do |f|
     f.sequence(:title) {|n| "A Workflow_#{n}"}
     f.projects {[Factory.build(:project)]}
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
     f.after_create do |workflow|
       if workflow.content_blob.blank?
         workflow.content_blob = Factory.create(:enm_workflow, :asset => workflow, :asset_version=>workflow.version)
@@ -956,14 +956,14 @@ end
     f.sequence(:name) {|n| "Workflow Run #{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :workflow, :factory => :workflow
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
   end
 
   Factory.define(:sweep) do |f|
     f.sequence(:name) {|n| "Sweep #{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :workflow, :factory => :workflow
-    f.association :contributor, :factory => :user
+    f.association :contributor, :factory => :person
   end
 
   Factory.define(:sweep_with_runs, :parent => :sweep) do |f|

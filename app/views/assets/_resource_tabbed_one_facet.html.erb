@@ -79,7 +79,7 @@
           <% if (!resources.empty? || hidden_count > 0) || show_empty_tabs %>
               <div id="<%= resource_type -%>" class="tabbertab">
                 <% unless resources.empty? && extra_count < 1 %>
-                    <h3 class='<%= resource_type -%>'><%= tab_title -%></h3>
+                    <h3 class='<%= resource_type  + ' ' + title_class  -%>'><%= tab_title -%></h3>
                     <%= render :partial => "assets/resource_list", :locals => { :collection => resources,
                                                                                 :narrow_view => narrow_view,
                                                                                 :authorization_for_showing_already_done => true,
