@@ -46,7 +46,7 @@ module FancyMultiselectHelper
       assign_Selected_Item_js = "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}'));".html_safe
           onchange += assign_Selected_Item_js
       options[:possibilities_options][:onchange] = onchange.html_safe
-      super(object, association, options) + "\n<script type='text/javascript'>#{assign_Selected_Item_js}</script>\n".html_safe
+      super(object, association, options)
     end
   end
 
