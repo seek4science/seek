@@ -20,6 +20,7 @@ function updateFirstPage() {
             })
                     .done(function (data) {
                         updateContent(data.items_for_result);
+                        $j("#loading").hide();
                         $j("div[data-ex-role='exhibit-view']").children().show();
 
                         $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
@@ -34,10 +35,6 @@ function updateFirstPage() {
 
 jQuery.noConflict();
 var $j = jQuery;
-
-$j(document).ajaxComplete(function () {
-    $j("#loading").hide();
-});
 
 $j(document).ready(function(){
     $j(document).on("exhibitConfigured.exhibit", function() {
