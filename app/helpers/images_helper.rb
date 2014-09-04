@@ -365,39 +365,33 @@ module ImagesHelper
   end
   
   def flag_icon(country, text=country, margin_right='0.3em')
-    return '' if country.nil? or country.empty?
+    return '' unless country && !country.empty?
+
+    code = country_code(country)
     
-    code = ''
-    
-    if country.downcase == "great britain"
-      code = "gb"
-    elsif ["england", "wales", "scotland"].include?(country.downcase)
-      code = country
-    elsif country.length > 2
-      code = CountryCodes.code(country)
-    else
-      code = country if CountryCodes.valid_code?(country)
-    end
-    
-    unless code.nil? or code.empty?
-      return image_tag("famfamfam_flags/#{code.downcase}.png",
+    if code && !code.empty?
+      image_tag("famfamfam_flags/#{code.downcase}.png",
         :title => "header=[] body=[<b>Location: </b>#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[200]",
         :style => "vertical-align:middle; margin-right: #{margin_right};")
     else
-      return ''
+      ''
     end
   end
-
 
   def model_image_url(model_instance, model_image_id, size=nil)
     basic_url = eval("model_model_image_path(#{model_instance.id}, #{model_image_id})")
 
-    if size
-      basic_url += "?size=#{size}"
-      basic_url += "x#{size}" if size.kind_of?(Numeric)
-    end
+    basic_url = append_size_parameter(basic_url,size)
 
     return basic_url
+  end
+
+  def append_size_parameter url,size
+    if size
+      url << "?size=#{size}"
+      url << "x#{size}" if size.kind_of?(Numeric)
+    end
+    url
   end
 
   def delete_icon model_item, user
@@ -441,6 +435,7 @@ module ImagesHelper
   def collapse_image(margin_left="0.3em")
     image_tag icon_filename_for_key("collapse"), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
   end
+
   def expand_plus_image(size="18x18")
     image_tag icon_filename_for_key("expand_plus"),:size=>size,:alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
   end
