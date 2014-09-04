@@ -62,7 +62,8 @@
 
         <p>
           <%= preview_permission_popup_link(@data_file)-%>
-          <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
+          <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);" -%>
+          or <%= link_to 'Cancel', data_files_path -%>
         </p>
     </div>
     <% end -%>
