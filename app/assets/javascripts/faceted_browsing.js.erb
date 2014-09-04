@@ -113,7 +113,7 @@ function selectedFacets(){
     var selected_facets = [];
 
     $j(".exhibit-facet-value-selected").map(function(){
-        var value = $j(this).attr("title");
+        var value = $j(this).children('.exhibit-facet-value-inner').text();
         var facet =  $j(this).parents("div[data-ex-role='facet']").attr('data-ex-facet-label');
         selected_facets.push(facet + ':' + value);
     });
