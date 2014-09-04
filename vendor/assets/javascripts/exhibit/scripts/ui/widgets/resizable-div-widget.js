@@ -66,6 +66,7 @@ Exhibit.ResizableDivWidget.prototype._initializeUI = function() {
     this._resizerDiv = Exhibit.jQuery(this._div).children().get(1);
 
     Exhibit.jQuery(this._resizerDiv).bind("mousedown", function(evt) {
+        evt.preventDefault();
         self._dragging = true;
         self._height = Exhibit.jQuery(self._contentDiv).height();
         self._origin = { "x": evt.pageX, "y": evt.pageY };
