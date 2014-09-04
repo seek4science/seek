@@ -26,8 +26,8 @@
             <div class="yui-u" style="float:right;width: 15%;">
               <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
               <br/>
-              <b>Filter <%= internationalized_resource_name(object_type)%> by:</b>
-              <hr/>
+              <span class="filter_text">Filter <%= internationalized_resource_name(object_type)%> by: <hr/>
+              </span>
               <% count = 0 %>
               <% facets_for_object.each do |key, value| %>
                   <%
@@ -37,6 +37,7 @@
                   <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => collapsed} %>
                   <br/>
               <% end %>
+              <input type="button" value="Reset All Filters" class="reset_all_filters" onclick="resetAllFilters()"/>
             </div>
         </div>
     </div>

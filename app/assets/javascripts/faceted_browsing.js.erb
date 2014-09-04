@@ -42,6 +42,8 @@ $j(document).ajaxComplete(function () {
 $j(document).ready(function(){
     $j(document).on("exhibitConfigured.exhibit", function() {
         defaultSearchText();
+        $j('.reset_all_filters').show();
+        $j('.filter_text').show();
     });
 
     $j(document).bind("registerLocales.exhibit", function() {
@@ -134,4 +136,12 @@ function selectedFacets(){
     }
 
     $j(element).insertBefore( ".exhibit-collectionView-header-sortControls" );
+}
+
+function resetAllFilters(){
+    state = window.exhibit._uiContext._collection.clearAllRestrictions();
+    Exhibit.History.pushState(
+            state.data,
+            Exhibit._("%widget.collectionSummary.resetActionTitle")
+    );
 }
