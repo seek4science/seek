@@ -465,7 +465,7 @@ Exhibit.Collection.prototype.clearAllRestrictions = function() {
     }
     this._updating = false;
     
-    this.onFacetUpdated();
+    //this.onFacetUpdated();
 
     return state;
 };
