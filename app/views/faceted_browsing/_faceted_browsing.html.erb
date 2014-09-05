@@ -37,7 +37,9 @@
                   <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => collapsed} %>
                   <br/>
               <% end %>
-              <input type="button" value="Reset All Filters" class="reset_all_filters" onclick="resetAllFilters()"/>
+              <ul class="sectionIcons" style="text-align:left;">
+                    <li><%= link_to_function 'Reset All Filters', 'resetAllFilters()', {:class => 'reset_all_filters' }%> </li>
+              </ul>
             </div>
         </div>
     </div>

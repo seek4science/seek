@@ -75,6 +75,6 @@ span.filter_text {
     font-weight: bold;
 }
 
-input.reset_all_filters {
+a.reset_all_filters {
     display: none;
 }
