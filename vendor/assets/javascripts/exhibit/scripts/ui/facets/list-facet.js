@@ -192,10 +192,10 @@ Exhibit.ListFacet.prototype.onUncollapse = function() {
  * @param {Exhibit.Set} items
  */
 Exhibit.ListFacet.prototype.update = function(items) {
-    if (Exhibit.FacetUtilities.isCollapsed(this)) {
+/*    if (Exhibit.FacetUtilities.isCollapsed(this)) {
         this._delayedUpdateItems = items;
         return;
-    }
+    }*/
     Exhibit.jQuery(this._dom.valuesContainer)
         .hide()
         .empty();
