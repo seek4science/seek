@@ -351,6 +351,8 @@ module ImagesHelper
         "famfamfam_silk/table.png"
       when "myexperiment"
         "myexp_icon.png"
+      when "filter"
+        "crystal_project/16x16/actions/filter.png"
     else
       return nil
     end
