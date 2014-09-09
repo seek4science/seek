@@ -196,3 +196,38 @@ The required package names are just the same as for Ubuntu 12.04 - so just follo
 If you encounter issues related to <em>rvm use</em> - you may need to configure your terminal to run commands as a login shell. There is a checkbox that can be found under the menu <em>Edit</em>, <em>Profile Preferences</em> and then
 under the tab <em>Title and Command</em>.
 
+
+= Installing SEEK for Mac OS X
+== Mavericks
+
+This section will guide you to install prerequisite packages, for other steps please read the main {Install Guide}[link:doc/INSTALL.html]
+
+You will need first to install Fink and MacPorts, two package manager tools for Mac OS X. Most of the packages will be installed by Finks, while some will be installed by MacPorts
+Follow this link to install Fink: http://www.finkproject.org/download/index.php?phpLang=en
+and for MacPorts: https://www.macports.org/install.php
+
+=== Installing packages
+
+    sudo fink install wget curl openssl100-dev git readline6
+    sudo fink install libxml++2 sqlite3-dev sqlite3
+    sudo fink install poppler-bin mysql-unified-dev
+
+    sudo port install mysql5-server
+    sudo port install openssh ImageMagick libxslt
+
+For the following packages, you download the dmg image and install manually:
+    Libreoffice (alternative open office): http://www.libreoffice.org/download
+
+=== Other notes
+
+By default, mysql client connects to mysql server through socket at /tmp/mysql.sock. However, you might install by default the .sock file at /opt/local/var/run/mysql56/mysqld.sock.
+Therefore, the .sock file needs to be re-configured in database.yml
+
+    socket: /opt/local/var/run/mysql56/mysqld.sock
+
+And also when you want to run mysql client, you need to give the .sock file path under option -S
+
+You might need to specify the installed location of Libreoffice before running soffice command.
+E.g. you might add the following line into ~/.bashrc
+
+    export PATH="$PATH:/Applications/LibreOffice.app/Contents/MacOS/"
