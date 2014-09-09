@@ -216,7 +216,9 @@ and for MacPorts: https://www.macports.org/install.php
     sudo port install openssh ImageMagick libxslt
 
 For the following packages, you download the dmg image and install manually:
+
     Libreoffice (alternative open office): http://www.libreoffice.org/download
+    Java JDK: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 === Other notes
 
