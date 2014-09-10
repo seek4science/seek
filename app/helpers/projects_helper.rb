@@ -21,7 +21,7 @@ module ProjectsHelper
 
   def link_list_for_role role_text, role_members
     if role_members.empty?
-      html = "<span class='none_text'>No #{role.pluralize} for this #{t('project')}</span>";
+      html = "<span class='none_text'>No #{role_text.pluralize} for this #{t('project')}</span>";
     else
       html = role_members.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
@@ -33,11 +33,11 @@ module ProjectsHelper
   end
 
   def asset_managers_link_list project
-    link_list_for_role("Asset manager",project.asset_managers)
+    link_list_for_role("Asset Manager",project.asset_managers)
   end
 
   def project_managers_link_list project
-    link_list_for_role("#{t('project')} manager",project.project_managers)
+    link_list_for_role("#{t('project')} Manager",project.project_managers)
   end
 
   def gatekeepers_link_list project
