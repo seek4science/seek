@@ -19,49 +19,33 @@ module ProjectsHelper
     return result.html_safe
   end
 
-  def pals_link_list project
-    if project.pals.empty?
-      html = "<span class='none_text'>No PALs for this #{t('project')}</span>";
+  def link_list_for_role role_text, role_members
+    if role_members.empty?
+      html = "<span class='none_text'>No #{role.pluralize} for this #{t('project')}</span>";
     else
-      html = project.pals.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = role_members.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
     html.html_safe
+  end
+
+  def pals_link_list project
+    link_list_for_role("PAL",project.pals)
   end
 
   def asset_managers_link_list project
-    if project.asset_managers.empty?
-      html = "<span class='none_text'>No Asset Managers for this #{t('project')}</span>";
-    else
-      html = project.asset_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
-    end
-    html.html_safe
+    link_list_for_role("Asset manager",project.asset_managers)
   end
 
   def project_managers_link_list project
-    if project.project_managers.empty?
-      html = "<span class='none_text'>No #{t('project')} Managers for this #{t('project')}</span>";
-    else
-      html = project.project_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
-    end
-    html.html_safe
+    link_list_for_role("#{t('project')} manager",project.project_managers)
   end
 
   def gatekeepers_link_list project
-    if project.gatekeepers.empty?
-      html = "<span class='none_text'>No Gatekeepers for this #{t('project')}</span>";
-    else
-      html = project.gatekeepers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
-    end
-    html.html_safe
+    link_list_for_role("Gatekeeper",project.gatekeepers)
   end
 
   def project_coordinators_link_list project
-    if project.project_coordinators.empty?
-      html=  "<span class='none_text'>No project coordinators for this project</span>";
-    else
-      html = project.project_coordinators.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
-    end
-    html.html_safe
+    link_list_for_role("Project coordinator",project.project_coordinators)
   end
   
   def programme_link project
