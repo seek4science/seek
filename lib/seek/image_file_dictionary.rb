@@ -1,13 +1,13 @@
 module Seek
   # a means to lookup the configured icon image filename for a given key
-  class IconFileDictionary
+  class ImageFileDictionary
     include Singleton
 
     def initialize
       @dictionary = dictionary_definition
     end
 
-    def icon_filename_for_key(key)
+    def image_filename_for_key(key)
       @dictionary[key.to_sym]
     end
 
