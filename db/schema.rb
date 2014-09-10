@@ -141,7 +141,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.integer  "strain_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "tissue_and_cell_type_id"
   end
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
@@ -152,8 +151,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "term_uri"
-    t.string   "source_path"
-    t.integer  "contributor_id"
   end
 
   create_table "assay_types_edges", :id => false, :force => true do |t|
@@ -205,6 +202,26 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
   end
 
   add_index "assets_creators", ["asset_id", "asset_type"], :name => "index_assets_creators_on_asset_id_and_asset_type"
+
+  create_table "attachments", :force => true do |t|
+    t.integer  "size"
+    t.integer  "height"
+    t.integer  "width"
+    t.integer  "parent_id"
+    t.integer  "attachable_id"
+    t.integer  "position"
+    t.string   "content_type"
+    t.string   "filename"
+    t.string   "thumbnail"
+    t.string   "attachable_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "data_url"
+    t.string   "original_filename"
+  end
+
+  add_index "attachments", ["attachable_id", "attachable_type"], :name => "index_attachments_on_attachable_id_and_attachable_type"
+  add_index "attachments", ["parent_id"], :name => "index_attachments_on_parent_id"
 
   create_table "auth_lookup_update_queues", :force => true do |t|
     t.integer  "item_id"
@@ -260,7 +277,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.string  "asset_type"
     t.integer "asset_version"
     t.boolean "is_webpage",                              :default => false
-    t.boolean "external_link"
   end
 
   add_index "content_blobs", ["asset_id", "asset_type"], :name => "index_content_blobs_on_asset_id_and_asset_type"
@@ -331,7 +347,7 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -714,7 +730,7 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -931,11 +947,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.text     "funding_details"
   end
 
-  create_table "project_descendants", :id => false, :force => true do |t|
-    t.integer "ancestor_id"
-    t.integer "descendant_id"
-  end
-
   create_table "project_folder_assets", :force => true do |t|
     t.integer  "asset_id"
     t.string   "asset_type"
@@ -987,7 +998,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.string   "uuid"
     t.integer  "programme_id"
     t.integer  "ancestor_id"
-    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -1068,8 +1078,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.integer  "publication_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "author_index"
-    t.integer  "person_id"
   end
 
   create_table "publications", :force => true do |t|
@@ -1088,7 +1096,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "publication_type",              :default => 1
-    t.string   "citation"
   end
 
   add_index "publications", ["contributor_id", "contributor_type"], :name => "index_publications_on_contributor_id_and_contributor_type"
@@ -1206,15 +1213,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.datetime "updated_at",                :null => false
   end
 
-  create_table "scalings", :force => true do |t|
-    t.integer  "scale_id"
-    t.integer  "scalable_id"
-    t.integer  "person_id"
-    t.string   "scalable_type"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
-  end
-
   create_table "sessions", :force => true do |t|
     t.string   "session_id", :null => false
     t.text     "data"
@@ -1304,7 +1302,7 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                       :default => 1
+    t.integer  "version"
     t.string   "first_letter",     :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -1466,25 +1464,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.integer  "project_subscription_id"
   end
 
-  create_table "suggested_assay_types", :force => true do |t|
-    t.string   "label"
-    t.string   "uri"
-    t.string   "parent_uri"
-    t.integer  "contributor_id"
-    t.boolean  "is_for_modelling"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
-  end
-
-  create_table "suggested_technology_types", :force => true do |t|
-    t.string   "label"
-    t.string   "uri"
-    t.string   "parent_uri"
-    t.integer  "contributor_id"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
-  end
-
   create_table "sweep_auth_lookup", :force => true do |t|
     t.integer "user_id"
     t.integer "asset_id"
@@ -1633,8 +1612,6 @@ ActiveRecord::Schema.define(:version => 20140908142454) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "term_uri"
-    t.string   "source_path"
-    t.integer  "contributor_id"
   end
 
   create_table "technology_types_edges", :id => false, :force => true do |t|
