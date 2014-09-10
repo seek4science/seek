@@ -33,31 +33,25 @@ module Seek
       Mailer.request_resource(current_user,resource,details,base_host).deliver
 
       render :update do |page|
-        page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
+        html = "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
+        page[:requesting_resource_status].replace_html(html)
       end
     end
 
     def destroy_version
       name = self.controller_name.singularize
       @asset = eval("@#{name}")
-
       if Seek::Config.delete_asset_version_enabled
         @asset.destroy_version  params[:version]
-
         flash[:notice] = "Version #{params[:version]} was deleted!"
-        respond_to do |format|
-          format.html { redirect_to(polymorphic_path(@asset)) }
-          format.xml { head :ok }
-        end
       else
         flash[:error] = "Deleting a version of #{@asset.class.name.underscore.humanize} is not enabled!"
-        respond_to do |format|
-          format.html { redirect_to(polymorphic_path(@asset)) }
-          format.xml { head :ok }
-        end
+      end
+      respond_to do |format|
+        format.html { redirect_to(polymorphic_path(@asset)) }
+        format.xml { head :ok }
       end
     end
-
 
   end
 end
