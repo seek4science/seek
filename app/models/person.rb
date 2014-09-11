@@ -197,12 +197,9 @@ class Person < ActiveRecord::Base
 
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json
-    all_people = Person.order("ID asc")
-    names_emails = all_people.collect{ |p| {"id" => p.id,
-        "name" => (p.first_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a first name\n----\n"); "(NO FIRST NAME)") : h(p.first_name)) + " " +
-                  (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : h(p.last_name)),
-        "email" => (p.email.blank? ? "unknown" : h(p.email)) } }
-    return names_emails.to_json
+    Person.order("ID asc").collect do |p|
+      {"id" => p.id,"name" => p.name,"email" => p.email}
+    end.to_json
   end
 
   def validates_associated(*associations)
@@ -286,10 +283,8 @@ class Person < ActiveRecord::Base
   end
 
   def name
-    firstname=first_name
-    firstname||=""
-    lastname=last_name
-    lastname||=""
+    firstname=first_name || ""
+    lastname=last_name || ""
     #capitalize, including double barrelled names
     #TODO: why not just store them like this rather than processing each time? Will need to reprocess exiting entries if we do this.
     return (firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}).strip
@@ -319,12 +314,8 @@ class Person < ActiveRecord::Base
 
   def project_roles_of_project(projects_or_project)
     #Get intersection of all project memberships + person's memberships to find project membership
-	#MERGENOTE - just make it into an array    
-	if projects_or_project.is_a? Array
-      memberships = group_memberships.select{|g| projects_or_project.include? g.work_group.project}
-    else
-      memberships = group_memberships.select{|g| g.work_group.project == projects_or_project}
-    end
+	  projects_or_project = Array(projects_or_project)
+    memberships = group_memberships.select{|g| projects_or_project.include? g.work_group.project}
     return memberships.collect{|m| m.project_roles}.flatten
   end
 
@@ -336,7 +327,7 @@ class Person < ActiveRecord::Base
   #(admin or project managers of this person) and (this person does not have a user or not the other admin)
   #themself
   def can_be_edited_by?(subject)
-    return false if subject.nil?
+    return false unless subject
     subject = subject.user if subject.is_a?(Person)
     subject == self.user || subject.is_admin? || self.is_managed_by?(subject)
   end
@@ -354,8 +345,6 @@ class Person < ActiveRecord::Base
   #admin can administer other people, project manager can administer other people except other admins and themself
   def can_be_administered_by?(user)
     return false if user.nil? || user.person.nil?
-
-
     user.is_admin? || (user.person.is_project_manager_of_any_project? && (self.is_admin? || self!=user.person))
   end
 
@@ -366,8 +355,6 @@ class Person < ActiveRecord::Base
   def can_edit? user = User.current_user
     new_record? || can_be_edited_by?(user)
   end
-
-
 
   def can_manage? user = User.current_user
     user.try(:is_admin?)
@@ -466,7 +453,7 @@ class Person < ActiveRecord::Base
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
-    self.is_admin = true if Person.count==0
+    self.is_admin = (Person.count==0)
   end
 
   def orcid_id_must_be_valid_or_blank
