@@ -1,5 +1,5 @@
 language: ruby
-bundler_args: --without production
+bundler_args: --without production --retry 7
 rvm:
   - 1.9.3
   - 2.1.2
