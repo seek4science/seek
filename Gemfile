@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem "rails", "3.2.19"
 gem "rdoc"
-gem 'rails-settings',:require=>"settings"
+
 gem "feedjira","~>1"
 gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
@@ -61,6 +61,7 @@ gem 'bives'
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "git://github.com/SysMO-DB/white_list.git"
 gem 'white_list_formatted_content', :git => "git://github.com/SysMO-DB/white_list_formatted_content.git"
+gem 'my_rails_settings', :git => "git://github.com/SysMO-DB/my_rails_settings.git", :require=>"settings"
 gem 'piwik_analytics',:git=>"git://github.com/SysMO-DB/piwik-ruby-tracking.git"
 gem 'my_savage_beast', :git => "git://github.com/SysMO-DB/my_savage_beast"
 gem 'redbox', :git=>"git://github.com/SysMO-DB/redbox"

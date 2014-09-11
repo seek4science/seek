@@ -43,6 +43,12 @@ GIT
     gibberish (1.0.0)
 
 GIT
+  remote: git://github.com/SysMO-DB/my_rails_settings.git
+  revision: e3f7fe9625ea27fea42b02c95e30cb4f1341655b
+  specs:
+    my_rails_settings (1.0.0)
+
+GIT
   remote: git://github.com/SysMO-DB/my_responds_to_parent.git
   revision: 5fadfd0cd85a0a70caaddd36f9617cb743047e0b
   specs:
@@ -407,7 +413,6 @@ GEM
       activesupport (= 3.2.19)
       bundler (~> 1.0)
       railties (= 3.2.19)
-    rails-settings (1.0.0)
     rails_autolink (1.1.6)
       rails (> 3.1)
     railties (3.2.19)
@@ -671,6 +676,7 @@ DEPENDENCIES
   minitest-reporters (~> 0.14)
   modporter-plugin
   my_annotations!
+  my_rails_settings!
   my_responds_to_parent!
   my_savage_beast!
   mysql2
@@ -686,7 +692,6 @@ DEPENDENCIES
   psych
   rack-openid
   rails (= 3.2.19)
-  rails-settings
   rails_autolink
   rdf-virtuoso (>= 0.1.6)
   rdoc
