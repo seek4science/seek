@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140911131032) do
+ActiveRecord::Schema.define(:version => 20140908142454) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1713,7 +1713,7 @@ ActiveRecord::Schema.define(:version => 20140911131032) do
     t.float    "time_after_treatment"
     t.integer  "time_after_treatment_unit_id"
     t.float    "incubation_time"
-    t.float    "incubation_time_unit_id"
+    t.integer  "incubation_time_unit_id"
   end
 
   create_table "units", :force => true do |t|
