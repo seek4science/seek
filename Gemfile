@@ -79,8 +79,10 @@ gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 
-gem 'passenger'
-gem 'unicorn-rails'
+gem 'taverna-t2flow'
+gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
+gem 'jquery-rails', '~> 3'
+
 gem "recaptcha", '0.3.1'
 gem 'metainspector'
 gem 'mechanize'
@@ -88,11 +90,12 @@ gem 'mechanize'
 
 group :assets do
   gem 'turbo-sprockets-rails3'
+  gem 'yui-compressor'
 end
 
-gem 'taverna-t2flow'
-gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
-gem 'jquery-rails', '~> 3'
+group :production do
+  gem 'passenger'
+end
 
 group :development do
   gem "pry"
@@ -102,6 +105,7 @@ group :development do
   gem "rubocop",:require=>false
   gem "rubycritic",:require=>false
   gem "guard-rubycritic",:require=>false
+  gem 'unicorn-rails'
 end
 
 group :test do
@@ -115,6 +119,3 @@ group :test do
   gem 'sunspot_matchers'
 end
 
-group :assets do
-  gem 'yui-compressor'
-end
