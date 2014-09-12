@@ -13,13 +13,13 @@ class ProjectExtensionTest <  ActiveSupport::TestCase
     proj.parent = parent_proj_changed
     proj.save!
 
-    assert_equal "changed test parent", proj.parent.name
+    assert_equal "changed test parent", proj.parent.title
 
   end
 
   test "create ancestor work groups after adding institutions" do
     institutions = [Factory(:institution), Factory(:institution)]
-    parent_proj = Factory :project, :name => "parent proj"
+    parent_proj = Factory :project, :title => "parent proj"
     project = Factory :project, :parent => parent_proj
     project.institutions = institutions
     project.save!
