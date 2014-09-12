@@ -251,7 +251,6 @@ class Project < ActiveRecord::Base
     child
   end
 
-   #MERGENOTE - don't like this
    #should put below at the bottom in order to override methods for hierarchies,
    #Try to find a better way for overriding methods regardless where to include the module
     include Seek::ProjectHierarchies::ProjectExtension if Seek::Config.project_hierarchy_enabled
