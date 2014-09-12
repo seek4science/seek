@@ -687,12 +687,8 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  #MERGENOTE - this isn't what this test, and later tests are actually testing, there is no version tested
-  test "download link for sop in tab has version" do
+  test "download link for sop in lazy loaded tab" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
-    end
 
     with_config_value :tabs_lazy_load_enabled, true do
       get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
@@ -703,11 +699,8 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  test "show link for sop in tab has version" do
+  test "show link for sop in lazy loaded tab" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
-    end
 
     with_config_value :tabs_lazy_load_enabled, true do
       get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
@@ -718,11 +711,9 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  test "edit link for sop in tabs" do
+  test "edit link for sop in lazy loaded tabs" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id=>assays(:metabolomics_assay)
-    end
+
     with_config_value :tabs_lazy_load_enabled, true do
       get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     end
@@ -732,11 +723,8 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  test "download link for data_file in tabs" do
+  test "download link for data_file in lazy loaded tabs" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
-    end
 
     with_config_value :tabs_lazy_load_enabled, true do
       get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
@@ -747,11 +735,8 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  test "show link for data_file in tabs" do
+  test "show link for data_file in laz loaded tabs" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
-    end
 
     with_config_value :tabs_lazy_load_enabled, true do
       get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
@@ -762,11 +747,8 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  test "edit link for data_file in tabs" do
+  test "edit link for data_file in lazy loaded tabs" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
-    end
 
     with_config_value :tabs_lazy_load_enabled, true do
       get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
@@ -786,9 +768,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
     end
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-    end
 
     assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]", "nofollow", :text=>/news\.bbc\.co\.uk/, :minimum=>1
@@ -802,9 +781,6 @@ class AssaysControllerTest < ActionController::TestCase
     data_file_version.save!
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
-    end
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     end
 
     assert_select "div.list_item div.list_item_desc" do
