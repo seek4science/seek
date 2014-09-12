@@ -10,6 +10,10 @@ module ApplicationHelper
   include Recaptcha::ClientHelper
 
 
+  def index_title
+    show_title(self.controller_name.humanize.capitalize)
+  end
+
   def is_front_page?
     current_page?(main_app.root_url)
   end
