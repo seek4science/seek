@@ -95,7 +95,6 @@ class Person < ActiveRecord::Base
     wg.project.touch
   end
 
-  #MERGENOTE - why are we not inculding AuthLookup module?
   after_commit :queue_update_auth_table
 
   def queue_update_auth_table
