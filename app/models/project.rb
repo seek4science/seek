@@ -49,7 +49,6 @@ class Project < ActiveRecord::Base
 
   validate :lineage_ancestor_cannot_be_self
 
-  #MERGENOTE - would like to get rid of this, or move into a shared module
   RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type.underscore.pluralize}" do
