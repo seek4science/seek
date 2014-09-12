@@ -453,7 +453,7 @@ class Person < ActiveRecord::Base
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
-    self.is_admin = (Person.count==0)
+    self.is_admin = true if Person.count==0
   end
 
   def orcid_id_must_be_valid_or_blank
