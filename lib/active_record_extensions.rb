@@ -56,6 +56,9 @@
     respond_to? :versions
   end
 
+  def is_suggested_type?
+      self.class.include? Seek::Ontologies::SuggestedType
+  end
 end
 
 ActiveRecord::Base.class_eval do

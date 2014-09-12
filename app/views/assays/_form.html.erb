@@ -62,24 +62,24 @@
 <table class="padded_table">
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
-        <%= create_suggested_assay_type_popup_link @assay.is_modelling?, controller_name %>
+        <%= create_suggested_type_popup_link @assay.assay_type_reader.ontology_term_type %>
 
     </td>
     <% unless @assay.is_modelling? -%>
         <td><%= f.label "Technology type: " %>
-              <%= create_suggested_technology_type_popup_link controller_name %>
+              <%= create_suggested_type_popup_link @assay.technology_type_reader.ontology_term_type %>
         </td>
     <% end -%>
   </tr>
   <tr>
     <td style="width:50%">
-      <div id="assay_assay_types_list">
+      <div id="assay_<%= @assay.assay_type_reader.ontology_term_type %>_types_list">
         <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay.assay_type_uri, {:style => "width:100%"} %>
       </div>
     </td>
     <td style="width:50%">
       <% unless @assay.is_modelling? -%>
-          <div id="assay_technology_types_list">
+          <div id="assay_<%= @assay.technology_type_reader.ontology_term_type %>_types_list">
             <%= technology_type_select_tag f, "technology_type_uri", @assay.technology_type_uri, {:style => "width:100%"} %>
           </div>
       <% end -%>

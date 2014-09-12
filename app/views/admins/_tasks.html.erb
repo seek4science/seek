@@ -15,7 +15,7 @@
   
   <h3>Manage</h3>
   <ul>
-    <li><%= link_to "Manage #{t('assays.assay').downcase} types", url_for(:action=>"manage", :controller=>"suggested_assay_types") %></li>
+    <li><%= link_to "Manage assay types", url_for(:action=>"manage", :controller=>"suggested_assay_types") %></li>
     <li><%= link_to "Manage technology types", url_for(:action=>"manage", :controller=>"suggested_technology_types") %></li>
     <li><%= link_to "Manage tags", tags_admin_path %></li>
     <li><%= link_to "Manage projects", url_for(:action=>"manage", :controller=>"projects") %></li>

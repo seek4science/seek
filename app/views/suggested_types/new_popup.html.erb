@@ -1,6 +1,3 @@
-<%
-      type = @suggested_assay_type.is_for_modelling ? "modelling_analysis" : "assay"
- %>
 
 <!--empty form tag is added here, so that the new_suggested_assay_types form below wont be ignored by some browsers, e.g. Chrome,-->
 <form></form>
@@ -8,16 +5,16 @@
   <div class="head">
     <%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
     <span style="vertical-align:middle;">
-          Create new <%= t('assays.assay').downcase %> type
+          Create new <%= @suggested_type.humanize_term_type%> type
     </span>
   </div>
   <div class="body">
     <div style="float:left;width: 50%">
-      <ul><%= ontology_editor_display type, (@suggested_assay_type.uri.blank? ? @suggested_assay_type.default_parent_uri : @suggested_assay_type.uri) %></ul>
+      <ul><%= ontology_editor_display @suggested_type.term_type, (@suggested_type.uri.blank? ? @suggested_type.default_parent_uri : @suggested_type.uri) %></ul>
     </div>
      <div style="float:left;width: 50%">
        <div id= "new_suggested_assay_type_form" >
-         <%= render :partial => "form", :locals => {:action => :new_popup, :type => type} -%>
+         <%= render :partial => "suggested_types/form", :locals => {:action => :new_popup, :type => @suggested_type.term_type} -%>
        </div>
          <%= image 'large-spinner', :id => "edit_suggested_type_spinner", :style => "display: none;" %>
      </div>

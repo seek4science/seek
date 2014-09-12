@@ -94,4 +94,10 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
 
    end
 
+  test "term type" do
+      Factory :suggested_assay_type, :term_type => "assay"
+
+  end
+
+
 end

@@ -52,7 +52,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     suggested_parent1 = Factory(:suggested_technology_type)
     suggested_parent2 = Factory(:suggested_technology_type)
     ontology_parent_uri = "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
-    ontology_parent = Factory(:suggested_technology_type).ontology_reader.class_hierarchy.hash_by_uri[ontology_parent_uri]
+    ontology_parent = Factory(:suggested_technology_type).class.base_ontology_hash_by_uri[ontology_parent_uri]
     suggested_technology_type = Factory(:suggested_technology_type, :contributor_id => User.current_user.person.try(:id), :parent_uri => suggested_parent1.uri)
     assert_equal 1, suggested_technology_type.parents.size
     assert_equal suggested_parent1, suggested_technology_type.parents.first
