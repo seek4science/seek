@@ -265,9 +265,7 @@ class Person < ActiveRecord::Base
   end
 
   def member_of?(item_or_array)
-    array = Array(item_or_array)
-    #MERGENOTE - needs a closer look, and simplifying
-    array.detect {|item|Rails.cache.fetch([:member_of?, self.cache_key, item.cache_key]) { (item.is_a?(Project) && projects.include?(item)) || item.people.include?(self)}}
+    !(Array(item_or_array) & projects).empty?
   end
 
   def locations
