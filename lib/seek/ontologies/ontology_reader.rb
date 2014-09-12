@@ -63,7 +63,7 @@ module Seek
         @known_classes[uri] || begin
           label ||= fetch_label_for(uri)
           description ||= fetch_description_for(uri)
-          result = OntologyClass.new(uri, label, description, subclasses)
+          result = OntologyClass.new(uri, label, description, subclasses, [], ontology_term_type)
           @known_classes[uri]=result
           result
         end

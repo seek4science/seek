@@ -9,6 +9,10 @@ module Seek
       def ontology_file
         Seek::Config.modelling_analysis_type_ontology_file
       end
+
+      def ontology_term_type
+        "modelling_analysis"
+      end
     end
   end
 end

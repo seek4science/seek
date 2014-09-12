@@ -31,6 +31,13 @@ class OntologyClassTest < ActiveSupport::TestCase
     assert_equal 1, o.subclasses.count
     assert_equal "http://fish#baby_bob",o.subclasses.first.to_s
 
+    o = Seek::Ontologies::OntologyClass.new RDF::URI.new("http://fish#bob"), "fred", "the fred", [RDF::URI.new("http://fish#baby_bob")],[],"assay"
+    assert_equal "http://fish#bob", o.uri.to_s
+    assert_equal "fred", o.label
+    assert_equal "the fred", o.description
+    assert_equal 1, o.subclasses.count
+    assert_equal "http://fish#baby_bob", o.subclasses.first.to_s
+    assert_equal "assay", o.term_type
   end
 
   test "flattened" do

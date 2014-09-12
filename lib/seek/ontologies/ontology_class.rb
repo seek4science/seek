@@ -2,18 +2,19 @@ module Seek
   module Ontologies
 
     class OntologyClass
-      attr_reader :uri,:description,:label,:subclasses,:parents
+      attr_reader :uri,:description,:label,:subclasses,:parents, :term_type
 
 
       alias_method :children, :subclasses
 
-      def initialize uri,label=nil,description=nil,subclasses=[],parents=[]
+      def initialize uri,label=nil,description=nil, subclasses=[],parents=[], term_type=nil
         @uri = uri
         validate_uri
         @description = description
         @label = label
         @subclasses = subclasses
         @parents = parents
+        @term_type = term_type
       end
 
       def label
