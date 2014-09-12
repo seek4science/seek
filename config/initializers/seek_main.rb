@@ -90,8 +90,6 @@ SEEK::Application.configure do
   Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
   Annotations::Config.versioning_enabled = false
 
-  #MERGENOTE - should not be needed anymore, en.yml handles this
-  CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
   ENV['LANG'] = 'en_US.UTF-8'
 
   begin
