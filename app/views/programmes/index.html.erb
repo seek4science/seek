@@ -1,7 +1,4 @@
-<% if @organisms -%>
-    <h2><%= "#{t('project').pluralize} involved with the organism '"+h(@organisms)+"' ... " -%></h2>
-<% end %>
-
+<%= index_title -%>
 
 <% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing %>
     <%= render :partial => "faceted_browsing/faceted_browsing", :object => @programmes %>

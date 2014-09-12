@@ -2,7 +2,7 @@
 
 item||=nil
 
-avatar = item.nil? ? nil : resource_title_draggable_avatar(item,params[:version])
+avatar = item ? resource_title_draggable_avatar(item,params[:version]) : nil
 title_prefix||="" 
 title_postfix||=""
 title ||= item.title || ""

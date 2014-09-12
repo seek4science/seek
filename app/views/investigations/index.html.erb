@@ -1,3 +1,5 @@
+<%= index_title -%>
+
 <%= render :partial => "assets/new_button", :locals => {:new_object_path => new_investigation_path, :label => "New #{t('investigation')}"} %>
 
 <% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing %>
