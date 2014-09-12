@@ -165,7 +165,6 @@ class Person < ActiveRecord::Base
   end
 
 
-  #MERGENOTE - perhaps need programmes in here too
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
