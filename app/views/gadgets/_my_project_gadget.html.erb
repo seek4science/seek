@@ -22,7 +22,7 @@
 
                 <% current_user.person.projects.each do |p| %>
 
-                    <li class='dynamic_menu_li' onclick="javascript:location.href='<%= project_path(p) -%>';"><%= h(p.name) %></li>
+                    <li class='dynamic_menu_li' onclick="javascript:location.href='<%= project_path(p) -%>';"><%= h(p.title) %></li>
                 <% end %>
             </ul>
 
