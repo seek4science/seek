@@ -45,6 +45,16 @@ module Seek
              term_type.humanize.downcase if term_type
           end
 
+          def destroy_errors
+             return nil if can_destroy?
+             error_messages = []
+             type_name =  humanize_term_type
+             error_messages << "Unable to delete #{type_name} types with children." if !children.empty?
+             error_messages << "Unable to delete #{type_name} type " \
+                                          "due to reliance from #{assays.count} " \
+                                          "existing #{type_name}." if !assays.empty?
+             error_messages
+          end
 
           def parents
             Array(parent)

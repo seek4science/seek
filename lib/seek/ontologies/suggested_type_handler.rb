@@ -78,7 +78,7 @@ module Seek
             flash[:notice] = "#{@suggested_type.humanize_term_type} type #{title} was deleted."
             format.xml { head :ok }
           else
-            flash[:error] = view_context.destroy_errors(@suggested_type)
+            flash[:error] = @suggested_type.destroy_errors.join("<br/>").html_safe
             format.xml { render :xml => @suggested_type.errors, :status => :unprocessable_entity }
           end
           format.html { redirect_to(:action => "manage") }
