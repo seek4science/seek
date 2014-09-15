@@ -57,6 +57,10 @@ module ImagesHelper
     (@@icon_dictionary ||= Seek::ImageFileDictionary.instance).image_filename_for_key(key)
   end
 
+  def remove_member_icon_filename
+    icon_filename_for_key("destroy")
+  end
+
   def image key,options={}
     image_tag(icon_filename_for_key(key),options)
   end
