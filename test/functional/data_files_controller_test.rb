@@ -408,7 +408,6 @@ end
     assert assay.related_asset_ids('DataFile').include? assigns(:data_file).id
   end
 
-  #MERGENOTE - VLN's upload tool will need rebuilding to match the changed parameters.
   test "upload_for_tool inacessible with normal login" do
     post :upload_for_tool, :data_file => { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_id=>projects(:sysmo_project).id}, :recipient_id => people(:quentin_person).id
     assert_redirected_to root_url
