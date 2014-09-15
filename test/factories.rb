@@ -203,14 +203,14 @@ end
 
   Factory.define(:suggested_assay_type) do |f|
     f.sequence(:label) {|n| "An AssayType#{n}"}
-    f.is_for_modelling false
     f.parent_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
+    f.after_build{|type| type.term_type = "assay"}
   end
 
    Factory.define(:suggested_modelling_analysis_type, :class=> SuggestedAssayType) do |f|
     f.sequence(:label) {|n| "An Modelling Analysis Type#{n}"}
-    f.is_for_modelling true
     f.parent_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
+    f.after_build{|type| type.term_type = "modelling_analysis"}
   end
 
   #Assay

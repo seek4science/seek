@@ -20,10 +20,14 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
 
 
 
-  test "should popup new" do
+  test "should new" do
     get :new
     assert_response :success
-    assert_not_nil assigns(:suggested_assay_type)
+  end
+
+  test "should new with ajax" do
+    xhr :get, "new"
+    assert_response :success
   end
 
   test "should show edit own assay types" do
@@ -32,24 +36,47 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:suggested_assay_type)
   end
 
-  test "should create" do
+  test "should edit with ajax" do
+    xhr :get, "edit", id: Factory(:suggested_assay_type, :contributor_id => User.current_user.person.try(:id)).id
+    assert_response :success
+  end
 
+  test "should create" do
+    login_as Factory(:admin)
     assert_difference("SuggestedAssayType.count") do
-      post :create, :suggested_assay_type => {:label => "test_assay_type", :link_from => "suggested_assay_types"}
+      post :create, :suggested_assay_type => {:label => "test assay type"}
     end
-    suggested_assay_type = assigns(:suggested_assay_type)
-    assert suggested_assay_type.valid?
-    assert_equal 1, suggested_assay_type.parents.size
+    assert_redirected_to :action => :manage
+    get :manage
+    assert_select "li a", :text=>/test assay type/
+
+  end
+
+  test "should create for ajax request" do
+    assert_difference("SuggestedAssayType.count") do
+      xhr :post,  :create, :suggested_assay_type => {:label => "test_assay_type"}
+    end
+    assert_select "select option[selected='selected']",  :text=>/test_assay_type/
+  end
+
+  test "should update for ajax request" do
+    suggested_assay_type = Factory(:suggested_assay_type, :contributor_id => User.current_user.person.try(:id))
+    xhr :put,  :update,  id: suggested_assay_type.id, suggested_assay_type: {:label => "child_assay_type_a"}
+    assert_select "select option[value=?][selected='selected']",suggested_assay_type.uri, :text=>/child_assay_type_a/
   end
 
   test "should update label" do
-    suggested_assay_type = Factory(:suggested_assay_type, :contributor_id => User.current_user.person.try(:id))
-    put :update, id: suggested_assay_type.id, suggested_assay_type: {:label => "child_assay_type_a"}
-    assert assigns(:suggested_assay_type)
-    assert_equal "child_assay_type_a", assigns(:suggested_assay_type).label
+    login_as Factory(:admin)
+    suggested_assay_type = Factory(:suggested_assay_type, :label => "old label",:contributor_id => User.current_user.person.try(:id))
+    put :update, id: suggested_assay_type.id, suggested_assay_type: {:label => "new label"}
+    assert_redirected_to :action => :manage
+    get :manage
+    assert_select "li a[href=?]", http_escape(assay_types_path(uri: suggested_assay_type.uri, label: "new label")), :text=>/new label/
   end
 
   test "should update parent" do
+    login_as Factory(:admin)
+
     suggested_parent1 = Factory(:suggested_assay_type)
     suggested_parent2 = Factory(:suggested_assay_type)
     ontology_parent_uri = "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics"
@@ -61,19 +88,11 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
 
     #update to other parent suggested
     put :update, :id => suggested_assay_type.id, :suggested_assay_type => {:parent_uri => suggested_parent2.uri}
-    suggested_at = assigns(:suggested_assay_type)
-    assert suggested_at
-    assert_equal 1, suggested_at.parents.size
-    assert_equal suggested_parent2, suggested_at.parents.first
-    assert_equal suggested_parent2.uri, suggested_at.parent.uri.to_s
+    assert_redirected_to :action => :manage
 
     #update to other parent from ontology
     put :update, id: suggested_assay_type.id, suggested_assay_type: {:parent_uri => ontology_parent_uri}
-    suggested_at = assigns(:suggested_assay_type)
-    assert suggested_at
-    assert_equal 1, suggested_at.parents.size
-    assert_equal ontology_parent, suggested_at.parents.first
-    assert_equal ontology_parent.uri.to_s, suggested_at.parent.uri.to_s
+    assert_redirected_to :action => :manage
 
   end
 
@@ -130,5 +149,10 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_redirected_to :action => :manage
   end
 
+  private
+
+  def http_escape url
+     ERB::Util.html_escape url
+  end
 
 end
