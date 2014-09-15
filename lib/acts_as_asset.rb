@@ -42,8 +42,7 @@ module Acts #:nodoc:
 
         validates_presence_of :title
 
-        #MERGENOTE - this was removed by VLN at some point, possibly needs some configuration setting
-        #validates_presence_of :projects
+        validates_presence_of :projects
 
         has_many :relationships,
                  :class_name => 'Relationship',

@@ -1,9 +1,9 @@
-<h1>Feedback</h1>
+<%= show_title("Feedback") %>
 <script type="text/javascript">
-//customize theme of recaptcha widget, see https://developers.google.com/recaptcha/docs/customization
-var RecaptchaOptions = {
-   theme : 'white'
-};
+    //customize theme of recaptcha widget, see https://developers.google.com/recaptcha/docs/customization
+    var RecaptchaOptions = {
+        theme: 'white'
+    };
 </script>
 
 
@@ -13,8 +13,10 @@ var RecaptchaOptions = {
     <p>
       Your feedback, error reports and suggestions are valuable to us.
     </p>
+
     <p>
-      Please provide the details below, and your message will be forwarded to the <%= Seek::Config.dm_project_name %> Team.
+      Please provide the details below, and your message will be forwarded to the <%= Seek::Config.dm_project_name %>
+      Team.
     </p>
 
   </div>
@@ -22,63 +24,63 @@ var RecaptchaOptions = {
 
   <%= form_tag send_feedback_home_url do -%>
 
-    <p>
-      <%= label_tag :subject  -%><br/>
-      <%= text_field_tag :subject,@subject,:size=>60 -%><br/>
-    </p>
+      <p>
+        <%= label_tag :subject -%><br/>
+        <%= text_field_tag :subject, @subject, :size => 60 -%><br/>
+      </p>
 
-    <p>
-      <%= label_tag :send_anonymously -%><br/>
-      <% if current_user.try(:person) %>
-        <%= check_box_tag :anon,true,@anon, :onclick=>visual_effect(:toggle_blind,'anon_notes',:duration=>0.5)  -%>
-      <% else %>
-        <%= check_box_tag :anon,true,true, :disabled => true -%>
-      <% end %>
-    </p>
+      <p>
+        <%= label_tag :send_anonymously -%><br/>
+        <% if current_user.try(:person) %>
+            <%= check_box_tag :anon, true, @anon, :onclick => visual_effect(:toggle_blind, 'anon_notes', :duration => 0.5) -%>
+        <% else %>
+            <%= check_box_tag :anon, true, true, :disabled => true -%>
+        <% end %>
+      </p>
 
-    <div <%= current_user.try(:person) ? 'style="display:none;"' : nil %>" class="box_standout" id="anon_notes">
+      <div <%= current_user.try(:person) ? 'style="display:none;"' : nil %>" class="box_standout" id="anon_notes">
       <%= image("warning") %>
       <p>
         If you send anonymously, we are unable to identify the person that sent the message.
       </p>
+
       <p>
         This means that we will not be able to contact you to discuss your feedback further.
       </p>
-    </div>
+      </div>
 
-    <p>
-      <%= label_tag :details -%><br/>
-      <%= text_area_tag :details,@details,:cols=>60,:rows=>15 -%>
-    </p>
-    <% if Seek::Config.recaptcha_enabled %>
-    <div>
-      <%= label_tag :verification -%>
-      <p><%= recaptcha_tags -%></p>
-    </div>
-    <% end %>
-    <%= submit_tag "Send feedback",:onclick=>"return check_form();" -%>
-
+      <p>
+        <%= label_tag :details -%><br/>
+        <%= text_area_tag :details, @details, :cols => 60, :rows => 15 -%>
+      </p>
+      <% if Seek::Config.recaptcha_enabled %>
+          <div>
+            <%= label_tag :verification -%>
+            <p><%= recaptcha_tags -%></p>
+          </div>
+      <% end %>
+      <%= submit_tag "Send feedback", :onclick => "return check_form();" -%>
 
 
   <% end -%>
 
-</div>
+  </div>
 
-<script type="text/javascript">
-  // set padding-left style of recaptcha widget in order to keep align with other elements in the feedback form
-    var widget = document.getElementById('recaptcha_widget_div');
-    if(widget){
-        widget.style.marginLeft = "2em" ;
-    }
+  <script type="text/javascript">
+      // set padding-left style of recaptcha widget in order to keep align with other elements in the feedback form
+      var widget = document.getElementById('recaptcha_widget_div');
+      if (widget) {
+          widget.style.marginLeft = "2em";
+      }
 
-  function check_form() {
-    if ($('subject').value.length<1) {
-      alert("You must provide a Subject");
-      return false;
-    }
-    if ($('details').value.length<1) {
-      alert("You must provide some Details");
-      return false;
-    }
-  }
-</script>
+      function check_form() {
+          if ($('subject').value.length < 1) {
+              alert("You must provide a Subject");
+              return false;
+          }
+          if ($('details').value.length < 1) {
+              alert("You must provide some Details");
+              return false;
+          }
+      }
+  </script>
