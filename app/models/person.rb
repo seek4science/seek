@@ -269,8 +269,7 @@ class Person < ActiveRecord::Base
 
   def locations
     # infer all person's locations from the institutions where the person is member of
-    locations = self.institutions.collect(&:country).select { |l| !l.blank? }
-    return locations
+    self.institutions.collect(&:country).compact.uniq
   end
 
   def email_with_name
