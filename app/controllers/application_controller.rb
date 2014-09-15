@@ -550,6 +550,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def append_info_to_payload(payload)
+    super
+    payload[:user_agent] = request.user_agent
+  end
+
 
   def log_extra_exception_data
       request.env["exception_notifier.exception_data"] = {
