@@ -216,7 +216,6 @@ class Policy < ActiveRecord::Base
    
   # translates access type codes into human-readable form  
   def self.get_access_type_wording(access_type, downloadable=false)
-    #MERGENOTE - VLN used hard-coded values here that should be moved into the en.yml file
     case access_type
       when Policy::DETERMINED_BY_GROUP
         return I18n.t('access.determined_by_group')

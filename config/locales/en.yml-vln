@@ -76,9 +76,9 @@ en:
     no_access: "No access"
     #the appended _downloadable allows a different message for downloadable items - e.g Workflows can be downloaded, assays cannot
     visible: "View summary"
-    visible_downloadable: "View summary only"
+    visible_downloadable: "View summary only (NO DOWNLOAD)"
     accessible: "View summary"
-    accessible_downloadable: "View summary and get contents"
+    accessible_downloadable: "Download"
     editing: "View and edit summary"
-    editing_downloadable: "View and edit summary and contents"
+    editing_downloadable: "Edit"
     managing: "Manage"
