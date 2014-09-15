@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140625135500) do
+ActiveRecord::Schema.define(:version => 20140911131032) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -679,7 +679,6 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.string   "title"
     t.text     "description"
     t.integer  "recommended_environment_id"
-    t.text     "result_graph"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -709,7 +708,6 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.string   "title"
     t.text     "description"
     t.integer  "recommended_environment_id"
-    t.text     "result_graph"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1436,7 +1434,6 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.string   "experimentalists"
     t.datetime "begin_date"
     t.integer  "person_responsible_id"
-    t.integer  "organism_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "first_letter",          :limit => 1
@@ -1715,6 +1712,8 @@ ActiveRecord::Schema.define(:version => 20140625135500) do
     t.string   "medium_title"
     t.float    "time_after_treatment"
     t.integer  "time_after_treatment_unit_id"
+    t.float    "incubation_time"
+    t.integer  "incubation_time_unit_id"
   end
 
   create_table "units", :force => true do |t|

@@ -12,6 +12,14 @@ module SearchHelper
     return link_to_draggable(tiny_image, saved_search_path(saved_search.id), :title=>tooltip_title_attrib("Search: #{saved_search.search_query} (#{saved_search.search_type})"),:class=>"saved_search", :id=>"sav_#{saved_search.id}")
   end
 
+  def force_search_type search_type_options
+    search_type_options.each do |type|
+      if current_page?("/"+type[1].to_s)
+        @search_type=type[1].to_s
+      end
+    end
+  end
+
   def external_search_tooltip_text
 
     text = "Checking this box allows external resources to be includes in the search.<br/>"

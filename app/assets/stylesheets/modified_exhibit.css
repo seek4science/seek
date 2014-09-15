@@ -70,4 +70,11 @@ div.exhibit-collectionView-header{
     z-index:    1000;
 }
 
+span.filter_text {
+    display: none;
+    font-weight: bold;
+}
 
+a.reset_all_filters {
+    display: none;
+}

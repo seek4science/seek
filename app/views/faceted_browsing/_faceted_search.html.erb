@@ -28,8 +28,8 @@
   <div class="yui-u facet_list" style="float:right;width: 15%;">
     <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
     <br/>
-    <b>Filter items by:</b>
-    <hr/>
+    <span class="filter_text">Filter items by: <hr/>
+              </span>
     <% count = 0 %>
     <% common_facet_config.each do |key, value| %>
         <%
@@ -57,13 +57,13 @@
                  less_id = "less_#{object_type}"
                  facet_type_id = "#{object_type}_facet"
               %>
-              <%= link_to_function ("<b>More filters </b>"+image("expand")).html_safe, :id => more_id, :style => "float:right;display:none", :class => "more_link" do |page|
+              <%= link_to_function ("<b>More filters </b>"+image("expand")).html_safe, :id => more_id, :style => "display:none", :class => "more_link" do |page|
                 page[more_id].toggle
                 page[less_id].toggle
                 page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
               end
               -%>
-              <%= link_to_function ("<b>Less filters </b>"+image("collapse")).html_safe, :id => less_id, :style => "float:right;display:none" do |page|
+              <%= link_to_function ("<b>Less filters </b>"+image("collapse")).html_safe, :id => less_id, :style => "display:none" do |page|
                 page[more_id].toggle
                 page[less_id].toggle
                 page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
@@ -72,6 +72,11 @@
             </div>
         <% end %>
     <% end %>
+
+    <br/>
+    <ul class="sectionIcons" style="text-align:left;">
+      <li><%= link_to_function 'Reset All Filters', 'resetAllFilters()', {:class => 'reset_all_filters' }%> </li>
+    </ul>
 
   </div>
 </div>

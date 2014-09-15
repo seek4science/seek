@@ -102,7 +102,7 @@
     </li>
 
     <li id="edit_off_<%= compound.id -%>" style="display:none">
-      <%= link_to_function image(("edit-off"),:title=>"Stop editing",:alt=>"Stop editing") do |page|
+      <%= link_to_function image(("edit_off"),:title=>"Stop editing",:alt=>"Stop editing") do |page|
          page.visual_effect :fade, "edit_compound_#{compound.id}"
          page["edit_on_#{compound.id}"].toggle
          page["edit_off_#{compound.id}"].toggle

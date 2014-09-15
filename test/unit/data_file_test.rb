@@ -475,12 +475,13 @@ class DataFileTest < ActiveSupport::TestCase
         assert_equal 0,df.treatments.values.keys.count
       end
   end
- test "cache_remote_content" do
+
+  test "cache_remote_content" do
     user = Factory :user
     User.with_current_user(user) do
-      mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://mockedlocation.com/picture.png"
+      mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", "http://mockedlocation.com/picture.png"
 
-      data_file = Factory :data_file, :content_blob=>ContentBlob.new(:url=>"http://mockedlocation.com/picture.png",:original_filename=>"picture.png")
+      data_file = Factory :data_file, :content_blob => ContentBlob.new(:url => "http://mockedlocation.com/picture.png", :original_filename => "picture.png")
 
       data_file.save!
 
@@ -490,8 +491,6 @@ class DataFileTest < ActiveSupport::TestCase
 
       assert data_file.content_blob.file_exists?
     end
-
-
   end
 
 =begin

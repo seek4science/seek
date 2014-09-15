@@ -114,9 +114,9 @@ function validateUploadFormFields(respond_to_content_blobs, resource_name) {
             return (false);
         }
     } else {
-        if ($(resource_name + '_data').value.length == 0 && $(resource_name + '_data_url').value.length == 0) {
+        if ($('content_blob_data').value.length == 0 && $('data_url_field').value.length == 0) {
             alert("Please specify at least a file to upload or provide a URL.");
-            $(resource_name + '_data').focus();
+            $('content_blob_data').focus();
             return (false);
         }
     }

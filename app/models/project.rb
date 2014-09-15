@@ -49,10 +49,6 @@ class Project < ActiveRecord::Base
 
   validate :lineage_ancestor_cannot_be_self
 
-  #MERGENOTE - temporary alias
-  alias_attribute :name, :title
-
-  #MERGENOTE - would like to get rid of this, or move into a shared module
   RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type.underscore.pluralize}" do
@@ -255,7 +251,6 @@ class Project < ActiveRecord::Base
     child
   end
 
-   #MERGENOTE - don't like this
    #should put below at the bottom in order to override methods for hierarchies,
    #Try to find a better way for overriding methods regardless where to include the module
     include Seek::ProjectHierarchies::ProjectExtension if Seek::Config.project_hierarchy_enabled

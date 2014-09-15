@@ -418,27 +418,29 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should create model version with image" do
-       m=models(:model_with_format_and_type)
-       assert_difference("Model::Version.count", 1) do
-         assert_difference('ModelImage.count') do
-          post :new_version, :id=>m, :content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}, :revision_comment=>"This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
-         end
-       end
+    m=models(:model_with_format_and_type)
+    assert_difference("Model::Version.count", 1) do
+      assert_difference('ModelImage.count') do
+        post :new_version, :id => m, :content_blob => {:data_0 => file_for_upload(:filename => "little_file.txt")}, :revision_comment => "This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+      end
+    end
 
-       assert_redirected_to model_path(m)
-       assert assigns(:model)
+    assert_redirected_to model_path(m)
+    assert assigns(:model)
 
-       m=Model.find(m.id)
-       assert_equal 2,m.versions.size
-       assert_equal 2,m.version
-       assert_equal 1,m.content_blobs.size
-       assert_equal 1,m.versions[1].content_blobs.size
-       assert_equal m.content_blobs,m.versions[1].content_blobs
-       assert_equal "little_file.txt",m.content_blobs.first.original_filename
-       assert_equal "little_file.txt",m.versions[1].content_blobs.first.original_filename
-       assert_equal "This is a new revision",m.versions[1].revision_comments
-       assert_equal "Teusink.xml",m.versions[0].content_blobs.first.original_filename
-    #MERGENOTE - doesn't actually test if there is an image associated
+    m=Model.find(m.id)
+    assert_equal 2, m.versions.size
+    assert_equal 2, m.version
+    assert_equal 1, m.content_blobs.size
+    assert_equal 1, m.versions[1].content_blobs.size
+    assert_equal 1, m.model_images.count
+    assert_equal 'image/png',m.model_images[0].content_type
+    assert_equal m.content_blobs, m.versions[1].content_blobs
+    assert File.exist?(m.model_images[0].file_path)
+    assert_equal "little_file.txt", m.content_blobs.first.original_filename
+    assert_equal "little_file.txt", m.versions[1].content_blobs.first.original_filename
+    assert_equal "This is a new revision", m.versions[1].revision_comments
+    assert_equal "Teusink.xml", m.versions[0].content_blobs.first.original_filename
   end
 
   test "should create model with import details" do

@@ -10,6 +10,10 @@ module ApplicationHelper
   include Recaptcha::ClientHelper
 
 
+  def index_title
+    show_title(self.controller_name.humanize.capitalize)
+  end
+
   def is_front_page?
     current_page?(main_app.root_url)
   end
@@ -428,9 +432,7 @@ module ApplicationHelper
         + '&creators=' + encodeURIComponent(getCreators()) + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&resource_id=' + '#{resource_id}' + '&is_new_file=' + '#{is_new_file}'"},
       { :id => 'preview_permission',
         :style => 'display:none'
-      } #,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+      }
     )
   end
   #Return whether or not to hide contact details from this user

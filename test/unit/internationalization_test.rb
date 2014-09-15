@@ -3,8 +3,7 @@ require 'test_helper'
 class InternationalizationTest < ActiveSupport::TestCase
 
   test "biosamples renaming" do
-       #MERGENOTE - would be better to make these tests less dependent on the flavour of en.yml, so that it would still work for VLN/ Biovel etc.
-       assert_equal "Specimen", (I18n.t "biosamples.sample_parent_term")
+       refute_nil (I18n.t "biosamples.sample_parent_term")
        assert_equal "Culture starting date", (I18n.t "biosamples.specimen_culture_starting_date")
        assert_equal "Age at sampling", (I18n.t "biosamples.sample_age")
        assert_equal "Creators", (I18n.t "biosamples.specimen_creators")

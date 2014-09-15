@@ -149,7 +149,7 @@ SEEK::Application.routes.draw do
       get :waiting_approval_assets
       get :select
     end
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:only=>[:index]
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:samples,:specimens,:only=>[:index]
     resources :avatars do
       member do
         post :select
