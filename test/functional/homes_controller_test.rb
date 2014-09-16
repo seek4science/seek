@@ -34,10 +34,7 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
-  #MERGENOTE - what's happend to the test for the feedback link whilst logged in?
-
   test "should get feedback form" do
-    #MERGENOTE ability to give feedback shouldn't rely on recatcha being enabled
     with_config_value :recaptcha_enabled, false do
       login_as(:quentin)
       get :feedback

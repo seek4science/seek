@@ -26,16 +26,14 @@ class HomesController < ApplicationController
 
   def send_feedback
     @subject=params[:subject]
-    @anon=params[:anon]
+    @anon=params[:anon]=="true"
     @details=params[:details]
 
-    @anon=@anon=="true"
-
-    if @anon.nil? or @anon.nil?
+    if @details.blank? || @subject.blank?
       flash[:error]="You must provide a Subject and details"
       render :action=>:feedback
     else
-      if ( Seek::Config.recaptcha_enabled ? verify_recaptcha : true) && Seek::Config.email_enabled
+      if ( Seek::Config.recaptcha_setup? ? verify_recaptcha : true) && Seek::Config.email_enabled
         Mailer.feedback(current_user,@subject,@details,@anon,base_host).deliver
         flash[:notice]="Your feedback has been delivered. Thank You."
         redirect_to root_path

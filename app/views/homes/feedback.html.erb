@@ -39,22 +39,19 @@
         <% end %>
       </p>
 
-      <div <%= current_user.try(:person) ? 'style="display:none;"' : nil %>" class="box_standout" id="anon_notes">
+      <div <%= current_user.try(:person) ? 'style="display:none;"' : nil %> class="box_standout" id="anon_notes">
       <%= image("warning") %>
-      <p>
-        If you send anonymously, we are unable to identify the person that sent the message.
-      </p>
-
-      <p>
-        This means that we will not be able to contact you to discuss your feedback further.
-      </p>
+          <p>
+            If you send anonymously, we are unable to identify the person that sent the message.
+            This means that we will not be able to contact you to discuss your feedback further.
+          </p>
       </div>
 
       <p>
         <%= label_tag :details -%><br/>
         <%= text_area_tag :details, @details, :cols => 60, :rows => 15 -%>
       </p>
-      <% if Seek::Config.recaptcha_enabled %>
+      <% if Seek::Config.recaptcha_setup? %>
           <div>
             <%= label_tag :verification -%>
             <p><%= recaptcha_tags -%></p>
