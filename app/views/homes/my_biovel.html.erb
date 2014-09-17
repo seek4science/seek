@@ -1,0 +1,23 @@
+<h1>My BioVeL</h1>
+
+<% if logged_in? %>
+    <div class="fold">
+      <div class="foldTitle">
+        Runs
+      </div>
+      <div class="foldContent">
+        <%= render :partial=>"recent_runs" -%>
+        <br/>
+        <%= link_to 'See all', taverna_player.runs_path %>
+      </div>
+    </div>
+    <div class="fold">
+      <div class="foldTitle">
+        Workflows
+      </div>
+      <div class="foldContent">
+        <%= render :partial=>"recent_workflows" -%>
+        <%= render :partial=>"favourite_workflows" -%>
+      </div>
+    </div>
+<% end %>

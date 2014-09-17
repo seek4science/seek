@@ -6,10 +6,30 @@ require 'app_version'
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
+  include TavernaPlayer::RunsHelper
   include Recaptcha::ClientHelper
 
+
+  def index_title
+    show_title(self.controller_name.humanize.capitalize)
+  end
+
   def is_front_page?
-    current_page?(root_url)
+    current_page?(main_app.root_url)
+  end
+
+  def seek_stylesheet_tags main='application'
+    css = (Seek::Config.css_prepended || "").split(",")
+    css << main
+    css = css | (Seek::Config.css_appended || "").split(",")
+    css.empty? ? "" : stylesheet_link_tag(*css)
+  end
+
+  def seek_javascript_tags main='application'
+    js = (Seek::Config.javascript_prepended || "").split(",")
+    js << main
+    js = js | (Seek::Config.javascript_appended || "").split(",")
+    js.empty? ? "" : javascript_include_tag(*js)
   end
 
   def date_as_string date,show_time_of_day=false,year_only_1st_jan=false
@@ -57,20 +77,17 @@ module ApplicationHelper
     if items.empty? && title_only_items.empty? && hidden_items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else
-
       items = items.sort_by { |i| get_object_title(i) } if sort
       title_only_items = title_only_items.sort_by { |i| get_object_title(i) } if sort
 
       list = items.collect { |i| link_to truncate(i.title, :length => max_length), show_resource_path(i), :title => get_object_title(i) }
       list = list + title_only_items.collect { |i| h(truncate(i.title, :length => max_length)) }
       html << list.join(', ')
-
-
-        if count_hidden_items && !hidden_items.empty?
-          text = items.size > 0 ? " and " : ""
-          text << "#{hidden_items.size} hidden #{hidden_items.size > 1 ? 'items' :'item'}"
-          html << hidden_items_html(hidden_items,text)
-        end
+      if count_hidden_items && !hidden_items.empty?
+        text = items.size > 0 ? " and " : ""
+        text << "#{hidden_items.size} hidden #{hidden_items.size > 1 ? 'items' : 'item'}"
+        html << hidden_items_html(hidden_items, text)
+      end
 
     end
     html.html_safe
@@ -230,7 +247,7 @@ module ApplicationHelper
     else
       list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
     end
-    item_caption = " " + (caption.blank? ? item.name : caption)
+    item_caption = " " + (caption.blank? ? item.title : caption)
     list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += "</li>"
     
@@ -349,8 +366,8 @@ module ApplicationHelper
   end
 
   def favourite_group_popup_link_action_new resource_type=nil
-    return link_to_remote_redbox("Create new favourite group",
-      { :url => new_favourite_group_url,
+    return link_to_remote_redbox("Create new #{t('favourite_group')}",
+      { :url => main_app.new_favourite_group_url,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
       { #:style => options[:style],
@@ -362,8 +379,8 @@ module ApplicationHelper
   end
   
   def favourite_group_popup_link_action_edit resource_type=nil
-    return link_to_remote_redbox("Edit selected favourite group",
-      { :url => edit_favourite_group_url,
+    return link_to_remote_redbox("Edit selected #{t('favourite_group')}",
+      { :url => main_app.edit_favourite_group_url,
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}' + '&id=' + selectedFavouriteGroup()" },
       { #:style => options[:style],
@@ -376,7 +393,7 @@ module ApplicationHelper
   
   def workgroup_member_review_popup_link resource_type=nil
     return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>".html_safe,
-      { :url => review_work_group_url("type", "id", "access_type"),
+      { :url => main_app.review_work_group_url("type", "id", "access_type"),
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
         :with => "'resource_type=' + '#{resource_type}'" },
       { #:style => options[:style],
@@ -415,9 +432,7 @@ module ApplicationHelper
         + '&creators=' + encodeURIComponent(getCreators()) + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&resource_id=' + '#{resource_id}' + '&is_new_file=' + '#{is_new_file}'"},
       { :id => 'preview_permission',
         :style => 'display:none'
-      } #,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+      }
     )
   end
   #Return whether or not to hide contact details from this user
@@ -463,14 +478,7 @@ module ApplicationHelper
   end    
   
   def get_object_title(item)
-    title = ""
-    
-    if ["Person", "Institution", "Project"].include? item.class.name
-      title = h(item.name)          
-    else
-      title = h(item.title)
-    end
-    return title
+    return h(item.title)
   end
 
   def can_manage_announcements?
@@ -484,11 +492,6 @@ module ApplicationHelper
 
   def toggle_appear_javascript block_id
     "Effect.toggle('#{block_id}','slide',{duration:0.5})".html_safe
-  end
-
-  def toggle_appear_with_image_javascript block_id
-      toggle_appear_javascript block_id
-      ""
   end
 
   def count_actions(object, actions=nil)
@@ -555,16 +558,6 @@ module ApplicationHelper
          :hidden => options[:hidden]}
   end
 
-  def require_js file
-    #TODO: Needs testing, not sure what the 'lifecycle' for instance variables in a helper is.
-    #Needs to last as long as the page is being rendered and no longer. The intent is to include the js only if it hasn't already been included.
-    @required_js ||= []
-    unless @required_js.include? file
-      @required_js << file
-      javascript_include_tag file
-    end
-  end
-
   def resource_tab_item_name resource_type,pluralize=true
     resource_type = resource_type.singularize
     if resource_type == "Speciman"
@@ -578,18 +571,34 @@ module ApplicationHelper
     pluralize ? result.pluralize : result
   end
 
+  def internationalized_resource_name resource_type,pluralize=true
+    resource_type = resource_type.singularize
+    if resource_type == "Speciman"
+      result = t('biosamples.sample_parent_term')
+    elsif resource_type == "Assay"
+      result = t('assays.assay')
+    elsif resource_type == "TavernaPlayer::Run"
+      result = "Run"
+    else
+      translated_resource_type = translate_resource_type(resource_type)
+      result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
+    end
+    pluralize ? result.pluralize : result
+  end
+
   def translate_resource_type resource_type
     t("#{resource_type.underscore}")
   end
 
   def add_return_to_search
     referer = request.headers["Referer"].try(:normalize_trailing_slash)
-    search_path = search_url.normalize_trailing_slash
-    root_path = root_url.normalize_trailing_slash
+    search_path = main_app.search_url.normalize_trailing_slash
+    root_path = main_app.root_url.normalize_trailing_slash
     request_uri = request.fullpath.try(:normalize_trailing_slash)
     if !request_uri.include?(root_path)
       request_uri = root_path.chop + request_uri
     end
+
     if referer == search_path && referer != request_uri && request_uri != root_path
       javascript_tag "
         if (window.history.length > 1){
@@ -604,41 +613,98 @@ module ApplicationHelper
       #link_to_function 'Return to search', "window.history.back();"
     end
   end
-  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
-                         Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
-                         Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
-                         Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
-                         Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
-                         Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
-                         Project=>"You cannot delete this #{I18n.t 'project'}. It might has people associated with it.",
-                         Institution=>"You cannot delete this Institution. It might has people associated with it."
-  }
 
-  def delete_icon model_item, user
-    item_name = text_for_resource model_item
-    if model_item.can_delete?(user)
-      html = "<li>"+image_tag_for_key('destroy',url_for(model_item),"Delete #{item_name}", {:confirm=>"Are you sure?",:method=>:delete },"Delete #{item_name}") + "</li>"
-      return html.html_safe
-    elsif model_item.can_manage?(user)
-      explanation=unable_to_delete_text model_item
-      html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span></li>"
-      return html.html_safe
-    end
+  def no_deletion_explanation_message(clz)
+    no_deletion_explanation_messages[clz] || "You are unable to delete this #{clz.name}. It might be published"
   end
 
+  def no_deletion_explanation_messages
+    {Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
+     Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
+     Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
+     Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
+     Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
+     Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
+     Project=>"You cannot delete this #{I18n.t 'project'}. It might has people associated with it.",
+     Institution=>"You cannot delete this Institution. It might has people associated with it."
+    }
+  end
+
+
+  
   def unable_to_delete_text model_item
-    text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
-    return text.html_safe
+    no_deletion_explanation_message(model_item.class).html_safe
   end
 
+  #
+  # Converts the given HASH array like 'params' to a flat
+  # HASH array that's compatible with url_for and link_to
+  # From http://www.gamecreatures.com/blog/2007/08/21/rails-url_for-and-params-missery/
+  #
+  def flatten_param_hash( params )
+    found = true
 
+    while found
+      found = false
+      new_hash = {}
+
+      params.each do |key,value|
+        if value.is_a?( Hash )
+          found = true
+          value.each do |key2,value2|
+            new_hash[ key.to_s + '[' + key2.to_s + ']' ] = value2
+          end
+        else
+          new_hash[ key.to_s ] = value
+        end
+      end
+      params = new_hash
+    end
+    params
+  end
+
+  #returns a new instance of the string describing a resource type, or nil if it is not applicable
+  def instance_of_resource_type resource_type
+    resource = nil
+    begin
+      resource_class = resource_type.classify.constantize unless resource_type.nil?
+      resource = resource_class.send(:new) if !resource_class.nil? && resource_class.respond_to?(:new)
+    rescue NameError=>e
+      logger.error("Unable to find constant for resource type #{resource_type}")
+    end
+    resource
+  end
+
+  def klass_from_controller controller_name
+    controller_name.singularize.camelize.constantize
+  end
+
+  def describe_visibility(model)
+    text = '<strong>Visibility:</strong> '
+
+    if model.policy.sharing_scope == 0
+      css_class = 'private'
+      text << "Private "
+      text << "with some exceptions " unless model.policy.permissions.empty?
+      text << image('lock', :style => 'vertical-align: middle')
+    elsif model.policy.sharing_scope == 2 && model.policy.access_type == 0
+      css_class = 'group'
+      text << "Only visible to members of "
+      text << model.policy.permissions.select {|p| p.contributor_type == 'Project'}.map {|p| p.contributor.title}.to_sentence
+    else
+      css_class = 'public'
+      text << "Public #{image('world', :style => 'vertical-align: middle')}"
+    end
+
+    "<span class='visibility #{css_class}'>#{text}</span>".html_safe
+  end
 
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>I18n.t('project').pluralize,"institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search",
                "assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>I18n.t('sop').pluralize,"models"=>I18n.t('model').pluralize,"data_files"=>I18n.t('data_file').pluralize,
                "publications"=>"Publications","investigations"=>I18n.t('investigation').pluralize,"studies"=>I18n.t('study').pluralize,
                "specimens"=>I18n.t('biosamples.sample_parent_term').pluralize,"samples"=>"Samples","strains"=>"Strains","organisms"=>"Organisms","biosamples"=>"Biosamples",
-               "presentations"=>I18n.t('presentation').pluralize,"events"=>I18n.t('event').pluralize,"help_documents"=>"Help"}
+               "presentations"=>I18n.t('presentation').pluralize,"programmes"=>I18n.t('programme').pluralize,"events"=>I18n.t('event').pluralize,"help_documents"=>"Help"}
 end
 
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder

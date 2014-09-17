@@ -46,25 +46,6 @@ function hide_existing_samples() {
     Effect.Fade('existing_samples', { duration: 0.25 })
 }
 
-function strain_form(strain_id, organism_id, action, url) {
-    if (url != '') {
-        request = new Ajax.Request(url,
-            {
-                method: 'get',
-                parameters: {
-                    id: strain_id,
-                    organism_id:organism_id,
-                    strain_action: action
-                },
-                onSuccess: function(transport) {
-                },
-                onFailure: function(transport) {
-                    alert('Something went wrong, please try again...');
-                }
-            });
-    }
-}
-
 function getSelectedStrains() {
     var strain_ids  = new Array();
     if (strain_table && strain_table.length != 0){
@@ -115,11 +96,26 @@ function fnGetSelected( oTableLocal )
 }
 
 function checkSelectOneStrain(){
-   if (getSelectedStrains().split(',').length > 1){
-       alert('Please select only ONE strain for this new strain to base on.');
-       return false;
-   }else
+    var selected_strains = getSelectedStrains().split(',');
+    if (selected_strains.length > 1){
+        alert('Please select only ONE strain for this new strain to base on.');
+        return false;
+    }else if (selected_strains.length == 1 && selected_strains[0] != "" ){
+        //add selected specimen_id to the link param
+        var old_link = $('new_strain_link').href;
+        var new_link = old_link.split('?')[0];
+        new_link = new_link.concat('?parent_id=' + selected_strains[0]);
+        new_link = new_link.concat('&from_biosamples=true');
+        $('new_strain_link').href = new_link;
         return true;
+    }else{
+        var old_link = $('new_strain_link').href;
+        var new_link = old_link.split('?')[0];
+        new_link = new_link.concat('?from_biosamples=true');
+        $('new_strain_link').href = new_link;
+        return true;
+    }
+
 }
 
 //if more than one specimen are selected, display the notice message
@@ -147,101 +143,6 @@ function checkSelectOneSpecimen(cell_culture_or_specimen){
     }
 }
 
-function validateSpecimenSampleFields(cell_culture_or_specimen, is_new_specimen, is_virtualliver){
-    if (is_new_specimen) {
-        if($('specimen_title').value.length == 0) {
-                alert("Please enter " + cell_culture_or_specimen + " title.");
-                $('specimen_title').focus();
-                return(false);
-        }
-        if($('specimen_lab_internal_number').value.length == 0) {
-                alert("Please enter " + cell_culture_or_specimen + " lab internal identifier.");
-                $('specimen_lab_internal_number').focus();
-                return(false);
-        }
-        if(is_virtualliver && $('specimen_institution_id').value == '0') {
-                        alert("Please select one institution");
-                        $('specimen_institution_id').focus();
-                        return(false);
-         }
-        if($('organism_id').value == '0') {
-                alert("Please select one organism");
-                $('organism_id').focus();
-                return(false);
-        }
-    }
-    if($('sample_title').value.length == 0) {
-            alert("Please enter sample title");
-            $('sample_title').focus();
-            return(false);
-    }
-    if($('sample_lab_internal_number').value.length == 0) {
-            alert("Please enter sample lab internal number");
-            $('sample_lab_internal_number').focus();
-            return(false);
-    }
-    if(!is_virtualliver && $F('sample_project_ids').length == 0) {
-            alert("Please select projects");
-            $('possible_sample_project_ids').focus();
-            return(false);
-    }
-            $('create_specimen_sample').disabled = true;
-            $('create_specimen_sample').value = "Creating...";
-            return true;
-}
-
-function validateStrainFields(action){
-    if ($('strain_title').value.length == 0) {
-        alert("Please enter strain name.");
-        $('strain_title').focus();
-        return(false);
-    }
-    if ($('strain_organism_id').value == '0') {
-        alert("Please select one organism");
-        $('strain_organism_id').focus();
-        return(false);
-    }
-    if ($F('strain_project_ids').length == 0) {
-        alert("Please select projects");
-        $('possible_strain_project_ids').focus();
-        return(false);
-    }
-    if (!validateGenoTypeFields() || !validatePhenoTypeFields()) {
-        return(false);
-    }
-    if(action == 'edit'){
-        $('edit_strain').disabled = true;
-        $('edit_strain').value = 'Updating...'
-    }
-    else{
-        $('create_strain').disabled = true;
-        $('create_strain').value = 'Creating...'
-    }
-    return true;
-}
-function validateGenoTypeFields(){
-    var genotype_genes = document.getElementsByName("strain[genotypes_attributes][][gene_attributes][title]");
-    for(var i = 0 ; i < genotype_genes.length; i++){
-        if(genotype_genes[i].value==""){
-            alert("Genotype Gene cannot be empty.");
-            genotype_genes[i].focus();
-            return false;
-        }
-    }
-    return true;
-}
-
-function validatePhenoTypeFields(){
-    var phenotype_descriptions = document.getElementsByName("strain[phenotypes_attributes][][description]");
-       for(var i = 0 ; i < phenotype_descriptions.length; i++){
-           if(phenotype_descriptions[i].value==""){
-               alert("Phenotype description cannot be empty.");
-               phenotype_descriptions[i].focus();
-               return false;
-           }
-       }
-       return true;
-}
 function strains_of_selected_organism(organism_id, strain_selection_box_id, strain_selection_box_name){
       var updated_selection_box = '<select id=\''+ strain_selection_box_id +'\' name=\''+ strain_selection_box_name +'\'>';
         updated_selection_box += "<option value='0'>Select Strain ...</option>";

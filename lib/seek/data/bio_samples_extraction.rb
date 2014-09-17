@@ -21,7 +21,7 @@ module Seek
               end
               bio_samples
             else
-              Seek::BioSamples.new self
+              Seek::Data::BioSamples.new self
             end
           rescue Exception => e
             Rails.logger.error("Error parsing spreadsheet #{e.message}")

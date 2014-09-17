@@ -4,8 +4,6 @@ require 'fileutils'
 
 module Seek
   
-  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-  
   # Handles downloading data files from a Remote site, together with authentication using the provided username and password.
   # Includes some simple file caching to prevent multiple downloads of the same item    
   class RemoteDownloader

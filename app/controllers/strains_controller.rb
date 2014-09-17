@@ -13,18 +13,41 @@ class StrainsController < ApplicationController
   include Seek::BreadCrumbs
 
   def new
-    @strain = Strain.new()
+    parent_strain = Strain.find_by_id(params[:parent_id])
+    if !parent_strain.nil? && parent_strain.can_view?
+      @strain = parent_strain.clone_with_associations
+      @strain.parent_id = parent_strain.id
+    else
+      @strain = Strain.new()
+    end
+
+    @strain.from_biosamples = params[:from_biosamples]
+  end
+
+  def edit
+    @strain.from_biosamples = params[:from_biosamples]
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml
+    end
   end
 
   def create
-    @strain = BiosamplesController.new().new_strain(params[:strain])
+    @strain = new_strain(params[:strain])
     @strain.policy.set_attributes_with_sharing params[:sharing], @strain.projects
     update_annotations @strain
+
     if @strain.save
-      respond_to do |format|
-        flash[:notice] = 'Strain was successfully created.'
-        format.html { redirect_to(@strain) }
-        format.xml { render :xml => @strain, :status => :created, :location => @strain }
+      if @strain.from_biosamples=='true'
+        #reload to get updated nested attributes,e.g. genotypes/phenotypes
+        @strain.reload
+        render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'create', :object => @strain}
+      else
+        respond_to do |format|
+          flash[:notice] = 'Strain was successfully created.'
+          format.html { redirect_to(@strain) }
+          format.xml { render :xml => @strain, :status => :created, :location => @strain }
+        end
       end
     else
       respond_to do |format|
@@ -49,10 +72,16 @@ class StrainsController < ApplicationController
     end
     @strain.attributes = params[:strain]
     if @strain.save
-      respond_to do |format|
-        flash[:notice] = 'Strain was successfully updated.'
-        format.html { redirect_to(@strain) }
-        format.xml { render :xml => @strain, :status => :created, :location => @strain }
+      if @strain.from_biosamples=='true'
+        #reload to get updated nested attributes,e.g. genotypes/phenotypes
+        @strain.reload
+        render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @strain}
+      else
+        respond_to do |format|
+          flash[:notice] = 'Strain was successfully updated.'
+          format.html { redirect_to(@strain) }
+          format.xml { render :xml => @strain, :status => :created, :location => @strain }
+        end
       end
     else
       respond_to do |format|
@@ -97,4 +126,37 @@ class StrainsController < ApplicationController
       end
     end
   end
+
+  def new_strain strain_params
+    strain = Strain.new
+    # to delete id hash which is saved in the hidden id field (automatically generated in form with fields_for)
+    # try_block {
+    #delete id hashes of genotypes/phenotypes
+    strain_params[:genotypes_attributes].try(:delete, "id")
+    strain_params[:phenotypes_attributes].try(:delete, "id")
+    #delete id hashes of gene_attributes/modification_attributes
+    strain_params[:genotypes_attributes].try(:each) do |genotype_key, genotype_value|
+
+      genotype_value.delete_if { |k, v| k=="id" }
+      #delete if,e.g. "0"=>{"_destroy"=>0} for genotypes
+      strain_params[:genotypes_attributes].delete(genotype_key) if genotype_value.keys == ["_destroy"]
+
+      genotype_value[:gene_attributes].try(:delete_if) { |k, v| k=="id" }
+      genotype_value[:modification_attributes].try(:delete_if) { |k, v| k=="id" }
+
+      #delete if,e.g. "0"=>{"_destroy"=>0}  for gene_attributes/modification_attributes (which means new genes/modifications with empty title), this must be done after the id hashes are deleted!!!
+      genotype_value.delete("gene_attributes") if genotype_value[:gene_attributes].try(:keys) == ["_destroy"]
+      genotype_value.delete("modification_attributes") if genotype_value[:modification_attributes].try(:keys) == ["_destroy"]
+    end
+    strain_params[:phenotypes_attributes].try(:each) do |key, value|
+      value.delete_if { |k, v| k=="id" }
+      #delete if ,e.g. "0"=>{"_destroy"=>0} for phenotypes
+      strain_params[:phenotypes_attributes].delete(key) if value.keys== ["_destroy"]
+    end
+    # }
+
+    strain.attributes = strain_params
+    strain
+  end
+
 end

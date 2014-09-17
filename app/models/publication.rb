@@ -13,6 +13,9 @@ class Publication < ActiveRecord::Base
     text :publication_authors do
       publication_authors.compact.map(&:first_name) + publication_authors.compact.map(&:last_name)
     end
+    text :non_seek_authors do
+      non_seek_authors.compact.map(&:first_name) + non_seek_authors.compact.map(&:last_name)
+    end
   end if Seek::Config.solr_enabled
 
 
@@ -99,14 +102,21 @@ class Publication < ActiveRecord::Base
   end
 
 
+  def extract_metadata(reference)
+    if reference.respond_to?(:pubmed)
+      extract_pubmed_metadata(reference)
+    else
+      extract_doi_metadata(reference)
+    end
+  end
 
   def extract_pubmed_metadata(reference)
-        self.title = reference.title.chop #remove full stop
-        self.abstract = reference.abstract
-        self.journal = reference.journal
-        self.pubmed_id = reference.pubmed
-        self.published_date = reference.published_date
-      self.citation = reference.citation
+    self.title = reference.title.chop #remove full stop
+    self.abstract = reference.abstract
+    self.journal = reference.journal
+    self.pubmed_id = reference.pubmed
+    self.published_date = reference.published_date
+    self.citation = reference.citation
   end
 
   def extract_doi_metadata(doi_record)
@@ -169,6 +179,18 @@ class Publication < ActiveRecord::Base
 
   def endnote
    bio_reference.endnote
+  end
+
+  def publication_author_names
+    author_names = []
+    publication_authors.each do |author|
+      if author.kind_of?(Person)
+        author_names << author.name
+      else
+        author_names << author.first_name + " " + author.last_name
+      end
+    end
+    author_names
   end
 
   private

@@ -7,10 +7,9 @@ class Assay < ActiveRecord::Base
   include Seek::OntologyExtensionWithSuggestedType
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
-  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in
-  acts_as_taggable
+  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in  
   def projects
-    study.try(:investigation).try(:projects) || []
+    study.try(:projects) || []
   end
 
   acts_as_isa
@@ -19,7 +18,6 @@ class Assay < ActiveRecord::Base
 
   belongs_to :institution
   has_and_belongs_to_many :samples
-
   belongs_to :study
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
@@ -45,6 +43,7 @@ class Assay < ActiveRecord::Base
            :dependent => :destroy
 
   has_one :investigation,:through=>:study
+
   validates_presence_of :assay_type_uri
   validates_presence_of :technology_type_uri, :unless=>:is_modelling?
   validates_presence_of :study, :message=>" must be selected"
@@ -53,7 +52,6 @@ class Assay < ActiveRecord::Base
   validate :either_samples_or_organisms_for_experimental_assay,  :if => "Seek::Config.is_virtualliver"
   validate :no_sample_for_modelling_assay
 
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
   before_validation :default_assay_and_technology_type
 
   #a temporary store of added assets - see AssayReindexer
@@ -62,10 +60,8 @@ class Assay < ActiveRecord::Base
   alias_attribute :contributor, :owner
 
   searchable(:auto_index=>false) do
-    text :description, :title, :searchable_tags, :organism_terms, :assay_type_label,:technology_type_label
-    text :contributor do
-      contributor.try(:person).try(:name)
-    end
+    text :organism_terms, :assay_type_label,:technology_type_label
+
     text :strains do
       strains.compact.map{|s| s.title}
     end
@@ -190,21 +186,16 @@ class Assay < ActiveRecord::Base
   #strain_id should be the id of the strain
   #culture_growth should be the culture growth instance
   def associate_organism(organism,strain_id=nil,culture_growth_type=nil,tissue_and_cell_type_id="0",tissue_and_cell_type_title=nil)
-
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
-    assay_organism=AssayOrganism.new
-    assay_organism.assay = self
-    assay_organism.organism = organism
-    strain=nil
+    strain=organism.strains.find_by_id(strain_id)
+    assay_organism=AssayOrganism.new(:assay=>self,:organism=>organism,:culture_growth_type=>culture_growth_type,:strain=>strain)
 
-    if (!strain_id.blank?)
-      strain=organism.strains.find(strain_id)
+    unless AssayOrganism.exists_for?(strain,organism,self,culture_growth_type)
+      self.assay_organisms << assay_organism
     end
-    assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
-    assay_organism.strain=strain
-
+    
     tissue_and_cell_type=nil
-    if tissue_and_cell_type_title && !tissue_and_cell_type_title.empty?
+    if !tissue_and_cell_type_title.blank?
       if ( tissue_and_cell_type_id =="0" )
           found = TissueAndCellType.where(:title => tissue_and_cell_type_title).first
           unless found
@@ -215,18 +206,7 @@ class Assay < ActiveRecord::Base
       end
     end
     assay_organism.tissue_and_cell_type = tissue_and_cell_type
-
-    existing = AssayOrganism.all.select{|ao|ao.organism==organism and ao.assay == self and ao.strain==strain and ao.culture_growth_type==culture_growth_type and ao.tissue_and_cell_type==tissue_and_cell_type}
-    if existing.blank?
-      self.assay_organisms << assay_organism
-    end
-
   end
-  
-
-
-
-
   
   def assets
     asset_masters.collect {|a| a.latest_version} |  (data_files + models + sops)

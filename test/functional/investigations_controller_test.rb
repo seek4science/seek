@@ -42,7 +42,10 @@ class InvestigationsControllerTest < ActionController::TestCase
     Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub2
     Factory :relationship, :subject=>assay2, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub3
 
-    study = Factory(:study,:assays=>[assay1,assay2],:policy => Factory(:public_policy))
+    investigation = Factory(:investigation,:policy => Factory(:public_policy))
+    study = Factory(:study,:policy => Factory(:public_policy),
+                    :assays=>[assay1,assay2],
+                    :investigation => investigation)
 
     get :show,:id=>study.investigation.id
     assert_response :success
@@ -211,7 +214,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test "option to delete investigation without study" do    
     get :show,:id=>Factory(:investigation, :contributor => User.current_user).id
-    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/,:count=>1
+    assert_select "a",:text=>/Delete #{I18n.t('investigation')}/i,:count=>1
   end
 
   test "no option to delete investigation with study" do

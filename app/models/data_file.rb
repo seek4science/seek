@@ -3,6 +3,7 @@ require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'title_trimmer'
 
+
 class DataFile < ActiveRecord::Base
 
   include Seek::Data::DataFileExtraction
@@ -13,20 +14,16 @@ class DataFile < ActiveRecord::Base
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :spreadsheet_annotation_search_fields,:fs_search_fields,
-         :assay_type_titles,:technology_type_titles, :spreadsheet_contents_for_search, :other_creators
+    text :spreadsheet_annotation_search_fields,:fs_search_fields,:spreadsheet_contents_for_search
   end if Seek::Config.solr_enabled
 
   acts_as_asset
-  acts_as_trashable
 
    scope :default_order, order('title')
 
   title_trimmer
 
   validates_presence_of :title
-
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
@@ -82,25 +79,6 @@ class DataFile < ActiveRecord::Base
     def event_ids= events_ids
 
     end
-  end
-
-  # get a list of DataFiles with their original uploaders - for autocomplete fields
-  # (authorization is done immediately to save from iterating through the collection again afterwards)
-  #
-  # Parameters:
-  # - user - user that performs the action; this is required for authorization
-  def self.get_all_as_json(user)
-    #FIXME: could probably be moved into a mixin rather than being dupilcated across assets
-    all = DataFile.all_authorized_for "view",user
-    with_contributors = all.collect{ |d|
-        contributor = d.contributor;
-        { "id" => d.id,
-          "title" => h(d.title),
-          "contributor" => contributor.nil? ? "" : "by " + h(contributor.person.name),
-          "type" => self.name
-        }
-    }
-    return with_contributors.to_json
   end
 
   def included_to_be_copied? symbol
@@ -164,7 +142,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def to_presentation
-    presentation_attrs = attributes.delete_if { |k, v| !Presentation.new.attributes.include? k}
+    presentation_attrs = attributes.delete_if { |k, v| !(::Presentation.new.attributes.include?(k))}
 
     Presentation.new(presentation_attrs).tap do |presentation|
       DataFile.reflect_on_all_associations.select { |a| [:has_many, :has_and_belongs_to_many, :has_one].include?(a.macro) && !a.through_reflection }.each do |a|

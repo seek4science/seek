@@ -41,7 +41,7 @@ The following resources have just been created or updated in <%= Seek::Config.ap
              <% resource_projects = log.try(:activity_loggable).try(:projects)
                 person_subscribed_projects = @person.project_subscriptions.collect(&:project)
                 reported_projects = resource_projects.to_a & person_subscribed_projects
-                project_names = reported_projects.collect(&:name).join(',')
+                project_names = reported_projects.collect(&:title).join(',')
              %>
 
              <tr>

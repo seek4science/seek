@@ -5,11 +5,11 @@ class ProjectsController < ApplicationController
   include IndexPager
   include CommonSweepers
 
-  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report]
+  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:update_members]
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report, :resource_in_tab]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report,:admin_members,:update_members,:resource_in_tab]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :administerable_by_user, :only =>[:admin]
+  before_filter :administerable_by_user, :only =>[:admin,:admin_members,:update_members]
   before_filter :auth_params,:only=>[:update]
   before_filter :member_of_this_project, :only=>[:asset_report],:unless=>:admin?
 
@@ -17,6 +17,8 @@ class ProjectsController < ApplicationController
 
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
   include Seek::BreadCrumbs
+
+  respond_to :html
 
   def auto_complete_for_organism_name
     render :json => Project.organism_counts.map(&:name).to_json
@@ -92,6 +94,7 @@ class ProjectsController < ApplicationController
       format.html # show.html.erb
       format.rdf { render :template=>'rdf/show'}
       format.xml
+      format.json { render :text=>@project.to_json}
     end
   end
 
@@ -161,13 +164,14 @@ class ProjectsController < ApplicationController
   # POST /projects.xml
   def create
     @project = Project.new(params[:project])
+
     @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]
 
 
     respond_to do |format|
       if @project.save
         flash[:notice] = "#{t('project')} was successfully created."
-         format.html { redirect_to(@project) }
+        format.html { redirect_to(@project) }
         format.xml  { render :xml => @project, :status => :created, :location => @project }
       else
         format.html { render :action => "new" }
@@ -229,7 +233,7 @@ class ProjectsController < ApplicationController
     end
   end
   
-
+  
   # returns a list of institutions for a project in JSON format
   def request_institutions
     # listing institutions for a project is public data, but still
@@ -240,7 +244,7 @@ class ProjectsController < ApplicationController
     
     begin
       project = Project.find(project_id)
-      institution_list = project.get_institutions_listing
+      institution_list = project.work_groups.collect{|w| [w.institution.title, w.institution.id, w.id]}
       success = true
     rescue ActiveRecord::RecordNotFound
       # project wasn't found
@@ -255,6 +259,40 @@ class ProjectsController < ApplicationController
           render :json => {:status => 404, :error => "Couldn't find #{t('project')} with ID #{project_id}."}
         end
       }
+    end
+  end
+
+  def admin_members
+    respond_with(@project)
+  end
+
+  def update_members
+    groups_to_remove = params[:group_memberships_to_remove] || []
+    people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
+    groups_to_remove.each do |group|
+      g = GroupMembership.find(group)
+      g.destroy unless g.nil?
+    end
+
+    people_and_institutions_to_add.each do |new_info|
+      json = JSON.parse(new_info)
+      person_id = json["person_id"]
+      institution_id = json["institution_id"]
+      person = Person.find(person_id)
+      institution = Institution.find(institution_id)
+      unless person.nil? || institution.nil?
+        work_group = WorkGroup.where(:project_id=>@project.id,:institution_id => institution_id).first
+        work_group ||= WorkGroup.new(:project=>@project,:institution=>institution)
+        group_membership = GroupMembership.new :work_group=>work_group,:person=>person
+        work_group.save!
+        group_membership.save!
+      end
+    end
+
+    flash[:notice]="The members and institutions of the #{t('project')}.downcase '#{@project.title}' have been updated"
+
+    respond_with(@project) do |format|
+      format.html {redirect_to project_path(@project)}
     end
   end
 

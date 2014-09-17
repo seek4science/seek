@@ -27,6 +27,28 @@ class UserTest < ActiveSupport::TestCase
     assert without_profile.include?(users(:aaron))
   end
 
+  test "with magic_guest_enabled" do
+    user = Factory(:user, :login=>"guest")
+    with_config_value :magic_guest_enabled,true do
+      User.with_current_user user do
+        assert_equal user, User.guest
+        assert user.guest?
+        assert !User.logged_in?
+      end
+    end
+  end
+
+  test "without auto magic_guest_enabled" do
+    user = Factory(:user, :login=>"guest")
+    with_config_value :magic_guest_enabled,false do
+      User.with_current_user user do
+        assert_nil User.guest
+        assert !user.guest?
+        assert User.logged_in?
+      end
+    end
+  end
+
   test "logged in and registered" do
     user = Factory(:brand_new_user)
     User.with_current_user(user) do
@@ -206,6 +228,15 @@ class UserTest < ActiveSupport::TestCase
     x.save
     x.reload
     assert !x.show_guide_box?
+  end
+
+  test "reset password" do
+    user = Factory(:user)
+    assert_nil user.reset_password_code
+    assert_nil user.reset_password_code_until
+    user.reset_password
+    refute_nil user.reset_password_code
+    refute_nil user.reset_password_code_until
   end
 
 protected

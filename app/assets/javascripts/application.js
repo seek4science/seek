@@ -1,4 +1,7 @@
 // ...
+//= require jquery
+//= require jquery_no_conflict
+//= require taverna_player/application
 //= require savage_beast/application
 //= require prototype
 //= require prototype_ujs
@@ -16,7 +19,6 @@
 //= require top_menu
 //= require dropMenu
 //= require dynamic_menu
-//= require batch_upload
 //= require assays
 //= require models
 //= require sharing
@@ -29,5 +31,5 @@
 //= require folds
 //= require tabber-minimized
 //= require detect_browser
-
-
+//= require easytabs
+//= require default_text_search

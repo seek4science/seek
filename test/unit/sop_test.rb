@@ -61,17 +61,34 @@ class SopTest < ActiveSupport::TestCase
     assert_nil sop_versions(:my_first_sop_v1).avatar_key
     assert sop_versions(:my_first_sop_v1).use_mime_type_for_avatar?
   end
-  
-  def test_defaults_to_blank_policy
-    sop=Sop.new Factory.attributes_for(:sop).tap{|h|h[:policy] = nil}
-    sop.save
-    assert !sop.valid?
-    assert !sop.policy.valid?
-    assert_blank sop.policy.sharing_scope
-    assert_blank sop.policy.access_type
-    assert_equal false,sop.policy.use_whitelist
-    assert_equal false,sop.policy.use_blacklist
-    assert_blank sop.policy.permissions
+
+  def test_defaults_to_private_policy
+    with_config_value "is_virtualliver",false do
+      sop=Sop.new Factory.attributes_for(:sop,:policy=>nil)
+      sop.save!
+      sop.reload
+      assert sop.valid?
+      assert sop.policy.valid?
+      assert_equal Policy::PRIVATE, sop.policy.sharing_scope
+      assert_equal Policy::NO_ACCESS, sop.policy.access_type
+      assert_equal false,sop.policy.use_whitelist
+      assert_equal false,sop.policy.use_blacklist
+      assert_blank sop.policy.permissions
+    end
+  end
+
+  def test_defaults_to_blank_policy_for_vln
+    with_config_value "is_virtualliver",true do
+      sop=Sop.new Factory.attributes_for(:sop,:policy=>nil)
+      sop.save
+      assert !sop.valid?
+      assert !sop.policy.valid?
+      assert_blank sop.policy.sharing_scope
+      assert_blank sop.policy.access_type
+      assert_equal false,sop.policy.use_whitelist
+      assert_equal false,sop.policy.use_blacklist
+      assert_blank sop.policy.permissions
+    end
   end
 
   def test_version_created_for_new_sop
@@ -172,6 +189,7 @@ class SopTest < ActiveSupport::TestCase
 
   test "is restorable after destroy" do
     sop = Factory :sop, :policy => Factory(:all_sysmo_viewable_policy), :title => 'is it restorable?'
+    blob_path = sop.content_blob.filepath
     User.current_user = sop.contributor
     assert_difference("Sop.count",-1) do
       sop.destroy
@@ -180,7 +198,11 @@ class SopTest < ActiveSupport::TestCase
     assert_difference("Sop.count",1) do
       disable_authorization_checks {Sop.restore_trash!(sop.id)}
     end
-    assert_not_nil Sop.find_by_title 'is it restorable?'
+    sop = Sop.find_by_title('is it restorable?')
+    refute_nil sop
+    refute_nil sop.content_blob
+    assert_equal blob_path,sop.content_blob.filepath
+    assert File.exist?(blob_path)
   end
 
   test 'failing to delete due to can_delete still creates trash' do
@@ -209,8 +231,8 @@ class SopTest < ActiveSupport::TestCase
   test "contributing_user" do
     sop = Factory :sop
     assert sop.contributor
-    assert_equal sop.contributor, sop.contributing_user
-    assert_equal sop.contributor,sop.latest_version.contributing_user
+    assert_equal sop.contributor.user, sop.contributing_user
+    assert_equal sop.contributor.user,sop.latest_version.contributing_user
     sop_without_contributor = Factory :sop, :contributor => nil
     assert_equal nil, sop_without_contributor.contributing_user
   end

@@ -7,7 +7,7 @@ class SampleTest < ActiveSupport::TestCase
   # to set up fixture information.
   test "validation" do
 
-    s = Factory :sample,:title =>"TestSample"
+    s = Factory :sample,:title =>"TestSample",:policy=>Factory(:private_policy)
     assert s.valid?
 
     s.title= nil
@@ -28,7 +28,7 @@ class SampleTest < ActiveSupport::TestCase
       s.donation_date=nil
       assert !s.valid?
       #for projects, it doesnt work by doing s.projects=[]
-      assert Factory.build(:sample, :projects => []).valid?
+      assert Factory.build(:sample, :projects => [],:policy=>Factory(:private_policy)).valid?
     end
 
     as_not_virtualliver do
@@ -36,7 +36,7 @@ class SampleTest < ActiveSupport::TestCase
       s.donation_date=nil
       assert s.valid?
       #for projects, it doesnt work by doing s.projects=[]
-      assert !Factory.build(:sample, :projects => []).valid?
+      assert !Factory.build(:sample, :projects => [],:policy=>Factory(:private_policy)).valid?
     end
 
     s.reload
@@ -89,6 +89,28 @@ class SampleTest < ActiveSupport::TestCase
       assert_equal [sop], sample.related_sops
       assert_equal [data_file], sample.related_data_files
     end
+  end
+
+  test "associated treatments" do
+    treatment = Factory(:treatment)
+    refute_nil treatment.sample
+    sample = treatment.sample
+    treatment2 = Factory(:treatment,:sample=>sample)
+    sample.reload
+    assert_equal 2,sample.treatments.size
+    assert_include sample.treatments,treatment
+    assert_include sample.treatments,treatment2
+
+    #dependent destroy
+    assert_difference('Treatment.count',-2) do
+      assert_difference('Sample.count',-1) do
+        disable_authorization_checks do
+          sample.destroy
+        end
+      end
+    end
+    assert_nil Treatment.find_by_id(treatment.id)
+    assert_nil Treatment.find_by_id(treatment2.id)
   end
 
 end

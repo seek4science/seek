@@ -1,4 +1,4 @@
-<h1> <font color="#456AAA"> <%= 'Institutions' %> </font> </h1> <br>
+<%= index_title -%>
 <ul class="sectionIcons">
     <% if project_manager_logged_in?-%>
         <li>
@@ -7,15 +7,8 @@
     <% end -%>
 </ul>
 
-<% if @institutions.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @institutions.pages, :page_totals=>@institutions.page_totals,:current_page=>@institutions.page } -%>
-<% end %>
-
-<div class="list_items_container">
-  <%= render :partial=>"assets/resource_list_item", :collection=>@institutions %>
-</div>
-
-<% if @institutions.page == "latest" && Institution.count > Seek::Config.limit_latest %>
-    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>Institution.count} %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
+    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @institutions %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @institutions %>
 <% end %>

@@ -1,0 +1,41 @@
+<%= javascript_include_tag "projects" %>
+
+<%= f.error_messages %>
+
+<h2><%= t('programme') %> Details</h2>
+
+<div>
+  <div style="width: 95%;">
+    <p>
+      <%= f.label :title -%><br />
+      <%= f.text_area :title, :class=>"title_text_entry" -%>
+    </p>
+    <p>
+      <%= f.label "Web page"-%><br />
+      <%= f.text_field :web_page, :class=>"text_entry" -%>
+    </p>
+
+    <p>
+      <%= f.label :description -%><br/>
+      <%= f.text_area :description, :class=>"large_text_entry"  %>
+    </p>
+    <p>
+      <%= f.label :funding_details -%></br>
+      <%= f.text_area :funding_details, :class=>"large_text_entry" -%>
+    </p>
+  </div>
+</div>
+
+
+<%= render :partial => "projects/project_selector", :locals => { :resource => @programme, :allow_nil => true, :possibilities=>(Project.without_programme | @programme.projects) } -%>
+
+
+<% if programme -%>
+    <h2><%= t('programme') %> Picture</h2>
+    <%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => programme, :form_instance => f } -%>
+<% end -%>
+
+<p>
+  <%= f.submit(programme ? "Update" : "Create",:disable_with=>(programme ? "Updating..." : "Creating...")) -%>
+  or <%= link_to 'Cancel', (programme ? programme_path(programme.id) : programmes_path) -%>
+</p>

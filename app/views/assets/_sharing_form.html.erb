@@ -4,7 +4,7 @@
    disable_advanced_view ||= nil
    show_advanced_permissions = !@resource.respond_to?(:has_advanced_permissions?) || @resource.has_advanced_permissions?
    default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::EDITING
-   default_consortium_access_type = Policy::ACCESSIBLE
+   default_consortium_access_type = Policy::VISIBLE
    can_publish = @resource.respond_to?(:can_publish?) ? @resource.can_publish? : true
 %>
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
@@ -62,7 +62,7 @@
       }
     </style>
 
-    <div id='simple sharing' class="sharing_box_form">
+    <div id='simple_sharing' class="sharing_box_form">
         <!-- private -->
         <p><label for="sharing_scope_<%= Policy::PRIVATE -%>">
             <input type="hidden" id='access_type_select_<%= Policy::PRIVATE -%>' name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
@@ -79,13 +79,13 @@
         <p>
           <label>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
-            - All <%= t('project').pluralize %> members:
+            - Members of <%= t('project').pluralize %> associated with this <%= @resource_type -%>:
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
                  <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource) || default_projects_access_type) -%>
              </select>
              <br/>
-            <span style="margin-left:10em;">... members of  <%= t('project').pluralize %> associated with this <%= @resource_type -%>:</span>
+            <span style="margin-left:10em;">... and all other <%= t('project') %> members:</span>
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
                :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => (@resource.respond_to?(:policy) && @resource.policy.try(:sharing_scope)==Policy::ALL_SYSMO_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] } -%>
              <%= additional_advanced_permissions_included @resource, Policy::ALL_SYSMO_USERS -%>
@@ -99,12 +99,20 @@
             - All visitors (including anonymous visitors with no login):
           </label>
            <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
-            :sharing_scope => Policy::EVERYONE, :access_type => (@sharing_mode == Policy::EVERYONE) ? @access_mode : Policy::ACCESSIBLE } -%>
+            :sharing_scope => @sharing_mode, :access_type => @access_mode, :default_access_type=>Policy::ACCESSIBLE } -%>
            <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
           <br/>
         </p>
 
     </div>
+
+    <!-- some javascript to set the default permissions for new records -->
+    <% if @resource.new_record? && @resource.errors.empty? -%>
+        <script type="text/javascript">
+          $("sharing_scope_<%= Policy::ALL_SYSMO_USERS-%>").checked=true;
+
+        </script>
+    <% end -%>
 
     <% if !disable_advanced_view %>
       <%= link_to_function ("Advanced permissions " + expand_image).html_safe, :class => 'advanced_sharing_link', :style => "display:" + (show_advanced_permissions ? 'none;' : 'block;'), :id =>'advanced_sharing_expand_image' do |page|
@@ -146,7 +154,7 @@
               <div class="foldTitle">
                 <%= image_tag icon_filename_for_key("spinner"), :id => "f_group_deleting_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
                 <%= help_icon("Here you can choose your favourite groups to share this #{@resource_type} with.") -%>
-                Favourite Groups
+                <%= t('favourite_group').capitalize.pluralize -%>
               </div>
 
               <div class="foldContent" style="display: none; background-color: #F2F2F2;">
@@ -201,7 +209,7 @@
                       <%= image_tag icon_filename_for_key("spinner"), :id => "institutions_loading_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
                       <span class="note_text" style="line-height: 1.5;">Step 1:</span> Select a <%= t('project') %>
                       <%= select("proj_project", "select",
-                                 Project.all.collect { |p| [p.name, p.id] },
+                                 Project.all.collect { |p| [p.title, p.id] },
                                  {:include_blank => "All #{t('project').pluralize} @ Institution (from Step 2)"}, {:style => "width: 100%; vertical-align: middle; margin: 0.3em 0;"}) -%>
                     </div>
 
@@ -325,6 +333,8 @@
 <script type="text/javascript">
   init_sharing();
 
+  downloadable_asset = <%= @resource.try(:is_downloadable?) %>;
+
   GET_INSTITUTIONS_LINK = '<%= request_institutions_projects_path -%>';
   GET_ALL_INSTITUTIONS_LINK = '<%= request_all_institutions_path -%>';
 
@@ -350,12 +360,12 @@
               <% if p.contributor_type == "Person" -%>
                 <%
                 contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
-                allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING && @resource_type != "Project"
+                allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
                 -%>
               <% elsif p.contributor_type == "WorkGroup" -%>
-                <% contributor_name = p.contributor.project.name + " @ " + p.contributor.institution.name -%>
+                <% contributor_name = p.contributor.project.title + " @ " + p.contributor.institution.title -%>
               <% else -%>
-                <% contributor_name = p.contributor.name -%>
+                <% contributor_name = p.contributor.title -%>
               <% end -%>
 
               // Need to decodeHTML for person name, as it comes from the autocompleter

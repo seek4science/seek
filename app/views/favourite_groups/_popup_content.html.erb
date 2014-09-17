@@ -1,6 +1,6 @@
 <%
    #this is use for correct display the access_type dropdown list, which depending on the type of resource
-   resource = try_block{resource_type.constantize.send 'new'}
+   resource = instance_of_resource_type(resource_type)
 %>
 <div id="redbox_contents_div" class="redbox_contents" style="width:500px;">
 	<div class="head">
@@ -10,7 +10,7 @@
 			<% if @f_group.is_whitelist_or_blacklist? -%>
 			  <%= (@f_group.name == FavouriteGroup::WHITELIST_NAME) ? "\"White List\"" : "\"Black List\"" -%>
 			<% else -%>
-			  Favourite Group
+        <%= t('favourite_group').capitalize.pluralize -%>
 			<% end -%>
 			<%= image_tag icon_filename_for_key("spinner"), :id => "fav_group_loading_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle;" -%>
 		</span>
@@ -63,7 +63,7 @@
 							
 						  	<select name="group_access_type_select" id="group_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;" <%= "disabled" if @f_group.is_whitelist_or_blacklist? -%>>
 								  <% unless @f_group.is_whitelist_or_blacklist? -%>
-										<%= policy_selection_options([Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING, Policy::MANAGING], resource)-%>
+										<%= policy_selection_options([Policy::NO_ACCESS,Policy::ACCESSIBLE,Policy::EDITING, Policy::MANAGING], resource)-%>
 									<% else -%>
 									  <% if @f_group.name == FavouriteGroup::BLACKLIST_NAME -%>
 										  <option value="<%= FavouriteGroup::BLACKLIST_ACCESS_TYPE -%>" ><%= Policy.get_access_type_wording(FavouriteGroup::BLACKLIST_ACCESS_TYPE) -%></option>

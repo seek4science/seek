@@ -1,19 +1,8 @@
-<h1> <font color="#456AAA"> <%= 'Publications' %> </font> </h1> <br>
-<% if logged_in_and_member? %>
-    <ul class="sectionIcons">
-      <li><%= image_tag_for_key "new", new_publication_path, "Register a publication", nil, "Register a publication" %></li>
-      <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
-    </ul>
-<% end %>
-<% if @publications.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @publications.pages, :page_totals=>@publications.page_totals,:current_page=>@publications.page } -%>
-<% end %>
+<%= index_title -%>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_publication_path, :label => "Register a publication"} %>
 
-<div class="list_items_container">
-  <%= render :partial=>"assets/resource_list_item", :collection=>@publications %>
-</div>
-
-<% if @publications.page == "latest" && (n=Publication.count) > Seek::Config.limit_latest%>
-   <%= render :partial => "general/paginate_see_all", :locals=>{:total=>n} %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
+    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @publications %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @publications %>
 <% end %>

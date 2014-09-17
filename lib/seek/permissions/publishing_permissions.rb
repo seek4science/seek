@@ -99,7 +99,7 @@ module Seek
       #new item: sysmo_and_project_policy
       #updated item: keep the policy as before
       def temporary_policy_while_waiting_for_publishing_approval
-        return true if $authorization_checks_disabled
+        return true unless authorization_checks_enabled
         if self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)
           self.policy = Policy.sysmo_and_projects_policy self.projects
         elsif !self.new_record? && self.policy.sharing_scope == Policy::EVERYONE && !self.kind_of?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)

@@ -1,0 +1,38 @@
+<%= javascript_include_tag "sharing.js" %>
+
+<div class="breadcrumbs">
+  <a href="/">Home</a> &gt;
+  <%= link_to @run.workflow.category.name, main_app.workflows_path(:category_id => @run.workflow.category) -%> &gt;
+  <%= link_to @run.workflow.title, main_app.workflow_path(@run.workflow) -%> &gt;
+  <% if @run.sweep %>
+    <%= link_to @run.sweep.name, main_app.sweep_path(@run.sweep) -%> &gt;
+  <% end %>
+  <%= link_to @run.name, taverna_player.run_path(@run) -%> &gt;
+  Manage
+</div>
+
+<h1>Manage run: <%= @run.name %></h1>
+
+<div class="show_basic">
+  <%= form_for @run, :url => main_app.run_path(@run.id), :method => "put" do |f| -%>
+    <div class="asset_form">
+      <%= error_messages_for :run -%>
+      <p>
+        <b>Name:</b>
+        <%= f.text_field :name, :size => 80 -%>
+      </p>
+
+      <% unless @run.using_sweep_policy? || current_user.guest_project_member?%>
+        <p>
+          <%= render :seek_partial => "assets/sharing_form" -%>
+        </p>
+      <% end %>
+
+      <p>
+        <%= submit_tag 'Save' -%>
+        or
+        <%= link_to 'Cancel', main_app.run_path(@run) -%>
+      </p>
+    </div>
+  <% end %>
+</div>

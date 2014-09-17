@@ -1,5 +1,7 @@
 // ...
 //= require savage_beast/application
+//= require jquery
+//= require jquery_no_conflict
 //= require prototype
 //= require prototype_ujs
 //= require effects
@@ -10,5 +12,5 @@
 //= require builder
 //= require top_menu
 //= require dynamic_menu
-//= require jquery-1.5.1.min
 //= require jscrollpane/index
+//= require default_text_search

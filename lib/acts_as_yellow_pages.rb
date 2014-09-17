@@ -14,10 +14,7 @@ module Acts #:nodoc:
       def acts_as_yellow_pages
         acts_as_favouritable
 
-        validates_presence_of :name
-
-        #TODO: refactor to remove :name entirely
-        alias_attribute :title, :name
+        validates :title,:presence=>true
 
         has_many :avatars,
                  :as        => :owner,
@@ -25,7 +22,7 @@ module Acts #:nodoc:
 
         has_many :activity_logs, :as => :activity_loggable
 
-        validates_associated :avatars
+        validates :avatar,:associated=>true
 
         belongs_to :avatar
 
@@ -35,10 +32,23 @@ module Acts #:nodoc:
         #load the configuration for the pagination
         grouped_pagination :pages=>("A".."Z").to_a
 
+        include Seek::Search::CommonFields
+
+        searchable do
+          text :locations do
+            if self.respond_to?(:country)
+              country
+            elsif self.respond_to?(:locations)
+              locations
+            end
+          end
+        end if Seek::Config.solr_enabled
+
         class_eval do
           extend Acts::Yellow_Pages::SingletonMethods
         end
         include Acts::Yellow_Pages::InstanceMethods
+        include BackgroundReindexing
 
       end
 

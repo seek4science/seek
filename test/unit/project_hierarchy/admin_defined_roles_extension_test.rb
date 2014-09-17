@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'integration/project_hierarchy/project_hierarchy_test_helper'
+require 'project_hierarchy_test_helper'
 class AdminDefinedRolesExtensionTest < ActiveSupport::TestCase
   include ProjectHierarchyTestHelper
 

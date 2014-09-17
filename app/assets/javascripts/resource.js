@@ -60,6 +60,14 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
 
 }
 
+function addTempLink(){
+    $('new_temporary_link_form').show();
+    $('new_temporary_link_form').select('.hidden_destroy_field')[0].setValue('false');
+    $("add_a_temporary_link").hide();
+    $('temp_link').select();
+ }
+
+
 function checkProjectExists(prefix) {
     el=prefix+"_project_ids";
     if ($F(el).length < 1) {
@@ -67,6 +75,24 @@ function checkProjectExists(prefix) {
         return (false);       
     }
     return(true);
+}
+
+function flipSaveEnable(){
+    if ($('redbox_workflow_submit_btn').hidden == true) {
+        $('redbox_workflow_submit_btn').hidden = false;
+    }
+    else {
+        $('redbox_workflow_submit_btn').hidden = true;
+    }
+}
+
+function createOrUpdateResourceInRedBox(is_new_file, resource_name){
+    // filename and title set - can submit
+    $('redbox_workflow_submit_btn').disabled = true;
+    $('redbox_workflow_submit_btn').value = (is_new_file=='true' ? "Creating..." : "Updating...");
+    var form0 = $('redbox_workflow_submit_btn').form;
+    form0.submit();
+    RedBox.close();
 }
 
 function createOrUpdateResource(is_new_file, resource_name){
@@ -88,9 +114,9 @@ function validateUploadFormFields(respond_to_content_blobs, resource_name) {
             return (false);
         }
     } else {
-        if ($(resource_name + '_data').value.length == 0 && $(resource_name + '_data_url').value.length == 0) {
+        if ($('content_blob_data').value.length == 0 && $('data_url_field').value.length == 0) {
             alert("Please specify at least a file to upload or provide a URL.");
-            $(resource_name + '_data').focus();
+            $('content_blob_data').focus();
             return (false);
         }
     }

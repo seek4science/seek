@@ -1,10 +1,65 @@
 body {
 	font-family: arial,sans-serif;
     font-size: 14px;
-	line-height: 1.0;
+    line-height: 1.0;
     border-left: #8e8e8e solid 10px;
     border-right: #8e8e8e solid 10px;
     min-width: 1024px;
+}
+
+p {
+    font-family: arial;
+    padding: 0.3em 0;
+    line-height: 1.4;
+    text-align: left;
+    margin-bottom: 0em;
+}
+
+hr {
+    margin: 1em 0;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    font-family: arial;
+    line-height: 1.0;
+    color: #333333;
+}
+
+h1 {
+    text-align: center;
+    font-size: 140%;
+    margin: 0.1em 0 0.3em 0;
+    line-height: 1.4;
+}
+
+h2 {
+    background-image: url("<%= asset_path('header-bg.png') %>");
+    background-position: top;
+    background-repeat: repeat-x;
+    background-color: #EEEEEE;
+    padding: 0.5em 0.6em;
+    border: 1px solid #CCCCCC;
+    font-size: 100%;
+}
+
+h3 {
+    background-color: transparent;
+    font-size: 108%;
+    font-weight: bold;
+    border: none;
+    padding: 0 0 0.3em 0;
+    margin: 1em 0 0.8em 0;
+    border-bottom: 1px dotted #999999;
+}
+
+h4 {
+    background-color: transparent;
+    font-size: 108%;
+    font-weight: bold;
+    border: none;
+    padding: 0.3em 0;
+    margin-top: 0;
+    margin-bottom: 0.6em;
 }
 
 
@@ -130,7 +185,10 @@ input[type="text"] {
 
 
 .list_items_container{
-    padding-left: 7px;
+    padding-left:1.5em;
+    margin-left:auto;
+    margin-right:auto;
+    width: 98%;
 }
 
 #password_login input {
@@ -1007,7 +1065,6 @@ div.list_item_whole_width{
 }
 
 
-
 div.hidden_list_item {
     width: 95%;
     background-color: #F0F0F0;
@@ -1213,10 +1270,16 @@ div#existing_strains {
     color: #f93fec;
 }
 
-.system_message {
-    border-color: red;
+#signup {
+    width: 60em;
+    margin-top: 0.5em;
+}
+
+p.system_message {
+    border: red 1px solid;
     text-align: center;
-    font-size: larger;    
+    font-size: larger;
+    font-weight: bolder;
 }
 
 .link_selector_buttons ul {
@@ -1480,15 +1543,12 @@ a.block_link {
 
 a.block_link_active {
   display: block;
-  border: 2px solid #0000ff;
+  border: 1px solid #0000ff;
   background-color: #eee;  
   padding: 0.4em;
   margin-top: 0.3em;
   text-align: left;
   vertical-align: middle;
-  border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
 }
 
 a:hover.block_link {
@@ -1520,20 +1580,18 @@ div.asset_form {
 
 div#upload_type_selection {
     padding-left: 0.5em;
-    height: 120px;
+    height: 18em;
 }
 
 ul#switch_upload_buttons {
     list-style: none;
-    clear: both;
-    display: block;
+    height:100%;
 }
 
-ul#switch_upload_buttons li {
+ul#switch_upload_buttons > li {
 	list-style: none;
     padding-right: 0.75em;
     padding-top: 10px;
-    float: left;
 }
 
 ul#switch_upload_buttons a {
@@ -1560,8 +1618,10 @@ div.email_configuration{
 
 
 
-a.advanced_sharing_link{
-   float:right;
+a.advanced_sharing_link {
+    float: none;
+    display: inline-block;
+    padding: 7px 0;
 }
 
 .sharing_box_form {
@@ -1923,7 +1983,6 @@ ul.model_scales_list {
 }
 
 
-
 .sectionIcons li:hover {
 }
 
@@ -2083,11 +2142,10 @@ ul#my_profile_menu {
 }
 
 div#logged_in_as {
-    clear:right;
-    padding-top: 10px;
     float:right;
     top:-0.45em;
     position: relative;
+    clear:both;
 }
 
 div#logged_in_as img {
@@ -2186,6 +2244,58 @@ div#profile_select {
     margin-top: 0.5em;
     margin:auto;
     text-align:left;
+}
+
+.field_with_errors > input {
+    border: 2px solid red;
+}
+
+.large_text_entry {
+    width: 99%;
+    height: 10em;
+}
+
+.title_text_entry {
+    width: 99%;
+    height: 2em;
+}
+
+.text_entry {
+    width: 40em;
+}
+
+#search_label {
+    padding-right: 0.25em;
+}
+#test_url_result p#url_type {
+    font-size:larger;
+}
+#test_url_result p#url_info {
+
+}
+#test_url_result img {
+    max-width: 8em;
+    max-height: 8em;
+    min-width: 3em;
+    min-height: 3em;
+    float:left;
+    padding-right:1em;
+}
+#test_url_result img {
+    vertical-align: text-top;
+}
+
+ul#pending_files li {
+    vertical-align: middle;
+}
+
+ul#pending_files span {
+    padding-right:0.25em;
+    vertical-align: middle;
+}
+
+ul#pending_files a {
+    padding-left:0.75em;
 }
 
 

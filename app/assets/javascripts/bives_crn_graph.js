@@ -1,6 +1,3 @@
-jQuery.noConflict();
-var $j = jQuery;
-
 var cytoscapeJSoptions = {
 
     layout: {name: 'arbor'},

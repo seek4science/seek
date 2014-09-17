@@ -13,7 +13,12 @@ module FancyMultiselectHelper
       return super if options.delete :preview_disabled
 
       #skip if controller class does not define a preview method
-      return super unless try_block{"#{association.to_s.classify.pluralize}Controller".constantize.method_defined?(:preview)}
+      begin
+        const = "#{association.to_s.classify.pluralize}Controller".constantize
+        return super unless const.method_defined?(:preview)
+      rescue NameError=>e
+        return super
+      end
 
       #adds options to the dropdown used to select items to add to the multiselect.
       options[:possibilities_options] = {} unless options[:possibilities_options]
@@ -41,7 +46,7 @@ module FancyMultiselectHelper
       assign_Selected_Item_js = "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}'));".html_safe
           onchange += assign_Selected_Item_js
       options[:possibilities_options][:onchange] = onchange.html_safe
-      super(object, association, options) + "\n<script type='text/javascript'>#{assign_Selected_Item_js}</script>\n".html_safe
+      super(object, association, options)
     end
   end
 
@@ -84,7 +89,7 @@ module FancyMultiselectHelper
 
       #set default values for locals being sent to the partial
       #override default values with options passed in to the method
-      options.reverse_merge! :intro => "The following #{association.to_s.singularize.humanize.pluralize} are associated with this #{object_type_text}:",
+      options.reverse_merge! :intro => "The following #{association.to_s.singularize.humanize.pluralize.downcase} are associated with this #{object_type_text.downcase}:",
                              :button_text => "Associate with this #{object_type_text}",
                              :default_choice_text => "Select #{association.to_s.singularize.humanize} ...",
                              :name => "#{options[:object_class].name.underscore}[#{association.to_s.singularize}_ids]",

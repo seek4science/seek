@@ -2,21 +2,21 @@
 
 one:
   id: 1
-  name: Institution1
+  title: Institution1
   address: MyText
   city: MyString  
   country: MyString
 
 two:
   id: 2
-  name: Institution2
+  title: Institution2
   address: MyText
   city: MyString  
   country: MyString
 
 three:
   id: 3
-  name: Institution3
+  title: Institution3
   address: MyText
   city: MyString  
   country: MyString
@@ -24,7 +24,7 @@ three:
 #an institution not associated with any workgroups or people
 four:
   id: 4
-  name: Institution4
+  title: Institution4
   address: MyText
   city: MyString  
   country: MyString
@@ -33,20 +33,20 @@ four:
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
 
 manchester_uni_inst:
-  name: "Manchester University"  
+  title: "Manchester University"
 
 
 ebi_inst:
-  name: "European Bioinformatics Institute"
+  title: "European Bioinformatics Institute"
   country: "uk"
   address: "address"
   city: "city"
 
 
 amsterdam_uni_inst:
-  name: "University of Amsterdam"
+  title: "University of Amsterdam"
   country: Netherlands
 
 
 empty_inst:
-  name: "empty institution with no members..."
+  title: "empty institution with no members..."

@@ -13,18 +13,21 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal false ,Seek::Config.jerm_enabled
   end
   test "solr enabled" do
-    assert_equal false ,Seek::Config.solr_enabled
+    assert_equal true ,Seek::Config.solr_enabled
   end
 
   test "is_virtualliver" do
-    original_value = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = true
-    assert Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = original_value
+    with_config_value "is_virtualliver",true do
+      assert Seek::Config.is_virtualliver
+    end
   end
+
   test 'project_hierarchy_enabled' do
-    assert_equal true ,Seek::Config.project_hierarchy_enabled
+    with_config_value "project_hierarchy_enabled",true do
+      assert_equal true ,Seek::Config.project_hierarchy_enabled
+    end
   end
+
   test "scales" do
     assert_equal ["organism","liver","liverLobule","intercellular","cell"],Seek::Config.scales
   end
@@ -42,6 +45,12 @@ class ConfigTest < ActiveSupport::TestCase
       assert !Seek::Config.external_search_enabled
     end
 
+  end
+
+  test "blacklisted feeds" do
+    Seek::Config.blacklisted_feeds = {"http://google.com"=>Time.parse("1 Sep 2014"),"http://fish.com"=>Time.parse("1 June 2014")}
+    assert_equal Time.parse("1 Sep 2014"),Seek::Config.blacklisted_feeds["http://google.com"]
+    assert_equal Time.parse("1 June 2014"),Seek::Config.blacklisted_feeds["http://fish.com"]
   end
 
   test "filestore_location" do

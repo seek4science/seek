@@ -145,7 +145,7 @@ class Mailer < ActionMailer::Base
     mail(:from=>Seek::Config.noreply_sender,
          :to=>project_manager_email(project_manager),
          :reply_to=>user.person.email_with_name,
-         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} which you are #{I18n.t('project').downcase} manager")
+         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} of which you are #{I18n.t('project').downcase} manager")
   end
 
   def resources_harvested(harvester_responses,user,base_host)
@@ -172,6 +172,15 @@ class Mailer < ActionMailer::Base
     mail(:from=>Seek::Config.noreply_sender,
          :to=>testing_email,
          :subject=>"SEEK Configuration Email Test")
+  end
+
+  def notify_user_projects_assigned(person)
+    @name = person.name
+    @projects = person.projects
+
+    mail(:from=>Seek::Config.noreply_sender,
+         :to=>person.email_with_name,
+         :subject=>"You have been assigned to a #{Seek::Config.application_name} project")
   end
 
   private

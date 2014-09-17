@@ -11,13 +11,13 @@
             <span class="required">*</span>
             <br/>
             <% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
-            <%= text_area_tag 'model[title]', model_title_value, :style => "width: 100%;", :rows=>2 -%>
+            <%= text_area_tag 'model[title]', model_title_value, :class=>"title_text_entry" -%>
         </p>
         <p style="margin-top: 0.5em;">
             <b>Description</b>
             <br/>
             <% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
-            <%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 10 -%>
+            <%= text_area_tag 'model[description]', model_description_value, :class=>"large_text_entry" -%>
         </p>
 
         <p>

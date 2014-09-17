@@ -107,7 +107,11 @@ module HomesHelper
           entry_link = entry.url
           entry_title = entry.title || "Unknown title"
           feed_title = entry.feed_title || "Unknown publisher"
-          entry_date = entry.try(:updated) || entry.try(:published) || entry.try(:last_modified)
+
+          entry_date = entry.try(:updated) if entry.respond_to?(:updated)
+          entry_date ||= entry.try(:published) if entry.respond_to?(:published)
+          entry_date ||= entry.try(:last_modified) if entry.respond_to?(:last_modified)
+
           entry_summary = truncate(strip_tags(entry.summary || entry.content),:length=>500)
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
 
@@ -145,7 +149,7 @@ module HomesHelper
 
   def recently_added_item_logs_hash time=1.month.ago, number_of_item=10
     Rails.cache.fetch("create_activity_#{current_user_id}") do
-      item_types = Seek::Util.user_creatable_types.collect{|type| type.name}
+      item_types = Seek::Util.user_creatable_types.collect{|type| type.name} | [Project,Programme]
       activity_logs = ActivityLog.where(["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types]).order("created_at DESC")
       selected_activity_logs = []
       count = 0
@@ -196,6 +200,10 @@ module HomesHelper
           html << "</li>"
       end
       html.html_safe
+  end
+
+  def guest_login_link(text)
+    link_to(text, session_path(:login => 'guest', :password => 'guest'), :method => :post)
   end
 
 end

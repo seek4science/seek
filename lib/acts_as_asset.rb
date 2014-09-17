@@ -35,11 +35,15 @@ module Acts #:nodoc:
         acts_as_uniquely_identifiable
         acts_as_annotatable :name_field=>:title
         acts_as_favouritable
+        acts_as_trashable
 
         attr_writer :original_filename,:content_type
         does_not_require_can_edit :last_used_at
 
         validates_presence_of :title
+
+        #MERGENOTE - this was removed by VLN at some point, possibly needs some configuration setting
+        #validates_presence_of :projects
 
         has_many :relationships,
                  :class_name => 'Relationship',
@@ -71,14 +75,23 @@ module Acts #:nodoc:
 
         grouped_pagination
 
-        searchable do
-          text :title, :description, :searchable_tags
+        include Seek::Search::CommonFields
+
+        searchable(:auto_index=>false) do
           text :creators do
-            creators.compact.map(&:name).join(' ')
+            if self.respond_to?(:creators)
+              creators.compact.map(&:name)
+            end
+          end
+          text :other_creators do
+            if self.respond_to?(:other_creators)
+              other_creators
+            end
           end
           text :content_blob do
             content_blob_search_terms
           end
+          text :assay_type_titles,:technology_type_titles
         end if Seek::Config.solr_enabled
 
         class_eval do
@@ -87,6 +100,19 @@ module Acts #:nodoc:
         include Acts::Asset::InstanceMethods
         include BackgroundReindexing
         include Subscribable
+
+        def get_all_as_json(user)
+          all = self.all_authorized_for "view",user
+          with_contributors = all.collect{ |d|
+            contributor = d.contributor;
+            { "id" => d.id,
+              "title" => h(d.title),
+              "contributor" => contributor.nil? ? "" : "by " + h(contributor.person.name),
+              "type" => self.name
+            }
+          }
+          return with_contributors.to_json
+        end
       end
 
 
@@ -152,7 +178,7 @@ module Acts #:nodoc:
             begin
               p=self.projects.first
               p.decrypt_credentials
-              downloader            =Jerm::DownloaderFactory.create p.name
+              downloader            =Jerm::DownloaderFactory.create p.title
               resource_type         = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
               data_hash             = downloader.get_remote_data blob.url, p.site_username, p.site_password, resource_type
               blob.tmp_io_object = File.open data_hash[:data_tmp_path],"r"

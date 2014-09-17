@@ -2,7 +2,7 @@
     var loaded_scales = new Array();
     loaded_scales["all"]=false;
 </script>
-
+<% current_scale_key ||="all" %>
 <%= show_title("Browse by #{t("scale")}") %>
 
 <%= render :partial => 'scales/scale_slider', :locals => {:current_scale => current_scale_key,:scale_slider_function => (remote_function(

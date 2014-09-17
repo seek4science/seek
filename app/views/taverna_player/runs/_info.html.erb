@@ -1,0 +1,57 @@
+<div id="run-info" style="padding-top: 10px;">
+  <%= form_for run, :url => main_app.run_path(run.id), :method => "put" do |f| -%>
+    <p>
+      <%= error_messages_for :run -%>
+      <b>Name:</b>
+      <%= f.text_field :name, :size => 80 -%>
+      <%= submit_tag('Save') -%>
+    </p>
+  <% end %>
+
+  <% if run.can_manage? && !current_user.guest? -%>
+      <p>
+        <%= describe_visibility(run) -%>
+      </p>
+  <% end %>
+
+  <div style="float: left; width: 300px; margin-right: 50px;">
+    <p>
+      <b>Workflow:</b>
+      <% workflow = run.workflow %>
+      <% workflow_version = workflow.find_version(run.workflow_version) %>
+
+      <%= link_to workflow_version.title, main_app.workflow_path(workflow, :version => workflow_version.version) %>
+    </p>
+    <p>
+      <b>Category:</b>
+      <%= workflow.category.name %>
+    </p>
+    <p>
+      <b>Status:</b>
+      <%= run.status_message %> <%= image_tag('ajax-loader.gif', :style => "vertical-align: middle") unless run.complete? %>
+    </p>
+  </div>
+
+  <div style="float: left">
+    <%
+       created_at = run.created_at.strftime("%e %b %Y %H:%M:%S %Z")
+       start_time = run.start_time.blank? ? 'N/A' : run.start_time.strftime("%e %b %Y %H:%M:%S %Z")
+       finish_time = run.finish_time.blank? ? 'N/A' : run.finish_time.strftime("%e %b %Y %H:%M:%S %Z")
+    %>
+
+    <p>
+      <b>Created at:</b>
+      <%= created_at %>
+    </p>
+
+    <p>
+      <b>Started at:</b>
+      <%= start_time %>
+    </p>
+
+    <p>
+      <b>Finished at:</b>
+      <%= finish_time %>
+    </p>
+  </div>
+</div>

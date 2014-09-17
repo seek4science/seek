@@ -5,18 +5,17 @@
   </ul>
   
   <h3>Create</h3>
-  <ul>  
-    <li><%= link_to "Create an institution", new_institution_path %></li>
-    <% if Seek::Config.organisms_enabled -%>
-	<li><%= link_to "Create an organism", new_organism_path %></li>
-    <% end -%>
-    <li><%= link_to "Create a #{t('project').downcase}", new_project_path %></li>
-    <li><%= link_to "Create a profile", new_person_path %></li>	
+  <ul>
+    <%= content_tag(:li,link_to("Create a #{t('programme').downcase}",new_programme_path)) if Seek::Config.programmes_enabled-%>
+    <%= content_tag :li, link_to("Create a #{t('project').downcase}", new_project_path) %>
+    <%= content_tag :li, link_to("Create an institution", new_institution_path) %>
+    <%= content_tag :li, link_to("Create a profile", new_person_path) %>
+    <%= content_tag(:li,link_to("Create an organism",new_organism_path)) if Seek::Config.organisms_enabled-%>
   </ul>
   
   <h3>Manage</h3>
   <ul>
-    <li><%= link_to "Manage #{t('assays.assay').downcase} types", url_for(:action=>"manage", :controller=>"suggested_assay_types") %></li>
+    <li><%= link_to "Manage assay types", url_for(:action=>"manage", :controller=>"suggested_assay_types") %></li>
     <li><%= link_to "Manage technology types", url_for(:action=>"manage", :controller=>"suggested_technology_types") %></li>
     <li><%= link_to "Manage tags", tags_admin_path %></li>
     <li><%= link_to "Manage projects", url_for(:action=>"manage", :controller=>"projects") %></li>

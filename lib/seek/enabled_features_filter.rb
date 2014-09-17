@@ -1,6 +1,6 @@
 module Seek
   module EnabledFeaturesFilter
-    FEATURES = [:models,:biosamples,:organisms,:events,:documentation]
+    FEATURES = [:models,:biosamples,:organisms,:events,:documentation, :workflows, :programmes]
 
     def feature_enabled? feature
       feature=feature.to_s
@@ -8,7 +8,7 @@ module Seek
         true
       else
         flash[:error] = "#{feature.capitalize} are disabled"
-        redirect_to :root
+        redirect_to main_app.root_path
         false
       end
     end

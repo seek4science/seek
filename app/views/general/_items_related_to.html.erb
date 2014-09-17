@@ -1,20 +1,21 @@
 <% item = items_related_to %>
-<%  resource_hash = {}
-   all_related_items_hash = collect_related_items(item)
-    all_related_items_hash.each_key do |resource_type|
-      all_related_items_hash[resource_type][:items].uniq!
-      all_related_items_hash[resource_type][:items].compact!
-      unless all_related_items_hash[resource_type][:items].empty?
-        resource_hash[resource_type] = all_related_items_hash[resource_type][:items]
-      end
-    end
-
-%>
+<% resource_hash = get_related_resources(item) %>
 <h2 style="margin-top: 3em;">
-  Items related to <span style="font-weight:bolder;"><%= h(get_object_title(item)) -%></span>.
+  Related items
 </h2>
+<% if Seek::Config.tabs_lazy_load_enabled %>
+    <div id="all_results">
+      <%= render :partial => "assets/resource_tabbed_lazy_loading",
+                 :locals => { :resource_hash => resource_hash,
+                              :actions_partial_disable => false} -%>
+    </div>
 
-<%= render :partial => "scales/scale_search_results_tabs", :locals => {:resource_hash=>resource_hash,
-                                                                          :scale_title=> "all",
-                                                                          :scaled_results_disabled => true,
-                                                                          :actions_partial_disable => false} %>
+<% else %>
+    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => {:resource_hash => resource_hash,
+                                                                                  :narrow_view => true,
+                                                                                  :authorization_already_done => true,
+                                                                                  :item => item,
+                                                                                  :actions_partial_disable => false,
+                                                                                  :limit => Seek::Config.related_items_limit} -%>
+
+<% end %>

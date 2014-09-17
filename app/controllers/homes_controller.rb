@@ -4,10 +4,11 @@ class HomesController < ApplicationController
   before_filter :redirect_to_sign_up_when_no_user
   before_filter :login_required, :only=>[:feedback,:send_feedback]
 
+  respond_to :html,:only=>[:index]
 
   def index
-    respond_to do |format|
-      format.html # index.html.erb      
+    respond_with do |format|
+      format.html { render :seek_template=>:index }
     end
   end
 
@@ -60,6 +61,12 @@ class HomesController < ApplicationController
 
   def seek_intro_demo
      respond_to do |format|
+      format.html
+    end
+  end
+
+  def my_biovel
+    respond_to do |format|
       format.html
     end
   end

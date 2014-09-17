@@ -2,7 +2,7 @@ module StudiesHelper
 
   # generates the HTML to display the project avatar and named link
   def related_project_avatar project
-    project_title = h(project.name)
+    project_title = h(project.title)
     project_url = project_path(project)
     image_tag=avatar(project,60,false,project_url,project_title,false)
     project_link=link_to project_title, project_url, :alt=>project_title

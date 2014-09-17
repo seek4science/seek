@@ -32,7 +32,7 @@ class ProjectSubscription < ActiveRecord::Base
   end
 
   def project_name
-    project ? project.name : nil
+    project ? project.title : nil
   end
 
   def self.subscribable_types

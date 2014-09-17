@@ -1,14 +1,18 @@
 require 'test_helper'
-require 'integration/project_hierarchy/project_hierarchy_test_helper'
+require 'project_hierarchy_test_helper'
+
 class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
   include ProjectHierarchyTestHelper
   def setup
+        skip_hierarchy_tests?
         sync_delayed_jobs [ProjectSubscriptionJob, SetSubscriptionsForItemJob, RemoveSubscriptionsForItemJob]
         login_as_test_user
         initialize_hierarchical_projects
   end
 
-
+  def teardown
+    desync_delayed_jobs
+  end
   test "rails 3 bug: before_add is not fired before the record is saved on `has_many :through` associations" do
       # no problem in the application, as work_groups are added directly with UI
       #problem in test is caused that the group_memberships instead of work_groups are assigned to person when created
@@ -22,10 +26,19 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
       #this is solved in Rails 4 https://github.com/rails/rails/commit/b1656fa6305a5c8237027ab8165d7292751c0e86
       # add work groups via adding group_memberships which is the join table of people and work_groups
       #results: work_groups are added but before_add callbacks are not fired
-      person = Factory(:person)
+      person = Factory(:brand_new_person)
 
       #'before_add' callback of 'work_groups' association is not fired.
       #project subscriptions should be created before person is saved but not
+      assert_equal true, person.project_subscriptions.empty?
+
+      person.group_memberships = [Factory(:group_membership)]
+      disable_authorization_checks do
+        person.save
+      end
+
+      person.reload
+      assert_equal false, person.projects.empty?
       assert_equal true, person.project_subscriptions.empty?
   end
 
@@ -35,9 +48,9 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
     assert person.project_subscriptions.map(&:project).include?(@proj)
 
     new_parent_proj = Factory :project
-    @proj_child1.parent = new_parent_proj
+    @proj_child1.parent_id = new_parent_proj.id
     @proj_child1.save
-    @proj_child2.parent = new_parent_proj
+    @proj_child2.parent_id = new_parent_proj.id
     @proj_child2.save
     person.reload
 
@@ -51,8 +64,8 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
       assert_equal 0, person.project_subscriptions.count
 
       #add 2 work_groups directly
-      project1 = Factory :project, :parent => @proj
-      project2 = Factory :project, :parent => @proj
+      project1 = Factory :project, :parent_id => @proj.id
+      project2 = Factory :project, :parent_id => @proj.id
       person.work_groups.create :project => project1, :institution => Factory(:institution)
       person.work_groups.create :project => project2, :institution => Factory(:institution)
       disable_authorization_checks do
@@ -65,7 +78,7 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
 
     test 'subscribing to a project subscribes existing and new items in the project AND NEW items in its ancestors' do
       # when person edits his profile to subscribe new project, only items in that direct project are subscribed
-      child_project = Factory :project, :parent => @proj
+      child_project = Factory :project, :parent_id => @proj.id
       @proj.reload
 
       existing_subscribable = Factory :subscribable, :projects => [child_project]
@@ -87,7 +100,7 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
       child_project.reload
       assert !child_project.project_subscriptions.map(&:person).empty?
       disable_authorization_checks do
-        child_project.parent = @proj
+        child_project.parent_id = @proj.id
         child_project.save!
       end
       @subscribables_in_proj.each &:reload
@@ -98,7 +111,7 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
     test "subscribe/unsubscribe a project should subscribe/unsubscribe only itself rather that its parents" do
       add_project_subscriptions_attributes = {"2" => {"project_id" => @proj_child1.id.to_s, "_destroy" => "0", "frequency" => "daily"}, "22" => {"project_id" => @proj_child2.id.to_s, "_destroy" => "0", "frequency" => "weekly"}}
       person = User.current_user.person
-      assert_equal 0, person.project_subscriptions.count
+      person.project_subscriptions.destroy_all
 
       put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes" => add_project_subscriptions_attributes}
 

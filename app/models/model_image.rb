@@ -1,8 +1,8 @@
 class ModelImage < ActiveRecord::Base
-
-  LARGE_SIZE = "1000x1000"
+  DEFAULT_SIZE = '200x200'
+  LARGE_SIZE = '1000x1000'
   belongs_to :model
-  after_create :change_filename unless Rails.env=="test"
+  #after_create :change_filename unless Rails.env == 'test'
 
   acts_as_fleximage do
     image_directory Seek::Config.model_image_filestore_path
@@ -18,20 +18,19 @@ class ModelImage < ActiveRecord::Base
   validates_presence_of :model
 
   def original_image_format
-    content_type.split("/").last
+    content_type.split('/').last
   end                                                                                                                                 #
 
-
   def self.original_path
-    File.join(self.image_directory,"original")
+    File.join(image_directory, 'original')
   end
 
-  def image_file= file
+  def image_file=(file)
     # save_original_file
     if file.respond_to?(:content_type) && file.respond_to?(:original_filename)
-      format = file.content_type.split("/").last
+      format = file.content_type.split('/').last
       FileUtils.mkdir_p(ModelImage.original_path)
-      File.open(File.join(ModelImage.original_path,"#{file.original_filename}.#{format}"), 'wb') do |f|
+      File.open(File.join(ModelImage.original_path, "#{file.original_filename}.#{format}"), 'wb') do |f|
         file.rewind
         f.write file.read
       end
@@ -40,8 +39,13 @@ class ModelImage < ActiveRecord::Base
     super
   end
 
+  def original_path
+    File.join(ModelImage.original_path, "#{original_filename}.#{original_image_format}")
+  end
+
+
   def change_filename
-    File.rename File.join(ModelImage.original_path,"#{original_filename}.#{original_image_format}"), File.join(ModelImage.original_path,"#{id}.#{original_image_format}")
+    File.rename original_path, File.join(ModelImage.original_path, "#{id}.#{original_image_format}")
   end
 
   def select!
@@ -56,5 +60,4 @@ class ModelImage < ActiveRecord::Base
   def selected?
     model.model_image_id && model.model_image_id.to_i == id.to_i
   end
-
 end

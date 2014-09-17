@@ -1,0 +1,56 @@
+<%= form_for(@workflow, :html => {:multipart => true}) do |f| -%>
+  <!-- Delete button -->
+  <div class="asset_form">
+    <%= error_messages_for :workflow -%>
+    <%= hidden_field_tag 'workflow[title]', 'A workflow' -%>
+    <% if @workflow.new_record? %>
+      <label>File</label><br/>
+      <p>
+        <%= file_field_tag 'workflow[data]' %>
+      </p>
+    <% end %>
+
+    <p>
+      <label>Category</label><br/>
+      <%= f.select(:category_id, WorkflowCategory.all.collect { |c| [c.name, c.id] }) %>
+    </p>
+
+    <p>
+      <label>MyExperiment Link</label><br/>
+      <%= f.text_field(:myexperiment_link) -%>
+    </p>
+    <p>
+      <label>Documentation Link</label><br/>
+      <%= f.text_field(:documentation_link) -%>
+    </p>
+
+    <p style="margin: 1em 0">
+      <label for="workflow_sweepable" class="enable-data-sweeps">
+        <%= help_icon("Ticking this box will allow users to run batches of runs with this workflow. "+
+                      "It may not be appropriate for all workflows to be ran in this manner, for example certain workflows with interactions.") -%>
+        Allow data sweeps?
+        <%= f.check_box(:sweepable, :style => "vertical-align: middle") -%>
+      </label>
+    </p>
+
+    <% unless @workflow.new_record? %>
+      <%= render :partial => 'port_type_table', :locals => {:f => f} %>
+    <% end %>
+
+    <div<%= ' style="display: none"'.html_safe if current_user.guest_project_member? -%>>
+      <%= render :partial => "projects/project_selector", :locals => {:resource => @workflow} -%>
+    </div>
+
+    <%= fields_for(@workflow) do |form| %>
+        <%= render :partial => "assets/asset_form_bottom",
+                   :locals => {:f => form, :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => !current_user.guest_project_member?, :sharing_link => false} %>
+    <% end %>
+    <p>
+      <%= preview_permission_popup_link(@workflow) -%>
+      <%= submit_tag @workflow.new_record? ? "Next" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>
+      or
+      <%= link_to 'Cancel', @workflow.new_record? ? workflows_path : workflow_path -%>
+    </p>
+  </div>
+
+<% end %>

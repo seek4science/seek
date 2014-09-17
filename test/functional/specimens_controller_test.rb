@@ -75,6 +75,16 @@ class SpecimensControllerTest < ActionController::TestCase
     assert_not_nil assigns(:specimen)
   end
 
+  test "should show as virtual liver config" do
+    with_config_value :is_virtualliver,true do
+      get :show, :id => Factory(:specimen,
+                                :title=>"running mouse NO2",
+                                :policy =>policies(:editing_for_all_sysmo_users_policy))
+      assert_response :success
+      assert_not_nil assigns(:specimen)
+    end
+  end
+
   test "should get edit" do
     get :edit, :id=> Factory(:specimen, :policy => policies(:editing_for_all_sysmo_users_policy))
     assert_response :success
@@ -145,7 +155,7 @@ class SpecimensControllerTest < ActionController::TestCase
     assert_redirected_to s
   end
   test "should not destroy specimen related to an existing sample" do
-    sample = Factory :sample
+    sample = Factory :sample, :policy => Factory(:public_policy)
     specimen = Factory :specimen
     specimen.samples = [sample]
     assert_no_difference("Specimen.count") do

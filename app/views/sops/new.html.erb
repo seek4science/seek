@@ -9,13 +9,13 @@
             <span class="required">*</span>
             <br/>
             <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
-            <%= text_area_tag 'sop[title]', sop_title_value, :style => "width: 100%;", :rows=>2 -%>
+            <%= text_area_tag 'sop[title]', sop_title_value, :class=>"title_text_entry" -%>
         </p>
         <p style="margin-top: 0.5em;">
             <b>Description</b>
             <br/>
             <% sop_description_value = (params[:sop].blank? || params[:sop][:description].blank?) ? nil : params[:sop][:description] -%>
-            <%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 10 -%>
+            <%= text_area_tag 'sop[description]', sop_description_value, :class=>"large_text_entry" -%>
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @sop,:allow_nil=> true} -%>
         <p>

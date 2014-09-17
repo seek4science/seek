@@ -43,7 +43,7 @@ class ModelImagesController < ApplicationController
 
 
   def show
-    params[:size] ||='200x200'
+    params[:size] ||=ModelImage::DEFAULT_SIZE
     if params[:size]=='large'
       size = ModelImage::LARGE_SIZE
     else

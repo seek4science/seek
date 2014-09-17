@@ -10,13 +10,13 @@
             <span class="required">*</span>
             <br/>
             <% presentation_title_value = (params[:presentation].blank? || params[:presentation][:title].blank?) ? nil : params[:presentation][:title] -%>
-            <%= text_area_tag "presentation[title]", presentation_title_value, :style => "width: 100%;", :rows=>2 -%>
+            <%= text_area_tag "presentation[title]", presentation_title_value, :class=>"title_text_entry" -%>
         </p>
         <p style="margin-top: 0.5em;">
             <b>Description</b>
             <br/>
             <% presentation_description_value = (params[:presentation].blank? || params[:presentation][:description].blank?) ? nil : params[:presentation][:description] -%>
-            <%= text_area_tag "presentation[description]", presentation_description_value, :style => "width: 100%;", :rows => 10 -%>
+            <%= text_area_tag "presentation[description]", presentation_description_value,:class=>"large_text_entry" -%>
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
           <p>

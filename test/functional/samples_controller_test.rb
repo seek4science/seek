@@ -63,7 +63,9 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select "div.tabbertab" do
       assert_select "h3", :text=>/#{I18n.t('biosamples.sample_parent_term')}s/ ,:count => 1
     end
-    get :resource_in_tab, {:resource_ids => [s.specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [s.specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
 
     assert_select "div.list_item" do
       assert_select "div.list_item_title a[href=?]", specimen_path(s.specimen), :text=>s.specimen.title,:count => 1
@@ -201,7 +203,34 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
-
+  test "should create sample specimen with tissue and cell types" do
+     existing_tissue_and_cell_type = Factory(:tissue_and_cell_type, :title=> "test tissue")
+     new_tissue_and_cell_types = ["0,new_tissue", "0,new_cell_type"]
+     assert_difference(["Sample.count","Specimen.count"]) do
+           post :create,
+                :organism_id => Factory(:organism).id,
+                :tissue_and_cell_type_ids => ["#{existing_tissue_and_cell_type.id},#{existing_tissue_and_cell_type.title}"] + new_tissue_and_cell_types,
+                :sample => {
+                    :title => "test",
+                    :project_ids => [Factory(:project).id],
+                    :lab_internal_number => "Do232",
+                    :donation_date => Date.today,
+                    :specimen_attributes => {
+                        :strain_id => Factory(:strain).id,
+                        :lab_internal_number => "Lab number",
+                        :institution_id =>Factory(:institution).id,
+                        :title => "Donor number"
+                        }
+                    },
+                :sharing => valid_sharing
+     end
+     s = assigns(:sample)
+     assert_redirected_to sample_path(s)
+     assert_equal "test", s.title
+     assert_not_nil s.specimen
+     assert_equal "Donor number", s.specimen.title
+     assert_equal ["test tissue", "new_tissue", "new_cell_type"], s.tissue_and_cell_types.map(&:title)
+   end
 
   test "should get show" do
     get :show, :id => Factory(:sample, :title=>"test", :policy =>policies(:editing_for_all_sysmo_users_policy))
@@ -326,7 +355,9 @@ test "should show organism and strain information of a sample if there is organi
     assert_not_nil assigns(:sample)
 
     #lazy load related cell cultures /speicmens
-    get :resource_in_tab, {:resource_ids => [specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
 
 
     assert_select 'p a[href=?]', organism_path(sample.specimen.strain.organism), :count => 1 # one in the show page of sample
@@ -405,7 +436,8 @@ test "should show organism and strain information of a sample if there is organi
     assert_response :success
     assert_select 'input#sample_age_at_sampling', :count => 1
 
-    sample = Factory(:sample, :age_at_sampling => 4, :age_at_sampling_unit => Factory(:unit, :symbol => 's'))
+    sample = Factory(:sample, :policy => Factory(:public_policy),
+                     :age_at_sampling => 4, :age_at_sampling_unit => Factory(:unit, :symbol => 's'))
     get :show, :id => sample.id
     assert_response :success
     assert_select "label", :text => /Age at sampling/

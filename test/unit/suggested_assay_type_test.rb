@@ -19,14 +19,21 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     assert_equal true, at1.uri != at2.uri
   end
 
-  test "new label is unique and cannot repeat with labels defined in ontology" do
+  test "label is uniq" do
      at1 = Factory :suggested_assay_type
      at2 = Factory.build(:suggested_assay_type, :label => at1.label)
      ma =  Factory.build(:suggested_modelling_analysis_type, :label => at1.label)
      assert !at2.valid?, "at2 is invalid ,as it has the same label as at1"
-     assert !ma.valid?, "modelling analysis at2 is invalid ,as it has the same label as at1"
+     assert !ma.valid?, "modelling analysis ma is invalid ,as it has the same label as at1"
   end
 
+   test "label should not be the same as labels in ontology" do
+     label_in_ontology = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_label.keys.first
+     suggested_assay_type =  Factory.build(:suggested_assay_type, :label => label_in_ontology)
+     suggested_modelling_analysis = Factory.build(:suggested_modelling_analysis_type, :label => label_in_ontology)
+     assert !suggested_assay_type.valid?, "label #{suggested_assay_type.label} already exists"
+     assert !suggested_modelling_analysis.valid?, "label #{suggested_modelling_analysis.label} already exists"
+   end
   test "its only one parent is either from ontology or from suggested assay types" do
      #ontology parent
      uri = "http://www.mygrid.org.uk/ontology/JERMOntology#Gene_expression_profiling"
@@ -93,5 +100,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
      assert_equal true, at.can_destroy?
 
    end
+
+
 
 end

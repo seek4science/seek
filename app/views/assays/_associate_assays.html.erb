@@ -3,20 +3,23 @@
 
     show_relationships = resource.is_a?(DataFile)
     resource_text ||= text_for_resource(resource)
-    if Seek::Config.is_virtualliver
-      all_assays = authorised_assets(Assay, nil, "view")
+    authorized_action = "edit"
+    authorized_action = "view" if Seek::Config.is_virtualliver
+
+    all_assays = authorised_assays(authorized_action)
+
+    project_assays=authorised_assays(current_user.person.projects, authorized_action)
+    if resource.is_a?(Model)
       all_assays = all_assays.select do |assay|
         assay.is_modelling?
-      end if resource.is_a? Model
-      project_assays=authorised_assets(Assay, current_user.person.projects, "view")
-    else
-      all_assays=authorised_assays
-      all_assays = authorised_assays.select do |assay|
+      end
+      project_assays=project_assays.select do |assay|
         assay.is_modelling?
-      end if resource.is_a? Model
-      project_assays=authorised_assays(current_user.person.projects)
+      end
     end
-    project_assays=project_assays.select{|a| a.is_modelling?} if resource.is_a?(Model)
+
+
+
     select_truncate_length=120
     associated_assays = resource.is_a?(Publication) ? resource.related_assays : resource.assays
 

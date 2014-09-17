@@ -195,4 +195,26 @@ class SpecimenTest < ActiveSupport::TestCase
 
     end
   end
+
+  test "associated treatments" do
+    treatment = Factory(:treatment)
+    refute_nil treatment.specimen
+    specimen = treatment.specimen
+    treatment2 = Factory(:treatment,:specimen=>specimen)
+    specimen.reload
+    assert_equal 2,specimen.treatments.size
+    assert_include specimen.treatments,treatment
+    assert_include specimen.treatments,treatment2
+
+    #dependent destroy
+    assert_difference('Treatment.count',-2) do
+      assert_difference('Specimen.count',-1) do
+        disable_authorization_checks do
+          specimen.destroy
+        end
+      end
+    end
+    assert_nil Treatment.find_by_id(treatment.id)
+    assert_nil Treatment.find_by_id(treatment2.id)
+  end
 end

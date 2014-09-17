@@ -165,7 +165,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
   test "gatekeeper of asset can publish, if the asset is waiting for his approval" do
     gatekeeper = Factory(:gatekeeper)
     datafile = Factory(:data_file, :projects => gatekeeper.projects)
-    datafile.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>datafile.contributor)
+    datafile.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>datafile.contributor.user)
 
     User.with_current_user gatekeeper.user do
       assert gatekeeper.is_gatekeeper_of?(datafile),'The gatekeeper must be the gatekeeper of datafile for the test to succeed'
@@ -179,7 +179,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
   test "gatekeeper can not publish asset which he is not the gatekeeper of" do
     gatekeeper = Factory(:gatekeeper)
     datafile = Factory(:data_file)
-    datafile.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>datafile.contributor)
+    datafile.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>datafile.contributor.user)
 
     User.with_current_user gatekeeper.user do
       assert !gatekeeper.is_gatekeeper_of?(datafile),'The gatekeeper must not be the gatekeeper of datafile for the test to be succeed'

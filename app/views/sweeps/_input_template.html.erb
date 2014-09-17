@@ -1,0 +1,12 @@
+<div class="run_input" data-input-name="{{name}}">
+  <h3>{{name}}</h3>
+  <input type="hidden" value="{{name}}" name="{{name_prefix}}[name]" id="{{id_prefix}}_name">
+  <div class="text_input">
+    <textarea rows="2" placeholder="Enter input here..." name="{{name_prefix}}[value]" id="{{id_prefix}}_value" cols="40">{{example_value}}</textarea>
+  </div>
+  <div class="file_input">
+    Or select a file...<br>
+    <input type="file" name="{{name_prefix}}[file]" id="{{id_prefix}}_file">
+  </div>
+  <div style="clear:both"></div>
+</div>

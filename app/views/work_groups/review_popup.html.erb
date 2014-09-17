@@ -1,6 +1,7 @@
 <%
    #this is use for correct display the access_type dropdown list, which depending on the type of resource
-   resource = try_block{params[:resource_type].constantize.send 'new'}
+   resource = instance_of_resource_type params[:resource_type]
+
 %>
 <div id="redbox_contents_div" class="redbox_contents" style="width:500px;">
 	<div class="head">
@@ -29,7 +30,7 @@
 						  	<td id="work_group_member_person_<%= p.id -%>" style="text-align: left;"><%= "#{p.first_name} #{p.last_name}" -%></td>
 								<td>
 									<select id="work_group_access_rights_select_person_<%= p.id -%>" style="width: 220px; vertical-align: middle;">
-									  <%= policy_selection_options([Policy::NO_ACCESS, Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING, Policy::MANAGING], resource, @access_type)-%>
+									  <%= policy_selection_options([Policy::NO_ACCESS, Policy::ACCESSIBLE,Policy::EDITING, Policy::MANAGING], resource, @access_type)-%>
 									</select>
 								</td>
 						  </tr>

@@ -19,8 +19,23 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal nil, WorkGroup.find_by_id(wg.id), "the workgroup should also have been destroyed"
   end
 
-  def test_ordered_by_name
-    assert Institution.find(:all).sort_by {|i| i.name.downcase} == Institution.default_order || Institution.all.sort_by {|i|i.name} == Institution.default_order
+  test "programmes" do
+    proj1=Factory(:work_group).project
+    proj2=Factory(:work_group).project
+    proj3=Factory(:work_group).project
+
+    refute_empty proj1.institutions
+    refute_empty proj2.institutions
+    refute_empty proj3.institutions
+
+    prog1 = Factory(:programme,:projects=>[proj1,proj2])
+    assert_includes proj1.institutions.first.programmes,prog1
+    assert_includes proj2.institutions.first.programmes,prog1
+    refute_includes proj3.institutions.first.programmes,prog1
+  end
+
+  def test_ordered_by_title
+    assert Institution.all.sort_by {|i| i.title.downcase} == Institution.default_order || Institution.all.sort_by {|i|i.title} == Institution.default_order
   end
 
   test "to_rdf" do
@@ -46,7 +61,7 @@ class InstitutionTest < ActiveSupport::TestCase
   end
   
   def test_update_first_letter
-    i=Institution.new(:name=>"an institution")
+    i=Institution.new(:title=>"an institution")
     i.save
     assert_equal "A",i.first_letter
   end
@@ -81,13 +96,13 @@ class InstitutionTest < ActiveSupport::TestCase
     i=institutions(:one)
     assert i.valid?
 
-    i.name=nil
+    i.title=nil
     assert !i.valid?
 
-    i.name=""
+    i.title=""
     assert !i.valid?
 
-    i.name="Name"
+    i.title="Name"
     assert i.valid?
 
     i.web_page=nil
@@ -155,5 +170,11 @@ class InstitutionTest < ActiveSupport::TestCase
     assert institution.work_groups.reload.collect(&:people).flatten.empty?
     assert user.is_admin?
     assert institution.can_delete?(user)
+  end
+
+  test "get all institution listing" do
+    inst = Factory(:institution,:title=>"Inst X")
+    array = Institution.get_all_institutions_listing
+    assert_include array,["Inst X",inst.id]
   end
 end

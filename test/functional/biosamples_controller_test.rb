@@ -16,23 +16,6 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'should get the create_strain_popup' do
-    get :create_strain_popup
-    assert_response :success
-    end
-
-  test 'should get strain form' do
-    get :strain_form
-    assert_response :success
-  end
-
-  test 'should not be able to go to the create_strain_popup without login' do
-    @request.env["HTTP_REFERER"]  = ''
-    logout
-    get :create_strain_popup
-    assert_not_nil flash[:error]
-  end
-
   test 'should show existing strains for selected organisms' do
     organism1 = organisms(:yeast)
     strains_of_organism1 = organism1.strains.reject { |s| s.is_dummy? }
@@ -100,26 +83,6 @@ class BioSamplesControllerTest < ActionController::TestCase
     end
   end
 
-
-  test 'should create strain with name and organism' do
-    organism = organisms(:yeast)
-    strain = {:title => 'test', :organism_id => organism.id, :project_ids => [Factory(:project).id]}
-    assert_difference ('Strain.count') do
-      post :create_strain, :strain => strain
-    end
-    assert_response :success
-  end
-
-  test 'should not be able to create strain without login' do
-    logout
-    organism = organisms(:yeast)
-    strain = {:title => 'test', :organism_id => organism.id}
-    assert_no_difference ('Strain.count') do
-      post :create_strain, :strain => strain
-    end
-  end
-
-
   test "should update the strain list in specimen_form" do
     organism = organisms(:yeast)
     strains = organism.strains
@@ -169,84 +132,5 @@ class BioSamplesControllerTest < ActionController::TestCase
     assert_select "table#strain_table tbody tr td", :text => 'default', :count => 0
     assert_select "table#strain_table tbody tr td", :text => 'TRS99', :count => 1
     assert_select "table#strain_table tbody tr td", :text => 'ZX81', :count => 1
-  end
-
-  test "should update strain" do
-    strain = Factory(:strain)
-    login_as(strain.contributor)
-    new_project = Factory(:project)
-    new_title = 'new title'
-    put :update_strain, :strain => {:id => strain.id, :project_ids =>[new_project.id.to_s], :title => new_title}, :sharing =>{:sharing_scope => Policy::PRIVATE, :access_type_0 => Policy::NO_ACCESS}
-    assert_response :success
-    updated_strain = Strain.find_by_id strain.id
-    assert_equal new_title, updated_strain.title
-    assert_equal [new_project], updated_strain.projects
-    assert_equal Policy::PRIVATE, updated_strain.policy.sharing_scope
-    assert_equal Policy::NO_ACCESS, updated_strain.policy.access_type
-  end
-
-  test "should update strain phenotypes" do
-      strain = Factory(:strain)
-      phenotype1 = Factory(:phenotype, :strain => strain)
-      phenotype2 = Factory(:phenotype, :strain => strain)
-
-      new_phenotype_description = 'new phenotype'
-      login_as(strain.contributor)
-      put :update_strain, :strain => {:id => strain.id, :phenotypes_attributes => {'0' => {:description => phenotype1.description,:id=>phenotype1.id}, '1' => {:description => new_phenotype_description},'2'=>{:description=>phenotype2.description,:id=>phenotype2.id,:_destroy=>1}}}
-      assert_response :success
-
-      updated_strain = Strain.find_by_id strain.id
-      new_phenotype = Phenotype.find_by_description(new_phenotype_description)
-      updated_phenotypes = [phenotype1, new_phenotype].sort_by(&:description)
-      assert_equal updated_phenotypes, updated_strain.phenotypes.sort_by(&:description)
-  end
-
-  test "should update strain genotypes" do
-          strain = Factory(:strain)
-          genotype1 = Factory(:genotype, :strain => strain)
-          genotype2 = Factory(:genotype, :strain => strain)
-
-          new_gene_title = 'new gene'
-          new_modification_title = 'new modification'
-          login_as(strain.contributor)
-          #[genotype1,genotype2] =>[genotype2,new genotype]
-          put :update_strain, :strain => {:id => strain.id, :genotypes_attributes => {'0' => {:gene_attributes => {:title => genotype2.gene.title, :id => genotype2.gene.id }, :id=>genotype2.id, :modification_attributes => {:title => genotype2.modification.title,:id=>genotype2.modification.id }},"2"=>{:gene_attributes => {:title => new_gene_title},:modification_attributes => {:title => new_modification_title }},  "1"=>{:id => genotype1.id, :_destroy => 1}} }
-          assert_response :success
-
-          updated_strain = Strain.find_by_id strain.id
-          new_gene = Gene.find_by_title(new_gene_title)
-          new_modification = Modification.find_by_title(new_modification_title)
-          new_genotype = Genotype.find(:all, :conditions => ["gene_id=? and modification_id=?", new_gene.id, new_modification.id]).first
-          updated_genotypes = [genotype2, new_genotype].sort_by(&:id)
-          assert_equal updated_genotypes, updated_strain.genotypes.sort_by(&:id)
-    end
-
-  test "should not be able to update the policy of the strain when having no manage rights" do
-    strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING))
-    user = Factory(:user)
-    assert strain.can_edit?user
-    assert !strain.can_manage?(user)
-
-    login_as(user)
-      put :update_strain, :strain => {:id => strain.id}, :sharing =>{:sharing_scope => Policy::EVERYONE, :access_type_4 => Policy::EDITING }
-    assert_response :success
-
-    updated_strain = Strain.find_by_id strain.id
-    assert_equal Policy::ALL_SYSMO_USERS, updated_strain.policy.sharing_scope
-  end
-
-  test "should not be able to update the permissions of the strain when having no manage rights" do
-      strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING))
-      user = Factory(:user)
-      assert strain.can_edit?user
-      assert !strain.can_manage?(user)
-
-      login_as(user)
-        put :update_strain, :strain => {:id => strain.id}, :sharing=>{:permissions =>{:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {user.person.id =>  {"access_type" =>  Policy::MANAGING}}})}}
-      assert_response :success
-
-      updated_strain = Strain.find_by_id strain.id
-      assert updated_strain.policy.permissions.empty?
-      assert !updated_strain.can_manage?(user)
   end
 end

@@ -94,7 +94,7 @@ class StudyTest < ActiveSupport::TestCase
   test "project from investigation" do
     study=studies(:metabolomics_study)
     assert_equal projects(:sysmo_project), study.projects.first
-    assert_not_nil study.projects.first.name
+    assert_not_nil study.projects.first.title
   end
 
   test "title trimmed" do

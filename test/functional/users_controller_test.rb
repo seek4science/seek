@@ -76,11 +76,13 @@ class UsersControllerTest < ActionController::TestCase
   end  
   
   def test_should_activate_user
-    assert !users(:aaron).active?
-    get :activate, :activation_code => users(:aaron).activation_code
+    user = users(:aaron)
+    assert !user.guest?, "user mustn't be a guest for activation"
+    assert !user.active?
+    get :activate, :activation_code => user.activation_code
     assert_redirected_to person_path(people(:aaron_person))
     assert_not_nil flash[:notice]
-    assert User.find(users(:aaron).id).active?    
+    assert User.find(user.id).active?
   end
   
   def test_should_not_activate_user_without_key
@@ -170,6 +172,46 @@ class UsersControllerTest < ActionController::TestCase
     assert_select 'div#guide_box', :count => 0
     x.reload
     assert !x.show_guide_box
+  end
+
+  test "reset password with valid code" do
+    user = Factory(:user)
+    user.reset_password
+    user.save!
+    refute_nil(user.reset_password_code)
+    refute_nil(user.reset_password_code_until)
+    get :reset_password,:reset_code=>user.reset_password_code
+    assert_redirected_to edit_user_path(user)
+    assert_equal "You can change your password here", flash[:notice]
+    assert_nil flash[:error]
+  end
+
+  test "reset password with invalid code" do
+    get :reset_password,:reset_code=>"xxx"
+    assert_redirected_to root_path
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+    assert_equal "Invalid password reset code", flash[:error]
+  end
+
+  test "reset password with no code" do
+    get :reset_password
+    assert_redirected_to root_path
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+    assert_equal "Invalid password reset code", flash[:error]
+  end
+
+  test "reset password with expired code" do
+    user = Factory(:user)
+    user.reset_password
+    user.reset_password_code_until = 5.days.ago
+    user.save!
+    get :reset_password,:reset_code=>user.reset_password_code
+    assert_redirected_to root_path
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+    assert_equal "Your password reset code has expired", flash[:error]
   end
 
   protected

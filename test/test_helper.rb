@@ -1,4 +1,8 @@
-ENV["RAILS_ENV"] = "test"
+ENV['RAILS_ENV'] ||= 'test'
+
+require "coveralls"
+Coveralls.wear!("rails")
+
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'rails/test_help'
 
@@ -14,6 +18,16 @@ require 'webmock/test_unit'
 require 'action_view/test_case'
 require 'tmpdir'
 require 'authenticated_test_helper'
+
+
+module ActionView
+  class Renderer
+    def self.get_alternative key
+      key = stringify_values(key)
+      @@alternative_map[key]
+    end
+  end
+end
 
 
 FactoryGirl.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
@@ -60,6 +74,18 @@ Kernel.class_eval do
     Seek::Config.auth_lookup_enabled=val
   end
 
+  def with_alternative_rendering key,value
+    current = ActionView::Renderer.get_alternative(key)
+    ActionView::Renderer.define_alternative key,value
+    yield
+    if current.nil?
+      ActionView::Renderer.clear_alternative key
+    else
+      ActionView::Renderer.define_alternative key,current
+    end
+
+  end
+
   def with_config_value config,value
     oldval = Seek::Config.send(config)
     Seek::Config.send("#{config.to_s}=",value)
@@ -71,6 +97,19 @@ end
 class ActiveSupport::TestCase
   setup :clear_rails_cache
   teardown :clear_current_user
+
+
+  def file_for_upload options={}
+    default={:filename=>'little_file_v2.txt',:content_type=>'text/plain',:tempfile_fixture=>'files/little_file_v2.txt'}
+    options = default.merge(options)
+    ActionDispatch::Http::UploadedFile.new({
+                                               :filename => options[:filename],
+                                               :content_type => options[:content_type],
+                                               :tempfile => fixture_file_upload(options[:tempfile_fixture])
+                                           })
+  end
+
+
 
   def check_for_soffice
     port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
@@ -85,7 +124,8 @@ class ActiveSupport::TestCase
   end
 
   def skip_jws_tests?
-    false
+    #skip if running in travis
+    !ENV["TRAVIS"].nil?
   end
 
   def skip_rest_schema_check?
@@ -204,3 +244,6 @@ class ActiveSupport::TestCase
   end
   
 end
+
+# Load seed data
+#load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")

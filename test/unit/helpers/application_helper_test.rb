@@ -11,6 +11,21 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "a: b: c and d",join_with_and(["a","b","c","d"],": ")
   end
 
+  test "instance of resource_type" do
+    m = instance_of_resource_type("model")
+    assert m.is_a?(Model)
+    assert m.new_record?
+
+    p = instance_of_resource_type("Presentation")
+    assert p.is_a?(Presentation)
+    assert p.new_record?
+
+    assert_nil instance_of_resource_type(nil)
+    assert_nil instance_of_resource_type("mushypeas")
+    assert_nil instance_of_resource_type({})
+
+  end
+
   test "force to treat 1 Jan as year only" do
     date = Date.new(2012,1,1)
     text = date_as_string(date,false,true)
@@ -23,6 +38,36 @@ class ApplicationHelperTest < ActionView::TestCase
     date = Date.new(2012,1,2)
     text = date_as_string(date,false,true)
     assert_equal "2nd Jan 2012",text
+  end
+
+  test "seek stylesheet tag" do
+    with_config_value :css_appended,"fish" do
+      with_config_value :css_prepended,"apple" do
+        tags = seek_stylesheet_tags "carrot"
+        assert_include tags,"<link href=\"/stylesheets/apple.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />"
+        assert_include tags,"<link href=\"/stylesheets/carrot.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />"
+        assert_include tags,"<link href=\"/stylesheets/fish.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />"
+        assert tags.index("fish.css") > tags.index("carrot.css")
+        assert tags.index("carrot.css") > tags.index("apple.css")
+        refute_equal 0,tags.index("apple.css")
+      end
+
+    end
+  end
+
+  test "seek javascript tag" do
+    with_config_value :javascript_appended,"fish" do
+      with_config_value :javascript_prepended,"apple" do
+        tags = seek_javascript_tags "carrot"
+        assert_include tags,"<script src=\"/javascripts/apple.js\" type=\"text/javascript\"></script>"
+        assert_include tags,"<script src=\"/javascripts/carrot.js\" type=\"text/javascript\"></script>"
+        assert_include tags,"<script src=\"/javascripts/fish.js\" type=\"text/javascript\"></script>"
+        assert tags.index("fish.js") > tags.index("carrot.js")
+        assert tags.index("carrot.js") > tags.index("apple.js")
+        refute_equal 0,tags.index("apple.js")
+      end
+
+    end
   end
 
   test "should handle nil date" do
@@ -67,14 +112,14 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test "resource tab title" do
-    assert_equal "EBI Biomodels",resource_tab_item_name("EBI Biomodels",true)
-    assert_equal "Database",resource_tab_item_name("Database",false)
-    assert_equal I18n.t('model').pluralize,resource_tab_item_name("Model")
-    assert_equal I18n.t('data_file').pluralize,resource_tab_item_name("DataFile")
-    assert_equal I18n.t('data_file').pluralize,resource_tab_item_name("DataFiles")
-    assert_equal I18n.t('data_file'),resource_tab_item_name("DataFile",false)
-    assert_equal I18n.t('sop').pluralize,resource_tab_item_name("SOP")
-    assert_equal I18n.t('sop').pluralize,resource_tab_item_name("Sop")
-    assert_equal I18n.t('sop'),resource_tab_item_name("Sop",false)
+    assert_equal "EBI Biomodels",internationalized_resource_name("EBI Biomodels",true)
+    assert_equal "Database",internationalized_resource_name("Database",false)
+    assert_equal I18n.t('model').pluralize,internationalized_resource_name("Model")
+    assert_equal I18n.t('data_file').pluralize,internationalized_resource_name("DataFile")
+    assert_equal I18n.t('data_file').pluralize,internationalized_resource_name("DataFiles")
+    assert_equal I18n.t('data_file'),internationalized_resource_name("DataFile",false)
+    assert_equal I18n.t('sop').pluralize,internationalized_resource_name("SOP")
+    assert_equal I18n.t('sop').pluralize,internationalized_resource_name("Sop")
+    assert_equal I18n.t('sop'),internationalized_resource_name("Sop",false)
   end
 end

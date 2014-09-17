@@ -3,6 +3,7 @@ class PeopleController < ApplicationController
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
   include Seek::Publishing::GatekeeperPublish
+  include Seek::FacetedBrowsing
 
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
@@ -64,10 +65,13 @@ class PeopleController < ApplicationController
       end
       @people=@people.select{|p| !p.group_memberships.empty?}
       @people = apply_filters(@people).select(&:can_view?)#.select{|p| !p.group_memberships.empty?}
-      @people=Person.paginate_after_fetch(@people,
-                                          :page=>(params[:page] || Seek::Config.default_page('people')),
-                                          :reorder=>false,
-                                          :latest_limit => Seek::Config.limit_latest)
+
+      unless Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages["people"] && ie_support_faceted_browsing?
+        @people=Person.paginate_after_fetch(@people,
+                                            :page=>(params[:page] || Seek::Config.default_page('people')),
+                                            :reorder=>false,
+                                            :latest_limit => Seek::Config.limit_latest)
+      end
     else
       @people = @people.select(&:can_view?).reject {|p| p.projects.empty?}
     end
@@ -145,7 +149,7 @@ class PeopleController < ApplicationController
       !proj.people.find{|person| !person.email.nil? && person.user.nil?}.nil?
     end
 
-    @userless_projects.sort!{|a,b|a.name<=>b.name}
+    @userless_projects.sort!{|a,b|a.title<=>b.title}
     @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
 
   end
@@ -154,6 +158,7 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
+
     redirect_action="new"
 
     set_tools_and_expertise(@person, params)
@@ -164,7 +169,7 @@ class PeopleController < ApplicationController
     if registration    
       current_user.person=@person      
       @userless_projects=Project.with_userless_people
-      @userless_projects.sort!{|a,b|a.name<=>b.name}
+      @userless_projects.sort!{|a,b|a.title<=>b.title}
       is_sysmo_member=params[:sysmo_member]
 
       if (is_sysmo_member)
@@ -247,6 +252,8 @@ class PeopleController < ApplicationController
     # PUT /people/1
   # PUT /people/1.xml
   def administer_update
+    had_no_projects = @person.work_groups.empty?
+
     passed_params=    {:roles                 =>  User.admin_logged_in?,
                        :roles_mask            => User.admin_logged_in?,
                        :can_edit_projects     => (User.admin_logged_in? || (User.project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?)),
@@ -265,6 +272,10 @@ class PeopleController < ApplicationController
 
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
+        if Seek::Config.email_enabled && had_no_projects && !@person.work_groups.empty? && @person != current_user.person
+          Mailer.notify_user_projects_assigned(@person).deliver
+        end
+
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
@@ -389,14 +400,14 @@ class PeopleController < ApplicationController
   def project_or_institution_details projects_or_institutions
     details = ''
     unless params[projects_or_institutions].blank?
-        params[projects_or_institutions].each do |project_or_institution|
-          project_or_institution_details= project_or_institution.split(',')
-          if project_or_institution_details[0] == 'Others'
-             details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
-          else
-             details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
-          end
+      params[projects_or_institutions].each do |project_or_institution|
+        project_or_institution_details= project_or_institution.split(',')
+        if project_or_institution_details[0] == 'Others'
+          details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
+        else
+          details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
         end
+      end
     end
     details
   end
@@ -405,8 +416,7 @@ class PeopleController < ApplicationController
     project_manager_list = []
     unless projects_param.blank?
       projects_param.each do |project_param|
-        project_detail = project_param.split(',')
-        project = Project.find_by_id(project_detail[1])
+        project = Project.find_by_id(project_param)
         project_managers = project.try(:project_managers)
         project_manager_list |= project_managers unless project_managers.nil?
       end

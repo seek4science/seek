@@ -4,24 +4,24 @@
   
 <h2><%= t('project') %> Details</h2>
 
-<div style="text-align: center;">
+<div>
 	<div style="width: 95%;">
 		<p>
 		  <%= f.label :name -%><br />
-		  <%= f.text_field :name, :style => "width: 350px;" -%>
+		  <%= f.text_area :title, :class=>"title_text_entry"-%>
 		</p>
 		<p>
 		  <%= f.label "Public Web page"-%><br />
-		  <%= f.text_field :web_page, :style => "width: 350px;" -%>
+		  <%= f.text_field :web_page, :class=>"text_entry" -%>
 		</p>
 		<p>
 		  <%= f.label "Internal Web page" -%><br />
-		  <%= f.text_field :wiki_page, :style => "width: 350px;" -%>
+		  <%= f.text_field :wiki_page, :class=>"text_entry" -%>
 		</p>
 
 		<p>
 		  <%= f.label :description -%><br/>
-		  <%= f.text_area :description, :style => "width: 85%;", :rows => 10 -%>
+		  <%= f.text_area :description, :class=>"large_text_entry" -%>
 		</p>
       <% if Seek::Config.project_hierarchy_enabled -%>
       <p>
@@ -45,7 +45,7 @@
 
 
 
-<p style="margin-top: 2em; text-align: center;">
+<p>
   <%= f.submit(project ? "Update" : "Create",:disable_with=>(project ? "Updating..." : "Creating...")) -%>
 	or <%= link_to 'Cancel', (project ? project_path(project.id) : projects_path) -%>
 </p>

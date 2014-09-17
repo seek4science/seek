@@ -10,7 +10,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	fixtures :all
 
 	def setup
-		login_as(Factory(:admin).user)
+		login_as(Factory(:admin))
   end
 
   def rest_api_test_object
@@ -46,34 +46,54 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
 	def test_should_create_project
-    parent_id = Factory(:project,:title=>"Test Parent").id
 		assert_difference('Project.count') do
-			post :create, :project => {:name=>"test",:parent_id=>parent_id}
+			post :create, :project => {:title=>"test"}
 		end
 
 		assert_redirected_to project_path(assigns(:project))
 	end
 
+    #MERGENOTE - VLN removed the earlier test and changed to the following, we need both
+    #def test_should_create_project
+    #parent_id = Factory(:project,:title=>"Test Parent").id
+	#	assert_difference('Project.count') do
+	#		post :create, :project => {:name=>"test",:parent_id=>parent_id}
+	#	end
+    #
+	#	assert_redirected_to project_path(assigns(:project))
+	#end
+
 	def test_should_show_project
-		get :show, :id => projects(:four)
+
+    proj = Factory(:project)
+    avatar = Factory(:avatar,:owner=>proj)
+    proj.avatar = avatar
+    proj.save!
+
+		get :show, :id => proj
 		assert_response :success
 	end
 
 	def test_should_get_edit
-		get :edit, :id => projects(:four)
+    p = Factory(:project,:avatar=>Factory(:avatar))
+    Factory(:avatar,:owner=>p)
+		get :edit, :id => p
+
 		assert_response :success
 	end
 
 	def test_should_update_project
-    parent_id = Factory(:project,:title=>"Test Parent").id
-		put :update, :id => projects(:four), :project => {:parent_id=>parent_id}
-		assert_redirected_to project_path(assigns(:project))
+    put :update, :id => Factory(:project,:description=>"ffffff"), :project => {:title=>"pppp"}
+    assert_redirected_to project_path(assigns(:project))
+    proj = assigns(:project)
+    assert_equal "pppp",proj.title
+    assert_equal "ffffff",proj.description
 	end
 
 	def test_should_destroy_project
     project = projects(:four)
     get :show, :id => project
-    assert_select "span.icon", :text => /Delete #{I18n.t('project')}/, :count => 1
+    assert_select "span.icon", :text => /Delete #{I18n.t('project')}/i, :count => 1
 
 		assert_difference('Project.count', -1) do
 			delete :destroy, :id => project
@@ -216,19 +236,17 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select "a[href=?]",project_folders_path(p.projects.first), :count=>0
   end
 
-test 'should get index for non-project member, should for non-login user' do
-    registered_user_with_no_projects = Factory :user, :person=> Factory(:brand_new_person)
-		login_as registered_user_with_no_projects
+	test 'should get index for non-project member, non-login user' do
+		login_as(:registered_user_with_no_projects)
 		get :index
 		assert_response :success
+		assert_not_nil assigns(:projects)
 
 		logout
 		get :index
 		assert_response :success
 		assert_not_nil assigns(:projects)
 	end
-
-
 
 	test 'should show project for non-project member and non-login user' do
 		login_as(:registered_user_with_no_projects)
@@ -312,7 +330,10 @@ test 'should get index for non-project member, should for non-login user' do
     get :show,:id=>project
     assert_response :success
 
-    get :resource_in_tab, {:resource_ids => [sop.id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    #MERGENOTE - all this resource in tab should have gone now
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [sop.id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
 
     assert_select "div.list_item  div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
@@ -326,7 +347,9 @@ test 'should get index for non-project member, should for non-login user' do
     df = Factory :data_file,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
     assert_response :success
-    get :resource_in_tab, {:resource_ids => [df.id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [df.id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
     end
@@ -338,7 +361,9 @@ test 'should get index for non-project member, should for non-login user' do
     login_as(user)
     model = Factory :model,:description=>"http://news.bbc.co.uk",:project_ids=>[project.id],:contributor=>user
     get :show,:id=>project
-    get :resource_in_tab, {:resource_ids => [model.id].join(","), :resource_type => "Model", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [model.id].join(","), :resource_type => "Model", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item  div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:count=>1
     end
@@ -549,7 +574,7 @@ test 'should get index for non-project member, should for non-login user' do
     get :admin, :id => project
     assert_response :success
 
-    new_institution = Institution.create(:name => 'a test institution')
+    new_institution = Institution.create(:title => 'a test institution')
     put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
     assert_redirected_to project_path(project)
     project.reload
@@ -570,7 +595,7 @@ test 'should get index for non-project member, should for non-login user' do
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    new_institution = Institution.create(:name => 'a test institution')
+    new_institution = Institution.create(:title => 'a test institution')
     put :update, :id => a_project, :project => {:institution_ids => (a_project.institutions + [new_institution]).collect(&:id)}
     assert_redirected_to :root
     assert_not_nil flash[:error]
@@ -597,17 +622,15 @@ test 'should get index for non-project member, should for non-login user' do
   end
 
   test 'project manager can only see all institutions' do
-    as_not_virtualliver do
-      project_manager = Factory(:project_manager)
-      project = project_manager.projects.first
-      login_as(project_manager.user)
+    project_manager = Factory(:project_manager)
+    project = project_manager.projects.first
+    login_as(project_manager.user)
     Factory(:institution)
 
-      get :admin, :id => project
-      assert_response :success
+    get :admin, :id => project
+    assert_response :success
     Institution.all.each do |institution|
-      assert_select "input[type='checkbox'][value='#{institution.id}']", :count => 1
-      end
+      assert_select "input[type='checkbox'][id='institution_#{institution.id}'][value='#{institution.id}']", :count => 1
     end
   end
 
@@ -702,16 +725,11 @@ test 'should get index for non-project member, should for non-login user' do
     assert !work_group.people.empty?
 
     assert_no_difference('WorkGroup.count') do
-      begin
-        post :update, :id => project, :project => {:institution_ids => []}
-        assert_redirected_to project
-        assert_not_nil flash[:error]
-      rescue Exception => e
-        puts e.message
-      end
+      post :update, :id => project, :project => {:institution_ids => []}
     end
 
-
+    assert_redirected_to project
+    assert_not_nil flash[:error]
     assert !project.reload.institutions.empty?
     assert !work_group.reload.people.empty?
   end
@@ -837,6 +855,168 @@ test 'should get index for non-project member, should for non-login user' do
 
   end
 
+  test "programme shown" do
+    prog = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
+    get :index
+    assert_select "p.list_item_attribute" do
+      assert_select "b",:text=>/#{I18n.t('programme')}/i
+      assert_select "a[href=?]",programme_path(prog),:text=>prog.title,:count=>2
+    end
+
+  end
+
+  test "programme not shown when disabled" do
+    prog = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
+    with_config_value :programmes_enabled,false do
+      get :index
+      assert_select "p.list_item_attribute" do
+        assert_select "b",:text=>/#{I18n.t('programme')}/i,:count=>0
+        assert_select "a[href=?]",programme_path(prog),:text=>prog.title,:count=>0
+      end
+    end
+  end
+
+  test "get as json" do
+    proj = Factory(:project,:title=>"fishing project",:description=>"investigating fishing")
+    get :show,:id=>proj,:format=>"json"
+    assert_response :success
+    json = JSON.parse(@response.body)
+    assert_equal "fishing project",json["title"]
+    assert_equal "investigating fishing",json["description"]
+  end
+
+  test "admin members available to admin" do
+    login_as(Factory(:admin))
+    p=Factory(:project)
+    get :admin_members,:id=>p
+    assert_response :success
+  end
+
+  test "admin_members available to project manager" do
+    person = Factory(:project_manager)
+    login_as(person)
+    project = person.projects.first
+    get :admin_members,:id=>project
+    assert_response :success
+  end
+
+  test "admin members not available to normal person" do
+    login_as(Factory(:person))
+    p=Factory(:project)
+    get :admin_members,:id=>p
+    assert_redirected_to :root
+  end
+
+  test "update members" do
+    login_as(Factory(:admin))
+    project = Factory(:project)
+    wg = Factory(:work_group, :project => project)
+    group_membership = Factory(:group_membership, :work_group => wg)
+    person = Factory(:person, :group_memberships => [group_membership])
+    group_membership2 = Factory(:group_membership, :work_group => wg)
+    person2 = Factory(:person, :group_memberships => [group_membership2])
+    new_institution = Factory(:institution)
+    new_person = Factory(:person)
+    new_person2 = Factory(:person)
+    assert_no_difference("GroupMembership.count") do #2 deleted, 2 added
+      assert_difference("WorkGroup.count",1) do
+        post :update_members,
+             :id=>project,
+             :group_memberships_to_remove=>[group_membership.id,group_membership2.id],
+             :people_and_institutions_to_add=>[{"person_id"=>new_person.id,"institution_id"=>new_institution.id}.to_json,{"person_id"=>new_person2.id,"institution_id"=>new_institution.id}.to_json]
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
+    end
+
+    person.reload
+    new_person.reload
+    new_person2.reload
+
+    refute_includes person.projects,project
+    refute_includes person2.projects,project
+    assert_includes new_person.projects,project
+    assert_includes new_person2.projects,project
+    assert_includes new_person.institutions,new_institution
+    assert_includes new_person2.institutions,new_institution
+    assert_includes project.work_groups,wg
+
+  end
+
+  test "update members as project manager" do
+    person = Factory(:project_manager)
+    project = person.projects.first
+    login_as(person)
+
+    wg = Factory(:work_group, :project => project)
+    group_membership = Factory(:group_membership, :work_group => wg)
+    person = Factory(:person, :group_memberships => [group_membership])
+    group_membership2 = Factory(:group_membership, :work_group => wg)
+    person2 = Factory(:person, :group_memberships => [group_membership2])
+    new_institution = Factory(:institution)
+    new_person = Factory(:person)
+    new_person2 = Factory(:person)
+    assert_no_difference("GroupMembership.count") do #2 deleted, 2 added
+      assert_difference("WorkGroup.count",1) do
+        post :update_members,
+             :id=>project,
+             :group_memberships_to_remove=>[group_membership.id,group_membership2.id],
+             :people_and_institutions_to_add=>[{"person_id"=>new_person.id,"institution_id"=>new_institution.id}.to_json,{"person_id"=>new_person2.id,"institution_id"=>new_institution.id}.to_json]
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
+    end
+
+    person.reload
+    new_person.reload
+    new_person2.reload
+
+    refute_includes person.projects,project
+    refute_includes person2.projects,project
+    assert_includes new_person.projects,project
+    assert_includes new_person2.projects,project
+    assert_includes new_person.institutions,new_institution
+    assert_includes new_person2.institutions,new_institution
+    assert_includes project.work_groups,wg
+
+  end
+
+  test "person who cannot administer project cannot update members" do
+    login_as(Factory(:person))
+    project = Factory(:project)
+    wg = Factory(:work_group, :project => project)
+    group_membership = Factory(:group_membership, :work_group => wg)
+    person = Factory(:person, :group_memberships => [group_membership])
+    group_membership2 = Factory(:group_membership, :work_group => wg)
+    person2 = Factory(:person, :group_memberships => [group_membership2])
+    new_institution = Factory(:institution)
+    new_person = Factory(:person)
+    new_person2 = Factory(:person)
+    assert_no_difference("GroupMembership.count") do
+      assert_no_difference("WorkGroup.count") do
+        post :update_members,
+             :id=>project,
+             :group_memberships_to_remove=>[group_membership.id,group_membership2.id],
+             :people_and_institutions_to_add=>[{"person_id"=>new_person.id,"institution_id"=>new_institution.id}.to_json,{"person_id"=>new_person2.id,"institution_id"=>new_institution.id}.to_json]
+        assert_redirected_to :root
+        refute_nil flash[:error]
+      end
+    end
+
+    person.reload
+    new_person.reload
+    new_person2.reload
+
+    assert_includes person.projects,project
+    assert_includes person2.projects,project
+    refute_includes new_person.projects,project
+    refute_includes new_person2.projects,project
+    refute_includes new_person.institutions,new_institution
+    refute_includes new_person2.institutions,new_institution
+
+  end
 
 	private
 

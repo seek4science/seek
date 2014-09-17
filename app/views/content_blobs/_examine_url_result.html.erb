@@ -1,0 +1,5 @@
+<% if @is_webpage && !@error && !@unauthorized %>
+    <%= render :partial=>"examine_url_wepage_result" %>
+<% else %>
+    <%= render :partial=>"examine_url_file_result" %>
+<% end %>

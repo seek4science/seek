@@ -21,7 +21,7 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, :sharing_scope => 0, :resource_name => 'data_file'
 
     assert_response :success
-    assert_select "p",:text=>"You keep this #{I18n.t('data_file')} private (only visible to you)", :count=>1
+    assert_select "p",:text=>/You keep this #{I18n.t('data_file')} private \(only visible to you\)/i, :count=>1
   end
 
   test 'should show the preview permission when choosing network scope' do
@@ -55,9 +55,9 @@ class PoliciesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "h3",:text=>"Fine-grained sharing permissions:", :count=>1
 
-    assert_select 'p', :text=>"#{person.name} can #{Policy.get_access_type_wording(Policy::MANAGING, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
-    assert_select 'p', :text=>"Members of Favourite group #{favorite_group.name} have #{Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
-    assert_select 'p', :text=>"Members of #{I18n.t('project')} #{project.name} can #{Policy.get_access_type_wording(Policy::ACCESSIBLE, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
+    assert_select 'p', :text=>"#{person.name} can #{Policy.get_access_type_wording(Policy::MANAGING, 'data_file'.camelize.constantize.new().try(:is_downloadable?)).downcase}", :count => 1
+    assert_select 'p', :text=>"Members of Favourite group #{favorite_group.title} have #{Policy.get_access_type_wording(Policy::DETERMINED_BY_GROUP, 'data_file'.camelize.constantize.new().try(:is_downloadable?)).downcase}", :count => 1
+    assert_select 'p', :text=>"Members of #{I18n.t('project')} #{project.title} can #{Policy.get_access_type_wording(Policy::ACCESSIBLE, 'data_file'.camelize.constantize.new().try(:is_downloadable?)).downcase}", :count => 1
   end
 
   test 'should show the correct manager(contributor) when updating a study' do
@@ -65,7 +65,7 @@ class PoliciesControllerTest < ActionController::TestCase
     contributor = study.contributor
     post :preview_permissions, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :is_new_file => "false", :contributor_id => contributor.user.id, :resource_name => 'study'
 
-    assert_select "p",:text=>"#{contributor.name} can manage as an uploader", :count=>1
+    assert_select "p",:text=>"#{contributor.person.name} can manage as an uploader", :count=>1
   end
 
   test 'should show asset managers for not entirely private item' do

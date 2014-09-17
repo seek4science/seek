@@ -1,10 +1,12 @@
 require 'grouped_pagination'
 
+
 class Sample < ActiveRecord::Base
   include Subscribable
 
   acts_as_scalable if Seek::Config.is_virtualliver
   include Seek::Rdf::RdfGeneration
+  include BackgroundReindexing
 
   acts_as_authorized
   acts_as_favouritable
@@ -22,11 +24,7 @@ class Sample < ActiveRecord::Base
   has_and_belongs_to_many :assays
   has_and_belongs_to_many :tissue_and_cell_types
   has_many :sample_assets, :dependent => :destroy
- 
-   validates_numericality_of :age_at_sampling, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-
-
-
+  has_many :treatments, :dependent=>:destroy
 
   has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
   has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
@@ -34,14 +32,11 @@ class Sample < ActiveRecord::Base
   has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
   has_many :model_masters, :through => :sample_assets, :source => :asset, :source_type => 'Model'
   has_many :sop_masters, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
-  has_many :treatments
-
 
   accepts_nested_attributes_for :specimen
   alias_attribute :description, :comments
 
   validates_uniqueness_of :title
-  validates_numericality_of :age_at_sampling, :greater_than => 0, :allow_nil => true, :message => "is invalid value", :unless => "Seek::Config.is_virtualliver"
 
   validates_presence_of :title
   validates_presence_of :specimen, :lab_internal_number
@@ -50,6 +45,29 @@ class Sample < ActiveRecord::Base
 
   scope :default_order, order("title")
 
+  include Seek::Search::BiosampleFields
+
+  searchable(:auto_index=>false) do
+    text :specimen do
+      if specimen
+        text=[]
+        text << specimen.lab_internal_number
+        text << specimen.provider_name
+        text << specimen.title
+        text << specimen.provider_id
+        text
+      end
+    end
+
+    text :strain do
+      if (specimen.strain)
+        text = []
+        text << specimen.strain.info
+        text << specimen.strain.try(:organism).try(:title).to_s
+        text
+      end
+    end
+  end if Seek::Config.solr_enabled
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
 
@@ -62,9 +80,7 @@ class Sample < ActiveRecord::Base
      END_EVAL
   end
 
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :searchable_terms
-  end if Seek::Config.solr_enabled
+
 
   def self.sop_sql()
     'SELECT sop_versions.* FROM sop_versions ' +
@@ -82,26 +98,6 @@ class Sample < ActiveRecord::Base
         'AND sample_assets.asset_type=\'' + asset_class + '\' ' +
         'WHERE (sample_assets.version= ' + asset_class_underscored + '_versions.version ' +
         "AND sample_assets.sample_id= #{self.id})"
-  end
-
-  def searchable_terms
-    text=[]
-    text << title
-    text << description
-    text << lab_internal_number
-    text << provider_name
-    text << provider_id
-    if (specimen)
-      text << specimen.lab_internal_number
-      text << specimen.provider_id
-      text << specimen.title
-      text << specimen.provider_id
-      if (specimen.strain)
-        text << specimen.try(:strain).try(:info).to_s
-        text << specimen.try(:strain).try(:organism).try(:title).to_s
-      end
-    end
-    text
   end
 
   def state_allows_delete? *args

@@ -2,7 +2,8 @@ class UsersController < ApplicationController
     
   before_filter :is_current_user_auth, :only=>[:edit, :update]  
   before_filter :is_user_admin_auth, :only => [:impersonate]
-  skip_before_filter :project_membership_required, :only => [:create, :new]
+  skip_before_filter :restrict_guest_user
+  skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:update]
   
   # render new.rhtml
@@ -62,7 +63,7 @@ class UsersController < ApplicationController
   end
 
   def reset_password
-    user = User.find_by_reset_password_code(params[:reset_code])
+    user = User.find_by_reset_password_code(params[:reset_code] || "")
 
     respond_to do |format|
       if user
@@ -81,11 +82,11 @@ class UsersController < ApplicationController
           end
         else
           flash[:error] = "Your password reset code has expired"
-          format.html { redirect_to(:controller => "session", :action => "new") }
+          format.html { redirect_to(main_app.root_path) }
         end
       else
         flash[:error] = "Invalid password reset code"
-        format.html { redirect_to(:controller => "session", :action => "new") }
+        format.html { redirect_to(main_app.root_path) }
       end
     end 
   end
@@ -98,10 +99,10 @@ class UsersController < ApplicationController
 
       respond_to do |format|
         if user && user.person && !user.person.email.blank?
-          user.reset_password_code_until = 1.day.from_now
-          user.reset_password_code =  Digest::SHA1.hexdigest( "#{user.email}#{Time.now.to_s.split(//).sort_by {rand}.join}" )
+          user.reset_password
+
           user.save!
-          Mailer.forgot_password(user, base_host).deliver
+          Mailer.forgot_password(user, base_host).deliver if Seek::Config.email_enabled
           flash[:notice] = "Instructions on how to reset your password have been sent to #{user.person.email}"
           format.html { render :action => "forgot_password" }
         else

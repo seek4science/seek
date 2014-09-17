@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140403123551) do
+ActiveRecord::Schema.define(:version => 20140916130030) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -568,7 +568,7 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
   end
 
   create_table "institutions", :force => true do |t|
-    t.string   "name"
+    t.string   "title"
     t.text     "address"
     t.string   "city"
     t.string   "web_page"
@@ -679,7 +679,6 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
     t.string   "title"
     t.text     "description"
     t.integer  "recommended_environment_id"
-    t.text     "result_graph"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -709,7 +708,6 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
     t.string   "title"
     t.text     "description"
     t.integer  "recommended_environment_id"
-    t.text     "result_graph"
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -921,6 +919,18 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
   add_index "presentations_projects", ["presentation_id", "project_id"], :name => "index_presentations_projects_on_presentation_id_and_project_id"
   add_index "presentations_projects", ["project_id"], :name => "index_presentations_projects_on_project_id"
 
+  create_table "programmes", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.integer  "avatar_id"
+    t.string   "web_page"
+    t.string   "first_letter",    :limit => 1
+    t.string   "uuid"
+    t.datetime "created_at",                   :null => false
+    t.datetime "updated_at",                   :null => false
+    t.text     "funding_details"
+  end
+
   create_table "project_descendants", :id => false, :force => true do |t|
     t.integer "ancestor_id"
     t.integer "descendant_id"
@@ -962,7 +972,7 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
   add_index "project_subscriptions", ["person_id", "project_id"], :name => "index_project_subscriptions_on_person_id_and_project_id"
 
   create_table "projects", :force => true do |t|
-    t.string   "name"
+    t.string   "title"
     t.string   "web_page"
     t.string   "wiki_page"
     t.datetime "created_at"
@@ -976,6 +986,8 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
     t.datetime "last_jerm_run"
     t.string   "uuid"
     t.integer  "parent_id"
+    t.integer  "programme_id"
+    t.integer  "ancestor_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -1009,6 +1021,26 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
   create_table "projects_strains", :id => false, :force => true do |t|
     t.integer "project_id"
     t.integer "strain_id"
+  end
+
+  create_table "projects_sweeps", :force => true do |t|
+    t.integer "sweep_id"
+    t.integer "project_id"
+  end
+
+  create_table "projects_taverna_player_runs", :id => false, :force => true do |t|
+    t.integer "run_id"
+    t.integer "project_id"
+  end
+
+  create_table "projects_workflow_versions", :id => false, :force => true do |t|
+    t.integer "version_id"
+    t.integer "project_id"
+  end
+
+  create_table "projects_workflows", :id => false, :force => true do |t|
+    t.integer "workflow_id"
+    t.integer "project_id"
   end
 
   create_table "publication_auth_lookup", :id => false, :force => true do |t|
@@ -1144,7 +1176,7 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
     t.string   "organism_part"
     t.string   "provider_id"
     t.string   "provider_name"
-    t.float    "age_at_sampling"
+    t.string   "age_at_sampling"
     t.string   "sample_type"
     t.string   "treatment"
     t.string   "uuid"
@@ -1402,7 +1434,6 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
     t.string   "experimentalists"
     t.datetime "begin_date"
     t.integer  "person_responsible_id"
-    t.integer  "organism_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "first_letter",          :limit => 1
@@ -1454,6 +1485,30 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
     t.datetime "updated_at",     :null => false
   end
 
+  create_table "sweep_auth_lookup", :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.integer "can_view",     :limit => 1
+    t.integer "can_manage",   :limit => 1
+    t.integer "can_edit",     :limit => 1
+    t.integer "can_download", :limit => 1
+    t.integer "can_delete",   :limit => 1
+  end
+
+  create_table "sweeps", :force => true do |t|
+    t.string   "name"
+    t.integer  "contributor_id"
+    t.integer  "workflow_id"
+    t.integer  "workflow_version",              :default => 1
+    t.datetime "created_at",                                   :null => false
+    t.datetime "updated_at",                                   :null => false
+    t.string   "contributor_type"
+    t.text     "description"
+    t.string   "uuid"
+    t.string   "first_letter",     :limit => 1
+    t.integer  "policy_id"
+  end
+
   create_table "synonyms", :force => true do |t|
     t.string   "name"
     t.integer  "substance_id"
@@ -1480,6 +1535,98 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
   create_table "tags", :force => true do |t|
     t.string "name"
   end
+
+  create_table "taverna_player_interactions", :force => true do |t|
+    t.boolean  "replied",                        :default => false
+    t.integer  "run_id"
+    t.datetime "created_at",                                        :null => false
+    t.datetime "updated_at",                                        :null => false
+    t.boolean  "displayed",                      :default => false
+    t.text     "page"
+    t.string   "feed_reply"
+    t.text     "data",       :limit => 16777215
+    t.string   "serial"
+    t.string   "page_uri"
+  end
+
+  add_index "taverna_player_interactions", ["run_id", "replied"], :name => "index_taverna_player_interactions_on_run_id_and_replied"
+  add_index "taverna_player_interactions", ["run_id", "serial"], :name => "index_taverna_player_interactions_on_run_id_and_serial"
+  add_index "taverna_player_interactions", ["run_id"], :name => "index_taverna_player_interactions_on_run_id"
+
+  create_table "taverna_player_run_auth_lookup", :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.integer "can_view",     :limit => 1
+    t.integer "can_manage",   :limit => 1
+    t.integer "can_edit",     :limit => 1
+    t.integer "can_download", :limit => 1
+    t.integer "can_delete",   :limit => 1
+  end
+
+  create_table "taverna_player_run_ports", :force => true do |t|
+    t.string   "name"
+    t.string   "value"
+    t.string   "port_type"
+    t.integer  "run_id"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+    t.string   "file_file_name"
+    t.string   "file_content_type"
+    t.integer  "file_file_size"
+    t.datetime "file_updated_at"
+    t.integer  "depth",             :default => 0
+    t.text     "metadata"
+  end
+
+  add_index "taverna_player_run_ports", ["run_id", "name"], :name => "index_taverna_player_run_ports_on_run_id_and_name"
+  add_index "taverna_player_run_ports", ["run_id"], :name => "index_taverna_player_run_ports_on_run_id"
+
+  create_table "taverna_player_runs", :force => true do |t|
+    t.string   "run_id"
+    t.string   "saved_state",                     :default => "pending", :null => false
+    t.datetime "create_time"
+    t.datetime "start_time"
+    t.datetime "finish_time"
+    t.integer  "workflow_id",                                            :null => false
+    t.datetime "created_at",                                             :null => false
+    t.datetime "updated_at",                                             :null => false
+    t.string   "status_message_key"
+    t.string   "results_file_name"
+    t.integer  "results_file_size"
+    t.boolean  "embedded",                        :default => false
+    t.boolean  "stop",                            :default => false
+    t.string   "log_file_name"
+    t.integer  "log_file_size"
+    t.string   "name",                            :default => "None"
+    t.integer  "delayed_job_id"
+    t.integer  "sweep_id"
+    t.integer  "contributor_id"
+    t.integer  "policy_id"
+    t.string   "contributor_type"
+    t.text     "failure_message"
+    t.integer  "parent_id"
+    t.string   "uuid"
+    t.string   "first_letter",       :limit => 1
+    t.text     "description"
+    t.integer  "user_id"
+    t.integer  "workflow_version",                :default => 1
+  end
+
+  add_index "taverna_player_runs", ["parent_id"], :name => "index_taverna_player_runs_on_parent_id"
+  add_index "taverna_player_runs", ["user_id"], :name => "index_taverna_player_runs_on_user_id"
+  add_index "taverna_player_runs", ["workflow_id"], :name => "index_taverna_player_runs_on_workflow_id"
+
+  create_table "taverna_player_service_credentials", :force => true do |t|
+    t.string   "uri",         :null => false
+    t.string   "name"
+    t.text     "description"
+    t.string   "login"
+    t.string   "password"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  add_index "taverna_player_service_credentials", ["uri"], :name => "index_taverna_player_service_credentials_on_uri"
 
   create_table "technology_types", :force => true do |t|
     t.string   "title"
@@ -1556,7 +1703,7 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
     t.string   "treatment_protocol"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "treatment_type_id"
+    t.integer  "measured_item_id"
     t.float    "start_value"
     t.float    "end_value"
     t.float    "standard_deviation"
@@ -1566,6 +1713,9 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
     t.integer  "sample_id"
     t.integer  "specimen_id"
     t.integer  "compound_id"
+    t.string   "medium_title"
+    t.float    "time_after_treatment"
+    t.integer  "time_after_treatment_unit_id"
   end
 
   create_table "units", :force => true do |t|
@@ -1608,6 +1758,90 @@ ActiveRecord::Schema.define(:version => 20140403123551) do
   end
 
   add_index "work_groups", ["project_id"], :name => "index_work_groups_on_project_id"
+
+  create_table "workflow_auth_lookup", :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.integer "can_view",     :limit => 1
+    t.integer "can_manage",   :limit => 1
+    t.integer "can_edit",     :limit => 1
+    t.integer "can_download", :limit => 1
+    t.integer "can_delete",   :limit => 1
+  end
+
+  create_table "workflow_categories", :force => true do |t|
+    t.string "name"
+  end
+
+  create_table "workflow_input_port_types", :force => true do |t|
+    t.string "name"
+  end
+
+  create_table "workflow_input_ports", :force => true do |t|
+    t.string  "name"
+    t.text    "description"
+    t.integer "port_type_id"
+    t.text    "example_value"
+    t.integer "example_data_file_id"
+    t.integer "workflow_id"
+    t.integer "workflow_version"
+    t.string  "mime_type"
+  end
+
+  create_table "workflow_output_port_types", :force => true do |t|
+    t.string "name"
+  end
+
+  create_table "workflow_output_ports", :force => true do |t|
+    t.string  "name"
+    t.text    "description"
+    t.integer "port_type_id"
+    t.text    "example_value"
+    t.integer "example_data_file_id"
+    t.integer "workflow_id"
+    t.integer "workflow_version"
+    t.string  "mime_type"
+  end
+
+  create_table "workflow_versions", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.integer  "category_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+    t.string   "uuid"
+    t.integer  "policy_id"
+    t.text     "other_creators"
+    t.string   "first_letter",       :limit => 1
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
+    t.datetime "last_used_at"
+    t.integer  "workflow_id"
+    t.text     "revision_comments"
+    t.integer  "version"
+    t.boolean  "sweepable"
+    t.string   "myexperiment_link"
+    t.string   "documentation_link"
+  end
+
+  create_table "workflows", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.integer  "category_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+    t.string   "uuid"
+    t.integer  "policy_id"
+    t.text     "other_creators"
+    t.string   "first_letter",       :limit => 1
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
+    t.datetime "last_used_at"
+    t.integer  "version"
+    t.boolean  "sweepable"
+    t.string   "myexperiment_link"
+    t.string   "documentation_link"
+  end
 
   create_table "worksheets", :force => true do |t|
     t.integer "content_blob_id"

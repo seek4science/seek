@@ -285,8 +285,6 @@ class PublicationsController < ApplicationController
     end
   end
 
-
-
   def fetch_pubmed_or_doi_result pubmed_id,doi
     result = nil
     if pubmed_id
@@ -301,8 +299,13 @@ class PublicationsController < ApplicationController
     end
     result
   end
-        
 
+  def get_data(publication, pubmed_id, doi=nil)
+    result = fetch_pubmed_or_doi_result(pubmed_id,doi)
+    publication.extract_metadata(result)
+    result
+  end
+        
   private
 
   def preprocess_doi_or_pubmed pubmed_id,doi
@@ -312,28 +315,7 @@ class PublicationsController < ApplicationController
     return pubmed_id,doi
   end
 
-  def get_data(publication, pubmed_id, doi=nil)
-    if !pubmed_id.nil?
-      begin
-        result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
-      rescue Exception=>e
-        result = Bio::Reference.new({})
-        result.error = e.message
-      end
 
-      unless result.nil? || !result.error.nil?
-        publication.extract_pubmed_metadata(result)
-      end
-      return result
-    elsif !doi.nil?
-      query = DoiQuery.new(Seek::Config.crossref_api_email)
-      result = query.fetch(doi)
-      unless result.nil? || !result.error.nil?
-        publication.extract_doi_metadata(result)
-      end
-      return result
-    end
-  end
 
   def create_or_update_associations asset_ids, asset_type, required_action
     asset_ids.each do |id|

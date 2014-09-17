@@ -1,5 +1,16 @@
 module Seek
   module ContentBlobCommon
+    include Seek::UploadHandling::ContentInspection
+
+    def redirect_on_error asset,msg=nil
+      flash[:error]=msg if !msg.nil?
+      if (asset.class.name.include?("::Version"))
+        redirect_to asset.parent,:version=>asset.version
+      else
+        redirect_to asset
+      end
+    end
+
     def handle_download disposition='attachment', image_size=nil
       if @content_blob.url.blank?
         if @content_blob.file_exists?
@@ -45,7 +56,7 @@ module Seek
     def download_jerm_asset
       project = @asset_version.projects.first
       project.decrypt_credentials
-      downloader=Jerm::DownloaderFactory.create project.name
+      downloader=Jerm::DownloaderFactory.create project.title
       resource_type = @asset_version.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
       begin
         data_hash = downloader.get_remote_data @content_blob.url,project.site_username,project.site_password, resource_type
@@ -74,7 +85,7 @@ module Seek
           redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
           return_file_or_redirect_to redirected_url, error_message
         end
-      elsif (["301","302","401"].include?(code))
+      elsif (["301","302","401","403"].include?(code))
         return_file_or_redirect_to @content_blob.url
       elsif code=="404"
         error_message = "This item is referenced at a remote location, which is currently unavailable"

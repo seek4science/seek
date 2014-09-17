@@ -5,6 +5,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
   def perform
     ps = ProjectSubscription.find_by_id(project_subscription_id)
     if ps
+      #MERGENOTE - why changes to take the project rather than the subscription?
       project = ps.project
       all_in_project(project).each do |item|
         item.subscriptions << Subscription.new(:person => ps.person, :project_subscription_id => project_subscription_id) unless item.subscribed?(ps.person)
@@ -31,15 +32,14 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
 
     assets |= subscribable_types.collect do |type|
       # e.g.: 'data_files_projects'
-      assets_projects_table = ["#{type.underscore.pluralize}", 'projects'].sort.join('_')
+      assets_projects_table = ["#{type.underscore.gsub('/','_').pluralize}", 'projects'].sort.join('_')
       assets_for_project project, type, assets_projects_table
     end.flatten.uniq
-    assets
     assets
   end
 
   def assets_for_project project, asset_type, assets_projects_table
-    asset_id = asset_type.underscore + "_id"
+    asset_id = (asset_type.underscore + '_id').split('/').last
     klass =  asset_type.constantize
     table = assets_projects_table
     sql = "select #{asset_id} from #{table}"

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
 #delete tmp and filestore artifacts remaining from previous tests
 echo "Deleting old artifacts in tmp/ and filestore/"
 rm -rf tmp/attachement_fu
@@ -13,9 +16,9 @@ rm -rf filestore/
 
 #rvm handling is based on example at http://pivotallabs.com/users/mbarinek/blog/articles/1450-rails-3-with-rvm-and-cruise-control
 
-desired_ruby=ruby-1.9.3-p545
-project_name=seek-0-20
-rubygems=1.8.25
+desired_ruby=ruby-2.1.2
+project_name=seek-0-22
+rubygems=2.2.2
 
 # remove annoying "warning: Insecure world writable dir"
 function remove_annoying_warning() {

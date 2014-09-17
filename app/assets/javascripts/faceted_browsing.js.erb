@@ -1,0 +1,144 @@
+function updateFirstPage() {
+    //temporary put this function here, need to find better place or rename the updateFirstPage
+    renameHFMissingField();
+    renameOtherField();
+    var items = $j('div[itemid]');
+    var seek_items = getItems(items);
+
+    if (seek_items.length > 0) {
+        $j("#loading").show();
+
+        setTimeout(function() {
+            $j.ajax({
+                url: items_for_result_url,
+                async: false,
+                type: 'POST',
+                data: {
+                    items: seek_items.join(','),
+                    active_tab: active_tab
+                }
+            })
+                    .done(function (data) {
+                        updateContent(data.items_for_result);
+                        $j("#loading").hide();
+                        $j("div[data-ex-role='exhibit-view']").children().show();
+
+                        $j('.exhibit-viewPanel').removeClass('exhibit-ui-protection');
+                        $j('.exhibit-collectionView-header-groupControl').hide();
+                        $j('.exhibit-toolboxWidget-button').hide();
+                        decodeValueTooltip();
+                        selectedFacets();
+                    });
+        }, 0);
+    }
+}
+
+jQuery.noConflict();
+var $j = jQuery;
+
+$j(document).ready(function(){
+    $j(document).on("exhibitConfigured.exhibit", function() {
+        defaultSearchText();
+        $j('.reset_all_filters').show();
+        $j('.filter_text').show();
+    });
+
+    $j(document).bind("registerLocales.exhibit", function() {
+        $j(document).trigger("beforeLocalesRegistered.exhibit");
+        new Exhibit.Locale("default", "<%= asset_path('exhibit/locales/en/locale.js') %>");
+        new Exhibit.Locale("en", "<%= asset_path('exhibit/locales/en/locale.js') %>");
+        $j(document).trigger("localesRegistered.exhibit");
+    });
+});
+
+function defaultSearchText(){
+    var default_text = 'Search filters below';
+    $j('div[id="facet_search_box"] input').each(function(){
+        $j(this).attr('placeholder',default_text);
+    });
+}
+
+function getItems(items){
+    var items = items.map(function(){
+        var exhibit_item_id = $j(this).attr("itemid");
+        var type = database.getObject(exhibit_item_id, 'type');
+        var id = database.getObject(exhibit_item_id, 'item_id');
+        return type + '_' + id;
+    }).get();
+
+    return items;
+}
+
+function updateContent(items_for_result){
+    var collection_view_body = $j('.exhibit-collectionView-body');
+    collection_view_body.html(items_for_result);
+}
+
+function decodeValueTooltip(){
+    $j('.exhibit-facet-value').map(function(){
+        var title = $j(this).attr("title");
+        $j(this).attr("title", decodeHTML(title));
+    })
+}
+
+//rename Hierachical Facet Missing Field of the root level: from others to missing this field
+function renameHFMissingField(){
+    var missing_field_elements = $j('.exhibit-flowingFacet-body').children("[title='(others)']");
+    var replaced_term = "(don't have this field)";
+    missing_field_elements.map(function(){
+        $j(this).attr("title", replaced_term);
+        var value_link = $j(this).children('.exhibit-flowingFacet-value-link');
+        value_link.html("<span class='exhibit-facet-value-missingThisField'>" + replaced_term + "</span>");
+    })
+}
+
+//rename Hierachical Facet (others) Field of the children levels: from others to Undefined in -parent term-
+function renameOtherField(){
+    var missing_field_elements = $j('.exhibit-flowingFacet-childrenContainer').children("[title='(others)']");
+    missing_field_elements.map(function(){
+        var parent_term = this.parentNode.parentNode.title;
+        var replaced_term = "Undefined in " + parent_term;
+
+        $j(this).attr("title", replaced_term);
+        var value_link = $j(this).children('.exhibit-flowingFacet-value-link');
+        value_link.html(replaced_term);
+    })
+}
+
+//use in the case of one instance faceted search
+//use active_tab to send this info to the server, in order to keep the same selection after the server response
+var active_tab = null;
+
+function selectedFacets(){
+    var selected_facets = [];
+
+    $j(".exhibit-facet-value-selected").map(function(){
+        var value = $j(this).children('.exhibit-facet-value-inner').text();
+        var facet =  $j(this).parents("div[data-ex-role='facet']").attr('data-ex-facet-label');
+        selected_facets.push(facet + ':' + value);
+    });
+
+    $j(".exhibit-flowingFacet-value-selected").map(function(){
+        var value = $j(this).attr("title");
+        var facet =  $j(this).parents("div[data-ex-role='facet']").attr('data-ex-facet-label');
+        selected_facets.push(facet + ':' + value);
+    });
+
+    var element = $j(".selected_facets");
+    var selected_facets_string = selected_facets.join('; ');
+    if (element.length == 0){
+        element = "<span class='selected_facets'>" + selected_facets_string + '</span>';
+    }else{
+        element.html(selected_facets_string);
+    }
+
+    $j(element).insertBefore( ".exhibit-collectionView-header-sortControls" );
+}
+
+function resetAllFilters(){
+    state = window.exhibit._uiContext._collection.clearAllRestrictions();
+    Exhibit.History.pushState(
+            state.data,
+            Exhibit._("%widget.collectionSummary.resetActionTitle")
+    );
+}

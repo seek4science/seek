@@ -6,4 +6,4 @@
 
 <%= list_item_authorized_list resource.creators, "Contributor" %>
 
-<%= list_item_optional_attribute "Other contributors", h(resource.other_creators), nil -%>
+<%= list_item_optional_attribute "Other contributors", h(resource.other_creators), nil if resource.respond_to?'other_creators' -%>

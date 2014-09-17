@@ -54,24 +54,23 @@ module Seek
 
       def species_from_jws_dat content_blob
         begin
-          species = []
+
           contents = open(content_blob.filepath).read
           start_tag = "begin initial conditions"
           start=contents.index(start_tag)
-          unless start.nil?
-            last = contents.index("end initial conditions")
-            unless last.nil?
-              interesting_bit = (contents[start+start_tag.length..last-1]).strip
-              unless interesting_bit.blank?
-                interesting_bit.each_line do |line|
-                  unless line.index("[").nil?
-                    species << line.gsub(/\[.*/, "").strip
-                  end
-                end
-              end
+          last = contents.index("end initial conditions")
+          unless start.nil? || last.nil?
+            interesting_bit = (contents[start+start_tag.length..last-1]).strip || ""
+            lines = interesting_bit.each_line.reject do |line|
+              line.index("[").nil?
             end
+            lines.collect do |line|
+              line.gsub(/\[.*/, "").strip
+            end
+          else
+            []
           end
-          species
+
         rescue Exception => e
           Rails.logger.error("Error processing dat #{t('model')}  content for content_blob #{content_blob.id} #{e}")
           []
@@ -97,25 +96,21 @@ module Seek
 
       def parameters_and_values_from_jws_dat content_blob
         begin
-          params_and_values = {}
           contents = open(content_blob.filepath).read
-          start_tag = "begin parameters"
-          start=contents.index(start_tag)
-          unless start.nil?
-            last = contents.index("end parameters")
-            unless last.nil?
-              interesting_bit = (contents[start+start_tag.length..last-1]).strip
-              unless interesting_bit.blank?
-                interesting_bit.each_line do |line|
-                  unless line.index("=").nil?
-                    p_and_v = line.split("=")
-                    params_and_values[p_and_v[0].strip]=p_and_v[1].strip
-                  end
-                end
-              end
+          start=contents.index("begin parameters")
+          last = contents.index("end parameters")
+          unless start.nil? || last.nil?
+            interesting_bit = (contents[start+16..last-1]).strip || ""
+            lines = interesting_bit.each_line.reject do |line|
+              line.index("=").nil?
             end
+            Hash[lines.map do |line|
+              p_and_v = line.split("=")
+              [p_and_v[0].strip,p_and_v[1].strip]
+            end]
+          else
+            {}
           end
-          params_and_values
         rescue Exception => e
           Rails.logger.error("Error processing dat #{t('model')}  content for content_blob #{content_blob.id} #{e}")
           {}

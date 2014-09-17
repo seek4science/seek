@@ -184,11 +184,11 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   def requested_approval_assets_for gatekeeper
     df = Factory(:data_file, :project_ids => gatekeeper.projects.collect(&:id))
-    df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>df.contributor)
+    df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>df.contributor.user)
     model = Factory(:model, :project_ids => gatekeeper.projects.collect(&:id))
-    model.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>model.contributor)
+    model.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>model.contributor.user)
     sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id))
-    sop.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>sop.contributor)
+    sop.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>sop.contributor.user)
     assert !df.can_download?(nil)
     assert !model.can_download?(nil)
     assert !sop.can_download?(nil)

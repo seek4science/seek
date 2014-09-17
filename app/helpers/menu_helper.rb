@@ -7,6 +7,7 @@ module MenuHelper
   def menu_definitions
     definitions=[
         {:title=>t("menu.yellow_pages"), :sections=>[
+            {:controller=>"programmes",:title=>t('programme').pluralize,:hide=>!Seek::Config.programmes_enabled},
             {:controller=>"people",:title=>"People"},
             {:controller=>"projects",:title=>t("project").pluralize},
             {:controller=>"institutions",:title=>"Institutions"}
@@ -126,6 +127,14 @@ module MenuHelper
     end
 
     menu
+  end
+
+  def navigation_link(text, url, icon = nil, active = false)
+    content_tag(:li, :class => (active ? 'active' : nil)) do
+      link_to(url) do
+        %(<b class="#{icon}"></b> #{text}).html_safe
+      end
+    end
   end
 
 end

@@ -9,9 +9,8 @@ class Institution < ActiveRecord::Base
 
   acts_as_yellow_pages
 
-  scope :default_order, order("name")
-
-  validates_uniqueness_of :name
+  validates :title, :uniqueness=>true
+  scope :default_order, order("title")
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   
@@ -19,8 +18,8 @@ class Institution < ActiveRecord::Base
   has_many :projects, :through=>:work_groups
   has_many :specimens
 
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :name,:country,:city, :address
+  searchable(:auto_index=>false) do
+    text :city, :address
   end if Seek::Config.solr_enabled
 
   def people
@@ -30,6 +29,10 @@ class Institution < ActiveRecord::Base
     end
     #TODO: write a test to check they are ordered
     return res.sort{|a,b| a.last_name <=> b.last_name}
+  end
+
+  def programmes
+    projects.collect{|p| p.programme}.uniq
   end
 
    def can_be_edited_by?(subject)
@@ -47,11 +50,11 @@ class Institution < ActiveRecord::Base
 
   # get a listing of all known institutions
   def self.get_all_institutions_listing
-    Institution.all.collect { |i| [i.name, i.id] }
+    Institution.all.collect { |i| [i.title, i.id] }
   end
 
   def can_delete?(user=User.current_user)
     user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
   end
-  
+
 end

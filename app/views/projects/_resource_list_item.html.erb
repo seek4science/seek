@@ -1,6 +1,7 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
+  <%= list_item_programme_attribute(resource) if Seek::Config.programmes_enabled %>
   <%= list_item_optional_attribute "Public web page", h(resource.web_page), h(resource.web_page) %>
 
   <% unless hide_contact_details? %>

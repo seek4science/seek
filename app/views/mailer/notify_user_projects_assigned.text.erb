@@ -1,0 +1,12 @@
+Hi <%= @name %>,
+
+An administrator has assigned you to the following project<%= 's' if @projects.size > 1 -%>:
+<% @projects.each do |project| %>
+    * <%= project.title -%>
+<% end %>
+
+You may now upload assets and execute workflows.
+
+Regards,
+
+- The <%= Seek::Config.dm_project_name %> Team

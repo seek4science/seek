@@ -4,27 +4,19 @@
     <%= render :partial => "gadgets/my_project_gadget" -%>
     <%= render :partial=>"gadgets/announcements_gadget" %>
     <%= render :partial => "gadgets/favourites" -%>
-    <div id="sidebar_tag_cloud">
-      <% cache "sidebar_tag_cloud" do -%>
-          <%= render :partial=>"gadgets/tag_cloud_gadget" %>
-      <% end -%>
-    </div>
-
-    <%= render :partial=>"gadgets/organism_gadget" %>
 
 <% else -%>
-
     <%= render :partial => "gadgets/sign_in" -%>
-
+<% end -%>
+<% if Seek::Config.tagging_enabled %>
     <div id="sidebar_tag_cloud">
       <% cache "sidebar_tag_cloud" do -%>
           <%= render :partial=>"gadgets/tag_cloud_gadget" %>
       <% end -%>
     </div>
+<% end %>
 
-    <%= render :partial=>"gadgets/organism_gadget" %>
-
-<% end -%>
+<%= render :partial=>"gadgets/organism_gadget" %>
 
 
 

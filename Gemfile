@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "rails", "3.2.17"
+gem "rails", "3.2.19"
 gem "rdoc"
 
 gem "feedjira","~>1"
@@ -8,15 +8,15 @@ gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'
-gem 'libxml-ruby',"2.6.0",:require=>"libxml"
-gem 'uuidtools',"2.1.1"
+gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
+gem 'uuidtools'
 gem "RedCloth","4.2.9"
-gem 'simple-spreadsheet-extractor',"0.13.1"
-gem "rmagick","2.12.2"
+gem 'simple-spreadsheet-extractor',"~>0.13.3"
+gem "rmagick","2.13.2", :require => 'RMagick'
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
-gem 'rubyzip',"0.9.9"
+gem 'rubyzip', "~> 1.1.4"
 gem 'bio'
 gem 'sunspot_rails'
 gem 'sunspot_solr'
@@ -33,11 +33,11 @@ gem "equivalent-xml"
 gem "breadcrumbs_on_rails"
 gem 'docsplit'
 gem "pothoven-attachment_fu"
-gem "exception_notification","3.0.1"
+gem "exception_notification"
 gem "fssm"
-gem 'acts-as-taggable-on'
+gem 'acts-as-taggable-on',"3.0.1"
 gem 'acts_as_list'
-gem 'acts_as_tree',"0.2.0"
+gem 'acts_as_tree'
 gem 'country-select'
 gem 'modporter-plugin'
 gem "will_paginate", "~> 3.0.4"
@@ -46,14 +46,16 @@ gem "yaml_db"
 gem 'rails_autolink'
 gem 'rfc-822'
 gem 'nokogiri'
-gem 'rdf-virtuoso', :git=>'git://github.com/digibib/rdf-virtuoso.git'
+gem 'rdf-virtuoso', ">=0.1.6"
 gem 'cocaine'
 gem 'colorize'
 gem 'lograge'
+gem 'psych'
+gem 'transaction_isolation'
 
-gem 'newrelic_rpm'
 #gem for BiVeS and BudHat
 gem 'bives'
+
 
 #Linked to SysMO Git repositories
 gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
@@ -76,14 +78,23 @@ gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=
 gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
-gem 'passenger'
-gem 'unicorn-rails'
-gem "recaptcha", '0.3.1'
 
-gem 'rb-readline', '~> 0.4.2'
+gem 'taverna-t2flow'
+gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
+gem 'jquery-rails', '~> 3'
+
+gem "recaptcha", '0.3.1'
+gem 'metainspector'
+gem 'mechanize'
+
 
 group :assets do
   gem 'turbo-sprockets-rails3'
+  gem 'yui-compressor'
+end
+
+group :production do
+  gem 'passenger'
 end
 
 group :development do
@@ -91,16 +102,20 @@ group :development do
   gem "pry-doc"
   gem "pry-remote"
   gem "request-log-analyzer"
-  gem 'rails-dev-boost', :git => 'git://github.com/thedarkone/rails-dev-boost.git'
+  gem "rubocop",:require=>false
+  gem "rubycritic",:require=>false
+  gem "guard-rubycritic",:require=>false
+  gem 'unicorn-rails'
 end
 
 group :test do
-  gem "sqlite3","1.3.7"
+  gem 'test_after_commit'
+  gem "sqlite3"
   gem "ruby-prof"
   gem "webmock"
-  gem 'minitest-reporters',' >= 0.4.1' , "< 1.0.0"
+  gem 'minitest-reporters','~> 0.14'
+  gem 'coveralls', require: false
+  gem 'rspec-rails'
+  gem 'sunspot_matchers'
 end
 
-group :assets do
-  gem 'yui-compressor'
-end

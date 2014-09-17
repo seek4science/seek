@@ -77,7 +77,6 @@ module WebDav
     http=Net::HTTP.new(uri.host,uri.port)
 
     http.use_ssl=true if uri.scheme=="https"
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     req = Net::HTTP::Propfind.new(uri.path)
     req.basic_auth user,password
     req.add_field "Depth", depth

@@ -1,0 +1,18 @@
+<% redirect_to ||= taverna_player.runs_path %>
+
+<div id="buttons">
+  <ul class="sectionIcons">
+    <% if @run.finished? %>
+        <li><%= render :partial => 'download_link', :locals => { :download_link_name => "Download all results", :download_url => run.results.url} %></li>
+        <!--# If this run is part of a sweep - do not give option to create a new sweep off it.-->
+        <!--# Also, if workflow does not have data input ports - there is nothing to sweep over.-->
+        <% if @run.sweepable? %>
+            <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "Data sweep based on this run") -%></li>
+        <% end %>
+    <% end %>
+    <% if @run.can_manage? and !current_user.guest? -%>
+        <li><%= image_tag_for_key('manage', main_app.edit_run_path(@run), nil, nil, "Manage run") -%></li>
+    <% end -%>
+    <%= delete_or_cancel_button(@run, redirect_to) %>
+  </ul>
+</div>

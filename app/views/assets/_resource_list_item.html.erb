@@ -32,7 +32,7 @@
     </div>
   <% end %>
   <div class="list_item_content <%= other_classes -%>">
-    <%= render :partial=> content_partial,:locals=>{:resource => resource} %>
+    <%= render :seek_partial=> content_partial,:locals=>{:resource => resource} %>
   </div>
   <% unless actions_partial.blank? %>
     <div class="list_item_actions">

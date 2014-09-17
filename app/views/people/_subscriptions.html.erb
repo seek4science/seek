@@ -36,7 +36,7 @@
         <div id="subscription<%= project_subscription.project_id %>" style="display:none;">
           <fieldset>
             <%= sub_form.hidden_field :id unless sub_form.object.new_record? %>
-            <legend> <%= t('project') %>: <%= h(project_subscription.project.name) %></legend>
+            <legend> <%= t('project') %>: <%= h(project_subscription.project.title) %></legend>
             <%= sub_form.hidden_field :project_id %>
             <br/>
 
@@ -55,7 +55,7 @@
 </div>
 
 <script type="text/javascript">
-
+    <%# MERGENOTE - whats this? and why use .invoke? (similar later on) %>
     <% project_subscriptions_with_unsubscribed.map(&:project_id).each do |proj_id| %>
       $$('#subscription<%= proj_id %> input').invoke('disable');
     <% end %>

@@ -2,6 +2,7 @@
 class SessionsController < ApplicationController
 
   before_filter :signup_admin_if_not_users,:only=>:new
+  skip_before_filter :restrict_guest_user
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:new,:destroy]
   prepend_before_filter :strip_root_for_xml_requests
@@ -87,30 +88,37 @@ class SessionsController < ApplicationController
   end
   
   def successful_login
-    self.current_user = @user    
+    self.current_user = @user
+    flash[:notice] = "You have successfully logged in, #{@user.display_name}."
     if params[:remember_me] == "on"
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { :value => @user.remember_token , :expires => @user.remember_token_expires_at }
     end
-    
     respond_to do |format|
-      if !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
-        unless params[:called_from][:id].blank?
-          return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
-        else
-          return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action])
-        end
-      else
-        unless session[:return_to] and !session[:return_to].empty?
-          return_to_url = request.env['HTTP_REFERER']
-        else
-          return_to_url = session[:return_to]
-        end
+      return_to_url = determine_return_url_after_login
+      format.html do
+        is_search = return_to_url && return_to_url.normalize_trailing_slash == search_url.normalize_trailing_slash
+        default_url = is_search ? root_url : return_to_url || root_url
+        redirect_back_or_default(default_url)
       end
-      format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == root_url || return_to_url.normalize_trailing_slash == search_url.normalize_trailing_slash) ? redirect_to(root_url) : redirect_back_or_default(return_to_url) }
       format.xml {session[:xml_login] = true; head :ok }
     end
     clear_return_to
+  end
+
+  def determine_return_url_after_login
+    if !params[:called_from].blank? && !params[:called_from][:url].blank?
+      return_to_url = params[:called_from][:url]
+    elsif !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
+      if params[:called_from][:id].blank?
+        return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action])
+      else
+        return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
+      end
+    else
+        return_to_url = session[:return_to] || request.env['HTTP_REFERER']
+    end
+    return_to_url
   end
 
   def failed_login(message)

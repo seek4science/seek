@@ -1,4 +1,5 @@
-<h1>Administer <%= t('project') %>: <%= link_to @project.name, project_path(@project) -%></h1>
+
+<%= render :partial => "general/item_title",:locals=>{:title=>"Administer #{t('project').downcase} #{link_to(h(@project.title), @project)}".html_safe} %>
 
 <div class="show_basic">
   <%= form_for(@project) do |f| -%>
@@ -9,13 +10,17 @@
   
     <%= f.error_messages %>
 
+    <h2>Administer indivudial members</h2>
+
+    To add and remove members to this <%= t('project').downcase %> please go to the <%= link_to "Administer #{t('project')} Members",admin_members_project_path(@project) %> page.
+
     <h2>Participating Institutions</h2>
 
       <%= f.label :institution_ids, "Please select the institutions that participate in this #{t('project')}:", :style => "line-height: 2; margin-left: 1em;" -%><br/>
-      <% institution_list = Institution.order(:name) %>
+      <% institution_list = Institution.order(:title) %>
 
       <% chosen_institutions = @project.institutions %>
-      <div style="margin-top: 1em; margin-bottom: 2em; margin-left: 2em; width: 90%; height: 500px; overflow: auto;">
+      <div id="project_institutions">
           <% institution_list.each do |institution| %>
               <%= check_box_tag "institution_#{institution.id}", institution.id, chosen_institutions.include?(institution), :class => 'institution_checkbox' %>
               <%= institution.title %>

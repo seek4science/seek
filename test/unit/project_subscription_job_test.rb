@@ -33,15 +33,16 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
   end
 
   test "create job" do
-      assert_equal 0,Delayed::Job.count
-      ProjectSubscriptionJob.create_job(1)
-      assert_equal 1,Delayed::Job.count
+      assert_difference("Delayed::Job.count",1) do
+        ProjectSubscriptionJob.create_job(1)
+      end
 
       job = Delayed::Job.first
       assert_equal 2,job.priority
 
-      ProjectSubscriptionJob.create_job(1)
-      assert_equal 1,Delayed::Job.count
+      assert_no_difference("Delayed::Job.count") do
+        ProjectSubscriptionJob.create_job(1)
+      end
   end
 
   test "all_in_project" do
@@ -52,7 +53,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
 
     #create items for project
     ps.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study'}.each do |type|
-      Factory("#{type.underscore}", :projects => [project])
+      Factory("#{type.underscore.gsub('/','_')}", :projects => [project])
     end
     project.reload
     #study

@@ -13,6 +13,9 @@ module Seek
         Seek::Config.technology_type_ontology_file
       end
 
+      def ontology_term_type
+        "technology"
+      end
     end
   end
 end

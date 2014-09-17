@@ -15,27 +15,7 @@ class ScalesController < ApplicationController
 
         assets = scale ? Scale.with_scale(scale) : everything_with_scale
 
-        resource_hash={}
-        assets.each do |res|
-          resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
-          resource_hash[res.class.name][:items] << res
-        end
-
-        scale_types = Seek::Util.scalable_types
-        scale_types.each do |type|
-          resource_hash[type.name] = {:items => [], :hidden_count => 0} unless resource_hash[type.name]
-        end
-
-        resource_hash.each do |key,res|
-          res[:items].compact!
-          unless res[:items].empty?
-            total_count = res[:items].size
-            all = res[:items]
-            res[:items] = key.constantize.authorize_asset_collection res[:items], "view"
-            res[:hidden_count] = total_count - res[:items].size
-            res[:hidden_items] = all - res[:items]
-          end
-        end
+        resource_hash =  build_resource_hash(assets)
 
         render :update do |page|
           scale_title = scale.try(:key) || 'all'
@@ -49,11 +29,12 @@ class ScalesController < ApplicationController
         end
   end
 
+
   def search_and_lazy_load_results
     type = params[:scale_type]
     scale = Scale.find_by_key(type)
 
-    assets = scale ? Scale.with_scale(scale) : everything_with_scale
+    assets = scale ? Scale.with_scale(scale) :   everything_with_scale
 
     resource_hash={}
     grouped_assets = assets.group_by { |asset| asset.class.name }
@@ -88,9 +69,30 @@ class ScalesController < ApplicationController
         end.flatten.uniq
   end
 
-  def everything_in_seek
-      Seek::Util.user_creatable_types.each do |klass|
-            klass.all
-      end.flatten.uniq
+   def everything_in_seek
+       Seek::Util.user_creatable_types.map do |klass|
+             klass.all
+       end.flatten.uniq
+   end
+
+  def build_resource_hash(assets)
+      resource_hash={}
+      assets.each do |res|
+        resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
+        resource_hash[res.class.name][:items] << res
+      end
+
+      resource_hash.each do |key, res|
+        res[:items].compact!
+        unless res[:items].empty?
+          total_count = res[:items].size
+          all = res[:items]
+          res[:items] = key.constantize.authorize_asset_collection res[:items], "view"
+          res[:hidden_count] = total_count - res[:items].size
+          res[:hidden_items] = all - res[:items]
+        end
+      end
+      resource_hash
   end
+  
 end

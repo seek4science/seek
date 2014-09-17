@@ -29,7 +29,7 @@
         <p>
             Add multiple people at once from a given <%= t('project') %>, at a given institution, using the menu below.
         </p>
-        <%= select_tag("adv_project_id","<option selected=\"selected\" value=\"0\">Select project...</option>".html_safe+options_from_collection_for_select(Project.all, :id, :name),
+        <%= select_tag("adv_project_id","<option selected=\"selected\" value=\"0\">Select project...</option>".html_safe+options_from_collection_for_select(Project.all, :id, :title),
         :id => "adv_creator_select_projects",
         :onchange => remote_function(:url => request_institutions_projects_url,
         :method => :get,

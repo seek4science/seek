@@ -13,12 +13,12 @@
         <p>
           <%= f.label :title -%>
           <span class="required">*</span>
-          <%= f.text_field :title, :style => "width: 100%;", :rows=>2 -%>
+          <%= f.text_field :title, :class=>"title_text_entry" -%>
         </p>
 
         <p>
           <%= f.label :description %><br/>
-          <%= f.text_area :description, :style => "width:100%", :rows => 10 %>
+          <%= f.text_area :description, :class=>"large_text_entry" %>
         </p>
 
         <ul style="padding-bottom:1em;padding-top:0.5em;">
@@ -60,7 +60,7 @@
 
         <% if current_user_authorized_to_manage -%>
             <p>
-              <%= render :partial => "assets/sharing_form" -%>
+              <%= render :seek_partial => "assets/sharing_form" -%>
             </p>
             <p>
               <%= render :partial => "assets/special_auth_code_form", :locals => {:f => f} if !@event.try(:new_record?)-%>

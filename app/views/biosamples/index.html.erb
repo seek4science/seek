@@ -14,9 +14,9 @@
    default_selected_organisms = try_block { current_user.person.projects.first.organism_ids }.blank? ? [0] : try_block { current_user.person.projects.first.organism_ids }
 -%>
 
-<div class="contribution_title">
-     <h1>Browse Organisms, Strains, <%= I18n.t('biosamples.sample_parent_term').pluralize %> and Samples</h1>
-</div>
+
+<%= show_title("Browse Organisms, Strains, #{I18n.t('biosamples.sample_parent_term').pluralize} and Samples") %>
+
 
 <br/>
 <div class="fold" style="margin-left: 1em; width: 35em">

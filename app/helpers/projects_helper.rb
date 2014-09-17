@@ -1,5 +1,4 @@
-#encoding: utf-8
-
+# encoding: UTF-8
 module ProjectsHelper
   def project_select_choices
     res=[]
@@ -7,12 +6,12 @@ module ProjectsHelper
     return res
   end
 
-  def projects_link_list projects, sorted=true
-    projects=projects.select { |p| !p.nil? } #remove nil items
+  def projects_link_list projects,sorted=true
+    projects=projects.select{|p| !p.nil?} #remove nil items
     return "<span class='none_text'>Not defined</span>".html_safe if projects.empty?
 
     result=""
-    projects=projects.sort { |a, b| a.title<=>b.title } if sorted
+    projects=projects.sort{|a,b| a.title<=>b.title} if sorted
     projects.each do |proj|
       result += link_to proj.title,proj
       result += " | " unless projects.last==proj
@@ -20,50 +19,49 @@ module ProjectsHelper
     return result.html_safe
   end
 
-  def pals_link_list project
-    if project.pals.empty?
-      html = "<span class='none_text'>No PALs for this #{t('project')}</span>";
+  def link_list_for_role role_text, role_members
+    if role_members.empty?
+      html = "<span class='none_text'>No #{role_text.pluralize} for this #{t('project')}</span>";
     else
-      html = project.pals.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = role_members.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
     html.html_safe
+  end
+
+  def pals_link_list project
+    link_list_for_role("PAL",project.pals)
   end
 
   def asset_managers_link_list project
-    if project.asset_managers.empty?
-      html = "<span class='none_text'>No Asset Managers for this #{t('project')}</span>";
-    else
-      html = project.asset_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
-    end
-    html.html_safe
+    link_list_for_role("Asset Manager",project.asset_managers)
   end
 
   def project_managers_link_list project
-    if project.project_managers.empty?
-      html = "<span class='none_text'>No #{t('project')} Managers for this #{t('project')}</span>";
-    else
-      html = project.project_managers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
-    end
-    html.html_safe
+    link_list_for_role("#{t('project')} Manager",project.project_managers)
   end
 
   def gatekeepers_link_list project
-    if project.gatekeepers.empty?
-      html = "<span class='none_text'>No Gatekeepers for this #{t('project')}</span>";
-    else
-      html = project.gatekeepers.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
-    end
-    html.html_safe
+    link_list_for_role("Gatekeeper",project.gatekeepers)
   end
 
   def project_coordinators_link_list project
-    if project.project_coordinators.empty?
-      html=  "<span class='none_text'>No project coordinators for this project</span>";
+    link_list_for_role("Project coordinator",project.project_coordinators)
+  end
+  
+  def programme_link project
+    if project.try(:programme).nil?
+      html = "<span class='none_text'>This #{t('project')} is not associated with a #{t('programme')}</span>"
     else
-      html = project.project_coordinators.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
+      html = "<span>" + link_to(h(project.programme.title),project.programme) + "</span>"
     end
     html.html_safe
   end
+  
+  #MERGENOTE - this should be in images_helper probably
+  def remove_member_icon_filename
+    icon_filename_for_key("destroy")
+  end
+
   def project_mailing_list project
     if project.people.empty?
       html = "<span class='none_text'>No people in this #{t('project')}</span>";
@@ -148,6 +146,7 @@ module ProjectsHelper
         end
 
         folder_tag =  expand_link + collapse_link
+        #MERGENOTE - why have these funny characters only just started causing a problem with 1.9.3 and needing the utf-8 comment?
         if foldable
           folder = child.has_children? ? folder_tag : " └ "
         else
@@ -188,8 +187,7 @@ module ProjectsHelper
 
     select_tag "#{type.name.underscore}[#{name}]", options_for_select(options, :selected => selected_item, :disabled => disabled_options), html_options
   end
-
-  private
+  
   def child_single_select_options parent, depth=0
     result = []
 
@@ -203,4 +201,3 @@ module ProjectsHelper
   end
 
 end
-

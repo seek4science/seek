@@ -25,7 +25,7 @@ class AssetButtonsTest < ActionController::IntegrationTest
       get "/#{type_name}/#{item.id}"
       assert_response :success
       assert_select "span.icon" do
-        assert_select "a", :text => /Delete #{human_name}/
+        assert_select "a", :text => /Delete #{human_name}/i
       end
 
         delete "/#{type_name}/#{item.id}"

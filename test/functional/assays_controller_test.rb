@@ -424,23 +424,23 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
-  test "should not create modelling assay with sample for SysMO, but for VL" do
+  test "should not create modelling assay with sample" do
     person = Factory(:person)
-    as_not_virtualliver do
-      assert_no_difference("Assay.count") do
-        post :create, :assay => {:title => "test",
-                                 :study_id => studies(:metabolomics_study).id,
-                             :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                             :sample_ids=>[Factory(:sample).id, Factory(:sample).id].join(",")
-                                 },
-                                 :sharing => valid_sharing
-      end
-      assert_response :success
-      assert assigns(:assay)
-      assay = assigns(:assay)
-      assert_equal 0, assay.samples.count
+    assert_no_difference("Assay.count") do
+      post :create, :assay => {:title => "test",
+                               :study_id => studies(:metabolomics_study).id,
+                           :assay_class_id=>assay_classes(:modelling_assay_class).id,
+                           :sample_ids=>[Factory(:sample).id, Factory(:sample).id].join(",")
+                               },
+                               :sharing => valid_sharing
     end
+    assert_response :success
+    assert assigns(:assay)
+    assay = assigns(:assay)
+    assert_equal 0, assay.samples.count
+  end
 
+  test "should create modelling assay with sample for virtual liver" do
     as_virtualliver do
       assert_difference("Assay.count") do
         post :create, :assay => {:title => "test",
@@ -448,7 +448,7 @@ class AssaysControllerTest < ActionController::TestCase
                                  :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                                  :study_id => studies(:metabolomics_study).id,
                                  :assay_class_id => assay_classes(:modelling_assay_class).id,
-                                 :sample_ids => [Factory(:sample).id, Factory(:sample).id]},
+                                 :sample_ids => [Factory(:sample, :policy=>Factory(:public_policy)).id, Factory(:sample,:policy=>Factory(:public_policy)).id]},
                                  :sharing => valid_sharing
       end
       assert assigns(:assay)
@@ -687,86 +687,72 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  test "download link for sop in tab has version" do
+  test "download link for sop in lazy loaded tab" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
+
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     end
-
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-
     assert_select "div.list_item div.list_item_actions" do
       path=download_sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
-  test "show link for sop in tab has version" do
+  test "show link for sop in lazy loaded tab" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
-    end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_actions" do
       path=sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
-  test "edit link for sop in tabs" do
+  test "edit link for sop in lazy loaded tabs" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id=>assays(:metabolomics_assay)
-    end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_actions" do
       path=edit_sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum=>1
     end
   end
 
-  test "download link for data_file in tabs" do
+  test "download link for data_file in lazy loaded tabs" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
-    end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
     assert_select "div.list_item div.list_item_actions" do
-      path=download_data_file_path(data_files(:picture))
-      assert_select "a[href=?]", path, :minumum => 1
+    path=download_data_file_path(data_files(:picture))
+    assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
-  test "show link for data_file in tabs" do
+  test "show link for data_file in laz loaded tabs" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
+
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     end
-
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-
     assert_select "div.list_item div.list_item_actions" do
       path=data_file_path(data_files(:picture))
       assert_select "a[href=?]", path, :minumum => 1
     end
   end
 
-  test "edit link for data_file in tabs" do
+  test "edit link for data_file in lazy loaded tabs" do
     login_as(:owner_of_my_first_sop)
-    assert_difference('ActivityLog.count') do
-      get :show, :id => assays(:metabolomics_assay)
-    end
 
-    assert_response :success
-    get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+    end
 
     assert_select "div.list_item div.list_item_actions" do
       path=edit_data_file_path(data_files(:picture))
@@ -782,7 +768,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
     end
-    get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
     assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]", "nofollow", :text=>/news\.bbc\.co\.uk/, :minimum=>1
@@ -797,7 +782,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       get :show, :id=>assays(:metabolomics_assay)
     end
-    get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
     assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]", "nofollow", :text=>/news\.bbc\.co\.uk/, :minimum=>1
@@ -821,46 +805,76 @@ class AssaysControllerTest < ActionController::TestCase
     check_fixtures_for_authorization_of_sops_and_datafiles_links
     login_as(:model_owner)
     assay=assays(:assay_with_public_and_private_sops_and_datafiles)
-
     assert_difference('ActivityLog.count') do
-      get :show, :id => assay.id
+      get :show, :id=>assay.id
     end
 
     assert_response :success
 
-    # tabs lazy loading: only first tab with items, and other tabs only item types and counts are shown.
     assert_select "div.tabbertab" do
-      assert_select "h3", :text=>"#{I18n.t('sop').pluralize} (2)", :count=>1
-      assert_select "h3", :text=>"#{I18n.t('data_file').pluralize} (2)", :count=>1
+      assert_select "h3", :text=>"#{I18n.t('sop').pluralize} (1+1)", :count=>1
+      assert_select "h3", :text=>"#{I18n.t('data_file').pluralize} (1+1)", :count=>1
     end
 
-    #Other items are only shown when the tab is clicked
-    #TODO: better method to test clicking link?
-
-    #assay.data_files is data_file_versions
-    data_file_ids = assay.data_files.map &:data_file_id
-    get :resource_in_tab, {:resource_ids => data_file_ids.join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-    assert_response :success
     assert_select "div.list_item" do
-      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
-      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
-      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-    end
+      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text=>"SOP with fully public policy", :count=>1
+      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count=>1
+      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count=>0
+      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count=>0
 
-    sop_ids = assay.sops.map &:sop_id
-    get :resource_in_tab, {:resource_ids => sop_ids.join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-    assert_response :success
-    assert_select "div.list_item" do
-      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
-      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
-      assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text=>"Download Only", :count=>1
+      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count=>1
+      assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count=>0
+      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count=>0
     end
-
 
   end
 
+  def test_authorization_of_sops_and_datafiles_links_with_lazy_load
+    #sanity check the fixtures are correct
+    check_fixtures_for_authorization_of_sops_and_datafiles_links
+    login_as(:model_owner)
+    assay=assays(:assay_with_public_and_private_sops_and_datafiles)
+
+    with_config_value :tabs_lazy_load_enabled, true do
+
+      assert_difference('ActivityLog.count') do
+        get :show, :id => assay.id
+      end
+
+      assert_response :success
+
+      # tabs lazy loading: only first tab with items, and other tabs only item types and counts are shown.
+      assert_select "div.tabbertab" do
+        assert_select "h3", :text => "#{I18n.t('sop').pluralize} (2)", :count => 1
+        assert_select "h3", :text => "#{I18n.t('data_file').pluralize} (2)", :count => 1
+      end
+
+      #Other items are only shown when the tab is clicked
+      #TODO: better method to test clicking link?
+
+      #assay.data_files is data_file_versions
+      data_file_ids = assay.data_files.map &:data_file_id
+      get :resource_in_tab, {:resource_ids => data_file_ids.join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      assert_response :success
+      assert_select "div.list_item" do
+        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
+        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
+        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
+        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
+      end
+
+      sop_ids = assay.sops.map &:sop_id
+      get :resource_in_tab, {:resource_ids => sop_ids.join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      assert_response :success
+      assert_select "div.list_item" do
+        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
+        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
+        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+      end
+    end
+  end
   test "associated assets aren't lost on failed validation in create" do
     sop=sops(:sop_with_all_sysmo_users_policy)
     model=models(:model_with_links_in_description)
@@ -1223,8 +1237,45 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test "edit should include tags element" do
+    assay = Factory(:assay,:policy=>Factory(:public_policy))
+    get :edit, :id=>assay.id
+    assert_response :success
+
+    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div#tag_ids",:count=>1
+  end
+
+  test "new should include tags element" do
+    get :new,:class=>:experimental
+    assert_response :success
+    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div#tag_ids",:count=>1
+  end
+
+  test "edit should include not include tags element when tags disabled" do
+    with_config_value :tagging_enabled,false do
+      assay = Factory(:assay,:policy=>Factory(:public_policy))
+      get :edit, :id=>assay.id
+      assert_response :success
+
+      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div#tag_ids",:count=>0
+    end
+  end
+
+  test "new should not include tags element when tags disabled" do
+    with_config_value :tagging_enabled,false do
+      get :new,:class=>:experimental
+      assert_response :success
+      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div#tag_ids",:count=>0
+    end
+  end
+
   test "new object based on existing one" do
-    study = Factory(:study,:policy=>Factory(:public_policy))
+    investigation = Factory(:investigation,:policy=>Factory(:public_policy))
+    study = Factory(:study,:policy=>Factory(:public_policy), :investigation => investigation)
     assay = Factory(:assay,:policy=>Factory(:public_policy),:title=>"the assay",:study=>study)
     assert assay.can_view?
     assert assay.study.can_edit?
@@ -1363,6 +1414,38 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
   end
+
+  test 'faceted browsing config for Assay' do
+    Factory(:assay, :policy => Factory(:public_policy))
+    with_config_value :faceted_browsing_enabled,true do
+      get :index
+      assert_select "div[data-ex-facet-class='TextSearch']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.technology_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", :count => 1
+      assert_select "div[data-ex-role='facet'][data-ex-expression='.for_test']", :count => 0
+    end
+  end
+
+  test 'content config for Assay' do
+    with_config_value :faceted_browsing_enabled,true do
+      get :index
+      assert_select "div[data-ex-role='exhibit-view'][data-ex-label='Tiles'][data-ex-paginate='true']", :count => 1
+    end
+  end
+
+  test 'show only authorized items for faceted browsing' do
+    with_config_value :faceted_browsing_enabled,true do
+      assay1 = Factory(:assay, :policy => Factory(:public_policy))
+      assay2 = Factory(:assay, :policy => Factory(:private_policy))
+      assert assay1.can_view?
+      assert !assay2.can_view?
+      @request.env['HTTP_REFERER'] = '/assays/items_for_result'
+      xhr :post, "items_for_result",{:items => "Assay_#{assay1.id},Assay_#{assay2.id}"}
+      items_for_result =  ActiveSupport::JSON.decode(@response.body)['items_for_result']
+      assert items_for_result.include?(assay1.title)
+      assert !items_for_result.include?(assay2.title)
+    end
+  end
 end
-
-

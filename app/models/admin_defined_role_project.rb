@@ -8,7 +8,7 @@ class AdminDefinedRoleProject < ActiveRecord::Base
   validate :project_belongs_to_person_or_subprojects
 
 
-  after_save :queue_update_auth_table
+  after_commit :queue_update_auth_table, :if=>:persisted?
   before_destroy :queue_update_auth_table
 
   private

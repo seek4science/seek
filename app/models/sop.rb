@@ -9,17 +9,14 @@ class Sop < ActiveRecord::Base
 
   #searchable must come before acts_as_asset is called
   searchable(:auto_index => false) do
-    text :exp_conditions_search_fields,:assay_type_titles,:technology_type_titles, :other_creators
+    text :exp_conditions_search_fields
   end if Seek::Config.solr_enabled
 
   acts_as_asset
-  acts_as_trashable
 
   scope :default_order, order("title")
 
   title_trimmer
-
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   validates_presence_of :title
 
@@ -43,24 +40,6 @@ class Sop < ActiveRecord::Base
     has_one :content_blob,:primary_key => :sop_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version,parent.class.name]}
     has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  Proc.new{["experimental_conditions.sop_version =?",version]}
     
-  end
-
-  # get a list of SOPs with their original uploaders - for autocomplete fields
-  # (authorization is done immediately to save from iterating through the collection again afterwards)
-  #
-  # Parameters:
-  # - user - user that performs the action; this is required for authorization
-  def self.get_all_as_json(user)
-    all = Sop.all_authorized_for "view",user
-    with_contributors = all.collect{ |d|
-        contributor = d.contributor;
-        { "id" => d.id,
-          "title" => h(d.title),
-          "contributor" => contributor.nil? ? "" : "by " + h(contributor.person.name),
-          "type" => self.name
-        }
-    }
-    return with_contributors.to_json
   end
 
   def organism_title

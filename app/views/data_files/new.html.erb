@@ -1,7 +1,7 @@
 
 <% @page_title ||= "New #{t('data_file')}" %>
 <h1><%= @page_title %></h1>
-<% all_institutions = Institution.order(:name) %>
+<% all_institutions = Institution.order(:title) %>
 <div class="show_basic">
     <%= form_tag({:action => :create}, :multipart => true) do -%>
       <%= hidden_field_tag 'data_file[parent_name]', @data_file.parent_name%>
@@ -14,18 +14,17 @@
             <span class="required">*</span>
             <br/>
             <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
-            <%= text_area_tag 'data_file[title]', data_file_title_value, :style => "width: 100%;", :rows=>2 -%>
+            <%= text_area_tag 'data_file[title]', data_file_title_value, :class=>"title_text_entry" -%>
         </p>
         <% if @data_file.is_with_sample? %>
         <p style="margin-top: 0.5em;">
           <b>Institution</b>
-          <span class="required">
-                    <% if Seek::Config.is_virtualliver %>
-                    *
-                    <% end %>
-          </span><br/>
+          <% if Seek::Config.is_virtualliver %>
+              <span class="required"> * </span>
+          <% end %>
+          <br/>
           <%= select_tag :institution_id,
-                       options_for_select(all_institutions.collect { |o| [h(o.name), o.id] }, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)), {} %>
+                       options_for_select(all_institutions.collect { |o| [h(o.title), o.id] }, current_user.try(:person).try(:projects).try(:first).try(:institution_ids).try(:first)), {} %>
 
 
         </p>
@@ -41,7 +40,7 @@
             <b>Description</b>
             <br/>
             <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
-            <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 10 -%>
+            <%= text_area_tag 'data_file[description]', data_file_description_value, :class=>"large_text_entry" -%>
         </p>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file,:allow_nil=>true } -%>
       <p>
@@ -63,7 +62,8 @@
 
         <p>
           <%= preview_permission_popup_link(@data_file)-%>
-          <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
+          <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);" -%>
+          or <%= link_to 'Cancel', data_files_path -%>
         </p>
     </div>
     <% end -%>

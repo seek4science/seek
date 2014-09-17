@@ -1,10 +1,14 @@
 require 'grouped_pagination'
 require 'subscribable'
+
 class Specimen < ActiveRecord::Base
   include Subscribable
-  include Seek::Rdf::RdfGeneration
 
-   acts_as_scalable if Seek::Config.is_virtualliver
+  include Seek::Rdf::RdfGeneration
+  include Seek::Biosamples::PhenoTypesAndGenoTypes
+  include BackgroundReindexing
+
+  acts_as_scalable if Seek::Config.is_virtualliver
 
   acts_as_authorized
   acts_as_favouritable
@@ -13,7 +17,6 @@ class Specimen < ActiveRecord::Base
   grouped_pagination
 
   before_save  :clear_garbage
-  before_destroy :destroy_genotypes_phenotypes
 
   attr_accessor :from_biosamples
 
@@ -23,20 +26,13 @@ class Specimen < ActiveRecord::Base
 
   has_one :organism, :through=>:strain
 
-  has_many :genotypes
-  has_many :phenotypes
   has_many :samples
+  has_many :treatments, :dependent=>:destroy
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
-#  accepts_nested_attributes_for :creators
-  has_many :treatments
   has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
   has_many :sop_masters,:class_name => "SopSpecimen",:dependent => :destroy
-
-
-  accepts_nested_attributes_for :genotypes, :allow_destroy => true
-  accepts_nested_attributes_for :phenotypes, :allow_destroy => true
 
   alias_attribute :description, :comments
 
@@ -64,6 +60,23 @@ class Specimen < ActiveRecord::Base
   "AND sop_specimens.specimen_id = #{self.id})"
   end
 
+  include Seek::Search::BiosampleFields
+
+  searchable(:auto_index=>false) do
+    text :other_creators
+    text :culture_growth_type do
+      culture_growth_type.try :title
+    end
+
+    text :strain do
+      strain.try :title
+      strain.try(:organism).try(:title).to_s
+    end    
+
+    text :creators do
+      creators.compact.map(&:name)
+    end
+  end if Seek::Config.solr_enabled
 
 
   def build_sop_masters sop_ids
@@ -77,23 +90,7 @@ class Specimen < ActiveRecord::Base
     self.sop_masters = self.sop_masters.select { |s| sop_ids.include? s.sop_id }
   end
 
-  def genotype_info
-        genotype_detail = []
-      genotypes.each do |genotype|
-        genotype_detail << genotype.modification.try(:title).to_s + ' ' + genotype.gene.try(:title).to_s if genotype.gene
-      end
-      genotype_detail = genotype_detail.blank? ? 'wild-type' : genotype_detail.join('; ')
-      genotype_detail
-    end
 
-    def phenotype_info
-      phenotype_detail = []
-      phenotypes.each do |phenotype|
-        phenotype_detail << phenotype.try(:description) unless phenotype.try(:description).blank?
-      end
-      phenotype_detail = phenotype_detail.blank? ? 'wild-type' : phenotype_detail.join('; ')
-      phenotype_detail
-    end
 
   def related_people
     creators
@@ -103,38 +100,6 @@ class Specimen < ActiveRecord::Base
     sop_masters.collect(&:sop)
   end
   
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :searchable_terms
-    text :culture_growth_type do
-      culture_growth_type.try :title
-    end
-
-    text :strain do
-      strain.try :title
-      strain.try(:organism).try(:title).to_s
-    end
-    
-    text :institution do
-      institution.try :name
-    end if Seek::Config.is_virtualliver
-
-    text :creators do
-      creators.compact.map(&:name).join(' ')
-    end
-  end if Seek::Config.solr_enabled
-
-  def searchable_terms
-      text=[]
-      text << title
-      text << description
-      text << lab_internal_number
-      text << other_creators
-      if (strain)
-        text << strain.info
-        text << strain.try(:organism).try(:title).to_s
-      end
-      text
-  end
 
   def age_with_unit
       age.nil? ? "" : "#{age}(#{age_unit}s)"
@@ -209,26 +174,5 @@ class Specimen < ActiveRecord::Base
 
   def organism
     strain.try(:organism)
-  end
-
-  def destroy_genotypes_phenotypes
-    genotypes = self.genotypes
-    phenotypes = self.phenotypes
-    genotypes.each do |g|
-      if g.strain.nil?
-        g.destroy
-      else
-        g.specimen_id = nil
-        g.save
-      end
-    end
-    phenotypes.each do |p|
-      if p.strain.nil?
-        p.destroy
-      else
-        p.specimen_id = nil
-        p.save
-      end
-    end
   end
 end

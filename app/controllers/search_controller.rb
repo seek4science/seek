@@ -1,6 +1,7 @@
 class SearchController < ApplicationController
 
   include Seek::ExternalSearch
+  include Seek::FacetedBrowsing
 
   def index
 
@@ -36,6 +37,8 @@ class SearchController < ApplicationController
     end
 
     @include_external_search = params[:include_external_search]=="1"
+
+    ie_support_faceted_browsing? if Seek::Config.faceted_search_enabled
 
     respond_to do |format|
       format.html

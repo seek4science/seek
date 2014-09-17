@@ -5,13 +5,20 @@ class GroupMembership < ActiveRecord::Base
 
   has_and_belongs_to_many :project_roles
 
-  after_save :queue_update_auth_table
-  after_destroy :queue_update_auth_table
+  after_save :remember_previous_person
+  after_commit :queue_update_auth_table
+
+  validates :work_group,:presence => {:message=>"A workgroup is required"}
+
+  def remember_previous_person
+    @previous_person_id = person_id_was
+  end
 
   def queue_update_auth_table
     people = [Person.find_by_id(person_id)]
-    people << Person.find_by_id(person_id_was) unless person_id_was.blank?
+    people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
 
     AuthLookupUpdateJob.add_items_to_queue people.compact
   end
+
 end

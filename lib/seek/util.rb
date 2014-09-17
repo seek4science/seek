@@ -54,7 +54,7 @@ module Seek
     end
 
     def self.searchable_types
-      @@searchable_types ||= (user_creatable_types | [Person, Project, Institution]).sort_by(&:name)
+      @@searchable_types ||= (user_creatable_types | [Person, Programme, Project, Institution]).sort_by(&:name)
     end
 
     def self.scalable_types

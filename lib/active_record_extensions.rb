@@ -13,8 +13,9 @@
       class_alias_method_chain :after_initialize, :ensure_base_exists
 
       def self.is_taggable?
-        self.ancestors.include?(Seek::Taggable)
+        false #defaults to false, unless it includes Taggable which will override this and check the configuration
       end
+
     end
 
 
@@ -55,6 +56,9 @@
     respond_to? :versions
   end
 
+  def is_suggested_type?
+      self.class.include? Seek::Ontologies::SuggestedType
+  end
 end
 
 ActiveRecord::Base.class_eval do

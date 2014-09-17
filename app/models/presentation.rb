@@ -6,16 +6,9 @@ class Presentation < ActiveRecord::Base
 
    attr_accessor :orig_data_file_id
 
-   #searchable must come before acts_as_asset is called
-   searchable(:auto_index => false) do
-     text :other_creators
-   end if Seek::Config.solr_enabled
-
    acts_as_asset
 
    scope :default_order, order("title")
-
-   after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 
@@ -46,18 +39,7 @@ class Presentation < ActiveRecord::Base
   #
   # Parameters:
   # - user - user that performs the action; this is required for authorization
-  def self.get_all_as_json(user)
-    all = Presentation.all_authorized_for "view",user
-    with_contributors = all.collect{ |d|
-        contributor = d.contributor;
-        { "id" => d.id,
-          "title" => h(d.title),
-          "contributor" => contributor.nil? ? "" : "by " + h(contributor.person.name),
-          "type" => self.name
-        }
-    }
-    return with_contributors.to_json
-  end
+
 
    #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?

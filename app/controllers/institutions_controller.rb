@@ -135,7 +135,4 @@ class InstitutionsController < ApplicationController
     end
   end
 
-  def default_items_per_page
-    12 #can be larger for institutions since the item size is smaller
-  end
 end

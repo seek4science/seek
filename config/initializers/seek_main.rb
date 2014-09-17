@@ -2,8 +2,6 @@
 #TO MODIFY THE DEFAULT SETTINGS, COPY seek_local.rb.pre to seek_local.rb AND EDIT THAT FILE INSTEAD
 
 require 'object'
-require 'asset'
-require 'object'
 require 'active_record_extensions'
 require 'acts_as_taggable_extensions'
 require 'acts_as_isa'
@@ -18,8 +16,7 @@ require 'modporter_extensions'
 require "attachment_fu_extension"
 require 'seek/taggable'
 require "bio"
-require 'assets_common_extension'
-require 'acts_as_cached_tree'
+
 require 'sunspot_rails'
 require 'cancan'
 require 'in_place_editing'
@@ -28,7 +25,7 @@ require 'string_extension'
 require 'recaptcha'
 require 'acts_as_list'
 require 'acts_as_trashable'
-require 'acts_as_tree'
+
 require 'country-select'
 require 'will_paginate'
 require 'piwik_analytics'
@@ -42,6 +39,11 @@ require 'subscribable'
 require 'seek/permissions/publishing_permissions'
 
 require 'seek/scalable'
+
+require 'taverna_player_callbacks'
+require 'taverna_player_renderers'
+
+require 'seek/search/search_sunspot'
 
 require 'doi_query_tool_extension'
 
@@ -87,7 +89,6 @@ SEEK::Application.configure do
   Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
   Annotations::Config.versioning_enabled = false
 
-CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell culture'
   ENV['LANG'] = 'en_US.UTF-8'
 
   begin
@@ -108,5 +109,3 @@ CELL_CULTURE_OR_SPECIMEN = Seek::Config.is_virtualliver ? 'specimen' : 'cell cul
       }
 
 end
-
-

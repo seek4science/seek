@@ -45,6 +45,7 @@ class AvatarsControllerTest < ActionController::TestCase
   test 'breadcrumb for avatar index' do
     login_as @admin.user
     person = Factory(:person)
+    Factory(:avatar,:owner=>person)
     get :index,:person_id => person.id
     assert_response :success
 
@@ -58,6 +59,7 @@ class AvatarsControllerTest < ActionController::TestCase
   test 'breadcrumb for uploading new avatar' do
     login_as @admin.user
     person = Factory(:person)
+    Factory(:avatar,:owner=>person)
     get :new,:person_id => person.id
     assert_response :success
     assert_select 'div.breadcrumbs', :text => /Home > People Index > #{person.title} > Edit > Avatars Index > New/, :count => 1 do
@@ -66,6 +68,38 @@ class AvatarsControllerTest < ActionController::TestCase
       assert_select "a[href=?]", person_url(person), :count => 1
       assert_select "a[href=?]", person_avatars_url(person), :count => 1
     end
+  end
+
+  test "index for programmes" do
+    programme = Factory(:programme,:avatar=>Factory(:avatar))
+    Factory(:avatar,:owner=>programme)
+    login_as(@admin)
+    get :index, :programme_id=>programme.id
+    assert_response :success
+  end
+
+  test "index for projects" do
+    p = Factory(:project,:avatar=>Factory(:avatar))
+    Factory(:avatar,:owner=>p)
+    login_as(@admin)
+    get :index, :project_id=>p.id
+    assert_response :success
+  end
+
+  test "index for institutions" do
+    i = Factory(:institution,:avatar=>Factory(:avatar))
+    Factory(:avatar,:owner=>i)
+    login_as(@admin)
+    get :index, :institution_id=>i.id
+    assert_response :success
+  end
+
+  test "new avatar for programme" do
+    programme = Factory(:programme,:avatar=>Factory(:avatar))
+    Factory(:avatar,:owner=>programme)
+    login_as(@admin)
+    get :new, :programme_id=>programme
+    assert_response :success
   end
   
 end

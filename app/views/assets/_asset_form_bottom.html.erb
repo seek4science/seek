@@ -3,31 +3,32 @@
 <%
    if f ||= nil
      resource_type ||= f.object.class.name
-     existing_attributions ||= try_block{f.object.attributions_objects.select &:can_view?}
+     existing_attributions ||= f.try(:object).respond_to?(:attributions_objects) ? f.object.attributions_objects.select(&:can_view?) : nil
 	 existing_creators ||= f.object.try(:creators)
      existing_creators =  [current_user.person] if existing_creators.blank?
 	 other_creators ||= f.object.try :other_creators
-	 related_publications ||= try_block { f.object.related_publications }
+	 related_publications ||= f.try(:object).respond_to?(:related_publications) ? f.object.related_publications : nil
    end
    existing_attributions||=[]
    existing_creators||=[current_user.person]
    related_publications||=[]
    other_creators||=nil
    show_publications=true if show_publications.nil?
-   taggable = resource_type.constantize.respond_to?("is_taggable?") && resource_type.constantize.is_taggable?
+   taggable = resource_type.constantize.is_taggable?
    sharing_enable=true if sharing_enable.nil?
    attribution_enable=true if attribution_enable.nil?
    creators_enable=true if creators_enable.nil?
+   sharing_link=true if sharing_link.nil?
 %>
 <% if sharing_enable -%>
     <p>
-      <%= render :partial => "assets/sharing_form" -%>
+      <%= render :seek_partial => "assets/sharing_form" -%>
     </p>
 <% end -%>
 
 <% if taggable -%>
     <p>
-      <%= render :partial=>"assets/select_tags" -%>
+      <%= render :seek_partial=>"assets/select_tags" -%>
     </p>
 <% end -%>
 <% if attribution_enable %>
@@ -44,8 +45,10 @@
                                                                :other_creators => other_creators} -%>
     </p>
 <% end %>
-<% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
-    <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+<% if sharing_link %>
+    <% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
+        <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f}%>
+    <% end %>
 <% end %>
 <% if show_publications -%>
     <p>

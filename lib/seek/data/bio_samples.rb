@@ -51,8 +51,8 @@ module Seek
       @mock_json_import = {}
       @assay_json = {}
 
-      @institution_name = ""
-      @institution_name = Institution.find(institution_id).try(:name) if institution_id
+      @institution_title = ""
+      @institution_title = Institution.find(institution_id).try(:title) if institution_id
 
       if xml
         begin
@@ -64,10 +64,10 @@ module Seek
         end
         if doc
           template = @file.template_name
-          Rails.logger.warn "Template = #{template}, Institution name = " + @institution_name
+          Rails.logger.warn "Template = #{template}, Institution name = " + @institution_title
           filename = @file.content_blob.original_filename
           parser_mapper = Seek::ParserMapper.new
-          @parser_mapping = parser_mapper.mapping(template.downcase != "autodetect by filename" ? template.downcase : parser_mapper.filename_to_mapping_name(filename))
+          @parser_mapping = parser_mapper.mapping(template.downcase != "autodetect by filename" && template.downcase != "none" ? template.downcase : parser_mapper.filename_to_mapping_name(filename))
 
           if @parser_mapping
             @samples_mapping = @parser_mapping[:samples_mapping]
@@ -236,22 +236,23 @@ module Seek
       @study.investigation = @investigation
       study.save!
 
-        assay_class = AssayClass.find_by_title(I18n.t('assays.experimental_assay'))
-        assay_class = AssayClass.create :title => I18n.t('assays.experimental_assay') unless assay_class
-      assay_type =  AssayType.find_by_title(assay_type_title)
-      assay_type = AssayType.create :title=> assay_type_title unless assay_type
+      assay_class = AssayClass.where(title: I18n.t('assays.experimental_assay')).first_or_create
+      assay_type_in_ontology = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_label[assay_type_title.downcase]
+      assay_type = assay_type_in_ontology || SuggestedAssayType.where(label: assay_type_title).first_or_create
 
-        assay_title = filename.nil? ? "dummy #{t('assays.assay').downcase}" : filename.split(".").first
-      @assay = Assay.all.detect{|a|a.title == assay_title  && a.study_id == study.id  && a.assay_class_id == assay_class.try(:id)  && a.assay_type == assay_type  && a.owner_id == User.current_user.person.id}
+
+      assay_title = filename.nil? ? "dummy #{t('assays.assay').downcase}" : filename.split(".").first
+      @assay = Assay.all.detect{|a|a.title == assay_title  && a.study_id == study.id  && a.assay_class_id == assay_class.try(:id)  && a.assay_type_uri== assay_type.uri.try(:to_s)  && a.owner_id == User.current_user.person.id}
       unless @assay
         @assay = Assay.new :title => assay_title
         @assay.policy = Policy.private_policy
       end
       @assay.lock!
       @assay.assay_class = assay_class
-      @assay.assay_type = assay_type
+      @assay.assay_type_uri = assay_type.uri.try(:to_s)
+      @assay.assay_type_label = assay_type_title
       ### unknown technology type
-      @assay.technology_type = TechnologyType.first
+      #@assay.technology_type_uri = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_label
       @assay.study = study
       @assay.save!
       @assay.relate @file
@@ -405,12 +406,12 @@ module Seek
           sample_organism_parts = hunt_for_field_values_mapped sheet, :"samples.organism_part", @samples_mapping
           tissue_and_cell_types = hunt_for_field_values_mapped sheet, :"tissue_and_cell_types.title", @samples_mapping
           sop_titles = hunt_for_field_values_mapped sheet, :"sop.title", @samples_mapping
-          institution_names = hunt_for_field_values_mapped sheet, :"institution.name", @samples_mapping
+          institution_titles = hunt_for_field_values_mapped sheet, :"institution.title", @samples_mapping
 
 
-          samples_data = sample_titles.zip(sample_types, sample_donation_dates, sample_comments, sample_organism_parts, tissue_and_cell_types, sop_titles, institution_names, specimen_titles).map do |sample_title, sample_type, sample_donation_date, sample_comment, sample_organism_part, tissue_and_cell_type, sop_title, institution_name, specimen_title|
+          samples_data = sample_titles.zip(sample_types, sample_donation_dates, sample_comments, sample_organism_parts, tissue_and_cell_types, sop_titles, institution_titles, specimen_titles).map do |sample_title, sample_type, sample_donation_date, sample_comment, sample_organism_part, tissue_and_cell_type, sop_title, institution_title, specimen_title|
             {:sample_title => sample_title, :sample_type => sample_type, :sample_donation_date => sample_donation_date, :sample_comment => sample_comment, :sample_organism_part => sample_organism_part,
-             :tissue_and_cell_type => tissue_and_cell_type, :sop_title => sop_title, :institution_name => institution_name, :specimen_title => specimen_title}
+             :tissue_and_cell_type => tissue_and_cell_type, :sop_title => sop_title, :institution_title => institution_title, :specimen_title => specimen_title}
           end
 
           Rails.logger.warn "$$$$$$$$$$$$$$ samples_comments #{sample_comments}"
@@ -493,7 +494,7 @@ module Seek
         if assay_json["investigation title"] &&
            assay_json["assay type title"] &&
            assay_json["study title"]
-            assay = populate_assay data["assay"], @file.original_filename
+            assay = populate_assay data["assay"], @file.content_blob.original_filename
         end
       else
         @creator = Person.find(User.current_user.person_id)
@@ -783,13 +784,14 @@ module Seek
 
         strain = Strain.new :title => strain_title  unless strain
         strain.organism = organism
+        strain.projects = @file.projects
         strain.save!
 
 
 
         specimen = Specimen.find_by_title specimen_title
 
-        institution = Institution.find_by_name @institution_name
+        institution = Institution.find_by_title @institution_title
 
         unless specimen
           specimen = Specimen.new :title => specimen_title, :lab_internal_number => specimen_title
@@ -867,7 +869,7 @@ module Seek
       tissue_and_cell_type_title = sample_data[:tissue_and_cell_type][:value]
       sop_title = sample_data[:sop_title][:value]
       donation_date = sample_data[:sample_donation_date][:value]
-      institution_name = sample_data[:institution_name][:value]
+      institution_title = sample_data[:institution_title][:value]
       comments = sample_data[:sample_comment][:value]
       organism_part = sample_data[:sample_organism_part][:value]
 
@@ -878,7 +880,7 @@ module Seek
                 "tissue and cell type" => tissue_and_cell_type_title,
                 "sop" => sop_title,
                 "donation date" => donation_date.to_s,
-                "institution" => institution_name,
+                "institution" => institution_title,
                 "comments" => comments,
                 "organism part" => organism_part}
 
@@ -900,12 +902,12 @@ module Seek
         tissue_and_cell_type_title = sample_json["tissue and cell type"]
         sop_title = sample_json["sop"]
         donation_date = sample_json["donation date"] + " UTC +00.00"
-        institution_name = sample_json["institution"]
+        institution_title = sample_json["institution"]
         comments = sample_json["comments"]
         organism_part = sample_json["organism part"]
 
         sop_title = nil if sop_title=="NO STORAGE"
-        institution_name = @institution_name if (institution_name=="" || institution_name.nil?)
+        institution_title = @institution_title if (institution_title=="" || institution_title.nil?)
 
 
         #Rails.logger.warn "TISSUE AND CELL TYPE TITLE : #{tissue_and_cell_type_title}"
@@ -919,7 +921,7 @@ module Seek
         end
 
         sop = Sop.find_by_title sop_title
-        institution = Institution.find_by_name institution_name
+        institution = Institution.find_by_title institution_title
 
         #specimen_title = @specimen_names[row]
         #specimen = Specimen.find_by_title specimen_title
@@ -949,7 +951,6 @@ module Seek
           sample.comments = comments
           sample.treatment = treatment
           sample.policy = @file.policy.deep_copy
-          sample.creators << @creator
           sample.save!
         else
           unless sample.specimen == specimen &&
@@ -1068,7 +1069,7 @@ module Seek
     end
 
     def hunt_for_horizontal_field_value_mapped sheet, field_name, mapping
-      mapping[field_name][:value].call((hunt_for_horizontal_field_value(sheet, mapping[field_name][:column]))).map { |it| {:value => it}}
+      Array(mapping[field_name][:value].call((hunt_for_horizontal_field_value(sheet, mapping[field_name][:column])))).map { |it| {:value => it}}
     end
 
     # this is the most important method to get data out of the spreadsheet

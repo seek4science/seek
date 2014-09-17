@@ -11,7 +11,7 @@ class Model < ActiveRecord::Base
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :organism_terms,:model_contents_for_search,:assay_type_titles,:technology_type_titles, :other_creators
+    text :organism_terms,:model_contents_for_search
     text :model_format do
       model_format.try(:title)
     end
@@ -24,15 +24,12 @@ class Model < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   acts_as_asset
-  acts_as_trashable
 
   scope :default_order, order("title")
 
   include Seek::Models::ModelExtraction
 
   validates_presence_of :title
-
-  after_save :queue_background_reindexing if Seek::Config.solr_enabled
 
   before_save :check_for_sbml_format
   
@@ -76,24 +73,6 @@ class Model < ActiveRecord::Base
       ContentBlob.where(["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
     end
 
-  end
-
-  # get a list of Models with their original uploaders - for autocomplete fields
-  # (authorization is done immediately to save from iterating through the collection again afterwards)
-  #
-  # Parameters:
-  # - user - user that performs the action; this is required for authorization
-  def self.get_all_as_json(user)
-    all = Model.all_authorized_for "view",user
-    with_contributors = all.collect{ |d|
-        contributor = d.contributor;
-        { "id" => d.id,
-          "title" => h(d.title),
-          "contributor" => contributor.nil? ? "" : "by " + h(contributor.person.name),
-          "type" => self.name
-        }
-    }
-    return with_contributors.to_json
   end
 
   def organism_terms

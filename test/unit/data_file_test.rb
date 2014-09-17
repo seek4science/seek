@@ -131,18 +131,34 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal [p],df.latest_version.projects
   end
 
-  def test_defaults_to_blank_policy
+  def test_defaults_to_private_policy
     df_hash = Factory.attributes_for(:data_file)
     df_hash[:policy] = nil
     df=DataFile.new(df_hash)
-
-    assert !df.valid?
-    assert !df.policy.valid?
-    assert_blank df.policy.sharing_scope
-    assert_blank df.policy.access_type
+    df.save!
+    df.reload
+    assert_not_nil df.policy
+    assert_equal Policy::PRIVATE, df.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, df.policy.access_type
     assert_equal false,df.policy.use_whitelist
     assert_equal false,df.policy.use_blacklist
-    assert_blank df.policy.permissions
+    assert df.policy.permissions.empty?
+  end
+
+  def test_defaults_to_blank_policy_for_vln
+    with_config_value "is_virtualliver",true do
+      df_hash = Factory.attributes_for(:data_file)
+      df_hash[:policy] = nil
+      df=DataFile.new(df_hash)
+
+      assert !df.valid?
+      assert !df.policy.valid?
+      assert_blank df.policy.sharing_scope
+      assert_blank df.policy.access_type
+      assert_equal false,df.policy.use_whitelist
+      assert_equal false,df.policy.use_blacklist
+      assert_blank df.policy.permissions
+    end
   end
 
   test "data_file with no contributor" do
@@ -459,12 +475,13 @@ class DataFileTest < ActiveSupport::TestCase
         assert_equal 0,df.treatments.values.keys.count
       end
   end
- test "cache_remote_content" do
+
+  test "cache_remote_content" do
     user = Factory :user
     User.with_current_user(user) do
-      mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://mockedlocation.com/picture.png"
+      mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", "http://mockedlocation.com/picture.png"
 
-      data_file = Factory :data_file, :content_blob=>ContentBlob.new(:url=>"http://mockedlocation.com/picture.png",:original_filename=>"picture.png")
+      data_file = Factory :data_file, :content_blob => ContentBlob.new(:url => "http://mockedlocation.com/picture.png", :original_filename => "picture.png")
 
       data_file.save!
 
@@ -474,8 +491,6 @@ class DataFileTest < ActiveSupport::TestCase
 
       assert data_file.content_blob.file_exists?
     end
-
-
   end
 
 =begin

@@ -6,11 +6,14 @@ class AuthLookupUpdateJob
 
   BATCHSIZE=3
 
+  mattr_accessor :job_queue_name
+  @@job_queue_name = "authlookup"
+
   def perform
     process_queue
 
     if AuthLookupUpdateQueue.count>0 && !AuthLookupUpdateJob.exists?
-      Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>0, :run_at=>1.seconds.from_now)
+      Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>0, :queue=>AuthLookupUpdateJob.job_queue_name,:run_at=>1.seconds.from_now)
     end
   end
 
@@ -73,9 +76,10 @@ class AuthLookupUpdateJob
 
       disable_authorization_checks do
         items.uniq.each do |item|
-          #immediately update for the current user
+          #immediately update for the current user and anonymous user
           if item.respond_to?(:authorization_supported?) && item.authorization_supported?
             item.update_lookup_table(User.current_user)
+            item.update_lookup_table(nil) unless User.current_user.nil?
           end
           # Could potentially delete the records for this item (either by asset_id or user_id) to ensure an immediate reflection of the change,
           # but with some slowdown until the changes have been reapplied.
@@ -83,7 +87,7 @@ class AuthLookupUpdateJob
           # for users some additional simple code is required.
           AuthLookupUpdateQueue.create(:item=>item, :priority=>queuepriority) unless AuthLookupUpdateQueue.exists?(item)
         end
-        Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>priority, :run_at=>t) unless AuthLookupUpdateJob.count>10
+        Delayed::Job.enqueue(AuthLookupUpdateJob.new, :priority=>priority, :queue=>AuthLookupUpdateJob.job_queue_name,:run_at=>t) unless AuthLookupUpdateJob.count>10
       end
     end
   end

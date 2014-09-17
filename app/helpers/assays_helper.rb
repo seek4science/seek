@@ -35,8 +35,8 @@ module AssaysHelper
   end
 
 
-  def authorised_assays projects=nil
-    authorised_assets(Assay, projects, "edit")
+  def authorised_assays projects=nil,action="edit"
+    authorised_assets(Assay, projects, action)
   end
 
 

@@ -89,11 +89,12 @@ class AssayTypesControllerTest < ActionController::TestCase
       assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
     end
   end
+
   test "no label passed render the same page as long as the same ontolgoy uri is passed" do
     assay = Factory :experimental_assay, :policy => Factory(:public_policy)
     #without label
     get :show, :uri => assay.assay_type_uri
-    assert_select "h1", :text => /Assay type &#x27;#{assay.assay_type_label}&#x27;/
+    assert_select "h1", :text => /Assay type &#x27;#{assay.assay_type_label}&#x27;/i
     assert_select "div.list_items_container" do
       assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
     end

@@ -3,7 +3,7 @@ require 'test_helper'
 class ProjectTest < ActiveSupport::TestCase
   
   fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users,  :publications, :assets, :organisms
-  #checks that the dependent work_groups are destoryed when the project s
+  #checks that the dependent work_groups are destroyed when the project s
   def test_delete_work_groups_when_project_deleted
     n_wg=WorkGroup.all.size
     p=Project.find(2)
@@ -91,12 +91,7 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_ordered_by_name
-    assert Project.all.sort_by {|p| p.name.downcase} == Project.default_order || Project.all.sort_by {|p| p.name} == Project.default_order
-  end
-
-  def test_title_alias_for_name
-    p=projects(:sysmo_project)
-    assert_equal p.name,p.title
+    assert Project.all.sort_by {|p| p.title.downcase} == Project.default_order || Project.all.sort_by {|p| p.title} == Project.default_order
   end
 
   def test_title_trimmed 
@@ -218,7 +213,7 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_update_first_letter
-    p=Project.new(:name=>"test project")
+    p=Project.new(:title=>"test project")
     p.save
     assert_equal "T",p.first_letter
   end
@@ -274,13 +269,13 @@ class ProjectTest < ActiveSupport::TestCase
     p.wiki_page="http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110"
     assert p.valid?
 
-    p.name=nil
+    p.title=nil
     assert !p.valid?
 
-    p.name=""
+    p.title=""
     assert !p.valid?
 
-    p.name="fred"
+    p.title="fred"
     assert p.valid?
   end
 
@@ -300,8 +295,8 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test "Should order Latest list of projects by updated_at" do
-    project1 = Factory(:project, :name => 'C', :updated_at => 2.days.ago)
-    project2 = Factory(:project, :name => 'B', :updated_at => 1.days.ago)
+    project1 = Factory(:project, :title => 'C', :updated_at => 2.days.ago)
+    project2 = Factory(:project, :title => 'B', :updated_at => 1.days.ago)
 
     latest_projects = Project.paginate_after_fetch([project1,project2], :page=>'latest')
     assert_equal project2, latest_projects.first
@@ -335,6 +330,7 @@ class ProjectTest < ActiveSupport::TestCase
   test "gatekeepers" do
     User.with_current_user(Factory(:admin)) do
       person=Factory(:person_in_multiple_projects)
+      assert_equal 3,person.projects.count
       proj1 = person.projects.first
       proj2 = person.projects.last
       person.is_gatekeeper=true,proj1
@@ -384,6 +380,143 @@ class ProjectTest < ActiveSupport::TestCase
     end
   end
 
+  test "without programme" do
+    p1 = Factory(:project)
+    p2 = Factory(:project,:programme=>Factory(:programme))
+    ps = Project.without_programme
+    assert_includes ps,p1
+    refute_includes ps,p2
+  end
 
+
+
+  test "ancestor and dependants" do
+    p=Factory(:project)
+    p2 = Factory(:project)
+
+    assert_nil p2.lineage_ancestor
+    assert_empty p.lineage_descendants
+
+    p.lineage_ancestor = p
+    refute p.valid?
+
+    p2.lineage_ancestor = p
+    assert p2.valid?
+    p2.save!
+    p2.reload
+    p.reload
+
+    assert_equal p,p2.lineage_ancestor
+    assert_equal [p2],p.lineage_descendants
+
+    #repeat, but assigning the other way around
+    p=Factory(:project)
+    p2 = Factory(:project)
+
+    assert_nil p2.lineage_ancestor
+    assert_empty p.lineage_descendants
+
+    p2.lineage_descendants << p
+    assert p2.valid?
+    p2.save!
+    p2.reload
+    p.reload
+
+    assert_equal [p],p2.lineage_descendants
+    assert_equal p2,p.lineage_ancestor
+
+    p3=Factory(:project)
+    p2.lineage_descendants << p3
+    p2.save!
+    p2.reload
+    assert_equal [p,p3],p2.lineage_descendants.sort_by(&:id)
+  end
+
+  test "spawn" do
+    p = Factory(:programme,:projects=>[Factory(:project,:avatar=>Factory(:avatar))]).projects.first
+    wg1 = Factory(:work_group,:project=>p)
+    wg2 = Factory(:work_group,:project=>p)
+    person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg1)])
+    person2 = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg1)])
+    person3 = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg2)])
+    p.reload
+
+    assert_equal 3,p.people.size
+    assert_equal 2,p.work_groups.size
+    assert_includes p.people,person
+    assert_includes p.people,person2
+    assert_includes p.people,person3
+    refute_nil p.avatar
+
+    p2 = p.spawn
+    assert p2.new_record?
+
+    assert_equal p2.title,p.title
+    assert_equal p2.description,p.description
+    assert_equal p2.programme,p.programme
+
+    p2.title="sdfsdflsdfoosdfsdf" #to allow it to save
+
+    p2.save!
+    p2.reload
+    p.reload
+
+    assert_nil p2.avatar
+    refute_equal p,p2
+    refute_includes p2.work_groups,wg1
+    refute_includes p2.work_groups,wg2
+
+    assert_equal 2,p2.work_groups.size
+
+    assert_equal p.institutions,p2.institutions
+    assert_equal p.people,p2.people
+    assert_equal 3,p2.people.size
+
+    assert_includes p2.people,person
+    assert_includes p2.people,person2
+    assert_includes p2.people,person3
+
+    assert_equal p,p2.lineage_ancestor
+    assert_equal [p2],p.lineage_descendants
+
+    prog2=Factory(:programme)
+    p2=p.spawn({:title=>"fish project",:programme=>prog2,:description=>"about doing fishing"})
+    assert p2.new_record?
+
+    assert_equal "fish project",p2.title
+    assert_equal prog2,p2.programme
+    assert_equal "about doing fishing",p2.description
+
+  end
+
+  test "spawn consolidates workgroups" do
+    p = Factory(:programme,:projects=>[Factory(:project,:avatar=>Factory(:avatar))]).projects.first
+    wg1 = Factory(:work_group,:project=>p)
+    wg2 = Factory(:work_group,:project=>p)
+    Factory(:group_membership,:work_group=>wg1,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg1,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg1,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg2,:person=>Factory(:person))
+    Factory(:group_membership,:work_group=>wg2,:person=>Factory(:person))
+    p.reload
+    assert_equal 5,p.people.count
+    assert_equal 2,p.work_groups.count
+    p2=nil
+    assert_difference("WorkGroup.count",2) do
+      assert_difference("GroupMembership.count",5) do
+        assert_difference("Project.count",1) do
+          assert_no_difference("Person.count") do
+            p2 = p.spawn(:title=>"sdfsdfsdfsdf")
+            p2.save!
+          end
+        end
+      end
+    end
+    p2.reload
+    assert_equal 5,p2.people.count
+    assert_equal 2,p2.work_groups.count
+    refute_equal p.work_groups,p2.work_groups
+    assert_equal p.people,p2.people
+  end
 
 end

@@ -8,7 +8,7 @@
   <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(@project) -%>
     <li><%= image_tag_for_key('organise', project_folders_path(@project.id), "Organise", nil, "Organise") -%></li>
   <% end -%>
-<% if mine?(@project) || @project.try(:can_be_edited_by?, current_user) -%>
+<% if mine?(@project) || @project.can_be_edited_by?(current_user) -%>
 
     <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
 
@@ -32,6 +32,10 @@
 
     <div class="box_about_actor">
       <%=  item_description @project.description -%>
+      <p>
+        <label><%= t('programme') -%>:</label>
+        <%= programme_link(@project) -%>
+      </p>
         <p>
           <label>Public web page:</label>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>

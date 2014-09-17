@@ -15,32 +15,29 @@ class ApplicationController < ActionController::Base
 
   before_filter :log_extra_exception_data
 
+
   after_filter :log_event
 
   include AuthenticatedSystem
 
   around_filter :with_current_user
 
-  rescue_from "ActionController::RoutingError", :with=>:render_routing_error
-
-  def with_current_user
-    User.with_current_user current_user do
-        yield
-    end
-  end
+  #rescue_from "ActionController::RoutingError", :with=>:render_routing_error
 
   before_filter :profile_for_login_required
-  #around_filter :silence_logging if Rails.env == 'production'
-  def silence_logging
-    Rails.logger.silence do
-      yield
-    end
-  end
-
 
   before_filter :project_membership_required,:only=>[:create,:new]
 
+  before_filter :restrict_guest_user, :only => [:new, :edit, :batch_publishing_preview]
   helper :all
+
+  layout Seek::Config.main_layout
+
+  def with_current_user
+    User.with_current_user current_user do
+      yield
+    end
+  end
 
   def strip_root_for_xml_requests
     #intended to use as a before filter on requests that lack a single root model.
@@ -65,7 +62,7 @@ class ApplicationController < ActionController::Base
     return  "http://#{base_host}"
   end
   helper_method :application_root
-
+  
   #Overridden from restful_authentication
   #Does a second check that there is a profile assigned to the user, and if not goes to the profile
   #selection page (GET people/select)
@@ -122,13 +119,10 @@ class ApplicationController < ActionController::Base
     current_user.forget_me if logged_in?
     cookies.delete :auth_token
     cookies.delete :open_id
-    error = flash[:error]
-    notice = flash[:notice]
     reset_session
-    flash[:error] = error
-    flash[:notice] = notice
   end
 
+  #MERGENOTE - put back for now, but needs modularizing, refactoring, and possibly replacing
   def resource_in_tab
     resource_type = params[:resource_type]
     view_type = params[:view_type]
@@ -140,7 +134,7 @@ class ApplicationController < ActionController::Base
       actions_partial_disable = false
     end
 
-     #params[:resource_ids] is passed as string, e.g. "id1, id2, ..."
+    #params[:resource_ids] is passed as string, e.g. "id1, id2, ..."
     resource_ids = (params[:resource_ids] || '').split(',')
     clazz = resource_type.constantize
     resources = clazz.find_all_by_id(resource_ids)
@@ -155,13 +149,26 @@ class ApplicationController < ActionController::Base
     end
 
     render :update do |page|
-        page.replace_html "#{scale_title}_#{resource_type}_#{view_type}",
-                          :partial => "assets/resource_in_tab",
-                          :locals => {:resources => resources,
-                                      :scale_title => scale_title,
-                                      :authorized_resources => authorized_resources,
-                                      :view_type => view_type,
-                                      :actions_partial_disable => actions_partial_disable}
+      page.replace_html "#{scale_title}_#{resource_type}_#{view_type}",
+                        :partial => "assets/resource_in_tab",
+                        :locals => {:resources => resources,
+                                    :scale_title => scale_title,
+                                    :authorized_resources => authorized_resources,
+                                    :view_type => view_type,
+                                    :actions_partial_disable => actions_partial_disable}
+    end
+  end
+
+  private
+
+  def restrict_guest_user
+    if current_user && current_user.guest?
+      flash[:error] = "You cannot perform this action as a Guest User. Please sign in or register for an account first."
+      if !request.env["HTTP_REFERER"].nil?
+        redirect_to :back
+      else
+        redirect_to main_app.root_path
+      end
     end
   end
 
@@ -171,13 +178,19 @@ class ApplicationController < ActionController::Base
     unless User.logged_in_and_member? || User.admin_logged_in?
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
-        format.html do
-          #FIXME: remove the try_block{}
+        format.html do          
           object = eval("@"+controller_name.singularize)
           if !object.nil? && object.try(:can_view?)
             redirect_to object
           else
-            try_block { redirect_to eval("#{controller_name}_path") } or redirect_to root_url
+            path = nil
+            begin
+              path = eval("main_app.#{controller_name}_path")
+            rescue Exception=>e
+              logger.error("No path found for controller - #{controller_name}",e)
+              path = main_app.root_path
+            end
+            redirect_to path
           end
 
         end
@@ -228,11 +241,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  #The default for the number items in a page when paginating
-  def default_items_per_page
-    7
-  end
-
   #required for the Savage Beast
   def admin?
     User.admin_logged_in?
@@ -246,7 +254,7 @@ class ApplicationController < ActionController::Base
     if User.current_user
       if User.current_user.person.nil?
         flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
-        redirect_to select_people_path
+        redirect_to main_app.select_people_path
       end
     end
   end
@@ -255,30 +263,30 @@ class ApplicationController < ActionController::Base
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
           'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview', 'new_object_based_on_existing_one'
-
+          'tag', 'items', 'statistics', 'tag_suggestions', 'preview','runs','new_object_based_on_existing_one'
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,
-          'export_as_xgmml','compare_versions'
+          'export_as_xgmml', 'download_log', 'download_results', 'input', 'output', 'download_output', 'download_input',
+          'view_result','compare_versions'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
           'destroy_version', 'edit_version', 'update_version', 'new_item',
-          'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link'
+          'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link', 'describe_ports'
         'edit'
 
-      when 'destroy', 'destroy_item'
+      when 'destroy', 'destroy_item', 'cancel'
         'delete'
 
-      when 'manage'
+      when 'manage', 'notification', 'read_interaction', 'write_interaction'
           'manage'
       else
         nil
     end
   end
 
-  #hanles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
+  #handles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
   def find_requested_item
     name = self.controller_name.singularize
     object = name.camelize.constantize.find_by_id(params[:id])
@@ -310,8 +318,10 @@ class ApplicationController < ActionController::Base
         params.delete :sharing unless object.can_manage?(current_user)
       else
         respond_to do |format|
-          store_location
-          #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
+
+          #remember the location to return to if somebody immediately logs in next
+          store_return_to_location
+
           if User.current_user.nil?
             flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
           else
@@ -337,7 +347,7 @@ class ApplicationController < ActionController::Base
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
         if eval("@#{name}").nil?
-          flash[:error] = "The #{name.humanize} does not exist!"
+          flash[:error] = "The #{name.humanize.downcase} does not exist!"
         else
           flash[:error] = "You are not authorized to view #{name.humanize}"
         end
@@ -475,7 +485,7 @@ class ApplicationController < ActionController::Base
   end
 
   def permitted_filters
-    #placed this in a seperate method so that other controllers could override it if necessary
+    #placed this in a separate method so that other controllers could override it if necessary
     Seek::Util.persistent_classes.select {|c| c.respond_to? :find_by_id}.map {|c| c.name.underscore}
   end
 
@@ -503,48 +513,49 @@ class ApplicationController < ActionController::Base
         klass = filter.camelize.constantize
         value = klass.find_by_id value.to_i
 
-        case
-          #first the special cases
-          when filter == 'investigation' && res.respond_to?(:assays)
-            res.assays.collect { |a| a.study.investigation_id }.include? value.id
-          when filter == 'study' && res.respond_to?(:assays)
-            res.assays.collect { |a| a.study_id }.include? value.id
-         
-        when (filter == 'project' && res.respond_to?(:projects_and_ancestors)) then res.projects_and_ancestors.include? value
-        when (filter == 'project' && res.class.name == "Assay") then Seek::Config.project_hierarchy_enabled ? res.study.investigation.projects_and_ancestors.include?(value) : res.study.investigation.projects.include?(value)
-        when (filter == 'project' && res.class.name == "Study") then Seek::Config.project_hierarchy_enabled ? res.investigation.projects_and_ancestors.include?(value) : res.investigation.projects.include?(value)
-            when filter == 'person' && res.class.is_asset?
-
-             (res.creators.include?(value) || res.contributor== value || res.contributor.try(:person) == value)
-          when filter == 'person' && (res.respond_to?(:contributor) || res.respond_to?(:creators) || res.respond_to?(:owner))
-            people = [res.contributor,res.contributor.try(:person)]
-            people = people | res.creators if res.respond_to?(:creators)
-            people << res.owner if res.respond_to?(:owner)
-            people.compact!
-            people.include?(value)
-          #then the general case
-          when res.respond_to?("all_related_#{filter.pluralize}")
-            res.send("all_related_#{filter.pluralize}").include?(value)
-          when res.respond_to?("related_#{filter.pluralize}")
-            res.send("related_#{filter.pluralize}").include?(value)
-          when res.respond_to?(filter)
-            res.send(filter) == value
-          when res.respond_to?(filter.pluralize)
-            res.send(filter.pluralize).include? value
-          #defaults to false, if a filter is not recognised then nothing is return
-          else
-            false
-        end
+        detect_for_filter(filter, res, value)
       end
     end
   end
+
+  def detect_for_filter(filter, resource, value)
+    case
+      #first the special cases
+      when filter == 'investigation' && resource.respond_to?(:assays)
+        resource.assays.collect { |a| a.study.investigation_id }.include? value.id
+      when filter == 'study' && resource.respond_to?(:assays)
+        resource.assays.collect { |a| a.study_id }.include? value.id
+      when (filter == 'project' && resource.respond_to?(:projects_and_ancestors))
+        resource.projects_and_ancestors.include? value
+      when filter == 'person' && resource.class.is_asset?
+        (resource.creators.include?(value) || resource.contributor== value || resource.contributor.try(:person) == value)
+      when filter == 'person' && (resource.respond_to?(:contributor) || resource.respond_to?(:creators) || resource.respond_to?(:owner))
+        people = [resource.contributor, resource.contributor.try(:person)]
+        people = people | resource.creators if resource.respond_to?(:creators)
+        people << resource.owner if resource.respond_to?(:owner)
+        people.compact!
+        people.include?(value)
+      #then the general case
+      when resource.respond_to?("all_related_#{filter.pluralize}")
+        resource.send("all_related_#{filter.pluralize}").include?(value)
+      when resource.respond_to?("related_#{filter.pluralize}")
+        resource.send("related_#{filter.pluralize}").include?(value)
+      when resource.respond_to?(filter)
+        resource.send(filter) == value
+      when resource.respond_to?(filter.pluralize)
+        resource.send(filter.pluralize).include? value
+      #defaults to false, if a filter is not recognised then nothing is return
+      else
+        false
+    end
+  end
+
 
   def log_extra_exception_data
       request.env["exception_notifier.exception_data"] = {
           :current_logged_in_user=>current_user
       }
   end
-
 
 end
 

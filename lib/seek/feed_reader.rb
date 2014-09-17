@@ -3,28 +3,55 @@ require 'feedjira'
 module Seek
   class FeedReader
 
+    BLACKLIST_TIME=1.day
+
     #Fetches the feed entries - aggregated and ordered, for a particular category
     #the category may be either :project_news or :community_news
     def self.fetch_entries_for category
       raise ArgumentError.new("Invalid category - should be either :project_news or :community_news") unless [:project_news,:community_news].include? category
 
-      urls = Seek::Config.send("#{category.to_s}_feed_urls")
-      n = Seek::Config.send("#{category.to_s}_number_of_entries")
+      feeds = fetch_feeds_for_category(category)
 
-      feeds = urls.split(",").select{|url| !url.blank?}.collect do |url|
+      filter_feeds_entries_with_chronological_order(feeds, Seek::Config.send("#{category.to_s}_number_of_entries"))
+    end
+
+    def self.fetch_feeds_for_category(category)
+      feeds = determine_feed_urls(category).collect do |url|
         begin
-          Rails.cache.fetch(cache_key(url),:expires_in=>Seek::Config.home_feeds_cache_timeout.minutes) do
+          Rails.cache.fetch(cache_key(url), :expires_in => Seek::Config.home_feeds_cache_timeout.minutes) do
             get_feed(url)
           end
-        rescue => e
-          Rails.logger.error("Problem with feed: #{url} - #{e.message}")
+        rescue => exception
+          Rails.logger.error("Problem with feed: #{url} - #{exception.message}")
+          blacklist(url)
           nil
         end
       end
       feeds.compact!
+      feeds
+    end
 
-      filter_feeds_entries_with_chronological_order(feeds, n)
-      
+    def self.blacklist url
+      blacklisted = Seek::Config.blacklisted_feeds || {}
+      blacklisted[url]=Time.now
+      Seek::Config.blacklisted_feeds = blacklisted
+    end
+
+    def self.is_blacklisted? url
+      list = Seek::Config.blacklisted_feeds || {}
+      return false unless list[url]
+      if list[url] < BLACKLIST_TIME.ago
+        list.delete(url)
+        Seek::Config.blacklisted_feeds=list
+        false
+      else
+        true
+      end
+    end
+
+    def self.determine_feed_urls category
+      urls = Seek::Config.send("#{category.to_s}_feed_urls")
+      urls.split(",").select{|url| !url.blank? && !is_blacklisted?(url)}
     end
 
     #deletes the cache directory, along with any files in it
@@ -41,9 +68,6 @@ module Seek
       key = Digest::MD5.hexdigest(feed_url.strip)
       "news-feed-#{key}"
     end
-  
-    private
-
 
     def self.get_feed feed_url
 
@@ -60,21 +84,42 @@ module Seek
       filtered_entries = []
       unless feeds.blank?
         feeds.each do |feed|
-           entries = feed.entries || []
-           #concat the source of the entry in the entry title, used later on to display
-
-           entries.each do |entry|
-             class << entry
-               attr_accessor :feed_title
-             end
-             entry.feed_title = feed.title
-           end
-
-           filtered_entries |= entries.take(number_of_entries) if entries
+          filtered_entries = fetch_and_filter_entries(feed, filtered_entries, number_of_entries)
           end
       end
-      filtered_entries.sort {|a,b| (b.try(:updated) || b.try(:published) || b.try(:last_modified) || 10.year.ago) <=> (a.try(:updated) || a.try(:published) || a.try(:last_modified) || 10.year.ago)}.take(number_of_entries)
+      sort_entries(filtered_entries).take(number_of_entries)
+    end
 
+    def self.sort_entries(filtered_entries)
+      filtered_entries.sort do |entry_a, entry_b|
+        date_a = resolve_feed_date(entry_a)
+        date_b = resolve_feed_date(entry_b)
+        date_b <=> date_a
+      end
+    end
+
+    def self.fetch_and_filter_entries(feed, filtered_entries, number_of_entries)
+      entries = feed.entries || []
+
+
+      entries.each do |entry|
+        class << entry
+          attr_accessor :feed_title
+        end
+        entry.feed_title = feed.title
+      end
+
+      filtered_entries |= entries.take(number_of_entries) if entries
+      filtered_entries
+    end
+
+    def self.resolve_feed_date(entry)
+      date = nil
+      date = entry.try(:updated) if entry.respond_to?(:updated)
+      date ||= entry.try(:published) if entry.respond_to?(:published)
+      date ||= entry.try(:last_modified) if entry.respond_to?(:last_modified)
+      date ||= 10.year.ago
+      date
     end
 
   end
