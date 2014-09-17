@@ -30,16 +30,13 @@ class ReindexingJobTest < ActiveSupport::TestCase
   test "add item to queue" do
     Delayed::Job.delete_all
     p = Factory :person
-    assert_difference("Delayed::Job.count") do
-      assert_difference("ReindexingQueue.count") do
-        ReindexingJob.add_items_to_queue p
-      end
+    assert_difference("ReindexingQueue.count") do
+      ReindexingJob.add_items_to_queue p
     end
+
     models = [Factory(:model),Factory(:model)]
-    assert_no_difference("Delayed::Job.count") do
-      assert_difference("ReindexingQueue.count",2) do
-        ReindexingJob.add_items_to_queue models
-      end
+    assert_difference("ReindexingQueue.count",2) do
+      ReindexingJob.add_items_to_queue models
     end
   end
 

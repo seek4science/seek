@@ -21,35 +21,34 @@
         The following <%= t('data_file').pluralize %> are involved in this <%= resource_text -%>:
       </p>
       <div id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5">
-        <span class="none_text" id="data_files">Loading...</span>
+        <span class="none_text" id="data_files">Loading ...</span>
       </div>
       <div class="association_step">
         <p style="color: #666666;">
             You may select an existing <%= t('data_file') %> or <%= link_to "upload a new #{t('data_file')} here", new_data_file_path(:parent_name=>controller_name.underscore.singularize), :onclick => "window.open(this.href);return false;" %>  for the <%= resource_text -%>.
         </p>
+
+        <% if show_relationships -%>
+            <%= label_tag "How was the data used in this #{resource_text}" %><br/>
+            <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
+        <% end -%>
+
         <%= select_tag :possible_data_files,
           options_for_select([["Select #{t('data_file')} ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-          {:style=>"width:90%",:onchange=>remote_function(
+          {:style=>"width:90%",:onchange=>"addSelectedDataFile();"+remote_function(
             :method=>:get,
             :url=>preview_data_files_path(:element=>"data_file_preview"),
             :with=>"'id='+this.value",
             :before=>"show_ajax_loader('data_file_preview')"
-          )+";check_show_add_data_file();return(false)"
+          )+";return(false)"
         } -%>
         
         <%= select_tag :data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-        
-        <% if show_relationships -%>
-          <br/>
-          <%= label_tag "How was the data used in this #{resource_text}" %><br/>
-          <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
-        <% end -%>
-        
+
         <br/>
-        <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= t('data_file').pluralize %> from other <%= t('project').pluralize %>?
+        <%= check_box_tag :include_other_project_data_files, nil, true, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate Data files from other projects?
       </div>
 	  <br/>
-      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link" %>
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'data_file'} %>
@@ -63,36 +62,46 @@
         var selection_box = $('possible_data_files');
         var option;
 
-        selection_box.options.length=0;
+        selection_box.options.length = 0;
 
         if (checked) {
-    <% ([["Select #{t('data_file')} ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+        <% ([["Select #{t('data_file')} ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(df_details[0]) -%>';
             option.value = '<%= df_details[1] -%>';
             try {
-              selection_box.add(option); //for older IE version
+                selection_box.add(option); //for older IE version
             }
             catch (ex) {
-              selection_box.add(option, null);
+                selection_box.add(option, null);
             }
-    <% end -%>
+        <% end -%>
         }
         else {
-    <% ([["Select #{t('data_file')} ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+        <% ([["Select #{t('data_file')} ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(df_details[0]) -%>';
             option.value = '<%= df_details[1] -%>';
             try {
-              selection_box.add(option); //for older IE version
+                selection_box.add(option); //for older IE version
             }
             catch (ex) {
-              selection_box.add(option, null);
+                selection_box.add(option, null);
             }
-    <% end -%>
+        <% end -%>
         }
-        selection_box.selectedIndex=0;
-        selection_box.onchange();
+        //selection_box.onchange();
+    }
+
+    function check_show_add_data_file() {
+        i=$('possible_data_files').selectedIndex;
+        selected_id=$('possible_data_files').options[i].value;
+        if (selected_id=='0') {
+          $('add_data_file_link').hide();
+        }
+        else {
+          $('add_data_file_link').show();
+        }
       }
 
 <% data_files = resource.is_a?(Publication) ? resource.related_data_files : resource.data_file_masters %>
@@ -122,18 +131,8 @@
   <% end -%>
 <% end -%>
 
- updateDataFiles();
 
-  function check_show_add_data_file() {
-    i=$('possible_data_files').selectedIndex;
-    selected_id=$('possible_data_files').options[i].value;
-    if (selected_id=='0') {
-      $('add_data_file_link').hide();
-    }
-    else {
-      $('add_data_file_link').show();
-    }
-  }
+    updateDataFiles();
+    toggle_data_file_list();
 
-  check_show_add_data_file();
 </script>

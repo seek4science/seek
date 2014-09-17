@@ -1,3 +1,4 @@
+
 class ContentBlobsController < ApplicationController
 
   before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_pdf_content, :download]
@@ -5,7 +6,7 @@ class ContentBlobsController < ApplicationController
   before_filter :set_asset_version, :only=>[:get_pdf, :download]
 
   include Seek::AssetsCommon
-  include AssetsCommonExtension
+  include Seek::UploadHandling::ExamineUrl
   include Seek::ContentBlobCommon
 
   def view_pdf_content
@@ -13,6 +14,21 @@ class ContentBlobsController < ApplicationController
     @pdf_url = polymorphic_path([@asset,@content_blob], :action => 'download',:intent=>:inline_view, :format => 'pdf', :code => params[:code])
     respond_to do |format|
       format.html { render :layout=>false }
+    end
+  end
+
+  def examine_url
+    #check content type and size
+    url = params[:data_url]
+    begin
+      code = check_url_response_code(url)
+      if code == 200
+        process_view_for_successful_url(url)
+      else
+        handle_non_200_response(code)
+      end
+    rescue Exception=>e
+      handle_exception_response(e)
     end
   end
 
@@ -105,8 +121,8 @@ class ContentBlobsController < ApplicationController
   end
 
   def get_data_hash_from_url
-    code = url_response_code(@content_blob.url)
-    if code == "200"
+    code = check_url_response_code(@content_blob.url)
+    if code == 200
       downloader=Seek::RemoteDownloader.new
       begin
         data_hash = downloader.get_remote_data @content_blob.url

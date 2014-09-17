@@ -115,7 +115,9 @@ class Policy < ActiveRecord::Base
 
         # obtain parameters from sharing hash
         policy.sharing_scope = sharing[:sharing_scope]
-        policy.access_type = sharing["access_type_#{sharing_scope}"]
+        
+        #MERGENOTE - refactor
+        policy.access_type = sharing["access_type_#{sharing_scope}"].blank? ? 0 : sharing["access_type_#{sharing_scope}"]
 
         # NOW PROCESS THE PERMISSIONS
 
@@ -129,7 +131,9 @@ class Policy < ActiveRecord::Base
         end
 
         #if share with your project is chosen
-        if (sharing[:sharing_scope].to_i == Policy::ALL_SYSMO_USERS) and !projects.blank?
+ 
+        #MERGENOTE - refactor
+        if (sharing[:sharing_scope].to_i == Policy::ALL_SYSMO_USERS) and !projects.map(&:id).compact.blank?
           #add Project to contributor_type
           contributor_types << "Project" if !contributor_types.include? "Project"
           #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
@@ -169,22 +173,26 @@ class Policy < ActiveRecord::Base
   end
   
   def self.private_policy
-    policy = Policy.new(:name => "default private",                        
-                        :sharing_scope => PRIVATE,
-                        :access_type => NO_ACCESS,
-                        :use_whitelist => false,
-                        :use_blacklist => false)
+    Policy.new(:name => "default private",
+               :sharing_scope => PRIVATE,
+               :access_type => NO_ACCESS,
+               :use_whitelist => false,
+               :use_blacklist => false)
+  end
 
-    return policy
+  def self.registered_users_accessible_policy
+    Policy.new(:name => "default accessible",
+               :sharing_scope => ALL_SYSMO_USERS,
+               :access_type => ACCESSIBLE,
+               :use_whitelist => false,
+               :use_blacklist => false)
   end
 
   def self.public_policy
-      policy = Policy.new(:name => "default public",
+      Policy.new(:name => "default public",
                           :sharing_scope => EVERYONE,
                           :access_type => ACCESSIBLE
       )
-
-      return policy
   end
 
   def self.sysmo_and_projects_policy projects=[]
@@ -200,11 +208,17 @@ class Policy < ActiveRecord::Base
 
   #The default policy to use when creating authorized items if no other policy is specified
   def self.default resource=nil
-    private_policy
+    #MERGENOTE - would like to revisit this, remove is_virtualiver, and make the default policy itself a configuration
+    unless Seek::Config.is_virtualliver
+      private_policy
+    else
+      Policy.new(:name => "default accessible", :use_whitelist => false, :use_blacklist => false)
+    end
   end
    
-  # translates access type codes into human-readable form
+  # translates access type codes into human-readable form  
   def self.get_access_type_wording(access_type, downloadable=false)
+    #MERGENOTE - VLN used hard-coded values here that should be moved into the en.yml file
     case access_type
       when Policy::DETERMINED_BY_GROUP
         return I18n.t('access.determined_by_group')

@@ -10,10 +10,11 @@
 <%= list_item_attribute "Version", resource.version %>
 
 <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
-  <%= scales_list_for_list_item resource -%>
+
 
 </div>
 <div class="list_item_whole_width">
+<%= scales_list_for_list_item resource %>
 <%= list_item_description resource.description %>
 
 <%= list_item_timestamp resource %>  

@@ -1,5 +1,6 @@
 <% sample_row = []
    specimen_row = []
+   strain_row = []
    new_specimen ||= false
    specimen_title = nil
    if object.kind_of?(Sample)
@@ -11,7 +12,11 @@
      specimen_row = specimen_row_data(object)
      strain = object.strain
      specimen_title = object.title
+   elsif object.kind_of?(Strain)
+     strain_row = strain_row_data(object)
+     strain = object
    end
+
    strain_id = strain.try(:id)
    id_column = Seek::Config.is_virtualliver ? 8 : 6
  %>
@@ -28,11 +33,15 @@
     object_class = "<%= object.class.name.downcase%>"
     sample_row = new Array;
     specimen_row = new Array;
+    strain_row = new Array;
     <%sample_row.each do |column_data|%>
           sample_row.push('<%=escape_javascript(column_data.to_s)%>');
     <%end%>
     <%specimen_row.each do |column_data|%>
-      specimen_row.push('<%=escape_javascript(column_data.to_s)%>');
+        specimen_row.push('<%=escape_javascript(column_data.to_s)%>');
+    <%end%>
+    <%strain_row.each do |column_data|%>
+        strain_row.push('<%=escape_javascript(column_data.to_s)%>');
     <%end%>
 
     if (action == 'create' && object_class == 'sample' && "<%=new_specimen%>" == "true" ){
@@ -45,7 +54,12 @@
         window.opener.updateSampleRow(sample_row, 6);
     }else if (action == 'update' && object_class == 'specimen'){
         window.opener.updateSpecimenRow( specimen_row,<%= id_column%>);
+    }else if (action == 'create' && object_class == 'strain'){
+        window.opener.loadNewStrainAfterCreation(strain_row,'<%=strain.organism.title%>');
+    }else if (action == 'update' && object_class == 'strain') {
+        window.opener.updateStrainRow(strain_row, 5);
     }
+
     alert("New item was " + action + "d!");
     window.close();
 </script>

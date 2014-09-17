@@ -18,14 +18,15 @@ function addSelectedPublication() {
     {
         relationshipType="None"
     }
-
-    if(checkNotInList(id,publication_array)) {
-        addPublication(title,id,relationshipType);
-        updatePublications();
-    }
-    else {
-        alert('The following publication has already been added:\n\n' +
-            title);
+    if (id != "0"){
+        if(checkNotInList(id,publication_array)) {
+            addPublication(title,id,relationshipType);
+            updatePublications();
+        }
+        else {
+            alert('The following publication has already been added:\n\n' +
+                title);
+        }
     }
 }
 

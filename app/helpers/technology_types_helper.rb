@@ -1,13 +1,13 @@
 module TechnologyTypesHelper
 
   def link_to_technology_type assay
-    uri = assay.technology_type_uri
-    label = assay.technology_type_label
-    if assay.valid_technology_type_uri?
-      link_to label,technology_types_path(:uri=>uri,:label=>label)
-    else
-      label
-    end
+     uri = assay.technology_type_uri
+     label = assay.technology_type_label
+     if assay.valid_technology_type_uri?(uri) || SuggestedTechnologyType.where(:uri=>uri).first
+       link_to label,technology_types_path(:uri=>uri,:label=>label)
+     else
+       label
+     end
   end
 
   def parent_technology_types_list_links parents

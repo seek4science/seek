@@ -27,23 +27,22 @@ class HomesControllerTest < ActionController::TestCase
   test "shouldn't display feedback link when not logged in" do
     get :index
     assert_response :success
-    assert_select "ul#my_profile_menu",:count=>0
-    assert_select "li.dynamic_menu_li",:text=>/Provide feedback/, :count=>0
-  end
+    assert_select "span#account_menu_section", :count => 0
 
-  test "should display feedback link when logged in" do
-    login_as(Factory(:user))
-    get :index
-    assert_response :success
-    assert_select "ul#my_profile_menu" do
-      assert_select "li.dynamic_menu_li",:text=>/Provide feedback/, :count=>1
+    assert_select "li" do
+      assert_select "a[href=?]", feedback_home_path, :text => I18n.t("menu.feedback"), :count => 0
     end
   end
 
+  #MERGENOTE - what's happend to the test for the feedback link whilst logged in?
+
   test "should get feedback form" do
-    login_as(:quentin)
-    get :feedback
-    assert_response :success
+    #MERGENOTE ability to give feedback shouldn't rely on recatcha being enabled
+    with_config_value :recaptcha_enabled, false do
+      login_as(:quentin)
+      get :feedback
+      assert_response :success
+    end
   end
 
   test "should not get feedback form as anonymous user" do
@@ -56,6 +55,13 @@ class HomesControllerTest < ActionController::TestCase
     assert_emails(0) do
       post :send_feedback, :anon => false, :details => 'test feedback', :subject => 'test feedback'
     end
+  end
+
+  test "admin link not visible to non admin" do
+    login_as(:aaron)
+    get :index
+    assert_response :success
+    assert_select "a#adminmode[href=?]", admin_path, :count => 0
   end
 
   test "admin menu item not visible to non admin" do
@@ -78,10 +84,13 @@ class HomesControllerTest < ActionController::TestCase
 
   test "SOP menu item should be capitalized" do
     login_as(:quentin)
-    get :index
-    if Seek::Config.is_virtualliver
-      assert_select "div.section>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
-    else
+
+    as_virtualliver do
+      get :index
+      assert_select "div.section>li>a[href=?]", "/sops", :text => "SOPs", :count => 1
+    end
+    as_not_virtualliver do
+      get :index
       assert_select "span#assets_menu_section" do
         assert_select "li" do
           assert_select "a[href=?]",sops_path,:text=>"SOPs"
@@ -190,6 +199,51 @@ class HomesControllerTest < ActionController::TestCase
     assert_routing("/",{:controller=>"homes",:action=>"index"})
     assert_recognizes({:controller=>"homes",:action=>"index"},"/index.html")
     assert_recognizes({:controller=>"homes",:action=>"index"},"/index")
+  end
+
+  test "ids of scales list should be the same as scales defined in Seek::Config.scales" do
+    as_virtualliver do
+      get :index
+      assert_response :success
+      scales = ["all"]
+      scales += Scale.all.map(&:key)
+      assert_select 'div#options ul>li', scales.length do
+        scales.each do |scale|
+          assert_select "[id=?]", scale
+        end
+      end
+    end
+  end
+
+  test "scales slider on home page" do
+    as_virtualliver do
+      Seek::Config.solr_enabled = true
+      get :index
+
+      assert_response :success
+      #vln home
+      assert_select "div#wrapper" do
+        #slider
+        assert_select "ul#scale_list"
+        assert_select "div#slider"
+        #scale images
+        assert_select "div#zoom img", :count => 6
+      end
+
+      #default scale is organism
+      assert_select "div#scaled_items" do
+        assert_select "div#organism_results"
+      end
+
+      #default scale for search filtering is Organism
+      assert_select "div#search_box" do
+        assert_select "select#scale option" do
+          assert_select "[value=?]", /all/ do
+            assert_select "[selected=?]", /selected/
+          end
+        end
+      end
+    end
   end
 
   test "should show the content of project news and community news with the configurable number of entries" do

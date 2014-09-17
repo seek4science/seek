@@ -1,55 +1,32 @@
+
 <%
-# determine the asset type from the controller
-upload_field = controller_name.downcase.singularize.underscore
-# inject the attributes data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
+upload_field = asset_field_prefix
 obj=eval("@"+upload_field)
-class << obj
-attr_accessor :data_url,:local_copy
-end unless obj.nil?
-obj.local_copy=0 unless obj.nil?
+
+
+
 asset_name = text_for_resource upload_field
 new_version ||= false
 original_filename=nil
+batch ||= false
+with_image_file ||= false
+
 -%>
+
+
 
 <%
    if params[upload_field.to_sym]
-     obj.data_url=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
-     original_filename = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
+     url_from_params=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
+     original_filename_from_params = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
    end
 -%>
 
+<%# MERGENOTE - need to pluralize text for batch upload %>
 <div class="box_infotext">
-
     <p>
         You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL to either another page or remote file. Please test the URL before submitting.
-      <%= link_to_function ("More info "+image("expand")).html_safe, :id => 'more_info_expand_image' do |page|
-        page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
-        page["more_info_expand_image"].toggle
-        page["more_info_collapse_image"].toggle
-      end
-      -%>
-      <%= link_to_function ("More info "+image("collapse")).html_safe, :id => 'more_info_collapse_image', :style => "display:none" do |page|
-        page.visual_effect(:toggle_appear, "more_upload_info", :duration => 0.3)
-        page["more_info_expand_image"].toggle
-        page["more_info_collapse_image"].toggle
-      end
-      -%>
     </p>
-    <span id="more_upload_info" style="display:none;">
-        <p>
-            If the URL points to another webpage - for example a collection of datasets in another repostiory - then the link will be shown for this asset, and there will be no download option.
-        </p>
-        <p>
-            If the URL points to a remote file, then it will appear just like an uploaded asset in SEEK. If accessing the file requires authorization, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
-            then they will simply directed to the URL (for example, so that they can login to access the file).
-        </p>
-        <p>
-          When registering a URL to a file, you can specify that a copy of the data should be stored
-          within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL become unavailable, the data is still available from SEEK. However, you should
-          be sure that the copyright on the file allows you to do this.
-        </p>
-    </span>
     <% if new_version -%>
     <p>
       You are about to upload a new version of this <%= asset_name -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
@@ -60,58 +37,93 @@ original_filename=nil
 </div>
 
 <div>
+  <% if with_image_file -%>
+      <div id="image_file_box" style="float:right;">
+        <% resource_name = obj.class.name.underscore %>
+        <%= hidden_field_tag("#{resource_name}_id", obj.id) -%>
+        <p>
+          <br/>
+          <b>Image file: </b>
+          <br/>
+          <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
+        </p>
+        <% if new_version && previous_version_image_file = obj.latest_version.model_image.try(:original_filename) -%>
+            <p>
+              The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %> </span> will be used if you dont specify the image file
+              <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
+            </p>
+        <% end -%>
+      </div>
+  <% end -%>
   <div id="upload_type_selection">
+
     <ul id="switch_upload_buttons">
-      <li>
-        <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class => "block_link_active", :id => "upload_from_file_button", :title => tooltip_title_attrib('Add from a local file') -%>
-      </li>
-      <li>
+      <li style="float:left;height:100%;">
+        <%= link_to_function image("file_large"), "from_file_selected(); return (false);", :class => "block_link block_link_active", :id => "upload_from_file_button", :title => tooltip_title_attrib('Add from a local file') -%>
+
         <%= link_to_function image("internet_large"), "from_url_selected(); return (false);", :class => "block_link", :id => "upload_from_url_button", :title => tooltip_title_attrib('Add from a remote URL') -%>
       </li>
-      <li id="upload_options">
+      <li>
         <div id="upload_from_file">
           <b>File to upload:</b>
           <span class="required">*</span>
           <br/>
-          <%= file_field upload_field, :data -%>
+          <%= file_field_tag "content_blob[data]" -%>
         </div>
         <div id="upload_from_url" style="display:none;">
-
+          <br/>
           <b>URL:</b>
           <span class="required">*</span>
-          <%= text_field upload_field, :data_url, :size => 55 -%>
-          <span style="display:inline-block;">
-                        <%= link_to_with_callbacks image("test", :title => "Test", :alt => "Test")+" Test",
-                                           {:url => {:action => :test_asset_url},
-                                            :method => :post,
-                                            :type => :synchronous,
-                                            :with => "$('#{upload_field}_data_url').serialize()",
-                                            :before => "$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');"},
-                                           {:id => 'test', :remote => true} -%>
-                    </span>
+          <%= text_field_tag "content_blob[data_url]", "", :size => 55, :id => "data_url_field" -%>
+          <% if batch %>
+              <%= link_to_function (image("new") + "Add"), "addToList()" %>
+          <% end %>
+          <%= link_to image("test", :title => "Test", :alt => "Test")+" Test", "#", :id => "examine_url" %>
+          <br/>
 
-          <p style="clear:both;">
-            <b>Make a copy?</b>
-            <%= check_box upload_field, :local_copy, :id => "local_copy" -%>
-          </p>
-          <p>
-            <span id="test_url_result_icon"></span>
-            <span id="test_url_msg" style="display:none;"></span>
-          </p>
-          <%= hidden_field_tag "#{upload_field}[original_filename]", original_filename -%>
+          <div id="test_url_result"></div>
+          <div id="copy_option" style="display:none;">
+            <b>Upload a copy?</b>
+            <%= check_box_tag "content_blob[make_local_copy]", "0", false, :id => "make_local_copy" %>
+          </div>
+
+          <%= hidden_field_tag "content_blob[original_filename]", original_filename, :id => :original_filename %>
+          <%= hidden_field_tag "url_checked", false %>
         </div>
       </li>
     </ul>
   </div>
+
+
 </div>
 
+<br/>
+<ul id='pending_files'></ul>
+<div id='batch_items_list' style='display:none;'></div>
+<div id='existing_content_blobs' style="display:none;"></div>
+
+<% if batch %>
+    <%= javascript_include_tag "batch_upload.js" %>
+<% end %>
+
 <script type="text/javascript">
-  <% if obj.data_url.blank? -%>
-  from_file_selected();
-  <% else -%>
-  from_url_selected();
-  clickLink($('test'));
-  <% end -%>
+
+  setup_url_field("<%= examine_url_content_blobs_path %>","examine_url");
+
+  <% if url_from_params && original_filename_from_params %>
+    createElementsForNewItem('<%= url_from_params %>','<%= original_filename_from_params %>',"1");
+  <% end %>
+
+
+<% if batch %>
+  <% obj.content_blobs.each do |blob| %>
+    <%
+    text = blob.url ? blob.url : blob.original_filename
+    text = text + " (original)"
+    %>
+    showExistingInList('<%= text %>',item_index++,<%= blob.id %>);
+
+  <% end %>
+<% end %>
 
 </script>
-

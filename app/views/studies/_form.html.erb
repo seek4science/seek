@@ -38,7 +38,7 @@
     </p>
 
     <p>
-      <%= f.label "Person responsible" %><br/>
+      <%= f.label "Contributor" %><br/>
       <div id="person_responsible_collection">
         <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
         <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
@@ -51,10 +51,10 @@
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
       </p>
   <% end %>
+
   <p>
     <%= render :seek_partial=>"assets/sharing_form" if @study.can_manage? -%>
   </p>
-
 </div>
 
 

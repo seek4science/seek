@@ -7,7 +7,7 @@ class ProjectsController < ApplicationController
 
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:update_members]
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report,:admin_members,:update_members,:resource_in_tab]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin,:admin_members,:update_members]
   before_filter :auth_params,:only=>[:update]
@@ -210,18 +210,25 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def manage
+    @projects = Project.all
+    respond_to do |format|
+      format.html
+      format.xml{render :xml=>@projects}
+    end
+  end
   # DELETE /projects/1
   # DELETE /projects/1.xml
   def destroy
     respond_to do |format|
       if @project.can_delete?
         @project.destroy
-        format.html { redirect_to(projects_url) }
-        format.xml  { head :ok }
+        format.html { redirect_to(projects_path) }
+        format.xml { head :ok }
       else
-        flash[:error] = "Unable to delete this #{t('project')}"
-        format.html { redirect_to(project_url) }
-        format.xml  { render :xml => "Unable to delete this #{t('project')}", :status => :unprocessable_entity }
+        flash.now[:error]="Unable to delete #{t('project')} with children"
+        format.html { redirect_to(@project) }
+        format.xml { render :xml=>@project.errors, :status=>:unprocessable_entity }
       end
     end
   end
@@ -237,7 +244,7 @@ class ProjectsController < ApplicationController
     
     begin
       project = Project.find(project_id)
-      institution_list = project.get_institutions_listing
+      institution_list = project.work_groups.collect{|w| [w.institution.title, w.institution.id, w.id]}
       success = true
     rescue ActiveRecord::RecordNotFound
       # project wasn't found

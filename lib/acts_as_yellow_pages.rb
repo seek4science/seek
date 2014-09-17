@@ -32,6 +32,18 @@ module Acts #:nodoc:
         #load the configuration for the pagination
         grouped_pagination :pages=>("A".."Z").to_a
 
+        include Seek::Search::CommonFields
+
+        searchable do
+          text :locations do
+            if self.respond_to?(:country)
+              country
+            elsif self.respond_to?(:locations)
+              locations
+            end
+          end
+        end if Seek::Config.solr_enabled
+
         class_eval do
           extend Acts::Yellow_Pages::SingletonMethods
         end

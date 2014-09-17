@@ -5,6 +5,7 @@ SEEK::Application.routes.draw do
   resources :scales do
     collection do
       post :search
+      post :search_and_lazy_load_results
     end
   end
 
@@ -130,6 +131,8 @@ SEEK::Application.routes.draw do
       get :select
       get :get_work_group
       post :userless_project_selected_ajax
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :check_related_items
@@ -146,7 +149,7 @@ SEEK::Application.routes.draw do
       get :waiting_approval_assets
       get :select
     end
-    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:only=>[:index]
+    resources :projects,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,:publications,:events,:samples,:specimens,:only=>[:index]
     resources :avatars do
       member do
         post :select
@@ -157,6 +160,9 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
+      get :manage
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       get :asset_report
@@ -190,6 +196,8 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       get :request_all
+      post :items_for_result
+      post :resource_in_tab
     end
     resources :people,:projects,:specimens,:only=>[:index]
     resources :avatars do
@@ -202,6 +210,10 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations do
+    collection do
+      post :items_for_result
+      post :resource_in_tab
+    end
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
     member do
       get :new_object_based_on_existing_one
@@ -211,6 +223,8 @@ SEEK::Application.routes.draw do
   resources :studies do
     collection do
       post :investigation_selected_ajax
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       get :new_object_based_on_existing_one
@@ -221,6 +235,9 @@ SEEK::Application.routes.draw do
   resources :assays do
     collection do
       get :preview
+      post :items_for_result
+      #MERGENOTE - these should be gets and are tested as gets, using post to fix later
+      post :resource_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -228,6 +245,29 @@ SEEK::Application.routes.draw do
     end
     resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
+
+
+   ### ASSAY AND TECHNOLOGY TYPES ###
+
+  resources :suggested_assay_types do
+      collection do
+        get :manage
+        get :new_popup
+        put :set_is_modelling
+      end
+
+  end
+  resources :suggested_technology_types do
+    collection do
+      get :manage
+      get :new_popup
+    end
+  end
+
+  #MERGENOTE - why are these hard-coded routes?
+  get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
+  get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
+
 
   ### ASSETS ###
 
@@ -237,6 +277,8 @@ SEEK::Application.routes.draw do
       post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :check_related_items
@@ -253,6 +295,8 @@ SEEK::Application.routes.draw do
       post :convert_to_presentation
       post :update_annotations_ajax
       post :new_version
+      #MERGENOTE - this is a destroy, and should be the destory method, not post since we are not updating or creating something.
+      post :destroy_version
     end
     resources :studied_factors do
       collection do
@@ -273,6 +317,8 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :test_asset_url
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :check_related_items
@@ -284,6 +330,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :destroy_version
     end
     resources :content_blobs do
       member do
@@ -300,6 +347,8 @@ SEEK::Application.routes.draw do
       get :build
       get :preview
       post :test_asset_url
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       get :compare_versions
@@ -321,6 +370,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :execute
       post :request_resource
+      post :destroy_version
     end
     resources :model_images do
       collection do
@@ -331,6 +381,7 @@ SEEK::Application.routes.draw do
       end
     end
     resources :content_blobs do
+
       member do
         get :view_pdf_content
         get :get_pdf
@@ -344,6 +395,8 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :test_asset_url
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :check_related_items
@@ -355,6 +408,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
+      post :destroy_version
     end
     resources :experimental_conditions do
       collection do
@@ -371,11 +425,19 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
+  resources :content_blobs, :except => [:show, :index, :update, :create, :destroy] do
+    collection do
+      post :examine_url
+    end
+  end
   resources :programmes do
     resources :avatars do
       member do
         post :select
       end
+    end
+    collection do
+      post :items_for_result
     end
     member do
       get :initiate_spawn_project
@@ -388,6 +450,8 @@ SEEK::Application.routes.draw do
     collection do
       get :preview
       post :fetch_preview
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -399,6 +463,8 @@ SEEK::Application.routes.draw do
   resources :events do
     collection do
       get :preview
+      post :items_for_result
+      post :resource_in_tab
     end
     resources :people,:projects,:data_files,:publications,:presentations,:only=>[:index]
   end
@@ -414,6 +480,9 @@ SEEK::Application.routes.draw do
   ### BIOSAMPLES AND ORGANISMS ###
 
   resources :specimens do
+    collection do
+      post :items_for_result
+    end
     resources :projects,:people,:samples,:strains,:institutions,:sops,:only=>[:index]
     member do
       get :new_object_based_on_existing_one
@@ -423,6 +492,8 @@ SEEK::Application.routes.draw do
   resources :samples do
     collection do
       get :preview
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       get :new_object_based_on_existing_one
@@ -433,6 +504,8 @@ SEEK::Application.routes.draw do
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
+      post :items_for_result
+      post :resource_in_tab
     end
     member do
       post :update_annotations_ajax
@@ -446,18 +519,13 @@ SEEK::Application.routes.draw do
       get :existing_specimens
       get :strains_of_selected_organism
       get :existing_samples
-      get :strain_form
-      put :update_strain
-      post :create_specimen_sample
-      post :create_strain
-      post :create_strain_popup
-      post :edit_strain_popup
     end
   end
 
   resources :organisms do
     collection do
       post :search_ajax
+      post :resource_in_tab
     end
     resources :projects,:assays,:studies,:models,:strains,:specimens,:only=>[:index]
     member do
@@ -465,6 +533,9 @@ SEEK::Application.routes.draw do
     end
 
   end
+
+  resources :tissue_and_cell_types
+  resources :statistics, :only => [:index]
 
   resources :workflows do
     collection do
@@ -508,11 +579,14 @@ SEEK::Application.routes.draw do
   get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
   get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
 
+
+  resources :statistics, :only => [:index]
   ### MISC MATCHES ###
 
   match '/search/' => 'search#index', :as => :search
   match '/search/save' => 'search#save', :as => :save_search
   match '/search/delete' => 'search#delete', :as => :delete_search
+  match '/search/items_for_result' => 'search#items_for_result', :via => :post
   match 'svg/:id.:format' => 'svg#show', :as => :svg
   match '/tags' => 'tags#index', :as => :all_tags
   match '/tags/:id' => 'tags#show', :as => :show_tag
@@ -545,6 +619,12 @@ SEEK::Application.routes.draw do
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
 
   match '/contact' => 'contact#index', :as => :contact, :via => :get
+
+  #feedback
+  match '/home/feedback' => 'homes#feedback', :as=> :feedback, :via=>:get
+
+  #tabber lazy load
+  match 'application/resource_in_tab' => 'application#resource_in_tab'
 
   #error rendering
   match "/404" => "errors#error_404"

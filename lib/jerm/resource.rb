@@ -8,7 +8,7 @@ module Jerm
     attr_accessor :project, :uri, :author_first_name, :author_last_name,:author_seek_id,:timestamp,:type, :filename, :title, :description, :duplicate, :error, :authorization
     
     def to_s
-      "Owner: #{author_name} (#{author_seek_id}), #{t('project')}: #{project}, URI: #{uri}, Type: #{type}, Timestamp: #{timestamp}"
+      "Contributor: #{author_name} (#{author_seek_id}), #{t('project')}: #{project}, URI: #{uri}, Type: #{type}, Timestamp: #{timestamp}"
     end
     
     def author_name

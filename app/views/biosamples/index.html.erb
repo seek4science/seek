@@ -14,9 +14,9 @@
    default_selected_organisms = try_block { current_user.person.projects.first.organism_ids }.blank? ? [0] : try_block { current_user.person.projects.first.organism_ids }
 -%>
 
-<div class="contribution_title">
-     <h1>Browse Organisms, Strains, <%= I18n.t('biosamples.sample_parent_term').pluralize %> and Samples</h1>
-</div>
+
+<%= show_title("Browse Organisms, Strains, #{I18n.t('biosamples.sample_parent_term').pluralize} and Samples") %>
+
 
 <br/>
 <div class="fold" style="margin-left: 1em; width: 35em">
@@ -94,7 +94,7 @@
         if (table_name == 'strain_table') {
         <%=remote_function(:url => {:controller => 'biosamples', :action => 'existing_specimens'},
                            :method => :get,
-                           :with => "'strain_ids=' + getSelectedStrains()",
+                           :with => "'strain_ids=' + getSelectedStrains()+ '&organism_ids='+$F('strain_organism_ids')",
                            :before=>"show_large_ajax_loader('existing_specimens')");%>
             show_existing_specimens();
             hide_existing_samples();

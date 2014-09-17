@@ -1,3 +1,4 @@
+
 module ActsAsCachedTree
   def self.included klass
     klass.class_eval do
@@ -35,3 +36,4 @@ module ActsAsCachedTree
     end
   end
 end
+

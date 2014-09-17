@@ -43,7 +43,8 @@
     </ul>
   </div>
   <div style="padding-top:0.25em;">
-      <% selection_options = @person.projects.sort_by(&:title).collect{|p| [sanitize(p.title),p.id]} -%>
+    <% person_direct_projects = Seek::Config.project_hierarchy_enabled ?  @person.direct_projects : @person.projects %>
+      <% selection_options = person_direct_projects.sort_by(&:title).collect{|p| [sanitize(p.title),p.id]} -%>
       <%= select_tag user_selection_id, options_for_select(selection_options) -%>
       &nbsp;<%= link_to_function "Add", "addPersonToAdminDefinedRole('#{role}');return(false);" -%>
   </div>

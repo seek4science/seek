@@ -45,6 +45,7 @@ class AdminsController < ApplicationController
     Seek::Config.jerm_enabled= string_to_boolean params[:jerm_enabled]
     Seek::Config.email_enabled= string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled= string_to_boolean params[:pdf_conversion_enabled]
+    Seek::Config.delete_asset_version_enabled= string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.forum_enabled= string_to_boolean params[:forum_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
@@ -70,6 +71,7 @@ class AdminsController < ApplicationController
     Seek::Config.piwik_analytics_enabled= string_to_boolean params[:piwik_analytics_enabled]
     Seek::Config.piwik_analytics_id_site= params[:piwik_analytics_id_site]
     Seek::Config.piwik_analytics_url= params[:piwik_analytics_url]
+
 
     Seek::Config.set_smtp_settings 'port', params[:port] if only_integer params[:port], 'port'
     Seek::Util.clear_cached
@@ -185,6 +187,9 @@ class AdminsController < ApplicationController
         end
       rescue Exception=>e
         error=e.message
+        if Seek::Config.exception_notification_enabled
+          ExceptionNotifier.notify_exception(e,:data=>{:message=>'Problem restarting delayed job'})
+        end
       end
     end
 

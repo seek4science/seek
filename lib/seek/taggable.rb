@@ -96,11 +96,15 @@ module Seek
     end
 
     def searchable_tags
-      tags_as_text_array
+      annotations_as_text_array
+    end
+
+    def annotations_as_text_array
+      self.annotations.include_values.collect{|a| a.value.text}
     end
 
     def tags_as_text_array
-      self.annotations.include_values.collect{|a| a.value.text}
+      self.annotations.include_values.with_attribute_name('tag').collect{|a| a.value.text}
     end
 
     module ClassMethods

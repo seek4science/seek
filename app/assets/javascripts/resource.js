@@ -4,6 +4,7 @@ function showResourceVersion(form) {
     form.submit;
 }
 
+
 function showCompareVersions(form) {
     var url=$('compare_versions').value;
     location.href=url;
@@ -13,6 +14,15 @@ function showCompareVersions(form) {
 // ***************  Resource Upload Validation  *****************
 
 function validateResourceFields(is_new_file, resource_name, is_managed) {
+    // check if sharing rights are defined
+    if (!($(document.getElementById('sharing_scope_0')).checked) &&
+        !($(document.getElementById('sharing_scope_2')).checked) &&
+        !($(document.getElementById('sharing_scope_4')).checked))
+        {
+        alert('Sharing rights are not defined!');
+        $(document.getElementById('sharing_scope_0')).focus();
+        return(false);
+    }
 
     // only make this test if that's a new SOP
     if(is_new_file) {
@@ -28,9 +38,7 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
         return(false);
     }
     if (is_managed){
-        if (!checkProjectExists(resource_name)) {
-            return (false);
-        }
+
 
         // check if no tokens remain in the attributions autocompleter
         // (only do this if the fold with attributions is expanded)
@@ -106,9 +114,9 @@ function validateUploadFormFields(respond_to_content_blobs, resource_name) {
             return (false);
         }
     } else {
-        if ($(resource_name + '_data').value.length == 0 && $(resource_name + '_data_url').value.length == 0) {
+        if ($('content_blob_data').value.length == 0 && $('data_url_field').value.length == 0) {
             alert("Please specify at least a file to upload or provide a URL.");
-            $(resource_name + '_data').focus();
+            $('content_blob_data').focus();
             return (false);
         }
     }

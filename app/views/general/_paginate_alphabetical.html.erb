@@ -15,7 +15,7 @@
                 <li class="disabled_page <%= current_page_class %>"><%= h(page_title) %></li>
             <% end -%>
 
-    <% end -%>
+    <% end -%>    
     <li class="<%= current_page == "all" ? selected_classes : "" %>"><%= link_to "All", {:id => params[:id], :page => "all"} %></li>
   </ul>
 </div>

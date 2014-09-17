@@ -6,6 +6,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
   include RdfTestCases
   include FunctionalAuthorizationTests
 
@@ -144,7 +145,8 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should create" do
     assert_difference("Study.count") do
-      post :create,:study=>{:title=>"test",:investigation_id=>investigations(:metabolomics_investigation).id}
+      post :create,:study=>{:title=>"test",:investigation_id=>investigations(:metabolomics_investigation).id}, :sharing=>valid_sharing
+
     end
     s=assigns(:study)
     assert_redirected_to study_path(s)
@@ -270,7 +272,6 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   def test_assay_tab_doesnt_show_private_sops_or_datafiles
-    user = Factory :user
     login_as(:model_owner)
     study=studies(:study_with_assay_with_public_private_sops_and_datafile)
     get :show,:id=>study
@@ -281,7 +282,7 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select "h3",:text=>"#{I18n.t('sop').pluralize} (1+1)",:count=>1
       assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
     end
-    
+
     assert_select "div.list_item" do
       #the Assay resource_list_item
       assert_select "p.list_item_attribute a[title=?]",sops(:sop_with_fully_public_policy).title,:count=>1
@@ -306,7 +307,52 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select "div.list_item_actions a[href=?]",data_file_path(data_files(:private_data_file)),:count=>0
     end
   end
+  def test_assay_tab_doesnt_show_private_sops_or_datafiles_with_lazy_load
+    login_as(:model_owner)
+    study=studies(:study_with_assay_with_public_private_sops_and_datafile)
+    with_config_value :tabs_lazy_load_enabled, true do
+      get :show, :id => study
+      assert_response :success
+      assert_select "div.tabbertab" do
+        assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
+        assert_select "h3",:text=>"#{I18n.t('sop').pluralize} (2)",:count=>1
+        assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (2)",:count=>1
+      end
+      get :resource_in_tab, {:resource_ids => study.assays.map(&:id).join(","), :resource_type => "Assay", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      assert_select "div.list_item" do
+        #the Assay resource_list_item
+        assert_select "p.list_item_attribute a[title=?]", sops(:sop_with_fully_public_policy).title, :count => 1
+        assert_select "p.list_item_attribute a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
+        assert_select "p.list_item_attribute a[title=?]", sops(:sop_with_private_policy_and_custom_sharing).title, :count => 0
+        assert_select "p.list_item_attribute a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
 
+        assert_select "p.list_item_attribute a[title=?]", data_files(:downloadable_data_file).title, :count => 1
+        assert_select "p.list_item_attribute a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
+        assert_select "p.list_item_attribute a[title=?]", data_files(:private_data_file).title, :count => 0
+        assert_select "p.list_item_attribute a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
+      end
+
+      get :resource_in_tab, {:resource_ids => study.related_sops.map(&:id).join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+
+      assert_select "div.list_item" do
+        # Sops resource_list_item
+        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
+        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
+        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+      end
+      get :resource_in_tab, {:resource_ids => study.related_data_files.map(&:id).join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+
+      assert_select "div.list_item" do
+        #DataFiles resource_list_item
+        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
+        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
+        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
+        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
+      end
+
+    end
+  end
   def test_should_show_investigation_tab
     s=studies(:metabolomics_study)
     get :show,:id=>s
@@ -332,7 +378,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_routing "people/2/studies",{controller:"studies",action:"index",person_id:"2"}
     study = Factory(:study,:policy=>Factory(:public_policy))
     study2 = Factory(:study,:policy=>Factory(:public_policy))
-    person = study.contributor
+    person = study.contributor.person
     refute_equal study.contributor,study2.contributor
     assert person.is_a?(Person)
     get :index,person_id:person.id
@@ -366,7 +412,8 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test 'object based on existing study' do
-    study = Factory :study,:title=>"the study",:policy=>Factory(:public_policy)
+    study = Factory :study,:title=>"the study",:policy=>Factory(:public_policy),
+                    :investigation => Factory(:investigation, :policy => Factory(:public_policy))
     get :new_object_based_on_existing_one,:id=>study.id
     assert_response :success
     assert_select "textarea#study_title",:text=>"the study"

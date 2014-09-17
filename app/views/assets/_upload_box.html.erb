@@ -1,26 +1,9 @@
+<%= javascript_include_tag "upload_selection" %>
 <%
     new_version ||= false
 %>
-<script type="text/javascript">
-    function from_url_selected(){
-        Effect.Fade("upload_from_file", {
-            duration: 0.0
-        });
-        Effect.Appear("upload_from_url");
-		$('upload_from_file_button').className="block_link";
-		$('upload_from_url_button').className="block_link_active";
-    }
-    
-    function from_file_selected(){
-        Effect.Fade("upload_from_url", {
-            duration: 0.0
-        });
-        Effect.Appear("upload_from_file");
-		$('upload_from_file_button').className="block_link_active";
-		$('upload_from_url_button').className="block_link";  
-    }
-</script>
  <% resource ||=nil %>
+
 <div class="fold">
     <div class="foldTitle">
         Upload
@@ -28,7 +11,7 @@
 
     <div class="foldContent" style="display: block;">
       <% if !resource.nil? && resource.respond_to?(:content_blobs) %>
-          <%= render :partial=>"assets/batch_upload",:locals=>{:new_version=>new_version}-%>
+          <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version,:batch=>true, :with_image_file=>resource.is_a?(Model)} -%>
       <% else %>
           <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version} -%>
       <% end %>

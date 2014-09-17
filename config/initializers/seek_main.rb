@@ -2,8 +2,6 @@
 #TO MODIFY THE DEFAULT SETTINGS, COPY seek_local.rb.pre to seek_local.rb AND EDIT THAT FILE INSTEAD
 
 require 'object'
-require 'asset'
-require 'object'
 require 'active_record_extensions'
 require 'acts_as_taggable_extensions'
 require 'acts_as_isa'
@@ -18,16 +16,16 @@ require 'modporter_extensions'
 require "attachment_fu_extension"
 require 'seek/taggable'
 require "bio"
-require 'assets_common_extension'
+
 require 'sunspot_rails'
 require 'cancan'
 require 'in_place_editing'
 require 'seek/breadcrumbs'
 require 'string_extension'
+require 'recaptcha'
 require 'acts_as_list'
 require 'acts_as_trashable'
-require 'acts_as_tree'
-#require 'fleximage'
+
 require 'country-select'
 require 'will_paginate'
 require 'piwik_analytics'
@@ -44,6 +42,12 @@ require 'seek/scalable'
 
 require 'taverna_player_callbacks'
 require 'taverna_player_renderers'
+
+require 'seek/search/search_sunspot'
+
+require 'doi_query_tool_extension'
+
+require 'seek/project_hierarchies/project_extension'
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
@@ -105,5 +109,3 @@ SEEK::Application.configure do
       }
 
 end
-
-

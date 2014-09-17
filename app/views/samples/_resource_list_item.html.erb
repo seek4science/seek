@@ -1,7 +1,7 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
-  <%= list_item_authorized_attribute "Owner", resource.contributor.try(:person) %>
+  <%= list_item_authorized_attribute "Uploader", resource.contributor.try(:person) %>
 
   <%= list_item_attribute "Lab internal ID", h(resource.lab_internal_number) %>
 
@@ -20,6 +20,7 @@
 </div>
 
 <div class="list_item_whole_width">
-<%= list_item_timestamp resource %>
-
+  <%= scales_list_for_list_item resource%>
+  <%= list_item_timestamp resource %>
 </div>
+

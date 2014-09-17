@@ -1,17 +1,8 @@
-<% if logged_in_and_member? %>
-    <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_sop_path, "Upload a #{t('sop')}", nil, "Upload a #{t('sop')}" %></li>
-        <!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
-    </ul>
-<% end %>
+<%= index_title -%>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_sop_path, :label => "Upload a #{t('sop')}"} %>
 
-<% if @sops.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @sops.pages, :page_totals=>@sops.page_totals,:current_page=>@sops.page } -%>
-<% end %>
-
-<%= render :partial => "assets/resource_list", :locals => { :collection => @sops, :authorization_for_showing_already_done=>true } %>
-
-<% if @sops.page == "latest" && (n=Sop.all_authorized_for("view").count) > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all", :locals=>{:total=>n} %>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
+    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @sops %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @sops %>
 <% end %>

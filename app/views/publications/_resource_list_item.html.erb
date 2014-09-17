@@ -1,8 +1,18 @@
 <%= list_item_title resource %>
 
 <p class="list_item_attribute">
-  <b>Author<%= resource.publication_author_orders.size > 1 ? "s" : "" -%>:</b>
-  <%= author_display_list resource %>
+  <b>Author<%= resource.publication_authors.size > 1 ? "s" : "" -%>:</b>
+  <% if resource.publication_authors.empty? %>
+    <span class='none_text'>Not specified</span>
+  <% else %>
+    <%= resource.publication_authors.map do |author|
+      if author.person && author.person.can_view?
+        link_to get_object_title(author.person), show_resource_path(author.person)
+      else
+        author.first_name + " " + author.last_name
+      end
+    end.join(', ').html_safe %>
+  <% end %>
 </p>
 
 <div class="list_item_left_column">
@@ -20,10 +30,12 @@
 
 <%= list_item_optional_attribute publication_type_text(resource.publication_type), h(resource.journal) %>
 
-  <%= scales_list_for_list_item resource -%>
+<%= list_item_attribute "Citation", h(resource.citation)%>
+
 </div>
 
 <div class="list_item_whole_width">
+<%= scales_list_for_list_item resource %>
 
 <%= list_item_expandable_text "Abstract", h(resource.abstract) %>
 

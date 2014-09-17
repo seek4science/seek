@@ -7,6 +7,9 @@ en:
     sample_age: "Age at sampling"
     specimen_creators: "Creators"
 
+  search_label: ""
+  search_prompt: "Search here..."
+
   #Investigation
   investigation: "Investigation"
 
@@ -44,6 +47,10 @@ en:
   workflow: "Workflow"
 
   scale: "Scale"
+
+  gadget:
+      new_heading: "New or upload"
+      create_button: "CREATE"
 
   menu:
     yellow_pages: "Yellow pages"

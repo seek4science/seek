@@ -45,7 +45,7 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
-  test 'creators show in list item' do
+  test 'creators do not show in list item' do
     p1=Factory :person
     p2=Factory :person
     sop=Factory(:sop,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
@@ -62,9 +62,7 @@ class SopsControllerTest < ActionController::TestCase
       assert_select "a[href=?]",person_path(p2) do
         assert_select "img"
       end
-      assert_select "a[href=?]",person_path(p1) do
-        assert_select "img"
-      end
+      assert_select ["a[href=?]", person_path(p1)], 0
     end
   end
 
@@ -97,7 +95,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => {:title=>"Test", :data_url=>uri.to_s}, :sharing=>valid_sharing
+        post :create, :sop => {:title=>"Test"},:content_blob=>{:data_url=>uri.to_s}, :sharing=>valid_sharing
       end
     end
     assert_not_nil flash[:error]
@@ -145,19 +143,22 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should correctly handle bad data url" do
-    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:project_ids=>[projects(:sysmo_project).id]}
+    stub_request(:any,"http://sdfsdfds.com/sdf.png").to_raise(SocketError)
+    sop={:title=>"Test", :project_ids=>[projects(:sysmo_project).id]}
+    blob = {:data_url=>"http://sdfsdfds.com/sdf.png"}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => sop, :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blob=>blob, :sharing=>valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
 
     #not even a valid url
-    sop={:title=>"Test", :data_url=>"s  df::sd:dfds.com/sdf.png",:project_ids=>[projects(:sysmo_project).id]}
+    sop={:title=>"Test", :project_ids=>[projects(:sysmo_project).id]}
+    blob={:data_url=>"s  df::sd:dfds.com/sdf.png"}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => sop, :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blob=>blob, :sharing=>valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -167,7 +168,7 @@ class SopsControllerTest < ActionController::TestCase
     sop={:title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => sop, :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blob=>{}, :sharing=>valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -198,10 +199,11 @@ class SopsControllerTest < ActionController::TestCase
 
   test "associate sample" do
      # assign to a new sop
-     sop_with_samples = valid_sop
+     sop_with_samples,blob = valid_sop
      sop_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
+
      assert_difference("Sop.count") do
-       post :create,:sop => sop_with_samples
+       post :create,:sop => sop_with_samples,:content_blob=>blob, :sharing => valid_sharing
      end
 
     s = assigns(:sop)
@@ -215,10 +217,11 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should create sop" do
     login_as(:owner_of_my_first_sop) #can edit assay_can_edit_by_my_first_sop_owner
+    sop,blob = valid_sop
     assay=assays(:assay_can_edit_by_my_first_sop_owner1)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => valid_sop, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+        post :create, :sop => sop, :content_blob=>blob, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
       end
     end
 
@@ -233,33 +236,27 @@ class SopsControllerTest < ActionController::TestCase
     assert assay.related_asset_ids('Sop').include? assigns(:sop).id
   end
 
-  def test_missing_sharing_should_default_to_private
-    assert_difference('Sop.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :sop => valid_sop
+  def test_missing_sharing_should_not_default
+    sop,blob = valid_sop
+    with_config_value "is_virtualliver",true do
+      assert_no_difference('Sop.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :create, :sop => sop,:content_blob=>blob
+        end
       end
+      s = assigns(:sop)
+      assert !s.valid?
+      assert !s.policy.valid?
+      assert_blank s.policy.sharing_scope
+      assert_blank s.policy.access_type
     end
-    assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:quentin), assigns(:sop).contributor
-    assert assigns(:sop)
-
-    sop            =assigns(:sop)
-    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
-    assert_equal private_policy.sharing_scope, sop.policy.sharing_scope
-    assert_equal private_policy.access_type, sop.policy.access_type
-    assert_equal private_policy.use_whitelist, sop.policy.use_whitelist
-    assert_equal private_policy.use_blacklist, sop.policy.use_blacklist
-    assert sop.policy.permissions.empty?
-
-    #check it doesn't create an error when retreiving the index
-    get :index
-    assert_response :success
   end
 
   test "should create sop with url" do
+    sop,blob = valid_sop_with_url
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => valid_sop_with_url, :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blob=>blob, :sharing=>valid_sharing
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -272,11 +269,11 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should create sop and store with url and store flag" do
-    sop_details             =valid_sop_with_url
-    sop_details[:local_copy]="1"
+    sop_details,blob=valid_sop_with_url
+    blob[:make_local_copy]="1"
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => sop_details, :sharing=>valid_sharing
+        post :create, :sop => sop_details,:content_blob=>blob, :sharing=>valid_sharing
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -297,13 +294,14 @@ class SopsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
+    
     assert_select "div.box_about_actor" do
       assert_select "p > b",:text=>/Filename:/
       assert_select "p",:text=>/a_pdf_file\.pdf/
       assert_select "p > b",:text=>/Format:/
       assert_select "p",:text=>/PDF document/
       assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/8.8 KB/
+      assert_select "p",:text=>/8.62 KB/
     end
 
     al = ActivityLog.last
@@ -382,7 +380,7 @@ class SopsControllerTest < ActionController::TestCase
 
 
     #create new version
-    post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/little_file_v2.txt',(Mime::TEXT).to_s)}
+    post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload(:tempfile_fixture=>'files/little_file_v2.txt',:content_type=>"text/plain",:filename=>"little_file_v2.txt")}
     assert_redirected_to sop_path(assigns(:sop))
 
     s=Sop.find(s.id)
@@ -424,7 +422,7 @@ class SopsControllerTest < ActionController::TestCase
     s=sops(:editable_sop)
 
     assert_difference("Sop::Version.count", 1) do
-      post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision"
+      post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision"
     end
 
     assert_redirected_to sop_path(s)
@@ -469,7 +467,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1,s.experimental_conditions.count
     assert_difference("Sop::Version.count", 1) do
      assert_difference("ExperimentalCondition.count",1) do
-        post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
      end
     end
 
@@ -484,7 +482,7 @@ class SopsControllerTest < ActionController::TestCase
                                               :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
       assert_difference("ExperimentalCondition.count",1) do
-        post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
       end
     end
 
@@ -584,13 +582,11 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "owner should be able to update sharing" do
-    login_as(:owner_of_editing_for_all_sysmo_users_policy)
-    user = users(:owner_of_editing_for_all_sysmo_users_policy)
-    sop   = sops(:sop_with_all_sysmo_users_policy)
+    user = Factory(:user)
+    login_as(user)
 
-    assert sop.can_edit?(user), "sop should be editable and manageable for this test"
-    assert sop.can_manage?(user), "sop should be editable and manageable for this test"
-    assert_equal Policy::EDITING, sop.policy.access_type, "data file should have an initial policy with access type for editing"
+    sop = Factory :sop, :contributor => User.current_user, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING)
+
     put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS}
     assert_redirected_to sop_path(sop)
     sop.reload
@@ -622,7 +618,7 @@ class SopsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     no_other_creator_sops = assigns(:sops).select { |s| s.other_creators.blank? }
-    assert_select 'p.list_item_attribute', :text => /Other creators: Not specified/, :count => no_other_creator_sops.count
+    assert_select 'p.list_item_attribute', :text => /Other contributors: Not specified/, :count => no_other_creator_sops.count
   end
 
   test 'breadcrumb for sop index' do
@@ -665,16 +661,19 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
-    gatekeeper = Factory(:gatekeeper)
-    post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id), :data => fixture_file_upload('files/file_picture.png')}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
-    sop = assigns(:sop)
-    assert_redirected_to (sop)
-    policy = sop.policy
-    assert_equal Policy::ALL_SYSMO_USERS , policy.sharing_scope
-    assert_equal Policy::VISIBLE, policy.access_type
-    assert_equal 1, policy.permissions.count
-    assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
-    assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
+    as_not_virtualliver do
+      gatekeeper = Factory(:gatekeeper)
+    post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id)},:content_blob=>{:data => file_for_upload},
+         :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      sop = assigns(:sop)
+      assert_redirected_to (sop)
+      policy = sop.policy
+      assert_equal Policy::ALL_SYSMO_USERS, policy.sharing_scope
+      assert_equal Policy::VISIBLE, policy.access_type
+      assert_equal 1, policy.permissions.count
+      assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
+      assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
+    end
   end
 
   test "should not change the policy if the item is requested to be published, when managing sop" do
@@ -733,16 +732,17 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'duplicated logs are NOT created by uploading new version' do
+    sop,blob = valid_sop
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop.count', 1) do
-        post :create, :sop => valid_sop, :sharing => valid_sharing
+        post :create, :sop => sop,:content_blob=>blob, :sharing => valid_sharing
       end
     end
     al1= ActivityLog.last
     s=assigns(:sop)
     assert_difference('ActivityLog.count', 1) do
       assert_difference("Sop::Version.count", 1) do
-        post :new_version, :id => s, :sop => {:data => fixture_file_upload('files/file_picture.png')}, :revision_comment => "This is a new revision"
+        post :new_version, :id => s, :sop => {},:content_blob=>{:data => file_for_upload}, :revision_comment => "This is a new revision"
       end
     end
     al2=ActivityLog.last
@@ -755,7 +755,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not create duplication sop_versions_projects when uploading new version' do
     sop = Factory(:sop)
     login_as(sop.contributor)
-    post :new_version, :id => sop, :sop => {:data => fixture_file_upload('files/file_picture.png')}, :revision_comment => "This is a new revision"
+    post :new_version, :id => sop, :sop => {},:content_blob=>{:data => file_for_upload}, :revision_comment => "This is a new revision"
 
     sop.reload
     assert_equal 2, sop.versions.count
@@ -763,7 +763,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not create duplication sop_versions_projects when uploading sop' do
-    post :create, :sop => valid_sop, :sharing => valid_sharing
+    sop,blob = valid_sop
+    post :create, :sop => sop,:content_blob=>blob, :sharing => valid_sharing
 
     sop = assigns(:sop)
     assert_equal 1, sop.versions.count
@@ -871,13 +872,23 @@ class SopsControllerTest < ActionController::TestCase
 
   private
 
+  def file_for_upload options={}
+    default={:filename=>'file_picture.png',:content_type=>'image/png',:tempfile_fixture=>'files/file_picture.png'}
+    options = default.merge(options)
+    ActionDispatch::Http::UploadedFile.new({
+                                               :filename => options[:filename],
+                                               :content_type => options[:content_type],
+                                               :tempfile => fixture_file_upload(options[:tempfile_fixture])
+                                           })
+  end
+
   def valid_sop_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
-    {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project_ids=>[projects(:sysmo_project).id]}
+    return {:title=>"Test", :project_ids=>[projects(:sysmo_project).id]},{:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}
   end
 
   def valid_sop
-    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:project_ids=>[projects(:sysmo_project).id]}
+    return {:title=>"Test", :project_ids=>[projects(:sysmo_project).id]},{:data=>file_for_upload,:data_url=>""}
   end
 
 end

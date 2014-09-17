@@ -4,11 +4,7 @@ teusink:
   contributor: model_owner (User)
   title: Teusink
   description: Teusink from JWS Online
-  #original_filename: Teusink.xml
-  #content_blob: teusink_blob
-  #content_type: text/xml  
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 2  
   projects: [sysmo_project]
@@ -19,7 +15,6 @@ teusink_with_project_without_gatekeeper:
   title: Teusink
   description: Teusink from JWS Online
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 2
   projects: [moses_project]
@@ -29,11 +24,7 @@ teusink_with_space:
   contributor: model_owner (User)
   title: Teusink with space
   description: Teusink from JWS Online
-  #original_filename: Teusink (1).xml
-  #content_blob: teusink_blob
-  #content_type: text/xml
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
@@ -43,11 +34,7 @@ jws_model:
   contributor: model_owner (User)
   title: Model in JWS Dat format
   description: Model in JWS Dat format
-  #original_filename: JWS Model.dat
-  #content_blob: jws_model_blob
-  #content_type: text/xml  
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1  
   projects: [sysmo_project]
@@ -57,11 +44,7 @@ francos_model:
   contributor: model_owner (User)
   title: Francos model
   description: Problematic BioModels model that Franco gave as a test
-  #original_filename: BIOMD0000000064.xml
-  #content_blob: francos_model_blob
-  #content_type: text/xml  
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1  
   projects: [sysmo_project]
@@ -71,11 +54,7 @@ non_sbml_xml:
   contributor: model_owner (User)
   title: Non SBML XML
   description: An XML file that is not SBML
-  #original_filename: non_sbml_xml.xml
-  #content_blob: non_sbml_xml_blob
-  #content_type: text/xml  
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-02 11:09:18
   version: 1  
   projects: [other_project]
@@ -85,11 +64,7 @@ invalid_sbml_xml:
   contributor: model_owner (User)
   title: Invalid SBML XML
   description: An XML file that is not SBML
-  #original_filename: invalid_sbml_xml.xml
-  #content_blob: invalid_sbml_xml_blob
-  #content_type: text/xml  
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-02 11:09:18
   version: 1  
   projects: [other_project]
@@ -99,11 +74,7 @@ non_jws_dat:
   contributor: model_owner (User)
   title: Non JWS Online Dat file
   description: An Dat file that is not JWS Online format
-  #original_filename: non_jws_dat.xml
-  #content_blob: non_jws_dat_blob
-  #content_type: text/xml  
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-02 11:09:18
   version: 1  
   projects: [other_project]
@@ -113,11 +84,7 @@ model_with_format_and_type:
   contributor: model_owner (User)
   title: Model with format and type
   description: Teusink from JWS Online
-  #original_filename: Teusink.xml
-  #content_blob: teusink_blob
-  #content_type: text/xml
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   model_type: SBML
   model_format: BioPAX
@@ -130,11 +97,7 @@ model_with_links_in_description:
   contributor: model_owner (User)
   title: Links in my desc
   description: Visit my site http://www.google.com
-  #original_filename: Teusink.xml
-  #content_blob: teusink_blob
-  #content_type: text/xml  
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
@@ -144,11 +107,7 @@ model_with_different_owner:
   contributor: pal_user (User)
   title: Model with different Owner
   description: Visit my site http://www.google.com
-  #original_filename: Teusink.xml
-  #content_blob: teusink_blob
-  #content_type: text/xml
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [other_project] # not linked to any project for now
@@ -157,11 +116,7 @@ model_with_different_owner:
 model_with_no_contributor:
   title: Model with no contributor
   description: Visit my site http://www.google.com
-  #original_filename: Teusink.xml
-  #content_blob: teusink_blob
-  #content_type: text/xml
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
@@ -170,11 +125,7 @@ model_with_no_contributor:
 model_jws_incompatible:
   title: A model that is neither JWS Dat or SBML
   description: It is actually a picture
-  #original_filename: file_picture.png
-  #content_blob: picture_blob
-  #content_type: image/png
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]
@@ -183,11 +134,7 @@ model_jws_incompatible:
 private_model:
   title: Private model
   description: It is a private model
-  #original_filename: file_picture.png
-  #content_blob: picture_blob
-  #content_type: image/png
   recommended_environment: jws
-  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
   projects: [sysmo_project]

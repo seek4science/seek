@@ -79,6 +79,11 @@
   <br/>
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>Seek::Config.is_virtualliver ? true : false}%>
 
+  <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample} if @sample.respond_to?(:tissue_and_cell_types) -%>
+  <p>
+
+    <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sample} if @sample.respond_to?(:scales) && show_scales? %>
+  </p>
   <br style="clear:both"/>
 
   <% if @sample.can_manage?%>
@@ -90,6 +95,7 @@
   <% end %>      
 
   <%= fancy_multiselect @sample, :data_files,  {:name => 'sample_data_file_ids', :association_class => DataFile,:selected => (params[:sample_data_file_ids] || []).map(&:to_i) | @sample.data_file_masters.map(&:id), :hidden=> @sample.data_file_masters.blank? ? true : false, :other_projects_checkbox => true} %>
+  <%= fancy_multiselect @sample, :models, :name => 'sample_model_ids', :association_class => Model,:selected => (params[:sample_model_ids] || []).map(&:to_i) | @sample.model_masters.map(&:id) %>
   <%= fancy_multiselect @sample, :sops,  {:name => 'sample_sop_ids', :association_class => Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:id), :hidden=> @sample.sop_masters.blank?  ? true : false, :other_projects_checkbox => true} %>
 </div>
 

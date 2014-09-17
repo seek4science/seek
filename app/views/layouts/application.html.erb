@@ -11,7 +11,7 @@
 
   <%= csrf_meta_tag %>
 
-  <% if is_front_page? %>
+  <% if is_front_page? && !Seek::Config.is_virtualliver%>
       <%= seek_stylesheet_tags 'front_page' %>
       <%= seek_javascript_tags 'front_page' %>
   <% else %>
@@ -28,6 +28,7 @@
       }
   </script>
 
+  <link href="#data" type="application/json" rel="exhibit-data" />
 </head>
 
 <body id="body">
@@ -48,6 +49,7 @@
           <tr>
             <td>
               <div class="breadcrumbs">
+				<%# #MERGENOTE - VLN wrapped this in bold <b> but should be done in their CSS %>
                 <%= render_breadcrumbs :separator => ' > ' %>
               </div>
             </td>
@@ -71,8 +73,6 @@
               <%= flash[:notice] %>
             </div>
         <% end %>
-
-
 
         <%# main content part of every page -%>
         <%= yield :layout %>

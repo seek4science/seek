@@ -19,28 +19,27 @@
       </p>
   
       <div id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="sops">Loading...</span>
+        <span class="none_text" id="sops">Loading ...</span>
       </div>
       
       <div class="association_step">  
         <%= select_tag :possible_sops,
                        options_for_select([["Select #{t('sop')} ...", 0]]|project_sops.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
-                       {:style=>"width:90%",:onchange=>remote_function(
+                       {:style=>"width:90%",:onchange=>"addSelectedSop();"+remote_function(
                                :method=>:get,
                                :url=>preview_sops_path(:element=>"sop_preview"),
                                :with=>"'id='+this.value",
                                :before=>"show_ajax_loader('sop_preview')"
-                       )+";check_show_add_sop();return(false);"
+                       )+";return(false);"
                        } -%>
         
         <%= select_tag :assay_sop_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
         
         <br/>
 
-        <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= t('sop').pluralize %> from other <%= t('project').pluralize %>?
+        <%= check_box_tag :include_other_project_sops, nil, true, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate SOPs from other projects?
       </div>
 	  <br/>
-      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedSop(); return(false);", :id=>"add_sop_link", :class=>"block_link" %>
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'sop'} %>
   
@@ -81,9 +80,19 @@
                 }
             <% end -%>
             }
-
-            selection_box.onchange();
+            selection_box.selectedIndex = 0;
+           // selection_box.onchange();
         }
+    function check_show_add_sop() {
+            i = $('possible_sops').selectedIndex;
+            selected_id = $('possible_sops').options[i].value;
+            if (selected_id == '0') {
+                $('add_sop_link').hide();
+            }
+            else {
+                $('add_sop_link').show();
+            }
+     }
 
     <% @assay.sop_masters.each do |s| -%>    
       <% if s.can_view? -%>
@@ -104,19 +113,10 @@
       <% end -%>
     <% end -%>
 
+
+
+
     updateSops();
+    toggle_sop_list()
 
-
-    function check_show_add_sop() {
-        i = $('possible_sops').selectedIndex;
-        selected_id = $('possible_sops').options[i].value;
-        if (selected_id == '0') {
-            $('add_sop_link').hide();
-        }
-        else {
-            $('add_sop_link').show();
-        }
-    }
-
-    check_show_add_sop();
 </script>

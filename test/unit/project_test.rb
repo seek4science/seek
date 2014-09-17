@@ -3,7 +3,7 @@ require 'test_helper'
 class ProjectTest < ActiveSupport::TestCase
   
   fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users,  :publications, :assets, :organisms
-  #checks that the dependent work_groups are destoryed when the project s
+  #checks that the dependent work_groups are destroyed when the project s
   def test_delete_work_groups_when_project_deleted
     n_wg=WorkGroup.all.size
     p=Project.find(2)
@@ -394,42 +394,42 @@ class ProjectTest < ActiveSupport::TestCase
     p=Factory(:project)
     p2 = Factory(:project)
 
-    assert_nil p2.ancestor
-    assert_empty p.descendants
+    assert_nil p2.lineage_ancestor
+    assert_empty p.lineage_descendants
 
-    p.ancestor = p
+    p.lineage_ancestor = p
     refute p.valid?
 
-    p2.ancestor = p
+    p2.lineage_ancestor = p
     assert p2.valid?
     p2.save!
     p2.reload
     p.reload
 
-    assert_equal p,p2.ancestor
-    assert_equal [p2],p.descendants
+    assert_equal p,p2.lineage_ancestor
+    assert_equal [p2],p.lineage_descendants
 
     #repeat, but assigning the other way around
     p=Factory(:project)
     p2 = Factory(:project)
 
-    assert_nil p2.ancestor
-    assert_empty p.descendants
+    assert_nil p2.lineage_ancestor
+    assert_empty p.lineage_descendants
 
-    p2.descendants << p
+    p2.lineage_descendants << p
     assert p2.valid?
     p2.save!
     p2.reload
     p.reload
 
-    assert_equal [p],p2.descendants
-    assert_equal p2,p.ancestor
+    assert_equal [p],p2.lineage_descendants
+    assert_equal p2,p.lineage_ancestor
 
     p3=Factory(:project)
-    p2.descendants << p3
+    p2.lineage_descendants << p3
     p2.save!
     p2.reload
-    assert_equal [p,p3],p2.descendants.sort_by(&:id)
+    assert_equal [p,p3],p2.lineage_descendants.sort_by(&:id)
   end
 
   test "spawn" do
@@ -439,6 +439,7 @@ class ProjectTest < ActiveSupport::TestCase
     person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg1)])
     person2 = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg1)])
     person3 = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => wg2)])
+    p.reload
 
     assert_equal 3,p.people.size
     assert_equal 2,p.work_groups.size
@@ -475,8 +476,8 @@ class ProjectTest < ActiveSupport::TestCase
     assert_includes p2.people,person2
     assert_includes p2.people,person3
 
-    assert_equal p,p2.ancestor
-    assert_equal [p2],p.descendants
+    assert_equal p,p2.lineage_ancestor
+    assert_equal [p2],p.lineage_descendants
 
     prog2=Factory(:programme)
     p2=p.spawn({:title=>"fish project",:programme=>prog2,:description=>"about doing fishing"})

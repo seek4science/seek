@@ -16,9 +16,9 @@
             <%= f.text_area :description, :class=>"large_text_entry" -%>
         </p>        
       
-        <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
+        <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, and project selector was disabled) -%>
         <% if current_user_authorized_to_manage -%>
-            <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :disable_project_select => true } -%>
+            <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :allow_nil => true } -%>
         <% end -%>
 
       <% if show_scales? %>
@@ -26,11 +26,11 @@
       <% end %>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
-		
-		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
+
+        <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
           <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@sop} %>
-        <% end -%>
+      <% end -%>           
         <p>
           <%= preview_permission_popup_link(@sop)-%>
           <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateResourceFields(false, 'sop', #{current_user_authorized_to_manage}); return(false);" -%> or <%= link_to "Cancel", sop_path(@sop) -%>

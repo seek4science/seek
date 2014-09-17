@@ -1,18 +1,9 @@
-<% if logged_in_and_member? %>
-    <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_investigation_path, "New #{t('investigation')}", nil, "New #{t('investigation')}" %></li>
-    </ul>
-<% end %>
+<%= index_title -%>
 
-<% if @investigations.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @investigations.pages, :page_totals=>@investigations.page_totals,:current_page=>@investigations.page } -%>
-<% end %>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_investigation_path, :label => "New #{t('investigation')}"} %>
 
-<div class="list_items_container">
-  <%= render :partial => "assets/resource_list_item", :collection=>@investigations %>
-</div>
-
-<% if @investigations.page == "latest" && (n=Investigation.all_authorized_for("view").count) > Seek::Config.limit_latest %>
-    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>n}%>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing %>
+    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @investigations %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @investigations %>
 <% end %>

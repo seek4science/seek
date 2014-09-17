@@ -1,0 +1,42 @@
+<div id="data" style="display:none">
+  <%
+     resource_hash = data_search
+     common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
+     specified_facet_config = YAML.load(File.read(specified_faceted_search_config_path))
+     external_faceted_config = YAML.load(File.read(external_faceted_search_config_path))
+
+     #generate tree for HierarchicalFacet
+     all_facet_config = common_facet_config
+     resource_hash.keys.each do |object_type|
+       all_facet_config = all_facet_config.merge(specified_facet_config[object_type] || {})
+     end
+     exhibit_items = exhibit_trees all_facet_config
+
+     #generate exhibit_items
+     resource_hash.each do |key,value|
+       objects = value[:items]
+       if objects.first.respond_to?(:is_external_search_result?) && objects.first.is_external_search_result?
+         facets_for_object = external_faceted_config[key] || {}
+         config = common_facet_config.merge(facets_for_object)
+       else
+         facets_for_object = specified_facet_config[key] || {}
+         config = common_facet_config.merge(facets_for_object)
+       end
+
+       objects.each do |object|
+        if object.respond_to?(:is_external_search_result?) && object.is_external_search_result?
+           exhibit_item = exhibit_item_for_external_resource object, config
+        else
+           exhibit_item = exhibit_item_for object, config
+        end
+
+        exhibit_items << exhibit_item
+       end
+     end
+  %>
+
+  {
+  "items": <%= exhibit_items.to_json %>
+  }
+
+</div>

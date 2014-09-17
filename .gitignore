@@ -27,14 +27,17 @@ tmp/avatars/*
 tmp/models/*
 tmp/model_images/*
 tmp/restart.txt
+tmp/rubycritic/*
 tmp/profile-*
 tmp/test_content_blobs/*
+tmp/rubycritic/*
 tmp/rdf/
 tmp/*.csv
 tmp/*.zip
 tmp/zip-files
 tmp/testing-filestore
 tmp/testing-seek-cache
+tmp/rubycritic
 *.tmp*
 *~
 
@@ -60,5 +63,8 @@ vendor/bundle/
 vendor/cache/
 *.~lock*
 
-coverage/
 *.orig
+
+coverage/
+
+Test\ Results*.html

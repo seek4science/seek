@@ -36,12 +36,25 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test "default policy" do
-    pol=Policy.default
-    assert_equal Policy::PRIVATE, pol.sharing_scope
-    assert_equal Policy::NO_ACCESS, pol.access_type
-    assert_equal false,pol.use_whitelist
-    assert_equal false,pol.use_blacklist
-    assert pol.permissions.empty?
+    with_config_value "is_virtualliver",false do
+      pol=Policy.default
+      assert_equal Policy::PRIVATE, pol.sharing_scope
+      assert_equal Policy::NO_ACCESS, pol.access_type
+      assert_equal false, pol.use_whitelist
+      assert_equal false, pol.use_blacklist
+      assert pol.permissions.empty?
+    end
+  end
+
+  test "default policy for virtual liver" do
+    with_config_value "is_virtualliver",true do
+      pol=Policy.default
+      assert_blank pol.sharing_scope
+      assert_blank pol.access_type
+      assert_equal false, pol.use_whitelist
+      assert_equal false, pol.use_blacklist
+      assert pol.permissions.empty?
+    end
   end
 
   test "policy access type presedence" do

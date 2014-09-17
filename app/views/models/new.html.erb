@@ -23,19 +23,23 @@
         <p>
 
 
-                  <%= render :partial => "projects/project_selector", :locals => { :resource => @model } -%>
+                  <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => true } -%>
                     <%= render :partial=>"model_metadata" -%>
 
         </p>
 
         <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
-        <% if show_scales? %>
-            <%= render :partial => "scales/scales_selector_with_parameters",:locals=>{:object=>@model} %>
-        <% end %>
+          <p>
+            <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} if show_scales?%>
+          </p>
 
         <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
-        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
-        <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@model} %>
+       
+
+        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
+      <%= fields_for(@model) do |f|
+        f.fancy_multiselect(:samples, {:hidden => @model.samples.blank? ? true : false, :other_projects_checkbox => true})
+      end -%>
 
         <p>
           <%= preview_permission_popup_link(@model)-%>

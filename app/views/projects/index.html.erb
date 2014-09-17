@@ -1,16 +1,10 @@
+<%= index_title -%>
 <% if @organisms -%>
   <h2><%= "#{t('project').pluralize} involved with the organism '"+h(@organisms)+"' ... " -%></h2>
 <% end %>
 
-<% if @projects.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @projects.pages, :page_totals=>@projects.page_totals,:current_page=>@projects.page } -%>
-<% end %>
-
-<div class="list_items_container">
-  <%= render :partial=>"assets/resource_list_item", :collection=>@projects %>
-</div>
-
-<% if @projects.page == "latest" && Project.count > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>Project.count}%>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
+    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @projects %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @projects %>
 <% end %>

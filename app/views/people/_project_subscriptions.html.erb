@@ -1,19 +1,21 @@
 <div class="fold">
   <div class="foldTitle">
-    Subscriptions
+    <div title='<%= tooltip_title_attrib(h("Click to see subscriptions"), 300)%>'>
+      Subscriptions
+    </div>
   </div>
-  <div class="foldContent" style="display:none">
-    Here is the list of <%= t('project').pluralize %> you are subscribed to:
+  <div class="foldContent" style="display: none;">
     <% project_subscriptions = person.project_subscriptions.uniq %>
     <% if project_subscriptions.empty? %>
         <span class='none_text'>None</span>
     <% else %>
+       <span> Here is the list of <%= t('project').pluralize %> you are subscribed to: </span>
         <table>
           <tr>
             <th> <%= t('project') %></th>
             <th>Email Frequency</th>
           </tr>
-          <% project_subscriptions.each do |project_subscription| %>
+          <% project_subscriptions.sort{|ps1,ps2|ps1.project.title <=> ps2.project.title}.each do |project_subscription| %>
               <tr>
                 <td style="text-align: left"> <%= link_to project_subscription.project.title, project_subscription.project %> </td>
                 <td> <%= project_subscription.frequency %> </td>

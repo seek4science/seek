@@ -4,11 +4,12 @@ class Assay < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::OntologyTypeHandling
+  include Seek::OntologyExtensionWithSuggestedType
   include Seek::Taggable
 
-  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in
+  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in  
   def projects
-    study.try(:investigation).try(:projects) || []
+    study.try(:projects) || []
   end
 
   acts_as_isa
@@ -23,6 +24,7 @@ class Assay < ActiveRecord::Base
   has_many :assay_organisms, :dependent=>:destroy
   has_many :organisms, :through=>:assay_organisms
   has_many :strains, :through=>:assay_organisms
+  has_many :tissue_and_cell_types,:through => :assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
 
@@ -47,6 +49,7 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
+  validate :either_samples_or_organisms_for_experimental_assay,  :if => "Seek::Config.is_virtualliver"
   validate :no_sample_for_modelling_assay
 
   before_validation :default_assay_and_technology_type
@@ -57,10 +60,8 @@ class Assay < ActiveRecord::Base
   alias_attribute :contributor, :owner
 
   searchable(:auto_index=>false) do
-    text :description, :title, :searchable_tags, :organism_terms, :assay_type_label,:technology_type_label
-    text :contributor do
-      contributor.try(:person).try(:name)
-    end
+    text :organism_terms, :assay_type_label,:technology_type_label
+
     text :strains do
       strains.compact.map{|s| s.title}
     end
@@ -103,10 +104,46 @@ class Assay < ActiveRecord::Base
 
 
 
+  #uri for generating rdf for suggested assay type,
+  #if uri is valid, this will be ignored, as it is already added by assay_type_uri
+  #otherwise use the uri of parent in ontology
+  def suggested_assay_type_ontology_uri
+     uri = RDF::URI.new assay_type_uri
+     if uri.valid?
+       nil
+     else
+       SuggestedAssayType.where(:uri=> assay_type_uri).first.try(:ontology_uri)
+     end
+  end
+
+  #uri for generating rdf for suggested technology type,
+  #if uri is valid, this will be ignored, as it is already added by technology_type_uri
+  #otherwise use the uri of parent in ontology
+
+  def suggested_technology_type_ontology_uri
+    uri = RDF::URI.new technology_type_uri
+    if uri.valid?
+      nil
+    else
+      SuggestedTechnologyType.where(:uri=> technology_type_uri).first.try(:ontology_uri)
+    end
+  end
+  # super method defined in ontology_type_handling
+  # so the query order is: 1. read_attribute(:assay_type_label) 2.Ontology 3. SuggestedAssayType
+  def assay_type_label
+    super ||  SuggestedAssayType.where(:uri => self.assay_type_uri).first.try(:label)
+  end
+
+  # super method defined in ontology_type_handling
+   # so the query order is: 1. read_attribute(:technology_type_label) 2.Ontology 3. SuggestedTechnologyType
+  def technology_type_label
+      super || SuggestedTechnologyType.where(:uri => self.technology_type_uri).first.try(:label)
+  end
+
   def short_description
-    type=assay_type.nil? ? "No type" : assay_type.title
+    type= self.assay_type_label.nil? ? "No type" : self.assay_type_label
    
-    "#{title} (#{type})"
+    "#{self.title} (#{type})"
   end
 
   def state_allows_delete? *args
@@ -148,7 +185,7 @@ class Assay < ActiveRecord::Base
   #organism may be either an ID or Organism instance
   #strain_id should be the id of the strain
   #culture_growth should be the culture growth instance
-  def associate_organism(organism,strain_id=nil,culture_growth_type=nil)
+  def associate_organism(organism,strain_id=nil,culture_growth_type=nil,tissue_and_cell_type_id="0",tissue_and_cell_type_title=nil)
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
     strain=organism.strains.find_by_id(strain_id)
     assay_organism=AssayOrganism.new(:assay=>self,:organism=>organism,:culture_growth_type=>culture_growth_type,:strain=>strain)
@@ -156,7 +193,19 @@ class Assay < ActiveRecord::Base
     unless AssayOrganism.exists_for?(strain,organism,self,culture_growth_type)
       self.assay_organisms << assay_organism
     end
-
+    
+    tissue_and_cell_type=nil
+    if !tissue_and_cell_type_title.blank?
+      if ( tissue_and_cell_type_id =="0" )
+          found = TissueAndCellType.where(:title => tissue_and_cell_type_title).first
+          unless found
+          tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title) if (!tissue_and_cell_type_title.nil? && tissue_and_cell_type_title!="")
+          end
+      else
+          tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+      end
+    end
+    assay_organism.tissue_and_cell_type = tissue_and_cell_type
   end
   
   def assets
@@ -188,8 +237,11 @@ class Assay < ActiveRecord::Base
     new_object.model_masters = self.try(:model_masters)
     new_object.sample_ids = self.try(:sample_ids)
     new_object.assay_organisms = self.try(:assay_organisms)
-
     return new_object
+  end
+
+  def either_samples_or_organisms_for_experimental_assay
+     errors[:base] << "You should associate a #{I18n.t('assays.experimental_assay')} with either samples or organisms or both" if !is_modelling? && samples.empty? && assay_organisms.empty?
   end
 
   def no_sample_for_modelling_assay

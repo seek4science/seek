@@ -4,7 +4,6 @@ class SopsController < ApplicationController
   include DotGenerator
 
   include Seek::AssetsCommon
-  include AssetsCommonExtension
   
   #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
@@ -16,7 +15,7 @@ class SopsController < ApplicationController
   include Seek::BreadCrumbs
 
   def new_version
-    if (handle_data nil)      
+    if handle_upload_data
       comments=params[:revision_comment]
 
 
@@ -84,7 +83,7 @@ class SopsController < ApplicationController
   # POST /sops
   def create    
 
-    if handle_data            
+    if handle_upload_data
       @sop = Sop.new(params[:sop])
       @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
@@ -115,6 +114,8 @@ class SopsController < ApplicationController
           }
         end
       end
+    else
+      handle_upload_data_failure
     end
   end
   
@@ -198,15 +199,5 @@ class SopsController < ApplicationController
       end
     end
   end
-  
-  def request_resource
-    resource = Sop.find(params[:id])
-    details = params[:details]
-    
-    Mailer.request_resource(current_user,resource,details,base_host).deliver
-    
-    render :update do |page|
-      page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
-    end
-  end
+
 end

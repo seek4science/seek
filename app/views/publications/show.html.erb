@@ -38,18 +38,27 @@
         <label><%= publication_type_text @publication.publication_type -%>:</label>
         <%=h @publication.journal -%>
         <br/>
+        <label><%= "Citation:" -%></label>
+        <%=h @publication.citation -%>
+        <br/>
         <label for="date_published">Date Published:</label>
         <span><%= date_as_string(@publication.published_date,false,true) -%></span>
       </p>
 
       <p>
-        <label>Author<%= @publication.publication_author_orders.size > 1 ? "s" : "" -%>:</label>
-        <%= author_display_list @publication %>
+        <label>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</label>
+        <% if @publication.publication_authors.empty? %>
+            <span class='none_text'>Not specified</span>
+        <% else %>
+            <%= @publication.publication_authors.map do |author|
+              if author.person && author.person.can_view?
+                link_to get_object_title(author.person), show_resource_path(author.person)
+              else
+                author.first_name + " " + author.last_name
+              end
+            end.join(', ').html_safe %>
+        <% end %>
       </p>
-
-      <% if show_scales? -%>
-          <%= render :partial=>"scales/asset_scales_list",:object=>@publication -%>
-      <% end %>
 
 
 
@@ -61,7 +70,7 @@
     <%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @publication, :title=>"Registered by" } -%>
 
     <%= item_tags_and_tag_entry -%>
-
+    <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @publication}-%>
   </div>
 
   <div style="clear:both">

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "rails", "3.2.17"
+gem "rails", "3.2.19"
 gem "rdoc"
 
 gem "feedjira","~>1"
@@ -16,7 +16,7 @@ gem "rmagick","2.13.2", :require => 'RMagick'
 gem "mysql2"
 gem 'rest-client',">=1.6.1"
 gem 'factory_girl', "2.6.4"
-gem 'rubyzip',"0.9.9"
+gem 'rubyzip', "~> 1.1.4"
 gem 'bio'
 gem 'sunspot_rails'
 gem 'sunspot_solr'
@@ -50,6 +50,7 @@ gem 'rdf-virtuoso', ">=0.1.6"
 gem 'cocaine'
 gem 'colorize'
 gem 'lograge'
+gem 'psych'
 gem 'transaction_isolation'
 
 #gem for BiVeS and BudHat
@@ -78,18 +79,23 @@ gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
 gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 
-gem 'passenger'
-gem 'unicorn-rails'
-
-gem 'coveralls', require: false
-
-group :assets do
-  gem 'turbo-sprockets-rails3'
-end
-
 gem 'taverna-t2flow'
 gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
 gem 'jquery-rails', '~> 3'
+
+gem "recaptcha", '0.3.1'
+gem 'metainspector'
+gem 'mechanize'
+
+
+group :assets do
+  gem 'turbo-sprockets-rails3'
+  gem 'yui-compressor'
+end
+
+group :production do
+  gem 'passenger'
+end
 
 group :development do
   gem "pry"
@@ -97,9 +103,9 @@ group :development do
   gem "pry-remote"
   gem "request-log-analyzer"
   gem "rubocop",:require=>false
-  gem "reek",:require=>false
-  gem "flog",:require=>false
-  gem "flay",:require=>false
+  gem "rubycritic",:require=>false
+  gem "guard-rubycritic",:require=>false
+  gem 'unicorn-rails'
 end
 
 group :test do
@@ -108,8 +114,8 @@ group :test do
   gem "ruby-prof"
   gem "webmock"
   gem 'minitest-reporters','~> 0.14'
+  gem 'coveralls', require: false
+  gem 'rspec-rails'
+  gem 'sunspot_matchers'
 end
 
-group :assets do
-  gem 'yui-compressor'
-end

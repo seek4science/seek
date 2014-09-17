@@ -112,14 +112,14 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test "resource tab title" do
-    assert_equal "EBI Biomodels",resource_tab_item_name("EBI Biomodels",true)
-    assert_equal "Database",resource_tab_item_name("Database",false)
-    assert_equal I18n.t('model').pluralize,resource_tab_item_name("Model")
-    assert_equal I18n.t('data_file').pluralize,resource_tab_item_name("DataFile")
-    assert_equal I18n.t('data_file').pluralize,resource_tab_item_name("DataFiles")
-    assert_equal I18n.t('data_file'),resource_tab_item_name("DataFile",false)
-    assert_equal I18n.t('sop').pluralize,resource_tab_item_name("SOP")
-    assert_equal I18n.t('sop').pluralize,resource_tab_item_name("Sop")
-    assert_equal I18n.t('sop'),resource_tab_item_name("Sop",false)
+    assert_equal "EBI Biomodels",internationalized_resource_name("EBI Biomodels",true)
+    assert_equal "Database",internationalized_resource_name("Database",false)
+    assert_equal I18n.t('model').pluralize,internationalized_resource_name("Model")
+    assert_equal I18n.t('data_file').pluralize,internationalized_resource_name("DataFile")
+    assert_equal I18n.t('data_file').pluralize,internationalized_resource_name("DataFiles")
+    assert_equal I18n.t('data_file'),internationalized_resource_name("DataFile",false)
+    assert_equal I18n.t('sop').pluralize,internationalized_resource_name("SOP")
+    assert_equal I18n.t('sop').pluralize,internationalized_resource_name("Sop")
+    assert_equal I18n.t('sop'),internationalized_resource_name("Sop",false)
   end
 end

@@ -34,8 +34,12 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
-  belongs_to :ancestor,:class_name=>"Project",:foreign_key => :ancestor_id
-  has_many :descendants,:class_name=>"Project",:foreign_key => :ancestor_id
+  # SEEK projects suffer from having 2 types of ancestor and descendant,that were added separately - those from the historical lineage of the project, and also from
+  # the hierarchical tree structure that can be. For this reason and to avoid the clash, these anscestors and descendants have been renamed.
+  # However, in the future it would probably be more appropriate to change these back to simply ancestor and descendant, and rename the hierarchy struture
+  # to use parents/children.
+  belongs_to :lineage_ancestor,:class_name=>"Project",:foreign_key => :ancestor_id
+  has_many :lineage_descendants,:class_name=>"Project",:foreign_key => :ancestor_id
 
   scope :default_order, order('title')
   scope :without_programme,:conditions=>"programme_id IS NULL"
@@ -43,8 +47,14 @@ class Project < ActiveRecord::Base
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
 
-  validate :ancestor_cannot_be_self
+  validate :lineage_ancestor_cannot_be_self
 
+  RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
+  RELATED_RESOURCE_TYPES.each do |type|
+    define_method "related_#{type.underscore.pluralize}" do
+      send "#{type.underscore.pluralize}"
+    end
+  end
 
   def studies
     investigations.collect(&:studies).flatten.uniq
@@ -56,7 +66,7 @@ class Project < ActiveRecord::Base
   #  necessary, deep copies of it will be made to ensure that all settings get
   #  fully copied and assigned to belong to owners of assets, where identical policy
   #  is to be used)
-  belongs_to :default_policy, 
+  belongs_to :default_policy,
     :class_name => 'Policy',
     :dependent => :destroy,
     :autosave => true
@@ -64,7 +74,12 @@ class Project < ActiveRecord::Base
   after_initialize :default_default_policy_if_new
 
   def default_default_policy_if_new
-    self.default_policy = Policy.default if new_record?
+    unless Seek::Config.is_virtualliver
+      self.default_policy = Policy.default if new_record?
+    else
+      self.default_policy = Policy.private_policy if new_record?
+    end
+
   end
 
   def group_memberships_empty? institution
@@ -80,10 +95,6 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :organisms, :before_add=>:update_rdf_on_associated_change, :before_remove=>:update_rdf_on_associated_change
   has_many :project_subscriptions,:dependent => :destroy
-  
-  searchable(:auto_index=>false) do
-    text :title , :description, :locations
-  end if Seek::Config.solr_enabled
 
   attr_accessor :site_username,:site_password
 
@@ -138,15 +149,11 @@ class Project < ActiveRecord::Base
 
   def locations
     # infer all project's locations from the institutions where the person is member of
-    locations = self.institutions.collect { |i| i.country unless i.country.blank? }
-
-    # make sure this list is unique and (if any institutions didn't have a country set) that 'nil' element is deleted
-    locations = locations.uniq
-    locations.delete(nil)
-
+    locations = self.institutions.collect(&:country).select { |l| !l.blank? }
     return locations
   end
 
+  #OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
   def people
     #TODO: look into doing this with a scope or direct query
     res = work_groups.collect(&:people).flatten.uniq.compact
@@ -169,13 +176,6 @@ class Project < ActiveRecord::Base
   def self.with_userless_people
     p=Project.all(:include=>:work_groups)
     return p.select { |proj| proj.includes_userless_people? }
-  end
-  
-  
-  # get a listing of institutions for this project
-  def get_institutions_listing
-    workgroups_for_project = WorkGroup.where(:project_id => self.id)
-    return workgroups_for_project.collect { |w| [w.institution.title, w.institution.id, w.id] }
   end
 
   def assays
@@ -226,9 +226,9 @@ class Project < ActiveRecord::Base
     user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
   end
 
-  def ancestor_cannot_be_self
-    if ancestor==self
-      errors.add(:ancestor, "cannot be the same as itself")
+  def lineage_ancestor_cannot_be_self
+    if lineage_ancestor==self
+      errors.add(:lineage_ancestor, "cannot be the same as itself")
     end
   end
 
@@ -247,8 +247,11 @@ class Project < ActiveRecord::Base
     end
     child.assign_attributes(attributes)
     child.avatar=nil
-    child.ancestor=self
+    child.lineage_ancestor=self
     child
   end
 
+   #should put below at the bottom in order to override methods for hierarchies,
+   #Try to find a better way for overriding methods regardless where to include the module
+    include Seek::ProjectHierarchies::ProjectExtension if Seek::Config.project_hierarchy_enabled
 end

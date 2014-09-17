@@ -137,8 +137,8 @@ class PoliciesController < ApplicationController
 
   def sharing_params_to_policy params=params
       policy =Policy.new()
-      policy.sharing_scope = params["sharing_scope"].to_i
-      policy.access_type = params["access_type"].to_i
+      policy.sharing_scope = params["sharing_scope"].to_i unless params[:sharing_scope].blank?
+      policy.access_type = params[:access_type].blank? ? 0 : params["access_type"].to_i
       policy.use_whitelist = params["use_whitelist"] == 'true' ? true : false
       policy.use_blacklist = params["use_blacklist"] == 'true' ? true : false
 

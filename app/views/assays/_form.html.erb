@@ -40,7 +40,7 @@
     <% investigations = Investigation.all.select &:can_view? -%>
       <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
       <% investigations.each do |i| %>
-         <% studies = i.studies.select &:can_edit? %>
+         <% studies = i.studies.select(&:can_edit?) %>
         <% unless studies.empty?%>
           <% options << "<optgroup label=\"#{truncate(h(i.title), :length => 64)}\">\n" %>
           <% studies.each do |s| %>
@@ -62,21 +62,28 @@
 <table class="padded_table">
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
+        <%= create_suggested_assay_type_popup_link @assay.is_modelling?, controller_name %>
 
     </td>
     <% unless @assay.is_modelling? -%>
-      <td><%= f.label "Technology type: " %>
-
-
-      </td>
+        <td><%= f.label "Technology type: " %>
+              <%= create_suggested_technology_type_popup_link controller_name %>
+        </td>
     <% end -%>
   </tr>
   <tr>
-
-    <td style="width:50%"><%= assay_type_select_tag f,@assay.is_modelling?,"assay_type_uri",(@assay.assay_type_uri),{:style=>"width:100%"} %></td>
-    <% unless @assay.is_modelling? -%>
-      <td style="width:50%"><%= technology_type_select_tag f,"technology_type_uri",(@assay.technology_type_uri),{:style=>"width:100%"} %></td>
-    <% end -%>
+    <td style="width:50%">
+      <div id="assay_assay_types_list">
+        <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay.assay_type_uri, {:style => "width:100%"} %>
+      </div>
+    </td>
+    <td style="width:50%">
+      <% unless @assay.is_modelling? -%>
+          <div id="assay_technology_types_list">
+            <%= technology_type_select_tag f, "technology_type_uri", @assay.technology_type_uri, {:style => "width:100%"} %>
+          </div>
+      <% end -%>
+    </td>
   </tr>
 </table>
 

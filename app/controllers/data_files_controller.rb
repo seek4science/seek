@@ -9,13 +9,12 @@ class DataFilesController < ApplicationController
   include DotGenerator
 
   include Seek::AssetsCommon
-  include AssetsCommonExtension
 
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show,:explore,:download,:matching_models]
   skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
-  before_filter :xml_login_only, :only => [:upload_for_tool, :upload_from_email]
+  before_filter :xml_login_only, :only => [:upload_for_tool,:upload_from_email]
 
   #has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -57,7 +56,7 @@ class DataFilesController < ApplicationController
   end
     
   def new_version
-    if (handle_data nil)          
+    if handle_upload_data
       comments=params[:revision_comment]
 
       respond_to do |format|
@@ -72,7 +71,7 @@ class DataFilesController < ApplicationController
           end
           flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
           if @data_file.is_with_sample?
-            bio_samples = @data_file.bio_samples_population
+            bio_samples = @data_file.bio_samples_population @data_file.samples.first.institution_id if @data_file.samples.first
             unless bio_samples.errors.blank?
               flash[:notice] << "<br/> However, Sample database population failed."
               flash[:error] = bio_samples.errors.html_safe
@@ -118,12 +117,12 @@ class DataFilesController < ApplicationController
 
   def upload_for_tool
 
-    if handle_data
+    if handle_upload_data
       params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
       #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
-      Policy.new_for_upload_tool(@data_file, params[:recipient_id])
+      @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
         @data_file.creators = [current_user.person]
@@ -143,10 +142,10 @@ class DataFilesController < ApplicationController
   def upload_from_email
     if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
       User.with_current_user Person.find(params[:sender_id]).user do
-        if handle_data
+        if handle_upload_data
           @data_file = DataFile.new params[:data_file]
 
-          Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
+          @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
 
           if @data_file.save
             @data_file.creators = [User.current_user.person]
@@ -166,16 +165,13 @@ class DataFilesController < ApplicationController
   end
 
   def create
-    if handle_data
+    if handle_upload_data
 
       @data_file = DataFile.new params[:data_file]
-      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
-
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
       assay_ids = params[:assay_ids] || []
-
 
       if @data_file.save
         update_annotations @data_file
@@ -191,7 +187,7 @@ class DataFilesController < ApplicationController
 
         #Add creators
         AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-        if @data_file.parent_name=="assay"
+          if !@data_file.parent_name.blank?
           render :partial => "assets/back_to_fancy_parent", :locals => {:child => @data_file, :parent_name => @data_file.parent_name, :is_not_fancy => true}
         else
           respond_to do |format|
@@ -229,6 +225,8 @@ class DataFilesController < ApplicationController
         end
 
       end
+    else
+      handle_upload_data_failure
     end
   end
 
@@ -352,18 +350,7 @@ class DataFilesController < ApplicationController
         page.replace_html element,:text=>"Nothing is selected to preview."
       end
     end
-  end  
-  
-  def request_resource
-    resource = DataFile.find(params[:id])
-    details = params[:details]
-    
-    Mailer.request_resource(current_user,resource,details,base_host).deliver
-    
-    render :update do |page|
-      page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
-    end
-  end  
+  end
   
   def explore
     if @display_data_file.contains_extractable_spreadsheet?

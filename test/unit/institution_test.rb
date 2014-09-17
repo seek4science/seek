@@ -171,4 +171,10 @@ class InstitutionTest < ActiveSupport::TestCase
     assert user.is_admin?
     assert institution.can_delete?(user)
   end
+
+  test "get all institution listing" do
+    inst = Factory(:institution,:title=>"Inst X")
+    array = Institution.get_all_institutions_listing
+    assert_include array,["Inst X",inst.id]
+  end
 end

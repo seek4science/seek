@@ -18,6 +18,7 @@ class User < ActiveRecord::Base
 
   has_many :investigations,:as=>:contributor
   has_many :studies,:as=>:contributor
+  has_many :samples,:as=>:contributor
 
   has_many :workflows, :as => :contributor
   has_many :taverna_player_runs, :class_name => 'TavernaPlayer::Run', :as => :contributor
@@ -79,6 +80,9 @@ class User < ActiveRecord::Base
     self.logged_in_and_registered? && self.current_user.person.is_project_manager_of_any_project?
   end
 
+  def self.asset_manager_logged_in?
+     self.logged_in_and_registered? && self.current_user.person.is_asset_manager?
+  end
   #a person can be logged in but not fully registered during
   #the registration process whilst selecting or creating a profile
   def self.logged_in_and_registered?
@@ -207,6 +211,31 @@ class User < ActiveRecord::Base
   
   def can_edit_institutions?
     !person.nil? && person.can_edit_institutions?
+  end
+
+  def can_manage_types?
+    unless Seek::Config.type_managers_enabled
+      return false
+    end
+
+    case Seek::Config.type_managers
+      when "admins"
+        if User.admin_logged_in?
+          return true
+        else
+          return false
+        end
+      when "pals"
+        if User.admin_logged_in? || User.pal_logged_in?
+          return false
+        else
+          return false
+        end
+      when "users"
+        return false
+      when "none"
+        return false
+    end
   end
 
   def self.with_current_user user

@@ -17,8 +17,8 @@
 //= require autocompleter_advanced
 //= require publication
 //= require top_menu
+//= require dropMenu
 //= require dynamic_menu
-//= require batch_upload
 //= require assays
 //= require models
 //= require sharing
@@ -32,3 +32,4 @@
 //= require tabber-minimized
 //= require detect_browser
 //= require easytabs
+//= require default_text_search

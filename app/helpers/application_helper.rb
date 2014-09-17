@@ -7,7 +7,12 @@ module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
   include TavernaPlayer::RunsHelper
+  include Recaptcha::ClientHelper
 
+
+  def index_title
+    show_title(self.controller_name.humanize.capitalize)
+  end
 
   def is_front_page?
     current_page?(main_app.root_url)
@@ -427,9 +432,7 @@ module ApplicationHelper
         + '&creators=' + encodeURIComponent(getCreators()) + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&resource_id=' + '#{resource_id}' + '&is_new_file=' + '#{is_new_file}'"},
       { :id => 'preview_permission',
         :style => 'display:none'
-      } #,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+      }
     )
   end
   #Return whether or not to hide contact details from this user
@@ -555,17 +558,20 @@ module ApplicationHelper
          :hidden => options[:hidden]}
   end
 
-  def require_js file
-    #TODO: Needs testing, not sure what the 'lifecycle' for instance variables in a helper is.
-    #Needs to last as long as the page is being rendered and no longer. The intent is to include the js only if it hasn't already been included.
-    @required_js ||= []
-    unless @required_js.include? file
-      @required_js << file
-      javascript_include_tag file
+  def resource_tab_item_name resource_type,pluralize=true
+    resource_type = resource_type.singularize
+    if resource_type == "Speciman"
+      result = t('biosamples.sample_parent_term')
+    elsif resource_type == "Assay"
+      result = t('assays.assay')
+    else
+      translated_resource_type = translate_resource_type(resource_type)
+      result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
     end
+    pluralize ? result.pluralize : result
   end
 
-  def resource_tab_item_name resource_type,pluralize=true
+  def internationalized_resource_name resource_type,pluralize=true
     resource_type = resource_type.singularize
     if resource_type == "Speciman"
       result = t('biosamples.sample_parent_term')
@@ -608,36 +614,26 @@ module ApplicationHelper
     end
   end
 
-  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
-                         Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
-                         Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
-                         Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
-                         Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
-                         Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
-                         Project=>"You cannot delete this #{I18n.t 'project'}. It might has people associated with it.",
-                         Institution=>"You cannot delete this Institution. It might has people associated with it."
-  }
+  def no_deletion_explanation_message(clz)
+    no_deletion_explanation_messages[clz] || "You are unable to delete this #{clz.name}. It might be published"
+  end
 
-  def delete_icon model_item, user
-    item_name = text_for_resource model_item
-    if model_item.can_delete?(user)
-      html = "<li>"+image_tag_for_key('destroy',url_for(model_item),"Delete #{item_name.downcase}", {:confirm=>"Are you sure?",:method=>:delete },"Delete #{item_name.downcase}") + "</li>"
-      return html.html_safe
-    elsif model_item.can_manage?(user)
-      explanation=unable_to_delete_text model_item
-      html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span></li>"
-      return html.html_safe
-    end
+  def no_deletion_explanation_messages
+    {Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
+     Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
+     Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
+     Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
+     Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
+     Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
+     Project=>"You cannot delete this #{I18n.t 'project'}. It might has people associated with it.",
+     Institution=>"You cannot delete this Institution. It might has people associated with it."
+    }
   end
 
 
-  def share_icon
-    icon = simple_image_tag_for_key('share').html_safe
-    html = link_to_remote_redbox(icon + "Share workflow".html_safe,
-                                 {:url => url_for(:action => 'temp_link'),
-                                  :failure => "alert('Sorry, an error has occurred.'); RedBox.close();"}
-    )
-    return html.html_safe
+  
+  def unable_to_delete_text model_item
+    no_deletion_explanation_message(model_item.class).html_safe
   end
 
   #
@@ -679,10 +675,8 @@ module ApplicationHelper
     resource
   end
 
-
-  def unable_to_delete_text model_item
-    text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}. It might be published"
-    return text.html_safe
+  def klass_from_controller controller_name
+    controller_name.singularize.camelize.constantize
   end
 
   def describe_visibility(model)

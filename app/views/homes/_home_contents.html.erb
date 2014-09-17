@@ -8,6 +8,7 @@
 <%= render :partial=>"guide_box" -%>
 
 <div class="top_home_panel with_shadow curved">
+  <% link_to_demo = link_to h("demos here"),Seek::Config.seek_video_link,:popup => true %>
   <%= home_description_text -%>
 </div>
 

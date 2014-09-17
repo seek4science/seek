@@ -1,0 +1,10 @@
+Assay:
+  organism:
+      label: Organism
+      value_from: organisms:title
+  assay_type:
+      label: Assay Type
+      value_from: assay_type_label
+      facet_class: Exhibit.HierarchicalFacet
+      tree_from: Seek::Ontologies::AssayTypeReader,Seek::Ontologies::ModellingAnalysisTypeReader
+

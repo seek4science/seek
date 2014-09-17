@@ -33,20 +33,15 @@ class Strain < ActiveRecord::Base
 
   scope :default_order, order("title")
 
-  searchable(:auto_index=>false) do
-      text :searchable_terms
-  end if Seek::Config.solr_enabled
+  alias_attribute :description, :comment
 
-  def searchable_terms
-      text=[title,synonym,comment,provider_name,provider_id,searchable_tags]
-      text |= genotypes.compact.collect do |g|
-        g.gene.try(:title)
-      end
-      text |= phenotypes.compact.collect do |p|
-        p.description
-      end
-      text.compact
-  end
+  include Seek::Search::BiosampleFields
+
+  attr_accessor :from_biosamples
+
+  searchable(:auto_index=>false) do
+      text :synonym
+  end if Seek::Config.solr_enabled
 
   def is_default?
     title=="default" && is_dummy==true
@@ -89,5 +84,19 @@ class Strain < ActiveRecord::Base
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
   def self.user_creatable?
     Seek::Config.organisms_enabled
+  end
+
+  def default_policy
+    Policy.registered_users_accessible_policy
+  end
+
+  def clone_with_associations
+    new_object= self.dup
+    new_object.policy = self.policy.deep_copy
+    new_object.projects = self.projects
+    new_object.genotypes = self.genotypes
+    new_object.phenotypes = self.phenotypes
+
+    return new_object
   end
 end

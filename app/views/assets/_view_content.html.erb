@@ -8,18 +8,19 @@
     <% end %>
 
     <% is_inline_viewable = content_blob.is_content_viewable? %>
-    <% if is_inline_viewable %>
-        <%
-           li_start = ""
-           li_end = ""
-           label = ""
-           if button_style
-             li_start = "<li>"
-             li_end = "</li>"
-             label = "View content"
-           end
-        %>
+
+    <%
+       li_start = ""
+       li_end = ""
+       label = ""
+       if button_style
+         li_start = "<li>"
+         li_end = "</li>"
+         label = "View content"
+       end
+    %>
         <%= li_start.html_safe %>
+    <% if is_inline_viewable %>
         <% if content_blob.is_image? %>
             <%
                image_width = content_blob.width.to_i
@@ -36,8 +37,14 @@
             <% view_pdf_content_url = polymorphic_path([asset, content_blob], :action => 'view_pdf_content', :code => params[:code]) %>
             <%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "checkSupportedBrowser();", :title => 'View inline content this file'}, label %>
         <% end %>
-        <%= li_end.html_safe %>
+
+     <% elsif !asset.is_a?(Model) && asset.is_downloadable_asset? %>
+           <% explanation = "Your #{asset.class.name} is unable to be viewed in browser. " +
+                "Supported file formats are: " +  (Seek::ContentTypeDetection::PDF_CONVERTABLE_FORMAT + ["pdf"]).join(" , ") +
+               "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(" , ") %>
+        <span class='disabled_icon disabled' onclick='javascript:alert("<%=explanation%>")' title='<%= tooltip_title_attrib(explanation) %>' > <%=  image('show', {:alt=>"View Content",:class=>"disabled"}) %>  View Content </span>
     <% end %>
+    <%= li_end.html_safe %>
 <% end %>
 
 <script type="text/javascript">

@@ -17,14 +17,14 @@ module Acts #:nodoc:
         acts_as_favouritable
         acts_as_scalable
         acts_as_authorized
-
         scope :default_order, order("title")
+
 
         title_trimmer
 
         attr_accessor :create_from_asset
 
-        validates_presence_of :title
+        validates :title,:presence => true
 
         has_many :favourites,
                  :as        => :resource,
@@ -36,6 +36,7 @@ module Acts #:nodoc:
 
         acts_as_uniquely_identifiable
 
+        include Seek::Search::CommonFields
 
         class_eval do
           extend Acts::Isa::SingletonMethods
@@ -43,7 +44,7 @@ module Acts #:nodoc:
         include Acts::Isa::InstanceMethods
         include BackgroundReindexing
         include Subscribable
-
+        include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
       end
 
       def is_isa?

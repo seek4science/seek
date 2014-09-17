@@ -85,7 +85,7 @@ class AssayFolderTest < ActiveSupport::TestCase
 
   test "move publication" do
     assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
-    pub = Factory :publication,:projects=>[assay.projects.first],:policy=>Factory(:public_policy)
+    pub = Factory :publication,:projects=>[assay.projects.first],:policy=>Factory(:public_policy),:pubmed_id=> 100000
     folder = Seek::AssayFolder.new assay,assay.projects.first
     src_folder = Factory :project_folder, :project=>assay.projects.first
     assert_difference("Relationship.count") do
@@ -114,7 +114,7 @@ class AssayFolderTest < ActiveSupport::TestCase
 
   test "remove publication asset" do
     assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
-    publication = Factory :publication, :contributor=>@user.person
+    publication = Factory :publication, :contributor=>@user.person,:pubmed_id=> 100000
     Relationship.create :subject=>assay, :other_object=>publication, :predicate=>Relationship::RELATED_TO_PUBLICATION
     assert_equal [publication],assay.related_publications
     assay.reload

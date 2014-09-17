@@ -19,7 +19,7 @@
 
         <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
         <% if current_user_authorized_to_manage -%>
-            <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation} -%>
+            <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
         <% end -%>
       <% if show_scales? %>
           <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} %>
@@ -28,6 +28,7 @@
         <% if current_user_authorized_to_manage -%>
 
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f} -%>
+        
         <p>
             <% if Seek::Config.events_enabled -%>
                 <%= render :partial => "assets/associate_event", :locals=>{:resource => @presentation} -%>

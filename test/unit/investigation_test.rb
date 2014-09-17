@@ -61,16 +61,17 @@ class InvestigationTest < ActiveSupport::TestCase
   end
   
   test "validations" do
-    inv=Investigation.new(:title=>"Test",:projects=>[projects(:sysmo_project)])
+    inv=Investigation.new(:title=>"Test",:projects=>[projects(:sysmo_project)],:policy => Factory(:private_policy))
     assert inv.valid?
     inv.title=""
     assert !inv.valid?
     inv.title=nil
     assert !inv.valid?
 
+    # do not allow empty projects
     inv.title="Test"
     inv.projects=[]
-    assert !inv.valid?
+    refute inv.valid?
 
     inv.projects=[projects(:sysmo_project)]
     assert inv.valid?

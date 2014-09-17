@@ -18,7 +18,7 @@
 }
 
 .ui-widget-content {
-    background: url("<%= asset_path('ui-bg_flat_75_ffffff_40x100.png') %>") repeat-x scroll 50% 50% #FFFFFF;
+    background: url("<%= asset_path('scales/style_images/ui-bg_flat_75_ffffff_40x100.png') %>") repeat-x scroll 50% 50% #FFFFFF;
     border: 1px solid #AAAAAA;
     color: #222222;
 }
@@ -42,7 +42,7 @@
 }
 
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
-    background: url("<%= asset_path('ui-bg_glass_75_e6e6e6_1x400.png') %>") repeat-x scroll 50% 50% #E6E6E6;
+    background: url("<%= asset_path('scales/style_images/ui-bg_glass_75_e6e6e6_1x400.png') %>") repeat-x scroll 50% 50% #E6E6E6;
     border: 1px solid #D3D3D3;
     color: #555555;
     font-weight: normal;
@@ -83,7 +83,7 @@
 }
 
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
-    background: url("<%= asset_path('ui-bg_glass_75_e6e6e6_1x400.png') %>") repeat-x scroll 50% 50% #E6E6E6;
+    background: url("<%= asset_path('scales/style_images/ui-bg_glass_75_e6e6e6_1x400.png') %>") repeat-x scroll 50% 50% #E6E6E6;
     border: 1px solid #D3D3D3;
     color: #555555;
     font-weight: normal;
@@ -92,6 +92,10 @@
 #wrapper{
     width: 50em;
     margin: 0 auto;
+    background-color: white;
+
+    overflow: hidden !important;
+    padding-top:5px;
 }
 
 .scaled_items{
@@ -130,16 +134,19 @@
     display:none;
 }
 
-#zoom img{
+
+ #zoom img{
     position:absolute;
-    /*display:none;
-    margin:auto;
-    vertical-align:middle;
-    text-align:center; */
     padding-top:8px;
-    //margin-left:100px;
     height:100%;
+    vertical-align: middle;
 }
+
+ul#scale_list li {
+    height: 0.5em;
+    font-size:14px;
+}
+
 
 
 #plus, #minus{
@@ -153,7 +160,7 @@
 }
 
 #plus{
-    margin-top:-30px;
+    margin-top:-15px;
 }
 
 #minus{
@@ -171,8 +178,8 @@
 
 
 .step li{
-    margin-bottom:12px;
-    font-size:14px;
+    margin-bottom:24px;
+    font-size:12px;
     list-style: none;
 }
 
@@ -191,7 +198,7 @@
     padding: 1px 0px;
     cursor:pointer;
     font-weight:bold;
-    background: url("<%= asset_path('ui-bg_glass_75_e6e6e6_1x400.png') %>") repeat-x scroll 50% 50% #E6E6E6;
+    background: url("<%= asset_path('scales/style_images/ui-bg_glass_75_e6e6e6_1x400.png') %>") repeat-x scroll 50% 50% #E6E6E6;
     border: 1px solid #D3D3D3;
 }
 .slide:hover{
@@ -219,14 +226,14 @@
 
 
 /* states and images */
-.ui-icon { width: 16px; height: 16px; background-image: url("<%= asset_path('ui-icons_222222_256x240.png') %>"); float:left;}
-.ui-widget-content .ui-icon {background-image: url("<%= asset_path('ui-icons_222222_256x240.png') %>"); }
-.ui-widget-header .ui-icon {background-image: url("<%= asset_path('ui-icons_222222_256x240.png') %>"); }
-.ui-state-default .ui-icon { background-image: url("<%= asset_path('ui-icons_888888_256x240.png') %>"); }
-.ui-state-hover .ui-icon, .ui-state-focus .ui-icon {background-image: url("<%= asset_path('ui-icons_454545_256x240.png') %>"); }
-.ui-state-active .ui-icon {background-image: url("<%= asset_path('ui-icons_454545_256x240.png') %>"); }
-.ui-state-highlight .ui-icon {background-image: url("<%= asset_path('ui-icons_2e83ff_256x240.png') %>"); }
-.ui-state-error .ui-icon, .ui-state-error-text .ui-icon {background-image: url("<%= asset_path('ui-icons_cd0a0a_256x240.png') %>"); }
+.ui-icon { width: 16px; height: 16px; background-image: url("<%= asset_path('scales/style_images/ui-icons_222222_256x240.png') %>"); float:left;}
+.ui-widget-content .ui-icon {background-image: url("<%= asset_path('scales/style_images/ui-icons_222222_256x240.png') %>"); }
+.ui-widget-header .ui-icon {background-image: url("<%= asset_path('scales/style_images/ui-icons_222222_256x240.png') %>"); }
+.ui-state-default .ui-icon { background-image: url("<%= asset_path('scales/style_images/ui-icons_888888_256x240.png') %>"); }
+.ui-state-hover .ui-icon, .ui-state-focus .ui-icon {background-image: url("<%= asset_path('scales/style_images/ui-icons_454545_256x240.png') %>"); }
+.ui-state-active .ui-icon {background-image: url("<%= asset_path('scales/style_images/ui-icons_454545_256x240.png') %>"); }
+.ui-state-highlight .ui-icon {background-image: url("<%= asset_path('scales/style_images/ui-icons_2e83ff_256x240.png') %>"); }
+.ui-state-error .ui-icon, .ui-state-error-text .ui-icon {background-image: url("<%= asset_path('scales/style_images/ui-icons_cd0a0a_256x240.png') %>"); }
 
 /* positioning */
 .ui-icon-triangle-1-e { background-position: -32px -16px; }

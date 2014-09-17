@@ -27,6 +27,7 @@ module Acts #:nodoc:
     module ClassMethods
 
       def acts_as_asset
+        attr_accessor :parent_name
         include Seek::Taggable
 
         acts_as_scalable
@@ -40,7 +41,9 @@ module Acts #:nodoc:
         does_not_require_can_edit :last_used_at
 
         validates_presence_of :title
-        validates_presence_of :projects
+
+        #MERGENOTE - this was removed by VLN at some point, possibly needs some configuration setting
+        #validates_presence_of :projects
 
         has_many :relationships,
                  :class_name => 'Relationship',
@@ -72,14 +75,23 @@ module Acts #:nodoc:
 
         grouped_pagination
 
-        searchable do
-          text :title, :description, :searchable_tags
+        include Seek::Search::CommonFields
+
+        searchable(:auto_index=>false) do
           text :creators do
-            creators.compact.map(&:name)
+            if self.respond_to?(:creators)
+              creators.compact.map(&:name)
+            end
+          end
+          text :other_creators do
+            if self.respond_to?(:other_creators)
+              other_creators
+            end
           end
           text :content_blob do
             content_blob_search_terms
           end
+          text :assay_type_titles,:technology_type_titles
         end if Seek::Config.solr_enabled
 
         class_eval do

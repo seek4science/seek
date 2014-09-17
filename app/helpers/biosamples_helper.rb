@@ -1,37 +1,18 @@
 module BiosamplesHelper
-  def create_strain_popup_link
-     return link_to_remote_redbox(image_tag("famfamfam_silk/add.png") + 'Create new strain',
-      { :url => create_strain_popup_biosamples_path ,
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-        :with => "'strain_id=' + getSelectedStrains()+'&organism_ids='+$F('strain_organism_ids')",
-        :condition => "checkSelectOneStrain()"
-      }
-      #,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-    )
+  def create_strain_link
+    link_to image("new") + "Create new strain", new_strain_path(), {:id => 'new_strain_link', :target => '_blank', :onclick => "if (checkSelectOneStrain()) {return(true);} else {return(false);}"}
   end
 
   
-   def create_sample_popup_link
+   def create_sample_link
      link_to image("new") + "Create new sample", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{I18n.t "biosamples.sample_parent_term"}')) {return(true);} else {return(false);}"}
    end
 
-  def edit_strain_popup_link strain
+  def edit_strain_link strain
     if strain.can_manage?
-      return link_to_remote_redbox(image_tag("famfamfam_silk/wrench.png"),
-                                   {:url => edit_strain_popup_biosamples_path,
-                                    :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-                                    :with => "'strain_id=' + #{strain.id}"
-                                   },
-                                   :title => "Manage this strain")
+      return link_to image("manage"), edit_strain_path(strain) + "?from_biosamples=true", {:title => "Manage this strain", :target => '_blank'}
     elsif strain.can_edit?
-      return link_to_remote_redbox(image_tag("famfamfam_silk/page_white_edit.png"),
-                                   {:url => edit_strain_popup_biosamples_path,
-                                    :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-                                    :with => "'strain_id=' + #{strain.id}"
-                                   },
-                                   :title => "Edit this strain")
+      return link_to image("edit"), edit_strain_path(strain) + "?from_biosamples=true", {:title => "Edit this strain", :target => '_blank'}
     else
       explanation = "You are not authorized to edit this Strain"
       return image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
@@ -52,7 +33,7 @@ module BiosamplesHelper
         explanation=unable_to_delete_text strain
         image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
       end ),
-     edit_strain_popup_link(strain)]
+     edit_strain_link(strain)]
   end
   
   def organism_selection_onchange_function
@@ -63,7 +44,7 @@ module BiosamplesHelper
      function += remote_function(:url => {:controller => 'biosamples',
                                           :action => 'existing_specimens'},
                                           :method => :get,
-                                          :with => "'strain_ids=' + getSelectedStrains() + '&organism_ids='+$F('strain_organism_ids')",
+                                          :with => "'organism_ids='+$F('strain_organism_ids')",
                                           :before=>"show_large_ajax_loader('existing_specimens')") + ";"  if Seek::Config.is_virtualliver
      function +=  "check_show_existing_items('strain_organism_ids', 'existing_strains', '');"
      if Seek::Config.is_virtualliver
@@ -145,7 +126,7 @@ module BiosamplesHelper
     if sample.can_manage?
       update_icon = link_to image("manage"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Manage this sample", :target => '_blank'}
     elsif sample.can_edit?
-      update_icon = link_to image("edit"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Edit this sample}", :target => '_blank'}
+      update_icon = link_to image("edit"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Edit this sample", :target => '_blank'}
     else
       explanation = "You are not authorized to edit this Sample"
       update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})

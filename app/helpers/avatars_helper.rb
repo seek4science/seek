@@ -71,13 +71,7 @@ module AvatarsHelper
       end
     else
       basic_url = eval("#{avatar_for_instance.class.name.downcase}_avatar_path(#{avatar_for_instance.id}, #{avatar_id})")
-
-      if size
-        basic_url += "?size=#{size}"
-        basic_url += "x#{size}" if size.kind_of?(Numeric)
-      end
-
-      basic_url
+      append_size_parameter(basic_url,size)
     end
   end
 

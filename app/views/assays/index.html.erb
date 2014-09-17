@@ -1,18 +1,12 @@
-<% if logged_in_and_member? %>
-    <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_assay_path, "New #{t('assays.assay').downcase}", nil, "New #{t('assays.assay').downcase}" %></li>
-    </ul>
+<%= index_title -%>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_assay_path, :label => "New #{t('assays.assay')}"} %>
+
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing %>
+    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @assays %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @assays %>
 <% end %>
 
-<% if @assays.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @assays.pages, :page_totals=>@assays.page_totals,:current_page=>@assays.page } -%>
-<% end %>
 
-<div class="list_items_container">
-  <%= render :partial => "assets/resource_list_item", :collection=>@assays %>
-</div>
 
-<% if @assays.page == "latest" && (n=Assay.all_authorized_for("view").count) > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all", :locals=>{:total=>n} %>
-<% end %>
+

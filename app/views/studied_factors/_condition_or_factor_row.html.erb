@@ -60,7 +60,7 @@
         </li>
 
         <li id="edit_off_<%= object.id -%>" style="display:none">
-          <%= link_to_function image(("edit-off"),:title=>"Stop editing",:alt=>"Stop editing") do |page|
+          <%= link_to_function image(("edit_off"),:title=>"Stop editing",:alt=>"Stop editing") do |page|
              page.visual_effect :fade, "edit_condition_or_factor_#{object.id}_form"
              page["edit_on_#{object.id}"].toggle
              page["edit_off_#{object.id}"].toggle

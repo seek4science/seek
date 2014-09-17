@@ -1,18 +1,8 @@
-<% if logged_in_and_member? %>
-    <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_study_path, "New #{t('study')}", nil, "New #{t('study')}" %></li>
-    </ul>
-<% end %>
+<%= index_title -%>
+<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_study_path, :label => "New #{t('study')}"} %>
 
-<% if @studies.public_methods.include?(:page_totals) %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "general/paginate_alphabetical", :locals => { :pages => @studies.pages, :page_totals=>@studies.page_totals,:current_page=>@studies.page } -%>
-<% end %>
-
-<div class="list_items_container">
-  <%= render :partial => "assets/resource_list_item", :collection=>@studies %>
-</div>
-
-<% if @studies.page == "latest" && (n=Study.all_authorized_for("view").count) > Seek::Config.limit_latest%>
-    <%= render :partial => "general/paginate_see_all",:locals=>{:total=>n}%>
+<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
+    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @studies %>
+<% else %>
+    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @studies %>
 <% end %>

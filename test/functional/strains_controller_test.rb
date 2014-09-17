@@ -155,7 +155,7 @@ class StrainsControllerTest < ActionController::TestCase
     updated_strain = Strain.find_by_id strain.id
     new_gene = Gene.find_by_title(new_gene_title)
     new_modification = Modification.find_by_title(new_modification_title)
-    new_genotype = Genotype.find(:all, :conditions => ["gene_id=? and modification_id=?", new_gene.id, new_modification.id]).first
+    new_genotype = Genotype.where(:gene_id=> new_gene.id, :modification_id=> new_modification.id).first
     new_phenotype = Phenotype.find_all_by_description(new_phenotype_description).sort_by(&:created_at).last
     updated_genotypes = [genotype2, new_genotype].sort_by(&:id)
     assert_equal updated_genotypes, updated_strain.genotypes.sort_by(&:id)
@@ -260,5 +260,47 @@ class StrainsControllerTest < ActionController::TestCase
     strain = assigns(:strain)
     assert_equal strain, publish_log.resource
     assert_equal strain.contributor, publish_log.user
+  end
+
+  test 'should fill in the based-on strain if chosen' do
+    strain = Factory(:strain,
+                     :genotypes => [Factory(:genotype)],
+                     :phenotypes => [Factory(:phenotype)] )
+
+    get :new, :parent_id => strain.id
+    assert_response :success
+
+    assert_select 'input[id=?][value=?]','strain_title',strain.title
+    assert_select 'select[id=?]','strain_parent_id' do
+      assert_select 'option[value=?][selected=?]',strain.id,'selected',:text=>strain.info
+    end
+    assert_select 'select[id=?]','strain_organism_id' do
+      assert_select 'option[value=?][selected=?]',strain.organism.id,'selected',:text=>strain.organism.title
+    end
+    genotype = strain.genotypes.first
+    phenotype = strain.phenotypes.first
+
+    assert_select 'td input[value=?]', genotype.gene.title
+    assert_select 'td input[value=?]', genotype.modification.title
+    assert_select 'td input[value=?]', phenotype.description
+  end
+
+  test 'authorization for based-on strain' do
+    unauthorized_parent_strain = Factory(:strain,
+                                         :policy => Factory(:private_policy))
+    assert !unauthorized_parent_strain.can_view?
+
+    get :new, :parent_id => unauthorized_parent_strain.id
+    assert_response :success
+
+    assert_select 'input[id=?][value=?]','strain_title',unauthorized_parent_strain.title,:count => 0
+
+    authorized_parent_strain = Factory(:strain)
+    assert authorized_parent_strain.can_view?
+
+    get :new, :parent_id => authorized_parent_strain.id
+    assert_response :success
+
+    assert_select 'input[id=?][value=?]','strain_title',authorized_parent_strain.title
   end
 end

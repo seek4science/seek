@@ -13,7 +13,7 @@ class ReindexingJob
       todo
     end
     if Seek::Config.solr_enabled
-      todo.uniq.each do |item|
+      todo.uniq.compact.each do |item|
         begin
           Timeout::timeout(TIMELIMIT) do
             item.solr_index!
@@ -21,7 +21,7 @@ class ReindexingJob
         rescue Exception => e
           Rails.logger.error(e)
           if Seek::Config.exception_notification_enabled
-            ExceptionNotifier.notify_exception(e,:data=>{:item_type=>item.class.name,:item_id=>item.id,:message=>'Problem reindexing'})
+            ExceptionNotifier.notify_exception(e,:data=>{:item_type=>item.class.name,:item_id=>item.try(:id),:message=>'Problem reindexing'})
           end
         end
       end

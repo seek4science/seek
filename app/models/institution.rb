@@ -19,7 +19,7 @@ class Institution < ActiveRecord::Base
   has_many :specimens
 
   searchable(:auto_index=>false) do
-    text :title,:country,:city, :address
+    text :city, :address
   end if Seek::Config.solr_enabled
 
   def people
@@ -50,11 +50,11 @@ class Institution < ActiveRecord::Base
 
   # get a listing of all known institutions
   def self.get_all_institutions_listing
-    Institution.all.collect { |i| [i.name, i.id] }
+    Institution.all.collect { |i| [i.title, i.id] }
   end
 
   def can_delete?(user=User.current_user)
     user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
   end
-  
+
 end

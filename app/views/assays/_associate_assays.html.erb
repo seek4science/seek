@@ -3,13 +3,23 @@
 
     show_relationships = resource.is_a?(DataFile)
     resource_text ||= text_for_resource(resource)
-    all_assays=authorised_assays
-    all_assays = authorised_assays.select do |assay|
-            assay.is_modelling?
-         end if resource.is_a? Model
+    authorized_action = "edit"
+    authorized_action = "view" if Seek::Config.is_virtualliver
 
-    project_assays=authorised_assays(current_user.person.projects)
-    project_assays=project_assays.select{|a| a.is_modelling?} if resource.is_a?(Model)
+    all_assays = authorised_assays(authorized_action)
+
+    project_assays=authorised_assays(current_user.person.projects, authorized_action)
+    if resource.is_a?(Model)
+      all_assays = all_assays.select do |assay|
+        assay.is_modelling?
+      end
+      project_assays=project_assays.select do |assay|
+        assay.is_modelling?
+      end
+    end
+
+
+
     select_truncate_length=120
     associated_assays = resource.is_a?(Publication) ? resource.related_assays : resource.assays
 
@@ -24,6 +34,12 @@
         assay_class_text = "#{t('assays.experimental_assay').pluralize}"
         single_assay_class_text = "#{t('assays.experimental_assay')}"
       end
+    end
+
+    if Seek::Config.is_virtualliver
+      add_new_assay_title = " or create #{link_to(h("new #{single_assay_class_text}"), new_assay_path(:create_from_asset => :true), :onclick => "window.open(this.href);return false;")}".html_safe
+    else
+      add_new_assay_title = ""
     end
 %>
 
@@ -41,16 +57,17 @@
         The following <%= assay_class_text -%> are associated with this <%= resource_text -%>:
       </p>
       <div id="assay_to_list" class="box_editing_inner" style="line-height: 1.5">
-        <span class="none_text" id="assay_files">Loading...</span>
+        <span class="none_text" id="assay_files">Loading ...</span>
       </div>
       <div class="association_step">
         <p style="color: #666666;">
-             You may select an existing editable <%= single_assay_class_text -%> to associate with this <%= resource_text -%>.
+          You may select an existing editable <%= single_assay_class_text -%><%= add_new_assay_title -%> to associate with this <%= resource_text -%>.
         </p>
+
         <% if show_relationships -%>
             <%= select_tag :possible_assays,
               options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-              {:style=>"width:90%",:onchange=>remote_function(
+              {:style=>"width:90%",:onchange=>"addSelectedAssay();"+remote_function(
                 :method=>:get,
                 :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
                 :with=>"'id='+this.value",
@@ -67,7 +84,7 @@
         <% else %>
             <%= select_tag :possible_assays,
                   options_for_select([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-                  {:style=>"width:90%",:onchange=>remote_function(
+                  {:style=>"width:90%",:onchange=>"addSelectedAssay();"+remote_function(
                     :method=>:get,
                     :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
                     :with=>"'id='+this.value",
@@ -81,9 +98,8 @@
       </div>
 
 	  <br/>
-      <%= link_to_function (image("new") + " Associate with this #{resource_text}"), "addSelectedAssay(); return(false);", :id=>"add_assay_link", :class=>"block_link" %>
 
-      <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other <%= t('project').pluralize %>?
+      <%= check_box_tag :include_other_project_assays, nil, true, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>
@@ -93,7 +109,7 @@
   
 
 <script type="text/javascript">
-  function selected_assay(){
+    function selected_assay(){
        i = $('possible_assays').selectedIndex;
        id = $('possible_assays').options[i].value;
        for (var j = 0; j < id_rel_array.length; j++) {
@@ -140,8 +156,7 @@
               }
           <% end -%>
           }
-          selection_box.selectedIndex = 0;
-          selection_box.onchange();
+          //selection_box.onchange();
       }
 
 <% associated_assay_ids = resource.is_a?(Publication) ? resource.related_assays.collect(&:id) : resource.assays.collect(&:id) %>
@@ -176,6 +191,5 @@
 
 
   updateAssays();
-
-  check_show_add_assay();
+  toggle_assay_list()
 </script>

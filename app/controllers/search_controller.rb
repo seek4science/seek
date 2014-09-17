@@ -1,6 +1,7 @@
 class SearchController < ApplicationController
 
   include Seek::ExternalSearch
+  include Seek::FacetedBrowsing
 
   def index
 
@@ -14,6 +15,21 @@ class SearchController < ApplicationController
     @results = @results.select{|r| !r.nil?}
 
     @results = select_authorised @results
+
+    @results_scaled = Scale.all.collect {|scale| [scale.key, @results.select {|item| !item.respond_to?(:scale_ids) or item.scale_ids.include? scale.id}]}
+    @results_scaled << ['all', @results]
+    @results_scaled = Hash[*@results_scaled.flatten(1)]
+    logger.info @results_scaled.inspect
+    if params[:scale]
+      # when user does not login, params[:scale] is nil
+      @results = @results_scaled[params[:scale]]
+      @scale_key = params[:scale]
+    else
+       @results = @results_scaled['all']
+       @scale_key = 'all'
+    end
+
+
     if @results.empty?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'.".html_safe
     else
@@ -21,6 +37,8 @@ class SearchController < ApplicationController
     end
 
     @include_external_search = params[:include_external_search]=="1"
+
+    ie_support_faceted_browsing? if Seek::Config.faceted_search_enabled
 
     respond_to do |format|
       format.html

@@ -7,7 +7,7 @@ class AssetTest < ActiveSupport::TestCase
 
   test "default contributor or nil" do
     User.current_user = users(:owner_of_my_first_sop)
-    model = Model.new(Factory.attributes_for(:model).tap{|h|h[:contributor] = nil})
+    model = Model.new(Factory.attributes_for(:model).tap{|h|h[:contributor] = nil; h[:policy] = Factory(:private_policy)})
     assert_equal users(:owner_of_my_first_sop),model.contributor
     model.contributor = nil
     model.save!
@@ -73,15 +73,15 @@ class AssetTest < ActiveSupport::TestCase
     assert df.contains_downloadable_items?
     assert df.latest_version.contains_downloadable_items?
 
-    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
     assert !df.contains_downloadable_items?
     assert !df.latest_version.contains_downloadable_items?
 
     Factory.define(:model_with_urls,:parent=>:model) do |f|
       f.after_create do |model|
         model.content_blobs = [
-            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version),
-            Factory.create(:content_blob, :url=>"http://webpage2.com", :asset => model,:asset_version=>model.version)
+            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version, :external_link => true),
+            Factory.create(:content_blob, :url=>"http://webpage2.com", :asset => model,:asset_version=>model.version, :external_link => true)
         ]
       end
     end
@@ -97,7 +97,7 @@ class AssetTest < ActiveSupport::TestCase
     Factory.define(:model_with_urls_and_files,:parent=>:model) do |f|
       f.after_create do |model|
         model.content_blobs = [
-            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version),
+            Factory.create(:content_blob, :url=>"http://webpage.com", :asset => model,:asset_version=>model.version, :external_link => true),
             Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version)
         ]
       end
@@ -119,7 +119,7 @@ class AssetTest < ActiveSupport::TestCase
     disable_authorization_checks do
       model.save_as_new_version
       model.reload
-      model.content_blobs=[Factory.create(:content_blob, :url=>"http://webpage.com",:asset => model,:asset_version=>model.version)]
+      model.content_blobs=[Factory.create(:content_blob, :url=>"http://webpage.com",:asset => model,:asset_version=>model.version,:external_link=>true)]
       model.save!
       model.reload
     end
@@ -149,69 +149,6 @@ class AssetTest < ActiveSupport::TestCase
     m=Factory :model
     assert_equal [],m.technology_type_titles
 
-  end
-
-  test "content type from filename" do
-    #to allow us to test the private method in isolation
-    class TTT
-      include AssetsCommonExtension
-      def content_type_for_test filename
-        content_type_from_filename filename
-      end
-    end
-
-    ttt=TTT.new
-    type = ttt.content_type_for_test "test.jpg"
-    checks = [
-        {:f=>"test.jpg",:t=>"image/jpeg"},
-        {:f=>"test.JPG",:t=>"image/jpeg"},
-        {:f=>"test.png",:t=>"image/png"},
-        {:f=>"test.PNG",:t=>"image/png"},
-        {:f=>"test.jpeg",:t=>"image/jpeg"},
-        {:f=>"test.JPEG",:t=>"image/jpeg"},
-        {:f=>"test.xls",:t=>"application/excel"},
-        {:f=>"test.doc",:t=>"application/msword"},
-        {:f=>"test.xlsx",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-        {:f=>"test.docx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-        {:f=>"test.XLs",:t=>"application/excel"},
-        {:f=>"test.Doc",:t=>"application/msword"},
-        {:f=>"test.XLSX",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-        {:f=>"test.dOCx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-        {:f=>"unknown.xxx",:t=>"application/octet-stream"},
-        {:f=>nil,:t=>"text/html"}
-    ]
-    checks.each do |check|
-      assert_equal check[:t],ttt.content_type_for_test(check[:f]),"Expected #{check[:t]} for #{check[:f]}"
-    end
-
-  end
-
-  test "classifying and authorizing resources" do
-    resource_array = []
-    sop=sops(:my_first_sop)
-    model=models(:teusink)
-    data_file=data_files(:picture)
-    user=users(:owner_of_my_first_sop)        
-    
-    sop_version1 = sop.find_version(1)
-    model_version2 = model.find_version(2)
-    
-    resource_array << sop_version1
-    resource_array << model_version2
-    resource_array << data_file
-    
-    assert_equal 1, sop.version
-    assert_equal 2, model.version
-    assert_equal 1, data_file.version
-    
-        
-    result = Asset.classify_and_authorize_resources(resource_array, true, user)    
-    
-    assert_equal 3, result.length
-    
-    assert result["Sop"].include?(sop_version1)    
-    assert result["Model"].include?(model_version2)
-    assert result["DataFile"].include?(data_file)
   end
 
   test "managers" do
@@ -250,12 +187,12 @@ class AssetTest < ActiveSupport::TestCase
     Factory :tag,:annotatable=>model,:source=>u,:value=>"bbb"
     Factory :tag,:annotatable=>model,:source=>u,:value=>"ddd"
     Factory :tag,:annotatable=>model,:source=>u,:value=>"ccc"
-    assert_equal ["aaa","bbb","ccc","ddd"],model.tags_as_text_array.sort
+    assert_equal ["aaa","bbb","ccc","ddd"],model.annotations_as_text_array.sort
 
     p = Factory :person
     Factory :expertise,:annotatable=>p,:source=>u,:value=>"java"
     Factory :tool,:annotatable=>p,:source=>u,:value=>"trowel"
-    assert_equal ["java","trowel"],p.tags_as_text_array.sort
+    assert_equal ["java","trowel"],p.annotations_as_text_array.sort
   end
 
   test "related people" do

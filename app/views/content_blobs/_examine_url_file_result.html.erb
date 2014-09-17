@@ -1,0 +1,39 @@
+<% app_name = Seek::Config.application_name %>
+
+
+<% unless @error %>
+<p id="url_type">
+  This link points to a downloadable file, and not a webpage.
+</p>
+<p id="url_info">
+  The size of the file <%= @size ? "is expected to be #{number_to_human_size(@size)}" : content_tag(:span,"unknown",class:"none_text") %>.
+  <% if @filename %>
+    The filename is <%= @filename %>.
+  <% end %>
+</p>
+<% end %>
+<p>
+<div>
+  <% if @unauthorized %>
+    <span id="warning_icon"></span>Access to this link is unauthorized. You can still register it as a link, but somebody wishing to access it may need a username and password to login to the site and download the file.
+  <% elsif @error %>
+    <span id="error_icon"></span><%= @error_msg %>
+  <% else %>
+  <p>
+    You can either upload this file to <%= app_name %> using this URL, or you can register a link to the file.
+
+    By selecting the option below, a copy of the file will be made. This is recommended, and is equivalent to uploading
+    a file from your disk. It also means that should the data behind the URL become unavailable, the data is still
+    available from <%= app_name %>.
+    However, you should be sure that the copyright on the file allows you to do this.
+  </p>
+
+  <p>
+    If you do not select the option below <%= app_name %> will store only the URL. In this case, when another user
+    selects to download the file then they will simply directed to the URL.
+  </p>
+  <% end %>
+</div>
+
+
+

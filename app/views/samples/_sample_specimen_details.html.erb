@@ -77,7 +77,8 @@
 
     <p>
       <label>Treatment:</label>
-      <%= text_or_not_specified(specimen.treatment) %>
+      <%= text_or_not_specified(nil) if specimen.treatments.empty? %>
+      <%= render :partial => "treatments/treatments", :object => specimen.treatments unless specimen.treatments.empty? %>
     </p>
     <p>
       <label>Institution:</label>
@@ -135,6 +136,7 @@
  <span style="font-size: 120%;">
   <%= list_item_authorized_list (specimen.strain.is_dummy? ? [] : [specimen.strain]),"Strain", true, 50, true %>
  </span>
-
- <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => specimen} %>
 <% end %>
+
+<%= render :partial => "assets/special_auth_code_display", :locals => {:resource => specimen} %>
+

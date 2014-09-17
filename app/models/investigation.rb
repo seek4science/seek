@@ -9,17 +9,9 @@ class Investigation < ActiveRecord::Base
 
   has_many :studies
 
-  validates_presence_of :projects
-  validates_presence_of :title
-
   has_many :assays,:through=>:studies
 
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :description,:title
-    text :contributor do
-      contributor.try(:person).try(:name)
-    end
-  end if Seek::Config.solr_enabled
+  validates :projects,:presence => true
 
   def state_allows_delete? *args
     studies.empty? && super

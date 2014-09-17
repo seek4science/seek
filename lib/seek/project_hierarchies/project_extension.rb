@@ -1,0 +1,110 @@
+#extensions for hierarchical projects
+
+# Project can be configured as hierarchical ba setting Seek::Config.project_hierarchy_enabled = true
+# @project's direct parent is saved in additional parent_id column in projects table.
+# Its ancestors and descendants are stored in another table named "projects_descendants".
+# 1.Work_groups is hierarchical,
+# e.g. projects:  A,A1,A1.1,A1.2,A2,A2.1,A2.2 ;institutions: in1,in2,in3.
+# if in1 is added to A1.1, then work group(in1 <-> A1.1), and ancestor work groups(in1 <-> A1,in1 <-> A) will be created,
+# but NO groups memberships will be created for ancestor work groups, so ancestor work groups has no people.
+# 2.Project Subscriptions is hierarchical
+# - subscribe projects and ancestors when assigned to projects
+# - subscribe only project when person subscribe via editing the profile
+
+
+module Seek
+  module ProjectHierarchies
+    module ProjectExtension
+
+      def self.included klass
+        klass.class_eval do
+          include ActsAsCachedTree
+          after_update :touch_for_hierarchy_updates
+          #add institution to ancestor projects
+          after_add_for_institutions << :create_ancestor_workgroups
+          after_add_for_ancestors << :add_project_subscriptions_for_subscriber
+          after_remove_for_ancestors << :remove_project_subscriptions_for_subscriber
+
+          def touch_for_hierarchy_updates
+            if changed_attributes.include? :parent_id
+              Permission.find_by_contributor_type("Project", :conditions => {:contributor_id => ([id] + ancestors.map(&:id) + descendants.map(&:id))}).each &:touch
+              ancestors.each &:touch
+              descendants.each &:touch
+            end
+          end
+
+          def create_ancestor_workgroups institution
+            parent.institutions << institution unless parent.nil? || parent.institutions.include?(institution)
+          end
+
+          def add_project_subscriptions_for_subscriber ancestor
+            subscribers = project_subscriptions.includes(:person).map(&:person)
+            subscribers.each do |person|
+              person.project_subscriptions.where(:project_id => ancestor.id).first_or_create
+            end
+          end
+
+
+          def remove_project_subscriptions_for_subscriber ancestor
+            subscribers = project_subscriptions.includes(:person).map(&:person)
+            subscribers.each do |person|
+              person.project_subscriptions.where(:project_id => ancestor.id).first.try(:destroy)
+            end
+          end
+
+          #people in the project and its descendants
+          def people
+            #TODO: look into doing this with a named_scope or direct query
+            res = ([self] + descendants).collect { |proj| proj.work_groups.collect(&:people) }.flatten.uniq.compact
+            res.sort_by { |a| (a.last_name.blank? ? a.name : a.last_name) }
+          end
+
+          #relate_things, in the project and descendants
+          Project::RELATED_RESOURCE_TYPES.each do |type|
+            define_method "related_#{type.underscore.pluralize}" do
+              res = send "#{type.underscore.pluralize}"
+              descendants.each do |descendant|
+                res = res | descendant.send("#{type.underscore.pluralize}")
+              end
+              res.compact
+            end
+          end
+
+          #project role, in project and its descendants
+          def pis
+            pi_role = ProjectRole.find_by_name('PI')
+            projects = [self] + descendants
+            people.select { |p| p.project_roles_of_project(projects).include?(pi_role) }
+          end
+
+          #admin defined project roles, in the project and its ancestors
+          Person::PROJECT_DEPENDENT_ROLES.each do |role|
+            define_method "#{role.pluralize}" do
+              self_and_ancestors = [self] + self.ancestors
+              self_and_ancestors.map { |proj| proj.people_with_the_role(role) }.flatten.uniq
+            end
+          end
+
+          #project role, in the project and its descendants
+          def project_coordinators
+            coordinator_role = ProjectRole.project_coordinator_role
+            projects = [self] + descendants
+            people.select { |p| p.project_roles_of_project(projects).include?(coordinator_role) }
+
+          end
+
+
+          def can_delete_with_hierarchy? user=User.current_user
+            can_delete_without_hierarchy?(user) && children.empty?
+          end
+
+          alias_method_chain :can_delete?, :hierarchy
+        end  if Seek::Config.project_hierarchy_enabled
+
+      end
+
+    end
+
+
+  end
+end

@@ -13,14 +13,27 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal false ,Seek::Config.jerm_enabled
   end
   test "solr enabled" do
-    assert_equal false ,Seek::Config.solr_enabled
+    assert_equal true ,Seek::Config.solr_enabled
   end
 
   test "is_virtualliver" do
-    original_value = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = true
-    assert Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = original_value
+    with_config_value "is_virtualliver",true do
+      assert Seek::Config.is_virtualliver
+    end
+  end
+
+  test 'project_hierarchy_enabled' do
+    with_config_value "project_hierarchy_enabled",true do
+      assert_equal true ,Seek::Config.project_hierarchy_enabled
+    end
+  end
+
+  test "scales" do
+    assert_equal ["organism","liver","liverLobule","intercellular","cell"],Seek::Config.scales
+  end
+
+  test "seek_video_link" do
+    assert_equal "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u", Seek::Config.seek_video_link
   end
 
   test "external search" do
@@ -32,6 +45,12 @@ class ConfigTest < ActiveSupport::TestCase
       assert !Seek::Config.external_search_enabled
     end
 
+  end
+
+  test "blacklisted feeds" do
+    Seek::Config.blacklisted_feeds = {"http://google.com"=>Time.parse("1 Sep 2014"),"http://fish.com"=>Time.parse("1 June 2014")}
+    assert_equal Time.parse("1 Sep 2014"),Seek::Config.blacklisted_feeds["http://google.com"]
+    assert_equal Time.parse("1 June 2014"),Seek::Config.blacklisted_feeds["http://fish.com"]
   end
 
   test "filestore_location" do
@@ -76,6 +95,9 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal true ,Seek::Config.pdf_conversion_enabled
   end
 
+  test "delete asset version enabled" do
+      assert_equal false ,Seek::Config.delete_asset_version_enabled
+      end
   test "forum_enabled" do
     assert_equal false ,Seek::Config.forum_enabled
   end
@@ -217,6 +239,10 @@ class ConfigTest < ActiveSupport::TestCase
   test "limit_latest" do
     assert_equal 7,Seek::Config.limit_latest
   end
+#others
+  test "type_managers" do
+    assert_equal "admins",Seek::Config.type_managers
+  end
 
   test "pubmed_api_email" do
     assert_equal nil,Seek::Config.pubmed_api_email
@@ -270,6 +296,10 @@ class ConfigTest < ActiveSupport::TestCase
 
   test "publish_button_enabled" do
     assert_equal true,Seek::Config.publish_button_enabled
+  end
+
+  test "recaptcha enabled" do
+    assert_equal true, Seek::Config.recaptcha_enabled
   end
 
   test 'propagate bioportal api key' do

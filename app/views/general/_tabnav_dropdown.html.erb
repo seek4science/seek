@@ -1,15 +1,19 @@
 
 
 <%= javascript_include_tag 'dropMenu' %>
-
+<%= render :partial => "general/my_profile" %>
 
 <div>
 <table cellspacing="0" cellpadding="0" id="menu" class="dm">
   <tr>
     <td>
-      <a class="item1" href="javascript:void(0)">Yellow Pages</a>
+      <a class="item1 curved_top" href="javascript:void(0)">Yellow Pages <%=image_tag('misc_icons/arrow_down_small_white.png')%></a>
 
       <div class="section">
+        <!-- Programme  tab -->
+        <%= tab_definition :controllers=>["programmes"], :title=>t('programme').pluralize if Seek::Config.programmes_enabled -%>
+
+        <!-- people tab-->
         <%= tab_definition :controllers=>["people"] -%>
 
         <!-- Projects tab -->
@@ -21,7 +25,7 @@
     </td>
     <td>
       <div class="tab_gap_before">
-        <a class="item1" href="javascript:void(0)">I S A</a>
+        <a class="item1 curved_top" href="javascript:void(0)">Experiments <%=image_tag('misc_icons/arrow_down_small_white.png')%></a>
 
 
         <div class="section">
@@ -34,16 +38,12 @@
           <!-- Assays tab -->
           <%= tab_definition :controllers=>["assays"], :title=>t('assays.assay').pluralize -%>
         </div>
-       </div>
+      </div>
     </td>
-    <td>
-         <div class="tab_gap_before">
-           <%= link_to "Biosamples", biosamples_path, {:class =>"item1"}%>
-         </div>
-     </td>
+
     <td>
       <div class="tab_gap_before">
-        <a class="item1" href="javascript:void(0)">Assets</a>
+        <a class="item1 curved_top" href="javascript:void(0)">Items <%=image_tag('misc_icons/arrow_down_small_white.png')%></a>
 
 
         <div class="section">
@@ -62,27 +62,33 @@
           <!-- Presentations tab -->
           <%= tab_definition :controllers=>["presentations"], :title=>t('presentation').pluralize -%>
 
-          <!-- slides tab -->
-
+          <!-- biosamples tab -->
+          <%= tab_definition :controllers=>["biosamples"]-%>
 
         </div>
-       </div>
-    </td>
-    <td>
-      <div class="tab_gap_before">
-        <% if logged_in? %>
-            <%= link_to "Forums", forums_path, {:class =>"item1"} %>
-        <% end %>
       </div>
     </td>
     <td>
       <div class="tab_gap_before">
-        <%= link_to t('event').pluralize, events_path, {:class =>"item1"} if Seek::Config.events_enabled %>
+        <a class="item1 curved_top" href="javascript:void(0)">Activities <%=image_tag('misc_icons/arrow_down_small_white.png')%></a>
+
+        <div class="section">
+          <!-- Events tab -->
+          <%= tab_definition :controllers => ["events"] ,:title=>t('event').pluralize if Seek::Config.events_enabled -%>
+          <!-- Forums tab -->
+          <%= tab_definition :controllers => ["forums"] if logged_in? -%>
+        </div>
+
       </div>
     </td>
     <td>
       <div class="tab_gap_before">
-        <%= link_to "Help", {:controller => "help_documents", :action=>"index"}, {:class =>"item1"} %>
+        <%= link_to "Content Statistics", statistics_path,{:class =>"item1 curved_top",:target=>"_blank"} if logged_in?%>
+      </div>
+    </td>
+    <td>
+      <div class="tab_gap_before">
+        <%= link_to "Help", {:controller => "help_documents", :action=>"index"}, {:class =>"item1 curved_top"} %>
       </div>
     </td>
   </tr>
