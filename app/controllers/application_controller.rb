@@ -550,6 +550,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #checks if a captcha has been filled out correctly, if enabled, and returns false if not
+  def check_captcha
+    if Seek::Config.recaptcha_setup?
+      verify_recaptcha
+    else
+      true
+    end
+  end
+
   def append_info_to_payload(payload)
     super
     payload[:user_agent] = request.user_agent
