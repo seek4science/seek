@@ -48,12 +48,12 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether a captcha is enabled on forms susceptible to spam",
+            :description=>"Enable to show a captcha on forms susceptible to spam",
             :name=>"Captcha enabled",
             :field=>check_box_tag(:recaptcha_enabled, 1, Seek::Config.recaptcha_enabled, :onchange=>toggle_appear_javascript('captcha_key_settings'))
     } -%>
-    <div id="captcha_key_settings" style="<%= show_or_hide_block(Seek::Config.recaptcha_enabled) %>">
-      <ul style="padding-left:2em;">
+    <div id="captcha_key_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.recaptcha_enabled) %>">
+      <ul>
         <li class="setting_description">
           You can request a private and public key for Recaptcha by visiting <%= link_to("https://www.google.com/recaptcha/admin","https://www.google.com/recaptcha/admin",:target=>"_blank")%> (a Google account is required).</li>
         <li>
