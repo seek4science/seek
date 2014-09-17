@@ -251,11 +251,9 @@ class ApplicationController < ActionController::Base
   end
 
   def profile_for_login_required
-    if User.current_user
-      if User.current_user.person.nil?
-        flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
-        redirect_to main_app.select_people_path
-      end
+    if User.logged_in? && !User.logged_in_and_registered?
+      flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
+      redirect_to main_app.select_people_path
     end
   end
 
