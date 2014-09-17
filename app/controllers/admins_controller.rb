@@ -74,6 +74,8 @@ class AdminsController < ApplicationController
 
 
     Seek::Config.set_smtp_settings 'port', params[:port] if only_integer params[:port], 'port'
+
+
     Seek::Util.clear_cached
     update_redirect_to (only_integer params[:port], "port"),'features_enabled'
   end
@@ -161,6 +163,9 @@ class AdminsController < ApplicationController
     Seek::Config.tag_threshold = params[:tag_threshold] if only_integer params[:tag_threshold], "tag threshold"
     Seek::Config.max_visible_tags = params[:max_visible_tags] if only_positive_integer params[:max_visible_tags], "maximum visible tags"
     Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
+    Seek::Config.recaptcha_enabled = string_to_boolean params[:recaptcha_enabled]
+    Seek::Config.recaptcha_private_key = params[:recaptcha_private_key]
+    Seek::Config.recaptcha_public_key = params[:recaptcha_public_key]
     update_flag = (params[:pubmed_api_email] == '' ||(check_valid_email params[:pubmed_api_email], "pubmed api email")) && (params[:crossref_api_email] == '' || (check_valid_email params[:crossref_api_email], "crossref api email")) && (only_integer params[:tag_threshold], "tag threshold") && (only_positive_integer params[:max_visible_tags], "maximum visible tags")
     update_redirect_to update_flag,'others'
   end

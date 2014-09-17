@@ -30,6 +30,14 @@
         <%= text_field_tag :subject, @subject, :size => 60 -%><br/>
       </p>
 
+      <div style="display:none;" class="box_standout" id="anon_notes">
+        <%= image("warning") %>
+        <p>
+          If you send anonymously, we are unable to identify the person that sent the message.
+          This means that we will not be able to contact you to discuss your feedback further.
+        </p>
+      </div>
+
       <p>
         <%= label_tag :send_anonymously -%><br/>
         <% if current_user.try(:person) %>
@@ -38,14 +46,6 @@
             <%= check_box_tag :anon, true, true, :disabled => true -%>
         <% end %>
       </p>
-
-      <div <%= current_user.try(:person) ? 'style="display:none;"' : nil %> class="box_standout" id="anon_notes">
-      <%= image("warning") %>
-          <p>
-            If you send anonymously, we are unable to identify the person that sent the message.
-            This means that we will not be able to contact you to discuss your feedback further.
-          </p>
-      </div>
 
       <p>
         <%= label_tag :details -%><br/>

@@ -47,6 +47,32 @@
             :field=>text_field_tag(:sabiork_ws_base_url, Seek::Config.sabiork_ws_base_url, :title => 'this is needed for getting compound annotation from SabioRK')
     } -%>
 
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether a captcha is enabled on forms susceptible to spam",
+            :name=>"Captcha enabled",
+            :field=>check_box_tag(:recaptcha_enabled, 1, Seek::Config.recaptcha_enabled, :onchange=>toggle_appear_javascript('captcha_key_settings'))
+    } -%>
+    <div id="captcha_key_settings" style="<%= show_or_hide_block(Seek::Config.recaptcha_enabled) %>">
+      <ul style="padding-left:2em;">
+        <li class="setting_description">
+          You can request a private and public key for Recaptcha by visiting <%= link_to("https://www.google.com/recaptcha/admin","https://www.google.com/recaptcha/admin",:target=>"_blank")%> (a Google account is required).</li>
+        <li>
+          <%= render :partial=>'setting_li',:locals=>{
+                  :description=>"",
+                  :name=>"Public recaptcha key",
+                  :field=>text_field_tag(:recaptcha_public_key, Seek::Config.recaptcha_public_key)
+          } -%>
+        </li>
+        <li>
+          <%= render :partial=>'setting_li',:locals=>{
+                  :description=>"",
+                  :name=>"Private recaptcha key",
+                  :field=>text_field_tag(:recaptcha_private_key, Seek::Config.recaptcha_private_key)
+          } -%>
+        </li>
+      </ul>
+    </div>
+
     <li>
         <%= submit_tag "Update",:disable_with=>"Updating..." -%>
     </li>
