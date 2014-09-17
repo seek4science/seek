@@ -27,6 +27,9 @@ module Seek
             base_ontology_reader.default_parent_class_uri.try(:to_s)
           end
 
+          def label_not_defined_in_ontology
+            errors[:base] << "#{self.humanize_term_type} type with label #{label} is already defined in ontology!" if self.class.base_ontology_labels.each(&:downcase).include?(label.downcase)
+          end
 
           #parent with valid uri
           def ontology_parent term=self
@@ -88,7 +91,6 @@ module Seek
             auth = User.admin_logged_in?
             auth && assays.count == 0 && children.empty?
           end
-
 
 
           def get_child_assays suggested_type=self

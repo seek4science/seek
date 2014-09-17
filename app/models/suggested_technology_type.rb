@@ -25,9 +25,6 @@ class SuggestedTechnologyType < ActiveRecord::Base
   def self.all_term_types
     Array(self.new.base_ontology_reader.ontology_term_type)
   end
-  def label_not_defined_in_ontology
-      errors[:base] << "Technology type with label #{self.label} already exists!" if self.class.base_ontology_labels.each(&:downcase).include?(self.label.downcase)
-  end
 
   def self.uri_key_in_assay
     "technology_type_uri"

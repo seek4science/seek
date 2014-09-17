@@ -32,12 +32,6 @@ class SuggestedAssayType < ActiveRecord::Base
        base_ontology_hash_by_label.keys
    end
 
-  #parent with valid uri
-  def ontology_parent term=self
-      return nil if term.nil?
-      rdf_uri = RDF::URI.new term.parent_uri
-      rdf_uri.valid? ? term.parent : ontology_parent(term.parent)
-  end
 
 
   def self.all_term_types
@@ -51,9 +45,6 @@ class SuggestedAssayType < ActiveRecord::Base
   end
 
 
-  def label_not_defined_in_ontology
-      errors[:base] << "Assay type with label #{self.label} is already defined in ontology!" if self.class.base_ontology_labels.each(&:downcase).include?(self.label.downcase)
-  end
 
   def self.uri_key_in_assay
       "assay_type_uri"
