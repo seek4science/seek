@@ -78,7 +78,7 @@ SEEK::Application.configure do
 
   # add time to lograge
   config.lograge.custom_options = lambda do |event|
-    {:time => event.time}
+    {:time => event.time, :user_agent => event.payload[:user_agent]}
   end
 
 end

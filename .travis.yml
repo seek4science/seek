@@ -1,7 +1,6 @@
 language: ruby
-bundler_args: --retry 5 --without production
+bundler_args: --retry=5 --without production
 rvm:
-  - 1.9.3
   - 2.1.2
 env:
   - SUITE="rake test:units"

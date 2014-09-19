@@ -56,11 +56,6 @@ module ProjectsHelper
     end
     html.html_safe
   end
-  
-  #MERGENOTE - this should be in images_helper probably
-  def remove_member_icon_filename
-    icon_filename_for_key("destroy")
-  end
 
   def project_mailing_list project
     if project.people.empty?
@@ -146,7 +141,6 @@ module ProjectsHelper
         end
 
         folder_tag =  expand_link + collapse_link
-        #MERGENOTE - why have these funny characters only just started causing a problem with 1.9.3 and needing the utf-8 comment?
         if foldable
           folder = child.has_children? ? folder_tag : " └ "
         else

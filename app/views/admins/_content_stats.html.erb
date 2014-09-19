@@ -19,8 +19,7 @@
 </script>
 
 <%
-  #MERGENOTE - check, we should be able to get authorized types through SEEK::Utils, so this constant looks like it duplicates it
-  authorised_types=Seek::ContentStats::AUTHORISED_TYPES
+  authorised_types=Seek::ContentStats::TYPES_FOR_STATS
   non_downloadable=[Investigation,Study,Assay]
   na_tag = content_tag(:span,"--",class:'none_text')
   #So we don't have to run lengthy authorization a second time when calculating total stats
@@ -171,7 +170,6 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
     <td><%= stat.publications.count -%> </td>
   </tr>
   <% end %>
-  </tbody> <%# #MERGENOTE - this tbody appears to close the table before the last row? -%>
   <tr style="background-color: #DEF">
     <td><b>Overall</b></td>
     <td><%= Person.count -%> (<%= User.count(:all,:conditions=>"person_id IS NOT NULL") -%>)<em>*</em></td>
@@ -190,6 +188,7 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
 
     <td><%= Publication.count -%></td>
   </tr>
+  </tbody>
 </table>
 <hr/>
 <em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple <%= t('project').pluralize %>.</em>

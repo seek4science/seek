@@ -269,8 +269,7 @@ class Person < ActiveRecord::Base
 
   def locations
     # infer all person's locations from the institutions where the person is member of
-    locations = self.institutions.collect(&:country).select { |l| !l.blank? }
-    return locations
+    self.institutions.collect(&:country).compact.uniq
   end
 
   def email_with_name
@@ -339,8 +338,9 @@ class Person < ActiveRecord::Base
 
   #admin can administer other people, project manager can administer other people except other admins and themself
   def can_be_administered_by?(user)
-    return false if user.nil? || user.person.nil?
-    user.is_admin? || (user.person.is_project_manager_of_any_project? && (self.is_admin? || self!=user.person))
+    person = user.try(:person)
+    return false unless user && person
+    user.is_admin? || (person.is_project_manager_of_any_project? && (self.is_admin? || self!=person))
   end
 
   def can_view? user = User.current_user
