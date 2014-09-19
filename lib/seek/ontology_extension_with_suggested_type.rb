@@ -9,9 +9,27 @@ module Seek
       end
 
       alias_method_chain :children, :suggested_types
-
+      #returns an array of all ontology classes and suggested types
+      def flatten_hierarchy_with_suggested_types c=self
+        result = [c]
+        c.children.each do |s|
+          result += flatten_hierarchy_with_suggested_types(s)
+        end
+        result
+      end
       def suggested_children
-        SuggestedAssayType.where(:parent_uri => self.uri.try(:to_s)) | SuggestedTechnologyType.where(:parent_uri => self.uri.try(:to_s))
+        case term_type
+          when "assay", "modelling_analysis"
+            SuggestedAssayType.where(:parent_uri => self.uri.try(:to_s)).all
+          when "technology"
+            SuggestedTechnologyType.where(:parent_uri => self.uri.try(:to_s)).all
+          else
+            []
+        end
+      end
+
+      def is_suggested_type?
+        false
       end
 
       def can_edit? user=User.current_user
@@ -23,7 +41,14 @@ module Seek
       end
 
       def assays
-        Assay.find_all_by_assay_type_uri(self.uri.try(:to_s)) |  Assay.find_all_by_technology_type_uri(self.uri.try(:to_s))
+        case term_type
+          when "assay", "modelling analysis"
+            Assay.find_all_by_assay_type_uri(self.uri.try(:to_s))
+          when "technology"
+            Assay.find_all_by_technology_type_uri(self.uri.try(:to_s))
+          else
+            []
+        end
       end
 
     end

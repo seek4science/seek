@@ -30,6 +30,18 @@ module Seek
 
       private
 
+      def default_parent_class_uri
+        raise NotImplementedError, "Subclasses must implement a default_parent_class_uri method"
+      end
+
+      def ontology_file
+        raise NotImplementedError, "Subclasses must implement a ontology_file method"
+      end
+
+      def ontology_term_type
+        nil
+      end
+
       def process_ontology_hierarchy
         parent_uri = default_parent_class_uri
         OntologyClass # so that the class is loaded before it is needed from the cache
@@ -63,7 +75,7 @@ module Seek
         @known_classes[uri] || begin
           label ||= fetch_label_for(uri)
           description ||= fetch_description_for(uri)
-          result = OntologyClass.new(uri, label, description, subclasses)
+          result = OntologyClass.new(uri, label, description, subclasses, [], ontology_term_type)
           @known_classes[uri]=result
           result
         end

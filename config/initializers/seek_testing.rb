@@ -3,6 +3,7 @@ SEEK::Application.configure do
   if Rails.env.test?
     silence_warnings do
       Seek::Config.forced_default :is_virtualliver, false
+      Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:application_title] = 'The Sysmo SEEK'
       Settings.defaults[:project_name] = 'Sysmo'
       Settings.defaults[:project_title] = 'The Sysmo Consortium'

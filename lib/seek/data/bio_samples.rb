@@ -951,7 +951,6 @@ module Seek
           sample.comments = comments
           sample.treatment = treatment
           sample.policy = @file.policy.deep_copy
-          sample.creators << @creator
           sample.save!
         else
           unless sample.specimen == specimen &&

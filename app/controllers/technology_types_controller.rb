@@ -27,7 +27,7 @@ class TechnologyTypesController < ApplicationController
   def find_and_authorize_assays
     @assays=[]
     if @type_class
-      if view_context.is_suggested?(@type_class)
+      if @type_class.is_suggested_type?
          uris = ([@type_class] +@type_class.children).map(&:uri)
       else
          uris=@type_class.flatten_hierarchy.collect{|o| o.uri.to_s}

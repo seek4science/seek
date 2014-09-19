@@ -9,7 +9,7 @@
     <div class="ontology_nav">
 
       <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
-      <%= parent_technology_types_list_links is_suggested?(@type_class) ? Array(@type_class.ontology_parent) : @type_class.parents  -%>
+      <%= parent_technology_types_list_links @type_class.is_suggested_type? ? Array(@type_class.ontology_parent) : @type_class.parents  -%>
 
       <br/>
 

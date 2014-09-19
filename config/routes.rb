@@ -252,21 +252,19 @@ SEEK::Application.routes.draw do
   resources :suggested_assay_types do
       collection do
         get :manage
-        get :new_popup
-        put :set_is_modelling
       end
 
+  end
+  resources :suggested_modelling_analysis_types, :path => :suggested_assay_types, :controller => :suggested_assay_types do
+     collection do
+        get :manage
+      end
   end
   resources :suggested_technology_types do
     collection do
       get :manage
-      get :new_popup
     end
   end
-
-  #MERGENOTE - why are these hard-coded routes?
-  get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
-  get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
 
 
   ### ASSETS ###
@@ -577,6 +575,7 @@ SEEK::Application.routes.draw do
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"
+  get '/modelling_analysis_types/',:to=>"assay_types#show",:as=>"modelling_analysis_types"
   get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
 
 
