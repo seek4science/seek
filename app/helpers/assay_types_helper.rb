@@ -48,7 +48,6 @@ module AssayTypesHelper
     #the display of the label, with an indication of the actual label if the label presented is a temporary label awaiting addition to the ontology
     def displayed_hierarchy_current_label declared_label, defined_class
       result = h(declared_label)
-      #MERGENOTE - where is this is_suggested? method
       if !defined_class.nil? && defined_class.is_suggested_type?
         comment = "  - this is a new suggested term that specialises #{defined_class.ontology_parent.try(:label)}"
         result << content_tag("span",comment,:class=>"none_text")
