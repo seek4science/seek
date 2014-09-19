@@ -16,6 +16,7 @@ module Seek
         blob_params.each do |item_params|
           return false unless check_for_data_or_url(item_params) unless allow_empty_content_blob
           return false unless check_for_empty_data_if_present(item_params)
+          default_to_http_if_missing(item_params)
           return false unless check_for_valid_uri_if_present(item_params)
           return false unless check_for_valid_scheme(item_params)
 
@@ -36,7 +37,7 @@ module Seek
         version = asset.version
 
         content_blob_params.each do |item_params|
-          attributes = build_attributes_hash_for_content_blob(item_params,version)
+          attributes = build_attributes_hash_for_content_blob(item_params, version)
           if asset.respond_to?(:content_blobs)
             asset.content_blobs.create(attributes)
           else
@@ -47,12 +48,12 @@ module Seek
         retain_previous_content_blobs(asset)
       end
 
-      def build_attributes_hash_for_content_blob item_params,version
+      def build_attributes_hash_for_content_blob(item_params, version)
         { tmp_io_object: item_params[:tmp_io_object],
           url: item_params[:data_url],
           external_link: !item_params[:make_local_copy] == '1',
           original_filename: item_params[:original_filename],
-          content_type: item_params[:content_type] ,
+          content_type: item_params[:content_type],
           asset_version: version }
       end
 
@@ -105,6 +106,7 @@ module Seek
         true
       end
 
+      # whether there is data being uploaded rather than a URI being registered
       def add_from_upload?(blob_params)
         !blob_params[:data].blank?
       end
@@ -125,6 +127,12 @@ module Seek
             end
           end
         end
+      end
+
+      # if the urls misses the schema, default to http
+      def default_to_http_if_missing(blob_params)
+        url = blob_params[:data_url]
+        blob_params[:data_url] = Addressable::URI.heuristic_parse(url).to_s unless url.blank?
       end
 
       def check_for_valid_scheme(blob_params)

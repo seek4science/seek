@@ -368,6 +368,30 @@ end
     assert_equal "text/plain", assigns(:data_file).content_blob.content_type
   end
 
+  test "should create data file and store with url even with http protocol missing" do
+    mock_http
+    data,blob = valid_data_file_with_http_url
+    blob[:data_url]="mockedlocation.com/txt_test.txt"
+    blob[:make_local_copy]="1"
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file=>data,:content_blob=>blob,
+               :sharing=>valid_sharing
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert !assigns(:data_file).content_blob.data_io_object.read.nil?
+    assert assigns(:data_file).content_blob.file_exists?
+    assert_equal "txt_test.txt", assigns(:data_file).content_blob.original_filename
+    assert_equal "text/plain", assigns(:data_file).content_blob.content_type
+  end
+
   test "should correctly handle 404 url" do
     mock_http
     df={:title=>"Test"}
@@ -538,6 +562,29 @@ end
 
     data_file = { :title=>"Test HTTP",:project_ids=>[projects(:sysmo_project).id]}
     blob = {:data_url=>"http://webpage.com"}
+
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "", assigns(:data_file).content_blob.original_filename
+    assert assigns(:data_file).content_blob.is_webpage?
+    assert_equal "http://webpage.com", assigns(:data_file).content_blob.url
+    assert_equal "text/html", assigns(:data_file).content_blob.content_type
+  end
+
+  test "should add link to a webpage with http protocol missing" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
+
+    data_file = { :title=>"Test HTTP",:project_ids=>[projects(:sysmo_project).id]}
+    blob = {:data_url=>"webpage.com"}
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
