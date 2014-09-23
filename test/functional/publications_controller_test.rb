@@ -387,17 +387,16 @@ class PublicationsControllerTest < ActionController::TestCase
     original_authors[15] = %!<a href="/people/#{seek_author2.id}">#{publication.non_seek_authors[15].first_name + " " + publication.non_seek_authors[15].last_name}</a>!
 
     #Associate a non-seek author to a seek person
-    as_virtualliver do
-      assert_difference('publication.non_seek_authors.count', -2) do
-        assert_difference('AssetsCreator.count', 2) do
-          put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
-        end
+    assert_difference('publication.non_seek_authors.count', -2) do
+      assert_difference('AssetsCreator.count', 2) do
+        put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
       end
-      publication.reload
-      joined_original_authors = original_authors.join(', ')
-      get :show, :id => publication.id
-      assert_equal true, @response.body.include?(joined_original_authors)
     end
+    publication.reload
+    joined_original_authors = original_authors.join(', ')
+    get :show, :id => publication.id
+    assert_equal true, @response.body.include?(joined_original_authors)
+
 
   end
 
