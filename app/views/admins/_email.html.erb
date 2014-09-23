@@ -3,7 +3,7 @@
     <span class='setting_description'>
       Allows email support, for sending notifications, requesting feedback, and requesting access to other users files.
     </span>
-    <div id="email_settings" style="padding-left:2em;<%= show_or_hide_block(Seek::Config.email_enabled) -%>;">
+    <div id="email_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.email_enabled) -%>;">
       <ul>
             <li>Address: <%= text_field_tag(:address, Seek::Config.smtp_settings('address')) %> </li>
             <li>Port: <%= text_field_tag(:port, Seek::Config.smtp_settings('port'), :onkeypress => "javascript: return onlyNumbers(event);") %></li>

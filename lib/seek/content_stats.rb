@@ -1,6 +1,6 @@
 module Seek
   class ContentStats
-    AUTHORISED_TYPES = [Investigation, Study, Assay, DataFile, Model, Sop, Presentation]
+    TYPES_FOR_STATS = [Investigation, Study, Assay, DataFile, Model, Sop, Presentation]
 
     class ProjectStats
       attr_accessor :project, :sops, :data_files, :models, :publications, :people, :assays, :studies, :investigations, :presentations, :user
@@ -9,7 +9,7 @@ module Seek
         @user = User.first
       end
 
-      AUTHORISED_TYPES.each do |type|
+      TYPES_FOR_STATS.each do |type|
         type_class_name = type.name
         type_str = type_class_name.underscore.pluralize
         define_method "visible_#{type_str}" do
@@ -55,7 +55,7 @@ module Seek
         project_stats = ProjectStats.new
         project_stats.project = project
         project_stats.people = project.people
-        AUTHORISED_TYPES.each do |type|
+        TYPES_FOR_STATS.each do |type|
           type_str = type.name.underscore.pluralize
           project_stats.send(type_str + '=', project.send(type_str))
         end

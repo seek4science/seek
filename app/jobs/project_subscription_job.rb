@@ -5,9 +5,7 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
   def perform
     ps = ProjectSubscription.find_by_id(project_subscription_id)
     if ps
-      #MERGENOTE - why changes to take the project rather than the subscription?
-      project = ps.project
-      all_in_project(project).each do |item|
+      all_in_project(ps.project).each do |item|
         item.subscriptions << Subscription.new(:person => ps.person, :project_subscription_id => project_subscription_id) unless item.subscribed?(ps.person)
       end
     end

@@ -108,6 +108,21 @@ module Seek
       configure_exception_notification
     end
 
+    def recaptcha_private_key_propagate
+      configure_recaptcha_keys
+    end
+
+    def recaptcha_public_key_propagate
+      configure_recaptcha_keys
+    end
+
+    def configure_recaptcha_keys
+      Recaptcha.configure do |config|
+        config.public_key  = self.recaptcha_public_key
+        config.private_key = self.recaptcha_private_key
+      end
+    end
+
     def configure_exception_notification
       if exception_notification_enabled && !Rails.application.config.consider_all_requests_local
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
@@ -147,7 +162,18 @@ module Seek
   module CustomAccessors
     include SimpleCrypt
 
-
+    def recaptcha_setup?
+      if Seek::Config.recaptcha_enabled
+        if Seek::Config.recaptcha_public_key.blank? || Seek::Config.recaptcha_private_key.blank?
+          raise Exception.new("Recaptcha is enabled, but public and private key are not set")
+          false
+        else
+          true
+        end
+      else
+        false
+      end
+    end
 
     def rdf_filestore_path
       append_filestore_path "rdf"
@@ -326,7 +352,8 @@ module Seek
       :authorization_checks_enabled,:magic_guest_enabled,:workflows_enabled,:programmes_enabled,
       :assay_type_ontology_file,:technology_type_ontology_file,:modelling_analysis_type_ontology_file,:assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri,
       :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit,:faceted_browsing_enabled,:facet_enable_for_pages,:faceted_search_enabled,
-      :css_appended, :css_prepended, :javascript_appended,:javascript_prepended,:main_layout,:profile_select_by_default]
+      :css_appended, :css_prepended, :javascript_appended,:javascript_prepended,:main_layout,:profile_select_by_default,
+      :recaptcha_public_key, :recaptcha_private_key]
 
 
     #Settings that require a conversion to integer

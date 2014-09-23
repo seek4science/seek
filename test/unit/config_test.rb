@@ -28,6 +28,26 @@ class ConfigTest < ActiveSupport::TestCase
     end
   end
 
+  test "recaptcha setup?" do
+    with_config_value :recaptcha_enabled,true do
+      with_config_value :recaptcha_public_key,"sdfsdf" do
+        with_config_value :recaptcha_private_key,"sdfsdf" do
+          assert Seek::Config.recaptcha_setup?
+        end
+        with_config_value :recaptcha_private_key,"" do
+          assert_raises(Exception) do
+            Seek::Config.recaptcha_setup?
+          end
+        end
+      end
+    end
+    with_config_value :recaptcha_enabled,false do
+      with_config_value :recaptcha_private_key,"" do
+        refute Seek::Config.recaptcha_setup?
+      end
+    end
+  end
+
   test "scales" do
     assert_equal ["organism","liver","liverLobule","intercellular","cell"],Seek::Config.scales
   end

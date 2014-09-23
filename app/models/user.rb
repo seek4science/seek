@@ -196,7 +196,7 @@ class User < ActiveRecord::Base
   def using_openid?
     !openid.nil?
   end
-        
+
   def is_admin?
     !person.nil? && person.is_admin?
   end
