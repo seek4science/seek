@@ -59,19 +59,10 @@
             end.join(', ').html_safe %>
         <% end %>
       </p>
-
-
-
     </div>
   </div>
 
-  <div class="main_content_right_box">
-    <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @publication, :truncate_to => 20, :title=>"Authors" } -%>
-    <%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @publication, :title=>"Registered by" } -%>
-
-    <%= item_tags_and_tag_entry -%>
-    <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @publication}-%>
-  </div>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @publication, :authors_title=>"Authors" } -%>
 
   <div style="clear:both">
     <%= render :partial=>"general/isa_graph", :locals => {:root_item => @publication, :current_item => @publication, :deep => false} %>
