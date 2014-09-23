@@ -25,12 +25,6 @@ GIT
     convert_office (0.9.1)
 
 GIT
-  remote: git://github.com/SysMO-DB/doi_query_tool.git
-  revision: 09fc4e9a86daf0514ee21106fd6eff578745702f
-  specs:
-    doi_query_tool (0.0.0)
-
-GIT
   remote: git://github.com/SysMO-DB/fleximage
   revision: 658985eb1460fb5d6612f624463e6cbf067ad973
   specs:
@@ -99,6 +93,12 @@ GIT
   revision: c02bea47e477c1ac59e45a2a8a51aaa2c8e6b72f
   specs:
     white_list_formatted_content (1.0.0)
+
+GIT
+  remote: git://github.com/aina1205/doi_query_tool.git
+  revision: 108634c6ea12196ab9d50b097566ea97f0d70314
+  specs:
+    doi_query_tool (0.0.0)
 
 GIT
   remote: git://github.com/myGrid/annotations.git
