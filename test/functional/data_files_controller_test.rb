@@ -76,7 +76,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "#simple_sharing" do
       assert_select "select#access_type_select_4" do
-        assert_select "option[value=?]",1,:text=>/#{I18n.t('access.visible_downloadable')}/i
+        assert_select "option[value=?]",1,:text=>/#{Regexp.escape(I18n.t('access.visible_downloadable'))}/i
         assert_select "option[value=?][selected='selected']",2,:text=>/#{I18n.t('access.accessible_downloadable')}/i
       end
     end
