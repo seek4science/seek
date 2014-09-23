@@ -6,7 +6,6 @@ module Seek
 
       def handle_upload_data
         blob_params = content_blob_params
-
         # MERGENOTE - the manipulation and validation of the params still needs a bit of cleaning up
         blob_params = update_params_for_batch(blob_params)
         allow_empty_content_blob = model_image_present?
@@ -15,14 +14,11 @@ module Seek
 
         blob_params.each do |item_params|
           return false unless check_for_data_or_url(item_params) unless allow_empty_content_blob
-          return false unless check_for_empty_data_if_present(item_params)
-          return false unless check_for_valid_uri_if_present(item_params)
-          return false unless check_for_valid_scheme(item_params)
 
           if add_from_upload?(item_params)
-            return false unless process_upload(item_params)
+            return false unless add_data_for_upload(item_params)
           else
-            return false unless process_from_url(item_params)
+            return false unless add_data_for_url(item_params)
           end
         end
 
@@ -31,12 +27,24 @@ module Seek
         true
       end
 
+      def add_data_for_upload(item_params)
+        return false unless check_for_empty_data_if_present(item_params)
+        process_upload(item_params)
+      end
+
+      def add_data_for_url(item_params)
+        default_to_http_if_missing(item_params)
+        return false unless check_for_valid_uri_if_present(item_params)
+        return false unless check_for_valid_scheme(item_params)
+        process_from_url(item_params)
+      end
+
       def create_content_blobs
         asset = eval "@#{controller_name.downcase.singularize}"
         version = asset.version
 
         content_blob_params.each do |item_params|
-          attributes = build_attributes_hash_for_content_blob(item_params,version)
+          attributes = build_attributes_hash_for_content_blob(item_params, version)
           if asset.respond_to?(:content_blobs)
             asset.content_blobs.create(attributes)
           else
@@ -47,35 +55,42 @@ module Seek
         retain_previous_content_blobs(asset)
       end
 
-      def build_attributes_hash_for_content_blob item_params,version
+      def build_attributes_hash_for_content_blob(item_params, version)
         { tmp_io_object: item_params[:tmp_io_object],
           url: item_params[:data_url],
           external_link: !item_params[:make_local_copy] == '1',
           original_filename: item_params[:original_filename],
-          content_type: item_params[:content_type] ,
+          content_type: item_params[:content_type],
           asset_version: version }
       end
 
       def retain_previous_content_blobs(asset)
         retained_ids = retained_content_blob_ids
-        if retained_ids.present? && (previous_version = asset.find_version(asset.version - 1))
-          previous_version.content_blobs.select { |blob| retained_ids.include?(blob.id) }.each do |blob|
-            new_blob = asset.content_blobs.build(url: blob.url,
-                                                 original_filename: blob.original_filename,
-                                                 content_type: blob.content_type,
-                                                 asset_version: asset.version)
-            FileUtils.cp(blob.filepath, new_blob.filepath) if File.exist?(blob.filepath)
-            # need to save after copying the file, coz an after_save on contentblob relies on the file
-            new_blob.save
-
+        previous_version = asset.find_version(asset.version - 1)
+        if retained_ids.present? && previous_version
+          retained_blobs = previous_version.content_blobs.select { |blob| retained_ids.include?(blob.id) }
+          retained_blobs.each do |blob|
+            copy_blob_to_asset(asset, blob)
           end
         end
       end
 
+      def copy_blob_to_asset(asset, blob)
+        new_blob = asset.content_blobs.build(url: blob.url,
+                                             original_filename: blob.original_filename,
+                                             content_type: blob.content_type,
+                                             asset_version: asset.version)
+        FileUtils.cp(blob.filepath, new_blob.filepath) if File.exist?(blob.filepath)
+        # need to save after copying the file, coz an after_save on contentblob relies on the file
+        new_blob.save
+      end
+
       def process_upload(blob_params)
-        blob_params[:original_filename] = (blob_params[:data]).original_filename if blob_params[:original_filename].blank?
-        blob_params[:tmp_io_object] = blob_params[:data]
-        blob_params[:content_type] = (blob_params[:data]).content_type || content_type_from_filename(blob_params[:original_filename])
+        data = blob_params[:data]
+        filename = blob_params[:original_filename]
+        blob_params[:original_filename] = data.original_filename if filename.blank?
+        blob_params[:tmp_io_object] = data
+        blob_params[:content_type] = data.content_type || content_type_from_filename(filename)
       end
 
       def process_from_url(blob_params)
@@ -105,15 +120,14 @@ module Seek
         true
       end
 
+      # whether there is data being uploaded rather than a URI being registered
       def add_from_upload?(blob_params)
         !blob_params[:data].blank?
       end
 
       def init_asset_for_render
         clean_params
-        c = controller_name.singularize
-        obj = c.camelize.constantize.new(asset_params)
-        eval "@#{c} = obj"
+        eval "@#{controller_name.singularize} = controller_name.classify.constantize.new(asset_params)"
       end
 
       def handle_upload_data_failure
@@ -125,6 +139,12 @@ module Seek
             end
           end
         end
+      end
+
+      # if the urls misses the schema, default to http
+      def default_to_http_if_missing(blob_params)
+        url = blob_params[:data_url]
+        blob_params[:data_url] = Addressable::URI.heuristic_parse(url).to_s unless url.blank?
       end
 
       def check_for_valid_scheme(blob_params)

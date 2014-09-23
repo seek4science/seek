@@ -89,7 +89,7 @@ function addToList() {
 
     var parsed = parseUri(url);
 
-    if (!parsed.protocol || !parsed.host || parsed.host == "null") {
+    if (!parsed.host || parsed.host == "null") {
         alert("An invalid URL was provided");
     }
     else {

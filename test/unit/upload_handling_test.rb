@@ -4,7 +4,6 @@ require 'seek/upload_handling/data_upload'
 require 'seek/upload_handling/examine_url'
 
 class UploadHandingTest < ActiveSupport::TestCase
-
   include Seek::UploadHandling::DataUpload
   include Seek::UploadHandling::ExamineUrl
 
@@ -24,6 +23,25 @@ class UploadHandingTest < ActiveSupport::TestCase
   test 'content_blob_params' do
     @params = { content_blob: { fish: 1, soup: 2 }, data_file: { title: 'george' } }
     assert_equal({ fish: 1, soup: 2 }, content_blob_params)
+  end
+
+  test 'default to http if missing' do
+    params = { data_url: 'fish.com/path?query=yes' }
+    default_to_http_if_missing(params)
+    assert_equal('http://fish.com/path?query=yes', params[:data_url])
+
+    params[:data_url] = 'https://fish.com/path?query=yes'
+    default_to_http_if_missing(params)
+    assert_equal('https://fish.com/path?query=yes', params[:data_url])
+
+    params[:data_url] = nil
+    default_to_http_if_missing(params)
+    assert_nil(params[:data_url])
+
+    params[:data_url] = 'sdfhksdlfsdkfh'
+    default_to_http_if_missing(params)
+    assert_equal('sdfhksdlfsdkfh', params[:data_url])
+
   end
 
   test 'asset params' do
@@ -53,7 +71,7 @@ class UploadHandingTest < ActiveSupport::TestCase
     stub_request(:head, 'http://moved2.com').to_return(status: 302, body: '', headers: { location: 'http://forbidden.com' })
     assert_equal 200, check_url_response_code('http://moved.com')
     assert_equal 403, check_url_response_code('http://moved2.com')
-        
+
   end
 
   test 'fetch url headers' do
@@ -158,25 +176,25 @@ class UploadHandingTest < ActiveSupport::TestCase
     assert_equal 'text/html', content_type_from_filename(nil)
     # FIXME: , MERGENOTE - .xml gives an incorrect mime type of sbml+xml due to the ordering
     checks = [
-        {:f=>"test.jpg",:t=>"image/jpeg"},
-        {:f=>"test.JPG",:t=>"image/jpeg"},
-        {:f=>"test.png",:t=>"image/png"},
-        {:f=>"test.PNG",:t=>"image/png"},
-        {:f=>"test.jpeg",:t=>"image/jpeg"},
-        {:f=>"test.JPEG",:t=>"image/jpeg"},
-        {:f=>"test.xls",:t=>"application/excel"},
-        {:f=>"test.doc",:t=>"application/msword"},
-        {:f=>"test.xlsx",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-        {:f=>"test.docx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-        {:f=>"test.XLs",:t=>"application/excel"},
-        {:f=>"test.Doc",:t=>"application/msword"},
-        {:f=>"test.XLSX",:t=>"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-        {:f=>"test.dOCx",:t=>"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-        {:f=>"unknown.xxx",:t=>"application/octet-stream"},
-        {:f=>nil,:t=>"text/html"}
+      { f: 'test.jpg', t: 'image/jpeg' },
+      { f: 'test.JPG', t: 'image/jpeg' },
+      { f: 'test.png', t: 'image/png' },
+      { f: 'test.PNG', t: 'image/png' },
+      { f: 'test.jpeg', t: 'image/jpeg' },
+      { f: 'test.JPEG', t: 'image/jpeg' },
+      { f: 'test.xls', t: 'application/excel' },
+      { f: 'test.doc', t: 'application/msword' },
+      { f: 'test.xlsx', t: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+      { f: 'test.docx', t: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+      { f: 'test.XLs', t: 'application/excel' },
+      { f: 'test.Doc', t: 'application/msword' },
+      { f: 'test.XLSX', t: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+      { f: 'test.dOCx', t: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+      { f: 'unknown.xxx', t: 'application/octet-stream' },
+      { f: nil, t: 'text/html' }
     ]
     checks.each do |check|
-      assert_equal check[:t],content_type_from_filename(check[:f]),"Expected #{check[:t]} for #{check[:f]}"
+      assert_equal check[:t], content_type_from_filename(check[:f]), "Expected #{check[:t]} for #{check[:f]}"
     end
   end
 
@@ -228,31 +246,30 @@ class UploadHandingTest < ActiveSupport::TestCase
 
   end
 
-  test "retained content blob ids" do
+  test 'retained content blob ids' do
 
-    @params={:content_blobs=>{:id=>{1=>"fish.png",2=>"2.png"}}}
-    assert_equal [1,2],retained_content_blob_ids
-    @params={}
-    assert_equal [],retained_content_blob_ids
-    @params={:content_blobs=>nil}
-    assert_equal [],retained_content_blob_ids
-    @params={:content_blobs=>{:id=>{"3"=>"bob.png","1"=>"fish.png","2"=>"2.png"}}}
-    assert_equal [1,2,3],retained_content_blob_ids
-
+    @params = { content_blobs: { id: { 1 => 'fish.png', 2 => '2.png' } } }
+    assert_equal [1, 2], retained_content_blob_ids
+    @params = {}
+    assert_equal [], retained_content_blob_ids
+    @params = { content_blobs: nil }
+    assert_equal [], retained_content_blob_ids
+    @params = { content_blobs: { id: { '3' => 'bob.png', '1' => 'fish.png', '2' => '2.png' } } }
+    assert_equal [1, 2, 3], retained_content_blob_ids
 
   end
 
-  test "model image present?" do
+  test 'model image present?' do
     file_with_content = ActionDispatch::Http::UploadedFile.new(
         filename: 'file',
         content_type: 'text/plain',
         tempfile: StringIO.new('fish')
     )
-    @params={:model_image=>{:image_file=>file_with_content},:content_blob=>{},:model=>{:title=>"fish"}}
+    @params = { model_image: { image_file: file_with_content }, content_blob: {}, model: { title: 'fish' } }
     assert model_image_present?
-    @params={:model_image=>{},:content_blob=>{},:model=>{:title=>"fish"}}
+    @params = { model_image: {}, content_blob: {}, model: { title: 'fish' } }
     refute model_image_present?
-    @params={:content_blob=>{},:model=>{:title=>"fish"}}
+    @params = { content_blob: {}, model: { title: 'fish' } }
     refute model_image_present?
   end
 
