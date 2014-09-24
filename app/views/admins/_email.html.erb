@@ -38,6 +38,11 @@
                 A comma or space seperated list of email address for those that will receive exception notifications.
               </span>
           </li>
+          <%= render :partial=>'setting_li',:locals=>{
+                  :description=>"The email address which to send support emails (such as run problem reports).",
+                  :name=>"Support Email Address",
+                  :field=>text_field_tag(:support_email_address, Seek::Config.support_email_address)
+          } -%>
         </ul>
     </div>
 </div>

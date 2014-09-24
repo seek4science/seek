@@ -78,6 +78,14 @@ module TavernaPlayer
       workflow.find_version(workflow_version)
     end
 
+    def reported?
+      self.reported
+    end
+
+    def reportable?
+      self.failed? || self.outputs.any? { |o| o.value_is_error? }
+    end
+
     private
 
     # Override of Taverna Player method to support versioned workflows

@@ -353,7 +353,7 @@ module Seek
       :assay_type_ontology_file,:technology_type_ontology_file,:modelling_analysis_type_ontology_file,:assay_type_base_uri,:technology_type_base_uri,:modelling_analysis_type_base_uri,
       :header_tagline_text_enabled,:header_home_logo_image,:related_items_limit,:faceted_browsing_enabled,:facet_enable_for_pages,:faceted_search_enabled,
       :css_appended, :css_prepended, :javascript_appended,:javascript_prepended,:main_layout,:profile_select_by_default,
-      :recaptcha_public_key, :recaptcha_private_key]
+      :recaptcha_public_key, :recaptcha_private_key,:support_email_address]
 
 
     #Settings that require a conversion to integer
