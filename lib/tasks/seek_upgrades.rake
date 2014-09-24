@@ -22,7 +22,7 @@ namespace :seek do
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
-  task(:upgrade=>[:environment,"db:migrate","db:sessions:clear","tmp:clear"]) do
+  task(:upgrade => [:environment, "db:migrate", "db:sessions:clear", "tmp:clear"]) do
 
     solr=Seek::Config.solr_enabled
 
@@ -41,7 +41,7 @@ namespace :seek do
 
   desc("Cleans out group memberships where the person no longer exists")
   task(:remove_invalid_group_memberships => :environment) do
-    invalid = GroupMembership.select{|gm| gm.person.nil? || gm.work_group.nil?}
+    invalid = GroupMembership.select { |gm| gm.person.nil? || gm.work_group.nil? }
     invalid.each do |inv|
       inv.destroy
     end
@@ -65,10 +65,10 @@ namespace :seek do
 
   def convert_publication_authors(publication)
     puts "publication #{publication.id} needs updating"
-    PublicationAuthorOrder.where(:publication_id=>publication.id).each do |publication_author_order|
+    PublicationAuthorOrder.where(:publication_id => publication.id).each do |publication_author_order|
       publication_author = publication_author_order.author
       if publication_author.is_a?(Person)
-        publication_author = PublicationAuthor.new(:publication=>publication,:person=>publication_author,:author_index=>publication_author_order.order)
+        publication_author = PublicationAuthor.new(:publication => publication, :person => publication_author, :author_index => publication_author_order.order)
       else
         publication_author.author_index=publication_author_order.order
       end
@@ -115,7 +115,7 @@ namespace :seek do
       end
 
       unless assay.suggested_assay_type_label.nil?
-         puts "The Assay #{assay.id} has a suggested assay type label of #{assay.assay_type_label.inspect}, currently attached to the parent URI #{assay.assay_type_uri.inspect}".yellow
+        puts "The Assay #{assay.id} has a suggested assay type label of #{assay.assay_type_label.inspect}, currently attached to the parent URI #{assay.assay_type_uri.inspect}".yellow
       end
 
       disable_authorization_checks do
@@ -174,32 +174,31 @@ namespace :seek do
   end
 
   desc "repopulate missing book titles for publications"
-    task(:repopulate_missing_publication_book_titles => :environment) do
-      disable_authorization_checks do
-        Publication.all.select { |p| p.publication_type ==3 && p.journal.blank? }.each do |pub|
-          if pub.doi
-            query = DoiQuery.new(Seek::Config.crossref_api_email)
-            result = query.fetch(pub.doi)
-            unless result.nil? || !result.error.nil?
-              pub.extract_doi_metadata(result)
-              pub.save
-            end
+  task(:repopulate_missing_publication_book_titles => :environment) do
+    disable_authorization_checks do
+      Publication.all.select { |p| p.publication_type ==3 && p.journal.blank? }.each do |pub|
+        if pub.doi
+          query = DoiQuery.new(Seek::Config.crossref_api_email)
+          result = query.fetch(pub.doi)
+          unless result.nil? || !result.error.nil?
+            pub.extract_doi_metadata(result)
+            pub.save
           end
         end
       end
-    end        
+    end
   end
 
 
-  task(:update_admin_assigned_roles=>:environment) do
+  task(:update_admin_assigned_roles => :environment) do
     Person.where("roles_mask > 0").each do |p|
       if p.admin_defined_role_projects.empty?
         roles = []
         (p.role_names & Person::PROJECT_DEPENDENT_ROLES).each do |role|
-          projects =  Seek::Config.project_hierarchy_enabled ? p.direct_projects : p.projects
+          projects = Seek::Config.project_hierarchy_enabled ? p.direct_projects : p.projects
           #update admin defined roles only if person has any project role in his project
-          projects = projects.select{|proj| p.project_roles.map(&:group_memberships).flatten.map(&:project).include? proj}
-          msg =  "Updating #{p.name} for - '#{role}' - adding to #{projects.count} projects"
+          projects = projects.select { |proj| p.project_roles.map(&:group_memberships).flatten.map(&:project).include? proj }
+          msg = "Updating #{p.name} for - '#{role}' - adding to #{projects.count} projects"
           msg += " and #{projects.map(&:descendants).flatten.count} sub projects" if  Seek::Config.project_hierarchy_enabled
           puts msg
 
@@ -213,7 +212,7 @@ namespace :seek do
             disable_authorization_checks do
               p.save!
             end
-          rescue Exception=>e
+          rescue Exception => e
             puts "Error saving #{p.name} - #{p.id}: #{e.message}"
           ensure
             Person.record_timestamps = true
@@ -227,7 +226,7 @@ namespace :seek do
 
   def read_label_map type
     file = "#{type.to_s}_label_mappings.yml"
-    file = File.join(Rails.root,"config","default_data",file)
+    file = File.join(Rails.root, "config", "default_data", file)
     YAML::load_file(file)
   end
 
@@ -239,10 +238,10 @@ namespace :seek do
 
     codepoints = name.mb_chars.normalize(:d).split(//u)
     if remove_special_character
-      ascii=codepoints.map(&:to_s).reject{|e| e.bytesize > 1}.join
+      ascii=codepoints.map(&:to_s).reject { |e| e.bytesize > 1 }.join
     end
     if replace_umlaut
-      ascii=codepoints.map(&:to_s).collect {|e| e == '̈' ? 'e' : e}.join
+      ascii=codepoints.map(&:to_s).collect { |e| e == '̈' ? 'e' : e }.join
     end
     ascii
   end
