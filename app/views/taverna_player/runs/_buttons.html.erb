@@ -10,6 +10,11 @@
             <li><%= image_tag_for_key('sweep', main_app.new_sweep_path(:run_id => @run.id), nil, nil, "Data sweep based on this run") -%></li>
         <% end %>
     <% end %>
+    <% if @run.complete? && @run.can_manage? %>
+        <% if !@run.reported? && @run.reportable? && Seek::Config.email_enabled%>
+            <li><%= image_tag_for_key('report', main_app.report_problem_run_path(@run), nil, {:method=>:post}, "Report a problem with this run") -%></li>
+        <% end %>
+    <% end %>
     <% if @run.can_manage? and !current_user.guest? -%>
         <li><%= image_tag_for_key('manage', main_app.edit_run_path(@run), nil, nil, "Manage run") -%></li>
     <% end -%>

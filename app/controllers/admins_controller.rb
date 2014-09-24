@@ -53,9 +53,11 @@ class AdminsController < ApplicationController
     Seek::Config.set_smtp_settings 'password', params[:password]
     Seek::Config.set_smtp_settings 'enable_starttls_auto', params[:enable_starttls_auto] == '1'
 
-    Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
-    Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
-    Seek::Config.jws_online_root = params[:jws_online_root]
+    Seek::Config.support_email_address= params[:support_email_address]
+
+    Seek::Config.solr_enabled= string_to_boolean params[:solr_enabled]
+    Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
+    Seek::Config.jws_online_root= params[:jws_online_root]
 
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
@@ -310,30 +312,34 @@ class AdminsController < ApplicationController
         type = 'auth_consistency'
       when 'monthly_stats'
         monthly_stats = get_monthly_stats
-        type = 'monthly_statistics'
-      when 'none'
-        type = 'none'
+        type = "monthly_statistics"
+      when "workflow_stats"
+        type = "workflow_stats"
+      when "none"
+        type = "none"
     end
     respond_to do |format|
       case type
-        when 'invalid_users'
-          format.html { render partial: 'admins/invalid_user_stats_list', locals: { collection: collection } }
-        when 'users'
-          format.html { render partial: 'admins/user_stats_list', locals: { title: title, collection: collection } }
-        when 'content_stats'
-          format.html { render partial: 'admins/content_stats', locals: { stats: Seek::ContentStats.generate } }
-        when 'activity_stats'
-          format.html { render partial: 'admins/activity_stats', locals: { stats: Seek::ActivityStats.new } }
-        when 'search_stats'
-          format.html { render partial: 'admins/search_stats', locals: { stats: Seek::SearchStats.new } }
-        when 'job_queue'
-          format.html { render partial: 'admins/job_queue' }
-        when 'auth_consistency'
-          format.html { render partial: 'admins/auth_consistency' }
-        when 'monthly_statistics'
-          format.html { render partial: 'admins/monthly_statistics', locals: { stats: monthly_stats } }
-        when 'none'
-          format.html { render text: '' }
+        when "invalid_users"
+          format.html { render :partial => "admins/invalid_user_stats_list", :locals => { :collection => collection} }
+        when "users"
+          format.html { render :partial => "admins/user_stats_list", :locals => { :title => title, :collection => collection} }
+        when "content_stats"
+          format.html { render :partial => "admins/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
+        when "activity_stats"
+          format.html { render :partial => "admins/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
+        when "search_stats"
+          format.html { render :partial => "admins/search_stats", :locals => {:stats => Seek::SearchStats.new} }
+        when "job_queue"
+          format.html { render :partial => "admins/job_queue" }
+        when "auth_consistency"
+          format.html { render :partial => "admins/auth_consistency" }
+        when "monthly_statistics"
+          format.html { render :partial => "admins/monthly_statistics", :locals => {:stats => monthly_stats}}
+        when "workflow_stats"
+          format.html { render :partial => "admins/workflow_stats" }
+        when "none"
+          format.html { render :text=>"" }
       end
     end
   end
