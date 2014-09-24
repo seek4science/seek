@@ -136,7 +136,7 @@ function selectedFacets(){
 }
 
 function resetAllFilters(){
-    state = window.exhibit._uiContext._collection.clearAllRestrictions();
+    var state = window.exhibit._uiContext._collection.clearAllRestrictions();
     Exhibit.History.pushState(
             state.data,
             Exhibit._("%widget.collectionSummary.resetActionTitle")
