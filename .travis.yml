@@ -1,6 +1,8 @@
 language: ruby
 bundler_args: --without production
 rvm:
+  - 1.9.3
+  - 2.1.2
   - 2.1.3
 env:
   - SUITE="rake test:units"
