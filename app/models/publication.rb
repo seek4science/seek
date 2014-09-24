@@ -39,21 +39,8 @@ class Publication < ActiveRecord::Base
 
   after_update :update_creators_from_publication_authors
 
-  #MERGENOTE - ??? the is never active, if not needed should be removed
-  after_update :update_policy_from_publication_authors , :if=> "false"
-
   def update_creators_from_publication_authors
     self.creators = seek_authors.map(&:person)
-  end
-
-  def update_policy_from_publication_authors
-    #Update policy so current authors have manage permissions
-    policy.permissions.clear
-    creators.each do |author|
-      policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
-    end
-    #Add contributor
-   policy.permissions << Permission.create(:contributor => contributor.person, :policy => policy, :access_type => Policy::MANAGING) unless contributor.nil?
   end
 
   if Seek::Config.events_enabled
