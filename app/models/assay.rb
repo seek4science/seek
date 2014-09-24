@@ -49,7 +49,7 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-  validate :either_samples_or_organisms_for_experimental_assay,  :if => "Seek::Config.is_virtualliver"
+  #validate :either_samples_or_organisms_for_experimental_assay,  :if => "Seek::Config.is_virtualliver"
   validate :no_sample_for_modelling_assay
 
   before_validation :default_assay_and_technology_type

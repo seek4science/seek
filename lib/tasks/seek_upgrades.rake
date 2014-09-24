@@ -9,19 +9,16 @@ require 'colorize'
 namespace :seek do
 
   #these are the tasks required for this version upgrade
-  task :upgrade_version_tasks=>[
-            :environment,
-            :update_admin_assigned_roles,
-            :update_assay_types_from_ontology,
-            :update_technology_types_from_ontology,
-             :update_top_level_assay_type_titles,
-            :repopulate_missing_publication_book_titles,
-            :resynchronise_assay_types,
-            :resynchronise_technology_types,
-            :remove_invalid_group_memberships,
-            :convert_publication_authors,
-            :clear_filestore_tmp,
-            :repopulate_auth_lookup_tables,
+  task :upgrade_version_tasks => [
+      :environment,
+      :update_admin_assigned_roles,
+      :repopulate_missing_publication_book_titles,
+      :resynchronise_assay_types,
+      :resynchronise_technology_types,
+      :remove_invalid_group_memberships,
+      :convert_publication_authors,
+      :clear_filestore_tmp,
+      :repopulate_auth_lookup_tables,
   ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
@@ -189,39 +186,8 @@ namespace :seek do
             end
           end
         end
-
-        #If no results, match by normalised name, taken from grouped_pagination.rb
-        if matches.empty?
-          seek_authors.each do |seek_author|
-            ascii1 = normalize_name(author.last_name)
-            ascii2 = normalize_name(seek_author.last_name)
-            matches << seek_author if (ascii1 == ascii2)
-          end
-        end
-
-        #special normalization case for umlaut: e.g. ü match ue
-        if matches.empty?
-          seek_authors.each do |seek_author|
-            ascii1 = normalize_name(author.last_name, false, true)
-            ascii2 = normalize_name(seek_author.last_name, false, true)
-            matches << seek_author if (ascii1 == ascii2)
-          end
-        end
-
-        #if no results, match by parts of last name
-        if matches.empty?
-          matches = seek_authors.select{|seek_author| Regexp.new(seek_author.last_name, Regexp::IGNORECASE).match(author.last_name) ||
-                                                      Regexp.new(author.last_name, Regexp::IGNORECASE).match(seek_author.last_name)}
-        end
-
-        match = matches.first
-        unless match.nil?
-          updating_publication_author_order = PublicationAuthorOrder.where(["publication_id=? AND author_id=? AND author_type=?", publication.id, author.id, 'PublicationAuthor' ]).first
-          updating_publication_author_order.author = match
-          updating_publication_author_order.save
-          author.delete
-        end
       end
+    end        
   end
 
 
