@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: git://github.com/SysMO-DB/doi_query_tool.git
-  revision: 09fc4e9a86daf0514ee21106fd6eff578745702f
+  revision: d87ae6ffa2393beba4bbb49817cf04a60f520fee
   specs:
     doi_query_tool (0.0.0)
 
