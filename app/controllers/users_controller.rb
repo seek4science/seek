@@ -51,7 +51,7 @@ class UsersController < ApplicationController
         Mailer.welcome_no_projects(current_user, base_host).deliver
         logout_user
         flash[:notice] = "Signup complete! However, you will need to wait for an administrator to associate you with your project(s) before you can login."        
-        redirect_to new_session_path
+        redirect_to main_app.root_path
       else
         Mailer.welcome(current_user, base_host).deliver
         flash[:notice] = "Signup complete!"
