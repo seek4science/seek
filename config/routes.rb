@@ -1,6 +1,6 @@
 SEEK::Application.routes.draw do
 
-  mount TavernaPlayer::Engine, :at => "/"
+  mount TavernaPlayer::Engine, :at => (SEEK::Application.config.relative_url_root || "/")
 
   resources :scales do
     collection do

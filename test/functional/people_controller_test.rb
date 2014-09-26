@@ -1335,14 +1335,32 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test "should email user after assigned to a project" do
+  test "should not email user after assigned to a project if they are not registered" do
     new_person = Factory(:brand_new_person)
     admin = Factory(:admin)
     work_group = Factory(:work_group)
 
+    refute new_person.user
     login_as admin.user
 
-    assert_emails 1 do
+    assert_no_emails do
+      put :administer_update, :id => new_person.id, :person => {:work_group_ids => [work_group.id]}
+    end
+
+    assert_redirected_to person_path(new_person)
+
+    assert_includes assigns(:person).work_groups, work_group
+  end
+
+  test "should email user after assigned to a project if they are registered" do
+    new_person = Factory(:brand_new_person,:user=>Factory(:user))
+    admin = Factory(:admin)
+    work_group = Factory(:work_group)
+
+    assert new_person.user
+    login_as admin.user
+
+    assert_emails(1) do
       put :administer_update, :id => new_person.id, :person => {:work_group_ids => [work_group.id]}
     end
 

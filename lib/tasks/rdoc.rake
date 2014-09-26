@@ -16,6 +16,7 @@ namespace :doc do
     rdoc.rdoc_files.include('doc/CREDITS')
     rdoc.rdoc_files.include('doc/INSTALL')
     rdoc.rdoc_files.include('doc/INSTALL-PRODUCTION')
+    rdoc.rdoc_files.include('doc/INSTALL-ON-A-SUBURI')
     rdoc.rdoc_files.include('doc/OTHER-DISTRIBUTIONS')
     rdoc.rdoc_files.include('doc/UPGRADING')
     rdoc.rdoc_files.include('doc/EARLIER-UPGRADES')

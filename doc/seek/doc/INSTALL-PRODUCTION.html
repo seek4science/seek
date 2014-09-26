@@ -63,6 +63,8 @@
   
     <li class="file"><a href="../doc/INSTALL.html">INSTALL</a>
   
+    <li class="file"><a href="../doc/INSTALL-ON-A-SUBURI.html">INSTALL-ON-A-SUBURI</a>
+  
     <li class="file"><a href="../doc/INSTALL-PRODUCTION.html">INSTALL-PRODUCTION</a>
   
     <li class="file"><a href="../doc/OTHER-DISTRIBUTIONS.html">OTHER-DISTRIBUTIONS</a>
@@ -115,6 +117,10 @@
 <p>By reading and following these extra notes, you will more performance out
 of SEEK, and reduce the ongoing maintenance.</p>
 
+<p>If you wish to run under a sub URI (e.g. &lt;host&gt;/seek) then please
+read and follow <a href="INSTALL-ON-A-SUBURI.html">Installing under a sub
+URI</a> at the end of the installation.</p>
+
 <h2 id="label-Before+you+install+SEEK">Before you install SEEK</h2>
 
 <p>This will make sure some of the rake tasks affect the appropriate database.</p>
@@ -166,7 +172,7 @@ necessary.</p>
 
 <h2 id="label-After+you+have+installed+SEEK">After you have installed SEEK</h2>
 
-<h2 id="label-Compiling+Assets+%3D%3D">Compiling Assets ==</h2>
+<h2 id="label-Compiling+Assets">Compiling Assets</h2>
 
 <p>Assets - such as images, javascript and stylesheets, need to be precompiled
 - which means minifying them, grouping some together into a single file,
@@ -205,20 +211,24 @@ PassengerDefaultRuby /home/www-data/.rvm/wrappers/ruby-1.9.3-p448@seek/ruby</pre
 ServerName appropriately):</p>
 
 <pre>&lt;VirtualHost *:80&gt;
-   ServerName www.yourhost.com
-   DocumentRoot /srv/rails/seek/public
-      &lt;Directory /srv/rails/seek/public&gt;
-       AllowOverride all
-       Options -MultiViews
-    &lt;/Directory&gt;
-    &lt;LocationMatch &quot;^/assets/.*$&quot;&gt;
-       Header unset ETag
-       FileETag None
-       # RFC says only cache for 1 year
-       ExpiresActive On
-       ExpiresDefault &quot;access plus 1 year&quot;
-    &lt;/LocationMatch&gt;
- &lt;/VirtualHost&gt;</pre>
+  ServerName www.yourhost.com
+  DocumentRoot /srv/rails/seek/public
+   &lt;Directory /srv/rails/seek/public&gt;
+      # This relaxes Apache security settings.
+      Allow from all
+      # MultiViews must be turned off.
+      Options -MultiViews
+      # Uncomment this if you&#39;re on Apache &gt;= 2.4:
+      #Require all granted
+   &lt;/Directory&gt;
+   &lt;LocationMatch &quot;^/assets/.*$&quot;&gt;
+      Header unset ETag
+      FileETag None
+      # RFC says only cache for 1 year
+      ExpiresActive On
+      ExpiresDefault &quot;access plus 1 year&quot;
+   &lt;/LocationMatch&gt;
+&lt;/VirtualHost&gt;</pre>
 
 <p>The LocationMatch block tells Apache to serve up the assets (images, CSS,
 Javascript) with a long expiry time, leading to better performance since
@@ -236,7 +246,9 @@ sudo a2dissite default
 sudo service apache2 restart</pre>
 
 <p>If you now visit <a href="http://localhost">localhost</a> (note there is no
-3000 port) - you should see SEEK.</p>
+3000 port) - you should see SEEK. If you get a 403 forbidden error, and are
+running a version of Apache &gt; 2.4, then you need to uncomment the
+<em>Require all granted</em> in the Directory definition.</p>
 
 <p>If you wish to restart SEEK, maybe after an upgrade, without restarting
 Apache you can do so by running (as www-data)</p>
