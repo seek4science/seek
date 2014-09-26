@@ -4,7 +4,7 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 
-<title>module Seek::Rdf - SEEK Technical Guide</title>
+<title>INSTALL-ON-A-SUBURI - SEEK Technical Guide</title>
 
 <link type="text/css" media="screen" href="../rdoc.css" rel="stylesheet">
 
@@ -20,7 +20,7 @@
 <script type="text/javascript" charset="utf-8" src="../js/darkfish.js"></script>
 
 
-<body id="top" class="module">
+<body class="file">
 <nav id="metadata">
   <nav id="home-section" class="section">
   <h3 class="section-header">
@@ -42,28 +42,6 @@
   <ul id="search-results" class="initially-hidden"></ul>
 </nav>
 
-
-  <div id="file-metadata">
-    <nav id="file-list-section" class="section">
-  <h3 class="section-header">Defined In</h3>
-  <ul>
-    <li>lib/seek/rdf/rdf_repository.rb
-    <li>lib/seek/rdf/rdf_repository_storage.rb
-    <li>lib/seek/rdf/rdf_file_storage.rb
-    <li>lib/seek/rdf/virtuoso_repository.rb
-    <li>lib/seek/rdf/rdf_generation.rb
-  </ul>
-</nav>
-
-    
-  </div>
-
-  <div id="class-metadata">
-    
-    
-    
-    
-  </div>
 
   <div id="project-metadata">
     <nav id="fileindex-section" class="section project-section">
@@ -129,30 +107,61 @@
   </div>
 </nav>
 
-<div id="documentation">
-  <h1 class="module">module Seek::Rdf</h1>
-
-  <div id="description" class="description">
-    
-  </div><!-- description -->
-
+<div id="documentation" class="description">
   
-  
-  
-  <section id="5Buntitled-5D" class="documentation-section">
-    
+<h1 id="label-Installing+SEEK+under+a+sub+URI">Installing SEEK under a sub URI</h1>
 
-    
+<p>Running under a sub URI means running seek with a path below the main
+domain URI - e.g <a href="http://myhost.org/seek">myhost.org/seek</a></p>
 
-    
+<p>This requires a couple of small changes on-top of the standard
+installation. This only covers installing in a production environment
+running with Apache, but the principle is the same for other webservers.</p>
 
-    
+<p>It is assumed here that the suburi will be /seek and these steps should be
+carried out once the rest of the installation is complete.</p>
 
-    <!-- Methods -->
-    
-  </section><!-- 5Buntitled-5D -->
+<h2 id="label-Modifying+the+Apache+configuration">Modifying the Apache configuration</h2>
 
-</div><!-- documentation -->
+<p>The Apache configuration requires a small change to pass an additional
+couple of parameters to Passenger. Please add the following to your virtual
+host settings, just before the Directory definition.</p>
+
+<pre>Alias /seek /srv/rails/seek/public
+&lt;Location /seek&gt;
+  PassengerBaseURI /seek
+  PassengerAppRoot /srv/rails/seek
+&lt;/Location&gt;</pre>
+
+<p>You can find out more about this configuration at <a
+href="https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html#deploying_rails_to_sub_uri">www.phusionpassenger.com/documentation/Users%20guide%20Apache.html#deploying_rails_to_sub_uri</a></p>
+
+<h2 id="label-Setting+the+relative_url_root">Setting the relative_url_root</h2>
+
+<p>In the file <em>config/application.rb</em> towards the end withing the
+inner block, either uncomment or add the line:</p>
+
+<pre>config.relative_url_root = &#39;/seek&#39;</pre>
+
+<p>This setting is necessary to create the correct paths when compiling the
+assets, and also for the delayed-job background tasks. An alternative to
+this is to set the RAILS_RELATIVE_URL_ROOT environment variable when
+starting/stopping the seek:workers or compiling assets.</p>
+
+<p>Now re-compile the assets</p>
+
+<pre>rm -rf public/assets
+bundle exec rake assets:precompile</pre>
+
+<p>Now restart Apache, and if you have already ran seek clear the cache with:</p>
+
+<pre>bundle exec rake tmp:clear</pre>
+
+<p>You should now be able to visit and use seek at <a
+href="http://localhost/seek">localhost/seek</a></p>
+
+</div>
+
 
 
 <footer id="validator-badges">

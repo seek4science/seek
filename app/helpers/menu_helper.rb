@@ -35,15 +35,15 @@ module MenuHelper
 
     if show_scales?
       scales_menu = {:title=>t("scale").pluralize,:sections=>[]}
-      scales_menu[:sections] << {:path=>scales_path,:title=>"Browse #{t("scale").pluralize}"}
+      scales_menu[:sections] << {:controller=>"scales",:title=>"Browse #{t("scale").pluralize}"}
       definitions << scales_menu
     end
 
     definitions << {:title=>t("menu.documentation"),:spacer=>true, :hide=>!Seek::Config.documentation_enabled,:sections=>[
         {:controller=>"help_documents",:title=>t("menu.help")},
-        {:path=>"/help/faq",:title=>t("menu.faq")},
-        {:path=>"/help/templates",:title=>t("menu.jerm_templates")},
-        {:path=>"/help/isa-best-practice",:title=>t("menu.isa_best_practice")}
+        {:controller=>"help_documents",:page=>"faq",:title=>t("menu.faq")},
+        {:controller=>"help_documents",:page=>"templates",:title=>t("menu.jerm_templates")},
+        {:controller=>"help_documents",:page=>"isa-best-practice",:title=>t("menu.isa_best_practice")}
     ]}
     definitions
   end
@@ -73,15 +73,13 @@ module MenuHelper
     selected_section = current_second_level_section sections
     sections.collect do |section|
       unless section[:hide]
-        c = section[:controller]
-        path = section[:path]
+
         title = section[:title]
         title ||= c.capitalize
 
-        path = section[:path] || eval("#{c}_path")
         options = section[:options] || {}
         options[:class]="curved"
-        link = link_to title, path,options
+        link = link_to title, determine_path(section),options
         classes="curved"
         classes << " selected_menu" if section == selected_section
         attributes = "class='#{classes}'"
@@ -100,18 +98,18 @@ module MenuHelper
   end
 
   def current_second_level_section sections
-    section = sections.find do |section|
-      !section[:path].nil? && request.path.end_with?(section[:path])
+    sections.find do |section|
+      request.path.end_with?(determine_path(section))
     end
+  end
 
-    c = controller.controller_name.to_s
-
-
-    section ||= sections.find do |section|
-      section[:controller]==c
+  def determine_path(section)
+    unless section[:stored_path]
+      path = eval("#{section[:controller]}_path")
+      path = path + "/" + section[:page] if section[:page]
+      section[:stored_path] = path
     end
-
-    section
+    section[:stored_path]
   end
 
   def current_top_level_tab definitions
@@ -119,7 +117,7 @@ module MenuHelper
     path = request.path
 
     menu = definitions.find do |menu|
-      !menu[:sections].nil? && !menu[:sections].select{|section| !section[:path].nil? && !path.nil? && section[:path].end_with?(path)}.empty?
+      !menu[:sections].nil? && !menu[:sections].select{|section| !section[:page].nil? && path.end_with?(section[:page])}.empty?
     end
 
     menu ||= definitions.find do |menu|
