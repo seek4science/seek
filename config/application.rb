@@ -74,7 +74,7 @@ module SEEK
     config.exceptions_app = self.routes
 
     #uncomment and set the value if running under a suburi
-    config.relative_url_root = '/seek'
+    #config.relative_url_root = '/seek'
 
   end
 end
