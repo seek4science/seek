@@ -143,7 +143,7 @@ start it up with:
 
 ==== Delayed Job Background Service
 
-Create the file /etc/init.d/delayed_job-seek and copy the contents of https://gist.github.com/3169625 into it.
+Create the file /etc/init.d/delayed_job-seek and copy the contents of https://gist.github.com/e4219ec7cb161129f1c7 into it.
 
 The run:
 

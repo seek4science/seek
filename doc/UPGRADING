@@ -40,6 +40,30 @@ same pattern. Upgrading to version 0.18 is an exception and involves some additi
 only be necessary to run <em>bundle install</em> and the <em>db:migrate</em> rake task. Using seek:upgrade should still work, but could take a lot of unnecessary time. There is more details and
 an example towards the end of the this page.
 
+== Steps to upgrade from 0.20.x to 0.21.x
+
+#if using rvm do:
+    rvm get stable
+    rvm install ruby-2.1.2
+
+    export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
+
+    ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop
+    hg pull https://bitbucket.org/seek4science/seek -r v0.21.0
+    hg update # only if no other changes have been made to your local version, if you get an error ignore it and do merge
+    hg merge # only required if you've made changes since installing. If you have, you may need to deal with conflicts.
+    hg commit -m "merged" # likewise - only required if you made changes since installing
+    bundle install --deployment
+    bundle exec rake seek:upgrade
+
+The mechanism to start, stop and restart the delayed-job process has now changed you you should use the rake task seek:workers:<start|stop|restart|status>,
+e.g
+
+   bundle exec rake seek:workers:start
+
+there is a new init.d script for this described at https://gist.github.com/e4219ec7cb161129f1c7
+
 == Steps to upgrade from 0.19.x to 0.20.x
 
 Start the upgrade following the standard steps:
