@@ -1610,6 +1610,7 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.text     "description"
     t.integer  "user_id"
     t.integer  "workflow_version",                :default => 1
+    t.boolean  "reported",                        :default => false
   end
 
   add_index "taverna_player_runs", ["parent_id"], :name => "index_taverna_player_runs_on_parent_id"

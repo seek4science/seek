@@ -14,6 +14,7 @@ SEEK::Application.configure do
   Seek::Config.default :email_enabled,false
   Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
   Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
+  Seek::Config.default :support_email_address, ''
   Seek::Config.default :solr_enabled,false
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"https://jws.sysmo-db.org/"

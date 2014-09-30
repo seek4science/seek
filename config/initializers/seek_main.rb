@@ -45,7 +45,6 @@ require 'taverna_player_renderers'
 
 require 'seek/search/search_sunspot'
 
-
 require 'seek/project_hierarchies/project_extension'
 
 SEEK::Application.configure do

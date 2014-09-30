@@ -8,29 +8,38 @@
 
   <% end %>
   <% if !@results.blank? %>
-      <ul class="sectionIcons">
-        <li>
-          <% filter_path = url_for(:controller => 'search', :action => 'index',
-                  :search_query => params[:search_query],
-                  :search_type => params[:search_type],
-                  :include_external_search=>params[:include_external_search],
-                  :filter => true)%>
-          <%= image_tag_for_key('filter', filter_path, 'Filter result',
-                {:style => params[:filter] ? 'display: none' : 'display: block'}, 'Filter result')  %>
-        </li>
-
-        <li>
-          <% unfilter_path = url_for(:controller => 'search', :action => 'index',
+      <% if Seek::Config.faceted_search_enabled && @ie_support_faceted_browsing %>
+          <%
+             filter_path = url_for(:controller => 'search', :action => 'index',
+                                   :search_query => params[:search_query],
+                                   :search_type => params[:search_type],
+                                   :include_external_search=>params[:include_external_search],
+                                   :filter => true)
+             unfilter_path = url_for(:controller => 'search', :action => 'index',
                                      :search_query => params[:search_query],
                                      :search_type => params[:search_type],
-                                     :include_external_search=>params[:include_external_search]) %>
-          <%= image_tag_for_key('filter', unfilter_path, 'Un-filter result',
-                        {:style => params[:filter] ? 'display: block' : 'display: none'}, 'Un-filter result')  %>
-        </li>
-      </ul>
+                                     :include_external_search=>params[:include_external_search])
+          %>
+          <ul class="sectionIcons">
+            <li>
+              <%= image_tag_for_key('filter', filter_path, 'Filter result',
+                                    {:style => params[:filter] == 'true' ? 'display: none' : 'display: block'}, 'Filter result')  %>
+            </li>
 
-      <% if Seek::Config.faceted_search_enabled && @ie_support_faceted_browsing && params[:filter] %>
-          <%= render :partial => "faceted_browsing/faceted_search" -%>
+            <li>
+              <%= image_tag_for_key('filter', unfilter_path, 'Un-filter result',
+                                    {:style => params[:filter] == 'true' ? 'display: block' : 'display: none'}, 'Un-filter result')  %>
+            </li>
+          </ul>
+          <% if params[:filter] == 'true' %>
+            <%= render :partial => "faceted_browsing/faceted_search" -%>
+          <% else %>
+              <% resource_hash = classify_for_tabs @results -%>
+              <%= render :partial => "assets/resource_listing_tabbed_by_class",
+                         :locals => {:resource_hash => resource_hash,
+                                     :narrow_view => true,
+                                     :authorization_already_done => true} -%>
+          <% end %>
       <% else %>
           <% resource_hash = classify_for_tabs @results -%>
           <%= render :partial => "assets/resource_listing_tabbed_by_class",

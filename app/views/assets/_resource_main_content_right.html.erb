@@ -1,10 +1,11 @@
 <% truncate_length_for_boxes = 22 -%>
 <% versioned_resource ||= resource -%>
 <% creators ||= nil %>
+<% authors_title||=nil %>
 
 <div class="main_content_right_box">
   <% if !creators.nil? || resource.respond_to?("creators") %>
-    <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes,:creators=>creators } -%>
+    <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes,:creators=>creators,:title=>authors_title } -%>
   <% end -%>
 
   <% if resource.class.is_taggable? -%>
@@ -18,7 +19,7 @@
   <% end -%>
 
   
-  <%= render :partial => "assets/resource_scales_box", :locals => { :resource => resource} if resource.respond_to?(:scales)-%>
+  <%= render :partial => "assets/resource_scales_box", :locals => { :resource => resource} if resource.respond_to?(:scales) && show_scales?-%>
 
  <%= render :partial => "assets/usage_info",:locals => { :resource => resource, :versioned_resource=>versioned_resource } -%>
 

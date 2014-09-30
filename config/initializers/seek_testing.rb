@@ -9,6 +9,7 @@ SEEK::Application.configure do
       Settings.defaults[:project_title] = 'The Sysmo Consortium'
 
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
+      Settings.defaults[:support_email_address] = 'support@seek.org'
 
       Settings.defaults[:crossref_api_email] = "sowen@cs.man.ac.uk"
 

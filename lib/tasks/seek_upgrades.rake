@@ -16,6 +16,7 @@ namespace :seek do
       :resynchronise_assay_types,
       :resynchronise_technology_types,
       :remove_invalid_group_memberships,
+      :convert_publication_authors,
       :clear_filestore_tmp,
       :repopulate_auth_lookup_tables,
   ]
@@ -43,6 +44,35 @@ namespace :seek do
     invalid = GroupMembership.select { |gm| gm.person.nil? || gm.work_group.nil? }
     invalid.each do |inv|
       inv.destroy
+    end
+  end
+
+  task(:convert_publication_authors => :environment) do
+    Publication.all.each do |publication|
+      if publication.publication_authors.first
+        unless publication.publication_authors.first.author_index
+          disable_authorization_checks do
+            convert_publication_authors(publication)
+            Publication.record_timestamps = false
+            publication.update_creators_from_publication_authors
+            publication.save!
+            Publication.record_timestamps = true
+          end
+        end
+      end
+    end
+  end
+
+  def convert_publication_authors(publication)
+    puts "publication #{publication.id} needs updating"
+    PublicationAuthorOrder.where(:publication_id => publication.id).each do |publication_author_order|
+      publication_author = publication_author_order.author
+      if publication_author.is_a?(Person)
+        publication_author = PublicationAuthor.new(:publication => publication, :person => publication_author, :author_index => publication_author_order.order)
+      else
+        publication_author.author_index=publication_author_order.order
+      end
+      publication_author.save!
     end
   end
 
@@ -157,7 +187,6 @@ namespace :seek do
         end
       end
     end
-
   end
 
 

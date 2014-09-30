@@ -11,61 +11,37 @@ class Publication < ActiveRecord::Base
   searchable(:auto_index=>false) do
     text :journal,:pubmed_id, :doi, :published_date
     text :publication_authors do
-      publication_authors.compact.map(&:first_name) + publication_authors.compact.map(&:last_name)
+      seek_authors.map(&:person).collect{|p| p.name}
     end
     text :non_seek_authors do
-      non_seek_authors.compact.map(&:first_name) + non_seek_authors.compact.map(&:last_name)
+      non_seek_authors.compact.map(&:first_name) | non_seek_authors.compact.map(&:last_name)
     end
   end if Seek::Config.solr_enabled
 
-
-
   acts_as_asset
 
-  def default_policy
-    policy = Policy.new(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
-    #add managers (authors + contributor)
-    creators.each do |author|
-      policy.permissions << Permissions.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
-    end
-    #Add contributor
-    c = contributor || default_contributor
-    policy.permissions << Permission.create(:contributor => c.person, :policy => policy, :access_type => Policy::MANAGING) if c
-    policy
-  end
+  has_many :publication_authors, :dependent => :destroy, :autosave => true
 
-  validate :check_identifier_present
-  validate :check_uniqueness_of_identifier_within_project, :unless => "Seek::Config.is_virtualliver"
-  validate :check_uniqueness_of_title_within_project, :unless => "Seek::Config.is_virtualliver"
+  has_many :backwards_relationships,
+           :class_name => 'Relationship',
+           :as => :other_object,
+           :dependent => :destroy
 
+  #validation differences between OpenSEEK and the VLN SEEK
   validates_uniqueness_of :pubmed_id , :allow_nil => true, :allow_blank => true, :if => "Seek::Config.is_virtualliver"
   validates_uniqueness_of :doi ,:allow_nil => true, :allow_blank => true, :if => "Seek::Config.is_virtualliver"
   validates_uniqueness_of :title , :if => "Seek::Config.is_virtualliver"
 
-  has_many :publication_authors, :dependent => :destroy, :autosave => true
+  validate :check_uniqueness_of_identifier_within_project, :unless => "Seek::Config.is_virtualliver"
+  validate :check_uniqueness_of_title_within_project, :unless => "Seek::Config.is_virtualliver"
 
-  after_update :update_creators_from_publication_authors , :if => "Seek::Config.is_virtualliver"
-  after_update :update_policy_from_publication_authors , :if=> "false"
+  validate :check_identifier_present
+
+  after_update :update_creators_from_publication_authors
 
   def update_creators_from_publication_authors
-    self.creators = publication_authors.map(&:person).compact
+    self.creators = seek_authors.map(&:person)
   end
-
-  def update_policy_from_publication_authors
-    #Update policy so current authors have manage permissions
-    policy.permissions.clear
-    creators.each do |author|
-      policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
-    end
-    #Add contributor
-   policy.permissions << Permission.create(:contributor => contributor.person, :policy => policy, :access_type => Policy::MANAGING) unless contributor.nil?
-  end
-
-  has_many :backwards_relationships,
-    :class_name => 'Relationship',
-    :as => :other_object,
-    :dependent => :destroy
-
 
   if Seek::Config.events_enabled
     has_and_belongs_to_many :events
@@ -84,9 +60,23 @@ class Publication < ActiveRecord::Base
 
   end
 
-  alias :seek_authors :creators
+  def default_policy
+    policy = Policy.new(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+    #add managers (authors + contributor)
+    creators.each do |author|
+      policy.permissions << Permissions.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
+    end
+    #Add contributor
+    c = contributor || default_contributor
+    policy.permissions << Permission.create(:contributor => c.person, :policy => policy, :access_type => Policy::MANAGING) if c
+    policy
+  end
 
   scope :default_order, order("published_date DESC")
+
+  def seek_authors
+    publication_authors.select{|publication_author| publication_author.person}
+  end
 
   def non_seek_authors
     publication_authors.find_all_by_person_id nil
