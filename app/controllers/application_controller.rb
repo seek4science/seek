@@ -311,15 +311,14 @@ class ApplicationController < ActionController::Base
 
       object = name.camelize.constantize.find(params[:id])
 
+      #remember the location to return to if somebody immediately logs in next
+      store_return_to_location
+
       if is_auth?(object, action)
         eval "@#{name} = object"
         params.delete :sharing unless object.can_manage?(current_user)
       else
         respond_to do |format|
-
-          #remember the location to return to if somebody immediately logs in next
-          store_return_to_location
-
           if User.current_user.nil?
             flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
           else
@@ -327,14 +326,14 @@ class ApplicationController < ActionController::Base
           end
 
           format.html do
-            case action
-              when 'publish'   then redirect_to object
-              when 'manage'   then redirect_to object
-              when 'edit'     then redirect_to object
-              when 'download' then redirect_to object
-              when 'delete' then redirect_to object
-              else                 redirect_to eval "#{self.controller_name}_path"
-            end
+            redirect_path = case action
+                              when 'publish', 'manage', 'edit', 'download', 'delete'
+                                eval("#{self.controller_name.singularize}_path(#{object.id})")
+                              else
+                                eval "#{self.controller_name}_path"
+                            end
+            store_denied_and_redirected_to_location(redirect_path)
+            redirect_to redirect_path
           end
           format.rdf { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
           format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
