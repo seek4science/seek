@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
     t.string   "controller_name"
   end
 
@@ -259,8 +259,8 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.integer "asset_id"
     t.string  "asset_type"
     t.integer "asset_version"
-    t.boolean "is_webpage",                              :default => false
     t.boolean "external_link"
+    t.boolean "is_webpage",                              :default => false
   end
 
   add_index "content_blobs", ["asset_id", "asset_type"], :name => "index_content_blobs_on_asset_id_and_asset_type"
@@ -368,9 +368,9 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.datetime "locked_at"
     t.datetime "failed_at"
     t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "queue"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
@@ -985,9 +985,9 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
     t.string   "uuid"
+    t.integer  "parent_id"
     t.integer  "programme_id"
     t.integer  "ancestor_id"
-    t.integer  "parent_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -1177,9 +1177,9 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.string   "age_at_sampling"
-    t.string   "uuid"
     t.string   "sample_type"
     t.string   "treatment"
+    t.string   "uuid"
     t.integer  "age_at_sampling_unit_id"
   end
 
@@ -1199,11 +1199,11 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
 
   create_table "scales", :force => true do |t|
     t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "key"
     t.integer  "pos",        :default => 1
     t.string   "image_name"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
   end
 
   create_table "scalings", :force => true do |t|
@@ -1211,8 +1211,8 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.integer  "scalable_id"
     t.integer  "person_id"
     t.string   "scalable_type"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "sessions", :force => true do |t|
@@ -1365,8 +1365,8 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.string   "provider_id"
     t.string   "provider_name"
     t.boolean  "is_dummy",               :default => false
-    t.string   "uuid"
     t.string   "age_unit"
+    t.string   "uuid"
   end
 
   create_table "strain_auth_lookup", :id => false, :force => true do |t|
@@ -1644,10 +1644,10 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                            :null => false
-    t.integer  "version",                                  :null => false
+    t.integer  "text_value_id",                          :null => false
+    t.integer  "version",                                :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1657,7 +1657,7 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
   create_table "text_values", :force => true do |t|
     t.integer  "version"
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 2147483647, :null => false
+    t.text     "text",               :limit => 16777215, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1667,6 +1667,8 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
 
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"
@@ -1702,19 +1704,19 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.string   "treatment_protocol"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "sample_id"
     t.integer  "measured_item_id"
     t.float    "start_value"
     t.float    "end_value"
     t.float    "standard_deviation"
     t.text     "comments"
-    t.integer  "compound_id"
+    t.float    "incubation_time"
+    t.integer  "incubation_time_unit_id"
+    t.integer  "sample_id"
     t.integer  "specimen_id"
+    t.integer  "compound_id"
     t.string   "medium_title"
     t.float    "time_after_treatment"
     t.integer  "time_after_treatment_unit_id"
-    t.float    "incubation_time"
-    t.integer  "incubation_time_unit_id"
   end
 
   create_table "units", :force => true do |t|
