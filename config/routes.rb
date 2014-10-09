@@ -293,7 +293,6 @@ SEEK::Application.routes.draw do
       post :convert_to_presentation
       post :update_annotations_ajax
       post :new_version
-      #MERGENOTE - this is a destroy, and should be the destory method, not post since we are not updating or creating something.
       delete :destroy_version
     end
     resources :studied_factors do
