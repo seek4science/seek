@@ -164,7 +164,7 @@ module Seek
 
       #prioritize filename from data_hash
       def get_filename filename_from_data_hash, filename_from_content_blob
-        if filename_from_data_hash != 'download'
+        if !filename_from_data_hash.blank? && filename_from_data_hash != 'download'
           filename = filename_from_data_hash
         elsif filename_from_data_hash == 'download' && !filename_from_content_blob.blank?
           filename = filename_from_content_blob
