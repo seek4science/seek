@@ -34,4 +34,76 @@ class AssetButtonsTest < ActionController::IntegrationTest
     end
   end
 
+  test 'configurable showing as external link when there is no local copy' do
+    pdf_blob_with_local_copy_attrs = {url: 'http://somewhere.com/piccy.pdf', uuid: UUIDTools::UUID.random_create.to_s, data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", "rb").read}
+    pdf_blob_without_local_copy_attrs = {data: nil, url: 'http://somewhere.com/piccy_no_copy.pdf', uuid: UUIDTools::UUID.random_create.to_s}
+    html_blob_attrs = {data: nil, url: "http://www.abc.com", uuid: UUIDTools::UUID.random_create.to_s}
+
+    Seek::Util.inline_viewable_content_types.each do |klass|
+      underscored_type_name = klass.name.underscore
+      human_name = klass.name.humanize
+      item = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy))
+      with_config_value :show_as_external_link_enabled, true do
+        if Seek::Util.multi_files_asset_types.include? klass
+          create_content_blobs item, [pdf_blob_with_local_copy_attrs]
+          assert_download_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
+
+          create_content_blobs item, [pdf_blob_without_local_copy_attrs]
+          assert_link_button "#{underscored_type_name.pluralize}/#{item.id}"
+
+          create_content_blobs item, [pdf_blob_with_local_copy_attrs, pdf_blob_without_local_copy_attrs]
+          assert_download_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
+
+          create_content_blobs item, [html_blob_attrs, pdf_blob_without_local_copy_attrs]
+          assert_neither_download_nor_link_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
+
+        else
+          item.create_content_blob pdf_blob_with_local_copy_attrs
+          assert_download_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
+
+          item.content_blob.destroy
+          item.create_content_blob html_blob_attrs
+          assert_link_button "#{underscored_type_name.pluralize}/#{item.id}"
+
+          item.content_blob.destroy
+          item.create_content_blob pdf_blob_without_local_copy_attrs
+          assert_link_button "#{underscored_type_name.pluralize}/#{item.id}"
+        end
+      end
+    end
+  end
+
+  private
+
+  def create_content_blobs asset, multi_attrs
+    asset.content_blobs.clear
+    multi_attrs.each do |attrs|
+      asset.content_blobs.create attrs
+    end
+  end
+
+  def assert_neither_download_nor_link_button path, human_name
+    get path
+    assert_response :success
+    assert_select "span.icon" do
+      assert_select "a", :text => /Download #{human_name}/i, :count => 0
+      assert_select "a", :text => /Link/i, :count => 0
+    end
+  end
+  def assert_link_button path
+    assert_action_button path, "Link"
+  end
+
+  def assert_download_button path, human_name
+    assert_action_button path, "Download #{human_name}"
+  end
+
+  def assert_action_button path, text
+    get path
+    assert_response :success
+    assert_select "span.icon" do
+      assert_select "a", :text => /#{text}/i
+    end
+  end
+
 end

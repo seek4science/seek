@@ -33,6 +33,7 @@ SEEK::Application.configure do
       Seek::Config.forced_default :programmes_enabled, true
       Seek::Config.forced_default :project_hierarchy_enabled, true
       Seek::Config.forced_default :tabs_lazy_load_enabled, false
+      Seek::Config.forced_default :show_as_external_link_enabled, false
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'SEEK'
