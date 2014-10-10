@@ -1,8 +1,8 @@
 language: ruby
 bundler_args: --without production
+addons:
+  postgresql: "9.3"
 rvm:
-  - 1.9.3
-  - 2.1.2
   - 2.1.3
 env:
   - SUITE="rake test:units"
@@ -11,6 +11,8 @@ env:
   - SUITE="rspec spec"
 before_install:
   - bundle config build.nokogiri --use-system-libraries
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
 script:
   - mv config/database.travis.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create

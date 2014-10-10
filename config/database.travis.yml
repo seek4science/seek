@@ -1,4 +1,4 @@
 test:
-  adapter: mysql2
-  database: seek_test
-  username: travis
+  adapter: postgresql
+  database: travis_ci_test
+  username: postgres
