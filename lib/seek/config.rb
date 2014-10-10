@@ -348,6 +348,7 @@ module Seek
       :tagline_prefix,
       :biosamples_enabled,:events_enabled,:modelling_analysis_enabled,:organisms_enabled,:models_enabled,:forum_enabled,:jerm_enabled,:email_enabled,:jws_enabled,:external_search_enabled,:piwik_analytics_enabled,
       :seek_video_link, :scales, :delete_asset_version_enabled, :recaptcha_enabled, :project_hierarchy_enabled, :tabs_lazy_load_enabled,#putting vl settings on their own line to simplify merges
+      :show_as_external_link_enabled,
       :admin_impersonation_enabled, :auth_lookup_enabled, :sample_parent_term,:specimen_culture_starting_date,:sample_age,:specimen_creators, :sample_parser_enabled,
       :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,
       :sample_parser_enabled,:guide_box_enabled,:treatments_enabled, :factors_studied_enabled,:experimental_conditions_enabled,:documentation_enabled,:tagging_enabled,

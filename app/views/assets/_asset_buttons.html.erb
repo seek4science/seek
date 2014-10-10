@@ -1,30 +1,21 @@
 
 <% if asset.is_downloadable? -%>
-    <% display_asset = asset.find_version(version) %>
     <%# param code is used for temporary link -%>
-
         <%
+           display_asset = asset.find_version(version)
            path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])
-           link_url =  try_block{display_asset.content_blob.url} || try_block{ display_asset.content_blobs.first.url}
         %>
     <% if can_download_asset?(asset, params[:code]) -%>
         <% if display_asset.contains_downloadable_items? %>
             <li>
-              <%= image_tag_for_key('download', path, "Download #{human_name}", nil, "Download #{human_name}") -%>
+              <%= download_or_link_button display_asset, path, display_asset.single_content_blob.try(:url), human_name %>
             </li>
             <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
                 <li>
                   <%= image_tag_for_key('spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code => params[:code]), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
                 </li>
             <% end -%>
-            <% unless Seek::Util.multi_files_asset_types.include?(asset.class) && (display_asset.content_blobs.count > 1) %>
-                <% content_blob = display_asset.respond_to?(:content_blobs) ? display_asset.content_blobs.first : display_asset.content_blob %>
-                <%= render :partial => "assets/view_content", :locals => {:content_blob => content_blob, :button_style => true} -%>
-            <% end %>
-        <% elsif !(Seek::Util.multi_files_asset_types.include?(asset.class) && (display_asset.content_blobs.count > 1)) %>
-            <li>
-              <%= image_tag_for_key('download', link_url, "Link", {:target => 'blank'}, "Link") -%>
-            </li>
+            <%= view_content_button display_asset %>
         <% end %>
     <% end -%>
     <% if logged_in? && !can_download_asset?(asset, params[:code]) %>

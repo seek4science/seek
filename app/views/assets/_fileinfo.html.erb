@@ -1,5 +1,5 @@
 <div class='fileinfo'>
-<% if fileinfo.is_webpage? -%>
+<% if fileinfo.show_as_external_link?  -%>
     <% if fileinfo.asset.can_download? %>
         <p>
           <b>Link:</b>

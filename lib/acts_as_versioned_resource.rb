@@ -66,14 +66,21 @@ module Acts #:nodoc:
       def scales
         self.parent.scales
 
-      end 
+      end
       def contains_downloadable_items?
+        !all_content_blobs.compact.select{|blob| !blob.is_webpage?}.empty?
+      end
+
+      def all_content_blobs
         blobs = []
         blobs << self.content_blob if self.respond_to?(:content_blob)
         blobs = blobs | self.content_blobs if self.respond_to?(:content_blobs)
-        !blobs.compact.select{|blob| !blob.is_webpage?}.empty?
+        blobs
       end
 
+      def single_content_blob
+        all_content_blobs.size == 1 ? all_content_blobs.first : nil
+      end
       #returns a list of the people that can manage this file
       #which will be the contributor, and those that have manage permissions
       def managers

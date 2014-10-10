@@ -70,6 +70,13 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
+  def show_as_external_link?
+    if Seek::Config.show_as_external_link_enabled
+      !url.blank? && !file_exists?
+    else
+      is_webpage? || content_type == "text/html"
+    end
+  end
   #include all image types
   def is_image?
     self.content_type.nil?? false : self.content_type.index('image')== 0
