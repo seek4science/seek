@@ -351,7 +351,7 @@ module AssetsHelper
   def download_or_link_button asset, download_path, link_url, human_name=nil
     download_button = image_tag_for_key('download', download_path, "Download #{human_name}", nil, "Download #{human_name}")
     link_button_or_nil = link_url ? image_tag_for_key('download', link_url, "Link", {:target => 'blank'}, "Link") : nil
-    return asset.content_blob.show_as_external_link? ? link_button : download_button if asset.respond_to?(:content_blob)
+    return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob)
     return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ? download_button : link_button_or_nil if asset.respond_to?(:content_blobs)
   end
 
