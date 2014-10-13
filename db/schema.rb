@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141013090204) do
+ActiveRecord::Schema.define(:version => 20141013102857) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -290,7 +290,7 @@ ActiveRecord::Schema.define(:version => 20141013090204) do
     t.boolean "can_delete",   :default => false
   end
 
-  add_index "data_file_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_data_file_auth_lookup_on_user_id_and_asset_id_and_can_view"
+  add_index "data_file_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_data_file_auth_lookup_user_asset_view"
   add_index "data_file_auth_lookup", ["user_id", "can_view"], :name => "index_data_file_auth_lookup_on_user_id_and_can_view"
 
   create_table "data_file_versions", :force => true do |t|
@@ -313,7 +313,7 @@ ActiveRecord::Schema.define(:version => 20141013090204) do
     t.string   "template_name",                  :default => "none"
   end
 
-  add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_on_contributor_id_and_contributor_type"
+  add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_contributor"
   add_index "data_file_versions", ["data_file_id"], :name => "index_data_file_versions_on_data_file_id"
 
   create_table "data_file_versions_projects", :id => false, :force => true do |t|
@@ -608,7 +608,7 @@ ActiveRecord::Schema.define(:version => 20141013090204) do
     t.integer "investigation_id"
   end
 
-  add_index "investigations_projects", ["investigation_id", "project_id"], :name => "index_investigations_projects_on_investigation_id_and_project_id"
+  add_index "investigations_projects", ["investigation_id", "project_id"], :name => "index_investigations_projects_inv_proj_id"
   add_index "investigations_projects", ["project_id"], :name => "index_investigations_projects_on_project_id"
 
   create_table "mapping_links", :force => true do |t|
@@ -915,7 +915,7 @@ ActiveRecord::Schema.define(:version => 20141013090204) do
     t.integer "presentation_id"
   end
 
-  add_index "presentations_projects", ["presentation_id", "project_id"], :name => "index_presentations_projects_on_presentation_id_and_project_id"
+  add_index "presentations_projects", ["presentation_id", "project_id"], :name => "index_presentations_projects_pres_proj_id"
   add_index "presentations_projects", ["project_id"], :name => "index_presentations_projects_on_project_id"
 
   create_table "programmes", :force => true do |t|
