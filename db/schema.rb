@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140916130030) do
+ActiveRecord::Schema.define(:version => 20141013090204) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -250,7 +250,6 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
   end
 
   create_table "content_blobs", :force => true do |t|
-    t.binary  "data_old",          :limit => 2147483647
     t.string  "md5sum"
     t.string  "url"
     t.string  "uuid"
@@ -259,7 +258,7 @@ ActiveRecord::Schema.define(:version => 20140916130030) do
     t.integer "asset_id"
     t.string  "asset_type"
     t.integer "asset_version"
-    t.boolean "is_webpage",                              :default => false
+    t.boolean "is_webpage",        :default => false
     t.boolean "external_link"
   end
 
