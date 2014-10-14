@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141013104844) do
+ActiveRecord::Schema.define(:version => 20141013102857) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -353,6 +353,10 @@ ActiveRecord::Schema.define(:version => 20141013104844) do
 
   add_index "data_files_projects", ["data_file_id", "project_id"], :name => "index_data_files_projects_on_data_file_id_and_project_id"
   add_index "data_files_projects", ["project_id"], :name => "index_data_files_projects_on_project_id"
+
+  create_table "db_files", :force => true do |t|
+    t.binary "data", :limit => 2147483647
+  end
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
