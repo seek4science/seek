@@ -7,14 +7,14 @@ rvm:
 env:
   - SUITE="rake test:units"
   - SUITE="rake test:functionals"
-  - SUITE="rake test:integration"
-  - SUITE="rspec spec"
+  - DB_TYPE=mysql
+  - DB_TYPE=postgres
 before_install:
   - bundle config build.nokogiri --use-system-libraries
 before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+  - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test;' -U postgres; fi"
 script:
-  - mv config/database.travis.yml config/database.yml
+  - mv config/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
   - RAILS_ENV=test bundle exec rake db:schema:load
   - bundle exec $SUITE
