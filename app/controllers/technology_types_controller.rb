@@ -34,7 +34,6 @@ class TechnologyTypesController < ApplicationController
       end
       assays = Assay.where(technology_type_uri: uris)
       @assays = Assay.authorize_asset_collection(assays,"view")
-      @uris = uris
     end
   end
 
