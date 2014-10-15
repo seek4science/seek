@@ -82,6 +82,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal 3,result.publication_type
     assert_equal "Prediction with Confidence Based on a Random Forest Classifier",result.title
     assert_equal 2,result.authors.size
+    assert_equal "IFIP Advances in Information and Communication Technology 339 : 37", result.citation
     last_names = ["Devetyarov","Nouretdinov"]
     result.authors.each do |auth|
       assert last_names.include? auth.last_name
