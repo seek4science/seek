@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141014124733) do
+ActiveRecord::Schema.define(:version => 20141015162033) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1487,11 +1487,11 @@ ActiveRecord::Schema.define(:version => 20141014124733) do
   create_table "sweep_auth_lookup", :force => true do |t|
     t.integer "user_id"
     t.integer "asset_id"
-    t.integer "can_view",     :limit => 1
-    t.integer "can_manage",   :limit => 1
-    t.integer "can_edit",     :limit => 1
-    t.integer "can_download", :limit => 1
-    t.integer "can_delete",   :limit => 1
+    t.boolean "can_view"
+    t.boolean "can_manage"
+    t.boolean "can_edit"
+    t.boolean "can_download"
+    t.boolean "can_delete"
   end
 
   create_table "sweeps", :force => true do |t|
@@ -1555,11 +1555,11 @@ ActiveRecord::Schema.define(:version => 20141014124733) do
   create_table "taverna_player_run_auth_lookup", :force => true do |t|
     t.integer "user_id"
     t.integer "asset_id"
-    t.integer "can_view",     :limit => 1
-    t.integer "can_manage",   :limit => 1
-    t.integer "can_edit",     :limit => 1
-    t.integer "can_download", :limit => 1
-    t.integer "can_delete",   :limit => 1
+    t.boolean "can_view"
+    t.boolean "can_manage"
+    t.boolean "can_edit"
+    t.boolean "can_download"
+    t.boolean "can_delete"
   end
 
   create_table "taverna_player_run_ports", :force => true do |t|
@@ -1760,11 +1760,11 @@ ActiveRecord::Schema.define(:version => 20141014124733) do
   create_table "workflow_auth_lookup", :force => true do |t|
     t.integer "user_id"
     t.integer "asset_id"
-    t.integer "can_view",     :limit => 1
-    t.integer "can_manage",   :limit => 1
-    t.integer "can_edit",     :limit => 1
-    t.integer "can_download", :limit => 1
-    t.integer "can_delete",   :limit => 1
+    t.boolean "can_view"
+    t.boolean "can_manage"
+    t.boolean "can_edit"
+    t.boolean "can_download"
+    t.boolean "can_delete"
   end
 
   create_table "workflow_categories", :force => true do |t|
