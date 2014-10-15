@@ -13,11 +13,11 @@ class ProjectTest < ActiveSupport::TestCase
     wg.people=[]
     wg.save!
     User.current_user = Factory(:admin).user
-    p.destroy
-    
+    assert_difference("WorkGroup.count",-1) do
+      p.destroy
+    end
+
     assert_equal nil,WorkGroup.find_by_id(wg.id)
-    wg=WorkGroup.all.first
-    assert_same 1,wg.project_id
   end
 
   test "to_rdf" do
@@ -468,7 +468,7 @@ class ProjectTest < ActiveSupport::TestCase
 
     assert_equal 2,p2.work_groups.size
 
-    assert_equal p.institutions,p2.institutions
+    assert_equal p.institutions.sort,p2.institutions.sort
     assert_equal p.people,p2.people
     assert_equal 3,p2.people.size
 
@@ -515,7 +515,7 @@ class ProjectTest < ActiveSupport::TestCase
     p2.reload
     assert_equal 5,p2.people.count
     assert_equal 2,p2.work_groups.count
-    refute_equal p.work_groups,p2.work_groups
+    refute_equal p.work_groups.sort,p2.work_groups.sort
     assert_equal p.people,p2.people
   end
 
