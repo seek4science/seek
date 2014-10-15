@@ -119,11 +119,15 @@ SEEK::Application.configure do
   #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
   Seek::Config.forced_default :scales,["organism","liver","liverLobule","intercellular","cell"]
 
+  # Admin setting to allow user impersonation, useful for debugging
+  Seek::Config.default :admin_impersonation_enabled, false
+
   #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
   Seek::Config.forced_default :magic_guest_enabled,false
 
   Seek::Config.forced_default :recaptcha_enabled, true
 
+  #MERGENOTE - remove this from config and replace with alternative partial
   Seek::Config.forced_default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
 
   Seek::Config.fixed :css_prepended,''
