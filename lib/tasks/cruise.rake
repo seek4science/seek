@@ -8,7 +8,7 @@ require 'rspec/core/rake_task'
 
 "Cruise task for running with .rvm via ./script/build-cruise.sh"
 task :cruise do |t,args|
-  FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")
+  FileUtils.copy(Dir.pwd+"/test/database.cc.yml", Dir.pwd+"/config/database.yml")
 
   begin
     Rake::Task["db:drop:all"].invoke

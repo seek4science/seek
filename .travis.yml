@@ -14,7 +14,7 @@ before_install:
 before_script:
   - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test;' -U postgres; fi"
 script:
-  - mv config/database.travis.$DB_TYPE.yml config/database.yml
+  - cp test/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
   - RAILS_ENV=test bundle exec rake db:schema:load
   - bundle exec $SUITE
