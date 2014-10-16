@@ -106,6 +106,7 @@ SEEK::Application.routes.draw do
       post :forgot_password
       post :hide_guide_box
       post :impersonate
+      post :cancel_registration
     end
     member do
       put :set_openid

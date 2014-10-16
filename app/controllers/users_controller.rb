@@ -2,9 +2,10 @@ class UsersController < ApplicationController
     
   before_filter :is_current_user_auth, :only=>[:edit, :update]  
   before_filter :is_user_admin_auth, :only => [:impersonate]
+
   skip_before_filter :restrict_guest_user
   skip_before_filter :project_membership_required
-  skip_before_filter :profile_for_login_required,:only=>[:update]
+  skip_before_filter :profile_for_login_required,:only=>[:update,:cancel_registration]
   
   # render new.rhtml
   def new
@@ -23,6 +24,15 @@ class UsersController < ApplicationController
       check_registration
     end
 
+  end
+
+  def cancel_registration
+    user = User.current_user
+    if user && !user.person
+      logout_user
+      user.destroy
+    end
+    redirect_to main_app.root_path
   end
 
   def set_openid
