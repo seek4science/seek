@@ -174,6 +174,33 @@ and the <em>db:migrate</em> rake task. Using seek:upgrade should still
 work, but could take a lot of unnecessary time. There is more details and
 an example towards the end of the this page.</p>
 
+<h2 id="label-Steps+to+upgrade+from+0.20.x+to+0.21.x">Steps to upgrade from 0.20.x to 0.21.x</h2>
+
+<p>if using rvm do:</p>
+
+<pre>rvm get stable
+rvm install ruby-2.1.3
+
+export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
+
+./script/delayed_job stop
+bundle exec rake sunspot:solr:stop
+hg pull https://bitbucket.org/seek4science/seek -r v0.21.0
+hg update # only if no other changes have been made to your local version, if you get an error ignore it and do merge
+hg merge # only required if you&#39;ve made changes since installing. If you have, you may need to deal with conflicts.
+hg commit -m &quot;merged&quot; # likewise - only required if you made changes since installing
+bundle install --deployment
+bundle exec rake seek:upgrade</pre>
+
+<p>The mechanism to start, stop and restart the delayed-job process has now
+changed you you should use the rake task
+seek:workers:&lt;start|stop|restart|status&gt;, e.g</p>
+
+<pre>bundle exec rake seek:workers:start</pre>
+
+<p>there is a new init.d script for this described at <a
+href="https://gist.github.com/e4219ec7cb161129f1c7">gist.github.com/e4219ec7cb161129f1c7</a></p>
+
 <h2 id="label-Steps+to+upgrade+from+0.19.x+to+0.20.x">Steps to upgrade from 0.19.x to 0.20.x</h2>
 
 <p>Start the upgrade following the standard steps:</p>
