@@ -48,15 +48,19 @@
       </p>
 
       <%= fields_for(@data_file) {|f|render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
-      
-        <p>
-            <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file} -%>
-        </p>
-      <p>
-        <% if Seek::Config.events_enabled -%>
-            <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
-        <% end -%>
-      </p>
+
+      <% if Seek::Config.assays_enabled %>
+          <p>
+            <%= render :partial => "assays/associate_assays", :locals => {:resource => @data_file} -%>
+          </p>
+      <% end %>
+
+      <% if Seek::Config.events_enabled %>
+          <p>
+            <%= render :partial => "assets/associate_event", :locals => {:resource => @data_file} -%>
+          </p>
+      <% end -%>
+
       <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@data_file} %>
 
 

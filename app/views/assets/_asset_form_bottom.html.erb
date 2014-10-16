@@ -14,6 +14,7 @@
    related_publications||=[]
    other_creators||=nil
    show_publications=true if show_publications.nil?
+   show_publications = show_publications && Seek::Config.publications_enabled
    taggable = resource_type.constantize.is_taggable?
    sharing_enable=true if sharing_enable.nil?
    attribution_enable=true if attribution_enable.nil?

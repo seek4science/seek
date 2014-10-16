@@ -346,7 +346,7 @@ module Seek
       :google_analytics_tracker_id,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
       :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:blacklisted_feeds,:is_virtualliver, :sabiork_ws_base_url,:filestore_path,
       :tagline_prefix,
-      :biosamples_enabled,:events_enabled,:modelling_analysis_enabled,:organisms_enabled,:models_enabled,:forum_enabled,:jerm_enabled,:email_enabled,:jws_enabled,:external_search_enabled,:piwik_analytics_enabled,
+      :biosamples_enabled,:events_enabled,:modelling_analysis_enabled,:organisms_enabled,:models_enabled,:assays_enabled, :publications_enabled,:forum_enabled,:jerm_enabled,:email_enabled,:jws_enabled,:external_search_enabled,:piwik_analytics_enabled,
       :seek_video_link, :scales, :delete_asset_version_enabled, :recaptcha_enabled, :project_hierarchy_enabled, :tabs_lazy_load_enabled,#putting vl settings on their own line to simplify merges
       :admin_impersonation_enabled, :auth_lookup_enabled, :sample_parent_term,:specimen_culture_starting_date,:sample_age,:specimen_creators, :sample_parser_enabled,
       :publish_button_enabled,:project_browser_enabled, :experimental_features_enabled, :pdf_conversion_enabled,:admin_impersonation_enabled, :auth_lookup_enabled,

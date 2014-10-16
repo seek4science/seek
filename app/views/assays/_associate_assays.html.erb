@@ -1,5 +1,6 @@
 <%
     return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
+    return unless Seek::Config.assays_enabled
 
     show_relationships = resource.is_a?(DataFile)
     resource_text ||= text_for_resource(resource)
@@ -42,6 +43,7 @@
       add_new_assay_title = ""
     end
 %>
+
 
 <div class="fold">
 

@@ -10,8 +10,8 @@ module ApplicationHelper
   include Recaptcha::ClientHelper
 
 
-  def index_title
-    show_title(self.controller_name.humanize.capitalize)
+  def index_title title=nil
+    show_title(title || self.controller_name.humanize.capitalize)
   end
 
   def is_front_page?
