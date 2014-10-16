@@ -47,11 +47,10 @@ class AssayTypesController < ApplicationController
         uris = ([@type_class] +@type_class.children).map(&:uri)
       else
         uris=@type_class.flatten_hierarchy.collect { |o| o.uri.to_s }
-        uris |= SuggestedAssayType.where(:parent_uri=>@type_class.uri.to_s)
+        uris |= SuggestedAssayType.where(:parent_uri=>@type_class.uri.to_s).map(&:uri)
       end
-        assays = Assay.where(assay_type_uri: uris)
-        @assays = Assay.authorize_asset_collection(assays, "view")
-        @uris = uris
+      assays = Assay.where(assay_type_uri: uris)
+      @assays = Assay.authorize_asset_collection(assays, "view")
     end
   end
 

@@ -117,5 +117,6 @@ group :test do
   gem 'coveralls', require: false
   gem 'rspec-rails'
   gem 'sunspot_matchers'
+  gem 'pg'
 end
 

@@ -95,7 +95,6 @@ class ContentBlob < ActiveRecord::Base
     return @tmp_io_object unless @tmp_io_object.nil?
     return StringIO.new(@data) unless @data.nil? 
     return File.open(filepath,"rb") if file_exists?
-    return StringIO.new(data_old) unless data_old.nil?
     return nil
   end
   
@@ -202,7 +201,6 @@ class ContentBlob < ActiveRecord::Base
   
   def dump_data_object_to_file
     data_to_save = @data
-    data_to_save ||= self.data_old
     
     if !data_to_save.nil?
       File.open(filepath,"wb+") do |f|

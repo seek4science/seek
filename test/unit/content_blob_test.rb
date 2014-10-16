@@ -118,7 +118,6 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob=ContentBlob.new(:data=>pic.data_io_object.read,:original_filename=>"piccy.jpg")
     blob.save!
     blob=ContentBlob.find(blob.id)
-    assert_nil blob.data_old
     assert_equal data_for_test('file_picture.png'),blob.data_io_object.read
 
     assert_not_nil blob.filepath
