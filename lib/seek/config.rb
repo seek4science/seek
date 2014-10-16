@@ -265,10 +265,6 @@ module Seek
       Settings.defaults[setting]=value
     end
 
-    #forced default is equivalent to default, it is only used to differentiate variables NOT able to be reset by admins with SEEK UI.
-    # i.e. these variables are always set with values in seek configuration file.
-    alias_method :forced_default, :default
-
     #unlike default, always sets the value
     def fixed setting,value
       setter="#{setting.to_s}="

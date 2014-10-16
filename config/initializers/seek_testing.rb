@@ -2,7 +2,7 @@
 SEEK::Application.configure do
   if Rails.env.test?
     silence_warnings do
-      Seek::Config.forced_default :is_virtualliver, false
+      Settings.defaults[:is_virtualliver] = false
       Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:application_title] = 'The Sysmo SEEK'
       Settings.defaults[:project_name] = 'Sysmo'
@@ -47,9 +47,9 @@ SEEK::Application.configure do
       Settings.defaults[:header_image] = 'sysmo-db-logo_smaller.png'
       Settings.defaults[:bioportal_api_key]="fish"
 
-      Seek::Config.forced_default :technology_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
-      Seek::Config.forced_default :modelling_analysis_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
-      Seek::Config.forced_default :assay_type_ontology_file, "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Settings.defaults[:technology_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Settings.defaults[:modelling_analysis_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
+      Settings.defaults[:assay_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
 
       Seek::Config.fixed :css_prepended,''
       Seek::Config.fixed :css_appended,''
@@ -63,9 +63,9 @@ SEEK::Application.configure do
       ActionView::Renderer.clear_alternative({:controller=>:people,:seek_partial=>"general/items_related_to"})
 
 
-      Seek::Config.forced_default :faceted_browsing_enabled, false
-      Seek::Config.forced_default :facet_enable_for_pages, {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
-      Seek::Config.forced_default :faceted_search_enabled,  false
+      Settings.defaults[:faceted_browsing_enabled] = false
+      Settings.defaults[:facet_enable_for_pages] = {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
+      Settings.defaults[:faceted_search_enabled] =  false
 
       #enable solr for testing, but use mockup sunspot session
       Seek::Config.solr_enabled = true
