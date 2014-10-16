@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141015162033) do
+ActiveRecord::Schema.define(:version => 20141016093319) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -249,7 +249,7 @@ ActiveRecord::Schema.define(:version => 20141015162033) do
     t.datetime "updated_at"
   end
 
-  create_table "content_blobs", :force => true do |t|    
+  create_table "content_blobs", :force => true do |t|
     t.string  "md5sum"
     t.string  "url"
     t.string  "uuid"
@@ -1494,6 +1494,9 @@ ActiveRecord::Schema.define(:version => 20141015162033) do
     t.boolean "can_delete"
   end
 
+  add_index "sweep_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sweep_auth_lookup_on_user_id_and_asset_id_and_can_view"
+  add_index "sweep_auth_lookup", ["user_id", "can_view"], :name => "index_sweep_auth_lookup_on_user_id_and_can_view"
+
   create_table "sweeps", :force => true do |t|
     t.string   "name"
     t.integer  "contributor_id"
@@ -1561,6 +1564,10 @@ ActiveRecord::Schema.define(:version => 20141015162033) do
     t.boolean "can_download"
     t.boolean "can_delete"
   end
+
+  add_index "taverna_player_run_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "tav_player_run_user_asset_view_index"
+  add_index "taverna_player_run_auth_lookup", ["user_id", "can_view"], :name => "index_taverna_player_run_auth_lookup_on_user_id_and_can_view"
+  add_index "taverna_player_run_auth_lookup", ["user_id", "can_view"], :name => "tav_player_run_user_view_index"
 
   create_table "taverna_player_run_ports", :force => true do |t|
     t.string   "name"
@@ -1667,8 +1674,6 @@ ActiveRecord::Schema.define(:version => 20141015162033) do
     t.datetime "updated_at"
   end
 
-  add_index "tissue_and_cell_types", ["title"], :name => "title", :unique => true
-
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"
     t.integer  "user_id"
@@ -1768,6 +1773,9 @@ ActiveRecord::Schema.define(:version => 20141015162033) do
     t.boolean "can_download"
     t.boolean "can_delete"
   end
+
+  add_index "workflow_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_workflow_auth_lookup_on_user_id_and_asset_id_and_can_view"
+  add_index "workflow_auth_lookup", ["user_id", "can_view"], :name => "index_workflow_auth_lookup_on_user_id_and_can_view"
 
   create_table "workflow_categories", :force => true do |t|
     t.string "name"
