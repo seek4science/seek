@@ -253,5 +253,9 @@ class Assay < ActiveRecord::Base
     organisms.collect{|o| o.searchable_terms}.flatten
   end
 
+  def self.user_creatable?
+    Seek::Config.assays_enabled
+  end
+
 
 end
