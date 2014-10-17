@@ -31,6 +31,8 @@ SEEK::Application.configure do
       Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:workflows_enabled] = true
       Settings.defaults[:assays_enabled] = true
+      Settings.defaults[:models_enabled] = true
+      Settings.defaults[:biosamples_enabled] = true
       Settings.defaults[:publications_enabled] = true
       Settings.defaults[:programmes_enabled] = true
       Settings.defaults[:project_hierarchy_enabled] = true
