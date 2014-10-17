@@ -1,5 +1,4 @@
 
-<% @search_query=t('search_prompt') unless @search_query %>
 <% @search_type="All" unless @search_type %>
 
 
@@ -10,7 +9,7 @@
   <%= form_tag main_app.search_path do -%>
     <div id="search_box">
       <span id='search_label'><%= t('search_label')%></span>
-      <%= text_field_tag :search_query, @search_query, :onclick => "clickclear(this, '#{t('search_prompt')}')", :onblur => "clickrecall(this, '#{t('search_prompt')}')" ,:class=>"curved", :style=>"display:none;"-%>
+      <%= text_field_tag :search_query, @search_query, :class=>"curved", :style=>"display:none;", :placeholder=>"Search here..." %>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
       <% if show_scales? && Seek::Config.is_virtualliver %>
         <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])) %>
