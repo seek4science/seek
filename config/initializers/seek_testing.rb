@@ -29,11 +29,14 @@ SEEK::Application.configure do
       Settings.defaults[:tagging_enabled] = true
       Settings.defaults[:authorization_checks_enabled] = true
       Settings.defaults[:magic_guest_enabled] = false
+      Settings.defaults[:modelling_analysis_enabled] = true
       Settings.defaults[:workflows_enabled] = true
       Settings.defaults[:assays_enabled] = true
       Settings.defaults[:models_enabled] = true
       Settings.defaults[:biosamples_enabled] = true
       Settings.defaults[:publications_enabled] = true
+      Settings.defaults[:factors_studied_enabled] = true
+      Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programmes_enabled] = true
       Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:tabs_lazy_load_enabled] = false
