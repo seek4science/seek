@@ -5,18 +5,17 @@ module TavernaPlayer#
         extend ActiveSupport::Concern
 
         included do
-          attr_accessor :data_file_id
           attr_accessible :data_file_id
           before_save :assign_data_file_content
-          #belongs_to :data_file
+          belongs_to :data_file
         end
-
 
         def assign_data_file_content
           unless data_file_id.blank?
             df = DataFile.find(data_file_id)
             File.open(df.content_blob.filepath) do |f|
               self.file = f
+              self.data_file_version=df.version
             end
           end
         end

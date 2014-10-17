@@ -30,8 +30,8 @@
         <%= input_fields.file_field :file %>
       </div>
       <div class="file_input">
-        Or select a data file...</br/>
-        <%= input_fields.select :data_file_id,input_fields.object.suitable_data_files.map{|df| [df.title,df.id]},:prompt=>"Select #{t('data_file')}" %>
+        Or select a <%= t('data_file').downcase %>...</br/>
+        <%= input_fields.select :data_file_id,input_fields.object.suitable_data_files.map{|df| [df.title,df.id]},:prompt=>"Select a #{t('data_file').downcase}" %>
       </div>
       <div style="clear:both"></div>
     <% end %>
