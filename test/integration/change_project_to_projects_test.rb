@@ -22,7 +22,6 @@ class ChangeProjectToProjectsTest < ActionController::IntegrationTest
   test 'choosing my project in the sharing form adds permissions for each project' do
     #publications are skipped, because they don't have a sharing form
     ASSETS_WITH_MULTIPLE_PROJECTS.reject { |t| t=='publications' }.each do |type_name|
-      pp type_name
       item = Factory(type_name.singularize.to_sym, :contributor => User.current_user)
 
       item.projects = [Factory(:project), Factory(:project)]
