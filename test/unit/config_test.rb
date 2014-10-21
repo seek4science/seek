@@ -22,6 +22,12 @@ class ConfigTest < ActiveSupport::TestCase
     end
   end
 
+  test "read setting attributes" do
+    attributes = Seek::Config.read_setting_attributes
+    refute attributes.empty?
+    assert_include attributes,:events_enabled
+  end
+
   test 'project_hierarchy_enabled' do
     with_config_value 'project_hierarchy_enabled', true do
       assert_equal true, Seek::Config.project_hierarchy_enabled

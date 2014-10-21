@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141016093319) do
+ActiveRecord::Schema.define(:version => 20141017125035) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1582,6 +1582,8 @@ ActiveRecord::Schema.define(:version => 20141016093319) do
     t.datetime "file_updated_at"
     t.integer  "depth",             :default => 0
     t.text     "metadata"
+    t.integer  "data_file_id"
+    t.integer  "data_file_version"
   end
 
   add_index "taverna_player_run_ports", ["run_id", "name"], :name => "index_taverna_player_run_ports_on_run_id_and_name"

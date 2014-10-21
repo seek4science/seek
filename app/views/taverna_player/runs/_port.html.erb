@@ -12,7 +12,13 @@
        mime_type = port.depth == 0 ? port.metadata[:type] : "(list of depth #{port.depth})"
      end
   %>
+
   <%= "<span class='mime_type'>(#{mime_type})</span>".html_safe unless mime_type.blank? %>
+
+  <% if port.respond_to?(:data_file) && port.data_file %>
+      .. originating from the <%= t('data_file').downcase %> <%= link_to port.data_file.title,main_app.data_file_path(port.data_file,:version=>port.data_file_version) %>.
+  <% end %>
+
   <ul class="sectionIcons" style="font-weight: normal; vertical-align:middle; text-align:right; position:relative; top:-15px; /* ugly, but necessary relative positioning */">
     <li><%= render :partial => "download_link", :locals => { :download_link_name => "Download value",
                                                              :download_url => download_url } %></li>

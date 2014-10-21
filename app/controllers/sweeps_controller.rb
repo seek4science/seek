@@ -45,6 +45,7 @@ class SweepsController < ApplicationController
   end
 
   def create
+
     @sweep = Sweep.new(params[:sweep])
     @workflow = @sweep.workflow
     @workflow_version = @workflow.find_version(@sweep.workflow_version)
