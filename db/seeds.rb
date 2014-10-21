@@ -1,1 +1,1 @@
-seeds.rb-openseek
+seeds.rb-biovel
