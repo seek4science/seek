@@ -18,6 +18,11 @@ module ApplicationHelper
     current_page?(main_app.root_url)
   end
 
+  #turns the object name from a form builder, in the equivalent id
+  def sanitized_object_name object_name
+    object_name.gsub(/\]\[|[^-a-zA-Z0-9:.]/, "_").sub(/_$/, "")
+  end
+
   def seek_stylesheet_tags main='application'
     css = (Seek::Config.css_prepended || "").split(",")
     css << main
