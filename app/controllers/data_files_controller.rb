@@ -323,14 +323,15 @@ class DataFilesController < ApplicationController
   def data
     @data_file =  DataFile.find(params[:id])
     sheet = params[:sheet] || 1
-    trim = params[:trim]
-    trim ||= false
-    if !(["xls","xlsx"] & (mime_extensions(@data_file.content_blob.content_type))).empty?
-
+    trim = params[:trim] || false
+    content_blob = @data_file.content_blob
+    mime_extensions = mime_extensions(content_blob.content_type)
+    if !(["xls","xlsx"] & mime_extensions).empty?
       respond_to do |format|
+        file = open(content_blob.filepath)
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
-        format.xml {render :xml=>spreadsheet_to_xml(open(@data_file.content_blob.filepath)) }
-        format.csv {render :text=>spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet,trim) }
+        format.xml {render :xml=>spreadsheet_to_xml(file) }
+        format.csv {render :text=>spreadsheet_to_csv(file,sheet,trim) }
       end
     else
       respond_to do |format|
