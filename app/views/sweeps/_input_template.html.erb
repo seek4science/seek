@@ -15,6 +15,8 @@
        options = options_for_select(data_files.map{|df| [df.title,df.id]})
     %>
     <%= select_tag "{{name_prefix}}[data_file_id]",options,:prompt=>"Select a #{t('data_file').downcase}", :id=>"{{id_prefix}}_data_file_id" %>
+    <%= render :partial=>"taverna_player/runs/data_preview",:locals=>{:id_prefix=>"{{id_prefix}}"} -%>
+
   </div>
   <div style="clear:both"></div>
 </div>

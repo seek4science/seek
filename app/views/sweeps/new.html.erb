@@ -1,3 +1,4 @@
+<%= javascript_include_tag :sweeps,:runs %>
 <%
    workflow_title = @workflow_version.title
    data_input_names = @workflow_version.data_input_ports.map { |input| input.name }
@@ -122,5 +123,4 @@
     </div>
   <% end %>
 
-  <%= javascript_include_tag 'sweeps.js' %>
 </div>

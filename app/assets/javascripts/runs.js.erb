@@ -1,0 +1,34 @@
+function bind_data_select_to_fetch_preview(id_prefix) {
+    var select_id = id_prefix+'_data_file_id';
+    var preview_id = id_prefix+'_preview';
+    $j('select#'+select_id).change(function() {
+        $j('select#'+select_id).attr('disabled','disabled');
+        var data_file_id = $j(this).find('option:selected').val();
+        if (data_file_id) {
+            $j.ajax({
+                url:"/data_files/"+data_file_id+"/",
+                type: "get",
+                dataType: "json",
+                success: function(data) {
+                    $j('select#'+select_id).removeAttr('disabled');
+                    var description = data["description"];
+                    if (!description) {
+                        description = "Not defined"
+                    }
+                    var version = data["version"];
+                    $j('#'+preview_id).show();
+                    $j('#'+preview_id+" #description").text(description);
+                    $j('#'+preview_id+" #version").text(version);
+                },
+                error: function() {
+                    $j('#'+preview_id).hide();
+                }
+            });
+        }
+        else {
+            $j('#'+preview_id).hide();
+            $j('select#'+select_id).removeAttr('disabled');
+        }
+
+    });
+}

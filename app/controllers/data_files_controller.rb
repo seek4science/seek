@@ -245,6 +245,7 @@ class DataFilesController < ApplicationController
       format.html #{render :locals => {:template => params[:parsing_template]}}# show.html.erb
       format.xml
       format.rdf { render :template=>'rdf/show'}
+      format.json
     end
   end
   

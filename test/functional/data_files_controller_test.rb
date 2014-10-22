@@ -1875,6 +1875,17 @@ end
     end
   end
 
+  test "get data_file as json" do
+    df = Factory(:data_file,:policy=>Factory(:public_policy),:title=>"fish flop",:description=>"testing json description")
+    get :show,:id=>df,:format=>"json"
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal df.id,json["id"]
+    assert_equal "fish flop",json["title"]
+    assert_equal "testing json description",json["description"]
+    assert_equal df.version,json["version"]
+  end
+
   private
 
   def mock_http
