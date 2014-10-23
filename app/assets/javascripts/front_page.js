@@ -13,4 +13,4 @@
 //= require top_menu
 //= require dynamic_menu
 //= require jscrollpane/index
-//= require default_text_search
+
