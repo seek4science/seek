@@ -137,13 +137,6 @@ GIT
   specs:
     calendar_date_select (1.16.2)
 
-GIT
-  remote: git://github.com/thedarkone/rails-dev-boost.git
-  revision: bf49caca6670a2dc26cef7b2b01819e2ed88387a
-  specs:
-    rails-dev-boost (0.3.0)
-      railties (>= 3.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -702,7 +695,6 @@ DEPENDENCIES
   psych
   rack-openid
   rails (= 3.2.19)
-  rails-dev-boost!
   rails_autolink
   rdf-virtuoso (>= 0.1.6)
   rdoc
