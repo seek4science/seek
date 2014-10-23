@@ -106,6 +106,7 @@ group :development do
   gem "rubycritic",:require=>false
   gem "guard-rubycritic",:require=>false
   gem 'unicorn-rails'
+  gem 'rails-dev-boost', :git => 'git://github.com/thedarkone/rails-dev-boost.git'
 end
 
 group :test do

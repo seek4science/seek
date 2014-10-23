@@ -49,6 +49,7 @@ SEEK::Application.configure do
 
   I18n.enforce_available_locales = true
 
+  RailsDevelopmentBoost.debug! if defined?(RailsDevelopmentBoost)
 
 end
 
