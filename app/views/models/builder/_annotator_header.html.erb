@@ -1,9 +1,0 @@
-<div id="builder_header">
-	<%= render :partial => "general/item_title",:locals=>{:item=>@model,:title_postfix=>" - JWS Online <em>OneStop</em> Annotator".html_safe } -%>
-    <p class="box_standout">
-      You can use the JWS OneStop annotator to add MIRIAME annotations to the reactions and processes in the <%= t('model') %>. If your annotation is missing when you select the species or process, you can search for annotation URN's for your species or reaction using Semantic SBML.
-      You can also add attribution annotations to the <%= t('model') %>.<br/>
-      When you are finished click the Store button to return to the JWS <em>OneStop</em> editor. Your changes are not saved in <%= Seek::Config.application_name -%> until you save as a new version from <em>OneStop</em>.
-    </p>
-	
-</div>

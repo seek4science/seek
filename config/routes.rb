@@ -343,7 +343,6 @@ SEEK::Application.routes.draw do
 
   resources :models do
     collection do
-      get :build
       get :preview
       post :test_asset_url
       post :items_for_result
@@ -352,7 +351,6 @@ SEEK::Application.routes.draw do
     member do
       get :compare_versions
       post :compare_versions
-      get :builder
       post :check_related_items
       get :visualise
       post :check_gatekeeper_required
@@ -360,12 +358,10 @@ SEEK::Application.routes.draw do
       get :matching_data
       get :published
       post :publish_related_items
-      post :submit_to_jws
       post :new_version
       post :submit_to_sycamore
       post :export_as_xgmml
       post :update_annotations_ajax
-      post :simulate
       post :publish
       post :execute
       post :request_resource
