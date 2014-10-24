@@ -243,21 +243,14 @@ class ModelsController < ApplicationController
       update_annotations @model
       update_scales @model
       build_model_image @model,params[:model_image]
-      assay_ids = params[:assay_ids] || []
+
       respond_to do |format|
         if @model.save
-
           create_content_blobs
-          # update attributions
           update_relationships(@model,params)
-
+          update_assay_assets(@model,params[:assay_ids])
           flash[:notice] = "#{t('model')} was successfully uploaded and saved."
           format.html { redirect_to model_path(@model) }
-          Assay.find(assay_ids).each do |assay|
-            if assay.can_edit?
-              assay.relate(@model)
-            end
-          end
         else
           format.html {
             render :action => "new"
@@ -287,7 +280,6 @@ class ModelsController < ApplicationController
 
     update_annotations @model
     update_scales @model
-    publication_params = params[:related_publication_ids].nil? ? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }
 
     @model.attributes = params[:model]
 
@@ -296,27 +288,14 @@ class ModelsController < ApplicationController
       @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
     end
 
-    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @model.save
 
         update_relationships(@model,params)
+        update_assay_assets(@model,params[:assay_ids])
 
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
-        # Update new assay_asset
-        Assay.find(assay_ids).each do |assay|
-          if assay.can_edit?
-            assay.relate(@model)
-          end
-        end
-        #Destroy AssayAssets that aren't needed
-        assay_assets = @model.assay_assets
-        assay_assets.each do |assay_asset|
-          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
-            AssayAsset.destroy(assay_asset.id)
-          end
-        end
       else
         format.html {
           render :action => "edit"

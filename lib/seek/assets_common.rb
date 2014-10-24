@@ -38,6 +38,25 @@ module Seek
       AssetsCreator.add_or_update_creator_list(asset, params[:creators])
     end
 
+    def update_assay_assets(asset,assay_ids,relationship_type_titles=nil)
+      assay_ids ||= []
+      relationship_type_titles ||= Array.new(assay_ids.size)
+      assay_ids.each.with_index do |assay_id,index|
+        assay = Assay.find(assay_id)
+        if assay.can_edit?
+          relationship = RelationshipType.find_by_title(relationship_type_titles[index])
+          assay.relate(asset,relationship)
+        end
+      end
+
+      #Destroy AssayAssets that aren't needed
+      asset.assay_assets.each do |assay_asset|
+        if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+          AssayAsset.destroy(assay_asset.id)
+        end
+      end
+    end
+
     def request_resource
       resource = self.controller_name.classify.find(params[:id])
       details = params[:details]

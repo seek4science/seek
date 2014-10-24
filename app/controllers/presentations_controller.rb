@@ -133,8 +133,6 @@ class PresentationsController < ApplicationController
       params[:presentation][:last_used_at] = Time.now
     end
 
-    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
-
     update_annotations @presentation
     update_scales @presentation
 

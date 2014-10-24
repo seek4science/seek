@@ -107,8 +107,6 @@ class WorkflowsController < ApplicationController
       params[:workflow][:last_used_at] = Time.now
     end
 
-    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
-
     @workflow.attributes = params[:workflow]
 
      if params[:sharing]

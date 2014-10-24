@@ -89,21 +89,14 @@ class SopsController < ApplicationController
 
       update_annotations @sop
       update_scales @sop
-      assay_ids = params[:assay_ids] || []
+
       respond_to do |format|
         if @sop.save
-
           create_content_blobs
-
           update_relationships(@sop,params)
-          
+          update_assay_assets(@sop,params[:assay_ids])
           flash[:notice] = "#{t('sop')} was successfully uploaded and saved."
           format.html { redirect_to sop_path(@sop) }
-          Assay.find(assay_ids).each do |assay|
-            if assay.can_edit?
-              assay.relate(@sop)
-            end
-          end
         else
           format.html { 
             render :action => "new" 
@@ -131,8 +124,6 @@ class SopsController < ApplicationController
     update_annotations @sop
     update_scales @sop
 
-    assay_ids = params[:assay_ids] || []
-
     @sop.attributes = params[:sop]
 
     if params[:sharing]
@@ -143,23 +134,10 @@ class SopsController < ApplicationController
     respond_to do |format|
       if @sop.save
         update_relationships(@sop,params)
-        
+        update_assay_assets(@sop,params[:assay_ids])
         flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }
-        # Update new assay_asset
-        Assay.find(assay_ids).each do |assay|
-          if assay.can_edit?
-            assay.relate(@sop)
-          end
-        end
 
-        #Destroy AssayAssets that aren't needed
-        assay_assets = @sop.assay_assets
-        assay_assets.each do |assay_asset|
-          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
-            AssayAsset.destroy(assay_asset.id)
-          end
-        end
       else
         format.html { 
           render :action => "edit" 
