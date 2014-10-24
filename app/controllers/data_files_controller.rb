@@ -202,13 +202,7 @@ class DataFilesController < ApplicationController
               end
             end
             #the assay_id param can also contain the relationship type
-            assay_ids = []
-            relationship_types = []
-            (params[:assay_ids] || []).each do |assay_type_text|
-              assay_id, relationship_type = assay_type_text.split(",")
-              assay_ids << assay_id
-              relationship_types << relationship_type
-            end
+            assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
             update_assay_assets(@data_file,assay_ids,relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
           end
@@ -226,9 +220,18 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def determine_related_assay_ids_and_relationship_types params
+    assay_ids = []
+    relationship_types = []
+    (params[:assay_ids] || []).each do |assay_type_text|
+      assay_id, relationship_type = assay_type_text.split(",")
+      assay_ids << assay_id
+      relationship_types << relationship_type
+    end
+    return assay_ids, relationship_types
+  end
 
 
-  
   def show
     # store timestamp of the previous last usage
     @last_used_before_now = @data_file.last_used_at
@@ -276,13 +279,7 @@ class DataFilesController < ApplicationController
         update_relationships(@data_file,params)
 
         #the assay_id param can also contain the relationship type
-        assay_ids = []
-        relationship_types = []
-        (params[:assay_ids] || []).each do |assay_type_text|
-          assay_id, relationship_type = assay_type_text.split(",")
-          assay_ids << assay_id
-          relationship_types << relationship_type
-        end
+        assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
         update_assay_assets(@data_file,assay_ids,relationship_types)
 
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
