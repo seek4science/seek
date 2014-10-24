@@ -2,7 +2,6 @@ class AssaysController < ApplicationController
 
   include DotGenerator
   include IndexPager
-  include Seek::AnnotationCommon
   include Seek::AssetsCommon
 
   before_filter :assays_enabled?
