@@ -184,6 +184,7 @@ GEM
       httparty
     arel (3.0.3)
     ast (2.0.0)
+    awesome_print (1.2.0)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -200,9 +201,12 @@ GEM
       activesupport (>= 3.0)
     cocaine (0.5.4)
       climate_control (>= 0.0.3, < 1.0)
+    code_analyzer (0.4.5)
+      sexp_processor
     coderay (1.1.0)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
+    colored (1.2)
     colorize (0.7.3)
     country-select (1.1.1)
     coveralls (0.7.1)
@@ -417,6 +421,16 @@ GEM
       railties (= 3.2.19)
     rails_autolink (1.1.6)
       rails (> 3.1)
+    rails_best_practices (1.15.4)
+      activesupport
+      awesome_print
+      code_analyzer (>= 0.4.3)
+      colored
+      erubis
+      i18n
+      json
+      require_all
+      ruby-progressbar
     railties (3.2.19)
       actionpack (= 3.2.19)
       activesupport (= 3.2.19)
@@ -696,6 +710,7 @@ DEPENDENCIES
   rack-openid
   rails (= 3.2.19)
   rails_autolink
+  rails_best_practices
   rdf-virtuoso (>= 0.1.6)
   rdoc
   recaptcha (= 0.3.1)

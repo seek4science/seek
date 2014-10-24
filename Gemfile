@@ -106,6 +106,7 @@ group :development do
   gem "rubycritic",:require=>false
   gem "guard-rubycritic",:require=>false
   gem 'unicorn-rails'
+  gem 'rails_best_practices'
 end
 
 group :test do
