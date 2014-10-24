@@ -179,14 +179,8 @@ class DataFilesController < ApplicationController
 
         create_content_blobs
 
-        # update attributions
-        Relationship.create_or_update_attributions(@data_file, params[:attributions])
+        update_relationships(@data_file,params)
 
-        # update related publications
-        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-
-        #Add creators
-        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
           if !@data_file.parent_name.blank?
           render :partial => "assets/back_to_fancy_parent", :locals => {:child => @data_file, :parent_name => @data_file.parent_name, :is_not_fancy => true}
         else
@@ -280,15 +274,7 @@ class DataFilesController < ApplicationController
 
       if @data_file.save
 
-        # update attributions
-        Relationship.create_or_update_attributions(@data_file, params[:attributions])
-        
-        # update related publications        
-        Relationship.create_or_update_attributions(@data_file, publication_params, Relationship::RELATED_TO_PUBLICATION)
-        
-        
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
+        update_relationships(@data_file,params)
 
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }

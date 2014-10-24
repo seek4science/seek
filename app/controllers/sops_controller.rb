@@ -95,11 +95,7 @@ class SopsController < ApplicationController
 
           create_content_blobs
 
-          # update attributions
-          Relationship.create_or_update_attributions(@sop, params[:attributions])
-          
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
+          update_relationships(@sop,params)
           
           flash[:notice] = "#{t('sop')} was successfully uploaded and saved."
           format.html { redirect_to sop_path(@sop) }
@@ -146,11 +142,7 @@ class SopsController < ApplicationController
 
     respond_to do |format|
       if @sop.save
-        # update attributions
-        Relationship.create_or_update_attributions(@sop, params[:attributions])
-        
-        #update authors
-        AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
+        update_relationships(@sop,params)
         
         flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }

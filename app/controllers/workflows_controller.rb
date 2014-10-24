@@ -80,14 +80,8 @@ class WorkflowsController < ApplicationController
         # Pull title and from t2flow
         extract_workflow_metadata
 
-        # update attributions
-        Relationship.create_or_update_attributions(@workflow, params[:attributions])
+        update_relationships(@workflow,params)
 
-        # update related publications
-        Relationship.create_or_update_attributions(@workflow, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-
-        #Add creators
-        AssetsCreator.add_or_update_creator_list(@workflow, params[:creators])
         respond_to do |format|
           flash[:notice] = "#{t('workflow')} was successfully uploaded and saved." if flash.now[:notice].nil?
           format.html { redirect_to describe_ports_workflow_path(@workflow) }
@@ -127,14 +121,7 @@ class WorkflowsController < ApplicationController
 
       extract_workflow_metadata
 
-      # update attributions
-      Relationship.create_or_update_attributions(@workflow, params[:attributions])
-
-      # update related publications
-      Relationship.create_or_update_attributions(@workflow, publication_params, Relationship::RELATED_TO_PUBLICATION)
-
-      #Add creators
-      AssetsCreator.add_or_update_creator_list(@workflow, params[:creators])
+      update_relationships(@workflow,params)
 
       respond_to do |format|
         flash[:notice] = "#{t('workflow')} was successfully updated." if flash.now[:notice].nil?

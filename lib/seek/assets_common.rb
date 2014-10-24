@@ -26,6 +26,18 @@ module Seek
         end
     end
 
+    def update_relationships asset,params
+      Relationship.create_or_update_attributions(asset, params[:attributions])
+
+      # update related publications
+      if params[:related_publication_ids]
+        Relationship.create_or_update_attributions(asset, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION)
+      end
+
+      #Add creators
+      AssetsCreator.add_or_update_creator_list(asset, params[:creators])
+    end
+
     def request_resource
       resource = self.controller_name.classify.find(params[:id])
       details = params[:details]

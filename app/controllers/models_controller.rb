@@ -249,13 +249,7 @@ class ModelsController < ApplicationController
 
           create_content_blobs
           # update attributions
-          Relationship.create_or_update_attributions(@model, params[:attributions])
-
-          # update related publications
-          Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@model, params[:creators])
+          update_relationships(@model,params)
 
           flash[:notice] = "#{t('model')} was successfully uploaded and saved."
           format.html { redirect_to model_path(@model) }
@@ -275,6 +269,8 @@ class ModelsController < ApplicationController
     end
 
   end
+
+
 
   # PUT /models/1
   # PUT /models/1.xml
@@ -304,14 +300,7 @@ class ModelsController < ApplicationController
     respond_to do |format|
       if @model.save
 
-        # update attributions
-        Relationship.create_or_update_attributions(@model, params[:attributions])
-
-        # update related publications
-        Relationship.create_or_update_attributions(@model, publication_params, Relationship::RELATED_TO_PUBLICATION)
-
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@model, params[:creators])
+        update_relationships(@model,params)
 
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
@@ -378,8 +367,6 @@ class ModelsController < ApplicationController
       format.html
     end
   end
-
-
 
   protected
 
