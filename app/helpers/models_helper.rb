@@ -54,7 +54,7 @@ module ModelsHelper
     options = ''
     other_version = other_model_version.version
     displayed_version = displayed_model_version.version
-    if other_version == displayed_version.version || !other_model_version.contains_sbml?
+    if other_version == displayed_version || !other_model_version.contains_sbml?
       options << "<option value='' disabled"
     else
       compare_path = compare_versions_model_path(versioned_model, version: displayed_version, other_version: other_version)
