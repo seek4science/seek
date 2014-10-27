@@ -114,6 +114,7 @@ group :test do
   gem "sqlite3"
   gem "ruby-prof"
   gem "webmock"
+  gem "minitest","~> 4.0"
   gem 'minitest-reporters'
   gem 'coveralls', require: false
   gem 'rspec-rails'
