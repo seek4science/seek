@@ -28,6 +28,12 @@ class ProgrammesController < ApplicationController
     respond_with(@programme)
   end
 
+  def destroy
+    @programme.destroy
+    flash[:notice]="The #{t('programme').capitalize} was successfully deleted."
+    redirect_to programmes_path
+  end
+
   def new
     @programme=Programme.new
     respond_with(@programme)

@@ -4,7 +4,7 @@ class Programme < ActiveRecord::Base
   acts_as_yellow_pages
 
   #associations
-  has_many :projects
+  has_many :projects, :dependent=>:nullify
   accepts_nested_attributes_for :projects
 
   #validations

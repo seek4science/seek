@@ -18,6 +18,36 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test "only admin can destroy" do
+    login_as(Factory(:person))
+    prog = Factory(:programme)
+    proj = prog.projects.first
+    refute_nil proj
+    assert_equal prog,proj.programme
+    assert_no_difference("Programme.count") do
+      delete :destroy,:id=>prog.id
+    end
+    refute_nil flash[:error]
+    assert_redirected_to :root
+    proj.reload
+    assert_equal prog,proj.programme
+  end
+
+  test "destroy" do
+    login_as(Factory(:admin))
+    prog = Factory(:programme)
+    proj = prog.projects.first
+    refute_nil proj
+    assert_equal prog,proj.programme
+    assert_difference("Programme.count",-1) do
+      delete :destroy,:id=>prog.id
+    end
+    assert_redirected_to programmes_path
+    proj.reload
+    assert_nil proj.programme
+    assert_nil proj.programme_id
+  end
+
   test "update" do
     login_as(Factory(:admin))
     prog = Factory(:programme,:description=>"ggggg")
