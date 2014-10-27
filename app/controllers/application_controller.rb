@@ -77,7 +77,7 @@ class ApplicationController < ActionController::Base
 
   def is_user_activated
     if Seek::Config.activation_required_enabled && current_user && !current_user.active?
-      error("Activation of this account it required for gaining full access", "Activation required?")
+      error("Activation of this account is required for gaining full access", "Activation required?")
       false
     end
   end
