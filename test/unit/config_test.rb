@@ -311,6 +311,11 @@ end
     assert_equal ActionMailer::Base.smtp_settings[:password], 'abcd'
   end
 
+  test 'encrypt/decrypt datacite password' do
+    Seek::Config.datacite_password_encrypt 'abcd'
+    assert_equal Seek::Config.datacite_password_decrypt, 'abcd'
+  end
+
   test 'home_description' do
     assert_equal 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.', Seek::Config.home_description
     Seek::Config.home_description = 'A new description'
