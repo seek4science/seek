@@ -356,12 +356,12 @@ GEM
     method_source (0.8.2)
     mime-types (1.25.1)
     mini_portile (0.6.0)
-    minitest (4.7.5)
-    minitest-reporters (0.14.24)
+    minitest (5.4.2)
+    minitest-reporters (1.0.7)
       ansi
       builder
-      minitest (>= 2.12, < 5.0)
-      powerbar
+      minitest (>= 5.0)
+      ruby-progressbar
     modporter-plugin (0.1.0)
     multi_json (1.10.1)
     multi_xml (0.5.5)
@@ -392,9 +392,6 @@ GEM
       railties (>= 3.1.0)
     polyglot (0.3.5)
     pothoven-attachment_fu (3.2.14)
-    powerbar (1.0.11)
-      ansi (~> 1.4.0)
-      hashie (>= 1.1.0)
     powerpack (0.0.9)
     pr_geohash (1.0.0)
     prototype-rails (3.2.1)
