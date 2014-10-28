@@ -1886,6 +1886,40 @@ end
     assert_equal df.version,json["version"]
   end
 
+  test "landing page for hidden item" do
+    df = Factory(:data_file,:policy=>Factory(:private_policy),:title=>"fish flop",:description=>"testing json description")
+    assert !df.can_view?
+
+    get :show,:id=>df
+    assert_response :success
+    assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
+
+    assert !df.can_see_hidden_item?(User.current_user.person)
+    contributor_person = df.contributor.person
+    assert_select "a[href=?]", person_path(contributor_person), :count => 0
+  end
+
+  test "landing page for hidden item with the contributor contact" do
+    df = Factory(:data_file,:policy=>Factory(:private_policy),:title=>"fish flop",:description=>"testing json description")
+
+    project = df.projects.first
+    work_group = Factory(:work_group, project: project)
+    person = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    user = Factory(:user, person: person)
+
+    login_as(user)
+
+    assert !df.can_view?
+    assert df.can_see_hidden_item?(user.person)
+
+    get :show,:id=>df
+    assert_response :success
+    assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
+
+    contributor_person = df.contributor.person
+    assert_select "a[href=?]", person_path(contributor_person)
+  end
+
   private
 
   def mock_http
