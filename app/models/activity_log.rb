@@ -5,14 +5,14 @@ class ActivityLog  < ActiveRecord::Base
   enforce_authorization_on_association :activity_loggable,:view
   serialize :data
 
-  scope :no_spider,:conditions=>"(user_agent NOT LIKE '%spider%' OR user_agent IS NULL)"
+  scope :no_spider,:conditions=>"(UPPER(user_agent) NOT LIKE '%SPIDER%' OR user_agent IS NULL)"
 
   #returns items that have duplicates for a given action - NOTE that the result does not contain all the actual duplicates.
   scope :duplicates, lambda {|action|
     {
-    :select=>"id,created_at,activity_loggable_type,activity_loggable_id,action,count(activity_loggable_id+activity_loggable_type) as dup_count",
-    :conditions=>"action='#{action}' and controller_name!='sessions'",
-    :group=>"activity_loggable_type,activity_loggable_id having dup_count>1"
+    :select=>"activity_loggable_type,activity_loggable_id",
+    :conditions=>"action='#{action}' AND controller_name!='sessions'",
+    :group=>'activity_loggable_type,activity_loggable_id HAVING COUNT(*)>1'
     }
   }
 

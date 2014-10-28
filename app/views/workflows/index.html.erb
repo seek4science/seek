@@ -1,4 +1,4 @@
-<h1><%= @category.nil? ? "Workflows" : "#{@category.name} Workflows" -%></h1>
+<%= index_title(@category.nil? ? "Workflows" : "#{@category.name} Workflows") -%>
 
 <% if logged_in? and current_user.person.member? and !current_user.guest?%>
     <ul class="sectionIcons">

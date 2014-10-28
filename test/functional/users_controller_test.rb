@@ -20,6 +20,32 @@ class UsersControllerTest < ActionController::TestCase
     get :new
     assert_select "title",:text=>/The Sysmo SEEK.*/, :count=>1
   end
+
+  test "cancel registration" do
+    user = Factory :brand_new_user
+    refute user.person
+    login_as user
+    assert_equal user.id,session[:user_id]
+    assert_difference("User.count",-1) do
+      post :cancel_registration
+    end
+
+    assert_redirected_to :root
+    assert_nil session[:user_id]
+  end
+
+  test "cancel registration doesnt destroy user with profile" do
+    person = Factory :person
+
+    login_as person.user
+    assert_equal person.user.id,session[:user_id]
+    assert_no_difference("User.count") do
+      post :cancel_registration
+    end
+
+    assert_redirected_to :root
+    assert_equal person.user.id,session[:user_id]
+  end
   
   def test_activation_required_link
     get :activation_required

@@ -10,12 +10,17 @@ module ApplicationHelper
   include Recaptcha::ClientHelper
 
 
-  def index_title
-    show_title(self.controller_name.humanize.capitalize)
+  def index_title title=nil
+    show_title(title || self.controller_name.humanize.capitalize)
   end
 
   def is_front_page?
     current_page?(main_app.root_url)
+  end
+
+  #turns the object name from a form builder, in the equivalent id
+  def sanitized_object_name object_name
+    object_name.gsub(/\]\[|[^-a-zA-Z0-9:.]/, "_").sub(/_$/, "")
   end
 
   def seek_stylesheet_tags main='application'

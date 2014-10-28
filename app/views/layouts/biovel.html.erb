@@ -33,6 +33,7 @@
       <%= link_to image_tag("biovel-logo-official-small.png", :alt => "BioVeL", :title => "BioVeL", :style => "height: 50px"), "http://www.biovel.eu/", :style => "float: left", :target => '_blank' %>
       <ul class="biovel-menutabs clearfix">
         <%= navigation_link 'Home', main_app.root_path, nil, controller_name == 'homes' -%>
+        <%= navigation_link t('data_file').pluralize, main_app.data_files_path, nil, controller_name == 'data_files' -%>
         <%= navigation_link 'Workflows', main_app.workflows_path, nil, controller_name == 'workflows' -%>
         <%= navigation_link 'Runs', taverna_player.runs_path, nil, controller_name == 'runs' -%>
       </ul>

@@ -1,36 +1,45 @@
-<div class="run_input" data-input-name="<%= input[:name]-%>">
+<div class="run_input" data-input-name="<%= input[:name] -%>">
 
   <% input_data = form.object.new_record? ? nil : form.object.inputs.select { |i| i.name == input[:name] }.last %>
   <%= form.fields_for :inputs, TavernaPlayer::RunPort::Input.new do |input_fields| %>
-    <%= input_fields.hidden_field :name, :value => input[:name] %>
+      <% id_prefix = sanitized_object_name(input_fields.object_name) %>
+      <%= input_fields.hidden_field :name, :value => input[:name] %>
 
-    <% if !(preset = params["input_#{input[:name]}"]).blank? %>
-      <%= input_fields.hidden_field :value, :value => preset %>
-    <% else %>
-      <h3><%= input[:name] %>
-        <% unless input[:description].blank? %>
-          <%= help_icon(simple_format(input[:description])) -%>
-        <% end %>
-      </h3>
+      <% if !(preset = params["input_#{input[:name]}"]).blank? %>
+          <%= input_fields.hidden_field :value, :value => preset %>
+      <% else %>
+          <h3><%= input[:name] %>
+            <% unless input[:description].blank? %>
+                <%= help_icon(simple_format(input[:description])) -%>
+            <% end %>
+          </h3>
 
-      <% unless input[:example_value].blank? %>
-        <% unless input_data.try(:value) %>
-          <p>
-            The example value is automatically entered in the box below.
-            Click to edit or enter a new value directly or choose a file.
-          </p>
-        <% end %>
+          <% unless input[:example_value].blank? %>
+              <% unless input_data.try(:value) %>
+                  <p>
+                    The example value is automatically entered in the box below.
+                    Click to edit or enter a new value directly or choose a file.
+                  </p>
+              <% end %>
+          <% end %>
+
+          <div class="text_input">
+            <%= input_fields.text_area :value, :value => input_data.try(:value) || input[:example_value], :rows => 3, :cols => 50, :placeholder => "Enter input here..." %>
+          </div>
+          <div class="file_input">
+            Or select a file...<br/>
+            <%= input_fields.file_field :file %>
+          </div>
+          <div class="file_input">
+            Or select a <%= t('data_file').downcase %>...</br/>
+            <%= input_fields.select :data_file_id, input_fields.object.suitable_data_files.map { |df| [df.title, df.id] }, :prompt => "Select a #{t('data_file').downcase}" %>
+            <%= render :partial=>"taverna_player/runs/data_preview",:locals=>{:id_prefix=>id_prefix} -%>
+          </div>
+
+
+          <div style="clear:both"></div>
       <% end %>
-
-      <div class="text_input">
-        <%= input_fields.text_area :value, :value => input_data.try(:value) || input[:example_value], :rows => 3, :cols => 50, :placeholder => "Enter input here..." %>
-      </div>
-      <div class="file_input">
-        Or select a file...<br/>
-        <%= input_fields.file_field :file %>
-      </div>
-      <div style="clear:both"></div>
-    <% end %>
   <% end %>
 
 </div>
+

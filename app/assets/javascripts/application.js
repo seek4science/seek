@@ -32,4 +32,3 @@
 //= require tabber-minimized
 //= require detect_browser
 //= require easytabs
-//= require default_text_search

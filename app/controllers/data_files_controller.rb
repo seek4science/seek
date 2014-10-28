@@ -179,14 +179,8 @@ class DataFilesController < ApplicationController
 
         create_content_blobs
 
-        # update attributions
-        Relationship.create_or_update_attributions(@data_file, params[:attributions])
+        update_relationships(@data_file,params)
 
-        # update related publications
-        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-
-        #Add creators
-        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
           if !@data_file.parent_name.blank?
           render :partial => "assets/back_to_fancy_parent", :locals => {:child => @data_file, :parent_name => @data_file.parent_name, :is_not_fancy => true}
         else
@@ -207,13 +201,9 @@ class DataFilesController < ApplicationController
                 # end
               end
             end
-            assay_ids.each do |text|
-              a_id, r_type = text.split(",")
-              @assay = Assay.find(a_id)
-              if @assay.can_edit?
-                @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
-              end
-            end
+            #the assay_id param can also contain the relationship type
+            assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
+            update_assay_assets(@data_file,assay_ids,relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
           end
         end
@@ -230,9 +220,18 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def determine_related_assay_ids_and_relationship_types params
+    assay_ids = []
+    relationship_types = []
+    (params[:assay_ids] || []).each do |assay_type_text|
+      assay_id, relationship_type = assay_type_text.split(",")
+      assay_ids << assay_id
+      relationship_types << relationship_type
+    end
+    return assay_ids, relationship_types
+  end
 
 
-  
   def show
     # store timestamp of the previous last usage
     @last_used_before_now = @data_file.last_used_at
@@ -245,6 +244,7 @@ class DataFilesController < ApplicationController
       format.html #{render :locals => {:template => params[:parsing_template]}}# show.html.erb
       format.xml
       format.rdf { render :template=>'rdf/show'}
+      format.json
     end
   end
   
@@ -263,12 +263,9 @@ class DataFilesController < ApplicationController
       params[:data_file][:last_used_at] = Time.now
     end
 
-    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
-
     update_annotations @data_file
     update_scales @data_file
 
-    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       @data_file.attributes = params[:data_file]
 
@@ -279,38 +276,34 @@ class DataFilesController < ApplicationController
 
       if @data_file.save
 
-        # update attributions
-        Relationship.create_or_update_attributions(@data_file, params[:attributions])
-        
-        # update related publications        
-        Relationship.create_or_update_attributions(@data_file, publication_params, Relationship::RELATED_TO_PUBLICATION)
-        
-        
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
+        update_relationships(@data_file,params)
+
+        #the assay_id param can also contain the relationship type
+        assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
+        update_assay_assets(@data_file,assay_ids,relationship_types)
 
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
 
 
-        # Update new assay_asset
-        a_ids = []
-        assay_ids.each do |text|
-          a_id, r_type = text.split(",")
-          a_ids.push(a_id)
-          @assay = Assay.find(a_id)
-          if @assay.can_edit?
-            @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
-          end
-        end
-
-        #Destroy AssayAssets that aren't needed
-        assay_assets = @data_file.assay_assets
-        assay_assets.each do |assay_asset|
-          if assay_asset.assay.can_edit? and !a_ids.include?(assay_asset.assay_id.to_s)
-            AssayAsset.destroy(assay_asset.id)
-          end
-        end
+        # # Update new assay_asset
+        # a_ids = []
+        # assay_ids.each do |text|
+        #   a_id, r_type = text.split(",")
+        #   a_ids.push(a_id)
+        #   @assay = Assay.find(a_id)
+        #   if @assay.can_edit?
+        #     @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+        #   end
+        # end
+        #
+        # #Destroy AssayAssets that aren't needed
+        # assay_assets = @data_file.assay_assets
+        # assay_assets.each do |assay_asset|
+        #   if assay_asset.assay.can_edit? and !a_ids.include?(assay_asset.assay_id.to_s)
+        #     AssayAsset.destroy(assay_asset.id)
+        #   end
+        # end
       else
         format.html {
           render :action => "edit"
@@ -322,14 +315,15 @@ class DataFilesController < ApplicationController
   def data
     @data_file =  DataFile.find(params[:id])
     sheet = params[:sheet] || 1
-    trim = params[:trim]
-    trim ||= false
-    if !(["xls","xlsx"] & (mime_extensions(@data_file.content_blob.content_type))).empty?
-
+    trim = params[:trim] || false
+    content_blob = @data_file.content_blob
+    mime_extensions = mime_extensions(content_blob.content_type)
+    if !(["xls","xlsx"] & mime_extensions).empty?
       respond_to do |format|
+        file = open(content_blob.filepath)
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
-        format.xml {render :xml=>spreadsheet_to_xml(open(@data_file.content_blob.filepath)) }
-        format.csv {render :text=>spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet,trim) }
+        format.xml {render :xml=>spreadsheet_to_xml(file) }
+        format.csv {render :text=>spreadsheet_to_csv(file,sheet,trim) }
       end
     else
       respond_to do |format|

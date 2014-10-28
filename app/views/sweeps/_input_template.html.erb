@@ -2,11 +2,21 @@
   <h3>{{name}}</h3>
   <input type="hidden" value="{{name}}" name="{{name_prefix}}[name]" id="{{id_prefix}}_name">
   <div class="text_input">
-    <textarea rows="2" placeholder="Enter input here..." name="{{name_prefix}}[value]" id="{{id_prefix}}_value" cols="40">{{example_value}}</textarea>
+    <textarea rows="3" cols="50" placeholder="Enter input here..." name="{{name_prefix}}[value]" id="{{id_prefix}}_value" cols="40">{{example_value}}</textarea>
   </div>
   <div class="file_input">
     Or select a file...<br>
     <input type="file" name="{{name_prefix}}[file]" id="{{id_prefix}}_file">
+  </div>
+  <div class="file_input">
+    Or select a <%= t('data_file').downcase %>...</br/>
+    <%
+       data_files = TavernaPlayer::RunPort::Input.new.suitable_data_files
+       options = options_for_select(data_files.map{|df| [df.title,df.id]})
+    %>
+    <%= select_tag "{{name_prefix}}[data_file_id]",options,:prompt=>"Select a #{t('data_file').downcase}", :id=>"{{id_prefix}}_data_file_id" %>
+    <%= render :partial=>"taverna_player/runs/data_preview",:locals=>{:id_prefix=>"{{id_prefix}}"} -%>
+
   </div>
   <div style="clear:both"></div>
 </div>

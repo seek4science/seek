@@ -747,7 +747,7 @@ Exhibit.HierarchicalFacet.prototype._buildCache = function() {
                     results.values.visit(function(parentValue) {
                         insert(value, parentValue, valueToParent);
                         insert(parentValue, value, valueToChildren);
-                        if (!valueSet.contains(parentValue)) {
+                        if (!values.contains(parentValue)) {
                             newValueSet.add(parentValue);
                         }
                         return true;

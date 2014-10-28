@@ -71,14 +71,7 @@ class PresentationsController < ApplicationController
 
           create_content_blobs
 
-          # update attributions
-          Relationship.create_or_update_attributions(@presentation, params[:attributions])
-
-          # update related publications
-          Relationship.create_or_update_attributions(@presentation, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@presentation, params[:creators])
+          update_relationships(@presentation,params)
 
           if !@presentation.parent_name.blank?
             render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@presentation, :parent_name=>@presentation.parent_name}
@@ -140,8 +133,6 @@ class PresentationsController < ApplicationController
       params[:presentation][:last_used_at] = Time.now
     end
 
-    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
-
     update_annotations @presentation
     update_scales @presentation
 
@@ -156,14 +147,7 @@ class PresentationsController < ApplicationController
     respond_to do |format|
       if @presentation.save
 
-        # update attributions
-        Relationship.create_or_update_attributions(@presentation, params[:attributions])
-
-        # update related publications
-        Relationship.create_or_update_attributions(@presentation,publication_params, Relationship::RELATED_TO_PUBLICATION)
-
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@presentation, params[:creators])
+        update_relationships(@presentation,params)
 
         flash[:notice] = "#{t('presentation')} metadata was successfully updated."
         format.html { redirect_to presentation_path(@presentation) }

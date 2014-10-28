@@ -127,6 +127,10 @@ module Acts #:nodoc:
 
     module InstanceMethods
 
+      def managers_names
+        managers.collect(&:title).join(", ")
+      end
+
       def contains_downloadable_items?
         !all_content_blobs.compact.select { |blob| !blob.is_webpage? }.empty?
       end

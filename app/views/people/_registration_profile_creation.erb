@@ -8,7 +8,9 @@
       page.visual_effect :toggle_blind, "profile_selection"
       page.visual_effect :toggle_blind, "profile_creation"
     end -%>.</b>
-  <br/><br/>
+  <br/>
+  Alternatively you may choose to <b><%= render :partial => "cancel_registration" %></b>
+  <br/>
 
 </p>
 <%= form_for @person do |f| %>
@@ -99,6 +101,7 @@
     <br/>
 
   <%=  f.submit("Create",:disable_with=>"Creating...") %>
+  <%= render :partial=>"cancel_registration" %>
   <%= javascript_tag "others('projects')"-%>
   <%= javascript_tag "others('institutions')"-%>
 <% end -%>

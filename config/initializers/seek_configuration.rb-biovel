@@ -7,7 +7,7 @@ SEEK::Application.configure do
   #Main settings
   Seek::Config.default :public_seek_enabled,true
   Seek::Config.default :sycamore_enabled,false
-  Seek::Config.default :events_enabled,true
+  Seek::Config.default :events_enabled,false
   Seek::Config.default :jerm_enabled,false
   Seek::Config.default :email_enabled,false
   Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => '', :enable_starttls_auto=>false}
@@ -42,19 +42,22 @@ SEEK::Application.configure do
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
+  Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
-  Seek::Config.default :biosamples_enabled, true
-  Seek::Config.default :modelling_analysis_enabled,true
+  Seek::Config.default :biosamples_enabled, false
+  Seek::Config.default :modelling_analysis_enabled,false
   Seek::Config.default :organisms_enabled,true
-  Seek::Config.default :models_enabled,true
+  Seek::Config.default :models_enabled,false
   Seek::Config.default :guide_box_enabled,true
-  Seek::Config.default :treatments_enabled,true
-  Seek::Config.default :factors_studied_enabled,true
-  Seek::Config.default :experimental_conditions_enabled,true
+  Seek::Config.default :treatments_enabled,false
+  Seek::Config.default :factors_studied_enabled,false
+  Seek::Config.default :experimental_conditions_enabled,false
   Seek::Config.default :documentation_enabled,true
   Seek::Config.default :tagging_enabled, false
   Seek::Config.default :workflows_enabled,true
+  Seek::Config.default :assays_enabled,false
+  Seek::Config.default :publications_enabled,false
   Seek::Config.default :authorization_checks_enabled, false
   Seek::Config.default :assay_type_ontology_file, "JERM-RDFXML.owl"
   Seek::Config.default :technology_type_ontology_file, "JERM-RDFXML.owl"
@@ -114,11 +117,18 @@ SEEK::Application.configure do
 
   Seek::Config.default :datacite_url,"https://mds.datacite.org/"
 
+  #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
+  Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
+
   # Admin setting to allow user impersonation
   Seek::Config.default :admin_impersonation_enabled, true
 
   #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
   Seek::Config.default :magic_guest_enabled,true
+
+  Seek::Config.default :recaptcha_enabled, true
+
+  Seek::Config.default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
   
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,'biovel_application'

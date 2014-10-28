@@ -174,8 +174,9 @@ class Publication < ActiveRecord::Base
   def publication_author_names
     author_names = []
     publication_authors.each do |author|
-      if author.kind_of?(Person)
-        author_names << author.name
+      seek_author = author.person
+      unless seek_author.nil?
+        author_names << seek_author.name
       else
         author_names << author.first_name + " " + author.last_name
       end
@@ -248,7 +249,7 @@ class Publication < ActiveRecord::Base
 
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
-    true
+    Seek::Config.publications_enabled
   end
 end
 

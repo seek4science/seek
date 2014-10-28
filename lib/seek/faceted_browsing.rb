@@ -52,9 +52,10 @@ module Seek
 
     def get_items item_type, item_ids
       items = []
+      item_ids.collect!(&:to_i)
       if !item_type.blank?
         clazz = item_type.constantize
-        items = clazz.find_all_by_id(item_ids.collect(&:to_i))
+        items = clazz.find_all_by_id(item_ids)
         if clazz.respond_to?(:authorize_asset_collection)
           items = clazz.authorize_asset_collection(items,"view")
         else

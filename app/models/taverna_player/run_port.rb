@@ -52,6 +52,8 @@ module TavernaPlayer
 
   class RunPort::Input < RunPort
     include TavernaPlayer::Concerns::Models::Input
+    include TavernaPlayer::Concerns::Models::DataFileInput
+
   end
 
   class RunPort::Output < RunPort

@@ -1,3 +1,5 @@
+<%= javascript_include_tag :runs %>
+
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @workflow.category.name, main_app.workflows_path(:category_id => @workflow.category) -%> &gt;
@@ -22,7 +24,6 @@
       </p>
     </div>
 <% end %>
-
 
 <div class="show_basic">
   <%= error_messages_for :run -%>

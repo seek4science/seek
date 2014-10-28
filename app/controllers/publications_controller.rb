@@ -6,6 +6,8 @@ class PublicationsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::BioExtension
 
+  before_filter :publications_enabled?
+
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]

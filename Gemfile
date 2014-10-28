@@ -14,7 +14,7 @@ gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"~>0.13.3"
 gem "rmagick","2.13.2", :require => 'RMagick'
 gem "mysql2"
-gem 'rest-client',">=1.6.1"
+gem 'rest-client'
 gem 'factory_girl', "2.6.4"
 gem 'rubyzip', "~> 1.1.4"
 gem 'bio'
@@ -83,7 +83,7 @@ gem 'taverna-t2flow'
 gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
 gem 'jquery-rails', '~> 3'
 
-gem "recaptcha", '0.3.1'
+gem "recaptcha"
 gem 'metainspector'
 gem 'mechanize'
 
@@ -106,6 +106,7 @@ group :development do
   gem "rubycritic",:require=>false
   gem "guard-rubycritic",:require=>false
   gem 'unicorn-rails'
+  gem 'rails_best_practices'
 end
 
 group :test do
@@ -113,9 +114,11 @@ group :test do
   gem "sqlite3"
   gem "ruby-prof"
   gem "webmock"
-  gem 'minitest-reporters','~> 0.14'
+  gem "minitest","~> 4.0"
+  gem 'minitest-reporters'
   gem 'coveralls', require: false
   gem 'rspec-rails'
   gem 'sunspot_matchers'
+  gem 'pg'
 end
 
