@@ -226,4 +226,9 @@ class AssetTest < ActiveSupport::TestCase
     assert workflow.is_doiable?
     assert !presentation.is_doiable?
   end
+
+  test "is_doi_minted?" do
+    df = Factory :data_file
+    assert df.is_doi_minted?
+  end
 end

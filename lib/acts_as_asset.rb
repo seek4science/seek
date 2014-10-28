@@ -172,6 +172,10 @@ module Acts #:nodoc:
         Seek::Util.doiable_asset_types.include?(self.class)
       end
 
+      def is_doi_minted?
+        true
+      end
+
       def cache_remote_content_blob
         blobs = []
         blobs << self.content_blob if self.respond_to?(:content_blob)
