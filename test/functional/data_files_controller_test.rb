@@ -1892,6 +1892,7 @@ end
 
     get :show,:id=>df
     assert_response :success
+    assert_select "h1", :text=>'403'
     assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
 
     assert !df.can_see_hidden_item?(User.current_user.person)
@@ -1914,6 +1915,7 @@ end
 
     get :show,:id=>df
     assert_response :success
+    assert_select "h1", :text=>'403'
     assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
 
     contributor_person = df.contributor.person
