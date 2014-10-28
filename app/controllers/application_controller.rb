@@ -337,15 +337,17 @@ class ApplicationController < ActionController::Base
       end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
-        if eval("@#{name}").nil?
-          flash[:error] = "The #{name.humanize.downcase} does not exist!"
-        else
-          flash[:error] = "You are not authorized to view #{name.humanize}"
+        format.html do
+          if eval("@#{name}").nil?
+            render :template => "general/landing_page_for_not_found_item"
+          else
+            render :template => "general/landing_page_for_hidden_item", :locals => {:item => object}
+          end
         end
+
         format.rdf { render  :text=>"Not found",:status => :not_found }
         format.xml { render  :text=>"<error>404 Not found</error>",:status => :not_found }
         format.json { render :text=>"Not found", :status => :not_found }
-        format.html { redirect_to eval "#{self.controller_name}_path" }
       end
       return false
     end

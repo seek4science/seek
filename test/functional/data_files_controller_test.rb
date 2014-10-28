@@ -1920,6 +1920,13 @@ end
     assert_select "a[href=?]", person_path(contributor_person)
   end
 
+  test "landing page for non-existing item" do
+    get :show,:id=>123
+    assert_response :success
+    assert_select "h1", :text=>'404'
+    assert_select "h2",:text=>/The #{I18n.t('data_file')} does not exist./
+  end
+
   private
 
   def mock_http
