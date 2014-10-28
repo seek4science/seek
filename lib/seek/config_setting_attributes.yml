@@ -121,3 +121,4 @@ profile_select_by_default:
 recaptcha_public_key:
 recaptcha_private_key:
 support_email_address:
+show_as_external_link_enabled:

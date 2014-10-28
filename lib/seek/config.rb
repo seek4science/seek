@@ -333,7 +333,7 @@ module Seek
       yaml = YAML.load_file(File.join(File.dirname(File.expand_path(__FILE__)), 'config_setting_attributes.yml'))
       yaml.keys.map { |k| k.to_sym }
     end
-      :show_as_external_link_enabled,
+
 
     # Settings that require a conversion to integer
     setting :tag_threshold, convert: 'to_i'
