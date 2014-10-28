@@ -88,5 +88,9 @@ module Seek
     def self.multi_files_asset_types
       [Model]
     end
+
+    def self.doiable_asset_types
+      [DataFile, Model, Sop, Workflow]
+    end
   end
 end

@@ -214,4 +214,16 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal publication.creators,publication.related_people
   end
 
+  test "is_doiable?" do
+    df = Factory :data_file
+    sop = Factory :sop
+    model = Factory :model
+    workflow = Factory :workflow
+    presentation = Factory :presentation
+    assert df.is_doiable?
+    assert sop.is_doiable?
+    assert model.is_doiable?
+    assert workflow.is_doiable?
+    assert !presentation.is_doiable?
+  end
 end

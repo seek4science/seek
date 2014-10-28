@@ -168,6 +168,10 @@ module Acts #:nodoc:
         self.relationships.select { |a| a.other_object_type == "Publication" }.collect { |a| a.other_object }
       end
 
+      def is_doiable?
+        Seek::Util.doiable_asset_types.include?(self.class)
+      end
+
       def cache_remote_content_blob
         blobs = []
         blobs << self.content_blob if self.respond_to?(:content_blob)
