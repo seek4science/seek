@@ -127,6 +127,10 @@ module Acts #:nodoc:
 
     module InstanceMethods
 
+      def managers_names
+        managers.collect(&:title).join(", ")
+      end
+
       def contains_downloadable_items?
         blobs = []
         blobs << self.content_blob if self.respond_to?(:content_blob)

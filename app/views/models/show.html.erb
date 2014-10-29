@@ -7,23 +7,6 @@
 <ul class="sectionIcons">
   <%= asset_buttons @model, @display_model.version -%>
 
-  <% if Seek::Config.jws_enabled && @display_model.is_jws_supported? -%>
-      <% jws_supported_content_blob = @display_model.jws_supported_content_blobs.first %>
-      <% if jws_supported_content_blob.is_in_simulatable_size_limit? %>
-          <% if @model.can_edit? -%>
-              <li>
-                <%= image_tag_for_key('jws_builder', builder_model_path(@model, :version => @display_model.version), nil, nil, "JWS One Stop") -%>
-              </li>
-          <% end -%>
-          <% if can_download_asset?(@model, params[:code]) -%>
-              <li>
-                <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate #{t('model')} on JWS") -%>
-              </li>
-          <% end -%>
-      <% end -%>
-  <% end -%>
-
-
   <% if Seek::Config.solr_enabled && @display_model.latest_version? && (@model.contains_sbml? || @model.contains_jws_dat?) -%>
       <li>
         <%= image_tag_for_key("search",matching_data_model_path(@model),nil,nil,"Find related #{t('data_file').pluralize}") -%>

@@ -11,9 +11,9 @@ class ModelsController < ApplicationController
   before_filter :models_enabled?
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
-  before_filter :find_display_asset, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:matching_data,:visualise,:export_as_xgmml,:compare_versions]
+  before_filter :find_display_asset, :only=>[:show,:download,:execute,:matching_data,:visualise,:export_as_xgmml,:compare_versions]
 
-  before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
+  before_filter :jws_enabled,:only=>[]
 
   before_filter :find_other_version,:only=>[:compare_versions]
 
@@ -22,8 +22,6 @@ class ModelsController < ApplicationController
   include Seek::BreadCrumbs
 
   include Bives
-
-  @@model_builder = Seek::JWS::Builder.new
 
   def find_other_version
     version = params[:other_version]
@@ -119,102 +117,6 @@ class ModelsController < ApplicationController
     end
   end
 
-  def builder
-    saved_file=params[:saved_file]
-    error=nil
-    supported=false
-    begin
-      if saved_file
-        supported=true
-        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
-      else
-        supported = @display_model.is_jws_supported?
-        if supported
-          content_blob = @display_model.jws_supported_content_blobs.first
-          @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content content_blob
-        end
-      end
-    rescue Exception=>e
-      error=e
-      logger.error "Error submitting to JWS Online OneStop - #{e.message}"
-      raise e unless Rails.env=="production"
-    end
-
-    respond_to do |format|
-      if error
-        flash[:error]="JWS Online encountered a problem processing this model."
-        format.html { redirect_to model_path(@model,:version=>@display_model.version)}
-      elsif !supported
-        flash[:error]="This #{t('model')} is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
-        format.html { redirect_to model_path(@model,:version=>@display_model.version)}
-      else
-        format.html
-      end
-    end
-  end
-
-  def submit_to_jws
-    following_action=params.delete("following_action")
-    error=nil
-
-    #FIXME: currently we have to assume that a model with multiple files only contains 1 model file that would be executed on jws online, and only the first one is chosen
-    raise Exception.new("JWS Online is not supported for this model") unless @model.is_jws_supported?
-    content_blob = @model.jws_supported_content_blobs.first
-
-    begin
-      if following_action == "annotate"
-        @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = Seek::JWS::Annotator.new.annotate params
-      else
-        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
-      end
-    rescue Exception => e
-      error=e
-      raise e unless Rails.env == "production"
-    end
-
-    if (!error && @error_keys.empty?)
-      if following_action == "save_new_version"
-        model_format=params.delete("saved_model_format") #only used for saving as a new version
-        new_version_filename=params.delete("new_version_filename")
-        new_version_comments=params.delete("new_version_comments")
-        if model_format == "dat"
-          url=@@model_builder.saved_dat_download_url @saved_file
-        elsif model_format == "sbml"
-          url=@@model_builder.sbml_download_url @saved_file
-        end
-        if url
-          downloader=Seek::RemoteDownloader.new
-          data_hash = downloader.get_remote_data url
-          File.open(data_hash[:data_tmp_path],"r") do |f|
-            content_blob = @model.content_blobs.build(:data=>f.read)
-          end
-          content_blob.content_type=model_format=="sbml" ? "text/xml" : "text/plain"
-          content_blob.original_filename=new_version_filename
-        end
-      end
-    end
-
-    respond_to do |format|
-      if error
-        flash[:error]="JWS Online encountered a problem processing this model."
-        format.html { render :action=>"builder" }
-      elsif @error_keys.empty? && following_action == "simulate"
-        @modelname=@saved_file
-        @no_sidebar=true
-        format.html {render :simulate}
-      elsif @error_keys.empty? && following_action == "annotate"
-        format.html {render :action=>"annotator"}
-      elsif @error_keys.empty? && following_action == "save_new_version"
-        create_new_version(new_version_comments)
-        content_blob.asset_version = @model.version
-        content_blob.save!
-        format.html {redirect_to  model_path(@model,:version=>@model.version) }
-      else
-        format.html { render :action=>"builder" }
-      end
-    end
-  end
-
   def submit_to_sycamore
     @model = Model.find_by_id(params[:id])
     @display_model = @model.find_version(params[:version])
@@ -231,32 +133,6 @@ class ModelsController < ApplicationController
         page['sycamore-form'].submit()
       else
         page.alert(error_message)
-      end
-    end
-  end
-
- def simulate
-    error=nil
-    begin
-      if @display_model.is_jws_supported?
-        @modelname = Seek::JWS::Simulator.new.simulate(@display_model.jws_supported_content_blobs.first)
-      end
-    rescue Exception=>e
-      Rails.logger.error("Problem simulating #{t('model')} on JWS Online #{e}")
-      raise e unless Rails.env=="production"
-      error=e
-    end
-
-    respond_to do |format|
-      if error
-        flash[:error]="JWS Online encountered a problem processing this model."
-        format.html { redirect_to(@model, :version=>@display_model.version) }
-      elsif !@display_model.is_jws_supported?
-        flash[:error]="This #{t('model')} is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
-        format.html { redirect_to(@model, :version=>@display_model.version) }
-      else
-        @no_sidebar=true
-         format.html { render :simulate }
       end
     end
   end
@@ -367,27 +243,14 @@ class ModelsController < ApplicationController
       update_annotations @model
       update_scales @model
       build_model_image @model,params[:model_image]
-      assay_ids = params[:assay_ids] || []
+
       respond_to do |format|
         if @model.save
-
           create_content_blobs
-          # update attributions
-          Relationship.create_or_update_attributions(@model, params[:attributions])
-
-          # update related publications
-          Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@model, params[:creators])
-
+          update_relationships(@model,params)
+          update_assay_assets(@model,params[:assay_ids])
           flash[:notice] = "#{t('model')} was successfully uploaded and saved."
           format.html { redirect_to model_path(@model) }
-          Assay.find(assay_ids).each do |assay|
-            if assay.can_edit?
-              assay.relate(@model)
-            end
-          end
         else
           format.html {
             render :action => "new"
@@ -399,6 +262,8 @@ class ModelsController < ApplicationController
     end
 
   end
+
+
 
   # PUT /models/1
   # PUT /models/1.xml
@@ -415,7 +280,6 @@ class ModelsController < ApplicationController
 
     update_annotations @model
     update_scales @model
-    publication_params = params[:related_publication_ids].nil? ? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }
 
     @model.attributes = params[:model]
 
@@ -424,34 +288,14 @@ class ModelsController < ApplicationController
       @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
     end
 
-    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @model.save
 
-        # update attributions
-        Relationship.create_or_update_attributions(@model, params[:attributions])
-
-        # update related publications
-        Relationship.create_or_update_attributions(@model, publication_params, Relationship::RELATED_TO_PUBLICATION)
-
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@model, params[:creators])
+        update_relationships(@model,params)
+        update_assay_assets(@model,params[:assay_ids])
 
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
-        # Update new assay_asset
-        Assay.find(assay_ids).each do |assay|
-          if assay.can_edit?
-            assay.relate(@model)
-          end
-        end
-        #Destroy AssayAssets that aren't needed
-        assay_assets = @model.assay_assets
-        assay_assets.each do |assay_asset|
-          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
-            AssayAsset.destroy(assay_asset.id)
-          end
-        end
       else
         format.html {
           render :action => "edit"
@@ -503,8 +347,6 @@ class ModelsController < ApplicationController
     end
   end
 
-
-
   protected
 
   def create_new_version comments
@@ -516,8 +358,6 @@ class ModelsController < ApplicationController
   end
 
   def translate_action action
-    action="download" if action == "simulate"
-    action="edit" if ["submit_to_jws","builder"].include?(action)
     action="view" if ["matching_data"].include?(action)
     super action
   end

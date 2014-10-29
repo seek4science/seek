@@ -58,7 +58,7 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether integration with JWS Online is enabled. Enabling this allows simulation of SBML models, and editing them using JWS OneStop",
+            :description=>"Whether integration with JWS Online is enabled. Enabling this allows simulation of SBML models with JWS Online.",
             :name=>"JWS Online enabled",
             :field=>check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled, :onchange=>toggle_appear_javascript('jws_online_details'),:title => 'enable JWS Online for building and simulating SBML models')
     } -%>

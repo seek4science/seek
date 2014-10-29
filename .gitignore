@@ -3,6 +3,7 @@ syntax: glob
 .idea/
 
 data.sql
+rails_best_practices_output.html
 
 db/*.sqlite3
 db/*.sqlite3-journal
