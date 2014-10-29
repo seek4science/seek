@@ -1,7 +1,18 @@
 <div class="dialog">
   <h1>404</h1>
-  <h2>The <%= t("#{controller_name.singularize}")%> does not exist.</h2>
-  <p style="text-align: center;">You may have mistyped the address or the <%= t("#{controller_name.singularize}")%> may have deleted.</p>
+  <% asset_type = t("#{controller_name.singularize}") %>
+  <h2>The <%= asset_type %> does not exist.</h2>
+
+  <% klass = controller_name.singularize.camelize %>
+  <% if AssetDoiLog.was_doi_minted_for?(klass, params[:id]) %>
+      <% asset_doi_log = AssetDoiLog.where(asset_type: klass, asset_id: params[:id], action: AssetDoiLog::DELETE).last %>
+      <% comment = asset_doi_log.try(:comment) %>
+      <% unless comment.blank? %>
+          <p class="comment">The authors left the reason for removing the <%= asset_type %>: <%= comment.html_safe %></p>
+      <% end %>
+  <% else %>
+      <p>You may have mistyped the address or the <%= asset_type %> may have deleted.</p>
+  <% end %>
 </div>
 
 
@@ -12,5 +23,6 @@
     }
     div.dialog h1 { font-size: 300%; color: #00d; }
     div.dialog h2 { font-size: 200%; color: #00d; }
-    div.dialog p  { font-size: 150%; color: #555 }
+    div.dialog p  { font-size: 150%; color: #555; text-align: center; }
+    p.comment {}
 </style>

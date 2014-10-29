@@ -1942,6 +1942,18 @@ end
     assert_select "h2",:text=>/The #{I18n.t('data_file')} does not exist./
   end
 
+  test "landing page for deleted item which DOI was minted" do
+    comment = 'the paper was restracted'
+    klass = 'DataFile'
+    id = 123
+    AssetDoiLog.create(:asset_type => klass, :asset_id=> id, :action => AssetDoiLog::MINT, :comment => comment)
+    AssetDoiLog.create(:asset_type => klass, :asset_id=> id, :action => AssetDoiLog::DELETE, :comment => comment)
+    assert AssetDoiLog.was_doi_minted_for?(klass, id)
+    get :show,:id=>id
+    assert_response :success
+    assert_select "p[class=comment]",:text=>/#{comment}/
+  end
+
   private
 
   def mock_http
