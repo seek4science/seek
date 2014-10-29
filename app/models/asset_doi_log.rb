@@ -4,5 +4,7 @@ class AssetDoiLog < ActiveRecord::Base
   belongs_to :asset, :polymorphic => true #, :required_access => false
   belongs_to :user #, :required_access => false
 
-  ACTIONS = %w(mint, delete, un-publish)
+  MINT = 1
+  DELETE = 2
+  UNPUBLISH = 3
 end

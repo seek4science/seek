@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141017125035) do
+ActiveRecord::Schema.define(:version => 20141028161450) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -184,6 +184,17 @@ ActiveRecord::Schema.define(:version => 20141017125035) do
   create_table "assays_samples", :id => false, :force => true do |t|
     t.integer "assay_id"
     t.integer "sample_id"
+  end
+
+  create_table "asset_doi_logs", :force => true do |t|
+    t.string   "asset_type"
+    t.integer  "asset_id"
+    t.integer  "asset_version"
+    t.string   "action"
+    t.text     "comment"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.integer  "user_id"
   end
 
   create_table "assets", :force => true do |t|

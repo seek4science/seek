@@ -1,12 +1,19 @@
 <div class="dialog">
   <h1>403</h1>
-  <h2>The <%= t("#{controller_name.singularize}")%> is not visible to you.</h2>
+  <% asset_type =  t("#{controller_name.singularize}") %>
+  <h2>The <%= asset_type %> is not visible to you.</h2>
   <p style="text-align: center;">You may need to login.</p>
   <%  hidden_item_contributor_links = hidden_item_contributor_links([item])%>
   <% unless hidden_item_contributor_links.empty? %>
     <p style="text-align: center;">Or you may want to contact the authors: <%= hidden_item_contributor_links([item]).join(', ').html_safe%></p>
   <% end %>
-  <%  %>
+  <% if item.is_doi_minted? %>
+      <% asset_doi_log = AssetDoiLog.where(asset_type: item.class.name, asset_id: item.id, action: AssetDoiLog::UNPUBLISH).last %>
+      <% comment = asset_doi_log.try(:comment) %>
+      <% unless comment.blank? %>
+        <p class="comment" style="text-align: center;">The authors left the reason for un-publishing the <%= asset_type %>: <%= comment.html_safe %></p>
+      <% end %>
+  <% end %>
 </div>
 
 

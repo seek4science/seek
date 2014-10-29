@@ -1922,6 +1922,19 @@ end
     assert_select "a[href=?]", person_path(contributor_person)
   end
 
+  test "landing page for hidden item which DOI was minted" do
+    df = Factory(:data_file,:policy=>Factory(:private_policy),:title=>"fish flop",:description=>"testing json description")
+    comment = 'the paper was restracted'
+    AssetDoiLog.create(:asset_type => df.class.name, :asset_id=> df.id, :action => AssetDoiLog::UNPUBLISH, :comment => comment)
+
+    assert !df.can_view?
+    assert df.is_doi_minted?
+
+    get :show,:id=>df
+    assert_response :success
+    assert_select "p[class=comment]",:text=>/#{comment}/
+  end
+
   test "landing page for non-existing item" do
     get :show,:id=>123
     assert_response :success
