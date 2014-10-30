@@ -6,7 +6,7 @@
   <% klass = controller_name.singularize.camelize %>
   <% version = params[:version] %>
   <% if AssetDoiLog.was_doi_minted_for?(klass, params[:id], version) %>
-      <% asset_doi_log = AssetDoiLog.where(asset_type: klass, asset_id: params[:id], version: version, action: AssetDoiLog::DELETE).last %>
+      <% asset_doi_log = AssetDoiLog.where(asset_type: klass, asset_id: params[:id], asset_version: version, action: AssetDoiLog::DELETE).last %>
       <% comment = asset_doi_log.try(:comment) %>
       <% unless comment.blank? %>
           <p class="comment">The authors left the reason for removing the <%= asset_type %>: <%= comment.html_safe %></p>

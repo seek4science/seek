@@ -10,7 +10,7 @@
 
   <% version = params[:version] || item.version %>
   <% if AssetDoiLog.was_doi_minted_for?(item.class.name, item.id, version) %>
-      <% asset_doi_log = AssetDoiLog.where(asset_type: item.class.name, asset_id: item.id, version: version, action: AssetDoiLog::UNPUBLISH).last %>
+      <% asset_doi_log = AssetDoiLog.where(asset_type: item.class.name, asset_id: item.id, asset_version: version, action: AssetDoiLog::UNPUBLISH).last %>
       <% comment = asset_doi_log.try(:comment) %>
       <% unless comment.blank? %>
         <p class="comment" style="text-align: center;">The authors left the reason for un-publishing the <%= asset_type %>: <%= comment.html_safe %></p>

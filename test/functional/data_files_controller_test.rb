@@ -1925,10 +1925,11 @@ end
   test "landing page for hidden item which DOI was minted" do
     df = Factory(:data_file,:policy=>Factory(:private_policy),:title=>"fish flop",:description=>"testing json description")
     comment = 'the paper was restracted'
-    AssetDoiLog.create(:asset_type => df.class.name, :asset_id=> df.id, :action => AssetDoiLog::UNPUBLISH, :comment => comment)
+    AssetDoiLog.create(:asset_type => df.class.name, :asset_id=> df.id, :asset_version => df.version, :action => AssetDoiLog::MINT)
+    AssetDoiLog.create(:asset_type => df.class.name, :asset_id=> df.id, :asset_version => df.version, :action => AssetDoiLog::UNPUBLISH, :comment => comment)
 
     assert !df.can_view?
-    assert df.is_doi_minted?
+    assert AssetDoiLog.was_doi_minted_for?(df.class.name, df.id, df.version)
 
     get :show,:id=>df
     assert_response :success
@@ -1946,10 +1947,11 @@ end
     comment = 'the paper was restracted'
     klass = 'DataFile'
     id = 123
-    AssetDoiLog.create(:asset_type => klass, :asset_id=> id, :action => AssetDoiLog::MINT, :comment => comment)
-    AssetDoiLog.create(:asset_type => klass, :asset_id=> id, :action => AssetDoiLog::DELETE, :comment => comment)
-    assert AssetDoiLog.was_doi_minted_for?(klass, id)
-    get :show,:id=>id
+    version = 1
+    AssetDoiLog.create(:asset_type => klass, :asset_id=> id, :asset_version => version, :action => AssetDoiLog::MINT)
+    AssetDoiLog.create(:asset_type => klass, :asset_id=> id, :asset_version => version, :action => AssetDoiLog::DELETE, :comment => comment)
+    assert AssetDoiLog.was_doi_minted_for?(klass, id, version)
+    get :show,:id=>id, :version=>version
     assert_response :success
     assert_select "p[class=comment]",:text=>/#{comment}/
   end
