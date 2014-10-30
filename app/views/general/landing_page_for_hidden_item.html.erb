@@ -8,7 +8,7 @@
     <p style="text-align: center;">Or you may want to contact the authors: <%= hidden_item_contributor_links([item]).join(', ').html_safe%></p>
   <% end %>
 
-  <% version = params[:version] || item.version %>
+  <% version = params[:version] || (item.respond_to?(:version) && item.version) %>
   <% if AssetDoiLog.was_doi_minted_for?(item.class.name, item.id, version) %>
       <% asset_doi_log = AssetDoiLog.where(asset_type: item.class.name, asset_id: item.id, asset_version: version, action: AssetDoiLog::UNPUBLISH).last %>
       <% comment = asset_doi_log.try(:comment) %>

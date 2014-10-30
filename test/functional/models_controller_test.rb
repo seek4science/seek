@@ -208,8 +208,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "fail gracefullly when trying to access a missing model" do
     get :show,:id=>99999
-    assert_redirected_to models_path
-    assert_not_nil flash[:error]
+    assert_response :not_found
   end
   
   test "should get new as non admin" do

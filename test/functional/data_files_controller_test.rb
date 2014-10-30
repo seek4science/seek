@@ -1208,8 +1208,7 @@ end
 
   test "fail gracefullly when trying to access a missing data file" do
     get :show,:id=>99999
-    assert_redirected_to data_files_path
-    assert_not_nil flash[:error]
+    assert_response :not_found
   end
 
   test "owner should be able to update sharing" do
@@ -1608,18 +1607,14 @@ end
     df=Factory :data_file
     logout
     get :show, :id=>df
-    assert_redirected_to data_files_path
-    assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this #{I18n.t('data_file')}, you may need to login first.",flash[:error]
+    assert_response :forbidden
   end
 
   test "should not show private data file to another user" do
 
     df=Factory :data_file,:contributor=>Factory(:user)
     get :show, :id=>df
-    assert_redirected_to data_files_path
-    assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this #{I18n.t('data_file')}.",flash[:error]
+    assert_response :forbidden
   end
 
   test "should show error for the user who doesn't login or is not the project member, when the user specify the version and this version is not the latest version" do

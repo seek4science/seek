@@ -8,8 +8,7 @@ module FunctionalAuthorizationTests
     logout
 
     get :show,:id=>item.id
-    assert_redirected_to eval("#{itemname.pluralize}_path")
-    assert_not_nil flash[:error]
+    assert_response :forbidden
 
   end
 
@@ -22,8 +21,7 @@ module FunctionalAuthorizationTests
     login_as(another_user)
 
     get :show,:id=>item.id
-    assert_redirected_to eval("#{itemname.pluralize}_path")
-    assert_not_nil flash[:error]
+    assert_response :forbidden
   end
 
   def test_private_item_accessible_by_owner

@@ -1226,8 +1226,7 @@ class PeopleControllerTest < ActionController::TestCase
     logout
     as_virtualliver do
       get :show, id: a_person
-      assert_response :redirect
-      refute_nil flash[:error]
+      assert_response :forbidden
     end
   end
 

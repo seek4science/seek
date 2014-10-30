@@ -1219,8 +1219,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay = Factory(:assay,:policy=>Factory(:private_policy),:title=>"the assay")
     refute assay.can_view?
     get :new_object_based_on_existing_one,:id=>assay.id
-    assert_redirected_to assays_path
-    refute_nil flash[:error]
+    assert_response :forbidden
   end
 
   test "new object based on existing one when can view but not logged in" do

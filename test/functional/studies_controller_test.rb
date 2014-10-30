@@ -424,8 +424,7 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory :study,:title=>"the private study",:policy=>Factory(:private_policy)
     refute study.can_view?
     get :new_object_based_on_existing_one,:id=>study.id
-    assert_redirected_to studies_path
-    refute_nil flash[:error]
+    assert_response :forbidden
   end
 
   test "logged out user can't see new" do
