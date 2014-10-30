@@ -234,9 +234,9 @@ class ApplicationController < ActionController::Base
         params.delete(column_name)
       end
 
-      # update 'last_used_at' timestamp on the Model
       params[:last_used_at] = Time.now
     end
+    params
   end
 
   def currently_logged_in
