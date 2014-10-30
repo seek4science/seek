@@ -366,6 +366,7 @@ SEEK::Application.routes.draw do
       post :execute
       post :request_resource
       post :destroy_version
+      post :simulate
     end
     resources :model_images do
       collection do

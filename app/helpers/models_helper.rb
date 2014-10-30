@@ -66,4 +66,8 @@ module ModelsHelper
     options << "> #{text} </option>"
     options
   end
+
+  def show_jws_simulate?
+    Seek::Config.jws_enabled && @model.can_download? && @display_model.is_jws_supported?
+  end
 end

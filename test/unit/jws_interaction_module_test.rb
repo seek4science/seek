@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'jws_online_test_helper'
 
-class JwsSimualtorModuleTest < ActiveSupport::TestCase
+class JwsInteractionModuleTest < ActiveSupport::TestCase
 
   include Seek::Jws::Interaction
   include JwsOnlineTestHelper
@@ -33,6 +33,11 @@ class JwsSimualtorModuleTest < ActiveSupport::TestCase
     assert_equal "fish-soup",extract_slug_from_url("http://10.10.10.10/models/fish-soup")
     assert_equal "fish-soup",extract_slug_from_url("http://10.10.10.10/models/fish-soup/")
     assert_equal "fish-soup",extract_slug_from_url("http://10.10.10.10/models/fish-soup/simulate")
+  end
+
+  test "model_simulate_url_from_slug" do
+    expected="http://jws2.sysmo-db.org/models/bob-2/simulate"
+    assert_equal expected,model_simulate_url_from_slug("bob-2")
   end
 
 
