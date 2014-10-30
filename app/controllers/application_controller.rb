@@ -326,7 +326,7 @@ class ApplicationController < ActionController::Base
                 end
                 redirect_to(eval("#{self.controller_name.singularize}_path(#{object.id})"))
               else
-                render :template => "general/landing_page_for_hidden_item", :locals => {:item => object}
+                render :template => "general/landing_page_for_hidden_item", :locals => {:item => object}, :status => :forbidden
             end
           end
           format.rdf { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
@@ -339,9 +339,9 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         format.html do
           if eval("@#{name}").nil?
-            render :template => "general/landing_page_for_not_found_item"
+            render :template => "general/landing_page_for_not_found_item", :status => :not_found
           else
-            render :template => "general/landing_page_for_hidden_item", :locals => {:item => object}
+            render :template => "general/landing_page_for_hidden_item", :locals => {:item => object}, :status => :forbidden
           end
         end
 

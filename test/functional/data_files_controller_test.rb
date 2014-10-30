@@ -1891,7 +1891,7 @@ end
     assert !df.can_view?
 
     get :show,:id=>df
-    assert_response :success
+    assert_response :forbidden
     assert_select "h1", :text=>'403'
     assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
 
@@ -1914,7 +1914,7 @@ end
     assert df.can_see_hidden_item?(user.person)
 
     get :show,:id=>df
-    assert_response :success
+    assert_response :forbidden
     assert_select "h1", :text=>'403'
     assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
 
@@ -1932,13 +1932,13 @@ end
     assert AssetDoiLog.was_doi_minted_for?(df.class.name, df.id, df.version)
 
     get :show,:id=>df
-    assert_response :success
+    assert_response :forbidden
     assert_select "p[class=comment]",:text=>/#{comment}/
   end
 
   test "landing page for non-existing item" do
     get :show,:id=>123
-    assert_response :success
+    assert_response :not_found
     assert_select "h1", :text=>'404'
     assert_select "h2",:text=>/The #{I18n.t('data_file')} does not exist./
   end
@@ -1952,7 +1952,7 @@ end
     AssetDoiLog.create(:asset_type => klass, :asset_id=> id, :asset_version => version, :action => AssetDoiLog::DELETE, :comment => comment)
     assert AssetDoiLog.was_doi_minted_for?(klass, id, version)
     get :show,:id=>id, :version=>version
-    assert_response :success
+    assert_response :not_found
     assert_select "p[class=comment]",:text=>/#{comment}/
   end
 
