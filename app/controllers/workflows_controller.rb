@@ -99,15 +99,9 @@ class WorkflowsController < ApplicationController
   end
 
   def update
-    if params[:workflow]
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
-        params[:workflow].delete(column_name)
-      end
+    workflow_params=filter_protected_update_params(params[:workflow])
 
-      params[:workflow][:last_used_at] = Time.now
-    end
-
-    @workflow.attributes = params[:workflow]
+    @workflow.attributes = workflow_params
 
      if params[:sharing]
        @workflow.policy_or_default

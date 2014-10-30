@@ -111,20 +111,12 @@ class SopsController < ApplicationController
   
   # PUT /sops/1
   def update
-    # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-    if params[:sop]
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
-        params[:sop].delete(column_name)
-      end
-      
-      # update 'last_used_at' timestamp on the SOP
-      params[:sop][:last_used_at] = Time.now
-    end
-
+    sop_params=filter_protected_update_params(params[:sop])
+    
     update_annotations @sop
     update_scales @sop
 
-    @sop.attributes = params[:sop]
+    @sop.attributes = sop_params
 
     if params[:sharing]
       @sop.policy_or_default

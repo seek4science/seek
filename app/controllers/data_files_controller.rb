@@ -254,20 +254,13 @@ class DataFilesController < ApplicationController
   
   def update
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-    if params[:data_file]
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
-        params[:data_file].delete(column_name)
-      end
-      
-      # update 'last_used_at' timestamp on the DataFile
-      params[:data_file][:last_used_at] = Time.now
-    end
+    data_file_params=filter_protected_update_params(params[:data_file])
 
     update_annotations @data_file
     update_scales @data_file
 
     respond_to do |format|
-      @data_file.attributes = params[:data_file]
+      @data_file.attributes = data_file_params
 
       if params[:sharing]
         @data_file.policy_or_default
@@ -285,25 +278,6 @@ class DataFilesController < ApplicationController
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
 
-
-        # # Update new assay_asset
-        # a_ids = []
-        # assay_ids.each do |text|
-        #   a_id, r_type = text.split(",")
-        #   a_ids.push(a_id)
-        #   @assay = Assay.find(a_id)
-        #   if @assay.can_edit?
-        #     @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
-        #   end
-        # end
-        #
-        # #Destroy AssayAssets that aren't needed
-        # assay_assets = @data_file.assay_assets
-        # assay_assets.each do |assay_asset|
-        #   if assay_asset.assay.can_edit? and !a_ids.include?(assay_asset.assay_id.to_s)
-        #     AssayAsset.destroy(assay_asset.id)
-        #   end
-        # end
       else
         format.html {
           render :action => "edit"

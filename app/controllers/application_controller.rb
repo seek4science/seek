@@ -228,6 +228,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def filter_protected_update_params(params)
+    if params
+      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
+        params.delete(column_name)
+      end
+
+      # update 'last_used_at' timestamp on the Model
+      params[:last_used_at] = Time.now
+    end
+  end
+
   def currently_logged_in
     current_user.person
   end

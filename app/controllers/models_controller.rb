@@ -258,15 +258,7 @@ class ModelsController < ApplicationController
   # PUT /models/1.xml
   def update
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-    model_params=params[:model]
-    if model_params
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
-        model_params.delete(column_name)
-      end
-
-      # update 'last_used_at' timestamp on the Model
-      model_params[:last_used_at] = Time.now
-    end
+    model_params=filter_protected_update_params(params[:model])
 
     update_annotations @model
     update_scales @model
