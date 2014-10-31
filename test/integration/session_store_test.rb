@@ -3,7 +3,7 @@ require "test_helper"
 class SessionStoreTest < ActionController::IntegrationTest
 
   def setup
-    login_as_test_user "http://www.example.com"
+    login_as_test_user
   end
 
   test "should forbid the unauthorized page" do
@@ -17,7 +17,7 @@ class SessionStoreTest < ActionController::IntegrationTest
     get "/data_files/#{data_file.id}", {}, {'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"}
     assert_response :forbidden
 
-    login_as_test_user "http://www.example.com/data_files/#{data_file.id}"
+    login_as_test_user
     assert_redirected_to data_file_path(data_file)
     get "/data_files/#{data_file.id}"
     assert_response :success
@@ -32,7 +32,7 @@ class SessionStoreTest < ActionController::IntegrationTest
     get "/data_files/#{data_file.id}"
     assert_response :success
 
-    login_as_test_user "http://www.example.com/data_files/#{data_file.id}"
+    login_as_test_user
     assert_redirected_to data_file_path(data_file)
 
   end
@@ -44,9 +44,9 @@ class SessionStoreTest < ActionController::IntegrationTest
     User.authenticate("test", "blah") || Factory(:user, :login => "test", :password => "blah")
   end
 
-  def login_as_test_user referer
+  def login_as_test_user
     User.current_user = test_user
-    post "/session", {:login => test_user.login, :password => "blah"}, {'HTTP_REFERER' => referer}
+    post "/session", {:login => test_user.login, :password => "blah"}
   end
 
   def logout referer
