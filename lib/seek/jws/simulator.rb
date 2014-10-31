@@ -12,6 +12,7 @@ module Seek
       def simulate
         slug = upload_model_blob(select_jws_content_blob)
         @simulate_url = model_simulate_url_from_slug(slug)
+        @no_sidebar=true
       end
 
       def select_jws_content_blob
