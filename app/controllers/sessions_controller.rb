@@ -67,7 +67,9 @@ class SessionsController < ApplicationController
     if @user = User.authenticate(params[:login], params[:password])
       check_login
     else
-      failed_login "Invalid username/password."
+
+      failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten password?", main_app.forgot_password_url }</b>".html_safe
+
     end  
   end
 

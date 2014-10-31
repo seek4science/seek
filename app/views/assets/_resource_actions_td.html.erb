@@ -9,7 +9,7 @@
     <%= image_tag_for_key "show", show_resource_path(resource), nil, nil, "View" -%>
 
     <% if resource.contains_downloadable_items? && can_download_asset?(resource, params[:code],permissions.can_download)-%>
-      <%= image_tag_for_key "download", download_resource_path(resource, params[:code]) -%>
+      <%= download_or_link_button resource, download_resource_path(resource, params[:code]), resource.single_content_blob.try(:url)%>
     <% end -%>
     <% if permissions.can_manage -%>
       <%= image_tag_for_key "manage", edit_resource_path(resource), nil, nil, "Manage" -%>

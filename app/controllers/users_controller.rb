@@ -105,7 +105,7 @@ class UsersController < ApplicationController
     if request.get?
       # forgot_password.rhtml
     elsif request.post?      
-      user = User.find_by_login(params[:login])
+      user = User.find_by_login(params[:login]) || Person.where(email: params[:login]).first.try(:user)
 
       respond_to do |format|
         if user && user.person && !user.person.email.blank?
@@ -116,7 +116,7 @@ class UsersController < ApplicationController
           flash[:notice] = "Instructions on how to reset your password have been sent to #{user.person.email}"
           format.html { render :action => "forgot_password" }
         else
-          flash[:error] = "Invalid login: #{params[:login]}" if !user
+          flash[:error] = "Invalid login name/email: #{params[:login]}" if !user
           flash[:error] = "Unable to send you an email, as this information isn't available for #{params[:login]}" if user && (!user.person || user.person.email.blank?)
           format.html { render :action => "forgot_password" }
         end

@@ -294,8 +294,7 @@ SEEK::Application.routes.draw do
       post :convert_to_presentation
       post :update_annotations_ajax
       post :new_version
-      #MERGENOTE - this is a destroy, and should be the destory method, not post since we are not updating or creating something.
-      post :destroy_version
+      delete :destroy_version
     end
     resources :studied_factors do
       collection do
@@ -329,7 +328,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
-      post :destroy_version
+      delete :destroy_version
     end
     resources :content_blobs do
       member do
@@ -365,8 +364,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :execute
       post :request_resource
-      post :destroy_version
-      post :simulate
+      delete :destroy_version
     end
     resources :model_images do
       collection do
@@ -404,7 +402,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :update_annotations_ajax
       post :new_version
-      post :destroy_version
+      delete :destroy_version
     end
     resources :experimental_conditions do
       collection do

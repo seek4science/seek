@@ -68,6 +68,7 @@ SEEK::Application.configure do
   Seek::Config.default :technology_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
   Seek::Config.default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
   Seek::Config.default :profile_select_by_default,true
+  Seek::Config.default :show_as_external_link_enabled, true
   Seek::Config.default :programmes_enabled, true
   Seek::Config.default :project_hierarchy_enabled, true
 

@@ -15,14 +15,14 @@
      end
    end
 
-   web_pages  = multiple_fileinfo.content_blobs.select &:is_webpage
-   files =   multiple_fileinfo.content_blobs  - web_pages
+   external_links  = multiple_fileinfo.content_blobs.select &:show_as_external_link?
+   files =   multiple_fileinfo.content_blobs  - external_links
 %>
 <p>
   <strong> <%= pluralize(n, 'item') -%><%= model_image_text -%> <%= (n==1 && image_count==0) ? "is" : "are" %> associated with this <%= resource_text %>:</strong>
   <%= link_to_function "view in large icon","javascript:toggle_view(this);" %>
 
-  <% unless multiple_fileinfo.content_blobs .empty? %>
+  <% unless multiple_fileinfo.content_blobs.empty? %>
 <table id="file_list_view" class="fileinfo" style="display: block;padding-left: 2em; ">
   <th>Filename</th>
   <th>Format</th>
@@ -42,7 +42,7 @@
        </tr>
    <% end -%>
 
-  <% web_pages.each do |page| -%>
+  <% external_links.each do |page| -%>
         <tr class='fileinfo'>
           <td><%= link_to page.url, page.url, :target=>"_blank" -%></td>
           <td>Website</td>

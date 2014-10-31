@@ -354,6 +354,7 @@ module Seek
       yaml.keys.map { |k| k.to_sym }
     end
 
+
     # Settings that require a conversion to integer
     setting :tag_threshold, convert: 'to_i'
     setting :limit_latest, convert: 'to_i'

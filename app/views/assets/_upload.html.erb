@@ -84,7 +84,7 @@ with_image_file ||= false
           <div id="test_url_result"></div>
           <div id="copy_option" style="display:none;">
             <b>Upload a copy?</b>
-            <%= check_box_tag "content_blob[make_local_copy]", "0", false, :id => "make_local_copy" %>
+            <%= check_box_tag "content_blob[make_local_copy]", "1", false, :id => "make_local_copy" %>
           </div>
 
           <%= hidden_field_tag "content_blob[original_filename]", original_filename, :id => :original_filename %>
