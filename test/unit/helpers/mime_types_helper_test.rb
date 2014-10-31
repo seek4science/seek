@@ -22,7 +22,7 @@ class MimeTypesHelperTest < ActionView::TestCase
   RTF=%w{application/rtf}
   HTML=%w{text/html}
   SBML=%w{application/sbml+xml}
-
+  MP4_IN_MIME_MAGIC=%w{video/mp4}
   
   def test_recognised
     supported_types=MISC+EXCEL+EXCELX+DOC+DOCX+PPT+PDF+IMAGE+TEXT+CSV+XML+ODP+FODP+ODT+FODT+RTF+HTML
@@ -41,6 +41,10 @@ class MimeTypesHelperTest < ActionView::TestCase
       assert !mime_types.include?(type)
     end
 
+    mime_magic_types = mime_types_for_extension("mp4")
+    MP4_IN_MIME_MAGIC.each do |type|
+      assert mime_magic_types.include? type
+    end
     assert !mime_types.include?(nil)
   end
 
@@ -145,5 +149,13 @@ class MimeTypesHelperTest < ActionView::TestCase
   def test_not_recognised
     assert_equal "Unknown file type", mime_find("application/foobar-zoo-fish-squirrel")[:name]
   end
-  
+
+  def test_recognise_with_mime_magic
+    mime_not_in_seek = MP4_IN_MIME_MAGIC.first
+    assert !MIME_MAP[mime_not_in_seek]
+    assert mime_magic_map[mime_not_in_seek]
+    assert_equal "MPEG-4 video", mime_magic_map[mime_not_in_seek][:name]
+
+    assert_equal "MPEG-4 video", mime_nice_name(mime_not_in_seek)
+  end
 end

@@ -60,6 +60,33 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
+  def file_extension
+    original_filename && original_filename.split(".").last
+  end
+
+  def unrecognized_content_type?
+    content_type_in_database = read_attribute(:content_type)
+    unknown_type = mime_nice_name(content_type_in_database) == "Unknown file type"
+    binary_file = content_type_in_database == "application/octet-stream"
+    unknown_type || binary_file
+  end
+
+  def find_type_with_mime_magic
+    mime = MimeMagic.by_extension(file_extension)
+    file_path = if  file_exists?
+                  filepath
+                elsif !url.blank?
+                  Seek::RemoteDownloader.new.get_remote_data(url)[:data_tmp_path]
+                end
+    mime ||= MimeMagic.by_magic(File.open file_path) if File.exists?(file_path)
+    mime.try(:type)
+  end
+
+  def content_type
+    @content_type ||= find_type_with_mime_magic if unrecognized_content_type?
+    @content_type ||= read_attribute(:content_type)
+  end
+
   def human_content_type
     mime_nice_name(content_type)
   end
