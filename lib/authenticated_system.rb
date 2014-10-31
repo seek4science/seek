@@ -85,22 +85,13 @@ module AuthenticatedSystem
     session.delete(:return_to)
   end
 
-  def store_denied_and_redirected_to_location redirected_path
-    session[:denied_and_redirected_to] = redirected_path
-  end
-
-  def clear_denied_and_redirected_to
-    session.delete(:denied_and_redirected_to)
-  end
   # Redirect to the URI stored by the most recent store_return_to_location call or
   # to the passed default.
   def redirect_back_or_default(default)
-    denied_and_redirected_to_url = "#{application_root}#{session[:denied_and_redirected_to]}"
-    path = default.normalize_trailing_slash == denied_and_redirected_to_url.normalize_trailing_slash ? (session[:return_to]|| default) : default
-    redirect_to path
+    redirect_to(session[:return_to] || default)
     clear_return_to
-    clear_denied_and_redirected_to
   end
+
 
   def redirect_back
     if request.env['HTTP_REFERER']

@@ -104,7 +104,6 @@ class SessionsController < ApplicationController
       format.xml {session[:xml_login] = true; head :ok }
     end
     clear_return_to
-    clear_denied_and_redirected_to
   end
 
   def determine_return_url_after_login
