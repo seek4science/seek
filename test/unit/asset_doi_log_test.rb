@@ -1,9 +1,6 @@
 require 'test_helper'
 
 class AssetDoiLogTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
 
   test "was_doi_minted_for?" do
     df = Factory :data_file
