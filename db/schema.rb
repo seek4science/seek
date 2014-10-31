@@ -1566,7 +1566,6 @@ ActiveRecord::Schema.define(:version => 20141017125035) do
   end
 
   add_index "taverna_player_run_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "tav_player_run_user_asset_view_index"
-  add_index "taverna_player_run_auth_lookup", ["user_id", "can_view"], :name => "index_taverna_player_run_auth_lookup_on_user_id_and_can_view"
   add_index "taverna_player_run_auth_lookup", ["user_id", "can_view"], :name => "tav_player_run_user_view_index"
 
   create_table "taverna_player_run_ports", :force => true do |t|
