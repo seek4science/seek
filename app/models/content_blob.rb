@@ -60,6 +60,24 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
+  #allows you to run something on a temporary copy of the blob file, which is deleted once finished
+  # e.g. blob.with_temporary_copy{|copy_path| <some stuff with the copy>}
+  def with_temporary_copy
+    copy_path = make_temp_copy
+    begin
+      yield copy_path
+    ensure
+      FileUtils.rm(copy_path)
+    end
+  end
+
+  def make_temp_copy
+    temp_name = Time.now.strftime("%Y%m%d%H%M%S%L")+"-"+original_filename
+    temp_path = File.join(Seek::Config.temporary_filestore_path,temp_name).to_s
+    FileUtils.cp(filepath,temp_path)
+    temp_path
+  end
+
   def human_content_type
     mime_nice_name(content_type)
   end

@@ -1,17 +1,21 @@
+require 'uuidtools'
 module Seek
   module Jws
     # methods related to interacting with JWS
     module Interaction
       # uploads the model, and returns the "slug", which is the identifier used to construct URLS to interact wit the model
       def upload_model_blob(blob)
-        url = get_endpoint[get_upload_path].post(upload_payload(blob.filepath), cookie_header_definition) do |response, request, result, &block|
-          if response.code == 302
-            response.headers[:location]
-          else
-            response.return!(request, result, &block)
+        blob.with_temporary_copy do |temp_path|
+          payload = upload_payload(temp_path)
+          url = get_endpoint[get_upload_path].post(payload, cookie_header_definition) do |response, request, result, &block|
+            if response.code == 302
+              response.headers[:location]
+            else
+              response.return!(request, result, &block)
+            end
           end
+          extract_slug_from_url(url)
         end
-        extract_slug_from_url(url)
       end
 
       def model_simulate_url_from_slug(slug)
