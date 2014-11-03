@@ -15,13 +15,10 @@ module Seek
           #or from admin page --> manage assay types
           attr_accessor :link_from, :term_type
 
-
           validates_presence_of :label, :uri
           validates_uniqueness_of :label, :uri
           validate :label_not_defined_in_ontology
           before_validation :default_parent
-
-
 
           def default_parent_uri
             base_ontology_reader.default_parent_class_uri.try(:to_s)

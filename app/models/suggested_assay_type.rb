@@ -28,9 +28,9 @@ class SuggestedAssayType < ActiveRecord::Base
       end
   end
 
-   def self.base_ontology_labels
-       base_ontology_hash_by_label.keys
-   end
+  def self.base_ontology_labels
+     base_ontology_hash_by_label.keys
+  end
 
 
 

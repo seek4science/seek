@@ -1,6 +1,5 @@
 class AssayTypesController < ApplicationController
 
-
   before_filter :find_ontology_class, :only=>[:show]
   before_filter :find_and_authorize_assays, :only=>[:show]
 
@@ -11,23 +10,15 @@ class AssayTypesController < ApplicationController
     end
   end
 
-   private
+  private
 
   def find_ontology_class
     uri = params[:uri] || Seek::Ontologies::AssayTypeReader.instance.default_parent_class_uri.to_s
-
-    @is_modelling = false
     cls = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[uri]
 
-    if cls.nil?
-      cls = Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[uri]
-      @is_modelling = true
-    end
 
-    if cls.nil?
-      cls = SuggestedAssayType.where(:uri => uri).first
-      @is_modelling = cls.try(:is_for_modelling)
-    end
+    cls ||= Seek::Ontologies::ModellingAnalysisTypeReader.instance.class_hierarchy.hash_by_uri[uri]
+    cls ||= SuggestedAssayType.where(:uri => uri).first
 
     if cls.nil?
       flash.now[:error] = "Unrecognised assay type"
@@ -53,14 +44,5 @@ class AssayTypesController < ApplicationController
       @assays = Assay.authorize_asset_collection(assays, "view")
     end
   end
-
-  def check_allowed_to_edit_types
-    @assay_type=AssayType.find(params[:id])
-    if !@assay_type.is_user_defined
-       flash.now[:error] = "It cannot be edited, as it is extracted from external ontology!"
-    end
-  end
-
-
 
 end

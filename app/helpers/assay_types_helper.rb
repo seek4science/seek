@@ -1,6 +1,10 @@
 #encoding: utf-8
 module AssayTypesHelper
 
+  def is_modelling_type? type_class
+    type_class.term_type=="modelling analysis"
+  end
+
   def link_to_assay_type assay
         uri =  assay.assay_type_uri
         label = assay.assay_type_label
