@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141103143919) do
+ActiveRecord::Schema.define(:version => 20141103180504) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -146,15 +146,6 @@ ActiveRecord::Schema.define(:version => 20141103143919) do
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
   add_index "assay_organisms", ["organism_id"], :name => "index_assay_organisms_on_organism_id"
-
-  create_table "assay_types", :force => true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "term_uri"
-    t.string   "source_path"
-    t.integer  "contributor_id"
-  end
 
   create_table "assay_types_edges", :id => false, :force => true do |t|
     t.integer "parent_id"
@@ -1645,15 +1636,6 @@ ActiveRecord::Schema.define(:version => 20141103143919) do
   end
 
   add_index "taverna_player_service_credentials", ["uri"], :name => "index_taverna_player_service_credentials_on_uri"
-
-  create_table "technology_types", :force => true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "term_uri"
-    t.string   "source_path"
-    t.integer  "contributor_id"
-  end
 
   create_table "technology_types_edges", :id => false, :force => true do |t|
     t.integer "parent_id"
