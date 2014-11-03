@@ -2,7 +2,7 @@
 module AssayTypesHelper
 
   def is_modelling_type? type_class
-    type_class.term_type=="modelling analysis"
+    type_class.try(:term_type)==Seek::Ontologies::ModellingAnalysisTypeReader::TERM_TYPE
   end
 
   def link_to_assay_type assay

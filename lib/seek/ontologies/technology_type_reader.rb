@@ -5,6 +5,8 @@ module Seek
 
     class TechnologyTypeReader < OntologyReader
 
+      TERM_TYPE="technology"
+
       def default_parent_class_uri
         RDF::URI.new(Seek::Config.technology_type_base_uri)
       end
@@ -14,7 +16,7 @@ module Seek
       end
 
       def ontology_term_type
-        "technology"
+        TERM_TYPE
       end
     end
   end

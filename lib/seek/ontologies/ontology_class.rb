@@ -25,7 +25,7 @@ module Seek
       end
 
 
-      #returns an array of all the classes, inluding this and traversal of the subclasses
+      #returns an array of all the classes, including this and traversal of the subclasses
       def flatten_hierarchy c=self
         result = [c]
         c.subclasses.each do |s|

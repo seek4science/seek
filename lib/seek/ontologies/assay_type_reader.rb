@@ -5,6 +5,8 @@ module Seek
 
     class AssayTypeReader < OntologyReader
 
+      TERM_TYPE="assay"
+
       def default_parent_class_uri
         RDF::URI.new(Seek::Config.assay_type_base_uri)
       end
@@ -14,7 +16,7 @@ module Seek
       end
 
       def ontology_term_type
-        "assay"
+        TERM_TYPE
       end
     end
   end
