@@ -34,7 +34,7 @@ class ContentBlob < ActiveRecord::Base
   #is_webpage: whether text/html
   #MERGENOTE, FIXME: this isn't correct. it is possible to not make a local copy and also not display an external link
   #external_link: true means no local copy, false means local copy. Set true by default on upload page.
-  before_create :check_url_content_type
+  before_create :check_content_type
 
   has_many :worksheets, :dependent => :destroy
 
@@ -64,27 +64,27 @@ class ContentBlob < ActiveRecord::Base
     original_filename && original_filename.split(".").last
   end
 
-  def unrecognized_content_type?
-    content_type_in_database = read_attribute(:content_type)
-    unknown_type = mime_nice_name(content_type_in_database) == "Unknown file type"
-    binary_file = content_type_in_database == "application/octet-stream"
-    unknown_type || binary_file
+  def original_content_type
+    read_attribute(:content_type)
   end
 
-  def find_type_with_mime_magic
-    mime = MimeMagic.by_extension(file_extension)
-    file_path = if  file_exists?
-                  filepath
-                elsif !url.blank?
-                  Seek::RemoteDownloader.new.get_remote_data(url)[:data_tmp_path]
-                end
-    mime ||= MimeMagic.by_magic(File.open file_path) if File.exists?(file_path)
-    mime.try(:type)
+  def is_binary_file?
+    original_content_type == "application/octet-stream"
   end
+
 
   def content_type
-    @content_type ||= find_type_with_mime_magic if unrecognized_content_type?
-    @content_type ||= read_attribute(:content_type)
+    is_binary_file? ? find_or_keep_type_with_mime_magic : original_content_type
+  end
+
+  def unknown_file_type?
+    human_content_type == "Unknown file type"
+  end
+
+  def find_or_keep_type_with_mime_magic
+      mime = MimeMagic.by_extension(file_extension)
+      mime ||= MimeMagic.by_magic(File.open filepath)
+      mime.try(:type) || original_content_type
   end
 
   def human_content_type
@@ -211,8 +211,8 @@ class ContentBlob < ActiveRecord::Base
 
   private
 
-  def check_url_content_type
-    unless url.nil?
+  def check_content_type
+    if url
       begin
         response = RestClient.head url
         type = response.headers[:content_type] || ""
@@ -224,14 +224,17 @@ class ContentBlob < ActiveRecord::Base
           self.content_type = type
         end
 
-        self.content_type = type if self.human_content_type == "Unknown file type"
+        self.content_type = type if unknown_file_type?
       rescue Exception=>e
         self.is_webpage = false
         Rails.logger.warn("There was a problem reading the headers for the URL of the content blob = #{self.url}")
       end
+    elsif unknown_file_type? && file_exists?
+      type = find_or_keep_type_with_mime_magic
+      self.content_type = type
     end
   end
-  
+
   def dump_data_object_to_file
     data_to_save = @data
     
