@@ -10,7 +10,7 @@ module Seek
 
         # link_from: where the new assay type link was initiated, e.g. new assay type link at assay creation page,--> link_from = "assays".
         #or from admin page --> manage assay types
-        attr_accessor :link_from, :term_type
+        attr_accessor :term_type
 
         validates_presence_of :label, :uri
         validates_uniqueness_of :label, :uri
