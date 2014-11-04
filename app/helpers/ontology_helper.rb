@@ -9,7 +9,6 @@ module OntologyHelper
     ontology_select_tag form, "technology",element_id,selected_uri,html_options
   end
 
-
   def ontology_select_tag form,type,element_id,selected_uri,html_options={}
     options = ontology_select_options(type)
     form.select element_id,options,{:selected=>selected_uri},html_options

@@ -11,14 +11,6 @@ module Seek
         end
 
         alias_method_chain :children, :suggested_types
-        # returns an array of all ontology classes and suggested types
-        def flatten_hierarchy_with_suggested_types(c = self)
-          result = [c]
-          c.children.each do |s|
-            result += flatten_hierarchy_with_suggested_types(s)
-          end
-          result
-        end
 
         def suggested_children
           case term_type
@@ -45,7 +37,7 @@ module Seek
 
         def assays
           case term_type
-            when 'assay', 'modelling analysis'
+            when 'assay', 'modelling_analysis'
               Assay.find_all_by_assay_type_uri(uri.try(:to_s))
             when 'technology'
               Assay.find_all_by_technology_type_uri(uri.try(:to_s))

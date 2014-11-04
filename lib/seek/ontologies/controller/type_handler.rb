@@ -25,7 +25,7 @@ module Seek
             flash.now[:notice] = "Undefined #{type_text} with label <b> #{params[:label]} </b>. Did you mean #{link_to_alternative}?".html_safe
             @type_class = nil
           end
-          @label = params[:label] || @type_class.try(:label)
+
         end
 
         def find_ontology_type_class

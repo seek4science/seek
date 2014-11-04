@@ -4,7 +4,6 @@ module Seek
     class OntologyClass
       attr_reader :uri,:description,:label,:subclasses,:parents, :term_type
 
-
       alias_method :children, :subclasses
 
       def initialize uri,label=nil,description=nil, subclasses=[],parents=[], term_type=nil
@@ -24,6 +23,9 @@ module Seek
         @label
       end
 
+      def descriptive_label
+        label
+      end
 
       #returns an array of all the classes, including this and traversal of the subclasses
       def flatten_hierarchy c=self
@@ -69,4 +71,5 @@ module Seek
       end
     end
   end
+
 end

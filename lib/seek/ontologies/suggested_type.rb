@@ -6,7 +6,6 @@ module Seek
         alias_attribute :uuid, :uri
         acts_as_uniquely_identifiable
 
-
         belongs_to :contributor, :class_name => "Person"
 
         # link_from: where the new assay type link was initiated, e.g. new assay type link at assay creation page,--> link_from = "assays".
@@ -33,6 +32,11 @@ module Seek
         return nil if term.nil?
         rdf_uri = RDF::URI.new term.parent_uri
         rdf_uri.valid? ? term.parent : ontology_parent(term.parent)
+      end
+
+      def descriptive_label
+        comment = " - this is a new suggested term that specialises #{ontology_parent.try(:label)}"
+        (self.label + content_tag("span",comment,:class=>"none_text")).html_safe
       end
 
       # its own valid uri or its parent with valid uri
