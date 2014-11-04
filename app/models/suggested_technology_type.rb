@@ -26,9 +26,5 @@ class SuggestedTechnologyType < ActiveRecord::Base
     Array(self.new.base_ontology_reader.ontology_term_type)
   end
 
-  def self.uri_key_in_assay
-    "technology_type_uri"
-  end
-
 
 end

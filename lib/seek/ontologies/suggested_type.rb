@@ -81,7 +81,12 @@ module Seek
       end
 
       def assays
-        Assay.where(self.class.uri_key_in_assay.to_sym => uri).all
+        Assay.where(assay_uri_type_key => uri).all
+      end
+
+      def assay_uri_type_key
+        key = self.class.name.tableize.gsub("suggested_","").singularize+"_uri"
+        key.to_sym
       end
 
       def can_edit?

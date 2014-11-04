@@ -40,12 +40,6 @@ class SuggestedAssayType < ActiveRecord::Base
   def term_type
     @term_type ||= ontology_parent.try(:term_type)
   end
-
-
-
-  def self.uri_key_in_assay
-      "assay_type_uri"
-  end
 end
   
 
