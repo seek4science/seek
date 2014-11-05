@@ -15,6 +15,9 @@ class Assay < ActiveRecord::Base
 
   acts_as_isa
 
+  belongs_to :suggested_assay_type
+  belongs_to :suggested_technology_type
+
   acts_as_annotatable :name_field=>:title
 
   belongs_to :institution
