@@ -6,47 +6,60 @@ module AssayTypesHelper
   end
 
   def link_to_assay_type assay
-        uri =  assay.assay_type_uri
-        label = assay.assay_type_label
-      if assay.valid_assay_type_uri?(uri) || SuggestedAssayType.where(:uri=>uri).first
-        link_to label,assay_types_path(:uri => uri,:label=>label)
-      else
-        label
-      end
+    parameters={}
+    parameters[:uri]=assay.assay_type_uri
+    parameters[:label] = assay.assay_type_label
+    if assay.suggested_assay_type
+      parameters[:suggested_type_id]=assay.suggested_assay_type.id
     end
-
-    def parent_assay_types_list_links parents
-      unless parents.empty?
-        parents.collect do |par|
-          link_to par.label,assay_types_path(uri: par.uri,label: par.label),:class=>"parent_term"
-        end.join(" | ").html_safe
-      else
-        content_tag :span,"No parent terms",:class=>"none_text"
-      end
-    end
-
-
-    def child_assay_types_list_links children
-      child_type_links children,"assay_type"
-    end
-
-    def child_type_links children,type
-      unless children.empty?
-        children.collect do |child|
-          if child.is_a?(SuggestedAssayType) || child.is_a?(SuggestedTechnologyType)
-            uris = ([child] +child.children).map(&:uri)
-          else
-            uris = child.flatten_hierarchy.collect{|o| o.uri.to_s}
-          end
-          assays = Assay.where("#{type}_uri".to_sym => uris)
-          n = Assay.authorize_asset_collection(assays,"view").count
-          path = send("#{type}s_path",:uri=>child.uri,:label=>child.label)
-
-          link_to "#{child.label} (#{n})",path,:class=>"child_term"
-        end.join(" | ").html_safe
-      else
-        content_tag :span,"No child terms",:class=>"none_text"
-      end
-    end
-
+    link_to parameters[:label], assay_types_path(parameters)
   end
+
+  def parent_types_list_links parents, type
+    unless parents.empty?
+      parents.collect do |par|
+        link_to_ontology_term par, par.label, type, :class => "parent_term"
+      end.join(" | ").html_safe
+    else
+      content_tag :span, "No parent terms", :class => "none_text"
+    end
+  end
+
+  #FIMXE: these and the technology type helper methods need rejigging and moving to a general helper for types
+  #some may be duplicated in ontology_helper
+  def parent_assay_types_list_links parents
+    parent_types_list_links parents, "assay_type"
+  end
+
+  def parent_technology_types_list_links parents
+    parent_types_list_links parents, "technology_type"
+  end
+
+  def link_to_ontology_term term, label, type, options={}
+    link_to label, send("#{type}s_path", parameters_for_ontology_term(term), options)
+  end
+
+  #generates the parameters for a link to assay or technology type, or future type
+  #determined by the type and whether it is from the ontology or a suggested term
+  def parameters_for_ontology_term term
+    parameters={:label => term.label, :uri => term.uri}
+    parameters[:suggested_type_id]=term.id if term.respond_to?(:id)
+  end
+
+
+  def child_assay_types_list_links children
+    child_type_links children, "assay_type"
+  end
+
+  def child_type_links children, type
+    unless children.empty?
+      children.collect do |child|
+        n = Assay.authorize_asset_collection(child.assays, "view").count
+        link_to_ontology_term(child, "#{child.label} (#{n})", type, :class => "child_term")
+      end.join(" | ").html_safe
+    else
+      content_tag :span, "No child terms", :class => "none_text"
+    end
+  end
+
+end

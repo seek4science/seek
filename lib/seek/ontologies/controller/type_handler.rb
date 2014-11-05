@@ -29,13 +29,14 @@ module Seek
         end
 
         def find_ontology_type_class
-          uri = params[:uri] || ontology_readers.first.default_parent_class_uri.to_s
-
-          @type_class = ontology_readers.map do |ontology_reader|
-            @type_class || ontology_reader.class_hierarchy.hash_by_uri[uri]
-          end.compact.first
-
-          @type_class ||= suggested_type_class.where(uri: uri).first
+          if (type_id=params[:suggested_type_id])
+            @type_class= suggested_type_class.find(type_id)
+          else
+            uri = params[:uri] || ontology_readers.first.default_parent_class_uri.to_s
+            @type_class = ontology_readers.map do |ontology_reader|
+              @type_class || ontology_reader.class_hierarchy.hash_by_uri[uri]
+            end.compact.first
+          end
         end
 
         def find_and_authorize_assays

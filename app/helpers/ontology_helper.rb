@@ -23,6 +23,7 @@ module OntologyHelper
     select_tag element_name, options_for_select(options, :selected => selected_uri, :disabled => disabled_uris), html_options
   end
 
+
   def ontology_select_options(type)
     reader = reader_for_type(type)
     classes = reader.class_hierarchy
