@@ -14,14 +14,6 @@ module Seek
         Seek::Ontologies::TechnologyTypeReader.instance
       end
 
-      def assay_type_label
-        super || assay_type_reader.class_hierarchy.hash_by_uri[assay_type_uri].try(:label)
-      end
-
-      def technology_type_label
-        super || technology_type_reader.class_hierarchy.hash_by_uri[technology_type_uri].try(:label)
-      end
-
       def default_assay_and_technology_type
         self.use_default_assay_type_uri! if assay_type_uri.nil?
         if is_modelling?
