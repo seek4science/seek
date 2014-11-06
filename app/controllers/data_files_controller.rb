@@ -21,6 +21,8 @@ class DataFilesController < ApplicationController
 
   include Seek::BreadCrumbs
 
+  include Seek::DataciteDoi
+
 
   def convert_to_presentation
     @data_file = DataFile.find params[:id]
