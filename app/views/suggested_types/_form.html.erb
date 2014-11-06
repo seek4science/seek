@@ -1,6 +1,7 @@
 
 <% options = (action == :new_popup || action == :edit_popup) ? {:remote=> true} : {}
   types ||= Array(@suggested_type.term_type)
+   selected_uri = @suggested_type.parent.try(:uri) || @suggested_type.ontology_uri
 %>
 
 <%= form_for @suggested_type, options do |f| %>
@@ -19,7 +20,7 @@
          <%= f.label "Parent" -%><br/>
          <span style="color: #666666;"> Select parent</span><br/>
       <%= ontology_selection_list types, "#{@suggested_type.class.name.underscore}[parent_uri]",
-                                  @suggested_type.ontology_uri,
+                                  selected_uri,
                                   ([@suggested_type] + @suggested_type.children).map(&:uri),
                                    {:style => "width:100%"}
       %>

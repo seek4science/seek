@@ -71,7 +71,7 @@ module Seek
       end
 
       def children
-        self.class.where(:parent_id => id).all
+        self.class.where("parent_id=? AND parent_id IS NOT NULL",id).all
       end
 
       def assays
