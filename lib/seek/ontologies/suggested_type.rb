@@ -25,22 +25,14 @@ module Seek
         errors[:base] << "#{self.humanize_term_type} type with label #{label} is already defined in ontology!" if self.class.base_ontology_labels.each(&:downcase).include?(label.downcase)
       end
 
-      #parent with valid uri
-      def ontology_parent term=self
-        return nil if term.nil?
-        rdf_uri = RDF::URI.new term.parent_uri
-        rdf_uri.valid? ? term.parent : ontology_parent(term.parent)
+      #the first parent that comes from the ontology
+      def ontology_parent
+        self.class.base_ontology_hash_by_uri[ontology_uri]
       end
 
       def descriptive_label
         comment = " - this is a new suggested term that specialises #{ontology_parent.try(:label)}"
         (self.label + content_tag("span",comment,:class=>"none_text")).html_safe
-      end
-
-      # its own valid uri or its parent with valid uri
-      def ontology_uri
-        rdf_uri = RDF::URI.new uri
-        return rdf_uri.valid? ? rdf_uri.to_s : ontology_parent.try(:uri).try(:to_s)
       end
 
       def humanize_term_type
@@ -63,14 +55,14 @@ module Seek
       end
 
       def parent
-        super || self.class.base_ontology_hash_by_uri[parent_uri]
+        super || ontology_parent
       end
 
       # before adding to ontology ang assigned a uri, returns its parent_uri
       def default_parent
-        if parent_uri.blank?
+        if ontology_uri.blank?
           raise Exception.new("#{self.class.name} #{label} has no default parent uri!") if default_parent_uri.blank?
-          self.parent_uri = default_parent_uri
+          self.ontology_uri = default_parent_uri
         end
       end
 
