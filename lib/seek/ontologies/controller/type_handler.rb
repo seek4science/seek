@@ -42,7 +42,7 @@ module Seek
         def find_and_authorize_assays
           @assays = []
           return unless @type_class
-          @assays = Assay.authorize_asset_collection(Assay.where(assay_uri_field => possible_assay_uris), 'view')
+          @assays = Assay.authorize_asset_collection(@type_class.assays, 'view')
         end
 
         def invalid_label?
@@ -52,15 +52,6 @@ module Seek
         def link_to_alternative
           path = eval("#{controller_name}_path(:uri=>@type_class.uri, :label=> @type_class.label)")
           view_context.link_to(@type_class.label, path, style: 'font-style:italic;font-weight:bold;')
-        end
-
-        # the possible uris for assays based upon the selected @type_class uri and its children
-        def possible_assay_uris
-          if @type_class.is_suggested_type?
-            ([@type_class] + @type_class.children).map(&:uri)
-          else
-            @type_class.hash_by_uri.keys | suggested_type_class.where(parent_uri: @type_class.uri.to_s).map(&:uri)
-          end
         end
 
         ##### dynamic fields and attributes determined by the controller name #####

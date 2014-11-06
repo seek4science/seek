@@ -3,8 +3,6 @@ module Seek
     module SuggestedType
       extend ActiveSupport::Concern
       included do
-        alias_attribute :uuid, :uri
-        acts_as_uniquely_identifiable
 
         belongs_to :contributor, :class_name => "Person"
         belongs_to :parent,:class_name=>self.name
@@ -13,12 +11,11 @@ module Seek
         #or from admin page --> manage assay types
         attr_accessor :term_type
 
-        validates_presence_of :label, :uri
-        validates_uniqueness_of :label, :uri
+        validates_presence_of :label
+        validates_uniqueness_of :label
         validate :label_not_defined_in_ontology
         before_validation :default_parent
       end
-
 
       def default_parent_uri
         base_ontology_reader.default_parent_class_uri.try(:to_s)
@@ -82,12 +79,8 @@ module Seek
       end
 
       def assays
-        Assay.where(assay_uri_type_key => uri).all
-      end
-
-      def assay_uri_type_key
-        key = self.class.name.tableize.gsub("suggested_","").singularize+"_uri"
-        key.to_sym
+        #FIXME: find a better way of getting the id foreign key
+        Assay.where("#{SuggestedAssayType.table_name.singularize}_id"=>id).all
       end
 
       def can_edit?
@@ -104,7 +97,7 @@ module Seek
         result = suggested_type.assays
         suggested_type.children.each do |child|
           result = result | child.assays
-          result = result | get_child_assays(child) if !child.children.empty?
+          result = result | get_child_assays(child) unless child.children.empty?
         end
         return result
       end

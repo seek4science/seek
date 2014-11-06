@@ -35,15 +35,17 @@ module AssayTypesHelper
     parent_types_list_links parents, "technology_type"
   end
 
-  def link_to_ontology_term term, label, type, options={}
-    link_to label, send("#{type}s_path", parameters_for_ontology_term(term), options)
+  def link_to_ontology_term term, label, type, html_options={}
+    link_to label, send("#{type}s_path", parameters_for_ontology_term(term)),html_options
   end
 
   #generates the parameters for a link to assay or technology type, or future type
   #determined by the type and whether it is from the ontology or a suggested term
   def parameters_for_ontology_term term
-    parameters={:label => term.label, :uri => term.uri}
+    parameters={:label => term.label}
+    parameters[:uri]=term.uri if term.respond_to?(:uri)
     parameters[:suggested_type_id]=term.id if term.respond_to?(:id)
+    parameters
   end
 
 
