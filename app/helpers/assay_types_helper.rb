@@ -7,11 +7,8 @@ module AssayTypesHelper
 
   def link_to_assay_type assay
     parameters={}
-    parameters[:uri]=assay.assay_type_uri
+    parameters[:uri]=assay.suggested_assay_type.try(:uri) || assay.assay_type_uri
     parameters[:label] = assay.assay_type_label
-    if assay.suggested_assay_type
-      parameters[:suggested_type_id]=assay.suggested_assay_type.id
-    end
     link_to parameters[:label], assay_types_path(parameters)
   end
 
@@ -43,8 +40,7 @@ module AssayTypesHelper
   #determined by the type and whether it is from the ontology or a suggested term
   def parameters_for_ontology_term term
     parameters={:label => term.label}
-    parameters[:uri]=term.uri if term.respond_to?(:uri)
-    parameters[:suggested_type_id]=term.id if term.respond_to?(:id)
+    parameters[:uri]=term.uri
     parameters
   end
 

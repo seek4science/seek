@@ -98,7 +98,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, :suggested_technology_type => suggested_technology_type, :policy => Factory(:public_policy)
 
     #with correct label
-    get :show, :uri => assay.technology_type_uri, :label => "this is a techno type"
+    get :show, :uri => suggested_technology_type.uri, :label => "this is a techno type"
     assert_select "h1", :text => /Technology type &#x27;this is a techno type&#x27;/
     assert_select "div.list_items_container" do
       assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/

@@ -23,19 +23,17 @@ class AssayTypesControllerTest < ActionController::TestCase
 
 
  test "hierarchy" do
-    assay = Factory :experimental_assay,:assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Flux_balance_analysis",:policy=>Factory(:public_policy)
+    assay = Factory :experimental_assay,:title=>"flux balance assay",:assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Flux_balance_analysis",:policy=>Factory(:public_policy)
   logout
     get :show, :uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
     assert_response :success
+
     assert_select "h1",:text=>/Assay type &#x27;Experimental assay type&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
+      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay)
     end
     assert_select "div.ontology_nav a.child_term",:text=>/fluxomics \(1\)/i
   end
-
-
-
 
   test "default page" do
     assay = Factory :experimental_assay,:policy=>Factory(:public_policy)
@@ -107,7 +105,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, :suggested_assay_type => suggested_assay_type, :policy => Factory(:public_policy)
 
     #with correct label
-    get :show, :uri => assay.assay_type_uri, :label => "this is an assay type"
+    get :show, :uri => suggested_assay_type.uri, :label => "this is an assay type"
     assert_select "h1", :text => /Assay type &#x27;this is an assay type&#x27;/
     assert_select "div.list_items_container" do
       assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/

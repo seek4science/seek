@@ -36,11 +36,12 @@ module Seek
         end
 
         def assays
+          uris = hash_by_uri.keys
           case term_type
             when 'assay', 'modelling_analysis'
-              Assay.find_all_by_assay_type_uri(uri.try(:to_s))
+              Assay.where(:assay_type_uri=>uris)
             when 'technology'
-              Assay.find_all_by_technology_type_uri(uri.try(:to_s))
+              Assay.where(:technology_type_uri=>uris)
             else
               []
           end
