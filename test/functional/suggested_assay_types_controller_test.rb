@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SuggestedAssayTypesControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
 
   def setup
@@ -17,8 +18,6 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_response :success
 
   end
-
-
 
   test "should new" do
     get :new
@@ -48,30 +47,30 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     end
     assert_redirected_to :action => :manage
     get :manage
-    assert_select "li a", :text=>/test assay type/
+    assert_select "li a", :text => /test assay type/
 
   end
 
   test "should create for ajax request" do
     assert_difference("SuggestedAssayType.count") do
-      xhr :post,  :create, :suggested_assay_type => {:label => "test_assay_type"}
+      xhr :post, :create, :suggested_assay_type => {:label => "test_assay_type"}
     end
-    assert_select "select option[selected='selected']",  :text=>/test_assay_type/
+    assert_select "select option[selected='selected']", :text => /test_assay_type/
   end
 
   test "should update for ajax request" do
     suggested_assay_type = Factory(:suggested_assay_type, :contributor_id => User.current_user.person.try(:id))
-    xhr :put,  :update,  id: suggested_assay_type.id, suggested_assay_type: {:label => "child_assay_type_a"}
-    assert_select "select option[value=?][selected='selected']",suggested_assay_type.uri, :text=>/child_assay_type_a/
+    xhr :put, :update, id: suggested_assay_type.id, suggested_assay_type: {:label => "child_assay_type_a"}
+    assert_select "select option[value=?][selected='selected']", suggested_assay_type.uri, :text => /child_assay_type_a/
   end
 
   test "should update label" do
     login_as Factory(:admin)
-    suggested_assay_type = Factory(:suggested_assay_type, :label => "old label",:contributor_id => User.current_user.person.try(:id))
+    suggested_assay_type = Factory(:suggested_assay_type, :label => "old label", :contributor_id => User.current_user.person.try(:id))
     put :update, id: suggested_assay_type.id, suggested_assay_type: {:label => "new label"}
     assert_redirected_to :action => :manage
     get :manage
-    assert_select "li a[href=?]", http_escape(assay_types_path(uri: suggested_assay_type.uri, label: "new label")), :text=>/new label/
+    assert_select "li a[href=?]", http_escape(assay_types_path(uri: suggested_assay_type.uri, label: "new label")), :text => /new label/
   end
 
   test "should update parent" do
@@ -81,18 +80,21 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     suggested_parent2 = Factory(:suggested_assay_type)
     ontology_parent_uri = "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics"
     ontology_parent = Factory(:suggested_assay_type).class.base_ontology_hash_by_uri[ontology_parent_uri]
-    suggested_assay_type = Factory(:suggested_assay_type, :contributor_id => User.current_user.person.try(:id), :parent_uri => suggested_parent1.uri)
+    suggested_assay_type = Factory(:suggested_assay_type, :contributor_id => User.current_user.person.try(:id), :parent_id => suggested_parent1.id)
     assert_equal 1, suggested_assay_type.parents.size
     assert_equal suggested_parent1, suggested_assay_type.parents.first
     assert_equal suggested_parent1.uri, suggested_assay_type.parent.uri.to_s
 
     #update to other parent suggested
-    put :update, :id => suggested_assay_type.id, :suggested_assay_type => {:parent_uri => suggested_parent2.uri}
+    put :update, :id => suggested_assay_type.id, :suggested_assay_type => {:parent_id => suggested_parent2.id}
     assert_redirected_to :action => :manage
+    suggested_parent2.reload
+    assert_include suggested_parent2.children,suggested_assay_type
 
     #update to other parent from ontology
-    put :update, id: suggested_assay_type.id, suggested_assay_type: {:parent_uri => ontology_parent_uri}
+    put :update, id: suggested_assay_type.id, suggested_assay_type: {:ontology_uri => ontology_parent_uri}
     assert_redirected_to :action => :manage
+    assert ontology_parent.children.include?(suggested_assay_type)
 
   end
 
@@ -128,7 +130,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     login_as Factory(:user, :person_id => Factory(:admin).id)
 
     parent = Factory :suggested_assay_type
-    child = Factory :suggested_assay_type, :parent_uri => parent.uri
+    child = Factory :suggested_assay_type, :parent_id => parent.id
 
     assert_no_difference('SuggestedAssayType.count') do
       delete :destroy, id: parent.id
@@ -141,7 +143,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     login_as Factory(:user, :person_id => Factory(:admin).id)
 
     suggested_at = Factory :suggested_assay_type
-    Factory(:experimental_assay, :assay_type_uri => suggested_at.uri)
+    Factory(:experimental_assay, :suggested_assay_type => suggested_at)
     assert_no_difference('SuggestedAssayType.count') do
       delete :destroy, id: suggested_at.id
     end
@@ -152,7 +154,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   private
 
   def http_escape url
-     ERB::Util.html_escape url
+    ERB::Util.html_escape url
   end
 
 end

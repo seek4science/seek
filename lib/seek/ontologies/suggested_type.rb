@@ -50,6 +50,10 @@ module Seek
         error_messages
       end
 
+      def uri
+        "suggested:#{id}"
+      end
+
       def parents
         Array(parent)
       end
@@ -72,7 +76,7 @@ module Seek
 
       def assays
         #FIXME: find a better way of getting the id foreign key
-        Assay.where("#{SuggestedAssayType.table_name.singularize}_id"=>id).all
+        Assay.where("#{self.class.table_name.singularize}_id"=>id).all
       end
 
       def can_edit?
@@ -80,10 +84,8 @@ module Seek
       end
 
       def can_destroy?
-        auth = User.admin_logged_in?
-        auth && assays.count == 0 && children.empty?
+        User.admin_logged_in? && assays.empty? && children.empty?
       end
-
 
       def get_child_assays suggested_type=self
         result = suggested_type.assays

@@ -80,17 +80,19 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     suggested_parent2 = Factory(:suggested_technology_type)
     ontology_parent_uri = "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"
     ontology_parent = Factory(:suggested_technology_type).class.base_ontology_hash_by_uri[ontology_parent_uri]
-    suggested_technology_type = Factory(:suggested_technology_type, :contributor_id => User.current_user.person.try(:id), :parent_uri => suggested_parent1.uri)
+    suggested_technology_type = Factory(:suggested_technology_type, :contributor_id => User.current_user.person.try(:id), :parent_id => suggested_parent1.id)
     assert_equal 1, suggested_technology_type.parents.size
     assert_equal suggested_parent1, suggested_technology_type.parents.first
     assert_equal suggested_parent1.uri, suggested_technology_type.parent.uri.to_s
 
     #update to other parent suggested
-    put :update, :id => suggested_technology_type.id, :suggested_technology_type => {:parent_uri => suggested_parent2.uri}
+    put :update, :id => suggested_technology_type.id, :suggested_technology_type => {:parent_id => suggested_parent2.id}
     assert_redirected_to :action => :manage
+    suggested_parent2.reload
+    assert_includes suggested_parent2.children,suggested_technology_type
 
     #update to other parent from ontology
-    put :update, id: suggested_technology_type.id, suggested_technology_type: {:parent_uri => ontology_parent_uri}
+    put :update, id: suggested_technology_type.id, suggested_technology_type: {:ontology_uri => ontology_parent_uri}
     assert_redirected_to :action => :manage
 
   end
@@ -126,7 +128,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     login_as Factory(:user, :person_id => Factory(:admin).id)
 
     parent = Factory :suggested_technology_type
-    child = Factory :suggested_technology_type, :parent_uri => parent.uri
+    child = Factory :suggested_technology_type, :parent_id => parent.id
 
     assert_no_difference('SuggestedTechnologyType.count') do
       delete :destroy, id: parent.id
@@ -139,7 +141,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     login_as Factory(:user, :person_id => Factory(:admin).id)
 
     suggested = Factory :suggested_technology_type
-    Factory(:experimental_assay, :technology_type_uri => suggested.uri)
+    Factory(:experimental_assay, :suggested_technology_type => suggested)
     assert_no_difference('SuggestedTechnologyType.count') do
       delete :destroy, id: suggested.id
     end

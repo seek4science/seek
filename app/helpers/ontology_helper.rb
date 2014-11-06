@@ -14,7 +14,7 @@ module OntologyHelper
     form.select element_id,options,{:selected=>selected_uri},html_options
   end
 
-  #ontology select tag when form is unavailable
+  #ontology select tag when form is unavailables
   def ontology_selection_list types, element_name, selected_uri, disabled_uris={}, html_options={}
     options = []
     Array(types).each do |type|

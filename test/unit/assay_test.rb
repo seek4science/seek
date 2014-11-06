@@ -40,7 +40,7 @@ class AssayTest < ActiveSupport::TestCase
     # assay with suggested assay/technology types
     suggested_assay_type = Factory(:suggested_assay_type)
     suggested_tech_type = Factory(:suggested_technology_type)
-    assay = Factory :experimental_assay, :assay_type_uri => suggested_assay_type.uri, :technology_type_uri => suggested_tech_type.uri
+    assay = Factory :experimental_assay, :suggested_assay_type => suggested_assay_type, :suggested_technology_type => suggested_tech_type
     rdf = assay.to_rdf
 
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
@@ -400,46 +400,32 @@ class AssayTest < ActiveSupport::TestCase
       assert_equal assay.contributor.user, assay.contributing_user
   end
 
-  test "assay type label from ontology or suggested assay type if missing" do
+  test "assay type label from ontology or suggested assay type" do
 
-    assay = Factory(:experimental_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response",assay_type_label:"fish")
-    assert_equal "fish", assay.assay_type_label
-    assay.assay_type_label = nil
+    assay = Factory(:experimental_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response")
     assert_equal "Catabolic response",assay.assay_type_label
 
-    assay = Factory(:modelling_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Genome_scale",assay_type_label:"frog")
-    assert_equal "frog",assay.assay_type_label
-    assay.assay_type_label = nil
+    assay = Factory(:modelling_assay,assay_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Genome_scale")
     assert_equal "Genome scale",assay.assay_type_label
 
 
     suggested_at = Factory(:suggested_assay_type, :label => "new fluxomics")
-    assay = Factory(:experimental_assay, :assay_type_uri => suggested_at.uri, :assay_type_label=> "fish")
-    assert_equal "fish", assay.assay_type_label
-    assay.assay_type_label = nil
+    assay = Factory(:experimental_assay, :suggested_assay_type => suggested_at)
     assert_equal "new fluxomics", assay.assay_type_label
 
     suggested_ma = Factory(:suggested_modelling_analysis_type, :label => "new metabolism")
-    assay = Factory(:experimental_assay, :assay_type_uri => suggested_ma.uri, :assay_type_label => "fish")
-    assert_equal "fish", assay.assay_type_label
-    assay.assay_type_label = nil
+    assay = Factory(:experimental_assay, :suggested_assay_type => suggested_ma)
     assert_equal "new metabolism", assay.assay_type_label
-
 
   end
 
-  test "technology type label from ontology or suggested technology type if missing" do
-    assay = Factory(:experimental_assay,technology_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Binding",technology_type_label:"fish")
-    assert_equal "fish",assay.technology_type_label
-    assay.technology_type_label = nil
+  test "technology type label from ontology or suggested technology type" do
+    assay = Factory(:experimental_assay,technology_type_uri:"http://www.mygrid.org.uk/ontology/JERMOntology#Binding")
     assert_equal "Binding",assay.technology_type_label
 
     suggested_tt = Factory(:suggested_technology_type, :label => "new technology type")
-    assay = Factory(:experimental_assay, :technology_type_uri => suggested_tt.uri, :technology_type_label => "fish")
-    assert_equal "fish", assay.technology_type_label
-    assay.technology_type_label = nil
+    assay = Factory(:experimental_assay, :suggested_technology_type => suggested_tt)
     assert_equal "new technology type", assay.technology_type_label
-
   end
 
   test "default assay and tech type" do
@@ -487,50 +473,6 @@ class AssayTest < ActiveSupport::TestCase
     assert exp_assay.valid_technology_type_uri?
     exp_assay.technology_type_uri = "http://fish.com/onto#fish"
     assert !exp_assay.valid_technology_type_uri?
-  end
-
-  test "suggested assay type label" do
-    exp_assay = Factory(:experimental_assay)
-    assert_nil exp_assay.suggested_assay_type_label
-    exp_assay.assay_type_label=nil
-    assert_nil exp_assay.suggested_assay_type_label
-
-    #a different label, but one that is still valid
-    exp_assay.assay_type_label = "metabolite concentration"
-    assert_nil exp_assay.suggested_assay_type_label
-
-    #should be case insensitive
-    exp_assay.assay_type_label = "Metabolite CONCentration"
-    assert_nil exp_assay.suggested_assay_type_label
-
-    #a completely new one
-    exp_assay.assay_type_label = "bacteria juggling"
-    assert_equal "bacteria juggling",exp_assay.suggested_assay_type_label
-
-    #a modelling type would also be treated as a new suggstion
-    exp_assay.assay_type_label = "gene expression"
-    assert_equal "gene expression",exp_assay.suggested_assay_type_label
-  end
-
-  test "suggested tech type label" do
-    exp_assay = Factory(:experimental_assay)
-    assert_nil exp_assay.suggested_technology_type_label
-    exp_assay.technology_type_label=nil
-    assert_nil exp_assay.suggested_technology_type_label
-
-    #a different label, but one that is still valid
-    exp_assay.technology_type_label = "hplc"
-    assert_nil exp_assay.suggested_technology_type_label
-
-    #should be case insensitive
-    exp_assay.technology_type_label = "HPLC"
-    assert_nil exp_assay.suggested_technology_type_label
-
-    #a completely new one
-    exp_assay.technology_type_label = "bacteria juggling"
-    assert_equal "bacteria juggling",exp_assay.suggested_technology_type_label
-
-
   end
 
   test "destroy" do

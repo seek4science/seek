@@ -198,18 +198,18 @@ end
 
   Factory.define(:suggested_technology_type) do |f|
     f.sequence(:label) {|n| "A TechnologyType#{n}"}
-    f.parent_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
+    f.ontology_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
   end
 
   Factory.define(:suggested_assay_type) do |f|
     f.sequence(:label) {|n| "An AssayType#{n}"}
-    f.parent_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
+    f.ontology_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
     f.after_build{|type| type.term_type = "assay"}
   end
 
    Factory.define(:suggested_modelling_analysis_type, :class=> SuggestedAssayType) do |f|
     f.sequence(:label) {|n| "An Modelling Analysis Type#{n}"}
-    f.parent_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
+    f.ontology_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
     f.after_build{|type| type.term_type = "modelling_analysis"}
   end
 
@@ -243,9 +243,7 @@ end
   Factory.define(:experimental_assay, :parent => :assay_base) do |f|
     f.association :assay_class, :factory => :experimental_assay_class
     f.assay_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
-    f.assay_type_label "Experimental assay type"
     f.technology_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
-    f.technology_type_label "Technology type"
     f.samples {[Factory.build(:sample, :policy => Factory(:public_policy))]}
   end
 
