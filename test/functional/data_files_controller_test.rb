@@ -1951,6 +1951,51 @@ end
     assert_select "p[class=comment]",:text=>/#{comment}/
   end
 
+  test "get mint_doi_preview" do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    assert df.is_published?
+    assert df.can_manage?
+
+    get :mint_doi_preview, :id => df.id, :version => df.version
+    assert_response :success
+    #TODO: some assertion of the html elements
+  end
+
+  test "authorization for mint_doi_preview" do
+    df = Factory(:data_file, :policy=>Factory(:private_policy), :contributor => User.current_user)
+    assert !df.is_published?
+    assert df.can_manage?
+
+    get :mint_doi_preview, :id => df.id, :version => df.version
+    assert_response :forbidden
+
+    df.publish!
+    assert df.reload.is_published?
+    login_as(Factory :user)
+    assert !df.can_manage?
+
+    get :mint_doi_preview, :id => df.id, :version => df.version
+    assert_response :forbidden
+  end
+
+  test "mint doi" do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    post :mint, :id => df.id, :metadata => {}
+    assert_redirected_to data_file_minted_path(df)
+
+    assert AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
+  end
+
+  test 'minted' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    assert df.is_published?
+    assert df.can_manage?
+
+    get :minted, :id => df.id, :version => df.version
+    assert_response :success
+    #TODO: some assertion of the html elements
+  end
+
   private
 
   def mock_http
