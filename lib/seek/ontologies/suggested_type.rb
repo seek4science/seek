@@ -7,6 +7,7 @@ module Seek
         acts_as_uniquely_identifiable
 
         belongs_to :contributor, :class_name => "Person"
+        belongs_to :parent,:class_name=>self.name
 
         # link_from: where the new assay type link was initiated, e.g. new assay type link at assay creation page,--> link_from = "assays".
         #or from admin page --> manage assay types
@@ -65,7 +66,7 @@ module Seek
       end
 
       def parent
-        self.class.base_ontology_hash_by_uri[parent_uri] || self.class.where(:uri => parent_uri).first
+        super || self.class.base_ontology_hash_by_uri[parent_uri]
       end
 
       # before adding to ontology ang assigned a uri, returns its parent_uri
@@ -77,7 +78,7 @@ module Seek
       end
 
       def children
-        self.class.where(:parent_uri => uri).all
+        self.class.where(:parent_id => id).all
       end
 
       def assays

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141105141425) do
+ActiveRecord::Schema.define(:version => 20141105165558) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1474,6 +1474,7 @@ ActiveRecord::Schema.define(:version => 20141105141425) do
     t.integer  "contributor_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+    t.integer  "parent_id"
   end
 
   create_table "suggested_technology_types", :force => true do |t|
@@ -1483,6 +1484,7 @@ ActiveRecord::Schema.define(:version => 20141105141425) do
     t.integer  "contributor_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+    t.integer  "parent_id"
   end
 
   create_table "sweep_auth_lookup", :force => true do |t|
