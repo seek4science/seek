@@ -34,7 +34,7 @@ class ContentBlob < ActiveRecord::Base
   #is_webpage: whether text/html
   #MERGENOTE, FIXME: this isn't correct. it is possible to not make a local copy and also not display an external link
   #external_link: true means no local copy, false means local copy. Set true by default on upload page.
-  before_create :check_url_content_type
+  before_create :check_content_type
 
   has_many :worksheets, :dependent => :destroy
 
@@ -71,11 +71,37 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
+  def file_extension
+    original_filename && original_filename.split(".").last
+  end
+
   def make_temp_copy
     temp_name = Time.now.strftime("%Y%m%d%H%M%S%L")+"-"+original_filename
     temp_path = File.join(Seek::Config.temporary_filestore_path,temp_name).to_s
     FileUtils.cp(filepath,temp_path)
     temp_path
+  end
+
+  def original_content_type
+    read_attribute(:content_type)
+  end
+
+  def is_binary_file?
+    original_content_type == "application/octet-stream"
+  end
+
+  def content_type
+    is_binary_file? ? find_or_keep_type_with_mime_magic : original_content_type
+  end
+
+  def unknown_file_type?
+    human_content_type == "Unknown file type"
+  end
+
+  def find_or_keep_type_with_mime_magic
+      mime = MimeMagic.by_extension(file_extension)
+      mime ||= MimeMagic.by_magic(File.open filepath)
+      mime.try(:type) || original_content_type
   end
 
   def human_content_type
@@ -202,8 +228,8 @@ class ContentBlob < ActiveRecord::Base
 
   private
 
-  def check_url_content_type
-    unless url.nil?
+  def check_content_type
+    if url
       begin
         response = RestClient.head url
         type = response.headers[:content_type] || ""
@@ -215,11 +241,14 @@ class ContentBlob < ActiveRecord::Base
           self.content_type = type
         end
 
-        self.content_type = type if self.human_content_type == "Unknown file type"
+        self.content_type = type if unknown_file_type?
       rescue Exception=>e
         self.is_webpage = false
         Rails.logger.warn("There was a problem reading the headers for the URL of the content blob = #{self.url}")
       end
+    elsif unknown_file_type? && file_exists?
+      type = find_or_keep_type_with_mime_magic
+      self.content_type = type
     end
   end
   

@@ -46,6 +46,7 @@ require 'taverna_player_renderers'
 require 'seek/search/search_sunspot'
 
 require 'seek/project_hierarchies/project_extension'
+require 'mimemagic'
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
