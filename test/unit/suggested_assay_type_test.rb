@@ -2,16 +2,6 @@ require 'test_helper'
 
 class SuggestedAssayTypeTest < ActiveSupport::TestCase
 
-   test "default_parent_uri" do
-      at = Factory :suggested_modelling_analysis_type
-      default_parent_class_uri = Seek::Ontologies::ModellingAnalysisTypeReader.instance.default_parent_class_uri.try(:to_s)
-      assert_equal  default_parent_class_uri,  at.default_parent_uri
-
-      modelling_at =  Factory :suggested_assay_type
-      default_parent_class_uri = Seek::Ontologies::AssayTypeReader.instance.default_parent_class_uri.try(:to_s)
-      assert_equal  default_parent_class_uri,  modelling_at.default_parent_uri
-   end
-
   test "label is uniq" do
      at1 = Factory :suggested_assay_type
      at2 = Factory.build(:suggested_assay_type, :label => at1.label)
@@ -73,6 +63,31 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
      assert_equal (child_child_at1.assays | child_at1.assays | child_at2.assays).sort, parent_at.get_child_assays.sort
    end
 
+   test "parent cannot be self" do
+     child = Factory :suggested_assay_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics"
+     assert child.valid?
+     child.parent=child
+     refute child.valid?
+   end
+
+   test "new type has nil ontology uri and ontology_parent" do
+     assert_nil SuggestedAssayType.new.ontology_uri
+     assert_nil SuggestedAssayType.new.ontology_parent
+   end
+
+   test "traverse hierarchy for parent" do
+     parent = Factory :suggested_assay_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics"
+     child = Factory :suggested_assay_type,:parent=>parent,:ontology_uri=>nil
+     child_child = Factory :suggested_assay_type,:parent=>child,:ontology_uri=>nil
+     ontology_parent = parent.parent
+     assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",parent.ontology_uri
+     assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",child.ontology_uri
+     assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",child_child.ontology_uri
+     assert_equal ontology_parent,parent.ontology_parent
+     assert_equal ontology_parent,child.ontology_parent
+     assert_equal ontology_parent,child_child.ontology_parent
+   end
+
    test "user can only edit his own assay type but not others, and admins can edit/delete any suggested assay type" do
      admin = Factory :user, :person => Factory(:admin)
      owner= Factory :user
@@ -95,6 +110,11 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
      User.current_user = admin
      assert_equal true, at.can_edit?
      assert_equal true, at.can_destroy?
+   end
+
+   test "generated uri" do
+     at = Factory :suggested_assay_type
+     assert_equal "suggested_assay_type:#{at.id}",at.uri
    end
 
 

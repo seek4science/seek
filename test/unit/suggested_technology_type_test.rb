@@ -2,13 +2,6 @@ require 'test_helper'
 
 class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
 
-  test "default_parent_uri" do
-    tt = Factory :suggested_technology_type
-    default_parent_class_uri = Seek::Ontologies::TechnologyTypeReader.instance.default_parent_class_uri.try(:to_s)
-    assert_equal default_parent_class_uri, tt.default_parent_uri
-  end
-
-
   test "new label is unique and cannot repeat with labels defined in ontology" do
     tt1 = Factory :suggested_technology_type
     tt2 = Factory.build(:suggested_technology_type, :label => tt1.label)
@@ -44,6 +37,19 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
 
     assert_equal assay, tt.assays.first
     assert_equal tt.label, assay.technology_type_label
+  end
+
+  test "traverse hierarchy for parent" do
+    parent = Factory :suggested_technology_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Binding"
+    child = Factory :suggested_technology_type,:parent=>parent,:ontology_uri=>nil
+    child_child = Factory :suggested_technology_type,:parent=>child,:ontology_uri=>nil
+    ontology_parent = parent.parent
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Binding",parent.ontology_uri
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Binding",child.ontology_uri
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Binding",child_child.ontology_uri
+    assert_equal ontology_parent,parent.ontology_parent
+    assert_equal ontology_parent,child.ontology_parent
+    assert_equal ontology_parent,child_child.ontology_parent
   end
 
   test "child assays" do
@@ -84,5 +90,10 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
     assert_equal true, tt.can_edit?
     assert_equal true, tt.can_destroy?
 
+  end
+
+  test "generated uri" do
+    tt = Factory :suggested_technology_type
+    assert_equal "suggested_technology_type:#{tt.id}",tt.uri
   end
 end

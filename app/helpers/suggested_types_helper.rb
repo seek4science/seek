@@ -75,6 +75,7 @@ module SuggestedTypesHelper
   def show_ontology_class_link clz
     label = clz.label
     type = clz.term_type
+    raise "error" if type.nil?
     path = send("#{type}_types_path", :uri => clz.uri.try(:to_s), :label => label)
     html_options = clz.is_suggested_type? ? {:style => "color:green;font-style:italic"} : {}
     link_to label, path, html_options

@@ -7,14 +7,12 @@ module Seek
         belongs_to :contributor, :class_name => "Person"
         belongs_to :parent,:class_name=>self.name
 
-        # link_from: where the new assay type link was initiated, e.g. new assay type link at assay creation page,--> link_from = "assays".
-        #or from admin page --> manage assay types
         attr_accessor :term_type
 
         validates_presence_of :label
         validates_uniqueness_of :label
         validate :label_not_defined_in_ontology
-        before_validation :default_parent
+        validate :parent_cannot_be_self
       end
 
       def default_parent_uri
@@ -25,9 +23,18 @@ module Seek
         errors[:base] << "#{self.humanize_term_type} type with label #{label} is already defined in ontology!" if self.class.base_ontology_labels.each(&:downcase).include?(label.downcase)
       end
 
+      def parent_cannot_be_self
+        errors[:base] << "#{self.humanize_term_type} type cannot define itself as a parent!" if parent==self
+      end
+
       #the first parent that comes from the ontology
       def ontology_parent
         self.class.base_ontology_hash_by_uri[ontology_uri]
+      end
+
+      #traverse parents until an ontology_uri is found
+      def ontology_uri
+        super || self.class.find_by_id(parent_id).try(:ontology_uri)
       end
 
       def descriptive_label
@@ -50,8 +57,9 @@ module Seek
         error_messages
       end
 
+      #generated uri based on the id, e.g. suggested_assay_type:2
       def uri
-        "suggested:#{id}"
+        "#{uri_scheme}#{id}"
       end
 
       def parents
@@ -60,14 +68,6 @@ module Seek
 
       def parent
         super || ontology_parent
-      end
-
-      # before adding to ontology ang assigned a uri, returns its parent_uri
-      def default_parent
-        if ontology_uri.blank?
-          raise Exception.new("#{self.class.name} #{label} has no default parent uri!") if default_parent_uri.blank?
-          self.ontology_uri = default_parent_uri
-        end
       end
 
       def children
@@ -94,6 +94,20 @@ module Seek
           result = result | get_child_assays(child) unless child.children.empty?
         end
         return result
+      end
+
+      def parent_uri=uri
+        if uri
+          if uri.start_with?(uri_scheme)
+            self.parent_id = uri.gsub(uri_scheme,"").to_i
+          else
+            self.ontology_uri = uri
+          end
+        end
+      end
+
+      def uri_scheme
+        "#{self.class.name.underscore}:"
       end
     end
   end

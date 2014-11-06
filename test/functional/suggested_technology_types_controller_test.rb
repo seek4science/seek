@@ -41,20 +41,36 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
      assert_response :success
    end
 
-
-  test "should create" do
+  test "should create with suggested parent" do
     login_as Factory(:admin)
+    suggested = Factory(:suggested_technology_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography")
+    assert suggested.children.empty?
     assert_difference("SuggestedTechnologyType.count") do
-      post :create, :suggested_technology_type => {:label => "test technology type"}
+      post :create, :suggested_technology_type => {:label => "test tech type",:parent_uri=>"suggested_technology_type:#{suggested.id}"}
     end
     assert_redirected_to :action => :manage
+    assert suggested.children.count==1
     get :manage
-    assert_select "li a", :text => /test technology type/
+    assert_select "li a", :text => /test tech type/
+
+  end
+
+  test "should create with ontology parent" do
+    login_as Factory(:admin)
+
+    assert_difference("SuggestedTechnologyType.count") do
+      post :create, :suggested_technology_type => {:label => "test tech type",:parent_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"}
+    end
+    assert_redirected_to :action => :manage
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography",SuggestedTechnologyType.last.parent.uri
+    get :manage
+    assert_select "li a", :text => /test tech type/
+
   end
 
   test "should create for ajax request" do
      assert_difference("SuggestedTechnologyType.count") do
-       xhr :post,  :create, :suggested_technology_type => {:label => "test_technology_type"}
+       xhr :post,  :create, :suggested_technology_type => {:label => "test_technology_type", :parent_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography"}
      end
      assert_select "select option[selected='selected']",  :text=>/test_technology_type/
    end

@@ -20,6 +20,8 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   end
 
   test "should new" do
+    suggested = Factory(:suggested_assay_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics")
+    suggested2 = Factory(:suggested_assay_type, :parent_id=>suggested.id)
     get :new
     assert_response :success
   end
@@ -40,12 +42,28 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should create" do
+  test "should create with suggested parent" do
     login_as Factory(:admin)
+    suggested = Factory(:suggested_assay_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics")
+    assert suggested.children.empty?
     assert_difference("SuggestedAssayType.count") do
-      post :create, :suggested_assay_type => {:label => "test assay type"}
+      post :create, :suggested_assay_type => {:label => "test assay type",:parent_uri=>"suggested_assay_type:#{suggested.id}"}
     end
     assert_redirected_to :action => :manage
+    assert suggested.children.count==1
+    get :manage
+    assert_select "li a", :text => /test assay type/
+
+  end
+
+  test "should create with ontology parent" do
+    login_as Factory(:admin)
+
+    assert_difference("SuggestedAssayType.count") do
+      post :create, :suggested_assay_type => {:label => "test assay type",:parent_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics"}
+    end
+    assert_redirected_to :action => :manage
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",SuggestedAssayType.last.parent.uri
     get :manage
     assert_select "li a", :text => /test assay type/
 
@@ -53,7 +71,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
 
   test "should create for ajax request" do
     assert_difference("SuggestedAssayType.count") do
-      xhr :post, :create, :suggested_assay_type => {:label => "test_assay_type"}
+      xhr :post, :create, :suggested_assay_type => {:label => "test_assay_type",:parent_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics"}
     end
     assert_select "select option[selected='selected']", :text => /test_assay_type/
   end
@@ -86,17 +104,18 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_equal suggested_parent1.uri, suggested_assay_type.parent.uri.to_s
 
     #update to other parent suggested
-    put :update, :id => suggested_assay_type.id, :suggested_assay_type => {:parent_id => suggested_parent2.id}
+    put :update, :id => suggested_assay_type.id, :suggested_assay_type => {:parent_uri => "suggested_assay_type:#{suggested_parent2.id}"}
     assert_redirected_to :action => :manage
     suggested_parent2.reload
     assert_include suggested_parent2.children,suggested_assay_type
 
     #update to other parent from ontology
-    put :update, id: suggested_assay_type.id, suggested_assay_type: {:ontology_uri => ontology_parent_uri}
+    put :update, id: suggested_assay_type.id, suggested_assay_type: {:parent_uri => ontology_parent_uri}
     assert_redirected_to :action => :manage
     assert ontology_parent.children.include?(suggested_assay_type)
 
   end
+
 
   test "should delete assay" do
     #even owner cannot delete own type
