@@ -28,7 +28,7 @@
   </table>
 
   <div class="add_icon">
-    <%= image_tag_for_key('add', '#', "Add #{table_id}", {:onclick => "addRow('#{table_id}', '#{metadata_path}');"}, "Add #{table_id}") -%>
+    <%= image_tag 'famfamfam_silk/add.png', :alt=>"Add more", :title=>"Add more #{table_id}", :onclick=>"addRow('#{table_id}', '#{metadata_path}')" %>
   </div>
 
 </div>
