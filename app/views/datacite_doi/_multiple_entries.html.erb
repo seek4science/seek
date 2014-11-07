@@ -19,7 +19,7 @@
     <% objects.each_with_index do |object, index| %>
         <tr id='<%= table_id %>_<%= index %>'>
           <td>
-            <%= text_field_tag "#{metadata_path}[#{index}]", object, :size => 40 %>
+            <%= text_field_tag "#{metadata_path}[#{index}]", object.html_safe, :size => 40 %>
           </td>
           <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_#{table_id}_#{index}"), "fadeRow('#{table_id}','#{index}')" -%>
           </td>
