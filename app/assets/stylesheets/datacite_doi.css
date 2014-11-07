@@ -1,0 +1,21 @@
+div.metadata {
+
+}
+
+div.metadata span.description{
+    margin-left: 1em;
+    padding-bottom: 0.5em;
+    display:block;
+    max-width: 95%;
+    font-size: smaller;
+    color: #777;
+}
+
+div.metadata table.metadata_table{
+    margin-left: 2em;
+}
+
+div.metadata div.add_icon{
+    margin-left: 2.5em;
+}
+
