@@ -1,0 +1,20 @@
+<%
+   # Parameters:
+   # field
+   # field_name
+   # description: some explanation how to input the content
+%>
+
+<div class="metadata">
+  <span class="label">
+    <%= label_tag "#{field_name}".capitalize %>
+  </span>
+
+  <span class="description">
+    <%= description %>
+  </span>
+
+  <div class="field">
+    <%= field %>
+  </div>
+</div>
