@@ -1,0 +1,34 @@
+<%
+# Parameters:
+# table_id
+# metadata_path: to be aligned with metadata schema of Datacite
+# objects: use to populate some field taken from seek asset
+# description: some explanation how to input the content
+%>
+
+<div class="metadata">
+  <span class="label">
+    <%= label_tag "#{table_id}".capitalize.pluralize %>
+  </span>
+
+  <span class="description">
+    <%= description %>
+  </span>
+
+  <table id="<%= table_id %>" class="metadata_table">
+    <% objects.each_with_index do |object, index| %>
+        <tr id='<%= table_id %>_<%= index %>'>
+          <td>
+            <%= text_field_tag "#{metadata_path}[#{index}]", object, :size => 40 %>
+          </td>
+          <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_#{table_id}_#{index}"), "fadeRow('#{table_id}','#{index}')" -%>
+          </td>
+        </tr>
+    <% end %>
+  </table>
+
+  <div class="add_icon">
+    <%= image_tag_for_key('add', '#', "Add #{table_id}", {:onclick => "addRow('#{table_id}', '#{metadata_path}');"}, "Add #{table_id}") -%>
+  </div>
+
+</div>
