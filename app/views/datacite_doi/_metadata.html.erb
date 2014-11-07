@@ -9,19 +9,19 @@
 <%= render :partial => "datacite_doi/single_entry",
            :locals => {:field_name => 'title',
                        :description => "Input the title of the asset",
-                       :field => text_area_tag("titles[title]", @asset_version.title, :class => "title_text_entry")
+                       :field => text_area_tag("metadata[titles][title]", @asset_version.title, :class => "title_text_entry")
            } %>
 
 <%= render :partial => "datacite_doi/single_entry",
            :locals => {:field_name => 'publisher',
                        :description => "Input the publisher",
-                       :field => text_field_tag("publisher", nil, :size => 40)
+                       :field => text_field_tag("metadata[publisher]", nil, :size => 40)
            } %>
 
 <%= render :partial => "datacite_doi/single_entry",
            :locals => {:field_name => 'publication year',
                        :description => "Input the publication year",
-                       :field => text_field_tag("publicationYear", nil, :size => 40)
+                       :field => text_field_tag("metadata[publicationYear]", nil, :size => 40)
            } %>
 
 <%= render :partial => "datacite_doi/multiple_entries",
@@ -34,23 +34,23 @@
 <%= render :partial => "datacite_doi/single_entry",
            :locals => {:field_name => 'language',
                        :description => "Input the language, e.g. eng",
-                       :field => text_field_tag("language", nil, :size => 40)
+                       :field => text_field_tag("metadata[language]", nil, :size => 40)
            } %>
 
 <%= render :partial => "datacite_doi/single_entry",
            :locals => {:field_name => 'resource type',
                        :description => "Input the asset type, e.g. Dataset",
-                       :field => text_field_tag("resourceType", nil, :size => 40)
+                       :field => text_field_tag("metadata[resourceType]", nil, :size => 40)
            } %>
 
 <%= render :partial => "datacite_doi/single_entry",
            :locals => {:field_name => 'version',
                        :description => "Input the version",
-                       :field => text_field_tag("version", nil, :size => 40)
+                       :field => text_field_tag("metadata[version]", nil, :size => 40)
            } %>
 
 <%= render :partial => "datacite_doi/single_entry",
            :locals => {:field_name => 'Description',
                        :description => "Input the description",
-                       :field => text_area_tag("descriptions[description]", @asset_version.description, :class => "large_text_entry")
+                       :field => text_area_tag("metadata[descriptions][description]", @asset_version.description, :class => "large_text_entry")
            } %>
