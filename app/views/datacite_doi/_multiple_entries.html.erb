@@ -1,6 +1,6 @@
 <%
 # Parameters:
-# table_id
+# field_name
 # metadata_path: to be aligned with metadata schema of Datacite
 # objects: use to populate some field taken from seek asset
 # description: some explanation how to input the content
@@ -8,7 +8,7 @@
 
 <div class="metadata">
   <span class="label">
-    <%= label_tag "#{table_id}".capitalize.pluralize %>
+    <%= label_tag "#{field_name}".capitalize.pluralize %>
   </span>
 
   <span class="description">
@@ -17,18 +17,18 @@
 
   <table id="<%= table_id %>" class="metadata_table">
     <% objects.each_with_index do |object, index| %>
-        <tr id='<%= table_id %>_<%= index %>'>
+        <tr id='<%= field_name %>_<%= index %>'>
           <td>
             <%= text_field_tag "#{metadata_path}[#{index}]", object.html_safe, :size => 40 %>
           </td>
-          <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_#{table_id}_#{index}"), "fadeRow('#{table_id}','#{index}')" -%>
+          <td> <%= link_to_function image("destroy", :alt => "Delete", :title => "Delete this entry", :id => "delete_#{field_name}_#{index}"), "fadeRow('#{field_name}','#{index}')" -%>
           </td>
         </tr>
     <% end %>
   </table>
 
   <div class="add_icon">
-    <%= image_tag 'famfamfam_silk/add.png', :alt=>"Add more", :title=>"Add more #{table_id}", :onclick=>"addRow('#{table_id}', '#{metadata_path}')" %>
+    <%= image_tag 'famfamfam_silk/add.png', :alt=>"Add more", :title=>"Add more #{field_name}", :onclick=>"addRow('#{field_name}', '#{metadata_path}')" %>
   </div>
 
 </div>
