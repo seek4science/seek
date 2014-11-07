@@ -1,4 +1,4 @@
-<% creators = @asset_version.creators.collect{|creator| creator.last_name + ', ' + creator.first_name} %>
+<% creators = @asset_version.creators.collect{|creator| creator.last_name.capitalize + ', ' + creator.first_name.capitalize} %>
 <%= render :partial => "datacite_doi/multiple_entries",
            :locals => {:objects => creators,
                        :table_id => 'creator',
