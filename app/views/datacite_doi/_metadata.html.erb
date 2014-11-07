@@ -6,13 +6,6 @@
                        :description => "Input the creator names, with the format: Last name, First name"
            } %>
 
-<%= render :partial => "datacite_doi/multiple_entries",
-           :locals => {:objects => [],
-                       :table_id => 'subject',
-                       :metadata_path => "metadata[subjects][subject]",
-                       :description => "Input the subjects of the asset, e.g. System Biology"
-           } %>
-
 <%= render :partial => "datacite_doi/single_entry",
            :locals => {:field_name => 'title',
                        :description => "Input the title of the asset",
@@ -29,6 +22,13 @@
            :locals => {:field_name => 'publication year',
                        :description => "Input the publication year",
                        :field => text_field_tag("publicationYear", nil, :size => 40)
+           } %>
+
+<%= render :partial => "datacite_doi/multiple_entries",
+           :locals => {:objects => [],
+                       :table_id => 'subject',
+                       :metadata_path => "metadata[subjects][subject]",
+                       :description => "Input the subjects of the asset, e.g. System Biology"
            } %>
 
 <%= render :partial => "datacite_doi/single_entry",
