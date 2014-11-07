@@ -3,7 +3,6 @@ div.metadata {
 }
 
 div.metadata span.description{
-    margin-left: 1em;
     padding-bottom: 0.5em;
     display:block;
     max-width: 95%;
@@ -12,6 +11,10 @@ div.metadata span.description{
 }
 
 div.metadata table.metadata_table{
+    margin-left: 2em;
+}
+
+div.metadata div.field{
     margin-left: 2em;
 }
 
