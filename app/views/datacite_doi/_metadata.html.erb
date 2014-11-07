@@ -6,3 +6,10 @@
                        :description => "Input the creator names, with the format: Last name, First name"
            } %>
 
+<%= render :partial => "datacite_doi/multiple_entries",
+           :locals => {:objects => [],
+                       :table_id => 'subject',
+                       :metadata_path => "metadata[subjects][subject]",
+                       :description => "Input the subjects of the asset, e.g. System Biology"
+           } %>
+
