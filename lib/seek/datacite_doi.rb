@@ -83,11 +83,11 @@ module Seek
     def metadata_validated?
       metadata = params[:metadata]
       if metadata
-        identifier = metadata[:identifier].blank? ? false : true
-        creatorName = metadata[:creators][:creator][:creatorName].blank? ? false : true
-        title = metadata[:titles][:title].blank? ? false : true
-        publisher = metadata[:publisher].blank? ? false : true
-        publicationYear = metadata[:publicationYear].blank? ? false : true
+        identifier = metadata[:identifier]
+        creatorName = metadata[:creators][:creator][:creatorName]
+        title = metadata[:titles][:title]
+        publisher = metadata[:publisher]
+        publicationYear = metadata[:publicationYear]
         if identifier.blank? || creatorName.blank? || title.blank? || publisher.blank? || publicationYear.blank?
           validated = false
         else
