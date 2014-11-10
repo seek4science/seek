@@ -13,11 +13,20 @@ module Seek
     end
 
     def mint
-
+      respond_to do |format|
+        if metadata_validated?
+          format.html { redirect_to :action => :minted}
+        else
+          flash[:error] = "The mandatory fields (M) must be filled"
+          format.html { redirect_to :action => :mint_doi_preview}
+        end
+      end
     end
 
     def minted
-
+      respond_to do |format|
+        format.html { render :template => "datacite_doi/minted"}
+      end
     end
 
     def resolve_doi doi
@@ -69,6 +78,25 @@ module Seek
       else
         nil
       end
+    end
+
+    def metadata_validated?
+      metadata = params[:metadata]
+      if metadata
+        identifier = metadata[:identifier].blank? ? false : true
+        creatorName = metadata[:creators][:creator][:creatorName].blank? ? false : true
+        title = metadata[:titles][:title].blank? ? false : true
+        publisher = metadata[:publisher].blank? ? false : true
+        publicationYear = metadata[:publicationYear].blank? ? false : true
+        if identifier.blank? || creatorName.blank? || title.blank? || publisher.blank? || publicationYear.blank?
+          validated = false
+        else
+          validated = true
+        end
+      else
+        validated = false
+      end
+      validated
     end
   end
 end

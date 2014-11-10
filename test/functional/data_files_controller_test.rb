@@ -1990,14 +1990,14 @@ end
                 :publicationYear => '2014'
     }
     post :mint, :id => df.id, :metadata => valid_metadata
-    assert_redirected_to data_file_minted_path(df)
+    assert_redirected_to  minted_data_file_path(df)
     assert_nil flash[:error]
 
     invalid_metadata = {:creators => {:creator => {:creatorName => 'Last, First'}},
                         :titles => {:title => 'A title'}
     }
     post :mint, :id => df.id, :metadata => invalid_metadata
-    assert_redirected_to data_file_mint_doi_preview_path(df)
+    assert_redirected_to mint_doi_preview_data_file_path(df)
     assert_not_nil flash[:error]
   end
 
