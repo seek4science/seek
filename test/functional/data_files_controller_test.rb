@@ -1997,7 +1997,7 @@ end
                         :titles => {:title => 'A title'}
     }
     post :mint, :id => df.id, :metadata => invalid_metadata
-    assert_redirected_to mint_doi_preview_data_file_path(df)
+    assert_response :success
     assert_not_nil flash[:error]
   end
 
