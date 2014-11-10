@@ -1956,9 +1956,17 @@ end
     assert df.is_published?
     assert df.can_manage?
 
+    df.creators = [Factory(:person)]
+    df.save
+
     get :mint_doi_preview, :id => df.id, :version => df.version
     assert_response :success
-    #TODO: some assertion of the html elements
+
+    creator = df.creators.first
+    assert_select "input[type=text][name=?][value=?]", "metadata[creators][creator][creatorName]", (creator.last_name + ', ' + creator.first_name)
+    assert_select "textarea[name=?]", "metadata[titles][title]", :text => df.title
+    assert_select "input[type=text][name=?]", "metadata[publisher]"
+
   end
 
   test "authorization for mint_doi_preview" do
