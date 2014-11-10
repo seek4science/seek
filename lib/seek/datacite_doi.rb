@@ -18,7 +18,7 @@ module Seek
           format.html { redirect_to :action => :minted}
         else
           flash[:error] = "The mandatory fields (M) must be filled"
-          format.html { redirect_to :action => :mint_doi_preview}
+          format.html { render "datacite_doi/mint_doi_preview"}
         end
       end
     end
