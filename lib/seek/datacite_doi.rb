@@ -56,5 +56,19 @@ module Seek
     def log_minting_doi
 
     end
+
+    def generate_metadata_in_xml
+      if params['metadata']
+        xml = "<resource xmlns='http://datacite.org/schema/kernel-3'"
+        xml << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
+        xml << "xsi:schemaLocation='http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd'>"
+        metadata_in_xml = params['metadata'].to_xml
+        xml << metadata_in_xml.split("<hash>")[1].split('</hash>').first
+        xml << "</resource>"
+        xml
+      else
+        nil
+      end
+    end
   end
 end
