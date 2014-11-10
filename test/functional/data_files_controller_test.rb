@@ -1969,6 +1969,38 @@ end
 
   end
 
+  test "should have 5 mandatory fields of metadata" do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    assert df.is_published?
+    assert df.can_manage?
+
+    get :mint_doi_preview, :id => df.id, :version => df.version
+    assert_response :success
+
+    assert_select "span[class=required]", :count => 5
+  end
+
+  test "should validate 5 mandatory fields of metadata" do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+
+    valid_metadata = {:identifier => '10.5072/my_test',
+                :creators => {:creator => {:creatorName => 'Last, First'}},
+                :titles => {:title => 'A title'},
+                :publisher => 'System Biology',
+                :publicationYear => '2014'
+    }
+    post :mint, :id => df.id, :metadata => valid_metadata
+    assert_redirected_to data_file_minted_path(df)
+    assert_nil flash[:error]
+
+    invalid_metadata = {:creators => {:creator => {:creatorName => 'Last, First'}},
+                        :titles => {:title => 'A title'}
+    }
+    post :mint, :id => df.id, :metadata => invalid_metadata
+    assert_redirected_to data_file_mint_doi_preview_path(df)
+    assert_not_nil flash[:error]
+  end
+
   test "authorization for mint_doi_preview" do
     df = Factory(:data_file, :policy=>Factory(:private_policy), :contributor => User.current_user)
     assert !df.is_published?
