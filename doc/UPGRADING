@@ -25,7 +25,7 @@ looks something like:
 
 == General notes about versions and upgrading
 
-<b>If upgrading from a version earlier than v0.11.x please contact us. You can find details on how to contact us at: http://seek4science.org/contact
+<b>If upgrading from a version earlier than v0.11.x please contact us.</b> You can find details on how to contact us at: http://seek4science.org/contact
 
 When upgrading between versions greater than v0.11.x you need to upgrade to each released minor version in order incrementally (i.e. 0.13.x -> 0.14.x -> 0.15.x -> 0.16.x, you can skip patch versions such as 0.13.3).
 

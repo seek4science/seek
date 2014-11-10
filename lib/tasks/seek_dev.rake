@@ -4,6 +4,8 @@ require 'active_record/fixtures'
 require 'uuidtools'
 require 'colorize'
 
+include SysMODB::SpreadsheetExtractor
+
 namespace :seek_dev do
   desc 'A simple task for quickly setting up a project and institution, and assigned the first user to it. This is useful for quickly setting up the database when testing. Need to create a default user before running this task'
   task(:initial_membership=>:environment) do
@@ -189,6 +191,47 @@ namespace :seek_dev do
         end
       end
       puts "\t#{assays.count} Assays updated, #{studies.count} Studies updated, #{investigations.count} Investigations updated"
+    end
+  end
+
+  task :add_people_from_spreadsheet, [:path] => :environment do |t, args|
+    path = args.path
+    file = open(path)
+    csv = spreadsheet_to_csv(file)
+    CSV.parse(csv) do |row|
+      firstname=row[0].strip
+      next if firstname=="first"
+      lastname=row[1].strip
+      email=row[2].strip
+      project_id=row[3].strip
+      institution_id=row[4].strip
+      pp "Checking for #{firstname} #{lastname}"
+      matches = Person.where(:first_name => firstname, :last_name => lastname)
+      unless matches.empty?
+        puts "A person already exists with firstname and lastname #{firstname},#{lastname} respectively, skipping".red
+        next
+      else
+        puts "Preparing to add person #{firstname} #{lastname} with email #{email}"
+        person = Person.new :first_name => firstname, :last_name => lastname, :email => email
+      end
+      project = Project.find_by_id(project_id)
+      if project.nil?
+        pp "No project found for id #{project_id}, skipping #{person.name}".red
+        next
+      end
+      institution = Institution.find_by_id(institution_id)
+      if institution.nil?
+        pp "No institution found for id #{institution_id}, skipping #{person.name}".red
+        next
+      end
+      person.add_to_project_and_institution(project, institution)
+      begin
+        person.save!
+        puts "#{person.name} successfully added".green
+      rescue Exception => e
+        puts "Error adding #{person.name}".red
+        puts e
+      end
     end
   end
 
