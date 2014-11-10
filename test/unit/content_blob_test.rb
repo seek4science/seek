@@ -284,20 +284,32 @@ class ContentBlobTest < ActiveSupport::TestCase
     content_blob = Factory(:docx_content_blob)
     assert_equal "Word document",content_blob.human_content_type
 
-    content_blob.content_type = "application/msexcel"
+    content_blob = Factory(:content_blob, :content_type => "application/msexcel")
     assert_equal "Spreadsheet",content_blob.human_content_type
 
-    content_blob.content_type = "text/html"
+    content_blob = Factory(:pdf_content_blob, :content_type => "application/octet-stream")
+    assert_equal "PDF document",content_blob.human_content_type
+
+    content_blob = Factory(:content_blob, :content_type => "text/html")
     assert_equal "HTML document",content_blob.human_content_type
 
-    content_blob.content_type = "application/x-download"
+    content_blob = Factory(:content_blob, :content_type => "application/x-download")
     assert_equal "Unknown file type",content_blob.human_content_type
 
-    content_blob.content_type = ""
+    content_blob = Factory(:content_blob, :content_type => "")
     assert_equal "Unknown file type",content_blob.human_content_type
 
-    content_blob.content_type = nil
+    content_blob =  Factory(:content_blob)
     assert_equal "Unknown file type",content_blob.human_content_type
+
+    content_blob= Factory(:tiff_content_blob)
+    assert_equal "TIFF image",content_blob.human_content_type
+
+  end
+
+  test "pdf file without 'application/pdf' content_type is also pdf" do
+    pdf_content_blob = Factory(:pdf_content_blob, :content_type => "application/octet-stream")
+    assert pdf_content_blob.is_pdf?
   end
 
   test 'covert_office should doc to pdf and then docslit convert pdf to txt' do
