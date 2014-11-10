@@ -1,7 +1,7 @@
 <%= javascript_include_tag 'datacite_doi' %>
 <%= stylesheet_link_tag "datacite_doi" %>
 
-<div class="show_basic">
+<div class="mint_doi_preview">
   <%= show_title "Minting a DOI for this #{t(controller_name.singularize)} version #{@asset_version.version} from DataCite service" %>
 
   <div class="box_infotext">
@@ -14,6 +14,15 @@
       You will first need to update and fill in the metadata below. They are conformed to the standards published by
       DataCite at:
       <%= link_to "Schema", 'http://schema.datacite.org', :target => '_blank' -%>
+    </p>
+
+    <p>
+      There are three different levels of obligation for the metadata properties:
+        <ul style="list-style-type: circle;">
+          <li>Mandatory <b>(M)</b> properties must be provided,</li>
+          <li>Recommended <b>(R)</b> properties are optional, but strongly recommended and</li>
+          <li>Optional <b>(O)</b> properties are optional and provide richer description.</li>
+        </ul>
     </p>
   </div>
   <br/>

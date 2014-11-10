@@ -2,12 +2,13 @@
    # Parameters:
    # field
    # field_name
+   # obligation: whether the field is mandatory, recommended or optional
    # description: some explanation how to input the content
 %>
 
 <div class="metadata">
   <span class="label">
-    <%= label_tag "#{field_name}".capitalize %>
+    <%= label_tag "#{field_name}".capitalize %> <%= obligation %>
   </span>
 
   <span class="description">
