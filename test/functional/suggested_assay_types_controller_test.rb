@@ -16,7 +16,6 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     login_as Factory(:user, :person_id => Factory(:admin).id)
     get :manage
     assert_response :success
-
   end
 
   test "should new" do
@@ -53,7 +52,6 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert suggested.children.count==1
     get :manage
     assert_select "li a", :text => /test assay type/
-
   end
 
   test "should create with ontology parent" do
@@ -66,7 +64,6 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",SuggestedAssayType.last.parent.uri
     get :manage
     assert_select "li a", :text => /test assay type/
-
   end
 
   test "should create for ajax request" do
