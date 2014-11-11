@@ -5,6 +5,10 @@ class SuggestedTechnologyType < ActiveRecord::Base
       Seek::Ontologies::TechnologyTypeReader.instance
   end
 
+  def self.base_ontology_hash_by_label
+    self.new.base_ontology_reader.class_hierarchy.hash_by_label
+  end
+
   def self.base_ontology_hash_by_uri
      self.new.base_ontology_reader.class_hierarchy.hash_by_uri
   end
