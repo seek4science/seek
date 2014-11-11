@@ -27,7 +27,6 @@ module Seek
         errors[:base] << "#{self.humanize_term_type} type cannot define itself as a parent!" if parent==self
       end
 
-      #the first parent that comes from the ontology
       def ontology_parent
         self.class.base_ontology_hash_by_uri[ontology_uri]
       end
