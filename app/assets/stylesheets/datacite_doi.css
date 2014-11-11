@@ -27,3 +27,7 @@ div.metadata div.add_icon{
     margin-left: 2.5em;
 }
 
+div.metadata span.label{
+    font-weight: bold;
+}
+
