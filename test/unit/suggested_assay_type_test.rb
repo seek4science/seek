@@ -38,6 +38,12 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     assert_equal at.default_parent_uri, at.ontology_uri
   end
 
+  test "all term types" do
+    types = SuggestedAssayType.all_term_types
+    assert_equal ["assay","modelling_analysis"],types.sort
+  end
+
+
   test "link to related assays" do
     at = Factory :suggested_assay_type
     assay = Factory  :experimental_assay, :suggested_assay_type => at

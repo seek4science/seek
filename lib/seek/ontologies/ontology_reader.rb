@@ -28,6 +28,28 @@ module Seek
         Rails.cache.delete(cache_key)
       end
 
+      def class_for_uri uri
+        class_hierarchy.hash_by_uri[uri]
+      end
+
+      def label_exists? label
+        all_labels.include?(label)
+      end
+
+      def all_labels
+        class_hierarchy.hash_by_label.keys
+      end
+
+      def fetch_label_for uri
+        result = ontology.query(:subject=>uri,:predicate=>RDF::RDFS.label).first
+        result.nil? ? result : result.object.to_s
+      end
+
+      def fetch_description_for uri
+        result = ontology.query(:subject=>uri,:predicate=>RDF::DC11.description).first
+        result.nil? ? result : result.object.to_s
+      end
+
       private
 
       def default_parent_class_uri
@@ -39,7 +61,7 @@ module Seek
       end
 
       def ontology_term_type
-        nil
+        raise NotImplementedError, "Subclasses must implement a ontology_term_type method"
       end
 
       def process_ontology_hierarchy
@@ -80,16 +102,6 @@ module Seek
           result
         end
 
-      end
-
-      def fetch_label_for uri
-        result = ontology.query(:subject=>uri,:predicate=>RDF::RDFS.label).first
-        result.nil? ? result : result.object.to_s
-      end
-
-      def fetch_description_for uri
-        result = ontology.query(:subject=>uri,:predicate=>RDF::DC11.description).first
-        result.nil? ? result : result.object.to_s
       end
 
 

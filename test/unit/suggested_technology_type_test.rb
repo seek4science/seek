@@ -31,6 +31,11 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
     assert_equal tt.default_parent_uri, tt.ontology_uri
   end
 
+  test "all term types" do
+    types = SuggestedTechnologyType.all_term_types
+    assert_equal ["technology"],types.sort
+  end
+
   test "link to related assays" do
     tt = Factory :suggested_technology_type
     assay = Factory :experimental_assay, :suggested_technology_type => tt

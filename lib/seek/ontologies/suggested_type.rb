@@ -4,8 +4,8 @@ module Seek
       extend ActiveSupport::Concern
       included do
 
-        belongs_to :contributor, :class_name => "Person"
-        belongs_to :parent,:class_name=>self.name
+        belongs_to :contributor, class_name: 'Person'
+        belongs_to :parent, class_name: name
 
         attr_accessor :term_type
 
@@ -20,26 +20,44 @@ module Seek
       end
 
       def label_not_defined_in_ontology
-        errors[:base] << "#{self.humanize_term_type} type with label #{label} is already defined in ontology!" if self.class.base_ontology_labels.each(&:downcase).include?(label.downcase)
+        errors[:base] << "#{humanize_term_type} type with label #{label} is already defined in ontology!" if label_exists_in_ontology?
+      end
+
+      def label_exists_in_ontology?
+        ontology_readers.find do |reader|
+          reader.label_exists?(label)
+        end
+      end
+
+      def all_term_types
+        ontology_readers.map do |reader|
+          reader.ontology_term_type
+        end
       end
 
       def parent_cannot_be_self
-        errors[:base] << "#{self.humanize_term_type} type cannot define itself as a parent!" if parent==self
+        errors[:base] << "#{humanize_term_type} type cannot define itself as a parent!" if parent == self
       end
 
-      #the first parent that comes from the ontology
+      # the first parent that comes from the ontology
       def ontology_parent
-        self.class.base_ontology_hash_by_uri[ontology_uri]
+        class_for_uri(ontology_uri)
       end
 
-      #traverse parents until an ontology_uri is found
+      def class_for_uri(uri)
+        ontology_readers.find do |reader|
+          reader.class_for_uri(uri)
+        end
+      end
+
+      # traverse parents until an ontology_uri is found
       def ontology_uri
         super || self.class.find_by_id(parent_id).try(:ontology_uri)
       end
 
       def descriptive_label
         comment = " - this is a new suggested term that specialises #{ontology_parent.try(:label)}"
-        (self.label + content_tag("span",comment,:class=>"none_text")).html_safe
+        (label + content_tag('span', comment, class: 'none_text')).html_safe
       end
 
       def humanize_term_type
@@ -50,14 +68,14 @@ module Seek
         return nil if can_destroy?
         error_messages = []
         type_name = humanize_term_type
-        error_messages << "Unable to delete #{type_name} types with children." if !children.empty?
+        error_messages << "Unable to delete #{type_name} types with children." unless children.empty?
         error_messages << "Unable to delete #{type_name} type " \
                                           "due to reliance from #{assays.count} " \
-                                          "existing #{type_name}." if !assays.empty?
+                                          "existing #{type_name}." unless assays.empty?
         error_messages
       end
 
-      #generated uri based on the id, e.g. suggested_assay_type:2
+      # generated uri based on the id, e.g. suggested_assay_type:2
       def uri
         "#{uri_scheme}#{id}"
       end
@@ -71,35 +89,35 @@ module Seek
       end
 
       def children
-        self.class.where("parent_id=? AND parent_id IS NOT NULL",id).all
+        self.class.where('parent_id=? AND parent_id IS NOT NULL', id).all
       end
 
       def assays
-        #FIXME: find a better way of getting the id foreign key
-        Assay.where("#{self.class.table_name.singularize}_id"=>id).all
+        # FIXME: find a better way of getting the id foreign key
+        Assay.where("#{self.class.table_name.singularize}_id" => id).all
       end
 
       def can_edit?
-        contributor==User.current_user.try(:person) || User.admin_logged_in?
+        contributor == User.current_user.try(:person) || User.admin_logged_in?
       end
 
       def can_destroy?
         User.admin_logged_in? && assays.empty? && children.empty?
       end
 
-      def get_child_assays suggested_type=self
+      def get_child_assays(suggested_type = self)
         result = suggested_type.assays
         suggested_type.children.each do |child|
           result = result | child.assays
           result = result | get_child_assays(child) unless child.children.empty?
         end
-        return result
+        result
       end
 
-      def parent_uri=uri
+      def parent_uri=(uri)
         if uri
           if uri.start_with?(uri_scheme)
-            self.parent_id = uri.gsub(uri_scheme,"").to_i
+            self.parent_id = uri.gsub(uri_scheme, '').to_i
           else
             self.ontology_uri = uri
           end
@@ -112,4 +130,3 @@ module Seek
     end
   end
 end
-

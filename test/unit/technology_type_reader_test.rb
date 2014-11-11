@@ -28,5 +28,27 @@ class TechnologyTypeReaderTest < ActiveSupport::TestCase
     refute_empty mic
   end
 
+  test "class for uri" do
+    reader = Seek::Ontologies::TechnologyTypeReader.instance
+    c = reader.class_for_uri("http://www.mygrid.org.uk/ontology/JERMOntology#Sequencing")
+    refute_nil c
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Sequencing",c.uri
+    assert_nil reader.class_for_uri("http://www.mygrid.org.uk/ontology/JERMOntology#sdfskdfhsdf")
+  end
+
+  test "label exists?" do
+    reader = Seek::Ontologies::TechnologyTypeReader.instance
+    assert reader.label_exists?("chip-seq")
+    refute reader.label_exists?("sdkfhsdfkhsdfhksdf")
+  end
+
+  test "all labels" do
+    reader = Seek::Ontologies::TechnologyTypeReader.instance
+    labels = reader.all_labels
+    pp labels
+    assert labels.size>50
+    assert_include labels,"chip-seq"
+  end
+
 
 end
