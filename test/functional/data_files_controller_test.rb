@@ -2041,6 +2041,25 @@ end
     assert_response :forbidden
   end
 
+  test "generate_metadata_in_xml" do
+    metadata_param = {:identifier => '10.5072/my_test',
+                      :creators => [{:creatorName => 'Last1, First1'}, {:creatorName => 'Last2, First2'}],
+                      :titles => ['test title'],
+                      :publisher => 'Fairdom',
+                      :publicationYear => '2014',
+                      :subjects => ['System Biology', 'Bioinformatic'],
+                      :language => 'eng',
+                      :resourceType => 'Dataset',
+                      :version => '1.0',
+                      :descriptions => ['test description']
+    }
+
+    metadata_in_xml = DataFilesController.new().generate_metadata_in_xml(metadata_param)
+    metadata_from_file = open("#{Rails.root}/test/fixtures/files/doi_metadata.xml").read
+
+    assert_equal metadata_from_file, metadata_in_xml
+  end
+
   test "mint doi" do
     df = Factory(:data_file,:policy=>Factory(:public_policy))
     post :mint, :id => df.id, :metadata => {}
