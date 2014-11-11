@@ -48,7 +48,7 @@ an example towards the end of the this page.
 
     export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
 
-    ./script/delayed_job stop
+    bundle exec ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop
     hg pull https://bitbucket.org/seek4science/seek -r v0.21.0
     hg update # only if no other changes have been made to your local version, if you get an error ignore it and do merge
