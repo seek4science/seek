@@ -1,14 +1,14 @@
 <%
    if params[:metadata]
-     creators = params[:metadata][:creators][:creator][:creatorName]
-     title = params[:metadata][:titles][:title]
+     creators = params[:metadata][:creators] ? params[:metadata][:creators].collect{|creator| creator['creatorName']} : []
+     title = params[:metadata][:titles] ? params[:metadata][:titles].first : nil
      publisher = params[:metadata][:publisher]
      publication_year = params[:metadata][:publicationYear]
-     subjects = params[:metadata][:subjects][:subject]
+     subjects = params[:metadata][:subjects] ? params[:metadata][:subjects] : []
      language = params[:metadata][:language]
      resource_type = params[:metadata][:resourceType]
      version = params[:metadata][:version]
-     description = params[:metadata][:descriptions][:description]
+     description = params[:metadata][:descriptions] ? params[:metadata][:descriptions].first : nil
    else
      creators = @asset_version.creators.collect{|creator| creator.last_name.capitalize + ', ' + creator.first_name.capitalize}
      title = @asset_version.title
@@ -25,7 +25,7 @@
            :locals => {:objects => creators,
                        :field_name => 'creator',
                        :obligation => "(M) <span class='required'>*</span>".html_safe,
-                       :metadata_path => "metadata[creators][creator][creatorName]",
+                       :metadata_path => "metadata[creators][][creatorName]",
                        :description => "Input the creator names, with the format: Last name, First name"
            } %>
 
@@ -33,7 +33,7 @@
            :locals => {:field_name => 'title',
                        :obligation => "(M) <span class='required'>*</span>".html_safe,
                        :description => "Input the title of the asset",
-                       :field => text_area_tag("metadata[titles][title]", title, :class => "title_text_entry")
+                       :field => text_area_tag("metadata[titles][]", title, :class => "title_text_entry")
            } %>
 
 <%= render :partial => "datacite_doi/single_entry",
@@ -54,7 +54,7 @@
            :locals => {:objects => subjects,
                        :field_name => 'subject',
                        :obligation => "(R)",
-                       :metadata_path => "metadata[subjects][subject]",
+                       :metadata_path => "metadata[subjects][]",
                        :description => "Input the subjects of the asset, e.g. System Biology"
            } %>
 
@@ -83,5 +83,5 @@
            :locals => {:field_name => 'Description',
                        :obligation => "(R)",
                        :description => "Input the description",
-                       :field => text_area_tag("metadata[descriptions][description]", description, :class => "large_text_entry")
+                       :field => text_area_tag("metadata[descriptions][]", description, :class => "large_text_entry")
            } %>

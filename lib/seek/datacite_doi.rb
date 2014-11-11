@@ -84,11 +84,11 @@ module Seek
       metadata = params[:metadata]
       if metadata
         identifier = metadata[:identifier]
-        creatorName = metadata[:creators][:creator][:creatorName]
-        title = metadata[:titles][:title]
+        creators = metadata[:creators] ? metadata[:creators].collect{|creator| creator['creatorName']}.join('') : nil
+        title = metadata[:titles] ? metadata[:titles].join('') : nil
         publisher = metadata[:publisher]
         publicationYear = metadata[:publicationYear]
-        if identifier.blank? || creatorName.blank? || title.blank? || publisher.blank? || publicationYear.blank?
+        if identifier.blank? || creators.blank? || title.blank? || publisher.blank? || publicationYear.blank?
           validated = false
         else
           validated = true

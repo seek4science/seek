@@ -1984,8 +1984,8 @@ end
     df = Factory(:data_file,:policy=>Factory(:public_policy))
 
     valid_metadata = {:identifier => '10.5072/my_test',
-                :creators => {:creator => {:creatorName => 'Last, First'}},
-                :titles => {:title => 'A title'},
+                :creators => [{:creatorName => 'Last, First'}],
+                :titles => ['A title'],
                 :publisher => 'System Biology',
                 :publicationYear => '2014'
     }
@@ -1993,8 +1993,31 @@ end
     assert_redirected_to  minted_data_file_path(df)
     assert_nil flash[:error]
 
-    invalid_metadata = {:creators => {:creator => {:creatorName => 'Last, First'}},
-                        :titles => {:title => 'A title'}
+    #lack of fields
+    invalid_metadata = {:creators => [:creatorName => 'Last, First'],
+                        :titles => ['A title']
+    }
+    post :mint, :id => df.id, :metadata => invalid_metadata
+    assert_response :success
+    assert_not_nil flash[:error]
+
+    #lack of value
+    invalid_metadata = {:identifier => '10.5072/my_test',
+                      :creators => [],
+                      :titles => ['A title'],
+                      :publisher => 'System Biology',
+                      :publicationYear => '2014'
+    }
+    post :mint, :id => df.id, :metadata => invalid_metadata
+    assert_response :success
+    assert_not_nil flash[:error]
+
+    #blank value
+    invalid_metadata = {:identifier => '10.5072/my_test',
+                      :creators => [{:creatorName => ''}],
+                      :titles => [' '],
+                      :publisher => 'System Biology',
+                      :publicationYear => '2014'
     }
     post :mint, :id => df.id, :metadata => invalid_metadata
     assert_response :success
