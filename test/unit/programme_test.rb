@@ -77,5 +77,14 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute programme.can_be_edited_by?(nil)
   end
 
+  test "disassociate projects on destroy" do
+    programme = Factory(:programme)
+    project = programme.projects.first
+    assert_equal programme.id,project.programme_id
+    programme.destroy
+    project.reload
+    assert_nil project.programme_id
+  end
+
 
 end

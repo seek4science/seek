@@ -42,8 +42,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       item = Factory(type_name.singularize.to_sym, :policy => Factory(:private_policy))
 
       get "/#{type_name}/#{item.id}"
-      assert_redirected_to eval "#{type_name}_path"
-      assert_not_nil flash[:error]
+      assert_response :forbidden
 
       if item.is_downloadable?
         test_failing_for item, type_name, 'download', nil
@@ -59,8 +58,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
         end
         random_code = CGI::escape(SecureRandom.base64(30))
         get "/#{type_name}/#{item.id}?code=#{random_code}"
-        assert_redirected_to eval "#{type_name}_path"
-        assert_not_nil flash[:error]
+        assert_response :forbidden
 
         if item.is_downloadable?
           test_failing_for item, type_name, 'download', random_code
@@ -76,8 +74,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
 
       #test without code instead of can_...? function
       get "/#{type_name}/#{item.id}"
-      assert_redirected_to eval "#{type_name}_path"
-      assert_not_nil flash[:error]
+      assert_response :forbidden
 
       if item.is_downloadable?
         test_failing_for item, type_name, 'download', nil
@@ -95,8 +92,7 @@ class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
       disable_authorization_checks {auth_code.expiration_date = Time.now - 1.days; auth_code.save! }
       item.reload
       get "/#{type_name}/#{item.id}?code=#{code}"
-      assert_redirected_to eval "#{type_name}_path"
-      assert_not_nil flash[:error]
+      assert_response :forbidden
 
       if item.is_downloadable?
         test_failing_for item, type_name, 'download', code

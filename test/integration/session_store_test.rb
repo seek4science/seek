@@ -6,7 +6,7 @@ class SessionStoreTest < ActionController::IntegrationTest
     login_as_test_user
   end
 
-  test "should go back to the authorized page when access denied" do
+  test "should forbid the unauthorized page" do
 
     data_file = Factory :data_file, :contributor => User.current_user
     get "/data_files/#{data_file.id}", {}, {'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"}
@@ -15,8 +15,7 @@ class SessionStoreTest < ActionController::IntegrationTest
     logout "http://www.example.com/data_files/#{data_file.id}"
     assert_redirected_to data_file_path(data_file)
     get "/data_files/#{data_file.id}", {}, {'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"}
-    assert_not_nil flash[:error]
-    assert_redirected_to data_files_path
+    assert_response :forbidden
 
     login_as_test_user
     assert_redirected_to data_file_path(data_file)
@@ -47,7 +46,7 @@ class SessionStoreTest < ActionController::IntegrationTest
 
   def login_as_test_user
     User.current_user = test_user
-    post "/session", :login => test_user.login, :password => "blah"
+    post "/session", {:login => test_user.login, :password => "blah"}
   end
 
   def logout referer

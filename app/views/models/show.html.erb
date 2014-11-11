@@ -20,6 +20,11 @@
                </li>
            <% end -%>
    <% end %>
+  <% if show_jws_simulate? %>
+      <li>
+        <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate #{t('model')} on JWS") -%>
+      </li>
+  <% end %>
 </ul>
 
 <% if Seek::Config.sycamore_enabled && @display_model.contains_sbml? %>

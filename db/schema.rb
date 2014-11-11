@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141017125035) do
+ActiveRecord::Schema.define(:version => 20141103180504) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -147,15 +147,6 @@ ActiveRecord::Schema.define(:version => 20141017125035) do
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
   add_index "assay_organisms", ["organism_id"], :name => "index_assay_organisms_on_organism_id"
 
-  create_table "assay_types", :force => true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "term_uri"
-    t.string   "source_path"
-    t.integer  "contributor_id"
-  end
-
   create_table "assay_types_edges", :id => false, :force => true do |t|
     t.integer "parent_id"
     t.integer "child_id"
@@ -184,6 +175,17 @@ ActiveRecord::Schema.define(:version => 20141017125035) do
   create_table "assays_samples", :id => false, :force => true do |t|
     t.integer "assay_id"
     t.integer "sample_id"
+  end
+
+  create_table "asset_doi_logs", :force => true do |t|
+    t.string   "asset_type"
+    t.integer  "asset_id"
+    t.integer  "asset_version"
+    t.integer  "action"
+    t.text     "comment"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.integer  "user_id"
   end
 
   create_table "assets", :force => true do |t|
@@ -1470,9 +1472,8 @@ ActiveRecord::Schema.define(:version => 20141017125035) do
     t.string   "uri"
     t.string   "parent_uri"
     t.integer  "contributor_id"
-    t.boolean  "is_for_modelling"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   create_table "suggested_technology_types", :force => true do |t|
@@ -1635,15 +1636,6 @@ ActiveRecord::Schema.define(:version => 20141017125035) do
   end
 
   add_index "taverna_player_service_credentials", ["uri"], :name => "index_taverna_player_service_credentials_on_uri"
-
-  create_table "technology_types", :force => true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "term_uri"
-    t.string   "source_path"
-    t.integer  "contributor_id"
-  end
 
   create_table "technology_types_edges", :id => false, :force => true do |t|
     t.integer "parent_id"

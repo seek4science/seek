@@ -60,8 +60,26 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
+  #allows you to run something on a temporary copy of the blob file, which is deleted once finished
+  # e.g. blob.with_temporary_copy{|copy_path| <some stuff with the copy>}
+  def with_temporary_copy
+    copy_path = make_temp_copy
+    begin
+      yield copy_path
+    ensure
+      FileUtils.rm(copy_path)
+    end
+  end
+
   def file_extension
     original_filename && original_filename.split(".").last
+  end
+
+  def make_temp_copy
+    temp_name = Time.now.strftime("%Y%m%d%H%M%S%L")+"-"+original_filename
+    temp_path = File.join(Seek::Config.temporary_filestore_path,temp_name).to_s
+    FileUtils.cp(filepath,temp_path)
+    temp_path
   end
 
   def original_content_type
@@ -71,7 +89,6 @@ class ContentBlob < ActiveRecord::Base
   def is_binary_file?
     original_content_type == "application/octet-stream"
   end
-
 
   def content_type
     is_binary_file? ? find_or_keep_type_with_mime_magic : original_content_type
@@ -234,7 +251,7 @@ class ContentBlob < ActiveRecord::Base
       self.content_type = type
     end
   end
-
+  
   def dump_data_object_to_file
     data_to_save = @data
     

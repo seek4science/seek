@@ -5,6 +5,7 @@ addons:
 rvm:
   - 1.9.3
   - 2.1.3
+  - 2.1.4
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
   - SUITE="rake test:functionals" DB_TYPE=mysql

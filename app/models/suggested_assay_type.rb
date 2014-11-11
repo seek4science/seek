@@ -11,7 +11,6 @@ class SuggestedAssayType < ActiveRecord::Base
      end
   end
 
-
   def self.base_ontology_hash_by_label
     @base_hash_by_label ||= begin
       assay_type_hash = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_label
@@ -28,11 +27,9 @@ class SuggestedAssayType < ActiveRecord::Base
       end
   end
 
-   def self.base_ontology_labels
-       base_ontology_hash_by_label.keys
-   end
-
-
+  def self.base_ontology_labels
+     base_ontology_hash_by_label.keys
+  end
 
   def self.all_term_types
     assay_type = Seek::Ontologies::AssayTypeReader.instance.ontology_term_type

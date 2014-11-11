@@ -1,0 +1,22 @@
+<div class="landing_page">
+  <h1>403</h1>
+  <% asset_type =  t("#{controller_name.singularize}") %>
+  <h2>The <%= asset_type %> is not visible to you.</h2>
+  <p style="text-align: center;">You may need to login.</p>
+
+  <% if item.class.authorization_supported? %>
+      <%  hidden_item_contributor_links = hidden_item_contributor_links([item])%>
+      <% unless hidden_item_contributor_links.empty? %>
+        <p style="text-align: center;">Or you may want to contact the authors: <%= hidden_item_contributor_links([item]).join(', ').html_safe%></p>
+      <% end %>
+  <% end %>
+
+  <% version = params[:version] || (item.respond_to?(:version) && item.version) %>
+  <% if AssetDoiLog.was_doi_minted_for?(item.class.name, item.id, version) %>
+      <% asset_doi_log = AssetDoiLog.where(asset_type: item.class.name, asset_id: item.id, asset_version: version, action: AssetDoiLog::UNPUBLISH).last %>
+      <% comment = asset_doi_log.try(:comment) %>
+      <% unless comment.blank? %>
+        <p class="comment" style="text-align: center;">The authors left the reason for un-publishing the <%= asset_type %>: <%= comment.html_safe %></p>
+      <% end %>
+  <% end %>
+</div>

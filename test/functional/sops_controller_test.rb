@@ -84,8 +84,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "fail gracefullly when trying to access a missing sop" do
     get :show,:id=>99999
-    assert_redirected_to sops_path
-    assert_not_nil flash[:error]
+    assert_response :not_found
   end
 
   test "should not create sop with file url" do
@@ -123,17 +122,13 @@ class SopsControllerTest < ActionController::TestCase
     sop=Factory :sop
     logout
     get :show, :id=>sop
-    assert_redirected_to sops_path
-    assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this #{I18n.t('sop')}, you may need to login first.",flash[:error]
+    assert_response :forbidden
   end
 
   test "should not show private sop to another user" do
     sop=Factory :sop,:contributor=>Factory(:user)
     get :show, :id=>sop
-    assert_redirected_to sops_path
-    assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this #{I18n.t('sop')}.",flash[:error]
+    assert_response :forbidden
   end
 
   test "should get new" do

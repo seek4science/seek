@@ -123,11 +123,6 @@ class ActiveSupport::TestCase
     skip("soffice is not available on port #{port}, skipping test") unless @@soffice_available
   end
 
-  def skip_jws_tests?
-    #skip if running in travis
-    !ENV["TRAVIS"].nil?
-  end
-
   def skip_rest_schema_check?
     false
   end

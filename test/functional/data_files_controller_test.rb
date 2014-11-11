@@ -1208,8 +1208,7 @@ end
 
   test "fail gracefullly when trying to access a missing data file" do
     get :show,:id=>99999
-    assert_redirected_to data_files_path
-    assert_not_nil flash[:error]
+    assert_response :not_found
   end
 
   test "owner should be able to update sharing" do
@@ -1608,18 +1607,14 @@ end
     df=Factory :data_file
     logout
     get :show, :id=>df
-    assert_redirected_to data_files_path
-    assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this #{I18n.t('data_file')}, you may need to login first.",flash[:error]
+    assert_response :forbidden
   end
 
   test "should not show private data file to another user" do
 
     df=Factory :data_file,:contributor=>Factory(:user)
     get :show, :id=>df
-    assert_redirected_to data_files_path
-    assert_not_nil flash[:error]
-    assert_equal "You are not authorized to view this #{I18n.t('data_file')}.",flash[:error]
+    assert_response :forbidden
   end
 
   test "should show error for the user who doesn't login or is not the project member, when the user specify the version and this version is not the latest version" do
@@ -1884,6 +1879,76 @@ end
     assert_equal "fish flop",json["title"]
     assert_equal "testing json description",json["description"]
     assert_equal df.version,json["version"]
+  end
+
+  test "landing page for hidden item" do
+    df = Factory(:data_file,:policy=>Factory(:private_policy),:title=>"fish flop",:description=>"testing json description")
+    assert !df.can_view?
+
+    get :show,:id=>df
+    assert_response :forbidden
+    assert_select "h1", :text=>'403'
+    assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
+
+    assert !df.can_see_hidden_item?(User.current_user.person)
+    contributor_person = df.contributor.person
+    assert_select "a[href=?]", person_path(contributor_person), :count => 0
+  end
+
+  test "landing page for hidden item with the contributor contact" do
+    df = Factory(:data_file,:policy=>Factory(:private_policy),:title=>"fish flop",:description=>"testing json description")
+
+    project = df.projects.first
+    work_group = Factory(:work_group, project: project)
+    person = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    user = Factory(:user, person: person)
+
+    login_as(user)
+
+    assert !df.can_view?
+    assert df.can_see_hidden_item?(user.person)
+
+    get :show,:id=>df
+    assert_response :forbidden
+    assert_select "h1", :text=>'403'
+    assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
+
+    contributor_person = df.contributor.person
+    assert_select "a[href=?]", person_path(contributor_person)
+  end
+
+  test "landing page for hidden item which DOI was minted" do
+    df = Factory(:data_file,:policy=>Factory(:private_policy),:title=>"fish flop",:description=>"testing json description")
+    comment = 'the paper was restracted'
+    AssetDoiLog.create(:asset_type => df.class.name, :asset_id=> df.id, :asset_version => df.version, :action => AssetDoiLog::MINT)
+    AssetDoiLog.create(:asset_type => df.class.name, :asset_id=> df.id, :asset_version => df.version, :action => AssetDoiLog::UNPUBLISH, :comment => comment)
+
+    assert !df.can_view?
+    assert AssetDoiLog.was_doi_minted_for?(df.class.name, df.id, df.version)
+
+    get :show,:id=>df
+    assert_response :forbidden
+    assert_select "p[class=comment]",:text=>/#{comment}/
+  end
+
+  test "landing page for non-existing item" do
+    get :show,:id=>123
+    assert_response :not_found
+    assert_select "h1", :text=>'404'
+    assert_select "h2",:text=>/The #{I18n.t('data_file')} does not exist./
+  end
+
+  test "landing page for deleted item which DOI was minted" do
+    comment = 'the paper was restracted'
+    klass = 'DataFile'
+    id = 123
+    version = 1
+    AssetDoiLog.create(:asset_type => klass, :asset_id=> id, :asset_version => version, :action => AssetDoiLog::MINT)
+    AssetDoiLog.create(:asset_type => klass, :asset_id=> id, :asset_version => version, :action => AssetDoiLog::DELETE, :comment => comment)
+    assert AssetDoiLog.was_doi_minted_for?(klass, id, version)
+    get :show,:id=>id, :version=>version
+    assert_response :not_found
+    assert_select "p[class=comment]",:text=>/#{comment}/
   end
 
   private

@@ -122,3 +122,6 @@ recaptcha_public_key:
 recaptcha_private_key:
 support_email_address:
 show_as_external_link_enabled:
+doi_minting_enabled:
+datacite_username:
+datacite_password:

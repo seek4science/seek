@@ -237,6 +237,26 @@ module Seek
       value
     end
 
+    def datacite_password_decrypt
+      datacite_password = Seek::Config.datacite_password
+      unless datacite_password.blank?
+        begin
+          datacite_password = decrypt(datacite_password, generate_key(GLOBAL_PASSPHRASE))
+        rescue => e
+          datacite_password = ''
+          Rails.logger.error 'ERROR DETERIMINING THE DATACITE PASSWORD - USING BLANK'
+        end
+      end
+      datacite_password
+    end
+
+    def datacite_password_encrypt(password)
+      unless password.blank?
+        Seek::Config.datacite_password = encrypt(password, generate_key(GLOBAL_PASSPHRASE))
+      end
+      datacite_password
+    end
+
     def facet_enable_for_page(controller)
       facet_enable_for_pages[controller.to_sym]
     end

@@ -1,0 +1,17 @@
+<div class="landing_page">
+  <h1>404</h1>
+  <% asset_type = t("#{controller_name.singularize}") %>
+  <h2>The <%= asset_type %> does not exist.</h2>
+
+  <% klass = controller_name.singularize.camelize %>
+  <% version = params[:version] %>
+  <% if AssetDoiLog.was_doi_minted_for?(klass, params[:id], version) %>
+      <% asset_doi_log = AssetDoiLog.where(asset_type: klass, asset_id: params[:id], asset_version: version, action: AssetDoiLog::DELETE).last %>
+      <% comment = asset_doi_log.try(:comment) %>
+      <% unless comment.blank? %>
+          <p class="comment">The authors left the reason for removing the <%= asset_type %>: <%= comment.html_safe %></p>
+      <% end %>
+  <% else %>
+      <p>You may have mistyped the address or the <%= asset_type %> may have deleted.</p>
+  <% end %>
+</div>
