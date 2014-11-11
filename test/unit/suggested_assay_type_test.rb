@@ -43,6 +43,19 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     assert_equal ["assay","modelling_analysis"],types.sort
   end
 
+  test "ontology_parent" do
+    type = Factory(:suggested_assay_type,:parent_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics")
+    parent = type.ontology_parent
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",parent.uri
+    assert_equal "Fluxomics",parent.label
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics",type.ontology_uri
+  end
+
+  test "term type" do
+    type = Factory(:suggested_assay_type,:parent_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics")
+    assert_equal "assay",type.term_type
+  end
+
 
   test "link to related assays" do
     at = Factory :suggested_assay_type

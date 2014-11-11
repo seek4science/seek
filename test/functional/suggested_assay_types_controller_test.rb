@@ -97,7 +97,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     suggested_parent1 = Factory(:suggested_assay_type)
     suggested_parent2 = Factory(:suggested_assay_type)
     ontology_parent_uri = "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics"
-    ontology_parent = Factory(:suggested_assay_type).class.base_ontology_hash_by_uri[ontology_parent_uri]
+
     suggested_assay_type = Factory(:suggested_assay_type, :contributor_id => User.current_user.person.try(:id), :parent_id => suggested_parent1.id)
     assert_equal 1, suggested_assay_type.parents.size
     assert_equal suggested_parent1, suggested_assay_type.parents.first
@@ -112,6 +112,8 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     #update to other parent from ontology
     put :update, id: suggested_assay_type.id, suggested_assay_type: {:parent_uri => ontology_parent_uri}
     assert_redirected_to :action => :manage
+
+    ontology_parent = Seek::Ontologies::AssayTypeReader.instance.class_for_uri("http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics")
     assert ontology_parent.children.include?(suggested_assay_type)
 
   end

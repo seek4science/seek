@@ -45,9 +45,11 @@ module Seek
       end
 
       def class_for_uri(uri)
-        ontology_readers.find do |reader|
-          reader.class_for_uri(uri)
+        result = nil
+        ontology_readers.detect do |reader|
+          result = reader.class_for_uri(uri)
         end
+        result
       end
 
       # traverse parents until an ontology_uri is found
@@ -126,6 +128,12 @@ module Seek
 
       def uri_scheme
         "#{self.class.name.underscore}:"
+      end
+
+      def base_ontology_reader
+        ontology_readers.detect do |reader|
+          reader.ontology_term_type == @term_type
+        end || ontology_readers[0]
       end
     end
   end
