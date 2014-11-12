@@ -1,1 +1,2 @@
-<%= ontology_selection_list suggested_type.term_type, "assay[#{suggested_type.class.uri_key_in_assay}]",suggested_type.uri,{:style=>"width:100%"} %>
+<% key = controller_name.gsub("suggested_","").singularize + "_uri" %>
+<%= ontology_selection_list suggested_type.term_type, "assay[#{key}]",suggested_type.uri,{:style=>"width:100%"} %>

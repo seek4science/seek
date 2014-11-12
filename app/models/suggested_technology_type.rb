@@ -1,34 +1,19 @@
 class SuggestedTechnologyType < ActiveRecord::Base
   include Seek::Ontologies::SuggestedType
 
+  def ontology_readers
+    [Seek::Ontologies::TechnologyTypeReader.instance]
+  end
+
   def base_ontology_reader
-      Seek::Ontologies::TechnologyTypeReader.instance
-  end
-
-  def self.base_ontology_hash_by_label
-    self.new.base_ontology_reader.class_hierarchy.hash_by_label
-  end
-
-  def self.base_ontology_hash_by_uri
-     self.new.base_ontology_reader.class_hierarchy.hash_by_uri
-  end
-
-  def self.base_ontology_labels
-    base_ontology_hash_by_label.keys
-  end
-
-
-  def term_type
-      @term_type ||= base_ontology_reader.ontology_term_type
+    ontology_readers[0]
   end
 
   def self.all_term_types
-    Array(self.new.base_ontology_reader.ontology_term_type)
+    new.all_term_types
   end
 
-  def self.uri_key_in_assay
-    "technology_type_uri"
+  def term_type
+    @term_type ||= base_ontology_reader.ontology_term_type
   end
-
-
 end

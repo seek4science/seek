@@ -1,7 +1,5 @@
 
-<%= render :partial => "general/item_title",:locals=>{:title=>"Technology type '#{h(@label)}'"} %>
-
-
+<%= render :partial => "general/item_title",:locals=>{:title=>"Technology type '#{@type_class.try(:label) || params[:label]}'"} %>
 
 
 <% unless @type_class.nil? -%>
@@ -9,12 +7,12 @@
     <div class="ontology_nav">
 
       <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
-      <%= parent_technology_types_list_links @type_class.is_suggested_type? ? Array(@type_class.ontology_parent) : @type_class.parents  -%>
+      <%= parent_technology_types_list_links @type_class.parents  -%>
 
       <br/>
 
       <%= image("current",{:title=>"Current technology type",:alt=>"Current technology type",:style=>"vertical-align:middle"}) -%>
-      <%= displayed_hierarchy_current_label(@label,@type_class) -%>
+      <%= @type_class.descriptive_label -%>
 
       <br/>
 

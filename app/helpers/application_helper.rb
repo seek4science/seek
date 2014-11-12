@@ -207,11 +207,6 @@ module ApplicationHelper
   
   def empty_list_li_text list
     return "<li><div class='none_text'> None specified</div></li>".html_safe if is_nil_or_empty?(list)
-  end  
-
-  def model_title_or_not_specified model
-    text=model.nil? ? nil : model.title
-    text_or_not_specified text,:capitalize=>true    
   end
   
   def text_or_not_specified text, options = {}
@@ -343,32 +338,6 @@ module ApplicationHelper
     return "#{Seek::Config.application_title} "+name
   end
 
-  # http://www.igvita.com/blog/2006/09/10/faster-pagination-in-rails/
-  def windowed_pagination_links(pagingEnum, options)
-    link_to_current_page = options[:link_to_current_page]
-    always_show_anchors = options[:always_show_anchors]
-    padding = options[:window_size]
-
-    current_page = pagingEnum.page
-    html = ''
-
-    #Calculate the window start and end pages
-    padding = padding < 0 ? 0 : padding
-    first = pagingEnum.page_exists?(current_page  - padding) ? current_page - padding : 1
-    last = pagingEnum.page_exists?(current_page + padding) ? current_page + padding : pagingEnum.last_page
-
-    # Print start page if anchors are enabled
-    html << yield(1) if always_show_anchors and not first == 1
-
-    # Print window pages
-    first.upto(last) do |page|
-      (current_page == page && !link_to_current_page) ? html << page : html << yield(page)
-    end
-
-    # Print end page if anchors are enabled
-    html << yield(pagingEnum.last_page) if always_show_anchors and not last == pagingEnum.last_page
-    html.html_safe
-  end
 
   def favourite_group_popup_link_action_new resource_type=nil
     return link_to_remote_redbox("Create new #{t('favourite_group')}",
@@ -641,32 +610,6 @@ module ApplicationHelper
     no_deletion_explanation_message(model_item.class).html_safe
   end
 
-  #
-  # Converts the given HASH array like 'params' to a flat
-  # HASH array that's compatible with url_for and link_to
-  # From http://www.gamecreatures.com/blog/2007/08/21/rails-url_for-and-params-missery/
-  #
-  def flatten_param_hash( params )
-    found = true
-
-    while found
-      found = false
-      new_hash = {}
-
-      params.each do |key,value|
-        if value.is_a?( Hash )
-          found = true
-          value.each do |key2,value2|
-            new_hash[ key.to_s + '[' + key2.to_s + ']' ] = value2
-          end
-        else
-          new_hash[ key.to_s ] = value
-        end
-      end
-      params = new_hash
-    end
-    params
-  end
 
   #returns a new instance of the string describing a resource type, or nil if it is not applicable
   def instance_of_resource_type resource_type

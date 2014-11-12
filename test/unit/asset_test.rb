@@ -41,10 +41,10 @@ class AssetTest < ActiveSupport::TestCase
 
   test "assay type titles" do
     df = Factory :data_file
-    assay = Factory :experimental_assay,:assay_type_label=>"aaa"
-    assay2 = Factory :modelling_assay,:assay_type_label=>"bbb"
-    assay3 = Factory :modelling_assay,:assay_type_label=>nil,:assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle"
-    assay4 = Factory :modelling_assay,:assay_type_label=>nil,:assay_type_uri=>"http://some-made-up-uri-not-resolvable-from-ontology.org/types#to_force_nil_label"
+    assay = Factory :experimental_assay
+    assay2 = Factory :modelling_assay
+    assay3 = Factory :modelling_assay,:assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle"
+    assay4 = Factory :modelling_assay,:assay_type_uri=>"http://some-made-up-uri-not-resolvable-from-ontology.org/types#to_force_nil_label"
 
     disable_authorization_checks do
       assay.relate(df)
@@ -58,7 +58,7 @@ class AssetTest < ActiveSupport::TestCase
       df.reload
     end
 
-    assert_equal ["Cell cycle","aaa","bbb"],df.assay_type_titles.sort
+    assert_equal ["Cell cycle", "Experimental assay type", "Model analysis type"],df.assay_type_titles.sort
     m=Factory :model
     assert_equal [],m.assay_type_titles
 
@@ -132,9 +132,10 @@ class AssetTest < ActiveSupport::TestCase
 
   test "tech type titles" do
     df = Factory :data_file
-    assay = Factory :experimental_assay,:technology_type_label=>"aaa"
-    assay2 = Factory :modelling_assay,:technology_type_label=>"bbb"
-    assay3 = Factory :modelling_assay,:technology_type_label=>nil
+    assay = Factory :experimental_assay,:technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Binding"
+    assay2 = Factory :experimental_assay,:technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Imaging"
+    assay3 = Factory :modelling_assay
+
 
     disable_authorization_checks do
       assay.relate(df)
@@ -145,7 +146,7 @@ class AssetTest < ActiveSupport::TestCase
       df.reload
     end
 
-    assert_equal ["aaa","bbb"],df.technology_type_titles.sort
+    assert_equal ["Binding","Imaging"],df.technology_type_titles.sort
     m=Factory :model
     assert_equal [],m.technology_type_titles
 

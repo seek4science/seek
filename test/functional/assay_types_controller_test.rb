@@ -23,19 +23,17 @@ class AssayTypesControllerTest < ActionController::TestCase
 
 
  test "hierarchy" do
-    assay = Factory :experimental_assay,:assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Flux_balance_analysis",:policy=>Factory(:public_policy)
+    assay = Factory :experimental_assay,:title=>"flux balance assay",:assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Flux_balance_analysis",:policy=>Factory(:public_policy)
   logout
     get :show, :uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
     assert_response :success
+
     assert_select "h1",:text=>/Assay type &#x27;Experimental assay type&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
+      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay)
     end
     assert_select "div.ontology_nav a.child_term",:text=>/fluxomics \(1\)/i
   end
-
-
-
 
   test "default page" do
     assay = Factory :experimental_assay,:policy=>Factory(:public_policy)
@@ -101,32 +99,23 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
 
-  test "correct label passed with suggested assay type uri should render correctly" do
+  test "correct label passed with suggested assay type should render correctly" do
     #assay with suggested types
-    suggested_assay_type = Factory(:suggested_assay_type)
-    assay = Factory :experimental_assay, :assay_type_uri => suggested_assay_type.uri, :assay_type_label => suggested_assay_type.label ,:policy => Factory(:public_policy)
+    suggested_assay_type = Factory(:suggested_assay_type,:label=>"this is an assay type")
+    assay = Factory :experimental_assay, :suggested_assay_type => suggested_assay_type, :policy => Factory(:public_policy)
 
     #with correct label
-    get :show, :uri => assay.assay_type_uri, :label => assay.assay_type_label
-    assert_select "h1", :text => /Assay type &#x27;#{assay.assay_type_label}&#x27;/
+    get :show, :uri => suggested_assay_type.uri, :label => "this is an assay type"
+    assert_select "h1", :text => /Assay type &#x27;this is an assay type&#x27;/
     assert_select "div.list_items_container" do
       assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
     end
   end
 
-  test "no label passed render the same page as long as the same suggested assay type uri is passed" do
-    suggested_assay_type = Factory(:suggested_assay_type)
-    assay = Factory :experimental_assay, :assay_type_uri => suggested_assay_type.uri, :assay_type_label => suggested_assay_type.label ,:policy => Factory(:public_policy)
-    #without label
-    get :show, :uri => assay.assay_type_uri
-    assert_select "h1", :text => /Assay type &#x27;#{assay.assay_type_label}&#x27;/
-    assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
-    end
-  end
+
   test "unmatched label passed render term suggestion page with suggested_assay_type_label" do
     suggested_assay_type = Factory(:suggested_assay_type)
-    assay = Factory :experimental_assay, :assay_type_uri => suggested_assay_type.uri, :assay_type_label => suggested_assay_type.label ,:policy => Factory(:public_policy)
+    assay = Factory :experimental_assay, :suggested_assay_type => suggested_assay_type, :policy => Factory(:public_policy)
     get :show, :uri => assay.assay_type_uri, :label => "frog"
     assert_not_nil flash[:notice]
     assert_select "h1", :text => /Assay type &#x27;frog&#x27;/
