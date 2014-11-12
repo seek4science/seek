@@ -5,7 +5,6 @@ addons:
 rvm:
   - 1.9.3  
   - 2.1.4
-  - ruby-2.2.0-preview1
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
   - SUITE="rake test:functionals" DB_TYPE=mysql
@@ -24,6 +23,3 @@ script:
   - RAILS_ENV=test bundle exec rake db:create
   - RAILS_ENV=test bundle exec rake db:schema:load
   - bundle exec $SUITE
-matrix:
-  allow_failures:
-    - rvm: ruby-2.2.0-preview1
