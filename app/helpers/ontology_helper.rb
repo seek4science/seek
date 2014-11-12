@@ -39,7 +39,7 @@ module OntologyHelper
 
   def link_to_assay_type(assay)
     parameters = parameters_for_type(assay, 'assay_type')
-    link_to parameters[:label], technology_types_path(parameters)
+    link_to parameters[:label], assay_types_path(parameters)
   end
 
   def link_to_technology_type(assay)
