@@ -13,13 +13,14 @@ module OntologyHelper
     form.select element_id, options, { selected: selected_uri }, html_options
   end
 
-  # ontology select tag when form is unavailables
+  # ontology select tag when form is unavailable
   def ontology_selection_list(types, element_name, selected_uri, disabled_uris = {}, html_options = {})
     options = []
     Array(types).each do |type|
       options += ontology_select_options(type)
     end
-    select_tag element_name, options_for_select(options, selected: selected_uri, disabled: disabled_uris), html_options
+    select_options = options_for_select(options, selected: selected_uri, disabled: disabled_uris)
+    select_tag element_name, select_options, html_options
   end
 
   def ontology_select_options(type)
@@ -47,8 +48,10 @@ module OntologyHelper
   end
 
   def parameters_for_type(assay, type)
-    parameters = {label: assay.send("#{type}_label")}
-    parameters[:uri] = assay.send("suggested_#{type}").try(:uri) || assay.send("#{type}_uri")
+    {
+        label: assay.send("#{type}_label"),
+        uri: assay.send("suggested_#{type}").try(:uri) || assay.send("#{type}_uri")
+    }
   end
 
   def child_technology_types_list_links(children)

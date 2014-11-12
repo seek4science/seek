@@ -45,7 +45,6 @@ class TechnologyTypeReaderTest < ActiveSupport::TestCase
   test "all labels" do
     reader = Seek::Ontologies::TechnologyTypeReader.instance
     labels = reader.all_labels
-    pp labels
     assert labels.size>50
     assert_include labels,"chip-seq"
   end

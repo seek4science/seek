@@ -61,7 +61,7 @@ module Seek
       end
 
       def ontology_term_type
-        raise NotImplementedError, "Subclasses must implement a ontology_term_type method"
+        nil
       end
 
       def process_ontology_hierarchy
