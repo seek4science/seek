@@ -13,6 +13,7 @@ module Seek
         validates_uniqueness_of :label
         validate :label_not_defined_in_ontology
         validate :parent_cannot_be_self
+        validate :parent_cannot_be_child
       end
 
       def default_parent_uri
@@ -33,10 +34,6 @@ module Seek
         ontology_readers.map do |reader|
           reader.ontology_term_type
         end
-      end
-
-      def parent_cannot_be_self
-        errors[:base] << "#{humanize_term_type} type cannot define itself as a parent!" if parent == self
       end
 
       # the first parent that comes from the ontology
@@ -90,8 +87,16 @@ module Seek
         super || ontology_parent
       end
 
+      #provides the direct child of this type. For all children in the hierarchy see all_children
       def children
         self.class.where('parent_id=? AND parent_id IS NOT NULL', id).all
+      end
+
+      #provides all children of this type, traversing down the hierarchy
+      def all_children
+        children.collect do |child|
+          [child] | child.all_children
+        end.flatten.uniq
       end
 
       def assays
@@ -134,6 +139,18 @@ module Seek
         ontology_readers.detect do |reader|
           reader.ontology_term_type == @term_type
         end || ontology_readers[0]
+      end
+
+      def parent_cannot_be_self
+        if parent == self
+          errors[:base] << "#{humanize_term_type} type cannot define itself as a parent!"
+        end
+      end
+
+      def parent_cannot_be_child
+        if all_children.include?(parent)
+          errors[:base] << "#{humanize_term_type} type cannot define a child as a parent!"
+        end
       end
     end
   end
