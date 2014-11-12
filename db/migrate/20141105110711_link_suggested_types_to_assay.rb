@@ -8,19 +8,18 @@ class LinkSuggestedTypesToAssay < ActiveRecord::Migration
   def down
   end
 
-
   private
 
   def update_for type_prefix
     sql = "SELECT id,#{type_prefix}_uri FROM assays"
-    records = ActiveRecord::Base.connection.select(sql)
-    assays_with_uuid = records.select { |rec| !valid_uri?(rec["#{type_prefix}_uri"]) && !rec["#{type_prefix}_uri"].blank? }
+    records = ActiveRecord::Base.connection.select_rows(sql)
+    assays_with_uuid = records.select { |rec| !valid_uri?(rec[1]) && !rec[1].blank? }
     puts "#{assays_with_uuid.size} assays found that need updating for #{type_prefix}"
     assays_with_uuid.each do |assay|
-      uri = assay["#{type_prefix}_uri"]
+      uri = assay[1]
       if record=find_suggested_type_record(uri,type_prefix)
         ontology_uri = find_ontology_parent_uri(uri,type_prefix)
-        update_assay(assay["id"],record["id"],ontology_uri,type_prefix)
+        update_assay(assay[0],record["id"],ontology_uri,type_prefix)
       end
     end
   end

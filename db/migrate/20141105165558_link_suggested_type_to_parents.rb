@@ -11,11 +11,11 @@ class LinkSuggestedTypeToParents < ActiveRecord::Migration
 
   def update_for type
     sql = "SELECT id,parent_uri FROM suggested_#{type}"
-    ActiveRecord::Base.connection.select(sql).each do |record|
-      parent_uri = record["parent_uri"]
+    ActiveRecord::Base.connection.select_rows(sql).each do |record|
+      parent_uri = record[1]
       unless valid_uri?(parent_uri)
         parent_id = find_parent_id(parent_uri,type)
-        update_type record["id"],parent_id,type
+        update_type record[0],parent_id,type
       end
     end
   end
