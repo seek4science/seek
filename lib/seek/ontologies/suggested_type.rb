@@ -14,6 +14,9 @@ module Seek
         validate :label_not_defined_in_ontology
         validate :parent_cannot_be_self
         validate :parent_cannot_be_child
+
+        after_destroy :join_parents_and_children
+        after_destroy :update_ontology_uri_for_children
       end
 
       def default_parent_uri
@@ -150,6 +153,26 @@ module Seek
       def parent_cannot_be_child
         if all_children.include?(parent)
           errors[:base] << "#{humanize_term_type} type cannot define a child as a parent!"
+        end
+      end
+
+      #triggered after a destroy, to link up the parent and children to retain the tree after self has been removed
+      def join_parents_and_children
+        if parent && parent.instance_of?(self.class)
+          children.each do |child|
+            child.parent = parent
+            child.save
+          end
+        end
+      end
+
+      #when destroying a top level suggested type, updates the children to point to the new parent from the ontology
+      def update_ontology_uri_for_children
+        if parent && !parent.instance_of?(self.class) && self[:ontology_uri]
+          children.each do |child|
+            child.ontology_uri = self[:ontology_uri]
+            child.save
+          end
         end
       end
     end
