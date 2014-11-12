@@ -1,6 +1,6 @@
 class ChangeAssetDoiLogActionToAnInteger < ActiveRecord::Migration
   def up
-    if ActiveRecord::Base.connection.instance_of?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+    if ActiveRecord::Base.connection.class.name=="ActiveRecord::ConnectionAdapters::PostgreSQLAdapter"
       change_column :asset_doi_logs,:action,'integer USING CAST(action as integer)'
     else
       change_column :asset_doi_logs,:action,:integer
