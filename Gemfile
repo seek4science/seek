@@ -87,6 +87,7 @@ gem "recaptcha"
 gem 'metainspector'
 gem 'mechanize'
 
+gem 'datacite_doi_ify', :git=>"git://github.com/FAIRdom/datacite_doi_ify.git"
 
 group :assets do
   gem 'turbo-sprockets-rails3'
