@@ -317,7 +317,7 @@ end
   end
 
   test 'doi_prefix, doi_suffix' do
-    assert_equal "10.15490", Seek::Config.doi_prefix
+    assert_equal "10.5072", Seek::Config.doi_prefix
     assert_equal "Sysmo.SEEK", Seek::Config.doi_suffix
   end
 

@@ -100,10 +100,10 @@
       Datacite username: <%= text_field_tag(:datacite_username, Seek::Config.datacite_username) %>
       <span class="setting_description">The username you get when your organization contracts with DataCite.</span>
       Datacite password: <%= password_field_tag(:datacite_password, Seek::Config.datacite_password_decrypt, :autocomplete => 'off') %>
+      <span class="setting_description">The password you get when your organization contracts with DataCite.</span>
       Datacite url: <%= text_field_tag(:datacite_url, Seek::Config.datacite_url, :size => 40) %>
       <span class="setting_description">The root URL for the restful webservices of Datacite. If it is not set, https://mds.datacite.org will be used.
         You can for example set the test url for generating test DOI at: https://test.datacite.org/mds/.</span>
-      <span class="setting_description">The password you get when your organization contracts with DataCite.</span>
       DOI prefix: <%= text_field_tag(:doi_prefix, Seek::Config.doi_prefix) %>
       <span class="setting_description">The DOI prefix you get when your organization contracts with DataCite.</span>
       DOI suffix: <%= text_field_tag(:doi_suffix, Seek::Config.doi_suffix) %>
