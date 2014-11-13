@@ -58,10 +58,6 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
-  def application_root
-    return  "http://#{base_host}"
-  end
-  helper_method :application_root
   
   #Overridden from restful_authentication
   #Does a second check that there is a profile assigned to the user, and if not goes to the profile
@@ -71,13 +67,6 @@ class ApplicationController < ActionController::Base
       redirect_to(select_people_path) if current_user.person.nil?
       true
     else
-      false
-    end
-  end
-
-  def is_user_activated
-    if Seek::Config.activation_required_enabled && current_user && !current_user.active?
-      error("Activation of this account is required for gaining full access", "Activation required?")
       false
     end
   end
@@ -255,10 +244,6 @@ class ApplicationController < ActionController::Base
   #required for the Savage Beast
   def admin?
     User.admin_logged_in?
-  end
-
-  def email_enabled?
-    Seek::Config.email_enabled
   end
 
   def profile_for_login_required

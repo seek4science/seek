@@ -3,11 +3,12 @@
 class Assay < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
-  include Seek::OntologyTypeHandling
-  include Seek::OntologyExtensionWithSuggestedType
+  include Seek::Ontologies::OntologyTypeHandling
+  include Seek::Ontologies::OntologyExtensionWithSuggestedType
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
-  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in  
+
+  #needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in
   def projects
     study.try(:projects) || []
   end
@@ -67,7 +68,19 @@ class Assay < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
+  ##### assay and tech type related stuff. probably to be moved to a module #####
+  belongs_to :suggested_assay_type
+  belongs_to :suggested_technology_type
 
+  #provides either the label of a suggested type, or if missing the label from the ontology
+  def assay_type_label
+    suggested_assay_type.try(:label) || assay_type_reader.class_hierarchy.hash_by_uri[assay_type_uri].try(:label)
+  end
+
+  #provides either the label of a suggested type, or if missing the label from the ontology
+  def technology_type_label
+    suggested_technology_type.try(:label) || technology_type_reader.class_hierarchy.hash_by_uri[technology_type_uri].try(:label)
+  end
 
   def project_ids
     projects.map(&:id)
@@ -103,42 +116,6 @@ class Assay < ActiveRecord::Base
   end
 
 
-
-  #uri for generating rdf for suggested assay type,
-  #if uri is valid, this will be ignored, as it is already added by assay_type_uri
-  #otherwise use the uri of parent in ontology
-  def suggested_assay_type_ontology_uri
-     uri = RDF::URI.new assay_type_uri
-     if uri.valid?
-       nil
-     else
-       SuggestedAssayType.where(:uri=> assay_type_uri).first.try(:ontology_uri)
-     end
-  end
-
-  #uri for generating rdf for suggested technology type,
-  #if uri is valid, this will be ignored, as it is already added by technology_type_uri
-  #otherwise use the uri of parent in ontology
-
-  def suggested_technology_type_ontology_uri
-    uri = RDF::URI.new technology_type_uri
-    if uri.valid?
-      nil
-    else
-      SuggestedTechnologyType.where(:uri=> technology_type_uri).first.try(:ontology_uri)
-    end
-  end
-  # super method defined in ontology_type_handling
-  # so the query order is: 1. read_attribute(:assay_type_label) 2.Ontology 3. SuggestedAssayType
-  def assay_type_label
-    super ||  SuggestedAssayType.where(:uri => self.assay_type_uri).first.try(:label)
-  end
-
-  # super method defined in ontology_type_handling
-   # so the query order is: 1. read_attribute(:technology_type_label) 2.Ontology 3. SuggestedTechnologyType
-  def technology_type_label
-      super || SuggestedTechnologyType.where(:uri => self.technology_type_uri).first.try(:label)
-  end
 
   def short_description
     type= self.assay_type_label.nil? ? "No type" : self.assay_type_label

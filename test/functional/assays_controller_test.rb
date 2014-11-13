@@ -195,8 +195,8 @@ class AssaysControllerTest < ActionController::TestCase
 
   test "should show item" do
     assay = Factory(:experimental_assay,:policy=>Factory(:public_policy),
-                    :assay_type_label=>"Metabolomics",
-                    :technology_type_label=>"Gas chromatography")
+                    :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response",
+                    :technology_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Binding")
     assert_difference('ActivityLog.count') do
       get :show, :id=>assay.id
     end
@@ -205,8 +205,8 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_not_nil assigns(:assay)
 
-    assert_select "p#assay_type", :text=>/Metabolomics/, :count=>1
-    assert_select "p#technology_type", :text=>/Gas chromatography/, :count=>1
+    assert_select "p#assay_type", :text=>/Catabolic response/, :count=>1
+    assert_select "p#technology_type", :text=>/Binding/, :count=>1
   end
 
   test "should not show tagging when not logged in" do
@@ -228,6 +228,8 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should show new" do
+    #adding a suggested type tests the assay type tree handles inclusion of suggested type
+    Factory :suggested_assay_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response"
     get :new
     assert_response :success
     assert_not_nil assigns(:assay)

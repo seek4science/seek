@@ -444,6 +444,18 @@ class Person < ActiveRecord::Base
     end
   end
 
+  #a utitlity method to simply add a person to a project and institution
+  #will automatically handle the WorkGroup and GroupMembership, and avoid creating duplicates
+  def add_to_project_and_institution project, institution
+    group = WorkGroup.where(:project_id=>project.id,:institution_id=>institution.id).first
+    group ||= WorkGroup.new :project=>project, :institution=>institution
+
+    membership = GroupMembership.where(:person_id=>id,:work_group_id=>group.id).first
+    membership ||= GroupMembership.new :person=>self,:work_group=>group
+
+    self.group_memberships << membership
+  end
+
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin

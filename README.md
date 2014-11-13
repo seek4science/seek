@@ -13,7 +13,7 @@ Copyright (c) 2009-2014, University of Manchester and HITS gGmbH
 
 See the
 [SEEK install guide](http://seek4science.org/sites/default/files/seekdocs/doc/INSTALL.html)
-and the [inluded documentation](doc).
+and the [included documentation](doc).
 
 
 ## Credit

@@ -41,7 +41,8 @@ module Seek
         end
 
         def create
-          @suggested_type = model_class.new(params[controller_name.singularize.to_sym])
+          attributes = params[controller_name.singularize.to_sym]
+          @suggested_type = model_class.new(attributes)
           @suggested_type.contributor_id = User.current_user.try(:person_id)
           saved = @suggested_type.save
           respond_to do |format|
@@ -58,13 +59,9 @@ module Seek
           end
         end
 
-        def set_successful_flash_message(action)
-          flash[:notice] = "#{@suggested_type.humanize_term_type} type #{@suggested_type.label} was successfully #{action}."
-        end
-
         def update
           @suggested_type = eval("@#{controller_name.singularize}")
-          @suggested_type.attributes = params[controller_name.singularize.to_sym]
+          @suggested_type.update_attributes(params[controller_name.singularize.to_sym])
           saved = @suggested_type.save
           respond_to do |format|
             format.js { render template: 'suggested_types/create.js.rjs' }
@@ -93,6 +90,12 @@ module Seek
             format.html { redirect_to(action: 'manage') }
           end
         end
+
+        def set_successful_flash_message(action)
+          flash[:notice] = "#{@suggested_type.humanize_term_type} type #{@suggested_type.label} was successfully #{action}."
+        end
+
+
       end
     end
   end

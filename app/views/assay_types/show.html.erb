@@ -2,19 +2,19 @@
 assay_type_text = is_modelling_type?(@type_class) ? "Biological problem addressed" : "#{t('assays.assay')} type"
 %>
 
-<%= render :partial => "general/item_title",:locals=>{:title=>"#{assay_type_text} '#{h(@label)}'"} %>
+<%= render :partial => "general/item_title",:locals=>{:title=>"#{assay_type_text} '#{@type_class.try(:label) || params[:label]}'"} %>
 
 <% unless @type_class.nil? -%>
 
     <div class="ontology_nav">
 
       <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
-      <%= parent_assay_types_list_links @type_class.is_suggested_type? ? Array(@type_class.ontology_parent) : @type_class.parents  -%>
+      <%= parent_assay_types_list_links @type_class.parents  -%>
 
       <br/>
 
       <%= image("current",{:title=>"Current #{assay_type_text}",:alt=>"Current #{assay_type_text}",:style=>"vertical-align:middle"}) -%>
-      <%= displayed_hierarchy_current_label(@label,@type_class) -%>
+      <%= @type_class.descriptive_label -%>
 
       <br/>
 

@@ -34,17 +34,6 @@ module SuggestedTypesHelper
     end
   end
 
-
-  #select tag without form
-  def ontology_selection_list types, element_name, selected_uri, disabled_uris={}, html_options={}
-    options = []
-    Array(types).each do |type|
-      options += ontology_select_options(type)
-    end
-    select_tag element_name, options_for_select(options, :selected => selected_uri, :disabled => disabled_uris), html_options
-  end
-
-
   def ontology_editor_display types, selected_uri=nil
     list = []
     Array(types).each do |type|
@@ -86,6 +75,7 @@ module SuggestedTypesHelper
   def show_ontology_class_link clz
     label = clz.label
     type = clz.term_type
+    raise "error" if type.nil?
     path = send("#{type}_types_path", :uri => clz.uri.try(:to_s), :label => label)
     html_options = clz.is_suggested_type? ? {:style => "color:green;font-style:italic"} : {}
     link_to label, path, html_options

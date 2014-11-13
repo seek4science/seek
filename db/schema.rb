@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141103180504) do
+ActiveRecord::Schema.define(:version => 20141106153545) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -161,15 +161,15 @@ ActiveRecord::Schema.define(:version => 20141103180504) do
     t.integer  "technology_type_id"
     t.integer  "study_id"
     t.integer  "owner_id"
-    t.string   "first_letter",          :limit => 1
+    t.string   "first_letter",                 :limit => 1
     t.integer  "assay_class_id"
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "institution_id"
     t.string   "assay_type_uri"
     t.string   "technology_type_uri"
-    t.string   "technology_type_label"
-    t.string   "assay_type_label"
+    t.integer  "suggested_assay_type_id"
+    t.integer  "suggested_technology_type_id"
   end
 
   create_table "assays_samples", :id => false, :force => true do |t|
@@ -1469,20 +1469,20 @@ ActiveRecord::Schema.define(:version => 20141103180504) do
 
   create_table "suggested_assay_types", :force => true do |t|
     t.string   "label"
-    t.string   "uri"
-    t.string   "parent_uri"
+    t.string   "ontology_uri"
     t.integer  "contributor_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+    t.integer  "parent_id"
   end
 
   create_table "suggested_technology_types", :force => true do |t|
     t.string   "label"
-    t.string   "uri"
-    t.string   "parent_uri"
+    t.string   "ontology_uri"
     t.integer  "contributor_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+    t.integer  "parent_id"
   end
 
   create_table "sweep_auth_lookup", :force => true do |t|
