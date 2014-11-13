@@ -15,8 +15,11 @@ module Seek
     def mint_doi
       respond_to do |format|
         if metadata_validated?
-          mint
-          format.html { redirect_to :action => :minted_doi}
+          if mint
+            format.html { redirect_to :action => :minted_doi}
+          else
+            format.html { render "datacite_doi/mint_doi_preview"}
+          end
         else
           flash[:error] = "The mandatory fields (M) must be filled"
           format.html { render "datacite_doi/mint_doi_preview", :status => :bad_request}
@@ -108,11 +111,22 @@ module Seek
       endpoint = Datacite.new(username, password, url)
 
       metadata = generate_metadata_in_xml params[:metadata]
-      endpoint.upload_metadata metadata
+      upload_response = endpoint.upload_metadata metadata
+      return false unless validate_response(upload_response)
 
       asset_url = "#{Rails.root}/#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
       doi = params[:metadata][:identifier]
-      endpoint.mint(doi, asset_url)
+      mint_response = endpoint.mint(doi, asset_url)
+      return false unless validate_response(mint_response)
+    end
+
+    def validate_response response
+      if response[0..2] == "201"
+        true
+      else
+        flash.now[:error] = "There is a problem working with DataCite Metadata Store service: #{response}"
+        false
+      end
     end
   end
 end

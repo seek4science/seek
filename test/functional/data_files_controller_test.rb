@@ -2061,11 +2061,48 @@ end
   end
 
   test "mint_doi" do
+    mock_datacite_request
+
     df = Factory(:data_file,:policy=>Factory(:public_policy))
-    post :mint_doi, :id => df.id, :metadata => {}
-    assert_response :bad_request
+    metadata_param = {:identifier => '10.5072/my_test',
+                      :creators => [{:creatorName => 'Last1, First1'}, {:creatorName => 'Last2, First2'}],
+                      :titles => [df.title],
+                      :publisher => 'Fairdom',
+                      :publicationYear => '2014',
+                      :subjects => ['System Biology', 'Bioinformatic'],
+                      :language => 'eng',
+                      :resourceType => 'Dataset',
+                      :version => '1.0',
+                      :descriptions => [df.description]
+    }
+    post :mint_doi, :id => df.id, :metadata => metadata_param
+    assert_redirected_to minted_doi_data_file_path(df)
 
     assert AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
+  end
+
+  test "handle error when mint_doi" do
+    mock_datacite_request
+
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    metadata_param = {:identifier => '10.5072/my_test',
+                      :creators => [{:creatorName => 'Last1, First1'}, {:creatorName => 'Last2, First2'}],
+                      :titles => [df.title],
+                      :publisher => 'Fairdom',
+                      :publicationYear => '2014',
+                      :subjects => ['System Biology', 'Bioinformatic'],
+                      :language => 'eng',
+                      :resourceType => 'Dataset',
+                      :version => '1.0',
+                      :descriptions => [df.description]
+    }
+
+    with_config_value :datacite_password, 'invalid' do
+      post :mint_doi, :id => df.id, :metadata => metadata_param
+      assert_not_nil flash[:error]
+
+      assert !AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
+    end
   end
 
   test 'minted_doi' do
@@ -2129,5 +2166,10 @@ end
     return { :title=>"Test HTTP",:project_ids=>[projects(:sysmo_project).id]},{:data_url=>"https://mockedlocation.com/txt_test.txt",:make_local_copy=>"0"}
   end
 
-  
+  def mock_datacite_request
+    stub_request(:post, "https://test:test@test.datacite.org/mds/metadata").to_return(:body => 'OK', :status => 201)
+    stub_request(:post, "https://test:test@test.datacite.org/mds/doi").to_return(:body => 'OK', :status => 201)
+    stub_request(:post, "https://test:invalid@test.datacite.org/mds/metadata").to_return(:body => 'Bad credentials', :status => 401)
+  end
+
 end
