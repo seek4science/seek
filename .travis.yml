@@ -3,8 +3,8 @@ bundler_args: --without production
 addons:
   postgresql: "9.3"
 rvm:
-  - 1.9.3  
-  - 2.1.4
+  - 1.9.3
+  - 2.1.5
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
   - SUITE="rake test:functionals" DB_TYPE=mysql
