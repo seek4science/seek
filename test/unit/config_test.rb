@@ -325,6 +325,14 @@ end
     assert_equal "https://test.datacite.org/mds/", Seek::Config.datacite_url
   end
 
+  test 'datacite_username' do
+    assert_equal "test", Seek::Config.datacite_username
+  end
+
+  test 'datacite_password' do
+    assert_equal "test", Seek::Config.datacite_password
+  end
+
   test 'home_description' do
     assert_equal 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.', Seek::Config.home_description
     Seek::Config.home_description = 'A new description'
