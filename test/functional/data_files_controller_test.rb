@@ -1998,7 +1998,7 @@ end
                         :titles => ['A title']
     }
     post :mint_doi, :id => df.id, :metadata => invalid_metadata
-    assert_response :success
+    assert_response :bad_request
     assert_not_nil flash[:error]
 
     #lack of value
@@ -2009,7 +2009,7 @@ end
                       :publicationYear => '2014'
     }
     post :mint_doi, :id => df.id, :metadata => invalid_metadata
-    assert_response :success
+    assert_response :bad_request
     assert_not_nil flash[:error]
 
     #blank value
@@ -2020,7 +2020,7 @@ end
                       :publicationYear => '2014'
     }
     post :mint_doi, :id => df.id, :metadata => invalid_metadata
-    assert_response :success
+    assert_response :bad_request
     assert_not_nil flash[:error]
   end
 
@@ -2063,7 +2063,7 @@ end
   test "mint_doi" do
     df = Factory(:data_file,:policy=>Factory(:public_policy))
     post :mint_doi, :id => df.id, :metadata => {}
-    assert_redirected_to minted_doi_data_file_path(df)
+    assert_response :bad_request
 
     assert AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
   end
