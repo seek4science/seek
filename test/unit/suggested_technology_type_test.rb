@@ -101,4 +101,111 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
     tt = Factory :suggested_technology_type
     assert_equal "suggested_technology_type:#{tt.id}",tt.uri
   end
+
+  test "parent cannot be self" do
+    child = Factory :suggested_technology_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Binding"
+    assert child.valid?
+    child.parent=child
+    refute child.valid?
+  end
+
+  test "parent cannot be a child" do
+    top = Factory :suggested_technology_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Binding"
+    child1 = Factory :suggested_technology_type,:parent=>top
+    child2 = Factory :suggested_technology_type,:parent=>child1
+    child3 = Factory :suggested_technology_type,:parent=>child2
+    top.reload
+    assert top.valid?
+
+    top.parent=child1
+    refute top.valid?
+
+    top.parent=child2
+    refute top.valid?
+
+    top.parent=child3
+    refute top.valid?
+
+    top.parent=Factory :suggested_technology_type
+    assert top.valid?
+  end
+
+  test "all children" do
+    top = Factory :suggested_technology_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Binding"
+    child1 = Factory :suggested_technology_type,:parent=>top
+    child2 = Factory :suggested_technology_type,:parent=>child1
+    child3 = Factory :suggested_technology_type,:parent=>child2
+    top.reload
+
+    assert_includes top.all_children,child1
+    assert_includes top.all_children,child2
+    assert_includes top.all_children,child3
+  end
+
+  test "children" do
+    top = Factory :suggested_technology_type,:ontology_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Binding"
+    child1 = Factory :suggested_technology_type,:parent=>top
+    child2 = Factory :suggested_technology_type,:parent=>child1
+    child3 = Factory :suggested_technology_type,:parent=>child2
+    top.reload
+
+    assert_includes top.children,child1
+    refute_includes top.children,child2
+    refute_includes top.children,child3
+  end
+
+  test "update parent after destroy" do
+    top = Factory :suggested_technology_type, :ontology_uri => "http://www.mygrid.org.uk/ontology/JERMOntology#Binding"
+    child1 = Factory :suggested_technology_type, :parent => top
+    child2 = Factory :suggested_technology_type, :parent => child1
+    child3 = Factory :suggested_technology_type, :parent => child2
+    top.reload
+
+    child1.destroy
+
+    top.reload
+    child2.reload
+    child3.reload
+    assert_includes top.children,child2
+    assert_includes child2.children,child3
+    assert_equal top,child2.parent
+
+    child2.destroy
+
+    top.reload
+    child3.reload
+
+    assert_includes top.children,child3
+    assert_equal top,child3.parent
+
+  end
+
+  test "updates new parent ontology uri when deleting old parent" do
+    top = Factory :suggested_technology_type, :ontology_uri => "http://www.mygrid.org.uk/ontology/JERMOntology#Binding"
+    child1 = Factory :suggested_technology_type, :parent => top, :ontology_uri=>nil
+    child2 = Factory :suggested_technology_type, :parent => child1, :ontology_uri=>nil
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Binding",top.ontology_uri
+    assert_nil child1[:ontology_uri]
+    assert_nil child2[:ontology_uri]
+
+    top.destroy
+    child1.reload
+    child2.reload
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Binding",child1.ontology_uri
+    assert_nil child2[:ontology_uri]
+
+    #check it only affects the children when the item being destroyed hangs from an ontology term
+    top = Factory :suggested_technology_type, :ontology_uri => "http://www.mygrid.org.uk/ontology/JERMOntology#Binding"
+    child1 = Factory :suggested_technology_type, :parent => top, :ontology_uri=>nil
+    child2 = Factory :suggested_technology_type, :parent => child1, :ontology_uri=>nil
+
+    child1.destroy
+    top.reload
+    child2.reload
+    assert_equal "http://www.mygrid.org.uk/ontology/JERMOntology#Binding",top.ontology_uri
+    assert_nil child2[:ontology_uri]
+
+
+  end
+
 end
