@@ -12,10 +12,11 @@ module Seek
       end
     end
 
-    def mint
+    def mint_doi
       respond_to do |format|
         if metadata_validated?
-          format.html { redirect_to :action => :minted}
+          mint
+          format.html { redirect_to :action => :minted_doi}
         else
           flash[:error] = "The mandatory fields (M) must be filled"
           format.html { render "datacite_doi/mint_doi_preview"}
@@ -23,7 +24,7 @@ module Seek
       end
     end
 
-    def minted
+    def minted_doi
       respond_to do |format|
         format.html { render :template => "datacite_doi/minted"}
       end
@@ -98,6 +99,20 @@ module Seek
         validated = false
       end
       validated
+    end
+
+    def mint
+      username = Seek::Config.datacite_username
+      password = Seek::Config.datacite_password
+      url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
+      endpoint = Datacite.new(username, password, url)
+
+      metadata = generate_metadata_in_xml params[:metadata]
+      endpoint.upload_metadata metadata
+
+      asset_url = "#{Rails.root}/#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
+      doi = params[:metadata][:identifier]
+      endpoint.mint(doi, asset_url)
     end
   end
 end

@@ -1989,15 +1989,15 @@ end
                 :publisher => 'System Biology',
                 :publicationYear => '2014'
     }
-    post :mint, :id => df.id, :metadata => valid_metadata
-    assert_redirected_to  minted_data_file_path(df)
+    post :mint_doi, :id => df.id, :metadata => valid_metadata
+    assert_redirected_to  minted_doi_data_file_path(df)
     assert_nil flash[:error]
 
     #lack of fields
     invalid_metadata = {:creators => [:creatorName => 'Last, First'],
                         :titles => ['A title']
     }
-    post :mint, :id => df.id, :metadata => invalid_metadata
+    post :mint_doi, :id => df.id, :metadata => invalid_metadata
     assert_response :success
     assert_not_nil flash[:error]
 
@@ -2008,7 +2008,7 @@ end
                       :publisher => 'System Biology',
                       :publicationYear => '2014'
     }
-    post :mint, :id => df.id, :metadata => invalid_metadata
+    post :mint_doi, :id => df.id, :metadata => invalid_metadata
     assert_response :success
     assert_not_nil flash[:error]
 
@@ -2019,7 +2019,7 @@ end
                       :publisher => 'System Biology',
                       :publicationYear => '2014'
     }
-    post :mint, :id => df.id, :metadata => invalid_metadata
+    post :mint_doi, :id => df.id, :metadata => invalid_metadata
     assert_response :success
     assert_not_nil flash[:error]
   end
@@ -2060,20 +2060,20 @@ end
     assert_equal metadata_from_file, metadata_in_xml
   end
 
-  test "mint doi" do
+  test "mint_doi" do
     df = Factory(:data_file,:policy=>Factory(:public_policy))
-    post :mint, :id => df.id, :metadata => {}
-    assert_redirected_to data_file_minted_path(df)
+    post :mint_doi, :id => df.id, :metadata => {}
+    assert_redirected_to minted_doi_data_file_path(df)
 
     assert AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
   end
 
-  test 'minted' do
+  test 'minted_doi' do
     df = Factory(:data_file,:policy=>Factory(:public_policy))
     assert df.is_published?
     assert df.can_manage?
 
-    get :minted, :id => df.id, :version => df.version
+    get :minted_doi, :id => df.id, :version => df.version
     assert_response :success
     #TODO: some assertion of the html elements
   end
