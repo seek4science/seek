@@ -4,7 +4,6 @@ class Assay < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::Ontologies::AssayOntologyTypes
-  include Seek::Ontologies::OntologyExtensionWithSuggestedType
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
