@@ -489,4 +489,19 @@ class AssayTest < ActiveSupport::TestCase
 
   end
 
+  test "converts assay and tech suggested type uri" do
+    assay_type = Factory(:suggested_assay_type,:label=>"fishy",:ontology_uri=>"fish:2")
+    tech_type = Factory(:suggested_technology_type,:label=>"carroty",:ontology_uri=>"carrot:3")
+    assay = Factory(:experimental_assay)
+    assay.assay_type_uri = assay_type.uri
+    assay.technology_type_uri = tech_type.uri
+    assert_equal assay_type, assay.suggested_assay_type
+    assert_equal "fishy", assay.assay_type_label
+    assert_equal "fish:2",assay.assay_type_uri
+
+    assert_equal tech_type, assay.suggested_technology_type
+    assert_equal "carroty", assay.technology_type_label
+    assert_equal "carrot:3",assay.technology_type_uri
+  end
+
 end
