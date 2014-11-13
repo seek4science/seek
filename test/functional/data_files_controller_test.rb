@@ -2042,17 +2042,7 @@ end
   end
 
   test "generate_metadata_in_xml" do
-    metadata_param = {:identifier => '10.5072/my_test',
-                      :creators => [{:creatorName => 'Last1, First1'}, {:creatorName => 'Last2, First2'}],
-                      :titles => ['test title'],
-                      :publisher => 'Fairdom',
-                      :publicationYear => '2014',
-                      :subjects => ['System Biology', 'Bioinformatic'],
-                      :language => 'eng',
-                      :resourceType => 'Dataset',
-                      :version => '1.0',
-                      :descriptions => ['test description']
-    }
+    metadata_param = datacite_metadata_param
 
     metadata_in_xml = DataFilesController.new().generate_metadata_in_xml(metadata_param)
     metadata_from_file = open("#{Rails.root}/test/fixtures/files/doi_metadata.xml").read
@@ -2064,17 +2054,8 @@ end
     mock_datacite_request
 
     df = Factory(:data_file,:policy=>Factory(:public_policy))
-    metadata_param = {:identifier => '10.5072/my_test',
-                      :creators => [{:creatorName => 'Last1, First1'}, {:creatorName => 'Last2, First2'}],
-                      :titles => [df.title],
-                      :publisher => 'Fairdom',
-                      :publicationYear => '2014',
-                      :subjects => ['System Biology', 'Bioinformatic'],
-                      :language => 'eng',
-                      :resourceType => 'Dataset',
-                      :version => '1.0',
-                      :descriptions => [df.description]
-    }
+    metadata_param = datacite_metadata_param
+
     post :mint_doi, :id => df.id, :metadata => metadata_param
     assert_redirected_to minted_doi_data_file_path(df)
 
@@ -2085,17 +2066,7 @@ end
     mock_datacite_request
 
     df = Factory(:data_file,:policy=>Factory(:public_policy))
-    metadata_param = {:identifier => '10.5072/my_test',
-                      :creators => [{:creatorName => 'Last1, First1'}, {:creatorName => 'Last2, First2'}],
-                      :titles => [df.title],
-                      :publisher => 'Fairdom',
-                      :publicationYear => '2014',
-                      :subjects => ['System Biology', 'Bioinformatic'],
-                      :language => 'eng',
-                      :resourceType => 'Dataset',
-                      :version => '1.0',
-                      :descriptions => [df.description]
-    }
+    metadata_param = datacite_metadata_param
 
     with_config_value :datacite_password, 'invalid' do
       post :mint_doi, :id => df.id, :metadata => metadata_param
@@ -2167,9 +2138,22 @@ end
   end
 
   def mock_datacite_request
-    stub_request(:post, "https://test:test@test.datacite.org/mds/metadata").to_return(:body => 'OK', :status => 201)
-    stub_request(:post, "https://test:test@test.datacite.org/mds/doi").to_return(:body => 'OK', :status => 201)
-    stub_request(:post, "https://test:invalid@test.datacite.org/mds/metadata").to_return(:body => 'Bad credentials', :status => 401)
+    stub_request(:post, "https://test:test@test.datacite.org/mds/metadata").to_return(:body => '201 OK', :status => 201)
+    stub_request(:post, "https://test:test@test.datacite.org/mds/doi").to_return(:body => '201 OK', :status => 201)
+    stub_request(:post, "https://test:invalid@test.datacite.org/mds/metadata").to_return(:body => '401 Bad credentials', :status => 401)
   end
 
+  def datacite_metadata_param
+    {:identifier => '10.5072/my_test',
+     :creators => [{:creatorName => 'Last1, First1'}, {:creatorName => 'Last2, First2'}],
+     :titles => ['test title'],
+     :publisher => 'Fairdom',
+     :publicationYear => '2014',
+     :subjects => ['System Biology', 'Bioinformatic'],
+     :language => 'eng',
+     :resourceType => 'Dataset',
+     :version => '1.0',
+     :descriptions => ['test description']
+    }
+  end
 end
