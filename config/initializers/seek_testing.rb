@@ -78,6 +78,7 @@ SEEK::Application.configure do
 
       Seek::Config.doi_prefix = "10.15490"
       Seek::Config.doi_suffix = "Sysmo.SEEK"
+      Seek::Config.datacite_url = "https://test.datacite.org/mds/"
     end
   end
 end
