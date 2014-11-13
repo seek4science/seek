@@ -124,5 +124,6 @@ support_email_address:
 doi_minting_enabled:
 datacite_username:
 datacite_password:
+datacite_url:
 doi_prefix:
 doi_suffix:

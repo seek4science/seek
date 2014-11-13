@@ -118,8 +118,6 @@ SEEK::Application.configure do
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
 
-
-  Seek::Config.default :datacite_url,"https://mds.datacite.org/"
   Seek::Config.default :doi_prefix,"10.15490"
   Seek::Config.default :doi_suffix,"Sysmo.SEEK"
 
