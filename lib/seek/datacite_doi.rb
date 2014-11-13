@@ -114,7 +114,7 @@ module Seek
       upload_response = endpoint.upload_metadata metadata
       return false unless validate_response(upload_response)
 
-      asset_url = "#{Rails.root}/#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
+      asset_url = "#{root_url}/#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
       doi = params[:metadata][:identifier]
       mint_response = endpoint.mint(doi, asset_url)
       return false unless validate_response(mint_response)
