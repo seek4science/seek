@@ -98,9 +98,14 @@
     } -%>
     <li id="doi_minting_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.doi_minting_enabled -%>">
       Datacite username: <%= text_field_tag(:datacite_username, Seek::Config.datacite_username) %>
-      <span class="setting_description">the username you get when you contract with DataCite.</span>
+      <span class="setting_description">The username you get when your organization contracts with DataCite.</span>
       Datacite password: <%= password_field_tag(:datacite_password, Seek::Config.datacite_password_decrypt, :autocomplete => 'off') %>
-      <span class="setting_description">the password you get when you contract with DataCite.</span>
+      <span class="setting_description">The password you get when your organization contracts with DataCite.</span>
+      DOI prefix: <%= text_field_tag(:doi_prefix, Seek::Config.doi_prefix) %>
+      <span class="setting_description">The DOI prefix you get when your organization contracts with DataCite.</span>
+      DOI suffix: <%= text_field_tag(:doi_suffix, Seek::Config.doi_suffix) %>
+      <span class="setting_description">The whole DOI suffix is unique under one DOI prefix. This configuration is the first part of the whole DOI suffix.
+        It will be concatted with the seek_asset_type.seek_asset_id.seek_asset_version. E.g: Sysmo.SEEK.DataFile.1.1</span>
     </li>
 
     <li>

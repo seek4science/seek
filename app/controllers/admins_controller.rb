@@ -75,6 +75,8 @@ class AdminsController < ApplicationController
     Seek::Config.doi_minting_enabled = string_to_boolean params[:doi_minting_enabled]
     Seek::Config.datacite_username = params[:datacite_username]
     Seek::Config.datacite_password_encrypt params[:datacite_password]
+    Seek::Config.doi_prefix = params[:doi_prefix]
+    Seek::Config.doi_suffix = params[:doi_suffix]
 
     port = params[:port]
     port_is_integer = only_integer(port, 'port')

@@ -76,6 +76,8 @@ SEEK::Application.configure do
       Seek::Config.solr_enabled = true
       Sunspot.session = SunspotMatchers::SunspotSessionSpy.new(Sunspot.session)
 
+      Seek::Config.doi_prefix = "10.15490"
+      Seek::Config.doi_suffix = "Sysmo.SEEK"
     end
   end
 end
