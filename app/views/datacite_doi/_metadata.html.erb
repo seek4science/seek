@@ -21,6 +21,16 @@
      description = @asset_version.description
    end
 %>
+
+<% asset = @asset_version.parent %>
+
+<%= render :partial => "datacite_doi/single_entry",
+           :locals => {:field_name => 'identifier',
+                       :obligation => "(M) <span class='required'>*</span>".html_safe,
+                       :description => "The DOI for the asset",
+                       :field => text_field_tag("metadata[identifier]", generate_doi_for(asset.class.name, asset.id, @asset_version.version), {:disabled => 'disabled', :class => 'disabled', :size => 40})
+           } %>
+
 <%= render :partial => "datacite_doi/multiple_entries",
            :locals => {:objects => creators,
                        :field_name => 'creator',
