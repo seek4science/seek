@@ -12,8 +12,8 @@
    else
      creators = @asset_version.creators.collect{|creator| creator.last_name.capitalize + ', ' + creator.first_name.capitalize}
      title = @asset_version.title
-     publisher = nil
-     publication_year = nil
+     publisher = Seek::Config.project_name
+     publication_year = Time.now.year
      subjects = []
      language = nil
      resource_type = nil
