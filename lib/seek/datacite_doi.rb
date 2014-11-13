@@ -118,6 +118,7 @@ module Seek
       doi = params[:metadata][:identifier]
       mint_response = endpoint.mint(doi, asset_url)
       return false unless validate_response(mint_response)
+      true
     end
 
     def validate_response response
