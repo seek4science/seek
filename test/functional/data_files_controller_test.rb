@@ -2159,8 +2159,8 @@ end
   end
 
   def mock_datacite_request
-    stub_request(:post, "https://test:test@test.datacite.org/mds/metadata").to_return(:body => '201 OK', :status => 201)
-    stub_request(:post, "https://test:test@test.datacite.org/mds/doi").to_return(:body => '201 OK', :status => 201)
+    stub_request(:post, "https://test:test@test.datacite.org/mds/metadata").to_return(:body => 'OK (10.5072/my_test)', :status => 201)
+    stub_request(:post, "https://test:test@test.datacite.org/mds/doi").to_return(:body => 'OK', :status => 201)
     stub_request(:post, "https://invalid:test@test.datacite.org/mds/metadata").to_return(:body => '401 Bad credentials', :status => 401)
   end
 
