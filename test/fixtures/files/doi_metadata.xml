@@ -1,7 +1,7 @@
 <resource xmlns='http://datacite.org/schema/kernel-3'
           xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
           xsi:schemaLocation='http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd'>
-  <identifier>10.5072/my_test</identifier>
+  <identifier identifierType="DOI">10.5072/my_test</identifier>
   <creators>
     <creator>
       <creatorName>Last1, First1</creatorName>
@@ -20,9 +20,9 @@
     <subject>Bioinformatic</subject>
   </subjects>
   <language>eng</language>
-  <resourceType>Dataset</resourceType>
+  <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
   <version>1.0</version>
   <descriptions>
-    <description>test description</description>
+    <description descriptionType="Abstract">test description</description>
   </descriptions>
 </resource>

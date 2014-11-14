@@ -2050,6 +2050,27 @@ end
     assert_equal metadata_from_file, metadata_in_xml
   end
 
+  test "generate_metadata_in_xml does not contain empty node" do
+    metadata_param = {:identifier => '',
+                      :creators => [],
+                      :titles => ['test title'],
+                      :publisher => 'Fairdom',
+                      :publicationYear => '2014'
+    }
+
+    metadata_in_xml = DataFilesController.new().generate_metadata_in_xml(metadata_param)
+
+    assert !metadata_in_xml.include?('identifier')
+    assert !metadata_in_xml.include?('creators')
+    assert !metadata_in_xml.include?('creator')
+    assert !metadata_in_xml.include?('descriptions')
+
+    assert metadata_in_xml.include?('title')
+    assert metadata_in_xml.include?('titles')
+    assert metadata_in_xml.include?('publisher')
+    assert metadata_in_xml.include?('publicationYear')
+  end
+
   test "mint_doi" do
     mock_datacite_request
 

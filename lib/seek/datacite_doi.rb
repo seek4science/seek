@@ -50,9 +50,12 @@ module Seek
         xml = "<resource xmlns='http://datacite.org/schema/kernel-3'
           xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
           xsi:schemaLocation='http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd'>"
-        metadata_in_xml = metadata_param.to_xml
-        metadata_in_xml.gsub!(/ type="array"/,'')
-        xml << metadata_in_xml.split("<hash>")[1].split('</hash>').first
+        metadata_in_xml = metadata_param.to_xml(:skip_types => true, :skip_instruct => true)
+        modified_xml = remove_empty_nodes(metadata_in_xml)
+        modified_xml = concat_attribute_to('identifier', 'identifierType', 'DOI', modified_xml)
+        modified_xml = concat_attribute_to('resourceType', 'resourceTypeGeneral', 'Dataset', modified_xml)
+        modified_xml = concat_attribute_to('description', 'descriptionType', 'Abstract', modified_xml)
+        xml << modified_xml.split("<hash>")[1].split('</hash>').first
         xml << "</resource>"
         xml
       else
@@ -106,7 +109,7 @@ module Seek
 
     def mint
       username = Seek::Config.datacite_username
-      password = Seek::Config.datacite_password
+      password = Seek::Config.datacite_password_decrypt
       url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
       endpoint = Datacite.new(username, password, url)
 
@@ -128,6 +131,23 @@ module Seek
         flash.now[:error] = "There is a problem working with DataCite Metadata Store service: #{response}"
         false
       end
+    end
+
+    def concat_attribute_to(node, attribute, value, xml)
+      doc = Nokogiri::XML(xml)
+      doc.xpath("//#{node}").select do |n|
+        n["#{attribute}"] = value
+        n
+      end
+      doc.to_xml
+    end
+
+    def remove_empty_nodes xml
+      doc = Nokogiri::XML(xml)
+      doc.xpath("//*").each do |n|
+        n.text.blank? ? n.remove : n
+      end
+      doc.to_xml
     end
   end
 end
