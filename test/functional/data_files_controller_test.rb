@@ -2089,7 +2089,7 @@ end
     df = Factory(:data_file,:policy=>Factory(:public_policy))
     metadata_param = datacite_metadata_param
 
-    with_config_value :datacite_password, 'invalid' do
+    with_config_value :datacite_username, 'invalid' do
       post :mint_doi, :id => df.id, :metadata => metadata_param
       assert_not_nil flash[:error]
 
@@ -2161,7 +2161,7 @@ end
   def mock_datacite_request
     stub_request(:post, "https://test:test@test.datacite.org/mds/metadata").to_return(:body => '201 OK', :status => 201)
     stub_request(:post, "https://test:test@test.datacite.org/mds/doi").to_return(:body => '201 OK', :status => 201)
-    stub_request(:post, "https://test:invalid@test.datacite.org/mds/metadata").to_return(:body => '401 Bad credentials', :status => 401)
+    stub_request(:post, "https://invalid:test@test.datacite.org/mds/metadata").to_return(:body => '401 Bad credentials', :status => 401)
   end
 
   def datacite_metadata_param
