@@ -33,18 +33,6 @@ module Seek
       end
     end
 
-    def resolve_doi doi
-
-    end
-
-    def resolve_metadata doi
-
-    end
-
-    def upload_metadata metadata
-
-    end
-
     def generate_metadata_in_xml metadata_param
       if metadata_param
         xml = "<resource xmlns='http://datacite.org/schema/kernel-3'
