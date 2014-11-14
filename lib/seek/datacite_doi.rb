@@ -125,7 +125,7 @@ module Seek
     end
 
     def validate_response response
-      if response[0..2] == "201"
+      if response.include?('OK')
         true
       else
         flash.now[:error] = "There is a problem working with DataCite Metadata Store service: #{response}"
