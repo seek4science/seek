@@ -6,7 +6,7 @@ require 'simple-spreadsheet-extractor'
 require 'active_record/fixtures'
 
 namespace :db do
-  desc 'seeds the database using seek:seed rather than db/seed.rb'
+  desc 'seeds the database using seek:seed in conjuction with running the seed data defined in db/seeds.rb'
   task :seed=>[:environment,"seek:seed"]
 end
 
