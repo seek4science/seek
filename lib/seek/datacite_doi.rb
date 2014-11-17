@@ -3,7 +3,7 @@ module Seek
     def self.included(base)
       base.before_filter :set_asset_version
       base.before_filter :mint_doi_auth
-      base.after_filter :log_minting_doi, :only=>[:mint]
+      base.after_filter :log_minting_doi, :only=>[:mint_doi]
     end
 
     def mint_doi_preview
@@ -16,7 +16,9 @@ module Seek
       respond_to do |format|
         if metadata_validated?
           if mint
-            format.html { redirect_to :action => :minted_doi}
+            format.html { redirect_to :action => :minted_doi,
+                                      :doi => params[:metadata][:identifier],
+                                      :url => asset_url}
           else
             format.html { render "datacite_doi/mint_doi_preview"}
           end
@@ -29,7 +31,7 @@ module Seek
 
     def minted_doi
       respond_to do |format|
-        format.html { render :template => "datacite_doi/minted"}
+        format.html { render :template => "datacite_doi/minted_doi" }
       end
     end
 
@@ -105,9 +107,9 @@ module Seek
       upload_response = endpoint.upload_metadata metadata
       return false unless validate_response(upload_response)
 
-      asset_url = "#{root_url}/#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
+      url = asset_url
       doi = params[:metadata][:identifier]
-      mint_response = endpoint.mint(doi, asset_url)
+      mint_response = endpoint.mint(doi, url)
       return false unless validate_response(mint_response)
       true
     end
@@ -136,6 +138,10 @@ module Seek
         n.text.blank? ? n.remove : n
       end
       doc.to_xml
+    end
+
+    def asset_url
+      "#{root_url}#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
     end
   end
 end

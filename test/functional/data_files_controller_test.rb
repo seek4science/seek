@@ -2102,9 +2102,16 @@ end
     assert df.is_published?
     assert df.can_manage?
 
-    get :minted_doi, :id => df.id, :version => df.version
+    doi = '10.5072/my_test'
+    url = "#{root_url}data_files/#{df.id}?version=#{df.version}"
+
+    get :minted_doi, :id => df.id, :version => df.version,
+                     :doi => doi, :url => url
     assert_response :success
-    #TODO: some assertion of the html elements
+
+    assert_select "li", :text => /#{doi}/
+    assert_select "li", :text => "Resolved URL: http://test.host/data_files/#{df.id}?version=1"
+    assert_select "li", :text => /#{df.title}/
   end
 
   private

@@ -1,0 +1,15 @@
+<%= stylesheet_link_tag "datacite_doi" %>
+
+<div class="minted_doi">
+  <%= show_title "Minting DOI complete" %>
+
+  <h2>DOI information:</h2>
+  <ul style="list-style-type: circle;">
+    <li>DOI: <%= params[:doi].html_safe %></li>
+    <li>Resolved URL: <%= params[:url].html_safe %></li>
+    <li><%= "#{t(controller_name.singularize)}" %>: <%= @asset_version.title.html_safe %></li>
+  </ul>
+
+  <%= link_to "Back to #{t(controller_name.singularize)}", polymorphic_path(@asset_version.parent, :version => @asset_version.version) -%>
+
+</div>
