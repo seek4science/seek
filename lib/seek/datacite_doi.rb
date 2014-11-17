@@ -1,8 +1,8 @@
 module Seek
   module DataciteDoi
     def self.included(base)
-      base.before_filter :set_asset_version
-      base.before_filter :mint_doi_auth
+      base.before_filter :set_asset_version, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
+      base.before_filter :mint_doi_auth, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
       base.after_filter :log_minting_doi, :only=>[:mint_doi]
     end
 
