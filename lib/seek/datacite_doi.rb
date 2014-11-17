@@ -71,7 +71,7 @@ module Seek
     end
 
     def mint_doi_auth
-      #is_published && can_manage
+      @asset_version.parent.is_doiable?
     end
 
     def log_minting_doi

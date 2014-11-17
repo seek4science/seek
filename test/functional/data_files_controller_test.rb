@@ -1951,6 +1951,18 @@ end
     assert_select "p[class=comment]",:text=>/#{comment}/
   end
 
+  test 'mint a DOI button' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    assert df.is_doiable?
+
+    get :show, :id => df.id, :version => df.version
+    assert_response :success
+
+    assert_select "ul.sectionIcons > li > span.icon" do
+      assert_select "a[href=?]", mint_doi_preview_data_file_path(df, :version => 1), :text=>/Mint a DOI/
+    end
+  end
+
   test "get mint_doi_preview" do
     df = Factory(:data_file,:policy=>Factory(:public_policy))
     assert df.is_published?

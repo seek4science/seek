@@ -172,6 +172,11 @@ module Acts #:nodoc:
         self.relationships.select { |a| a.other_object_type == "Publication" }.collect { |a| a.other_object }
       end
 
+      #TODO
+      #is_published && can_manage
+      #after one week asset is created
+      #asset type
+      #is_doi_already minted
       def is_doiable?
         Seek::Util.doiable_asset_types.include?(self.class)
       end
