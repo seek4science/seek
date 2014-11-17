@@ -1975,8 +1975,8 @@ end
     assert_response :success
 
     creator = df.creators.first
-    assert_select "input[type=text][name=?][value=?]", "metadata[creators][creator][creatorName]", (creator.last_name + ', ' + creator.first_name)
-    assert_select "textarea[name=?]", "metadata[titles][title]", :text => df.title
+    assert_select "input[type=text][name=?][value=?]", "metadata[creators][][creatorName]", (creator.last_name + ', ' + creator.first_name)
+    assert_select "textarea[name=?]", "metadata[titles][]", :text => df.title
     assert_select "input[type=text][name=?]", "metadata[publisher]"
 
   end
@@ -1993,6 +1993,8 @@ end
   end
 
   test "should validate 5 mandatory fields of metadata" do
+    mock_datacite_request
+
     df = Factory(:data_file,:policy=>Factory(:public_policy))
 
     valid_metadata = {:identifier => '10.5072/my_test',
@@ -2002,7 +2004,7 @@ end
                 :publicationYear => '2014'
     }
     post :mint_doi, :id => df.id, :metadata => valid_metadata
-    assert_redirected_to  minted_doi_data_file_path(df)
+    assert_redirected_to  minted_doi_data_file_path(df, :doi => '10.5072/my_test', :url => asset_url(df))
     assert_nil flash[:error]
 
     #lack of fields
@@ -2090,7 +2092,7 @@ end
     metadata_param = datacite_metadata_param
 
     post :mint_doi, :id => df.id, :metadata => metadata_param
-    assert_redirected_to minted_doi_data_file_path(df)
+    assert_redirected_to minted_doi_data_file_path(df, :doi => '10.5072/my_test', :url => asset_url(df))
 
     assert AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
   end
@@ -2195,5 +2197,9 @@ end
      :version => '1.0',
      :descriptions => ['test description']
     }
+  end
+
+  def asset_url asset
+    "#{root_url}data_files/#{asset.id}?version=#{asset.version}"
   end
 end
