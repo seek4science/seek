@@ -77,6 +77,11 @@ SEEK::Application.configure do
       Seek::Config.solr_enabled = true
       Sunspot.session = SunspotMatchers::SunspotSessionSpy.new(Sunspot.session)
 
+      Seek::Config.doi_prefix = "10.5072"
+      Seek::Config.doi_suffix = "Sysmo.SEEK"
+      Seek::Config.datacite_url = "https://test.datacite.org/mds/"
+      Seek::Config.datacite_username = 'test'
+      Seek::Config.datacite_password_encrypt('test')
     end
   end
 end

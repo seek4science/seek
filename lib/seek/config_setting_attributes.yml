@@ -125,3 +125,6 @@ show_as_external_link_enabled:
 doi_minting_enabled:
 datacite_username:
 datacite_password:
+datacite_url:
+doi_prefix:
+doi_suffix:

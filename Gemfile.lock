@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/FAIRdom/datacite_doi_ify.git
+  revision: 561964ebe841d86c1cc8808f99573ec61229101f
+  specs:
+    datacite_doi_ify (0.0.1)
+
+GIT
   remote: git://github.com/SysMO-DB/acts_as_activity_logged.git
   revision: da0b6d8e4ccabfa231c39aa89522c8ba73f03c0e
   specs:
@@ -678,6 +684,7 @@ DEPENDENCIES
   country-select
   coveralls
   daemons
+  datacite_doi_ify!
   delayed_job_active_record
   docsplit
   doi_query_tool!

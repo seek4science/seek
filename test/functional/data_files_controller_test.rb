@@ -1951,6 +1951,183 @@ end
     assert_select "p[class=comment]",:text=>/#{comment}/
   end
 
+  test 'mint a DOI button' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    assert df.is_doiable?
+
+    get :show, :id => df.id, :version => df.version
+    assert_response :success
+
+    assert_select "ul.sectionIcons > li > span.icon" do
+      assert_select "a[href=?]", mint_doi_preview_data_file_path(df, :version => 1), :text=>/Mint a DOI/
+    end
+  end
+
+  test "get mint_doi_preview" do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    assert df.is_published?
+    assert df.can_manage?
+
+    df.creators = [Factory(:person)]
+    df.save
+
+    get :mint_doi_preview, :id => df.id, :version => df.version
+    assert_response :success
+
+    creator = df.creators.first
+    assert_select "input[type=text][name=?][value=?]", "metadata[creators][][creatorName]", (creator.last_name + ', ' + creator.first_name)
+    assert_select "textarea[name=?]", "metadata[titles][]", :text => df.title
+    assert_select "input[type=text][name=?]", "metadata[publisher]"
+
+  end
+
+  test "should have 5 mandatory fields of metadata" do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    assert df.is_published?
+    assert df.can_manage?
+
+    get :mint_doi_preview, :id => df.id, :version => df.version
+    assert_response :success
+
+    assert_select "span[class=required]", :count => 5
+  end
+
+  test "should validate 5 mandatory fields of metadata" do
+    mock_datacite_request
+
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+
+    valid_metadata = {:identifier => '10.5072/my_test',
+                :creators => [{:creatorName => 'Last, First'}],
+                :titles => ['A title'],
+                :publisher => 'System Biology',
+                :publicationYear => '2014'
+    }
+    post :mint_doi, :id => df.id, :metadata => valid_metadata
+    assert_redirected_to  minted_doi_data_file_path(df, :doi => '10.5072/my_test', :url => asset_url(df))
+    assert_nil flash[:error]
+
+    #lack of fields
+    invalid_metadata = {:creators => [:creatorName => 'Last, First'],
+                        :titles => ['A title']
+    }
+    post :mint_doi, :id => df.id, :metadata => invalid_metadata
+    assert_response :bad_request
+    assert_not_nil flash[:error]
+
+    #lack of value
+    invalid_metadata = {:identifier => '10.5072/my_test',
+                      :creators => [],
+                      :titles => ['A title'],
+                      :publisher => 'System Biology',
+                      :publicationYear => '2014'
+    }
+    post :mint_doi, :id => df.id, :metadata => invalid_metadata
+    assert_response :bad_request
+    assert_not_nil flash[:error]
+
+    #blank value
+    invalid_metadata = {:identifier => '10.5072/my_test',
+                      :creators => [{:creatorName => ''}],
+                      :titles => [' '],
+                      :publisher => 'System Biology',
+                      :publicationYear => '2014'
+    }
+    post :mint_doi, :id => df.id, :metadata => invalid_metadata
+    assert_response :bad_request
+    assert_not_nil flash[:error]
+  end
+
+  test "authorization for mint_doi_preview" do
+    df = Factory(:data_file, :policy=>Factory(:private_policy), :contributor => User.current_user)
+    assert !df.is_published?
+    assert df.can_manage?
+
+    get :mint_doi_preview, :id => df.id, :version => df.version
+    assert_response :forbidden
+
+    df.publish!
+    assert df.reload.is_published?
+    login_as(Factory :user)
+    assert !df.can_manage?
+
+    get :mint_doi_preview, :id => df.id, :version => df.version
+    assert_response :forbidden
+  end
+
+  test "generate_metadata_in_xml" do
+    metadata_param = datacite_metadata_param
+
+    metadata_in_xml = DataFilesController.new().generate_metadata_in_xml(metadata_param)
+    metadata_from_file = open("#{Rails.root}/test/fixtures/files/doi_metadata.xml").read
+
+    assert_equal metadata_from_file, metadata_in_xml
+  end
+
+  test "generate_metadata_in_xml does not contain empty node" do
+    metadata_param = {:identifier => '',
+                      :creators => [],
+                      :titles => ['test title'],
+                      :publisher => 'Fairdom',
+                      :publicationYear => '2014'
+    }
+
+    metadata_in_xml = DataFilesController.new().generate_metadata_in_xml(metadata_param)
+
+    assert !metadata_in_xml.include?('identifier')
+    assert !metadata_in_xml.include?('creators')
+    assert !metadata_in_xml.include?('creator')
+    assert !metadata_in_xml.include?('descriptions')
+
+    assert metadata_in_xml.include?('title')
+    assert metadata_in_xml.include?('titles')
+    assert metadata_in_xml.include?('publisher')
+    assert metadata_in_xml.include?('publicationYear')
+  end
+
+  test "mint_doi" do
+    mock_datacite_request
+
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    metadata_param = datacite_metadata_param
+
+    post :mint_doi, :id => df.id, :metadata => metadata_param
+    assert_redirected_to minted_doi_data_file_path(df, :doi => '10.5072/my_test', :url => asset_url(df))
+
+    assert AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
+  end
+
+  test "handle error when mint_doi" do
+    mock_datacite_request
+
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    metadata_param = datacite_metadata_param
+
+    with_config_value :datacite_username, 'invalid' do
+      post :mint_doi, :id => df.id, :metadata => metadata_param
+      assert_not_nil flash[:error]
+
+      assert !AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
+    end
+  end
+
+  test 'minted_doi' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    assert df.is_published?
+    assert df.can_manage?
+
+    doi = '10.5072/my_test'
+    url = "#{root_url}data_files/#{df.id}?version=#{df.version}"
+
+    get :minted_doi, :id => df.id, :version => df.version,
+                     :doi => doi, :url => url
+    assert_response :success
+
+    assert_select "li", :text => /#{doi}/
+    assert_select "li", :text => "Resolved URL: http://test.host/data_files/#{df.id}?version=1"
+    assert_select "li", :text => /#{df.title}/
+  end
+
   private
 
   def mock_http
@@ -2002,5 +2179,27 @@ end
     return { :title=>"Test HTTP",:project_ids=>[projects(:sysmo_project).id]},{:data_url=>"https://mockedlocation.com/txt_test.txt",:make_local_copy=>"0"}
   end
 
-  
+  def mock_datacite_request
+    stub_request(:post, "https://test:test@test.datacite.org/mds/metadata").to_return(:body => 'OK (10.5072/my_test)', :status => 201)
+    stub_request(:post, "https://test:test@test.datacite.org/mds/doi").to_return(:body => 'OK', :status => 201)
+    stub_request(:post, "https://invalid:test@test.datacite.org/mds/metadata").to_return(:body => '401 Bad credentials', :status => 401)
+  end
+
+  def datacite_metadata_param
+    {:identifier => '10.5072/my_test',
+     :creators => [{:creatorName => 'Last1, First1'}, {:creatorName => 'Last2, First2'}],
+     :titles => ['test title'],
+     :publisher => 'Fairdom',
+     :publicationYear => '2014',
+     :subjects => ['System Biology', 'Bioinformatic'],
+     :language => 'eng',
+     :resourceType => 'Dataset',
+     :version => '1.0',
+     :descriptions => ['test description']
+    }
+  end
+
+  def asset_url asset
+    "#{root_url}data_files/#{asset.id}?version=#{asset.version}"
+  end
 end
