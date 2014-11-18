@@ -330,7 +330,7 @@ end
   end
 
   test 'datacite_password' do
-    assert_equal "test", Seek::Config.datacite_password
+    assert_equal "test", Seek::Config.datacite_password_decrypt
   end
 
   test 'home_description' do
