@@ -65,21 +65,24 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     assert_equal at.label, assay.assay_type_label
   end
 
-  test "child assays" do
-    parent_at = Factory :suggested_assay_type
-    child_at1 = Factory :suggested_assay_type, :parent_id => parent_at.id
-    assay1_with_child_at1 = Factory(:experimental_assay, :suggested_assay_type => child_at1)
-    assay2_with_child_at1 = Factory(:experimental_assay, :suggested_assay_type => child_at1)
+  test "assays" do
+    top = Factory :suggested_assay_type, :ontology_uri => "http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics"
+    child1 = Factory :suggested_assay_type, :parent => top, :ontology_uri=>nil
+    child2 = Factory :suggested_assay_type, :parent => child1, :ontology_uri=>nil
 
-    child_at2 = Factory :suggested_assay_type, :parent_id => parent_at.id
-    assay1_with_child_at2 = Factory(:experimental_assay, :suggested_assay_type => child_at2)
-    assay2_with_child_at2 = Factory(:experimental_assay, :suggested_assay_type => child_at2)
+    assay = Factory(:experimental_assay, :suggested_assay_type => child2)
+    assay2 = Factory(:experimental_assay, :suggested_assay_type => top)
 
-    child_child_at1 = Factory :suggested_assay_type, :parent_id => child_at1.id
-    assay1_with_child_child_at1 = Factory(:experimental_assay, :suggested_assay_type => child_child_at1)
-    assay2_with_child_child_at1 = Factory(:experimental_assay, :suggested_assay_type => child_child_at1)
 
-    assert_equal (child_child_at1.assays | child_at1.assays | child_at2.assays).sort, parent_at.get_child_assays.sort
+    assert_includes top.assays,assay
+    assert_includes child1.assays,assay
+    assert_includes child2.assays,assay
+
+    assert_includes top.assays,assay2
+    refute_includes child1.assays,assay2
+    refute_includes child2.assays,assay2
+
+
   end
 
   test "parent cannot be self" do
