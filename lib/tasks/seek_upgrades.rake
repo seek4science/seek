@@ -13,8 +13,7 @@ namespace :seek do
       :environment,
       :update_admin_assigned_roles,
       :repopulate_missing_publication_book_titles,
-      :resynchronise_assay_types,
-      :resynchronise_technology_types,
+      :resynchronise_ontology_types,
       :remove_invalid_group_memberships,
       :convert_publication_authors,
       :clear_filestore_tmp,
@@ -74,6 +73,12 @@ namespace :seek do
       end
       publication_author.save!
     end
+  end
+
+  desc("Synchronised the assay and technology types assigned to assays according to the current ontology, resolving any suggested types that have been added")
+  task(:resynchronise_ontology_types=>:environment) do
+    synchronizer = Seek::Ontologies::Synchronize.new
+    synchronizer.synchronize_assay_types
   end
 
 
