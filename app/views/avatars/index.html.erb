@@ -1,9 +1,9 @@
 <% avatar_can_be_edited_by_current_user = mine?(@avatar_owner_instance) || @avatar_owner_instance.can_be_edited_by?(current_user) -%>
 
 <ul class="sectionIcons">
-	<li><%= image_tag_for_key(@avatar_owner_instance.class.name.downcase, url_for(@avatar_owner_instance), nil, nil, 'Return to Profile')%></li>
+  <li><%= image_tag_for_key(@avatar_owner_instance.class.name.downcase, url_for(@avatar_owner_instance), nil, nil, 'Return to Profile')%></li>
   <% if avatar_can_be_edited_by_current_user -%>
-    <li><%= image_tag_for_key('avatar', new_avatar_link(@avatar_owner_instance), nil, nil, 'Upload New Picture')%></li>
+      <li><%= image_tag_for_key('avatar', new_avatar_link(@avatar_owner_instance), nil, nil, 'Upload New Picture')%></li>
   <% end %>
 </ul>
 
@@ -12,48 +12,50 @@
 
 <% unless @avatars.empty? %>
 
-<br/>
-<table class="alt_table">
-  
-<% odd_row = false -%>
-<% for avatar in @avatars -%>
-  <tr class="<%= (odd_row = !odd_row) ? "odd_row" : "even_row" -%>">
-    <td width="150" style="padding-top: 3em;">
-      <% if avatar.selected? -%> 
-				<%= image_tag_for_key "tick", nil, nil, nil, "" -%><br/>
-        Current
+    <br/>
+    <table class="alt_table">
+
+      <% odd_row = false -%>
+      <% for avatar in @avatars -%>
+          <tr class="<%= (odd_row = !odd_row) ? "odd_row" : "even_row" -%>">
+            <td width="150" style="padding-top: 3em;">
+              <% if avatar.selected? -%>
+                  <%= image_tag_for_key "tick", nil, nil, nil, "" -%><br/>
+                  Current
+              <% end -%>
+            </td>
+            <td>
+              <%= image_tag avatar_url(@avatar_owner_instance, avatar.id, 100), :alt => @avatar_owner_instance.title, :class => 'framed' -%>
+            </td>
+            <td class="actions">
+              <% if avatar_can_be_edited_by_current_user -%>
+                  <% avatar_link = avatar_url(@avatar_owner_instance, avatar.id) -%>
+                  <% unless avatar.selected? -%>
+                      <%
+                         change_path = eval("select_#{@avatar_owner_instance.class.name.downcase}_avatar_path(@avatar_owner_instance,avatar)")
+
+                      %>
+                      <%= image_tag_for_key "avatar", change_path, nil, { :method => :post }, "Set as Main Picture" -%>
+                  <% end -%>
+              <% end -%>
+              <%# "enlarge" option is shown to everyone -%>
+              <%= image_tag_for_key "show", avatar_url(@avatar_owner_instance, avatar.id, "large"), nil, nil, "View enlarged" -%>
+              <% if avatar_can_be_edited_by_current_user -%>
+                  <% avatar_path = eval("#{@avatar_owner_instance.class.name.downcase}_avatar_path(@avatar_owner_instance,avatar)") %>
+                  <%= image_tag_for_key "destroy", avatar_path, nil, { :confirm => 'Are you sure?', :method => :delete }, "Delete" -%>
+              <% end -%>
+            </td>
+          </tr>
       <% end -%>
-    </td>
-    <td>
-      <%= image_tag avatar_url(@avatar_owner_instance, avatar.id, 100), :alt => @avatar_owner_instance.title, :class => 'framed' -%>
-    </td>
-    <td class="actions">
-			<% if avatar_can_be_edited_by_current_user -%>
-				<% avatar_link = avatar_url(@avatar_owner_instance, avatar.id) -%>
-				<% unless avatar.selected? -%>
-              <%
-                change_path = eval("select_#{@avatar_owner_instance.class.name.downcase}_avatar_path(@avatar_owner_instance,avatar)")
-              %>
-					<%= image_tag_for_key "avatar", change_path, nil, { :method => :post }, "Set as Main Picture" -%>
-				<% end -%>
-			<% end -%>
-			<%# "enlarge" option is shown to everyone -%>
-			<%= image_tag_for_key "show", avatar_url(@avatar_owner_instance, avatar.id, "large"), nil, nil, "View enlarged" -%>
-			<% if avatar_can_be_edited_by_current_user -%>
-				<%= image_tag_for_key "destroy", avatar_link, nil, { :confirm => 'Are you sure?', :method => :delete }, "Delete" -%>
-			<% end -%>
-    </td>
-  </tr>
-<% end -%>
-</table>
+    </table>
 
 <% else -%>
 
-<div class="show_basic">
-  <p class="none_text" style="text-align: center; font-size: 123.1%;">
-  	No avatars yet!
-	</p>
-</div>
+    <div class="show_basic">
+      <p class="none_text" style="text-align: center; font-size: 123.1%;">
+        No avatars yet!
+      </p>
+    </div>
 
 <% end -%>
 

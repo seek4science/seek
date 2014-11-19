@@ -8,11 +8,11 @@ class Avatar < ActiveRecord::Base
   acts_as_fleximage do
     image_directory Seek::Config.avatar_filestore_path
     use_creation_date_based_directories false
-    image_storage_format :jpg
-    output_image_jpg_quality 85
-    require_image true
-    missing_image_message 'is required'
-    invalid_image_message 'was not a readable image'
+    image_storage_format      :jpg
+    output_image_jpg_quality  100
+    require_image             true
+    missing_image_message     'is required'
+    invalid_image_message     'was not a readable image'
   end
   acts_as_fleximage_extension
 

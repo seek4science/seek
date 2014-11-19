@@ -73,10 +73,6 @@ class InstitutionsController < ApplicationController
   # PUT /institutions/1.xml
   def update
 
-    # extra check required to see if any avatar was actually selected (or it remains to be the default one)
-    avatar_id = params[:institution].delete(:avatar_id).to_i
-    @institution.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
-
     respond_to do |format|
       if @institution.update_attributes(params[:institution])
         expire_resource_list_item_content

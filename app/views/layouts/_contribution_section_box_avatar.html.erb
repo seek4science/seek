@@ -13,4 +13,9 @@
         <%= seek_role_icons(@person) -%>
       </div>
   <% end -%>
+  <% if object && (mine?(object) || object.can_be_edited_by?(current_user)) -%>
+      <span style="font-size:smaller">
+      <%= image_tag_for_key("avatars", all_avatars_link(object), nil, nil, "Change picture") %>
+      </span>
+  <% end %>
 </div>
