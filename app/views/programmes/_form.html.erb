@@ -30,11 +30,6 @@
 <%= render :partial => "projects/project_selector", :locals => { :resource => @programme, :allow_nil => true, :possibilities=>(Project.without_programme | @programme.projects) } -%>
 
 
-<% if programme -%>
-    <h2><%= t('programme') %> Picture</h2>
-    <%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => programme, :form_instance => f } -%>
-<% end -%>
-
 <p>
   <%= f.submit(programme ? "Update" : "Create",:disable_with=>(programme ? "Updating..." : "Creating...")) -%>
   or <%= link_to 'Cancel', (programme ? programme_path(programme.id) : programmes_path) -%>
