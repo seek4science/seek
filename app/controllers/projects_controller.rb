@@ -183,10 +183,7 @@ class ProjectsController < ApplicationController
   # PUT /projects/1
   # PUT /projects/1.xml
   def update
-    
-    # extra check required to see if any avatar was actually selected (or it remains to be the default one)
-    avatar_id = params[:project].delete(:avatar_id).to_i
-    @project.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
+
 
     @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:sharing], [@project] if params[:sharing]
 
