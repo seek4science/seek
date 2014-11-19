@@ -1,0 +1,28 @@
+<resource xmlns='http://datacite.org/schema/kernel-3'
+          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+          xsi:schemaLocation='http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd'>
+  <identifier identifierType="DOI">10.5072/my_test</identifier>
+  <creators>
+    <creator>
+      <creatorName>Last1, First1</creatorName>
+    </creator>
+    <creator>
+      <creatorName>Last2, First2</creatorName>
+    </creator>
+  </creators>
+  <titles>
+    <title>test title</title>
+  </titles>
+  <publisher>Fairdom</publisher>
+  <publicationYear>2014</publicationYear>
+  <subjects>
+    <subject>System Biology</subject>
+    <subject>Bioinformatic</subject>
+  </subjects>
+  <language>eng</language>
+  <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
+  <version>1.0</version>
+  <descriptions>
+    <description descriptionType="Abstract">test description</description>
+  </descriptions>
+</resource>

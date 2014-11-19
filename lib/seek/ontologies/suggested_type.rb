@@ -103,8 +103,9 @@ module Seek
       end
 
       def assays
-        # FIXME: find a better way of getting the id foreign key
-        Assay.where("#{self.class.table_name.singularize}_id" => id).all
+        field="#{self.class.table_name.singularize}_id"
+        ids = all_children.collect(&:id) | [id]
+        Assay.where(field => ids).all
       end
 
       def can_edit?

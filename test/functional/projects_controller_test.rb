@@ -45,21 +45,14 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-	def test_should_create_project
-		assert_difference('Project.count') do
-			post :create, :project => {:title=>"test"}
-		end
-
-		assert_redirected_to project_path(assigns(:project))
-	end
-
   def test_should_create_project
-    parent_id = Factory(:project,:title=>"Test Parent").id
+    parent = Factory(:project,:title=>"Test Parent")
 		assert_difference('Project.count') do
-			post :create, :project => {:title=>"test",:parent_id=>parent_id}
+			post :create, :project => {:title=>"test",:parent_id=>parent.id}
 		end
 
 		assert_redirected_to project_path(assigns(:project))
+    assert_includes assigns(:project).ancestors,parent
 	end
 
 	def test_should_show_project

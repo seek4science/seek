@@ -1,0 +1,40 @@
+function fadeRow(table, index){
+    try {
+        var row_id = table.concat('_').concat(index.toString());
+
+        //Dont remove the row coz it messes up the row id
+        Effect.Fade(row_id, { duration: 0.25 });
+        while ($(row_id).firstChild) {
+            $(row_id).removeChild($(row_id).firstChild);
+        }
+    } catch(e) {
+        alert(e);
+    }
+}
+
+function addRow(tableID, elementName){
+    var table = document.getElementById(tableID);
+    var rowCount = table.rows.length;
+    var row = table.insertRow(rowCount);
+    row.id = tableID.concat('_').concat(rowCount);
+    var cell1 = row.insertCell(0);
+    var element1 = document.createElement("input");
+    element1.type = "text";
+    element1.size = 40;
+
+    var new_id = rowCount;
+    element1.name = elementName;
+    //element1.id = elementName.replace(/[/g,"_").replace(/]/,"_").concat(new_id);
+    cell1.appendChild(element1);
+
+    var cell2 = row.insertCell(1);
+    var element2 = document.createElement("img");
+    element2.src = "<%= asset_path('famfamfam_silk/cross.png') %>";
+    element2.alt = "Delete"
+    element2.id = "delete_".concat(tableID).concat('_').concat(rowCount.toString());
+    element2.title = "Delete this entry"
+    cell2 .appendChild(element2);
+    cell2 .children[0].onclick = function() {
+        fadeRow(tableID, rowCount);
+    }
+}

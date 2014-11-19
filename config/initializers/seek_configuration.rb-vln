@@ -118,6 +118,8 @@ SEEK::Application.configure do
 
 
   Seek::Config.default :datacite_url,"https://mds.datacite.org/"
+  Seek::Config.default :doi_prefix,"10.15490"
+  Seek::Config.default :doi_suffix,"Sysmo.SEEK"
 
   #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
   Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]

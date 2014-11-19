@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "rails", "3.2.20"
+gem "rails", "3.2.21"
 gem "rdoc"
 
 gem "feedjira","~>1"
@@ -87,6 +87,8 @@ gem "recaptcha"
 gem 'metainspector'
 gem 'mechanize'
 gem 'mimemagic'
+
+gem 'datacite_doi_ify', :git=>"git://github.com/FAIRdom/datacite_doi_ify.git"
 
 group :assets do
   gem 'turbo-sprockets-rails3'

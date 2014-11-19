@@ -307,8 +307,6 @@ class ApplicationController < ActionController::Base
 
       object = name.camelize.constantize.find(params[:id])
 
-      store_return_to_location
-
       if is_auth?(object, action)
         eval "@#{name} = object"
         params.delete :sharing unless object.can_manage?(current_user)

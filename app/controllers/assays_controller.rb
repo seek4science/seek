@@ -9,7 +9,7 @@ class AssaysController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
 
-  #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
+  #project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
   #defined in the application controller
   before_filter :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
@@ -134,13 +134,12 @@ class AssaysController < ApplicationController
   end
 
   def update
-
     update_assay_organisms @assay, params
 
     update_annotations @assay
     update_scales @assay
 
-    @assay.attributes = params[:assay]
+    @assay.update_attributes(params[:assay])
     if params[:sharing]
       @assay.policy_or_default
       @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
@@ -237,4 +236,5 @@ class AssaysController < ApplicationController
       end
     end
   end
+
 end

@@ -31,7 +31,9 @@ class AssayTypeReaderTest < ActiveSupport::TestCase
   test "label exists?" do
     reader = Seek::Ontologies::AssayTypeReader.instance
     assert reader.label_exists?("amplification")
+    assert reader.label_exists?("AmplifiCation") #case insensitive
     refute reader.label_exists?("sdkfhsdfkhsdfhksdf")
+    refute reader.label_exists?(nil)
   end
 
   test "all labels" do

@@ -1,0 +1,97 @@
+<%
+   if params[:metadata]
+     creators = params[:metadata][:creators] ? params[:metadata][:creators].collect{|creator| creator['creatorName']} : []
+     title = params[:metadata][:titles] ? params[:metadata][:titles].first : nil
+     publisher = params[:metadata][:publisher]
+     publication_year = params[:metadata][:publicationYear]
+     subjects = params[:metadata][:subjects] ? params[:metadata][:subjects] : []
+     language = params[:metadata][:language]
+     resource_type = params[:metadata][:resourceType]
+     version = params[:metadata][:version]
+     description = params[:metadata][:descriptions] ? params[:metadata][:descriptions].first : nil
+   else
+     creators = @asset_version.creators.collect{|creator| creator.last_name.capitalize + ', ' + creator.first_name.capitalize}
+     title = @asset_version.title
+     publisher = Seek::Config.project_name
+     publication_year = Time.now.year
+     subjects = []
+     language = nil
+     resource_type = nil
+     version = nil
+     description = @asset_version.description
+   end
+%>
+
+<% asset = @asset_version.parent %>
+
+<%= render :partial => "datacite_doi/single_entry",
+           :locals => {:field_name => 'identifier',
+                       :obligation => "(M) <span class='required'>*</span>".html_safe,
+                       :description => "The DOI for the asset",
+                       :field => text_field_tag("metadata[identifier]", generate_doi_for(asset.class.name, asset.id, @asset_version.version), {:readonly => true, :class => 'disabled', :size => 40})
+           } %>
+
+<%= render :partial => "datacite_doi/multiple_entries",
+           :locals => {:objects => creators,
+                       :field_name => 'creator',
+                       :obligation => "(M) <span class='required'>*</span>".html_safe,
+                       :metadata_path => "metadata[creators][][creatorName]",
+                       :description => "Input the creator names, with the format: Last name, First name"
+           } %>
+
+<%= render :partial => "datacite_doi/single_entry",
+           :locals => {:field_name => 'title',
+                       :obligation => "(M) <span class='required'>*</span>".html_safe,
+                       :description => "Input the title of the asset",
+                       :field => text_area_tag("metadata[titles][]", title, :class => "title_text_entry")
+           } %>
+
+<%= render :partial => "datacite_doi/single_entry",
+           :locals => {:field_name => 'publisher',
+                       :obligation => "(M) <span class='required'>*</span>".html_safe,
+                       :description => "Input the publisher",
+                       :field => text_field_tag("metadata[publisher]", publisher, :size => 40)
+           } %>
+
+<%= render :partial => "datacite_doi/single_entry",
+           :locals => {:field_name => 'publication year',
+                       :obligation => "(M) <span class='required'>*</span>".html_safe,
+                       :description => "Input the publication year",
+                       :field => text_field_tag("metadata[publicationYear]", publication_year, :size => 40)
+           } %>
+
+<%= render :partial => "datacite_doi/multiple_entries",
+           :locals => {:objects => subjects,
+                       :field_name => 'subject',
+                       :obligation => "(R)",
+                       :metadata_path => "metadata[subjects][]",
+                       :description => "Input the subjects of the asset, e.g. System Biology"
+           } %>
+
+<%= render :partial => "datacite_doi/single_entry",
+           :locals => {:field_name => 'language',
+                       :obligation => "(O)",
+                       :description => "Input the language, e.g. eng",
+                       :field => text_field_tag("metadata[language]", language, :size => 40)
+           } %>
+
+<%= render :partial => "datacite_doi/single_entry",
+           :locals => {:field_name => 'resource type',
+                       :obligation => "(R)",
+                       :description => "Input the asset type, e.g. Dataset",
+                       :field => text_field_tag("metadata[resourceType]", resource_type, :size => 40)
+           } %>
+
+<%= render :partial => "datacite_doi/single_entry",
+           :locals => {:field_name => 'version',
+                       :obligation => "(O)",
+                       :description => "Input the version",
+                       :field => text_field_tag("metadata[version]", version, :size => 40)
+           } %>
+
+<%= render :partial => "datacite_doi/single_entry",
+           :locals => {:field_name => 'Description',
+                       :obligation => "(R)",
+                       :description => "Input the description",
+                       :field => text_area_tag("metadata[descriptions][]", description, :class => "large_text_entry")
+           } %>

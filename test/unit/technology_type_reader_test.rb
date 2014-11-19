@@ -39,7 +39,9 @@ class TechnologyTypeReaderTest < ActiveSupport::TestCase
   test "label exists?" do
     reader = Seek::Ontologies::TechnologyTypeReader.instance
     assert reader.label_exists?("chip-seq")
+    assert reader.label_exists?("Chip-Seq")
     refute reader.label_exists?("sdkfhsdfkhsdfhksdf")
+    refute reader.label_exists?(nil)
   end
 
   test "all labels" do

@@ -33,7 +33,7 @@ module Seek
       end
 
       def label_exists? label
-        all_labels.include?(label)
+        all_labels.include?(label && label.downcase)
       end
 
       def all_labels
