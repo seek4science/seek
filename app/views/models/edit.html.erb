@@ -28,7 +28,7 @@
             <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
         </p>
         <p>
-        <%= fancy_multiselect @model,:scales, {:possibilities=>sort_scales(Scale.all)} if @model.respond_to?(:scales) -%>
+          <%= render :partial => "scales/scales_selector_with_parameters",:locals=>{:object=>@model} if show_scales?%>
        </p>
 
         <% if current_user_authorized_to_manage -%>
