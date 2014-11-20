@@ -140,7 +140,7 @@ module Seek
     def metadata_hash
       creators = @asset_version.creators.collect{|creator| creator.last_name.capitalize + ', ' + creator.first_name.capitalize}
       metadata_hash = {:identifier => @doi,
-                       :creators => creators,
+                       :creators => creators.collect{|creator| {:creatorName => creator}},
                        :titles => [@asset_version.title],
                        :publisher => Seek::Config.project_name,
                        :publicationYear => Time.now.year
