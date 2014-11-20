@@ -2135,6 +2135,18 @@ end
     assert_select "li", :text => /#{df.title}/
   end
 
+  test 'should show doi attribute for asset which doi is minted' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    doi = '10.5072/my_test'
+    df.doi = doi
+    assert df.save
+
+    get :show, :id => df.id, :version => df.version
+    assert_response :success
+
+    assert_select "p", :text => /#{doi}/
+  end
+
 
   private
 

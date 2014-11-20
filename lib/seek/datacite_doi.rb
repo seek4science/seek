@@ -16,6 +16,7 @@ module Seek
     def mint_doi
       respond_to do |format|
         if mint
+          add_doi_to_asset
           flash[:notice] = "The DOI is successfully generated: #{@doi}"
         end
         format.html { redirect_to polymorphic_path(@asset_version.parent, :version => @asset_version.version)}
@@ -162,6 +163,16 @@ module Seek
       end
       doi = prefix + suffix
       doi
+    end
+
+    def add_doi_to_asset
+      @asset_version.doi = @doi
+      @asset_version.save
+      asset = @asset_version.parent
+      if (asset.version == @asset_version.version)
+        asset.doi = @doi
+        asset.save
+      end
     end
   end
 end
