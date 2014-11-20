@@ -1,6 +1,7 @@
 <% doi = displayed_resource.doi%>
 <% unless doi.blank? %>
     <p>
-      <b>DOI:</b> <%= doi %>
+      <b>DOI:</b> <%= doi %> <%=  image_tag("doi.gif", :class => 'icon') %>
     </p>
 <% end %>
+
