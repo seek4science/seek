@@ -3,6 +3,7 @@ module Seek
     def self.included(base)
       base.before_filter :set_asset_version, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
       base.before_filter :mint_doi_auth, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
+      base.before_filter :set_doi, :only=>[:mint_doi]
       base.after_filter :log_minting_doi, :only=>[:mint_doi]
     end
 
@@ -14,18 +15,10 @@ module Seek
 
     def mint_doi
       respond_to do |format|
-        if metadata_validated?
-          if mint
-            format.html { redirect_to :action => :minted_doi,
-                                      :doi => params[:metadata][:identifier],
-                                      :url => asset_url}
-          else
-            format.html { render "datacite_doi/mint_doi_preview"}
-          end
-        else
-          flash[:error] = "The mandatory fields (M) must be filled"
-          format.html { render "datacite_doi/mint_doi_preview", :status => :bad_request}
+        if mint
+          flash[:notice] = "The DOI is successfully generated: #{@doi}"
         end
+        format.html { redirect_to polymorphic_path(@asset_version.parent, :version => @asset_version.version)}
       end
     end
 
@@ -103,13 +96,13 @@ module Seek
       url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
       endpoint = Datacite.new(username, password, url)
 
-      metadata = generate_metadata_in_xml params[:metadata]
+      metadata_in_hash = metadata_hash
+      metadata = generate_metadata_in_xml metadata_in_hash
       upload_response = endpoint.upload_metadata metadata
       return false unless validate_response(upload_response)
 
       url = asset_url
-      doi = params[:metadata][:identifier]
-      mint_response = endpoint.mint(doi, url)
+      mint_response = endpoint.mint(@doi, url)
       return false unless validate_response(mint_response)
       true
     end
@@ -118,7 +111,7 @@ module Seek
       if response.include?('OK')
         true
       else
-        flash.now[:error] = "There is a problem working with DataCite Metadata Store service: #{response}"
+        flash[:error] = "There is a problem working with DataCite Metadata Store service: #{response}"
         false
       end
     end
@@ -141,7 +134,34 @@ module Seek
     end
 
     def asset_url
-      "#{root_url}#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
+      "#{Seek::Config.site_base_host}#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
+    end
+
+    def metadata_hash
+      creators = @asset_version.creators.collect{|creator| creator.last_name.capitalize + ', ' + creator.first_name.capitalize}
+      metadata_hash = {:identifier => @doi,
+                       :creators => creators,
+                       :titles => [@asset_version.title],
+                       :publisher => Seek::Config.project_name,
+                       :publicationYear => Time.now.year
+      }
+      metadata_hash
+    end
+
+    def set_doi
+      asset = @asset_version.parent
+      @doi = generate_doi_for(asset.class.name, asset.id, @asset_version.version)
+    end
+
+    def generate_doi_for klass, id,  version=nil
+      prefix = Seek::Config.doi_prefix.to_s + '/'
+      suffix = Seek::Config.doi_suffix.to_s + '.'
+      suffix << klass + '.' + id.to_s
+      if version
+        suffix << '.' + version.to_s
+      end
+      doi = prefix + suffix
+      doi
     end
   end
 end
