@@ -185,12 +185,13 @@ module Acts #:nodoc:
       #after one week asset is created
       #asset type
       #is_doi_already minted
-      def is_doiable?
-        Seek::Util.doiable_asset_types.include?(self.class)
+      def is_doiable?(version)
+        Seek::Util.doiable_asset_types.include?(self.class) && self.can_manage? && !is_doi_minted?(version)
       end
 
-      def is_doi_minted?
-        true
+      def is_doi_minted?(version)
+        asset_version = self.find_version version
+        !asset_version.doi.blank?
       end
 
       def cache_remote_content_blob
