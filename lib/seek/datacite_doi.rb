@@ -65,7 +65,7 @@ module Seek
     end
 
     def mint_doi_auth
-      @asset_version.parent.is_doiable?
+      @asset_version.parent.is_doiable?(@asset_version.version)
     end
 
     def log_minting_doi

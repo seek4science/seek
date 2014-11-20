@@ -1953,7 +1953,7 @@ end
 
   test 'mint a DOI button' do
     df = Factory(:data_file,:policy=>Factory(:public_policy))
-    assert df.is_doiable?
+    assert df.is_doiable?(1)
 
     get :show, :id => df.id, :version => df.version
     assert_response :success
