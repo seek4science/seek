@@ -67,9 +67,7 @@ class SessionsController < ApplicationController
     if @user = User.authenticate(params[:login], params[:password])
       check_login
     else
-
-      failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten password?", main_app.forgot_password_url }</b>".html_safe
-
+      failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
     end  
   end
 
@@ -82,8 +80,6 @@ class SessionsController < ApplicationController
       redirect_to(select_people_path)
 	  elsif !@user.active?
       failed_login "You still need to activate your account. You should have been sent a validation email."
-    #elsif @user.person && !@user.is_admin? && @user.person.projects.empty?
-      #failed_login "You have not yet been assigned to a project by an administrator."
     else      
       successful_login
     end   
