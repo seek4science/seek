@@ -70,17 +70,17 @@ SEEK::Application.configure do
   Seek::Config.default :home_feeds_cache_timeout,2
 
 # Branding
-  Seek::Config.default :project_name,'SysMO'
-  Seek::Config.default :project_type,'Consortium'
-  Seek::Config.default :project_link,'http://www.sysmo.net'
+  Seek::Config.default :project_name,'FAIRDOM'
+  Seek::Config.default :project_type,''
+  Seek::Config.default :project_link,'http://www.fair-dom.org'
 
   Seek::Config.default :application_name,"SEEK"
-  Seek::Config.default :dm_project_name,"SysMO-DB"
-  Seek::Config.default :dm_project_link,"http://www.sysmo-db.org"
+  Seek::Config.default :dm_project_name,"FAIRDOM"
+  Seek::Config.default :dm_project_link,"http://www.fair-dom.org"
   Seek::Config.default :header_image_enabled,true
-  Seek::Config.default :header_image_title, "SysMO-DB"
-  Seek::Config.default :header_image_link,"http://www.sysmo-db.org"
-  Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
+  Seek::Config.default :header_image_title, "FAIRDOM"
+  Seek::Config.default :header_image_link,"http://www.fair-dom.org"
+  Seek::Config.default :header_image,'logos/fairdom-banner.png'
   Seek::Config.default :header_home_logo_image,'seek-logo-smaller.png'
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
