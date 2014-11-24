@@ -82,7 +82,7 @@ gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
 gem 'taverna-t2flow'
 gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
 gem 'jquery-rails', '~> 3'
-
+gem 'jquery-ui-rails', '~>3'
 gem "recaptcha"
 gem 'metainspector'
 gem 'mechanize'
