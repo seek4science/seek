@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141120160953) do
+ActiveRecord::Schema.define(:version => 20141125101549) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -186,6 +186,7 @@ ActiveRecord::Schema.define(:version => 20141120160953) do
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
     t.integer  "user_id"
+    t.string   "doi"
   end
 
   create_table "assets", :force => true do |t|
