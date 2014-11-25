@@ -1,9 +1,14 @@
 language: ruby
 rvm:
-  - 2.1.2
-before_install:
+  - 2.1.3
+
+sudo: false
+
+cache: bundler
+
+before_script:
   - bundle config build.nokogiri --use-system-libraries
-script:
   - mv config/database.cc.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:schema:load
-  - bundle exec rake test
+
+script: bundle exec rake test
