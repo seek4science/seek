@@ -15,7 +15,7 @@ module Seek
     def mint_doi
       respond_to do |format|
         if mint
-          add_doi_to_asset
+          add_doi_to_asset_version
           add_log
           flash[:notice] = "The DOI is successfully generated: #{@doi}"
         end
@@ -171,14 +171,9 @@ module Seek
       doi
     end
 
-    def add_doi_to_asset
+    def add_doi_to_asset_version
       @asset_version.doi = @doi
       @asset_version.save
-      asset = @asset_version.parent
-      if (asset.version == @asset_version.version)
-        asset.doi = @doi
-        asset.save
-      end
     end
 
     def add_log
