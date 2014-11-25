@@ -238,4 +238,19 @@ class AssetTest < ActiveSupport::TestCase
     disable_authorization_checks{ df.save }
     assert df.is_doi_minted?(1)
   end
+
+  test 'is_doi_locked?' do
+    df = Factory :data_file
+    with_config_value :lock_doi_after, 7 do
+      assert !df.is_doi_locked?(1)
+    end
+
+    df_version = df.latest_version
+    df_version.created_at = 8.days.ago
+    disable_authorization_checks{ df_version.save}
+    with_config_value :lock_doi_after, 7 do
+      assert df.is_doi_locked?(1)
+    end
+  end
+
 end
