@@ -135,7 +135,13 @@ module Seek
     end
 
     def asset_url
-      "#{Seek::Config.site_base_host}#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
+      base_host_url = "#{Seek::Config.site_base_host}"
+      relative_url = "#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
+      if base_host_url.end_with?('/')
+        base_host_url + relative_url
+      else
+        base_host_url + '/' + relative_url
+      end
     end
 
     def metadata_hash
