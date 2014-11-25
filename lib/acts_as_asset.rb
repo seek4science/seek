@@ -186,7 +186,7 @@ module Acts #:nodoc:
       #asset type
       #is_doi_already minted
       def is_doiable?(version)
-        Seek::Util.doiable_asset_types.include?(self.class) && self.can_manage? && !is_doi_minted?(version) && !is_doi_locked?(version)
+        Seek::Util.doiable_asset_types.include?(self.class) && self.can_manage? && self.is_published? && !is_doi_minted?(version) && !is_doi_locked?(version)
       end
 
       def is_doi_minted?(version)
