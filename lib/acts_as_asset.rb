@@ -186,12 +186,19 @@ module Acts #:nodoc:
       #asset type
       #is_doi_already minted
       def is_doiable?(version)
-        Seek::Util.doiable_asset_types.include?(self.class) && self.can_manage? && !is_doi_minted?(version)
+        Seek::Util.doiable_asset_types.include?(self.class) && self.can_manage? && !is_doi_minted?(version) && !is_doi_locked?(version)
       end
 
       def is_doi_minted?(version)
         asset_version = self.find_version version
         !asset_version.doi.blank?
+      end
+
+      #minting doi is locked after configuration days since the asset version is created
+      def is_doi_locked?(version)
+        asset_version = self.find_version version
+        created_at = asset_version.created_at
+        Time.now - created_at > Seek::Config.lock_doi_after.to_i.days
       end
 
       def cache_remote_content_blob
