@@ -2167,6 +2167,24 @@ end
     assert_select "p", :text => /#{doi}/, :count => 0
   end
 
+  test 'should log doi after doi is minted' do
+    mock_datacite_request
+
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+
+    post :mint_doi, :id => df.id
+    assert AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
+
+    log = AssetDoiLog.last
+    assert_equal 'DataFile', log.asset_type
+    assert_equal df.id, log.asset_id
+    assert_equal df.version, log.asset_version
+    assert_equal User.current_user.id, log.user_id
+    assert_equal 1, log.action #MINTED
+    assert_equal "10.5072/Sysmo.SEEK.DataFile.#{df.id}.#{df.version}", log.doi
+    AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
+  end
+
 
   private
 
