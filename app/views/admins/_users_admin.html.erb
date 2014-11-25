@@ -1,0 +1,98 @@
+<%
+
+   pal_role = ProjectRole.pal_role
+   invalid_users = {}
+   invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal? != p.project_roles.include?(pal_role) }
+   invalid_users[:duplicates] = Person.duplicates
+   invalid_users[:no_person] = User.without_profile
+   invalid_users[:no_user] = Person.userless_people
+   pals = Person.pals
+
+   non_activated_users = User.not_activated
+   non_project_members = Person.without_group.registered
+%>
+
+<style>
+    .tabber {
+        overflow: auto;
+    }
+
+    ul.tabbernav li {
+        display: list-item;
+        margin-bottom: 2px;
+    }
+
+    ul.tabbernav li a {
+        display: block;
+    }
+
+    ul.tabbernav {
+        float: left;
+    }
+
+    .tabbertab {
+
+        overflow: auto;
+        padding-left: 2em;
+
+    }
+
+    .tabbertab p {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .clear {
+        clear: both;
+    }
+</style>
+
+
+
+<div class="tabber" id="vertical_tabber">
+
+
+  <div class="tabbertab">
+    <h3>Invalid Users/Profiles</h3>
+
+    <p> Invalid Users/Profiles</p>
+    <%= render :partial => "admins/invalid_user_stats_list", :locals => {:collection => invalid_users} %>
+  </div>
+
+  <div class="tabbertab">
+    <h3>Users Requiring Activation</h3>
+
+    <p> Users Requiring Activation </p>
+    <%= render :partial => "admins/user_stats_list", :locals => {:title => "Users requiring activation", :collection => non_activated_users, :action => "activate"} %>
+  </div>
+  <div class="tabbertab">
+    <h3>Non-<%= t('project') %> Members</h3>
+
+    <% title = "Users not in a #{Seek::Config.project_name} #{t('project')}" %>
+    <p> Non-<%= t('project') %> Members </p>
+    <%= render :partial => "admins/user_stats_list", :locals => {:title => title, :collection => non_project_members} %>
+  </div>
+  <div class="tabbertab">
+    <h3> PALs </h3>
+    <p>PALs List</p>
+    <%= render :partial => "admins/user_stats_list", :locals => {:title => "PALs", :collection => pals} %>
+  </div>
+  <div class="tabbertab">
+    <h3>Administrators</h3>
+
+    <p> Administrators Management </p>
+    <%= render :partial => "admins/admin_selection" %>
+  </div>
+
+
+  <div class="clear"></div>
+</div>
+
+<%= javascript_include_tag "tabber-minimized" %>
+<script type="text/javascript">
+
+    var tabberOptions = {'onLoad': function () {
+        displayTabs();
+    }};
+    tabberAutomatic(tabberOptions);
+</script>

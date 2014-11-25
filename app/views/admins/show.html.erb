@@ -6,7 +6,7 @@
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Common tasks", :partial => 'admins/tasks'} -%>
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Site configuration",:partial => 'admins/site_configuration'} -%>
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Statistics", :partial => 'admins/stats'} -%>
-  <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Manage Administrators", :partial => 'admins/admin_selection'} -%>
+  <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Users and Administrators Management", :partial => 'admins/users_admin'} -%>
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Act as another User", :partial => 'admins/impersonate'} if Seek::Config.admin_impersonation_enabled-%>
   <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Register SEEK", :partial => 'admins/registration'} -%>
 

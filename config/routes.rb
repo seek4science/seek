@@ -111,6 +111,7 @@ SEEK::Application.routes.draw do
     end
     member do
       put :set_openid
+      post :resend_activation_email
     end
   end
 

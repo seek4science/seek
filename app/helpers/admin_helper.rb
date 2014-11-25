@@ -43,4 +43,19 @@ module AdminHelper
     status.html_safe
   end
 
+  def action_buttons user_or_person, action
+    case action
+      when "activate"
+        if user_or_person.is_a?(User) && user_or_person.person
+          admin_activate_user_button = content_tag(:li, image_tag_for_key('activate', activate_path(:activation_code => user_or_person.activation_code), "user activation", {}, "Activate now"))
+          resend_activation_email_button = content_tag(:li, image_tag_for_key('message', resend_activation_email_user_path(user_or_person), "Resend activation email", {:method => :post}, "Resend activation email"))
+          buttons =  admin_activate_user_button + resend_activation_email_button
+        end
+      when "delete"
+        buttons = content_tag(:li, image_tag_for_key('destroy', user_or_person , "delete", {:method => :delete, :confirm => "Are you sure you wish to delete this #{user_or_person.class.name}?"}, "Delete"))
+      else
+        nil
+    end
+    content_tag(:ul, buttons, :class => "sectionIcons")
+  end
 end
