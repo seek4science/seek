@@ -2147,6 +2147,26 @@ end
     assert_select "p", :text => /#{doi}/
   end
 
+  test 'should show doi attribute on minted version' do
+    df= Factory(:data_file,:contributor=>User.current_user)
+    post :new_version, :id=>df.id, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
+    df.reload
+    assert_equal 2, df.version
+
+    doi = '10.5072/my_test'
+    df.doi = doi
+    assert df.save
+
+    get :show, :id => df.id, :version => 2
+    assert_response :success
+    assert_select "p", :text => /#{doi}/
+
+    get :show, :id => df.id, :version => 1
+    assert_response :success
+
+    assert_select "p", :text => /#{doi}/, :count => 0
+  end
+
 
   private
 
