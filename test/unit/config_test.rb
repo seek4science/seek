@@ -333,6 +333,10 @@ end
     assert_equal "test", Seek::Config.datacite_password_decrypt
   end
 
+  test 'lock_doi_after' do
+    assert_equal 7, Seek::Config.lock_doi_after #7 days
+  end
+
   test 'home_description' do
     assert_equal 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.', Seek::Config.home_description
     Seek::Config.home_description = 'A new description'
