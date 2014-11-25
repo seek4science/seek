@@ -2093,27 +2093,24 @@ end
     mock_datacite_request
 
     df = Factory(:data_file,:policy=>Factory(:public_policy))
-    metadata_param = datacite_metadata_param
 
-    post :mint_doi, :id => df.id, :metadata => metadata_param
+    post :mint_doi, :id => df.id
     assert_redirected_to data_file_path(df, :version => df.version)
     assert_not_nil flash[:notice]
 
-    #TODO add this assert after adding log
-    #assert AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
+    assert AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
   end
 
   test "handle error when mint_doi" do
     mock_datacite_request
 
     df = Factory(:data_file,:policy=>Factory(:public_policy))
-    metadata_param = datacite_metadata_param
 
     with_config_value :datacite_username, 'invalid' do
-      post :mint_doi, :id => df.id, :metadata => metadata_param
+      post :mint_doi, :id => df.id
       assert_not_nil flash[:error]
-      #TODO add this assert after adding log
-      #assert !AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
+
+      assert !AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
     end
   end
 
