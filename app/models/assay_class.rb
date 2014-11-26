@@ -6,4 +6,8 @@ class AssayClass < ActiveRecord::Base
     keys={"experimental"=>"EXP","modelling"=>"MODEL"}
     return AssayClass.find_by_key(keys[type])
   end
+
+  def is_modelling?
+    key == "MODEL"
+  end
 end

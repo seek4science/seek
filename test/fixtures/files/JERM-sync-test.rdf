@@ -716,6 +716,7 @@
     <!-- http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle -->
 
     <owl:Class rdf:about="http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle">
+
         <rdfs:subClassOf rdf:resource="http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00048</dc:identifier>
     </owl:Class>
@@ -1406,6 +1407,7 @@
     <!-- http://www.mygrid.org.uk/ontology/JERMOntology#Genome_scale -->
 
     <owl:Class rdf:about="http://www.mygrid.org.uk/ontology/JERMOntology#Genome_scale">
+        <rdfs:label>experimental_to_modelling</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:010</dc:identifier>
     </owl:Class>
@@ -1482,6 +1484,7 @@
     <!-- http://www.mygrid.org.uk/ontology/JERMOntology#Immune_precipitation -->
 
     <owl:Class rdf:about="http://www.mygrid.org.uk/ontology/JERMOntology#Immune_precipitation">
+        <rdfs:label>modelling_to_experimental</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://www.mygrid.org.uk/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00073</dc:identifier>
     </owl:Class>
