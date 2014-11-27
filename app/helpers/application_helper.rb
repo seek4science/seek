@@ -599,8 +599,8 @@ module ApplicationHelper
      Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
      Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
      Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
-     Project=>"You cannot delete this #{I18n.t 'project'}. It might has people associated with it.",
-     Institution=>"You cannot delete this Institution. It might has people associated with it."
+     Project=>"You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
+     Institution=>"You cannot delete this Institution. It may have people associated with it."
     }
   end
 

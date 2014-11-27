@@ -1,10 +1,16 @@
 language: ruby
-bundler_args: --without production
-addons:
-  postgresql: "9.3"
+
 rvm:
   - 1.9.3
   - 2.1.5
+
+addons:
+  postgresql: "9.3"
+
+sudo: false
+
+cache: bundler
+
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
   - SUITE="rake test:functionals" DB_TYPE=mysql
@@ -14,12 +20,11 @@ env:
   - SUITE="rake test:functionals" DB_TYPE=postgres
   - SUITE="rake test:integration" DB_TYPE=postgres
   - SUITE="rspec spec" DB_TYPE=postgres
-before_install:
-  - bundle config build.nokogiri --use-system-libraries
+
 before_script:
   - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test;' -U postgres; fi"
-script:
   - cp test/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
   - RAILS_ENV=test bundle exec rake db:schema:load
-  - bundle exec $SUITE
+  
+script: bundle exec $SUITE

@@ -6,8 +6,8 @@
 
 <ul class="sectionIcons">
     <%= asset_buttons @data_file,@display_data_file.version -%>
-    <% if @data_file.is_doiable? %>
-      <li><%= image_tag_for_key('add', mint_doi_preview_data_file_path(@data_file, :version => @display_data_file.version), nil, nil, "Mint a DOI") -%></li>
+    <% if @data_file.is_doiable?(@display_data_file.version) %>
+      <li><%= image_tag_for_key('doi', mint_doi_data_file_path(@data_file, :version => @display_data_file.version), nil, {:method => :post}, "Generate a DOI") -%></li>
     <% end %>
 </ul>
 <br/>
@@ -27,6 +27,8 @@
       <br/>
 
       <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
+
+      <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>
 
     </div>
   </div>

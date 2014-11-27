@@ -216,20 +216,26 @@ class AssetTest < ActiveSupport::TestCase
   end
 
   test "is_doiable?" do
-    df = Factory :data_file
-    sop = Factory :sop
-    model = Factory :model
-    workflow = Factory :workflow
-    presentation = Factory :presentation
-    assert df.is_doiable?
-    assert sop.is_doiable?
-    assert model.is_doiable?
-    assert workflow.is_doiable?
-    assert !presentation.is_doiable?
+    df = Factory(:data_file, :policy => Factory(:public_policy))
+    assert df.can_manage?
+    assert !df.is_doi_minted?(1)
+    assert df.is_doiable?(1)
+
+    df.policy = Factory(:private_policy)
+    disable_authorization_checks{ df.save }
+    assert !df.is_doiable?(1)
+
+    df.policy = Factory(:public_policy)
+    df.doi = 'test_doi'
+    disable_authorization_checks{ df.save }
+    assert !df.is_doiable?(1)
   end
 
   test "is_doi_minted?" do
     df = Factory :data_file
-    assert df.is_doi_minted?
+    assert !df.is_doi_minted?(1)
+    df.doi = 'test_doi'
+    disable_authorization_checks{ df.save }
+    assert df.is_doi_minted?(1)
   end
 end

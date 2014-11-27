@@ -41,7 +41,7 @@ gem 'acts_as_tree'
 gem 'country-select'
 gem 'modporter-plugin'
 gem "will_paginate", "~> 3.0.4"
-gem 'calendar_date_select', :git => 'git://github.com/paneq/calendar_date_select.git'
+gem 'calendar_date_select', :git => 'https://github.com/paneq/calendar_date_select.git'
 gem "yaml_db"
 gem 'rails_autolink'
 gem 'rfc-822'
@@ -58,37 +58,37 @@ gem 'bives'
 
 
 #Linked to SysMO Git repositories
-gem 'gibberish', :git => "git://github.com/SysMO-DB/gibberish.git"
-gem 'white_list', :git => "git://github.com/SysMO-DB/white_list.git"
-gem 'white_list_formatted_content', :git => "git://github.com/SysMO-DB/white_list_formatted_content.git"
-gem 'my_rails_settings', :git => "git://github.com/SysMO-DB/my_rails_settings.git", :require=>"settings"
-gem 'piwik_analytics',:git=>"git://github.com/SysMO-DB/piwik-ruby-tracking.git"
-gem 'my_savage_beast', :git => "git://github.com/SysMO-DB/my_savage_beast"
-gem 'redbox', :git=>"git://github.com/SysMO-DB/redbox"
-gem "my_responds_to_parent", :git => "git://github.com/SysMO-DB/my_responds_to_parent.git"
-gem 'site_announcements', :git => "git://github.com/SysMO-DB/site_announcements.git"
-gem 'open_id_authentication', :git => "git://github.com/SysMO-DB/open_id_authentication.git"
+gem 'gibberish', :git => "https://github.com/SysMO-DB/gibberish.git"
+gem 'white_list', :git => "https://github.com/SysMO-DB/white_list.git"
+gem 'white_list_formatted_content', :git => "https://github.com/SysMO-DB/white_list_formatted_content.git"
+gem 'my_rails_settings', :git => "https://github.com/SysMO-DB/my_rails_settings.git", :require=>"settings"
+gem 'piwik_analytics',:git=>"https://github.com/SysMO-DB/piwik-ruby-tracking.git"
+gem 'my_savage_beast', :git => "https://github.com/SysMO-DB/my_savage_beast"
+gem 'redbox', :git=>"https://github.com/SysMO-DB/redbox"
+gem "my_responds_to_parent", :git => "https://github.com/SysMO-DB/my_responds_to_parent.git"
+gem 'site_announcements', :git => "https://github.com/SysMO-DB/site_announcements.git"
+gem 'open_id_authentication', :git => "https://github.com/SysMO-DB/open_id_authentication.git"
 gem 'bioportal',">=2.2"
 
-gem 'acts_as_activity_logged', :git => "git://github.com/SysMO-DB/acts_as_activity_logged.git"
-gem 'acts_as_trashable',:git=> "git://github.com/SysMO-DB/acts_as_trashable.git"
-gem "app_version", :git => "git://github.com/SysMO-DB/app_version.git"
-gem 'doi_query_tool', :git => "git://github.com/SysMO-DB/doi_query_tool.git"
-gem 'convert_office',:git=>"git://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
-gem "fleximage", :git=>"git://github.com/SysMO-DB/fleximage"
-gem 'search_biomodel', "2.2.1",:git=>"git://github.com/myGrid/search_biomodel.git"
-gem 'my_annotations', :git=>"git://github.com/myGrid/annotations.git"
+gem 'acts_as_activity_logged', :git => "https://github.com/SysMO-DB/acts_as_activity_logged.git"
+gem 'acts_as_trashable',:git=> "https://github.com/SysMO-DB/acts_as_trashable.git"
+gem "app_version", :git => "https://github.com/SysMO-DB/app_version.git"
+gem 'doi_query_tool', :git => "https://github.com/SysMO-DB/doi_query_tool.git"
+gem 'convert_office',:git=>"https://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
+gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage"
+gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.git"
+gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
 
 gem 'taverna-t2flow'
-gem "taverna-player", :git=>"git://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
+gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
 gem 'jquery-rails', '~> 3'
-
+gem 'jquery-ui-rails', '~>3'
 gem "recaptcha"
 gem 'metainspector'
 gem 'mechanize'
 gem 'mimemagic'
 
-gem 'datacite_doi_ify', :git=>"git://github.com/FAIRdom/datacite_doi_ify.git"
+gem 'datacite_doi_ify', :git=>"https://github.com/FAIRdom/datacite_doi_ify.git"
 
 group :assets do
   gem 'turbo-sprockets-rails3'

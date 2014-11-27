@@ -83,17 +83,7 @@
    <%= render :partial=>"people/subscriptions",:locals=>{:f=>f} %>
 <br/>
 <% end -%>
-<%# show avatar selection only when the project exists AND when current user is allowed to edit it -%>
-<% if person && (mine?(person) || person.can_be_edited_by?(current_user)) -%>
-<div class="fold">
-    <div class="foldTitle">
-        Personal picture
-    </div>
-    <div class="foldContent">
-        <%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => person, :form_instance => f } -%>
-    </div>
-</div>
-<% end -%>
+
 <p style="text-align: center; margin-top: 1.5em;">
     <%= f.submit((person ? "Update" : "Create"), :disable_with=>(person ? "Updating..." : "Creating...")) -%>
     or <%= link_to 'Cancel', (person ? person_path(person.id) : people_path) -%>
