@@ -194,6 +194,10 @@ module Acts #:nodoc:
         !asset_version.doi.blank?
       end
 
+      def is_any_doi_minted?
+        !self.versions.collect(&:doi).compact.empty?
+      end
+
       #minting doi is locked after configuration days since the asset version is created
       def is_doi_locked?(version)
         asset_version = self.find_version version
