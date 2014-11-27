@@ -184,7 +184,7 @@ module Seek
 
     def new_version_auth
       asset = @asset_version.parent
-      if asset.is_doi_minted?@asset_version.version
+      if asset.is_any_doi_minted?
         error("Uploading new version is not possible", "is invalid")
         return false
       end
