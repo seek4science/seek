@@ -115,7 +115,7 @@ class Assay < ActiveRecord::Base
 
   #returns true if this is a modelling class of assay
   def is_modelling?
-    return !assay_class.nil? && assay_class.key=="MODEL"
+    return assay_class && assay_class.is_modelling?
   end
 
   #returns true if this is an experimental class of assay

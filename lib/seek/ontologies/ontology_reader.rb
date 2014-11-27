@@ -24,6 +24,14 @@ module Seek
         @class_hierarchy ||= process_ontology_hierarchy
       end
 
+      #resets the loaded ontology, stored hierarchy and classes and clears the cache
+      def reset
+        clear_cache
+        @class_hierarchy=nil
+        @ontology=nil
+        @known_classes=nil
+      end
+
       def clear_cache
         Rails.cache.delete(cache_key)
       end

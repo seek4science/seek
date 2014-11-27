@@ -311,7 +311,7 @@ class DataFileTest < ActiveSupport::TestCase
 
         #tags ans scales stored in annotations
         data_file_tag_text_array = data_file.annotations.with_attribute_name("tag").include_values.collect{|a| a.value.text}
-        data_file_scales =  data_file.scales.map(&:text)
+        data_file_scales =  data_file.scales.sort.map(&:text)
         presentation = Factory.build :presentation,:contributor=>user
 
         data_file_converted = data_file.to_presentation
@@ -332,17 +332,16 @@ class DataFileTest < ActiveSupport::TestCase
         assert data_file.policy.id != data_file_converted.policy.id
         assert_equal data_file.content_blob, data_file_converted.content_blob
 
-        assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
+        assert_equal data_file.subscriptions.map(&:person_id).sort, data_file_converted.subscriptions(&:person_id).sort
         assert_equal data_file.projects,data_file_converted.projects
         assert_equal data_file.attributions , data_file_converted.attributions
         assert_equal data_file.related_publications, data_file_converted.related_publications
-        assert_equal data_file.creators, data_file_converted.creators
+        assert_equal data_file.creators.sort, data_file_converted.creators.sort
         assert_equal data_file_tag_text_array, data_file_converted.annotations.with_attribute_name("tag").include_values.collect{|a| a.value.text}
-        assert_equal data_file.project_ids,data_file_converted.project_ids
-        assert_equal data_file.assays,data_file_converted.assays
-        assert_equal data_file.event_ids, data_file_converted.event_ids
-        assert_equal data_file_scales, data_file_converted.scales.map(&:text)
-        #assert_equal data_file.versions.map(&:updated_at).sort, data_file_converted.versions.map(&:updated_at).sort
+        assert_equal data_file.project_ids.sort,data_file_converted.project_ids.sort
+        assert_equal data_file.assays.sort,data_file_converted.assays.sort
+        assert_equal data_file.event_ids.sort, data_file_converted.event_ids.sort
+        assert_equal data_file_scales, data_file_converted.scales.sort.map(&:text)
 
       }
     end
