@@ -1,9 +1,10 @@
 module Seek
   module DataciteDoi
     def self.included(base)
-      base.before_filter :set_asset_version, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
+      base.before_filter :set_asset_version, :only=>[:mint_doi_preview,:mint_doi,:minted_doi,:new_version]
       base.before_filter :mint_doi_auth, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
       base.before_filter :set_doi, :only=>[:mint_doi]
+      base.before_filter :new_version_auth, :only=>[:new_version]
     end
 
     def mint_doi_preview
@@ -179,6 +180,14 @@ module Seek
     def add_log
       asset = @asset_version.parent
       AssetDoiLog.create(asset_type: asset.class.name, asset_id: asset.id, asset_version: @asset_version.version, doi: @doi, action: 1, user_id: current_user.id)
+    end
+
+    def new_version_auth
+      asset = @asset_version.parent
+      if asset.is_doi_minted?@asset_version.version
+        error("Uploading new version is not possible", "is invalid")
+        return false
+      end
     end
   end
 end
