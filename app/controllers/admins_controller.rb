@@ -284,29 +284,6 @@ class AdminsController < ApplicationController
     title = nil
     @page = params[:id]
     case @page
-      when 'pals'
-        title = 'PALs'
-        collection = Person.pals
-        type = 'users'
-      when 'admins'
-        title = 'Administrators'
-        collection = Person.admins
-        type = 'users'
-      when 'invalid'
-        collection = {}
-        type = 'invalid_users'
-        pal_role = ProjectRole.pal_role
-        collection[:pal_mismatch] = Person.all.select { |p| p.is_pal? != p.project_roles.include?(pal_role) }
-        collection[:duplicates] = Person.duplicates
-        collection[:no_person] = User.without_profile
-      when 'not_activated'
-        title = 'Users requiring activation'
-        collection = User.not_activated
-        type = 'users'
-      when 'projectless'
-        title = "Users not in a #{Seek::Config.project_name} #{t('project')}"
-        collection = Person.without_group.registered
-        type = 'users'
       when 'contents'
         type = 'content_stats'
       when 'activity'
@@ -327,10 +304,6 @@ class AdminsController < ApplicationController
     end
     respond_to do |format|
       case type
-        when "invalid_users"
-          format.html { render :partial => "admins/invalid_user_stats_list", :locals => { :collection => collection} }
-        when "users"
-          format.html { render :partial => "admins/user_stats_list", :locals => { :title => title, :collection => collection} }
         when "content_stats"
           format.html { render :partial => "admins/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
         when "activity_stats"
