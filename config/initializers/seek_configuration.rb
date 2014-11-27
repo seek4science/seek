@@ -1,1 +1,1 @@
-seek_configuration.rb-vln
+seek_configuration.rb-openseek
