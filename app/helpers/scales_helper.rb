@@ -43,14 +43,6 @@ module ScalesHelper
     }
     ordered_scales
   end
-  def show_item_scales resource
-    link = "".html_safe
-    resource.scales.each do |scale|
-      link += link_to h(scale.title), scale
-      link += ",<br/>".html_safe unless scale==resource.scales.last
-    end
-    link.html_safe
-  end
 
   def scales_list entity,list_item=false
     scales = entity.scales
