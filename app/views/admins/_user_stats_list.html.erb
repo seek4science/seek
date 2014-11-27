@@ -1,6 +1,8 @@
 <% title ||= nil
    action ||= nil
+   bulk_delete ||= false
 %>
+<div class="box_normal">
 <h4><%= h(title) -%></h4>
 <% if collection.empty? %>
   <span class="none_text">No users or profiles found matching the criteria.</span>
@@ -43,6 +45,15 @@
       <% end  %>
 
     </tr>
-    <% end %>  
+    <% end %>
+    <% if bulk_delete %>
+        <tr>
+          <td> <%= render :partial => "admins/bulk_delete_button", :locals => {:collection => collection} %></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+     <% end %>
   </table>
-  <% end %>  
+  <% end %>
+</div>

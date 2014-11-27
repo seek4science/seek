@@ -108,6 +108,7 @@ SEEK::Application.routes.draw do
       post :hide_guide_box
       post :impersonate
       post :cancel_registration
+      post :bulk_destroy
     end
     member do
       put :set_openid
@@ -135,6 +136,7 @@ SEEK::Application.routes.draw do
       post :userless_project_selected_ajax
       post :items_for_result
       post :resource_in_tab
+      post :bulk_destroy
     end
     member do
       post :check_related_items

@@ -63,7 +63,7 @@
     <h3>Users Requiring Activation</h3>
 
     <p> Users Requiring Activation </p>
-    <%= render :partial => "admins/user_stats_list", :locals => {:title => "Users requiring activation", :collection => non_activated_users, :action => "activate"} %>
+    <%= render :partial => "admins/user_stats_list", :locals => {:collection => non_activated_users, :action => "activate"} %>
   </div>
   <div class="tabbertab">
     <h3>Non-<%= t('project') %> Members</h3>
@@ -75,7 +75,7 @@
   <div class="tabbertab">
     <h3> PALs </h3>
     <p>PALs List</p>
-    <%= render :partial => "admins/user_stats_list", :locals => {:title => "PALs", :collection => pals} %>
+    <%= render :partial => "admins/user_stats_list", :locals => {:collection => pals} %>
   </div>
   <div class="tabbertab">
     <h3>Administrators</h3>

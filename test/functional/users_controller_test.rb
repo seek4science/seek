@@ -90,6 +90,25 @@ class UsersControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
+  test "bulk destroy" do
+    user1 = Factory :user
+    user2 = Factory :user
+    Factory :favourite_group, :user => user1
+    Factory :favourite_group, :user => user2
+    #destroy also dependencies
+    assert_difference("User.count", -2) do
+      assert_difference("FavouriteGroup.count", -2) do
+        post :bulk_destroy, ids: [user1.id, user2.id]
+      end
+    end
+  end
+
+  test "should not bulk destroy without ids param" do
+    assert_difference("User.count", 0) do
+          post :bulk_destroy
+    end
+  end
+
   def test_system_message_on_signup_no_users
     get :new
     assert_response :success

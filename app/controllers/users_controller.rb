@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
-    
+  include Seek::BulkAction
+
   before_filter :is_current_user_auth, :only=>[:edit, :update]
   before_filter :is_user_admin_auth, :only => [:impersonate, :resend_activation_email, :destroy]
 
