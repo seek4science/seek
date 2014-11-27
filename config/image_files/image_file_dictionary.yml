@@ -74,25 +74,10 @@ current: 'famfamfam_silk/bullet_green.png'
 collapse: 'folds/fold.png' 
 expand: 'folds/unfold.png' 
 pal: 'famfamfam_silk/rosette.png' 
-admin: 'famfamfam_silk/shield.png' 
+admin: 'famfamfam_silk/shield.png'
+doi: 'doi.gif'
 
-#files
-pdf_file: 'file_icons/small/pdf.png'
-xls_file: 'file_icons/small/xls.png' 
-doc_file: 'file_icons/small/doc.png' 
-misc_file: 'file_icons/small/genericBlue.png' 
-ppt_file: 'file_icons/small/ppt.png' 
-xml_file: 'file_icons/small/xml.png' 
-zip_file: 'file_icons/small/zip.png' 
-jpg_file: 'file_icons/small/jpg.png' 
-gif_file: 'file_icons/small/gif.png' 
-png_file: 'file_icons/small/png.png' 
-jpg_file: 'file_icons/small/jpg.png' 
-bmp_file: 'file_icons/small/bmp.png' 
-svg_file: 'file_icons/small/svg.png' 
-txt_file: 'file_icons/small/txt.png' 
-rtf_file: 'file_icons/small/rtf.png' 
-html_file: 'file_icons/small/html.png'
+
 
 
 investigation_avatar: 'crystal_project/64x64/apps/mydocuments.png' 
@@ -166,7 +151,27 @@ simple_run: 'famfamfam_silk/table.png'
 myexperiment: 'myexp_icon.png' 
 filter: 'crystal_project/16x16/actions/filter.png'
 
- #add file icons via script
+
+#images for mime types
+#general mime type
+pdf_file: 'file_icons/small/pdf.png'
+xls_file: 'file_icons/small/xls.png'
+doc_file: 'file_icons/small/doc.png'
+misc_file: 'file_icons/small/genericBlue.png'
+ppt_file: 'file_icons/small/ppt.png'
+xml_file: 'file_icons/small/xml.png'
+zip_file: 'file_icons/small/zip.png'
+jpg_file: 'file_icons/small/jpg.png'
+gif_file: 'file_icons/small/gif.png'
+png_file: 'file_icons/small/png.png'
+jpg_file: 'file_icons/small/jpg.png'
+bmp_file: 'file_icons/small/bmp.png'
+svg_file: 'file_icons/small/svg.png'
+txt_file: 'file_icons/small/txt.png'
+rtf_file: 'file_icons/small/rtf.png'
+html_file: 'file_icons/small/html.png'
+
+#missing mime types files added by script
 aac_file: 'file_icons/small/aac.png'
 aif_file: 'file_icons/small/aif.png'
 ai_file: 'file_icons/small/ai.png'
@@ -215,12 +220,7 @@ wav_file: 'file_icons/small/wav.png'
 zip2_file: 'file_icons/small/zip2.png'
 genericBlue_file: 'file_icons/small/genericBlue.png'
 genericGray_file: 'file_icons/small/genericGray.png'
-doi: 'doi.gif'
-
-
-
-
-aiff_file: 'file_icons/small/aiff.png' 
+aiff_file: 'file_icons/small/aiff.png'
 tmp_file: 'file_icons/small/tmp.png' 
 mswmm_file: 'file_icons/small/mswmm.png' 
 dvf_file: 'file_icons/small/dvf.png' 
