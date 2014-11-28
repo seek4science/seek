@@ -205,6 +205,14 @@ module Acts #:nodoc:
         Time.now - created_at > Seek::Config.lock_doi_after.to_i.days
       end
 
+      def state_allows_delete? *args
+        if Seek::Util.doiable_asset_types.include?(self.class)
+          !self.is_any_doi_minted? && super
+        else
+          super
+        end
+      end
+
       def cache_remote_content_blob
         blobs = []
         blobs << self.content_blob if self.respond_to?(:content_blob)
