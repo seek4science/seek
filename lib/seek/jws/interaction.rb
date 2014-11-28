@@ -30,6 +30,7 @@ module Seek
         token = determine_csrf_token
         { :cookies => { 'csrftoken' => token },
           'X-CSRFToken' => token,
+          referer:Seek::Config.jws_online_root
         }
       end
 
