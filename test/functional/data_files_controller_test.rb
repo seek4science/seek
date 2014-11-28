@@ -2182,7 +2182,7 @@ end
     AssetDoiLog.was_doi_minted_for?('DataFile', df.id, df.version)
   end
 
-  test 'after DOI is minted, the -Upload new version- is disabled' do
+  test 'after DOI is minted, the -Upload new version- button is disabled' do
     df = Factory(:data_file,:policy=>Factory(:public_policy))
     latest_version = df.latest_version
     latest_version.doi = '10.5072/my_test'
@@ -2204,6 +2204,31 @@ end
     post :new_version, :id=>df.id, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision"
 
     assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
+
+  test 'after DOI is minted, the -Delete- button is disabled' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    latest_version = df.latest_version
+    latest_version.doi = '10.5072/my_test'
+    assert latest_version.save
+    assert df.is_doi_minted?(latest_version.version)
+
+    get :show, :id => df.id
+
+    assert_select "span[class='disabled_icon disabled']", :text => /Delete/
+  end
+
+  test 'can not delete asset after DOI is minted' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    latest_version = df.latest_version
+    latest_version.doi = '10.5072/my_test'
+    assert latest_version.save
+    assert df.is_doi_minted?(latest_version.version)
+
+    delete :destroy, :id => df.id
+
+    assert_redirected_to df
     assert_not_nil flash[:error]
   end
 
