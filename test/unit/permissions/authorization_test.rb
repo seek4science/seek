@@ -906,6 +906,18 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !df.reload.can_delete?(User.current_user)
   end
 
+  test 'can not unpublish the published asset which doi is minted' do
+    User.current_user = Factory :user
+    df = Factory :data_file, :policy => Factory(:public_policy), :contributor => User.current_user
+    assert df.can_unpublish?(User.current_user)
+
+    version = df.latest_version
+    version.doi = 'test_doi'
+    disable_authorization_checks{version.save}
+
+    assert !df.can_unpublish?(User.current_user)
+  end
+
   private 
 
   def actions
