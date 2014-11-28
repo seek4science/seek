@@ -64,10 +64,24 @@
 
     <div id='simple_sharing' class="sharing_box_form">
         <!-- private -->
+        <%
+           #dont allow to unpublish the asset which doi is minted
+           if @resource.is_published? && Seek::Util.doiable_asset_types.include?(@resource.class) && @resource.is_any_doi_minted?
+             disable_radio_button = "disabled=true"
+           else
+             disable_radio_button = ''
+           end
+        %>
+
         <p><label for="sharing_scope_<%= Policy::PRIVATE -%>">
             <input type="hidden" id='access_type_select_<%= Policy::PRIVATE -%>' name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
-            <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
-                                                                                  value="<%= Policy::PRIVATE -%>" type="radio" />
+            <input  type="radio"
+                    <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %>
+                    id="sharing_scope_<%= Policy::PRIVATE -%>"
+                    name="sharing[sharing_scope]"
+                    value="<%= Policy::PRIVATE -%>"
+                    <%= disable_radio_button %>
+            />
             - Keep this <%= @resource_type -%> private (only visible to you)
           </label>
           <%= additional_advanced_permissions_included @resource, Policy::PRIVATE -%>
@@ -78,7 +92,13 @@
         <!-- within your project ... and with all sysmo project members ...-->
         <p>
           <label>
-            <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
+            <input type="radio"
+                   <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%>
+                   id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>"
+                   name="sharing[sharing_scope]"
+                   value="<%= Policy::ALL_SYSMO_USERS -%>"
+                   <%= disable_radio_button %>
+            />
             - Members of <%= t('project').pluralize %> associated with this <%= @resource_type -%>:
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">

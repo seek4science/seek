@@ -1,10 +1,11 @@
 module Seek
   module DataciteDoi
     def self.included(base)
-      base.before_filter :set_asset_version, :only=>[:mint_doi_preview,:mint_doi,:minted_doi,:new_version]
+      base.before_filter :set_asset_version, :only=>[:mint_doi_preview,:mint_doi,:minted_doi,:new_version,:update]
       base.before_filter :mint_doi_auth, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
       base.before_filter :set_doi, :only=>[:mint_doi]
       base.before_filter :new_version_auth, :only=>[:new_version]
+      base.before_filter :unpublish_auth, :only=>[:update]
     end
 
     def mint_doi_preview
@@ -186,6 +187,15 @@ module Seek
       asset = @asset_version.parent
       if asset.is_any_doi_minted?
         error("Uploading new version is not possible", "is invalid")
+        return false
+      end
+    end
+
+    def unpublish_auth
+      asset = @asset_version.parent
+      is_unpublish_request = asset.is_published? && params[:sharing] && params[:sharing][:sharing_scope].to_i != Policy::EVERYONE
+      if  is_unpublish_request && asset.is_any_doi_minted?
+        error("Un-publishing this asset is not possible", "is invalid")
         return false
       end
     end
