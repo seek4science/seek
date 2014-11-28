@@ -2232,6 +2232,34 @@ end
     assert_not_nil flash[:error]
   end
 
+  test 'after DOI is minted, disable the sharing_form options to unpublish the asset' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    latest_version = df.latest_version
+    latest_version.doi = '10.5072/my_test'
+    assert latest_version.save
+    assert df.is_any_doi_minted?
+
+    get :edit, :id => df.id
+
+    assert_select "input[type=radio][disabled=true]", :count => 2
+  end
+
+  test 'can not unpublish asset after DOI is minted' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    latest_version = df.latest_version
+    latest_version.doi = '10.5072/my_test'
+    assert latest_version.save
+    assert df.is_doi_minted?(latest_version.version)
+
+    public_sharing = {:sharing_scope =>Policy::ALL_SYSMO_USERS,
+                      "access_type_#{Policy::ALL_SYSMO_USERS}".to_sym => Policy::VISIBLE
+                     }
+    put :update, :id => df.id, :sharing=>valid_sharing
+
+    assert_redirected_to :root
+    assert_not_nil flash[:error]
+  end
+
   private
 
   def mock_http
