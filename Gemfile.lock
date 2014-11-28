@@ -1,8 +1,9 @@
 GIT
   remote: https://github.com/FAIRdom/datacite_doi_ify.git
-  revision: 561964ebe841d86c1cc8808f99573ec61229101f
+  revision: 6965b4386295e0fcf0c79bff8adc9aaee950f6d2
   specs:
     datacite_doi_ify (0.0.1)
+      rest-client (~> 1.7)
 
 GIT
   remote: https://github.com/SysMO-DB/acts_as_activity_logged.git
