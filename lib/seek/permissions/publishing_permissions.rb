@@ -13,10 +13,6 @@ module Seek
         (Ability.new(user).can? :publish, self) || (can_manage?(user) && state_allows_publish?(user))
       end
 
-      def can_unpublish? user=User.current_user
-        can_manage?(user) && state_allows_unpublish?(user)
-      end
-
       def state_allows_publish? user=User.current_user
         if self.new_record?
           return true if !self.gatekeeper_required?
@@ -25,15 +21,6 @@ module Seek
           return false if self.is_published?
           return true if !self.gatekeeper_required?
           !self.is_waiting_approval?(user) && !self.is_rejected?
-        end
-      end
-
-      def state_allows_unpublish? user=User.current_user
-        return false if !self.is_published?
-        if Seek::Util.doiable_asset_types.include?(self.class)
-          !self.is_any_doi_minted?
-        else
-          true
         end
       end
 
