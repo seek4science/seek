@@ -4,6 +4,7 @@ class PeopleController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::Publishing::GatekeeperPublish
   include Seek::FacetedBrowsing
+  include Seek::BulkAction
 
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]

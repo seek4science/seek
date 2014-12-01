@@ -1,12 +1,20 @@
-<h3><%= h(title) -%></h3>
+<% title ||= nil
+   action ||= nil
+   bulk_delete ||= false
+%>
+<div class="box_normal">
+<h4><%= h(title) -%></h4>
 <% if collection.empty? %>
   <span class="none_text">No users or profiles found matching the criteria.</span>
 <% else %>
   <table>
     <tr>
-      <th>ID</th>
+      <th><%= collection.first.class.name %> ID</th>
       <th>Username</th>
       <th>Profile</th>
+      <% if action %>
+          <th>Action</th>
+      <% end %>
     </tr>
     <% collection.each do |el| -%>
     <%
@@ -21,10 +29,10 @@
       end      
     %>
     <tr>
+      <td> <%= user.try(:id) || person.try(:id) %></td>
       <% if user.nil? %>
-        <td colspan="2"><span class="none_text">No associated user</span></td>
+        <td><span class="none_text">No associated user</span></td>
       <% else %>
-        <td><%= user.id -%></td>
         <td><%= user.login -%></td>
       <% end %>
       <% if person.nil? %>
@@ -32,7 +40,20 @@
       <% else %>
         <td><%= link_to person.name, person -%></td>
       <% end %>
+      <% if action %>
+          <td> <%= action_buttons el, action %></td>
+      <% end  %>
+
     </tr>
-    <% end %>  
+    <% end %>
+    <% if bulk_delete %>
+        <tr>
+          <td> <%= render :partial => "admins/bulk_delete_button", :locals => {:collection => collection} %></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+     <% end %>
   </table>
-  <% end %>  
+  <% end %>
+</div>
