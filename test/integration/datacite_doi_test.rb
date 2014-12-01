@@ -2,8 +2,8 @@ require 'test_helper'
 
 class DataciteDoiTest < ActionController::IntegrationTest
 
-  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore}
-  #DOIABLE_ASSETS = ['data_file']
+  #DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore}
+  DOIABLE_ASSETS = ['data_file', 'model', 'sop']
 
   def setup
     User.current_user = Factory(:user, :login => 'test')

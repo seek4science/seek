@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141125101549) do
+ActiveRecord::Schema.define(:version => 20141201144047) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -696,6 +696,7 @@ ActiveRecord::Schema.define(:version => 20141125101549) do
     t.string   "imported_source"
     t.string   "imported_url"
     t.integer  "model_image_id"
+    t.string   "doi"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -726,6 +727,7 @@ ActiveRecord::Schema.define(:version => 20141125101549) do
     t.string   "imported_source"
     t.string   "imported_url"
     t.integer  "model_image_id"
+    t.string   "doi"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
@@ -1295,6 +1297,7 @@ ActiveRecord::Schema.define(:version => 20141125101549) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "doi"
   end
 
   add_index "sop_versions", ["contributor_id", "contributor_type"], :name => "index_sop_versions_on_contributor_id_and_contributor_type"
@@ -1313,6 +1316,7 @@ ActiveRecord::Schema.define(:version => 20141125101549) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "doi"
   end
 
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
@@ -1826,6 +1830,7 @@ ActiveRecord::Schema.define(:version => 20141125101549) do
     t.boolean  "sweepable"
     t.string   "myexperiment_link"
     t.string   "documentation_link"
+    t.string   "doi"
   end
 
   create_table "workflows", :force => true do |t|
@@ -1845,6 +1850,7 @@ ActiveRecord::Schema.define(:version => 20141125101549) do
     t.boolean  "sweepable"
     t.string   "myexperiment_link"
     t.string   "documentation_link"
+    t.string   "doi"
   end
 
   create_table "worksheets", :force => true do |t|
