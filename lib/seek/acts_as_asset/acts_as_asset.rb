@@ -35,44 +35,20 @@ module Seek
         acts_as_annotatable name_field: :title
         acts_as_favouritable
         acts_as_trashable
+        grouped_pagination
 
         attr_writer :original_filename, :content_type
         does_not_require_can_edit :last_used_at
 
         validates_presence_of :title
 
-        # MERGENOTE - this was removed by VLN at some point, possibly needs some configuration setting
-        # validates_presence_of :projects
-
-        has_many :relationships,
-                 class_name: 'Relationship',
-                 as: :subject,
-                 dependent: :destroy
-
-        has_many :attributions,
-                 class_name: 'Relationship',
-                 as: :subject,
-                 conditions: { predicate: Relationship::ATTRIBUTED_TO },
-                 dependent: :destroy
-
-        has_many :inverse_relationships,
-                 class_name: 'Relationship',
-                 as: :other_object,
-                 dependent: :destroy
-
-        has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id
-        has_many :assays, through: :assay_assets
-
-        has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
-        has_many :creators, class_name: 'Person', through: :assets_creators, order: 'assets_creators.id', after_remove: :update_timestamp, after_add: :update_timestamp
-
-        has_many :project_folder_assets, as: :asset, dependent: :destroy
-
         has_many :activity_logs, as: :activity_loggable
 
-        after_create :add_new_to_folder
+        include Seek::ActsAsAsset::ISA::Associations
+        include Seek::ActsAsAsset::Folders::Associations
+        include Seek::ActsAsAsset::Relationships::Associations
 
-        grouped_pagination
+        after_create :add_new_to_folder
 
         include Seek::Search::CommonFields
 
@@ -123,11 +99,11 @@ module Seek
     end
 
     module InstanceMethods
-      include Seek::ActsAsAsset::ContentBlobs
-      include Seek::ActsAsAsset::ISA
-      include Seek::ActsAsAsset::Dois
-      include Seek::ActsAsAsset::Relationships
-      include Seek::ActsAsAsset::Folders
+      include Seek::ActsAsAsset::ContentBlobs::InstanceMethods
+      include Seek::ActsAsAsset::ISA::InstanceMethods
+      include Seek::ActsAsAsset::Dois::InstanceMethods
+      include Seek::ActsAsAsset::Relationships::InstanceMethods
+      include Seek::ActsAsAsset::Folders::InstanceMethods
 
       # sets the last_used_at time to the current time
       def just_used
