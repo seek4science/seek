@@ -1,4 +1,4 @@
-require 'acts_as_asset'
+
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'title_trimmer'
