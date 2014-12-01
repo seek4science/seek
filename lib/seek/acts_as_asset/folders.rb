@@ -21,6 +21,7 @@ module Seek
         extend ActiveSupport::Concern
         included do
           has_many :project_folder_assets, as: :asset, dependent: :destroy
+          after_create :add_new_to_folder
         end
       end
     end
