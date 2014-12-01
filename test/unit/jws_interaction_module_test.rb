@@ -46,7 +46,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
   end
 
   test "model_simulate_url_from_slug" do
-    expected="http://jws2.sysmo-db.org/models/bob-2/simulate"
+    expected="http://jws2.sysmo-db.org/models/bob-2/simulate?embedded=1"
     assert_equal expected,model_simulate_url_from_slug("bob-2")
   end
 
