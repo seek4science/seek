@@ -115,7 +115,7 @@ module Seek
       end
 
       def is_asset?
-        include?(Acts::Asset::InstanceMethods)
+        include?(Seek::ActsAsAsset::InstanceMethods)
       end
     end
 
