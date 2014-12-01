@@ -38,7 +38,11 @@
   <!-- Manage button -->
   <% if workflow.can_manage? && !current_user.guest? -%>
       <li><%= image_tag_for_key('manage', edit_workflow_path(workflow), nil, nil, 'Manage workflow') -%></li>
-      <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
+      <% if Seek::Util.doiable_asset_types.include?(workflow.class) && workflow.is_any_doi_minted?  -%>
+          <li><%= link_to_function image("new")+" Upload new version", "javascript:alert('After DOI is generated, uploading new version is not possible')", :class=>"disabled" -%></li>
+      <% else %>
+          <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
+      <% end %>
   <% end -%>
 
   <!-- Publish button -->
@@ -47,4 +51,8 @@
       <li><%= image_tag_for_key('publish', polymorphic_path(workflow, :action => :check_related_items), nil, {:method=>:post}, "Publish #{human_name}") -%></li>
   <% end %>
 <% end -%>
+
+<% if workflow.is_doiable?(display_workflow.version) %>
+    <li><%= image_tag_for_key('doi', polymorphic_path(workflow, :action => 'mint_doi', :version => display_workflow.version), nil, {:method => :post}, "Generate a DOI") -%></li>
+<% end %>
 

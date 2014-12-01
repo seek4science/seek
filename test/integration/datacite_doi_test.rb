@@ -3,7 +3,7 @@ require 'test_helper'
 class DataciteDoiTest < ActionController::IntegrationTest
 
   #DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore}
-  DOIABLE_ASSETS = ['data_file', 'model', 'sop']
+  DOIABLE_ASSETS = ['workflow']
 
   def setup
     User.current_user = Factory(:user, :login => 'test')
@@ -302,7 +302,11 @@ class DataciteDoiTest < ActionController::IntegrationTest
       assert latest_version.save
       assert asset.is_doi_minted?(latest_version.version)
 
-      get "/#{type.pluralize}/#{asset.id}"
+      if type == 'workflow'
+        get "/#{type.pluralize}/#{asset.id}/edit"
+      else
+        get "/#{type.pluralize}/#{asset.id}"
+      end
 
       assert_select "span[class='disabled_icon disabled']", :text => /Delete/
     end
