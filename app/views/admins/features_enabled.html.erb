@@ -109,6 +109,8 @@
       DOI suffix: <%= text_field_tag(:doi_suffix, Seek::Config.doi_suffix) %>
       <span class="setting_description">The whole DOI suffix is unique under one DOI prefix. This configuration is the first part of the whole DOI suffix.
         It will be concatted with the seek_asset_type.seek_asset_id.seek_asset_version. E.g: Sysmo.SEEK.DataFile.1.1</span>
+      Lock DOI generation after: <%= text_field_tag(:lock_doi_after, Seek::Config.lock_doi_after, :onkeypress => "javascript: return onlyNumbers(event);") %> days
+      <span class="setting_description">DOI generation for the asset will not be available after the above specified days. It reduces number of unnecessary DOI in the system</span>
     </li>
 
     <li>

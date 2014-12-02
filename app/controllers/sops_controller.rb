@@ -13,6 +13,7 @@ class SopsController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs
+  include Seek::DataciteDoi
 
   def new_version
     if handle_upload_data

@@ -18,6 +18,7 @@ class ModelsController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
   include Bives
+  include Seek::DataciteDoi
 
   def find_other_version
     version = params[:other_version]

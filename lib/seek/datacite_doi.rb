@@ -1,10 +1,11 @@
 module Seek
   module DataciteDoi
     def self.included(base)
-      base.before_filter :set_asset_version, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
+      base.before_filter :set_asset_version, :only=>[:mint_doi_preview,:mint_doi,:minted_doi,:new_version,:update]
       base.before_filter :mint_doi_auth, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
       base.before_filter :set_doi, :only=>[:mint_doi]
-      base.after_filter :log_minting_doi, :only=>[:mint_doi]
+      base.before_filter :new_version_auth, :only=>[:new_version]
+      base.before_filter :unpublish_auth, :only=>[:update]
     end
 
     def mint_doi_preview
@@ -16,7 +17,8 @@ module Seek
     def mint_doi
       respond_to do |format|
         if mint
-          add_doi_to_asset
+          add_doi_to_asset_version
+          add_log
           flash[:notice] = "The DOI is successfully generated: #{@doi}"
         end
         format.html { redirect_to polymorphic_path(@asset_version.parent, :version => @asset_version.version)}
@@ -135,11 +137,23 @@ module Seek
     end
 
     def asset_url
-      "#{Seek::Config.site_base_host}#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
+      base_host_url = "#{Seek::Config.site_base_host}"
+      relative_url = "#{controller_name}/#{@asset_version.parent.id}?version=#{@asset_version.version}"
+      if base_host_url.end_with?('/')
+        base_host_url + relative_url
+      else
+        base_host_url + '/' + relative_url
+      end
     end
 
     def metadata_hash
       creators = @asset_version.creators.collect{|creator| creator.last_name.capitalize + ', ' + creator.first_name.capitalize}
+      uploader = @asset_version.contributor.try(:person)
+      unless uploader.nil?
+        creators << uploader.last_name.capitalize + ', ' + uploader.first_name.capitalize
+      end
+      creators.uniq!
+
       metadata_hash = {:identifier => @doi,
                        :creators => creators.collect{|creator| {:creatorName => creator}},
                        :titles => [@asset_version.title],
@@ -165,13 +179,30 @@ module Seek
       doi
     end
 
-    def add_doi_to_asset
+    def add_doi_to_asset_version
       @asset_version.doi = @doi
       @asset_version.save
+    end
+
+    def add_log
       asset = @asset_version.parent
-      if (asset.version == @asset_version.version)
-        asset.doi = @doi
-        asset.save
+      AssetDoiLog.create(asset_type: asset.class.name, asset_id: asset.id, asset_version: @asset_version.version, doi: @doi, action: 1, user_id: current_user.id)
+    end
+
+    def new_version_auth
+      asset = @asset_version.parent
+      if asset.is_any_doi_minted?
+        error("Uploading new version is not possible", "is invalid")
+        return false
+      end
+    end
+
+    def unpublish_auth
+      asset = @asset_version.parent
+      is_unpublish_request = asset.is_published? && params[:sharing] && params[:sharing][:sharing_scope].to_i != Policy::EVERYONE
+      if  is_unpublish_request && asset.is_any_doi_minted?
+        error("Un-publishing this asset is not possible", "is invalid")
+        return false
       end
     end
   end

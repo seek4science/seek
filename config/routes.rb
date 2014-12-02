@@ -370,6 +370,7 @@ SEEK::Application.routes.draw do
       post :request_resource
       post :simulate
       delete :destroy_version
+      post :mint_doi
     end
     resources :model_images do
       collection do
@@ -408,6 +409,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :new_version
       delete :destroy_version
+      post :mint_doi
     end
     resources :experimental_conditions do
       collection do
@@ -555,6 +557,7 @@ SEEK::Application.routes.draw do
 #      get :view_items_in_tab
       post :favourite
       delete :favourite_delete
+      post :mint_doi
     end
 
     resources :runs, :controller => 'taverna_player/runs'

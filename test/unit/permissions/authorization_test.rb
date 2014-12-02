@@ -893,7 +893,17 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'can not delete for the asset which doi is minted' do
+    User.current_user = Factory :user
+    df = Factory :data_file, :contributor => User.current_user
+    assert df.can_delete?(User.current_user)
 
+    version = df.latest_version
+    version.doi = 'test_doi'
+    disable_authorization_checks{version.save}
+
+    assert !df.reload.can_delete?(User.current_user)
+  end
 
   private 
 

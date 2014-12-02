@@ -128,3 +128,4 @@ datacite_password:
 datacite_url:
 doi_prefix:
 doi_suffix:
+lock_doi_after:

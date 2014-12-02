@@ -938,6 +938,7 @@ end
     f.sequence(:title) {|n| "A Workflow_#{n}"}
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :person
+    f.association :category, :factory => :workflow_category
     f.after_create do |workflow|
       if workflow.content_blob.blank?
         workflow.content_blob = Factory.create(:enm_workflow, :asset => workflow, :asset_version=>workflow.version)
@@ -947,6 +948,10 @@ end
         workflow.content_blob.save
       end
     end
+  end
+
+  Factory.define :workflow_category do |f|
+    f.name 'a category'
   end
 
   Factory.define(:enm_workflow, :parent => :content_blob) do |f|

@@ -79,6 +79,9 @@ class AdminsController < ApplicationController
     Seek::Config.doi_prefix = params[:doi_prefix]
     Seek::Config.doi_suffix = params[:doi_suffix]
 
+    lock_doi_after = params[:lock_doi_after]
+    Seek::Config.lock_doi_after = lock_doi_after if only_positive_integer lock_doi_after, 'lock doi after'
+
     port = params[:port]
     port_is_integer = only_integer(port, 'port')
     Seek::Config.set_smtp_settings('port', port) if port_is_integer
