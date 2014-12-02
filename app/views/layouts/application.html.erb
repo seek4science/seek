@@ -47,7 +47,9 @@
           <tr>
             <td>
               <div class="breadcrumbs">
-                <%= render_breadcrumbs :separator => ' > ' %>
+                <ol class="breadcrumb">
+                    <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
+                </ol>
               </div>
             </td>
 
