@@ -503,7 +503,7 @@ class ApplicationController < ActionController::Base
       filters.all? do |filter, value|
         filter = filter.to_s
         klass = filter.camelize.constantize
-        value = klass.find_by_id value.to_i
+        value = klass.find value.to_i
 
         detect_for_filter(filter, res, value)
       end

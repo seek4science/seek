@@ -1361,6 +1361,14 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test "filtered assays for non existent study" do
+    Factory :assay #needs an assay to be sure that the problem being fixed is triggered
+    study_id=999
+    assert_nil Study.find_by_id(study_id)
+    get :index,:study_id=>study_id
+    assert_response :not_found
+  end
+
   test "logged out user can't see new" do
     logout
     get :new

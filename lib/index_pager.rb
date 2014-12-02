@@ -32,9 +32,17 @@ module IndexPager
     else
       found = model_class.respond_to?(:default_order) ? model_class.default_order : model_class.all
     end
-    found = apply_filters(found)
-    
-    eval("@" + controller + " = found")
+    begin
+      found = apply_filters(found)
+      eval("@" + controller + " = found")
+        true
+    rescue ActiveRecord::RecordNotFound
+      respond_to do |format|
+        format.html do
+            render :template => "errors/error_404", :layout=>"errors",:status => :not_found
+        end
+      end
+    end
   end
 
 end

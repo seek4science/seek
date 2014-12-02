@@ -1763,6 +1763,22 @@ end
     end
   end
 
+  test "filtered data files for non existent study" do
+    Factory :data_file #needs a data file to be sure that the problem being fixed is triggered
+    study_id=999
+    assert_nil Study.find_by_id(study_id)
+    get :index,:study_id=>study_id
+    assert_response :not_found
+  end
+
+  test "filtered data files for non existent project" do
+    Factory :data_file #needs a data file to be sure that the problem being fixed is triggered
+    project_id=999
+    assert_nil Project.find_by_id(project_id)
+    get :index,:project_id=>project_id
+    assert_response :not_found
+  end
+
   test "handles nil description" do
     df = Factory(:data_file,:description=>nil,:policy=>Factory(:public_policy))
 
