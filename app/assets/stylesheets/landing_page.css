@@ -3,5 +3,6 @@ div.landing_page {
 }
 div.landing_page h1 { font-size: 300%; color: #00d; }
 div.landing_page h2 { font-size: 200%; color: #00d; }
+div.landing_page h2.forbidden { font-size: 200%; color: #a00; }
 div.landing_page p  { font-size: 150%; color: #555; text-align: center; }
 div.landing_page p.comment {}
