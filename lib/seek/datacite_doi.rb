@@ -148,6 +148,12 @@ module Seek
 
     def metadata_hash
       creators = @asset_version.creators.collect{|creator| creator.last_name.capitalize + ', ' + creator.first_name.capitalize}
+      uploader = @asset_version.contributor.try(:person)
+      unless uploader.nil?
+        creators << uploader.last_name.capitalize + ', ' + uploader.first_name.capitalize
+      end
+      creators.uniq!
+
       metadata_hash = {:identifier => @doi,
                        :creators => creators.collect{|creator| {:creatorName => creator}},
                        :titles => [@asset_version.title],
