@@ -1,0 +1,36 @@
+<% include_projects = false %>
+
+<% if logged_in_and_registered? %>
+    <li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+        <% current_person = current_user.person %>
+        <% if current_person.avatar.nil? %>
+            <%= image_tag(icon_filename_for_key("person_avatar"), :size => "20x20") %>
+        <% else %>
+            <%= image_tag avatar_url(current_person, current_person.avatar_id, 20) %>
+        <% end %>
+        <%= current_person.name %>
+        <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu" role="menu">
+        <li role="presentation" class="dropdown-header"> Your details</li>
+        <li><%= link_to 'Your profile', person_path(current_person) -%></li>
+        <li><%= link_to 'Edit profile', edit_person_path(current_person) -%></li>
+        <li><%= link_to 'Change password', edit_user_path(current_user) -%></li>
+
+        <% unless !include_projects || current_person.projects.empty? %>
+            <li role="presentation" class="dropdown-header"> Your projects</li>
+            <% current_person.projects.each do |project| %>
+                <li><%= link_to project.title, project_path(project) -%></li>
+            <% end %>
+        <% end %>
+        <% if current_person.is_admin? %>
+            <li role="presentation" class="divider"></li>
+            <li><%= link_to 'Server admin', admin_path -%></li>
+        <% end %>
+        <li role="presentation" class="divider"></li>
+        <li><%= link_to 'Provide feedback', feedback_home_path -%></li>
+        <li><%= link_to 'Logout', logout_path, :confirm => 'Are you sure you wish to logout?' -%></li>
+      </ul>
+    </li>
+<% end %>

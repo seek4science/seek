@@ -1,0 +1,53 @@
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <%= link_to Seek::Config.header_image_link,:class=>"logo_link" do %>
+          <%= image_tag(Seek::Config.header_image, :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title, :height => 50) %>
+      <% end %>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <% menu_definitions.each do |menu| %>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                <%= menu[:title] %> <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" role="menu">
+                <% menu[:sections].each do |section| %>
+                    <% unless section[:hide] %>
+                        <li><%= link_to section[:title], determine_path(section) %></li>
+                    <% end %>
+                <% end %>
+              </ul>
+            </li>
+        <% end %>
+      </ul>
+
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+
+      <ul class="nav navbar-nav navbar-right">
+
+        <ul class="nav navbar-nav">
+          <% if logged_in_and_registered? %>
+              <%= render :partial => "layouts/navbar/create_menu" %>
+              <%= render :partial => "layouts/navbar/user_menu" %>
+          <% end %>
+        </ul>
+      </ul>
+
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>

@@ -1,0 +1,10 @@
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <% new_creatable_selection_list.each do |item| %>
+        <li><a href="#" onclick="javascript:newAssetSelected('<%= item[1] -%>');"><%= item[0] -%></a></li>
+    <% end %>
+  </ul>
+</li>
