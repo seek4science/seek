@@ -1,6 +1,6 @@
 /* ...
+*= require bootstrap_include
 *= require reset-fonts-grids
-*= require base-min
 *= require my_exp
 *= require folds
 *= require gadgets
@@ -25,4 +25,5 @@
 *= require jws
 *= require images
 *= require landing_page
+*= require bootstrap_tweaks
 */

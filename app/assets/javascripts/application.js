@@ -5,11 +5,13 @@
 //= require savage_beast/application
 //= require prototype
 //= require prototype_ujs
+//= require prototype_patch
 //= require effects
 //= require dragdrop
 //= require boxover
 //= require scriptaculous
 //= require controls
+//= require bootstrap-sprockets
 //= require redbox
 //= require builder
 //= require application_shared

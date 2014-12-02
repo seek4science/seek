@@ -192,6 +192,8 @@ GEM
     bio (1.4.3.0001)
     bioportal (2.2)
     bives (0.10)
+    bootstrap-sass (3.3.1.0)
+      sass (~> 3.2)
     breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
     cancan (1.6.10)
@@ -556,6 +558,11 @@ GEM
       virtus (~> 1.0)
     rubyzip (1.1.6)
     safe_yaml (1.0.4)
+    sass (3.4.9)
+    sass-rails (3.2.6)
+      railties (~> 3.2.0)
+      sass (>= 3.1.10)
+      tilt (~> 1.3)
     savon (1.1.0)
       akami (~> 1.2.0)
       builder (>= 2.1.2)
@@ -674,6 +681,7 @@ DEPENDENCIES
   bio
   bioportal (>= 2.2)
   bives
+  bootstrap-sass (~> 3.3.1)
   breadcrumbs_on_rails
   calendar_date_select!
   cancan
@@ -744,6 +752,7 @@ DEPENDENCIES
   ruby-prof
   rubycritic
   rubyzip (~> 1.1.4)
+  sass-rails (>= 3.2)
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
   simple-spreadsheet-extractor (~> 0.13.3)
