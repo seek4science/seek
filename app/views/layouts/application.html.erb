@@ -33,18 +33,16 @@
 
 <body id="body">
 
-<div id="doc3" class="yui-t2">
+
 
 
   <div id="header">
     <%= render :partial=>"layouts/header_main" %>
   </div>
-    <%= render :partial=>"general/top_bar" %>
+  <%= render :partial=>"general/top_bar" %>
 
-
-  <div id="bd">
-    <div id="yui-main">
-      <div <%= "class='yui-b'".html_safe unless @no_sidebar %> id="content">
+  <div id="doc3" class="yui-t2">
+      <div id="content">
         <table width="100%">
           <tr>
             <td>
@@ -76,15 +74,13 @@
         <%# main content part of every page -%>
         <%= yield :layout %>
 
-      </div>
       <br style="clear:both"/>
     </div>
-    <% unless @no_sidebar -%>
+    <% unless true -%>
         <div id="myexp_sidebar" class="yui-b">
           <%= render :partial => "layouts/sidebar" %>
         </div>
     <% end -%>
-  </div>
 
   <div id="ft">
     <%= render :partial=>"layouts/footer" %>
