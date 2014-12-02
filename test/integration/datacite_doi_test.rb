@@ -3,7 +3,6 @@ require 'test_helper'
 class DataciteDoiTest < ActionController::IntegrationTest
 
   DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore}
-  #DOIABLE_ASSETS = ['workflow']
 
   def setup
     User.current_user = Factory(:user, :login => 'test')
@@ -304,7 +303,7 @@ class DataciteDoiTest < ActionController::IntegrationTest
 
   test 'after DOI is minted, the -Delete- button is disabled' do
     DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym,:policy=>Factory(:public_policy))
+      asset = Factory(type.to_sym, :contributor =>  User.current_user, :policy=>Factory(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -322,7 +321,7 @@ class DataciteDoiTest < ActionController::IntegrationTest
 
   test 'can not delete asset after DOI is minted' do
     DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym,:policy=>Factory(:public_policy))
+      asset = Factory(type.to_sym, :contributor =>  User.current_user, :policy=>Factory(:private_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
