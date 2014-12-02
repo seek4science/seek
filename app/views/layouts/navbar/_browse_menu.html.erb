@@ -1,0 +1,40 @@
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="glyphicon glyphicon-search" aria-hidden="true"></span> Browse <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li role="presentation" class="dropdown-header"><%= t("menu.yellow_pages") -%></li>
+    <% if Seek::Config.programmes_enabled %>
+        <li><%= link_to t('programme').pluralize, programmes_path %></li>
+    <% end %>
+    <li><%= link_to "People", people_path %></li>
+    <li><%= link_to t("project").pluralize, projects_path %></li>
+    <li><%= link_to "Institutions", institutions_path %></li>
+
+    <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
+    <li><%= link_to t("investigation").pluralize, investigations_path %></li>
+    <li><%= link_to t("study").pluralize, studies_path %></li>
+    <li><%= link_to t("assays.assay").pluralize, assays_path %></li>
+
+
+    <li role="presentation" class="dropdown-header"><%= t("menu.assets") -%></li>
+    <li><%= link_to t("data_file").pluralize, data_files_path %></li>
+    <% if Seek::Config.models_enabled %>
+        <li><%= link_to t("model").pluralize, models_path %></li>
+    <% end %>
+    <li><%= link_to t("sop").pluralize, sops_path %></li>
+    <li><%= link_to "Publications", publications_path %></li>
+    <% if Seek::Config.biosamples_enabled %>
+        <li><%= link_to "Biosamples", biosamples_path %></li>
+    <% end %>
+
+    <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
+    <li><%= link_to t("presentation").pluralize, presentations_path %></li>
+    <% if Seek::Config.events_enabled %>
+        <li><%= link_to t("event").pluralize, events_path %></li>
+    <% end %>
+    <% if Seek::Config.forum_enabled %>
+        <li><%= link_to "Forums", forums_path %></li>
+    <% end %>
+  </ul>
+</li>

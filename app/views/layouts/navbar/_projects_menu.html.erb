@@ -1,0 +1,10 @@
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="glyphicon glyphicon-home" aria-hidden="true"></span> My <%= t('project').pluralize -%> <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <% current_user.person.projects.each do |p| %>
+        <li><%= link_to p.title, project_path(p) -%></li>
+    <% end %>
+  </ul>
+</li>
