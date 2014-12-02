@@ -803,10 +803,10 @@ class ModelsControllerTest < ActionController::TestCase
   test "owner should be able to choose policy 'share with everyone' when updating a model" do
     login_as(:model_owner)
     user = users(:model_owner)
-    model   = models(:teusink_with_project_without_gatekeeper)
+    model = Factory(:model, :contributor => user)
     assert model.can_edit?(user), "model should be editable and manageable for this test"
     assert model.can_manage?(user), "model should be editable and manageable for this test"
-    assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
+    assert_equal Policy::NO_ACCESS, model.policy.access_type, "data file should have an initial policy with access type of no access"
     put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
     assert_redirected_to model_path(model)
     model.reload
