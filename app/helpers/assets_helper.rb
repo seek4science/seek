@@ -358,4 +358,8 @@ module AssetsHelper
   def view_content_button asset
     render :partial => "assets/view_content", :locals => {:content_blob => asset.single_content_blob, :button_style => true} if asset.single_content_blob && !asset.single_content_blob.show_as_external_link?
   end
+
+  def doi_link doi
+    link_to doi,"https://dx.doi.org/#{doi}"
+  end
 end
