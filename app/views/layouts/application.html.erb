@@ -37,21 +37,13 @@
 
   <div id="doc3" class="yui-t2">
       <div id="content">
-        <table width="100%">
-          <tr>
-            <td>
-              <div class="breadcrumbs">
-                <ol class="breadcrumb">
-                    <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
-                </ol>
-              </div>
-            </td>
+        <div class="breadcrumbs">
+          <ol class="breadcrumb">
+            <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
+          </ol>
+        </div>
 
-            <td class="return_to_search" id='return_to_search'>
-              <%= add_return_to_search %>
-            </td>
-          </tr>
-        </table>
+        <%= add_return_to_search %>
 
         <%# applying styling to error / notice messages -%>
         <% if flash[:error] %>
