@@ -58,7 +58,7 @@
 
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
 
-<% if asset.is_doiable?(display_asset.version) %>
+<% if Seek::Util.doiable_asset_types.include?(asset.class) && asset.is_doiable?(display_asset.version) %>
     <li><%= image_tag_for_key('doi', polymorphic_path(asset, :action => 'mint_doi', :version => display_asset.version), nil, {:method => :post}, "Generate a DOI") -%></li>
 <% end %>
 
