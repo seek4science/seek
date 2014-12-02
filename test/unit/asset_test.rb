@@ -251,6 +251,10 @@ class AssetTest < ActiveSupport::TestCase
     with_config_value :lock_doi_after, 7 do
       assert df.is_doi_locked?(1)
     end
+
+    with_config_value :lock_doi_after, nil do
+      assert !df.is_doi_locked?(1)
+    end
   end
 
   test 'is_any_doi_minted?' do

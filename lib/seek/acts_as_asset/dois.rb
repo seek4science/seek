@@ -25,7 +25,12 @@ module Seek
         def is_doi_locked?(version)
           asset_version = find_version version
           created_at = asset_version.created_at
-          Time.now - created_at > Seek::Config.lock_doi_after.to_i.days
+          lock_doi_after = Seek::Config.lock_doi_after
+          if lock_doi_after.nil?
+            false
+          else
+            Time.now - created_at > lock_doi_after.to_i.days
+          end
         end
 
         def state_allows_delete?(*args)
