@@ -2,8 +2,8 @@ require 'test_helper'
 
 class DataciteDoiTest < ActionController::IntegrationTest
 
-  #DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore}
-  DOIABLE_ASSETS = ['workflow']
+  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore}
+  #DOIABLE_ASSETS = ['workflow']
 
   def setup
     User.current_user = Factory(:user, :login => 'test')
@@ -227,7 +227,15 @@ class DataciteDoiTest < ActionController::IntegrationTest
       asset = Factory(type.to_sym,:contributor=>User.current_user)
 
       asset.save_as_new_version
-      Factory(:content_blob, :asset => asset, :asset_version => asset.version)
+      if type == 'workflow'
+        Factory(:content_blob, :asset => asset, :asset_version => asset.version,
+                :data => File.new("#{Rails.root}/test/fixtures/files/enm.t2flow","rb").read,
+                :original_filename => "enm.t2flow",
+                :content_type => "application/pdf")
+      else
+        Factory(:content_blob, :asset => asset, :asset_version => asset.version)
+      end
+
       asset.reload
       assert_equal 2, asset.version
 
