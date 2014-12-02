@@ -1,4 +1,4 @@
-require 'acts_as_asset'
+
 require 'grouped_pagination'
 require 'title_trimmer'
 require 'libxml'
