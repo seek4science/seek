@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DataciteDoiTest < ActionController::IntegrationTest
 
-  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore} 
+  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore}
 
   def setup
     User.current_user = Factory(:user, :login => 'test')
@@ -44,20 +44,6 @@ class DataciteDoiTest < ActionController::IntegrationTest
       assert_select "input[type=text][name=?][value=?]", "metadata[creators][][creatorName]", (creator.last_name + ', ' + creator.first_name)
       assert_select "textarea[name=?]", "metadata[titles][]", :text => asset.title
       assert_select "input[type=text][name=?]", "metadata[publisher]"
-    end
-  end
-
-  test "should have 5 mandatory fields of metadata" do
-    skip("should have 5 mandatory fields of metadata")
-    DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym,:policy=>Factory(:public_policy))
-      assert asset.is_published?
-      assert asset.can_manage?
-
-      get "/#{type.pluralize}/#{asset.id}/mint_doi_preview?version=#{asset.version}"
-      assert_response :success
-
-      assert_select "span[class=required]", :count => 5
     end
   end
 
@@ -134,7 +120,7 @@ class DataciteDoiTest < ActionController::IntegrationTest
   test "generate_metadata_in_xml" do
     metadata_param = datacite_metadata_param
 
-    metadata_in_xml = DataFilesController.new().generate_metadata_in_xml(metadata_param)
+    metadata_in_xml = DataFilesController.new().generate_metadata_xml(metadata_param)
     metadata_from_file = open("#{Rails.root}/test/fixtures/files/doi_metadata.xml").read
 
     assert_equal metadata_from_file, metadata_in_xml
@@ -148,7 +134,7 @@ class DataciteDoiTest < ActionController::IntegrationTest
                       :publicationYear => '2014'
     }
 
-    metadata_in_xml = DataFilesController.new().generate_metadata_in_xml(metadata_param)
+    metadata_in_xml = DataFilesController.new().generate_metadata_xml(metadata_param)
 
     assert !metadata_in_xml.include?('identifier')
     assert !metadata_in_xml.include?('creators')

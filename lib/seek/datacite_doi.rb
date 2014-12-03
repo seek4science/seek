@@ -31,12 +31,12 @@ module Seek
       end
     end
 
-    def generate_metadata_in_xml metadata_param
-      if metadata_param
+    def generate_metadata_xml hash=metadata_hash
+      if hash
         xml = "<resource xmlns='http://datacite.org/schema/kernel-3'
           xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
           xsi:schemaLocation='http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd'>"
-        metadata_in_xml = metadata_param.to_xml(:skip_types => true, :skip_instruct => true)
+        metadata_in_xml = hash.to_xml(:skip_types => true, :skip_instruct => true)
         modified_xml = remove_empty_nodes(metadata_in_xml)
         modified_xml = concat_attribute_to('identifier', 'identifierType', 'DOI', modified_xml)
         modified_xml = concat_attribute_to('resourceType', 'resourceTypeGeneral', 'Dataset', modified_xml)
@@ -70,38 +70,14 @@ module Seek
       @asset_version.parent.is_doiable?(@asset_version.version)
     end
 
-    def log_minting_doi
-
-    end
-
-    def metadata_validated?
-      metadata = params[:metadata]
-      if metadata
-        identifier = metadata[:identifier]
-        creators = metadata[:creators] ? metadata[:creators].collect{|creator| creator['creatorName']}.join('') : nil
-        title = metadata[:titles] ? metadata[:titles].join('') : nil
-        publisher = metadata[:publisher]
-        publicationYear = metadata[:publicationYear]
-        if identifier.blank? || creators.blank? || title.blank? || publisher.blank? || publicationYear.blank?
-          validated = false
-        else
-          validated = true
-        end
-      else
-        validated = false
-      end
-      validated
-    end
-
     def mint
       username = Seek::Config.datacite_username
       password = Seek::Config.datacite_password_decrypt
       url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
       endpoint = Datacite.new(username, password, url)
 
-      metadata_in_hash = metadata_hash
-      metadata = generate_metadata_in_xml metadata_in_hash
-      upload_response = endpoint.upload_metadata metadata
+      metadata_xml = generate_metadata_xml
+      upload_response = endpoint.upload_metadata metadata_xml
       return false unless validate_response(upload_response)
 
       url = asset_url
@@ -121,9 +97,9 @@ module Seek
 
     def concat_attribute_to(node, attribute, value, xml)
       doc = Nokogiri::XML(xml)
-      doc.xpath("//#{node}").select do |n|
-        n["#{attribute}"] = value
-        n
+      doc.xpath("//#{node}").select do |node|
+        node["#{attribute}"] = value
+        node
       end
       doc.to_xml
     end
@@ -152,15 +128,12 @@ module Seek
       unless uploader.nil?
         creators << uploader.last_name.capitalize + ', ' + uploader.first_name.capitalize
       end
-      creators.uniq!
-
-      metadata_hash = {:identifier => @doi,
-                       :creators => creators.collect{|creator| {:creatorName => creator}},
+      {:identifier => @doi,
+                       :creators => creators.uniq.collect{|creator| {:creatorName => creator}},
                        :titles => [@asset_version.title],
                        :publisher => Seek::Config.project_name,
                        :publicationYear => Time.now.year
       }
-      metadata_hash
     end
 
     def set_doi
