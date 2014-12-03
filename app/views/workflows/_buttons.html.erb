@@ -53,6 +53,6 @@
 <% end -%>
 
 <% if workflow.is_doiable?(display_workflow.version) %>
-    <li><%= image_tag_for_key('doi', polymorphic_path(workflow, :action => 'mint_doi', :version => display_workflow.version), nil, {:method => :post}, "Generate a DOI") -%></li>
+    <li><%= image_tag_for_key('doi', polymorphic_path(workflow, :action => 'mint_doi_confirm', :version => display_workflow.version), nil, {}, "Generate a DOI") -%></li>
 <% end %>
 

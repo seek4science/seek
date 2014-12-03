@@ -333,8 +333,8 @@ end
     assert_equal "test", Seek::Config.datacite_password_decrypt
   end
 
-  test 'lock_doi_after' do
-    assert_equal 7, Seek::Config.lock_doi_after #7 days
+  test 'time_lock_doi_for' do
+    assert_equal 0, Seek::Config.time_lock_doi_for
   end
 
   test 'home_description' do
