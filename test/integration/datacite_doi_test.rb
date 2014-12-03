@@ -22,13 +22,12 @@ class DataciteDoiTest < ActionController::IntegrationTest
       assert_response :success
 
       assert_select "ul.sectionIcons > li > span.icon" do
-        assert_select "a[href=?]", polymorphic_path(asset, :action => 'mint_doi', :version => 1), :text=>/Generate a DOI/
+        assert_select "a[href=?]", polymorphic_path(asset, :action => 'mint_doi_confirm', :version => 1), :text=>/Generate a DOI/
       end
     end
   end
 
-  test "get mint_doi_preview" do
-    skip("get mint_doi_preview")
+  test "get mint_doi_confirm" do
     DOIABLE_ASSETS.each do |type|
       asset = Factory(type.to_sym,:policy=>Factory(:public_policy))
       assert asset.is_published?
@@ -37,83 +36,34 @@ class DataciteDoiTest < ActionController::IntegrationTest
       asset.creators = [Factory(:person)]
       asset.save
 
-      get "/#{type.pluralize}/#{asset.id}/mint_doi_preview?version=#{asset.version}"
+      get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
       assert_response :success
 
-      creator = asset.creators.first
-      assert_select "input[type=text][name=?][value=?]", "metadata[creators][][creatorName]", (creator.last_name + ', ' + creator.first_name)
-      assert_select "textarea[name=?]", "metadata[titles][]", :text => asset.title
-      assert_select "input[type=text][name=?]", "metadata[publisher]"
+      assert_select "p",:text=>/The DOI that will be generated will be #{asset.generated_doi}/
     end
   end
 
-  test "should validate 5 mandatory fields of metadata" do
-    skip("should validate 5 mandatory fields of metadata")
-    DOIABLE_ASSETS.each do |type|
-      mock_datacite_request
-
-      asset = Factory(type.to_sym,:policy=>Factory(:public_policy))
-
-      valid_metadata = {:identifier => '10.5072/my_test',
-                        :creators => [{:creatorName => 'Last, First'}],
-                        :titles => ['A title'],
-                        :publisher => 'System Biology',
-                        :publicationYear => '2014'
-      }
-      post "/#{type.pluralize}/#{asset.id}/mint_doi", :metadata => valid_metadata
-      assert_redirected_to  polymorphic_path(asset, :action => minted_doi, :doi => '10.5072/my_test', :url => asset_url(asset))
-      assert_nil flash[:error]
-
-      #lack of fields
-      invalid_metadata = {:creators => [:creatorName => 'Last, First'],
-                          :titles => ['A title']
-      }
-      post "/#{type.pluralize}/#{asset.id}/mint_doi", :metadata => invalid_metadata
-      assert_response :bad_request
-      assert_not_nil flash[:error]
-
-      #lack of value
-      invalid_metadata = {:identifier => '10.5072/my_test',
-                          :creators => [],
-                          :titles => ['A title'],
-                          :publisher => 'System Biology',
-                          :publicationYear => '2014'
-      }
-      post "/#{type.pluralize}/#{asset.id}/mint_doi", :metadata => invalid_metadata
-      assert_response :bad_request
-      assert_not_nil flash[:error]
-
-      #blank value
-      invalid_metadata = {:identifier => '10.5072/my_test',
-                          :creators => [{:creatorName => ''}],
-                          :titles => [' '],
-                          :publisher => 'System Biology',
-                          :publicationYear => '2014'
-      }
-      post "/#{type.pluralize}/#{asset.id}/mint_doi", :metadata => invalid_metadata
-      assert_response :bad_request
-      assert_not_nil flash[:error]
-    end
-  end
-
-  test "authorization for mint_doi_preview" do
-    skip('authorization for doi')
+  test "authorization for mint_doi_confirm" do
+    skip("mint_doi_confirmation")
     DOIABLE_ASSETS.each do |type|
       asset = Factory(type.to_sym, :policy=>Factory(:private_policy), :contributor => User.current_user)
-      assert !asset.is_published?
+      refute asset.is_published?
       assert asset.can_manage?
+      refute asset.is_doiable?(asset.version)
 
-      get "/#{type.pluralize}/#{asset.id}/mint_doi_preview?version=#{asset.version}"
-      assert_response :forbidden
+      get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
+      assert_response :redirect
 
       asset.publish!
       assert asset.reload.is_published?
       a_user = Factory(:user, :login => 'a_user')
-      post '/session', :login => a_user.login, :password => 'blah'
-      assert !asset.can_manage?
+      post '/session', :login => 'a_user', :password => 'blah'
+      assert_equal a_user,User.current_user
+      refute asset.can_manage?
+      refute asset.is_doiable?(asset.version)
 
-      get "/#{type.pluralize}/#{asset.id}/mint_doi_preview?version=#{asset.version}"
-      assert_response :forbidden
+      get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
+      assert_response :redirect
     end
   end
 

@@ -1,0 +1,39 @@
+<%
+   asset = @asset_version.parent
+   type_text = text_for_resource(asset)
+   title = "You are about to create a DOI for the #{type_text} - #{link_to(asset.title,asset).html_safe}"
+%>
+
+<%= show_title(title.html_safe) %>
+
+<div class="show_basic">
+ <br/>
+  <div class="box_infotext">
+      <p>
+        You are about to create Digital Object Identifier (DOI) that will allow you to easily cite your <%= type_text %>.
+      </p>
+      <p>
+        <span id="warning_icon"></span>
+        Once you have done so, you will be unable to easily delete, or hide, the <%= type_text %> except under special circumstances where a retraction is necessary.
+      </p>
+      <p>
+        The DOI will be created using the current version and information stored about the <%= type_text %> and you may want to <%= link_to "review and modify",polymorphic_path(@asset_version.parent, :action=>:edit) %> this first.
+      </p>
+
+  </div>
+  <p>&nbsp;</p>
+  <p>
+    The DOI that will be generated will be <b><%= asset.generated_doi(@asset_version.version) %></b>.
+  </p>
+
+  <%= form_tag({:action => :mint_doi}, :method => :post) do -%>
+      <%= hidden_field_tag :id,asset.id %>
+      <%= hidden_field_tag :version,@asset_version.version %>
+      <br/>
+      <%= submit_tag "Generate the DOI" -%>
+      or
+      <%= link_to "Cancel", polymorphic_path(@asset_version.parent, :version => @asset_version.version) %>
+
+  <% end %>
+
+</div>

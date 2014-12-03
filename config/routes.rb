@@ -296,7 +296,7 @@ SEEK::Application.routes.draw do
       post :new_version
       #MERGENOTE - this is a destroy, and should be the destory method, not post since we are not updating or creating something.
       post :destroy_version
-      get :mint_doi_preview
+      get :mint_doi_confirm
       get :minted_doi
       post :mint_doi
     end
@@ -371,6 +371,7 @@ SEEK::Application.routes.draw do
       post :simulate
       delete :destroy_version
       post :mint_doi
+      get :mint_doi_confirm
     end
     resources :model_images do
       collection do
@@ -410,6 +411,7 @@ SEEK::Application.routes.draw do
       post :new_version
       delete :destroy_version
       post :mint_doi
+      get :mint_doi_confirm
     end
     resources :experimental_conditions do
       collection do
@@ -558,6 +560,7 @@ SEEK::Application.routes.draw do
       post :favourite
       delete :favourite_delete
       post :mint_doi
+      get :mint_doi_confirm
     end
 
     resources :runs, :controller => 'taverna_player/runs'

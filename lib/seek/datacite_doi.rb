@@ -1,16 +1,16 @@
 module Seek
   module DataciteDoi
     def self.included(base)
-      base.before_filter :set_asset_version, :only=>[:mint_doi_preview,:mint_doi,:minted_doi,:new_version,:update]
-      base.before_filter :mint_doi_auth, :only=>[:mint_doi_preview,:mint_doi,:minted_doi]
+      base.before_filter :set_asset_version, :only=>[:mint_doi_confirm,:mint_doi,:minted_doi,:new_version,:update]
+      base.before_filter :mint_doi_auth, :only=>[:mint_doi_confirm,:mint_doi,:minted_doi]
       base.before_filter :set_doi, :only=>[:mint_doi]
       base.before_filter :new_version_auth, :only=>[:new_version]
       base.before_filter :unpublish_auth, :only=>[:update]
     end
 
-    def mint_doi_preview
+    def mint_doi_confirm
       respond_to do |format|
-        format.html { render :template => "datacite_doi/mint_doi_preview"}
+        format.html { render :template => "datacite_doi/mint_doi_confirm"}
       end
     end
 
@@ -67,7 +67,10 @@ module Seek
     end
 
     def mint_doi_auth
-      @asset_version.parent.is_doiable?(@asset_version.version)
+      unless @asset_version.parent.is_doiable?(@asset_version.version)
+        error("Creating a DOI is not possible", "is invalid")
+        return false
+      end
     end
 
     def mint
