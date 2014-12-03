@@ -253,21 +253,23 @@ class AssetTest < ActiveSupport::TestCase
     assert df.is_doi_minted?(1)
   end
 
-  test 'is_doi_locked?' do
+  test 'is_doi_time_locked?' do
     df = Factory :data_file
-    with_config_value :lock_doi_after, 7 do
-      assert !df.is_doi_locked?(1)
+    with_config_value :time_lock_doi_for, 7 do
+      assert df.is_doi_time_locked?
+    end
+    with_config_value :time_lock_doi_for, nil do
+      refute df.is_doi_time_locked?
     end
 
-    df_version = df.latest_version
-    df_version.created_at = 8.days.ago
-    disable_authorization_checks{ df_version.save}
-    with_config_value :lock_doi_after, 7 do
-      assert df.is_doi_locked?(1)
+    df.created_at = 8.days.ago
+    disable_authorization_checks{ df.save}
+    with_config_value :time_lock_doi_for, 7 do
+      refute df.is_doi_time_locked?
     end
 
-    with_config_value :lock_doi_after, nil do
-      assert !df.is_doi_locked?(1)
+    with_config_value :time_lock_doi_for, nil do
+      refute df.is_doi_time_locked?
     end
   end
 

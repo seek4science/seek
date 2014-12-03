@@ -79,8 +79,8 @@ class AdminsController < ApplicationController
     Seek::Config.doi_prefix = params[:doi_prefix]
     Seek::Config.doi_suffix = params[:doi_suffix]
 
-    lock_doi_after = params[:lock_doi_after]
-    Seek::Config.lock_doi_after = lock_doi_after if only_positive_integer lock_doi_after, 'lock doi after'
+    time_lock_doi_for = params[:time_lock_doi_for]
+    Seek::Config.time_lock_doi_for = time_lock_doi_for if only_positive_integer time_lock_doi_for, 'time lock doi for'
 
     port = params[:port]
     port_is_integer = only_integer(port, 'port')

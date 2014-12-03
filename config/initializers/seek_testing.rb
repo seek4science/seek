@@ -82,7 +82,7 @@ SEEK::Application.configure do
       Seek::Config.datacite_url = "https://test.datacite.org/mds/"
       Seek::Config.datacite_username = 'test'
       Seek::Config.datacite_password_encrypt('test')
-      Seek::Config.lock_doi_after = 7
+      Seek::Config.time_lock_doi_for = 0
     end
   end
 end
