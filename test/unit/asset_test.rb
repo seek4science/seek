@@ -284,4 +284,18 @@ class AssetTest < ActiveSupport::TestCase
     assert df.reload.is_any_doi_minted?
   end
 
+  test "should not be able to delete after doi" do
+    User.current_user = Factory(:user)
+    df = Factory :data_file,:contributor=>User.current_user.person
+    assert df.can_delete?
+
+    df.doi="test.doi"
+    new_version = Factory :data_file_version, :data_file => df
+    new_version.doi="test.doi"
+    df.save!
+    new_version.save!
+    df.reload
+    refute df.can_delete?
+  end
+
 end

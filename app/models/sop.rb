@@ -6,7 +6,6 @@ require 'acts_as_versioned_resource'
 class Sop < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
-  include Seek::Dois::DoiGeneration
 
   #searchable must come before acts_as_asset is called
   searchable(:auto_index => false) do
@@ -14,6 +13,8 @@ class Sop < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   acts_as_asset
+
+  include Seek::Dois::DoiGeneration
 
   scope :default_order, order("title")
 

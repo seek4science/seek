@@ -6,7 +6,6 @@ require 'title_trimmer'
 class Model < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
-  include Seek::Dois::DoiGeneration
 
   title_trimmer
 
@@ -25,6 +24,8 @@ class Model < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   acts_as_asset
+
+  include Seek::Dois::DoiGeneration
 
   scope :default_order, order("title")
 

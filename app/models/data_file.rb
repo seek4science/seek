@@ -9,7 +9,7 @@ class DataFile < ActiveRecord::Base
   include Seek::Data::DataFileExtraction
   include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
-  include Seek::Dois::DoiGeneration
+
 
   attr_accessor :parent_name
 
@@ -19,6 +19,8 @@ class DataFile < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   acts_as_asset
+
+  include Seek::Dois::DoiGeneration
 
    scope :default_order, order('title')
 
