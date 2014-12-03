@@ -8,6 +8,7 @@ require 't2flow/dot'
 
 class Workflow < ActiveRecord::Base
 
+  include Seek::Dois::DoiGeneration
   acts_as_asset
 
   scope :default_order, order('title')

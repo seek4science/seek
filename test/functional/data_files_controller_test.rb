@@ -1863,7 +1863,6 @@ end
       get :edit, :id=>df
       assert_response :success
     end
-
   end
 
   test "edit should include not include tags element when tags disabled" do

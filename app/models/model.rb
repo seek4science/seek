@@ -6,6 +6,7 @@ require 'title_trimmer'
 class Model < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
+  include Seek::Dois::DoiGeneration
 
   title_trimmer
 

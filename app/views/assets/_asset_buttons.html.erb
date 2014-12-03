@@ -27,7 +27,7 @@
 
   <% if asset.can_manage? -%>
     <% if asset.is_downloadable?-%>
-        <% if Seek::Util.doiable_asset_types.include?(asset.class) && asset.is_any_doi_minted?  -%>
+        <% if asset.supports_doi? && asset.is_any_doi_minted?  -%>
             <li><%= link_to_function image("new")+" Upload new version", "javascript:alert('After DOI is generated, uploading new version is not possible')", :class=>"disabled" -%></li>
         <% else %>
             <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
@@ -58,7 +58,7 @@
 
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
 
-<% if Seek::Util.doiable_asset_types.include?(asset.class) && asset.is_doiable?(display_asset.version) %>
+<% if asset.supports_doi? && asset.is_doiable?(display_asset.version) %>
     <li><%= image_tag_for_key('doi', polymorphic_path(asset, :action => 'mint_doi', :version => display_asset.version), nil, {:method => :post}, "Generate a DOI") -%></li>
 <% end %>
 

@@ -76,7 +76,6 @@ module Seek
     module InstanceMethods
       include Seek::ActsAsAsset::ContentBlobs::InstanceMethods
       include Seek::ActsAsAsset::ISA::InstanceMethods
-      include Seek::ActsAsAsset::Dois::InstanceMethods
       include Seek::ActsAsAsset::Relationships::InstanceMethods
       include Seek::ActsAsAsset::Folders::InstanceMethods
 

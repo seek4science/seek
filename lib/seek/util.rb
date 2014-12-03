@@ -82,15 +82,21 @@ module Seek
     end
 
     def self.inline_viewable_content_types
+      #FIXME: needs to be discovered rather than hard-code classes here
       [DataFile, Model, Presentation, Sop]
     end
 
     def self.multi_files_asset_types
+      #FIXME: needs to be discovered rather than hard-code classes here
       [Model]
     end
 
     def self.doiable_asset_types
-      [DataFile, Model, Sop, Workflow]
+      @@doiable_types ||= begin
+        persistent_classes.select do |c|
+          c.supports_doi?
+        end.sort_by(&:name)
+      end
     end
   end
 end

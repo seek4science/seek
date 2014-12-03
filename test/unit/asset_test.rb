@@ -215,6 +215,20 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal publication.creators,publication.related_people
   end
 
+  test "supports_doi?" do
+    assert Model.supports_doi?
+    assert DataFile.supports_doi?
+    assert Sop.supports_doi?
+    assert Workflow.supports_doi?
+
+    refute Assay.supports_doi?
+    refute Presentation.supports_doi?
+
+    assert Factory(:model).supports_doi?
+    assert Factory(:data_file).supports_doi?
+    refute Factory(:presentation).supports_doi?
+  end
+
   test "is_doiable?" do
     df = Factory(:data_file, :policy => Factory(:public_policy))
     assert df.can_manage?

@@ -66,7 +66,7 @@
         <!-- private -->
         <%
            #dont allow to unpublish the asset which doi is minted
-           if @resource.respond_to?(:is_published?) && @resource.is_published? && Seek::Util.doiable_asset_types.include?(@resource.class) && @resource.is_any_doi_minted?
+           if @resource.respond_to?(:is_published?) && @resource.is_published? && @resource.supports_doi? && @resource.is_any_doi_minted?
              disable_radio_button = "disabled=true"
            else
              disable_radio_button = ''

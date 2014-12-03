@@ -9,6 +9,7 @@ class DataFile < ActiveRecord::Base
   include Seek::Data::DataFileExtraction
   include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
+  include Seek::Dois::DoiGeneration
 
   attr_accessor :parent_name
 

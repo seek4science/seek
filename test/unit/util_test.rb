@@ -34,4 +34,16 @@ class UtilTest < ActiveSupport::TestCase
     # double check they are actual types
     assert_equal expected, types
   end
+
+  test "doiable asset types" do
+    types = Seek::Util.doiable_asset_types
+
+    expected = [DataFile, Model, Sop, Workflow]
+
+    # first as strings for more readable failed assertion message
+    assert_equal expected.map { |t| t.to_s }, types.map { |t| t.to_s }
+
+    # double check they are actual types
+    assert_equal expected, types
+  end
 end
