@@ -28,7 +28,7 @@
            :locals => {:field_name => 'identifier',
                        :obligation => "(M) <span class='required'>*</span>".html_safe,
                        :description => "The DOI for the asset",
-                       :field => text_field_tag("metadata[identifier]", generate_doi_for(asset.class.name, asset.id, @asset_version.version), {:readonly => true, :class => 'disabled', :size => 40})
+                       :field => text_field_tag("metadata[identifier]", asset.generated_doi(@asset_version.version), {:readonly => true, :class => 'disabled', :size => 40})
            } %>
 
 <%= render :partial => "datacite_doi/multiple_entries",

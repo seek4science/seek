@@ -298,4 +298,16 @@ class AssetTest < ActiveSupport::TestCase
     refute df.can_delete?
   end
 
+  test "generated doi" do
+    df = Factory :data_file
+    model = Factory :model
+    with_config_value :doi_prefix,"xxx" do
+      with_config_value :doi_suffix,"yyy" do
+        assert_equal "xxx/yyy.DataFile.#{df.id}",df.generated_doi
+        assert_equal "xxx/yyy.DataFile.#{df.id}.1",df.generated_doi(1)
+        assert_equal "xxx/yyy.Model.#{model.id}.1",model.generated_doi(1)
+      end
+    end
+  end
+
 end

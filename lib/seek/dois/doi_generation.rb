@@ -41,6 +41,16 @@ module Seek
         end
       end
 
+      def generated_doi version=nil
+          prefix = Seek::Config.doi_prefix.to_s + '/'
+          suffix = Seek::Config.doi_suffix.to_s + '.'
+          suffix << self.class.name + '.' + self.id.to_s
+          if version
+            suffix << '.' + version.to_s
+          end
+          prefix + suffix
+      end
+
     end
   end
 end
