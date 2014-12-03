@@ -1903,7 +1903,6 @@ end
 
     get :show,:id=>df
     assert_response :forbidden
-    assert_select "h1", :text=>'403'
     assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
 
     assert !df.can_see_hidden_item?(User.current_user.person)
@@ -1926,7 +1925,6 @@ end
 
     get :show,:id=>df
     assert_response :forbidden
-    assert_select "h1", :text=>'403'
     assert_select "h2",:text=>/The #{I18n.t('data_file')} is not visible to you./
 
     contributor_person = df.contributor.person
@@ -1935,7 +1933,7 @@ end
 
   test "landing page for hidden item which DOI was minted" do
     df = Factory(:data_file,:policy=>Factory(:private_policy),:title=>"fish flop",:description=>"testing json description")
-    comment = 'the paper was restracted'
+    comment = 'the paper was retracted'
     AssetDoiLog.create(:asset_type => df.class.name, :asset_id=> df.id, :asset_version => df.version, :action => AssetDoiLog::MINT)
     AssetDoiLog.create(:asset_type => df.class.name, :asset_id=> df.id, :asset_version => df.version, :action => AssetDoiLog::UNPUBLISH, :comment => comment)
 
