@@ -864,6 +864,11 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
+  test "title for index should be SOPs" do
+    get :index
+    assert_response :success
+    assert_select "h1",:text=>"SOPs"
+  end
 
   private
 

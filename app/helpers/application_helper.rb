@@ -22,7 +22,7 @@ module ApplicationHelper
   end
 
   def index_title title=nil
-    show_title(title || self.controller_name.humanize.capitalize)
+    show_title(title || resource_text_from_controller.pluralize)
   end
 
   def is_front_page?
