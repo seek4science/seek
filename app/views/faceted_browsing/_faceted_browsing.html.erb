@@ -51,5 +51,5 @@
 
     <%= render :partial => "faceted_browsing/data_browsing", :object => objects %>
 <% else %>
-    <div class="box_infotext" style="margin:1em;">There is no <%= internationalized_resource_name(controller_name.singularize.camelize, false) %> in the system yet.</div>
+    <%= no_items_to_list_text %>
 <% end %>

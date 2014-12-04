@@ -10,6 +10,17 @@ module ApplicationHelper
   include Recaptcha::ClientHelper
 
 
+  def no_items_to_list_text
+    content_tag :div,:id=>"no-index-items-text" do
+      "There are no #{resource_text_from_controller.pluralize} found that are visible to you."
+    end
+  end
+
+  #e.g. SOP for sops_controller, taken from the locale based on the controller name
+  def resource_text_from_controller
+    internationalized_resource_name(controller_name.singularize.camelize, false)
+  end
+
   def index_title title=nil
     show_title(title || self.controller_name.humanize.capitalize)
   end
