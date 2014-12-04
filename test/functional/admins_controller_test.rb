@@ -211,4 +211,14 @@ class AdminsControllerTest < ActionController::TestCase
     assert Seek::Config.project_news_enabled
   end
 
+  test "update_redirect_to" do
+    login_as(:quentin)
+    post :update_features_enabled, :time_lock_doi_for => '1', :port => '25'
+    assert_redirected_to admin_path
+    assert_nil flash[:error]
+
+    post :update_features_enabled, :time_lock_doi_for => ''
+    assert_redirected_to features_enabled_admin_path
+    assert_not_nil flash[:error]
+  end
 end

@@ -80,14 +80,17 @@ class AdminsController < ApplicationController
     Seek::Config.doi_suffix = params[:doi_suffix]
 
     time_lock_doi_for = params[:time_lock_doi_for]
-    Seek::Config.time_lock_doi_for = time_lock_doi_for if only_integer time_lock_doi_for, 'time lock doi for'
+    time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
+    Seek::Config.time_lock_doi_for = time_lock_doi_for if time_lock_is_integer
 
     port = params[:port]
     port_is_integer = only_integer(port, 'port')
     Seek::Config.set_smtp_settings('port', port) if port_is_integer
 
     Seek::Util.clear_cached
-    update_redirect_to port_is_integer, 'features_enabled'
+
+    validation_flag = time_lock_is_integer && port_is_integer
+    update_redirect_to validation_flag, 'features_enabled'
   end
 
   def update_home_settings
