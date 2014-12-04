@@ -88,7 +88,7 @@ gem 'metainspector'
 gem 'mechanize'
 gem 'mimemagic'
 
-gem 'datacite_doi_ify', :git=>"https://github.com/FAIRdom/datacite_doi_ify.git"
+gem 'datacite_doi_ify'
 
 group :assets do
   gem 'turbo-sprockets-rails3'
