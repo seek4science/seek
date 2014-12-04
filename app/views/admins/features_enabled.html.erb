@@ -112,7 +112,7 @@
       DOI's cannot be generated for an asset until it has existed for a given period(in days): <%= text_field_tag(:time_lock_doi_for, Seek::Config.time_lock_doi_for, :onkeypress => "javascript: return onlyNumbers(event);") %> days
       <span class="setting_description">
         DOI generation for the asset will not be available after the above specified days. It reduces number of unnecessary DOI in the system.
-        If the day is not set, there will be no restriction.
+        If the day is set to 0, there will be no restriction.
       </span>
     </li>
 
