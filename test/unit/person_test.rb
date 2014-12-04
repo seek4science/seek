@@ -710,6 +710,20 @@ class PersonTest < ActiveSupport::TestCase
     assert_empty p.projects
   end
 
+  test "add to project and institution subscribes to project" do
+    person = Factory (:brand_new_person)
+    inst = Factory(:institution)
+    proj = Factory(:project)
+
+    assert_empty person.project_subscriptions
+    person.add_to_project_and_institution(proj,inst)
+    person.save!
+
+    person.reload
+    assert_includes person.project_subscriptions.map(&:project),proj
+
+  end
+
   test "add to project and institution" do
     proj1=Factory :project
     proj2=Factory :project

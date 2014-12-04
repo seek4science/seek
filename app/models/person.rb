@@ -27,14 +27,19 @@ class Person < ActiveRecord::Base
 
   has_and_belongs_to_many :disciplines
 
-  has_many :group_memberships, :dependent => :destroy
+  #FIXME: the handling of subscriptions and unsubscriptions needs revisiting
+  has_many :group_memberships, :dependent => :destroy,
+           :after_add => [:subscribe_to_group_membership_project, :touch_group_membership_project],
+           :after_remove => [:unsubscribe_from_group_membership_project, :touch_group_membership_project]
+
+  has_many :work_groups, :through=>:group_memberships,
+           :after_add => [:subscribe_to_work_group_project, :touch_work_group_project],
+           :after_remove => [:unsubscribe_from_work_group_project, :touch_work_group_project]
 
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
 
-  has_many :work_groups, :through=>:group_memberships,
-           :after_add => [:subscribe_to_work_group_project, :touch_work_group_project],
-           :after_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
+
   has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"  
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
@@ -78,12 +83,31 @@ class Person < ActiveRecord::Base
 
   end
 
-  def unsubscribe_to_work_group_project wg
+  def subscribe_to_group_membership_project group_membership
+    project = group_membership.work_group.try(:project)
+    if project
+      project_subscriptions.build :project => project unless project_subscriptions.detect{|ps| ps.project_id == project.id}
+    end
+  end
+
+  def unsubscribe_from_work_group_project wg
+    # clear project_subscriptions and all subscriptions if person is not project member
+    if work_groups.empty?
+      project_subscriptions.delete_all
+      subscriptions.delete_all
+    elsif ps = project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
+      #unsunscribe direct project subscriptions
+      project_subscriptions.delete ps
+    end
+
+  end
+
+  def unsubscribe_from_group_membership_project group_membership
      # clear project_subscriptions and all subscriptions if person is not project member
     if work_groups.empty?
           project_subscriptions.delete_all
           subscriptions.delete_all
-    elsif ps = project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
+    elsif ps = project_subscriptions.detect{|ps| ps.project_id == group_membership.work_group.project_id}
       #unsunscribe direct project subscriptions
       project_subscriptions.delete ps
     end
@@ -93,6 +117,10 @@ class Person < ActiveRecord::Base
   #touch project to expire cache for project members on project show page?
   def touch_work_group_project wg
     wg.project.touch
+  end
+
+  def touch_group_membership_project group_membership
+    group_membership.work_group.try(:project).try(:touch)
   end
 
   after_commit :queue_update_auth_table

@@ -267,8 +267,12 @@ class ProjectsController < ApplicationController
     groups_to_remove = params[:group_memberships_to_remove] || []
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
     groups_to_remove.each do |group|
-      g = GroupMembership.find(group)
-      g.destroy unless g.nil?
+      group_membership = GroupMembership.find(group)
+      if group_membership
+        #this slightly strange bit of code is required to trigger and after_remove callback, which should be revisted
+        group_membership.person.group_memberships.delete(group_membership)
+        group_membership.destroy
+      end
     end
 
     people_and_institutions_to_add.each do |new_info|
@@ -278,11 +282,8 @@ class ProjectsController < ApplicationController
       person = Person.find(person_id)
       institution = Institution.find(institution_id)
       unless person.nil? || institution.nil?
-        work_group = WorkGroup.where(:project_id=>@project.id,:institution_id => institution_id).first
-        work_group ||= WorkGroup.new(:project=>@project,:institution=>institution)
-        group_membership = GroupMembership.new :work_group=>work_group,:person=>person
-        work_group.save!
-        group_membership.save!
+        person.add_to_project_and_institution(@project,institution)
+        person.save!
       end
     end
 

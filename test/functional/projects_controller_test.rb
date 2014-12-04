@@ -902,6 +902,7 @@ class ProjectsControllerTest < ActionController::TestCase
     new_institution = Factory(:institution)
     new_person = Factory(:person)
     new_person2 = Factory(:person)
+
     assert_no_difference("GroupMembership.count") do #2 deleted, 2 added
       assert_difference("WorkGroup.count",1) do
         post :update_members,
@@ -925,6 +926,12 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes new_person.institutions,new_institution
     assert_includes new_person2.institutions,new_institution
     assert_includes project.work_groups,wg
+
+    assert_includes new_person.project_subscriptions.collect(&:project),project
+    assert_includes new_person2.project_subscriptions.collect(&:project),project
+
+    refute_includes person.project_subscriptions.collect(&:project),project
+    refute_includes person2.project_subscriptions.collect(&:project),project
 
   end
 
