@@ -96,19 +96,27 @@ class AdminsController < ApplicationController
   def update_home_settings
     Seek::Config.project_news_enabled = string_to_boolean params[:project_news_enabled]
     Seek::Config.project_news_feed_urls = params[:project_news_feed_urls]
-    Seek::Config.project_news_number_of_entries = params[:project_news_number_of_entries] if only_integer params[:project_news_number_of_entries], "#{t('project')} news items"
+
+    project_entries = params[:project_news_number_of_entries]
+    is_project_entries_integer = only_integer project_entries, "#{t('project')} news items"
+    Seek::Config.project_news_number_of_entries = project_entries if is_project_entries_integer
 
     Seek::Config.community_news_enabled = string_to_boolean params[:community_news_enabled]
     Seek::Config.community_news_feed_urls = params[:community_news_feed_urls]
-    Seek::Config.community_news_number_of_entries = params[:community_news_number_of_entries] if only_integer params[:community_news_number_of_entries], 'community news items'
+
+    community_entries = params[:community_news_number_of_entries]
+    is_community_entries_integer = only_integer community_entries, 'community news items'
+    Seek::Config.community_news_number_of_entries = community_entries if is_community_entries_integer
 
     Seek::Config.home_description = params[:home_description]
     begin
       Seek::FeedReader.clear_cache
-    rescue e
+    rescue => e
       logger.error "Error whilst attempting to clear feed cache #{e.message}"
     end
-    update_redirect_to true, 'home_settings'
+
+    validation_flag = is_project_entries_integer && is_community_entries_integer
+    update_redirect_to validation_flag, 'home_settings'
   end
 
   def rebrand
