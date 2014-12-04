@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141201144047) do
+ActiveRecord::Schema.define(:version => 20141204122730) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -594,6 +594,7 @@ ActiveRecord::Schema.define(:version => 20141201144047) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "investigation_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_inv_user_id_asset_id_can_view"
   add_index "investigation_auth_lookup", ["user_id", "can_view"], :name => "index_investigation_auth_lookup_on_user_id_and_can_view"
 
   create_table "investigations", :force => true do |t|
@@ -878,6 +879,7 @@ ActiveRecord::Schema.define(:version => 20141201144047) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "presentation_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_presentation_user_id_asset_id_can_view"
   add_index "presentation_auth_lookup", ["user_id", "can_view"], :name => "index_presentation_auth_lookup_on_user_id_and_can_view"
 
   create_table "presentation_versions", :force => true do |t|
@@ -1059,6 +1061,7 @@ ActiveRecord::Schema.define(:version => 20141201144047) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "publication_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_pub_user_id_asset_id_can_view"
   add_index "publication_auth_lookup", ["user_id", "can_view"], :name => "index_publication_auth_lookup_on_user_id_and_can_view"
 
   create_table "publication_author_orders", :force => true do |t|
@@ -1162,6 +1165,7 @@ ActiveRecord::Schema.define(:version => 20141201144047) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "sample_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sample_user_id_asset_id_can_view"
   add_index "sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
 
   create_table "samples", :force => true do |t|
@@ -1340,6 +1344,7 @@ ActiveRecord::Schema.define(:version => 20141201144047) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "specimen_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_spec_user_id_asset_id_can_view"
   add_index "specimen_auth_lookup", ["user_id", "can_view"], :name => "index_specimen_auth_lookup_on_user_id_and_can_view"
 
   create_table "specimens", :force => true do |t|
@@ -1387,6 +1392,7 @@ ActiveRecord::Schema.define(:version => 20141201144047) do
     t.boolean "can_delete",   :default => false
   end
 
+  add_index "strain_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_strain_user_id_asset_id_can_view"
   add_index "strain_auth_lookup", ["user_id", "can_view"], :name => "index_strain_auth_lookup_on_user_id_and_can_view"
 
   create_table "strain_descendants", :id => false, :force => true do |t|
