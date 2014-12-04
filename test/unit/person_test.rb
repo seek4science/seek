@@ -403,8 +403,8 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 3,p.projects.size
   end
   
-  def test_userless_people
-    peeps=Person.userless_people
+  test "not registered" do
+    peeps=Person.not_registered
     assert_not_nil peeps
     assert peeps.size>0,"There should be some userless people"
     assert_nil(peeps.find{|p| !p.user.nil?},"There should be no people with a non nil user")

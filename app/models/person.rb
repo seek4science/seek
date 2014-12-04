@@ -61,7 +61,6 @@ class Person < ActiveRecord::Base
   scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
 
-  #FIXME: change userless_people to use this scope - unit tests
   scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
 
   alias_attribute :webpage,:web_page
@@ -146,12 +145,6 @@ class Person < ActiveRecord::Base
       user_items = user_items | self.send("#{type}_for_person".to_sym) if self.respond_to? "#{type}_for_person".to_sym
       user_items.uniq
     end
-  end
-
-
-  def self.userless_people
-    p=Person.all
-    return p.select{|person| person.user.nil?}
   end
 
   #returns an array of Person's where the first and last name match

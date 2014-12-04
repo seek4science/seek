@@ -166,10 +166,8 @@ class Project < ActiveRecord::Base
     people.select{|p| p.user.nil?}
   end
 
-
   def includes_userless_people?
-    peeps=people
-    return peeps.size>0 && !(peeps.find{|p| p.user.nil?}).nil?
+    !userless_people.empty?
   end
 
   # Returns a list of projects that contain people that do not have users assigned to them
