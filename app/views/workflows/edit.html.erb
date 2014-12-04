@@ -1,17 +1,18 @@
-<%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" %>
+<%= javascript_include_tag "sharing.js", "associate_events.js", "assays.js", "attribution.js", "resource.js" %>
 
 <h1>Manage workflow: <%= @workflow.title %></h1>
 <p>
 <ul class="sectionIcons">
   <% if @workflow.runs.empty? %>
-    <li>
-      <%= delete_icon(@workflow, current_user) %>
-    </li>
+      <li>
+        <%= delete_icon(@workflow, current_user) %>
+      </li>
   <% end %>
   <li>
     <%= share_icon %>
   </li>
-</ul><p>
+</ul>
+</p>
 
 <div class="show_basic">
   <%= render :partial => 'form' %>

@@ -11,6 +11,20 @@ class WorkflowsControllerTest < ActionController::TestCase
     login_as @member
   end
 
+  test "show" do
+    workflow = Factory :workflow,:contributor=>@member
+    get :show,:id=>workflow.id
+    assert_response :success
+    assert_select "h1",:text=>/#{workflow.title}/
+  end
+
+  test "edit" do
+    workflow = Factory :workflow,:contributor=>@member
+    get :edit,:id=>workflow.id
+    assert_response :success
+    assert_select "h1",:text=>/#{workflow.title}/
+  end
+
   test "extracts metadata on create" do
     #MERGENOTE - this is currently failing, but only on travis. Skipping for now to revisit later once everything else is coming together.
     skip("Revisit this later")
