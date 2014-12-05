@@ -71,8 +71,10 @@ SEEK::Application.configure do
   Seek::Config.default :programmes_enabled, false
   Seek::Config.default :project_hierarchy_enabled, false
 
-  Seek::Config.default :doi_minting_enabled, true
+  Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
+  Seek::Config.default :doi_prefix,''
+  Seek::Config.default :doi_suffix,'seek'
 
 
   Seek::Config.default :header_tagline_text_enabled, true
@@ -119,8 +121,7 @@ SEEK::Application.configure do
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
 
-  Seek::Config.default :doi_prefix,"10.15490"
-  Seek::Config.default :doi_suffix,"Sysmo.SEEK"
+
 
   #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
   Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
