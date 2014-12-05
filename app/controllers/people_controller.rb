@@ -396,12 +396,11 @@ class PeopleController < ApplicationController
     details = ''
     unless params[projects_or_institutions].blank?
       params[projects_or_institutions].each do |project_or_institution|
-        project_or_institution_details= project_or_institution.split(',')
-        if project_or_institution_details.to_s=='0'
+        if project_or_institution.to_s=='0'
           details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
         else
           entity = projects_or_institutions.classify.constantize.find_by_id(project_or_institution)
-          details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{entity.try(:title)}, Id: #{project_or_institution_details}; ")
+          details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{entity.try(:title)}, Id: #{project_or_institution}; ")
         end
       end
     end
