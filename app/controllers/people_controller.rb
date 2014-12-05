@@ -411,7 +411,8 @@ class PeopleController < ApplicationController
     project_manager_list = []
     unless projects_param.blank?
       projects_param.each do |project_param|
-        project = Project.find_by_id(project_param)
+        id = project_param.split(",")[1]
+        project = Project.find_by_id(id)
         project_managers = project.try(:project_managers)
         project_manager_list |= project_managers unless project_managers.nil?
       end

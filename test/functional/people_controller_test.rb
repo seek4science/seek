@@ -1398,4 +1398,31 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert_includes assigns(:person).work_groups, work_group
   end
+
+  test "should email admin and project managers when specifying project" do
+    proj_man1=Factory :project_manager
+    proj_man2=Factory :project_manager
+    proj1=proj_man1.projects.first
+    proj2=proj_man2.projects.first
+    project_without_manager = Factory :project
+
+    #check there are 3 uniq projects
+    assert_equal 3,[proj1,proj2,project_without_manager].uniq.size
+
+    user = Factory :activated_user
+    assert_nil user.person
+    login_as(user)
+
+    #3 emails - 1 to admin and 2 to project managers
+    assert_emails(3) do
+      post :create,
+           :person=>{:first_name=>"Fred",:last_name=>"BBB",:email=>"fred.bbb@email.com"},
+           :projects=>["#{proj1.title},#{proj1.id}","#{proj2.title},#{proj2.id}","#{project_without_manager.title},#{project_without_manager.id}"],
+           :sysmo_member=>true
+    end
+
+    assert assigns(:person)
+    user.reload
+    assert_equal user.person,assigns(:person)
+  end
 end
