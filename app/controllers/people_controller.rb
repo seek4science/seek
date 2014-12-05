@@ -396,11 +396,11 @@ class PeopleController < ApplicationController
     details = ''
     unless params[projects_or_institutions].blank?
       params[projects_or_institutions].each do |project_or_institution|
-        project_or_institution_details= project_or_institution.split(',')
-        if project_or_institution_details[0] == 'Others'
+        if project_or_institution.to_s=='0'
           details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
         else
-          details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{project_or_institution_details[0]}, Id: #{project_or_institution_details[1]}; ")
+          entity = projects_or_institutions.classify.constantize.find_by_id(project_or_institution)
+          details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{entity.try(:title)}, Id: #{project_or_institution}; ")
         end
       end
     end
@@ -411,7 +411,7 @@ class PeopleController < ApplicationController
     project_manager_list = []
     unless projects_param.blank?
       projects_param.each do |project_param|
-        id = project_param.split(",")[1]
+        id = project_param
         project = Project.find_by_id(id)
         project_managers = project.try(:project_managers)
         project_manager_list |= project_managers unless project_managers.nil?
