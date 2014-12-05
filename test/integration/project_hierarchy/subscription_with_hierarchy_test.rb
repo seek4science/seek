@@ -13,34 +13,6 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
   def teardown
     desync_delayed_jobs
   end
-  test "rails 3 bug: before_add is not fired before the record is saved on `has_many :through` associations" do
-      # no problem in the application, as work_groups are added directly with UI
-      #problem in test is caused that the group_memberships instead of work_groups are assigned to person when created
-
-      #BUG: `before_add` callbacks are fired before the record is saved on
-      #`has_and_belongs_to_many` associations *and* on `has_many :through`
-      #associations.  Before this change, `before_add` callbacks would be fired
-      #before the record was saved on `has_and_belongs_to_many` associations, but
-      #*not* on `has_many :through` associations.
-
-      #this is solved in Rails 4 https://github.com/rails/rails/commit/b1656fa6305a5c8237027ab8165d7292751c0e86
-      # add work groups via adding group_memberships which is the join table of people and work_groups
-      #results: work_groups are added but before_add callbacks are not fired
-      person = Factory(:brand_new_person)
-
-      #'before_add' callback of 'work_groups' association is not fired.
-      #project subscriptions should be created before person is saved but not
-      assert_equal true, person.project_subscriptions.empty?
-
-      person.group_memberships = [Factory(:group_membership)]
-      disable_authorization_checks do
-        person.save
-      end
-
-      person.reload
-      assert_equal false, person.projects.empty?
-      assert_equal true, person.project_subscriptions.empty?
-  end
 
   test "add/remove_project_subscriptions_for_subscriber when adding/removing ancestors" do
 

@@ -1,0 +1,24 @@
+<%= render :partial=>'setting_li',:locals=>{
+                                         :description=>"Allows you to generate a DOI for an asset, using DataCite Metadata Store Web service. A contract is required with DataCite to be able to use their service, otherwise you should disable this setting.",
+                                         :name=>"DOI minting enabled",
+                                         :field=>check_box_tag(:doi_minting_enabled, 1, Seek::Config.doi_minting_enabled,:onchange=>toggle_appear_javascript('doi_minting_block'), :title => 'generating DOI for assets')
+                                 } -%>
+
+<li id="doi_minting_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.doi_minting_enabled -%>">
+  Datacite username: <%= text_field_tag(:datacite_username, Seek::Config.datacite_username) %>
+  <span class="setting_description">The username DataCite provides you with for your organization.</span>
+  Datacite password: <%= password_field_tag(:datacite_password, Seek::Config.datacite_password_decrypt, :autocomplete => 'off') %>
+  <span class="setting_description">The password DataCite provides you with for your organization.</span>
+  Datacite url: <%= text_field_tag(:datacite_url, Seek::Config.datacite_url, :size => 40) %>
+  <span class="setting_description">The root URL for the Datacite rest service. If it is not set, https://mds.datacite.org will be used.
+        You can also set the test url, https://test.datacite.org/mds/, for generating test DOIs.</span>
+  DOI prefix: <%= text_field_tag(:doi_prefix, Seek::Config.doi_prefix) %>
+  <span class="setting_description">The DOI prefix that will have been provided to you by DataCite for your organization.</span>
+  DOI suffix: <%= text_field_tag(:doi_suffix, Seek::Config.doi_suffix) %>
+  <span class="setting_description">The whole DOI suffix should be unique under one DOI prefix. This configuration is the first part of the whole DOI suffix.
+        It will be linked with the asset type, asset id and version, for example using 'seek' would create a DOI 'seek-DataFile.1.1'</span>
+  DOI's cannot be generated for an asset until it has existed for a given period(in days): <%= text_field_tag(:time_lock_doi_for, Seek::Config.time_lock_doi_for, :onkeypress => "javascript: return onlyNumbers(event);") %> days
+      <span class="setting_description">
+        DOI generation for the asset will not be available until is has existed beyond this period. This is to help prevent spam and excessive DOI creation. If the day is set to 0, there will be no restriction.
+      </span>
+</li>

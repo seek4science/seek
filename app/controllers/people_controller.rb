@@ -221,9 +221,6 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person.disciplines.clear if params[:discipline_ids].nil?
-
-    # extra check required to see if any avatar was actually selected (or it remains to be the default one)
-
     
     set_tools_and_expertise(@person,params)    
 

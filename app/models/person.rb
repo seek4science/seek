@@ -28,13 +28,12 @@ class Person < ActiveRecord::Base
   has_and_belongs_to_many :disciplines
 
   has_many :group_memberships, :dependent => :destroy
+  has_many :work_groups, :through=>:group_memberships
 
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
 
-  has_many :work_groups, :through=>:group_memberships,
-           :after_add => [:subscribe_to_work_group_project, :touch_work_group_project],
-           :after_remove => [:unsubscribe_to_work_group_project, :touch_work_group_project]
+
   has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"  
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
@@ -62,38 +61,11 @@ class Person < ActiveRecord::Base
   scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
 
-  #FIXME: change userless_people to use this scope - unit tests
   scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
 
   alias_attribute :webpage,:web_page
 
-  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person},:uniq=> true, :dependent => :destroy
-  accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
-
-  has_many :subscriptions,:dependent => :destroy
-
-  def subscribe_to_work_group_project wg
-    #subscribe direct project
-    project_subscriptions.build :project => wg.project unless project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
-
-  end
-
-  def unsubscribe_to_work_group_project wg
-     # clear project_subscriptions and all subscriptions if person is not project member
-    if work_groups.empty?
-          project_subscriptions.delete_all
-          subscriptions.delete_all
-    elsif ps = project_subscriptions.detect{|ps| ps.project_id == wg.project_id}
-      #unsunscribe direct project subscriptions
-      project_subscriptions.delete ps
-    end
-
-  end
-
-  #touch project to expire cache for project members on project show page?
-  def touch_work_group_project wg
-    wg.project.touch
-  end
+  include Seek::Subscriptions::PersonProjectSubscriptions
 
   after_commit :queue_update_auth_table
 
@@ -173,12 +145,6 @@ class Person < ActiveRecord::Base
       user_items = user_items | self.send("#{type}_for_person".to_sym) if self.respond_to? "#{type}_for_person".to_sym
       user_items.uniq
     end
-  end
-
-
-  def self.userless_people
-    p=Person.all
-    return p.select{|person| person.user.nil?}
   end
 
   #returns an array of Person's where the first and last name match

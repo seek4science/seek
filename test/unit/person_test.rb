@@ -403,8 +403,8 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 3,p.projects.size
   end
   
-  def test_userless_people
-    peeps=Person.userless_people
+  test "not registered" do
+    peeps=Person.not_registered
     assert_not_nil peeps
     assert peeps.size>0,"There should be some userless people"
     assert_nil(peeps.find{|p| !p.user.nil?},"There should be no people with a non nil user")
@@ -708,6 +708,20 @@ class PersonTest < ActiveSupport::TestCase
     p.save
     assert_empty p.work_groups
     assert_empty p.projects
+  end
+
+  test "add to project and institution subscribes to project" do
+    person = Factory (:brand_new_person)
+    inst = Factory(:institution)
+    proj = Factory(:project)
+
+    assert_empty person.project_subscriptions
+    person.add_to_project_and_institution(proj,inst)
+    person.save!
+
+    person.reload
+    assert_includes person.project_subscriptions.map(&:project),proj
+
   end
 
   test "add to project and institution" do
