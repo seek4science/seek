@@ -38,7 +38,7 @@
             <%= image_tag_for_key "show", view_pdf_content_url, 'View content', {:onclick => "checkSupportedBrowser();", :title => 'View inline content this file'}, label %>
         <% end %>
 
-     <% elsif !asset.is_a?(Model) && !asset.contains_extractable_spreadsheet? && asset.is_downloadable_asset? %>
+     <% elsif !asset.is_a?(Model) && !(asset.is_a?(DataFile) && asset.contains_extractable_spreadsheet?) && asset.is_downloadable_asset? %>
            <% explanation = "Your #{text_for_resource(asset)} is unable to be viewed in browser. " +
                 "Supported file formats are: " +  (Seek::ContentTypeDetection::PDF_CONVERTABLE_FORMAT + ["pdf"]).join(" , ") +
                "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(" , ") %>
