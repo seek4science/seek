@@ -194,7 +194,7 @@ You can now start up SEEK again running:
 
 == Creating an Administrator
 
-When you first visit SEEK at http://localhost3000 with no users present, you will be prompted to create a new user. This user will be the administrator of SEEK
+When you first visit SEEK at http://localhost:3000 with no users present, you will be prompted to create a new user. This user will be the administrator of SEEK
 (you can change to or add other users in the future). Create a username and password, and then fill out your profile, and you will be ready to use SEEK.
 
 You will be prompted to fill out our very short Registration form. <b>Please do if you haven't done so already</b>, as this greatly assists the future support and funding of SEEK.
