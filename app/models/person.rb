@@ -302,6 +302,10 @@ class Person < ActiveRecord::Base
     !match.nil?
   end
 
+  def me?
+    user && user==User.current_user
+  end
+
   #admin can administer other people, project manager can administer other people except other admins and themself
   def can_be_administered_by?(user)
     person = user.try(:person)

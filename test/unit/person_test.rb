@@ -30,6 +30,18 @@ class PersonTest < ActiveSupport::TestCase
 
   end
 
+  test "me?" do
+    person = Factory(:person)
+    refute person.me?
+    User.current_user = person.user
+    assert person.me?
+    person = Factory(:brand_new_person)
+    assert_nil person.user
+    refute person.me?
+    User.current_user = nil
+    refute person.me?
+  end
+
   test "programmes" do
     person1=Factory(:person)
     prog = Factory(:programme,:projects=>person1.projects)
