@@ -4,12 +4,9 @@
 	<p style="text-align:center;">You are already logged in.</p>
 	<p style="text-align:center;"><%= link_to "Sign out", logout_url %></p>
 <% else %>
-	<br/>
-	<center>
-	  <div style="width: 300px;">
-		  <%= render :partial => "gadgets/sign_in" %>
-	  </div>
-	</center>
+    <div class="container">
+        <%= render :partial => "gadgets/sign_in" %>
+    </div>
         
 	<script language="javascript">
       function focusLogin() {

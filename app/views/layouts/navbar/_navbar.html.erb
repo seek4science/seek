@@ -31,6 +31,9 @@
                 <%= render :partial => "layouts/navbar/projects_menu" %>
             <% end %>
             <%= render :partial => "layouts/navbar/user_menu" %>
+        <% else %>
+            <li><%= link_to 'Register', signup_path %></li>
+            <li><%= link_to 'Log in', new_session_path %></li>
         <% end %>
       </ul>
 
