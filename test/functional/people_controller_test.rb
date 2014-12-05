@@ -1417,7 +1417,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_emails(3) do
       post :create,
            :person=>{:first_name=>"Fred",:last_name=>"BBB",:email=>"fred.bbb@email.com"},
-           :projects=>["#{proj1.title},#{proj1.id}","#{proj2.title},#{proj2.id}","#{project_without_manager.title},#{project_without_manager.id}"],
+           :projects=>[proj1.id,proj2.id,project_without_manager.id],
            :sysmo_member=>true
     end
 

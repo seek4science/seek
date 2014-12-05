@@ -71,7 +71,7 @@
         <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
           <span style="font-weight:bold;float: left">Projects:</span> <br/>
           <%= select_tag "projects",
-                         options_for_select(Project.all.collect { |p| [p.title, "#{p.title},#{p.id}"] }|[['Others', 'Others,0']], :selected => params['projects']),
+                         options_for_select(Project.all.collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
                          {:onchange => "Javascript:others('projects')", :multiple => true, :style => "width: 100%"}
           -%>
           <div id='other_projects' style='display: none'>
@@ -86,7 +86,7 @@
         <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
           <span style="font-weight:bold;float: left">Institutions:</span> <br/>
           <%= select_tag "institutions",
-                         options_for_select(Institution.all.collect { |i| [i.title, "#{i.title},#{i.id}"] }|[['Others', 'Others,0']], :selected => params['institutions']),
+                         options_for_select(Institution.all.collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
                          {:onchange => "Javascript:others('institutions')", :multiple => true, :style => "width: 100%;"}
           -%>
           <div id='other_institutions' style='display: none'>
