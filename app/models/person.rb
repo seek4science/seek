@@ -29,6 +29,7 @@ class Person < ActiveRecord::Base
 
   has_many :group_memberships, :dependent => :destroy
   has_many :work_groups, :through=>:group_memberships
+  has_many :institutions,:through => :work_groups, :uniq => true
 
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
@@ -198,11 +199,6 @@ class Person < ActiveRecord::Base
   def sweeps
     self.try(:user).try(:sweeps) || []
   end
-
-  def institutions
-    work_groups.collect {|wg| wg.institution }.uniq
-  end
-
 
   def projects
       #updating workgroups doesn't change groupmemberships until you save. And vice versa.
