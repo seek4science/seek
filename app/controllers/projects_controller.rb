@@ -268,7 +268,7 @@ class ProjectsController < ApplicationController
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
     groups_to_remove.each do |group|
       group_membership = GroupMembership.find(group)
-      if group_membership
+      if group_membership && !group_membership.person.me?
         #this slightly strange bit of code is required to trigger and after_remove callback, which should be revisted
         group_membership.person.group_memberships.delete(group_membership)
         group_membership.destroy

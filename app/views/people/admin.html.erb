@@ -5,8 +5,11 @@
 <div class="show_basic">
   <%= form_for @person, :url => {:action => 'administer_update', :id => @person.id} do |f| -%>
       <% if admin_logged_in? || project_manager_logged_in? -%>
-          <h2 style="margin-top: 1.5em;">Choose <%= t('project') %> / Institution&nbsp;&nbsp;&nbsp;</h2>
-          <%= render :partial => "work_groups", :locals=> {:person => @person} -%>
+          
+          <% unless (project_manager_logged_in? && @person.me?) %>
+            <h2 style="margin-top: 1.5em;">Choose <%= t('project') %> / Institution&nbsp;&nbsp;&nbsp;</h2>
+            <%= render :partial => "work_groups", :locals=> {:person => @person} -%>
+          <% end %>
 
           <p style="line-height: 1.8;">
             <% if admin_logged_in? || (project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?) %>

@@ -15,7 +15,10 @@
 
           <% work_group.group_memberships.select { |gm| !gm.person.nil? }.each do |gm| %>
               <li class="institution_member" id="membership_<%= gm.person_id %>_<%= gm.work_group.institution_id %>">
-                <%= gm.person.name %>&nbsp;<%= link_to_function content_tag(:span, "", :class => "remove_member_icon").html_safe, "mark_group_membership_for_removal(#{gm.person.id},#{gm.work_group.institution_id},#{gm.id})" %>
+                <%= gm.person.name %>&nbsp;
+                <% unless gm.person.me? %>
+                    <%= link_to_function content_tag(:span, "", :class => "remove_member_icon").html_safe, "mark_group_membership_for_removal(#{gm.person.id},#{gm.work_group.institution_id},#{gm.id})" %>
+                <% end %>
               </li>
 
           <% end %>
