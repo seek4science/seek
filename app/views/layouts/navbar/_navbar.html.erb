@@ -17,7 +17,7 @@
 
       <ul class="nav navbar-nav">
         <%= render :partial => "layouts/navbar/browse_menu" %>
-        <% if current_user.person.can_create_new_items? -%>
+        <% if logged_in_and_registered? && current_user.person.can_create_new_items? -%>
             <%= render :partial => "layouts/navbar/create_menu" %>
         <% end %>
         <%= render :partial => "layouts/navbar/help_menu" %>
