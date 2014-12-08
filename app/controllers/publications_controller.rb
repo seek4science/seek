@@ -144,17 +144,6 @@ class PublicationsController < ApplicationController
     end
   end
 
-  # DELETE /publications/1
-  # DELETE /publications/1.xml
-  def destroy
-    @publication.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(publications_path) }
-      format.xml  { head :ok }
-    end
-  end
-
   def fetch_preview
     #trim the PubMed or Doi Id
     params[:key] = params[:key].strip() unless params[:key].blank?

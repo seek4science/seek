@@ -90,18 +90,6 @@ class DataFilesController < ApplicationController
     end
   end
   
-  # DELETE /models/1
-  # DELETE /models/1.xml
-  def destroy
-    #FIXME: Double check auth is working for deletion. Also, maybe should only delete if not associated with any assays.
-    @data_file.destroy
-    
-    respond_to do |format|
-      format.html { redirect_to(data_files_path) }
-      format.xml  { head :ok }
-    end
-  end
-  
   def new
     @data_file = DataFile.new
     @data_file.parent_name = params[:parent_name]

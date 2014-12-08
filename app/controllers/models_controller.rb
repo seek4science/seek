@@ -287,17 +287,6 @@ class ModelsController < ApplicationController
     end
   end
 
-  # DELETE /models/1
-  # DELETE /models/1.xml
-  def destroy
-    @model.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(models_path) }
-      format.xml { head :ok }
-    end
-  end
-
   def matching_data
     #FIXME: should use the correct version
     @matching_data_items = @model.matching_data_files

@@ -137,15 +137,6 @@ class SopsController < ApplicationController
       end
     end
   end
-  
-  # DELETE /sops/1
-  def destroy
-    @sop.destroy
-    
-    respond_to do |format|
-      format.html { redirect_to(sops_path) }
-    end
-  end
-
+ 
 
 end

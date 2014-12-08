@@ -172,16 +172,5 @@ class PresentationsController < ApplicationController
     end
   end
 
-  # DELETE /presentations/1
-  # DELETE /presentations/1.xml
-  def destroy
-    @presentation.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(presentations_path) }
-      format.xml  { head :ok }
-    end
-  end
-
 
 end
