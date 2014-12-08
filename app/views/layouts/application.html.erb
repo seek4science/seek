@@ -37,11 +37,13 @@
 
   <div class="container-fluid" style="max-width: 1400px">
       <div id="content">
-        <div class="breadcrumbs">
-          <ol class="breadcrumb">
-            <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
-          </ol>
-        </div>
+        <% unless breadcrumbs.empty? %>
+            <div class="breadcrumbs">
+              <ol class="breadcrumb">
+                <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
+              </ol>
+            </div>
+        <% end %>
 
         <%= add_return_to_search %>
 
