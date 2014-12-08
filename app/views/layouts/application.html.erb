@@ -62,11 +62,10 @@
         <%# main content part of every page -%>
         <%= yield :layout %>
     </div>
+</div>
 
-  <div id="ft">
+<div id="ft">
     <%= render :partial=>"layouts/footer" %>
-  </div>
-
 </div>
 
 <% unless is_front_page? %>
