@@ -505,7 +505,7 @@ class ProjectsControllerTest < ActionController::TestCase
 		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>0
+				assert_select "a[href=?]",admin_members_project_path(project),:count=>0
 			end
 		end
 	end
@@ -518,7 +518,7 @@ class ProjectsControllerTest < ActionController::TestCase
 		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(project),:text=>/#{I18n.t('project')} administration/,:count=>1
+				assert_select "a[href=?]",admin_members_project_path(project),:text=>/Administer #{I18n.t('project')} members/,:count=>1
 			end
 		end
 	end
@@ -553,7 +553,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     get :show, :id => project
     assert_response :success
-    assert_select "a", :text => /#{I18n.t('project')} administration/, :count => 1
+    assert_select "a[href=?]",admin_members_project_path(project), :text => /Administer #{I18n.t('project')} members/, :count => 1
 
     get :admin, :id => project
     assert_response :success

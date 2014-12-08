@@ -13,7 +13,7 @@
     <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
 
     <% if @project.try(:can_be_administered_by?, current_user) -%>
-      <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", nil, "#{t('project')} administration" -%></li>
+      <li><%= image_tag_for_key "group_edit", admin_members_project_path(@project), "Administer", nil, "Administer #{t('project')} members" -%></li>
      <% end -%>
     <% if admin_logged_in? -%>
           <%= delete_icon(@project,current_user) %>
