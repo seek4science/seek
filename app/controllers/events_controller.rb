@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  #before_filter :login_required
+  include Seek::PreviewHandling
   before_filter :find_and_authorize_requested_item, :except =>  [ :index, :new, :create, :preview]
 
   before_filter :find_assets
@@ -92,19 +92,5 @@ class EventsController < ApplicationController
       end
     end
   end
-
-    def preview
-    element=params[:element]
-    event=Event.find_by_id(params[:id])
-
-    render :update do |page|
-      if event.try :can_view?
-        page.replace_html element,:partial=>"events/resource_list_item_preview",:locals=>{:resource=>event}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
-    end
-  
 
 end

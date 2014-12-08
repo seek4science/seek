@@ -183,18 +183,5 @@ class PresentationsController < ApplicationController
     end
   end
 
-  def preview
-
-    element = params[:element]
-    presentation = Presentation.find_by_id(params[:id])
-
-    render :update do |page|
-      if presentation.try :can_view?
-        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>presentation}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
-  end
 
 end

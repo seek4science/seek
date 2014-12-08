@@ -7,6 +7,7 @@ module Seek
     include Seek::ContentBlobCommon
     include Seek::UploadHandling::DataUpload
     include Seek::DownloadHandling::DataDownload
+    include Seek::PreviewHandling
 
     def find_display_asset asset=eval("@#{self.controller_name.singularize}")
       requested_version = params[:version] || asset.latest_version.version
@@ -62,7 +63,7 @@ module Seek
     end
 
     def request_resource
-      resource = self.controller_name.classify.find(params[:id])
+      resource = self.controller_name.classify.constantize.find(params[:id])
       details = params[:details]
       mail = Mailer.request_resource(current_user,resource,details,base_host)
       mail.deliver

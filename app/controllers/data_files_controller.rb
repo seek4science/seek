@@ -309,19 +309,6 @@ class DataFilesController < ApplicationController
     end
   end
   
-  def preview
-    element=params[:element]
-    data_file=DataFile.find_by_id(params[:id])
-    
-    render :update do |page|
-      if data_file.try :can_view?
-        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>data_file}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
-  end
-  
   def explore
     if @display_data_file.contains_extractable_spreadsheet?
       respond_to do |format|

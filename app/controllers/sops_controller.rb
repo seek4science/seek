@@ -4,8 +4,7 @@ class SopsController < ApplicationController
   include DotGenerator
 
   include Seek::AssetsCommon
-  
-  #before_filter :login_required
+
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, :only=>[:show, :download]
@@ -148,19 +147,5 @@ class SopsController < ApplicationController
     end
   end
 
-  
-  def preview
-    
-    element=params[:element]
-    sop=Sop.find_by_id(params[:id])
-    
-    render :update do |page|
-      if sop.try :can_view?
-        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>sop}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
-  end
 
 end

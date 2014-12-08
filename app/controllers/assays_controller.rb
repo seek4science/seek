@@ -224,17 +224,4 @@ class AssaysController < ApplicationController
     end
   end
 
-  def preview
-    element=params[:element]
-    assay  =Assay.find_by_id(params[:id])
-
-    render :update do |page|
-      if assay.try :can_view?
-        page.replace_html element, :partial=>"assays/preview_for_associate", :locals=>{:resource=>assay}
-      else
-        page.replace_html element, :text=>"Nothing is selected to preview."
-      end
-    end
-  end
-
 end

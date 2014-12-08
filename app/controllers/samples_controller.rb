@@ -1,6 +1,8 @@
 class SamplesController < ApplicationController
 
   include IndexPager
+  include Seek::PreviewHandling
+
   before_filter :biosamples_enabled?
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy,:preview,:new_object_based_on_existing_one]
@@ -211,18 +213,6 @@ class SamplesController < ApplicationController
     end
   end
 
-  def preview
 
-    element=params[:element]
-    sample=Sample.find_by_id(params[:id])
-
-    render :update do |page|
-      if sample.try :can_view?
-        page.replace_html element,:partial=>"samples/resource_preview",:locals=>{:resource=>sample}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
-  end
 
 end

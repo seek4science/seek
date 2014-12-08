@@ -148,19 +148,6 @@ class WorkflowsController < ApplicationController
     end
   end
 
-  def preview
-    element=params[:element]
-    workflow=Workflow.find_by_id(params[:id])
-
-    render :update do |page|
-      if workflow.try :can_view?
-        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>workflow}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
-  end
-
   def new_version
     if (handle_data nil)
       comments=params[:revision_comment]

@@ -13,18 +13,6 @@ class PublicationsController < ApplicationController
   before_filter :associate_authors, :only => [:edit, :update]
 
   include Seek::BreadCrumbs
-
-  def preview
-    element=params[:element]
-    @publication = Publication.find_by_id(params[:id])
-    render :update do |page|
-      if @publication
-        page.replace_html element,:partial=>"publications/resource_preview",:locals=>{:resource=>@publication}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
-  end    
     
   # GET /publications/1
   # GET /publications/1.xml

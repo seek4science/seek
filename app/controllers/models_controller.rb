@@ -298,21 +298,6 @@ class ModelsController < ApplicationController
     end
   end
 
-  def preview
-
-    element = params[:element]
-    model = Model.find_by_id(params[:id])
-
-    render :update do |page|
-      if model.try :can_view?
-        page.replace_html element, :partial => "assets/resource_preview", :locals => {:resource => model}
-      else
-        page.replace_html element, :text => "Nothing is selected to preview."
-      end
-    end
-  end
-
-
   def matching_data
     #FIXME: should use the correct version
     @matching_data_items = @model.matching_data_files
