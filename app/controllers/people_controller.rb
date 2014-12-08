@@ -186,12 +186,12 @@ class PeopleController < ApplicationController
         #send notification email to admin and project managers, if a new member is registering as a new person
         if Seek::Config.email_enabled && registration && is_sysmo_member
           #send mail to admin
-          Mailer.contact_admin_new_user_no_profile(member_details, current_user, base_host).deliver
+          Mailer.contact_admin_new_user(member_details, current_user, base_host).deliver
 
           #send mail to project managers
           project_managers = project_managers_of_selected_projects params[:projects]
           project_managers.each do |project_manager|
-            Mailer.contact_project_manager_new_user_no_profile(project_manager, member_details, current_user, base_host).deliver
+            Mailer.contact_project_manager_new_user(project_manager, member_details, current_user, base_host).deliver
           end
         end
         if (!current_user.active?)

@@ -124,7 +124,7 @@ class Mailer < ActionMailer::Base
          :subject=>"Welcome to #{Seek::Config.application_name}")
   end
 
-  def contact_admin_new_user_no_profile(details,user,base_host)
+  def contact_admin_new_user(details,user,base_host)
     @details = details
     @person = user.person
     @user = user
@@ -136,7 +136,7 @@ class Mailer < ActionMailer::Base
 
   end
 
-  def contact_project_manager_new_user_no_profile(project_manager,details,user,base_host)
+  def contact_project_manager_new_user(project_manager,details,user,base_host)
 
     @details = details
     @person = user.person
@@ -159,7 +159,7 @@ class Mailer < ActionMailer::Base
   end
 
   def announcement_notification(site_announcement, notifiee_info,base_host)
-    #FIXME: this should really be part of the site_annoucements plugin
+    #FIXME: this should really be part of the site_announcements plugin
     @site_announcement  = site_announcement
     @notifiee_info = notifiee_info
     @host = base_host

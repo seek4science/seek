@@ -204,19 +204,19 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
-  test "contact_admin_new_user_no_profile" do
+  test "contact_admin_new_user" do
     @expected.subject = 'SEEK member signed up'
     @expected.to =  "Quentin Jones <quentin@email.com>"
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 
-    @expected.body = read_fixture('contact_admin_new_user_no_profile')
+    @expected.body = read_fixture('contact_admin_new_user')
 
     assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_admin_new_user_no_profile("test message", users(:aaron), "localhost"))
+                 encode_mail(Mailer.contact_admin_new_user("test message", users(:aaron), "localhost"))
   end
 
-  test "contact_project_manager_new_user_no_profile" do
+  test "contact_project_manager_new_user" do
     project_manager = Factory(:project_manager)
     @expected.subject = 'SEEK member signed up, please assign this person to the projects of which you are project manager'
     @expected.to = project_manager.email_with_name
@@ -224,10 +224,10 @@ class MailerTest < ActionMailer::TestCase
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 
 
-    @expected.body = read_fixture('contact_project_manager_new_user_no_profile')
+    @expected.body = read_fixture('contact_project_manager_new_user')
 
     assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_project_manager_new_user_no_profile(project_manager, "test message", users(:aaron), "localhost"))
+                 encode_mail(Mailer.contact_project_manager_new_user(project_manager, "test message", users(:aaron), "localhost"))
 
 
   end
