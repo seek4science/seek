@@ -1,10 +1,10 @@
 <% if Seek::Config.organisms_enabled %>
-    <div id="organism_gadget" class="sysmo_gadget"  >
-      <div class="header curved_top">
+    <div id="organism_gadget" class="panel panel-default">
+      <div class="panel-heading">
         Organisms
       </div>
 
-      <div class="contents curved_bottom">
+      <div class="panel-body">
         <ul>
           <% Organism.all.sort_by(&:title).each do |organism| %>
             <li>

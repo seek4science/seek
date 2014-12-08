@@ -1,11 +1,11 @@
-<div class="sysmo_gadget">
+<div class="panel panel-default">
 
-  <div class="header curved_top">
+  <div class="panel-heading">
     Tags
     <%= link_to "[show all]", all_anns_path -%>
   </div>
 
-  <div class="contents curved_bottom">
+  <div class="panel-body">
     <% unless Rails.env == "development" -%>
         <div class="tags_smaller">
           <div class="hTagcloud">

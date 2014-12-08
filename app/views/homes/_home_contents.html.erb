@@ -1,36 +1,28 @@
-
 <% if SiteAnnouncement.headline_announcement -%>
     <div class="box_standout headline_announcement">
       <%= site_annoucements_headline %>
     </div>
 <% end -%>
 
-<%= render :partial=>"guide_box" -%>
+<div class="row">
+  <div class="col-md-9">
+    <%= render :partial=>"guide_box" -%>
 
-<div class="top_home_panel with_shadow curved">
-  <% link_to_demo = link_to h("demos here"),Seek::Config.seek_video_link,:popup => true %>
-  <%= home_description_text -%>
+    <%= render :partial=>"home_description_box" -%>
+
+    <%= render :partial=>"home_news_feeds" -%>
+
+    <%= render :partial=>"home_activity_notifications" -%>
+  </div>
+  <div class="col-md-3">
+    <% if Seek::Config.tagging_enabled %>
+        <div id="sidebar_tag_cloud">
+          <% cache "sidebar_tag_cloud" do -%>
+              <%= render :partial=>"gadgets/tag_cloud_gadget" %>
+          <% end -%>
+        </div>
+    <% end %>
+
+    <%= render :partial=>"gadgets/organism_gadget" %>
+  </div>
 </div>
-
-
-<%= render :partial=>"home_news_feeds" -%>
-
-<br/>
-
-<%= render :partial=>"home_activity_notifications" -%>
-
-<script type="text/javascript">
-    $j(function()
-    {
-        $j('.homepanel_list').jScrollPane();
-        $j('.jspDrag').hide();
-        $j('.jspScrollable').mouseenter(function(){
-            $j(this).find('.jspDrag').stop(true, true).fadeIn('slow');
-        });
-        $j('.jspScrollable').mouseleave(function(){
-            $j(this).find('.jspDrag').stop(true, true).fadeOut('slow');
-        });
-    });
-</script>
-
-

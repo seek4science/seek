@@ -11,13 +11,8 @@
 
   <%= csrf_meta_tag %>
 
-  <% if is_front_page? && !Seek::Config.is_virtualliver%>
-      <%= seek_stylesheet_tags 'front_page' %>
-      <%= seek_javascript_tags 'front_page' %>
-  <% else %>
-      <%= seek_stylesheet_tags %>
-      <%= seek_javascript_tags %>
-  <% end %>
+  <%= seek_stylesheet_tags %>
+  <%= seek_javascript_tags %>
 
   <script type="text/javascript">
       function show_ajax_loader(element) {

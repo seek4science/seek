@@ -1,24 +1,27 @@
-<div class="yui-g home_panel_pair">
-  <div class="yui-u first home_panel  with_shadow curved">
-    <div class="heading curved_top">Latest additions</div>
-    <div id="recently_added" class="homepanel_list">
-      <ul>
-        <% recently_added_item_logs_hash(25.years.ago, 8).each do |added_item_log| -%>
-            <%= display_single_log_item_hash(added_item_log, 'added') -%>
-        <% end %>
-      </ul>
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">Latest additions</div>
+      <div id="recently_added" class="panel-body">
+        <ul>
+          <% recently_added_item_logs_hash(25.years.ago, 8).each do |added_item_log| -%>
+              <%= display_single_log_item_hash(added_item_log, 'added') -%>
+          <% end %>
+        </ul>
+      </div>
     </div>
   </div>
 
-  <div class="yui-u home_panel with_shadow curved">
-    <div class="heading curved_top">Latest downloads</div>
-    <div id="recently_downloaded" class="homepanel_list">
-      <ul>
-        <% recently_downloaded_item_logs_hash(25.years.ago, 8).each do |downloaded_item_log| %>
-            <%= display_single_log_item_hash(downloaded_item_log, 'downloaded') -%>
-        <% end %>
-      </ul>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">Latest downloads</div>
+      <div id="recently_downloaded" class="panel-body">
+        <ul>
+          <% recently_downloaded_item_logs_hash(25.years.ago, 8).each do |downloaded_item_log| %>
+              <%= display_single_log_item_hash(downloaded_item_log, 'downloaded') -%>
+          <% end %>
+        </ul>
+      </div>
     </div>
   </div>
-
 </div>
