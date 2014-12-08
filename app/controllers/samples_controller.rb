@@ -2,6 +2,7 @@ class SamplesController < ApplicationController
 
   include IndexPager
   include Seek::PreviewHandling
+  include Seek::DestroyHandling
 
   before_filter :biosamples_enabled?
   before_filter :find_assets, :only => [:index]
@@ -154,7 +155,6 @@ class SamplesController < ApplicationController
     #update policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
 
-
       if @sample.save
         #TODO CONFIG improve configurability. Configuration currently is deduced from other parameters
         if tissue_and_cell_types.blank?
@@ -200,19 +200,5 @@ class SamplesController < ApplicationController
       join_class.create!(:sop_id=>sop.id,:sop_version=>sop.version,"#{resource.class.name.downcase}_id".to_sym=>resource.id)
     end
   end
-
-  def destroy
-
-    respond_to do |format|
-      if @sample.destroy
-        format.html { redirect_to samples_url }
-      else
-        flash.now[:error] = "Unable to delete sample" if !@sample.specimen.nil?
-        format.html { render :action => "show" }
-      end
-    end
-  end
-
-
 
 end

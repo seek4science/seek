@@ -1,5 +1,8 @@
 class SpecimensController < ApplicationController
-  # To change this template use File | Settings | File Templates.
+  include IndexPager
+  include Seek::Publishing::PublishingCommon
+  include Seek::BreadCrumbs
+  include Seek::DestroyHandling
 
   before_filter :biosamples_enabled?
   before_filter :find_assets, :only => [:index]
@@ -8,13 +11,6 @@ class SpecimensController < ApplicationController
   #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   #defined in the application controller
   before_filter :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
-
-
-  include IndexPager
-
-  include Seek::Publishing::PublishingCommon
-
-  include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
     @existing_specimen =  Specimen.find(params[:id])
@@ -120,19 +116,6 @@ class SpecimensController < ApplicationController
     else
       respond_to do |format|
         format.html { render :action => "edit" }
-      end
-    end
-  end
-
-  def destroy
-    respond_to do |format|
-      if @specimen.destroy
-        format.html { redirect_to(specimens_path) }
-        format.xml { head :ok }
-      else
-        flash.now[:error]="Unable to delete the specimen" if !@specimen.institution.nil?
-        format.html { render :action=>"show" }
-        format.xml { render :xml => @specimen.errors, :status => :unprocessable_entity }
       end
     end
   end

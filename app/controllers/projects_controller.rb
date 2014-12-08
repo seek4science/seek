@@ -4,6 +4,7 @@ class ProjectsController < ApplicationController
   include WhiteListHelper
   include IndexPager
   include CommonSweepers
+  include Seek::DestroyHandling
 
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:update_members]
   before_filter :find_assets, :only=>[:index]
@@ -214,22 +215,7 @@ class ProjectsController < ApplicationController
       format.xml{render :xml=>@projects}
     end
   end
-  # DELETE /projects/1
-  # DELETE /projects/1.xml
-  def destroy
-    respond_to do |format|
-      if @project.can_delete?
-        @project.destroy
-        format.html { redirect_to(projects_path) }
-        format.xml { head :ok }
-      else
-        flash.now[:error]="Unable to delete #{t('project')} with children"
-        format.html { redirect_to(@project) }
-        format.xml { render :xml=>@project.errors, :status=>:unprocessable_entity }
-      end
-    end
-  end
-  
+
   
   # returns a list of institutions for a project in JSON format
   def request_institutions

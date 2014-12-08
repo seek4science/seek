@@ -1,5 +1,7 @@
 class EventsController < ApplicationController
   include Seek::PreviewHandling
+  include Seek::DestroyHandling
+
   before_filter :find_and_authorize_requested_item, :except =>  [ :index, :new, :create, :preview]
 
   before_filter :find_assets
@@ -16,15 +18,6 @@ class EventsController < ApplicationController
     
   end
 
-  #DELETE /events/1
-  #DELETE /events/1.xml
-  def destroy
-    @event.destroy
-    respond_to do | format |
-      format.html { redirect_to events_path }
-      format.xml { head :ok }
-    end
-  end
 
   def new
     @event = Event.new

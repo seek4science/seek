@@ -1,5 +1,7 @@
 class OrganismsController < ApplicationController
 
+  include Seek::DestroyHandling
+
   before_filter :organisms_enabled?
   before_filter :find_requested_item, :only=>[:show,:edit,:more_ajax,:visualise,:destroy, :update]
   before_filter :login_required,:except=>[:show,:index,:visualise]
@@ -14,18 +16,6 @@ class OrganismsController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-    end
-  end
-  
-  def destroy
-    respond_to do |format|
-      if @organism.can_delete? && @organism.destroy
-        flash[:notice] = 'Organism was successfully removed.'
-        format.html { redirect_to root_path }        
-      else
-        flash[:error] = "Unable to delete organism"
-        format.html { render :action => "show" }       
-      end
     end
   end
 
