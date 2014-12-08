@@ -268,6 +268,10 @@ class AssetTest < ActiveSupport::TestCase
       refute df.is_doi_time_locked?
     end
 
+    with_config_value :time_lock_doi_for, "7" do
+      refute df.is_doi_time_locked?
+    end
+
     with_config_value :time_lock_doi_for, nil do
       refute df.is_doi_time_locked?
     end

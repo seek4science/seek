@@ -30,7 +30,7 @@ module Seek
       # minting doi is locked until configuration days since the asset is created
       def is_doi_time_locked?
         time = Seek::Config.time_lock_doi_for || 0
-        (created_at + time.days) > Time.now
+        (created_at + time.to_i.days) > Time.now
       end
 
       def state_allows_delete?(*args)

@@ -130,7 +130,7 @@ class AdminsControllerTest < ActionController::TestCase
 
     assert !quentin.is_admin?
     assert aaron.is_admin?
-    
+    assert aaron.is_admin?
   end
 
   test "get project content stats" do
@@ -209,6 +209,12 @@ class AdminsControllerTest < ActionController::TestCase
     assert_equal 3,Seek::Config.project_news_number_of_entries
     assert Seek::Config.community_news_enabled
     assert Seek::Config.project_news_enabled
+  end
+
+  test "update doi locked, should be stored as int" do
+    login_as(:quentin)
+    post :update_features_enabled, :time_lock_doi_for => "6"
+    assert_equal 6,Seek::Config.time_lock_doi_for
   end
 
   test "update_redirect_to for update_features_enabled" do
