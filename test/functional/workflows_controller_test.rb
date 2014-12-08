@@ -39,4 +39,21 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'Hello Anyone With 3 Inputs', assigns(:workflow).title
   end
 
+  test 'public visibility' do
+    workflow = Factory :workflow,:contributor=>@member, :policy => Factory(:public_policy)
+    get :show,:id=>workflow.id
+    assert_response :success
+    assert_select "span[class=visibility public]",:text=>/Public/
+
+    policy = workflow.policy
+    policy.sharing_scope = Policy::ALL_SYSMO_USERS
+    policy.access_type = Policy::VISIBLE
+    policy.save
+    workflow.reload
+
+    get :show,:id=>workflow.id
+    assert_response :success
+    assert_select "span[class=visibility public]",:text=>/Public/, :count => 0
+  end
+
 end

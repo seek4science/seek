@@ -641,16 +641,16 @@ module ApplicationHelper
   def describe_visibility(model)
     text = '<strong>Visibility:</strong> '
 
-    if model.policy.sharing_scope == 0
+    if model.policy.sharing_scope == Policy::PRIVATE
       css_class = 'private'
       text << "Private "
       text << "with some exceptions " unless model.policy.permissions.empty?
       text << image('lock', :style => 'vertical-align: middle')
-    elsif model.policy.sharing_scope == 2 && model.policy.access_type == 0
+    elsif model.policy.sharing_scope == Policy::ALL_SYSMO_USERS && model.policy.access_type == Policy::NO_ACCESS
       css_class = 'group'
       text << "Only visible to members of "
       text << model.policy.permissions.select {|p| p.contributor_type == 'Project'}.map {|p| p.contributor.title}.to_sentence
-    else
+    elsif model.policy.sharing_scope == Policy::EVERYONE
       css_class = 'public'
       text << "Public #{image('world', :style => 'vertical-align: middle')}"
     end

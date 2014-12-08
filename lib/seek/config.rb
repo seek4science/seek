@@ -363,6 +363,7 @@ module Seek
     setting :project_news_number_of_entries, convert: 'to_i'
     setting :community_news_number_of_entries, convert: 'to_i'
     setting :home_feeds_cache_timeout, convert: 'to_i'
+    setting :time_lock_doi_for, convert: 'to_ig'
 
     read_setting_attributes.each do |sym|
       setting sym

@@ -68,9 +68,9 @@ help_documents:
       require for SEEK.\r\n\r\nh2. General SEEK Metadata\r\n\r\n*Name* (of the data
       uploader). This is the person responsible for the data and responsible for setting
       sharing and dissemination policies. If more than one person was involved in
-      the experiment, you can credit these people separately \r\n*SEEK ID* â€“ (Of
+      the experiment, you can credit these people separately \r\n*SEEK ID* - (Of
       the above person). This helps us identify each person within SEEK. \r\n*Project*
-      â€“ The name of the project that the asset relates to. If your data is being
+      - The name of the project that the asset relates to. If your data is being
       uploaded by a JERM harvester, we will know which project it belongs to, but
       if you are uploading directly to SEEK and you are in more than one SysMO project,
       it is important to specify. Typically, an asset will belong to only one project.\r\n*Upload
@@ -78,77 +78,77 @@ help_documents:
       of the experiment. Depending on the system your project uses, we will try to
       automatically detect when changes are made to a file. Each upload will automatically
       receive its own timestamp when uploaded directly into SEEK\r\n*Experiment Date
-      (yymmdd)*. This is the date the experiment was performed\r\n*Title* â€“ a unique
+      (yymmdd)*. This is the date the experiment was performed\r\n*Title* - a unique
       name for your asset file. If you upload manually, you will receive an error
       message if the file title is not unique within your project. If your asset is
       uploaded via a JERM Harvester without a title, you will receive an email notification.\r\n*Version
-      Number* â€“ If your file replaces an existing file, the version number will
+      Number* - If your file replaces an existing file, the version number will
       help us pick this up. Keep it simple, versions should go up by integers.\r\n*Names
-      of other people involved* â€“ many experiments involve multiple steps and multiple
+      of other people involved* - many experiments involve multiple steps and multiple
       people. This metadata field allows you to give credit and attribution to all
       those involved\r\n\r\nh2. ISA Infrastructure\r\n\r\nh3. Investigation\r\n\r\n*Title*
       - described above. All assets should have a title\r\n*Description* - free text
       describing the purpose of the investigation\r\n*Project* - as described above.
       All assets should be associated with a project\r\n\r\n\r\nh3. Study\r\n\r\n*Title*
-      â€“ as described above. All assets should have a title\r\n*Description* â€“
-      free text describing the purpose of the study\r\n*Person Responsible* â€“ the
-      contributor of the study description\r\n*Experimentalists* â€“ other scientists
+      - as described above. All assets should have a title\r\n*Description* -
+      free text describing the purpose of the study\r\n*Person Responsible* - the
+      contributor of the study description\r\n*Experimentalists* - other scientists
       involved in any of the work in the study. If they are in SysMO, please give
       their SEEK ID, so we can link to their profiles in SEEK. If they are not in
       SEEK, their names will still be displayed, but not linked. Peopleâ€™s involvement
-      can also be inferred from anyone named in included assays.\r\n*Project* â€“
+      can also be inferred from anyone named in included assays.\r\n*Project* -
       as described above. All assets should be associated with a project\r\n*Investigation
-      title* â€“ The name of the investigation the study belongs to. \r\n\r\n\r\nh3.
-      Assay\r\n\r\n*Assay Title* â€“ The name of the assay that the asset links to.
-      \r\n*Assay type* â€“ The controlled vocabulary term describing the assay classification\r\nIf
+      title* - The name of the investigation the study belongs to. \r\n\r\n\r\nh3.
+      Assay\r\n\r\n*Assay Title* - The name of the assay that the asset links to.
+      \r\n*Assay type* - The controlled vocabulary term describing the assay classification\r\nIf
       you cannot find a suitable Assay Type term, please contact us or your PAL to
-      update the vocabulary \r\n*Technology type* â€“ The controlled vocabulary term
+      update the vocabulary \r\n*Technology type* - The controlled vocabulary term
       describing the technology used in the assay\r\nIf you cannot find a suitable
       Technology Type term, please contact us or your PAL to update the vocabulary
-      \r\n*Study title* â€“ The name of the study the assay belongs to. An assay can
+      \r\n*Study title* - The name of the study the assay belongs to. An assay can
       belong to more than one study\r\n*Organism* The name of the organism being studied
       with this asset. If uploading through SEEK, organism names are provided as a
       drop-down list\r\n*Strain* The name of the particular strain being studied\r\n*WT/Mutant*
-      - Specifies whether this strain is wild-type or mutant\r\n*Genotype* â€“ a brief
-      text description of the genotype\r\n*Phenotype* â€“ a brief text description
+      - Specifies whether this strain is wild-type or mutant\r\n*Genotype* - a brief
+      text description of the genotype\r\n*Phenotype* - a brief text description
       of the phenotype\r\n*Culture Growth* - This describes how the culture was grown
       for this assay. You can choose values from a drop-down list when adding new
-      assays directly to SEEK\r\n*Data File Titles* â€“ the title of one or many data
-      files produced during this assay\r\n*SOP Titles* â€“ the title of one or many
+      assays directly to SEEK\r\n*Data File Titles* - the title of one or many data
+      files produced during this assay\r\n*SOP Titles* - the title of one or many
       SOPs used to execute this assay\r\n\r\n\r\nh2. SysMO Assets\r\n\r\nh3. Data\r\n\r\n*Title*
-      â€“ as described above\r\n*Description* â€“ free text to describe what the data
-      is showing\r\n*File Format* â€“ how the data is stored, for example excel spreadsheet\r\n*Factors
-      Studied* â€“ what experimental parameters did you alter in order to study the
+      - as described above\r\n*Description* - free text to describe what the data
+      is showing\r\n*File Format* - how the data is stored, for example excel spreadsheet\r\n*Factors
+      Studied* - what experimental parameters did you alter in order to study the
       effects in the organism (e.g. changing the pH from 5 to 7)\r\n*Measured Item*
-      â€“ what was measured in this data, e.g. concentration of glucose. Measured
+      - what was measured in this data, e.g. concentration of glucose. Measured
       items should be named using controlled vocabulary terms wherever possible, for
       example, glucose has chEBI name glucose and chEBI ID CHEBI:17234\r\n*Units*
-      â€“ how the measurements were taken, e.g. concentration in mmol, or mass in
-      grams.\r\n\r\n\r\nh3. Models \r\n\r\n*Filename/archive name* â€“ the title of
+      - how the measurements were taken, e.g. concentration in mmol, or mass in
+      grams.\r\n\r\n\r\nh3. Models \r\n\r\n*Filename/archive name* - the title of
       the asset\r\n*Description* - free text to describe what the model is showing\r\n*Model
-      Type* â€“ what kind of mathematical equations does your model contain e.g. ODE,
-      algebraic\r\n*Model Format* â€“ e.g. SBML, CellML. If uploading directly through
+      Type* - what kind of mathematical equations does your model contain e.g. ODE,
+      algebraic\r\n*Model Format* - e.g. SBML, CellML. If uploading directly through
       SEEK, you will be able to chose from a drop-down list\r\n*Model Execution Environment
-      and URL* â€“ how do you run a simulation on your model? This field should provide
+      and URL* - how do you run a simulation on your model? This field should provide
       a link to a tool or resource which would allow you to run your model\r\n*Linking
-      Models to Data* â€“ this section allows you to specify how and where data files
+      Models to Data* - this section allows you to specify how and where data files
       were used to a) construct your model b) validate your model, or c) record simulation
       results from your model. If you are uploading directly through SEEK, you can
       find the relevant files by searching a drop-down list. If uploading through
       a JERM Harvester, you should use the data file title or SEEKID \r\n\r\n\r\nh3.
-      SOPs\r\n\r\n*Title* â€“ as described above. All assets should have a title\r\n*Description*
+      SOPs\r\n\r\n*Title* - as described above. All assets should have a title\r\n*Description*
       - free text to describe what the SOP is used for\r\n*Experimental conditions*
       - what was standardised and fixed in this experiment (e.g. concentration of
       nutrients, pH, temperature). If you are uploading directly through SEEK, you
-      can chose from a drop-down list\r\n*Units*  â€“  how the measurements were taken
+      can chose from a drop-down list\r\n*Units*  -  how the measurements were taken
       e.g. concentration in mmol or mass in grams.\r\n\r\n\r\nh3. Publications\r\n\r\n*PubmedID
-      or DOI* â€“ the SEEK can extract publication abstracts from PubMed, when supplied
+      or DOI* - the SEEK can extract publication abstracts from PubMed, when supplied
       with a PubmedID. When the paper abstract is retrieved, you can verify which
       people from a drop-down list are authors from within the consortium, so that
       we can link to their profile\r\nCurrently, publications are linked to people
       and projects. In the next version, publications will be linked to other SysMO
       assets to allow you to use the SEEK as a supplementary data store\r\n\r\n\r\n*Attribution*
-      â€“ Some assets are based on others, for example, a model may use data from
+      - Some assets are based on others, for example, a model may use data from
       an experimental assay, or a SOP may be a modified version of another. The attribution
       section allows you to specify when this is the case\r\n"
     - 2010-05-20 08:37:01.000000000 Z
@@ -166,9 +166,9 @@ help_documents:
       for MAGE-TAB, so as long as you do not change the headers and titles of worksheets,
       we can extract your data in this format.\r\n\r\nThere are several parts to a
       MAGE-TAB file. These parts can be represented as separate files, or separate
-      worksheets in excel. MAGE-TAB consists of:\r\n\r\n*IDF â€“ Investigation Description
+      worksheets in excel. MAGE-TAB consists of:\r\n\r\n*IDF - Investigation Description
       Format*\r\nThis worksheet is an overview of the experiment, factors studied,
-      protocols, publication information and contact details.\r\n\r\n*SDRF â€“ Sample
+      protocols, publication information and contact details.\r\n\r\n*SDRF - Sample
       and Data Relationship Format*\r\nThis worksheet details the links between sample
       and data, it can include information about the source (e.g. organism rat), the
       sample (e.g. rat liver), extracts (e.g. total RNA), labelled extract (e.g. synthetic
@@ -176,7 +176,7 @@ help_documents:
       raw data (e.g. a reference to a raw data file), normalisation (e.g. a reference
       to normalised data file), derived array data files (e.g. a reference to a derived
       data file, or file matrix)\r\n\r\n*Raw Data and Processed Data*\r\nThese worksheets
-      hold the actual and derived data values\r\n\r\n*ADF â€“ Array Design Format
+      hold the actual and derived data values\r\n\r\n*ADF - Array Design Format
       (optional)*\r\nThis worksheet provides the array-level annotation for the experiment,
       relating the row-level identifiers in the data files to biological sequence
       annotation.\r\n\r\nThere are a detailed \"set of help pages and examples provided
@@ -454,32 +454,32 @@ help_documents:
       Investigation\r\n\r\n*Title* - The name of the investigation. All assets should
       have a title\r\n*Description* - free text describing the purpose of the investigation\r\n*Project*
       - The project that the investigation belongs to. All assets should be associated
-      with a project\r\n\r\n\r\nh3. Study\r\n\r\n*Title* â€“ The name of the Study.
-      All assets should have a title\r\n*Description* â€“ free text describing the
-      purpose of the study\r\n*Person Responsible* â€“ the creator of the study description\r\n*Experimentalists*
-      â€“ other scientists involved in any of the work in the study. If they are in
+      with a project\r\n\r\n\r\nh3. Study\r\n\r\n*Title* - The name of the Study.
+      All assets should have a title\r\n*Description* - free text describing the
+      purpose of the study\r\n*Person Responsible* - the creator of the study description\r\n*Experimentalists*
+      - other scientists involved in any of the work in the study. If they are in
       SysMO, please give their SEEK ID, so we can link to their profiles in SEEK.
       If they are not in SEEK, their names will still be displayed, but not linked.
       Peopleâ€™s involvement can also be inferred from anyone named in included assays.\r\n*Project*
-      â€“ The project that the study belongs to. All assets should be associated with
-      a project\r\n*Investigation title* â€“ The name of the investigation the study
-      belongs to. \r\n\r\n\r\nh3. Assay\r\n\r\n*Assay Title* â€“ The name of the assay
-      that the asset links to. \r\n*Assay type* â€“ The controlled vocabulary term
+      - The project that the study belongs to. All assets should be associated with
+      a project\r\n*Investigation title* - The name of the investigation the study
+      belongs to. \r\n\r\n\r\nh3. Assay\r\n\r\n*Assay Title* - The name of the assay
+      that the asset links to. \r\n*Assay type* - The controlled vocabulary term
       describing the assay classification\r\nIf you cannot find a suitable Assay Type
       term, please contact us or your PAL to update the vocabulary \r\n*Technology
-      type* â€“ The controlled vocabulary term describing the technology used in the
+      type* - The controlled vocabulary term describing the technology used in the
       assay\r\nIf you cannot find a suitable Technology Type term, please contact
-      us or your PAL to update the vocabulary \r\n*Study title* â€“ The name of the
+      us or your PAL to update the vocabulary \r\n*Study title* - The name of the
       study the assay belongs to. An assay can belong to more than one study\r\n*Organism*
       The name of the organism being studied with this asset. If uploading through
       SEEK, organism names are provided as a drop-down list\r\n*Strain* The name of
       the particular strain being studied\r\n*WT/Mutant* - Specifies whether this
-      strain is wild-type or mutant\r\n*Genotype* â€“ a brief text description of
-      the genotype\r\n*Phenotype* â€“ a brief text description of the phenotype\r\n*Culture
+      strain is wild-type or mutant\r\n*Genotype* - a brief text description of
+      the genotype\r\n*Phenotype* - a brief text description of the phenotype\r\n*Culture
       Growth* - This describes how the culture was grown for this assay. You can choose
       values from a drop-down list when adding new assays directly to SEEK\r\n*Data
-      File Titles* â€“ the title of one or many data files produced during this assay\r\n*SOP
-      Titles* â€“ the title of one or many SOPs used to execute this assay\r\n"
+      File Titles* - the title of one or many data files produced during this assay\r\n*SOP
+      Titles* - the title of one or many SOPs used to execute this assay\r\n"
     - 2010-09-01 08:59:29.000000000 Z
     - 2010-09-01 09:04:59.000000000 Z
   - - 15
