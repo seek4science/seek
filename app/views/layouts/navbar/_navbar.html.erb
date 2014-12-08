@@ -33,7 +33,7 @@
             <%= render :partial => "layouts/navbar/user_menu" %>
         <% else %>
             <li><%= link_to 'Register', signup_path %></li>
-            <li><%= link_to 'Log in', new_session_path %></li>
+            <li><%= link_to 'Log in', new_session_path(:return_to => request.original_url) %></li>
         <% end %>
       </ul>
 

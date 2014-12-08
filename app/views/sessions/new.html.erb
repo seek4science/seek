@@ -1,11 +1,10 @@
-<h1>Log in</h1>
 <% if logged_in? %>
 	<br/>
 	<p style="text-align:center;">You are already logged in.</p>
 	<p style="text-align:center;"><%= link_to "Sign out", logout_url %></p>
 <% else %>
     <div class="container">
-        <%= render :partial => "gadgets/sign_in" %>
+        <%= render :partial => "gadgets/sign_in", :locals => {:original_url => params[:return_to]} %>
     </div>
         
 	<script language="javascript">
