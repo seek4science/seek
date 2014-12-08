@@ -47,14 +47,14 @@
 
         <%# applying styling to error / notice messages -%>
         <% if flash[:error] %>
-            <div id="error_flash" class="box_standout curved with_smaller_shadow" style="color: red; margin: 0.8em 0.8em; line-height: 1.4;">
-              <%= link_to_function image_tag("close.gif", :style => "float: right;"),"new Effect.toggle('error_flash','slide',{duration:0.3});" %>
+            <div role="alert" class="alert alert-error alert-dismissible fade in" id="error_flash">
+              <button data-dismiss="alert" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
               <%= flash[:error] %>
             </div>
         <% end %>
         <% if flash[:notice] %>
-            <div id="notice_flash" class="box_standout curved with_smaller_shadow" style="color: green; margin: 0.8em 0.8em; line-height: 1.4;">
-              <%= link_to_function image_tag("close.gif", :style => "float: right;"),"new Effect.toggle('notice_flash','slide',{duration:0.3});" %>
+            <div role="alert" class="alert alert-success alert-dismissible fade in" id="notice_flash">
+              <button data-dismiss="alert" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
               <%= flash[:notice] %>
             </div>
         <% end %>
