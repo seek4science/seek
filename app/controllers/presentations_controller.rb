@@ -19,11 +19,6 @@ class PresentationsController < ApplicationController
     if handle_upload_data
       comments=params[:revision_comment]
 
-      #@presentation.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
-      #@presentation.content_type = params[:presentation][:content_type]
-      #@presentation.original_filename = params[:presentation][:original_filename]
-
-
       respond_to do |format|
         if @presentation.save_as_new_version(comments)
           create_content_blobs
