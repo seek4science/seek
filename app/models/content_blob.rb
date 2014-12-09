@@ -29,10 +29,7 @@ class ContentBlob < ActiveRecord::Base
   before_save :calculate_md5
 
   before_save :check_version
-
-  # is_webpage: whether text/html
-  # MERGENOTE, FIXME: this isn't correct. it is possible to not make a local copy and also not display an external link
-  # external_link: true means no local copy, false means local copy. Set true by default on upload page.
+  
   before_create :check_content_type
 
   has_many :worksheets, dependent: :destroy
@@ -269,7 +266,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def dump_tmp_io_object_to_file
-    fail Exception.new('You cannot define both :data content and a :tmp_io_object') unless (@data.nil? || @tmp_io_object.nil?)
+    fail Exception.new('You cannot define both :data content and a :tmp_io_object') unless @data.nil? || @tmp_io_object.nil?
     return unless @tmp_io_object
 
     if @tmp_io_object.is_a?(StringIO)
@@ -282,6 +279,5 @@ class ContentBlob < ActiveRecord::Base
       FileUtils.mv @tmp_io_object.path, filepath
     end
     @tmp_io_object = nil
-
   end
 end
