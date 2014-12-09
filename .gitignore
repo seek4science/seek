@@ -13,6 +13,7 @@ config/initializers/seek_local.rb
 config/environment_local.rb
 config/virtuoso_settings.yml
 config/initializers/taverna_server.rb
+config/sunspot.yml
 
 *.DS_Store
 log/*.log*

@@ -150,13 +150,12 @@ and to stop run:
 
   bundle exec rake sunspot:solr:stop
 
-Optionally, there is also a configuration file in config/sunspot.yml for configuring the port that Solr runs on - which is important if running multiple SEEK
-installations on the same machine.
+Optionally, there is also a configuration file for configuring the port and host that Solr runs on - which is important if running multiple SEEK
+installations on the same machine. If you wish to override the default ports then copy config/sunspot.default.yml to sunspot.yml and change the settings.
 
 The following task can also be at any time if there is need to force all content to be reindexed (such as after a period of running SEEK with search turned off).
 
   bundle exec rake seek:reindex_all
-
 
 === Starting and Stopping the Background Service
 
