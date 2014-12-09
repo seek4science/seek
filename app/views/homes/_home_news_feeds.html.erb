@@ -4,7 +4,7 @@
         <div class="panel panel-default">
           <div class="panel-heading"><%= Seek::Config.application_name%> News</div>
           <div id="project_news" class="panel-body front-page-panel">
-            <ul>
+            <ul class="feed">
               <%
                  entries = Seek::FeedReader.fetch_entries_for :project_news
               %>
@@ -24,7 +24,7 @@
         <div class="panel panel-default">
           <div class="panel-heading">Community News</div>
           <div id="community_news" class="panel-body front-page-panel">
-            <ul>
+            <ul class="feed">
               <%
                  entries = Seek::FeedReader.fetch_entries_for :community_news
               %>

@@ -117,12 +117,12 @@ module HomesHelper
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
 
           unless entry_title.blank? || entry_link.blank?
-            html << "<li class='homepanel_item'>"
+            html << "<li>"
             html << link_to("#{(entry_title)}", "#{entry_link}", :title => tooltip, :target=>"_blank")
-            html << "<div class='feedinfo none_text'>"
+            html << "<br/><span class='subtle'>"
             html << feed_title
             html << " - #{time_ago_in_words(entry_date)} ago" unless entry_date.nil?
-            html << "</div>"
+            html << "</span>"
             html << "</li>"
           end
       end
@@ -187,17 +187,15 @@ module HomesHelper
       html=''
        unless item.blank?
          image=item[:avatar_image]
-          icon  = link_to(image, item[:url], :class=> "asset", :title => tooltip_title_attrib(item[:type]))
+          icon  = link_to(image, item[:url], :class=> "file-type-icon", :title => tooltip_title_attrib(item[:type]))
 
           description = item[:description] || item[:abstract]
 
           tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{item[:created_at]}</p>")
-          html << "<li class='homepanel_item'>"
+          html << "<li>"
           html << "#{icon} "
           html << link_to(item[:title], item[:url], :title => tooltip)
-          html << "<div class='feedinfo none_text'>"
-          html << "<span>#{item[:type]} - #{action} #{time_ago_in_words(item[:created_at])} ago</span>"
-          html << "</div>"
+          html << "<br/><span class='subtle'>#{item[:type]} - #{action} #{time_ago_in_words(item[:created_at])} ago</span>"
           html << "</li>"
       end
       html.html_safe

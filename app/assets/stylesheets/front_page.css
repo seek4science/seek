@@ -9,6 +9,5 @@
 *= require site_announcements
 *= require top_menu
 *= require dynamic_menu
-*= require homepage
 *= require jscrollpane/jquery.jscrollpane
 */

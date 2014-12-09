@@ -6,3 +6,30 @@
   max-height: 280px;
   overflow-y: auto;
 }
+
+ul.feed {
+  padding: 0;
+  margin: 0;
+}
+
+ul.feed li {
+  list-style: none;
+  border-top: 1px solid #ccc;
+  padding: 0.5em 0;
+}
+
+ul.feed li:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+ul.feed .file-type-icon {
+  display: block;
+  float: left;
+  margin: 0 0.5em 0.5em 0;
+}
+
+.subtle {
+  font-size: 80%;
+  color: #777777;
+}
