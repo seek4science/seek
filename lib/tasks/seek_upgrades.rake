@@ -67,7 +67,7 @@ namespace :seek do
   end
 
   desc("Synchronised the assay and technology types assigned to assays according to the current ontology, resolving any suggested types that have been added")
-  task(:resynchronise_ontology_types=>:environment) do
+  task(:resynchronise_ontology_types=>[:environment,"tmp:create"]) do
     synchronizer = Seek::Ontologies::Synchronize.new
     synchronizer.synchronize_assay_types
     synchronizer.synchronize_technology_types
