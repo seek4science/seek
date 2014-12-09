@@ -33,3 +33,31 @@ ul.feed .file-type-icon {
   font-size: 80%;
   color: #777777;
 }
+
+.powered-by {
+  padding: 2px;
+  margin: 2px auto;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  width: 90px;
+  display: block;
+  border-radius: 4px;
+}
+
+#ft {
+  color: #333;
+  background-color: #eee;
+  bottom: 0;
+  margin-top: 1em;
+  text-align: center;
+  padding: 1em 0.5em;
+  font-size: small;
+  border-top: 1px solid #ccc;
+}
+
+#ft .logo-section {
+  border: 1px solid #ccc;
+  background-color: #fff;
+  padding: 0.5em;
+  border-radius: 4px;
+}
