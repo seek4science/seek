@@ -12,8 +12,8 @@ sudo: false
 cache: bundler
 
 branches:
-except:
-- bootstrap
+  except:
+    - bootstrap
 
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
