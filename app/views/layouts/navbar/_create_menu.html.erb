@@ -4,7 +4,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <% new_creatable_selection_list.each do |item| %>
-        <li><a href="#" onclick="javascript:newAssetSelected('<%= item[1] -%>');"><%= item[0] -%></a></li>
+        <li>
+          <%= link_to item[0], {:controller => item[1].pluralize, :action => 'new'} %>
+        </li>
     <% end %>
   </ul>
 </li>
