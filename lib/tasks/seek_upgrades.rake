@@ -14,7 +14,6 @@ namespace :seek do
       :update_admin_assigned_roles,
       :repopulate_missing_publication_book_titles,
       :resynchronise_ontology_types,
-      :remove_invalid_group_memberships,
       :convert_publication_authors,
       :clear_filestore_tmp,
       :repopulate_auth_lookup_tables,
@@ -36,14 +35,6 @@ namespace :seek do
     end
 
     puts "Upgrade completed successfully"
-  end
-
-  desc("Cleans out group memberships where the person no longer exists")
-  task(:remove_invalid_group_memberships => :environment) do
-    invalid = GroupMembership.select { |gm| gm.person.nil? || gm.work_group.nil? }
-    invalid.each do |inv|
-      inv.destroy
-    end
   end
 
   task(:convert_publication_authors => :environment) do
