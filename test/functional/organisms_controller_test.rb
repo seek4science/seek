@@ -124,9 +124,8 @@ class OrganismsControllerTest < ActionController::TestCase
     o=organisms(:human)
     assert_difference('Organism.count', -1) do
       delete :destroy, :id => o
-    end    
-    #TODO: this should be changed to organisms#index when/if it exists
-    assert_redirected_to root_path
+    end
+    assert_redirected_to organisms_path
   end
   
   test "cannot delete as non-admin" do
@@ -134,7 +133,8 @@ class OrganismsControllerTest < ActionController::TestCase
     o=organisms(:human)
     assert_no_difference('Organism.count') do
       delete :destroy, :id => o
-    end    
+    end
+    refute_nil flash[:error]
   end
 
   test "visualise available when logged out" do

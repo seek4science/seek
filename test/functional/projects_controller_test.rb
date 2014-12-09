@@ -120,8 +120,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_no_difference('Project.count') do
       delete :destroy, :id => project
     end
-    assert_redirected_to project_path(project)
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
   
  def test_non_admin_should_not_manage_projects

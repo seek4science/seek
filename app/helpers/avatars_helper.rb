@@ -61,7 +61,7 @@ module AvatarsHelper
 
   def avatar_according_to_user_upload(alternative, item, size)
     if item.avatar_selected?
-      image_tag avatar_url(object, object.avatar_id, size), alt: alternative, class: 'framed'
+      image_tag avatar_url(item, item.avatar_id, size), alt: alternative, class: 'framed'
     else
       default_avatar(item.class.name, size, alternative)
     end
