@@ -203,7 +203,7 @@ class DataciteDoiTest < ActionController::IntegrationTest
       assert_equal asset.version, log.asset_version
       assert_equal User.current_user.id, log.user_id
       assert_equal 1, log.action #MINTED
-      assert_equal "10.5072/Sysmo.SEEK.#{asset.class.name}.#{asset.id}.#{asset.version}", log.doi
+      assert_equal "10.5072/Sysmo.SEEK.#{asset.class.name.downcase}.#{asset.id}.#{asset.version}", log.doi
       AssetDoiLog.was_doi_minted_for?(asset.class.name, asset.id, asset.version)
     end
   end
