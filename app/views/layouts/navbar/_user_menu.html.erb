@@ -5,9 +5,9 @@
       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
         <% current_person = current_user.person %>
         <% if current_person.avatar.nil? %>
-            <%= image_tag(icon_filename_for_key("person_avatar"), :size => "20x20") %>
+            <%= image_tag(icon_filename_for_key("person_avatar"), :size => "18x18") %>
         <% else %>
-            <%= image_tag avatar_url(current_person, current_person.avatar_id, 20) %>
+            <%= image_tag avatar_url(current_person, current_person.avatar_id, 18) %>
         <% end %>
         <%= current_person.name %>
         <span class="caret"></span>
