@@ -54,7 +54,7 @@ namespace :seek do
   end
 
   def convert_publication_authors(publication)
-    puts "publication #{publication.id} needs updating"
+    puts "publication #{publication.id} authors being updating"
     PublicationAuthorOrder.where(:publication_id => publication.id).each do |publication_author_order|
       publication_author = publication_author_order.author
       if publication_author.is_a?(Person)
