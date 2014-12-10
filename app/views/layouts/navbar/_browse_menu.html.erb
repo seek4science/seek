@@ -5,6 +5,7 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li role="presentation" class="dropdown-header visible-md-block">Browse</li>
     <li role="presentation" class="dropdown-header"><%= t("menu.yellow_pages") -%></li>
     <% if Seek::Config.programmes_enabled %>
         <li><%= link_to t('programme').pluralize, programmes_path %></li>

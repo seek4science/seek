@@ -5,6 +5,7 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li role="presentation" class="dropdown-header visible-md-block">Create</li>
     <% new_creatable_selection_list.each do |item| %>
         <li>
           <%= link_to item[0], {:controller => item[1].pluralize, :action => 'new'} %>

@@ -5,6 +5,7 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li role="presentation" class="dropdown-header visible-md-block"><%= t("menu.documentation") -%></li>
     <li><%= link_to t("menu.help"), help_documents_path -%></li>
     <li><%= link_to t("menu.faq"), help_documents_path + '/faq' -%></li>
     <li><%= link_to t("menu.jerm_templates"), help_documents_path + '/templates' -%></li>
