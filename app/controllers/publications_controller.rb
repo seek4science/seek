@@ -272,6 +272,9 @@ class PublicationsController < ApplicationController
       rescue => exception
         result ||= Bio::Reference.new({})
         result.error = "There was an problem contacting the pubmed query service. Please try again later"
+        if Seek::Config.exception_notification_enabled
+          ExceptionNotifier.notify_exception(exception,:data=>{:message=>"Problem accessing ncbi using pubmed id #{pubmed_id}"})
+        end
       end
     elsif doi
       query = DoiQuery.new(Seek::Config.crossref_api_email)
