@@ -1,31 +1,31 @@
-
 <% @search_type="All" unless @search_type %>
-
 
 <% force_search_type(search_type_options) %>
 
-<% if true || Seek::Config.solr_enabled -%>
-
-  <%= form_tag main_app.search_path, :class => 'navbar-form navbar-left' do -%>
-    <div id="search_box" class="input-group">
-      <%= text_field_tag :search_query, @search_query, :class=>"form-control", :placeholder=>"Search here..." %>
-      <% if false && show_scales? && Seek::Config.is_virtualliver %>
-        <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])) %>
-      <% end %>
-      <% if false && Seek::Config.external_search_enabled %>
-        <span title='<%= tooltip_title_attrib(external_search_tooltip_text) -%>' >
-          <%= check_box_tag :include_external_search, 1, @include_external_search -%>External
-        </span>
-      <% end %>
-      <div class="input-group-btn">
-        <%= submit_tag "Search", :class => 'btn btn-default' -%>
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">All <span class="caret"></span></button>
-        <ul class="dropdown-menu dropdown-menu-right" role="menu">
-            <% search_type_options[1..-1].each do |option| %>
-                <li><a href="#">Search <%= option.first %></a></li>
+<% if Seek::Config.solr_enabled -%>
+    <%= form_tag main_app.search_path, :class => 'navbar-form navbar-left' do -%>
+        <div id="search_box">
+          <div class="input-group">
+            <%= text_field_tag :search_query, @search_query, :class=>"form-control", :placeholder=>"Search here..." %>
+            <div class="input-group-btn">
+                <%= submit_tag "Search", :class => 'btn btn-default' -%>
+                <button title="<%= tooltip_title_attrib('Click for more search options') -%>" type="button" class="btn btn-default" aria-expanded="false" onclick="$j('#advanced-search').fadeToggle()">
+                  <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;</button>
+            </div>
+          </div>
+          <div id="advanced-search" style="display: none">
+            <%= select_tag :search_type, options_for_select(search_type_options,@search_type) %>
+            <% if show_scales? && Seek::Config.is_virtualliver %>
+                <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])) %>
             <% end %>
-        </ul>
-      </div>
-    </div>
-  <% end  -%>
+            <% if Seek::Config.external_search_enabled %>
+                <div class="checkbox" style="display: inline-block">
+                  <label title="<%= tooltip_title_attrib(external_search_tooltip_text) -%>">
+                    <%= check_box_tag :include_external_search, 1, @include_external_search, :class => "checkbox" -%> External
+                  </label>
+                </div>
+            <% end %>
+          </div>
+        </div>
+    <% end  -%>
 <% end %>
