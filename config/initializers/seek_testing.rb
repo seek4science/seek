@@ -81,6 +81,8 @@ SEEK::Application.configure do
       Settings.defaults[:facet_enable_for_pages] = {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
       Settings.defaults[:faceted_search_enabled] =  false
 
+      Settings.defaults[:recaptcha_enabled] = true
+
       #enable solr for testing, but use mockup sunspot session
       Settings.defaults[:solr_enabled] = true
       Sunspot.session = SunspotMatchers::SunspotSessionSpy.new(Sunspot.session)
