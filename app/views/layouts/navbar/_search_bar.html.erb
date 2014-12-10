@@ -10,7 +10,9 @@
             <div class="input-group-btn">
                 <%= submit_tag "Search", :class => 'btn btn-default' -%>
                 <button title="<%= tooltip_title_attrib('Click for more search options') -%>" type="button" class="btn btn-default" aria-expanded="false" onclick="$j('#advanced-search').fadeToggle()">
-                  <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;</button>
+                  <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                  <span class="caret"></span>
+                </button>
             </div>
           </div>
           <div id="advanced-search" style="display: none">

@@ -1,5 +1,3 @@
-<% include_projects = false %>
-
 <% if logged_in_and_registered? %>
     <li class="dropdown" id="user-menu">
       <a href="#" id="user-menu-button" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -9,7 +7,7 @@
         <% else %>
             <%= image_tag avatar_url(current_person, current_person.avatar_id, 18) %>
         <% end %>
-        <%= current_person.name %>
+        <span class="truncated-name" style="max-width: 15em"><%= current_person.name %></span>
         <span class="caret"></span>
       </a>
       <ul class="dropdown-menu" role="menu">
@@ -18,7 +16,7 @@
         <li><%= link_to 'Edit profile', edit_person_path(current_person) -%></li>
         <li><%= link_to 'Change password', edit_user_path(current_user) -%></li>
 
-        <% unless !include_projects || current_person.projects.empty? %>
+        <% unless current_person.projects.empty? %>
             <li role="presentation" class="dropdown-header"> Your projects</li>
             <% current_person.projects.each do |project| %>
                 <li><%= link_to project.title, project_path(project) -%></li>

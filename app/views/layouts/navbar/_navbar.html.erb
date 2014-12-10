@@ -27,9 +27,6 @@
 
       <ul class="nav navbar-nav navbar-right">
         <% if logged_in_and_registered? %>
-            <% if current_user.try(:person).try(:member?) -%>
-                <%= render :partial => "layouts/navbar/projects_menu" %>
-            <% end %>
             <%= render :partial => "layouts/navbar/user_menu" %>
         <% else %>
             <li><%= link_to 'Register', signup_path %></li>

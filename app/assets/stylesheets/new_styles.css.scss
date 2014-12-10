@@ -97,3 +97,15 @@ ul.feed .file-type-icon {
   vertical-align: middle;
 }
 
+#search_box {
+  width: 18em;
+}
+
+span.truncated-name {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
