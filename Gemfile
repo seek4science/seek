@@ -84,7 +84,7 @@ gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :bra
 gem 'jquery-rails', '~> 3'
 gem 'jquery-ui-rails', '~>3'
 gem "recaptcha"
-gem 'metainspector'
+gem 'metainspector','3.3.0'
 gem 'mechanize'
 gem 'mimemagic'
 

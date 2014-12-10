@@ -353,7 +353,7 @@ GEM
       nokogiri (~> 1.4)
       ntlm-http (~> 0.1, >= 0.1.1)
       webrobots (>= 0.0.9, < 0.2)
-    metainspector (4.0.0)
+    metainspector (3.3.0)
       addressable (~> 2.3.5)
       faraday (~> 0.9.0)
       faraday-cookie_jar (~> 0.0.6)
@@ -707,7 +707,7 @@ DEPENDENCIES
   linkeddata
   lograge
   mechanize
-  metainspector
+  metainspector (= 3.3.0)
   mimemagic
   minitest (~> 4.0)
   minitest-reporters
