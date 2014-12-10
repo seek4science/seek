@@ -8,11 +8,7 @@
 %>
 
 <% if current_user.person.can_create_new_items? -%>
-
     <% cache "new_object_gadget" do -%>
-        <%= new_creatable_javascript -%>
-        <%= hidden_field_tag :new_resource_type %>
-
         <div id="new_asset" class="sysmo_gadget">
 
           <div class="header curved_top">
@@ -25,7 +21,7 @@
               <ul id="new_asset_menu" class='dynamic_menu with_smaller_shadow' style="display:none;">
 
                 <% new_creatable_selection_list.each do |item| -%>
-                    <li class='dynamic_menu_li' onclick="javascript:newAssetSelected('<%= item[1] -%>');"><%= item[0] -%></li>
+                    <li class='dynamic_menu_li'><%= link_to item[0], item[1] %></li>
                 <% end -%>
 
               </ul>
@@ -38,16 +34,7 @@
           </div>
 
         </div>
-        <script type="text/javascript">
-
-            function newAssetSelected(item) {
-                $('new_resource_type').value = item;
-                newAsset();
-            }
-
-        </script>
     <% end -%>
-
 <% end -%>
 
 

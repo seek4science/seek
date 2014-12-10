@@ -181,34 +181,13 @@ module ApplicationHelper
     return results
   end
 
-  def new_creatable_javascript
-    script="<script type='text/javascript'>\n"
-    script << "function newAsset() {\n"
-    script << "selected_model=$('new_resource_type').value;\n"
-    Seek::Util.user_creatable_types.each do |c|
-      name=c.name.underscore
-      path = eval "new_#{name}_path"
-      data_file_with_sample_path = eval "new_data_file_path(:page_title=>'#{t("data_file")} with Sample Parsing',:is_with_sample=>true)"
-      if c==Seek::Util.user_creatable_types.first
-        script << "if "
-      else
-        script << "else if(selected_model == 'data_file_with_sample'){
-          \n location.href = '#{data_file_with_sample_path}';\n
-        } \n"
-        script << "else if "
-      end
-      script << "(selected_model == '#{name}') {\n location.href = '#{path}';\n }\n"
-
-    end
-    script << "}\n"
-    script << "</script>"
-    script.html_safe
-  end
-
   #selection of assets for new asset gadget
   def new_creatable_selection_list
-    creatable_options = Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, c.name.underscore] }
-    creatable_options << ["#{t('data_file')} with sample", "data_file_with_sample"] if Seek::Config.sample_parser_enabled
+    creatable_options = Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, url_for({:controller => c.name.underscore.pluralize, :action => 'new'})] }
+    if Seek::Config.sample_parser_enabled
+      creatable_options << ["#{t('data_file')} with sample",
+                            new_data_file_url(:page_title=>"#{t('data_file')} with Sample Parsing", :is_with_sample=>true)]
+    end
     creatable_options
   end
 
