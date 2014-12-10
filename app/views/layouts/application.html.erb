@@ -44,7 +44,7 @@
 
         <%# applying styling to error / notice messages -%>
         <% if flash[:error] %>
-            <div role="alert" class="alert alert-error alert-dismissible fade in" id="error_flash">
+            <div role="alert" class="alert alert-danger alert-dismissible fade in" id="error_flash">
               <button data-dismiss="alert" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
               <%= flash[:error] %>
             </div>
