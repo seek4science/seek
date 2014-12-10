@@ -1,8 +1,8 @@
 <% include_projects = false %>
 
 <% if logged_in_and_registered? %>
-    <li class="dropdown">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <li class="dropdown" id="user-menu">
+      <a href="#" id="user-menu-button" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
         <% current_person = current_user.person %>
         <% if current_person.avatar.nil? %>
             <%= image_tag(icon_filename_for_key("person_avatar"), :size => "18x18") %>
@@ -24,6 +24,49 @@
                 <li><%= link_to project.title, project_path(project) -%></li>
             <% end %>
         <% end %>
+
+        <li role="presentation" class="dropdown-header">
+          Your favourites
+          <span id="fav_ajax-loader" style="display:none;">
+            <%= image_tag("ajax-loader.gif", :alt=>"loading...",:title=>"loading...") %>
+          </span>
+        </li>
+        <div id="drop-favourite-text" style="display: none">
+          <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+          Drop here to save
+        </div>
+        <% cache "favourites/user/#{current_user.id}" do -%>
+            <div id="drop_favourites">
+              <div id="favourite_list">
+                <%= render :partial=>"favourites/gadget_list" %>
+              </div>
+            </div>
+        <% end -%>
+        <div id="delete-favourite-zone" style="display: none">
+          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Drop here to delete
+        </div>
+        <%= drop_receiving_element(:drop_favourites,
+                                   :accept=>"asset",
+                                   :url=>{:controller=>'favourites', :action=>'add'},
+                                   :before => "Element.show('fav_ajax-loader')",
+                                   :complete => "Element.hide('fav_ajax-loader');")
+        %>
+        <%= drop_receiving_element(:drop_favourites,
+                                   :accept=>"search",
+                                   :url=>{:controller=>'favourites', :action=>'add',
+                                          :search_query => params[:search_query],
+                                          :search_type => params[:search_type],
+                                          :include_external_search => params[:include_external_search]},
+                                   :before => "Element.show('fav_ajax-loader')",
+                                   :complete => "Element.hide('fav_ajax-loader');")
+        %>
+        <%= drop_receiving_element("delete-favourite-zone",
+                                   :accept=>"favourite",
+                                   :url=>{:controller=>'favourites', :action=>'delete'},
+                                   :method=>:delete,
+                                   :before => "Element.show('fav_ajax-loader')",
+                                   :complete => "Element.hide('fav_ajax-loader');") %>
+
         <% if current_person.is_admin? %>
             <li role="presentation" class="divider"></li>
             <li><%= link_to 'Server admin', admin_path -%></li>

@@ -63,7 +63,7 @@ module ResourceListItemHelper
     resource_path = show_resource_path(resource)
     image=resource_avatar resource, :style => "width: 24px; height: 24px; vertical-align: middle"
 
-    icon = link_to_draggable(image, resource_path, :id => model_to_drag_id(resource), :class => "asset", :title => tooltip_title_attrib(get_object_title(resource)))
+    icon = link_to_draggable(image, resource_path, :id => model_to_drag_id(resource), :class => "asset favouritable", :title => tooltip_title_attrib(get_object_title(resource)))
 
     html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? resource_path : url)}</p>"
     html << "#item_visibility"

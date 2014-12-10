@@ -33,7 +33,7 @@ module FavouritesHelper
       tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
     end
 
-    link_to_draggable(tiny_image, show_resource_path(item), :title=>tooltip_title_attrib(title),:class=>"favourite", :id=>"fav_#{favourite.id}")
+    link_to_draggable(tiny_image, show_resource_path(item), :title=>tooltip_title_attrib(title),:class=>"favourite favouritable", :id=>"fav_#{favourite.id}")
 
   end
   
@@ -46,7 +46,7 @@ module FavouritesHelper
     #the image_tag_for_key:
     html = avatar(item, size, true)
 
-    html = link_to_draggable(html, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(item)))
+    html = link_to_draggable(html, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset favouritable", :title=>tooltip_title_attrib(get_object_title(item)))
     html = "<div class='favouritable_icon'>#{html}</div>"
     html.html_safe
   end 

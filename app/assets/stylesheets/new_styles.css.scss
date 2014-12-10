@@ -1,3 +1,5 @@
+@import 'bootstrap_colours';
+
 .logo_link {
   margin-right: 1em;
 }
@@ -60,4 +62,31 @@ ul.feed .file-type-icon {
   background-color: #fff;
   padding: 0.5em;
   border-radius: 4px;
+}
+
+#delete-favourite-zone {
+  background-color: $brand-danger;
+  color: white;
+  font-size: small;
+  padding: 8px 3px;
+  text-align: center;
+  border-radius: 4px;
+  margin: 5px;
+}
+
+#drop_favourites {
+  padding: 0.75em;
+}
+
+#drop_favourites.active {
+  border-style: solid;
+  border-width: 1px 0;
+  border-color: $brand-success; /* a bootstrap variable! (green colour) */
+}
+
+#drop-favourite-text {
+  padding: 0.25em 0.75em;
+  background: $brand-success;
+  color: white;
+  font-size: small;
 }

@@ -90,12 +90,12 @@ module AssetsHelper
       if resource.use_mime_type_for_avatar?
         image = image file_type_icon_key(resource_version), {}
       end
-      icon = link_to_draggable(image, show_resource_path(resource_version), :id => model_to_drag_id(resource_version), :class => "asset", :title => tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+      icon = link_to_draggable(image, show_resource_path(resource_version), :id => model_to_drag_id(resource_version), :class => "asset favouritable", :title => tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     else
       if resource.use_mime_type_for_avatar?
         image = image file_type_icon_key(resource), {}
       end
-      icon = link_to_draggable(image, show_resource_path(resource), :id => model_to_drag_id(resource), :class => "asset", :title => tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+      icon = link_to_draggable(image, show_resource_path(resource), :id => model_to_drag_id(resource), :class => "asset favouritable", :title => tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     end
     icon.html_safe
   end
