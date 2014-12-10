@@ -1,4 +1,4 @@
-@import 'bootstrap_colours';
+@import 'bootstrap_variables';
 
 .logo_link {
   margin-right: 1em;
@@ -93,12 +93,14 @@ ul.feed .file-type-icon {
 }
 
 #advanced-search {
-  display: inline-block;
   vertical-align: middle;
+  padding: 5px;
 }
 
-#search_box {
-  width: 18em;
+@media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
+  #search_box {
+    width: 18em;
+  }
 }
 
 span.truncated-name {

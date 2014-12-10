@@ -1,7 +1,10 @@
-/* Customize colours here */
+/* Customize colours etc. here */
 @import 'bootstrap/variables';
 
 $navbar-default-bg: #f8f8f8;
 $navbar-default-link-color: #777;
 $navbar-default-link-active-color: #555;
 $navbar-default-link-hover-color: #333;
+
+$grid-float-breakpoint: $screen-sm-max;
+
