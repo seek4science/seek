@@ -21,33 +21,36 @@ class DataFileTest < ActiveSupport::TestCase
     check_for_soffice
     df = Factory :data_file, :content_blob=>Factory(:doc_content_blob,:original_filename=>"word.doc")
     assert_equal ["This is a ms word doc format","word.doc"],df.content_blob_search_terms.sort
+
+    df = Factory :xlsx_spreadsheet_datafile
+    assert_includes df.content_blob_search_terms,"mild stress"
   end
 
-  test "spreadsheet contents for search" do
-    df = Factory :rightfield_datafile
-    
-    data = df.spreadsheet_contents_for_search
-    assert !data.empty?,"Content should not be empty"
-    assert data.include?("design type")
-    assert data.include?("methodological design"), "content should be humanized"
-    assert data.include?("MethodologicalDesign"),"should also preserve original form before humanizing"
-    assert data.include?("absolute")
-    assert !data.include?("ontology"),"Shouldn't include content from hidden sheets"
-    assert !data.include?("relative"),"Shouldn't include content from hidden sheets"
-
-    assert !data.include?("44.0"),"Should not include numbers"
-    assert !data.include?("1.0"),"Should not include numbers"
-    assert !data.include?("1.7"),"Should not include numbers"
-
-    assert !data.include?(44),"Should not include numbers"
-    assert !data.include?(1),"Should not include numbers"
-    assert !data.include?(1.7),"Should not include numbers"
-
-    assert !data.include?("seek id"),"Should not include blacklisted text"
-
-    df = data_files(:picture)
-    assert_equal [],df.spreadsheet_contents_for_search
-  end
+  # test "spreadsheet contents for search" do
+  #   df = Factory :rightfield_datafile
+  #
+  #   data = df.spreadsheet_contents_for_search
+  #   assert !data.empty?,"Content should not be empty"
+  #   assert data.include?("design type")
+  #   assert data.include?("methodological design"), "content should be humanized"
+  #   assert data.include?("MethodologicalDesign"),"should also preserve original form before humanizing"
+  #   assert data.include?("absolute")
+  #   assert !data.include?("ontology"),"Shouldn't include content from hidden sheets"
+  #   assert !data.include?("relative"),"Shouldn't include content from hidden sheets"
+  #
+  #   assert !data.include?("44.0"),"Should not include numbers"
+  #   assert !data.include?("1.0"),"Should not include numbers"
+  #   assert !data.include?("1.7"),"Should not include numbers"
+  #
+  #   assert !data.include?(44),"Should not include numbers"
+  #   assert !data.include?(1),"Should not include numbers"
+  #   assert !data.include?(1.7),"Should not include numbers"
+  #
+  #   assert !data.include?("seek id"),"Should not include blacklisted text"
+  #
+  #   df = data_files(:picture)
+  #   assert_equal [],df.spreadsheet_contents_for_search
+  # end
 
 
   test "event association" do
