@@ -62,7 +62,7 @@ module Seek
     end
 
     def is_content_viewable? blob=self
-       blob.asset.is_downloadable_asset? && (blob.is_viewable_format? || File.exist?(blob.filepath('pdf')))
+       blob.asset.is_downloadable_asset? && blob.is_viewable_format?
     end
 
     private
