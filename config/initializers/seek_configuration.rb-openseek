@@ -97,6 +97,9 @@ SEEK::Application.configure do
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
+  #the maximum size, in Mb, for a spreadsheet file that can be extracted and explored
+  Seek::Config.default :max_extractable_spreadsheet_size,10
+
   Seek::Config.default :is_virtualliver, false
 
 # Pagination
