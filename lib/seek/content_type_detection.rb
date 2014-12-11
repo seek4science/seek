@@ -3,7 +3,7 @@ module Seek
 
     include Seek::MimeTypes
 
-    MAX_EXTRACTABLE_SPREADSHEET_SIZE=4*1024*1024
+    MAX_EXTRACTABLE_SPREADSHEET_SIZE=(Seek::Config.max_extractable_spreadsheet_size || 10).to_i*1024*1024
     MAX_SIMULATABLE_SIZE=5*1024*1024
     PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt xls xlsx]
     PDF_VIEWABLE_FORMAT = PDF_CONVERTABLE_FORMAT - %w[xls xlsx]
