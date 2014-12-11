@@ -27,7 +27,7 @@ function animateNode(node){
         css: { 'width':250, 'height':50 }
     }, {
         duration: 300
-    })
+    });
     // set font style here for better animation (instead of in animate function).
     node.css('font-size', 14);
     node.css('font-weight', 'bolder');
@@ -86,6 +86,59 @@ function connectedNodes(node){
     return connected_nodes;
 }
 
+
+function targetNodeCollection(node){
+    var edges = cy.$('edge');
+    var target_node_collection = cy.collection();
+    edges.each(function(i, edge){
+        var source = edge.source();
+        var target =edge.target();
+        if (source.id() == node.id()){
+            target_node_collection = target_node_collection.add(target);
+        }
+    });
+    return target_node_collection;
+}
+
+function sourceNodeCollection(node){
+    var edges = cy.$('edge');
+    var source_node_collection = cy.collection();
+    edges.each(function(i, edge){
+        var source = edge.source();
+        var target =edge.target();
+        if (target.id() == node.id()){
+            source_node_collection = source_node_collection.add(source);
+        }
+    });
+    return source_node_collection;
+}
+
+function edgeToTargetCollection(node){
+    var edges = cy.$('edge');
+    var edge_to_target_collection = cy.collection();
+    edges.each(function(i, edge){
+        var source = edge.source();
+        var target =edge.target();
+        if (source.id() == node.id()){
+            edge_to_target_collection = edge_to_target_collection.add(edge);
+        }
+    });
+    return edge_to_target_collection;
+}
+
+function edgeToSourceCollection(node){
+    var edges = cy.$('edge');
+    var edge_to_source_collection = cy.collection();
+    edges.each(function(i, edge){
+        var source = edge.source();
+        var target =edge.target();
+        if (target.id() == node.id()){
+            edge_to_source_collection = edge_to_source_collection.add(edge);
+        }
+    });
+    return edge_to_source_collection;
+}
+
 function processPanzoom() {
     //display panzoom
     $j('#cy').cytoscapePanzoom({
@@ -134,6 +187,22 @@ function fadingNodes(nodes){
 
 function fadingEdges(edges){
     edges.css('opacity', 0.2);
+}
+
+function hidingNodes(nodes){
+    nodes.animate({
+        css: { 'opacity': 0 }
+    }, {
+        duration: 300
+    });
+}
+
+function hidingEdges(edges){
+    edges.animate({
+        css: { 'opacity': 0 }
+    }, {
+        duration: 300
+    });
 }
 
 function normalizingNodes(nodes){
