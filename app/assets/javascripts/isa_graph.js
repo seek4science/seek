@@ -174,19 +174,35 @@ function alignCenterVertical(element, element_height){
 }
 
 function appearingNodes(nodes){
-    nodes.css('opacity', 1);
+    nodes.animate({
+        css: { 'opacity': 1 }
+    }, {
+        duration: 300
+    });
 }
 
 function appearingEdges(edges){
-    edges.css('opacity', 1);
+    edges.animate({
+        css: { 'opacity': 1 }
+    }, {
+        duration: 300
+    });
 }
 
 function fadingNodes(nodes){
-    nodes.css('opacity', 0.3);
+    nodes.animate({
+        css: { 'opacity': 0.3 }
+    }, {
+        duration: 300
+    });
 }
 
 function fadingEdges(edges){
-    edges.css('opacity', 0.2);
+    edges.animate({
+        css: { 'opacity': 0.2 }
+    }, {
+        duration: 300
+    });
 }
 
 function hidingNodes(nodes){
