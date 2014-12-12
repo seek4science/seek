@@ -49,7 +49,7 @@ class AvatarsControllerTest < ActionController::TestCase
     get :index,:person_id => person.id
     assert_response :success
 
-    assert_select 'div.breadcrumbs', :text => /Home > People Index > #{person.title} > Edit > Avatars Index/, :count => 1 do
+    assert_select 'div.breadcrumbs', :text => /Home People Index #{person.title} Edit Avatars Index/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", people_url, :count => 1
       assert_select "a[href=?]", person_url(person), :count => 1
@@ -62,7 +62,7 @@ class AvatarsControllerTest < ActionController::TestCase
     Factory(:avatar,:owner=>person)
     get :new,:person_id => person.id
     assert_response :success
-    assert_select 'div.breadcrumbs', :text => /Home > People Index > #{person.title} > Edit > Avatars Index > New/, :count => 1 do
+    assert_select 'div.breadcrumbs', :text => /Home People Index #{person.title} Edit Avatars Index New/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", people_url, :count => 1
       assert_select "a[href=?]", person_url(person), :count => 1
