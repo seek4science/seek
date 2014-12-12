@@ -19,11 +19,6 @@ class PresentationsController < ApplicationController
     if handle_upload_data
       comments=params[:revision_comment]
 
-      #@presentation.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
-      #@presentation.content_type = params[:presentation][:content_type]
-      #@presentation.original_filename = params[:presentation][:original_filename]
-
-
       respond_to do |format|
         if @presentation.save_as_new_version(comments)
           create_content_blobs
@@ -172,29 +167,5 @@ class PresentationsController < ApplicationController
     end
   end
 
-  # DELETE /presentations/1
-  # DELETE /presentations/1.xml
-  def destroy
-    @presentation.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(presentations_path) }
-      format.xml  { head :ok }
-    end
-  end
-
-  def preview
-
-    element = params[:element]
-    presentation = Presentation.find_by_id(params[:id])
-
-    render :update do |page|
-      if presentation.try :can_view?
-        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>presentation}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
-  end
 
 end

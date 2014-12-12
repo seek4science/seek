@@ -204,36 +204,9 @@ class AssaysController < ApplicationController
     end
   end
 
-  def destroy
-
-    respond_to do |format|
-      if @assay.can_delete?(current_user) && @assay.destroy
-        format.html { redirect_to(assays_url) }
-        format.xml { head :ok }
-      else
-        flash.now[:error]="Unable to delete the assay" if !@assay.study.nil?
-        format.html { render :action=>"show" }
-        format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }
-      end
-    end
-  end
-
   def update_types
     render :update do |page|
       page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
-    end
-  end
-
-  def preview
-    element=params[:element]
-    assay  =Assay.find_by_id(params[:id])
-
-    render :update do |page|
-      if assay.try :can_view?
-        page.replace_html element, :partial=>"assays/preview_for_associate", :locals=>{:resource=>assay}
-      else
-        page.replace_html element, :text=>"Nothing is selected to preview."
-      end
     end
   end
 

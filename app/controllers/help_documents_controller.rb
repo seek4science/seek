@@ -1,5 +1,7 @@
 class HelpDocumentsController < ApplicationController
 
+  include Seek::DestroyHandling
+
   before_filter :documentation_enabled?
   before_filter :find_document, :except => [:new, :index, :create]
   before_filter :login_required, :except=>[:show,:index]
@@ -77,15 +79,6 @@ class HelpDocumentsController < ApplicationController
         format.html { render :action => "new" }
         format.xml  { render :xml => @help_document.errors, :status => :unprocessable_entity }
       end
-    end
-  end
-  
-  def destroy
-    @help_document.destroy
-    
-    respond_to do |format|
-      format.html { redirect_to(help_documents_url) }
-      format.xml  { head :ok }
     end
   end
   

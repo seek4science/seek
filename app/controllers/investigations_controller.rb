@@ -2,6 +2,7 @@ class InvestigationsController < ApplicationController
 
   include DotGenerator
   include IndexPager
+  include Seek::DestroyHandling
 
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_authorize_requested_item,:only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
@@ -26,15 +27,6 @@ class InvestigationsController < ApplicationController
       redirect_to @existing_investigation
     end
 
-  end
-
-  def destroy
-    @investigation.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(investigations_url) }
-      format.xml  { head :ok }
-    end
   end
 
   def show

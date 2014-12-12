@@ -4,6 +4,7 @@ class PeopleController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::Publishing::GatekeeperPublish
   include Seek::FacetedBrowsing
+  include Seek::DestroyHandling
 
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
@@ -186,12 +187,12 @@ class PeopleController < ApplicationController
         #send notification email to admin and project managers, if a new member is registering as a new person
         if Seek::Config.email_enabled && registration && is_sysmo_member
           #send mail to admin
-          Mailer.contact_admin_new_user_no_profile(member_details, current_user, base_host).deliver
+          Mailer.contact_admin_new_user(member_details, current_user, base_host).deliver
 
           #send mail to project managers
           project_managers = project_managers_of_selected_projects params[:projects]
           project_managers.each do |project_manager|
-            Mailer.contact_project_manager_new_user_no_profile(project_manager, member_details, current_user, base_host).deliver
+            Mailer.contact_project_manager_new_user(project_manager, member_details, current_user, base_host).deliver
           end
         end
         if (!current_user.active?)
@@ -293,17 +294,6 @@ class PeopleController < ApplicationController
           gr.project_roles << r
         end
       end
-    end
-  end
-
-  # DELETE /people/1
-  # DELETE /people/1.xml
-  def destroy
-    @person.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(people_url) }
-      format.xml  { head :ok }
     end
   end
 

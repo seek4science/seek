@@ -201,6 +201,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'should gracefully handle view_pdf for non existing asset' do
+    stub_request(:head, "http://somewhere.com/piccy.doc").to_return(:status=>404)
     sop = Factory(:sop,
                   policy: Factory(:all_sysmo_downloadable_policy),
                   content_blob: Factory(:doc_content_blob,

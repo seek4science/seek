@@ -1,6 +1,7 @@
 class StrainsController < ApplicationController
   include IndexPager
   include Seek::AnnotationCommon
+  include Seek::DestroyHandling
 
   before_filter :organisms_enabled?
   before_filter :find_assets, :only => [:index]
@@ -111,19 +112,6 @@ class StrainsController < ApplicationController
       @organism=Organism.find_by_id(params[:organism_id])
       strains=@organism.try(:strains)
       @strains = strains ? strains.reject{|s| s.is_dummy? || s.id == params[:strain_id].to_i}.select(&:can_view?) : strains
-    end
-  end
-
-  def destroy
-    respond_to do |format|
-      if @strain.destroy
-        format.html { redirect_to(strains_path) }
-        format.xml { head :ok }
-      else
-        flash.now[:error]="Unable to delete the strain."
-        format.html { render :action=>"show" }
-        format.xml { render :xml => @strain.errors, :status => :unprocessable_entity }
-      end
     end
   end
 

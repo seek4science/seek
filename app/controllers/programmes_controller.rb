@@ -1,5 +1,6 @@
 class ProgrammesController < ApplicationController
   include IndexPager
+  include Seek::DestroyHandling
 
   before_filter :programmes_enabled?
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:initiate_spawn_project,:spawn_project]
@@ -24,12 +25,6 @@ class ProgrammesController < ApplicationController
 
   def edit
     respond_with(@programme)
-  end
-
-  def destroy
-    @programme.destroy
-    flash[:notice]="The #{t('programme').capitalize} was successfully deleted."
-    redirect_to programmes_path
   end
 
   def new

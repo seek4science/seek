@@ -90,18 +90,6 @@ class DataFilesController < ApplicationController
     end
   end
   
-  # DELETE /models/1
-  # DELETE /models/1.xml
-  def destroy
-    #FIXME: Double check auth is working for deletion. Also, maybe should only delete if not associated with any assays.
-    @data_file.destroy
-    
-    respond_to do |format|
-      format.html { redirect_to(data_files_path) }
-      format.xml  { head :ok }
-    end
-  end
-  
   def new
     @data_file = DataFile.new
     @data_file.parent_name = params[:parent_name]
@@ -123,7 +111,6 @@ class DataFilesController < ApplicationController
       params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
-      #@data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
@@ -305,19 +292,6 @@ class DataFilesController < ApplicationController
       respond_to do |format|
         flash[:error] = "Unable to view contents of this data file"
         format.html { redirect_to @data_file,:format=>"html" }
-      end
-    end
-  end
-  
-  def preview
-    element=params[:element]
-    data_file=DataFile.find_by_id(params[:id])
-    
-    render :update do |page|
-      if data_file.try :can_view?
-        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>data_file}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
       end
     end
   end

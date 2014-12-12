@@ -14,7 +14,6 @@ namespace :seek do
       :update_admin_assigned_roles,
       :repopulate_missing_publication_book_titles,
       :resynchronise_ontology_types,
-      :remove_invalid_group_memberships,
       :convert_publication_authors,
       :clear_filestore_tmp,
       :repopulate_auth_lookup_tables,
@@ -38,14 +37,6 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
-  desc("Cleans out group memberships where the person no longer exists")
-  task(:remove_invalid_group_memberships => :environment) do
-    invalid = GroupMembership.select { |gm| gm.person.nil? || gm.work_group.nil? }
-    invalid.each do |inv|
-      inv.destroy
-    end
-  end
-
   task(:convert_publication_authors => :environment) do
     Publication.all.each do |publication|
       if publication.publication_authors.first
@@ -63,7 +54,7 @@ namespace :seek do
   end
 
   def convert_publication_authors(publication)
-    puts "publication #{publication.id} needs updating"
+    puts "publication #{publication.id} authors being updating"
     PublicationAuthorOrder.where(:publication_id => publication.id).each do |publication_author_order|
       publication_author = publication_author_order.author
       if publication_author.is_a?(Person)
@@ -76,7 +67,7 @@ namespace :seek do
   end
 
   desc("Synchronised the assay and technology types assigned to assays according to the current ontology, resolving any suggested types that have been added")
-  task(:resynchronise_ontology_types=>:environment) do
+  task(:resynchronise_ontology_types=>[:environment,"tmp:create"]) do
     synchronizer = Seek::Ontologies::Synchronize.new
     synchronizer.synchronize_assay_types
     synchronizer.synchronize_technology_types

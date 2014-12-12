@@ -120,8 +120,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_no_difference('Project.count') do
       delete :destroy, :id => project
     end
-    assert_redirected_to project_path(project)
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
   
  def test_non_admin_should_not_manage_projects
@@ -505,7 +504,7 @@ class ProjectsControllerTest < ActionController::TestCase
 		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(project),:text=>/Project administration/,:count=>0
+				assert_select "a[href=?]",admin_members_project_path(project),:count=>0
 			end
 		end
 	end
@@ -518,7 +517,7 @@ class ProjectsControllerTest < ActionController::TestCase
 		get :show,:id=>project
 		assert_select "ul.sectionIcons" do
 			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_project_path(project),:text=>/#{I18n.t('project')} administration/,:count=>1
+				assert_select "a[href=?]",admin_members_project_path(project),:text=>/Administer #{I18n.t('project')} members/,:count=>1
 			end
 		end
 	end
@@ -553,7 +552,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     get :show, :id => project
     assert_response :success
-    assert_select "a", :text => /#{I18n.t('project')} administration/, :count => 1
+    assert_select "a[href=?]",admin_members_project_path(project), :text => /Administer #{I18n.t('project')} members/, :count => 1
 
     get :admin, :id => project
     assert_response :success

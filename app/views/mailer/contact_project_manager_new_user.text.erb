@@ -1,0 +1,21 @@
+Hi,
+
+The new user <%= @person.name %> just signed up and indicated that they are a member of the following projects and/or institutions:
+
+"<%= @details %>"
+
+If you know they are a genuine member of the <%= t('project').pluralize.downcase %> you can manage, please assign him/her to the <%= t('project').pluralize.downcase %> by:
+- Go to the users profile at <%= person_url(@person, :host=>@host) %>
+- Click the 'Person Administration' button
+- Here you will see the list of <%= t('project').pluralize.downcase %> and institutions that you are able to assign this person to.
+
+You can also add people to a <%= t('project').downcase %> from the project page and clicking the 'Administer <%= t('project') %> members' button.
+
+If the institution does not exist, you can create the new institution. To do this:
+- Go to Institutions tab at <%= institutions_url(:host=>@host) %>
+- Click the 'New Institution' button
+
+After the institution has been created successfully, you need to assign it to the <%= t('project').downcase %> following the steps described above.
+
+If you need to contact the person, their details can be found at: <%= person_url(@person, :host=>@host) %>, and their email address is <%= @person.email %> .
+-- end --

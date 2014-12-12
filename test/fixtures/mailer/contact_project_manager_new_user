@@ -1,0 +1,21 @@
+Hi,
+
+The new user Aaron Spiggle just signed up and indicated that they are a member of the following projects and/or institutions:
+
+"test message"
+
+If you know they are a genuine member of the projects you can manage, please assign him/her to the projects by:
+- Go to the users profile at http://localhost/people/2
+- Click the 'Person Administration' button
+- Here you will see the list of projects and institutions that you are able to assign this person to.
+
+You can also add people to a project from the project page and clicking the 'Administer Project members' button.
+
+If the institution does not exist, you can create the new institution. To do this:
+- Go to Institutions tab at http://localhost/institutions
+- Click the 'New Institution' button
+
+After the institution has been created successfully, you need to assign it to the project following the steps described above.
+
+If you need to contact the person, their details can be found at: http://localhost/people/2, and their email address is aaron@email.com .
+-- end --

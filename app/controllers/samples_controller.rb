@@ -1,6 +1,9 @@
 class SamplesController < ApplicationController
 
   include IndexPager
+  include Seek::PreviewHandling
+  include Seek::DestroyHandling
+
   before_filter :biosamples_enabled?
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy,:preview,:new_object_based_on_existing_one]
@@ -152,7 +155,6 @@ class SamplesController < ApplicationController
     #update policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
 
-
       if @sample.save
         #TODO CONFIG improve configurability. Configuration currently is deduced from other parameters
         if tissue_and_cell_types.blank?
@@ -196,32 +198,6 @@ class SamplesController < ApplicationController
     (new_sop_ids - existing_ids).each do |id|
       sop=Sop.find(id)
       join_class.create!(:sop_id=>sop.id,:sop_version=>sop.version,"#{resource.class.name.downcase}_id".to_sym=>resource.id)
-    end
-  end
-
-  def destroy
-
-    respond_to do |format|
-      if @sample.destroy
-        format.html { redirect_to samples_url }
-      else
-        flash.now[:error] = "Unable to delete sample" if !@sample.specimen.nil?
-        format.html { render :action => "show" }
-      end
-    end
-  end
-
-  def preview
-
-    element=params[:element]
-    sample=Sample.find_by_id(params[:id])
-
-    render :update do |page|
-      if sample.try :can_view?
-        page.replace_html element,:partial=>"samples/resource_preview",:locals=>{:resource=>sample}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
     end
   end
 

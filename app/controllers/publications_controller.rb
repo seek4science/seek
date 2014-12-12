@@ -13,18 +13,6 @@ class PublicationsController < ApplicationController
   before_filter :associate_authors, :only => [:edit, :update]
 
   include Seek::BreadCrumbs
-
-  def preview
-    element=params[:element]
-    @publication = Publication.find_by_id(params[:id])
-    render :update do |page|
-      if @publication
-        page.replace_html element,:partial=>"publications/resource_preview",:locals=>{:resource=>@publication}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
-  end    
     
   # GET /publications/1
   # GET /publications/1.xml
@@ -156,17 +144,6 @@ class PublicationsController < ApplicationController
     end
   end
 
-  # DELETE /publications/1
-  # DELETE /publications/1.xml
-  def destroy
-    @publication.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(publications_path) }
-      format.xml  { head :ok }
-    end
-  end
-
   def fetch_preview
     #trim the PubMed or Doi Id
     params[:key] = params[:key].strip() unless params[:key].blank?
@@ -292,8 +269,12 @@ class PublicationsController < ApplicationController
     if pubmed_id
       begin
         result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
-      rescue Exception=>e
-        result.error = e.message
+      rescue => exception
+        result ||= Bio::Reference.new({})
+        result.error = "There was an problem contacting the pubmed query service. Please try again later"
+        if Seek::Config.exception_notification_enabled
+          ExceptionNotifier.notify_exception(exception,:data=>{:message=>"Problem accessing ncbi using pubmed id #{pubmed_id}"})
+        end
       end
     elsif doi
       query = DoiQuery.new(Seek::Config.crossref_api_email)
@@ -304,7 +285,7 @@ class PublicationsController < ApplicationController
 
   def get_data(publication, pubmed_id, doi=nil)
     result = fetch_pubmed_or_doi_result(pubmed_id,doi)
-    publication.extract_metadata(result)
+    publication.extract_metadata(result) unless result.error
     result
   end
         

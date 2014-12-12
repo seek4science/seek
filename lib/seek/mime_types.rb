@@ -41,10 +41,6 @@ module Seek
       mime_find(mime)[:name]
     end
 
-    def mime_nice_name2(mime)
-          mime_find2(mime)[:name]
-        end
-
     def mime_icon_key mime
       mime_find(mime)[:icon_key]
     end
@@ -89,9 +85,5 @@ module Seek
       mime_map[mime] || {:name => "Unknown file type", :icon_key => "misc_file"}
     end
 
-    def mime_find2(mime)
-      mime_map = MIME_MAP.merge(mime_magic_map) { |ext, seek_value, magic_value| seek_value }
-      mime_map[mime] || {:name => "Unknown file type", :icon_key => "misc_file"}
-    end
   end
 end
