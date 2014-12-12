@@ -31,3 +31,10 @@ div.node_info ul.items {
     right: 3.5em;
     margin-right:1em;
 }
+
+a.graph_toggle {
+    float: right;
+    margin-right:1em;
+    margin-bottom:1em;
+    font-weight: bold;
+}
