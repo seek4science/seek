@@ -306,11 +306,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  def test_not_current_user_doesnt_show_link_to_change_password
-    get :edit, id: people(:aaron_person)
-    assert_select 'a', text: 'Change password', count: 0
-  end
-
   def test_current_user_shows_seek_id
     login_as(:quentin)
     get :show, id: people(:quentin_person)

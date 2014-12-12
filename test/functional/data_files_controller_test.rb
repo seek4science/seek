@@ -109,25 +109,6 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
-  test "data files tab should be selected" do
-    as_not_virtualliver do
-      get :index
-      #VLN uses drop down menu, while SysMO uses two level menus
-      assert_select "span#assets_menu_section" do
-        assert_select "li.selected_menu" do
-          assert_select "a[href=?]", data_files_path, :text => I18n.t('data_file').pluralize
-        end
-      end
-      assert_select "ul.menutabs" do
-        assert_select "li#selected_tabnav" do
-          assert_select "a", :text => I18n.t("menu.assets")
-        end
-      end
-    end
-
-
-end
-
   test "XML for data file with tags" do
     p=Factory :person
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))

@@ -65,8 +65,8 @@ class HomesControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index
     assert_response :success
-    assert_select "ul#my_profile_menu" do
-      assert_select "li.dynamic_menu_li",:text=>"Server admin", :count=>0
+    assert_select "#user-menu" do
+      assert_select "li a",:text=>"Server admin", :count=>0
     end
   end
 
@@ -74,8 +74,8 @@ class HomesControllerTest < ActionController::TestCase
     login_as(:quentin)
     get :index
     assert_response :success
-    assert_select "ul#my_profile_menu" do
-      assert_select "li.dynamic_menu_li",:text=>"Server admin", :count=>1
+    assert_select "#user-menu" do
+      assert_select "li a",:text=>"Server admin", :count=>1
     end
   end
 
@@ -84,11 +84,11 @@ class HomesControllerTest < ActionController::TestCase
 
     as_virtualliver do
       get :index
-      assert_select "div.section>li>a[href=?]", "/sops", :text => "SOPs", :count => 1
+      assert_select "#browse-menu li>a[href=?]", "/sops", :text => "SOPs", :count => 1
     end
     as_not_virtualliver do
       get :index
-      assert_select "span#assets_menu_section" do
+      assert_select "#browse-menu" do
         assert_select "li" do
           assert_select "a[href=?]",sops_path,:text=>"SOPs"
         end
@@ -100,8 +100,8 @@ class HomesControllerTest < ActionController::TestCase
   test "SOP upload option should be capitalized" do
     login_as(:quentin)
     get :index
-    assert_select "ul#new_asset_menu",:count=>1 do
-      assert_select "li.dynamic_menu_li", :text=>"#{I18n.t('sop')}", :count => 1
+    assert_select "li#create-menu ul.dropdown-menu",:count=>1 do
+      assert_select "li>a", :text=>"#{I18n.t('sop')}", :count => 1
     end
   end
 
@@ -149,8 +149,8 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select "div.top_home_panel", :text=>/Blah blah blah/, :count=>1
-    assert_select "div.top_home_panel a[href=?]", "http://www.google.com", :count=>1
+    assert_select "div#home_description .panel-body", :text=>/Blah blah blah/, :count=>1
+    assert_select "div#home_description .panel-body a[href=?]", "http://www.google.com", :count=>1
 
   end
 
@@ -162,8 +162,8 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select "div.heading", :text=>/Community News/, :count=>1
-    assert_select "div.heading", :text=>"#{Seek::Config.application_name} News", :count=>1
+    assert_select "div.panel-heading", :text=>/Community News/, :count=>1
+    assert_select "div.panel-heading", :text=>"#{Seek::Config.application_name} News", :count=>1
 
     #turn off
     Seek::Config.project_news_enabled=false
@@ -173,8 +173,8 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select "div[class=?][style='display:none']",/yui-u first home_panel.*/, :count => 1
-    assert_select "div[class=?][style='display:none']",/yui-u home_panel.*/, :count => 1
+    assert_select "div#project_news", :count => 0
+    assert_select "div#community_news", :count => 0
   end
 
   test "feed reader should handle missing feed title" do
@@ -187,8 +187,8 @@ class HomesControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_select "li.homepanel_item" do
-      assert_select "div.feedinfo",:text=>/Unknown publisher/,:count=>4
+    assert_select "#project_news ul.feed li" do
+      assert_select "span.subtle",:text=>/Unknown publisher/,:count=>4
     end
   end
 
@@ -303,14 +303,14 @@ class HomesControllerTest < ActionController::TestCase
 
     get :index
     assert_response :success
-    assert_select "div.headline_announcement", :count=>1
+    assert_select "span.headline_announcement_title", :count=>1
 
     #now expire it
     ann.expires_at=1.day.ago
     ann.save!
     get :index
     assert_response :success
-    assert_select "p.headline_announcement",:count=>0
+    assert_select "span.headline_announcement_title",:count=>0
   end
 
   test "should show external search when not logged in" do
@@ -364,7 +364,21 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
-
+  test "should display feed announcements in gadget" do
+    headline=Factory :headline_announcement, :show_in_feed=>false, :title=>"a headline announcement"
+    feed=Factory :feed_announcement, :show_in_feed=>true,:title=>"a feed announcement"
+    get :index
+    assert_select "div#announcement_gadget" do
+      assert_select "div.panel-body" do
+        assert_select "ul.feed_announcement_list" do
+          assert_select "li.feed_announcement span.announcement_title" do
+            assert_select "a[href=?]",site_announcement_path(feed),:text=>"a feed announcement",:count=>1
+            assert_select "a",:text=>"a headline announcement",:count=>0
+          end
+        end
+      end
+    end
+  end
 
   def uri_to_guardian_feed
     uri_to_feed "guardian_atom.xml"
