@@ -639,7 +639,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?
     get :edit, :id => sop
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index #{sop.title} > Edit/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home #{I18n.t('sop').pluralize} Index #{sop.title} Edit/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", sops_url, :count => 1
       assert_select "a[href=?]", sop_url(sop), :count => 1
@@ -649,7 +649,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'breadcrumb for creating new sop' do
     get :new
     assert_response :success
-    assert_select "div.breadcrumbs", :text => /Home > #{I18n.t('sop').pluralize} Index New/, :count => 1 do
+    assert_select "div.breadcrumbs", :text => /Home #{I18n.t('sop').pluralize} Index New/, :count => 1 do
       assert_select "a[href=?]", root_path, :count => 1
       assert_select "a[href=?]", sops_url, :count => 1
     end
