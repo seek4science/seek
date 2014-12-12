@@ -40,8 +40,8 @@ module ISAHelper
       dot_elements = dot_graph.gsub('graph ISA_graph {','').gsub('}','')
       elements = dot_elements.split(';')
       edges = elements.select{|e| e.include?('--')}
-      nodes = edges.collect{|edge| edge.split('--')}.flatten.uniq
-      nodes = nodes.each{|n| n.strip!}
+      nodes = edges.collect{|edge| edge.split('--')}.flatten
+      nodes = nodes.each{|n| n.strip!}.uniq
       cytoscape_elements = cytoscape_node_elements(nodes) + cytoscape_edge_elements(edges)
       cytoscape_elements
     rescue Exception=>e
