@@ -7,8 +7,21 @@
 %>
 
 <div class="yui-u first isa_graph curved with_smaller_shadow">
-    <div id="cy"></div>
+  <div id="cy"></div>
+
+  <%= link_to_function ("Full graph "+image("expand")).html_safe,
+                       "showGraph(elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                       :id => 'full_graph_expand_image',
+                       :class => 'graph_toggle'
+  -%>
+  <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
+                       "showGraph(filtered_elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                       :id => 'reduced_graph_collapse_image',
+                       :style => "display:none",
+                       :class => 'graph_toggle'
+  -%>
 </div>
+
 <div class="yui-u node_info curved with_smaller_shadow" id="node_info">
 </div>
 <span id="ruler" style="visibility: hidden"></span>
@@ -31,14 +44,17 @@
         var default_node_height = 35;
         var default_font_size = 11;
         var default_color = '#323232';
-        var max_node_number = 10;
+        var max_node_number = 5;
 
         //check and filter elements before drawing the graph.
         var filtered_elements = filterElements(max_node_number, '<%= "#{current_item.class.name}_#{current_item.id}" %>');
+        showGraph(filtered_elements);
+    }
 
+    function showGraph(elements){
         $j('#cy').cytoscape({
             layout: {
-              name: 'breadthfirst'
+                name: 'breadthfirst'
             },
 
             showOverlay: false,
@@ -73,7 +89,7 @@
                         'font-size': (default_font_size-2)
                     }),
 
-            elements: filtered_elements,
+            elements: elements,
 
             ready: function(){
                 cy = this;
@@ -109,4 +125,5 @@
             }
         });
     }
+
 </script>
