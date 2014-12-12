@@ -346,11 +346,11 @@ class AdminsController < ApplicationController
         when "users"
           format.html { render :partial => "admins/user_stats_list", :locals => { :title => title, :collection => collection} }
         when "content_stats"
-          format.html { render :partial => "admins/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
+          format.html { render :partial => "admins/content_stats", :locals => {:stats => Seek::Stats::ContentStats.generate} }
         when "activity_stats"
-          format.html { render :partial => "admins/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
+          format.html { render :partial => "admins/activity_stats", :locals => {:stats => Seek::Stats::ActivityStats.new} }
         when "search_stats"
-          format.html { render :partial => "admins/search_stats", :locals => {:stats => Seek::SearchStats.new} }
+          format.html { render :partial => "admins/search_stats", :locals => {:stats => Seek::Stats::SearchStats.new} }
         when "job_queue"
           format.html { render :partial => "admins/job_queue" }
         when "auth_consistency"

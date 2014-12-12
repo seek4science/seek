@@ -19,7 +19,7 @@
 </script>
 
 <%
-  authorised_types=Seek::ContentStats::TYPES_FOR_STATS
+  authorised_types=Seek::Stats::ContentStats::TYPES_FOR_STATS
   non_downloadable=[Investigation,Study,Assay]
   na_tag = content_tag(:span,"--",class:'none_text')
   #So we don't have to run lengthy authorization a second time when calculating total stats
