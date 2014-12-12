@@ -7,6 +7,7 @@ class Specimen < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::Biosamples::PhenoTypesAndGenoTypes
   include BackgroundReindexing
+  include Seek::Stats::ActivityCounts
 
   acts_as_scalable if Seek::Config.is_virtualliver
 

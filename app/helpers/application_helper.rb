@@ -479,15 +479,7 @@ module ApplicationHelper
     "Effect.toggle('#{block_id}','slide',{duration:0.5})".html_safe
   end
 
-  def count_actions(object, actions=nil)
-    count = 0
-    if actions.nil?
-      count = ActivityLog.count(:conditions => {:activity_loggable_type => object.class.name, :activity_loggable_id => object.id})
-    else
-      count = ActivityLog.no_spider.count(:conditions => {:action => actions, :activity_loggable_type => object.class.name, :activity_loggable_id => object.id})
-    end
-    count
-  end
+
 
   def set_parameters_for_sharing_form object=nil
     object ||= eval "@#{controller_name.singularize}"
