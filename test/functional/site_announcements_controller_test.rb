@@ -163,22 +163,6 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     assert_select "ul.announcement_list li.announcement span.announcement_title", :text => "a headline announcement also in feed", :count => 1
   end
 
-  test "should display feed announcements in gadget" do
-    headline=Factory :headline_announcement, :show_in_feed=>false, :title=>"a headline announcement"
-    feed=Factory :feed_announcement, :show_in_feed=>true,:title=>"a feed announcement"
-    get :index
-    assert_select "div#announcement_gadget" do
-      assert_select "div.contents" do
-        assert_select "ul.feed_announcement_list" do
-          assert_select "li.feed_announcement span.announcement_title" do
-            assert_select "a[href=?]",site_announcement_path(feed),:text=>"a feed announcement",:count=>1
-            assert_select "a",:text=>"a headline announcement",:count=>0
-          end
-        end
-      end
-    end
-  end
-
   test 'handle notification_settings' do
     #valid key
     key = Factory(:notifiee_info).unique_key
