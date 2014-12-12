@@ -1,15 +1,11 @@
 
-<div id="announcement_gadget" class="sysmo_gadget"  >
+<div id="announcement_gadget" class="panel panel-default">
 
-
-  <div class="header curved_top">
-    <span style="float:left;margin-left:0.5em;padding-bottom: 0.5em;"><%= link_to image("atom_feed"),feed_site_announcements_path(:format=>"atom") %></span> Announcements
+  <div class="panel-heading">
+    <%= link_to image("atom_feed"),feed_site_announcements_path(:format=>"atom") %></span> Announcement
   </div>
 
-  <div class="contents curved_bottom">
+  <div class="panel-body">
     <%= site_announcements_feed :truncate_length=>100, :limit=>3 -%>
   </div>
 </div>
-
-
-
