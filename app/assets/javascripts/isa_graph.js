@@ -1,3 +1,67 @@
+function filterElements(max_node_number, current_element_id){
+    var nodes = [];
+    for( var i=0; i<elements.length; i++){
+        var element = elements[i]
+        if (element.group == 'nodes'){
+            nodes.push(element);
+        }
+    }
+
+    if (nodes.length > max_node_number){
+        var filtered_elements = connectedElements(current_element_id);
+        filtered_elements.push(currentElement(current_element_id));
+        return filtered_elements;
+    }else{
+        return elements;
+    }
+}
+
+function currentElement(current_element_id){
+    var current_element;
+    for( var i=0; i<elements.length; i++){
+        var element = elements[i];
+        if (element.group == 'nodes') {
+            if (element.data.id == current_element_id) {
+                current_element = element;
+                break;
+            }
+        }
+    }
+    return current_element;
+}
+
+function connectedElements(current_element_id){
+    var connected_edges = [];
+    var connected_nodes = [];
+
+    for( var i=0; i<elements.length; i++){
+        var element = elements[i]
+        if (element.group == 'edges'){
+            var edge_data = element.data;
+            if (edge_data.source == current_element_id || edge_data.target == current_element_id){
+                connected_edges.push(element);
+            }
+        }
+    }
+
+    for( var i=0; i<elements.length; i++){
+        var element = elements[i];
+        for( var j=0; j<connected_edges.length; j++){
+            var edge = connected_edges[j];
+            if (element.group == 'nodes'){
+                var node_id = element.data.id;
+                var edge_data = edge.data;
+                if (node_id != current_element_id && (node_id == edge_data.source || node_id == edge_data.target)){
+                    connected_nodes.push(element);
+                }
+            }
+        }
+    }
+
+    var connected_elements = connected_nodes.concat(connected_edges);
+    return connected_elements;
+}
+
 function animateNode(node){
     var nodes = cy.$('node');
     var edges = cy.$('edge');
