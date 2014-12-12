@@ -31,6 +31,10 @@
         var default_node_height = 35;
         var default_font_size = 11;
         var default_color = '#323232';
+        var max_node_number = 10;
+
+        //check and filter elements before drawing the graph.
+        var filtered_elements = filterElements(max_node_number, '<%= "#{current_item.class.name}_#{current_item.id}" %>');
 
         $j('#cy').cytoscape({
             layout: {
@@ -69,7 +73,7 @@
                         'font-size': (default_font_size-2)
                     }),
 
-            elements: elements,
+            elements: filtered_elements,
 
             ready: function(){
                 cy = this;
