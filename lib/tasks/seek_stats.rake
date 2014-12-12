@@ -118,6 +118,23 @@ namespace :seek_stats do
     puts "Done"
   end
 
+  task(:top_of_the_pops=>:environment) do
+    [DataFile,Sop,Model,Presentation].each do |type|
+      sorted = type.all.sort_by(&:view_count).reverse[0..9]
+      puts "Top views for #{type}"
+      sorted.each do |item|
+        puts "id:#{item.id} - title:#{item.title} - views:#{item.view_count}"
+      end
+
+      sorted = type.all.sort_by(&:download_count).reverse[0..9]
+      puts "Top downloads for #{type}"
+      sorted.each do |item|
+        puts "id:#{item.id} - title:#{item.title} - views:#{item.download_count}"
+      end
+      puts "------------------------------------------------------------"
+
+    end
+  end
 
   #things linked to publications
 
