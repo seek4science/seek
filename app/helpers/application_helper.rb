@@ -35,16 +35,16 @@ module ApplicationHelper
   end
 
   def seek_stylesheet_tags main='application'
-    css = (Seek::Config.css_prepended || "").split(",").map {|c| "customizations/#{c}" }
+    css = (Seek::Config.css_prepended || "").split(",").map {|c| "prepended/#{c}" }
     css << main
-    css = css | (Seek::Config.css_appended || "").split(",").map {|c| "customizations/#{c}" }
+    css = css | (Seek::Config.css_appended || "").split(",").map {|c| "appended/#{c}" }
     css.empty? ? "" : stylesheet_link_tag(*css)
   end
 
   def seek_javascript_tags main='application'
-    js = (Seek::Config.javascript_prepended || "").split(",")
+    js = (Seek::Config.javascript_prepended || "").split(",").map {|c| "prepended/#{c}" }
     js << main
-    js = js | (Seek::Config.javascript_appended || "").split(",")
+    js = js | (Seek::Config.javascript_appended || "").split(",").map {|c| "appended/#{c}" }
     js.empty? ? "" : javascript_include_tag(*js)
   end
 

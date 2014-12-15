@@ -27,6 +27,7 @@ module SEEK
     config.assets.css_compressor = :yui
 
     config.assets.precompile += ['*.js',
+                                 "prepended/*.css",
                                  "calendar_date_select/default.css",
                                  "cytoscape_isa_graph.css",
                                  "data_tables.css",
@@ -41,7 +42,7 @@ module SEEK
                                  "spreadsheet_explorer.css",
                                  "tablesorter/blue/tablesorter_blue.css",
                                  "yui/index.css",
-                                 "customizations/*.css"
+                                 "appended/*.css"
     ]
 
     # Force all environments to use the same logger level
