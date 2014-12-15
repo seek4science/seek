@@ -2,6 +2,33 @@
 
 <%= render :partial => "general/item_title",:locals=>{:title=>"Administering the #{t('project').downcase} members of #{link_to(h(@project.title),@project)}".html_safe} %>
 
+<div id="add_member">
+  <h3>Add members</h3>
+
+  Select the institution, and type the names of the people from that institution that need adding for this <%= t('project').downcase %></strong>
+  <br/>
+  <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title") %>
+  <br/>
+
+  <table id="facebook">
+    <tr>
+      <td>
+        <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('person_autocomplete_input').focus();" style="width: 400px;">
+          <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="people_hidden_input" tabindex="-1"></span>
+
+          <div id="person_autocomplete_display" class="tokenizer_input">
+            <input type="text" size="1" tabindex="" id="person_autocomplete_input"/>
+          </div>
+        </div>
+        <div id="person_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
+          <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <%= link_to_function (image("new") + " Add"), "add_selected_people()", :class => "block_link" %>
+</div>
+
 <div id="admin_members">
   <div id="project_institutions">
     <% @project.work_groups.sort { |a, b| a.institution.title <=> b.institution.title }.each do |work_group| %>
@@ -36,37 +63,6 @@
       <%= submit_tag "Submit" %>
   <% end -%>
 </div>
-
-
-<div id="add_member">
-  <h3>Add members</h3>
-
-  Select the institution, and type the names of the people from that institution that need adding for this <%= t('project').downcase %></strong>
-  <br/>
-  <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title") %>
-  <br/>
-
-  <table id="facebook">
-    <tr>
-      <td>
-        <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('person_autocomplete_input').focus();" style="width: 400px;">
-          <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="people_hidden_input" tabindex="-1"></span>
-
-          <div id="person_autocomplete_display" class="tokenizer_input">
-            <input type="text" size="1" tabindex="" id="person_autocomplete_input"/>
-          </div>
-        </div>
-        <div id="person_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
-          <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
-        </div>
-      </td>
-    </tr>
-  </table>
-  <%= link_to_function (image("new") + " Add"), "add_selected_people()", :class => "block_link" %>
-</div>
-
-
-
 
 <script type="application/javascript">
     setup_autocompleter(<%= Person.get_all_as_json.html_safe  -%>);
