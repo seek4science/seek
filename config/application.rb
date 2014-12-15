@@ -31,6 +31,7 @@ module SEEK
                                  "cytoscape_isa_graph.css",
                                  "data_tables.css",
                                  "datacite_doi.css",
+                                 "exhibit/styles/exhibit-scripted-bundle.css",
                                  "jquery-ui-1.8.14.custom.css",
                                  "jquery.ui.resizable.css",
                                  "lightbox.css",
