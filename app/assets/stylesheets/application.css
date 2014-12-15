@@ -26,5 +26,16 @@
 *= require images
 *= require landing_page
 *= require bootstrap_tweaks
+*= require asset_report
+*= require biosamples
+*= require bives
+*= require full_scroll_table
+*= require match_making
+*= require modified_exhibit
+*= require faceted_browsing
+*= require faceted_search
+*= require project_folders
+*= require publishing
+*= require settings
 *= require new_styles
 */
