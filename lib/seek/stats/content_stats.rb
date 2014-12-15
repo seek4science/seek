@@ -11,22 +11,21 @@ module Seek
         end
 
         TYPES_FOR_STATS.each do |type|
-          type_class_name = type.name
-          type_str = type_class_name.underscore.pluralize
+          type_str = type.name.underscore.pluralize
           define_method "visible_#{type_str}" do
-            authorised_assets type_class_name, 'view', @user
+            authorised_assets type, 'view', @user
           end
 
           define_method "accessible_#{type_str}" do
-            authorised_assets type_class_name, 'download', @user
+            authorised_assets type, 'download', @user
           end
 
           define_method "publicly_visible_#{type_str}" do
-            authorised_assets type_class_name, 'view', nil
+            authorised_assets type, 'view', nil
           end
 
           define_method "publicly_accessible_#{type_str}" do
-            authorised_assets type_class_name, 'download', nil
+            authorised_assets type, 'download', nil
           end
 
         end
@@ -38,14 +37,13 @@ module Seek
         private
 
         def authorised_assets(asset_type, action, user)
-          asset_class = asset_type.constantize
-          assets = asset_class.all_authorized_for(action, user, project)
+
           # this is necessary because some non downloadable items (such as assay) can possible be marked as downloadable in the
           # authorization info due to an earlier bug
-          if action == 'download' && asset_class.new.is_downloadable?
+          if action == 'download' && !asset_type.new.is_downloadable?
             []
           else
-            assets
+            asset_type.all_authorized_for(action, user, project)
           end
         end
       end
