@@ -35,9 +35,9 @@ module ApplicationHelper
   end
 
   def seek_stylesheet_tags main='application'
-    css = (Seek::Config.css_prepended || "").split(",")
+    css = (Seek::Config.css_prepended || "").split(",").map {|c| "customizations/#{c}" }
     css << main
-    css = css | (Seek::Config.css_appended || "").split(",")
+    css = css | (Seek::Config.css_appended || "").split(",").map {|c| "customizations/#{c}" }
     css.empty? ? "" : stylesheet_link_tag(*css)
   end
 

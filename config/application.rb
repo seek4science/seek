@@ -40,7 +40,8 @@ module SEEK
                                  "scales/scales.css",
                                  "spreadsheet_explorer.css",
                                  "tablesorter/blue/tablesorter_blue.css",
-                                 "yui/index.css"
+                                 "yui/index.css",
+                                 "customizations/*.css"
     ]
 
     # Force all environments to use the same logger level
