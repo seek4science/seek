@@ -7,6 +7,7 @@ class Sample < ActiveRecord::Base
   acts_as_scalable if Seek::Config.is_virtualliver
   include Seek::Rdf::RdfGeneration
   include BackgroundReindexing
+  include Seek::Stats::ActivityCounts
 
   acts_as_authorized
   acts_as_favouritable

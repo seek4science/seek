@@ -29,11 +29,11 @@ module Seek
                  :as        => :resource,
                  :dependent => :destroy
 
-        has_many :activity_logs, :as => :activity_loggable
-
         grouped_pagination
 
         acts_as_uniquely_identifiable
+
+        include Seek::Stats::ActivityCounts
 
         include Seek::Search::CommonFields
 

@@ -113,7 +113,7 @@ class Model < ActiveRecord::Base
         r
       end
 
-      fields = [:fs_search_fields, :spreadsheet_contents_for_search,:spreadsheet_annotation_search_fields, :searchable_tags]
+      fields = [:fs_search_fields, :content_blob,:spreadsheet_annotation_search_fields, :searchable_tags]
 
       search_terms.each do |key|
         key = Seek::Search::SearchTermFilter.filter(key)

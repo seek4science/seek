@@ -42,7 +42,7 @@ module Seek
 
         validates_presence_of :title
 
-        has_many :activity_logs, as: :activity_loggable
+        include Seek::Stats::ActivityCounts
 
         include Seek::ActsAsAsset::ISA::Associations
         include Seek::ActsAsAsset::Folders::Associations
