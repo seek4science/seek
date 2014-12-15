@@ -26,7 +26,32 @@ module SEEK
     config.assets.js_compressor = :yui
     config.assets.css_compressor = :yui
 
-    config.assets.precompile += ['*.js','*.css']
+    config.assets.precompile += ['*.js',
+                                 "asset_report.css",
+                                 "biosamples.css",
+                                 "bives.css",
+                                 "calendar_date_select/default.css",
+                                 "cytoscape_isa_graph.css",
+                                 "data_tables.css",
+                                 "datacite_doi.css",
+                                 "faceted_browsing.css",
+                                 "faceted_search.css",
+                                 "full_scroll_table.css",
+                                 "jquery-ui-1.8.14.custom.css",
+                                 "jquery.ui.resizable.css",
+                                 "lightbox.css",
+                                 "match_making.css",
+                                 "modified_exhibit.css",
+                                 "pdfjs/viewer.css",
+                                 "project_folders.css",
+                                 "publishing.css",
+                                 "savage_beast/display.css",
+                                 "scales/scales.css",
+                                 "settings.css",
+                                 "spreadsheet_explorer.css",
+                                 "tablesorter/blue/tablesorter_blue.css",
+                                 "yui/index.css"
+    ]
 
     # Force all environments to use the same logger level
     # (by default production uses :info, the others :debug)
