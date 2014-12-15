@@ -1,5 +1,4 @@
 <%= javascript_include_tag 'projects' %>
-<%= stylesheet_link_tag 'projects' %>
 
 <%= render :partial => "general/item_title",:locals=>{:title=>"Administering the #{t('project').downcase} members of #{link_to(h(@project.title),@project)}".html_safe} %>
 
