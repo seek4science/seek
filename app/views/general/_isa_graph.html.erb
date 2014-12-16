@@ -4,22 +4,27 @@
 
 <%
   current_item ||= nil
+  max_node_number ||= 10;
+  cytoscape_elements = cytoscape_elements(root_item, deep, current_item)
+  reduced_elements = reduced_elements(cytoscape_elements, max_node_number, root_item, current_item)
 %>
 
 <div class="yui-u first isa_graph curved with_smaller_shadow">
   <div id="cy"></div>
 
-  <%= link_to_function ("Full graph "+image("expand")).html_safe,
-                       "showGraph(elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
-                       :id => 'full_graph_expand_image',
-                       :class => 'graph_toggle'
-  -%>
-  <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
-                       "showGraph(filtered_elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
-                       :id => 'reduced_graph_collapse_image',
-                       :style => "display:none",
-                       :class => 'graph_toggle'
-  -%>
+  <% if cytoscape_elements.size > reduced_elements.size %>
+      <%= link_to_function ("Full graph "+image("expand")).html_safe,
+                           "showGraph(elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                           :id => 'full_graph_expand_image',
+                           :class => 'graph_toggle'
+      -%>
+      <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
+                           "showGraph(reduced_elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                           :id => 'reduced_graph_collapse_image',
+                           :style => "display:none",
+                           :class => 'graph_toggle'
+      -%>
+  <% end %>
 </div>
 
 <div class="yui-u node_info curved with_smaller_shadow" id="node_info">
@@ -31,7 +36,8 @@
     var $j = jQuery;
 
     var isa_graph = $j('.isa_graph')[0];
-    var elements = <%= cytoscape_elements(root_item, deep, current_item).to_json.html_safe %>;
+    var elements = <%= cytoscape_elements.to_json.html_safe %>;
+    var reduced_elements = <%= reduced_elements.to_json.html_safe %>;
 
     if (elements.error == 'error'){
         isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
@@ -44,11 +50,8 @@
         var default_node_height = 35;
         var default_font_size = 11;
         var default_color = '#323232';
-        var max_node_number = 5;
 
-        //check and filter elements before drawing the graph.
-        var filtered_elements = filterElements(max_node_number, '<%= "#{current_item.class.name}_#{current_item.id}" %>');
-        showGraph(filtered_elements);
+        showGraph(reduced_elements);
     }
 
     function showGraph(elements){

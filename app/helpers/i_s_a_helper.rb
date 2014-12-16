@@ -50,6 +50,22 @@ module ISAHelper
     end
   end
 
+  def reduced_elements elements, max_node_number, root_element, current_element=nil
+    nodes = elements.select{|e| e[:group] == 'nodes'}
+    current_element||=root_element
+    if nodes.size > max_node_number
+      current_element_id = current_element.class.name + '_' + current_element.id.to_s
+      connected_edges = elements.select{|e| (e[:group] == 'edges') && (e[:data][:source] == current_element_id || e[:data][:target] == current_element_id)}
+      connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}
+      connected_edge_targets = connected_edges.collect{|e| e[:data][:target]}
+      connected_edge_ids = (connected_edge_sources + connected_edge_targets).uniq
+      connected_nodes = elements.select{|e| e[:group] == 'nodes' && connected_edge_ids.include?(e[:data][:id])}
+      connected_nodes + connected_edges
+    else
+      elements
+    end
+  end
+
   private
 
   def cytoscape_node_elements nodes
