@@ -50,23 +50,62 @@ module ISAHelper
     end
   end
 
-  def reduced_elements elements, max_node_number, root_element, current_element=nil
+  def reduced_elements elements, max_node_number, force_max_node, root_element, current_element=nil
     nodes = elements.select{|e| e[:group] == 'nodes'}
     current_element||=root_element
     if nodes.size > max_node_number
       current_element_id = current_element.class.name + '_' + current_element.id.to_s
-      connected_edges = elements.select{|e| (e[:group] == 'edges') && (e[:data][:source] == current_element_id || e[:data][:target] == current_element_id)}
-      connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}
-      connected_edge_targets = connected_edges.collect{|e| e[:data][:target]}
-      connected_edge_ids = (connected_edge_sources + connected_edge_targets).uniq
-      connected_nodes = elements.select{|e| e[:group] == 'nodes' && connected_edge_ids.include?(e[:data][:id])}
-      connected_nodes + connected_edges
+      current_node = elements.select{|e| e[:group] == 'nodes' && e[:data][:id] == current_element_id }.first
+
+      connected_elements = connected_elements(elements, current_element_id)
+
+      if force_max_node && ([current_element] + connected_elements).size > max_node_number
+        force_max_elements(max_node_number, current_node, connected_elements)
+      else
+        connected_elements << current_element
+      end
     else
       elements
     end
   end
 
   private
+
+  def connected_elements elements, current_element_id
+    nodes = elements.select{|e| e[:group] == 'nodes'}
+    edges = elements.select{|e| e[:group] == 'edges'}
+
+    connected_edges = edges.select{|e| e[:data][:source] == current_element_id || e[:data][:target] == current_element_id}
+    connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}
+    connected_edge_targets = connected_edges.collect{|e| e[:data][:target]}
+    connected_edge_ids = (connected_edge_sources + connected_edge_targets).uniq
+
+    connected_nodes = nodes.select{|e| connected_edge_ids.include?(e[:data][:id]) && e[:data][:id] != current_element_id}
+    connected_elements = connected_nodes + connected_edges
+    connected_elements
+  end
+
+  def force_max_elements max_node_number, current_node, connected_elements
+    max_nodes = [current_node]
+    connected_nodes = connected_elements.select{|e| e[:group] == 'nodes'}
+    connected_edges = connected_elements.select{|e| e[:group] == 'edges'}
+    connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}
+    #put the parent nodes in front
+    connected_nodes.sort!{|a,b| connected_edge_sources.find_index(b) <=> connected_edge_sources.find_index(a)}
+    max_nodes |= connected_nodes.take(max_node_number-1)
+
+    max_edges = []
+    max_node_ids = max_nodes.collect{|node| node[:data][:id]}
+    connected_edges.each do |edge|
+      source = edge[:data][:source]
+      target = edge[:data][:target]
+      if max_node_ids.include?(source) && max_node_ids.include?(target)
+        max_edges << edge
+      end
+    end
+    max_elements = max_nodes + max_edges
+    max_elements
+  end
 
   def cytoscape_node_elements nodes
     cytoscape_node_elements = []

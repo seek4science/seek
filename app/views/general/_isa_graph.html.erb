@@ -4,9 +4,13 @@
 
 <%
   current_item ||= nil
-  max_node_number ||= 10;
+  max_node_number ||= 5
+  force_max_node ||= true
   cytoscape_elements = cytoscape_elements(root_item, deep, current_item)
-  reduced_elements = reduced_elements(cytoscape_elements, max_node_number, root_item, current_item)
+
+  #show only current node and connected nodes
+  #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
+  reduced_elements = reduced_elements(cytoscape_elements, max_node_number, force_max_node, root_item, current_item)
 %>
 
 <div class="yui-u first isa_graph curved with_smaller_shadow">
