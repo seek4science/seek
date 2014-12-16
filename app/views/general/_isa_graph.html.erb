@@ -14,12 +14,12 @@
 
   <% if cytoscape_elements.size > reduced_elements.size %>
       <%= link_to_function ("Full graph "+image("expand")).html_safe,
-                           "showGraph(elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                           "drawGraph(elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
                            :id => 'full_graph_expand_image',
                            :class => 'graph_toggle'
       -%>
       <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
-                           "showGraph(reduced_elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                           "drawGraph(reduced_elements);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
                            :id => 'reduced_graph_collapse_image',
                            :style => "display:none",
                            :class => 'graph_toggle'
@@ -51,10 +51,10 @@
         var default_font_size = 11;
         var default_color = '#323232';
 
-        showGraph(reduced_elements);
+        drawGraph(reduced_elements);
     }
 
-    function showGraph(elements){
+    function drawGraph(elements){
         $j('#cy').cytoscape({
             layout: {
                 name: 'breadthfirst'
