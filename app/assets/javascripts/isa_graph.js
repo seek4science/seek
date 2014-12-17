@@ -131,8 +131,8 @@ function displayNodeInfo(node){
     html += "<ul class='items'>";
     var connected_nodes = connectedNodes(node);
     for(var i=0;i<connected_nodes.length;i++){
-        var item_data = connected_nodes[i].data();
-        html += itemInfo(item_data);
+        var node_data = connected_nodes[i].data();
+        html += itemInfo(node_data);
     }
 
     html += '</ul>';
