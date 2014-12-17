@@ -113,8 +113,9 @@ function animateNode(node){
     // set font style here for better animation (instead of in animate function).
     node.css('font-size', 14);
     node.css('font-weight', 'bolder');
-    if (node.data().name !== 'Hidden item')
+    if (node.data().name !== 'Hidden item'){
         node.css('color', '#0000e5');
+    }
     node.select();
 }
 
@@ -184,7 +185,7 @@ function processPanzoom() {
 
     //reset on panzoom also reset all nodes and edges css
     $j('.ui-cytoscape-panzoom-reset').click(function () {
-        var nodes = cy.$('node')
+        var nodes = cy.$('node');
         normalizingNodes(nodes);
         appearingNodes(nodes);
         appearingEdges(cy.$('edge'));
@@ -236,7 +237,7 @@ function resizeGraph(){
 }
 
 function labelPosition(node){
-    var label_pos = new Object();
+    var label_pos = {};
     var graph_pos = $j('#cy')[0].getBoundingClientRect();
     var node_posX = node.renderedPosition().x + graph_pos.left;
     var node_posY = node.renderedPosition().y + graph_pos.top;
@@ -280,7 +281,7 @@ function disableMouseWheel(){
     for( var i=0; i<bindings.length; i++){
         binding = bindings[i];
         var event = binding.event;
-        if (event.match(/wheel/i) != null || event.match(/scroll/i) !=null){
+        if (event.match(/wheel/i) !== null || event.match(/scroll/i) !==null){
             binding.target.removeEventListener(event, binding.handler, binding.useCapture);
         }
     }
