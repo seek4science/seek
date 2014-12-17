@@ -37,7 +37,7 @@ function animateNode(node){
 }
 
 function displayNodeInfo(node){
-    var html = "<h3>Chosen item</h3>"
+    var html = "<h3>Chosen item</h3>";
     html += "<ul class='items'>";
     var item_data = node.data();
     html += itemInfo(item_data);
