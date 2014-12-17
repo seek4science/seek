@@ -17,6 +17,12 @@ body {
   background: none;
 }
 
+#content > .container-fluid,
+#navbar > .container-fluid,
+#ft > .container-fluid {
+  max-width: 1400px;
+}
+
 .logo_link {
   margin-right: 1em;
 }
