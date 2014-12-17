@@ -63,12 +63,6 @@
 
 <%= render :partial=>"layouts/footer" %>
 
-<% unless is_front_page? %>
-    <script type="text/javascript">
-        initialiseFolds();
-    </script>
-<% end %>
-
 <%= piwik_tracking_tag %>
 <%= analytics_init if Seek::Config.google_analytics_enabled %>
 </body>
