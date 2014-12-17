@@ -28,42 +28,40 @@
 
 <body id="body">
 
-  <%= render :partial=>"layouts/navbar/navbar" %>
+<%= render :partial=>"layouts/navbar/navbar" %>
 
-  <div class="container-fluid" style="max-width: 1400px">
-      <div id="content">
-        <% unless breadcrumbs.empty? %>
-            <div class="breadcrumbs">
-              <ol class="breadcrumb">
-                <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
-              </ol>
-            </div>
-        <% end %>
+<div id="content">
+  <div class="container">
+    <% unless breadcrumbs.empty? %>
+        <div class="breadcrumbs">
+          <ol class="breadcrumb">
+            <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
+          </ol>
+        </div>
+    <% end %>
 
-        <%= add_return_to_search %>
+    <%= add_return_to_search %>
 
-        <%# applying styling to error / notice messages -%>
-        <% if flash[:error] %>
-            <div role="alert" class="alert alert-danger alert-dismissible fade in" id="error_flash">
-              <button data-dismiss="alert" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-              <%= flash[:error] %>
-            </div>
-        <% end %>
-        <% if flash[:notice] %>
-            <div role="alert" class="alert alert-success alert-dismissible fade in" id="notice_flash">
-              <button data-dismiss="alert" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-              <%= flash[:notice] %>
-            </div>
-        <% end %>
+    <%# applying styling to error / notice messages -%>
+    <% if flash[:error] %>
+        <div role="alert" class="alert alert-danger alert-dismissible fade in" id="error_flash">
+          <button data-dismiss="alert" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+          <%= flash[:error] %>
+        </div>
+    <% end %>
+    <% if flash[:notice] %>
+        <div role="alert" class="alert alert-success alert-dismissible fade in" id="notice_flash">
+          <button data-dismiss="alert" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+          <%= flash[:notice] %>
+        </div>
+    <% end %>
 
-        <%# main content part of every page -%>
-        <%= yield :layout %>
-    </div>
+    <%# main content part of every page -%>
+    <%= yield :layout %>
+  </div>
 </div>
 
-<div id="ft" class="container-fluid">
-    <%= render :partial=>"layouts/footer" %>
-</div>
+<%= render :partial=>"layouts/footer" %>
 
 <% unless is_front_page? %>
     <script type="text/javascript">

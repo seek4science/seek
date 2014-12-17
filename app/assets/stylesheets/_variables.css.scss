@@ -9,3 +9,5 @@ $navbar-default-link-hover-color: #333;
 $grid-float-breakpoint: $screen-sm-max;
 $grid-float-breakpoint-max: $grid-float-breakpoint - 1;
 
+$container-large-desktop: 1400px + $grid-gutter-width;
+$container-lg: $container-large-desktop;
