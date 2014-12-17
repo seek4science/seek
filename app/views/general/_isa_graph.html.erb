@@ -43,7 +43,7 @@
     var elements = <%= cytoscape_elements.to_json.html_safe %>;
     var reduced_elements = <%= reduced_elements.to_json.html_safe %>;
 
-    if (elements.error == 'error'){
+    if (elements.error === 'error'){
         isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
         isa_graph.style['text-align'] = 'center';}
     else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
@@ -108,7 +108,7 @@
 
                     nodes.on('click', function(e){
                         var node = e.cyTarget;
-                        if(node.selected() == true){
+                        if(node.selected() === true){
                             clickLabelLink(node, e.originalEvent);
                         }else{
                             animateNode(node);

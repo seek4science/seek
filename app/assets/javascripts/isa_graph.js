@@ -12,11 +12,11 @@ function animateNode(node){
     edges.each(function(i, edge){
         var source = edge.source();
         var target =edge.target();
-        if (source.id() == node.id()){
+        if (source.id() === node.id()){
             appearingEdges(edge);
             appearingNodes(target);
         }
-        if (target.id() == node.id()){
+        if (target.id() === node.id()){
             appearingEdges(edge);
             appearingNodes(source);
         }
@@ -31,7 +31,7 @@ function animateNode(node){
     // set font style here for better animation (instead of in animate function).
     node.css('font-size', 14);
     node.css('font-weight', 'bolder');
-    if (node.data().name != 'Hidden item')
+    if (node.data().name !== 'Hidden item')
         node.css('color', '#0000e5');
     node.select();
 }
@@ -76,10 +76,10 @@ function connectedNodes(node){
     edges.each(function(i, edge){
         var source = edge.source();
         var target =edge.target();
-        if (source.id() == node.id()){
+        if (source.id() === node.id()){
             connected_nodes.push(target);
         }
-        if (target.id() == node.id()){
+        if (target.id() === node.id()){
             connected_nodes.push(source);
         }
     });
@@ -93,7 +93,7 @@ function targetNodeCollection(node){
     edges.each(function(i, edge){
         var source = edge.source();
         var target =edge.target();
-        if (source.id() == node.id()){
+        if (source.id() === node.id()){
             target_node_collection = target_node_collection.add(target);
         }
     });
@@ -106,7 +106,7 @@ function sourceNodeCollection(node){
     edges.each(function(i, edge){
         var source = edge.source();
         var target =edge.target();
-        if (target.id() == node.id()){
+        if (target.id() === node.id()){
             source_node_collection = source_node_collection.add(source);
         }
     });
@@ -119,7 +119,7 @@ function edgeToTargetCollection(node){
     edges.each(function(i, edge){
         var source = edge.source();
         var target =edge.target();
-        if (source.id() == node.id()){
+        if (source.id() === node.id()){
             edge_to_target_collection = edge_to_target_collection.add(edge);
         }
     });
@@ -132,7 +132,7 @@ function edgeToSourceCollection(node){
     edges.each(function(i, edge){
         var source = edge.source();
         var target =edge.target();
-        if (target.id() == node.id()){
+        if (target.id() === node.id()){
             edge_to_source_collection = edge_to_source_collection.add(edge);
         }
     });
@@ -236,7 +236,7 @@ function mouseOnLabel(node, mouse_event){
 }
 
 function clickLabelLink(node, mouse_event){
-    if (node.data().name != "Hidden item"){
+    if (node.data().name !== "Hidden item"){
         if (mouseOnLabel(node, mouse_event)){
             var link = document.createElement('a');
             link.href = node.data().item_info.split('"')[1];
