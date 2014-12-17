@@ -2,11 +2,14 @@
 @import 'bootstrap/variables';
 
 $navbar-default-bg: #f8f8f8;
+$navbar-default-border: darken($navbar-default-bg, 6.5%);
+$navbar-default-link-active-bg: darken($navbar-default-bg, 6.5%);
 $navbar-default-link-color: #777;
-$navbar-default-link-active-color: #555;
-$navbar-default-link-hover-color: #333;
+$navbar-default-link-active-color: darken($navbar-default-link-color, 30%);
+$navbar-default-link-active-color: darken($navbar-default-link-color, 40%);
 
 $grid-float-breakpoint: $screen-sm-max;
 $grid-float-breakpoint-max: $grid-float-breakpoint - 1;
 
 $info-box-colour: #fffeda;
+$seek-button-colour: #f0f4ff;

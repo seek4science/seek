@@ -147,16 +147,14 @@ span.truncated-name {
 }
 
 .sectionIcons li a {
-  width: 100%;
-  padding: 0.5em 0.5em;
+  padding: 0.5em;
   *padding: 0.2em 0.5em;
-  line-height: 1.0;
   text-decoration: none;
-  @include rounded-box-shadow(#f0f4ff);
+  @include rounded-box-shadow($seek-button-colour);
 }
 
 .sectionIcons li a:hover {
-  @include box(darken(#f0f4ff, 10%));
+  @include box(darken($seek-button-colour, 10%));
 }
 
 .box_standout {
@@ -179,6 +177,31 @@ div.list_item, div.private_list_item, div.public_list_item {
   @include rounded-box-shadow(#F0F0F0);
   border-collapse: collapse;
   min-height: 90px;
-  overflow: auto;
   margin: 3px 10px;
+}
+
+.contribution_title {
+  @include rounded-box-shadow(#f8f8f8);
+  margin-bottom: 0.5em;
+  margin-top: 0.5em;
+  text-align: center;
+  position: relative;
+  padding: 0.5em;
+}
+
+.contribution_title h1 {
+  margin: 0.2em 52px;
+}
+
+.contribution_title a.asset {
+  display: inline-block;
+  position: absolute;
+  left: 10px;
+}
+
+.contribution_title a.asset > img {
+  @include rounded-box-shadow(#ffffff);
+  width: 32px;
+  height: 32px;
+  padding: 2px;
 }
