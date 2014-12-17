@@ -141,7 +141,7 @@ function displayNodeInfo(node){
     $('node_info').innerHTML = html;
 
     //can not use Effect.Appear here, it does not activate clientHeight
-    node_info.style['display'] = 'block';
+    node_info.style.display = 'block';
     alignCenterVertical(node_info, node_info.clientHeight);
 }
 
@@ -249,9 +249,9 @@ function alignCenterVertical(element, element_height){
     var graph_height = cy.container().style.height.split('px')[0];
     var distance_from_top = (graph_height - element_height)/2;
     if (distance_from_top > 0){
-        element.style['top']=distance_from_top+'px';
+        element.style.top=distance_from_top+'px';
     }else{
-        element.style['top']='0px';
+        element.style.top='0px';
     }
 }
 
