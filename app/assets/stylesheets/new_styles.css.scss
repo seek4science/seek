@@ -140,7 +140,7 @@ span.truncated-name {
 }
 
 .contribution_section_box {
-  @include rounded-box($info-box-colour);
+  @include rounded-box-shadow($info-box-colour);
   padding: 0.5em 0.25em;
   text-align: center;
   margin-bottom: 0.6em;
@@ -152,27 +152,31 @@ span.truncated-name {
   *padding: 0.2em 0.5em;
   line-height: 1.0;
   text-decoration: none;
-  @include rounded-box(#f0f4ff);
+  @include rounded-box-shadow(#f0f4ff);
+}
+
+.sectionIcons li a:hover {
+  @include box(darken(#f0f4ff, 10%));
 }
 
 .box_standout {
   padding: 0.5em 0.8em;
-  @include rounded-box($info-box-colour);
+  @include rounded-box-shadow($info-box-colour);
 }
 
 .box_standout {
   padding: 0.5em 0.8em;
-  @include rounded-box($info-box-colour);
+  @include rounded-box-shadow($info-box-colour);
 }
 
 .contribution_version_box {
   padding: 0.6em 0.5em 0.4em 0.5em;
-  @include rounded-box($info-box-colour);
+  @include rounded-box-shadow($info-box-colour);
 }
 
 div.list_item, div.private_list_item, div.public_list_item {
   padding: 1em;
-  @include rounded-box(#F0F0F0);
+  @include rounded-box-shadow(#F0F0F0);
   border-collapse: collapse;
   min-height: 90px;
   overflow: auto;
