@@ -22,7 +22,7 @@ $j(document).ready(function () {
             e.stopPropagation();
             draggedFavouritable = false;
             setTimeout(function () {
-                if(!draggedFavouritable)
+                if(!draggedFavouritable && $j('#user-menu').hasClass('open'))
                     $j('#user-menu-button').dropdown('toggle');
             }, 800);
             return false;
