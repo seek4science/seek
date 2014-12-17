@@ -5,7 +5,7 @@
 <%= render :partial => "general/item_title",:locals=>{:item=>@model} %>
 
 <ul class="sectionIcons">
-  <%#= asset_buttons @model, @display_model.version -%>
+  <%= asset_buttons @model, @display_model.version -%>
 
   <% if Seek::Config.solr_enabled && @display_model.latest_version? && (@model.contains_sbml? || @model.contains_jws_dat?) -%>
       <li>
@@ -16,13 +16,13 @@
   <% if cytoscapeweb_supported?(@display_model) %>
            <% if can_download_asset?(@model, params[:code]) -%>
                <li>
-                 <%#= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank"}, "Visualise #{t('model')} with Cytoscape Web") -%>
+                 <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank"}, "Visualise #{t('model')} with Cytoscape Web") -%>
                </li>
            <% end -%>
    <% end %>
   <% if show_jws_simulate? %>
       <li>
-        <%#= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate #{t('model')} on JWS") -%>
+        <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate #{t('model')} on JWS") -%>
       </li>
   <% end %>
 </ul>
@@ -54,7 +54,7 @@
         <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
           <%= item_description @display_model.description -%>
-            <%#= render :partial=>"assets/multiple_fileinfo", :object=>@display_model -%>
+            <%= render :partial=>"assets/multiple_fileinfo", :object=>@display_model -%>
 
             <p>
                 <b>Organism:</b>
