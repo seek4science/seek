@@ -1,3 +1,82 @@
+var cy;
+var default_node_width = 175;
+var default_node_height = 35;
+var default_font_size = 11;
+var default_color = '#323232';
+
+function drawGraph(elements, current_element_id){
+    $j('#cy').cytoscape({
+        layout: {
+            name: 'breadthfirst'
+        },
+
+        showOverlay: false,
+
+        style: cytoscape.stylesheet()
+            .selector('node')
+            .css({
+                'shape': 'roundrectangle',
+                'border-color': 'data(borderColor)',
+                'border-width': 2,
+                'das': 'mapData(weight, 40, 80, 20, 60)',
+                'content': 'data(name)',
+                'text-valign': 'center',
+                'text-outline-width': 1,
+                'text-outline-color': 'data(faveColor)',
+                'background-color': 'data(faveColor)',
+                'color':default_color,
+                'width':default_node_width,
+                'height':default_node_height,
+                'font-size':default_font_size
+            })
+
+            .selector('edge')
+            .css({
+                'width': 1.5,
+                'target-arrow-shape': 'none',
+                'line-color': 'data(faveColor)',
+                'source-arrow-color': 'data(faveColor)',
+                'target-arrow-color': 'data(faveColor)',
+                'content': 'data(name)',
+                'color': '#323232',
+                'font-size': (default_font_size-2)
+            }),
+
+        elements: elements,
+
+        ready: function(){
+            cy = this;
+            var nodes = cy.$('node');
+
+            //process only when having nodes
+            if (nodes.length > 0){
+                processPanzoom();
+
+                nodes.on('click', function(e){
+                    var node = e.cyTarget;
+                    if(node.selected() === true){
+                        clickLabelLink(node, e.originalEvent);
+                    }else{
+                        animateNode(node);
+                        displayNodeInfo(node);
+                    }
+                });
+
+                //animate the current node
+                var current_node = cy.nodes('[id=\''+ current_element_id +'\']')[0];
+                animateNode(current_node);
+                displayNodeInfo(current_node);
+
+                disableMouseWheel();
+                resizeGraph();
+            }else{
+                $j('.isa_graph')[0].hide();
+            }
+        }
+    });
+}
+
+
 function animateNode(node){
     var nodes = cy.$('node');
     var edges = cy.$('edge');
