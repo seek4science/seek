@@ -72,6 +72,7 @@ function getItems(items){
 function updateContent(items_for_result){
     var collection_view_body = $j('.exhibit-collectionView-body');
     collection_view_body.html(items_for_result);
+    $j('.exhibit-collectionView-body .favouritable').mousedown(handleFavouritableDrag);
 }
 
 function decodeValueTooltip(){
