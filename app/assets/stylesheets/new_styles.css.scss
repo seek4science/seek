@@ -139,13 +139,6 @@ span.truncated-name {
   white-space: nowrap;
 }
 
-.contribution_section_box {
-  @include rounded-box-shadow($info-box-colour);
-  padding: 0.5em 0.25em;
-  text-align: center;
-  margin-bottom: 0.6em;
-}
-
 .sectionIcons li a,
 .sectionIcons li span.disabled_icon {
   padding: 0.5em;
@@ -158,19 +151,15 @@ span.truncated-name {
   @include box(darken($seek-button-colour, 10%));
 }
 
-.box_standout {
+.box_standout, .contribution_version_box, .contribution_section_box {
   padding: 0.5em 0.8em;
   @include rounded-box-shadow($info-box-colour);
 }
 
-.box_standout {
-  padding: 0.5em 0.8em;
-  @include rounded-box-shadow($info-box-colour);
-}
-
-.contribution_version_box {
-  padding: 0.6em 0.5em 0.4em 0.5em;
-  @include rounded-box-shadow($info-box-colour);
+.contribution_section_box {
+  padding: 0.5em 0.25em;
+  text-align: center;
+  margin-bottom: 0.6em;
 }
 
 div.list_item, div.private_list_item, div.public_list_item {
