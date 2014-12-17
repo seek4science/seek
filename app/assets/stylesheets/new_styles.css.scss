@@ -1,4 +1,21 @@
 @import 'variables';
+@import 'mixins';
+
+body {
+  border: none;
+}
+
+#header {
+  padding: 0 1em;
+}
+
+#myexp_sidebar {
+  background: none;
+}
+
+#bd {
+  background: none;
+}
 
 .logo_link {
   margin-right: 1em;
@@ -116,3 +133,42 @@ span.truncated-name {
   white-space: nowrap;
 }
 
+.contribution_section_box {
+  @include rounded-box($info-box-colour);
+  padding: 0.5em 0.25em;
+  text-align: center;
+  margin-bottom: 0.6em;
+}
+
+.sectionIcons li a {
+  width: 100%;
+  padding: 0.5em 0.5em;
+  *padding: 0.2em 0.5em;
+  line-height: 1.0;
+  text-decoration: none;
+  @include rounded-box(#f0f4ff);
+}
+
+.box_standout {
+  padding: 0.5em 0.8em;
+  @include rounded-box($info-box-colour);
+}
+
+.box_standout {
+  padding: 0.5em 0.8em;
+  @include rounded-box($info-box-colour);
+}
+
+.contribution_version_box {
+  padding: 0.6em 0.5em 0.4em 0.5em;
+  @include rounded-box($info-box-colour);
+}
+
+div.list_item, div.private_list_item, div.public_list_item {
+  padding: 1em;
+  @include rounded-box(#F0F0F0);
+  border-collapse: collapse;
+  min-height: 90px;
+  overflow: auto;
+  margin: 3px 10px;
+}

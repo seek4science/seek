@@ -1,25 +1,5 @@
-body {
-  border: none;
-}
-
-#header {
-  padding: 0 1em;
-}
-
-#myexp_sidebar {
-  background: none;
-}
-
-#bd {
-  background: none;
-}
-
 .main_content_right_box .panel-heading {
   text-align: center;
-}
-
-.no-corners {
-  border-radius: 0;
 }
 
 .dropdown-header {
@@ -29,4 +9,8 @@ body {
 
 .navbar {
   border-radius: 0;
+}
+
+p:last-child {
+  margin-bottom: 0;
 }
