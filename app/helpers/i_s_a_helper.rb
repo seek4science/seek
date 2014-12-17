@@ -87,9 +87,9 @@ module ISAHelper
     max_nodes = [current_node]
     connected_nodes = reduced_elements.select{|e| e[:group] == 'nodes'}.reject {|element| element[:data][:id] == current_node[:data][:id] }
     connected_edges = reduced_elements.select{|e| e[:group] == 'edges'}
-    connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}
+    connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}.uniq
     #put the parent nodes in front
-    connected_nodes.sort!{|a,b| connected_edge_sources.find_index(b) <=> connected_edge_sources.find_index(a)}
+    connected_nodes.sort!{|a,b| connected_edge_sources.find_index(b[:data][:id]).to_i <=> connected_edge_sources.find_index(a[:data][:id]).to_i}
     max_nodes |= connected_nodes.take(max_node_number-1)
 
     max_edges = possible_edges_for max_nodes, connected_edges
