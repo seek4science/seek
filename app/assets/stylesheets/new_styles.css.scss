@@ -174,7 +174,7 @@ span.truncated-name {
 
 div.list_item, div.private_list_item, div.public_list_item {
   padding: 1em;
-  @include rounded-box-shadow(#F0F0F0);
+  @include rounded-box-shadow(#f8f8f8);
   border-collapse: collapse;
   min-height: 90px;
   margin: 3px 10px;
