@@ -146,7 +146,8 @@ span.truncated-name {
   margin-bottom: 0.6em;
 }
 
-.sectionIcons li a {
+.sectionIcons li a,
+.sectionIcons li span.disabled_icon {
   padding: 0.5em;
   *padding: 0.2em 0.5em;
   text-decoration: none;
