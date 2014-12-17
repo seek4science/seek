@@ -113,8 +113,9 @@ function animateNode(node){
     // set font style here for better animation (instead of in animate function).
     node.css('font-size', 14);
     node.css('font-weight', 'bolder');
-    if (node.data().name !== 'Hidden item')
+    if (node.data().name !== 'Hidden item'){
         node.css('color', '#0000e5');
+    }
     node.select();
 }
 
@@ -168,59 +169,6 @@ function connectedNodes(node){
     return connected_nodes;
 }
 
-
-function targetNodeCollection(node){
-    var edges = cy.$('edge');
-    var target_node_collection = cy.collection();
-    edges.each(function(i, edge){
-        var source = edge.source();
-        var target =edge.target();
-        if (source.id() === node.id()){
-            target_node_collection = target_node_collection.add(target);
-        }
-    });
-    return target_node_collection;
-}
-
-function sourceNodeCollection(node){
-    var edges = cy.$('edge');
-    var source_node_collection = cy.collection();
-    edges.each(function(i, edge){
-        var source = edge.source();
-        var target =edge.target();
-        if (target.id() === node.id()){
-            source_node_collection = source_node_collection.add(source);
-        }
-    });
-    return source_node_collection;
-}
-
-function edgeToTargetCollection(node){
-    var edges = cy.$('edge');
-    var edge_to_target_collection = cy.collection();
-    edges.each(function(i, edge){
-        var source = edge.source();
-        var target =edge.target();
-        if (source.id() === node.id()){
-            edge_to_target_collection = edge_to_target_collection.add(edge);
-        }
-    });
-    return edge_to_target_collection;
-}
-
-function edgeToSourceCollection(node){
-    var edges = cy.$('edge');
-    var edge_to_source_collection = cy.collection();
-    edges.each(function(i, edge){
-        var source = edge.source();
-        var target =edge.target();
-        if (target.id() === node.id()){
-            edge_to_source_collection = edge_to_source_collection.add(edge);
-        }
-    });
-    return edge_to_source_collection;
-}
-
 function processPanzoom() {
     //display panzoom
     $j('#cy').cytoscapePanzoom({
@@ -237,7 +185,7 @@ function processPanzoom() {
 
     //reset on panzoom also reset all nodes and edges css
     $j('.ui-cytoscape-panzoom-reset').click(function () {
-        var nodes = cy.$('node')
+        var nodes = cy.$('node');
         normalizingNodes(nodes);
         appearingNodes(nodes);
         appearingEdges(cy.$('edge'));
@@ -289,7 +237,7 @@ function resizeGraph(){
 }
 
 function labelPosition(node){
-    var label_pos = new Object();
+    var label_pos = {};
     var graph_pos = $j('#cy')[0].getBoundingClientRect();
     var node_posX = node.renderedPosition().x + graph_pos.left;
     var node_posY = node.renderedPosition().y + graph_pos.top;
@@ -333,7 +281,7 @@ function disableMouseWheel(){
     for( var i=0; i<bindings.length; i++){
         binding = bindings[i];
         var event = binding.event;
-        if (event.match(/wheel/i) != null || event.match(/scroll/i) !=null){
+        if (event.match(/wheel/i) !== null || event.match(/scroll/i) !==null){
             binding.target.removeEventListener(event, binding.handler, binding.useCapture);
         }
     }
