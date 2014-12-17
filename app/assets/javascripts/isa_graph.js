@@ -4,6 +4,9 @@ var default_node_height = 35;
 var default_font_size = 11;
 var default_color = '#323232';
 
+jQuery.noConflict();
+var $j = jQuery;
+
 function drawGraph(elements, current_element_id){
     $j('#cy').cytoscape({
         layout: {
@@ -143,7 +146,7 @@ function displayNodeInfo(node){
 }
 
 function itemInfo(item_data){
-    html = '<li>';
+    var html = '<li>';
     html += item_data.item_info;
     html += '</li>';
     return html;

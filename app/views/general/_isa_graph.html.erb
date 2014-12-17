@@ -36,9 +36,6 @@
 <span id="ruler" style="visibility: hidden"></span>
 
 <script type="text/javascript">
-    jQuery.noConflict();
-    var $j = jQuery;
-
     var isa_graph = $j('.isa_graph')[0];
     var elements = <%= cytoscape_elements.to_json.html_safe %>;
     var reduced_elements = <%= reduced_elements.to_json.html_safe %>;
