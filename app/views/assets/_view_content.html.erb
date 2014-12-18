@@ -1,5 +1,4 @@
 <% asset = content_blob.asset
-   button_style ||= false
    if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
     <%# those libs have been loaded for Model %>
     <% unless asset.is_a?(Model) %>
@@ -9,17 +8,6 @@
 
     <% is_inline_viewable = content_blob.is_content_viewable? %>
 
-    <%
-       li_start = ""
-       li_end = ""
-       label = ""
-       if button_style
-         li_start = "<li>"
-         li_end = "</li>"
-         label = "View content"
-       end
-    %>
-        <%= li_start.html_safe %>
     <% if is_inline_viewable %>
         <% if content_blob.is_image? %>
             <%
@@ -44,7 +32,6 @@
                "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(" , ") %>
         <span class='disabled_icon disabled' onclick='javascript:alert("<%=explanation%>")' title='<%= tooltip_title_attrib(explanation) %>' > <%=  image('show', {:alt=>"View Content",:class=>"disabled"}) %>  View Content </span>
     <% end %>
-    <%= li_end.html_safe %>
 <% end %>
 
 <script type="text/javascript">

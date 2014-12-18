@@ -362,4 +362,18 @@ module AssetsHelper
   def doi_link doi
     link_to doi,"https://dx.doi.org/#{doi}"
   end
+
+  def sharing_text(item)
+    if item.private?
+      sharing_text = "This item is <span style='color: red; font-weight: bold;'>Private</span> (only you can view it)"
+    elsif item.is_published?
+      sharing_text = "This item is <span style='color: green; font-weight: bold;'>Published</span> (all visitors, even without a login, may view/access this item)"
+    elsif item.public?
+      sharing_text = "This item is <span style='color: green; font-weight: bold;'>Public</span> visible (all visitors, even without a login, may view this item)"
+    else
+      sharing_text = "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
+    end
+    sharing_text.html_safe
+  end
+
 end

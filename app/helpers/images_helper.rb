@@ -29,6 +29,8 @@ module ImagesHelper
 
     inner = img_tag.html_safe;
     inner = "#{img_tag} #{label}".html_safe unless label.blank?
+    html_options ||= {}
+    html_options.merge!(:class => 'btn btn-default')
     
     if (url)
       if (remote==:function)
@@ -40,8 +42,7 @@ module ImagesHelper
       end
     end
     
-    tag = '<span class="icon">'.html_safe + inner.html_safe + '</span>'.html_safe
-    tag.html_safe
+    inner.html_safe
   end
 
   def resource_avatar resource,html_options={}
@@ -102,11 +103,11 @@ module ImagesHelper
   def delete_icon model_item, user
     item_name = text_for_resource model_item
     if model_item.can_delete?(user)
-      html = "<li>"+image_tag_for_key('destroy',url_for(model_item),"Delete #{item_name.downcase}", {:confirm=>"Are you sure?",:method=>:delete },"Delete #{item_name.downcase}") + "</li>"
+      html = image_tag_for_key('destroy',url_for(model_item),"Delete #{item_name.downcase}", {:confirm=>"Are you sure?",:method=>:delete },"Delete #{item_name.downcase}")
       return html.html_safe
     elsif model_item.can_manage?(user)
       explanation=unable_to_delete_text model_item
-      html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span></li>"
+      html = "<span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span>"
       return html.html_safe
     end
   end
