@@ -14,3 +14,31 @@
 p:last-child {
   margin-bottom: 0;
 }
+
+@mixin responsive-text-align($size) {
+  .text-right-#{$size} { text-align: right; }
+  .text-left-#{$size} { text-align: left; }
+  .text-center-#{$size} { text-align: center; }
+}
+
+@media (max-width: $screen-xs-max) {
+  @include responsive-text-align('xs');
+}
+
+@media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+  @include responsive-text-align('xs');
+  @include responsive-text-align('sm');
+}
+
+@media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
+  @include responsive-text-align('xs');
+  @include responsive-text-align('sm');
+  @include responsive-text-align('md');
+}
+
+@media (min-width: $screen-lg-min) {
+  @include responsive-text-align('xs');
+  @include responsive-text-align('sm');
+  @include responsive-text-align('md');
+  @include responsive-text-align('lg');
+}

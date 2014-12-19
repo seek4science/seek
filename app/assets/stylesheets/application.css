@@ -25,7 +25,6 @@
 *= require jws
 *= require images
 *= require landing_page
-*= require bootstrap_tweaks
 *= require asset_report
 *= require biosamples
 *= require bives

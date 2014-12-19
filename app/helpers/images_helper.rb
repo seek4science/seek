@@ -29,9 +29,7 @@ module ImagesHelper
 
     inner = img_tag.html_safe;
     inner = "#{img_tag} #{label}".html_safe unless label.blank?
-    html_options ||= {}
-    html_options.merge!(:class => 'btn btn-default')
-    
+
     if (url)
       if (remote==:function)
         inner = link_to_function inner, url, html_options

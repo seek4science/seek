@@ -1,8 +1,4 @@
-
-<% truncate_length_for_boxes = 22 -%>
-
-
-<%= render :partial => "general/item_title",:locals=>{:item=>@data_file } -%>
+<%= render :partial => "general/item_title",:locals => {:item=>@data_file, :version => @display_data_file.version} -%>
 
 <div class="show_basic">
 

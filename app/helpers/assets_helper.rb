@@ -265,11 +265,8 @@ module AssetsHelper
     assets
   end
 
-  def asset_buttons asset, version=nil, delete_confirm_message=nil
-    human_name = text_for_resource asset
-    delete_confirm_message ||= "This deletes the #{human_name} and all metadata. Are you sure?"
-
-    render :partial => "assets/asset_buttons", :locals => {:asset => asset, :version => version, :human_name => human_name, :delete_confirm_message => delete_confirm_message}
+  def asset_buttons asset, version=nil
+    render :partial => "assets/asset_buttons", :locals => {:asset => asset, :version => version}
   end
 
   def asset_version_links asset_versions
@@ -349,8 +346,8 @@ module AssetsHelper
   end
 
   def download_or_link_button asset, download_path, link_url, human_name=nil
-    download_button = image_tag_for_key('download', download_path, "Download #{human_name}", nil, "Download #{human_name}")
-    link_button_or_nil = link_url ? image_tag_for_key('download', link_url, "Link", {:target => 'blank'}, "Link") : nil
+    download_button = button_link_to('Download', 'download', download_path)
+    link_button_or_nil = link_url ? button_link_to('Link', 'download', link_url, {:target => 'blank'}) : nil
     return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob)
     return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ? download_button : link_button_or_nil if asset.respond_to?(:content_blobs)
   end

@@ -1,12 +1,8 @@
 module BootstrapHelper
 
-  def icon_link_to(text, icon, url, options = {})
-    filename = icon_filename_for_key(icon)
-    icon_options = options.delete(:icon_options) || {}
-    icon_options[:class] = "icon #{icon_options[:class]}".strip
-    icon_options[:alt] ||= text
-
-    link_to((image_tag(filename, icon_options) + text).html_safe, url, options)
+  def icon_link_to(text, icon_key, url, options = {})
+    icon = icon_tag(icon_key, options.delete(:icon_options) || {})
+    link_to((icon + text).html_safe, url, options)
   end
 
   def button_link_to(text, icon, url, options = {})
@@ -23,6 +19,41 @@ module BootstrapHelper
         yield
       end
     end
+  end
+
+  def dropdown_button(text, icon_key = nil, options = {})
+    content_tag(:div, :class => "btn-group") do
+      content_tag(:div, :type => 'button', :class => "btn dropdown-toggle #{options[:type] || 'btn-default'}".strip,
+                  'data-toggle' => 'dropdown', 'aria-expanded' => 'false') do
+        ((icon_key ? icon_tag(icon_key, options.delete(:icon_options) || {}) : '') +
+        text + ' <span class="caret"></span>'.html_safe)
+      end +
+      content_tag(:ul, merge_options({:class => 'dropdown-menu', :role => 'menu'}, options.delete(:menu_options))) do
+        yield
+      end
+    end
+  end
+
+  private
+
+  def icon_tag(key, options = {})
+    filename = icon_filename_for_key(key)
+    options[:class] = "icon #{options[:class]}".strip
+    image_tag(filename, options)
+  end
+
+  # Merge two option hashes, joining colliding values with a whitespace
+  def merge_options(defaults, options = {})
+    options ||= {}
+
+    defaults.symbolize_keys!
+    options.symbolize_keys!
+
+    (defaults.keys & options.keys).each do |key|
+      options[key] = "#{defaults[key]} #{options[key]}".strip
+    end
+
+    defaults.merge(options)
   end
 
 end

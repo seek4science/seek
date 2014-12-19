@@ -7,8 +7,8 @@ title ||= item.title || ""
 title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
 %>
 
-<div class="row">
-  <div class="col-md-8">
+<div class="row contribution-header">
+  <div class="col-md-6">
     <% unless avatar.blank? -%>
       <%= avatar -%>
     <% end %>
@@ -21,7 +21,7 @@ title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
         </div>
     <% end %>
   </div>
-  <div class="col-md-4" id="buttons">
+  <div class="col-md-6 text-right-md" id="buttons">
     <%= render :partial => 'buttons', :locals => {:item => item, :version => version} -%>
   </div>
 </div>

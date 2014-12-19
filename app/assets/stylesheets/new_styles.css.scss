@@ -170,30 +170,24 @@ div.list_item, div.private_list_item, div.public_list_item {
   margin: 3px 10px;
 }
 
-.contribution_title {
-  @include rounded-box-shadow(#f8f8f8);
-  margin-bottom: 0.5em;
-  margin-top: 0.5em;
-  text-align: center;
-  position: relative;
-  padding: 0.5em;
+.contribution-header {
+  margin: 0.5em 0;
 }
 
-.contribution_title h1 {
-  margin: 0.2em 52px;
-}
-
-.contribution_title a.asset {
-  display: inline-block;
-  position: absolute;
-  left: 10px;
-}
-
-.contribution_title a.asset > img {
+.contribution-header a.asset {
   @include rounded-box-shadow(#ffffff);
-  width: 32px;
-  height: 32px;
+  float: left;
+  margin-right: 0.5em;
+}
+
+.contribution-header a.asset > img {
   padding: 2px;
+  width: 34px;
+  height: 34px;
+}
+
+.contribution-header h1 {
+  margin-top: 0;
 }
 
 img.icon {
