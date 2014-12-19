@@ -617,7 +617,6 @@ SEEK::Application.routes.draw do
   match '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group, :via => :post
   match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
   match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
-  match '/organism_list_autocomplete' => 'projects#auto_complete_for_organism_name', :as => :organism_list_autocomplete
   match ':controller/:id/approve_or_reject_publish' => ":controller#show"
 
   match '/signup' => 'users#new', :as => :signup

@@ -22,10 +22,6 @@ class ProjectsController < ApplicationController
 
   respond_to :html
 
-  def auto_complete_for_organism_name
-    render :json => Project.organism_counts.map(&:name).to_json
-  end
-
   def asset_report
     @no_sidebar=true
     project_assets = @project.assets | @project.assays | @project.studies | @project.investigations
