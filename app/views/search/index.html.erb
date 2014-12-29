@@ -21,12 +21,12 @@
                                      :include_external_search=>params[:include_external_search])
           %>
           <ul class="sectionIcons">
-            <li class="filter_button">
+            <li>
               <%= image_tag_for_key('filter', filter_path, 'Filter result',
                                     {:style => params[:filter] == 'true' ? 'display: none' : ''}, 'Filter result')  %>
             </li>
 
-            <li class="filter_button">
+            <li class="unfilter_button">
               <%= image_tag_for_key('filter', unfilter_path, 'Un-filter result',
                                     {:style => params[:filter] == 'true' ? '' : 'display: none'}, 'Un-filter result')  %>
             </li>
@@ -49,3 +49,9 @@
       <% end %>
   <% end %>
 </div>
+
+<style>
+  ul li.unfilter_button{
+      margin-right: 15%;
+  }
+</style>
