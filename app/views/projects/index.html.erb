@@ -4,7 +4,13 @@
 <% end %>
 
 <% if index_with_facets?(controller_name)  %>
-    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @projects %>
+    <%= render :partial => "assets/filter_button", :locals => {:index_path => projects_path} %>
+
+    <% if params[:user_enable_facet] == 'true' %>
+        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @projects %>
+    <% else %>
+        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @projects %>
+    <% end %>
 <% else %>
     <%= render :partial => "assets/resources_alphabetical_paginated", :object => @projects %>
 <% end %>
