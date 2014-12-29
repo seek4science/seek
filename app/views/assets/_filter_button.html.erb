@@ -5,11 +5,11 @@
 <ul class="sectionIcons">
   <li>
     <%= image_tag_for_key('filter', filter_path, 'Advance filter',
-                          {:style => params[:facet] == 'true' ? 'display: none' : 'display: block'}, 'Advance filter') %>
+                          {:style => params[:user_enable_facet] == 'true' ? 'display: none' : 'display: block'}, 'Advance filter') %>
   </li>
 
   <li>
     <%= image_tag_for_key('filter', unfilter_path, 'Un-filter',
-                          {:style => params[:facet] == 'true' ? 'display: block' : 'display: none'}, 'Un-filter') %>
+                          {:style => params[:user_enable_facet] == 'true' ? 'display: block' : 'display: none'}, 'Un-filter') %>
   </li>
 </ul>
