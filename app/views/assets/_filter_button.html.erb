@@ -8,7 +8,7 @@
                           {:style => params[:user_enable_facet] == 'true' ? 'display: none' : ''}, 'Advance filter') %>
   </li>
 
-  <li>
+  <li class="unfilter_button">
     <%= image_tag_for_key('filter', unfilter_path, 'Un-filter',
                           {:style => params[:user_enable_facet] == 'true' ? '' : 'display: none'}, 'Un-filter') %>
   </li>
