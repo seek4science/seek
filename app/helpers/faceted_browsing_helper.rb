@@ -44,6 +44,8 @@ module FacetedBrowsingHelper
         exhibit_item[key] = object.title
       elsif object.kind_of?(Person) && key == 'contributor'
         exhibit_item[key] = object.name
+      elsif object.kind_of?(Assay) && object.assay_class.title == 'Modelling Analysis' && key == 'technology_type'
+        exhibit_item[key] = "(don't have this field)"
       else
         exhibit_item[key] = value_for_key value, object
       end
