@@ -8,7 +8,7 @@
 
   <% end %>
   <% if !@results.blank? %>
-      <% if Seek::Config.faceted_search_enabled && @ie_support_faceted_browsing %>
+      <% if Seek::Config.faceted_search_enabled && ie_support_faceted_browsing? %>
           <%
              filter_path = url_for(:controller => 'search', :action => 'index',
                                    :search_query => params[:search_query],
@@ -23,12 +23,12 @@
           <ul class="sectionIcons">
             <li>
               <%= image_tag_for_key('filter', filter_path, 'Filter result',
-                                    {:style => params[:filter] == 'true' ? 'display: none' : 'display: block'}, 'Filter result')  %>
+                                    {:style => params[:filter] == 'true' ? 'display: none' : ''}, 'Filter result')  %>
             </li>
 
-            <li>
+            <li class="unfilter_button">
               <%= image_tag_for_key('filter', unfilter_path, 'Un-filter result',
-                                    {:style => params[:filter] == 'true' ? 'display: block' : 'display: none'}, 'Un-filter result')  %>
+                                    {:style => params[:filter] == 'true' ? '' : 'display: none'}, 'Un-filter result')  %>
             </li>
           </ul>
           <% if params[:filter] == 'true' %>
@@ -49,3 +49,9 @@
       <% end %>
   <% end %>
 </div>
+
+<style>
+  ul li.unfilter_button{
+      margin-right: 15%;
+  }
+</style>

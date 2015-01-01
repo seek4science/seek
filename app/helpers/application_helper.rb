@@ -551,9 +551,9 @@ module ApplicationHelper
   def internationalized_resource_name resource_type,pluralize=true
     resource_type = resource_type.singularize
     if resource_type == "Speciman"
-      result = t('biosamples.sample_parent_term')
+      result = I18n.t('biosamples.sample_parent_term')
     elsif resource_type == "Assay"
-      result = t('assays.assay')
+      result = I18n.t('assays.assay')
     elsif resource_type == "TavernaPlayer::Run"
       result = "Run"
     else
@@ -564,7 +564,7 @@ module ApplicationHelper
   end
 
   def translate_resource_type resource_type
-    t("#{resource_type.underscore}")
+    I18n.t("#{resource_type.underscore}")
   end
 
   def add_return_to_search

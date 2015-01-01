@@ -3,8 +3,14 @@
   <h2><%= "#{t('project').pluralize} involved with the organism '"+h(@organisms)+"' ... " -%></h2>
 <% end %>
 
-<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
-    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @projects %>
+<% if index_with_facets?(controller_name)  %>
+    <%= render :partial => "assets/filter_button", :locals => {:index_path => projects_path} %>
+
+    <% if params[:user_enable_facet] == 'true' %>
+        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @projects %>
+    <% else %>
+        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @projects %>
+    <% end %>
 <% else %>
     <%= render :partial => "assets/resources_alphabetical_paginated", :object => @projects %>
 <% end %>
