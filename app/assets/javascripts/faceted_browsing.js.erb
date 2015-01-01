@@ -29,6 +29,7 @@ function updateFirstPage() {
                         decodeValueTooltip();
                         selectedFacets();
                         grayingTechnologyTypeOfModellingAnalysis();
+                        internationalAssetType();
                     });
         }, 0);
     }
@@ -150,4 +151,19 @@ function grayingTechnologyTypeOfModellingAnalysis(){
             $j(this).html("<span class='exhibit-facet-value-missingThisField'>" + "(don't have this field)" + "</span>");
         }
     });
+}
+
+<% environment.context_class.instance_eval { include ApplicationHelper } %>
+
+function internationalAssetType(){
+
+    var result_summary = $j('.exhibit-collectionSummaryWidget-results').children().contents();
+    var international_asset_type = ' <%= internationalized_resource_name(controller_name.singlularize, true) %>';
+
+    if (result_summary.length == 3){
+        result_summary[1].nodeValue = international_asset_type;
+    }else{
+        result_summary[1].nodeValue = international_asset_type;
+        result_summary[3].nodeValue = international_asset_type;
+    }
 }
