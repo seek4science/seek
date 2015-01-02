@@ -324,6 +324,47 @@ class AdminsController < ApplicationController
     end
   end
 
+  def get_user_stats
+    partial = nil
+    collection = []
+    action = nil
+    title = nil
+    @page = params[:id]
+    case @page
+      when 'invalid_users_profiles'
+        partial = 'invalid_user_stats_list'
+        invalid_users = {}
+        pal_role = ProjectRole.pal_role
+        invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal? != p.project_roles.include?(pal_role) }
+        invalid_users[:duplicates] = Person.duplicates
+        invalid_users[:no_person] = User.without_profile
+        invalid_users[:no_user] = Person.userless_people
+        collection = invalid_users
+      when 'users_requiring_activation'
+        partial = 'user_stats_list'
+        collection = User.not_activated
+        action = "activate"
+      when 'non_project_members'
+        partial = 'user_stats_list'
+        collection = Person.without_group.registered
+        title = "Users not in a #{Seek::Config.project_name} #{t('project')}"
+      when 'pals'
+        partial = 'user_stats_list'
+        collection = Person.pals
+      when 'administrators'
+        partial = 'admin_selection'
+      when "none"
+        partial = "none"
+    end
+    respond_to do |format|
+      if partial == "none"
+        format.html { render :text=>"" }
+      else
+        format.html { render :partial => partial, :locals => {:collection => collection, :action => action, :title => title} }
+      end
+    end
+  end
+
   def get_monthly_stats
     first_month = User.all.sort_by(&:created_at).first.created_at
     number_of_months_since_first = (Date.today.year * 12 + Date.today.month) - (first_month.year * 12 + first_month.month)

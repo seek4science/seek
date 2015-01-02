@@ -1,98 +1,33 @@
-<%
+<%= select_tag :user_admin_query,
+               options_for_select([["Select query ...","none"],
+                                   ["Invalid Users/Profiles","invalid_users_profiles"],
+                                   ["Users Requiring Activation","users_requiring_activation"],
+                                   ["Non-#{t('project')} Members","non_project_member"],
+                                   ["PALs","pals"],
+                                   ["Administrators","administrators"]
+                                  ],:length=>10),
+               {:style=>"",
+                :onchange=>remote_function(:url=>get_user_stats_admin_path(:element=>"user_stats_list"),
+                                           :with=>"'id='+this.value",
+                                           :update => {:success => 'user_stats_list'},
+                                           :success => "Element.show('user_stats_list'); new Effect.Highlight('user_stats_list', { duration: 1.0 });",
+                                           :loading => "Element.show('spinner_for_user_stats');Element.hide('user_stats_list');Element.hide('refresh_button_for_user_stats');",
+                                           :complete => "Element.hide('spinner_for_user_stats');Element.show('user_stats_list');Element.show('refresh_button_for_user_stats');"
+                )
+               }
+-%>
 
-   pal_role = ProjectRole.pal_role
-   invalid_users = {}
-   invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal? != p.project_roles.include?(pal_role) }
-   invalid_users[:duplicates] = Person.duplicates
-   invalid_users[:no_person] = User.without_profile
-   invalid_users[:no_user] = Person.userless_people
-   pals = Person.pals
-
-   non_activated_users = User.not_activated
-   non_project_members = Person.without_group.registered
+<%= link_to_with_callbacks image('refresh'),
+                           {:url=>get_user_stats_admin_path,
+                            :with=>"'id='+encodeURIComponent($F('user_admin_query'))",
+                            :update => {:success => 'user_stats_list'},
+                            :success => "Element.show('user_stats_list'); new Effect.Highlight('user_stats_list', { duration: 1.0 });",
+                            :loading => "Element.show('spinner_for_user_stats');Element.hide('user_stats_list');Element.hide('refresh_button_for_user_stats');",
+                            :complete => "Element.hide('spinner_for_user_stats');Element.show('user_stats_list');Element.show('refresh_button_for_user_stats');"},
+                           {:id=>'refresh_button_for_user_stats', :style=>'display:none;'}
 %>
 
-<style>
-    .tabber {
-        overflow: auto;
-    }
-
-    ul.tabbernav li {
-        display: list-item;
-        margin-bottom: 2px;
-    }
-
-    ul.tabbernav li a {
-        display: block;
-    }
-
-    ul.tabbernav {
-        float: left;
-    }
-
-    .tabbertab {
-
-        overflow: auto;
-        padding-left: 2em;
-
-    }
-
-    .tabbertab p {
-        text-align: center;
-        font-weight: bold;
-    }
-
-    .clear {
-        clear: both;
-    }
-</style>
-
-
-
-<div class="tabber" id="vertical_tabber">
-
-
-  <div class="tabbertab">
-    <h3>Invalid Users/Profiles</h3>
-
-    <p> Invalid Users/Profiles</p>
-    <%= render :partial => "admins/invalid_user_stats_list", :locals => {:collection => invalid_users} %>
-  </div>
-
-  <div class="tabbertab">
-    <h3>Users Requiring Activation</h3>
-
-    <p> Users Requiring Activation </p>
-    <%= render :partial => "admins/user_stats_list", :locals => {:collection => non_activated_users, :action => "activate"} %>
-  </div>
-  <div class="tabbertab">
-    <h3>Non-<%= t('project') %> Members</h3>
-
-    <% title = "Users not in a #{Seek::Config.project_name} #{t('project')}" %>
-    <p> Non-<%= t('project') %> Members </p>
-    <%= render :partial => "admins/user_stats_list", :locals => {:title => title, :collection => non_project_members} %>
-  </div>
-  <div class="tabbertab">
-    <h3> PALs </h3>
-    <p>PALs List</p>
-    <%= render :partial => "admins/user_stats_list", :locals => {:collection => pals} %>
-  </div>
-  <div class="tabbertab">
-    <h3>Administrators</h3>
-
-    <p> Administrators Management </p>
-    <%= render :partial => "admins/admin_selection" %>
-  </div>
-
-
-  <div class="clear"></div>
+<%= image_tag "ajax-loader.gif", :id => 'spinner_for_user_stats', :style => 'display:none;' -%>
+<br/>
+<div id="user_stats_list">
 </div>
-
-<%= javascript_include_tag "tabber-minimized" %>
-<script type="text/javascript">
-
-    var tabberOptions = {'onLoad': function () {
-        displayTabs();
-    }};
-    tabberAutomatic(tabberOptions);
-</script>
