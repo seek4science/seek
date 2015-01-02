@@ -344,13 +344,15 @@ class AdminsController < ApplicationController
         partial = 'user_stats_list'
         collection = User.not_activated
         action = "activate"
+        title = "Users have not yet activated their account"
       when 'non_project_members'
         partial = 'user_stats_list'
         collection = Person.without_group.registered
-        title = "Users not in a #{Seek::Config.project_name} #{t('project')}"
+        title = "Users are not in a #{Seek::Config.project_name} #{t('project')}"
       when 'pals'
         partial = 'user_stats_list'
         collection = Person.pals
+        title = 'List of PALs'
       when 'administrators'
         partial = 'admin_selection'
       when "none"
