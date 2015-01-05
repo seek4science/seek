@@ -9,3 +9,29 @@ div.faceted_browsing {
     margin-left: 1em;
     margin-top: 2em;
 }
+
+div.ajax_loading {
+    display:none;
+    text-align:center;
+}
+
+div.content_width {
+    width: 85%;
+}
+
+div.facet_width {
+    float:right;
+    width: 15%;
+}
+
+ul.reset_button {
+    text-align:left;
+}
+
+div.display_content {
+    display: none;
+}
+
+div.data {
+    display: none;
+}
