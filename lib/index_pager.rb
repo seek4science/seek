@@ -3,7 +3,7 @@ module IndexPager
 
   def index
     controller = self.controller_name.downcase
-    unless view_context.index_with_facets?(controller) && params[:user_enable_facet]
+    unless view_context.index_with_facets?(controller) && params[:user_enable_facet] == 'true'
       model_class=self.controller_name.classify.constantize
       objects = eval("@#{controller}")
       @hidden=0
