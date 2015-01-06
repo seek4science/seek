@@ -1,18 +1,18 @@
-<%= render :partial => "subscriptions/subscribe", :locals => {:object => @investigation} %>
+<%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
 <% if logged_in_and_member? %>
-    <%= button_link_to("New #{t('investigation')} based on this one", 'new', new_object_based_on_existing_one_investigation_path(@investigation,:controller_name=>"investigations")) %>
+    <%= button_link_to("New #{t('investigation')} based on this one", 'new', new_object_based_on_existing_one_investigation_path(item,:controller_name=>"investigations")) %>
 <% end %>
 
-<% if @investigation.can_edit? -%>
-  <%= button_link_to("Add a #{t('study')}", 'new', new_study_path(:investigation_id=>@investigation,:create_from_asset=>@investigation.create_from_asset)) -%>
+<% if item.can_edit? -%>
+  <%= button_link_to("Add a #{t('study')}", 'new', new_study_path(:investigation_id=>item,:create_from_asset=>item.create_from_asset)) -%>
 <% end -%>
 
 <%= admin_dropdown do %>
-    <% if @investigation.can_manage? -%>
+    <% if item.can_manage? -%>
         <li><%= image_tag_for_key('manage', edit_investigation_path, nil, nil, "Manage #{t('investigation')}") -%></li>
-    <% elsif @investigation.can_edit?-%>
+    <% elsif item.can_edit?-%>
         <li><%= image_tag_for_key('edit', edit_investigation_path, "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
     <% end -%>
 
-    <%= delete_icon @investigation,current_user -%>
+    <%= delete_icon item,current_user -%>
 <% end -%>
