@@ -1,0 +1,19 @@
+<% if !item.pubmed_id.nil? %>
+    <%= button_link_to('View Publication On PubMed', 'visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{item.pubmed_id}", :target => "_blank") -%>
+<% elsif !item.doi.nil? %>
+    <%= button_link_to('View Publication', 'visit_pubmed', "http://dx.doi.org/#{item.doi}", :target => "_blank") -%>
+<% end -%>
+<%= render :partial => "subscriptions/subscribe", :locals => {:object => item } -%>
+<%= button_link_to('Export to EndNote', 'endnote', publication_path(:id => item.id, :format => 'enw')) %>
+
+<%= admin_dropdown do %>
+    <% if item.can_edit? -%>
+        <li><%= image_tag_for_key('manage', edit_publication_path(item), nil, nil, 'Manage Publication') -%></li>
+    <% end -%>
+
+    <% if item.can_delete? -%>
+        <li><%= image_tag_for_key('destroy', publication_path(item), nil, { :confirm => 'This will unregister this publication with SEEK. Are you sure wish to do this?', :method => :delete }, 'Unregister') -%></li>
+    <% end -%>
+<% end -%>
+
+

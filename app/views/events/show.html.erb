@@ -1,8 +1,4 @@
-<%= render :partial => "general/item_title",:locals=>{:item=>@event} %>
-
-<ul class="sectionIcons">
-<%= asset_buttons @event,nil -%>
-</ul>
+<%= render :partial => "general/item_title",:locals=>{:item=>@event, :buttons_partial => 'assets/asset_buttons'} -%>
 
 <div class="show_basic">
   <%= item_description @event.description -%>

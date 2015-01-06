@@ -1,6 +1,6 @@
 <%= javascript_include_tag 'projects' %>
 
-<%= render :partial => "general/item_title",:locals=>{:title=>"Administering the #{t('project').downcase} members of #{link_to(h(@project.title),@project)}".html_safe} %>
+<%= render :partial => "general/page_title",:locals=>{:title=>"Administering the #{t('project').downcase} members of #{link_to(h(@project.title),@project)}".html_safe} %>
 
 <div id="add_member">
   <h3>Add members</h3>

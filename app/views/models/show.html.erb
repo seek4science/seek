@@ -2,30 +2,9 @@
 <%= javascript_include_tag "zoom/lightbox"-%>
 <%= stylesheet_link_tag "lightbox" %>
 
-<%= render :partial => "general/item_title",:locals=>{:item=>@model} %>
+<%= render :partial => "general/item_title", :locals => {:item => @model, :version => @display_model.version,
+                                                         :buttons_partial => 'models/buttons'} -%>
 
-<ul class="sectionIcons">
-  <%= asset_buttons @model, @display_model.version -%>
-
-  <% if Seek::Config.solr_enabled && @display_model.latest_version? && (@model.contains_sbml? || @model.contains_jws_dat?) -%>
-      <li>
-        <%= image_tag_for_key("search",matching_data_model_path(@model),nil,nil,"Find related #{t('data_file').pluralize}") -%>
-      </li>
-  <% end -%>
-
-  <% if cytoscapeweb_supported?(@display_model) %>
-           <% if can_download_asset?(@model, params[:code]) -%>
-               <li>
-                 <%= image_tag_for_key('cytoscape_web', visualise_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:target => "_blank"}, "Visualise #{t('model')} with Cytoscape Web") -%>
-               </li>
-           <% end -%>
-   <% end %>
-  <% if show_jws_simulate? %>
-      <li>
-        <%= image_tag_for_key('execute', simulate_model_path(@model, :version => @display_model.version, :code => params[:code]), nil, {:method => :post}, "Simulate #{t('model')} on JWS") -%>
-      </li>
-  <% end %>
-</ul>
 
 <% if Seek::Config.sycamore_enabled && @display_model.contains_sbml? %>
     <% excutable_content_blob =  @display_model.content_blobs.detect{|cb| cb.is_sbml?}

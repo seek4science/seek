@@ -1,5 +1,8 @@
-<% display_asset = asset.find_version(version) %>
+<% asset ||= item %>
+<% display_asset = asset.find_version(version) if version %>
 <% human_name = text_for_resource(asset) %>
+
+<%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
 
 <% if asset.is_downloadable? -%>
     <%# param code is used for temporary link -%>
@@ -8,7 +11,7 @@
     %>
     <% if can_download_asset?(asset, params[:code]) -%>
         <% if display_asset.contains_downloadable_items? %>
-            <%= download_or_link_button display_asset, path, display_asset.single_content_blob.try(:url), human_name %>
+            <%= download_or_link_button display_asset, path, display_asset.single_content_blob.try(:url), human_name, :class => 'btn btn-default' %>
             <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
                 <%= button_link_to('Explore', 'spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code => params[:code])) %>
             <% end -%>
@@ -20,7 +23,7 @@
     <% end -%>
 <% end -%>
 
-<%= admin_dropdown('Administration', 'manage', {:menu_options => {:class => 'pull-right'}}) do %>
+<%= admin_dropdown do %>
     <% if asset.can_manage? -%>
 
         <% if asset.is_downloadable?-%>
@@ -49,8 +52,6 @@
     <% if Seek::Config.is_virtualliver && (asset.can_delete? || current_user.try(:admin?)) && asset.respond_to?(:to_presentation) %>
         <li><%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:title => "click to move this #{t('data_file')} to #{t('presentation').pluralize}", :confirm => "Are you sure you wish to move this #{t('data_file')} to #{t('presentation').pluralize}? Doing so is irreversible!", :method => :post}, "Move to #{t('presentation').pluralize}" %></li>
     <% end %>
-
-    <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
 
     <% if asset.supports_doi? && asset.is_doiable?(display_asset.version) %>
         <li><%= image_tag_for_key('doi', polymorphic_path(asset, :action => 'mint_doi_confirm', :version => display_asset.version), nil,{},"Generate a DOI") -%></li>

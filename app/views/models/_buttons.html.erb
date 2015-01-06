@@ -1,0 +1,18 @@
+<% if Seek::Config.solr_enabled && @display_model.latest_version? && (@model.contains_sbml? || @model.contains_jws_dat?) -%>
+    <%= button_link_to("Find related #{t('data_file').pluralize}", 'search', matching_data_model_path(@model)) %>
+<% end -%>
+
+<% if cytoscapeweb_supported?(@display_model) %>
+    <% if can_download_asset?(@model, params[:code]) -%>
+        <%= button_link_to("Visualize", 'cytoscape_web',
+                           visualise_model_path(@model, :version => @display_model.version, :code => params[:code]),
+                           :target => :blank, :title => "Visualise #{t('model')} with Cytoscape Web") %>
+    <% end -%>
+<% end %>
+<% if show_jws_simulate? %>
+    <%= button_link_to("Simulate", 'execute',
+                       simulate_model_path(@model, :version => @display_model.version, :code => params[:code]),
+                       :method => :post, :title => "Simulate #{t('model')} on JWS") %>
+<% end %>
+
+<%= render :partial => 'assets/asset_buttons', :locals => {:asset => item, :version => version} -%>

@@ -46,3 +46,13 @@ p:last-child {
 .btn {
   margin: 2px 0;
 }
+
+.dropdown-menu > li > span {
+  clear: both;
+  color: #333333;
+  display: block;
+  font-weight: normal;
+  line-height: 1.42857;
+  padding: 3px 20px;
+  white-space: nowrap;
+}

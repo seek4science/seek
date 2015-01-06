@@ -1,24 +1,4 @@
-<%= render :partial => "general/item_title",:locals=>{:item=>@investigation} %>
-
-<ul class="sectionIcons">
-  <%= render :partial => "subscriptions/subscribe", :locals => {:object => @investigation} %>
-  <% if @investigation.can_manage? -%>
-      <li><%= image_tag_for_key('manage', edit_investigation_path, nil, nil, "Manage #{t('investigation')}") -%></li>
-  <% elsif @investigation.can_edit?-%>
-      <li><%= image_tag_for_key('edit', edit_investigation_path, "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
-  <% end -%>
-
-  <% if @investigation.can_edit? -%>
-      <li>
-        <%= image_tag_for_key('new', new_study_path(:investigation_id=>@investigation,:create_from_asset=>@investigation.create_from_asset), "Add a #{t('study')}", nil, "Add a #{t('study')}") -%>
-      </li>
-  <% end -%>
-
-  <%= delete_icon @investigation,current_user -%>
-  <% if logged_in_and_member? %>
-      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_investigation_path(@investigation,:controller_name=>"investigations"), nil, nil, "New #{t('investigation')} based on this one") %></li>
-  <% end %>
-</ul>
+<%= render :partial => "general/item_title",:locals=>{:item=>@investigation, :buttons_partial => 'investigations/buttons'} %>
 
 <div class="show_basic">
   <div class="main_content_left_box">

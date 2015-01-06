@@ -5,10 +5,11 @@ title_prefix||=""
 title_postfix||=""
 title ||= item.title || ""
 title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
+buttons_partial ||= nil
 %>
 
 <div class="row contribution-header">
-  <div class="col-md-6">
+  <div class="col-md-<%= buttons_partial ? '6' : '12' -%>">
     <% unless avatar.blank? -%>
       <%= avatar -%>
     <% end %>
@@ -21,7 +22,9 @@ title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
         </div>
     <% end %>
   </div>
+  <% if buttons_partial %>
   <div class="col-md-6 text-right-md" id="buttons">
-    <%= render :partial => 'buttons', :locals => {:item => item, :version => version} -%>
+    <%= render :partial => buttons_partial, :locals => {:item => item, :version => version} -%>
   </div>
+  <% end %>
 </div>

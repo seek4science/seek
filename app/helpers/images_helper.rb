@@ -105,7 +105,7 @@ module ImagesHelper
       return html.html_safe
     elsif model_item.can_manage?(user)
       explanation=unable_to_delete_text model_item
-      html = "<span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span>"
+      html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span></li>"
       return html.html_safe
     end
   end

@@ -2,29 +2,7 @@
 
 <% truncate_length_for_boxes = 22 -%>
 
-<%= render :partial => "general/item_title",:locals=>{:item=>@project} %>
-
-<ul class="sectionIcons">
-  <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(@project) -%>
-    <li><%= image_tag_for_key('organise', project_folders_path(@project.id), "Organise", nil, "Organise") -%></li>
-  <% end -%>
-<% if mine?(@project) || @project.can_be_edited_by?(current_user) -%>
-
-    <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
-
-    <% if @project.try(:can_be_administered_by?, current_user) -%>
-      <li><%= image_tag_for_key "group_edit", admin_members_project_path(@project), "Administer", nil, "Administer #{t('project')} members" -%></li>
-     <% end -%>
-    <% if admin_logged_in? -%>
-          <%= delete_icon(@project,current_user) %>
-    <% end -%>
-
-<% end -%>
-  <% if @project.try(:has_member?,current_user) || admin_logged_in? -%>
-      <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
-      <li><%= image_tag_for_key "report", asset_report_project_path(@project), "Asset report", {:title=>tooltip_title_attrib(tooltip_text)}, "Asset report" -%></li>
-  <% end -%>
-</ul>
+<%= render :partial => "general/item_title",:locals => {:item=>@project, :buttons_partial => 'projects/buttons'} %>
 
 <div class="show_basic">
 

@@ -34,13 +34,13 @@ module BootstrapHelper
     end
   end
 
-  def admin_dropdown(text, icon_key = nil, options = {})
+  def admin_dropdown(text = 'Administration', icon = 'manage')
     opts = capture do
       yield
     end
 
     unless opts.blank?
-      dropdown_button(text, icon_key, options) do
+      dropdown_button(text, icon, {:menu_options => {:class => 'pull-right'}}) do
         opts
       end
     end

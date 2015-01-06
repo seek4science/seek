@@ -1,21 +1,10 @@
-<%= render :partial => "general/item_title",:locals=>{:item=>@assay} %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@assay, :buttons_partial => 'assays/buttons'} -%>
 
 <%
-assay_word=@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
 assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type"
-
 %>
 <ul class="sectionIcons">
-    <%= render :partial => "subscriptions/subscribe", :locals => {:object => @assay }%>
-    <% if @assay.can_manage? -%>
-      <li><%= image_tag_for_key('manage', edit_assay_path, nil, nil, "Manage #{assay_word}") -%></li>
-    <% elsif @assay.can_edit?-%>
-      <li> <%= image_tag_for_key('edit', edit_assay_path, "Edit #{assay_word} Details", nil, "Edit #{assay_word} Details") -%></li>
-    <% end -%>
-    <%= delete_icon(@assay,current_user) %>
-    <% if logged_in_and_member? %>
-      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_assay_path(@assay,:controller_name=>"assays"), nil, nil, "New #{assay_word} based on this one") %></li>
-    <% end %>
+
 </ul>
 
 <div class="show_basic">

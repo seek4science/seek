@@ -345,9 +345,9 @@ module AssetsHelper
     asset.single_content_blob.try(:url)
   end
 
-  def download_or_link_button asset, download_path, link_url, human_name=nil
-    download_button = button_link_to('Download', 'download', download_path)
-    link_button_or_nil = link_url ? button_link_to('Link', 'download', link_url, {:target => 'blank'}) : nil
+  def download_or_link_button asset, download_path, link_url, human_name=nil, opts = {}
+    download_button = icon_link_to('Download', 'download', download_path, opts)
+    link_button_or_nil = link_url ? icon_link_to('Link', 'download', link_url, opts.merge({:target => 'blank'})) : nil
     return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob)
     return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ? download_button : link_button_or_nil if asset.respond_to?(:content_blobs)
   end

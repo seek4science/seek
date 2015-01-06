@@ -1,17 +1,7 @@
 <% drag_id=model_to_drag_id @institution %>
 
 <% truncate_length_for_boxes = 22 -%>
-
-<%= render :partial => "general/item_title",:locals=>{:item=>@institution} -%>
-
-<% if mine?(@institution) || @institution.try(:can_be_edited_by?, current_user) -%>
-  <ul class="sectionIcons">
-    <li><%= image_tag_for_key('edit', edit_institution_path(@institution), "Edit Institution Details", nil, 'Edit Institution Details') -%></li>
-    <% if admin_logged_in? -%>
-        <%= delete_icon(@institution,current_user) %>
-    <% end -%>
-  </ul>
-<% end %>
+<%= render :partial => "general/item_title",:locals=>{:item=>@institution, :buttons_partial => 'institutions/buttons'} -%>
 
 <div class="show_basic">
 

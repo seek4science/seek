@@ -1,12 +1,5 @@
-
-<% truncate_length_for_boxes = 22 -%>
-
-<%= render :partial => "general/item_title",:locals=>{:item=>@presentation} %>
-
-<ul class="sectionIcons">
-    <%= asset_buttons @presentation,@display_presentation.version -%>
-</ul>
-<br/>
+<%= render :partial => "general/item_title",:locals=>{:item=>@presentation, :version => @display_presentation.version,
+                                                      :buttons_partial => 'assets/asset_buttons'} %>
 
 <div class="show_basic">
 
