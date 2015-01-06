@@ -42,3 +42,7 @@ p:last-child {
   @include responsive-text-align('md');
   @include responsive-text-align('lg');
 }
+
+.btn {
+  margin: 2px 0;
+}
