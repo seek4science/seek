@@ -29,7 +29,9 @@ function updateFirstPage() {
                         decodeValueTooltip();
                         selectedFacets();
                         grayingTechnologyTypeOfModellingAnalysis();
-                        internationalAssetType();
+                        if (location.pathname !== '/search'){
+                            internationalAssetType();
+                        }
                     });
         }, 0);
     }
