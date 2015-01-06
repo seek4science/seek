@@ -92,8 +92,9 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
 
       remove_project_subscriptions_attributes = {"2" => {"id" => person.project_subscriptions.first.id, "project_id" => @proj_child1.id.to_s, "_destroy" => "1", "frequency" => "daily"}, "22" => {"id" => person.project_subscriptions.last.id, "project_id" => @proj_child2.id.to_s, "_destroy" => "1", "frequency" => "weekly"}}
       put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes" => remove_project_subscriptions_attributes}
-      person.reload
-      assert_equal 0, person.project_subscriptions.count
+
+      project_subscriptions = ProjectSubscription.where(person_id: person.id)
+      assert_equal 0, project_subscriptions.count
     end
     test "unassign a project will unsubscribe its parent projects unless the person also subscribes other sub-projects of the parent projects" do
       person = new_person_with_hierarchical_projects
