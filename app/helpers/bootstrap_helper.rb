@@ -34,6 +34,18 @@ module BootstrapHelper
     end
   end
 
+  def admin_dropdown(text, icon_key = nil, options = {})
+    opts = capture do
+      yield
+    end
+
+    unless opts.blank?
+      dropdown_button(text, icon_key, options) do
+        opts
+      end
+    end
+  end
+
   private
 
   def icon_tag(key, options = {})

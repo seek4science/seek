@@ -20,7 +20,7 @@
     <% end -%>
 <% end -%>
 
-<% admin_options = capture do %>
+<%= admin_dropdown('Administration', 'manage', {:menu_options => {:class => 'pull-right'}}) do %>
     <% if asset.can_manage? -%>
 
         <% if asset.is_downloadable?-%>
@@ -54,11 +54,5 @@
 
     <% if asset.supports_doi? && asset.is_doiable?(display_asset.version) %>
         <li><%= image_tag_for_key('doi', polymorphic_path(asset, :action => 'mint_doi_confirm', :version => display_asset.version), nil,{},"Generate a DOI") -%></li>
-    <% end %>
-<% end %>
-
-<% unless admin_options.blank? %>
-    <%= dropdown_button('Administration', 'manage', {:menu_options => {:class => 'pull-right'}}) do %>
-        <%= admin_options %>
     <% end %>
 <% end %>
