@@ -7,21 +7,13 @@ div.exhibit-viewPanel {
 div.faceted_browsing {
     width: 99%;
     margin-left: 1em;
+    margin-right: 1em;
     margin-top: 2em;
 }
 
 div.ajax_loading {
     display:none;
     text-align:center;
-}
-
-div.content_width {
-    width: 85%;
-}
-
-div.facet_width {
-    float:right;
-    width: 15%;
 }
 
 ul.reset_button {
@@ -37,5 +29,5 @@ div.facet_list {
 }
 
 div.faceted_search {
-    margin-top: 1em;
+    margin-top: 2em;
 }
