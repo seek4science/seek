@@ -66,7 +66,7 @@ module ApplicationHelper
   end
 
   def show_title title
-    render :partial=>"general/item_title", :locals=>{:title=>title}
+    render :partial=>"general/page_title", :locals=>{:title=>title}
   end
 
   def version_text
