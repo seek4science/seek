@@ -30,7 +30,7 @@ function updateFirstPage() {
                         selectedFacets();
                         grayingTechnologyTypeOfModellingAnalysis();
                         if (location.pathname !== '/search'){
-                            internationalAssetType();
+                            internationalizeAssetType();
                         }
                     });
         }, 0);
@@ -157,7 +157,7 @@ function grayingTechnologyTypeOfModellingAnalysis(){
 
 <% environment.context_class.instance_eval { include ApplicationHelper } %>
 
-function internationalAssetType(){
+function internationalizeAssetType(){
 
     var result_summary = $j('.exhibit-collectionSummaryWidget-results').children().contents();
 
