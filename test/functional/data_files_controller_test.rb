@@ -703,7 +703,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "#buttons" do
       assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>1
-      assert_select "a",:text=>/Download #{I18n.t('data_file')}/,:count=>1
+      assert_select "a",:text=>/Download/,:count=>1
     end
 
     assert_select "div.contribution_section_box > div.usage_info" do

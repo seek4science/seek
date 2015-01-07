@@ -565,7 +565,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "#buttons" do
       assert_select "li" do
-        assert_select "span",:text=>/Delete/,:count=>1
+        assert_select "a",:text=>/Delete/,:count=>1
         assert_select "span.disabled_icon",:text=>/Delete/,:count=>0
       end
     end
