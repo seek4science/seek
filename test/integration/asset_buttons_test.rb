@@ -27,7 +27,7 @@ class AssetButtonsTest < ActionController::IntegrationTest
 
       get "/#{type_name}/#{item.id}"
       assert_response :success
-      assert_select "span.icon" do
+      assert_select "#buttons" do
         assert_select "a", :text => /Delete #{human_name}/i
       end
 
@@ -88,7 +88,7 @@ class AssetButtonsTest < ActionController::IntegrationTest
   def assert_neither_download_nor_link_button path, human_name
     get path
     assert_response :success
-    assert_select "span.icon" do
+    assert_select "#buttons" do
       assert_select "a", :text => /Download #{human_name}/i, :count => 0
       assert_select "a", :text => /Link/i, :count => 0
     end
@@ -104,7 +104,7 @@ class AssetButtonsTest < ActionController::IntegrationTest
   def assert_action_button path, text
     get path
     assert_response :success
-    assert_select "span.icon" do
+    assert_select "#buttons" do
       assert_select "a", :text => /#{text}/i
     end
   end

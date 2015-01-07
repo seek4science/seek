@@ -21,7 +21,7 @@ class DataciteDoiTest < ActionController::IntegrationTest
       get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
       assert_response :success
 
-      assert_select "ul.sectionIcons > li > span.icon" do
+      assert_select "#buttons" do
         assert_select "a[href=?]", polymorphic_path(asset, :action => 'mint_doi_confirm', :version => 1), :text=>/Generate a DOI/
       end
     end

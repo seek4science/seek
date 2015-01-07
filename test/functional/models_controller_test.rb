@@ -934,7 +934,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(model.contributor)
     get :show, :id=>model.id
     assert_response :success
-    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :text=>"Visualise #{I18n.t('model')} with Cytoscape Web"
+    assert_select "a[href=?]",visualise_model_path(model,:version=>model.version), :text=>"Visualize"
   end
 
   test "should not display cytoscape button for supported models" do
@@ -1027,7 +1027,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(m.contributor.user)
       get :show,:id=>m
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
+      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
     end
   end
 
@@ -1037,7 +1037,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(m.contributor.user)
       get :show,:id=>m
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
+      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
     end
   end
 
@@ -1047,8 +1047,8 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(m.contributor.user)
       get :show,:id=>m
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
+      assert_select "#buttons a[href=?]",matching_data_model_path(m),:count=>0
+      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
     end
   end
 
@@ -1063,13 +1063,13 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value :solr_enabled,true do
       get :show,:id=>m,:version=>2
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('data_file').pluralize}/
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
+      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/
+      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
 
       get :show,:id=>m,:version=>1
       assert_response :success
-      assert_select "ul.sectionIcons span.icon > a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "ul.sectionIcons span.icon > a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
+      assert_select "#buttons a[href=?]",matching_data_model_path(m),:count=>0
+      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
     end
   end
 
@@ -1079,7 +1079,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert one_file_model.content_blobs.first.is_content_viewable?
     get :show, :id => one_file_model.id
     assert_response :success
-    assert_select 'a', :text => /View content/, :count => 1
+    assert_select '#buttons a', :text => /View content/, :count => 1
 
     multiple_files_model = Factory(:model,
                                    :content_blobs => [Factory(:doc_content_blob), Factory(:content_blob)],
@@ -1088,7 +1088,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert multiple_files_model.content_blobs.first.is_content_viewable?
     get :show, :id => multiple_files_model.id
     assert_response :success
-    assert_select 'a', :text => /View content/, :count => 0
+    assert_select '#buttons a', :text => /View content/, :count => 0
   end
 
   test "compare versions" do
