@@ -89,7 +89,7 @@ class AssetButtonsTest < ActionController::IntegrationTest
     get path
     assert_response :success
     assert_select "#buttons" do
-      assert_select "a", :text => /Download #{human_name}/i, :count => 0
+      assert_select "a", :text => /Download/i, :count => 0
       assert_select "a", :text => /Link/i, :count => 0
     end
   end
@@ -98,7 +98,7 @@ class AssetButtonsTest < ActionController::IntegrationTest
   end
 
   def assert_download_button path, human_name
-    assert_action_button path, "Download #{human_name}"
+    assert_action_button path, "Download"
   end
 
   def assert_action_button path, text

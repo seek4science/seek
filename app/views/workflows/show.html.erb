@@ -14,7 +14,7 @@
   <h1><%= @display_workflow.title  -%></h1>
 </div>
 
-<ul class="sectionIcons">
+<ul class="sectionIcons" id="buttons">
   <% human_name = text_for_resource @workflow %>
   <%= render :partial => "buttons", :locals => {:workflow => @workflow, :display_workflow => @display_workflow, :based_off => nil, :human_name => human_name} %>
 </ul>
