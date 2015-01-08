@@ -1,13 +1,5 @@
 <% if can_view_asset?(@data_file, params[:code]) -%>
 
-  <% if @data_file.can_edit? -%>
-    <ul class="sectionIcons">
-      <li><%= image_tag_for_key('edit', data_file_studied_factors_path(@data_file), nil, nil, 'Edit factors studied (latest version)') -%></li>
-    </ul>
-  <% end -%>
-
-  <br/>
-  
   <div>
     <% unless @display_data_file.studied_factors.empty? -%>
       <ul>
@@ -20,5 +12,9 @@
   </div>
 
   <div style="clear:both;">&nbsp;</div>
+
+    <% if @data_file.can_edit? -%>
+        <%= button_link_to('Edit factors studied (latest version)', 'edit', data_file_studied_factors_path(@data_file)) -%>
+    <% end -%>
 
 <% end -%>
