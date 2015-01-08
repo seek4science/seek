@@ -194,3 +194,7 @@ div.list_item, div.private_list_item, div.public_list_item {
 img.icon {
   margin-right: 0.25em;
 }
+
+.list_item_actions > a {
+  display: block;
+}
