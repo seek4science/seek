@@ -640,7 +640,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com",:count=>0
     end
 
-    assert_select "ul.sectionIcons > li > span.icon" do
+    assert_select "#buttons" do
       assert_select "a",:text=>/Request/,:count=>1
     end
 
@@ -685,7 +685,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.can_download?(df.contributor.user)
     get :show,:id=>df
     assert_response :success
-    assert_select "ul.sectionIcons > li > span.icon" do
+    assert_select "#buttons" do
       assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>0
       assert_select "a",:text=>/Download/,:count=>0
       assert_select "a",:text=>/Request/,:count=>0
@@ -701,9 +701,9 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(df.contributor.user)
     get :show,:id=>df
     assert_response :success
-    assert_select "ul.sectionIcons > li > span.icon" do
+    assert_select "#buttons" do
       assert_select "a[href=?]",download_data_file_path(df,:version=>df.version),:count=>1
-      assert_select "a",:text=>/Download #{I18n.t('data_file')}/,:count=>1
+      assert_select "a",:text=>/Download/,:count=>1
     end
 
     assert_select "div.contribution_section_box > div.usage_info" do

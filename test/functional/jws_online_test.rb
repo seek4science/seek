@@ -12,17 +12,17 @@ class JwsOnlineTest < ActionController::TestCase
     model = Factory(:teusink_model,:policy=>Factory(:public_policy))
     get :show,:id=>model
     assert_response :success
-    assert_select "ul.sectionIcons li a[href=?]",simulate_model_path(model,:version=>1)
+    assert_select "#buttons a[href=?]",simulate_model_path(model,:version=>1)
 
     model = Factory(:non_sbml_xml_model,:policy=>Factory(:public_policy))
     get :show,:id=>model
     assert_response :success
-    assert_select "ul.sectionIcons li a[href=?]",simulate_model_path(model,:version=>1),:count=>0
+    assert_select "#buttons a[href=?]",simulate_model_path(model,:version=>1),:count=>0
 
     model = Factory(:teusink_model,:policy=>Factory(:publicly_viewable_policy))
     get :show,:id=>model
     assert_response :success
-    assert_select "ul.sectionIcons li a[href=?]",simulate_model_path(model,:version=>1), :count=>0
+    assert_select "#buttons a[href=?]",simulate_model_path(model,:version=>1), :count=>0
   end
 
   test "simulate" do

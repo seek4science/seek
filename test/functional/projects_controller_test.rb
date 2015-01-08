@@ -85,7 +85,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	def test_should_destroy_project
     project = projects(:four)
     get :show, :id => project
-    assert_select "span.icon", :text => /Delete #{I18n.t('project')}/i, :count => 1
+    assert_select "#buttons a", :text => /Delete #{I18n.t('project')}/i, :count => 1
 
 		assert_difference('Project.count', -1) do
 			delete :destroy, :id => project
@@ -166,7 +166,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as person.user
     get :show, :id=>project.id
     assert_response :success
-    assert_select "ul.sectionIcons" do
+    assert_select "#buttons" do
       assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report"
     end
   end
@@ -178,7 +178,7 @@ class ProjectsControllerTest < ActionController::TestCase
     logout
     get :show, :id=>project.id
     assert_response :success
-    assert_select "ul.sectionIcons" do
+    assert_select "#buttons" do
       assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report",:count=>0
     end
   end
@@ -192,7 +192,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as other_person.user
     get :show, :id=>project.id
     assert_response :success
-    assert_select "ul.sectionIcons" do
+    assert_select "#buttons" do
       assert_select "a[href=?]",asset_report_project_path(project),:text=>"Sharing report",:count=>0
     end
 
@@ -205,7 +205,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(admin)
     get :show, :id=>project.id
     assert_response :success
-    assert_select "ul.sectionIcons" do
+    assert_select "#buttons" do
       assert_select "a[href=?]",asset_report_project_path(project),:text=>"Asset report"
     end
   end
@@ -502,10 +502,8 @@ class ProjectsControllerTest < ActionController::TestCase
     project = user.person.projects.first
 		login_as(user)
 		get :show,:id=>project
-		assert_select "ul.sectionIcons" do
-			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_members_project_path(project),:count=>0
-			end
+		assert_select "#buttons" do
+      assert_select "a[href=?]",admin_members_project_path(project),:count=>0
 		end
 	end
 
@@ -515,10 +513,8 @@ class ProjectsControllerTest < ActionController::TestCase
     project = admin.projects.first
     login_as(admin.user)
 		get :show,:id=>project
-		assert_select "ul.sectionIcons" do
-			assert_select "span.icon" do
-				assert_select "a[href=?]",admin_members_project_path(project),:text=>/Administer #{I18n.t('project')} members/,:count=>1
-			end
+		assert_select "#buttons" do
+      assert_select "a[href=?]",admin_members_project_path(project),:text=>/Administer #{I18n.t('project')} members/,:count=>1
 		end
 	end
 

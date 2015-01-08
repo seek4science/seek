@@ -530,7 +530,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert a.can_view?
     get :show,:id=>a.id
     assert_response :success
-    assert_select "ul.sectionIcons" do
+    assert_select "#buttons" do
       assert_select "li" do
         assert_select "span",:text=>/Delete/,:count=>0
       end
@@ -548,7 +548,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !a.can_delete?
     get :show,:id=>a.id
     assert_response :success
-    assert_select "ul.sectionIcons" do
+    assert_select "#buttons" do
       assert_select "li" do
         assert_select "span.disabled_icon",:text=>/Delete/,:count=>1
       end
@@ -563,9 +563,9 @@ class AssaysControllerTest < ActionController::TestCase
     assert a.can_delete?
     get :show,:id=>a.id
     assert_response :success
-    assert_select "ul.sectionIcons" do
+    assert_select "#buttons" do
       assert_select "li" do
-        assert_select "span",:text=>/Delete/,:count=>1
+        assert_select "a",:text=>/Delete/,:count=>1
         assert_select "span.disabled_icon",:text=>/Delete/,:count=>0
       end
     end

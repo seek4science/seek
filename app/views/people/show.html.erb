@@ -1,51 +1,6 @@
 <% drag_id=model_to_drag_id @person %>
 
-<%= render :partial => "general/item_title", :locals=>{:item=>@person} %>
-
-<ul class="sectionIcons">
-  <% if (mine?(@person) || @person.can_be_edited_by?(current_user)) && !current_user.guest? -%>
-      <li>
-        <%= image_tag_for_key('edit', edit_person_path(@person), "Edit Person Profile", nil, 'Edit Profile') -%>
-      </li>
-      <% if mine?(@person) -%>
-          <li>
-            <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
-          </li>
-      <% end -%>
-      <% if admin_logged_in? -%>
-          <li>
-            <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", {:confirm => 'Are you sure?', :method => :delete}, "Delete Person" -%>
-          </li>
-      <% end -%>
-  <% end %>
-
-  <% if @person.can_be_administered_by?(current_user)-%>
-      <li>
-        <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
-      </li>
-  <% end -%>
-
-  <% if mine?(@person) && !current_user.guest? -%>
-      <li>
-        <% tooltip_text = "Publish your owned assets in one click. A preview will be given before publishing" %>
-        <%= image_tag_for_key "publish", batch_publishing_preview_person_path(@person), "Publish your assets", {:title => tooltip_title_attrib(tooltip_text)}, "Publish your assets" -%>
-      </li>
-      <% if @person.is_in_any_gatekept_projects? %>
-          <li>
-            <%= image_tag_for_key "waiting", waiting_approval_assets_person_path(@person), "Assets awaiting approval",
-                                  {:title => tooltip_title_attrib("The assets you have requested to publish, but are awaiting Gatekeeper approval")},
-                                  "Assets awaiting approval" -%>
-          </li>
-      <% end %>
-      <% if @person.is_gatekeeper_of_any_project? %>
-          <li>
-            <%= image_tag_for_key "waiting", requested_approval_assets_person_path(@person), "Assets you are Gatekeeping",
-                                  {:title => tooltip_title_attrib("The assets people have requested to publish, but are still awaiting your approval")},
-                                  "Assets you are Gatekeeping" -%>
-          </li>
-      <% end %>
-  <% end %>
-</ul>
+<%= render :partial => "general/item_title", :locals => {:item=>@person, :buttons_partial => 'people/buttons'} %>
 
 <div class="show_basic">
   <div class="main_content_left_box">
