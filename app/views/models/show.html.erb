@@ -5,25 +5,6 @@
 <%= render :partial => "general/item_title", :locals => {:item => @model, :version => @display_model.version,
                                                          :buttons_partial => 'models/buttons'} -%>
 
-
-<% if Seek::Config.sycamore_enabled && @display_model.contains_sbml? %>
-    <% excutable_content_blob =  @display_model.content_blobs.detect{|cb| cb.is_sbml?}
-       if excutable_content_blob.is_in_simulatable_size_limit? && can_download_asset?(@model, params[:code]) -%>
-        <ul class='sectionIcons'>
-          <li>
-            <%= form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id => 'sycamore-form', :target => '_blank') do -%>
-                <%= hidden_field_tag 'sbml_model' -%>
-                <%= hidden_field_tag 'sender', 'seek' -%>
-                <%= link_to image('execute') + "Simulate #{t('model')} on Sycamore", {:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version}, :remote => true, :method => :post -%>
-            <% end -%>
-
-          </li>
-        </ul>
-    <% end -%>
-<% end %>
-<br/>
-
-
 <div class="show_basic">
 
   <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
