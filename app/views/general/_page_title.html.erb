@@ -4,10 +4,11 @@ title_postfix||=""
 title ||= item.title || ""
 title = "#{h(title_prefix) + h(title) + h(title_postfix)}".html_safe
 buttons_partial ||= nil
+col_width = buttons_partial.nil? && !content_for?(:buttons) ? 12 : 6
 %>
 
 <div class="row contribution-header">
-  <div class="col-md-<%= buttons_partial ? '6' : '12' -%>">
+  <div class="col-md-<%= col_width -%>">
     <h1>
       <%= title -%>
     </h1>
@@ -15,6 +16,10 @@ buttons_partial ||= nil
   <% if buttons_partial %>
       <div class="col-md-6 text-right-md" id="buttons">
         <%= render :partial => buttons_partial -%>
+      </div>
+  <% elsif content_for? :buttons %>
+      <div class="col-md-6 text-right-md" id="buttons">
+        <%= content_for :buttons -%>
       </div>
   <% end %>
 </div>
