@@ -5,14 +5,14 @@
    end
 -%>
 <% if investigations.blank? %>
-    <ul class="sectionIcons">
-        <%= image_tag_for_key('arrow_right', new_investigation_path(:create_from_asset=>@assay.create_from_asset), "New #{t('investigation')}", {:style=>"font-size:larger"}, "New #{t('investigation')}") -%>
-    </ul>
+    <div class="text-center">
+        <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path(:create_from_asset=>@assay.create_from_asset)) -%>
+    </div>
 <% else %>
     <% if studies.flatten.blank? %>
-        <ul class="sectionIcons">
-            <%= image_tag_for_key('arrow_right', new_study_path(:create_from_asset=>@assay.create_from_asset), "New #{t('study')}", {:style=>"font-size:larger"}, "New #{t('study')}") -%>
-        </ul>
+        <div class="text-center">
+            <%= button_link_to("New #{t('study')}", 'arrow_right', new_study_path(:create_from_asset=>@assay.create_from_asset)) -%>
+        </div>
     <% else %>
         <div class="contribution_title">
           <h1><%=  @assay.is_modelling? ? "#{t('assays.modelling_analysis')} creation" : "#{t('assays.assay')} creation" -%></h1>

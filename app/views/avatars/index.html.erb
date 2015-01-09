@@ -1,12 +1,9 @@
 <% avatar_can_be_edited_by_current_user = mine?(@avatar_owner_instance) || @avatar_owner_instance.can_be_edited_by?(current_user) -%>
 
-<ul class="sectionIcons">
-  <li><%= image_tag_for_key(@avatar_owner_instance.class.name.downcase, url_for(@avatar_owner_instance), nil, nil, 'Return to Profile')%></li>
-  <% if avatar_can_be_edited_by_current_user -%>
-      <li><%= image_tag_for_key('avatar', new_avatar_link(@avatar_owner_instance), nil, nil, 'Upload New Picture')%></li>
-  <% end %>
-</ul>
-
+<%= button_link_to('Return to Profile', @avatar_owner_instance.class.name.downcase, url_for(@avatar_owner_instance))%></li>
+<% if avatar_can_be_edited_by_current_user -%>
+    <%= button_link_to('Upload New Picture', 'avatar', new_avatar_link(@avatar_owner_instance))%>
+<% end %>
 
 <h1><%= @avatar_for.humanize -%> Pictures: <%= link_to @avatar_owner_instance.title, url_for(@avatar_owner_instance) -%></h1>
 
