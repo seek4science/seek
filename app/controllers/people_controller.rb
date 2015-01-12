@@ -306,7 +306,11 @@ class PeopleController < ApplicationController
     @person.destroy
 
     respond_to do |format|
-      format.html { redirect_to(people_url) }
+      if request.env['HTTP_REFERER'].try(:include?,'/admin')
+        format.html { redirect_to(admin_url) }
+      else
+        format.html { redirect_to(people_url) }
+      end
       format.xml  { head :ok }
     end
   end
