@@ -3,9 +3,7 @@
 </script>
 <% investigations = Investigation.all.select &:can_view? -%>
 <% if investigations.blank? %>
-    <ul class="sectionIcons">
-   <%= image_tag_for_key('arrow_right', new_investigation_path(:create_from_asset=>@study.create_from_asset), "New #{t('investigation')}", {:style=>"font-size:larger"}, "New #{t('investigation')}") -%>
-    </ul>
+    <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path(:create_from_asset=>@study.create_from_asset)) -%>
 <% else %>
 <h1>New <%= t('study') %></h1>
 
