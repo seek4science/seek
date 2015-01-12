@@ -103,6 +103,19 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
+  test "bulk destroy only ids in params" do
+    user1 = Factory :user
+    user2 = Factory :user
+    Factory :favourite_group, :user => user1
+    Factory :favourite_group, :user => user2
+    #destroy also dependencies
+    assert_difference("User.count", -1) do
+      assert_difference("FavouriteGroup.count", -1) do
+        post :bulk_destroy, ids: [user1.id]
+      end
+    end
+  end
+
   test "should not bulk destroy without ids param" do
     assert_difference("User.count", 0) do
           post :bulk_destroy
