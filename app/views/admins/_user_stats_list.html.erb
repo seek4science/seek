@@ -12,6 +12,8 @@
       <th><%= collection.first.class.name %> ID</th>
       <th>Username</th>
       <th>Profile</th>
+      <th>Created at</th>
+      <th>Updated at</th>
       <% if action %>
           <th>Action</th>
       <% end %>
@@ -40,6 +42,8 @@
       <% else %>
         <td><%= link_to person.name, person -%></td>
       <% end %>
+      <td> <%= date_as_string(el.created_at, true) %></td>
+      <td> <%= date_as_string(el.updated_at, true) %></td>
       <% if action %>
           <td> <%= action_buttons el, action %></td>
       <% end  %>
