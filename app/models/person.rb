@@ -177,8 +177,7 @@ class Person < ActiveRecord::Base
 
 
   def self.userless_people
-    p=Person.all
-    return p.select{|person| person.user.nil?}
+    Person.includes(:user).select{|p| p.user.nil?}
   end
 
   #returns an array of Person's where the first and last name match
