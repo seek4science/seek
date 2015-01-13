@@ -1,8 +1,6 @@
-<ul class="sectionIcons">
-  <% if admin_logged_in? -%>
-    <li><%= image_tag_for_key('new', new_help_document_path, "Create New Page", nil, "Create New Page") -%></li>
-  <% end -%>
-</ul>
+<% if admin_logged_in? -%>
+    <%= button_link_to("Create New Page", 'new', new_help_document_path) -%>
+<% end -%>
 
 <h1>Help Index</h1>
 <div style="padding-left: 2em;">
