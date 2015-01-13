@@ -48,8 +48,7 @@ class User < ActiveRecord::Base
   has_many :favourite_groups, :dependent => :destroy
   
   scope :not_activated,where('activation_code IS NOT NULL')
-  scope :without_profile,where('person_id IS NULL')
-  
+
   acts_as_uniquely_identifiable
 
   after_commit :queue_update_auth_table, :on=>:create
@@ -263,6 +262,10 @@ class User < ActiveRecord::Base
   def reset_password
     self.reset_password_code_until = 1.day.from_now
     self.reset_password_code =  Digest::SHA1.hexdigest( "#{user.email}#{Time.now.to_s.split(//).sort_by {rand}.join}" )
+  end
+
+  def self.without_profile
+    User.includes(:person).select{|u| u.person.nil?}
   end
 
   protected
