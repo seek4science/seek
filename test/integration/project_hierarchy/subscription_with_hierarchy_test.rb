@@ -84,6 +84,8 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
       add_project_subscriptions_attributes = {"2" => {"project_id" => @proj_child1.id.to_s, "_destroy" => "0", "frequency" => "daily"}, "22" => {"project_id" => @proj_child2.id.to_s, "_destroy" => "0", "frequency" => "weekly"}}
       person = User.current_user.person
       person.project_subscriptions.destroy_all
+      
+      assert_equal 0,ProjectSubscription.where(person_id: person.id).count
 
       put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes" => add_project_subscriptions_attributes}
 
