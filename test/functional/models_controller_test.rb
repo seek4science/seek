@@ -1124,9 +1124,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 2, model.versions.select{|v| v.contains_sbml?}.count
     get :show,:id=>model
     assert_response :success
-
-    assert_select "select#compare_versions",:count=>1 do
-      assert_select "option[value=?]",compare_versions_model_path(model,:other_version=>1,:version=>2)
+    (model.versions - [model.latest_version]).each do |version|
+      assert_select "a.btn", :href => compare_versions_model_path(model,:other_version=>version.version,:version=>model.version)
     end
   end
 
