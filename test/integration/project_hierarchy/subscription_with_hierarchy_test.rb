@@ -81,10 +81,15 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
 
 
     test "subscribe/unsubscribe a project should subscribe/unsubscribe only itself rather that its parents" do
-      add_project_subscriptions_attributes = {"2" => {"project_id" => @proj_child1.id.to_s, "_destroy" => "0", "frequency" => "daily"}, "22" => {"project_id" => @proj_child2.id.to_s, "_destroy" => "0", "frequency" => "weekly"}}
+      ProjectSubscription.find_by_id(222222).try(:destroy)
+      ProjectSubscription.find_by_id(222223).try(:destroy)
+
+      add_project_subscriptions_attributes = {222222 => {"project_id" => @proj_child1.id.to_s, "_destroy" => "0", "frequency" => "daily"},
+                                              222223 => {"project_id" => @proj_child2.id.to_s, "_destroy" => "0", "frequency" => "weekly"}}
       person = User.current_user.person
       person.project_subscriptions.destroy_all
-      
+
+
       assert_equal 0,ProjectSubscription.where(person_id: person.id).count
 
       put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes" => add_project_subscriptions_attributes}
@@ -92,7 +97,8 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
       person.reload
       assert_equal 2, person.project_subscriptions.count
 
-      remove_project_subscriptions_attributes = {"2" => {"id" => person.project_subscriptions.first.id, "project_id" => @proj_child1.id.to_s, "_destroy" => "1", "frequency" => "daily"}, "22" => {"id" => person.project_subscriptions.last.id, "project_id" => @proj_child2.id.to_s, "_destroy" => "1", "frequency" => "weekly"}}
+      remove_project_subscriptions_attributes = {222222 => {"id" => person.project_subscriptions.first.id, "project_id" => @proj_child1.id.to_s, "_destroy" => "1", "frequency" => "daily"},
+                                                 222223 => {"id" => person.project_subscriptions.last.id, "project_id" => @proj_child2.id.to_s, "_destroy" => "1", "frequency" => "weekly"}}
       put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes" => remove_project_subscriptions_attributes}
 
       project_subscriptions = ProjectSubscription.where(person_id: person.id)
