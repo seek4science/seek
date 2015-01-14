@@ -81,8 +81,10 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
 
 
     test "subscribe/unsubscribe a project should subscribe/unsubscribe only itself rather that its parents" do
-      ProjectSubscription.find_by_id(222222).try(:destroy)
-      ProjectSubscription.find_by_id(222223).try(:destroy)
+      disable_authorization_checks do
+        ProjectSubscription.find_by_id(222222).try(:destroy)
+        ProjectSubscription.find_by_id(222223).try(:destroy)
+      end
 
       add_project_subscriptions_attributes = {222222 => {"project_id" => @proj_child1.id.to_s, "_destroy" => "0", "frequency" => "daily"},
                                               222223 => {"project_id" => @proj_child2.id.to_s, "_destroy" => "0", "frequency" => "weekly"}}
