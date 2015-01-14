@@ -37,7 +37,6 @@ module Seek
         private
 
         def authorised_assets(asset_type, action, user)
-
           # this is necessary because some non downloadable items (such as assay) can possible be marked as downloadable in the
           # authorization info due to an earlier bug
           if action == 'download' && !asset_type.new.is_downloadable?
