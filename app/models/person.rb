@@ -148,13 +148,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-
-  def self.userless_people
-    p=Person.all
-    return p.select{|person| person.user.nil?}
-  end
-
-
   def self.userless_people
     Person.includes(:user).select{|p| p.user.nil?}
   end
