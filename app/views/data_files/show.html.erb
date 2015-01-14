@@ -6,7 +6,6 @@
   <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 
   <div class="main_content_left_box">
-    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
 
       <%= item_description @display_data_file.description -%>
@@ -36,6 +35,8 @@
     <% end %>
     <%= render(:partial=>"data_files/vl_samples_info") if Seek::Config.is_virtualliver -%>
   </div>
+
+  <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
 
   <%= render :partial=>"general/items_related_to",:object => @data_file -%>
 

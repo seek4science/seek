@@ -1,80 +1,38 @@
 <% if logged_in_and_member? %>
-<div class="contribution_version_box curved">
-  <div class="contribution_version_selector_box">
-    <table>
-      <tbody>
-      <tr>
-        <td class="heading" width="33%">
-          <span><%= "Version #{displayed_resource.version.to_s} #{resource.describe_version(displayed_resource.version.to_s)}" -%></span>
-          <span class="count_text">(of <%= resource.versions.length -%>
-            <% if displayed_resource.version > resource.versions.length %>
-                *
-            <% end -%>
-             )</span>
-          <a name="versions"></a>
-        </td>
-
-        <td style="text-align:center;width:33%">
-          <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && resource.versions.length > 1 %>
-              <% path = polymorphic_path(resource, :version => displayed_resource.version, :action => :destroy_version) %>
-              <%= image_tag_for_key('destroy', path, nil, {:confirm => "This deletes version #{displayed_resource.version.to_s} of the #{text_for_resource resource}. Are you sure?", :method => :delete, :style => "padding:0.5em; line-height:2;border: 1px solid #BBBBBB;width:100%;"}, "Delete version #{displayed_resource.version.to_s}") -%>
-          <% end -%>
-        </td>
-
-        <td style="text-align:right;width:33%">
-          <% if resource.versions.length > 1 %>
-              <span>View version: </span>
-              <%= resource_version_selection resource, displayed_resource -%>
-              <% if allow_model_comparison(resource,displayed_resource) -%>
-                  <span>Compare with: </span>
-                  <%= compare_model_version_selection resource, displayed_resource -%>
-              <% end %>
-          <% end %>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <div id="version_info_box" style="font-size: 85%; margin: 0.6em 0.5em 0.2em 0.5em; border-top: 1px solid #666666; padding-top: 0.4em;">
-      <p style="text-align: center;">
-        <b>Version created on:</b>
-        <span><%= date_as_string(displayed_resource.created_at,true) %></span>
-        <b>by:</b>
-        <span><%= contributor displayed_resource.contributor %></span>
-        <% unless displayed_resource.version == 1 -%>
-            <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-            <span>
-              <%= link_to_function ("revision comments "+image("expand")).html_safe,  :id => 'revision_comments_expand_image' do |page|
-                page.visual_effect(:toggle_appear, "revision_comments", :duration => 0.5)
-                page["revision_comments_expand_image"].toggle
-                page["revision_comments_collapse_image"].toggle
-              end
-              -%>
-              <%= link_to_function ("revision comments "+image("collapse")).html_safe, :id => 'revision_comments_collapse_image', :style => "display:none" do |page|
-                page.visual_effect(:toggle_appear, "revision_comments", :duration => 0.5)
-                page["revision_comments_expand_image"].toggle
-                page["revision_comments_collapse_image"].toggle
-              end
-              -%>
-            </span>
-        <% end -%>
-      </p>
-      <p>
-        <% if displayed_resource.version > resource.versions.length %>
-            <span> * This indicates that some version of this <%= text_for_resource resource %> was deleted.</span>
-        <% end -%>
-      </p>
+    <h2>Version History</h2>
+    <div class="list-group">
+      <% resource.versions.reverse.each do |version| %>
+          <div class="list-group-item <%= 'list-group-item-info' if version.version == displayed_resource.version -%>">
+            <div class="row">
+              <div class="col-sm-8">
+                <h4 class="list-group-item-heading">
+                  <%= link_to "Version #{version.version} #{resource.describe_version(version.version)}", {:version => version.version} %>
+                  <small>
+                    Created <%= date_as_string(version.created_at,true) %>
+                    by <%= contributor version.contributor %>
+                  </small>
+                </h4>
+                <p class="list-group-item-text">
+                  <% if version.revision_comments.blank? %>
+                      <span class="subtle">No revision comments</span>
+                  <% else %>
+                      <%= white_list(version.revision_comments) -%>
+                  <% end %>
+                </p>
+              </div>
+              <div class="col-sm-4 text-right">
+                <% if resource.versions.length > 1 %>
+                    <% if allow_model_comparison(resource, version) -%>
+                        <%= button_link_to("Compare", 'show', compare_versions_model_path(resource, version: displayed_resource, other_version: version)) -%>
+                    <% end %>
+                <% end %>
+                <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && resource.versions.length > 1 %>
+                    <% path = polymorphic_path(resource, :version => version.version, :action => :destroy_version) %>
+                    <%= button_link_to("Delete", 'destroy', path, {:confirm => "This deletes version #{version.to_s} of the #{text_for_resource resource}. Are you sure?", :method => :delete}) -%>
+                <% end -%>
+              </div>
+            </div>
+          </div>
+      <% end %>
     </div>
-
-    <div id="revision_comments" class="box_standout" style="display:none;margin-top:0.5em;">
-      <div>
-        <% if !displayed_resource.revision_comments.blank? %>
-            <%= white_list(displayed_resource.revision_comments) -%>
-        <% else %>
-            <span class="none_text">None</span>
-        <% end %>
-      </div>
-    </div>
-  </div>
-</div>
 <% end %>

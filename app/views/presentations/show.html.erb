@@ -6,9 +6,6 @@
   <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
 
   <div class="main_content_left_box">
-
-    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
-
     <div class="box_about_actor">
       <%= item_description @display_presentation.description -%>
 
@@ -28,6 +25,8 @@
   </div>
 
   <div style="clear:both;">
+    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
+
     <%= render :partial=>"general/items_related_to",:object => @presentation %>
   </div>
 

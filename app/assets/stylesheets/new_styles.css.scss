@@ -198,3 +198,14 @@ img.icon {
 .list_item_actions > a {
   display: block;
 }
+
+h1 div.version {
+  display: inline-block;
+  font-size: 75%;
+  color: #999;
+  position: relative;
+}
+
+h1 div.version a.dropdown-toggle {
+  cursor: pointer;
+}
