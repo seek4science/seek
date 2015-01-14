@@ -1,11 +1,12 @@
-<ul class="sectionIcons">
-  <% if admin_logged_in? -%>
-    <li><%= image_tag_for_key('back', help_document_path(@help_document), "Return to document", nil, "Return to document") -%></li>
-    <li><%= image_tag_for_key('destroy', help_document_path(@help_document), nil, { :confirm => 'Are you sure you wish to remove this page?', :method => :delete }, 'Remove') -%></li>
-  <% end -%>
-</ul>
+<% if admin_logged_in? -%>
+    <% content_for(:buttons) do %>
+        <%= button_link_to("Return to document", 'back', help_document_path(@help_document)) -%>
+        <%= button_link_to('Remove', 'destroy', help_document_path(@help_document), { :confirm => 'Are you sure you wish to remove this page?', :method => :delete })  -%>
+    <% end -%>
+<% end -%>
 
-<h1>Editing Page: <%= h @help_document.title %></h1>
+<%= render :partial=>"general/page_title", :locals=>{ :title => "Editing Page: #{h @help_document.title}"} %>
+
 <%= render :partial => "form", :locals => {:action=>:update } -%>
 
 <div style="margin: 2em">

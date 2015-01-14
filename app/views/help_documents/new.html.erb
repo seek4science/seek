@@ -1,10 +1,12 @@
-<ul class="sectionIcons">
-  <% if admin_logged_in? -%>
-    <li><%= image_tag_for_key('back', help_documents_path, "Return to index", nil, "Return to index") -%></li>
-  <% end -%>
-</ul>
 
-<h1>New Help Page</h1>
+<% if admin_logged_in? -%>
+    <% content_for(:buttons) do %>
+        <%= button_link_to("Return to index", 'back', help_documents_path) -%>
+    <% end -%>
+<% end -%>
+
+<%= render :partial=>"general/page_title", :locals=>{ :title => "New Help Page"} %>
+
 <%= render :partial => "form", :locals => {:action=>:create } -%>
 <br/>
 <span style="margin-left: 2em;" class="none_text">Attachments and images may be added after the page has been created.</span>
