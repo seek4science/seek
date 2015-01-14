@@ -22,7 +22,7 @@ module IndexPager
 
   end
 
-  def find_assets  action="view"
+  def find_assets
     begin
       fetch_and_filter_assets
     rescue ActiveRecord::RecordNotFound
@@ -43,8 +43,6 @@ module IndexPager
     model_class=self.controller_name.classify.constantize
     if model_class.respond_to? :all_authorized_for
       found = model_class.all_authorized_for "view",User.current_user
-      found = model_class.all_authorized_for "view", User.current_user
-      found = model_class.all_authorized_for action, User.current_user
     else
       found = model_class.respond_to?(:default_order) ? model_class.default_order : model_class.all
     end
