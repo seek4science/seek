@@ -8,6 +8,7 @@ class Strain < ActiveRecord::Base
   include Subscribable
   include Seek::Biosamples::PhenoTypesAndGenoTypes
   include BackgroundReindexing
+  include Seek::Stats::ActivityCounts
 
   acts_as_authorized
   acts_as_uniquely_identifiable

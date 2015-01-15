@@ -1,11 +1,13 @@
 class UsersController < ApplicationController
-    
-  before_filter :is_current_user_auth, :only=>[:edit, :update]  
-  before_filter :is_user_admin_auth, :only => [:impersonate]
+
+  before_filter :is_current_user_auth, :only=>[:edit, :update]
+  before_filter :is_user_admin_auth, :only => [:impersonate, :resend_activation_email, :destroy]
 
   skip_before_filter :restrict_guest_user
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:update,:cancel_registration]
+
+  include Seek::AdminBulkAction
   
   # render new.rhtml
   def new
@@ -161,6 +163,27 @@ class UsersController < ApplicationController
       end
     end
     
+  end
+
+  def destroy
+    @user = User.find(params[:id])
+    @user.destroy if @user && !@user.person
+    respond_to do |format|
+      format.html { redirect_back }
+      format.xml { head :ok }
+    end
+  end
+
+  def resend_activation_email
+    user = User.find(params[:id])
+    if user && user.person && !user.active?
+      Mailer.signup(user,base_host).deliver
+      flash[:notice]="An email has been sent to user: #{user.person.name}"
+    else
+      flash[:notice] = "No email sent. User was already activated."
+    end
+
+    redirect_back
   end
 
   def activation_required

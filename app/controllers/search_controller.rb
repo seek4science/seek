@@ -38,7 +38,7 @@ class SearchController < ApplicationController
 
     @include_external_search = params[:include_external_search]=="1"
 
-    ie_support_faceted_browsing? if Seek::Config.faceted_search_enabled
+    view_context.ie_support_faceted_browsing? if Seek::Config.faceted_search_enabled
 
     respond_to do |format|
       format.html
@@ -61,7 +61,7 @@ class SearchController < ApplicationController
 
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
-          sources = Seek::Util.searchable_types
+          sources = Seek::Util.searchable_types - [DataFile,Model]
           sources.delete(Specimen) if !Seek::Config.is_virtualliver
           sources.each do |source|
             search_result = source.search do |query|

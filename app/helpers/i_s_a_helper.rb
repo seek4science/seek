@@ -40,8 +40,8 @@ module ISAHelper
       dot_elements = dot_graph.gsub('graph ISA_graph {','').gsub('}','')
       elements = dot_elements.split(';')
       edges = elements.select{|e| e.include?('--')}
-      nodes = edges.collect{|edge| edge.split('--')}.flatten.uniq
-      nodes = nodes.each{|n| n.strip!}
+      nodes = edges.collect{|edge| edge.split('--')}.flatten
+      nodes = nodes.each{|n| n.strip!}.uniq
       cytoscape_elements = cytoscape_node_elements(nodes) + cytoscape_edge_elements(edges)
       cytoscape_elements
     rescue Exception=>e
@@ -50,7 +50,67 @@ module ISAHelper
     end
   end
 
+  def reduced_elements elements, max_node_number, force_max_node, root_element, current_element=nil
+    current_element||=root_element
+    nodes = elements.select{|e| e[:group] == 'nodes'}
+    edges = elements.select{|e| e[:group] == 'edges'}
+    if nodes.size > max_node_number
+      current_element_id = current_element.class.name + '_' + current_element.id.to_s
+      current_node = elements.select{|e| e[:group] == 'nodes' && e[:data][:id] == current_element_id }.first
+
+      connected_edges = edges.select{|e| e[:data][:source] == current_element_id || e[:data][:target] == current_element_id}
+      connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}
+      connected_edge_targets = connected_edges.collect{|e| e[:data][:target]}
+      connected_edge_ids = (connected_edge_sources + connected_edge_targets).uniq
+
+      connected_nodes = nodes.select{|e| connected_edge_ids.include?(e[:data][:id]) && e[:data][:id] != current_element_id}
+      reduced_nodes = connected_nodes + [current_node]
+
+      reduced_edges = possible_edges_for reduced_nodes, edges
+
+      reduced_elements = reduced_nodes + reduced_edges
+
+      if force_max_node && reduced_nodes.size > max_node_number
+        max_elements_from(reduced_elements, max_node_number, current_node)
+      else
+        reduced_elements
+      end
+    else
+      elements
+    end
+  end
+
   private
+
+  #getting the nodes equal to the max_node_number, with the priority for the parent nodes
+  def max_elements_from(reduced_elements, max_node_number, current_node)
+    max_nodes = [current_node]
+    connected_nodes = reduced_elements.select{|e| e[:group] == 'nodes'}.reject {|element| element[:data][:id] == current_node[:data][:id] }
+    connected_edges = reduced_elements.select{|e| e[:group] == 'edges'}
+    connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}.uniq
+    #put the parent nodes in front
+    connected_nodes.sort!{|a,b| connected_edge_sources.find_index(b[:data][:id]).to_i <=> connected_edge_sources.find_index(a[:data][:id]).to_i}
+    max_nodes |= connected_nodes.take(max_node_number-1)
+
+    max_edges = possible_edges_for max_nodes, connected_edges
+    max_elements = max_nodes + max_edges
+    max_elements
+  end
+
+  #get all the edges for nodes from the edge collection.
+  #not only the edges that connect current node to other node
+  def possible_edges_for nodes, edge_collection
+    possible_edges = []
+    node_ids = nodes.collect{|node| node[:data][:id]}
+    edge_collection.each do |edge|
+      source = edge[:data][:source]
+      target = edge[:data][:target]
+      if node_ids.include?(source) && node_ids.include?(target)
+        possible_edges << edge
+      end
+    end
+    possible_edges
+  end
 
   def cytoscape_node_elements nodes
     cytoscape_node_elements = []

@@ -30,6 +30,7 @@ SEEK::Application.routes.draw do
       post :restart_server
       post :restart_delayed_job
       post :get_stats
+      post :get_user_stats
       post :update_admins
       post :update_rebrand
       post :test_email_configuration
@@ -108,9 +109,11 @@ SEEK::Application.routes.draw do
       post :hide_guide_box
       post :impersonate
       post :cancel_registration
+      post :bulk_destroy
     end
     member do
       put :set_openid
+      post :resend_activation_email
     end
   end
 
@@ -134,6 +137,7 @@ SEEK::Application.routes.draw do
       post :userless_project_selected_ajax
       post :items_for_result
       post :resource_in_tab
+      post :bulk_destroy
     end
     member do
       post :check_related_items
@@ -617,7 +621,6 @@ SEEK::Application.routes.draw do
   match '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group, :via => :post
   match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
   match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
-  match '/organism_list_autocomplete' => 'projects#auto_complete_for_organism_name', :as => :organism_list_autocomplete
   match ':controller/:id/approve_or_reject_publish' => ":controller#show"
 
   match '/signup' => 'users#new', :as => :signup

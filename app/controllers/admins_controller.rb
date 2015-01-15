@@ -298,29 +298,6 @@ class AdminsController < ApplicationController
     title = nil
     @page = params[:id]
     case @page
-      when 'pals'
-        title = 'PALs'
-        collection = Person.pals
-        type = 'users'
-      when 'admins'
-        title = 'Administrators'
-        collection = Person.admins
-        type = 'users'
-      when 'invalid'
-        collection = {}
-        type = 'invalid_users'
-        pal_role = ProjectRole.pal_role
-        collection[:pal_mismatch] = Person.all.select { |p| p.is_pal? != p.project_roles.include?(pal_role) }
-        collection[:duplicates] = Person.duplicates
-        collection[:no_person] = User.without_profile
-      when 'not_activated'
-        title = 'Users requiring activation'
-        collection = User.not_activated
-        type = 'users'
-      when 'projectless'
-        title = "Users not in a #{Seek::Config.project_name} #{t('project')}"
-        collection = Person.without_group.registered
-        type = 'users'
       when 'contents'
         type = 'content_stats'
       when 'activity'
@@ -341,16 +318,12 @@ class AdminsController < ApplicationController
     end
     respond_to do |format|
       case type
-        when "invalid_users"
-          format.html { render :partial => "admins/invalid_user_stats_list", :locals => { :collection => collection} }
-        when "users"
-          format.html { render :partial => "admins/user_stats_list", :locals => { :title => title, :collection => collection} }
         when "content_stats"
-          format.html { render :partial => "admins/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
+          format.html { render :partial => "admins/content_stats", :locals => {:stats => Seek::Stats::ContentStats.generate} }
         when "activity_stats"
-          format.html { render :partial => "admins/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
+          format.html { render :partial => "admins/activity_stats", :locals => {:stats => Seek::Stats::ActivityStats.new} }
         when "search_stats"
-          format.html { render :partial => "admins/search_stats", :locals => {:stats => Seek::SearchStats.new} }
+          format.html { render :partial => "admins/search_stats", :locals => {:stats => Seek::Stats::SearchStats.new} }
         when "job_queue"
           format.html { render :partial => "admins/job_queue" }
         when "auth_consistency"
@@ -361,6 +334,49 @@ class AdminsController < ApplicationController
           format.html { render :partial => "admins/workflow_stats" }
         when "none"
           format.html { render :text=>"" }
+      end
+    end
+  end
+
+  def get_user_stats
+    partial = nil
+    collection = []
+    action = nil
+    title = nil
+    @page = params[:id]
+    case @page
+      when 'invalid_users_profiles'
+        partial = 'invalid_user_stats_list'
+        invalid_users = {}
+        pal_role = ProjectRole.pal_role
+        invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal? != p.project_roles.include?(pal_role) }
+        invalid_users[:duplicates] = Person.duplicates
+        invalid_users[:no_person] = User.without_profile
+        invalid_users[:no_user] = Person.userless_people
+        collection = invalid_users
+      when 'users_requiring_activation'
+        partial = 'user_stats_list'
+        collection = User.not_activated
+        action = "activate"
+        title = "Users have not yet activated their account"
+      when 'non_project_members'
+        partial = 'user_stats_list'
+        collection = Person.without_group.registered
+        title = "Users are not in a #{Seek::Config.project_name} #{t('project')}"
+      when 'pals'
+        partial = 'user_stats_list'
+        collection = Person.pals
+        title = 'List of PALs'
+      when 'administrators'
+        partial = 'admin_selection'
+      when "none"
+        partial = "none"
+    end
+    respond_to do |format|
+      if partial == "none"
+        format.html { render :text=>"" }
+      else
+        format.html { render :partial => partial, :locals => {:collection => collection, :action => action, :title => title} }
       end
     end
   end

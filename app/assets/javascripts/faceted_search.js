@@ -27,8 +27,7 @@ function deactivate_previous_tab(){
         previous_active_tab.className = '';
 }
 
-//this is for the case of one exhibit instance.
-function tab_on_click_one_facet(resource_type) {
+function tab_on_click(resource_type) {
     var click_tab = document.getElementsByClassName(resource_type)[0];
     click_tab.onclick = function () {
         deactivate_previous_tab();
@@ -51,17 +50,14 @@ function displayMoreLink(){
     $j(".more_link").show();
 }
 
-//this is for the case of one exhibit instance.
 function hide_specified_facets(){
     $j(".specified_facets").hide();
 }
 
-//this is for the case of one exhibit instance.
 function hide_specified_facet_list(){
     $j(".specified_facet_list").hide();
 }
 
-//this is for the case of one exhibit instance.
 function hide_all_tabs_content(){
     var all_tabs_content = $j('.tabbertab');
     for (var i=0; i<all_tabs_content.length; i++){
@@ -73,7 +69,6 @@ function hide_all_tabs_content(){
     }
 }
 
-//this is for the case of one exhibit instance.
 function show_specified_facets_for_active_tab(active_tab) {
     var more_facet_id = "specified_" + active_tab + "_facets";
     //(does not work with jquery)

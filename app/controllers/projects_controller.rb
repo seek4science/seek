@@ -8,7 +8,8 @@ class ProjectsController < ApplicationController
 
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:update_members]
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report,:admin_members,:update_members,:resource_in_tab]
+  #before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report,:admin_members,:update_members,:resource_in_tab]
+  before_filter :is_user_admin_auth, :only => [:new, :create, :manage, :destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin,:admin_members,:update_members]
   before_filter :auth_params,:only=>[:update]
@@ -20,10 +21,6 @@ class ProjectsController < ApplicationController
   include Seek::BreadCrumbs
 
   respond_to :html
-
-  def auto_complete_for_organism_name
-    render :json => Project.organism_counts.map(&:name).to_json
-  end  
 
   def asset_report
     @no_sidebar=true

@@ -7,9 +7,9 @@
     authorized_action = "edit"
     authorized_action = "view" if Seek::Config.is_virtualliver
 
-    all_assays = authorised_assays(authorized_action)
+    all_assays = authorised_assays(nil,authorized_action)
 
-    project_assays=authorised_assays(current_user.person.projects, authorized_action)
+    project_assays=authorised_assays(current_user.person.projects,authorized_action)
     if resource.is_a?(Model)
       all_assays = all_assays.select do |assay|
         assay.is_modelling?
@@ -43,7 +43,6 @@
       add_new_assay_title = ""
     end
 %>
-
 
 <div class="fold">
 
@@ -101,7 +100,7 @@
 
 	  <br/>
 
-      <%= check_box_tag :include_other_project_assays, nil, true, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
+      <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>

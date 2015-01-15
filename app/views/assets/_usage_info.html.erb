@@ -2,10 +2,10 @@
 
     <div class="usage_info">
       <div class="usage_count">
-        <b>Views:</b> <%= count_actions(resource,"show") -%>
+        <b>Views:</b> <%= resource.view_count -%>
         <% if ["DataFile","Model","Sop", "Presentation"].include?(resource.class.name) && versioned_resource.contains_downloadable_items? -%>
                 &nbsp;&nbsp;
-                <b>Downloads:</b> <%= count_actions(resource,"download") -%>
+                <b>Downloads:</b> <%= resource.download_count -%>
           <% end -%>
       </div>
 

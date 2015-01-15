@@ -15,7 +15,7 @@ class DataFile < ActiveRecord::Base
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :spreadsheet_annotation_search_fields,:fs_search_fields,:spreadsheet_contents_for_search
+    text :spreadsheet_annotation_search_fields,:fs_search_fields
   end if Seek::Config.solr_enabled
 
   acts_as_asset
@@ -198,7 +198,7 @@ class DataFile < ActiveRecord::Base
     results = {}
 
     if Seek::Config.solr_enabled && contains_extractable_spreadsheet?
-      search_terms = spreadsheet_annotation_search_fields | spreadsheet_contents_for_search | fs_search_fields | searchable_tags
+      search_terms = spreadsheet_annotation_search_fields | content_blob_search_terms | fs_search_fields | searchable_tags
       #make the array uniq! case-insensistive whilst mainting the original case
       dc = []
       search_terms = search_terms.inject([]) do |r,v|

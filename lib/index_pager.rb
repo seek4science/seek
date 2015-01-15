@@ -3,7 +3,7 @@ module IndexPager
 
   def index
     controller = self.controller_name.downcase
-    unless index_with_facets?
+    unless view_context.index_with_facets?(controller) && params[:user_enable_facet] == 'true'
       model_class=self.controller_name.classify.constantize
       objects = eval("@#{controller}")
       @hidden=0
@@ -20,10 +20,6 @@ module IndexPager
       format.xml
     end
 
-  end
-
-  def index_with_facets?
-    Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[self.controller_name.downcase] && ie_support_faceted_browsing?
   end
 
   def find_assets
@@ -46,7 +42,7 @@ module IndexPager
   def fetch_all_viewable_assets
     model_class=self.controller_name.classify.constantize
     if model_class.respond_to? :all_authorized_for
-      found = model_class.all_authorized_for "view", User.current_user
+      found = model_class.all_authorized_for "view",User.current_user
     else
       found = model_class.respond_to?(:default_order) ? model_class.default_order : model_class.all
     end

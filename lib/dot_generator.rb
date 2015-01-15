@@ -211,12 +211,8 @@ class PublicationNode < SeekNode
     if publication.related_assays.empty?
       dot << pub_node.to_s
     else
-      #publications want to display assays nodes.. but with only this publication showing as a child
-      #so I create a local subclass, which does exactly that.
-      assay_viewer = Class.new(AssayNode)
-      assay_viewer.class_eval { define_method(:child_nodes) { [pub_node] } }
       publication.related_assays.each do |assay|
-        dot << assay_viewer.new(assay).to_s
+        dot << SeekNode.node_for(assay).to_s
       end
     end
     (publication.related_data_files + publication.related_models).each do |asset|

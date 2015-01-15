@@ -1,0 +1,43 @@
+<%= stylesheet_link_tag 'full_scroll_table' -%>
+<%= javascript_include_tag 'link_adder' %>
+
+<%= select_tag :user_admin_query,
+               options_for_select([["Select query ...","none"],
+                                   ["Invalid Users/Profiles","invalid_users_profiles"],
+                                   ["Users Requiring Activation","users_requiring_activation"],
+                                   ["Non-#{t('project')} Members","non_project_members"],
+                                   ["PALs","pals"],
+                                   ["Administrators","administrators"]
+                                  ],:length=>10),
+               {:style=>"",
+                :onchange=>remote_function(:url=>get_user_stats_admin_path(:element=>"user_stats_list"),
+                                           :with=>"'id='+this.value",
+                                           :update => {:success => 'user_stats_list'},
+                                           :success => "Element.show('user_stats_list'); new Effect.Highlight('user_stats_list', { duration: 1.0 });",
+                                           :loading => "Element.show('spinner_for_user_stats');Element.hide('user_stats_list');Element.hide('refresh_button_for_user_stats');",
+                                           :complete => "Element.hide('spinner_for_user_stats');Element.show('user_stats_list');Element.show('refresh_button_for_user_stats');"
+                )
+               }
+-%>
+
+<%= link_to_with_callbacks image('refresh'),
+                           {:url=>get_user_stats_admin_path,
+                            :with=>"'id='+encodeURIComponent($F('user_admin_query'))",
+                            :update => {:success => 'user_stats_list'},
+                            :success => "Element.show('user_stats_list'); new Effect.Highlight('user_stats_list', { duration: 1.0 });",
+                            :loading => "Element.show('spinner_for_user_stats');Element.hide('user_stats_list');Element.hide('refresh_button_for_user_stats');",
+                            :complete => "Element.hide('spinner_for_user_stats');Element.show('user_stats_list');Element.show('refresh_button_for_user_stats');"},
+                           {:id=>'refresh_button_for_user_stats', :style=>'display:none;'}
+%>
+
+<%= image_tag "ajax-loader.gif", :id => 'spinner_for_user_stats', :style => 'display:none;' -%>
+<br/>
+<div id="user_stats_list">
+</div>
+
+<style>
+    div.stat_box {
+        margin-top: 1em;
+    }
+</style>
+

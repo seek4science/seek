@@ -148,6 +148,10 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def self.userless_people
+    Person.includes(:user).select{|p| p.user.nil?}
+  end
+
   #returns an array of Person's where the first and last name match
   def self.duplicates
     people=Person.all

@@ -17,16 +17,16 @@
     <div class="faceted_browsing">
         <div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_type%>"></div>
         <div class="yui-g" id="exhibit">
-            <div class="yui-u first" style="width: 85%;">
-              <div id="loading" style="display:none;text-align:center">
+            <div class="yui-u first" style="width: 85%">
+              <div id="loading" class="ajax_loading">
                  <%= image_tag "ajax-loader-large.gif" -%>
               </div>
               <%= render :partial => 'faceted_browsing/content_element', :locals => {:possible_orders => facets_for_object.keys.join(',.'), :paginated => true} %>
             </div>
-            <div class="yui-u" style="float:right;width: 15%;">
+            <div class="yui-u" style="float:right; width: 15%;">
               <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
               <br/>
-              <span class="filter_text">Filter <%= internationalized_resource_name(object_type)%> by: <hr/>
+              <span class="filter_text">Filter <%= internationalized_resource_name(object_type, true)%> by: <hr/>
               </span>
               <% count = 0 %>
               <% facets_for_object.each do |key, value| %>
@@ -37,7 +37,7 @@
                   <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => collapsed} %>
                   <br/>
               <% end %>
-              <ul class="sectionIcons" style="text-align:left;">
+              <ul class="sectionIcons reset_button">
                     <li><%= link_to_function 'Reset All Filters', 'resetAllFilters()', {:class => 'reset_all_filters' }%> </li>
               </ul>
             </div>
@@ -47,6 +47,7 @@
     <script type="text/javascript">
        var items_for_result_url = '<%= url_for(:action => 'items_for_result') %>'
        Exhibit.SelectionState.currentAssetType = "<%= object_type %>";
+       var internationalized_resource_name = '<%= internationalized_resource_name(object_type, true)%>'
     </script>
 
     <%= render :partial => "faceted_browsing/data_browsing", :object => objects %>

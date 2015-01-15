@@ -28,6 +28,10 @@ function updateFirstPage() {
                         $j('.exhibit-toolboxWidget-button').hide();
                         decodeValueTooltip();
                         selectedFacets();
+                        grayingTechnologyTypeOfModellingAnalysis();
+                        if (location.pathname !== '/search'){
+                            internationalizeAssetType();
+                        }
                     });
         }, 0);
     }
@@ -81,7 +85,7 @@ function decodeValueTooltip(){
     })
 }
 
-//rename Hierachical Facet Missing Field of the root level: from others to missing this field
+//rename Hierachical Facet Missing Field of the root level: from others to (don't have this field)
 function renameHFMissingField(){
     var missing_field_elements = $j('.exhibit-flowingFacet-body').children("[title='(others)']");
     var replaced_term = "(don't have this field)";
@@ -141,4 +145,26 @@ function resetAllFilters(){
             state.data,
             Exhibit._("%widget.collectionSummary.resetActionTitle")
     );
+}
+
+function grayingTechnologyTypeOfModellingAnalysis(){
+    $j("div[data-ex-expression='.technology_type'] a.exhibit-flowingFacet-value-link").each(function(){
+        if (this.text == "(don\'t have this field)"){
+            $j(this).html("<span class='exhibit-facet-value-missingThisField'>" + "(don't have this field)" + "</span>");
+        }
+    });
+}
+
+<% environment.context_class.instance_eval { include ApplicationHelper } %>
+
+function internationalizeAssetType(){
+
+    var result_summary = $j('.exhibit-collectionSummaryWidget-results').children().contents();
+
+    if (result_summary.length == 3){
+        result_summary[1].nodeValue = ' ' + internationalized_resource_name;
+    }else{
+        result_summary[1].nodeValue = ' ' + internationalized_resource_name;
+        result_summary[3].nodeValue = ' ' + internationalized_resource_name;
+    }
 }

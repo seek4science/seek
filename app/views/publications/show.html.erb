@@ -65,7 +65,7 @@
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @publication, :authors_title=>"Authors" } -%>
 
   <div style="clear:both">
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @publication, :current_item => @publication, :deep => false} %>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @publication, :current_item => @publication, :deep => true} %>
   </div>
 
   <div style="clear:both;">

@@ -269,8 +269,12 @@ class PublicationsController < ApplicationController
     if pubmed_id
       begin
         result = Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
-      rescue Exception=>e
-        result.error = e.message
+      rescue => exception
+        result ||= Bio::Reference.new({})
+        result.error = "There was an problem contacting the pubmed query service. Please try again later"
+        if Seek::Config.exception_notification_enabled
+          ExceptionNotifier.notify_exception(exception,:data=>{:message=>"Problem accessing ncbi using pubmed id #{pubmed_id}"})
+        end
       end
     elsif doi
       query = DoiQuery.new(Seek::Config.crossref_api_email)
@@ -281,7 +285,7 @@ class PublicationsController < ApplicationController
 
   def get_data(publication, pubmed_id, doi=nil)
     result = fetch_pubmed_or_doi_result(pubmed_id,doi)
-    publication.extract_metadata(result)
+    publication.extract_metadata(result) unless result.error
     result
   end
         

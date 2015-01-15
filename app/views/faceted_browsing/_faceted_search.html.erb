@@ -3,7 +3,7 @@
 <%= javascript_include_tag 'modified_exhibit' %>
 <%= javascript_include_tag 'faceted_browsing' %>
 <%= stylesheet_link_tag 'modified_exhibit' %>
-<%= stylesheet_link_tag 'faceted_search' %>
+<%= stylesheet_link_tag 'faceted_browsing' %>
 
 <%= javascript_include_tag "faceted_search" %>
 
@@ -15,69 +15,70 @@
    external_faceted_config = YAML.load(File.read(external_faceted_search_config_path))
    expand_facet_count = 1
 %>
-
-<div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_types.join(',') %>"></div>
-<div class="yui-g" id="exhibit">
-  <div class="yui-u first" style="width: 85%;">
-    <div id="loading" style="display:none;text-align:center">
-      <%= image_tag "ajax-loader-large.gif" -%>
+<div class="faceted_search">
+  <div data-ex-role="exhibit-collection" data-ex-item-types="<%= object_types.join(',') %>"></div>
+  <div class="yui-g" id="exhibit">
+    <div class="yui-u first" style="width: 85%">
+      <div id="loading" class="ajax_loading">
+        <%= image_tag "ajax-loader-large.gif" -%>
+      </div>
+      <%= render :partial => 'faceted_browsing/content_element',
+                 :locals => {:possible_orders => common_facet_config.keys.join(',.'), :paginated => true, :page_size => 100} %>
     </div>
-    <%= render :partial => 'faceted_browsing/content_element',
-               :locals => {:possible_orders => common_facet_config.keys.join(',.'), :paginated => true, :page_size => 100} %>
-  </div>
-  <div class="yui-u facet_list" style="float:right;width: 15%;">
-    <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
-    <br/>
+    <div class="yui-u facet_list" style="float:right; width: 15%;">
+      <div data-ex-role="facet" data-ex-facet-class="TextSearch" id="facet_search_box"></div>
+      <br/>
     <span class="filter_text">Filter items by: <hr/>
               </span>
-    <% count = 0 %>
-    <% common_facet_config.each do |key, value| %>
-        <%
-           count += 1
-           collapsed = count > expand_facet_count ? true : false
-        %>
-        <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => collapsed} %>
-        <br/>
-    <% end %>
+      <% count = 0 %>
+      <% common_facet_config.each do |key, value| %>
+          <%
+             count += 1
+             collapsed = count > expand_facet_count ? true : false
+          %>
+          <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => collapsed} %>
+          <br/>
+      <% end %>
 
-    <% object_types.each do |object_type| %>
-        <% facets_for_object = specified_facet_config[object_type] || {} %>
-        <% facets_for_object.merge!(external_faceted_config[object_type] || {}) %>
-        <% unless facets_for_object.blank? %>
-            <div class="specified_facets" id="specified_<%= object_type %>_facets">
-              <div class="specified_facet_list" id="<%= object_type %>_facet">
-                <% facets_for_object.each do |key, value| %>
-                    <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => true} %>
-                    <br/>
-                <% end %>
+      <% object_types.each do |object_type| %>
+          <% facets_for_object = specified_facet_config[object_type] || {} %>
+          <% facets_for_object.merge!(external_faceted_config[object_type] || {}) %>
+          <% unless facets_for_object.blank? %>
+              <div class="specified_facets" id="specified_<%= object_type %>_facets">
+                <div class="specified_facet_list" id="<%= object_type %>_facet">
+                  <% facets_for_object.each do |key, value| %>
+                      <%= render :partial => 'faceted_browsing/facet_element', :locals => {:key => key, :value => value, :collapsed => true} %>
+                      <br/>
+                  <% end %>
+                </div>
+
+                <%
+                   more_id = "more_#{object_type}"
+                   less_id = "less_#{object_type}"
+                   facet_type_id = "#{object_type}_facet"
+                %>
+                <%= link_to_function ("<b>More filters </b>"+image("expand")).html_safe, :id => more_id, :style => "display: none;", :class => "more_link" do |page|
+                  page[more_id].toggle
+                  page[less_id].toggle
+                  page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
+                end
+                -%>
+                <%= link_to_function ("<b>Less filters </b>"+image("collapse")).html_safe, :id => less_id, :style => "display: none;" do |page|
+                  page[more_id].toggle
+                  page[less_id].toggle
+                  page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
+                end
+                -%>
               </div>
+          <% end %>
+      <% end %>
 
-              <%
-                 more_id = "more_#{object_type}"
-                 less_id = "less_#{object_type}"
-                 facet_type_id = "#{object_type}_facet"
-              %>
-              <%= link_to_function ("<b>More filters </b>"+image("expand")).html_safe, :id => more_id, :style => "display:none", :class => "more_link" do |page|
-                page[more_id].toggle
-                page[less_id].toggle
-                page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
-              end
-              -%>
-              <%= link_to_function ("<b>Less filters </b>"+image("collapse")).html_safe, :id => less_id, :style => "display:none" do |page|
-                page[more_id].toggle
-                page[less_id].toggle
-                page.visual_effect(:toggle_appear, facet_type_id, :duration => 0.3)
-              end
-              -%>
-            </div>
-        <% end %>
-    <% end %>
+      <br/>
+      <ul class="sectionIcons reset_button">
+        <li><%= link_to_function 'Reset All Filters', 'resetAllFilters()', {:class => 'reset_all_filters'} %> </li>
+      </ul>
 
-    <br/>
-    <ul class="sectionIcons" style="text-align:left;">
-      <li><%= link_to_function 'Reset All Filters', 'resetAllFilters()', {:class => 'reset_all_filters' }%> </li>
-    </ul>
-
+    </div>
   </div>
 </div>
 

@@ -3,9 +3,10 @@ module Seek
 
     include Seek::MimeTypes
 
-    MAX_EXTRACTABLE_SPREADSHEET_SIZE=20*1024*1024
+    MAX_EXTRACTABLE_SPREADSHEET_SIZE=(Seek::Config.max_extractable_spreadsheet_size || 10).to_i*1024*1024
     MAX_SIMULATABLE_SIZE=5*1024*1024
-    PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt]
+    PDF_CONVERTABLE_FORMAT = %w[doc docx ppt pptx odt odp rtf txt xls xlsx]
+    PDF_VIEWABLE_FORMAT = PDF_CONVERTABLE_FORMAT - %w[xls xlsx]
     IMAGE_VIEWABLE_FORMAT = %w[gif jpeg png jpg bmp svg]
 
     def is_excel? blob=self
@@ -54,14 +55,14 @@ module Seek
 
     def is_viewable_format? blob=self
       if Seek::Config.pdf_conversion_enabled
-        !(((PDF_CONVERTABLE_FORMAT + IMAGE_VIEWABLE_FORMAT) << 'pdf') & mime_extensions(blob.content_type)).empty?
+        !(((PDF_VIEWABLE_FORMAT + IMAGE_VIEWABLE_FORMAT) << 'pdf') & mime_extensions(blob.content_type)).empty?
       else
         !((IMAGE_VIEWABLE_FORMAT << 'pdf') & (mime_extensions(blob.content_type))).empty?
       end
     end
 
     def is_content_viewable? blob=self
-       blob.asset.is_downloadable_asset? && (blob.is_viewable_format? || File.exist?(blob.filepath('pdf')))
+       blob.asset.is_downloadable_asset? && blob.is_viewable_format?
     end
 
     private

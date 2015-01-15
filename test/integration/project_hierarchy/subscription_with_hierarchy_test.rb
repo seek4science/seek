@@ -81,20 +81,33 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
 
 
     test "subscribe/unsubscribe a project should subscribe/unsubscribe only itself rather that its parents" do
-      add_project_subscriptions_attributes = {"2" => {"project_id" => @proj_child1.id.to_s, "_destroy" => "0", "frequency" => "daily"}, "22" => {"project_id" => @proj_child2.id.to_s, "_destroy" => "0", "frequency" => "weekly"}}
+
+      add_project_subscriptions_attributes = [{"project_id" => @proj_child1.id, "_destroy" => "0", "frequency" => "daily"},
+                                              {"project_id" => @proj_child2.id, "_destroy" => "0", "frequency" => "weekly"}]
       person = User.current_user.person
       person.project_subscriptions.destroy_all
 
-      put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes" => add_project_subscriptions_attributes}
+      assert_equal 0,ProjectSubscription.where(person_id: person.id).count
+
+      assert_difference("ProjectSubscription.count",2) do
+        put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes" => add_project_subscriptions_attributes}
+      end
 
       person.reload
       assert_equal 2, person.project_subscriptions.count
+      first_id = person.project_subscriptions.where(:project_id=>@proj_child1.id).first.id
+      second_id = person.project_subscriptions.where(:project_id=>@proj_child2.id).first.id
 
-      remove_project_subscriptions_attributes = {"2" => {"id" => person.project_subscriptions.first.id, "project_id" => @proj_child1.id.to_s, "_destroy" => "1", "frequency" => "daily"}, "22" => {"id" => person.project_subscriptions.last.id, "project_id" => @proj_child2.id.to_s, "_destroy" => "1", "frequency" => "weekly"}}
-      put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes" => remove_project_subscriptions_attributes}
+      remove_project_subscriptions_attributes = [{"id" => first_id, "project_id" => @proj_child1.id, "_destroy" => "1", "frequency" => "daily"},
+                                                 {"id" => second_id, "project_id" => @proj_child2.id, "_destroy" => "1", "frequency" => "weekly"}]
+      assert_difference("ProjectSubscription.count",-2) do
+        put "/people/#{person.id}", id: person.id, person: {"project_subscriptions_attributes" => remove_project_subscriptions_attributes}
+      end
+
       person.reload
       assert_equal 0, person.project_subscriptions.count
     end
+
     test "unassign a project will unsubscribe its parent projects unless the person also subscribes other sub-projects of the parent projects" do
       person = new_person_with_hierarchical_projects
       assert_equal 3, person.project_subscriptions.count
