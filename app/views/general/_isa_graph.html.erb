@@ -4,105 +4,50 @@
 
 <%
   current_item ||= nil
+  max_node_number ||= 10
+  force_max_node ||= true
+  cytoscape_elements = cytoscape_elements(root_item, deep, current_item)
+
+  #show only current node and connected nodes
+  #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
+  reduced_elements = reduced_elements(cytoscape_elements, max_node_number, force_max_node, root_item, current_item)
 %>
 
 <div class="yui-u first isa_graph curved with_smaller_shadow">
-    <div id="cy"></div>
+  <div id="cy"></div>
+
+  <% if cytoscape_elements.size > reduced_elements.size %>
+      <%= link_to_function ("Full graph "+image("expand")).html_safe,
+                           "drawGraph(elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                           :id => 'full_graph_expand_image',
+                           :class => 'graph_toggle'
+      -%>
+      <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
+                           "drawGraph(reduced_elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                           :id => 'reduced_graph_collapse_image',
+                           :style => "display:none",
+                           :class => 'graph_toggle'
+      -%>
+  <% end %>
 </div>
+
 <div class="yui-u node_info curved with_smaller_shadow" id="node_info">
 </div>
 <span id="ruler" style="visibility: hidden"></span>
 
 <script type="text/javascript">
-    jQuery.noConflict();
-    var $j = jQuery;
-
     var isa_graph = $j('.isa_graph')[0];
-    var elements = <%= cytoscape_elements(root_item, deep, current_item).to_json.html_safe %>;
+    var elements = <%= cytoscape_elements.to_json.html_safe %>;
+    var reduced_elements = <%= reduced_elements.to_json.html_safe %>;
+    var current_element_id = '<%= controller_name.singularize.camelize %>' + '_' + '<%= params[:id] %>';
 
-    if (elements.error == 'error'){
+    if (elements.error === 'error'){
         isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
         isa_graph.style['text-align'] = 'center';}
     else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
         isa_graph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
         isa_graph.style['text-align'] = 'center';
    }else{
-        var default_node_width = 175;
-        var default_node_height = 35;
-        var default_font_size = 11;
-        var default_color = '#323232';
-
-        $j('#cy').cytoscape({
-            layout: {
-              name: 'breadthfirst'
-            },
-
-            showOverlay: false,
-
-            style: cytoscape.stylesheet()
-                    .selector('node')
-                    .css({
-                        'shape': 'roundrectangle',
-                        'border-color': 'data(borderColor)',
-                        'border-width': 2,
-                        'das': 'mapData(weight, 40, 80, 20, 60)',
-                        'content': 'data(name)',
-                        'text-valign': 'center',
-                        'text-outline-width': 1,
-                        'text-outline-color': 'data(faveColor)',
-                        'background-color': 'data(faveColor)',
-                        'color':default_color,
-                        'width':default_node_width,
-                        'height':default_node_height,
-                        'font-size':default_font_size
-                    })
-
-                    .selector('edge')
-                    .css({
-                        'width': 1.5,
-                        'target-arrow-shape': 'none',
-                        'line-color': 'data(faveColor)',
-                        'source-arrow-color': 'data(faveColor)',
-                        'target-arrow-color': 'data(faveColor)',
-                        'content': 'data(name)',
-                        'color': '#323232',
-                        'font-size': (default_font_size-2)
-                    }),
-
-            elements: elements,
-
-            ready: function(){
-                cy = this;
-                var nodes = cy.$('node');
-
-                //process only when having nodes
-                if (nodes.length > 0){
-                    processPanzoom();
-
-                    nodes.on('click', function(e){
-                        var node = e.cyTarget;
-                        if(node.selected() == true){
-                            clickLabelLink(node, e.originalEvent);
-                        }else{
-                            animateNode(node);
-                            displayNodeInfo(node);
-                        }
-                    });
-
-                    //animate the current asset node
-                    var asset_type =  '<%= controller_name.singularize.camelize %>';
-                    var asset_id = '<%= params[:id] %>';
-                    var asset_node_id = asset_type + '_' + asset_id;
-                    var asset_node = cy.nodes('[id=\''+ asset_node_id +'\']')[0];
-                    animateNode(asset_node);
-                    displayNodeInfo(asset_node);
-
-                    disableMouseWheel();
-                    resizeGraph();
-                }else{
-                    $j('.isa_graph')[0].hide();
-                }
-            }
-        });
-    }
+        drawGraph(reduced_elements, current_element_id);
+   }
 </script>

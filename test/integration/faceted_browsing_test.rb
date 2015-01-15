@@ -13,7 +13,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
     with_config_value :faceted_browsing_enabled,false do
       example_items
       ASSETS_WITH_FACET.each do |type_name|
-        get "/#{type_name}"
+        get "/#{type_name}", :user_enable_facet => 'true'
         assert_select "table[id='exhibit']", :count => 0
         assert_select "div.alphabetcal_pagination"
       end
@@ -26,7 +26,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       example_items
       ASSETS_WITH_FACET.each do |type_name|
         with_config_value :facet_enable_for_pages,{type_name=>true} do
-          get "/#{type_name}"
+          get "/#{type_name}", :user_enable_facet => 'true'
           assert_select "div[id='exhibit']"
           assert_select "div.alphabetcal_pagination", :count => 0
         end
@@ -52,18 +52,35 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       assert !facet_disabled_pages.blank?
 
       facet_enabled_pages.keys.each do |type_name|
-        get "/#{type_name}"
+        get "/#{type_name}", :user_enable_facet => 'true'
         assert_select "div[id='exhibit']"
         assert_select "div.alphabetcal_pagination", :count => 0
       end
 
       facet_disabled_pages.keys.each do |type_name|
-        get "/#{type_name}"
+        get "/#{type_name}", :user_enable_facet => 'true'
         assert_select "div[id='exhibit']", :count => 0
         assert_select "div.alphabetcal_pagination"
       end
     end
 
+  end
+
+  test 'user_enable_facet' do
+    with_config_value :faceted_browsing_enabled,true do
+      example_items
+      ASSETS_WITH_FACET.each do |type_name|
+        with_config_value :facet_enable_for_pages,{type_name=>true} do
+          get "/#{type_name}", :user_enable_facet => 'true'
+          assert_select "div[id='exhibit']"
+          assert_select "div.alphabetcal_pagination", :count => 0
+
+          get "/#{type_name}"
+          assert_select "div[id='exhibit']", :count => 0
+          assert_select "div.alphabetcal_pagination"
+        end
+      end
+    end
   end
 
   private

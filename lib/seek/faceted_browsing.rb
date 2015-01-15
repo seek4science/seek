@@ -67,19 +67,6 @@ module Seek
       items
     end
 
-    def ie_support_faceted_browsing?
-      @ie_support_faceted_browsing = true
-      user_agent = request.env["HTTP_USER_AGENT"]
-      index = user_agent.try(:index, 'MSIE')
-      if !index.nil?
-        version = user_agent[(index+5)..(index+8)].to_i
-        if version != 0 && version < 9
-          @ie_support_faceted_browsing = false
-        end
-      end
-      @ie_support_faceted_browsing
-    end
-
     def classify_for_tabs result_collection
       results={}
 

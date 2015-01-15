@@ -1,8 +1,14 @@
 <%= index_title %>
 <%= render :partial => "assets/new_button", :locals => {:new_object_path => new_event_path, :label => "Announce an #{t('event')}"} %>
 
-<% if Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages[controller_name] && @ie_support_faceted_browsing  %>
-    <%= render :partial => "faceted_browsing/faceted_browsing", :object => @events %>
+<% if index_with_facets?(controller_name)  %>
+    <%= render :partial => "assets/filter_button", :locals => {:index_path => events_path} %>
+
+    <% if params[:user_enable_facet] == 'true' %>
+        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @events %>
+    <% else %>
+        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @events %>
+    <% end %>
 <% else %>
     <%= render :partial => "assets/resources_alphabetical_paginated", :object => @events %>
 <% end %>

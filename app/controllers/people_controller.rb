@@ -5,6 +5,7 @@ class PeopleController < ApplicationController
   include Seek::Publishing::GatekeeperPublish
   include Seek::FacetedBrowsing
   include Seek::DestroyHandling
+  include Seek::AdminBulkAction
 
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
@@ -67,7 +68,7 @@ class PeopleController < ApplicationController
       @people=@people.select{|p| !p.group_memberships.empty?}
       @people = apply_filters(@people).select(&:can_view?)#.select{|p| !p.group_memberships.empty?}
 
-      unless Seek::Config.faceted_browsing_enabled && Seek::Config.facet_enable_for_pages["people"] && ie_support_faceted_browsing?
+      unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people=Person.paginate_after_fetch(@people,
                                             :page=>(params[:page] || Seek::Config.default_page('people')),
                                             :reorder=>false,
@@ -294,6 +295,21 @@ class PeopleController < ApplicationController
           gr.project_roles << r
         end
       end
+    end
+  end
+
+  # DELETE /people/1
+  # DELETE /people/1.xml
+  def destroy
+    @person.destroy
+
+    respond_to do |format|
+      if request.env['HTTP_REFERER'].try(:include?,'/admin')
+        format.html { redirect_to(admin_url) }
+      else
+        format.html { redirect_to(people_url) }
+      end
+      format.xml  { head :ok }
     end
   end
 

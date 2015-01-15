@@ -1,0 +1,15 @@
+<%
+   filter_path = index_path + '?user_enable_facet=true'
+   unfilter_path = index_path
+%>
+<ul class="sectionIcons">
+  <li>
+    <%= image_tag_for_key('filter', filter_path, 'Advance filter',
+                          {:style => params[:user_enable_facet] == 'true' ? 'display: none' : ''}, 'Advance filter') %>
+  </li>
+
+  <li class="unfilter_button">
+    <%= image_tag_for_key('filter', unfilter_path, 'Un-filter',
+                          {:style => params[:user_enable_facet] == 'true' ? '' : 'display: none'}, 'Un-filter') %>
+  </li>
+</ul>
