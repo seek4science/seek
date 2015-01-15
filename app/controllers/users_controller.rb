@@ -1,5 +1,4 @@
 class UsersController < ApplicationController
-  include Seek::BulkAction
 
   before_filter :is_current_user_auth, :only=>[:edit, :update]
   before_filter :is_user_admin_auth, :only => [:impersonate, :resend_activation_email, :destroy]
@@ -7,6 +6,8 @@ class UsersController < ApplicationController
   skip_before_filter :restrict_guest_user
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:update,:cancel_registration]
+
+  include Seek::AdminBulkAction
   
   # render new.rhtml
   def new
