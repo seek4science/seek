@@ -83,18 +83,18 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
     end
   end
 
-  test 'toogle -advance filter- button and -Un-filter- button' do
+  test 'toogle -advance filter- button and -stop filtering- button' do
     with_config_value :faceted_browsing_enabled,true do
       example_items
       ASSETS_WITH_FACET.each do |type_name|
         with_config_value :facet_enable_for_pages,{type_name=>true} do
           get "/#{type_name}"
-          assert_select "a[style='']", :text => /Advance filter/
-          assert_select "a[style='display: none']", :text => /Un-filter/
+          assert_select "a[style='']", :text => /Advanced filtering/
+          assert_select "a[style='display: none']", :text => /Stop filtering/
 
           get "/#{type_name}", :user_enable_facet => 'true'
-          assert_select "a[style='display: none']", :text => /Advance filter/
-          assert_select "a[style='']", :text => /Un-filter/
+          assert_select "a[style='display: none']", :text => /Advanced filtering/
+          assert_select "a[style='']", :text => /Stop filtering/
         end
       end
     end
@@ -109,7 +109,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
           klass.delete_all
           get "/#{type_name}"
           assert_select "div[id='no-index-items-text']"
-          assert_select "a", :text => /Advance filter/, :count => 0
+          assert_select "a", :text => /Advanced filtering/, :count => 0
         end
       end
     end
