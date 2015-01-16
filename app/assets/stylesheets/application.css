@@ -32,7 +32,6 @@
 *= require match_making
 *= require modified_exhibit
 *= require faceted_browsing
-*= require faceted_search
 *= require project_folders
 *= require publishing
 *= require settings
