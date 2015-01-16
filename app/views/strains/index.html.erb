@@ -1,15 +1,3 @@
-<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_strain_path, :label => "New Strain"} %>
-
-<% if index_with_facets?(controller_name)  %>
-    <%= render :partial => "assets/filter_button", :locals => {:index_path => strains_path} %>
-
-    <% if params[:user_enable_facet] == 'true' %>
-        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @strains %>
-    <% else %>
-        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @strains %>
-    <% end %>
-<% else %>
-    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @strains %>
-<% end %>
+<%= render :partial=> "general/index",:locals=>{:new_item_label=>"New Strain"} %>
 
 

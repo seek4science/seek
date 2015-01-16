@@ -15,16 +15,6 @@
   <h2><%= "People with the role '#{h(@project_role.name)}'" %></h2>
 <% end -%>
 
-<% if index_with_facets?(controller_name)  %>
-    <%= render :partial => "assets/filter_button", :locals => {:index_path => people_path} %>
-
-    <% if params[:user_enable_facet] == 'true' %>
-        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @people %>
-    <% else %>
-        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @people %>
-    <% end %>
-<% else %>
-    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @people %>
-<% end %>
+<%= render :partial => "general/index_facets_or_paged" %>
 
 
