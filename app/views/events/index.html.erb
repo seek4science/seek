@@ -1,14 +1,1 @@
-<%= index_title %>
-<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_event_path, :label => "Announce an #{t('event')}"} %>
-
-<% if index_with_facets?(controller_name)  %>
-    <%= render :partial => "assets/filter_button", :locals => {:index_path => events_path} %>
-
-    <% if params[:user_enable_facet] == 'true' %>
-        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @events %>
-    <% else %>
-        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @events %>
-    <% end %>
-<% else %>
-    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @events %>
-<% end %>
+<%= render :partial=> "general/index",:locals=>{:new_item_label=>"Announce an #{t('event')}"} %>

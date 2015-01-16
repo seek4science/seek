@@ -1,14 +1,1 @@
-<%= index_title -%>
-<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_study_path, :label => "New #{t('study')}"} %>
-
-<% if index_with_facets?(controller_name)  %>
-    <%= render :partial => "assets/filter_button", :locals => {:index_path => studies_path} %>
-
-    <% if params[:user_enable_facet] == 'true' %>
-        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @studies %>
-    <% else %>
-        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @studies %>
-    <% end %>
-<% else %>
-    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @studies %>
-<% end %>
+<%= render :partial=> "general/index" %>

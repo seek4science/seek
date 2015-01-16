@@ -1,14 +1,1 @@
-<%= index_title -%>
-<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_sop_path, :label => "Upload a #{t('sop')}"} %>
-
-<% if index_with_facets?(controller_name)  %>
-    <%= render :partial => "assets/filter_button", :locals => {:index_path => sops_path} %>
-
-    <% if params[:user_enable_facet] == 'true' %>
-        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @sops %>
-    <% else %>
-        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @sops %>
-    <% end %>
-<% else %>
-    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @sops %>
-<% end %>
+<%= render :partial=> "general/index" %>
