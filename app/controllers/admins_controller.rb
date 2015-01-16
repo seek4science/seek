@@ -140,9 +140,9 @@ class AdminsController < ApplicationController
     Seek::Config.application_title = params[:application_title]
 
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
-    Seek::Config.header_image = params[:header_image]
     Seek::Config.header_image_link = params[:header_image_link]
     Seek::Config.header_image_title = params[:header_image_title]
+    header_image_file
 
     Seek::Config.copyright_addendum_enabled = string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content = params[:copyright_addendum_content]
@@ -420,6 +420,29 @@ class AdminsController < ApplicationController
           ActionMailer::Base.smtp_settings = smtp_hash_old
           ActionMailer::Base.raise_delivery_errors = raise_delivery_errors_setting
         end
+  end
+
+  def header_image_file
+    file_io = params[:header_image_file]
+    location = Seek::Config.rebranding_filestore_path
+    if file_io
+      unless File.exist?(location)
+        FileUtils.mkdir_p(location)
+      end
+      file_path = File.join(location,file_io.original_filename)
+      File.open(file_path, 'wb') do |file|
+        file.write(file_io.read)
+      end
+
+      public_logos_dir = File.join(Rails.configuration.assets.prefix, 'logos')
+      public_logo_path = File.join(Rails.root, 'public', public_logos_dir)
+      unless File.exist?(public_logo_path)
+        FileUtils.mkdir_p public_logo_path
+      end
+      FileUtils.copy(file_path, public_logo_path)
+
+      Seek::Config.header_image = File.join(public_logos_dir, file_io.original_filename)
+    end
   end
 
   private

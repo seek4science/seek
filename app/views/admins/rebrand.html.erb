@@ -3,7 +3,7 @@
 <h1>Site branding</h1>
 
 <div class="show_basic">
-<%= form_tag :action=>"update_rebrand" do -%>
+<%= form_tag({:action=>"update_rebrand"}, :multipart => true) do -%>
    <ul class="settings">
         <%= render :partial=>'setting_li',:locals=>{
             :description=>"A name for you #{t('project')}, this is the text that is used in sentences. Example Sysmo_DB, Virtual Liver",
@@ -62,18 +62,23 @@
          } -%>
 
         <ul class="settings" id="header_image_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.header_image_enabled -%>">
-            <%= render :partial=>'setting_li',:locals=>{
-                :description=>"The filename for the header image - this must reside in the public/images directory of the installed SEEK.",
-                :name=>"Header image filename",
-                :field=>text_field_tag(:header_image, Seek::Config.header_image)
-            } -%>
-            <%= render :partial=>'setting_li',:locals=>{
-                :description=>"A URL that is used as the link in the header image.",
-                :name=>"Header image link",
-                :field=>text_field_tag(:header_image_link, Seek::Config.header_image_link)
-            } -%>
-            <%= render :partial=>'setting_li',:locals=>{
-            :description=>"A title for the header image.",
+          <%= render :partial => 'setting_li', :locals => {
+                  :description => "The file for the header image.",
+                  :name => "Current header image file",
+                  :field => text_field_tag(:header_image, Seek::Config.header_image)
+          } -%>
+          <%= render :partial => 'setting_li', :locals => {
+                  :description => "The file for the header image.",
+                  :name => "Upload a header image file",
+                  :field => file_field_tag(:header_image_file)
+          } -%>
+          <%= render :partial => 'setting_li', :locals => {
+                  :description => "A URL that is used as the link in the header image.",
+                  :name => "Header image link",
+                  :field => text_field_tag(:header_image_link, Seek::Config.header_image_link)
+          } -%>
+          <%= render :partial => 'setting_li', :locals => {
+                  :description => "A title for the header image.",
             :name=>"Header image title",
             :field=>text_field_tag(:header_image_title, Seek::Config.header_image_title)
          } -%>
