@@ -65,7 +65,7 @@
           <%= render :partial => 'setting_li', :locals => {
                   :description => "The file for the header image.",
                   :name => "Current header image file",
-                  :field => text_field_tag(:header_image, Seek::Config.header_image)
+                  :field => text_field_tag(:header_image, Seek::Config.header_image, :disabled => true)
           } -%>
           <%= render :partial => 'setting_li', :locals => {
                   :description => "The file for the header image.",
