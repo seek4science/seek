@@ -74,7 +74,7 @@ module AdminHelper
     end
 
     public_file_path = File.join(public_logo_path, filename)
-    unless File.exist?(public_file_path)
+    if File.exist?(public_file_path) && File.exist?(image_file_path)
       FileUtils.copy(image_file_path, public_logo_path)
     end
 
