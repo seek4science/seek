@@ -429,19 +429,13 @@ class AdminsController < ApplicationController
       unless File.exist?(location)
         FileUtils.mkdir_p(location)
       end
-      file_path = File.join(location,file_io.original_filename)
+      filename = file_io.original_filename
+      file_path = File.join(location,filename)
       File.open(file_path, 'wb') do |file|
         file.write(file_io.read)
       end
 
-      public_logos_dir = File.join(Rails.configuration.assets.prefix, 'logos')
-      public_logo_path = File.join(Rails.root, 'public', public_logos_dir)
-      unless File.exist?(public_logo_path)
-        FileUtils.mkdir_p public_logo_path
-      end
-      FileUtils.copy(file_path, public_logo_path)
-
-      Seek::Config.header_image = File.join(public_logos_dir, file_io.original_filename)
+      Seek::Config.header_image = view_context.public_header_image_url(filename)
     end
   end
 
