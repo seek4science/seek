@@ -110,7 +110,7 @@ module PolicyHelper
         group_name = (p.contributor_type == 'WorkGroup') ? (h(contributor.project.title) + ' @ ' + h(contributor.institution.title)) : h(contributor.title)
         prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
         html << "<p class='permission'>#{prefix_text + group_name}"
-        html << ((p.access_type == Policy::DETERMINED_BY_GROUP) ? ' have ' : ' can ')
+        html << ((p.access_type == Policy::DETERMINED_BY_GROUP || p.access_type == Policy::NO_ACCESS) ? ' have ' : ' can ')
         html << Policy.get_access_type_wording(p.access_type, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase
         html << "</p>"
       end
