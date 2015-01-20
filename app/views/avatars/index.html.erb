@@ -1,6 +1,6 @@
 <% avatar_can_be_edited_by_current_user = mine?(@avatar_owner_instance) || @avatar_owner_instance.can_be_edited_by?(current_user) -%>
 
-<%= button_link_to('Return to Profile', @avatar_owner_instance.class.name.downcase, url_for(@avatar_owner_instance))%></li>
+<%= button_link_to('Return to Profile', @avatar_owner_instance.class.name.downcase, url_for(@avatar_owner_instance))%>
 <% if avatar_can_be_edited_by_current_user -%>
     <%= button_link_to('Upload New Picture', 'avatar', new_avatar_link(@avatar_owner_instance))%>
 <% end %>

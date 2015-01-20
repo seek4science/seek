@@ -1,8 +1,5 @@
-<ul class="sectionIcons">
-    <li>
-        <%= image_tag_for_key('arrow_left', person_path(@user.person), 'Return to profile', nil, 'Return to profile') -%>
-    </li>
-</ul>
+<%= button_link_to('Return to profile', 'arrow_left', person_path(@user.person)) -%>
+
 <h1>Manage Account</h1>
 <div class="show_basic">
     <% unless @user.login.nil? && @user.openid %>

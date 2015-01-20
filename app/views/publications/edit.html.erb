@@ -57,7 +57,7 @@
           <% end %>
         </ul>
         <br/>
-        <ul class="sectionIcons"><li><%= image_tag_for_key('no_user', disassociate_authors_publication_url(@publication), "Disassociate All Authors", {:confirm => "This will reset the publication's links to people in SEEK, are you sure you wish to do this?", :method => :post}, "Disassociate All Authors") -%></li></ul>
+        <%= button_link_to("Disassociate All Authors", 'destroy', disassociate_authors_publication_url(@publication), {:confirm => "This will reset the publication's links to people in SEEK, are you sure you wish to do this?", :method => :post}) -%>
       <% else %>
         <span class="none_text">No associated authors</span>
       <% end %>

@@ -29,6 +29,4 @@ SEEK will try and suggest the correct person based on the author's name. If this
 
 <br style="clear: both"/>
 
-<ul class="sectionIcons">
-  <li><%= image_tag_for_key('destroy', disassociate_authors_publication_url(@publication), "Disassociate All Authors", {:confirm => "This will clear the publication of all links to SEEK members, are you sure you wish to do this?", :method => :post}, "Disassociate All Authors") -%></li>
-</ul>
+<%= button_link_to("Disassociate All Authors", 'destroy', disassociate_authors_publication_url(@publication), {:confirm => "This will clear the publication of all links to SEEK members, are you sure you wish to do this?", :method => :post}) -%>
