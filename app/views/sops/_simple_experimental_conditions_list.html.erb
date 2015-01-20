@@ -1,9 +1,7 @@
 <% if can_view_asset?(@sop, params[:code]) -%>
 
   <% if @sop.can_edit? -%>
-    <ul class="sectionIcons">
-      <li><%= image_tag_for_key('edit', sop_experimental_conditions_path(@sop), nil, nil, 'Edit experimental conditions (latest version)') -%></li>
-    </ul>
+      <%= button_link_to('Edit experimental conditions (latest version)', 'edit', sop_experimental_conditions_path(@sop)) -%>
   <% end -%>
 
   <br/>

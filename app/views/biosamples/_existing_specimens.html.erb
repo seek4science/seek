@@ -100,17 +100,14 @@
             </table>
           </div>
           <br/>
-          <div style="margin-bottom: <%= logged_in_and_member? ? '-2em' : '0em'%>">
+          <div style="margin-bottom: 1em">
               <input type="button" id='select_all_specimens' name="select_all_specimens" value="Select all" onclick="selectAll('specimen_table')">
               <input type="button" id='deselect_all_specimens' name="deselect_all_specimens" value="Deselect all" onclick="deselectAll('specimen_table')">
           </div>
       <% end -%>
-      <% if logged_in_and_member? %>
-            <ul class="sectionIcons">
-              <li><%= link_to image("new") + "Create new #{I18n.t 'biosamples.sample_parent_term'}", new_specimen_path() + "?from_biosamples=true", {:id => 'new_specimen_link', :target => '_blank'} -%></li>
-            </ul>
-            <br/>
-  <% end %>
+    <% if logged_in_and_member? %>
+        <%= create_specimen_link -%>
+    <% end %>
   </div>
 </div>
 

@@ -1,12 +1,15 @@
 module BiosamplesHelper
   def create_strain_link
-    link_to image("new") + "Create new strain", new_strain_path(), {:id => 'new_strain_link', :target => '_blank', :onclick => "if (checkSelectOneStrain()) {return(true);} else {return(false);}"}
+    button_link_to "Create new strain", 'new', new_strain_path, {:id => 'new_strain_link', :target => '_blank', :onclick => "if (checkSelectOneStrain()) {return(true);} else {return(false);}"}
   end
 
-  
-   def create_sample_link
-     link_to image("new") + "Create new sample", new_sample_path(), {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{I18n.t "biosamples.sample_parent_term"}')) {return(true);} else {return(false);}"}
-   end
+  def create_sample_link
+    button_link_to "Create new sample", 'new', new_sample_path, {:id => 'new_sample_link', :target => '_blank', :onclick => "if (checkSelectOneSpecimen('#{I18n.t "biosamples.sample_parent_term"}')) {return(true);} else {return(false);}"}
+  end
+
+  def create_specimen_link
+    button_link_to "Create new #{I18n.t 'biosamples.sample_parent_term'}", 'new', new_specimen_path() + "?from_biosamples=true", {:id => 'new_specimen_link', :target => '_blank'}
+  end
 
   def edit_strain_link strain
     if strain.can_manage?

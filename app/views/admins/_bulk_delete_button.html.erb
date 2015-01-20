@@ -1,12 +1,7 @@
 <% path = eval("bulk_destroy_#{collection.first.class.name.underscore.pluralize}_path") %>
-<ul class="sectionIcons">
-  <li>
-    <%= form_tag path do %>
+<%= form_tag path do %>
     <% collection.each do |item| %>
-       <%= hidden_field_tag "ids[]", item.id %>
+        <%= hidden_field_tag "ids[]", item.id %>
     <% end %>
-       <%= image_tag_for_key("destroy", "if(confirm('Are you sure?')){$(this).up('form').submit()}", "delete all", {:id => "bulk" }, 'Delete All', :function) %>
-    <% end %>
-  </li>
-
-</ul>
+    <%= button_link_to('Destroy All', 'destroy', '#', :onclick => "if(confirm('Are you sure?')){$(this).up('form').submit()}", :id => "bulk") %>
+<% end %>
