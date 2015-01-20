@@ -20,17 +20,13 @@
                                      :search_type => params[:search_type],
                                      :include_external_search=>params[:include_external_search])
           %>
-          <ul class="sectionIcons">
-            <li>
-              <%= image_tag_for_key('filter', filter_path, 'Filter result',
-                                    {:style => params[:filter] == 'true' ? 'display: none' : ''}, 'Filter result')  %>
-            </li>
+          <div class="text-center">
+              <%= button_link_to('Filter result', 'filter', filter_path,
+                                    {:style => params[:filter] == 'true' ? 'display: none' : ''}, )  %>
 
-            <li class="unfilter_button">
-              <%= image_tag_for_key('filter', unfilter_path, 'Un-filter result',
-                                    {:style => params[:filter] == 'true' ? '' : 'display: none'}, 'Un-filter result')  %>
-            </li>
-          </ul>
+              <%= button_link_to('Un-filter result', 'filter', unfilter_path,
+                                    {:style => params[:filter] == 'true' ? '' : 'display: none'})  %>
+          </div>
           <% if params[:filter] == 'true' %>
             <%= render :partial => "faceted_browsing/faceted_search" -%>
           <% else %>
