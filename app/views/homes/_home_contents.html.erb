@@ -22,7 +22,11 @@
 <script type="text/javascript">
     $j(function()
     {
-        $j('.homepanel_list').jScrollPane();
+        $j('.homepanel_list').jScrollPane({
+            autoReinitialise: true,
+            autoReinitialiseDelay: 10
+
+        });
         $j('.jspDrag').hide();
         $j('.jspScrollable').mouseenter(function(){
             $j(this).find('.jspDrag').stop(true, true).fadeIn('slow');
