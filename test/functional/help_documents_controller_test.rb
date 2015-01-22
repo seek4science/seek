@@ -74,7 +74,6 @@ class HelpDocumentsControllerTest < ActionController::TestCase
     logout
     get :new
     assert_response :redirect
-    puts @response.body
     assert_not_nil flash[:error]
   end
   

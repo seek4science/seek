@@ -3,8 +3,8 @@
    unfilter_path = index_path
 %>
 <div class="text-center">
-    <%= button_link_to('Advance filter', 'filter', filter_path,
+    <%= button_link_to('Advanced filtering', 'filter', filter_path,
                           {:style => params[:user_enable_facet] == 'true' ? 'display: none' : ''}) %>
-    <%= button_link_to('Un-filter', 'filter', unfilter_path,
+    <%= button_link_to('Stop filtering', 'filter', unfilter_path,
                           {:style => params[:user_enable_facet] == 'true' ? '' : 'display: none'}) %>
 </div>

@@ -1,15 +1,1 @@
-<%= index_title -%>
-<%= render :partial => "assets/new_button", :locals => {:new_object_path => new_model_path, :label => "Upload a #{t('model')}"} %>
-
-
-<% if index_with_facets?(controller_name)  %>
-    <%= render :partial => "assets/filter_button", :locals => {:index_path => models_path} %>
-
-    <% if params[:user_enable_facet] == 'true' %>
-        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @models %>
-    <% else %>
-        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @models %>
-    <% end %>
-<% else %>
-    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @models %>
-<% end %>
+<%= render :partial=> "general/index" %>

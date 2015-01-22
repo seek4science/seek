@@ -1,14 +1,4 @@
 <%= index_title -%>
 <%= render :partial => "assets/new_button", :locals => {:new_object_path => new_publication_path, :label => "Register a publication"} %>
 
-<% if index_with_facets?(controller_name)  %>
-    <%= render :partial => "assets/filter_button", :locals => {:index_path => publications_path} %>
-
-    <% if params[:user_enable_facet] == 'true' %>
-        <%= render :partial => "faceted_browsing/faceted_browsing", :object => @publications %>
-    <% else %>
-        <%= render :partial => "assets/resources_alphabetical_paginated", :object => @publications %>
-    <% end %>
-<% else %>
-    <%= render :partial => "assets/resources_alphabetical_paginated", :object => @publications %>
-<% end %>
+<%= render :partial => "general/index_facets_or_paged" %>

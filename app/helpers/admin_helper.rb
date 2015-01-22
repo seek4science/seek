@@ -58,4 +58,26 @@ module AdminHelper
     end
     content_tag(:ul, buttons, :class => "sectionIcons")
   end
+
+  # provides a url to the header image to be served from public/assets/logos/ - copying the image from filestore across if necessary
+  def public_header_image_url filename
+    image_folder = Seek::Config.rebranding_filestore_path
+    unless File.exist?(image_folder)
+      FileUtils.mkdir_p(image_folder)
+    end
+    image_file_path = File.join(image_folder, filename)
+
+    public_logos_dir = File.join(Rails.configuration.assets.prefix, 'logos')
+    public_logo_path = File.join(Rails.root, 'public', public_logos_dir)
+    unless File.exist?(public_logo_path)
+      FileUtils.mkdir_p public_logo_path
+    end
+
+    public_file_path = File.join(public_logo_path, filename)
+    if !File.exist?(public_file_path) && File.exist?(image_file_path)
+      FileUtils.copy(image_file_path, public_logo_path)
+    end
+
+    File.join(public_logos_dir, filename)
+  end
 end

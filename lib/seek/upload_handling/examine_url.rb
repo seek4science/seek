@@ -13,8 +13,7 @@ module Seek
           page = summarize_webpage(url)
           @title = page.title
           @description = page.description
-          @image = page.image
-          @image ||= page.images[0] unless page.images.blank?
+          @image = page.images.best
         else
           @is_webpage = false
           @filename = determine_filename_from_disposition(headers[:content_disposition])
