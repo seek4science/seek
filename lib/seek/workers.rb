@@ -19,21 +19,24 @@ module Seek
 
       begin
         commands.map { |c| Delayed::Command.new(c.split).daemonize }
-      rescue SystemExit
+      rescue SystemExit => e
+        Rails.logger.info("Exit code #{e.status}")
       end
     end
 
     def self.stop
       begin
         Delayed::Command.new(["stop"]).daemonize
-      rescue SystemExit
+      rescue SystemExit => e
+        Rails.logger.info("Exit code #{e.status}")
       end
     end
 
     def self.status
       begin
         Delayed::Command.new(["status"]).daemonize
-      rescue SystemExit
+      rescue SystemExit => e
+        Rails.logger.info("Exit code #{e.status}")
       end
     end
 
