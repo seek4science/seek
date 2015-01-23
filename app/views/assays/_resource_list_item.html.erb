@@ -2,40 +2,34 @@
    assay_type_text = resource.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type"
 %>
 
-<%= list_item_title resource %>
+<%= list_item_description resource.description %>
 
-<div class="list_item_left_column">
-  <%= list_item_attribute "ID", resource.id %>
+<div class="row">
+  <div class="col-sm-6">
+    <%= list_item_authorized_attribute "Contributor", resource.owner %>
+    <%= list_item_attribute "ID", resource.id %>
 
-  <%= "<p class=\"list_item_attribute\"><b>#{assay_type_text}</b>: #{link_to_assay_type(resource)}</p>".html_safe %>
-  <% unless resource.is_modelling? -%>
-      <%= "<p class=\"list_item_attribute\"><b>Technology type</b>: #{link_to_technology_type(resource)}</p>".html_safe %>
-  <% end -%>
+    <%= "<p class=\"list_item_attribute\"><b>#{assay_type_text}</b>: #{link_to_assay_type(resource)}</p>".html_safe %>
+    <% unless resource.is_modelling? -%>
+        <%= "<p class=\"list_item_attribute\"><b>Technology type</b>: #{link_to_technology_type(resource)}</p>".html_safe %>
+    <% end -%>
 
-  <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true %>
+    <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true %>
 
-  <%= list_item_authorized_list [resource.study], t('study'), true, 50, true %>
+    <%= list_item_authorized_list [resource.study], t('study'), true, 50, true %>
+  </div>
 
-  <%= list_item_authorized_list(resource.model_masters, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
+  <div class="col-sm-6 hidden-xs">
+    <% if Seek::Config.organisms_enabled %>
+        <%= list_samples_and_assay_organisms("Organisms", resource.samples, resource.assay_organisms,{:class=>"list_item_attribute"}) %>
+    <% end %>
 
+    <%= list_item_authorized_list(resource.model_masters, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
+    <%= list_item_authorized_list resource.sop_masters, t('sop').pluralize, true, 50, true %>
+    <%= list_item_authorized_list resource.data_file_masters, t('data_file').pluralize, true, 50, true %>
+  </div>
 </div>
 
-<div class="list_item_right_column">
-  <%= list_item_authorized_attribute "Contributor", resource.owner %>
-
-  <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
-  <% if Seek::Config.organisms_enabled %>
-    <%= list_samples_and_assay_organisms("Organisms", resource.samples, resource.assay_organisms,{:class=>"list_item_attribute"}) %>
-  <% end %>
-
-  <%= list_item_authorized_list resource.sop_masters, t('sop').pluralize, true, 50, true %>
-
-  <%= list_item_authorized_list resource.data_file_masters, t('data_file').pluralize, true, 50, true %>
-
-</div>
-
-<div class="list_item_whole_width">
+<div class="hidden-xs">
   <%= scales_list_for_list_item resource %>
-  <%= list_item_description resource.description %>
-  <%= list_item_timestamp resource %>
 </div>

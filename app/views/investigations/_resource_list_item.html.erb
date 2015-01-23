@@ -1,16 +1,8 @@
-<%= list_item_title resource %>
+<%= list_item_description resource.description %>
 
-<div class="list_item_left_column">
 <%= list_item_attribute "ID", resource.id %>
 <%= list_item_authorized_list resource.studies, t('study').pluralize %>
-</div>
 
-<div class="list_item_right_column">
-  <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
-</div>
-
-<div class="list_item_whole_width">
-<%= scales_list_for_list_item resource %>
-<%= list_item_description resource.description %>
-<%= list_item_timestamp resource %>
+<div class="hidden-xs">
+    <%= scales_list_for_list_item resource %>
 </div>
