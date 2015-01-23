@@ -3,17 +3,27 @@ people = Person.all.sort_by{|p| (p.last_name.nil? ? p.name : p.last_name)}
 admins = people.select{|p| p.is_admin?}
 %>
 
-<%= form_tag :action=>"update_admins" do -%>
-  <%= render :partial => "link_selector", :locals => {
-    :resource_id => "admins",
-    :resource_type => "People",
-    :right_resource_type=>"Administrators",
-    :left_collection=>people,
-    :right_collection=>admins,
-    :authorization_for_showing_already_done => true } -%>
-  <br style="clear:both;"/>
-  <br/>
-  <div style="width:100%;text-align:center;padding-right:4em;">
-    <%= submit_tag "Submit" %>
-  </div>
-<% end -%>
+<div class="box_normal stat_box">
+<h4 class="text_align">Add/remove admins</h4>
+
+    <%= form_tag :action=>"update_admins" do -%>
+      <%= render :partial => "link_selector", :locals => {
+        :resource_id => "admins",
+        :resource_type => "People",
+        :right_resource_type=>"Administrators",
+        :left_collection=>people,
+        :right_collection=>admins,
+        :authorization_for_showing_already_done => true } -%>
+      <br style="clear:both;"/>
+      <br/>
+      <div style="width:100%;text-align:center;padding-right:4em;">
+        <%= submit_tag "Submit" %>
+      </div>
+    <% end -%>
+</div>
+
+<style>
+  h4.text_align {
+      text-align: center;
+  }
+</style>

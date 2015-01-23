@@ -1425,4 +1425,20 @@ class PeopleControllerTest < ActionController::TestCase
     user.reload
     assert_equal user.person,assigns(:person)
   end
+  test 'redirect after destroy' do
+    person1 = Factory(:person)
+    person2 = Factory(:person)
+
+    @request.env['HTTP_REFERER'] = "/people/#{person1.id}"
+    assert_difference('Person.count', -1) do
+      delete :destroy, id: person1
+    end
+    assert_redirected_to people_path
+
+    @request.env['HTTP_REFERER'] = '/admin'
+    assert_difference('Person.count', -1) do
+      delete :destroy, id: person2
+    end
+    assert_redirected_to admin_path
+  end
 end
