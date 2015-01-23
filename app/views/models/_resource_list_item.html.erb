@@ -1,27 +1,17 @@
-<%= list_item_title resource %>
-
-<div class="list_item_left_column">
-<%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>
-
-<%= list_item_optional_attribute "#{t('model')} type", resource.model_type.try(:title) %>
-
-<%= list_item_optional_attribute "#{t('model')} format", resource.model_format.try(:title) %>
-
-</div>
-
-<div class="list_item_right_column">
-<%= list_item_attribute "Version", resource.version %>
-
-<%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
-  
-<%= list_item_optional_attribute "Organism", resource.organism.try(:title), resource.organism %>
-
-<%= list_item_optional_attribute "Environment", resource.recommended_environment.try(:title) %>
-
-</div>
-
-<div class="list_item_whole_width">
-<%= scales_list_for_list_item resource %>
 <%= list_item_description resource.description %>
-<%= list_item_timestamp resource %>
+
+<div class="row">
+  <div class="col-sm-6">
+    <%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>
+    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
+  </div>
+
+  <div class="col-sm-6 hidden-xs">
+    <%= list_item_optional_attribute "#{t('model')} type", resource.model_type.try(:title) %>
+    <%= list_item_optional_attribute "#{t('model')} format", resource.model_format.try(:title) %>
+    <%= list_item_optional_attribute "Organism", resource.organism.try(:title), resource.organism %>
+    <%= list_item_optional_attribute "Environment", resource.recommended_environment.try(:title) %>
+  </div>
 </div>
+
+<%= scales_list_for_list_item resource %>
