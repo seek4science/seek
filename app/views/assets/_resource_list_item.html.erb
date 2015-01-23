@@ -29,6 +29,11 @@
 <div class="panel panel-default <%= access_based_css_class%>">
   <div class="panel-heading">
     <%= list_item_title resource %>
+    <% if resource.respond_to?(:projects) %>
+        <div class="pull-right">
+          <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
+        </div>
+    <% end %>
   </div>
   <div class="panel-body">
     <div class="row">
