@@ -23,15 +23,7 @@ module IndexPager
   end
 
   def find_assets
-    begin
-      fetch_and_filter_assets
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        format.html do
-            render :template => "errors/error_404", :layout=>"errors",:status => :not_found
-        end
-      end
-    end
+    fetch_and_filter_assets
   end
 
   def fetch_and_filter_assets

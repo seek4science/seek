@@ -7,18 +7,10 @@ module Seek
 
     def bulk_destroy
       unless params["ids"].blank?
-        begin
-          model_class=self.controller_name.classify.constantize
-          objects = model_class.find(params["ids"])
-          objects.each(&:destroy)
-          redirect_back
-        rescue ActiveRecord::RecordNotFound
-          respond_to do |format|
-            format.html do
-              render :template => "errors/error_404", :layout=>"errors",:status => :not_found
-            end
-          end
-        end
+        model_class=self.controller_name.classify.constantize
+        objects = model_class.find(params["ids"])
+        objects.each(&:destroy)
+        redirect_back
       end
     end
 
