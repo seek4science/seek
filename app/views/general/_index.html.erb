@@ -1,0 +1,13 @@
+<%
+    new_item_label ||= "New #{t(controller_name.singularize)}"
+    new_item_path = eval("new_#{controller_name.singularize}_path")
+    items ||= nil
+    show_new_button=true if show_new_button.nil?
+%>
+
+<%= index_title %>
+<% if show_new_button %>
+    <%= render :partial => "assets/new_button", :locals => {:new_object_path => new_item_path, :label => new_item_label} %>
+<% end %>
+
+<%= render :partial => "general/index_facets_or_paged",:locals=>{:items=>items} %>

@@ -140,9 +140,9 @@ class AdminsController < ApplicationController
     Seek::Config.application_title = params[:application_title]
 
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
-    Seek::Config.header_image = params[:header_image]
     Seek::Config.header_image_link = params[:header_image_link]
     Seek::Config.header_image_title = params[:header_image_title]
+    header_image_file
 
     Seek::Config.copyright_addendum_enabled = string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content = params[:copyright_addendum_content]
@@ -420,6 +420,23 @@ class AdminsController < ApplicationController
           ActionMailer::Base.smtp_settings = smtp_hash_old
           ActionMailer::Base.raise_delivery_errors = raise_delivery_errors_setting
         end
+  end
+
+  def header_image_file
+    file_io = params[:header_image_file]
+    location = Seek::Config.rebranding_filestore_path
+    if file_io
+      unless File.exist?(location)
+        FileUtils.mkdir_p(location)
+      end
+      filename = file_io.original_filename
+      file_path = File.join(location,filename)
+      File.open(file_path, 'wb') do |file|
+        file.write(file_io.read)
+      end
+
+      Seek::Config.header_image = view_context.public_header_image_url(filename)
+    end
   end
 
   private

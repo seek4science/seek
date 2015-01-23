@@ -1,0 +1,20 @@
+<%
+   index_path = eval("#{controller_name}_path")
+   items ||= eval("@#{controller_name}")
+%>
+
+<% unless items.empty? %>
+    <% if index_with_facets?(controller_name)  %>
+        <%= render :partial => "assets/filter_button", :locals => {:index_path => index_path} %>
+
+        <% if params[:user_enable_facet] == 'true' %>
+            <%= render :partial => "faceted_browsing/faceted_browsing", :object => items %>
+        <% else %>
+            <%= render :partial => "assets/resources_alphabetical_paginated", :object => items %>
+        <% end %>
+    <% else %>
+        <%= render :partial => "assets/resources_alphabetical_paginated", :object => items %>
+    <% end %>
+<% else %>
+    <%= no_items_to_list_text %>
+<% end %>

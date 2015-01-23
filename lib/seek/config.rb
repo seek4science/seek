@@ -195,6 +195,10 @@ module Seek
       append_filestore_path 'model_images'
     end
 
+    def rebranding_filestore_path
+      append_filestore_path 'rebranding'
+    end
+
     def append_filestore_path(inner_dir)
       path = filestore_path
       unless path.start_with? '/'

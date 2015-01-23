@@ -9,8 +9,10 @@
         <%= render :partial=>"layouts/header_text_main" -%>
       </td>
       <td style="text-align:right;">
-        <%if Seek::Config.header_image_enabled%><%= link_to image_tag(Seek::Config.header_image,:alt=>Seek::Config.header_image_link,:title=>Seek::Config.header_image_title),
-          Seek::Config.header_image_link %><%end%>
+        <% if Seek::Config.header_image_enabled %>
+            <% image_filename = Seek::Config.header_image.split('logos/').last%>
+            <%= link_to image_tag(public_header_image_url(image_filename),:alt=>Seek::Config.header_image_link,:title=>Seek::Config.header_image_title), Seek::Config.header_image_link %>
+        <% end %>
       </td>
     </tr>
     </table>      

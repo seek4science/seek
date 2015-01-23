@@ -83,6 +83,38 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
     end
   end
 
+  test 'toogle -advance filter- button and -stop filtering- button' do
+    with_config_value :faceted_browsing_enabled,true do
+      example_items
+      ASSETS_WITH_FACET.each do |type_name|
+        with_config_value :facet_enable_for_pages,{type_name=>true} do
+          get "/#{type_name}"
+          assert_select "a[style='']", :text => /Advanced filtering/
+          assert_select "a[style='display: none']", :text => /Stop filtering/
+
+          get "/#{type_name}", :user_enable_facet => 'true'
+          assert_select "a[style='display: none']", :text => /Advanced filtering/
+          assert_select "a[style='']", :text => /Stop filtering/
+        end
+      end
+    end
+  end
+
+  test 'no -advance filter- button when no invisible assets' do
+    post '/logout' #to avoid redirect to select the profile for current user, when no person in the system
+    with_config_value :faceted_browsing_enabled,true do
+      ASSETS_WITH_FACET.each do |type_name|
+        with_config_value :facet_enable_for_pages,{type_name=>true} do
+          klass = type_name.singularize.camelize.constantize
+          klass.delete_all
+          get "/#{type_name}"
+          assert_select "div[id='no-index-items-text']"
+          assert_select "a", :text => /Advanced filtering/, :count => 0
+        end
+      end
+    end
+  end
+
   private
 
   def example_items

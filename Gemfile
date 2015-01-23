@@ -11,7 +11,7 @@ gem 'rack-openid'
 gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
 gem 'uuidtools'
 gem "RedCloth","4.2.9"
-gem 'simple-spreadsheet-extractor',"~>0.13.3"
+gem 'simple-spreadsheet-extractor',"~>0.13.4"
 gem "rmagick","2.13.2", :require => 'RMagick'
 gem "mysql2"
 gem 'rest-client'
@@ -80,7 +80,7 @@ gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.
 gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
 
 gem 'taverna-t2flow'
-gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :branch => 'list-inputs'
+gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :branch => 'list-inputs', :ref=>"bf7512faafa819a8df6ae692f4ba8ce41a9fa3e4"
 gem 'jquery-rails', '~> 3'
 gem 'jquery-ui-rails', '~>3'
 gem "recaptcha"
