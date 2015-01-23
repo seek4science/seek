@@ -38,7 +38,7 @@
   <div class="panel-body">
     <div class="row">
       <% unless avatar_partial.blank? %>
-          <div class="col-md-1 col-sm-2 hidden-xs text-center list_item_avatar">
+          <div class="col-md-1 col-sm-2 col-xs-3 <%='hidden-xs' unless resource.is_a?(Person)-%> text-center list_item_avatar">
             <%= render :partial=> avatar_partial,:locals=>{:resource => resource} %>
           </div>
       <% end %>
