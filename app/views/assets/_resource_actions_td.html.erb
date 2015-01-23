@@ -6,14 +6,12 @@
        permissions = resource.authorization_permissions
     -%>
 
-    <%= image_tag_for_key "show", show_resource_path(resource), nil, nil, "View" -%>
-
     <% if resource.contains_downloadable_items? && can_download_asset?(resource, params[:code],permissions.can_download)-%>
-      <%= download_or_link_button resource, download_resource_path(resource, params[:code]), resource.single_content_blob.try(:url)%>
+      <%= download_or_link_button resource, download_resource_path(resource, params[:code]), resource.single_content_blob.try(:url), nil, :class => 'btn btn-default btn-xs' %>
     <% end -%>
     <% if permissions.can_manage -%>
-      <%= image_tag_for_key "manage", edit_resource_path(resource), nil, nil, "Manage" -%>
+      <%= button_link_to 'Manage', 'manage', edit_resource_path(resource), :class => 'btn-xs' -%>
     <% elsif permissions.can_edit -%>
-      <%= image_tag_for_key "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
+      <%= button_link_to 'Edit', 'edit', edit_resource_path(resource), :class => 'btn-xs' -%>
     <% end -%>
 <% end -%>

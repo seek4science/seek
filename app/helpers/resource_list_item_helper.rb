@@ -43,7 +43,7 @@ module ResourceListItemHelper
         if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
           html = list_item_title_with_avatar(html, resource, title, url)
         else
-          html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
+          html << "#{link_to title, (url.nil? ? show_resource_path(resource) : url)}"
         end
       end
       html << "</div>"
@@ -55,7 +55,7 @@ module ResourceListItemHelper
 
   def list_item_title_for_person(html, person, title, url)
     icons = seek_role_icons(person)
-    html << "<p>#{link_to title, (url.nil? ? show_resource_path(person) : url)} #{icons}</p>"
+    html << "#{link_to title, (url.nil? ? show_resource_path(person) : url)} #{icons}"
     html
   end
 
@@ -65,9 +65,8 @@ module ResourceListItemHelper
 
     icon = link_to_draggable(image, resource_path, :id => model_to_drag_id(resource), :class => "asset favouritable", :title => tooltip_title_attrib(get_object_title(resource)))
 
-    html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? resource_path : url)}</p>"
+    html << "#{icon} #{link_to title, (url.nil? ? resource_path : url)}"
     html << "#item_visibility"
-    html << "<br style=\"clear:both\"/>"
     html
   end
 
@@ -135,11 +134,10 @@ module ResourceListItemHelper
   end
 
   def list_item_timestamp resource
-    html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Created:</b> " + date_as_string(resource.created_at,true)
+    html = "Created: " + date_as_string(resource.created_at,true)
     unless resource.created_at == resource.updated_at
-      html << "&nbsp;&nbsp;&nbsp<b>Last updated:</b> " + date_as_string(resource.updated_at,true)
+      html << ", Last updated: " + date_as_string(resource.updated_at,true)
     end
-    html << "</p>"
     return html.html_safe
   end
 
@@ -150,7 +148,7 @@ module ResourceListItemHelper
   end
 
   def list_item_description text, auto_link=true, length=500
-    html = "<div class='list_item_desc curved'>"
+    html = "<div class='well well-sm'>"
     html << text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
     html << "</div>"
     html.html_safe
@@ -222,6 +220,18 @@ module ResourceListItemHelper
         end
     end
     html << ""
+    html.html_safe
+  end
+
+  def list_item_contributor_list(contributors, other_contributors = nil)
+    contributor_count = contributors.count
+    contributor_count += 1 if !other_contributors.blank?
+    html = "<p class=\"list_item_attribute\"><b>Contributor#{contributor_count == 1 ? '' : 's'}:</b> "
+    html << contributors.map { |c| link_to truncate(c.title, :length => 75), show_resource_path(c), :title => get_object_title(c) }.join(', ')
+    unless other_contributors.blank?
+      html << ', ' + other_contributors
+    end
+    html << "</p>"
     html.html_safe
   end
 

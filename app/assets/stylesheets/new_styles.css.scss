@@ -162,14 +162,6 @@ span.truncated-name {
   margin-bottom: 0.6em;
 }
 
-div.list_item, div.private_list_item, div.public_list_item {
-  padding: 1em;
-  @include rounded-box-shadow(#f8f8f8);
-  border-collapse: collapse;
-  min-height: 90px;
-  margin: 3px 10px;
-}
-
 .contribution-header {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
@@ -195,10 +187,6 @@ img.icon {
   margin-right: 0.25em;
 }
 
-.list_item_actions > a {
-  display: block;
-}
-
 h1 div.version {
   display: inline-block;
   font-size: 75%;
@@ -208,4 +196,8 @@ h1 div.version {
 
 h1 div.version a.dropdown-toggle {
   cursor: pointer;
+}
+
+.list_item_actions .btn {
+  width: 9em;
 }

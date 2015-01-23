@@ -2,8 +2,5 @@
     resource = resource_list_item_contributor_and_creators
  -%>
 
-<%= list_item_contributor resource -%>
-
-<%= list_item_authorized_list resource.creators, "Contributor" %>
-
-<%= list_item_optional_attribute "Other contributors", h(resource.other_creators), nil if resource.respond_to?'other_creators' -%>
+<%= list_item_contributor_list resource.creators, resource.other_creators if resource.respond_to? 'other_creators' %>
+<%= list_item_contributor resource unless resource.creators.include?(resource.contributor.person)-%>
