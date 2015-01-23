@@ -35,7 +35,7 @@ module ResourceListItemHelper
         title = get_object_title(resource)
       end
 
-      html = ""
+      html = "<div class=\"list_item_title\">"
 
       if resource.class.name.split("::")[0] == "Person"
         html = list_item_title_for_person(html, resource, title, url)
@@ -46,6 +46,7 @@ module ResourceListItemHelper
           html << "#{link_to title, (url.nil? ? show_resource_path(resource) : url)}"
         end
       end
+      html << "</div>"
     end
     visibility = resource.authorization_supported? && resource.can_manage? ? list_item_visibility(resource) : ""
     result = result.gsub("#item_visibility",visibility)

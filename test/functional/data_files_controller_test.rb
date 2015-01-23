@@ -1640,7 +1640,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file.save
     get :index
 
-    assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
+    assert_select 'p.list_item_attribute', :text => /another creator/, :count => 1
   end
 
   test 'should show the other creators in  uploader and creators  box' do
@@ -1739,8 +1739,8 @@ class DataFilesControllerTest < ActionController::TestCase
     get :index,:project_id=>project.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",data_file_path(df),:text=>df.title
-      assert_select "p > a[href=?]",data_file_path(df2),:text=>df2.title,:count=>0
+      assert_select "a[href=?]",data_file_path(df),:text=>df.title
+      assert_select "a[href=?]",data_file_path(df2),:text=>df2.title,:count=>0
     end
   end
 
