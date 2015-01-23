@@ -210,6 +210,8 @@ class AdminsController < ApplicationController
       begin
         Seek::Workers.restart
         wait_for_delayed_job_to_start
+      rescue  SystemExit => e
+        Rails.logger.info("Exit code #{e.status}")
       rescue => e
         error = e.message
         if Seek::Config.exception_notification_enabled
