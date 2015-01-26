@@ -29,7 +29,7 @@
 <div class="panel panel-default <%= access_based_css_class%>">
   <div class="panel-heading clearfix">
     <%= list_item_title resource %>
-    <% if resource.respond_to?(:projects) && ![Person, Programme].include?(resource.class) %>
+    <% if resource.respond_to?(:projects) && ![Person, Project, Institution, Programme].include?(resource.class) %>
         <div class="pull-right small">
           <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
         </div>
@@ -52,7 +52,7 @@
       <% end %>
     </div>
   </div>
-  <% unless resource.is_a?(Project) || resource.is_a?(Programme) || resource.is_a?(Person)  %>
+  <% unless [Person, Project, Institution, Programme].include?(resource.class)  %>
       <div class="panel-footer hidden-xs small">
         <%= list_item_timestamp resource %>
       </div>

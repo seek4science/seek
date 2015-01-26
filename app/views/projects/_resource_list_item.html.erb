@@ -1,18 +1,16 @@
-<%= list_item_title resource %>
+<%= list_item_description resource.description %>
 
-<div class="list_item_left_column">
-  <%= list_item_programme_attribute(resource) if Seek::Config.programmes_enabled %>
-  <%= list_item_optional_attribute "Public web page", h(resource.web_page), h(resource.web_page) %>
+<div class="row">
+  <div class="col-sm-6">
+    <%= list_item_programme_attribute(resource) if Seek::Config.programmes_enabled %>
+    <%= list_item_optional_attribute "Public web page", h(resource.web_page), h(resource.web_page) %>
 
-  <% unless hide_contact_details? %>
-      <%= list_item_optional_attribute "Internal web page", h(resource.wiki_page), h(resource.wiki_page) %>
-  <% end %>
+    <% unless hide_contact_details? %>
+        <%= list_item_optional_attribute "Internal web page", h(resource.wiki_page), h(resource.wiki_page) %>
+    <% end %>
+  </div>
+
+  <div class="col-sm-6 hidden-xs">
+    <%= list_item_simple_list resource.organisms, "Organisms" %>
+  </div>
 </div>
-
-<div class="list_item_right_column">
-  <%= list_item_simple_list resource.organisms, "Organisms" %>
-</div>
-<div class="list_item_whole_width">
-  <%= list_item_description resource.description %>
-</div>
-
