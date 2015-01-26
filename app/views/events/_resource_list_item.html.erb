@@ -1,20 +1,14 @@
-<div>
-    <%= list_item_title resource %>
+<%= list_item_description resource.description %>
 
-    <div class="list_item_left_column">
+<div class="row">
+  <div class="col-sm-6">
+    <%= list_item_attribute "Start Date", date_as_string(resource.start_date) %>
+    <%= list_item_attribute "End Date", resource.end_date.nil? ? text_or_not_specified(nil) : date_as_string(resource.end_date) %>
+    <%= list_item_optional_attribute "#{t('event')} Website", h(resource.url), h(resource.url) %>
+  </div>
 
-        <%= list_item_attribute "Start Date", date_as_string(resource.start_date) %>
-        <%= list_item_attribute "End Date", resource.end_date.nil? ? text_or_not_specified(nil) : date_as_string(resource.end_date) %>
-        <%= list_item_optional_attribute "#{t('event')} Website", h(resource.url), h(resource.url) %>
-    </div>
-
-    <div class="list_item_right_column">
-        <%= list_item_attribute "Country", (text_or_not_specified resource.country, :link_as_country => true) %>
-        <%= list_item_optional_attribute "City", h(resource.city) %>
-    </div>
-
-    <div class="list_item_whole_width">
-        <%= list_item_description resource.description %>
-        <%= list_item_timestamp resource %>
-    </div>
+  <div class="col-sm-6">
+    <%= list_item_attribute "Country", (text_or_not_specified resource.country, :link_as_country => true) %>
+    <%= list_item_optional_attribute "City", h(resource.city) %>
+  </div>
 </div>
