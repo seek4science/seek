@@ -232,6 +232,7 @@ module ResourceListItemHelper
       html << ', ' unless contributors.empty?
       html << other_contributors
     end
+    html << "None" if contributor_count == 0
     html << "</p>"
     html.html_safe
   end
