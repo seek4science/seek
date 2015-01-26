@@ -44,7 +44,7 @@
             <%= render :partial=> avatar_partial,:locals=>{:resource => resource} %>
           </div>
       <% end %>
-      <div class="col-md-<%=content_grid_size-%> col-sm-<%=content_grid_size - 1-%> list_item_content">
+      <div class="col-md-<%=content_grid_size-%> col-sm-<%=content_grid_size - 1-%> <%='col-xs-9' if resource.is_a?(Person)-%> list_item_content">
         <%= render :seek_partial=> content_partial,:locals=>{:resource => resource} %>
       </div>
       <% unless actions_partial.blank? %>
