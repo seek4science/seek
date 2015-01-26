@@ -726,8 +726,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index,institution_id:institution.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",project_path(project),:text=>project.title
-      assert_select "p > a[href=?]",project_path(project2),:text=>project2.title,:count=>0
+      assert_select "a[href=?]",project_path(project),:text=>project.title
+      assert_select "a[href=?]",project_path(project2),:text=>project2.title,:count=>0
     end
 
   end
@@ -740,8 +740,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index,data_file_id:df1.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",project_path(df1.projects.first),:text=>df1.projects.first.title
-      assert_select "p > a[href=?]",project_path(df2.projects.first),:text=>df2.projects.first.title,:count=>0
+      assert_select "a[href=?]",project_path(df1.projects.first),:text=>df1.projects.first.title
+      assert_select "a[href=?]",project_path(df2.projects.first),:text=>df2.projects.first.title,:count=>0
     end
   end
 
@@ -753,8 +753,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index,model_id:model1.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",project_path(model1.projects.first),:text=>model1.projects.first.title
-      assert_select "p > a[href=?]",project_path(model2.projects.first),:text=>model2.projects.first.title,:count=>0
+      assert_select "a[href=?]",project_path(model1.projects.first),:text=>model1.projects.first.title
+      assert_select "a[href=?]",project_path(model2.projects.first),:text=>model2.projects.first.title,:count=>0
     end
   end
 
@@ -766,8 +766,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index,sop_id:sop1.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",project_path(sop1.projects.first),:text=>sop1.projects.first.title
-      assert_select "p > a[href=?]",project_path(sop2.projects.first),:text=>sop2.projects.first.title,:count=>0
+      assert_select "a[href=?]",project_path(sop1.projects.first),:text=>sop1.projects.first.title
+      assert_select "a[href=?]",project_path(sop2.projects.first),:text=>sop2.projects.first.title,:count=>0
     end
   end
 
@@ -779,8 +779,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index,publication_id:pub1.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",project_path(pub1.projects.first),:text=>pub1.projects.first.title
-      assert_select "p > a[href=?]",project_path(pub2.projects.first),:text=>pub2.projects.first.title,:count=>0
+      assert_select "a[href=?]",project_path(pub1.projects.first),:text=>pub1.projects.first.title
+      assert_select "a[href=?]",project_path(pub2.projects.first),:text=>pub2.projects.first.title,:count=>0
     end
   end
 
@@ -792,8 +792,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index,event_id:event1.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",project_path(event1.projects.first),:text=>event1.projects.first.title
-      assert_select "p > a[href=?]",project_path(event2.projects.first),:text=>event2.projects.first.title,:count=>0
+      assert_select "a[href=?]",project_path(event1.projects.first),:text=>event1.projects.first.title
+      assert_select "a[href=?]",project_path(event2.projects.first),:text=>event2.projects.first.title,:count=>0
     end
   end
 
@@ -806,8 +806,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index,specimen_id:spec1.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",project_path(spec1.projects.first),:text=>spec1.projects.first.title
-      assert_select "p > a[href=?]",project_path(spec2.projects.first),:text=>spec2.projects.first.title,:count=>0
+      assert_select "a[href=?]",project_path(spec1.projects.first),:text=>spec1.projects.first.title
+      assert_select "a[href=?]",project_path(spec2.projects.first),:text=>spec2.projects.first.title,:count=>0
     end
 
   end
@@ -828,8 +828,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index,strain_id:strain1.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",project_path(strain1.projects.first),:text=>strain1.projects.first.title
-      assert_select "p > a[href=?]",project_path(strain2.projects.first),:text=>strain2.projects.first.title,:count=>0
+      assert_select "a[href=?]",project_path(strain1.projects.first),:text=>strain1.projects.first.title
+      assert_select "a[href=?]",project_path(strain2.projects.first),:text=>strain2.projects.first.title,:count=>0
     end
 
   end

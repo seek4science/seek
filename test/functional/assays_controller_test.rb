@@ -1341,8 +1341,8 @@ class AssaysControllerTest < ActionController::TestCase
     get :index,investigation_id:inv.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
-      assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+      assert_select "a[href=?]",assay_path(assay),:text=>assay.title
+      assert_select "a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
     end
   end
 
@@ -1356,8 +1356,8 @@ class AssaysControllerTest < ActionController::TestCase
     get :index,study_id:study.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",assay_path(assay),:text=>assay.title
-      assert_select "p > a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
+      assert_select "a[href=?]",assay_path(assay),:text=>assay.title
+      assert_select "a[href=?]",assay_path(assay2),:text=>assay2.title,:count=>0
     end
   end
 

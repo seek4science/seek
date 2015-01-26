@@ -310,8 +310,8 @@ test "should update genotypes and phenotypes" do
     get :index,sample_id:sample1.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",specimen_path(sample1.specimen),:text=>sample1.specimen.title
-      assert_select "p > a[href=?]",specimen_path(sample2.specimen),:text=>sample2.specimen.title,:count=>0
+      assert_select "a[href=?]",specimen_path(sample1.specimen),:text=>sample1.specimen.title
+      assert_select "a[href=?]",specimen_path(sample2.specimen),:text=>sample2.specimen.title,:count=>0
     end
   end
 
@@ -328,8 +328,8 @@ test "should update genotypes and phenotypes" do
     get :index,project_id:sample1.specimen.projects.first.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",specimen_path(sample1.specimen),:text=>sample1.specimen.title
-      assert_select "p > a[href=?]",specimen_path(sample2.specimen),:text=>sample2.specimen.title,:count=>0
+      assert_select "a[href=?]",specimen_path(sample1.specimen),:text=>sample1.specimen.title
+      assert_select "a[href=?]",specimen_path(sample2.specimen),:text=>sample2.specimen.title,:count=>0
     end
   end
 
@@ -345,8 +345,8 @@ test "should update genotypes and phenotypes" do
     get :index,strain_id:spec1.strain.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",specimen_path(spec1),:text=>spec1.title
-      assert_select "p > a[href=?]",specimen_path(spec2),:text=>spec2.title,:count=>0
+      assert_select "a[href=?]",specimen_path(spec1),:text=>spec1.title
+      assert_select "a[href=?]",specimen_path(spec2),:text=>spec2.title,:count=>0
     end
   end
 
@@ -362,8 +362,8 @@ test "should update genotypes and phenotypes" do
     get :index,institution_id:spec1.institution.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",specimen_path(spec1),:text=>spec1.title
-      assert_select "p > a[href=?]",specimen_path(spec2),:text=>spec2.title,:count=>0
+      assert_select "a[href=?]",specimen_path(spec1),:text=>spec1.title
+      assert_select "a[href=?]",specimen_path(spec2),:text=>spec2.title,:count=>0
     end
   end
 

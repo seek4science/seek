@@ -169,8 +169,8 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",institution_path(person1.institutions.first),:text=>person1.institutions.first.title
-      assert_select "p > a[href=?]",institution_path(person2.institutions.first),:text=>person2.institutions.first.title,:count=>0
+      assert_select "a[href=?]",institution_path(person1.institutions.first),:text=>person1.institutions.first.title
+      assert_select "a[href=?]",institution_path(person2.institutions.first),:text=>person2.institutions.first.title,:count=>0
     end
   end
 

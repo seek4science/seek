@@ -384,8 +384,8 @@ class StudiesControllerTest < ActionController::TestCase
     get :index,person_id:person.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",study_path(study),:text=>study.title
-      assert_select "p > a[href=?]",study_path(study2),:text=>study2.title,:count=>0
+      assert_select "a[href=?]",study_path(study),:text=>study.title
+      assert_select "a[href=?]",study_path(study2),:text=>study2.title,:count=>0
     end
   end
 
@@ -466,8 +466,8 @@ class StudiesControllerTest < ActionController::TestCase
     get :index,assay_id:assay1.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",study_path(assay1.study),:text=>assay1.study.title
-      assert_select "p > a[href=?]",study_path(assay2.study),:text=>assay2.study.title,:count=>0
+      assert_select "a[href=?]",study_path(assay1.study),:text=>assay1.study.title
+      assert_select "a[href=?]",study_path(assay2.study),:text=>assay2.study.title,:count=>0
     end
   end
 

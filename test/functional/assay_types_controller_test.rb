@@ -16,7 +16,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "h1",:text=>/Assay type &#x27;Fluxomics&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
     end
     assert_select "div.ontology_nav a.parent_term",:text=>/experimental assay type/i
   end
@@ -30,7 +30,7 @@ class AssayTypesControllerTest < ActionController::TestCase
 
     assert_select "h1",:text=>/Assay type &#x27;Experimental assay type&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay)
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(assay)
     end
     assert_select "div.ontology_nav a.child_term",:text=>/fluxomics \(1\)/i
   end
@@ -41,7 +41,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "h1",:text=>/Assay type &#x27;Experimental assay type&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
     end
   end
 
@@ -52,8 +52,8 @@ class AssayTypesControllerTest < ActionController::TestCase
     get :show, :uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
     assert_response :success
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(pub_assay),:text=>/#{pub_assay.title}/
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(priv_assay),:text=>/#{priv_assay.title}/,:count=>0
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(pub_assay),:text=>/#{pub_assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(priv_assay),:text=>/#{priv_assay.title}/,:count=>0
     end
 
     assert_select "div.ontology_nav a.child_term",:text=>/fluxomics \(1\)/i
@@ -84,7 +84,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     get :show, :uri => assay.assay_type_uri, :label => assay.assay_type_label
     assert_select "h1", :text => /Assay type &#x27;#{assay.assay_type_label}&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
     end
   end
 
@@ -94,7 +94,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     get :show, :uri => assay.assay_type_uri
     assert_select "h1", :text => /Assay type &#x27;#{assay.assay_type_label}&#x27;/i
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
     end
   end
 
@@ -108,7 +108,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     get :show, :uri => suggested_assay_type.uri, :label => "this is an assay type"
     assert_select "h1", :text => /Assay type &#x27;this is an assay type&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
     end
   end
 

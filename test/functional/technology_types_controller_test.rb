@@ -17,7 +17,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "h1",:text=>/Technology type &#x27;Imaging&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
     end
     assert_select "div.ontology_nav a.parent_term",:text=>/technology type/i
   end
@@ -31,7 +31,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "h1",:text=>/Technology type &#x27;Technology type&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
     end
     assert_select "div.ontology_nav a.child_term",:text=>/imaging \(1\)/i
   end
@@ -42,7 +42,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "h1",:text=>/Technology type &#x27;Technology type&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(assay),:text=>/#{assay.title}/
     end
   end
 
@@ -53,8 +53,8 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     get :show, :uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
     assert_response :success
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(pub_assay),:text=>/#{pub_assay.title}/
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]",assay_path(priv_assay),:text=>/#{priv_assay.title}/,:count=>0
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(pub_assay),:text=>/#{pub_assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]",assay_path(priv_assay),:text=>/#{priv_assay.title}/,:count=>0
     end
 
     assert_select "div.ontology_nav a.child_term",:text=>/imaging \(1\)/i
@@ -78,7 +78,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     get :show, :uri => assay.technology_type_uri, :label => assay.technology_type_label
     assert_select "h1", :text => /Technology type &#x27;#{assay.technology_type_label}&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
     end
   end
   test "no label passed render the same page as long as the same ontolgoy uri is passed" do
@@ -87,7 +87,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     get :show, :uri => assay.technology_type_uri
     assert_select "h1", :text => /Technology type &#x27;#{assay.technology_type_label}&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
     end
   end
 
@@ -101,7 +101,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     get :show, :uri => suggested_technology_type.uri, :label => "this is a techno type"
     assert_select "h1", :text => /Technology type &#x27;this is a techno type&#x27;/
     assert_select "div.list_items_container" do
-      assert_select "div.list_item div.list_item_content div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
+      assert_select "div.list_item div.list_item_title a[href=?]", assay_path(assay), :text => /#{assay.title}/
     end
   end
 

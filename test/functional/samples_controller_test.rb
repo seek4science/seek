@@ -485,8 +485,8 @@ test "should show organism and strain information of a sample if there is organi
     get :index,specimen_id:sample1.specimen.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",sample_path(sample1),:text=>sample1.title
-      assert_select "p > a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
+      assert_select "a[href=?]",sample_path(sample1),:text=>sample1.title
+      assert_select "a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
     end
   end
 
@@ -503,8 +503,8 @@ test "should show organism and strain information of a sample if there is organi
     get :index,project_id:sample1.projects.first.id
     assert_response :success
     assert_select "div.list_item_title" do
-      assert_select "p > a[href=?]",sample_path(sample1),:text=>sample1.title
-      assert_select "p > a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
+      assert_select "a[href=?]",sample_path(sample1),:text=>sample1.title
+      assert_select "a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
     end
   end
 end

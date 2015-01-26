@@ -23,8 +23,8 @@ class RenderPartialFlippingTest < ActionController::TestCase
     assert_select "div.list_items_container" do
       assert_select "div.list_item" do
         assert_select "div.list_item_title" do
-          assert_select "p > a[href=?]",project_path(project),:text=>project.title
-          assert_select "p > a[href=?]",institution_path(inst),:text=>inst.title
+          assert_select "a[href=?]",project_path(project),:text=>project.title
+          assert_select "a[href=?]",institution_path(inst),:text=>inst.title
         end
       end
     end

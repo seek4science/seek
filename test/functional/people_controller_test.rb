@@ -1271,9 +1271,9 @@ class PeopleControllerTest < ActionController::TestCase
     get :index, project_id: proj.id
     assert_response :success
     assert_select 'div.list_item_title' do
-      assert_select 'p > a[href=?]', person_path(person1), text: person1.name
-      assert_select 'p > a[href=?]', person_path(person2), text: person2.name
-      assert_select 'p > a[href=?]', person_path(person3), text: person3.name, count: 0
+      assert_select 'a[href=?]', person_path(person1), text: person1.name
+      assert_select 'a[href=?]', person_path(person2), text: person2.name
+      assert_select 'a[href=?]', person_path(person3), text: person3.name, count: 0
     end
   end
 
@@ -1289,8 +1289,8 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'div.list_item_title' do
-      assert_select 'p > a[href=?]', person_path(person1), text: person1.name
-      assert_select 'p > a[href=?]', person_path(person2), text: person2.name, count: 0
+      assert_select 'a[href=?]', person_path(person1), text: person1.name
+      assert_select 'a[href=?]', person_path(person2), text: person2.name, count: 0
     end
   end
 
@@ -1305,8 +1305,8 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.list_item_title' do
-      assert_select 'p > a[href=?]', person_path(person1), text: person1.name
-      assert_select 'p > a[href=?]', person_path(person2), text: person2.name, count: 0
+      assert_select 'a[href=?]', person_path(person1), text: person1.name
+      assert_select 'a[href=?]', person_path(person2), text: person2.name, count: 0
     end
   end
 
@@ -1337,8 +1337,8 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item' do
         assert_select 'div.list_item_title' do
-          assert_select 'p > a[href=?]', project_path(project), text: project.title
-          assert_select 'p > a[href=?]', institution_path(inst), text: inst.title
+          assert_select 'a[href=?]', project_path(project), text: project.title
+          assert_select 'a[href=?]', institution_path(inst), text: inst.title
         end
       end
     end
