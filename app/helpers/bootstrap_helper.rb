@@ -10,12 +10,12 @@ module BootstrapHelper
     icon_link_to(text, icon, url, options)
   end
 
-  def info_box(title, options = {})
+  def panel(title, options = {})
     content_tag(:div, :class => "panel #{options[:type] || 'panel-default'}".strip) do
-      content_tag(:div, :class => 'panel-heading') do
+      content_tag(:div, merge_options({:class => 'panel-heading'}, options.delete(:heading_options))) do
         title
       end +
-      content_tag(:div, :class => 'panel-body') do
+      content_tag(:div, merge_options({:class => 'panel-body'}, options.delete(:body_options))) do
         yield
       end
     end
