@@ -1246,15 +1246,15 @@ class PeopleControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select 'div.list_items_container' do
-      assert_select 'div.list_item_content  a[href=?]', person_path(person_in_project), text: /#{person_in_project.name}/, count: 1
-      assert_select 'div.list_item_content  a[href=?]', person_path(person_not_in_project), text: /#{person_not_in_project.name}/, count: 0
+      assert_select 'div.list_item_title  a[href=?]', person_path(person_in_project), text: /#{person_in_project.name}/, count: 1
+      assert_select 'div.list_item_title  a[href=?]', person_path(person_not_in_project), text: /#{person_not_in_project.name}/, count: 0
     end
 
     get :index, page: 'P'
     assert_response :success
     assert_select 'div.list_items_container' do
-      assert_select 'div.list_item_content  a[href=?]', person_path(person_in_project), text: /#{person_in_project.name}/, count: 1
-      assert_select 'div.list_item_content  a[href=?]', person_path(person_not_in_project), text: /#{person_not_in_project.name}/, count: 0
+      assert_select 'div.list_item_title  a[href=?]', person_path(person_in_project), text: /#{person_in_project.name}/, count: 1
+      assert_select 'div.list_item_title  a[href=?]', person_path(person_not_in_project), text: /#{person_not_in_project.name}/, count: 0
     end
   end
 
