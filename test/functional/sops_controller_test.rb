@@ -609,11 +609,11 @@ class SopsControllerTest < ActionController::TestCase
     assert_nil flash[:notice]
   end
 
-  test 'should show <Not specified> for  other creators if no other creators' do
+  test "should show 'None' for other contributors if no contributors" do
     get :index
     assert_response :success
-    no_other_creator_sops = assigns(:sops).select { |s| s.other_creators.blank? }
-    assert_select 'p.list_item_attribute', :text => /Other contributors: Not specified/, :count => no_other_creator_sops.count
+    no_other_creator_sops = assigns(:sops).select { |s| s.creators.empty? && s.other_creators.blank? }
+    assert_select 'p.list_item_attribute', :text => /Contributors: None/, :count => no_other_creator_sops.count
   end
 
   test 'breadcrumb for sop index' do

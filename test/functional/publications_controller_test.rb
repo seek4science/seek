@@ -112,10 +112,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "div.list_item:first-of-type" do
       assert_select "div.list_item_title a[href=?]",publication_path(publication),:text=>/#{publication.title}/
-      assert_select "div.list_item_left_column" do
-        assert_select "p.list_item_attribute",:text=>/2013/,:count=>1
-        assert_select "p.list_item_attribute",:text=>/Jan.* 2013/,:count=>0
-      end
+      assert_select "p.list_item_attribute",:text=>/2013/,:count=>1
+      assert_select "p.list_item_attribute",:text=>/Jan.* 2013/,:count=>0
     end
   end
 

@@ -693,7 +693,7 @@ class AssaysControllerTest < ActionController::TestCase
     with_config_value :tabs_lazy_load_enabled, true do
       get :resource_in_tab, {:resource_ids => [sops(:my_first_sop).id].join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     end
-    assert_select "div.list_item div.list_item_actions" do
+    assert_select "div.list_item div.list_item_title" do
       path=sop_path(sops(:my_first_sop))
       assert_select "a[href=?]", path, :minumum => 1
     end
@@ -729,7 +729,7 @@ class AssaysControllerTest < ActionController::TestCase
     with_config_value :tabs_lazy_load_enabled, true do
       get :resource_in_tab, {:resource_ids => [data_files(:picture).id].join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
     end
-    assert_select "div.list_item div.list_item_actions" do
+    assert_select "div.list_item div.list_item_title" do
       path=data_file_path(data_files(:picture))
       assert_select "a[href=?]", path, :minumum => 1
     end
@@ -806,14 +806,14 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_select "div.list_item" do
       assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text=>"SOP with fully public policy", :count=>1
-      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count=>1
+      assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_fully_public_policy)), :count=>1
       assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count=>0
-      assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count=>0
+      assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count=>0
 
       assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text=>"Download Only", :count=>1
-      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count=>1
+      assert_select "div.list_item_actions a[href=?]", download_data_file_path(data_files(:downloadable_data_file)), :count=>1
       assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count=>0
-      assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count=>0
+      assert_select "div.list_item_actions a[href=?]", download_data_file_path(data_files(:private_data_file)), :count=>0
     end
 
   end
@@ -847,9 +847,9 @@ class AssaysControllerTest < ActionController::TestCase
       assert_response :success
       assert_select "div.list_item" do
         assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
-        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:downloadable_data_file)), :count => 1
+        assert_select "div.list_item_actions a[href=?]", download_data_file_path(data_files(:downloadable_data_file)), :count => 1
         assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
+        assert_select "div.list_item_actions a[href=?]", download_data_file_path(data_files(:private_data_file)), :count => 0
       end
 
       sop_ids = assay.sops.map &:sop_id
@@ -857,9 +857,9 @@ class AssaysControllerTest < ActionController::TestCase
       assert_response :success
       assert_select "div.list_item" do
         assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :count => 1
+        assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_fully_public_policy)), :count => 1
         assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
+        assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
       end
     end
   end

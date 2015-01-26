@@ -926,7 +926,7 @@ class ModelsControllerTest < ActionController::TestCase
     model.save
     get :index
 
-    assert_select 'p.list_item_attribute', :text => /: another creator/, :count => 1
+    assert_select 'p.list_item_attribute', :text => /, another creator/, :count => 1
   end
 
   test "should display cytoscape button for supported models" do
