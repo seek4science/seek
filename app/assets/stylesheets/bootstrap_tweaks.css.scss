@@ -11,10 +11,6 @@
   border-radius: 0;
 }
 
-p:last-child {
-  margin-bottom: 0;
-}
-
 @mixin responsive-text-align($size) {
   .text-right-#{$size} { text-align: right; }
   .text-left-#{$size} { text-align: left; }
