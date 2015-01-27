@@ -8,7 +8,7 @@ $navbar-default-link-color: #777;
 $navbar-default-link-active-color: darken($navbar-default-link-color, 30%);
 $navbar-default-link-hover-color: darken($navbar-default-link-color, 40%);
 
-$grid-float-breakpoint: $screen-sm-max;
+$grid-float-breakpoint: $screen-sm-max + 1;
 $grid-float-breakpoint-max: $grid-float-breakpoint - 1;
 
 $info-box-colour: #fffeda;
