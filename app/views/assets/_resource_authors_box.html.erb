@@ -13,13 +13,9 @@ else
     title ||= "Contributors"
 end
 %>
-<div class="contribution_section_box curved with_shadow">
-  <p class="heading">
-    <%= help_icon("These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its contributors.") -%>
-    <%= h(title) -%>
-  </p>
-  <p class="author_list">
 
+<%= panel(title, :help_text => "These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its contributors.") do %>
+  <div class="author_list text-center">
     <% creators.shift(5).each do |creator| %>
         <% if creator.nil? || creator.can_view? %>
             <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator,50) -%></span>
@@ -39,7 +35,7 @@ end
       <% end %>
       <br/><%= link_to_function "Unexpand", "$('expanded').hide();$('unexpanded').show();"%>
     </span>
-  </p>
+  </div>
 
   <% if resource.respond_to?(:other_creators) && !resource.other_creators.blank? -%>
 
@@ -51,5 +47,4 @@ end
     <%= h(resource.other_creators) %>
   </div>
   <% end -%>
-
-</div>
+<% end %>

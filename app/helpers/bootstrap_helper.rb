@@ -11,11 +11,19 @@ module BootstrapHelper
   end
 
   def panel(title, options = {})
-    content_tag(:div, :class => "panel #{options[:type] || 'panel-default'}".strip) do
-      content_tag(:div, merge_options({:class => 'panel-heading'}, options.delete(:heading_options))) do
-        title
+    heading_options = merge_options({:class => 'panel-heading'}, options.delete(:heading_options))
+    body_options = merge_options({:class => 'panel-body'}, options.delete(:body_options))
+    options = merge_options({:class => "panel #{options[:type] || 'panel-default'}"}, options)
+
+    content_tag(:div, options) do
+      content_tag(:div, heading_options) do
+        help_icon_html = ""
+        unless (help_text = options.delete(:help_text)).nil?
+          help_icon_html = help_icon(help_text) + " "
+        end
+        "#{help_icon_html}#{title}".html_safe
       end +
-      content_tag(:div, merge_options({:class => 'panel-body'}, options.delete(:body_options))) do
+      content_tag(:div, body_options) do
         yield
       end
     end

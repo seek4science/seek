@@ -6,13 +6,7 @@
 <% main_list_section_length = 5 -%>
 <% collection_name = "attributions_list_for_resource" %>
 
-<div class="contribution_section_box curved with_shadow">
-	
-	<p class="heading" style="margin-bottom: 0; padding-bottom: 0;">
-		<%= help_icon("What other assets have influenced this one?") -%>
-		Attributions		
-	</p>
-
+<%= panel('Attributions', :help_text => "What other assets have influenced this one?") do %>
 	<% unless attributed_to.blank? -%>
 		<ul class="list">
       <% for item in attributed_to.first(main_list_section_length) -%>
@@ -51,6 +45,5 @@
 		<% end -%>
 	<% else -%>
 	  <p class="none_text">None</p>
-	<% end  -%>
-	
-</div>
+	<% end %>
+<% end %>

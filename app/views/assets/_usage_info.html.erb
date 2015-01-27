@@ -1,30 +1,13 @@
-<div class="contribution_section_box curved with_shadow">
+<p><strong>Created</strong>: <%= date_as_string(resource.created_at,true) -%></p>
 
-    <div class="usage_info">
-      <div class="usage_count">
-        <b>Views:</b> <%= resource.view_count -%>
-        <% if ["DataFile","Model","Sop", "Presentation"].include?(resource.class.name) && versioned_resource.contains_downloadable_items? -%>
-                &nbsp;&nbsp;
-                <b>Downloads:</b> <%= resource.download_count -%>
-          <% end -%>
-      </div>
+<% unless resource.created_at == resource.updated_at -%>
+    <p><strong>Last updated</strong>: <%= date_as_string(resource.updated_at,true) -%></p>
+<% end -%>
 
-      <ul class="usage_times_list">
-        <li>
-          <b>Created</b>: <%= date_as_string(resource.created_at,true) -%>
-        </li>
-
-        <% unless resource.created_at == resource.updated_at -%>
-            <li>
-                <b>Last updated</b>: <%= date_as_string(resource.updated_at,true) -%>
-            </li>
-        <% end -%>
-        <% unless @last_used_before_now.blank? -%>
-            <li>
-                <b>Last used</b>: <%= date_as_string(@last_used_before_now,true) -%>
-            </li>
-        <% end -%>
-      </ul>
-    </div>
-
-</div>
+<% unless @last_used_before_now.blank? -%>
+    <p><strong>Last used</strong>: <%= date_as_string(@last_used_before_now,true) -%></p>
+<% end -%>
+<p><strong>Views:</strong> <%= resource.view_count -%></p>
+<% if ["DataFile","Model","Sop", "Presentation"].include?(resource.class.name) && versioned_resource.contains_downloadable_items? -%>
+    <p><strong>Downloads:</strong> <%= resource.download_count -%></p>
+<% end -%>

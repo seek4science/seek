@@ -17,7 +17,7 @@ module Seek
         update_owned_annotations entity
         eval("@#{controller_name.singularize} = entity")
         render :update do |page|
-          page.replace_html 'tags_box', :partial=>'assets/tags_box'
+          page.replace 'tags_box', :partial=>'assets/tags_box'
 
           # The tag cloud is generation is quite an expensive process and doesn't need to automatically update when filled up already.
           # When it is small its nice to see new tags appear in the cloud.

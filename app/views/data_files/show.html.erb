@@ -4,17 +4,25 @@
 <div class="row">
   <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 
-  <div class="col-md-9">
+  <div class="col-md-9 col-sm-8">
     <%= item_description @display_data_file.description -%>
 
-    <%= render :partial => 'assets/fileinfo',:object=>@display_data_file.content_blob -%>
+    <div class="row">
+      <div class="col-md-6">
+        <%= render :partial => 'assets/fileinfo',:object=>@display_data_file.content_blob -%>
 
-    <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
+        <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
 
-    <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>
+        <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>
+      </div>
+      <div class="col-md-6">
+        <%= render :partial => "assets/usage_info",:locals => { :resource => @data_file , :versioned_resource=> @display_data_file } -%>
+      </div>
+    </div>
+
   </div>
 
-  <div class="col-md-3">
+  <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } -%>
   </div>
 </div>

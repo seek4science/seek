@@ -12,48 +12,44 @@
 
    create_tag_link_text = owner_item_tags.empty? ? "Add your tags" : "Update your tags"
 %>
+<%= panel(title, :id => "tags_box", :help_text => "Tagging an item helps describe it and other people find it. You can contribute by applying your own tags to this item. The weight of a tag indicates how often it has been used.") do %>
+    <%= render :partial=>"tags/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>false, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
 
-<p class="heading">
-  <%= help_icon("Tagging an item helps describe it and other people find it. You can contribute by applying your own tags to this item. The weight of a tag indicates how often it has been used.") -%>
-  <%= h(title) -%>
-</p>
+    <small>
+      [
+      <%= link_to_function create_tag_link_text, visual_effect(:toggle_blind, "create_a_tag", :duration=>0.3) %>
+      ]
+    </small>
 
-<%= render :partial=>"tags/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>false, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
+    <div id="create_a_tag" style="display:none;">
+      <div class="none_text" style="font-size:smaller;padding-top:0.2em;">Either select a suggested tag whilst typing, or type a comma to end and define a new tag.</div>
+      <%= form_tag_with_callbacks({:action => :update_annotations_ajax},
+                                  {:method =>:post,
+                                   :id=>"create_tag",
+                                   :loading =>"$('tags_submit_button').value='Updating...';$('tags_submit_button').disabled=true;show_ajax_loader('tag_cloud');",
+                                   :remote => true}) do
+      %>
+          <p>
+            <%= hidden_field_tag "prefix", name -%>
 
-<small>
-  [
-  <%= link_to_function create_tag_link_text, visual_effect(:toggle_blind, "create_a_tag", :duration=>0.3) %>
-  ]
-</small>
+          <div id="facebook" class="clearfix">
+            <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
+              <span class="tokenizer_stretcher">^_^</span>
+              <span class="tab_stop"><input type="text" id="<%= name -%>_hidden_input" tabindex="-1"></span>
 
-<div id="create_a_tag" style="display:none;">
-  <div class="none_text" style="font-size:smaller;padding-top:0.2em;">Either select a suggested tag whilst typing, or type a comma to end and define a new tag.</div>
-  <%= form_tag_with_callbacks({:action => :update_annotations_ajax},
-               {:method =>:post,
-                :id=>"create_tag",
-                :loading =>"$('tags_submit_button').value='Updating...';$('tags_submit_button').disabled=true;show_ajax_loader('tag_cloud');",
-                :remote => true}) do
-  %>
-      <p>
-        <%= hidden_field_tag "prefix", name -%>
-
-      <div id="facebook" class="clearfix">
-        <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
-          <span class="tokenizer_stretcher">^_^</span>
-          <span class="tab_stop"><input type="text" id="<%= name -%>_hidden_input" tabindex="-1"></span>
-
-          <div id="<%= name -%>_autocomplete_display" class="tokenizer_input">
-            <input type="text" size="1" tabindex="" id="<%= name -%>_autocomplete_input" onBlur="addLastTag('<%= name -%>_autocompleter');"/>
+              <div id="<%= name -%>_autocomplete_display" class="tokenizer_input">
+                <input type="text" size="1" tabindex="" id="<%= name -%>_autocomplete_input" onBlur="addLastTag('<%= name -%>_autocompleter');"/>
+              </div>
+            </div>
+            <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list">
+              <div class="typeahead_message"><%= no_tags_message -%></div>
+            </div>
           </div>
-        </div>
-        <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list">
-          <div class="typeahead_message"><%= no_tags_message -%></div>
-        </div>
-      </div>
-      </p>
-      <p>
-        <%= submit_tag "Update", :id=>"tags_submit_button" -%>
-      </p>
-  <% end -%>
-</div>
-<%= render :partial=>"annotations/autocompleter_javascript", :locals=>{:name=>name, :all_annotations=>annotations, :item_annotations=>owner_item_tags} %>
+          </p>
+          <p>
+            <%= submit_tag "Update", :id=>"tags_submit_button" -%>
+          </p>
+      <% end -%>
+    </div>
+    <%= render :partial=>"annotations/autocompleter_javascript", :locals=>{:name=>name, :all_annotations=>annotations, :item_annotations=>owner_item_tags} %>
+<% end %>
