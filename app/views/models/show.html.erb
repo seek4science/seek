@@ -38,8 +38,6 @@
           </p>
         </div>
 
-        <%= render :partial=>"model_visualisation" -%>
-
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @model} %>
 
         <%= render :partial=>"import_details", :object=>@display_model %>
@@ -51,6 +49,8 @@
         <%= render :partial => "assets/usage_info",:locals => { :resource => @model , :versioned_resource=> @display_model } -%>
       </div>
     </div>
+
+    <%= render :partial=>"model_visualisation" -%>
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model,:versioned_resource=>@display_model } %>
