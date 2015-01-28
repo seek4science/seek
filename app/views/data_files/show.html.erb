@@ -1,10 +1,10 @@
 <%= render :partial => "general/item_title",:locals => {:item=>@data_file, :version => @display_data_file.version,
                                                         :buttons_partial => 'assets/asset_buttons'} -%>
 
-<div class="row">
-  <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
+<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 
-  <div class="col-md-9 col-sm-8">
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
     <%= item_description @display_data_file.description -%>
 
     <div class="row">
@@ -27,9 +27,7 @@
   </div>
 </div>
 
-<div class="hidden-xs clearfix">
-  <%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :current_item => @data_file, :deep => true} %>
-</div>
+<%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :current_item => @data_file, :deep => true} %>
 
 <%= render :partial=>"data_files/studied_factors" if Seek::Config.factors_studied_enabled %>
 

@@ -12,28 +12,29 @@
   #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
   reduced_elements = reduced_elements(cytoscape_elements, max_node_number, force_max_node, root_item, current_item)
 %>
+<div class="hidden-xs clearfix">
+    <div class="yui-u first isa_graph curved with_smaller_shadow">
+      <div id="cy"></div>
 
-<div class="yui-u first isa_graph curved with_smaller_shadow">
-  <div id="cy"></div>
+      <% if cytoscape_elements.size > reduced_elements.size %>
+          <%= link_to_function ("Full graph "+image("expand")).html_safe,
+                               "drawGraph(elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                               :id => 'full_graph_expand_image',
+                               :class => 'graph_toggle'
+          -%>
+          <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
+                               "drawGraph(reduced_elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                               :id => 'reduced_graph_collapse_image',
+                               :style => "display:none",
+                               :class => 'graph_toggle'
+          -%>
+      <% end %>
+    </div>
 
-  <% if cytoscape_elements.size > reduced_elements.size %>
-      <%= link_to_function ("Full graph "+image("expand")).html_safe,
-                           "drawGraph(elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
-                           :id => 'full_graph_expand_image',
-                           :class => 'graph_toggle'
-      -%>
-      <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
-                           "drawGraph(reduced_elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
-                           :id => 'reduced_graph_collapse_image',
-                           :style => "display:none",
-                           :class => 'graph_toggle'
-      -%>
-  <% end %>
+    <div class="yui-u node_info curved with_smaller_shadow" id="node_info">
+    </div>
+    <span id="ruler" style="visibility: hidden"></span>
 </div>
-
-<div class="yui-u node_info curved with_smaller_shadow" id="node_info">
-</div>
-<span id="ruler" style="visibility: hidden"></span>
 
 <script type="text/javascript">
     var isa_graph = $j('.isa_graph')[0];
