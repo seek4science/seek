@@ -43,7 +43,7 @@
                 if author.person && author.person.can_view?
                   link_to get_object_title(author.person), show_resource_path(author.person)
                 else
-                  author.first_name + " " + author.last_name
+                  author.full_name
                 end
               end.join(', ').html_safe %>
           <% end %>
