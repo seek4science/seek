@@ -1,24 +1,19 @@
-<% truncate_length_for_boxes = 22 -%>
-
 <%= render :partial => "general/item_title", :locals => {:item => @specimen, :buttons_partial => 'specimens/buttons'} %>
 
-<div class="show_basic">
-
-  <div style="clear:both">
-    <br/>
-
-    <div class="main_content_left_box">
-      <%= render :partial => "samples/sample_specimen_details", :object => @specimen %>
+<div class="row">
+  <div class="col-md-9 col-sm-8">
+    <div class="row">
+      <div class="col-md-6">
+        <%= render :partial => "samples/sample_specimen_details", :object => @specimen %>
+      </div>
+      <div class="col-md-6">
+        <%= render :partial => "assets/usage_info",:locals => { :resource => @specimen, :versioned_resource=>@specimen } -%>
+      </div>
     </div>
-    <br/>
+  </div>
+  <div class="col-md-3 col-sm-4">
     <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @specimen, :title => 'Contributor and creators'} %>
   </div>
-
-
-  <div style="clear:both">
-    <br/>
-    <%= render :partial => "general/items_related_to", :object => @specimen %>
-
-  </div>
-
 </div>
+
+<%= render :partial => "general/items_related_to", :object => @specimen %>
