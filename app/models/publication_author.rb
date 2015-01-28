@@ -7,4 +7,8 @@ class PublicationAuthor < ActiveRecord::Base
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :publication
 
+  def full_name
+    "#{first_name} #{last_name}"
+  end
+
 end
