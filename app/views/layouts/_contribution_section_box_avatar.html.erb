@@ -3,7 +3,7 @@
 <%# 2) "drag_id" - id for dragging-dropping avatar into "favourites" gadget; -%>
 
 
-<div class="contribution_section_box curved with_shadow">
+<%= panel(nil, :class => 'text-center') do %>
   <div>
     <%= favouritable_icon(object, 120) -%>
   </div>
@@ -18,4 +18,4 @@
       <%= image_tag_for_key("avatars", all_avatars_link(object), nil, nil, "Change picture") %>
       </span>
   <% end %>
-</div>
+<% end %>

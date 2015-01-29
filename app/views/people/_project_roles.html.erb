@@ -1,59 +1,50 @@
-<div class="fold">
-  <div class="foldTitle">
-    <div title='<%= tooltip_title_attrib(h("Click to see project roles"), 300)%>'>
-      <%= t('project') %> roles
-    </div>
-  </div>
-  <div class="foldContent" style="display: none;">
-    <ul class="groups">
-      <% for group_membership in @person.group_memberships -%>
-        <li class="group">
-          <p>Roles within <b><%= h(group_membership.work_group.description) -%></b></p>
-          <% if editable -%>
+<%= panel("#{t('project')} roles") do %>
+    <% @person.group_memberships.each do |group_membership| -%>
+        <h3>
+          <%= link_to group_membership.work_group.project.title, group_membership.work_group.project -%>
+          at
+          <%= link_to group_membership.work_group.institution.title, group_membership.work_group.institution -%>
+        </h3>
+        <% if editable -%>
             <%=  link_to_function "[edit]","startRolesEdit(#{group_membership.id});return(false);",:id=>"edit_link_#{group_membership.id}" %>
             <%= link_to("[delete]", group_membership, :method => :delete, :confirm => "Are you sure?") unless @person.group_memberships.count < 2%>
-          <% end -%>
-          <ul class="roles">
-            <div id="roles_<%= group_membership.id -%>">
-              <% unless group_membership.project_roles.empty? -%>
+        <% end -%>
+        <ul class="roles">
+          <div id="roles_<%= group_membership.id -%>">
+            <% unless group_membership.project_roles.empty? -%>
                 <% for role in group_membership.project_roles -%>
-                  <% if editable -%>
-                    <script type="text/javascript">
-                      addRole(<%= group_membership.id %>,'<%= role.name %>',<%= role.id %>);
-                    </script>
-                  <% else -%>
-                    <li>
-                      <%= link_to role.name,people_path(:project_role_id=>role.id) %>
-                    </li>
-                  <% end -%>
+                    <% if editable -%>
+                        <script type="text/javascript">
+                            addRole(<%= group_membership.id %>,'<%= role.name %>',<%= role.id %>);
+                        </script>
+                    <% else -%>
+                        <li>
+                          <%= link_to role.name,people_path(:project_role_id=>role.id) %>
+                        </li>
+                    <% end -%>
 
                 <% end -%>
-              <% else -%>
+            <% else -%>
                 <li>
                   <span class="none_text">No roles defined</span>
                 </li>
-              <% end -%>
-            </div>
-            <% if editable -%>
+            <% end -%>
+          </div>
+          <% if editable -%>
               <div id="edit_roles_<%= group_membership.id %>" style="display:none;">
                 <%= render :partial=>"edit_project_roles",:locals=>{:group_membership=>group_membership} %>
               </div>
-            <% end -%>
+          <% end -%>
 
-          </ul>
-        </li>
+        </ul>
 
         <% if editable -%>
-          <script type="text/javascript">
-            updateRoles(false,<%= group_membership.id %> );
-          </script>
+            <script type="text/javascript">
+                updateRoles(false,<%= group_membership.id %> );
+            </script>
         <% end -%>
         <% unless group_membership == @person.group_memberships.last -%>
-          <hr/>
+            <hr/>
         <% end -%>
-      <% end %>
-    </ul>
-  </div>
-</div>
-
-
+    <% end %>
+<% end %>
