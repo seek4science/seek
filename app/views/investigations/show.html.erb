@@ -1,26 +1,24 @@
 <%= render :partial => "general/item_title",:locals=>{:item=>@investigation, :buttons_partial => 'investigations/buttons'} %>
 
-<div class="show_basic">
-  <div class="main_content_left_box">
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
     <%= item_description @investigation.description -%>
-    <p class="id">
-        <label>
-            ID: 
-        </label>
-        <%= @investigation.id -%>
-    </p>
-    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
 
-    <br/>
+    <div class="row">
+      <div class="col-md-6">
+        <p class="id"><strong>ID:</strong><%= @investigation.id -%></p>
+        <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
+      </div>
+      <div class="col-md-6">
+        <%= render :partial => "assets/usage_info",:locals => { :resource => @investigation , :versioned_resource=> @investigation } -%>
+      </div>
+    </div>
   </div>
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => [@investigation.contributing_user.try(:person)] } %>
-
-  <div style="clear:both">
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @investigation, :deep => false} %>
+  <div class="col-md-3 col-sm-4">
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => [@investigation.contributing_user.try(:person)] } %>
   </div>
-
-  <div style="clear:both">
-    <%= render :partial=>"general/items_related_to",:object => @investigation %>
-  </div>
-
 </div>
+
+<%= render :partial=>"general/isa_graph", :locals => {:root_item => @investigation, :deep => false} %>
+
+<%= render :partial=>"general/items_related_to",:object => @investigation %>
