@@ -159,8 +159,8 @@ class AttributionsTest < ActionController::TestCase
 
     get :show,:id=>sop1
     assert_response :success
-    assert_select "div.contribution_section_box" do
-      assert_select "p.heading",:text=>/Attributions/
+    assert_select "div.panel" do
+      assert_select "div.panel-heading",:text=>/Attributions/
       assert_select "ul.list" do
         assert_select "li" do
           assert_select "a[href=?]",sop_path(sop2),:text=>/#{sop2.title}/
@@ -170,8 +170,8 @@ class AttributionsTest < ActionController::TestCase
 
     get :show,:id=>sop3
     assert_response :success
-    assert_select "div.contribution_section_box" do
-      assert_select "p.heading",:text=>/Attributions/
+    assert_select "div.panel" do
+      assert_select "div.panel-heading",:text=>/Attributions/
       assert_select "p.none_text",:text=>"None"
     end
   end

@@ -101,9 +101,11 @@ class PublicationsControllerTest < ActionController::TestCase
     publication = Factory(:publication,:published_date=>Date.new(2013,1,1))
     get :show,:id=>publication
     assert_response :success
-    assert_select "label[for=?]","date_published",:text=>"Date Published:"
-    assert_select "label[for='date_published']+span",:text=>/2013/,:count=>1
-    assert_select "label[for='date_published']+span",:text=>/Jan.* 2013/,:count=>0
+    assert_select("p") do
+      assert_select "strong", :text=>"Date Published:"
+      assert_select "span", :text=>/2013/, :count=>1
+      assert_select "span", :text=>/Jan.* 2013/, :count=>0
+    end
   end
 
   test "should only show the year for 1st Jan in list view" do

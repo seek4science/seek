@@ -357,7 +357,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = pal.projects.first
 		get :show,:id=>project
 		assert_select "div.box_about_actor p.pals" do
-			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
+			assert_select "strong",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>1
 			assert_select "a[href=?]",person_path(pal),:text=>"A PAL",:count=>1
 		end
@@ -368,7 +368,7 @@ class ProjectsControllerTest < ActionController::TestCase
       login_as asset_manager.user
       get :show,:id=>asset_manager.projects.first
       assert_select "div.box_about_actor p.asset_managers" do
-        assert_select "label",:text=>"Asset Managers:",:count=>1
+        assert_select "strong",:text=>"Asset Managers:",:count=>1
         assert_select "a",:count=>1
         assert_select "a[href=?]",person_path(asset_manager),:text=>asset_manager.name,:count=>1
       end
@@ -379,7 +379,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as project_manager.user
     get :show,:id=>project_manager.projects.first
 		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "label",:text=>"#{I18n.t('project')} Managers:",:count=>1
+			assert_select "strong",:text=>"#{I18n.t('project')} Managers:",:count=>1
 			assert_select "a",:count=>1
 			assert_select "a[href=?]",person_path(project_manager),:text=>project_manager.name,:count=>1
 		end
@@ -390,7 +390,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as gatekeeper.user
     get :show, :id => gatekeeper.projects.first
     assert_select "div.box_about_actor p.gatekeepers" do
-      assert_select "label", :text => "Gatekeepers:", :count => 1
+      assert_select "strong", :text => "Gatekeepers:", :count => 1
       assert_select "a", :count => 1
       assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 1
     end
@@ -412,16 +412,16 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(a_person.user)
     get :show, :id => project
     assert_select "div.box_about_actor p" do
-      assert_select "label", :text => "Asset Managers:", :count => 0
+      assert_select "strong", :text => "Asset Managers:", :count => 0
       assert_select "a[href=?]", person_path(asset_manager), :text => asset_manager.name, :count => 0
 
-      assert_select "label", :text => "Project Managers:", :count => 0
+      assert_select "strong", :text => "Project Managers:", :count => 0
       assert_select "a[href=?]", person_path(project_manager), :text => project_manager.name, :count => 0
 
-      assert_select "label", :text => "Gatekeepers:", :count => 0
+      assert_select "strong", :text => "Gatekeepers:", :count => 0
       assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 0
 
-      assert_select "label", :text => "SysMO-DB PALs:", :count => 1
+      assert_select "strong", :text => "SysMO-DB PALs:", :count => 1
       assert_select "a[href=?]", person_path(pal), :text => pal.name, :count => 1
     end
   end
@@ -437,7 +437,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	test "no pals displayed for project with no pals" do
 		get :show,:id=>projects(:myexperiment_project)
 		assert_select "div.box_about_actor p.pals" do
-			assert_select "label",:text=>"SysMO-DB PALs:",:count=>1
+			assert_select "strong",:text=>"SysMO-DB PALs:",:count=>1
 			assert_select "a",:count=>0
 			assert_select "span.none_text",:text=>"No PALs for this #{I18n.t('project')}",:count=>1
 		end
@@ -450,7 +450,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.asset_managers" do
-			assert_select "label",:text=>"Asset Managers:",:count=>1
+			assert_select "strong",:text=>"Asset Managers:",:count=>1
 			assert_select "a",:count=>0
 			assert_select "span.none_text",:text=>"No Asset Managers for this #{I18n.t('project')}",:count=>1
 		end
@@ -463,7 +463,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "label",:text=>"#{I18n.t('project')} Managers:",:count=>1
+			assert_select "strong",:text=>"#{I18n.t('project')} Managers:",:count=>1
 			assert_select "a",:count=>0
 			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Managers for this #{I18n.t('project')}",:count=>1
 		end
@@ -476,7 +476,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.gatekeepers" do
-			assert_select "label",:text=>"Gatekeepers:",:count=>1
+			assert_select "strong",:text=>"Gatekeepers:",:count=>1
 			assert_select "a",:count=>0
 			assert_select "span.none_text",:text=>"No Gatekeepers for this #{I18n.t('project')}",:count=>1
 		end

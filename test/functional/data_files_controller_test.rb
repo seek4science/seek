@@ -691,8 +691,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a",:text=>/Request/,:count=>0
     end
 
-    assert_select "div.contribution_section_box > div.usage_info" do
-      assert_select "b",:text=>/Downloads/,:count=>0
+    assert_select "div.usage_info" do
+      assert_select "strong",:text=>/Downloads/,:count=>0
     end
   end
 
@@ -706,8 +706,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a",:text=>/Download/,:count=>1
     end
 
-    assert_select "div.contribution_section_box > div.usage_info" do
-      assert_select "b",:text=>/Downloads/,:count=>1
+    assert_select "div.usage_info" do
+      assert_select "strong",:text=>/Downloads/,:count=>1
     end
 
   end
