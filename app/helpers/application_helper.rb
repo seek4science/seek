@@ -346,7 +346,7 @@ module ApplicationHelper
     name=PAGE_TITLES[controller_name]
     name ||=""
     name += " (Development)" if Rails.env=="development"
-    return "#{Seek::Config.application_name} "+name
+    return "The #{Seek::Config.application_name} "+name
   end
 
 

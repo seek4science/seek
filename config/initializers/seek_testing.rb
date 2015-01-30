@@ -41,7 +41,7 @@ SEEK::Application.configure do
       Settings.defaults[:tabs_lazy_load_enabled] = false
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
-      Settings.defaults[:application_name] = 'SEEK'
+      Settings.defaults[:application_name] = 'Sysmo SEEK'
       Settings.defaults[:dm_project_name] = "SysMO-DB"
       Settings.defaults[:dm_project_link] = "http://www.sysmo-db.org"
       Settings.defaults[:project_type] = 'Consortium'
