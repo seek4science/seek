@@ -1,36 +1,24 @@
 <% drag_id = model_to_drag_id(@programme) %>
 
-<% truncate_length_for_boxes = 22 -%>
-
 <%= render :partial => "general/item_title",:locals => {:item=>@programme, :buttons_partial => 'programmes/buttons'} %>
 
-<div class="show_basic">
-
-  <div class="main_content_left_box">
-
-    <div class="box_about_actor">
-      <%=  item_description @programme.description -%>
-      <p>
-        <label>Web page:</label>
-        <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>
-      </p>
-      <p>
-        <label>Funding details:</label>
-        <div id="description" class="box_normal curved">
-            <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>
-        </div>
-      </p>
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
+    <%=  item_description @programme.description -%>
+    <p>
+      <strong>Web page:</strong>
+      <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>
+    </p>
+    <strong>Funding details:</strong>
+    <div class="well well-sm">
+      <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>
     </div>
   </div>
 
-  <div class="main_content_right_box">
+  <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @programme, :drag_id => drag_id } -%>
   </div>
-
-  <div style="clear:both;">
-    <%# get, classify and authorize all assets for this project -%>
-    <%= render :partial=>"general/items_related_to",:object => @programme %>
-
-  </div>
-
 </div>
+
+<%# get, classify and authorize all assets for this project -%>
+<%= render :partial=>"general/items_related_to",:object => @programme %>

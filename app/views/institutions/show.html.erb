@@ -1,39 +1,29 @@
 <% drag_id=model_to_drag_id @institution %>
 
-<% truncate_length_for_boxes = 22 -%>
 <%= render :partial => "general/item_title",:locals=>{:item=>@institution, :buttons_partial => 'institutions/buttons'} -%>
 
-<div class="show_basic">
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
+    <p class="web_page">
+      <strong>Web page: </strong><%= text_or_not_specified(@institution.web_page, :external_link=>true) -%>
+    </p>
 
-  <div class="main_content_left_box">
+    <p class="country">
+      <strong>Country: </strong><%= text_or_not_specified @institution.country, :link_as_country => true -%>
+    </p>
 
-    <div class="box_about_actor">
-      <p class="web_page">
-        <label>Web page: </label><%= text_or_not_specified(@institution.web_page, :external_link=>true) -%>
-      </p>
+    <p class="city">
+      <strong>City: </strong><%= text_or_not_specified @institution.city %>
+    </p>
 
-
-      <p class="country">
-        <label>Country: </label><%= text_or_not_specified @institution.country, :link_as_country => true -%>
-      </p>
-
-      <p class="city">
-        <label>City: </label><%= text_or_not_specified @institution.city %>
-      </p>
-
-      <p class="address">
-        <label>Address: </label><%= text_or_not_specified @institution.address, :address=>true %>
-      </p>
-
-    </div>
-
+    <p class="address">
+      <strong>Address: </strong><%= text_or_not_specified @institution.address, :address=>true %>
+    </p>
   </div>
 
-  <div class="main_content_right_box">
+  <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @institution, :drag_id => drag_id } -%>
   </div>
-
-  <div style="clear:both;">
-    <%= render :partial=>"general/items_related_to",:object => @institution %>
-  </div>
 </div>
+
+<%= render :partial=>"general/items_related_to",:object => @institution %>

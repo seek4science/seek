@@ -1,95 +1,84 @@
 <% drag_id = model_to_drag_id(@project) %>
 
-<% truncate_length_for_boxes = 22 -%>
-
 <%= render :partial => "general/item_title",:locals => {:item=>@project, :buttons_partial => 'projects/buttons'} %>
 
-<div class="show_basic">
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
+    <%= item_description @project.description -%>
 
-  <div class="main_content_left_box">
+    <p>
+      <strong><%= t('programme') -%>:</strong>
+      <%= programme_link(@project) -%>
+    </p>
+    <p>
+      <strong>Public web page:</strong>
+      <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
+    </p>
 
-    <div class="box_about_actor">
-      <%=  item_description @project.description -%>
-      <p>
-        <label><%= t('programme') -%>:</label>
-        <%= programme_link(@project) -%>
-      </p>
+    <% unless hide_contact_details? %>
         <p>
-          <label>Public web page:</label>
-          <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
+          <strong>Internal web page:</strong>
+          <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
         </p>
-
-        <% unless hide_contact_details? %>
-          <p>
-            <label>Internal web page:</label>
-            <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
-          </p>
-        <% end %>
-        <% if Seek::Config.organisms_enabled %>
-            <p>
-                <label>Organisms:</label>
-                <%= organisms_link_list @project.organisms -%>
-            </p>
-        <% end %>
-
-        <p class="pals">
-          <label><%= Seek::Config.dm_project_name %> PALs:</label>
-          <%= pals_link_list @project -%>
+    <% end %>
+    <% if Seek::Config.organisms_enabled %>
+        <p>
+          <strong>Organisms:</strong>
+          <%= organisms_link_list @project.organisms -%>
         </p>
-        <% if @project.respond_to?(:project_coordinators)%>
+    <% end %>
+
+    <p class="pals">
+      <strong><%= Seek::Config.dm_project_name %> PALs:</strong>
+      <%= pals_link_list @project -%>
+    </p>
+    <% if @project.respond_to?(:project_coordinators)%>
         <p class="project_coordinators">
-          <label>Project Coordinators:</label>
+          <strong>Project Coordinators:</strong>
           <%= project_coordinators_link_list @project -%>
         </p>
-        <% end%>
- <% if @project.has_member?(current_user)%>
+    <% end%>
+    <% if @project.has_member?(current_user)%>
         <p class="asset_managers">
-          <label>Asset Managers:</label>
+          <strong>Asset Managers:</strong>
           <%= asset_managers_link_list @project -%>
         </p>
 
         <p class="project_managers">
-          <label><%= t('project') %> Managers:</label>
+          <strong><%= t('project') %> Managers:</strong>
           <%= project_managers_link_list @project -%>
         </p>
 
         <p class="gatekeepers">
-          <label>Gatekeepers:</label>
+          <strong>Gatekeepers:</strong>
           <%= gatekeepers_link_list @project -%>
         </p>
-        <% end %>
-
-
-    </div>
+    <% end %>
   </div>
-  <div class="main_content_right_box">
+
+  <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
   </div>
-
-  <% if Seek::Config.project_hierarchy_enabled && logged_in_and_member? -%>
-  <br/>
-  <div style="clear:both;">
-    <b>Project Hierarchies
-      (<%= link_to_function "hide", visual_effect(:toggle_appear, "project_hierarchy")+"$('project_hierarchy').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>
-      ):</b><br/><br/>
-
-    <div id="project_hierarchy" style="display: block;">
-      <ul><%= Rails.cache.fetch([:project_tree_editor, @project.cache_key]) { tree_editor_display Project, false, false, @project.id, "Person", true, true } %></ul>
-    </div>
-  </div>
-  <br/>
-   <div style="clear:both;">
-          <b><%= t('project') %> Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
-          <div id="project_mailing_list" style="display: none;">
-            <%= project_mailing_list @project %>
-          </div>
-       </div>
-  <% end %>
-
-  <div style="clear:both;">
-    <%# get, classify and authorize all assets for this project -%>
-    <%= render :partial=>"general/items_related_to",:object => @project %>
-    
-  </div>
-  
 </div>
+
+<% if Seek::Config.project_hierarchy_enabled && logged_in_and_member? -%>
+    <div style="clear:both;">
+      <b>Project Hierarchies
+        (<%= link_to_function "hide", visual_effect(:toggle_appear, "project_hierarchy")+"$('project_hierarchy').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>
+        ):</b><br/><br/>
+
+      <div id="project_hierarchy" style="display: block;">
+        <ul><%= Rails.cache.fetch([:project_tree_editor, @project.cache_key]) { tree_editor_display Project, false, false, @project.id, "Person", true, true } %></ul>
+      </div>
+    </div>
+    <br/>
+    <div style="clear:both;">
+      <b><%= t('project') %> Members(<%= link_to_function "show", visual_effect(:toggle_appear, "project_mailing_list")+"$('project_mailing_list').style.display=='none'? this.innerHTML='hide' : this.innerHTML='show';" %>):</b><br/><br/>
+      <div id="project_mailing_list" style="display: none;">
+        <%= project_mailing_list @project %>
+      </div>
+    </div>
+<% end %>
+
+<%# get, classify and authorize all assets for this project -%>
+<%= render :partial=>"general/items_related_to",:object => @project %>
