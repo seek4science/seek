@@ -226,7 +226,7 @@ end
   test 'dm_project_name' do
     assert_equal 'SysMO-DB', Seek::Config.dm_project_name
   end
-  
+
   test 'dm_project_link' do
     assert_equal 'http://www.sysmo-db.org', Seek::Config.dm_project_link
   end

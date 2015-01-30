@@ -6,12 +6,12 @@
 <%= form_tag :action=>"update_rebrand" do -%>
    <ul class="settings">
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"A name for your #{t('project')}, this is the text that is used in sentences. Example Sysmo_DB, Virtual Liver",
+            :description=>"A name for your #{t('project')}, this is the text that is used in sentences. Example Sysmo, Virtual Liver",
             :name=>"#{t('project')} name",
             :field=>text_field_tag(:project_name, Seek::Config.project_name)
          } -%>
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether your #{t('project')} is a group, consortium, etc.",
+            :description=>"Whether your #{t('project')} is a group, consortium, network etc.",
             :name=>"#{t('project')} type",
             :field=>text_field_tag(:project_type, Seek::Config.project_type)
         } -%>
