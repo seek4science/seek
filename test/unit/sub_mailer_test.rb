@@ -26,7 +26,7 @@ class SubMailerTest < ActionMailer::TestCase
     assert_equal "UTF-8", email.charset
     assert_equal ["no-reply@sysmo-db.org"], email.from
     assert_equal [p.email], email.to
-    assert_equal 'The Sysmo SEEK Subscription Report', email.subject
+    assert_equal 'The SEEK Subscription Report', email.subject
     assert email.body.include?("Dear #{p.name},")
     assert email.body.include?(%!<td><a href="http://localhost:3000/data_files/#{df.id}">#{df.title}</a></td>!)
     assert email.body.include?(%!<td><a href="http://localhost:3000/people/#{p2.id}">#{p2.name}</a></td>!)
@@ -56,7 +56,7 @@ class SubMailerTest < ActionMailer::TestCase
     assert_equal "UTF-8", email.charset
     assert_equal ["no-reply@sysmo-db.org"], email.from
     assert_equal [p.email], email.to
-    assert_equal 'The Sysmo SEEK Subscription Report', email.subject
+    assert_equal 'The SEEK Subscription Report', email.subject
     assert email.body.include?("Dear #{p.name},")
     assert email.body.include?(%!<td><a href="http://localhost:3000/data_files/#{df.id}">#{df.title}</a></td>!)
     assert email.body.include?(%!<td><a href="http://localhost:3000/people/#{p2.id}">#{p2.name}</a></td>!)
