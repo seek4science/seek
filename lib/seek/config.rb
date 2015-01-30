@@ -6,7 +6,11 @@ module Seek
   module Fallbacks
     # fallback attributes
     def project_long_name_fallback
-      "#{project_name} #{project_type}"
+      if project_type.blank?
+        "#{project_name}"
+      else
+        "#{project_name} #{project_type}"
+      end
     end
 
     def dm_project_name_fallback
