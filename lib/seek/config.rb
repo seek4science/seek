@@ -9,10 +9,6 @@ module Seek
       "#{project_name} #{project_type}"
     end
 
-    def project_title_fallback
-      project_long_name
-    end
-
     def dm_project_name_fallback
       project_name
     end

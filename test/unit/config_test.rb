@@ -223,9 +223,6 @@ end
   test 'project_long_name' do
     assert_equal 'Sysmo Consortium', Seek::Config.project_long_name
   end
-  test 'project_title' do
-    assert_equal 'The Sysmo Consortium', Seek::Config.project_title
-  end
   test 'dm_project_name' do
     assert_equal 'SysMO-DB', Seek::Config.dm_project_name
   end

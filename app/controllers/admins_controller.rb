@@ -129,7 +129,6 @@ class AdminsController < ApplicationController
     Seek::Config.project_name = params[:project_name]
     Seek::Config.project_type = params[:project_type]
     Seek::Config.project_link = params[:project_link]
-    Seek::Config.project_title = params[:project_title]
     Seek::Config.project_long_name = params[:project_long_name]
 
     Seek::Config.dm_project_name = params[:dm_project_name]
