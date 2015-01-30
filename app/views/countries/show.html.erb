@@ -33,16 +33,12 @@
   </div>
 
   <div class="col-md-3 col-sm-4">
-    <div class="contribution_section_box curved with_shadow">
-      <p class="heading">
-        <%= help_icon("Institutions that are situated in this country.") -%>
-        Institutions (<%= @institutions.length -%>)
-      </p>
-      <%= render :partial => "layouts/contribution_section_box_item_list",
-                 :locals => { :collection => @institutions,
-                              :collection_name => "institutions_in_country",
-                              :icon_type => "institution",
-                              :truncate_to => truncate_length_for_boxes } -%>
-    </div>
+    <%= panel("Institutions (#{@institutions.length})", :help_text => "Institutions that are situated in this country.") do %>
+        <%= render :partial => "layouts/contribution_section_box_item_list",
+                   :locals => { :collection => @institutions,
+                                :collection_name => "institutions_in_country",
+                                :icon_type => "institution",
+                                :truncate_to => truncate_length_for_boxes } -%>
+    <% end %>
   </div>
 </div>

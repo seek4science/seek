@@ -4,7 +4,7 @@
 
 
 <% unless is_nil_or_empty? collection -%>
-		<ul class="list">
+		<ul class="list no-icon">
       <% for item in collection.first(main_section_length) -%>
 				<%= list_item_with_icon(icon_type, item, nil, truncate_to) -%>
       <% end  %>
