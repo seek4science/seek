@@ -25,10 +25,6 @@ module Seek
       "#{project_name} SEEK"
     end
 
-    def application_title_fallback
-      application_name_fallback
-    end
-
     def header_image_link_fallback
       dm_project_link
     end
@@ -78,7 +74,7 @@ module Seek
       end
     end
 
-    def application_title_propagate
+    def application_name_propagate
       # required to update error message title
       exception_notification_enabled_propagate
     end
@@ -122,7 +118,7 @@ module Seek
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
           email: {
             sender_address: [noreply_sender],
-            email_prefix: "[ #{application_title} ERROR ] ",
+            email_prefix: "[ #{application_name} ERROR ] ",
             exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(%r{[, ]})
           }
       else

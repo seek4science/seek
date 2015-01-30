@@ -235,9 +235,7 @@ end
   test 'application_name' do
     assert_equal 'SEEK', Seek::Config.application_name
   end
-  test 'application_title' do
-    assert_equal 'The Sysmo SEEK', Seek::Config.application_title
-  end
+
   test 'header_image_enabled' do
     assert_equal true, Seek::Config.header_image_enabled
   end

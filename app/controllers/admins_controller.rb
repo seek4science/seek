@@ -136,7 +136,6 @@ class AdminsController < ApplicationController
     Seek::Config.dm_project_link = params[:dm_project_link]
 
     Seek::Config.application_name = params[:application_name]
-    Seek::Config.application_title = params[:application_title]
 
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
     Seek::Config.header_image = params[:header_image]

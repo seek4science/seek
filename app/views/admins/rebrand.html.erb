@@ -26,12 +26,6 @@
             :name=>"Application name",
             :field=>text_field_tag(:application_name, Seek::Config.application_name)
          } -%>
-     
-        <%= render :partial=>'setting_li',:locals=>{
-            :description=>"The name of your application, as used in titles, if you are extending SEEK and wish to give it a different name.",
-            :name=>"Application title",
-            :field=>text_field_tag(:application_title, Seek::Config.application_title)
-         } -%>
 
         <%= render :partial=>'setting_li',:locals=>{
             :description=>"The name of the data management #{t('project')}, if different from the #{t('project')}, as used in titles. For example, in SysMO the #{t('project')} is SysMO, but the DM #{t('project')} name is SysMO-DB",

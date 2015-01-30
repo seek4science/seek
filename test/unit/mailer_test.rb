@@ -244,7 +244,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "test mail" do
-    with_config_value(:application_title,"SEEK EMAIL TEST") do
+    with_config_value(:application_name,"SEEK EMAIL TEST") do
       with_config_value(:site_base_host,"http://fred.com") do
         email = Mailer.test_email("fred@email.com")
         assert_not_nil email
