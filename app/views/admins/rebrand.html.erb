@@ -33,11 +33,6 @@
             :field=>text_field_tag(:dm_project_name, Seek::Config.dm_project_name)
          } -%>
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"The name of the data management #{t('project')}, as used in titles.",
-            :name=>"Data management #{t('project')} title",
-            :field=>text_field_tag(:dm_project_title, Seek::Config.dm_project_title)
-         } -%>
-        <%= render :partial=>'setting_li',:locals=>{
             :description=>"A URL that is used in links to the data management #{t('project')}",
             :name=>"Data management #{t('project')} link",
             :field=>text_field_tag(:dm_project_link, Seek::Config.dm_project_link)

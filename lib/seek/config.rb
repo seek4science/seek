@@ -17,10 +17,6 @@ module Seek
       project_name
     end
 
-    def dm_project_title_fallback
-      project_long_name
-    end
-
     def dm_project_link_fallback
       project_link
     end
