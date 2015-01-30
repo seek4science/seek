@@ -231,7 +231,7 @@ end
     assert_equal 'http://www.sysmo-db.org', Seek::Config.dm_project_link
   end
   test 'application_name' do
-    assert_equal 'SEEK', Seek::Config.application_name
+    assert_equal 'Sysmo SEEK', Seek::Config.application_name
   end
 
   test 'header_image_enabled' do
