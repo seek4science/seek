@@ -3,10 +3,11 @@
 
 <%= select_tag :user_admin_query,
                options_for_select([["Select query ...","none"],
-                                   ["Invalid Users/Profiles","invalid_users_profiles"],
+                                   ["Invalid Users or Profiles","invalid_users_profiles"],
                                    ["Users Requiring Activation","users_requiring_activation"],
                                    ["Non-#{t('project')} Members","non_project_members"],
                                    ["PALs","pals"],
+                                   ["Profiles without users","profiles_without_users"],
                                    ["Administrators","administrators"]
                                   ],:length=>10),
                {:style=>"",

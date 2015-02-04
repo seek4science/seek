@@ -342,6 +342,7 @@ class AdminsController < ApplicationController
     collection = []
     action = nil
     title = nil
+    extra_options = {}
     @page = params[:id]
     case @page
       when 'invalid_users_profiles'
@@ -351,7 +352,6 @@ class AdminsController < ApplicationController
         invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal_of_any_project? != p.project_roles.include?(pal_role) }
         invalid_users[:duplicates] = Person.duplicates
         invalid_users[:no_person] = User.without_profile
-        invalid_users[:no_user] = Person.userless_people
         collection = invalid_users
       when 'users_requiring_activation'
         partial = 'user_stats_list'
@@ -362,6 +362,11 @@ class AdminsController < ApplicationController
         partial = 'user_stats_list'
         collection = Person.without_group.registered
         title = "Users are not in a #{Seek::Config.project_name} #{t('project')}"
+      when "profiles_without_users"
+        partial = "user_stats_list"
+        collection = Person.userless_people
+        title = "Profiles that have no associated user"
+        extra_options = {:action=>"delete",:bulk_delete=>false}
       when 'pals'
         partial = 'user_stats_list'
         collection = Person.pals
@@ -375,7 +380,8 @@ class AdminsController < ApplicationController
       if partial == "none"
         format.html { render :text=>"" }
       else
-        format.html { render :partial => partial, :locals => {:collection => collection, :action => action, :title => title} }
+        locals = {:collection => collection, :action => action, :title => title}.merge(extra_options)
+        format.html { render :partial => partial, :locals => locals }
       end
     end
   end
