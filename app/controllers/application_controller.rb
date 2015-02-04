@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
 
   around_filter :with_current_user
 
-  #rescue_from "ActionController::RoutingError", :with=>:render_routing_error
+  rescue_from "ActiveRecord::RecordNotFound", :with=>:render_not_found_error
 
   before_filter :profile_for_login_required
 
@@ -299,54 +299,51 @@ class ApplicationController < ActionController::Base
 
   #handles finding and authorizing an asset for all controllers that require authorization, and handling if the item cannot be found
   def find_and_authorize_requested_item
-    begin
-      name = self.controller_name.singularize
-      action = translate_action(action_name)
+    name = self.controller_name.singularize
+    action = translate_action(action_name)
 
-      return if action.nil?
+    return if action.nil?
 
-      object = name.camelize.constantize.find(params[:id])
+    object = name.camelize.constantize.find(params[:id])
 
-      if is_auth?(object, action)
-        eval "@#{name} = object"
-        params.delete :sharing unless object.can_manage?(current_user)
-      else
-        respond_to do |format|
-          format.html do
-            case action
-              when 'publish', 'manage', 'edit', 'download', 'delete'
-                if User.current_user.nil?
-                  flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
-                else
-                  flash[:error] = "You are not authorized to #{action} this #{name.humanize}."
-                end
-                redirect_to(eval("#{self.controller_name.singularize}_path(#{object.id})"))
-              else
-                render :template => "general/landing_page_for_hidden_item", :locals => {:item => object}, :status => :forbidden
-            end
-          end
-          format.rdf { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
-          format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
-          format.json { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
-        end
-        return false
-      end
-    rescue ActiveRecord::RecordNotFound
+    if is_auth?(object, action)
+      eval "@#{name} = object"
+      params.delete :sharing unless object.can_manage?(current_user)
+    else
       respond_to do |format|
         format.html do
-          if eval("@#{name}").nil?
-            render :template => "general/landing_page_for_not_found_item", :status => :not_found
-          else
-            render :template => "general/landing_page_for_hidden_item", :locals => {:item => object}, :status => :forbidden
+          case action
+            when 'publish', 'manage', 'edit', 'download', 'delete'
+              if User.current_user.nil?
+                flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
+              else
+                flash[:error] = "You are not authorized to #{action} this #{name.humanize}."
+              end
+              redirect_to(eval("#{self.controller_name.singularize}_path(#{object.id})"))
+            else
+              render :template => "general/landing_page_for_hidden_item", :locals => {:item => object}, :status => :forbidden
           end
         end
-
-        format.rdf { render  :text=>"Not found",:status => :not_found }
-        format.xml { render  :text=>"<error>404 Not found</error>",:status => :not_found }
-        format.json { render :text=>"Not found", :status => :not_found }
+        format.rdf { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
+        format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
+        format.json { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
       end
       return false
     end
+  end
+
+  def render_not_found_error
+
+    respond_to do |format|
+      format.html do
+        render :template => "general/landing_page_for_not_found_item", :status => :not_found
+      end
+
+      format.rdf { render  :text=>"Not found",:status => :not_found }
+      format.xml { render  :text=>"<error>404 Not found</error>",:status => :not_found }
+      format.json { render :text=>"Not found", :status => :not_found }
+    end
+    false
   end
 
   def is_auth? object, action
