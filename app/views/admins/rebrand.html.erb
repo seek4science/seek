@@ -4,17 +4,12 @@
 <%= form_tag({:action=>"update_rebrand"}, :multipart => true) do -%>
    <ul class="settings">
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"A name for you #{t('project')}, this is the text that is used in sentences. Example Sysmo_DB, Virtual Liver",
+            :description=>"A name for your #{t('project')}, this is the text that is used in sentences. Example Sysmo, Virtual Liver",
             :name=>"#{t('project')} name",
             :field=>text_field_tag(:project_name, Seek::Config.project_name)
          } -%>
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"The title for you #{t('project')}, this is the text that is used in titles. In the majority of cases it will be the same as #{t('project')} name, unless you want to prefix it with 'The'.",
-            :name=>"#{t('project')} title",
-            :field=>text_field_tag(:project_title, Seek::Config.project_title)
-         } -%>
-        <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether your #{t('project')} is a group, consortium, etc.",
+            :description=>"Whether your #{t('project')} is a group, consortium, network etc.",
             :name=>"#{t('project')} type",
             :field=>text_field_tag(:project_type, Seek::Config.project_type)
         } -%>
@@ -29,22 +24,11 @@
             :name=>"Application name",
             :field=>text_field_tag(:application_name, Seek::Config.application_name)
          } -%>
-     
-        <%= render :partial=>'setting_li',:locals=>{
-            :description=>"The name of your application, as used in titles, if you are extending SEEK and wish to give it a different name.",
-            :name=>"Application title",
-            :field=>text_field_tag(:application_title, Seek::Config.application_title)
-         } -%>
 
         <%= render :partial=>'setting_li',:locals=>{
             :description=>"The name of the data management #{t('project')}, if different from the #{t('project')}, as used in titles. For example, in SysMO the #{t('project')} is SysMO, but the DM #{t('project')} name is SysMO-DB",
             :name=>"Data management #{t('project')} name",
             :field=>text_field_tag(:dm_project_name, Seek::Config.dm_project_name)
-         } -%>
-        <%= render :partial=>'setting_li',:locals=>{
-            :description=>"The name of the data management #{t('project')}, as used in titles.",
-            :name=>"Data management #{t('project')} title",
-            :field=>text_field_tag(:dm_project_title, Seek::Config.dm_project_title)
          } -%>
         <%= render :partial=>'setting_li',:locals=>{
             :description=>"A URL that is used in links to the data management #{t('project')}",

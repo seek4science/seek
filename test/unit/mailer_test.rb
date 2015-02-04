@@ -5,7 +5,7 @@ class MailerTest < ActionMailer::TestCase
   fixtures :all
 
   test "signup" do
-    @expected.subject = 'SEEK account activation'
+    @expected.subject = 'Sysmo SEEK account activation'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
 
@@ -16,7 +16,7 @@ class MailerTest < ActionMailer::TestCase
   end
   
   test "signup_open_id" do
-    @expected.subject = 'SEEK account activation'
+    @expected.subject = 'Sysmo SEEK account activation'
     @expected.to = "Aaron Openid Spiggle <aaron_openid@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
 
@@ -30,7 +30,7 @@ class MailerTest < ActionMailer::TestCase
     announcement = Factory(:mail_announcement)
     recipient = Factory(:person)
 
-    @expected.subject = "SEEK Announcement: #{announcement.title}"
+    @expected.subject = "Sysmo SEEK Announcement: #{announcement.title}"
     @expected.to = recipient.email_with_name
     @expected.from    = "no-reply@sysmo-db.org"
 
@@ -44,7 +44,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "feedback anonymously" do
-    @expected.subject = 'SEEK Feedback provided - This is a test feedback'
+    @expected.subject = 'Sysmo SEEK Feedback provided - This is a test feedback'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"    
 
@@ -56,7 +56,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "feedback non anonymously" do
-    @expected.subject = 'SEEK Feedback provided - This is a test feedback'
+    @expected.subject = 'Sysmo SEEK Feedback provided - This is a test feedback'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
@@ -68,7 +68,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request resource" do
-    @expected.subject = "A SEEK member requested a protected file: Picture"
+    @expected.subject = "A Sysmo SEEK member requested a protected file: Picture"
     @expected.to = ["Datafile Owner <data_file_owner@email.com>","OwnerOf MyFirstSop <owner@sop.com>"]
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
@@ -84,7 +84,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request resource no details" do
-    @expected.subject = "A SEEK member requested a protected file: Picture"
+    @expected.subject = "A Sysmo SEEK member requested a protected file: Picture"
     #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
     @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
     @expected.from = "no-reply@sysmo-db.org"
@@ -106,7 +106,7 @@ class MailerTest < ActionMailer::TestCase
     resources = [Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture"),Factory(:teusink_model,:projects=>gatekeeper.projects,:title=>"Teusink")]
     requester=Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle").user
 
-    @expected.subject = "A SEEK member requested your approval to publish some items."
+    @expected.subject = "A Sysmo SEEK member requested your approval to publish some items."
 
     @expected.to = gatekeeper.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
@@ -128,7 +128,7 @@ class MailerTest < ActionMailer::TestCase
 
   test "request publishing" do
 
-    @expected.subject = "A SEEK member requests you make some items public"
+    @expected.subject = "A Sysmo SEEK member requests you make some items public"
     @expected.to = "Datafile Owner <data_file_owner@email.com>"
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
@@ -149,7 +149,7 @@ class MailerTest < ActionMailer::TestCase
     item = Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture")
     items_and_comments = [{:item => item, :comment => nil}]
     requester = Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle")
-    @expected.subject = "A SEEK gatekeeper approved your publishing requests."
+    @expected.subject = "A Sysmo SEEK gatekeeper approved your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
@@ -170,7 +170,7 @@ class MailerTest < ActionMailer::TestCase
     items_and_comments = [{:item => item, :comment => 'not ready'}]
 
     requester = Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle")
-    @expected.subject = "A SEEK gatekeeper rejected your publishing requests."
+    @expected.subject = "A Sysmo SEEK gatekeeper rejected your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
@@ -188,7 +188,7 @@ class MailerTest < ActionMailer::TestCase
 
 
   test "forgot_password" do
-    @expected.subject = 'SEEK - Password reset'
+    @expected.subject = 'Sysmo SEEK - Password reset'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
 
@@ -205,7 +205,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "contact_admin_new_user" do
-    @expected.subject = 'SEEK member signed up'
+    @expected.subject = 'Sysmo SEEK member signed up'
     @expected.to =  "Quentin Jones <quentin@email.com>"
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
@@ -218,7 +218,7 @@ class MailerTest < ActionMailer::TestCase
 
   test "contact_project_manager_new_user" do
     project_manager = Factory(:project_manager)
-    @expected.subject = 'SEEK member signed up, please assign this person to the projects of which you are project manager'
+    @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are project manager'
     @expected.to = project_manager.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
@@ -233,7 +233,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "welcome" do
-    @expected.subject = 'Welcome to SEEK'
+    @expected.subject = 'Welcome to Sysmo SEEK'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     
@@ -244,7 +244,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "test mail" do
-    with_config_value(:application_title,"SEEK EMAIL TEST") do
+    with_config_value(:application_name,"SEEK EMAIL TEST") do
       with_config_value(:site_base_host,"http://fred.com") do
         email = Mailer.test_email("fred@email.com")
         assert_not_nil email

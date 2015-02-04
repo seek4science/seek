@@ -223,24 +223,17 @@ end
   test 'project_long_name' do
     assert_equal 'Sysmo Consortium', Seek::Config.project_long_name
   end
-  test 'project_title' do
-    assert_equal 'The Sysmo Consortium', Seek::Config.project_title
-  end
   test 'dm_project_name' do
     assert_equal 'SysMO-DB', Seek::Config.dm_project_name
   end
-  test 'dm_project_title' do
-    assert_equal 'The Sysmo Consortium', Seek::Config.dm_project_title
-  end
+
   test 'dm_project_link' do
     assert_equal 'http://www.sysmo-db.org', Seek::Config.dm_project_link
   end
   test 'application_name' do
-    assert_equal 'SEEK', Seek::Config.application_name
+    assert_equal 'Sysmo SEEK', Seek::Config.application_name
   end
-  test 'application_title' do
-    assert_equal 'The Sysmo SEEK', Seek::Config.application_title
-  end
+
   test 'header_image_enabled' do
     assert_equal true, Seek::Config.header_image_enabled
   end

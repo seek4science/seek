@@ -129,15 +129,12 @@ class AdminsController < ApplicationController
     Seek::Config.project_name = params[:project_name]
     Seek::Config.project_type = params[:project_type]
     Seek::Config.project_link = params[:project_link]
-    Seek::Config.project_title = params[:project_title]
     Seek::Config.project_long_name = params[:project_long_name]
 
     Seek::Config.dm_project_name = params[:dm_project_name]
-    Seek::Config.dm_project_title = params[:dm_project_title]
     Seek::Config.dm_project_link = params[:dm_project_link]
 
     Seek::Config.application_name = params[:application_name]
-    Seek::Config.application_title = params[:application_title]
 
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
     Seek::Config.header_image_link = params[:header_image_link]
@@ -210,6 +207,8 @@ class AdminsController < ApplicationController
       begin
         Seek::Workers.restart
         wait_for_delayed_job_to_start
+      rescue  SystemExit => e
+        Rails.logger.info("Exit code #{e.status}")
       rescue => e
         error = e.message
         if Seek::Config.exception_notification_enabled
@@ -343,16 +342,16 @@ class AdminsController < ApplicationController
     collection = []
     action = nil
     title = nil
+    extra_options = {}
     @page = params[:id]
     case @page
       when 'invalid_users_profiles'
         partial = 'invalid_user_stats_list'
         invalid_users = {}
         pal_role = ProjectRole.pal_role
-        invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal? != p.project_roles.include?(pal_role) }
+        invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal_of_any_project? != p.project_roles.include?(pal_role) }
         invalid_users[:duplicates] = Person.duplicates
         invalid_users[:no_person] = User.without_profile
-        invalid_users[:no_user] = Person.userless_people
         collection = invalid_users
       when 'users_requiring_activation'
         partial = 'user_stats_list'
@@ -363,6 +362,11 @@ class AdminsController < ApplicationController
         partial = 'user_stats_list'
         collection = Person.without_group.registered
         title = "Users are not in a #{Seek::Config.project_name} #{t('project')}"
+      when "profiles_without_users"
+        partial = "user_stats_list"
+        collection = Person.userless_people
+        title = "Profiles that have no associated user"
+        extra_options = {:action=>"delete",:bulk_delete=>false}
       when 'pals'
         partial = 'user_stats_list'
         collection = Person.pals
@@ -376,7 +380,8 @@ class AdminsController < ApplicationController
       if partial == "none"
         format.html { render :text=>"" }
       else
-        format.html { render :partial => partial, :locals => {:collection => collection, :action => action, :title => title} }
+        locals = {:collection => collection, :action => action, :title => title}.merge(extra_options)
+        format.html { render :partial => partial, :locals => locals }
       end
     end
   end

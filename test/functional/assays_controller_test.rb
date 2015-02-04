@@ -77,7 +77,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select "title", :text=>/#{Seek::Config.application_title} #{I18n.t('assays.assay')}s.*/i, :count=>1
+    assert_select "title", :text=>/#{Seek::Config.application_name} #{I18n.t('assays.assay')}s.*/i, :count=>1
   end
 
   test "should show index" do
