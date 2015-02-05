@@ -66,6 +66,12 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert !blob.is_webpage?
   end
 
+  test "content type for url type with binary doesn't try read file" do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://webpage.com/binary-file",{'Content-Type' => 'application/octet-stream'},500
+    blob = ContentBlob.create :url=>"http://webpage.com/binary-file",:original_filename=>nil,:content_type=>'application/octet-stream'
+    assert_equal 'application/octet-stream',blob.content_type
+  end
+
   def test_cache_key
     blob=Factory :rightfield_content_blob
     assert_equal "content_blobs/#{blob.id}-01788bca93265d80e8127ca0039bb69b",blob.cache_key
@@ -287,7 +293,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     content_blob = Factory(:content_blob, :content_type => "application/msexcel")
     assert_equal "Spreadsheet",content_blob.human_content_type
 
-    content_blob = Factory(:pdf_content_blob, :content_type => "application/octet-stream")
+    content_blob = Factory.create(:pdf_content_blob, :content_type => "application/pdf")
     assert_equal "PDF document",content_blob.human_content_type
 
     content_blob = Factory(:content_blob, :content_type => "text/html")
@@ -307,9 +313,18 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   end
 
-  test "pdf file without 'application/pdf' content_type is also pdf" do
-    pdf_content_blob = Factory(:pdf_content_blob, :content_type => "application/octet-stream")
-    assert pdf_content_blob.is_pdf?
+  test "mimemagic updates content type on creation if binary" do
+    tmp_blob = Factory(:pdf_content_blob) #to get the filepath
+    content_blob = ContentBlob.create :data => File.new(tmp_blob.filepath,"rb").read,:original_filename=>"blob",:content_type=>'application/octet-stream'
+    assert_equal 'application/pdf',content_blob.content_type
+    assert content_blob.is_pdf?
+  end
+
+  test "is_binary?" do
+    content_blob = Factory(:pdf_content_blob)
+    refute content_blob.is_binary?
+    content_blob = Factory(:binary_content_blob)
+    assert content_blob.is_binary?
   end
 
   test 'covert_office should doc to pdf and then docslit convert pdf to txt' do

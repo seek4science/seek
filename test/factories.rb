@@ -718,6 +718,12 @@ end
     f.original_filename "file_with_no_extension"
   end
 
+  Factory.define(:binary_content_blob,:parent=>:content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/little_file.txt", "rb").read
+    f.content_type 'application/octet-stream'
+    f.original_filename "binary.bin"
+  end
+
   Factory.define(:activity_log) do |f|
     f.action "create"
     f.association :activity_loggable, :factory => :data_file

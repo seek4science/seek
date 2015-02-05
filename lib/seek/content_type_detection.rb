@@ -29,6 +29,10 @@ module Seek
       mime_extensions(blob.content_type).include?("xls")
     end
 
+    def is_binary? blob=self
+      blob.content_type == 'application/octet-stream'
+    end
+
     def is_jws_dat? blob=self
       check_content blob,"begin name",25000
     end

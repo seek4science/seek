@@ -30,7 +30,7 @@ class ContentBlob < ActiveRecord::Base
 
   before_save :check_version
   
-  before_create :check_content_type
+  before_create :update_content_mime_type
 
   has_many :worksheets, dependent: :destroy
 
@@ -77,26 +77,14 @@ class ContentBlob < ActiveRecord::Base
     temp_path
   end
 
-  def original_content_type
-    read_attribute(:content_type)
-  end
-
-  def is_binary_file?
-    original_content_type == 'application/octet-stream'
-  end
-
-  def content_type
-    is_binary_file? ? find_or_keep_type_with_mime_magic : original_content_type
-  end
-
   def unknown_file_type?
     human_content_type == 'Unknown file type'
   end
 
   def find_or_keep_type_with_mime_magic
     mime = MimeMagic.by_extension(file_extension)
-    mime ||= MimeMagic.by_magic(File.open filepath)
-    mime.try(:type) || original_content_type
+    mime ||= MimeMagic.by_magic(File.open filepath) if file_exists?
+    mime.try(:type) || content_type
   end
 
   def human_content_type
@@ -221,15 +209,16 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
-  private
-
-  def check_content_type
+  def update_content_mime_type
     if url
       set_content_type_according_to_url
-    elsif unknown_file_type? && file_exists?
+    elsif (is_binary? || unknown_file_type?) && file_exists?
       set_content_type_according_to_file
     end
   end
+
+  private
+
 
   def set_content_type_according_to_file
     self.content_type = find_or_keep_type_with_mime_magic
