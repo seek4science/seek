@@ -95,7 +95,7 @@ class ContentBlob < ActiveRecord::Base
 
   def find_or_keep_type_with_mime_magic
     mime = MimeMagic.by_extension(file_extension)
-    mime ||= MimeMagic.by_magic(File.open filepath)
+    mime ||= MimeMagic.by_magic(File.open filepath) if file_exists?
     mime.try(:type) || original_content_type
   end
 
