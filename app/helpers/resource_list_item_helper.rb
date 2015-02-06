@@ -148,10 +148,12 @@ module ResourceListItemHelper
   end
 
   def list_item_description text, auto_link=true, length=500
-    html = "<div class='well well-sm list_item_desc'>"
-    html << text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
-    html << "</div>"
-    html.html_safe
+    unless text.blank?
+      html = "<div class='well well-sm list_item_desc'>"
+      html << text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
+      html << "</div>"
+      html.html_safe
+    end
   end
 
   def small_list_item_description text, auto_link=true, length=150
@@ -230,7 +232,7 @@ module ResourceListItemHelper
     html << contributors.map { |c| link_to truncate(c.title, :length => 75), show_resource_path(c), :title => get_object_title(c) }.join(', ')
     unless other_contributors.blank?
       html << ', ' unless contributors.empty?
-      html << other_contributors
+      html << h(other_contributors)
     end
     html << "None" if contributor_count == 0
     html << "</p>"

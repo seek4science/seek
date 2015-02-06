@@ -2,6 +2,8 @@ require 'test_helper'
 
 class WorkflowsControllerTest < ActionController::TestCase
 
+  fixtures :workflow_input_port_types, :workflow_output_port_types, :workflow_categories
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
 
@@ -26,14 +28,16 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test "extracts metadata on create" do
-    #MERGENOTE - this is currently failing, but only on travis. Skipping for now to revisit later once everything else is coming together.
-    skip("Revisit this later")
+    wf_param = {:title => "A workflow", :project_ids=>[@project.id]}
+    cblob_param = {:data => ActionDispatch::Http::UploadedFile.new({
+                                                                       :filename => 'hello_anyone_3_inputs.t2flow',
+                                                                       :content_type => nil,
+                                                                       :tempfile => fixture_file_upload('files/hello_anyone_3_inputs.t2flow')
+                                                                   })
+    }
     assert_difference("Workflow.count") do
-      wf_param = {:title => "A workflow", :data=>fixture_file_upload('files/hello_anyone_3_inputs.t2flow'), :project_ids=>[@project.id]}
-      post :create, :workflow => wf_param, :sharing=>valid_sharing
+      post :create, :workflow => wf_param, :content_blob => cblob_param, :sharing=>valid_sharing
     end
-
-    puts assigns(:workflow).errors.full_messages
 
     assert_equal 3, assigns(:workflow).input_ports.size
     assert_equal 'Hello Anyone With 3 Inputs', assigns(:workflow).title
