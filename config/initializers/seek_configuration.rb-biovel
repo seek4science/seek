@@ -84,7 +84,6 @@ SEEK::Application.configure do
   Seek::Config.default :header_image_enabled,false
   Seek::Config.default :header_image_title, "BioVeL"
   Seek::Config.default :header_image_link,"http://www.biovel.eu"
-  Seek::Config.default :header_image,'biovel-logo-official.png'
   Seek::Config.default :header_home_logo_image,'seek-logo-smaller.png'
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'

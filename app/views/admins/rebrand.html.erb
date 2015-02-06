@@ -38,20 +38,15 @@
 
 
         <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Whether a header image appears on the right in the header.",
-            :name=>"Header image enabled",
+            :description=>"Whether a header logo image appears on the right in the header.",
+            :name=>"Header logo image enabled",
             :field=>check_box_tag(:header_image_enabled, 1, Seek::Config.header_image_enabled,:onchange=>toggle_appear_javascript('header_image_details'))
          } -%>
 
         <ul class="settings" id="header_image_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.header_image_enabled -%>">
           <%= render :partial => 'setting_li', :locals => {
-                  :description => "The file for the header image.",
-                  :name => "Current header image file",
-                  :field => text_field_tag(:header_image, Seek::Config.header_image, :disabled => true)
-          } -%>
-          <%= render :partial => 'setting_li', :locals => {
-                  :description => "The file for the header image.",
-                  :name => "Upload a header image file",
+                  :description => "The file for the header logo image. It should be a valid image file, such as JPEG or PNG",
+                  :name => "Upload a header logo image file",
                   :field => file_field_tag(:header_image_file)
           } -%>
           <%= render :partial => 'setting_li', :locals => {

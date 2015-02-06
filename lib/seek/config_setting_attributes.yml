@@ -17,8 +17,6 @@ smtp:
 default_pages:
 project_type:
 project_link:
-header_image_enabled:
-header_image:
 type_managers_enabled:
 type_managers:
 pubmed_api_email:
@@ -35,8 +33,8 @@ dm_project_link:
 header_image_link:
 header_image_title:
 header_image_enabled:
-header_image_link:
-header_image_title:
+header_home_logo_image:
+header_image_avatar_id:
 google_analytics_enabled:
 google_analytics_tracker_id:
 piwik_analytics_url:
@@ -103,8 +101,6 @@ assay_type_base_uri:
 technology_type_base_uri:
 modelling_analysis_type_base_uri:
 header_tagline_text_enabled:
-header_home_logo_image:
-header_image_avatar_id:
 related_items_limit:
 faceted_browsing_enabled:
 facet_enable_for_pages:

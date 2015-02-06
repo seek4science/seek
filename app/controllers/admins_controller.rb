@@ -428,10 +428,15 @@ class AdminsController < ApplicationController
   end
 
   def header_image_file
-    file_io = params[:header_image_file]
-    avatar = Avatar.new(:original_filename=>file_io.original_filename,:image_file=>file_io)
-    avatar.save!
-    Seek::Config.header_image_avatar_id = avatar.id
+    if params[:header_image_file]
+      file_io = params[:header_image_file]
+      avatar = Avatar.new(:original_filename=>file_io.original_filename,:image_file=>file_io)
+      if avatar.save
+        Seek::Config.header_image_avatar_id = avatar.id
+      else
+        flash[:error]="There was an error updating the header image logo! There could be a problem with the image file. Please try again or try another image."
+      end
+    end
   end
 
   private
