@@ -8,7 +8,6 @@ require 'rest-client'
 class ContentBlob < ActiveRecord::Base
   include Seek::ContentTypeDetection
   include Seek::PdfExtraction
-  include Seek::MimeTypes
 
   belongs_to :asset, polymorphic: true
 
@@ -29,8 +28,6 @@ class ContentBlob < ActiveRecord::Base
   before_save :calculate_md5
 
   before_save :check_version
-  
-  before_create :check_content_type
 
   has_many :worksheets, dependent: :destroy
 
@@ -77,32 +74,6 @@ class ContentBlob < ActiveRecord::Base
     temp_path
   end
 
-  def original_content_type
-    read_attribute(:content_type)
-  end
-
-  def is_binary_file?
-    original_content_type == 'application/octet-stream'
-  end
-
-  def content_type
-    is_binary_file? ? find_or_keep_type_with_mime_magic : original_content_type
-  end
-
-  def unknown_file_type?
-    human_content_type == 'Unknown file type'
-  end
-
-  def find_or_keep_type_with_mime_magic
-    mime = MimeMagic.by_extension(file_extension)
-    mime ||= MimeMagic.by_magic(File.open filepath)
-    mime.try(:type) || original_content_type
-  end
-
-  def human_content_type
-    mime_nice_name(content_type)
-  end
-
   def check_version
     if asset_version.nil? && !asset.nil?
       self.asset_version = asset.version
@@ -116,9 +87,6 @@ class ContentBlob < ActiveRecord::Base
     !url.blank? && show_as_link
   end
   # include all image types
-  def is_image?
-    content_type ? content_type.index('image') == 0 : false
-  end
 
   def md5sum
     if super.nil?
@@ -222,30 +190,6 @@ class ContentBlob < ActiveRecord::Base
   end
 
   private
-
-  def check_content_type
-    if url
-      set_content_type_according_to_url
-    elsif unknown_file_type? && file_exists?
-      set_content_type_according_to_file
-    end
-  end
-
-  def set_content_type_according_to_file
-    self.content_type = find_or_keep_type_with_mime_magic
-  end
-
-  def set_content_type_according_to_url
-    type = retrieve_content_type_from_url
-    if type == 'text/html'
-      self.is_webpage = true
-      self.content_type = type
-    end
-    self.content_type = type if unknown_file_type?
-  rescue => exception
-    self.is_webpage = false
-    Rails.logger.warn("There was a problem reading the headers for the URL of the content blob = #{url}")
-  end
 
   def retrieve_content_type_from_url
     response = RestClient.head url
