@@ -121,8 +121,8 @@ class AdminsController < ApplicationController
 
   def rebrand
     respond_to do |format|
-    format.html
-  end
+      format.html
+    end
   end
 
   def update_rebrand
@@ -429,19 +429,9 @@ class AdminsController < ApplicationController
 
   def header_image_file
     file_io = params[:header_image_file]
-    location = Seek::Config.rebranding_filestore_path
-    if file_io
-      unless File.exist?(location)
-        FileUtils.mkdir_p(location)
-      end
-      filename = file_io.original_filename
-      file_path = File.join(location,filename)
-      File.open(file_path, 'wb') do |file|
-        file.write(file_io.read)
-      end
-
-      Seek::Config.header_image = view_context.public_header_image_url(filename)
-    end
+    avatar = Avatar.new(:original_filename=>file_io.original_filename,:image_file=>file_io)
+    avatar.save!
+    Seek::Config.header_image_avatar_id = avatar.id
   end
 
   private

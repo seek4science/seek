@@ -17,8 +17,7 @@ logged_in_class = logged_in_and_registered? ? "class=logged_in" : ""
 
       <li id="image_block" <%= logged_in_class -%>>
             <% if Seek::Config.header_image_enabled %>
-            <% image_filename = Seek::Config.header_image.split('logos/').last%>
-                <%= link_to image_tag(public_header_image_url(image_filename), :alt => Seek::Config.header_image_link, :title => Seek::Config.header_image_title),Seek::Config.header_image_link,:class=>"logo_link" %>
+                <%= header_logo_image %>
             <% end %>
       </li>
     </ul>

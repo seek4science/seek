@@ -148,6 +148,14 @@ module ImagesHelper
     image_tag icon_filename_for_key("collapse_minus"),:size=>size,:alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
   end
 
+  def header_logo_image
+    if Seek::Config.header_image_avatar_id && avatar=Avatar.find_by_id(Seek::Config.header_image_avatar_id)
+      image_tag(avatar.public_asset_url)
+    else
+      image('header_image_default')
+    end
+  end
+
 
   
 end

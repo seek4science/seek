@@ -16,7 +16,7 @@ class Avatar < ActiveRecord::Base
   end
   acts_as_fleximage_extension
 
-  validates_presence_of :owner
+  #validates_presence_of :owner
 
   belongs_to :owner,
              polymorphic: true

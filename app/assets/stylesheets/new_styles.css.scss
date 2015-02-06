@@ -27,6 +27,10 @@ body {
   margin-right: 1em;
 }
 
+.logo_link > img {
+  max-height: 70px;
+}
+
 .front-page-panel {
   max-height: 280px;
   overflow-y: auto;
