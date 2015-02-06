@@ -1,15 +1,17 @@
 <%= index_title(@category.nil? ? "Workflows" : "#{@category.name} Workflows") -%>
 
 <% if logged_in? and current_user.person.member? and !current_user.guest?%>
-    <ul class="sectionIcons">
-        <li><%= image_tag_for_key "new", new_workflow_path(:category_id => params[:category_id]), nil, nil, 'Upload a workflow' %></li>
-    </ul>
+    <%= button_link_to 'Upload a workflow', "new", new_workflow_path(:category_id => params[:category_id]) %>
 <% end %>
 
-<%= render :partial => 'search' %>
-
-<%= render :partial => 'filters' %>
-
-<%= render :partial => "workflow_list", :locals => { :collection => @workflows,
-                                                     :authorization_for_showing_already_done=>true,
-                                                     :show_category => @category.nil? } %>
+<div class="text-right-sm"><%= render :partial => 'search' %></div>
+<div class="row">
+  <div class="col-sm-3">
+    <%= render :partial => 'filters' %>
+  </div>
+  <div class="col-sm-9">
+    <%= render :partial => "workflow_list", :locals => { :collection => @workflows,
+                                                         :authorization_for_showing_already_done=>true,
+                                                         :show_category => @category.nil? } %>
+  </div>
+</div>

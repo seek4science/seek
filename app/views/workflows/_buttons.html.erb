@@ -1,58 +1,53 @@
 <!-- Run workflow button -->
-<% if workflow.can_run? %>
-  <li>
-    <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow, :version => display_workflow.version), nil, nil, 'Run workflow') -%>
-  </li>
+<% if item.can_run? %>
+    <%= button_link_to('Run workflow','run_workflow', taverna_player.new_run_path(:workflow_id => item, :version => version)) -%>
 <% end %>
 
 <!-- Run new data sweep button - only if there is at least on data port to sweep over and a real user is logged in. -->
-<% if display_workflow.sweepable? && !current_user.guest? %>
-  <li>
-      <%= image_tag_for_key('sweep', new_sweep_path(:workflow_id => workflow.id, :version=>display_workflow.version), nil, nil, 'Run data sweep')  -%>
-  </li>
+<% if @display_workflow.sweepable? && !current_user.guest? %>
+    <%= button_link_to('Run data sweep', 'sweep', new_sweep_path(:workflow_id => item.id, :version=>version)) -%>
 <% end %>
 
 <!-- Download button -->
-<% if display_workflow.contains_downloadable_items? && display_workflow.is_downloadable? -%>
+<% if @display_workflow.contains_downloadable_items? && @display_workflow.is_downloadable? -%>
     <%# param code is used for temporary link -%>
-    <% if can_download_asset?(workflow, params[:code]) -%>
+    <% if can_download_asset?(item, params[:code]) -%>
         <%
-           path = polymorphic_path(workflow,:version=>display_workflow.version,:action=>:download,:code=>params[:code])
+           path = polymorphic_path(item,:version=>version,:action=>:download,:code=>params[:code])
         %>
-        <li>
-          <%= image_tag_for_key('download', path, nil, nil, 'Download workflow') -%>
-        </li>
+        <%= button_link_to('Download workflow', 'download', path)  -%>
     <% end -%>
 <% end -%>
 
 <!-- Favourite workflow button -->
 <% if logged_in? %>
-  <% if Favourite.exists?(:user_id => current_user.id, :resource_type => 'Workflow', :resource_id => workflow.id) %>
-    <li><%= image_tag_for_key('destroy', favourite_delete_workflow_path(workflow), nil, {:method=>:delete}, "Remove from Favourites") -%></li>
-  <% else %>
-    <li><%= image_tag_for_key('favourite', favourite_workflow_path(workflow), nil, {:method=>:post}, "Add to Favourites") -%></li>
-  <% end %>
+    <% if Favourite.exists?(:user_id => current_user.id, :resource_type => 'Workflow', :resource_id => item.id) %>
+        <%= button_link_to("Remove from Favourites", 'destroy', favourite_delete_workflow_path(item), {:method=>:delete}) -%>
+    <% else %>
+        <%= button_link_to("Add to Favourites", 'favourite', favourite_workflow_path(item), {:method=>:post}) -%>
+    <% end %>
 <% end %>
 
-<% if display_workflow.latest_version? %>
-  <!-- Manage button -->
-  <% if workflow.can_manage? && !current_user.guest? -%>
-      <li><%= image_tag_for_key('manage', edit_workflow_path(workflow), nil, nil, 'Manage workflow') -%></li>
-      <% if workflow.is_any_doi_minted?  -%>
-          <li><%= link_to_function image("new")+" Upload new version", "javascript:alert('After DOI is generated, uploading new version is not possible')", :class=>"disabled" -%></li>
-      <% else %>
-          <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
-      <% end %>
-  <% end -%>
+<%= admin_dropdown do %>
+    <% if version == item.version %>
+        <!-- Manage button -->
+        <% if item.can_manage? && !current_user.guest? -%>
+            <li><%= image_tag_for_key('manage', edit_workflow_path(item), nil, nil, 'Manage item') -%></li>
+            <% if item.is_any_doi_minted?  -%>
+                <li><%= link_to_function image("new")+" Upload new version", "javascript:alert('After DOI is generated, uploading new version is not possible')", :class=>"disabled" -%></li>
+            <% else %>
+                <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
+            <% end %>
+        <% end -%>
 
-  <!-- Publish button -->
+        <!-- Publish button -->
 
-  <% if workflow.is_in_isa_publishable? && workflow.can_publish? -%>
-      <li><%= image_tag_for_key('publish', polymorphic_path(workflow, :action => :check_related_items), nil, {:method=>:post}, "Publish #{human_name}") -%></li>
-  <% end %>
-<% end -%>
+        <% if item.is_in_isa_publishable? && item.can_publish? -%>
+            <li><%= image_tag_for_key('publish', polymorphic_path(item, :action => :check_related_items), nil, {:method=>:post}, "Publish ") -%></li>
+        <% end %>
+    <% end -%>
 
-<% if workflow.is_doiable?(display_workflow.version) %>
-    <li><%= image_tag_for_key('doi', polymorphic_path(workflow, :action => 'mint_doi_confirm', :version => display_workflow.version), nil, {}, "Generate a DOI") -%></li>
+    <% if item.is_doiable?(version) %>
+        <li><%= image_tag_for_key('doi', polymorphic_path(item, :action => 'mint_doi_confirm', :version => version), nil, {}, "Generate a DOI") -%></li>
+    <% end %>
 <% end %>
-
