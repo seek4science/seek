@@ -12,6 +12,7 @@ namespace :seek do
   task :upgrade_version_tasks => [
       :environment,
       :update_admin_assigned_roles,
+      :update_content_types,
       :repopulate_missing_publication_book_titles,
       :resynchronise_ontology_types,
       :convert_publication_authors,
@@ -35,6 +36,13 @@ namespace :seek do
     end
 
     puts "Upgrade completed successfully"
+  end
+
+  task(:update_content_types=>:environment) do
+    ContentBlob.all.each do |blob|
+      blob.update_content_mime_type
+      blob.save if blob.changed?
+    end
   end
 
   task(:convert_publication_authors => :environment) do
