@@ -40,6 +40,30 @@ same pattern. Upgrading to version 0.18 is an exception and involves some additi
 only be necessary to run <em>bundle install</em> and the <em>db:migrate</em> rake task. Using seek:upgrade should still work, but could take a lot of unnecessary time. There is more details and
 an example towards the end of the this page.
 
+== Steps to upgrade from 0.21.x to 0.22.x
+
+    export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
+
+    bundle exec ./script/delayed_job stop
+    bundle exec rake sunspot:solr:stop
+
+#if using rvm do:
+    rvm get stable
+    rvm install ruby-2.1.5
+
+#from this version, we use git version control and move the hosting place to github
+
+    git pull https://github.com/seek4science/seek.git
+    git checkout v.0.22.0
+    cd .. && cd seek #this is to allow RVM to pick up the ruby and gemset changes
+    bundle install --deployment
+    bundle exec rake seek:upgrade
+    bundle exec rake seek:workers:start
+    bundle exec rake sunspot:solr:start
+    bundle exec rake assets:precompile # this task will take a while
+    touch tmp/restart.txt
+    bundle exec rake tmp:clear
+
 == Steps to upgrade from 0.20.x to 0.21.x
 
     export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
