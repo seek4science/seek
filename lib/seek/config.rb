@@ -6,19 +6,15 @@ module Seek
   module Fallbacks
     # fallback attributes
     def project_long_name_fallback
-      "#{project_name} #{project_type}"
-    end
-
-    def project_title_fallback
-      project_long_name
+      if project_type.blank?
+        "#{project_name}"
+      else
+        "#{project_name} #{project_type}"
+      end
     end
 
     def dm_project_name_fallback
       project_name
-    end
-
-    def dm_project_title_fallback
-      project_title
     end
 
     def dm_project_link_fallback
@@ -27,10 +23,6 @@ module Seek
 
     def application_name_fallback
       "#{project_name} SEEK"
-    end
-
-    def application_title_fallback
-      application_name_fallback
     end
 
     def header_image_link_fallback
@@ -82,7 +74,7 @@ module Seek
       end
     end
 
-    def application_title_propagate
+    def application_name_propagate
       # required to update error message title
       exception_notification_enabled_propagate
     end
@@ -126,7 +118,7 @@ module Seek
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
           email: {
             sender_address: [noreply_sender],
-            email_prefix: "[ #{application_title} ERROR ] ",
+            email_prefix: "[ #{application_name} ERROR ] ",
             exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(%r{[, ]})
           }
       else

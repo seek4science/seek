@@ -17,24 +17,15 @@ module Seek
         commands << "--queue=#{TavernaPlayer.job_queue_name} -n #{number} #{action}"
       end
 
-      begin
-        commands.map { |c| Delayed::Command.new(c.split).daemonize }
-      rescue SystemExit
-      end
+      commands.map { |c| Delayed::Command.new(c.split).daemonize }
     end
 
     def self.stop
-      begin
-        Delayed::Command.new(["stop"]).daemonize
-      rescue SystemExit
-      end
+      Delayed::Command.new(["stop"]).daemonize
     end
 
     def self.status
-      begin
-        Delayed::Command.new(["status"]).daemonize
-      rescue SystemExit
-      end
+      Delayed::Command.new(["status"]).daemonize
     end
 
     def self.restart number=0

@@ -4,9 +4,7 @@ SEEK::Application.configure do
     silence_warnings do
       Settings.defaults[:is_virtualliver] = false
       Settings.defaults[:project_hierarchy_enabled] = true
-      Settings.defaults[:application_title] = 'The Sysmo SEEK'
       Settings.defaults[:project_name] = 'Sysmo'
-      Settings.defaults[:project_title] = 'The Sysmo Consortium'
 
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
       Settings.defaults[:support_email_address] = 'support@seek.org'
@@ -43,7 +41,7 @@ SEEK::Application.configure do
       Settings.defaults[:tabs_lazy_load_enabled] = false
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
-      Settings.defaults[:application_name] = 'SEEK'
+      Settings.defaults[:application_name] = 'Sysmo SEEK'
       Settings.defaults[:dm_project_name] = "SysMO-DB"
       Settings.defaults[:dm_project_link] = "http://www.sysmo-db.org"
       Settings.defaults[:project_type] = 'Consortium'

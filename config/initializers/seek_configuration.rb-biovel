@@ -76,11 +76,9 @@ SEEK::Application.configure do
 # Branding
   Seek::Config.default :project_name,'BioVeL'
   Seek::Config.default :project_type,'Project'
-  Seek::Config.default :project_title,'The BioVeL Project'
   Seek::Config.default :project_link,'http://www.biovel.eu'
 
   Seek::Config.default :application_name,"BioVeL Portal"
-  Seek::Config.default :application_title,"BioVeL Portal"
   Seek::Config.default :dm_project_name,"BioVeL"
   Seek::Config.default :dm_project_link,"http://www.biovel.eu"
   Seek::Config.default :header_image_enabled,false
