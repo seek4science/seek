@@ -51,7 +51,7 @@ an example towards the end of the this page.
     rvm get stable
     rvm install ruby-2.1.5
 
-#from this version, we use git version control and move the hosting place to github
+#then:
 
     git pull https://github.com/seek4science/seek.git
     git checkout v.0.22.0
