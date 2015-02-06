@@ -68,9 +68,9 @@ if you already had RVM installed, bring it up to date with:
 
   rvm get stable
 
-now install Ruby 2.1.3
+now install Ruby 2.1.5
 
-  rvm install ruby-2.1.3
+  rvm install ruby-2.1.5
 
 you may be asked for your password so that some additional packages can be installed. You will then need to wait for Ruby to be downloaded and compiled.
 
@@ -84,11 +84,11 @@ To create the gemset run:
 
 == Getting SEEK
 
-Now you are ready for installing SEEK. To fetch the latest version of SEEK <em>(v0.21.0)</em> change to the directory you want to install it and then run:
+Now you are ready for installing SEEK. To fetch the latest version of SEEK <em>(v0.22.0)</em> change to the directory you want to install it and then run:
 
   git clone https://github.com/seek4science/seek.git
   cd seek/
-  git checkout tags/v0.21.0
+  git checkout v0.22.0
 
 Now to install the ruby gems SEEK needs:
 
