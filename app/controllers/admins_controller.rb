@@ -430,7 +430,7 @@ class AdminsController < ApplicationController
   def header_image_file
     if params[:header_image_file]
       file_io = params[:header_image_file]
-      avatar = Avatar.new(:original_filename=>file_io.original_filename,:image_file=>file_io)
+      avatar = Avatar.new(:original_filename=>file_io.original_filename,:image_file=>file_io,:skip_owner_validation=>true)
       if avatar.save
         Seek::Config.header_image_avatar_id = avatar.id
       else
