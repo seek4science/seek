@@ -221,3 +221,10 @@ h1 div.version a.dropdown-toggle {
 ul.no-icon {
   list-style: none;
 }
+
+div.hidden_list_item {
+  margin-top: 6px;
+  padding: 1em;
+  color: #999;
+  @include rounded-box-shadow(#F5F5F5);
+}
