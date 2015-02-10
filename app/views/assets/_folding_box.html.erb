@@ -1,12 +1,6 @@
 <% hidden ||= false
    contents ||= nil %>
-<div id="<%= fold_id %>" class="fold">
 
-  <div class="foldTitle">
-    <%= fold_title %>
-  </div>
-
-  <div id="<%= fold_id %>_fold_content" class="foldContent" style="display:<%=hidden ? "none" : "block;" %>">
-      <%= contents || yield %>
-  </div>
- </div>
+<%= folding_panel(fold_title, hidden, :id => fold_id) do %>
+  <%= contents || yield %>
+<% end %>
