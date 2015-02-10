@@ -1,12 +1,12 @@
-<% resource_type=resource_type.underscore.humanize -%>
+<% resource_type=resource_type.underscore.humanize
+   all_publications=authorised_publications.sort_by(&:title)
+   project_publications=authorised_publications(current_user.person.projects).sort_by &:title
+   select_truncate_length=120
+   show_relationships=false
+%>
 <%= folding_panel('Publications', related_publications.blank?, :body_options => {:id => 'publications_fold_content'},
                   :help_text => "Here you attribute this #{resource_type} to any Publications registered in SEEK, or vice versa.") do %>
         <div class="yui-u first" style="width:66%; float:left">
-            <%
-            all_publications=authorised_publications.sort_by(&:title)
-            project_publications=authorised_publications(current_user.person.projects).sort_by &:title
-            select_truncate_length=120
-            show_relationships=false -%>
             <p class="pale_text">
                 The following Publications are related to this <%= resource_type -%>:
             </p>
