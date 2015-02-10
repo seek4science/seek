@@ -10,7 +10,29 @@ module BootstrapHelper
     icon_link_to(text, icon, url, options)
   end
 
+  def folding_panel(title = nil, collapsed = false, options = {})
+    options = options.merge(:collapsible => true, :collapsed => collapsed)
+    panel(title, options) do
+      yield
+    end
+  end
+
   def panel(title = nil, options = {})
+    collapsible = options.delete(:collapsible)
+    collapse_options = {}
+
+    if collapsible
+      collapsed = options.delete(:collapsed)
+      options[:heading_options] = merge_options({:class => 'clickable collapsible', 'data-toggle' => 'collapse-next'}, options[:heading_options])
+      collapse_options = {:class => 'panel-collapse collapse', 'aria-expanded' => true}
+      if collapsed
+        options[:heading_options][:class] += ' collapsed'
+        collapse_options['aria-expanded'] = false
+      else
+        collapse_options[:class] += ' in'
+      end
+    end
+
     heading_options = merge_options({:class => 'panel-heading'}, options.delete(:heading_options))
     body_options = merge_options({:class => 'panel-body'}, options.delete(:body_options))
     options = merge_options({:class => "panel #{options[:type] || 'panel-default'}"}, options)
@@ -18,14 +40,24 @@ module BootstrapHelper
     content_tag(:div, options) do
       if title
         content_tag(:div, heading_options) do
-          help_icon_html = ""
+          title_html = ""
           unless (help_text = options.delete(:help_text)).nil?
-            help_icon_html = help_icon(help_text) + " "
+            title_html << help_icon(help_text) + " "
           end
-          "#{help_icon_html}#{title}".html_safe
+          title_html << title
+          title_html << ' <span class="caret"></span>' if collapsible
+          title_html.html_safe
         end +
-        content_tag(:div, body_options) do
-          yield
+        if collapsible
+          content_tag(:div, collapse_options) do
+            content_tag(:div, body_options) do
+              yield
+            end
+          end
+        else
+          content_tag(:div, body_options) do
+            yield
+          end
         end
       else
         content_tag(:div, body_options) do
