@@ -168,7 +168,7 @@ requested - you will need this later.</p>
 
 <pre>sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git libreadline-dev
 sudo apt-get install libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3
-sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev</pre>
+sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev libpq-dev</pre>
 
 <p>Installing these packages now will make installing Ruby 1.9.3 easier later
 on:</p>
@@ -203,9 +203,9 @@ basic installation method is to run:</p>
 
 <pre>rvm get stable</pre>
 
-<p>now install Ruby 2.1.3</p>
+<p>now install Ruby 2.1.5</p>
 
-<pre>rvm install ruby-2.1.3</pre>
+<pre>rvm install ruby-2.1.5</pre>
 
 <p>you may be asked for your password so that some additional packages can be
 installed. You will then need to wait for Ruby to be downloaded and
@@ -220,12 +220,12 @@ each other, for different applications. To create the gemset run:</p>
 <h2 id="label-Getting+SEEK">Getting SEEK</h2>
 
 <p>Now you are ready for installing SEEK. To fetch the latest version of SEEK
-<em>(v0.21.0)</em> change to the directory you want to install it and then
+<em>(v0.22.0)</em> change to the directory you want to install it and then
 run:</p>
 
 <pre>git clone https://github.com/seek4science/seek.git
 cd seek/
-git checkout tags/v0.21.0</pre>
+git checkout v0.22.0</pre>
 
 <p>Now to install the ruby gems SEEK needs:</p>
 
@@ -300,9 +300,11 @@ start this service run:</p>
 
 <pre>bundle exec rake sunspot:solr:stop</pre>
 
-<p>Optionally, there is also a configuration file in config/sunspot.yml for
-configuring the port that Solr runs on - which is important if running
-multiple SEEK installations on the same machine.</p>
+<p>Optionally, there is also a configuration file for configuring the port and
+host that Solr runs on - which is important if running multiple SEEK
+installations on the same machine. If you wish to override the default
+ports then copy config/sunspot.default.yml to sunspot.yml and change the
+settings.</p>
 
 <p>The following task can also be at any time if there is need to force all
 content to be reindexed (such as after a period of running SEEK with search
@@ -349,7 +351,7 @@ browser, and to make them indexable to the search. To start soffice run:</p>
 <h2 id="label-Creating+an+Administrator">Creating an Administrator</h2>
 
 <p>When you first visit SEEK at <a
-href="http://localhost3000">localhost3000</a> with no users present, you
+href="http://localhost:3000">localhost:3000</a> with no users present, you
 will be prompted to create a new user. This user will be the administrator
 of SEEK (you can change to or add other users in the future). Create a
 username and password, and then fill out your profile, and you will be
