@@ -2,14 +2,8 @@
 <script type="text/javascript">
 </script>
 
-<div class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you associate Publications in SEEK to this #{resource_text}.") -%>
-    Publications
-  </div>
-
-  <div id="associate_publication_fold_content" class="foldContent" style="display:<%= resource.publications.blank? ? 'none' : 'block' -%>">
+<%= folding_panel('Publications', resource.publications.blank?, :body_options => {:id => 'associate_publication_fold_content'},
+                  :help_text => "Here you associate Publications in SEEK to this #{resource_text}.") do %>
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
@@ -47,8 +41,7 @@
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'publication'} %>
   
-  </div>
-</div>
+<% end %>
   
 
 <script type="text/javascript">

@@ -1,10 +1,6 @@
 <% resource_type=resource_type.underscore.humanize -%>
-<div class="fold">
-    <div class="foldTitle">
-        <%= help_icon("Here you attribute this #{resource_type} to any Publications registered in SEEK, or vice versa.") -%>
-        Publications
-    </div>
-    <div id="publications_fold_content" class="foldContent" style="display:<%= related_publications.blank? ? 'none' : 'block' -%>">
+<%= folding_panel('Publications', related_publications.blank?, :body_options => {:id => 'publications_fold_content'},
+                  :help_text => "Here you attribute this #{resource_type} to any Publications registered in SEEK, or vice versa.") do %>
         <div class="yui-u first" style="width:66%; float:left">
             <%
             all_publications=authorised_publications.sort_by(&:title)
@@ -38,8 +34,7 @@
 			<br/>
         </div>
       <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'publication'} %>
-    </div>
-</div>
+<% end %>
 <script type="text/javascript">
     updatePublications();
     toggle_publication_list();
