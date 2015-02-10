@@ -48,6 +48,7 @@
           <br/>
             </div>
 
+        <% if Seek::Config.is_virtualliver %>
         <div class="association_step">
           <b>Step 4</b> - <span class="assay_tissue_and_cell_type_info">  Select or specify a cell type or tissue (optional)</span> <br/>
           <%= select_tag :possible_tissue_and_cell_types,
@@ -58,6 +59,7 @@
           <%= text_field_tag :tissue_and_cell_type,nil,{:onfocus=>"$('possible_tissue_and_cell_types').selectedIndex = 0;"}%>
           <br/>
         </div>
+        <% end %>
 
             <br/>
         <%= link_to_function (image("new") + " Include in the #{@assay_text}"), "addSelectedOrganism(); return(false);", :id=>"add_organism_link", :class=>"block_link" %>
