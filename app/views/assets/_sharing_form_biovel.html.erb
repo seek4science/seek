@@ -16,15 +16,8 @@
 <%= hidden_field_tag "sharing[permissions][values]", "" -%>
 
 <%="<div class='fieldWithErrors'>" if !@resource.errors.empty? and !@policy.valid? %>
-<div class="fold" id="sharing_form">
-
-  <div class="foldTitle">
-    <%= help_icon("Specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type.downcase}.") -%>
-    Sharing
-  </div>
-
-  <div class="foldContent" >
-
+<%= folding_panel('Sharing', false, :id => 'sharing_form', :body_options => {:id => 'creator_fold_content'},
+                  :help_text => "Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") do %>
     <div class="box_infotext">
       <p>
         Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type.downcase -%>.
@@ -329,8 +322,7 @@
 
       </div>
   <% end %>
-  </div>
-</div>
+<% end %>
 <%="</div>" if !@resource.errors.empty? and !@policy.valid? %>
 
 <script type="text/javascript">

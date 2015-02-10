@@ -15,15 +15,8 @@
 <% resource_type = text_for_resource(resource_type) -%>
 
 
-<div class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you attribute this #{resource_type} to other people.") -%>
-    Contributors
-  </div>
-
-  <div id="creator_fold_content" class="foldContent" style="display:<%= existing_creators.blank? ? 'none' : 'block' -%>">
-
+<%= folding_panel('Contributors', existing_creators.blank?, :body_options => {:id => 'creator_fold_content'},
+                  :help_text => "Here you attribute this #{resource_type} to other people.") do %>
     <p>
       If this <%= resource_type %> was contributed by, or together with, other <%= Seek::Config.project_name %> members, please list their names below. <br/>
       The contributors you specify will have the right to 'view and edit summary and contents' of this <%= resource_type %>.
@@ -86,10 +79,7 @@
       </p>
       <%= text_field_tag original_resource_type.underscore+"[other_creators]", other_creators, :size=>90 %>
     </div>
-  </div>
-</div>
-
-
+<% end %>
 
 <script type="text/javascript">
 // ***************  Creator  *****************

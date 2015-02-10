@@ -14,12 +14,8 @@
 %>
 
 
-<div class="fold">
-  <div class="foldTitle">
-    <%= help_icon("Here you can provide some tags to help describe, and allow other people to find, your #{type_name}.") -%>
-    Tags
-  </div>
-  <div class="foldContent" style="display:<%= item_tags.blank? ? 'none' : 'block' -%>">
+<%= folding_panel('Tags', item_tags.blank?,
+                  :help_text => "Here you can provide some tags to help describe, and allow other people to find, your #{type_name}.") do %>
     <p class="box_infotext" style="margin-bottom: 0.5em;">
       <% if object.id.nil? -%>
           Here you can provide some initial tags to help describe this <%= type_name -%>. You can change these tags
@@ -33,5 +29,4 @@
       <% end %>
     </p>
     <%= render :partial=>"tags/select_tags", :locals=>{:all_tags=>all_tags, :owned_tags=>owned_annotations, :item_tags=>item_tags, :name=>"tag"} -%>
-  </div>
-</div>
+<% end %>
