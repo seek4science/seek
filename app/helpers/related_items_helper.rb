@@ -1,10 +1,10 @@
 module RelatedItemsHelper
   
-  def prepare_resource_hash(resource_hash, authorization_already_done = false, limit = nil, show_empty_tabs = false, is_one_facet = false)
+  def prepare_resource_hash(resource_hash, authorization_already_done = false, limit = nil, show_empty_tabs = false)
     perform_authorization(resource_hash) unless authorization_already_done
     limit_items(resource_hash, limit) unless limit.nil?
     remove_empty_tabs(resource_hash) unless show_empty_tabs
-    sort_items(resource_hash, is_one_facet)
+    sort_items(resource_hash)
   end
 
   private
@@ -31,7 +31,7 @@ module RelatedItemsHelper
     end
   end
 
-  def sort_items(resource_hash, is_one_facet)
+  def sort_items(resource_hash)
     ordered_keys = resource_hash.keys.sort_by do |asset|
       ASSET_ORDER.index(asset) || (resource_hash[asset][:is_external] ? 10000 : 1000)
     end
@@ -49,14 +49,7 @@ module RelatedItemsHelper
 
       resource_type[:tab_id] = resource_type[:type].downcase.pluralize.html_safe
       resource_type[:title_class] = resource_type[:is_external] ? "external_result" : ""
-
       resource_type[:total_visible] = resource_type[:items].count + resource_type[:extra_count]
-
-      # Tweaks for resource_tabbed_one_facet partial
-      if is_one_facet
-        resource_type[:tab_id] = resource_type[:type]
-        resource_type[:title_class] += " #{resource_type[:type]}" if is_one_facet
-      end
     end
   end
 

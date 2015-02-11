@@ -1,23 +1,19 @@
 <%= render :partial => "assets/resource_listing_tabbed_by_class",
            :locals => {:resource_hash => resource_hash, :narrow_view => true,
                        :authorization_already_done => true, :display_immediately => true,
-                       :active_tab => active_tab, :is_one_facet => true} %>
+                       :active_tab => active_tab, :hide_view_all => true} %>
 
 <script type="text/javascript">
-    load_tabs();
+    $j(document).ready(function () {
+        $j('.related-items a[data-toggle="tab"]').on('click', function (e) {
+            var type = $j(e.target).attr("data-model-name");
+            hide_specified_facets();
+            show_specified_facets_for_active_tab(type);
+        });
 
-    <% assets.each do |key| %>
-        tab_on_click('<%= key %>');
-    <% end %>
-
-    //Stay the same tab selection otherwise first tab
-    var active_tab =  document.getElementsByClassName('<%= active_tab %>')[0];
-    if (active_tab != null){
+        // Stay the same tab selection otherwise first tab
+        var active_tab = $j('.related-items a[aria-controls="<%= active_tab %>"]') ||
+                         $j('.related-items a[data-toggle="tab"]')[0];
         active_tab.click();
-    }else{
-        var first_tab = document.getElementsByClassName('<%= assets.first %>')[0];
-        if (first_tab != null){
-            first_tab.click();
-        }
-    }
+    });
 </script>

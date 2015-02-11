@@ -12,9 +12,9 @@
    show_empty_tabs ||= false
    item ||= nil
    limit ||= nil
-   is_one_facet ||= false
+   hide_view_all ||= false
 
-   ordered_resource_types = prepare_resource_hash(resource_hash, authorization_already_done, limit, show_empty_tabs, is_one_facet)
+   ordered_resource_types = prepare_resource_hash(resource_hash, authorization_already_done, limit, show_empty_tabs)
 
    total_count = 0
    resource_hash.each_value do |res|
@@ -23,7 +23,7 @@
 %>
 
 <% if total_count > 0 %>
-    <div class="tabpanel">
+    <div class="tabpanel related-items">
       <%= render :partial => 'assets/resource_listing_tab_nav', :locals => { :types => ordered_resource_types, :show_empty_tabs => show_empty_tabs } %>
       <div class="tab-content">
         <% ordered_resource_types.each_with_index do |type, i| -%>
@@ -42,7 +42,7 @@
                         <div class="hidden_list_item" id="view_list_items">
                           <% if item %>
                               <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", [item, type[:type].tableize] -%>
-                          <% elsif !is_one_facet %>
+                          <% elsif !hide_view_all %>
                               <%= link_to "View all items", eval("#{type[:type].pluralize.underscore}_path") %>
                           <% end-%>
                         </div>
