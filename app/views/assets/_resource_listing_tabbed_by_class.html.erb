@@ -12,8 +12,9 @@
    show_empty_tabs ||= false
    item ||= nil
    limit ||= nil
+   is_one_facet ||= false
 
-   ordered_resource_types = prepare_resource_hash(resource_hash, authorization_already_done, limit, show_empty_tabs)
+   ordered_resource_types = prepare_resource_hash(resource_hash, authorization_already_done, limit, show_empty_tabs, is_one_facet)
 
    total_count = 0
    resource_hash.each_value do |res|
@@ -41,7 +42,7 @@
                         <div class="hidden_list_item" id="view_list_items">
                           <% if item %>
                               <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", [item, type[:type].tableize] -%>
-                          <% else %>
+                          <% elsif !is_one_facet %>
                               <%= link_to "View all items", eval("#{type[:type].pluralize.underscore}_path") %>
                           <% end-%>
                         </div>
