@@ -40,7 +40,7 @@ namespace :seek do
 
   task(:update_content_types=>:environment) do
     ContentBlob.all.each do |blob|
-      if blob.file_exists?
+      if blob.file_exists? && blob.url.nil?
         blob.update_content_mime_type
         blob.save if blob.changed?
       end
