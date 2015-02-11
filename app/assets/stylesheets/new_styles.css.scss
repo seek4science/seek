@@ -228,3 +228,7 @@ div.hidden_list_item {
   color: #999;
   @include rounded-box-shadow(#F5F5F5);
 }
+
+.clickable {
+  cursor: pointer;
+}

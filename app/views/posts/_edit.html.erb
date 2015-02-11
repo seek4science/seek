@@ -34,6 +34,8 @@
       </tr>
     </table>
     <% end -%>
-    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Attachments", :partial => 'attachments'} %>
+    <%= folding_panel('Attachments', true) do %>
+        <%= render :partial => 'attachments' %>
+    <% end %>
   </div>
 </div>

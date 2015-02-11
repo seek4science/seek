@@ -7,13 +7,8 @@
     associated_models = resource.is_a?(Publication) ? resource.related_models : resource.models
 -%>
 
-<div class="fold">
-  <div class="foldTitle">
-    <%= help_icon("Here you associate #{t('model').pluralize} in SEEK to this #{resource_text}.") -%>
-    <%= t('model').pluralize %>
-  </div>
-
-  <div id="associate_model_fold_content" class="foldContent" style="display:<%= associated_models.blank? ? 'none' : 'block' -%>">
+<%= folding_panel(t('model').pluralize, associated_models.blank?, :body_options => {:id => 'associate_model_fold_content'},
+                  :help_text => "Here you associate #{t('model').pluralize} in SEEK to this #{resource_text}.") do %>
     <div class="yui-u first" style="width:66%; float:left">
       <p style="color: #666666;">
         The following  <%= t('model').pluralize %> are involved in this <%= resource_text -%>:
@@ -43,8 +38,7 @@
       </div>
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'model'} %>
-  </div>
-</div>
+<% end %>
 
 <script type="text/javascript">
     function toggle_model_list() {

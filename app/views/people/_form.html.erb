@@ -61,17 +61,12 @@
 </p>
 <br/>
 <% if person -%>
-<div class="fold">
-    <div class="foldTitle">
-        Knowledge and expertise
-    </div>
-    <div class="foldContent">
+    <%= folding_panel("Knowledge and expertise") do %>
         <%= render :partial=>"people/discipline_select",:locals=>{:f=>f} %>
         <br/>
         <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
         <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
-    </div>
-</div>
+    <% end %>
 <%= render :partial=>"project_roles",:locals=>{:editable=>true} -%>
 <% end %>
 <% if person && person.notifiee_info -%>

@@ -5,15 +5,8 @@
 %>
 
 
-<div class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you can associate the sample with specific tissue or cell types") -%>
-    Tissue and Cell Types
-  </div>
-
-  <div id="tissue_and_cell_types_fold_content" class="foldContent" style="display:block;">
-
+<%= folding_panel("Tissue and Cell Types", false, :body_options => {:id => 'tissue_and_cell_types_fold_content'},
+                  :help_text => "Here you can associate the sample with specific tissue or cell types") do %>
     <div class="yui-u first">
       <p style="color:#666666;">
         The following tissue or cell types are involved in this <%= "#{resource_text}" %>
@@ -47,9 +40,7 @@
       <br/>
       <%= link_to_function (image("new") + " Include in the #{resource_text}"), "addSelectedTissueOrCellType(); return(false);", :id=>"add_tissue_link", :class=>"block_link", :style => "width: 13em" %>
     </div>
-  </div>
-</div>
-
+<% end %>
 
 
 <script type="text/javascript">

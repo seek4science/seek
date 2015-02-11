@@ -1,22 +1,12 @@
 <% resource_text ||= text_for_resource(resource)
    associated_data_files = resource.is_a?(Publication) ? resource.related_data_files : resource.data_files
+   all_data_files=authorised_data_files
+   project_data_files=authorised_data_files(current_user.person.projects)
+   select_truncate_length=120
 %>
-<div class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you associate #{t('data_file')} in SEEK to this #{resource_text}.") -%>
-    <%= t('data_file').pluralize %>
-  </div>
-
-  <div id="associate_data_fold_content" class="foldContent" style="display:<%= associated_data_files.blank? ? 'none' : 'block' -%>">
+<%= folding_panel(t('data_file').pluralize, associated_data_files.blank?, :body_options => {:id => 'associate_data_fold_content'},
+                  :help_text => "Here you associate #{t('data_file')} in SEEK to this #{resource_text}.") do %>
     <div class="yui-u first" style="width:66%; float:left">
-      
-      <%
-         all_data_files=authorised_data_files
-         project_data_files=authorised_data_files(current_user.person.projects)
-        select_truncate_length=120
-      -%>
-      
       <p style="color: #666666;">
         The following <%= t('data_file').pluralize %> are involved in this <%= resource_text -%>:
       </p>
@@ -52,9 +42,8 @@
     </div>
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'data_file'} %>
-  
-  </div>
-</div>
+
+<% end %>
   
 <script type="text/javascript">
     function toggle_data_file_list() {

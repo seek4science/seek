@@ -32,38 +32,24 @@
     <% processors = workflow_model.all_processors || [] -%>
 
     <!-- Inputs -->
-    <div class="fold">
-      <div class="foldTitle">
-        Inputs (<%= @display_workflow.input_ports.count %>)
-      </div>
-      <div class="foldContent" style="display: none;">
+    <%= folding_panel("Inputs (#{@display_workflow.input_ports.count})", true) do %>
         <!-- Data inputs -->
         <%= render :partial => "port_list", :locals => { :ports => @display_workflow.data_input_ports, :title => "Data Inputs" } -%>
         <!-- Parameter inputs -->
         <%= render :partial => "port_list", :locals => { :ports => @display_workflow.parameter_input_ports, :title => "Parameter Inputs" } -%>
-      </div>
-    </div>
+    <% end %>
 
     <!-- Outputs -->
-    <div class="fold">
-      <div class="foldTitle">
-        Outputs (<%= @display_workflow.output_ports.count %>)
-      </div>
-      <div class="foldContent" style="display: none;">
+    <%= folding_panel("Outputs (#{@display_workflow.output_ports.count})", true) do %>
         <!-- Result outputs -->
         <%= render :partial => "port_list", :locals => { :ports => @display_workflow.result_output_ports, :title => "Result Outputs" } -%>
         <!-- Error/log outputs -->
         <%= render :partial => "port_list", :locals => { :ports => @display_workflow.error_log_output_ports, :title => "Error/Log Outputs" } -%>
-      </div>
-    </div>
+    <% end %>
 
     <!-- Interactions -->
     <% interactions = processors.select { |proc| proc.type == 'interaction' } || [] %>
-    <div class="fold">
-      <div class="foldTitle">
-        Interactions (<%= interactions.count -%>)
-      </div>
-      <div class="foldContent" style="display: none;">
+    <%= folding_panel("Interactions (#{interactions.count})", true) do %>
         <% unless interactions.blank? -%>
             <table class="simple" style="width: 100%;">
               <% interactions.each do |b| -%>
@@ -83,16 +69,11 @@
         <% else %>
             <p class="none_text">None</p>
         <% end %>
-      </div>
-    </div>
+    <% end %>
 
     <!-- R Scripts -->
     <% rscripts = processors.select { |proc| proc.type=='rshell' } || [] %>
-    <div class="fold">
-      <div class="foldTitle">
-        R Scripts (<%= rscripts.count -%>)
-      </div>
-      <div class="foldContent" style="display: none;">
+    <%= folding_panel("R Scripts (#{rscripts.count})", true) do %>
         <% unless rscripts.blank? -%>
             <table class="simple" style="width: 100%;">
               <% rscripts.each do |b| -%>
@@ -106,9 +87,7 @@
                         <%= ('<p><strong>Outputs: </strong>' + (b.outputs.blank? ? '' : b.outputs.join(", ")) + '</p>').html_safe %>
                         <p><strong>Script:</strong></p>
                         <% unless b.script.blank? # should not ever be blank %>
-                            <p>
                             <pre class="script_example_data_box"><%= b.script.html_safe %></pre>
-                            </p>
                         <% end %>
                       </div>
                     </td>
@@ -118,14 +97,9 @@
         <% else %>
             <p class="none_text">None</p>
         <% end %>
-      </div>
-    </div>
+    <% end %>
 
-    <div class="fold">
-      <div class="foldTitle">
-        Details
-      </div>
-      <div class="foldContent" style="display: none;">
+    <%= folding_panel("Details", true) do %>
         <div class="box_about_actor">
           <%= render :partial => 'fileinfo', :object => @display_workflow.content_blob -%>
           <p>
@@ -157,8 +131,7 @@
 
           <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_workflow} %>
         </div>
-      </div>
-    </div>
+    <% end %>
 
   </div>
   <div class="col-md-3 col-sm-4">

@@ -23,15 +23,8 @@
 
 <% resource_type = text_for_resource(resource_type) -%>
 
-<div class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you attribute this #{resource_type} to other #{resource_type_attributed_to_types}.") -%>
-    Attributions
-  </div>
-
-  <div id="attributions_fold_content" class="foldContent" style="display:<%= existing_attributions.blank? ? 'none' : 'block' -%>">
-    
+<%= folding_panel('Attributions', existing_attributions.blank?, :body_options => {:id => 'attributions_fold_content'},
+                  :help_text => "Here you attribute this #{resource_type} to other #{resource_type_attributed_to_types}.") do %>
     <p>
       If this <%= resource_type %> is based on any existing <%= resource_type_attributed_to_types -%>, please list them below
     </p>
@@ -87,9 +80,7 @@
 
     </div>
 
-  </div>
-</div>
-
+<% end %>
 
 <script type="text/javascript">
   // recreate internal store of attributions..

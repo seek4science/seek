@@ -12,6 +12,7 @@
 //= require scriptaculous
 //= require controls
 //= require bootstrap-sprockets
+//= require collapsible_panels
 //= require redbox
 //= require builder
 //= require application_shared
@@ -30,7 +31,6 @@
 //= require studied_factor
 //= require fancy_multiselect
 //= require parseuri
-//= require folds
 //= require tabber-minimized
 //= require detect_browser
 //= require easytabs

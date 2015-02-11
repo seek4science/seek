@@ -1230,14 +1230,14 @@ class AssaysControllerTest < ActionController::TestCase
     get :edit, :id=>assay.id
     assert_response :success
 
-    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div.panel-heading",:text=>/Tags/,:count=>1
     assert_select "div#tag_ids",:count=>1
   end
 
   test "new should include tags element" do
     get :new,:class=>:experimental
     assert_response :success
-    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div.panel-heading",:text=>/Tags/,:count=>1
     assert_select "div#tag_ids",:count=>1
   end
 
@@ -1247,7 +1247,7 @@ class AssaysControllerTest < ActionController::TestCase
       get :edit, :id=>assay.id
       assert_response :success
 
-      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div.panel-heading",:text=>/Tags/,:count=>0
       assert_select "div#tag_ids",:count=>0
     end
   end
@@ -1256,7 +1256,7 @@ class AssaysControllerTest < ActionController::TestCase
     with_config_value :tagging_enabled,false do
       get :new,:class=>:experimental
       assert_response :success
-      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div.panel-heading",:text=>/Tags/,:count=>0
       assert_select "div#tag_ids",:count=>0
     end
   end

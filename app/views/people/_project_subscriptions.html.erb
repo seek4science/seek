@@ -1,10 +1,4 @@
-<div class="fold">
-  <div class="foldTitle">
-    <div title='<%= tooltip_title_attrib(h("Click to see subscriptions"), 300)%>'>
-      Subscriptions
-    </div>
-  </div>
-  <div class="foldContent" style="display: none;">
+<%= folding_panel("Subscriptions", true, :title => tooltip_title_attrib(h("Click to see subscriptions"), 300)) do %>
     <% project_subscriptions = person.project_subscriptions.uniq %>
     <% if project_subscriptions.empty? %>
         <span class='none_text'>None</span>
@@ -23,5 +17,4 @@
           <% end %>
         </table>
     <% end %>
-  </div>
-</div>
+<% end %>

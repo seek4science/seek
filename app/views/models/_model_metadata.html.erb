@@ -1,9 +1,4 @@
-<div class="fold">
-  <div class="foldTitle">
-    <%= "#{t('model')} type details" %>
-  </div>
-  <div class="foldContent">
-
+<%= folding_panel("#{t('model')} type details") do %>
     <p>
       <span id="model_type_info" style="display:none;"></span>
       <b><%= t('model') %> type:</b><br/>
@@ -47,8 +42,7 @@
                      }
       %>
     </p>
-  </div>
-</div>
+<% end %>
 <script type="text/javascript">
 <%
 ModelFormat.all.each do |format|

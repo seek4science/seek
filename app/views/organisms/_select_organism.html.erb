@@ -1,12 +1,9 @@
 <% if Seek::Config.organisms_enabled %>
-    <div class="fold">
-        <div class="foldTitle">Details about the organism</div>
-        <div class="foldContent">
+    <%= folding_panel("Details about the organism") do %>
             <label>
                 Organism:
             </label>
             <br/>
             <%= select model_class.name.underscore.to_sym,:organism_id,Organism.order(:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%>
-        </div>
-    </div>
+    <% end %>
 <% end %>

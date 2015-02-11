@@ -66,7 +66,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'div.association_step p', :text => /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
     end
 
-    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div.panel-heading',:text=>/#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
   end
 
@@ -96,7 +96,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'div.association_step p', :text => /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
     end
 
-    assert_select 'div.foldTitle', :text => /#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div.panel-heading', :text => /#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p', :text => /The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
 
   end
@@ -1820,14 +1820,14 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, :id=>df.id
     assert_response :success
 
-    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div.panel-heading",:text=>/Tags/,:count=>1
     assert_select "div#tag_ids",:count=>1
   end
 
   test "new should include tags element" do
     get :new
     assert_response :success
-    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
+    assert_select "div.panel-heading",:text=>/Tags/,:count=>1
     assert_select "div#tag_ids",:count=>1
   end
 
@@ -1852,7 +1852,7 @@ class DataFilesControllerTest < ActionController::TestCase
       get :edit, :id=>df.id
       assert_response :success
 
-      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div.panel-heading",:text=>/Tags/,:count=>0
       assert_select "div#tag_ids",:count=>0
     end
   end
@@ -1861,7 +1861,7 @@ class DataFilesControllerTest < ActionController::TestCase
     with_config_value :tagging_enabled,false do
       get :new,:class=>:experimental
       assert_response :success
-      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
+      assert_select "div.panel-heading",:text=>/Tags/,:count=>0
       assert_select "div#tag_ids",:count=>0
     end
   end

@@ -31,18 +31,13 @@
 
     <% if admin_logged_in? && Seek::Config.jerm_enabled %>
         <br/>
-        <div id="details_for_jerm" class="fold" >
-          <div class="foldTitle">
-            <%= help_icon("These are details you will need if you have created and wish to use a <b>JERM harvester</b> for this project, to register assets from a remote site.") -%>
-            JERM details
-          </div>
-          <div class="foldContent" style="display:none;">
+          <%= folding_panel("JERM details", true, :id => 'details_for_jerm',
+                            :help_text => "These are details you will need if you have created and wish to use a <b>JERM harvester</b> for this project, to register assets from a remote site.") do %>
               <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
               <br/>
               <%= render :partial=>"assets/sharing_form"%>
-          </div>
-        </div>
-    <%end%>
+          <% end %>
+    <% end %>
 
     <p>
       <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateInstitutionIds();") -%>

@@ -3,11 +3,7 @@
    hidden ||= false
 %>
 
-<div class="fold">
-  <div class="foldTitle">
-    <%= title %>
-  </div>
-  <div class="foldContent workflow_input" <%= 'style="display: none;"'.html_safe if hidden -%>>
+<%= folding_panel(title, hidden, :body_options => {:class => 'workflow_input'}) do %>
     <% if form.object.is_a?(Sweep) %>
       <% sweep_length.times do |i| %>
         <h2>Iteration <%= i+1 -%></h2>
@@ -22,5 +18,4 @@
         <%= render :partial => 'taverna_player/runs/input_form', :locals => {:input => input, :form => form } %>
       <% end %>
     <% end %>
-  </div>
-</div>
+<% end %>
