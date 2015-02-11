@@ -1192,14 +1192,14 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(a_person.user)
     get :show, id: a_person
     assert_response :success
-    assert_select 'div.foldTitle', text: 'Subscriptions', count: 1
+    assert_select 'div.panel-heading', text: 'Subscriptions', count: 1
 
     logout
 
     login_as(:quentin)
     get :show, id: a_person
     assert_response :success
-    assert_select 'div.foldTitle', text: 'Subscriptions', count: 1
+    assert_select 'div.panel-heading', text: 'Subscriptions', count: 1
   end
 
   test 'should not show subscription list to people that are not yourself and admin' do
@@ -1207,13 +1207,13 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(Factory(:user))
     get :show, id: a_person
     assert_response :success
-    assert_select 'div.foldTitle', text: 'Subscriptions', count: 0
+    assert_select 'div.panel-heading', text: 'Subscriptions', count: 0
 
     logout
 
     get :show, id: a_person
     assert_response :success
-    assert_select 'div.foldTitle', text: 'Subscriptions', count: 0
+    assert_select 'div.panel-heading', text: 'Subscriptions', count: 0
   end
 
   test 'virtual liver blocks access to profile page whilst logged out' do
