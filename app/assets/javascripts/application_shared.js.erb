@@ -157,22 +157,6 @@ function insertAtCursor(myField, myValue) {
   myField.scrollTop = textAreaScrollPosition;
 }
 
-
-function toggle_collapsable_div(id) {
-  var elem = $('collapsable_div_' + id);
-  var toggle_img = $('collapsable_div_img_' + id);
-  if (elem.style.display == 'none') {
-    //Effect.BlindDown(('collapsable_div_' + id),{duration:0.2});
-    toggle_img.src = "<%= asset_path('folds/fold.png') %>";
-    elem.show();    
-  }
-  else {
-    //Effect.BlindUp(('collapsable_div_' + id),{duration:0.2});
-    toggle_img.src = "<%= asset_path('folds/unfold.png') %>";
-    elem.hide();    
-  }
-}
-
 //only allows numbers to by typed
 function onlyNumbers(evt)
  {
