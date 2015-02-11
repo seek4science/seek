@@ -29,11 +29,7 @@
     initialiseFold('existing_strains');
 </script>
 
-<div class="fold" id="existing_strains" style="margin-left: 1em">
-  <div class="foldTitle">
-    Strain
-  </div>
-  <div class="foldContent">
+<%= folding_panel('Strain', false, :id => 'existing_strains') do %>
     <%
        organisms_title = organisms.collect { |organism| organism.title }
        organisms_title = organisms_title.blank? ? '' : organisms_title.join(', ')
@@ -86,6 +82,4 @@
         <%= create_strain_link -%><br/>
         (create a new strain or one based on the selected one)
     <% end %>
-  </div>
-</div>
-
+<% end %>
