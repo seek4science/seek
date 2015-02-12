@@ -93,7 +93,7 @@
     }
   }
 
-    <% models = resource.is_a?(Publication) ? resource.related_models : resource.model_masters %>
+    <% models = resource.is_a?(Publication) ? resource.related_models : resource.models %>
 <% models.each do |model| -%>
   <% if model.can_view? -%>
       model_id = '<%= model.id -%>';

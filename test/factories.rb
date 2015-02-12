@@ -247,7 +247,7 @@ end
     f.samples {[Factory.build(:sample, :policy => Factory(:public_policy))]}
   end
 
-    Factory.define(:assay, :parent => :modelling_assay) {}
+  Factory.define(:assay, :parent => :modelling_assay) {}
 
   Factory.define :assay_asset do |f|
     f.association :assay

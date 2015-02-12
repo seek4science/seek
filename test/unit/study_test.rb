@@ -63,27 +63,27 @@ class StudyTest < ActiveSupport::TestCase
 
     assay1.reload
     assay2.reload
-    assert_equal 2,assay1.related_publications.size
-    assert_equal 2,assay2.related_publications.size
+    assert_equal 2,assay1.publications.size
+    assert_equal 2,assay2.publications.size
 
 
     assert_equal 2,study.assays.size
-    assert_equal 3,study.related_publications.size
-    assert_equal [pub1,pub2,pub3],study.related_publications.sort_by(&:id)
+    assert_equal 3,study.publications.size
+    assert_equal [pub1,pub2,pub3],study.publications.sort_by(&:id)
   end
 
   test "sops through assays" do
     study=studies(:metabolomics_study)
     assert_equal 2,study.sops.size
-    assert study.sops.include?(sops(:my_first_sop).versions.first)
-    assert study.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
+    assert study.sops.include?(sops(:my_first_sop))
+    assert study.sops.include?(sops(:sop_with_fully_public_policy))
     
     #study with 2 assays that have overlapping sops. Checks that the sops aren't dupliced.
     study=studies(:study_with_overlapping_assay_sops)
     assert_equal 3,study.sops.size
-    assert study.sops.include?(sops(:my_first_sop).versions.first)
-    assert study.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
-    assert study.sops.include?(sops(:sop_for_test_with_workgroups).versions.first)
+    assert study.sops.include?(sops(:my_first_sop))
+    assert study.sops.include?(sops(:sop_with_fully_public_policy))
+    assert study.sops.include?(sops(:sop_for_test_with_workgroups))
   end
 
   test "person responisble" do

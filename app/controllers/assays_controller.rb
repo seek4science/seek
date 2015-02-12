@@ -20,8 +20,8 @@ class AssaysController < ApplicationController
   def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations
-    params[:data_file_ids]=@existing_assay.data_file_masters.collect{|d|"#{d.id},None"}
-    params[:related_publication_ids]= @existing_assay.related_publications.collect{|p| "#{p.id},None"}
+    params[:data_file_ids]=@existing_assay.data_files.collect{|d|"#{d.id},None"}
+    params[:related_publication_ids]= @existing_assay.publications.collect{|p| "#{p.id},None"}
 
     if @existing_assay.can_view?
       unless @assay.study.can_edit?
@@ -29,19 +29,19 @@ class AssaysController < ApplicationController
         flash.now[:notice] = "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>".html_safe
       end
 
-      @existing_assay.data_file_masters.each do |d|
+      @existing_assay.data_files.each do |d|
         if !d.can_view?
           flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
           break
         end
       end
-      @existing_assay.sop_masters.each do |s|
+      @existing_assay.sops.each do |s|
         if !s.can_view?
           flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
           break
         end
       end
-      @existing_assay.model_masters.each do |m|
+      @existing_assay.models.each do |m|
         if !m.can_view?
           flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
           break
@@ -182,15 +182,15 @@ class AssaysController < ApplicationController
     Array(data_file_ids).each do |text|
       id, r_type = text.split(",")
       d = DataFile.find(id)
-      assay_assets_to_keep << assay.relate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
+      assay_assets_to_keep << assay.associate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
     end
     Array(model_ids).each do |id|
       m = Model.find(id)
-      assay_assets_to_keep << assay.relate(m) if m.can_view?
+      assay_assets_to_keep << assay.associate(m) if m.can_view?
     end
     Array(sop_ids).each do |id|
       s = Sop.find(id)
-      assay_assets_to_keep << assay.relate(s) if s.can_view?
+      assay_assets_to_keep << assay.associate(s) if s.can_view?
     end
     #Destroy AssayAssets that aren't needed
     (assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }

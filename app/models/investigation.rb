@@ -28,10 +28,6 @@ class Investigation < ActiveRecord::Base
         studies.collect{|study| study.send(:#{type}s)}.flatten.uniq
       end
 
-      #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
-      def related_#{type.pluralize}
-        #{type}_masters
-      end
     END_EVAL
   end
 

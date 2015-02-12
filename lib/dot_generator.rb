@@ -228,7 +228,7 @@ class AssetNode < SeekNode
   end
 
   def children
-    current.respond_to?(:contributor) && item.respond_to?(:related_publications) ? item.related_publications : []
+    current.respond_to?(:contributor) && item.respond_to?(:publications) ? item.publications : []
   end
 
   def as_dot
@@ -249,7 +249,7 @@ class AssayNode < SeekNode
   end
 
   def children
-    deep ? item.asset_masters + item.related_publications : []
+    deep ? item.assets + item.publications : []
   end
 end
 

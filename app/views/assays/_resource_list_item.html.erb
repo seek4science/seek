@@ -24,9 +24,9 @@
         <%= list_samples_and_assay_organisms("Organisms", resource.samples, resource.assay_organisms,{:class=>"list_item_attribute"}) %>
     <% end %>
 
-    <%= list_item_authorized_list(resource.model_masters, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
-    <%= list_item_authorized_list resource.sop_masters, t('sop').pluralize, true, 50, true %>
-    <%= list_item_authorized_list resource.data_file_masters, t('data_file').pluralize, true, 50, true %>
+    <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
+    <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
+    <%= list_item_authorized_list resource.data_files, t('data_file').pluralize, true, 50, true %>
   </div>
 </div>
 

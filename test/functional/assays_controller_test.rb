@@ -23,7 +23,7 @@ class AssaysControllerTest < ActionController::TestCase
     df = Factory(:data_file,:contributor=>User.current_user.person)
     a = Factory(:modelling_assay,:contributor=>User.current_user.person)
     disable_authorization_checks do
-      a.relate(df)
+      a.associate(df)
       a.reload
     end
 
@@ -149,7 +149,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.sops.include?(sop.latest_version)
+    assert updated_assay.sop_versions.include?(sop.latest_version)
     assert_not_equal timestamp, updated_assay.updated_at
 
   end
@@ -170,7 +170,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.data_files.include?(df.latest_version)
+    assert updated_assay.data_file_versions.include?(df.latest_version)
     assert_not_equal timestamp, updated_assay.updated_at
   end
 
@@ -189,7 +189,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.models.include?(model.latest_version)
+    assert updated_assay.model_versions.include?(model.latest_version)
     assert_not_equal timestamp, updated_assay.updated_at
   end
 
@@ -838,11 +838,8 @@ class AssaysControllerTest < ActionController::TestCase
         assert_select "h3", :text => "#{I18n.t('data_file').pluralize} (2)", :count => 1
       end
 
-      #Other items are only shown when the tab is clicked
-      #TODO: better method to test clicking link?
 
-      #assay.data_files is data_file_versions
-      data_file_ids = assay.data_files.map &:data_file_id
+      data_file_ids = assay.data_file_versions.map &:data_file_id
       get :resource_in_tab, {:resource_ids => data_file_ids.join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
       assert_response :success
       assert_select "div.list_item" do
@@ -852,7 +849,7 @@ class AssaysControllerTest < ActionController::TestCase
         assert_select "div.list_item_actions a[href=?]", download_data_file_path(data_files(:private_data_file)), :count => 0
       end
 
-      sop_ids = assay.sops.map &:sop_id
+      sop_ids = assay.sop_versions.map &:sop_id
       get :resource_in_tab, {:resource_ids => sop_ids.join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
       assert_response :success
       assert_select "div.list_item" do
@@ -935,10 +932,10 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_nil assigns(:assay)
     assay = assigns(:assay)
     assay.reload #necessary to pickup the relationships for publications
-    assert_equal [sop], assay.sop_masters
-    assert_equal [df], assay.data_file_masters
-    assert_equal [model],assay.model_masters
-    assert_equal [pub], assay.related_publications
+    assert_equal [sop], assay.sops
+    assert_equal [df], assay.data_files
+    assert_equal [model],assay.models
+    assert_equal [pub], assay.publications
 
   end
 
@@ -992,10 +989,10 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal 4, assay.assets.size
     assert_equal 2, assay.sops.size
     assert_equal 2, assay.data_files.size
-    assert assay.sops.include?(sops(:sop_with_fully_public_policy).find_version(1))
-    assert assay.sops.include?(sops(:sop_with_private_policy_and_custom_sharing).find_version(1))
-    assert assay.data_files.include?(data_files(:downloadable_data_file).find_version(1))
-    assert assay.data_files.include?(data_files(:private_data_file).find_version(1))
+    assert assay.sops.include?(sops(:sop_with_fully_public_policy))
+    assert assay.sops.include?(sops(:sop_with_private_policy_and_custom_sharing))
+    assert assay.data_files.include?(data_files(:downloadable_data_file))
+    assert assay.data_files.include?(data_files(:private_data_file))
 
     assert sops(:sop_with_fully_public_policy).can_view? user
     assert !sops(:sop_with_private_policy_and_custom_sharing).can_view?(user)
@@ -1106,8 +1103,8 @@ class AssaysControllerTest < ActionController::TestCase
     model = Factory(:model,:contributor => User.current_user)
     assay= Factory(:assay,:contributor => User.current_user.person,
                             :study => (Factory(:study, :investigation => (Factory(:investigation)))))
-    assay.data_file_masters << df
-    assay.model_masters << model
+    assay.data_files << df
+    assay.models << model
     assert assay.save
     assert assay.is_modelling?
 
@@ -1124,9 +1121,9 @@ class AssaysControllerTest < ActionController::TestCase
       sop = Factory(:sop,:contributor => User.current_user)
       assay= Factory(:modelling_assay,:contributor => User.current_user.person,
                               :study => (Factory(:study, :investigation => (Factory(:investigation)))))
-      assay.data_file_masters << df
-      assay.model_masters << model
-      assay.sop_masters << sop
+      assay.data_files << df
+      assay.models << model
+      assay.sops << sop
       assert assay.save
       assert assay.is_modelling?
 
@@ -1144,9 +1141,9 @@ class AssaysControllerTest < ActionController::TestCase
         sop = Factory(:sop,:contributor => User.current_user)
         assay= Factory(:experimental_assay,:contributor => User.current_user.person,
                                 :study => (Factory(:study, :investigation => (Factory(:investigation)))))
-        assay.data_file_masters << df
-        assay.model_masters << model
-        assay.sop_masters << sop
+        assay.data_files << df
+        assay.models << model
+        assay.sops << sop
         assert assay.save
         assert assay.is_experimental?
 
@@ -1160,7 +1157,7 @@ class AssaysControllerTest < ActionController::TestCase
   test "preview assay with associated hidden items" do
     assay = Factory(:assay,:policy=>Factory(:public_policy))
     private_df = Factory(:data_file,:policy=>Factory(:private_policy))
-    assay.data_file_masters << private_df
+    assay.data_files << private_df
     assay.save!
     login_as Factory(:user)
     xhr(:get, :preview,{:id=>assay.id})
@@ -1174,10 +1171,10 @@ class AssaysControllerTest < ActionController::TestCase
     model2 = Factory(:model, :title=>"public model", :policy=>Factory(:public_policy))
     assay = Factory(:modelling_assay,:policy=>Factory(:public_policy))
 
-    assay.data_file_masters << df
-    assay.data_file_masters << df2
-    assay.model_masters << model
-    assay.model_masters << model2
+    assay.data_files << df
+    assay.data_files << df2
+    assay.models << model
+    assay.models << model2
 
     assay.save!
 

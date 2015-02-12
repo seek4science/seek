@@ -94,7 +94,7 @@
             }
      }
 
-    <% @assay.sop_masters.each do |s| -%>    
+    <% @assay.sops.each do |s| -%>
       <% if s.can_view? -%>
         sop_id = '<%= s.id -%>';
         sop_title = '<%= escape_javascript(s.title) -%>';

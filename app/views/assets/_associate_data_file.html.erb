@@ -104,7 +104,7 @@
         }
       }
 
-<% data_files = resource.is_a?(Publication) ? resource.related_data_files : resource.data_file_masters %>
+<% data_files = resource.is_a?(Publication) ? resource.related_data_files : resource.data_files %>
 <% data_files.each do |data_file| -%>
   <% if data_file.can_view? -%>
       data_file_id = '<%= data_file.id -%>';

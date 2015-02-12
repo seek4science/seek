@@ -4,19 +4,11 @@ require 'tmpdir'
 class AssayTest < ActiveSupport::TestCase
   fixtures :all
 
-
   test "shouldnt edit the assay" do
     non_admin = Factory :user
     assert !non_admin.person.is_admin?
     assay = assays(:modelling_assay_with_data_and_relationship)
     assert_equal false, assay.can_edit?(non_admin)
-  end
-
-  test "sops association" do
-    assay=assays(:metabolomics_assay)
-    assert_equal 2,assay.sops.size
-    assert assay.sops.include?(sops(:my_first_sop).versions.first)
-    assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
 
   test "to_rdf" do
@@ -178,8 +170,8 @@ class AssayTest < ActiveSupport::TestCase
     end
   end
 
-  test "associated publication" do
-    assert_equal 1, assays(:assay_with_a_publication).related_publications.size
+  test "publications" do
+    assert_equal 1, assays(:assay_with_a_publication).publications.size
   end
 
   test "can delete?" do
@@ -187,15 +179,15 @@ class AssayTest < ActiveSupport::TestCase
     assert Factory(:assay, :contributor => user.person).can_delete?
 
     assay = Factory(:assay, :contributor => user.person)
-    assay.relate Factory(:data_file, :contributor => user)
+    assay.associate Factory(:data_file, :contributor => user)
     assert !assay.can_delete?
 
     assay = Factory(:assay, :contributor => user.person)
-    assay.relate Factory(:sop, :contributor => user)
+    assay.associate Factory(:sop, :contributor => user)
     assert !assay.can_delete?
 
     assay = Factory(:assay, :contributor => user.person)
-    assay.relate Factory(:model, :contributor => user)
+    assay.associate Factory(:model, :contributor => user)
     assert !assay.can_delete?
 
     pal = Factory :pal
@@ -214,24 +206,37 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 3,assay.assets.size,"should be 2 sops and 1 data file"
   end
 
+  test "sop versions" do
+    assay=assays(:metabolomics_assay)
+    assert_equal 2,assay.sops.size
+    assert assay.sop_versions.include?(sops(:my_first_sop).find_version(1))
+    assert assay.sop_versions.include?(sops(:sop_with_fully_public_policy).find_version(1))
+  end
+
   test "sops" do
     assay=assays(:metabolomics_assay)
     assert_equal 2,assay.sops.size
-    assert assay.sops.include?(sops(:my_first_sop).find_version(1))
-    assert assay.sops.include?(sops(:sop_with_fully_public_policy).find_version(1))
+    assert assay.sops.include?(sops(:my_first_sop))
+    assert assay.sops.include?(sops(:sop_with_fully_public_policy))
   end
 
-  test "data_files" do
+  test "data_file versions" do
     assay=assays(:metabolomics_assay)
     assert_equal 1,assay.data_files.size
-    assert assay.data_files.include?(data_files(:picture).find_version(1))
+    assert assay.data_file_versions.include?(data_files(:picture).find_version(1))
+  end
+
+  test "data files" do
+    assay=assays(:metabolomics_assay)
+    assert_equal 1,assay.data_files.size
+    assert assay.data_files.include?(data_files(:picture))
   end
   
-  test "can relate data files" do
+  test "can associate data files" do
     assay = assays(:metabolomics_assay)
     User.with_current_user assay.contributor.user do
       assert_difference("Assay.find_by_id(assay.id).data_files.count") do
-        assay.relate(data_files(:viewable_data_file), relationship_types(:test_data))
+        assay.associate(data_files(:viewable_data_file), relationship_types(:test_data))
       end
     end
   end
@@ -243,7 +248,7 @@ class AssayTest < ActiveSupport::TestCase
       sop=sops(:sop_with_all_sysmo_users_policy)
       assert_difference("Assay.find_by_id(assay.id).sops.count", 1) do
         assert_difference("AssayAsset.count", 1) do
-          assay.relate(sop)
+          assay.associate(sop)
         end
       end
       assay.reload
@@ -255,7 +260,7 @@ class AssayTest < ActiveSupport::TestCase
 
       assert_no_difference("Assay.find_by_id(assay.id).sops.count") do
         assert_no_difference("AssayAsset.count") do
-          assay.relate(sop)
+          assay.associate(sop)
         end
       end
 
@@ -274,23 +279,40 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "associate organism" do
-    assay=assays(:metabolomics_assay)
+    assay=Factory(:experimental_assay)
+    assay.assay_organisms.clear
     User.current_user = assay.contributor
     organism=organisms(:yeast)
+
+    #using the general associate method for the simple case with the organism object
+    assert_difference("AssayOrganism.count") do
+      assay.associate(organism)
+    end
+    assert_equal [organism],assay.organisms
+    assay.assay_organisms.clear
+
     #test with numeric ID
     assert_difference("AssayOrganism.count") do
       assay.associate_organism(organism.id)
     end
 
+    assert_equal [organism],assay.organisms
+    assay.assay_organisms.clear
+
     #with String ID
-    assert_no_difference("AssayOrganism.count") do
+    assert_difference("AssayOrganism.count") do
       assay.associate_organism(organism.id.to_s)
     end
 
+    assert_equal [organism],assay.organisms
+    assay.assay_organisms.clear
+
     #with Organism object
-    assert_no_difference("AssayOrganism.count") do
+    assert_difference("AssayOrganism.count") do
       assay.associate_organism(organism)
     end
+
+    assert_equal [organism],assay.organisms
 
     #with a culture growth
     assay.assay_organisms.clear
@@ -384,14 +406,6 @@ class AssayTest < ActiveSupport::TestCase
       :samples => [Factory(:sample)],
       :policy => Factory(:private_policy)
     )
-  end
-
-  test "related models" do
-    model_assay = Factory :modelling_assay,:model_master_ids => [Factory(:model).id]
-    exp_assay = Factory :experimental_assay,:model_master_ids => [Factory(:model).id]
-    assert_equal model_assay.model_masters, model_assay.related_models
-    assert_not_equal exp_assay.model_masters,exp_assay.related_models
-    assert_equal [], exp_assay.related_models
   end
 
   test "contributing_user" do
