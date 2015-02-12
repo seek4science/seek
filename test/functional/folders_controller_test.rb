@@ -208,7 +208,7 @@ class FoldersControllerTest < ActionController::TestCase
     end
     assert_response :success
     assay.reload
-    assert_equal [sop],assay.assets.collect{|a| a.parent}
+    assert_equal [sop],assay.assets
     assert_equal [sop],folder.assets
   end
 
@@ -217,7 +217,7 @@ class FoldersControllerTest < ActionController::TestCase
     assay.study.investigation.projects=[@project]
     assay.study.investigation.save!
     sop = Factory :sop, :project_ids=>[@project.id],:policy=>Factory(:public_policy)
-    assay.relate(sop)
+    assay.associate(sop)
     folder = Seek::AssayFolder.new assay,@project
     assert_difference("AssayAsset.count",-1) do
       xhr(:post,:remove_asset,{:asset_id=>sop.id,:asset_type=>"Sop",:id=>folder.id,:project_id=>folder.project.id,:orig_folder_element_id=>"sdfhsdk"})

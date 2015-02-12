@@ -173,12 +173,12 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop) #can edit assay_can_edit_by_my_first_sop_owner
     s = sops(:my_first_sop)
     original_assay = assays(:assay_can_edit_by_my_first_sop_owner1)
-    asset_ids = original_assay.related_asset_ids 'Sop'
-    assert asset_ids.include? s.id
+
+    assert_includes original_assay.sops, s
 
     new_assay=assays(:assay_can_edit_by_my_first_sop_owner2)
-    new_asset_ids = new_assay.related_asset_ids 'Sop'
-    assert !new_asset_ids.include?(s.id)
+
+    refute_includes new_assay.sops, s
 
     put :update, :id => s.id, :sop =>{}, :assay_ids=>[new_assay.id.to_s]
 
@@ -188,8 +188,8 @@ class SopsControllerTest < ActionController::TestCase
     original_assay.reload
     new_assay.reload
 
-    assert !original_assay.related_asset_ids('Sop').include?(s.id)
-    assert new_assay.related_asset_ids('Sop').include?(s.id)
+    refute_includes original_assay.sops,s
+    assert_includes new_assay.sops, s
   end
 
   test "associate sample" do
@@ -228,7 +228,7 @@ class SopsControllerTest < ActionController::TestCase
     assert assigns(:sop).content_blob.file_exists?
     assert_equal "file_picture.png", assigns(:sop).content_blob.original_filename
     assay.reload
-    assert assay.related_asset_ids('Sop').include? assigns(:sop).id
+    assert_includes assay.sops,assigns(:sop)
   end
 
   def test_missing_sharing_should_not_default

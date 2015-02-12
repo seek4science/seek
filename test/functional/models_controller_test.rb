@@ -252,11 +252,11 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner) #can edit assay_can_edit_by_my_first_sop_owner
     m = models(:teusink)
     original_assay = assays(:assay_with_a_model)
-    asset_ids = original_assay.related_asset_ids 'Model'
-    assert asset_ids.include? m.id
+
+    assert_includes original_assay.models, m
     new_assay=assays(:modelling_assay)
-    new_asset_ids = new_assay.related_asset_ids 'Model'
-    assert !new_asset_ids.include?(m.id)
+
+    refute_includes new_assay.models, m
 
     put :update, :id => m, :model =>{}, :assay_ids=>[new_assay.id.to_s]
 
@@ -264,8 +264,8 @@ class ModelsControllerTest < ActionController::TestCase
     m.reload
     original_assay.reload
     new_assay.reload
-    assert !original_assay.related_asset_ids('Model').include?(m.id)
-    assert new_assay.related_asset_ids('Model').include?(m.id)
+    refute_includes original_assay.models, m
+    assert_includes new_assay.models, m
     end
 
   test "associate sample" do
@@ -343,7 +343,7 @@ class ModelsControllerTest < ActionController::TestCase
     
     assert_redirected_to model_path(assigns(:model))
     assay.reload
-    assert assay.related_asset_ids('Model').include? assigns(:model).id
+    assert_includes assay.models, assigns(:model)
   end
 
   def test_missing_sharing_should_default_to_blank_for_vln

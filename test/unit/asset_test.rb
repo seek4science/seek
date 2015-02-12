@@ -47,13 +47,13 @@ class AssetTest < ActiveSupport::TestCase
     assay4 = Factory :modelling_assay,:assay_type_uri=>"http://some-made-up-uri-not-resolvable-from-ontology.org/types#to_force_nil_label"
 
     disable_authorization_checks do
-      assay.relate(df)
-      assay2.relate(df)
+      assay.associate(df)
+      assay2.associate(df)
       assay.reload
       assay2.reload
-      assay3.relate(df)
+      assay3.associate(df)
       assay3.reload
-      assay4.relate(df)
+      assay4.associate(df)
       assay4.reload
       df.reload
     end
@@ -138,9 +138,9 @@ class AssetTest < ActiveSupport::TestCase
 
 
     disable_authorization_checks do
-      assay.relate(df)
-      assay2.relate(df)
-      assay3.relate(df)
+      assay.associate(df)
+      assay2.associate(df)
+      assay3.associate(df)
       assay.reload
       assay2.reload
       df.reload

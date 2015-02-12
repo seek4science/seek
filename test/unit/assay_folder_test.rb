@@ -34,10 +34,10 @@ class AssayFolderTest < ActiveSupport::TestCase
       publication = Factory :publication, :contributor=>@user.person
       private_sop = Factory :sop,:policy=>Factory(:private_policy)
       project = assay.projects.first
-      assay.relate(sop)
-      assay.relate(private_sop)
+      assay.associate(sop)
+      assay.associate(private_sop)
       Relationship.create :subject=>assay, :other_object=>publication, :predicate=>Relationship::RELATED_TO_PUBLICATION
-      assert_equal [publication],assay.related_publications
+      assert_equal [publication],assay.publications
 
       folder = Seek::AssayFolder.new assay,project
       assert_equal [sop,publication],folder.authorized_assets
@@ -46,7 +46,7 @@ class AssayFolderTest < ActiveSupport::TestCase
   test "initialise assay folder" do
     assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
     sop = Factory :sop,:projects=>[assay.projects.first],:policy=>Factory(:public_policy)
-    assay.relate(sop)
+    assay.associate(sop)
     folder = Seek::AssayFolder.new assay,assay.projects.first
 
     assert_equal assay,folder.assay
@@ -79,7 +79,7 @@ class AssayFolderTest < ActiveSupport::TestCase
       folder.move_assets sop,src_folder
     end
     assay.reload
-    assert_equal [sop],assay.assets.collect{|a| a.parent}
+    assert_equal [sop],assay.assets
     assert_equal [sop],folder.assets
   end
 
@@ -92,14 +92,14 @@ class AssayFolderTest < ActiveSupport::TestCase
       folder.move_assets pub,src_folder
     end
     assay.reload
-    assert_equal [pub],assay.related_publications
+    assert_equal [pub],assay.publications
     assert_equal [pub],folder.assets
   end
 
   test "remove assets" do
     assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
     sop = Factory :sop,:projects=>[assay.projects.first],:policy=>Factory(:public_policy)
-    assay.relate(sop)
+    assay.associate(sop)
     assay.reload
     folder = Seek::AssayFolder.new assay,assay.projects.first
     assert_equal [sop],folder.assets
@@ -116,7 +116,7 @@ class AssayFolderTest < ActiveSupport::TestCase
     assay = Factory(:experimental_assay,:policy=>Factory(:public_policy))
     publication = Factory :publication, :contributor=>@user.person,:pubmed_id=> 100000
     Relationship.create :subject=>assay, :other_object=>publication, :predicate=>Relationship::RELATED_TO_PUBLICATION
-    assert_equal [publication],assay.related_publications
+    assert_equal [publication],assay.publications
     assay.reload
     folder = Seek::AssayFolder.new assay,assay.projects.first
     assert_equal [publication],folder.assets
@@ -125,7 +125,7 @@ class AssayFolderTest < ActiveSupport::TestCase
     end
     assay.reload
     assert_equal [],folder.assets
-    assert_equal [],assay.related_publications
+    assert_equal [],assay.publications
   end
 
 end

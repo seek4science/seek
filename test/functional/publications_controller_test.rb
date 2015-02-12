@@ -134,10 +134,10 @@ class PublicationsControllerTest < ActionController::TestCase
     p = publications(:taverna_paper_pubmed)
     original_assay = assays(:assay_with_a_publication)
     assert p.related_assays.include?(original_assay)
-    assert original_assay.related_publications.include?(p)
+    assert original_assay.publications.include?(p)
 
     new_assay=assays(:metabolomics_assay)
-    assert new_assay.related_publications.empty?
+    assert new_assay.publications.empty?
     
     put :update, :id => p,:author=>{},:assay_ids=>[new_assay.id.to_s]
 
@@ -149,10 +149,10 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 1, p.related_assays.count
 
     assert !p.related_assays.include?(original_assay)
-    assert !original_assay.related_publications.include?(p)
+    assert !original_assay.publications.include?(p)
 
     assert p.related_assays.include?(new_assay)
-    assert new_assay.related_publications.include?(p)
+    assert new_assay.publications.include?(p)
 
   end
 
@@ -221,10 +221,10 @@ class PublicationsControllerTest < ActionController::TestCase
     p = publications(:taverna_paper_pubmed)
     original_assay = assays(:assay_with_a_publication)
     assert p.related_assays.include?(original_assay)
-    assert original_assay.related_publications.include?(p)
+    assert original_assay.publications.include?(p)
 
     new_assay=assays(:metabolomics_assay)
-    assert new_assay.related_publications.empty?
+    assert new_assay.publications.empty?
 
     put :update, :id => p,:author=>{},:assay_ids=>[new_assay.id.to_s]
 
@@ -236,10 +236,10 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 1, p.related_assays.count
 
     assert p.related_assays.include?(original_assay)
-    assert original_assay.related_publications.include?(p)
+    assert original_assay.publications.include?(p)
 
     assert !p.related_assays.include?(new_assay)
-    assert !new_assay.related_publications.include?(p)
+    assert !new_assay.publications.include?(p)
 
   end
 

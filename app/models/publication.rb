@@ -137,7 +137,7 @@ class Publication < ActiveRecord::Base
   #includes those related directly, or through an assay
   def all_related_data_files
     via_assay = related_assays.collect do |assay|
-      assay.data_file_masters
+      assay.data_files
     end.flatten.uniq.compact
     via_assay | related_data_files
   end
@@ -145,7 +145,7 @@ class Publication < ActiveRecord::Base
   #includes those related directly, or through an assay
   def all_related_models
     via_assay = related_assays.collect do |assay|
-      assay.model_masters
+      assay.models
     end.flatten.uniq.compact
     via_assay | related_models
   end

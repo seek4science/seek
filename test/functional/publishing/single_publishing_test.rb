@@ -84,7 +84,7 @@ class SinglePublishingTest < ActionController::TestCase
     study=assay.study
     investigation=study.investigation
 
-    notifying_df=assay.data_file_masters.reject{|d|d==df}.first
+    notifying_df=assay.data_files.reject{|d|d==df}.first
     request_publishing_df = Factory(:data_file,
                                     :project_ids => Factory(:gatekeeper).projects.collect(&:id),
                                     :contributor => users(:datafile_owner),
@@ -258,7 +258,7 @@ class SinglePublishingTest < ActionController::TestCase
       params[:publish]["Investigation"]||={}
       params[:publish]["Investigation"][a.study.investigation.id.to_s]="1"
 
-      a.assets.collect{|a| a.parent}.each do |asset|
+      a.assets.each do |asset|
         assert !asset.is_published?,"This assays assets should not be public for the test to work"
         params[:publish][asset.class.name]||={}
         params[:publish][asset.class.name][asset.id.to_s]="1"
@@ -304,7 +304,7 @@ class SinglePublishingTest < ActionController::TestCase
       params[:publish]["Study"][a.study.id.to_s]="1"
       params[:publish]["Investigation"]||={}
 
-      a.assets.collect{|a| a.parent}.each do |asset|
+      a.assets.each do |asset|
         assert !asset.is_published?,"This assays assets should not be public for the test to work"
         params[:publish][asset.class.name]||={}
         params[:publish][asset.class.name][asset.id.to_s]="1" if asset.can_manage?
@@ -373,8 +373,8 @@ class SinglePublishingTest < ActionController::TestCase
                     :study=>Factory(:study,:contributor=>df.contributor.person,
                                     :investigation=>Factory(:investigation,:contributor=>df.contributor.person))
     other_persons_data_file = Factory :data_file, :contributor=>other_user, :project_ids=>other_user.person.projects.collect(&:id),:policy=>Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE)
-    assay.relate(df)
-    assay.relate(other_persons_data_file)
+    assay.associate(df)
+    assay.associate(other_persons_data_file)
     assert !other_persons_data_file.can_manage?
     df
   end

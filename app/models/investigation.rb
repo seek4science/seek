@@ -16,23 +16,17 @@ class Investigation < ActiveRecord::Base
   def state_allows_delete? *args
     studies.empty? && super
   end
-  
-  #FIXME: see comment in Assay about reversing these
+
   ["data_file","sop","model","publication"].each do |type|
     eval <<-END_EVAL
-      def #{type}_masters
-        studies.collect{|study| study.send(:#{type}_masters)}.flatten.uniq
-      end
-
       def #{type}s
         studies.collect{|study| study.send(:#{type}s)}.flatten.uniq
       end
 
+      def #{type}_versions
+        studies.collect{|study| study.send(:#{type}_versions)}.flatten.uniq
+      end
     END_EVAL
-  end
-
-  def sops
-    assays.collect{|assay| assay.sops}.flatten.uniq
   end
 
   def clone_with_associations

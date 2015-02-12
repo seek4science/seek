@@ -25,7 +25,7 @@ module Seek
     end
 
     def assets
-       assay.assets.collect{|a| a.parent} | assay.related_publications
+       assay.assets | assay.publications
     end
 
     #assets that are authorized to be shown for the current user
@@ -55,7 +55,7 @@ module Seek
         if asset.is_a?(Publication)
           Relationship.create :subject=>assay,:other_object=>asset,:predicate=>Relationship::RELATED_TO_PUBLICATION
         else
-          assay.relate(asset)
+          assay.associate(asset)
         end
       end
     end

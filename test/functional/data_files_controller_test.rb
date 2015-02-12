@@ -189,12 +189,12 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:model_owner) #can edit assay
     d = data_files(:picture)
     original_assay = assays(:metabolomics_assay)
-    asset_ids = original_assay.related_asset_ids 'DataFile'
-    assert asset_ids.include? d.id
+
+    assert_includes original_assay.data_files,d
 
     new_assay=assays(:metabolomics_assay2)
-    new_asset_ids = new_assay.related_asset_ids 'DataFile'
-    assert !new_asset_ids.include?(d.id)
+
+    refute_includes new_assay.data_files,d
     assert_difference('ActivityLog.count') do
       put :update, :id => d, :data_file =>{}, :assay_ids=>[new_assay.id.to_s]
     end
@@ -204,8 +204,8 @@ class DataFilesControllerTest < ActionController::TestCase
     original_assay.reload
     new_assay.reload
 
-    assert !original_assay.related_asset_ids('DataFile').include?(d.id)
-    assert new_assay.related_asset_ids('DataFile').include?(d.id)
+    refute_includes original_assay.data_files,d
+    assert_includes new_assay.data_files,d
   end
 
   test "associate sample" do
@@ -410,7 +410,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 1,assigns(:data_file).version
     assert_not_nil assigns(:data_file).latest_version
     assay.reload
-    assert assay.related_asset_ids('DataFile').include? assigns(:data_file).id
+    assert_includes assay.data_files, assigns(:data_file)
   end
 
   test "upload_for_tool inacessible with normal login" do
