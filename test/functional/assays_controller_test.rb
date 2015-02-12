@@ -833,7 +833,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert_response :success
 
       # tabs lazy loading: only first tab with items, and other tabs only item types and counts are shown.
-      assert_select "div.tab-pane" do
+      assert_select "div.tabbertab" do
         assert_select "h3", :text => "#{I18n.t('sop').pluralize} (2)", :count => 1
         assert_select "h3", :text => "#{I18n.t('data_file').pluralize} (2)", :count => 1
       end
