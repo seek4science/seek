@@ -60,7 +60,7 @@ class SamplesControllerTest < ActionController::TestCase
 
     get :show, :id=>s
     assert_response :success
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3", :text=>/#{I18n.t('biosamples.sample_parent_term')}s/ ,:count => 1
     end
     with_config_value :tabs_lazy_load_enabled, true do

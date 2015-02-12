@@ -50,7 +50,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     get :show,:id=>study.investigation.id
     assert_response :success
 
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3",:text=>"Publications (3)",:count=>1
     end
   end

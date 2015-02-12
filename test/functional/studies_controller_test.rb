@@ -44,7 +44,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study.id
     assert_response :success
 
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3",:text=>"Publications (3)",:count=>1
     end
   end
@@ -277,7 +277,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study
     assert_response :success
 
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
       assert_select "h3",:text=>"#{I18n.t('sop').pluralize} (1+1)",:count=>1
       assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
@@ -313,7 +313,7 @@ class StudiesControllerTest < ActionController::TestCase
     with_config_value :tabs_lazy_load_enabled, true do
       get :show, :id => study
       assert_response :success
-      assert_select "div.tabbertab" do
+      assert_select "div.tab-pane" do
         assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
         assert_select "h3",:text=>"#{I18n.t('sop').pluralize} (2)",:count=>1
         assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (2)",:count=>1
@@ -357,7 +357,7 @@ class StudiesControllerTest < ActionController::TestCase
     s=studies(:metabolomics_study)
     get :show,:id=>s
     assert_response :success
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3",:text=>"#{I18n.t('investigation').pluralize} (1)",:count=>1
     end
   end
