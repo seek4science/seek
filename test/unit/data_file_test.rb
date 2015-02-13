@@ -338,7 +338,7 @@ class DataFileTest < ActiveSupport::TestCase
         assert_equal data_file.subscriptions.map(&:person_id).sort, data_file_converted.subscriptions(&:person_id).sort
         assert_equal data_file.projects,data_file_converted.projects
         assert_equal data_file.attributions , data_file_converted.attributions
-        assert_equal data_file.related_publications, data_file_converted.related_publications
+        assert_equal data_file.publications, data_file_converted.publications
         assert_equal data_file.creators.sort, data_file_converted.creators.sort
         assert_equal data_file_tag_text_array, data_file_converted.annotations.with_attribute_name("tag").include_values.collect{|a| a.value.text}
         assert_equal data_file.project_ids.sort,data_file_converted.project_ids.sort

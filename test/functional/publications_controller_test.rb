@@ -160,7 +160,7 @@ class PublicationsControllerTest < ActionController::TestCase
     p = Factory(:publication)
     df = Factory(:data_file, :policy => Factory(:all_sysmo_viewable_policy))
     assert !p.data_files.include?(df)
-    assert !df.related_publications.include?(p)
+    assert !df.publications.include?(p)
 
     login_as(p.contributor)
     #add association
@@ -173,7 +173,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 1, p.data_files.count
 
     assert p.data_files.include?(df)
-    assert df.related_publications.include?(p)
+    assert df.publications.include?(p)
 
     #remove association
     put :update, :id => p,:author=>{},:data_file_ids=>[]
@@ -183,14 +183,14 @@ class PublicationsControllerTest < ActionController::TestCase
     df.reload
 
     assert_equal 0, p.data_files.count
-    assert_equal 0, p.related_publications.count
+    assert_equal 0, df.publications.count
   end
 
   test "associates models" do
     p = Factory(:publication)
     model = Factory(:model, :policy => Factory(:all_sysmo_viewable_policy))
     assert !p.models.include?(model)
-    assert !model.related_publications.include?(p)
+    assert !model.publications.include?(p)
 
     login_as(p.contributor)
     #add association
@@ -201,10 +201,10 @@ class PublicationsControllerTest < ActionController::TestCase
     model.reload
 
     assert_equal 1, p.models.count
-    assert_equal 1, model.related_publications.count
+    assert_equal 1, model.publications.count
 
     assert p.models.include?(model)
-    assert model.related_publications.include?(p)
+    assert model.publications.include?(p)
 
     #remove association
     put :update, :id => p,:author=>{},:model_ids=>[]
@@ -214,7 +214,7 @@ class PublicationsControllerTest < ActionController::TestCase
     model.reload
 
     assert_equal 0, p.models.count
-    assert_equal 0, p.related_publications.count
+    assert_equal 0, model.publications.count
   end
 
   test "do not associate assays unauthorized for edit" do

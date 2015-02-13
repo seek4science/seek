@@ -15,7 +15,7 @@ module Seek
           attributions.map { |a| a.other_object }
         end
 
-        def related_publications
+        def publications
           relationships.select { |a| a.other_object_type == 'Publication' }.map { |a| a.other_object }
         end
       end

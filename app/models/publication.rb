@@ -135,19 +135,19 @@ class Publication < ActiveRecord::Base
   end
 
   #includes those related directly, or through an assay
-  def related_data_filesz
+  def related_data_files
     via_assay = assays.collect do |assay|
       assay.data_files
     end.flatten.uniq.compact
-    via_assay | related_data_files
+    via_assay | data_files
   end
 
   #includes those related directly, or through an assay
-  def related_modelsz
+  def related_models
     via_assay = assays.collect do |assay|
       assay.models
     end.flatten.uniq.compact
-    via_assay | related_models
+    via_assay | models
   end
 
   #indicates whether the publication has data files or models linked to it (either directly or via an assay)

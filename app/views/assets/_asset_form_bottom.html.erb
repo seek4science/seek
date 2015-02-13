@@ -7,7 +7,7 @@
 	 existing_creators ||= f.object.try(:creators)
      existing_creators =  [current_user.person] if existing_creators.blank?
 	 other_creators ||= f.object.try :other_creators
-	 related_publications ||= f.try(:object).respond_to?(:related_publications) ? f.object.related_publications : nil
+	 related_publications ||= f.try(:object).respond_to?(:publications) ? f.object.publications : nil
    end
    existing_attributions||=[]
    existing_creators||=[current_user.person]

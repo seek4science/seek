@@ -8,7 +8,7 @@ class,method,property,uri or literal,transformation,collection transformation
 *,managers,RDF::SIOC.has_owner,u,,
 *,title,RDF::DC.title,l,,
 *,updated_at,RDF::DC.modified,l,item.to_datetime,
-*,related_publications,JERMVocab.isAssociatedWith,u,,
+*,publications,JERMVocab.isAssociatedWith,u,,
 *,version,RDF::DC.hasVersion,l,,
 Assay,assay_type_uri,JERMVocab.hasType,u,,
 Assay,organisms,JERMVocab.investigates,u,,

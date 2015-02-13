@@ -59,7 +59,7 @@ class ProjectsController < ApplicationController
     end
     project_assets.each do |asset|
       if @types_for_unlinked.include?(asset.class)
-        if asset.related_publications.empty?
+        if asset.publications.empty?
           @unlinked_to_publication[asset.class] << asset
         end
         if (!asset.respond_to?(:assays) || asset.assays.empty?) && (!asset.is_isa? || asset.assets.empty?)
