@@ -1,15 +1,18 @@
 module BootstrapHelper
 
+  # A link with an icon next to it
   def icon_link_to(text, icon_key, url, options = {})
     icon = icon_tag(icon_key, options.delete(:icon_options) || {})
     link_to((icon + text).html_safe, url, options)
   end
 
+  # A button with an icon and text
   def button_link_to(text, icon, url, options = {})
     options[:class] = "btn #{options[:type] || 'btn-default'} #{options[:class]}".strip
     icon_link_to(text, icon, url, options)
   end
 
+  # A collapsible panel
   def folding_panel(title = nil, collapsed = false, options = {})
     options = options.merge(:collapsible => true, :collapsed => collapsed)
     panel(title, options) do
@@ -17,6 +20,7 @@ module BootstrapHelper
     end
   end
 
+  # A panel with a heading section and body
   def panel(title = nil, options = {})
     collapsible = options.delete(:collapsible)
     collapse_options = {}
@@ -67,6 +71,14 @@ module BootstrapHelper
     end
   end
 
+  # A coloured information box with an X button to close it
+  def alert_box(style = 'info', options = {}, &block)
+    content_tag(:div, merge_options(options, {:class => "alert alert-#{style} alert-dismissable", :role => 'alert'})) do
+      dismiss_button + capture(&block)
+    end
+  end
+
+  # A button that displays a dropdown menu when clicked
   def dropdown_button(text, icon_key = nil, options = {})
     content_tag(:div, :class => "btn-group") do
       content_tag(:div, :type => 'button', :class => "btn dropdown-toggle #{options[:type] || 'btn-default'}".strip,
@@ -80,6 +92,8 @@ module BootstrapHelper
     end
   end
 
+  # A dropdown menu for admin commands. Will not display if the content is blank.
+  # (Saves having to check privileges twice)
   def admin_dropdown(text = 'Administration', icon = 'manage')
     opts = capture do
       yield
@@ -93,6 +107,12 @@ module BootstrapHelper
   end
 
   private
+
+  def dismiss_button
+    content_tag(:button, :class => 'close', 'data-dismiss' => 'alert', 'aria-label' => 'Close') do
+      content_tag(:span, '&times'.html_safe, 'aria-hidden' => 'true')
+    end
+  end
 
   def icon_tag(key, options = {})
     filename = icon_filename_for_key(key)

@@ -1,6 +1,6 @@
 <% if show_guide_box? %>
     <% tool_tip_text = tooltip_title_attrib("You may delete this box so it is no longer shown in the future.") %>
-    <div id='guide_box' class="alert alert-info" role="alert">
+    <%= alert_box('info', :id => 'guide_box') do %>
       <span id="guide_box_close">
           <%= link_to('×', hide_guide_box_users_path(),:remote=>true, :method => :post, :class => 'close', :title => tool_tip_text) -%>
         </span>
@@ -10,5 +10,5 @@
       <p>
         We also distribute our JERM Templates for use with <%= Seek::Config.application_name -%>, which can be found in our <%= link_to 'Templates', help_documents_path + '/templates' %> section.
       </p>
-    </div>
+      <% end %>
 <% end %>

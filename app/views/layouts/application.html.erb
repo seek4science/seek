@@ -44,16 +44,14 @@
 
     <%# applying styling to error / notice messages -%>
     <% if flash[:error] %>
-        <div role="alert" class="alert alert-danger alert-dismissible fade in" id="error_flash">
-          <button data-dismiss="alert" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-          <%= flash[:error] %>
-        </div>
+        <%= alert_box('danger', :id => 'error_flash', :class => 'fade in') do %>
+            <%= flash[:error] %>
+        <% end %>
     <% end %>
     <% if flash[:notice] %>
-        <div role="alert" class="alert alert-success alert-dismissible fade in" id="notice_flash">
-          <button data-dismiss="alert" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-          <%= flash[:notice] %>
-        </div>
+        <%= alert_box('success', :id => 'notice_flash', :class => 'fade in') do %>
+            <%= flash[:notice] %>
+        <% end %>
     <% end %>
 
     <%# main content part of every page -%>

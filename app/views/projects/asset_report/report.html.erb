@@ -1,7 +1,7 @@
 <%= javascript_include_tag "asset_report" %>
 
 <h1>Asset reports</h1>
-<div class='alert alert-info'>
+<%= alert_box do %>
   <p>
     There are 3 sets of reports about the availability of your <%= t('project').pluralize %> items:
   </p>
@@ -10,7 +10,7 @@
     <li>The second report gives are general report of items your <%= t('project') %> has made available, either publicly or with ALL other registered <%= t('project') %> members. It also displays items that have more restrictive sharing permissions.  You can view this report by clicking the <b>Summary of shared assets</b> tab.</li>
     <li>The third report displays items within your <%= t('project') %> that are not associated with publications, <%= t('assays.assay').pluralize %> or neither.You can view this report by clicking the <b>Summary of unlinked assets</b> tab.</li>
   </ul>
-</div>
+<% end %>
 
 <div id="report_tabs" role="tabpanel">
   <ul class="nav nav-tabs" role="tablist">
