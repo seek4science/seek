@@ -4,7 +4,7 @@
    all_models=authorised_models
    project_models=authorised_models(current_user.person.projects)
     select_truncate_length=120
-    associated_models = resource.is_a?(Publication) ? resource.related_models : resource.models
+    associated_models = resource.models
 -%>
 
 <div class="fold">
@@ -93,8 +93,7 @@
     }
   }
 
-    <% models = resource.is_a?(Publication) ? resource.related_models : resource.models %>
-<% models.each do |model| -%>
+<% resource.models.each do |model| -%>
   <% if model.can_view? -%>
       model_id = '<%= model.id -%>';
       model_title = '<%= escape_javascript(model.title) -%>';

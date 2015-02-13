@@ -118,33 +118,33 @@ class Publication < ActiveRecord::Base
     self.citation = doi_record.citation
   end
 
-  def related_data_files
+  def data_files
     self.backwards_relationships.select {|a| a.subject_type == "DataFile"}.collect { |a| a.subject }
   end
 
-  def related_models
+  def models
     self.backwards_relationships.select {|a| a.subject_type == "Model"}.collect { |a| a.subject }
   end
 
-  def related_assays
+  def assays
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
 
-  def related_presentations
+  def presentations
     self.backwards_relationships.select {|a| a.subject_type == "Presentation"}.collect { |a| a.subject }
   end
 
   #includes those related directly, or through an assay
-  def all_related_data_files
-    via_assay = related_assays.collect do |assay|
+  def related_data_filesz
+    via_assay = assays.collect do |assay|
       assay.data_files
     end.flatten.uniq.compact
     via_assay | related_data_files
   end
 
   #includes those related directly, or through an assay
-  def all_related_models
-    via_assay = related_assays.collect do |assay|
+  def related_modelsz
+    via_assay = assays.collect do |assay|
       assay.models
     end.flatten.uniq.compact
     via_assay | related_models
@@ -152,15 +152,18 @@ class Publication < ActiveRecord::Base
 
   #indicates whether the publication has data files or models linked to it (either directly or via an assay)
   def has_assets?
-    #FIXME: requires a unit test
-    !all_related_data_files.empty? || !all_related_models.empty?
+    !assets.any?
+  end
+
+  def assets
+    data_files | models | presentations
   end
 
   #returns a list of related organisms, related through either the assay or the model
   def related_organisms
-    organisms = related_assays.collect{|a| a.organisms}.flatten.uniq.compact
-    organisms = organisms | related_models.collect{|m| m.organism}.uniq.compact
-    organisms
+    organisms = assays.collect{|a| a.organisms}
+    organisms = organisms | models.collect{|m| m.organism}
+    organisms.uniq.compact
   end
 
   def self.subscribers_are_notified_of? action

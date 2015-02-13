@@ -22,7 +22,7 @@
 
 
     select_truncate_length=120
-    associated_assays = resource.is_a?(Publication) ? resource.related_assays : resource.assays
+    associated_assays = resource.assays
 
     if resource.is_a? Model
       single_assay_class_text = t 'assays.modelling_analysis'
@@ -160,7 +160,7 @@
           //selection_box.onchange();
       }
 
-<% associated_assay_ids = resource.is_a?(Publication) ? resource.related_assays.collect(&:id) : resource.assays.collect(&:id) %>
+<% associated_assay_ids = resource.assays.collect(&:id) %>
   <% associated_assay_ids.each do |associated_assay_id|%>
     <% assay = Assay.find(associated_assay_id) %>
     <% if assay.try :can_view? -%>

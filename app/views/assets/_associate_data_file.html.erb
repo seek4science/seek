@@ -1,5 +1,5 @@
 <% resource_text ||= text_for_resource(resource)
-   associated_data_files = resource.is_a?(Publication) ? resource.related_data_files : resource.data_files
+   associated_data_files = resource.data_files
 %>
 <div class="fold">
 
@@ -104,8 +104,8 @@
         }
       }
 
-<% data_files = resource.is_a?(Publication) ? resource.related_data_files : resource.data_files %>
-<% data_files.each do |data_file| -%>
+
+<% resource.data_files.each do |data_file| -%>
   <% if data_file.can_view? -%>
       data_file_id = '<%= data_file.id -%>';
       data_title = '<%= escape_javascript(data_file.title) -%>';

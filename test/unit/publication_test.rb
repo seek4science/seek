@@ -123,8 +123,8 @@ class PublicationTest < ActiveSupport::TestCase
 
   test "model and datafile association" do
     publication = publications(:pubmed_2)
-    assert publication.related_models.include?(models(:teusink))
-    assert publication.related_data_files.include?(data_files(:picture))
+    assert publication.models.include?(models(:teusink))
+    assert publication.data_files.include?(data_files(:picture))
   end
 
   test "test uuid generated" do
@@ -135,7 +135,7 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "sort by published_date" do
-    assert_equal Publication.find(:all).sort_by { |p| p.published_date}.reverse, Publication.default_order
+    assert_equal Publication.all.sort_by { |p| p.published_date}.reverse, Publication.default_order
   end
 
   test "title trimmed" do

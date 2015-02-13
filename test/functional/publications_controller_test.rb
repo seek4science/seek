@@ -44,7 +44,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_redirected_to edit_publication_path(assigns(:publication))
     p=assigns(:publication)
-    assert_equal 0,p.related_assays.count
+    assert_equal 0,p.assays.count
   end
 
   test "should create publication" do
@@ -57,8 +57,8 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_redirected_to edit_publication_path(assigns(:publication))
     p=assigns(:publication)
-    assert_equal 1,p.related_assays.count
-    assert p.related_assays.include? assay
+    assert_equal 1,p.assays.count
+    assert p.assays.include? assay
   end
   
   test "should create doi publication" do
@@ -133,7 +133,7 @@ class PublicationsControllerTest < ActionController::TestCase
     login_as(:model_owner) #can edit assay
     p = publications(:taverna_paper_pubmed)
     original_assay = assays(:assay_with_a_publication)
-    assert p.related_assays.include?(original_assay)
+    assert p.assays.include?(original_assay)
     assert original_assay.publications.include?(p)
 
     new_assay=assays(:metabolomics_assay)
@@ -146,12 +146,12 @@ class PublicationsControllerTest < ActionController::TestCase
     original_assay.reload
     new_assay.reload
 
-    assert_equal 1, p.related_assays.count
+    assert_equal 1, p.assays.count
 
-    assert !p.related_assays.include?(original_assay)
+    assert !p.assays.include?(original_assay)
     assert !original_assay.publications.include?(p)
 
-    assert p.related_assays.include?(new_assay)
+    assert p.assays.include?(new_assay)
     assert new_assay.publications.include?(p)
 
   end
@@ -159,7 +159,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "associates data files" do
     p = Factory(:publication)
     df = Factory(:data_file, :policy => Factory(:all_sysmo_viewable_policy))
-    assert !p.related_data_files.include?(df)
+    assert !p.data_files.include?(df)
     assert !df.related_publications.include?(p)
 
     login_as(p.contributor)
@@ -170,9 +170,9 @@ class PublicationsControllerTest < ActionController::TestCase
     p.reload
     df.reload
 
-    assert_equal 1, p.related_data_files.count
+    assert_equal 1, p.data_files.count
 
-    assert p.related_data_files.include?(df)
+    assert p.data_files.include?(df)
     assert df.related_publications.include?(p)
 
     #remove association
@@ -182,14 +182,14 @@ class PublicationsControllerTest < ActionController::TestCase
     p.reload
     df.reload
 
-    assert_equal 0, p.related_data_files.count
+    assert_equal 0, p.data_files.count
     assert_equal 0, p.related_publications.count
   end
 
   test "associates models" do
     p = Factory(:publication)
     model = Factory(:model, :policy => Factory(:all_sysmo_viewable_policy))
-    assert !p.related_models.include?(model)
+    assert !p.models.include?(model)
     assert !model.related_publications.include?(p)
 
     login_as(p.contributor)
@@ -200,10 +200,10 @@ class PublicationsControllerTest < ActionController::TestCase
     p.reload
     model.reload
 
-    assert_equal 1, p.related_models.count
+    assert_equal 1, p.models.count
     assert_equal 1, model.related_publications.count
 
-    assert p.related_models.include?(model)
+    assert p.models.include?(model)
     assert model.related_publications.include?(p)
 
     #remove association
@@ -213,14 +213,14 @@ class PublicationsControllerTest < ActionController::TestCase
     p.reload
     model.reload
 
-    assert_equal 0, p.related_models.count
+    assert_equal 0, p.models.count
     assert_equal 0, p.related_publications.count
   end
 
   test "do not associate assays unauthorized for edit" do
     p = publications(:taverna_paper_pubmed)
     original_assay = assays(:assay_with_a_publication)
-    assert p.related_assays.include?(original_assay)
+    assert p.assays.include?(original_assay)
     assert original_assay.publications.include?(p)
 
     new_assay=assays(:metabolomics_assay)
@@ -233,12 +233,12 @@ class PublicationsControllerTest < ActionController::TestCase
     original_assay.reload
     new_assay.reload
 
-    assert_equal 1, p.related_assays.count
+    assert_equal 1, p.assays.count
 
-    assert p.related_assays.include?(original_assay)
+    assert p.assays.include?(original_assay)
     assert original_assay.publications.include?(p)
 
-    assert !p.related_assays.include?(new_assay)
+    assert !p.assays.include?(new_assay)
     assert !new_assay.publications.include?(p)
 
   end
@@ -246,15 +246,15 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should keep model and data associations after update" do
     p = publications(:pubmed_2)
     put :update, :id => p,:author=>{},:assay_ids=>[],
-        :data_file_ids => p.related_data_files.collect{|df| "#{df.id},None"},
-        :model_ids => p.related_models.collect{|m| m.id.to_s}
+        :data_file_ids => p.data_files.collect{|df| "#{df.id},None"},
+        :model_ids => p.models.collect{|m| m.id.to_s}
 
     assert_redirected_to publication_path(p)
     p.reload
 
-    assert p.related_assays.empty?
-    assert p.related_models.include?(models(:teusink))
-    assert p.related_data_files.include?(data_files(:picture))
+    assert p.assays.empty?
+    assert p.models.include?(models(:teusink))
+    assert p.data_files.include?(data_files(:picture))
   end
 
 

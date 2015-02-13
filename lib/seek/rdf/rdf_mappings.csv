@@ -47,7 +47,7 @@ Project,organisms,JERMVocab.investigates,u,,
 Project,studies,JERMVocab.hasItem,u,,
 Project,web_page,RDF::FOAF.homepage,u,,
 Publication,projects,JERMVocab.isAssociatedWith,u,,
-Publication,related_assays,JERMVocab.isAssociatedWith,u,,
+Publication,assays,JERMVocab.isAssociatedWith,u,,
 Sample,assays,JERMVocab.isPartOf,u,,
 Sample,donation_date,JERMVocab.donation_date,l,item.to_datetime,compact
 Sample,lab_internal_number,JERMVocab.Lab_internal_ID,l,,

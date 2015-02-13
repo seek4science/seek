@@ -208,14 +208,14 @@ class PublicationNode < SeekNode
     publication = item
     dot = ""
     pub_node = SeekNode.node_for(publication)
-    if publication.related_assays.empty?
+    if publication.assays.empty?
       dot << pub_node.to_s
     else
-      publication.related_assays.each do |assay|
+      publication.assays.each do |assay|
         dot << SeekNode.node_for(assay).to_s
       end
     end
-    (publication.related_data_files + publication.related_models).each do |asset|
+    (publication.data_files | publication.models).each do |asset|
       dot << SeekNode.node_for(asset).to_s
     end
     return dot
