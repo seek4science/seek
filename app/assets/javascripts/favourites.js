@@ -1,4 +1,4 @@
-// Script to open the user dropdown menu when a favouritable icon is dragged, and highlight the appropriate 'drop zone'
+var closeDropdownWhenDone = false;
 
 $j(document).ready(function () {
 
@@ -39,7 +39,10 @@ function bindFavouritables(elements) {
         appendTo: 'body',
         start: function () {
             if (!$j('#user-menu').hasClass('open')) {
+                closeDropdownWhenDone = true;
                 $j('#user-menu-button').dropdown('toggle');
+            } else {
+                closeDropdownWhenDone = false;
             }
             $j('#add-favourites-zone').addClass('active');
             $j('#add-favourites-zone-text').show();
@@ -47,10 +50,11 @@ function bindFavouritables(elements) {
         stop: function () {
             $j('#add-favourites-zone').removeClass('active');
             $j('#add-favourites-zone-text').hide();
-            setTimeout(function () {
-                if ($j('#user-menu').hasClass('open'))
-                    $j('#user-menu-button').dropdown('toggle');
-            }, 800);
+            if(closeDropdownWhenDone)
+                setTimeout(function () {
+                    if ($j('#user-menu').hasClass('open'))
+                        $j('#user-menu-button').dropdown('toggle');
+                }, 800);
         }
     });
 }
