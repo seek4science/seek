@@ -2,11 +2,10 @@
 resource_type = text_for_resource(resource)
 %>
 
-
 <% if Seek::Config.email_enabled && !resource.managers.empty? -%>
 
-    <span id="request_resource_button" class="icon">
-        <%= link_to_function request_request_label(resource),"Effect.Appear('request_resource_form');Effect.Fade('request_resource_button');" -%>
+    <span id="request_resource_button">
+      <%= button_link_to("Request #{text_for_resource(resource)}", "message", '#', :onclick => "Effect.Appear('request_resource_form');Effect.Fade('request_resource_button');") -%>
     </span>
 
 
@@ -34,7 +33,7 @@ resource_type = text_for_resource(resource)
 
 
 <% else -%>
-    <span id="request_resource_button" class="icon">
-        <%= link_to_function request_request_label(resource),"alert('Unable to send emails - email is disabled');" -%>
+    <span id="request_resource_button">
+      <%= button_link_to("Request #{text_for_resource(resource)}", "message", '#', :class => 'disabled-button', :onclick => "alert('Unable to send emails - email is disabled');") -%>
     </span>
 <% end -%>
