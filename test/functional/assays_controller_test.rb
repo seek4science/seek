@@ -92,7 +92,8 @@ class AssaysControllerTest < ActionController::TestCase
     assays = assigns(:assays)
     first_assay = assays.first
     assert_not_nil first_assay
-    assert_select "a[id*=?]", /drag_Assay_#{first_assay.id}/
+    assert_select "a[data-favourite-url=?]", h(add_favourites_path(:resource_id =>first_assay.id,
+                                                                   :resource_type => first_assay.class.name))
   end
 
   test "should show index in xml" do

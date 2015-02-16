@@ -51,11 +51,13 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should show draggable icon in index" do
     get :index
+    puts @response.body
     assert_response :success
     studies = assigns(:studies)
     first_study = studies.first
     assert_not_nil first_study
-    assert_select "a[id*=?]",/drag_Study_#{first_study.id}/
+    assert_select "a[data-favourite-url=?]", h(add_favourites_path(:resource_id =>first_study.id,
+                                                                   :resource_type => first_study.class.name))
   end
   
   def test_title
