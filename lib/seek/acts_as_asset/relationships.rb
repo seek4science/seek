@@ -8,7 +8,7 @@ module Seek
         end
 
         def related_people
-          creators
+          (creators | [contributor.try(:person)]).compact.uniq
         end
 
         def attributions_objects

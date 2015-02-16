@@ -473,9 +473,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def permitted_filters
+  #Strips any unexpected filter, which protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
+  def strip_unpermitted_filters(filters)
     #placed this in a separate method so that other controllers could override it if necessary
-    Seek::Util.persistent_classes.select {|c| c.respond_to? :find_by_id}.map {|c| c.name.underscore}
+    permitted = Seek::Util.persistent_classes.select {|c| c.respond_to? :find_by_id}.map {|c| c.name.underscore}
+    filters.select{ |filter| permitted.include?(filter.to_s)}
   end
 
   def apply_filters(resources)
@@ -488,14 +490,13 @@ class ApplicationController < ActionController::Base
       end
     end
 
+    filters = strip_unpermitted_filters(filters)
+
     if filters.size>0
       params[:page]||="all"
       params[:filtered]=true
     end
 
-    #apply_filters will be dispatching to methods based on the symbols in params[:filter].
-    #Permitted filters protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
-    filters.delete_if { |k, v| not (permitted_filters.include? k.to_s) }
     resources.select do |res|
       filters.all? do |filter, value|
         filter = filter.to_s
@@ -509,29 +510,12 @@ class ApplicationController < ActionController::Base
 
   def detect_for_filter(filter, resource, value)
     case
-      #first the special cases
-      when filter == 'investigation' && resource.respond_to?(:assays)
-        resource.assays.collect { |a| a.study.investigation_id }.include? value.id
-      when filter == 'study' && resource.respond_to?(:assays)
-        resource.assays.collect { |a| a.study_id }.include? value.id
-      when (filter == 'project' && resource.respond_to?(:projects_and_ancestors))
-        resource.projects_and_ancestors.include? value
-      when filter == 'person' && resource.class.is_asset?
-        (resource.creators.include?(value) || resource.contributor== value || resource.contributor.try(:person) == value)
-      when filter == 'person' && (resource.respond_to?(:contributor) || resource.respond_to?(:creators) || resource.respond_to?(:owner))
-        people = [resource.contributor, resource.contributor.try(:person)]
-        people = people | resource.creators if resource.respond_to?(:creators)
-        people << resource.owner if resource.respond_to?(:owner)
-        people.compact!
-        people.include?(value)
-      #then the general cases
       when resource.respond_to?(filter.pluralize)
         resource.send(filter.pluralize).include? value
       when resource.respond_to?("related_#{filter.pluralize}")
         resource.send("related_#{filter.pluralize}").include?(value)
       when resource.respond_to?(filter)
         resource.send(filter) == value
-      #defaults to false, if a filter is not recognised then nothing is return
       else
         false
     end

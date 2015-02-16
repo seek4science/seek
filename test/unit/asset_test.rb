@@ -208,11 +208,11 @@ class AssetTest < ActiveSupport::TestCase
     presentation.creators = [Factory(:person),Factory(:person)]
     publication.creators = [Factory(:person),Factory(:person)]
 
-    assert_equal df.creators,df.related_people
-    assert_equal sop.creators,sop.related_people
-    assert_equal model.creators,model.related_people
-    assert_equal presentation.creators,presentation.related_people
-    assert_equal publication.creators,publication.related_people
+    assert_equal (df.creators | [df.contributor]).sort,df.related_people.sort
+    assert_equal (sop.creators | [sop.contributor]).sort,sop.related_people.sort
+    assert_equal (model.creators | [model.contributor]).sort,model.related_people.sort
+    assert_equal (presentation.creators | [presentation.contributor]).sort,presentation.related_people.sort
+    assert_equal (publication.creators | [publication.contributor]).sort,publication.related_people.sort
   end
 
   test "supports_doi?" do

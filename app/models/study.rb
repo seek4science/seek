@@ -25,7 +25,6 @@ class Study < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
-  #FIXME: see comment in Assay about reversing these
   ["data_file","sop","model","publication"].each do |type|
     eval <<-END_EVAL
       def #{type}_versions

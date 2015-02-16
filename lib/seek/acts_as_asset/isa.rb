@@ -3,6 +3,17 @@ module Seek
     # Acts as Asset behaviour that relates to the ISA framework
     module ISA
       module InstanceMethods
+
+        def related_people
+          people = [contributor.try(:person)]
+          people = people | creators if self.respond_to?(:creators)
+          people.compact.uniq
+        end
+
+        def investigations
+          studies.map {|s| s.investigation}.uniq
+        end
+
         def studies
           assays.map { |a| a.study }.uniq
         end

@@ -5,6 +5,11 @@ module Seek
         mod_or_class.send :include, ExtendedMethods
       end
       module ExtendedMethods
+
+        def related_projects
+          projects_and_ancestors
+        end
+
         def projects_and_ancestors
           projects.collect { |proj| [proj]+proj.ancestors }.flatten.uniq
         end
