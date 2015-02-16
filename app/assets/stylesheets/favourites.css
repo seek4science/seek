@@ -43,6 +43,6 @@ ul.favourites li {
     list-style-type: none;
 }
 
-#drop_favourites {
+#add-favourites-zone {
     max-height: 30em;    
 }

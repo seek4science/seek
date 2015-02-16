@@ -1,4 +1,3 @@
-<% drag_id=model_to_drag_id @person %>
 <%
    admin_or_me = (current_user.try(:person) == @person || admin_logged_in?)
 %>
@@ -70,7 +69,7 @@
   </div>
 
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => {:object => @person, :drag_id => drag_id} -%>
+    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => {:object => @person} -%>
     <%= render :partial => "personal_tags", :locals=>{:person=>@person} if Seek::Config.tagging_enabled %>
   </div>
 </div>

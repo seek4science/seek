@@ -103,17 +103,17 @@ ul.feed .file-type-icon img {
   margin: 5px;
 }
 
-#drop_favourites {
+#add-favourites-zone {
   padding: 0.75em;
 }
 
-#drop_favourites.active {
+#add-favourites-zone.active {
   border-style: solid;
   border-width: 1px 0;
   border-color: $brand-success; /* a bootstrap variable! (green colour) */
 }
 
-#drop-favourite-text {
+#add-favourites-zone-text {
   padding: 0.25em 0.75em;
   background: $brand-success;
   color: white;
@@ -167,13 +167,13 @@ span.truncated-name {
   margin-bottom: 0.5em;
 }
 
-.contribution-header a.asset {
+.contribution-header a.favouritable {
   @include rounded-box-shadow(#ffffff);
   float: left;
   margin-right: 0.5em;
 }
 
-.contribution-header a.asset > img {
+.contribution-header a.favouritable > img {
   padding: 2px;
   width: 34px;
   height: 34px;
@@ -231,4 +231,12 @@ div.hidden_list_item {
 
 .clickable {
   cursor: pointer;
+}
+
+.ui-draggable-dragging {
+  z-index: 1000;
+}
+
+.favourite .framed {
+  margin-bottom: 4px;
 }

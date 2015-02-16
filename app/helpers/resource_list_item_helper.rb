@@ -60,12 +60,7 @@ module ResourceListItemHelper
   end
 
   def list_item_title_with_avatar(html, resource, title, url)
-    resource_path = show_resource_path(resource)
-    image=resource_avatar resource, :style => "width: 24px; height: 24px; vertical-align: middle"
-
-    icon = link_to_draggable(image, resource_path, :id => model_to_drag_id(resource), :class => "asset favouritable", :title => tooltip_title_attrib(get_object_title(resource)))
-
-    html << "#{icon} #{link_to title, (url.nil? ? resource_path : url)}"
+    html << "#{favouritable_icon(resource, 24, :avatar_class => '')} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}"
     html << "#item_visibility"
     html
   end

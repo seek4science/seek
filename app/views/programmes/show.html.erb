@@ -1,5 +1,3 @@
-<% drag_id = model_to_drag_id(@programme) %>
-
 <%= render :partial => "general/item_title",:locals => {:item=>@programme, :buttons_partial => 'programmes/buttons'} %>
 
 <div class="row">
@@ -16,7 +14,7 @@
   </div>
 
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @programme, :drag_id => drag_id } -%>
+    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @programme } -%>
   </div>
 </div>
 

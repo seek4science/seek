@@ -7,7 +7,6 @@
 //= require prototype_ujs
 //= require prototype_patch
 //= require effects
-//= require dragdrop
 //= require boxover
 //= require scriptaculous
 //= require controls
@@ -35,4 +34,4 @@
 //= require detect_browser
 //= require easytabs
 //= require favourites
-
+//= require jquery-ui-drag-drop
