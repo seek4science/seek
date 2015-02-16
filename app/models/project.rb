@@ -49,16 +49,6 @@ class Project < ActiveRecord::Base
 
   validate :lineage_ancestor_cannot_be_self
 
-  RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
-  RELATED_RESOURCE_TYPES.each do |type|
-    define_method "related_#{type.underscore.pluralize}" do
-      send "#{type.underscore.pluralize}"
-    end
-  end
-
-  def studies
-    investigations.collect(&:studies).flatten.uniq
-  end
     
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
@@ -174,6 +164,10 @@ class Project < ActiveRecord::Base
   def self.with_userless_people
     p=Project.all(:include=>:work_groups)
     return p.select { |proj| proj.includes_userless_people? }
+  end
+
+  def studies
+    investigations.collect(&:studies).flatten.uniq
   end
 
   def assays

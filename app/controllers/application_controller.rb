@@ -524,15 +524,13 @@ class ApplicationController < ActionController::Base
         people << resource.owner if resource.respond_to?(:owner)
         people.compact!
         people.include?(value)
-      #then the general case
-      when resource.respond_to?("all_related_#{filter.pluralize}")
-        resource.send("all_related_#{filter.pluralize}").include?(value)
+      #then the general cases
+      when resource.respond_to?(filter.pluralize)
+        resource.send(filter.pluralize).include? value
       when resource.respond_to?("related_#{filter.pluralize}")
         resource.send("related_#{filter.pluralize}").include?(value)
       when resource.respond_to?(filter)
         resource.send(filter) == value
-      when resource.respond_to?(filter.pluralize)
-        resource.send(filter.pluralize).include? value
       #defaults to false, if a filter is not recognised then nothing is return
       else
         false

@@ -96,10 +96,6 @@ class DataFile < ActiveRecord::Base
   has_many :sample_assets,:dependent=>:destroy,:as => :asset
   has_many :samples, :through => :sample_assets
 
-    
-
-
-
 
   def relationship_type(assay)
     #FIXME: don't like this hardwiring to assay within data file, needs abstracting

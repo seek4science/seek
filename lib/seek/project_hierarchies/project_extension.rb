@@ -59,17 +59,6 @@ module Seek
             res.sort_by { |a| (a.last_name.blank? ? a.name : a.last_name) }
           end
 
-          #relate_things, in the project and descendants
-          Project::RELATED_RESOURCE_TYPES.each do |type|
-            define_method "related_#{type.underscore.pluralize}" do
-              res = send "#{type.underscore.pluralize}"
-              descendants.each do |descendant|
-                res = res | descendant.send("#{type.underscore.pluralize}")
-              end
-              res.compact
-            end
-          end
-
           #project role, in project and its descendants
           def pis
             pi_role = ProjectRole.find_by_name('PI')
