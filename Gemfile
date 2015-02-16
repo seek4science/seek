@@ -93,6 +93,8 @@ gem 'datacite_doi_ify'
 gem 'bootstrap-sass', '~>3.3.1'
 gem 'sass-rails', '>= 3.2'
 
+gem 'ro-bundle', '~> 0.1'
+
 group :assets do
   gem 'turbo-sprockets-rails3'
   gem 'yui-compressor'
