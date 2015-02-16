@@ -1,4 +1,4 @@
-require 'uuidtools'
+
 module Seek
   module UniquelyIdentifiable
     
@@ -19,7 +19,7 @@ module Seek
     module InstanceMethods
       
       def regenerate_uuid        
-        self.uuid = "#{UUIDTools::UUID.random_create.to_s}"       
+        self.uuid = UUID.generate
       end
 
       def uuid

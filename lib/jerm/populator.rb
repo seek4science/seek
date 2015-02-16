@@ -1,5 +1,4 @@
 require 'digest/md5'
-require 'uuidtools'
 
 module Jerm
   class Populator
@@ -51,7 +50,7 @@ module Jerm
       end
       
       response[:resource]=resource
-      response[:uuid]=UUIDTools::UUID.random_create.to_s
+      response[:uuid]=UUID.generate
       return response
     end
 

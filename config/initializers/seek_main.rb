@@ -15,7 +15,8 @@ require 'send_notification_emails_when_announcement_created'
 require 'modporter_extensions'
 require "attachment_fu_extension"
 require 'seek/taggable'
-require "bio"
+require 'bio'
+require 'uuid'
 
 require 'sunspot_rails'
 require 'cancan'

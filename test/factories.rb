@@ -581,7 +581,7 @@ end
 #Content_blob
 #either url or data should be provided for assets
   Factory.define(:content_blob) do |f|
-    f.sequence(:uuid) { UUIDTools::UUID.random_create.to_s }
+    f.sequence(:uuid) { UUID.generate }
     f.sequence(:data) {|n| "data [#{n}]" }
     f.sequence(:original_filename) {|n| "file-#{n}"}
   end

@@ -1,4 +1,4 @@
-require 'uuidtools'
+
 module Seek
   module Jws
     # methods related to interacting with JWS

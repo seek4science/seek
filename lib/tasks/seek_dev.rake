@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
-require 'uuidtools'
 require 'colorize'
 
 include SysMODB::SpreadsheetExtractor
@@ -39,7 +38,7 @@ namespace :seek_dev do
   desc 'create 50 randomly named unlinked projects'
   task(:random_projects=>:environment) do
     (0...50).to_a.each do
-      title=("A".."Z").to_a[rand(26)]+" #{UUIDTools::UUID.random_create.to_s}"
+      title=("A".."Z").to_a[rand(26)]+UUID.generate
       p=Project.create :title=>title
       p.save!
     end

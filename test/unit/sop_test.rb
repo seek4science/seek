@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SopTest < ActiveSupport::TestCase
+
   fixtures :all
   
   test "project" do

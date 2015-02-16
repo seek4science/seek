@@ -8,7 +8,7 @@ module FavouritesHelper
       model_name = model_name.gsub('::', '')
     end
 
-    uuid=UUIDTools::UUID.random_create.to_s.split("-")[0..2].join
+    uuid=UUID.generate.split("-")[0..2].join
     return "drag_#{model_name}_#{object.id.to_s}_#{version}_#{uuid}".html_safe
   end
 

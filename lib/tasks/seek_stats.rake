@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
-require 'uuidtools'
 
 namespace :seek_stats do
 

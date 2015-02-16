@@ -84,9 +84,10 @@ GIT
 
 GIT
   remote: https://github.com/SysMO-DB/site_announcements.git
-  revision: 91ceecf26ab29a74e32e239827fd5fef8519df0f
+  revision: 305cca221bd2759a97c935871363acae0c54f0a9
   specs:
-    site_announcements (1.1)
+    site_announcements (1.2)
+      uuid (~> 2.3)
 
 GIT
   remote: https://github.com/SysMO-DB/white_list.git
@@ -696,7 +697,6 @@ GEM
       procto (~> 0.0.2)
     uuid (2.3.7)
       macaddr (~> 1.0)
-    uuidtools (2.1.5)
     virtus (1.0.4)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
@@ -819,7 +819,7 @@ DEPENDENCIES
   transaction_isolation
   turbo-sprockets-rails3
   unicorn-rails
-  uuidtools
+  uuid (~> 2.3)
   webmock
   white_list!
   white_list_formatted_content!

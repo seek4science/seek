@@ -5,7 +5,7 @@ Technoweenie::AttachmentFu::InstanceMethods.module_eval do
       upload_results = self.uploaded_data_without_extension=file_data
       self.original_filename = file_data.original_filename
 
-      uuid_to_use="#{UUIDTools::UUID.random_create.to_s}"
+      uuid_to_use=UUID.generate
       self.filename= "#{uuid_to_use}.dat"
 
       if upload_results && file_data.content_type=="image/tiff"

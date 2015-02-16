@@ -9,7 +9,7 @@ gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid'
 gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
-gem 'uuidtools'
+gem 'uuid',"~>2.3"
 gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"~>0.13.4"
 gem "rmagick","2.13.2", :require => 'RMagick'

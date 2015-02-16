@@ -1,5 +1,4 @@
 require 'openssl'
-require 'uuidtools'
 require 'fileutils'
 
 module Seek
@@ -127,7 +126,7 @@ module Seek
     
     #caches the result into a temporary file
     def cache file_obj,data_result,url,username,password
-      data_result[:uuid]=UUIDTools::UUID.random_create.to_s
+      data_result[:uuid]=UUID.generate
       key=generate_key url,username,password      
       
       begin
