@@ -7,9 +7,9 @@ $j(document).ready(function () {
         //hoverClass: "ui-state-hover",
         accept: ".favouritable",
         drop: function(event, ui) {
-            $j('fav_ajax-loader').show();
+            $j('#fav_ajax-loader').show();
             $j.post(ui.draggable.data('favouriteUrl')).always(function() {
-                $j('fav_ajax-loader').hide();
+                $j('#fav_ajax-loader').hide();
             });
         }
     });
@@ -18,12 +18,12 @@ $j(document).ready(function () {
         greedy: true,
         accept: ".favourite",
         drop: function(event, ui) {
-            $j('fav_ajax-loader').show();
+            $j('#fav_ajax-loader').show();
             $j.ajax({
                 url: ui.draggable.data('deleteUrl'),
                 type: 'DELETE',
                 success: function() {
-                    $j('fav_ajax-loader').hide();
+                    $j('#fav_ajax-loader').hide();
                 }
             });
         }

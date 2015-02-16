@@ -25,9 +25,8 @@
 
         <li role="presentation" class="dropdown-header">
           Your favourites
-          <span id="fav_ajax-loader" style="display:none;">
-            <%= image_tag("ajax-loader.gif", :alt=>"loading...",:title=>"loading...") %>
-          </span>
+          <%= image_tag("ajax-loader.gif", :alt => "loading...", :title => "loading...",
+                        :id => "fav_ajax-loader", :style => 'display: none') %>
         </li>
         <div id="add-favourites-zone-text" style="display: none">
           <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
