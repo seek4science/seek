@@ -16,6 +16,8 @@ module Seek
   module ProjectHierarchies
     module ProjectExtension
 
+      RELATED_RESOURCE_TYPES = ["Investigation", "Study", "Assay", "DataFile", "Model", "Sop", "Publication", "Event", "Presentation", "Organism"]
+
       def self.included klass
         klass.class_eval do
           include ActsAsCachedTree
@@ -24,6 +26,8 @@ module Seek
           after_add_for_institutions << :create_ancestor_workgroups
           after_add_for_ancestors << :add_project_subscriptions_for_subscriber
           after_remove_for_ancestors << :remove_project_subscriptions_for_subscriber
+
+
 
           def touch_for_hierarchy_updates
             if changed_attributes.include? :parent_id
@@ -57,6 +61,18 @@ module Seek
             #TODO: look into doing this with a named_scope or direct query
             res = ([self] + descendants).collect { |proj| proj.work_groups.collect(&:people) }.flatten.uniq.compact
             res.sort_by { |a| (a.last_name.blank? ? a.name : a.last_name) }
+          end
+
+          #relate_things, in the project and descendants
+
+          Project::RELATED_RESOURCE_TYPES.each do |type|
+            define_method "related_#{type.underscore.pluralize}" do
+              res = send "#{type.underscore.pluralize}"
+              descendants.each do |descendant|
+                res = res | descendant.send("#{type.underscore.pluralize}")
+              end
+              res.compact
+            end
           end
 
           #project role, in project and its descendants
