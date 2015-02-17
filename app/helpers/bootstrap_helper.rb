@@ -106,6 +106,10 @@ module BootstrapHelper
     end
   end
 
+  def tags_input(name, existing_tags, options = {})
+    text_field_tag(name, existing_tags.join(','), options.merge('data-role' => 'tagsinput'))
+  end
+
   private
 
   def dismiss_button

@@ -9,17 +9,23 @@ module Seek
       self.class.is_taggable?
     end
 
-    def tag_as_user_with_params params,attr="tag",owner=User.current_user
-      tags = resolve_tags_from_params params,attr
-      tag_as_user_with tags,attr,owner
+    # tag_as_user_with_params
+    def tag_annotations_as_user(annotations, attr="tag", owner = User.current_user)
+      tags = resolve_tags(annotations)
+      tag_as_user_with(tags, attr, owner)
     end
 
-    def tag_with_params params,attr="tag", owner=User.current_user
-      tags = resolve_tags_from_params params,attr
-      tag_with tags,attr,owner
+    # tag_with_params
+    def tag_annotations(annotations, attr="tag", owner = User.current_user)
+      tags = resolve_tags(annotations)
+      tag_with(tags, attr, owner)
     end
 
-    def resolve_tags_from_params params, attr
+    def resolve_tags(annotations)
+      annotations.split(',')
+    end
+
+    def resolve_tags_from_params annotations
       tags=[]
 
         selected_key = "#{attr}_autocompleter_selected_ids".to_sym

@@ -195,6 +195,10 @@ GEM
     bives (0.10)
     bootstrap-sass (3.3.1.0)
       sass (~> 3.2)
+    bootstrap-tagsinput-rails (0.4.2.1)
+      railties (>= 3.1)
+    bootstrap-typeahead-rails (0.10.5.1)
+      railties (>= 3.0)
     breadcrumbs_on_rails (2.3.0)
     builder (3.0.4)
     cancan (1.6.10)
@@ -684,6 +688,8 @@ DEPENDENCIES
   bioportal (>= 2.2)
   bives
   bootstrap-sass (~> 3.3.1)
+  bootstrap-tagsinput-rails
+  bootstrap-typeahead-rails
   breadcrumbs_on_rails
   calendar_date_select!
   cancan
