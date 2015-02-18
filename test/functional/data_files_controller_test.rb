@@ -1260,7 +1260,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [],df.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
     assert_equal ["golf","sparrow"],df.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>df,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>df, :tag_list => "soup, #{golf.value.text}"}
 
     df.reload
 
@@ -1821,14 +1821,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.panel-heading",:text=>/Tags/,:count=>1
-    assert_select "div#tag_ids",:count=>1
+    assert_select "input#tag_list",:count=>1
   end
 
   test "new should include tags element" do
     get :new
     assert_response :success
     assert_select "div.panel-heading",:text=>/Tags/,:count=>1
-    assert_select "div#tag_ids",:count=>1
+    assert_select "input#tag_list",:count=>1
   end
 
   test "new with biovel sharing form" do
@@ -1853,7 +1853,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_response :success
 
       assert_select "div.panel-heading",:text=>/Tags/,:count=>0
-      assert_select "div#tag_ids",:count=>0
+      assert_select "input#tag_list",:count=>0
     end
   end
 
@@ -1862,7 +1862,7 @@ class DataFilesControllerTest < ActionController::TestCase
       get :new,:class=>:experimental
       assert_response :success
       assert_select "div.panel-heading",:text=>/Tags/,:count=>0
-      assert_select "div#tag_ids",:count=>0
+      assert_select "input#tag_list",:count=>0
     end
   end
 

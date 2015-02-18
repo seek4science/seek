@@ -1232,14 +1232,14 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.panel-heading",:text=>/Tags/,:count=>1
-    assert_select "div#tag_ids",:count=>1
+    assert_select "input#tag_list",:count=>1
   end
 
   test "new should include tags element" do
     get :new,:class=>:experimental
     assert_response :success
     assert_select "div.panel-heading",:text=>/Tags/,:count=>1
-    assert_select "div#tag_ids",:count=>1
+    assert_select "input#tag_list",:count=>1
   end
 
   test "edit should include not include tags element when tags disabled" do
@@ -1249,7 +1249,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert_response :success
 
       assert_select "div.panel-heading",:text=>/Tags/,:count=>0
-      assert_select "div#tag_ids",:count=>0
+      assert_select "input#tag_list",:count=>0
     end
   end
 
@@ -1258,7 +1258,7 @@ class AssaysControllerTest < ActionController::TestCase
       get :new,:class=>:experimental
       assert_response :success
       assert_select "div.panel-heading",:text=>/Tags/,:count=>0
-      assert_select "div#tag_ids",:count=>0
+      assert_select "input#tag_list",:count=>0
     end
   end
 
