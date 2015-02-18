@@ -621,8 +621,6 @@ SEEK::Application.routes.draw do
   match 'studies/new_investigation_redbox' => 'studies#new_investigation_redbox', :as => :new_investigation_redbox, :via => :post
   match 'experiments/create_investigation' => 'studies#create_investigation', :as => :create_investigation, :via => :post
   match '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group, :via => :post
-  match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
-  match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
   match ':controller/:id/approve_or_reject_publish' => ":controller#show"
 
   match '/signup' => 'users#new', :as => :signup

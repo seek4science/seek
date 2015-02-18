@@ -31,16 +31,7 @@ class PeopleController < ApplicationController
       @person.notifiee_info.save
     end
   end
-  def auto_complete_for_tools_name
-    render :json => Person.tool_counts.map(&:name).to_json
-  end
 
-  def auto_complete_for_expertise_name
-    render :json => Person.expertise_counts.map(&:name).to_json
-  end
-
-
-  
   protect_from_forgery :only=>[]
   
   # GET /people
@@ -349,15 +340,14 @@ class PeopleController < ApplicationController
   private
   
   def set_tools_and_expertise person,params
-      exp_changed = person.tag_with_params params,"expertise"
-      tools_changed = person.tag_with_params params,"tool"
+      exp_changed = person.tag_annotations(params[:expertise_list],"expertise")
+      tools_changed = person.tag_annotations(params[:tool_list],"tool")
       if immediately_clear_tag_cloud?
         expire_annotation_fragments("expertise") if exp_changed
         expire_annotation_fragments("tool") if tools_changed
       else
          RebuildTagCloudsJob.create_job
       end
-
   end
 
   def set_roles person, params

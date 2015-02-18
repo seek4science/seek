@@ -9,24 +9,13 @@
  %>
 
 <%
-all_tags.sort_by(&:text)
-no_tags_message ||= ""
-owned_tags ||= nil
+   all_tags.sort_by(&:text)
+   type ||= 'tag'
+   input_name = "#{name}_list"
+   existing_tags = item_tags.map {|t| t.text}
 %>
 
-  <div id="facebook" class="clearfix">
-    <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
-      <span class="tokenizer_stretcher">^_^</span>
-      <span class="tab_stop"><input type="text" id="<%= name -%>_hidden_input" tabindex="-1"></span>
-      <div id="<%= name -%>_autocomplete_display" class="tokenizer_input">
-        <input type="text" size="1" tabindex="" id="<%= name -%>_autocomplete_input" onBlur="addLastTag('<%= name -%>_autocompleter');"/>
-      </div>
-    </div>
-    <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
-      <div class="typeahead_message"><%= no_tags_message -%></div>
-    </div>
-  </div>
-
+<%= tags_input(input_name, existing_tags, :typeahead => {:type => type}) %>
 
 <% cache "suggestions_for_#{name}" do %>
     <%
@@ -44,7 +33,7 @@ owned_tags ||= nil
               <div class="popularity">
                 <% unless suggested_tags.blank? -%>
                     <% ann_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-                        <%= link_to tag.text, "javascript:addListTag('#{name}',#{tag.id});", :class => css_class -%>
+                        <%= link_to tag.text, "javascript:$j('##{input_name}').tagsinput('add', '#{tag.text}');", :class => css_class -%>
                     <% end -%>
                 <% end -%>
               </div>
@@ -54,5 +43,4 @@ owned_tags ||= nil
     <% end %>
 
 <% end -%>
-<%= render :partial=>"annotations/autocompleter_javascript", :locals=>{:name=>name, :all_annotations=>all_tags,:owned_annotations=>owned_tags,:item_annotations=>item_tags} %>
 
