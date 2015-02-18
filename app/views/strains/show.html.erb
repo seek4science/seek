@@ -46,7 +46,7 @@
   <div class="col-md-3 col-sm-4">
     <% #dont show creator box with JERM avatar for strain without contributor, as there are strains without contributor and are not harvested %>
     <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @strain, :creators => [@strain.contributor.try(:person)]} unless @strain.contributor.try(:person).nil? -%>
-    <%= item_tags_and_tag_entry -%>
+    <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." if current_user-%>
   </div>
 </div>
 
