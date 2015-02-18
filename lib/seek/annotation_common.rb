@@ -32,7 +32,7 @@ module Seek
             RebuildTagCloudsJob.create_job
           end
 
-          page.visual_effect :highlight, 'tags_box'
+          page.visual_effect :highlight, 'tag_cloud'
           page.visual_effect :highlight, 'sidebar_tag_cloud'
         end
       else

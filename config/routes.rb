@@ -602,6 +602,8 @@ SEEK::Application.routes.draw do
   match '/search/delete' => 'search#delete', :as => :delete_search
   match '/search/items_for_result' => 'search#items_for_result', :via => :post
   match 'svg/:id.:format' => 'svg#show', :as => :svg
+  match '/tags/latest' => 'tags#latest', :as => :latest_tags
+  match '/tags/query' => 'tags#query', :as => :query_tags
   match '/tags' => 'tags#index', :as => :all_tags
   match '/tags/:id' => 'tags#show', :as => :show_tag
   match '/tags' => 'tags#index', :as => :all_anns

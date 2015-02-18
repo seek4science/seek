@@ -3,7 +3,11 @@ module BootstrapHelper
   # A link with an icon next to it
   def icon_link_to(text, icon_key, url, options = {})
     icon = icon_tag(icon_key, options.delete(:icon_options) || {})
-    link_to((icon + text).html_safe, url, options)
+    if url.nil?
+      content_tag(:a, (icon + text).html_safe, options)
+    else
+      link_to((icon + text).html_safe, url, options)
+    end
   end
 
   # A button with an icon and text
@@ -107,7 +111,13 @@ module BootstrapHelper
   end
 
   def tags_input(name, existing_tags, options = {})
-    text_field_tag(name, existing_tags.join(','), options.merge('data-role' => 'tagsinput'))
+    options = options.merge('data-role' => 'seek-tagsinput')
+    if options.delete(:typeahead)
+      options['data-typeahead'] = true
+      options['data-typeahead-prefetch-url'] ||= latest_tags_path
+      options['data-typeahead-query-url'] ||= (query_tags_path + '?query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY
+    end
+    text_field_tag(name, existing_tags.join(','), options)
   end
 
   private

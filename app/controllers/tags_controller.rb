@@ -1,7 +1,5 @@
 class TagsController < ApplicationController
 
-
-
   before_filter :find_tag,:only=>[:show]
   
   def show
@@ -23,6 +21,22 @@ class TagsController < ApplicationController
   def index
     respond_to do |format|
       format.html
+    end
+  end
+
+  def latest
+    @tags = TextValue.select(:text).order("created_at DESC").limit(params[:limit] || 50).map {|t| t.text}
+
+    respond_to do |format|
+      format.json { render :json => @tags.to_json }
+    end
+  end
+
+  def query
+    @tags = TextValue.select(:text).where("text LIKE ?", "#{params[:query]}%").limit(10).map {|t| t.text}
+
+    respond_to do |format|
+      format.json { render :json => @tags.to_json }
     end
   end
   
