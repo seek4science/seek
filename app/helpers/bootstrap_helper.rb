@@ -112,10 +112,13 @@ module BootstrapHelper
 
   def tags_input(name, existing_tags, options = {})
     options = options.merge('data-role' => 'seek-tagsinput')
-    if options.delete(:typeahead)
+    typeahead_opts = options.delete(:typeahead)
+    if typeahead_opts
+      typeahead_opts = {} if typeahead_opts.is_a?(TrueClass)
       options['data-typeahead'] = true
-      options['data-typeahead-prefetch-url'] ||= latest_tags_path
-      options['data-typeahead-query-url'] ||= (query_tags_path + '?query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY
+      options['data-typeahead-prefetch-url'] = typeahead_opts[:prefetch_url] || latest_tags_path
+      # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
+      options['data-typeahead-query-url'] = typeahead_opts[:query_url] || (query_tags_path + '?query=%QUERY').html_safe
     end
     text_field_tag(name, existing_tags.join(','), options)
   end

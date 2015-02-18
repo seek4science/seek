@@ -25,7 +25,7 @@ class TagsController < ApplicationController
   end
 
   def latest
-    @tags = TextValue.select(:text).order("created_at DESC").limit(params[:limit] || 50).map {|t| t.text}
+    @tags = get_tags.limit(params[:limit] || 50).map {|t| t.text}
 
     respond_to do |format|
       format.json { render :json => @tags.to_json }
@@ -33,7 +33,7 @@ class TagsController < ApplicationController
   end
 
   def query
-    @tags = TextValue.select(:text).where("text LIKE ?", "#{params[:query]}%").limit(10).map {|t| t.text}
+    @tags = get_tags.where("text LIKE ?", "#{params[:query]}%").limit(10).map {|t| t.text}
 
     respond_to do |format|
       format.json { render :json => @tags.to_json }
@@ -57,6 +57,11 @@ class TagsController < ApplicationController
   #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
   def select_authorised collection
     collection.select {|el| el.can_view?}
+  end
+
+  def get_tags
+    attribute = AnnotationAttribute.where(:name => params[:type] || 'tag').first
+    TextValue.select(:text).joins("JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'").where(:annotations => {:attribute_id => attribute})
   end
 
 end
