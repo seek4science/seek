@@ -22,7 +22,7 @@ module Seek
     end
 
     def resolve_tags(annotations)
-      annotations.split(',')
+      annotations.split(',').map { |a| a.strip }.uniq
     end
 
     def resolve_tags_from_params annotations

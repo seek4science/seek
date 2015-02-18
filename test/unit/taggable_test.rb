@@ -39,16 +39,14 @@ class TaggableTest < ActiveSupport::TestCase
      assert_equal ["golf","fishing"].sort, p.expertise.collect{|t| t.text}.sort
   end
 
-  test "tag_with_params" do
+  test "tag_annotations" do
     p=Factory :person
      User.current_user = p.user
      assert_equal 0,p.expertise.size
      assert_difference("Annotation.count",2) do
        assert_difference("TextValue.count",2) do
-         params={:expertise_autocompleter_selected_ids=>[],
-                 :expertise_autocompleter_unrecognized_items=>["golf","fishing"]
-         }
-         p.tag_with_params params,"expertise"
+         params={:expertise_list=>["golf","fishing"]}
+         p.tag_annotations params[:expertise_list],"expertise"
        end
      end
      p.reload

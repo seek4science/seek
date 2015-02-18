@@ -63,7 +63,7 @@ module Seek
     #New tags are assigned to the owner, which defaults to the current user.
     def update_annotations entity, attr='tag', owner=User.current_user
       unless owner.nil?
-        entity.tag_with_params params, attr
+        entity.tag_annotations params[:tag_list], attr
         if immediately_clear_tag_cloud?
           expire_annotation_fragments(attr)
         else

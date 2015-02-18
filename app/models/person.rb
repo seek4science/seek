@@ -321,15 +321,15 @@ class Person < ActiveRecord::Base
 
   def expertise= tags
     if tags.kind_of? Hash
-      return tag_with_params(tags,"expertise")
+      tag_annotations tags[:expertise_list], "expertise"
     else
-      return tag_with(tags,"expertise")
+      tag_with tags,"expertise"
     end
   end
 
   def tools= tags
     if tags.kind_of? Hash
-      tag_with_params tags,"tool"
+      tag_annotations tags[:tool_list],"tool"
     else
       tag_with tags,"tool"
     end
