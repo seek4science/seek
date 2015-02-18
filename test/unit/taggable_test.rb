@@ -45,7 +45,7 @@ class TaggableTest < ActiveSupport::TestCase
      assert_equal 0,p.expertise.size
      assert_difference("Annotation.count",2) do
        assert_difference("TextValue.count",2) do
-         params={:expertise_list=>["golf","fishing"]}
+         params={:expertise_list=>"golf,fishing"}
          p.tag_annotations params[:expertise_list],"expertise"
        end
      end
