@@ -22,13 +22,13 @@
           %>
           <ul class="sectionIcons">
             <li>
-              <%= image_tag_for_key('filter', filter_path, 'Filter result',
-                                    {:style => params[:filter] == 'true' ? 'display: none' : ''}, 'Filter result')  %>
+              <%= image_tag_for_key('filter', filter_path, 'Filter results',
+                                    {:style => params[:filter] == 'true' ? 'display: none' : ''}, 'Filter results')  %>
             </li>
 
             <li class="unfilter_button">
-              <%= image_tag_for_key('filter', unfilter_path, 'Un-filter result',
-                                    {:style => params[:filter] == 'true' ? '' : 'display: none'}, 'Un-filter result')  %>
+              <%= image_tag_for_key('filter', unfilter_path, 'Stop filtering results',
+                                    {:style => params[:filter] == 'true' ? '' : 'display: none'}, 'Stop filtering results')  %>
             </li>
           </ul>
           <% if params[:filter] == 'true' %>
