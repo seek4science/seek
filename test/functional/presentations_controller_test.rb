@@ -166,7 +166,7 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_equal [],presentation.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
     assert_equal ["golf","sparrow"],presentation.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>presentation,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>presentation,:tag_list=>"soup,#{golf.value.text}"}
 
     presentation.reload
 

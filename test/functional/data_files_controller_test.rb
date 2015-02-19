@@ -1223,7 +1223,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     golf=Factory :tag,:annotatable=>dummy_df,:source=>p2,:value=>"golf"
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_df,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_df,:tag_list=>golf.value.text}
 
     viewable_df.reload
 
@@ -1234,7 +1234,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !private_df.can_view?(p.user)
     assert !private_df.can_edit?(p.user)
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>private_df,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>private_df,:tag_list=>golf.value.text}
 
     private_df.reload
     assert private_df.annotations.empty?
