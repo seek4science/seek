@@ -77,8 +77,13 @@ module BootstrapHelper
 
   # A coloured information box with an X button to close it
   def alert_box(style = 'info', options = {}, &block)
+    hide_button = options.delete(:hide_button)
     content_tag(:div, merge_options(options, {:class => "alert alert-#{style} alert-dismissable", :role => 'alert'})) do
-      dismiss_button + capture(&block)
+      if hide_button
+        capture(&block)
+      else
+        dismiss_button + capture(&block)
+      end
     end
   end
 
