@@ -39,7 +39,7 @@ module StudiedFactorsHelper
           end
         end
       end
-      tagged_substances
+      tagged_substances.map(&:name)
    end
 
   class Substance

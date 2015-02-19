@@ -21,9 +21,7 @@ class StudiedFactorsController < ApplicationController
     @studied_factor=StudiedFactor.new(params[:studied_factor])
     @studied_factor.data_file=@data_file
     @studied_factor.data_file_version = params[:version]
-    new_substances = params[:substance_autocompleter_unrecognized_items] || []
-    known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
-    substances = find_or_new_substances new_substances,known_substance_ids_and_types
+    substances = find_or_new_substances(params[:substance_list].split(','))
 
     substances.each do |substance|
       @studied_factor.studied_factor_links.build(:substance => substance )

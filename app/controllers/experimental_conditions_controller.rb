@@ -21,9 +21,7 @@ class ExperimentalConditionsController < ApplicationController
     @experimental_condition=ExperimentalCondition.new(params[:experimental_condition])
     @experimental_condition.sop=@sop
     @experimental_condition.sop_version = params[:version]
-    new_substances = params[:substance_autocompleter_unrecognized_items] || []
-    known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
-    substances = find_or_new_substances new_substances,known_substance_ids_and_types
+    substances = find_or_new_substances(params[:substance_list].split(','))
     substances.each do |substance|
       @experimental_condition.experimental_condition_links.build(:substance => substance )
     end

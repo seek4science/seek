@@ -1,11 +1,18 @@
 module Seek
 
   module FactorStudied
-    def find_or_new_substances(new_substances, known_substance_ids_and_types)
+    def find_or_new_substances(substances)
     result = []
-    known_substances = known_substances known_substance_ids_and_types
-    new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
-    result |= known_substances
+    new_substances = []
+
+    substances.each do |substance|
+      substance.strip!
+      if (compound = (Compound.find_by_name(substance) || Synonym.find_by_name(substance))).nil?
+        new_substances << substance
+      else
+        result << compound
+      end
+    end
 
     new_substances.each do |new_substance|
        #call the webservice to retrieve the substance annotation from sabiork
@@ -81,21 +88,6 @@ module Seek
     else
       return true
     end
-  end
-
-  #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
-  #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
-  def check_if_new_substances_are_known new_substances, known_substances
-    fixed_new_substances = []
-    new_substances.each do |new_substance|
-      substance=Compound.find_by_name(new_substance.strip) || Synonym.find_by_name(new_substance.strip)
-      if substance.nil?
-        fixed_new_substances << new_substance
-      else
-        known_substances << substance unless known_substances.include?(substance)
-      end
-    end
-    return fixed_new_substances, known_substances
   end
 
   def known_substances known_substance_ids_and_types
