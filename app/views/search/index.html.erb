@@ -21,10 +21,10 @@
                                      :include_external_search=>params[:include_external_search])
           %>
           <div class="text-center">
-              <%= button_link_to('Filter result', 'filter', filter_path,
+              <%= button_link_to('Filter results', 'filter', filter_path,
                                     {:style => params[:filter] == 'true' ? 'display: none' : ''}, )  %>
 
-              <%= button_link_to('Un-filter result', 'filter', unfilter_path,
+              <%= button_link_to('Stop filtering results', 'filter', unfilter_path,
                                     {:style => params[:filter] == 'true' ? '' : 'display: none'})  %>
           </div>
           <% if params[:filter] == 'true' %>
