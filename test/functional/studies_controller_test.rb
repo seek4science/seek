@@ -51,7 +51,6 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should show draggable icon in index" do
     get :index
-    puts @response.body
     assert_response :success
     studies = assigns(:studies)
     first_study = studies.first
