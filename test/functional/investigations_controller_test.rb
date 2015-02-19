@@ -29,6 +29,13 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:investigations)
   end
 
+  test "should respond to ro for research object" do
+    inv = Factory :investigation,:contributor=>User.current_user.person
+    get :show,:id=>inv, :format=>"ro"
+    assert_response :success
+    assert_select "p",:text=>"research object"
+  end
+
   test "should show aggregated publications linked to assay" do
     assay1 = Factory :assay,:policy => Factory(:public_policy)
     assay2 = Factory :assay,:policy => Factory(:public_policy)

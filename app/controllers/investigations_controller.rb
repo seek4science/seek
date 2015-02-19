@@ -37,6 +37,7 @@ class InvestigationsController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show' }
+      format.ro { render :text=>"<p>research object</p>"}
     end
   end
 
