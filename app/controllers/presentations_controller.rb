@@ -58,7 +58,7 @@ class PresentationsController < ApplicationController
 
       @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.projects
 
-      update_annotations @presentation
+      update_annotations(params[:tag_list], @presentation)
       update_scales @presentation
 
       assay_ids = params[:assay_ids] || []
@@ -128,7 +128,7 @@ class PresentationsController < ApplicationController
       params[:presentation][:last_used_at] = Time.now
     end
 
-    update_annotations @presentation
+    update_annotations(params[:tag_list], @presentation)
     update_scales @presentation
 
     @presentation.attributes = params[:presentation]

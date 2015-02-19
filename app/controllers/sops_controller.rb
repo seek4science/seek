@@ -87,7 +87,7 @@ class SopsController < ApplicationController
       @sop = Sop.new(params[:sop])
       @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
-      update_annotations @sop
+      update_annotations(params[:tag_list], @sop)
       update_scales @sop
 
       respond_to do |format|
@@ -112,8 +112,8 @@ class SopsController < ApplicationController
   # PUT /sops/1
   def update
     sop_params=filter_protected_update_params(params[:sop])
-    
-    update_annotations @sop
+
+    update_annotations(params[:tag_list], @sop)
     update_scales @sop
 
     @sop.attributes = sop_params

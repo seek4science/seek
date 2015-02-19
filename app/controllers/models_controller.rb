@@ -231,7 +231,7 @@ class ModelsController < ApplicationController
 
       @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
 
-      update_annotations @model
+      update_annotations(params[:tag_list], @model)
       update_scales @model
       build_model_image @model, params[:model_image]
 
@@ -261,7 +261,7 @@ class ModelsController < ApplicationController
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
     model_params=filter_protected_update_params(params[:model])
 
-    update_annotations @model
+    update_annotations(params[:tag_list], @model)
     update_scales @model
 
     @model.attributes = model_params

@@ -61,9 +61,9 @@ module Seek
 
     #Updates all annotations as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.
     #New tags are assigned to the owner, which defaults to the current user.
-    def update_annotations entity, attr='tag', owner=User.current_user
+    def update_annotations(param, entity, attr='tag', owner=User.current_user)
       unless owner.nil?
-        entity.tag_annotations params[:tag_list], attr
+        entity.tag_annotations(param, attr)
         if immediately_clear_tag_cloud?
           expire_annotation_fragments(attr)
         else

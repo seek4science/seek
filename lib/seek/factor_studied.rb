@@ -2,48 +2,51 @@ module Seek
 
   module FactorStudied
     def find_or_new_substances(substances)
-    result = []
-    new_substances = []
+      substances ||= ""
+      substances = substances.split(',')
 
-    substances.each do |substance|
-      substance.strip!
-      if (compound = (Compound.find_by_name(substance) || Synonym.find_by_name(substance))).nil?
-        new_substances << substance
-      else
-        result << compound
+      result = []
+      new_substances = []
+
+      substances.each do |substance|
+        substance.strip!
+        if (compound = (Compound.find_by_name(substance) || Synonym.find_by_name(substance))).nil?
+          new_substances << substance
+        else
+          result << compound
+        end
       end
-    end
 
-    new_substances.each do |new_substance|
-       #call the webservice to retrieve the substance annotation from sabiork
-       #the annotation is stored in a hash, which keys: recommended_name, synonyms, sabiork_id, chebi_ids, kegg_ids
-       compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(new_substance)
-       #compound_annotation = {'recommended_name' => "#{new_substance}", 'synonyms' => ["#{new_substance}_1","#{new_substance}_2"], 'sabiork_id' => 50, 'chebi_ids' => [CHEBI:15377], 'kegg_ids' => ["C00001", "C00002"]}
-       unless compound_annotation.blank?
-         #retrieve or create compound with the recommended_name
-         recommended_name = compound_annotation["recommended_name"]
-         c = Compound.find_by_name(recommended_name) ? Compound.find_by_name(recommended_name) : Compound.new(:name => recommended_name)
+      new_substances.each do |new_substance|
+        #call the webservice to retrieve the substance annotation from sabiork
+        #the annotation is stored in a hash, which keys: recommended_name, synonyms, sabiork_id, chebi_ids, kegg_ids
+        compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(new_substance)
+        #compound_annotation = {'recommended_name' => "#{new_substance}", 'synonyms' => ["#{new_substance}_1","#{new_substance}_2"], 'sabiork_id' => 50, 'chebi_ids' => [CHEBI:15377], 'kegg_ids' => ["C00001", "C00002"]}
+        unless compound_annotation.blank?
+          #retrieve or create compound with the recommended_name
+          recommended_name = compound_annotation["recommended_name"]
+          c = Compound.find_by_name(recommended_name) ? Compound.find_by_name(recommended_name) : Compound.new(:name => recommended_name)
 
-         #create new or update mappings and mapping_links
-         c = new_or_update_mapping_links c, compound_annotation
+          #create new or update mappings and mapping_links
+          c = new_or_update_mapping_links c, compound_annotation
 
-         #create new or update synonyms
-         c = new_or_update_synonyms c, compound_annotation
+          #create new or update synonyms
+          c = new_or_update_synonyms c, compound_annotation
 
-         #if new_substance is a new synonym of an existing compound,need to save that compound and return that synonym to the result
-         if !c.new_record? and c.save
+          #if new_substance is a new synonym of an existing compound,need to save that compound and return that synonym to the result
+          if !c.new_record? and c.save
             s = c.synonyms.select{|s| s.title == new_substance}
             result.push s.first unless s.first.blank?
-         else
-           result.push c
-         end
-       else
-         #if the webservice doesn't return any value: create compound with the name new_substance
-         c = Compound.new(:name => new_substance)
-         result.push c
-       end
-    end
-    result
+          else
+            result.push c
+          end
+        else
+          #if the webservice doesn't return any value: create compound with the name new_substance
+          c = Compound.new(:name => new_substance)
+          result.push c
+        end
+      end
+      result
   end
 
   def update_substance(substance)

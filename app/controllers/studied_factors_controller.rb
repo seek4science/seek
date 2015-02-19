@@ -21,13 +21,13 @@ class StudiedFactorsController < ApplicationController
     @studied_factor=StudiedFactor.new(params[:studied_factor])
     @studied_factor.data_file=@data_file
     @studied_factor.data_file_version = params[:version]
-    substances = find_or_new_substances(params[:substance_list].split(','))
+    substances = find_or_new_substances(params[:substance_list])
 
     substances.each do |substance|
       @studied_factor.studied_factor_links.build(:substance => substance )
     end
 
-    update_annotations(@studied_factor, 'description') if try_block{!params[:annotation][:value].blank?}
+    update_annotations(params[:annotation][:value], @studied_factor, 'description') if try_block{!params[:annotation][:value].blank?}
 
     render :update do |page|
       if @studied_factor.save
@@ -66,7 +66,7 @@ class StudiedFactorsController < ApplicationController
       end
       params[:annotation] = {}
       params[:annotation][:value] = try_block{Annotation.for_annotatable(studied_factor.class.name, studied_factor.id).with_attribute_name('description').first.value.text}
-      update_annotations(new_studied_factor, 'description', false) if try_block{!params[:annotation][:value].blank?}
+      update_annotations(params[:annotation][:value], new_studied_factor, 'description', false) if try_block{!params[:annotation][:value].blank?}
 
       new_studied_factors.push new_studied_factor
     end
@@ -100,7 +100,7 @@ class StudiedFactorsController < ApplicationController
 
     new_substances = params["#{@studied_factor.id}_substance_autocompleter_unrecognized_items"] || []
     known_substance_ids_and_types = params["#{@studied_factor.id}_substance_autocompleter_selected_ids"] || []
-    substances = find_or_new_substances new_substances,known_substance_ids_and_types
+    substances = find_or_new_substances(params[:substance_list])
 
     #delete the old studied_factor_links
     @studied_factor.studied_factor_links.each do |sfl|
@@ -114,7 +114,7 @@ class StudiedFactorsController < ApplicationController
     end
     @studied_factor.studied_factor_links = studied_factor_links
 
-    update_annotations(@studied_factor, 'description') if try_block{!params[:annotation][:value].blank?}
+    update_annotations(params[:annotation][:value], @studied_factor, 'description') if try_block{!params[:annotation][:value].blank?}
 
     render :update do |page|
       if  @studied_factor.update_attributes(params[:studied_factor])

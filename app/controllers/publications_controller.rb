@@ -100,7 +100,7 @@ class PublicationsController < ApplicationController
       end
     end
 
-    update_annotations @publication
+    update_annotations(params[:tag_list], @publication)
 
     assay_ids = params[:assay_ids] || []
     data_file_ids = params[:data_file_ids] || []

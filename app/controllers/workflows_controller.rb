@@ -64,7 +64,7 @@ class WorkflowsController < ApplicationController
       @workflow = Workflow.new params[:workflow]
       @workflow.policy.set_attributes_with_sharing params[:sharing], @workflow.projects
       if @workflow.save
-        update_annotations @workflow
+        update_annotations(params[:tag_list], @workflow)
 
         create_content_blobs
 
@@ -110,7 +110,7 @@ class WorkflowsController < ApplicationController
      end
 
     if @workflow.save && !params[:sharing_form]
-      update_annotations @workflow
+      update_annotations(params[:tag_list], @workflow)
 
       extract_workflow_metadata
 
