@@ -2,8 +2,6 @@
 <% @search_type="All" unless @search_type %>
 
 
-<% force_search_type(search_type_options) %>
-
 <% if Seek::Config.solr_enabled -%>
 
   <%= form_tag main_app.search_path do -%>
