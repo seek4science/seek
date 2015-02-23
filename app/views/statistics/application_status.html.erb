@@ -3,9 +3,7 @@
    delayed_job_count = delayed_job_status.split("Running [Process ID:").count - 1
 %>
 <div id="application_status">
-    <%= Seek::Config.application_name %> is running
-    <br/>
-    Search is <%= search_enabled %>
-    <br/>
-    <%= delayed_job_count %> Delayed Jobs is running
+<%= Seek::Config.application_name %> is running<br/>
+search is <%= search_enabled %><br/>
+<%= delayed_job_count %> delayed jobs running<br/>
 </div>
