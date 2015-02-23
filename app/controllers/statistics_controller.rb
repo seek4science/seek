@@ -5,7 +5,7 @@ class StatisticsController < ApplicationController
 
   def application_status
     respond_to do |format|
-      format.html {render :layout=>false}
+      format.html {render :formats=>[:text]}
     end
   end
 

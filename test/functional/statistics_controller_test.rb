@@ -26,10 +26,7 @@ class StatisticsControllerTest < ActionController::TestCase
         logout
         get :application_status
         assert_response :success
-
-        assert_select "div#application_status",:text=>/Euro SEEK is running/
-        assert_select "div#application_status",:text=>/search is enabled/
-        assert_select "div#application_status",:text=>/[0-9] delayed jobs running/
+        assert_match /Euro SEEK is running | search is enabled | [0-9] delayed jobs running/,@response.body
       end
     end
   end
