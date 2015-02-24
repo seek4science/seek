@@ -135,9 +135,9 @@ namespace :seek do
     avatar_filestore_path = Seek::Config.avatar_filestore_path
     Avatar.all.each do |avatar|
       filepath = avatar_filestore_path + "/#{avatar.id}.jpg"
+      convert_path = avatar_filestore_path + "/#{avatar.id}.png"
       if File.exist?(filepath)
         puts "converting avatar #{avatar.id}"
-        convert_path = avatar_filestore_path + "/#{avatar.id}.png"
         command = "convert #{filepath} #{convert_path}"
         begin
           cl = Cocaine::CommandLine.new(command)
@@ -150,13 +150,18 @@ namespace :seek do
           puts "Problem with converting avatar #{avatar.id}: " + error
         end
       else
-        puts "no file exist at #{filepath}"
+        if File.exist?(convert_path)
+          puts "avatar #{avatar.id} was already converted"
+        else
+          puts "no file exist at #{filepath}"
+        end
       end
     end
 
     model_image_filestore_path = Seek::Config.model_image_filestore_path
     ModelImage.all.each do |model_image|
       filepath = model_image_filestore_path + "/#{model_image.id}.jpg"
+      convert_path = model_image_filestore_path + "/#{model_image.id}.png"
       if File.exist?(filepath)
         puts "converting model image #{model_image.id}"
         convert_path = model_image_filestore_path + "/#{model_image.id}.png"
@@ -172,7 +177,11 @@ namespace :seek do
           puts "Problem with converting model image #{model_image.id}: " + error
         end
       else
-        puts "no file exist at #{filepath}"
+        if File.exist?(convert_path)
+          puts "model image  #{model_image.id} was already converted"
+        else
+          puts "no file exist at #{filepath}"
+        end
       end
     end
   end
