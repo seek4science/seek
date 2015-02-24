@@ -130,6 +130,53 @@ namespace :seek do
     end
   end
 
+  desc "convert the avatar and model image from jpg to png"
+  task(:convert_image_to_png => :environment) do
+    avatar_filestore_path = Seek::Config.avatar_filestore_path
+    Avatar.all.each do |avatar|
+      filepath = avatar_filestore_path + "/#{avatar.id}.jpg"
+      if File.exist?(filepath)
+        puts "converting avatar #{avatar.id}"
+        convert_path = avatar_filestore_path + "/#{avatar.id}.png"
+        command = "convert #{filepath} #{convert_path}"
+        begin
+          cl = Cocaine::CommandLine.new(command)
+          cl.run
+          FileUtils.remove_file(filepath)
+        rescue Cocaine::CommandNotFoundError => e
+          puts 'convert command not found!'
+        rescue => e
+          error = e.message
+          puts "Problem with converting avatar #{avatar.id}: " + error
+        end
+      else
+        puts "no file exist at #{filepath}"
+      end
+    end
+
+    model_image_filestore_path = Seek::Config.model_image_filestore_path
+    ModelImage.all.each do |model_image|
+      filepath = model_image_filestore_path + "/#{model_image.id}.jpg"
+      if File.exist?(filepath)
+        puts "converting model image #{model_image.id}"
+        convert_path = model_image_filestore_path + "/#{model_image.id}.png"
+        command = "convert #{filepath} #{convert_path}"
+        begin
+          cl = Cocaine::CommandLine.new(command)
+          cl.run
+          FileUtils.remove_file(filepath)
+        rescue Cocaine::CommandNotFoundError => e
+          puts 'convert command not found!'
+        rescue => e
+          error = e.message
+          puts "Problem with converting model image #{model_image.id}: " + error
+        end
+      else
+        puts "no file exist at #{filepath}"
+      end
+    end
+  end
+
   private
 
   def read_label_map type
