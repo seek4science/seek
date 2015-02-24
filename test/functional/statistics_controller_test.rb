@@ -20,4 +20,15 @@ class StatisticsControllerTest < ActionController::TestCase
     assert_select "h3",:text=>/Content statistics/, :count=>0
   end
 
+  test "application status" do
+    with_config_value :application_name,"Euro SEEK" do
+      with_config_value :solr_enabled,true do
+        logout
+        get :application_status
+        assert_response :success
+        assert_match /Euro SEEK is running | search is enabled | [0-9] delayed jobs running/,@response.body
+      end
+    end
+  end
+
 end

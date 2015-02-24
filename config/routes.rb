@@ -542,7 +542,11 @@ SEEK::Application.routes.draw do
   end
 
   resources :tissue_and_cell_types
-  resources :statistics, :only => [:index]
+  resources :statistics do
+    collection do
+      get :application_status
+    end
+  end
 
   resources :workflows do
     collection do
