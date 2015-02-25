@@ -253,6 +253,7 @@ GEM
     exception_notification (4.0.1)
       actionmailer (>= 3.0.4)
       activesupport (>= 3.0.4)
+    execjs (2.3.0)
     factory_girl (2.6.4)
       activesupport (>= 2.3.9)
     faraday (0.9.1)
@@ -289,6 +290,11 @@ GEM
       builder (>= 2.1.2)
     haml (4.0.6)
       tilt
+    handlebars_assets (0.20.1)
+      execjs (~> 2.0)
+      multi_json (~> 1.0)
+      sprockets (~> 2.0)
+      tilt (~> 1.2)
     hashie (2.1.2)
     hike (1.2.3)
     hitimes (1.2.2)
@@ -713,6 +719,7 @@ DEPENDENCIES
   gibberish!
   google-analytics-rails
   guard-rubycritic
+  handlebars_assets
   hpricot (~> 0.8.2)
   in_place_editing
   jquery-rails (~> 3)

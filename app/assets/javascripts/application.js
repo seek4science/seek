@@ -37,4 +37,7 @@
 //= require jquery-ui-drag-drop
 //= require bootstrap-tagsinput
 //= require bootstrap-typeahead-rails
-//= require tags
+//= require tags_input
+//= require objects_input
+//= require handlebars.runtime
+//= require_tree ./templates
