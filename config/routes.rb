@@ -398,6 +398,7 @@ SEEK::Application.routes.draw do
 
   resources :sops do
     collection do
+      get :typeahead
       get :preview
       post :test_asset_url
       post :items_for_result
@@ -596,7 +597,6 @@ SEEK::Application.routes.draw do
 
   resources :statistics, :only => [:index]
   ### MISC MATCHES ###
-
   match '/search/' => 'search#index', :as => :search
   match '/search/save' => 'search#save', :as => :save_search
   match '/search/delete' => 'search#delete', :as => :delete_search

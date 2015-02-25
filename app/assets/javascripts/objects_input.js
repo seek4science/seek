@@ -4,6 +4,10 @@ $j(document).ready(function () {
             itemValue: 'id',
             itemText: 'name'
         };
+
+        if($j(this).data('tagsLimit'))
+            options.maxTags = $j(this).data('tagsLimit');
+
         if($j(this).data('typeahead')) {
             var opts = {
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),

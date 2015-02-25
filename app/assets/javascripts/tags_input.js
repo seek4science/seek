@@ -5,6 +5,8 @@ var wrapTags =  function(list) {
 $j(document).ready(function () {
     $j('[data-role="seek-tagsinput"]').each(function () {
         var options = { tagClass: 'label label-default' };
+        if($j(this).data('tagsLimit'))
+            options.maxTags = $j(this).data('tagsLimit');
         if($j(this).data('typeahead')) {
             var opts = {
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),

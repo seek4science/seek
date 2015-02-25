@@ -116,15 +116,18 @@ module BootstrapHelper
   end
 
   def tags_input(name, existing_tags = [], options = {})
-    options = options.merge({'data-role' => 'seek-tagsinput'})
-    options = options.merge(typeahead_options(options.delete(:typeahead)))
+    options['data-role'] = 'seek-tagsinput'
+    options['data-tags-limit'] = options.delete(:limit) if options[:limit]
+    options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
     text_field_tag(name, existing_tags.join(','), options)
   end
 
   def objects_input(name, existing_objects = [], options = {})
-    options = options.merge('data-role' => 'seek-objectsinput')
-    options = options.merge(typeahead_options(options.delete(:typeahead)))
+    options['data-role'] = 'seek-objectsinput'
+    options['data-tags-limit'] = options.delete(:limit) if options[:limit]
+    options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
+
     unless existing_objects.empty?
       if existing_objects.is_a?(String)
         options['data-existing-objects'] = existing_objects
