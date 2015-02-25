@@ -11,6 +11,7 @@ namespace :seek do
       :environment,
       :clear_filestore_tmp,
       :repopulate_auth_lookup_tables,
+      :resynchronise_ontology_types,
       :convert_image_to_png
   ]
 
