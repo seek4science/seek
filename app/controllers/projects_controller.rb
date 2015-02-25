@@ -270,7 +270,7 @@ class ProjectsController < ApplicationController
       end
     end
 
-    flash[:notice]="The members and institutions of the #{t('project')}.downcase '#{@project.title}' have been updated"
+    flash[:notice]="The members and institutions of the #{t('project').downcase} '#{@project.title}' have been updated"
 
     respond_with(@project) do |format|
       format.html {redirect_to project_path(@project)}
