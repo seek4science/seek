@@ -115,36 +115,59 @@ module BootstrapHelper
     end
   end
 
-  def tags_input(name, existing_tags, options = {})
-    options = options.merge('data-role' => 'seek-tagsinput')
-    typeahead_opts = options.delete(:typeahead)
-    if typeahead_opts
-      typeahead_opts = {} if typeahead_opts.is_a?(TrueClass)
-      options['data-typeahead'] = true
-      if typeahead_opts[:values]
-        options['data-typeahead-local-values'] = typeahead_opts[:values].to_json
-      else
-        if typeahead_opts[:prefetch_url]
-          options['data-typeahead-prefetch-url'] = typeahead_opts[:prefetch_url]
-        elsif typeahead_opts[:type]
-          options['data-typeahead-prefetch-url'] = latest_tags_path(:type => typeahead_opts[:type])
-        else
-          options['data-typeahead-prefetch-url'] = latest_tags_path
-        end
+  def tags_input(name, existing_tags = [], options = {})
+    options = options.merge({'data-role' => 'seek-tagsinput'})
+    options = options.merge(typeahead_options(options.delete(:typeahead)))
 
-        if typeahead_opts[:query_url]
-          options['data-typeahead-query-url'] = typeahead_opts[:query_url]
-        elsif typeahead_opts[:type]
-          options['data-typeahead-query-url'] = (query_tags_path(:type => typeahead_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
-        else
-          options['data-typeahead-query-url'] = (query_tags_path + '?query=%QUERY').html_safe
-        end
-      end
-    end
     text_field_tag(name, existing_tags.join(','), options)
   end
 
+  def objects_input(name, existing_objects = [], options = {})
+    options = options.merge('data-role' => 'seek-objectsinput')
+    options = options.merge(typeahead_options(options.delete(:typeahead)))
+    unless existing_objects.empty?
+      if existing_objects.is_a?(String)
+        options['data-existing-objects'] = existing_objects
+      else
+        options['data-existing-objects'] = existing_objects.map {|o| {id: o.id, name: o.try(:name) || o.try(:title)}}.to_json
+      end
+    end
+
+    text_field_tag(name, nil, options)
+  end
+
   private
+
+  def typeahead_options(typeahead_opts)
+    typeahead_opts = {} if typeahead_opts.is_a?(TrueClass)
+    options = {}
+    options['data-typeahead'] = true
+    if typeahead_opts[:values]
+      options['data-typeahead-local-values'] = typeahead_opts[:values].to_json
+    else
+      if typeahead_opts[:prefetch_url]
+        options['data-typeahead-prefetch-url'] = typeahead_opts[:prefetch_url]
+      elsif typeahead_opts[:type]
+        options['data-typeahead-prefetch-url'] = latest_tags_path(:type => typeahead_opts[:type])
+      else
+        options['data-typeahead-prefetch-url'] = latest_tags_path
+      end
+
+      if typeahead_opts[:query_url]
+        options['data-typeahead-query-url'] = typeahead_opts[:query_url]
+      elsif typeahead_opts[:type]
+        options['data-typeahead-query-url'] = (query_tags_path(:type => typeahead_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
+      else
+        options['data-typeahead-query-url'] = (query_tags_path + '?query=%QUERY').html_safe
+      end
+    end
+
+    if typeahead_opts[:handlebars_template]
+      options['data-typeahead-template'] = typeahead_opts[:handlebars_template]
+    end
+
+    options
+  end
 
   def dismiss_button
     content_tag(:button, :class => 'close', 'data-dismiss' => 'alert', 'aria-label' => 'Close') do
