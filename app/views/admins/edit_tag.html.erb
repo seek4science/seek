@@ -1,4 +1,3 @@
-
 <div class="show_basic">
     <h1>
       Editing tag: '<strong><%= @tag.text -%></strong>'
@@ -6,28 +5,10 @@
 
     <h2>New tags</h2>
 
-
     <%= form_tag edit_tag_admin_path(:id=>@tag.id) do %>
-
-        <div id="facebook" class="clearfix">
-          <div tabindex="-1" id="tags_ids" class="clearfix tokenizer" onclick="$('tags_autocomplete_input').focus();">
-            <span class="tokenizer_stretcher">^_^</span>
-            <span class="tab_stop"><input type="text" id="tags_hidden_input" tabindex="-1"></span>
-
-            <div id="tags_autocomplete_display" class="tokenizer_input">
-              <input type="text" size="1" tabindex="" id="tags_autocomplete_input" onBlur="addLastTag('tags_autocompleter');"/>
-            </div>
-          </div>
-          <div id="tags_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="height: auto; overflow-y: hidden;display:none">
-            <div class="typeahead_message">Type tags</div>
-          </div>
-        </div>
-
-        <%= submit_tag "Update" -%>
-
+      <%= tags_input(:tag_list, [@tag.text], :typeahead => true) %>
+      <%= submit_tag "Update" -%>
     <% end -%>
-
-
 
     <h2>Tagged items (<%= @tag.annotations.size -%>)</h2>
     <ul>
@@ -42,21 +23,3 @@
     </ul>
 
 </div>
-
-<script type="text/javascript">
-    var autocompleters=new Array();
-    var tags_list = <%= @all_tags_as_json.html_safe -%>;
-    var prepopulate_with = <%= [@tag.id].to_json.html_safe -%>;
-    var tags_autocompleter_id='tags_autocompleter';
-    var tags_autocompleter = new Autocompleter.LocalAdvanced(
-            tags_autocompleter_id, 'tags_autocomplete_input', 'tags_autocomplete_display', 'tags_autocomplete_populate', tags_list, prepopulate_with, {
-                frequency: 0.1,
-                updateElement: addAction,
-                search_field: "name",
-                id_field: "id",
-                validation_type: "any"
-            });
-    var hidden_input = new HiddenInput('tags_hidden_input',tags_autocompleter);
-
-    autocompleters[tags_autocompleter_id] = tags_autocompleter;
-</script>

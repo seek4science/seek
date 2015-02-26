@@ -28,7 +28,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_equal ['fish'], sop.annotations.select{|a|a.source==p}.collect{|a| a.value.text}
 
     golf = Factory :tag,:annotatable=>sop,:source=>p,:value=>"golf"
-    post :edit_tag, :id=>fish.value.id, :tags_autocompleter_selected_ids=>[golf.value.id], :tags_autocompleter_unrecognized_items=>["microbiology", "spanish"]
+    post :edit_tag, :id=>fish.value.id, :tag_list=>"#{golf.value.text}, microbiology, spanish"
     assert_redirected_to :action=>:tags
 
     sop.reload
@@ -42,7 +42,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     fish = Factory :tag,:annotatable=>sop,:source=>p,:value=>Factory(:text_value, :text => 'fish')
     assert_equal ['fish'], sop.annotations.select{|a|a.source==p}.collect{|a| a.value.text}
 
-    post :edit_tag, :id=>fish.value.id, :tags_autocompleter_selected_ids=>[fish.value.id]
+    post :edit_tag, :id=>fish.value.id, :tag_list=>golf.value.text
     assert_redirected_to :action=>:tags
 
     sop.reload
@@ -63,7 +63,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    post :edit_tag, :id=>fish.value.id, :tags_autocompleter_unrecognized_items=>["microbiology", "spanish"]
+    post :edit_tag, :id=>fish.value.id, :tag_list=>"#{golf.value.text}, microbiology, spanish"
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
@@ -89,7 +89,7 @@ class AdminAnnotationsTest < ActionController::TestCase
 
     golf=Factory(:text_value, :text => 'golf')
     fishing=person.annotations_with_attribute("expertise").select{|a| a.value.text == 'fishing'}.first
-    post :edit_tag, :id=>fishing.value.id, :tags_autocompleter_selected_ids=>[golf.id], :tags_autocompleter_unrecognized_items=>["microbiology","spanish"]
+    post :edit_tag, :id=>fishing.value.id, :tag_list=>"#{golf.value.text}, microbiology, spanish"
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
@@ -120,7 +120,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     fishing=person.annotations_with_attribute("expertise").select{|a| a.value.text == 'fishing'}.first
     assert_not_nil fishing
 
-    post :edit_tag, :id=>fishing.value.id, :tags_autocompleter_selected_ids=>[golf.value.id], :tags_autocompleter_unrecognized_items=>["fishing","spanish"]
+    post :edit_tag, :id=>fishing.value.id, :tag_list=>"#{golf.value.text}, fishing, spanish"
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
@@ -150,7 +150,7 @@ class AdminAnnotationsTest < ActionController::TestCase
 
     assert person.annotations_with_attribute("expertise").select{|a| a.value.text == 'sparrow'}.blank?
 
-    post :edit_tag, :id=>fishing.value.id, :tags_autocompleter_selected_ids=>[], :tags_autocompleter_unrecognized_items=>["sparrow"]
+    post :edit_tag, :id=>fishing.value.id, :tag_list=>"sparrow"
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
@@ -176,7 +176,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     fishing= person.annotations_with_attribute("expertise").select{|a| a.value.text == 'fishing'}.first
     assert_not_nil fishing
 
-    post :edit_tag, :id=>fishing.value.id, :tags_autocompleter_selected_ids=>[], :tags_autocompleter_unrecognized_items=>[""]
+    post :edit_tag, :id=>fishing.value.id, :tag_list=>""
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
@@ -204,7 +204,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_not_nil fishing
 
     golf=Factory(:tag, :annotatable => person, :source => users(:quentin), :value => 'golf')
-    post :edit_tag, :id=>fishing.value.id, :tags_autocompleter_selected_ids=>[golf.value.id], :tags_autocompleter_unrecognized_items=>[""]
+    post :edit_tag, :id=>fishing.value.id, :tag_list=>golf.value.text
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
