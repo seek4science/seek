@@ -2,13 +2,14 @@
     <p>
       Add multiple people at once from a given <%= t('project') %>, at a given institution, using the menu below.
     </p>
-    <%= select_tag("adv_project_id","<option selected=\"selected\" value=\"0\">Select project...</option>".html_safe+options_from_collection_for_select(Project.all, :id, :title),
+    <%= select_tag("adv_project_id",options_from_collection_for_select(Project.all, :id, :title),
+                   :prompt => 'Select project...',
                    :id => "adv_creator_select_projects",
                    :onchange => remote_function(:url => request_institutions_projects_url,
                                                 :method => :get,
-                                                :with => "'id='+$(this).options[$(this).selectedIndex].value",
-                                                :loading => "Element.show('adv_creator_select_project_spinner')",
-                                                :complete => "projectName = $('adv_creator_select_projects').options[$('adv_creator_select_projects').selectedIndex].innerHTML; updateInstitutionList(request.responseText,projectName)")) -%>
+                                                :with => "'id='+$j(this).val()",
+                                                :loading => "$j('#adv_creator_select_project_spinner').hide()",
+                                                :complete => "projectName = $j('#adv_creator_select_projects options:selected').text();updateInstitutionList(request.responseText,projectName)")) -%>
     <%= image 'spinner', :id => "adv_creator_select_project_spinner", :style => "display: none;" %>
     <%= select_tag("adv_institution_id", "<option value=\"0\">N/A</option>".html_safe, :id => "adv_creator_select_institutions",:style=>"display:none;") %>
     <br/>
@@ -16,9 +17,10 @@
     <%= link_to_with_callbacks add_html, {
                                :url => get_work_group_people_url,
                                :method => :get,
-                               :with => "'project_id='+$('adv_creator_select_projects').options[$('adv_creator_select_projects').selectedIndex].value+"+
-                                       "'&institution_id='+$('adv_creator_select_institutions').options[$('adv_creator_select_institutions').selectedIndex].value",
-                               :loading => "Element.show('adv_creator_select_spinner')",
+                               :with => "'project_id='+$j('#adv_creator_select_projects').val()+"+
+                                       "'&institution_id='+$j('#adv_creator_select_institutions').val()",
+                               :loading => "$j('#adv_creator_select_spinner').show()",
                                :complete => "addPeopleToList(request.responseText)"},
-                               {:class=>"btn btn-default",:id => "adv_creator_select_add", :style => "display:none;"} -%><%= image 'spinner', :id => "adv_creator_select_spinner", :style => "display: none;" %>
+                               {:class=>"btn btn-default",:id => "adv_creator_select_add", :style => "display:none;"} -%>
+    <%= image 'spinner', :id => "adv_creator_select_spinner", :style => "display: none;" %>
 <% end %>
