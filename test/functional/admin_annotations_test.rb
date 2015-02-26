@@ -42,7 +42,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     fish = Factory :tag,:annotatable=>sop,:source=>p,:value=>Factory(:text_value, :text => 'fish')
     assert_equal ['fish'], sop.annotations.select{|a|a.source==p}.collect{|a| a.value.text}
 
-    post :edit_tag, :id=>fish.value.id, :tag_list=>golf.value.text
+    post :edit_tag, :id=>fish.value.id, :tag_list=>fish.value.text
     assert_redirected_to :action=>:tags
 
     sop.reload
@@ -63,7 +63,7 @@ class AdminAnnotationsTest < ActionController::TestCase
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    post :edit_tag, :id=>fish.value.id, :tag_list=>"#{golf.value.text}, microbiology, spanish"
+    post :edit_tag, :id=>fish.value.id, :tag_list=>"microbiology, spanish"
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
@@ -89,7 +89,7 @@ class AdminAnnotationsTest < ActionController::TestCase
 
     golf=Factory(:text_value, :text => 'golf')
     fishing=person.annotations_with_attribute("expertise").select{|a| a.value.text == 'fishing'}.first
-    post :edit_tag, :id=>fishing.value.id, :tag_list=>"#{golf.value.text}, microbiology, spanish"
+    post :edit_tag, :id=>fishing.value.id, :tag_list=>"#{golf.text}, microbiology, spanish"
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
