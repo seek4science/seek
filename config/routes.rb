@@ -239,6 +239,7 @@ SEEK::Application.routes.draw do
 
   resources :assays do
     collection do
+      get :typeahead
       get :preview
       post :items_for_result
       #MERGENOTE - these should be gets and are tested as gets, using post to fix later
@@ -276,6 +277,7 @@ SEEK::Application.routes.draw do
 
   resources :data_files do
     collection do
+      get :typeahead
       get :preview
       post :test_asset_url
       post :upload_for_tool
@@ -321,6 +323,7 @@ SEEK::Application.routes.draw do
 
   resources :presentations do
     collection do
+      get :typeahead
       get :preview
       post :test_asset_url
       post :items_for_result
@@ -350,6 +353,7 @@ SEEK::Application.routes.draw do
 
   resources :models do
     collection do
+      get :typeahead
       get :preview
       post :test_asset_url
       post :items_for_result
@@ -456,6 +460,7 @@ SEEK::Application.routes.draw do
 
   resources :publications do
     collection do
+      get :typeahead
       get :preview
       post :fetch_preview
       post :items_for_result
@@ -470,6 +475,7 @@ SEEK::Application.routes.draw do
 
   resources :events do
     collection do
+      get :typeahead
       get :preview
       post :items_for_result
       post :resource_in_tab
@@ -499,6 +505,7 @@ SEEK::Application.routes.draw do
 
   resources :samples do
     collection do
+      get :typeahead
       get :preview
       post :items_for_result
       post :resource_in_tab
@@ -547,6 +554,7 @@ SEEK::Application.routes.draw do
 
   resources :workflows do
     collection do
+      get :typeahead
       post :test_asset_url
 #      get :preview
     end

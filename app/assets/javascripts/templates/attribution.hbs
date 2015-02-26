@@ -1,7 +1,5 @@
-<b>{{type}}</b>: {{name}}
-&nbsp;&nbsp;<span style='color: #5F5F5F;'>({{contributor}})</span>
-&nbsp;&nbsp;
-<small style="vertical-align: middle;">
-    [<a class="delete-attribution" href="javascript:deleteAttribution(); return(false);" data-attributable-id="{{id}}" data-attributable-type="{{type}}">remove</a>]
-</small>
-<br/>
+<div>
+    <b>{{type}}</b>: {{name}}
+    <span class="subtle">({{contributor}})</span>
+    <a title="Remove" class="delete-attribution clickable" data-attributable-id="{{id}}" data-attributable-type="{{type}}">(remove)</a>
+</div>

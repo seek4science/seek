@@ -14,21 +14,16 @@ function updateAttributionSettings() {
         attributed_to_arr.push([attribution.type, attribution.id]);
     }
 
-    // remove the last line break
-    if(html.length > 0) {
-        html = html.slice(0,-5);
-    }
-
     // update the page
     if(html.length == 0) {
-        $('attributed_to_list').innerHTML = '<span class="none_text">No attributions</span>';
+        $j('#attributed_to_list').html('<span class="subtle">No attributions</span>');
     }
     else {
-        $('attributed_to_list').innerHTML = html;
+        $j('#attributed_to_list').html(html);
     }
 
     // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
-    $('attributions').value = Object.toJSON(attributed_to_arr);
+    $j('#attributions').val(Object.toJSON(attributed_to_arr));
 
     $j('.delete-attribution').click(function () {
         var type = $j(this).data('attributableType');
@@ -39,7 +34,6 @@ function updateAttributionSettings() {
                 break;
             }
         }
-
         // update the page
         updateAttributionSettings();
     })
@@ -52,7 +46,6 @@ function checkAttributionNotInList(attributable) {
             return false;
         }
     }
-
     return true;
 }
 
