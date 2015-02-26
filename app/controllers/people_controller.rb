@@ -337,6 +337,18 @@ class PeopleController < ApplicationController
     end
   end
 
+  # For use in autocompleters
+  def typeahead
+    results = Person.where("first_name LIKE :query OR last_name LIKE :query", :query => "#{params[:query]}%").limit(params[:limit] || 10)
+    items = results.map do |person|
+      {id: person.id, name: person.name, hint: person.email}
+    end
+
+    respond_to do |format|
+      format.json { render :json => items.to_json }
+    end
+  end
+
   private
   
   def set_tools_and_expertise person,params

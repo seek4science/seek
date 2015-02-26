@@ -132,6 +132,7 @@ SEEK::Application.routes.draw do
 
   resources :people do
     collection do
+      get :typeahead
       get :select
       get :get_work_group
       post :userless_project_selected_ajax

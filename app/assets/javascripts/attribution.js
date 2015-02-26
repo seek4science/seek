@@ -25,9 +25,9 @@ function updateAttributionSettings() {
     // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
     $j('#attributions').val(Object.toJSON(attributed_to_arr));
 
-    $j('.delete-attribution').click(function () {
-        var type = $j(this).data('attributableType');
-        var id = $j(this).data('attributableId');
+    $j('#attributed_to_list .delete').click(function () {
+        var type = $j(this).data('objectType');
+        var id = $j(this).data('objectId');
         for(var i = 0; i < attributions.length; i++) {
             if(attributions[i].type == type && attributions[i].id == id) {
                 attributions.splice(i, 1);

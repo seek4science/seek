@@ -26,6 +26,7 @@
 //= require sharing
 //= require associate_events
 //= require attribution
+//= require creators
 //= require resource
 //= require studied_factor
 //= require fancy_multiselect
