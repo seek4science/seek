@@ -20,7 +20,8 @@ module Seek::ResearchObjects
 
     def create_agent person=User.current_user.try(:person)
       unless person.nil?
-        ROBundle::Agent.new(person.name,uri_for_item(person),person.orcid)
+        person = person.person if person.is_a?(User)
+        ROBundle::Agent.new(person.title,uri_for_item(person),person.orcid)
       end
     end
 

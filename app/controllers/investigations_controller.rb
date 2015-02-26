@@ -37,7 +37,14 @@ class InvestigationsController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show' }
-      format.ro { render :text=>"<p>research object</p>"}
+      format.ro do
+        ro_file = Seek::ResearchObjects::Generator.instance.generate(@investigation)
+        send_file(ro_file.path,
+                  type:Mime::Type.lookup_by_extension("ro").to_s,
+                  filename: "ro.zip")
+        headers["Content-Length"]=ro_file.size.to_s
+      end
+
     end
   end
 
