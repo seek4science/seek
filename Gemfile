@@ -56,7 +56,6 @@ gem 'transaction_isolation'
 #gem for BiVeS and BudHat
 gem 'bives'
 
-
 #Linked to SysMO Git repositories
 gem 'gibberish', :git => "https://github.com/SysMO-DB/gibberish.git"
 gem 'white_list', :git => "https://github.com/SysMO-DB/white_list.git"
@@ -93,7 +92,7 @@ gem 'datacite_doi_ify'
 gem 'bootstrap-sass', '~>3.3.1'
 gem 'sass-rails', '>= 3.2'
 
-gem 'ro-bundle', '~> 0.1'
+gem 'ro-bundle', :git=>"https://github.com/myGrid/ruby-ro-bundle"
 
 group :assets do
   gem 'turbo-sprockets-rails3'
