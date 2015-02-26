@@ -48,7 +48,7 @@ gem 'rfc-822'
 gem 'nokogiri'
 gem 'rdf-virtuoso', ">=0.1.6"
 gem 'cocaine'
-gem 'colorize'
+gem 'colorize','0.7.4'
 gem 'lograge'
 gem 'psych'
 gem 'transaction_isolation'
