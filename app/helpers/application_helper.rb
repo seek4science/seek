@@ -283,21 +283,6 @@ module ApplicationHelper
       return false
     end
   end
-  
-  def fast_auto_complete_field(field_id, options={})
-    div_id = "#{field_id}_auto_complete"
-    url = options.delete(:url) or raise "url required"
-    options = options.merge(:tokens => ',', :frequency => 0.01 )
-    script = javascript_tag <<-end
-    new Ajax.Request('#{url}', {
-      method: 'get',
-      onSuccess: function(transport) {
-        new Autocompleter.Local('#{field_id}', '#{div_id}', eval(transport.responseText), #{options.to_json});
-      }
-    });
-    end
-    content_tag 'div', script, :class => 'auto_complete', :id => div_id
-  end
 
   def link_to_draggable(link_name, url, link_options = {})
     link_to(link_name, url, link_options)
