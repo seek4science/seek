@@ -17,12 +17,8 @@ module Seek::ResearchObjects
       file ||= temp_file("ro-bundle.zip")
       ROBundle::File.create(file) do |bundle|
         bundle.created_by=create_agent
-        describe_metadata(bundle,investigation)
-        investigation.studies.each do |study|
-          describe_metadata(bundle,study)
-          study.assays.each do |assay|
-            describe_metadata(bundle,assay)
-          end
+        gather_entries(investigation).each do |entry|
+          describe_metadata(bundle,entry)
         end
 
         bundle.created_on=Time.now
@@ -33,8 +29,23 @@ module Seek::ResearchObjects
 
     private
 
+    def gather_entries(investigation)
+      entries = [investigation] + [investigation.studies] + [investigation.studies.collect{|study| study.assays}]
+      entries.flatten
+    end
+
     def describe_metadata bundle, item
-      Seek::ResearchObjects::MetadataJson.add_to_bundle(bundle, item)
+      tmpfile = temp_file("metadata.rdf","ro-bundle-item-metadata")
+      tmpfile << item.to_rdf
+      tmpfile.close
+
+      targetpath = File.join(path_for_item(item),"metadata.rdf")
+      bundle.add(targetpath,tmpfile,:aggregate=>false)
+
+      an = ROBundle::Annotation.new(uri_for_item(item),targetpath)
+      an.created_on=Time.now
+      an.created_by=create_agent
+      bundle.add_annotation(an)
     end
 
   end
