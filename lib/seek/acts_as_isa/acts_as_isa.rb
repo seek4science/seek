@@ -44,6 +44,7 @@ module Seek
         include BackgroundReindexing
         include Subscribable
         include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
+        include Seek::ResearchObjects::Packaging
       end
 
       def is_isa?

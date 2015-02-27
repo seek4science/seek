@@ -39,10 +39,10 @@ module Seek::ResearchObjects
       tmpfile << item.to_rdf
       tmpfile.close
 
-      targetpath = File.join(path_for_item(item),"metadata.rdf")
+      targetpath = File.join(item.package_path,"metadata.rdf")
       bundle.add(targetpath,tmpfile,:aggregate=>false)
 
-      an = ROBundle::Annotation.new(uri_for_item(item),targetpath)
+      an = ROBundle::Annotation.new(item.rdf_resource.to_uri.to_s,targetpath)
       an.created_on=Time.now
       an.created_by=create_agent
       bundle.add_annotation(an)
