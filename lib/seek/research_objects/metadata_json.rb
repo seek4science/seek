@@ -19,6 +19,8 @@ module Seek::ResearchObjects
     def self.describe(item)
       json = {id:item.id, title:item.title, description:item.description}
       json[:contributor]=create_agent(item.contributor)
+      json[:assay_type]=item.assay_type_uri if item.respond_to?(:assay_type_uri)
+      json[:technology_type]=item.assay_type_uri if item.respond_to?(:technology_type_uri)
 
       JSON.pretty_generate(json)
     end

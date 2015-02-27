@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 #   end
 # end
 #
-#
+
 class Test::Unit::TestCase
 
   # to get local/current time with specified time zone, e.g. with_time_zone("UTC")) {Time.now} returns the current time of time zone 'UTC'

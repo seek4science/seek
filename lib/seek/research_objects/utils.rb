@@ -1,8 +1,12 @@
 module Seek::ResearchObjects
   module Utils
 
-    def path_for_item item, root=""
-      root + path_fragment_for_item(item)
+    def path_for_item item, prefix=""
+      prefix=path_for_item(item.study,prefix) if item.is_a?(Assay)
+      prefix=path_for_item(item.investigation,prefix) if item.is_a?(Study)
+
+
+      prefix + path_fragment_for_item(item)
     end
 
     def path_fragment_for_item item

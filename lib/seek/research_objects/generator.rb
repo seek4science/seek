@@ -18,6 +18,12 @@ module Seek::ResearchObjects
       ROBundle::File.create(file) do |bundle|
         bundle.created_by=create_agent
         describe_metadata(bundle,investigation)
+        investigation.studies.each do |study|
+          describe_metadata(bundle,study)
+          study.assays.each do |assay|
+            describe_metadata(bundle,assay)
+          end
+        end
 
         bundle.created_on=Time.now
       end
