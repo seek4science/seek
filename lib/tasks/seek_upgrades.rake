@@ -132,6 +132,41 @@ namespace :seek do
     end
   end
 
+  desc "put back policy and permission for sysmo assets as the original intention, after adding programme"
+  task(:update_policy_permission_for_sysmo_assets => :environment) do
+    sysmo_program = Programme.where(:title => "SysMO").first
+    unless sysmo_program.nil?
+      sysmo_projects = sysmo_program.projects
+      klasses = Seek::Util.authorized_types - [Publication]
+      klasses.each do |klass|
+        klass.all.each do |item|
+          #all projects assinged to sop need to belong to only sysmo programme
+          is_only_in_sysmo = (item.projects - sysmo_projects).empty?
+          policy = item.policy
+          if is_only_in_sysmo && (policy.sharing_scope == Policy::ALL_SYSMO_USERS)
+            puts "updating for #{klass.name} #{item.id}"
+
+            existing_permissions = policy.permissions
+            #permission has higher precedence than policy
+            sysmo_projects.each do |sp|
+              overlap_permissions = existing_permissions.select{|p| p.contributor == sp}
+              if overlap_permissions.empty?
+                Permission.create(:contributor => sp, :policy => policy, :access_type => policy.access_type )
+              end
+            end
+
+            #change policy sharing scope to private
+            policy.sharing_scope = Policy::PRIVATE
+            policy.name = "moved default sysmo network to sysmos project permissions"
+            policy.save
+          else
+            puts "no need to update for #{klass.name} #{item.id}"
+          end
+        end
+      end
+    end
+  end
+
   private
 
   def read_label_map type
