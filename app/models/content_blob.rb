@@ -182,7 +182,8 @@ class ContentBlob < ActiveRecord::Base
   acts_as_fleximage_extension
 
   def copy_image
-    copy_to_path = image_assets_storage_directory + "/#{id}.#{ContentBlob.image_storage_format.to_s}"
+    copy_to_path = image_assets_storage_directory
+    copy_to_path << "/#{id}.#{ContentBlob.image_storage_format.to_s}"
     if file_exists? && !File.exist?(copy_to_path)
       FileUtils.cp filepath, copy_to_path
     end
