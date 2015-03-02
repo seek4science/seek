@@ -61,11 +61,17 @@ module ProjectsHelper
     if project.people.empty?
       html = "<span class='none_text'>No people in this #{t('project')}</span>";
     else
-      html = "<span>" + project.people.sort_by(&:last_name).select(&:can_view?).map{|p|link_to(h(p.name), p) + " (" + p.email + ")"}.join(";<br/>") + "</span>";
+      html = "<span>" + mailing_list_links.join(";<br/>") + "</span>";
     end
     html.html_safe
   end
 
+  def content_for_project_mailing_list project
+    people = project.people.sort_by(&:last_name).select(&:can_view?)
+    people.map do |p|
+      link_to(h(p.name), p) + " (" + p.email + ")"
+    end
+  end
 
 
 end
