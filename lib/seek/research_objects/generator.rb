@@ -35,17 +35,8 @@ module Seek::ResearchObjects
     end
 
     def describe_metadata bundle, item
-      tmpfile = temp_file("metadata.rdf","ro-bundle-item-metadata")
-      tmpfile << item.to_rdf
-      tmpfile.close
-
-      targetpath = File.join(item.package_path,"metadata.rdf")
-      bundle.add(targetpath,tmpfile,:aggregate=>false)
-
-      an = ROBundle::Annotation.new(item.rdf_resource.to_uri.to_s,targetpath)
-      an.created_on=Time.now
-      an.created_by=create_agent
-      bundle.add_annotation(an)
+      Seek::ResearchObjects::RdfMetadata.instance.store(bundle,item)
+      Seek::ResearchObjects::JsonMetadata.instance.store(bundle,item)
     end
 
     def store_files(bundle,asset)
@@ -60,9 +51,7 @@ module Seek::ResearchObjects
       bundle.add(path,blob.filepath,:aggregate=>true)
     end
 
-    def asset_blobs(asset)
-      asset.respond_to?(:content_blob) ? [asset.content_blob] : asset.content_blobs
-    end
+
 
   end
 end

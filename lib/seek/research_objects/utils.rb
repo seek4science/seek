@@ -13,5 +13,9 @@ module Seek::ResearchObjects
       end
     end
 
+    def asset_blobs(asset)
+      asset.respond_to?(:content_blob) ? [asset.content_blob] : asset.content_blobs
+    end
+
   end
 end
