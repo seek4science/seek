@@ -137,5 +137,12 @@ class StudyTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
-  
+
+  test 'assets' do
+    assay_assets = [Factory(:assay_asset),Factory(:assay_asset)]
+    data_files = assay_assets.collect{|aa| aa.asset}
+    study = Factory(:experimental_assay,:assay_assets=>assay_assets).study
+    assert_equal data_files.sort,study.assets.sort
+  end
+
 end
