@@ -2,10 +2,7 @@
 
 <%= f.error_messages %>
 
-<h2><%= t('programme') %> Details</h2>
-
-<div>
-  <div style="width: 95%;">
+<%= panel("#{t('programme')} Details") do %>
     <p>
       <%= f.label :title -%><br />
       <%= f.text_area :title, :class=>"title_text_entry" -%>
@@ -23,12 +20,9 @@
       <%= f.label :funding_details -%></br>
       <%= f.text_area :funding_details, :class=>"large_text_entry" -%>
     </p>
-  </div>
-</div>
-
+<% end %>
 
 <%= render :partial => "projects/project_selector", :locals => { :resource => @programme, :allow_nil => true, :possibilities=>(Project.without_programme | @programme.projects) } -%>
-
 
 <p>
   <%= f.submit(programme ? "Update" : "Create",:disable_with=>(programme ? "Updating..." : "Creating...")) -%>

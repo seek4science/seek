@@ -2,10 +2,7 @@
 
 <%= f.error_messages %>
   
-<h2><%= t('project') %> Details</h2>
-
-<div>
-	<div style="width: 95%;">
+<%= panel("#{t('project')} Details") do %>
 		<p>
 		  <%= f.label :name -%><br />
 		  <%= f.text_area :title, :class=>"title_text_entry"-%>
@@ -29,12 +26,12 @@
         <%= tree_single_select_tag Project, "id", @project ? @project.parent : nil, [@project] + @project.descendants, "parent_id" %>
       </p>
       <% end -%>
-	</div>
-</div>
+<% end %>
 
 <% if Seek::Config.organisms_enabled %>
-    <h2>Organisms Relevant To This <%= t('project') %></h2>
-    <%= render :partial=>"projects/organisms_selection", :locals=>{:f=>f} -%>
+    <%= folding_panel("Organisms Relevant To This #{t('project')}") do %>
+        <%= render :partial=>"projects/organisms_selection", :locals=>{:f=>f} -%>
+    <% end %>
 <% end %>
 
 <p>

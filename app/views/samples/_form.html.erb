@@ -14,69 +14,66 @@
       <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:50%"}) %>
       </p>
 <% end %>
-<h2>Sample Details</h2>
+<%= folding_panel('Sample Details') do %>
+      <p>
+        <%= f.label "Sample name:" -%><span class="required">*</span><br/>
+        <%= f.text_field :title, :class=>"text_entry" -%>
+      </p>
 
-<div style="width: 95%;">
+      <% if Seek::Config.is_virtualliver %>
 
-  <p>
-    <%= f.label "Sample name:" -%><span class="required">*</span><br/>
-    <%= f.text_field :title, :class=>"text_entry" -%>
-  </p>
+          <p>
+            <%= f.label :description -%><br/>
+            <%= f.text_area :comments, :class=>"large_text_entry" -%>
+          </p>
 
-  <% if Seek::Config.is_virtualliver %>
+          <p>
+            <%= f.label "Explantation time" -%><br/>
+            <%= f.text_field :explantation, :class=>"text_entry" -%>
+          </p>
+
+          <p>
+            <%= f.label :donation_date -%><span class="required">*</span><br/>
+            <%= f.calendar_date_select :donation_date, :time => "mixed" -%>
+          </p>
+      <% end %>
 
       <p>
-          <%= f.label :description -%><br/>
-          <%= f.text_area :comments, :class=>"large_text_entry" -%>
+        <%= f.label :lab_internal_identifier -%><span class="required">*</span><br/>
+        <%= f.text_field :lab_internal_number, :class=>"text_entry" -%>
       </p>
 
       <p>
-        <%= f.label "Explantation time" -%><br/>
-        <%= f.text_field :explantation, :class=>"text_entry" -%>
+        <%= f.label :sampling_date -%><br/>
+        <%= f.calendar_date_select :sampling_date, :time => "mixed", :class=>"text_entry" -%>
       </p>
 
       <p>
-        <%= f.label :donation_date -%><span class="required">*</span><br/>
-        <%= f.calendar_date_select :donation_date, :time => "mixed" -%>
+        <%= f.label :age_at_sampling -%><br/>
+        <%= f.text_field :age_at_sampling, :class=>"text_entry", :onkeypress => "javascript: return onlyFloatNumbers(event);" -%> <%= f.select :age_at_sampling_unit_id, options_for_select(Unit.time_units.sort_by(&:order).collect{|u| [u.title, u.id]}, @sample.age_at_sampling_unit_id) -%>
       </p>
-  <% end %>
 
-  <p>
-    <%= f.label :lab_internal_identifier -%><span class="required">*</span><br/>
-    <%= f.text_field :lab_internal_number, :class=>"text_entry" -%>
-  </p>
+      <p>
+        <%= f.label :provider_name -%><br/>
+        <%= f.text_field :provider_name, :class=>"text_entry" -%>
+      </p>
 
-  <p>
-    <%= f.label :sampling_date -%><br/>
-    <%= f.calendar_date_select :sampling_date, :time => "mixed", :class=>"text_entry" -%>
-  </p>
+      <p>
+        <%= f.label "Provider's sample identifier" -%><br/>
+        <%= f.text_field :provider_id, :class=>"text_entry" -%>
+      </p>
 
-  <p>
-    <%= f.label :age_at_sampling -%><br/>
-    <%= f.text_field :age_at_sampling, :class=>"text_entry", :onkeypress => "javascript: return onlyFloatNumbers(event);" -%> <%= f.select :age_at_sampling_unit_id, options_for_select(Unit.time_units.sort_by(&:order).collect{|u| [u.title, u.id]}, @sample.age_at_sampling_unit_id) -%>
-  </p>
+      <p>
+        <%= f.label "Comment" -%><br/>
+        <%= f.text_field :comments, :class=>"text_entry" -%>
+      </p>
 
-  <p>
-    <%= f.label :provider_name -%><br/>
-    <%= f.text_field :provider_name, :class=>"text_entry" -%>
-  </p>
-
-  <p>
-    <%= f.label "Provider's sample identifier" -%><br/>
-    <%= f.text_field :provider_id, :class=>"text_entry" -%>
-  </p>
-
-  <p>
-    <%= f.label "Comment" -%><br/>
-    <%= f.text_field :comments, :class=>"text_entry" -%>
-  </p>
-
-  <p>
-    <%= f.label "Organism part" -%><br/>
-    <% organism_part_options = Seek::Config.is_virtualliver ? ['whole organism','organ','tissue','intercellular','cell','subcellular','blood','serum']:['whole cell', 'membrane fraction'] %>
-    <%= f.select :organism_part, options_for_select(organism_part_options.insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
-  </p>
-  <br/>
+      <p>
+        <%= f.label "Organism part" -%><br/>
+        <% organism_part_options = Seek::Config.is_virtualliver ? ['whole organism','organ','tissue','intercellular','cell','subcellular','blood','serum']:['whole cell', 'membrane fraction'] %>
+        <%= f.select :organism_part, options_for_select(organism_part_options.insert(0,'Not specified'), @sample.organism_part), :style => 'float:right;margin-right:30em' %>
+      </p>
+<% end %>
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>Seek::Config.is_virtualliver ? true : false}%>
 
   <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample} if @sample.respond_to?(:tissue_and_cell_types) -%>
@@ -84,7 +81,6 @@
 
     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sample} if @sample.respond_to?(:scales) && show_scales? %>
   </p>
-  <br style="clear:both"/>
 
   <% if @sample.can_manage?%>
       <p>
@@ -97,7 +93,6 @@
   <%= fancy_multiselect @sample, :data_files,  {:name => 'sample_data_file_ids', :association_class => DataFile,:selected => (params[:sample_data_file_ids] || []).map(&:to_i) | @sample.data_file_masters.map(&:id), :hidden=> @sample.data_file_masters.blank? ? true : false, :other_projects_checkbox => true} %>
   <%= fancy_multiselect @sample, :models, :name => 'sample_model_ids', :association_class => Model,:selected => (params[:sample_model_ids] || []).map(&:to_i) | @sample.model_masters.map(&:id) %>
   <%= fancy_multiselect @sample, :sops,  {:name => 'sample_sop_ids', :association_class => Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:id), :hidden=> @sample.sop_masters.blank?  ? true : false, :other_projects_checkbox => true} %>
-</div>
 
 <%= f.hidden_field :parent_name %>
 <%= f.hidden_field :from_biosamples %>

@@ -1,9 +1,6 @@
 <%= f.error_messages -%>
 
-<h2>Institution Details</h2>
-
-<center>
-	<div style="width: 95%;">
+<%= panel('Institution Details') do %>
 	  <p>
 	    <%= f.label :name -%><br/>
 	    <%= f.text_area :title, :class=>"title_text_entry" -%>
@@ -26,11 +23,7 @@
 	    <%= f.label :country -%><br/>
 	    <%= f.country_select :country, nil, {}, :class=>"text_entry" -%>
 	  </p>
-	</div>
-</center>
+<% end %>
 
-
-<p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(institution ? "Update" : "Create",:disable_with=>(institution ? "Updating..." : "Creating...")) -%>
-	or <%= link_to 'Cancel', (institution ? institution_path(institution.id) : institutions_path) -%>
-</p>
+<%= f.submit(institution ? "Update" : "Create",:disable_with=>(institution ? "Updating..." : "Creating...")) -%>
+ or <%= link_to 'Cancel', (institution ? institution_path(institution.id) : institutions_path) -%>
