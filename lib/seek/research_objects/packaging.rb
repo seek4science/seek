@@ -11,5 +11,14 @@ module Seek::ResearchObjects
     def package_path_fragment item
       "#{item.class.name.underscore.pluralize}/#{item.id}/"
     end
+
+    def permitted_for_research_object? item=self
+      if item.is_downloadable?
+        item.can_download?(nil)
+      else
+        item.can_view?(nil)
+      end
+    end
+
   end
 end

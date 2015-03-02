@@ -31,7 +31,7 @@ module Seek::ResearchObjects
 
     def gather_entries(investigation)
       entries = [investigation] + [investigation.studies] + [investigation.assays] + [investigation.assets]
-      entries.flatten
+      entries.flatten.select{|entry| entry.permitted_for_research_object?}
     end
 
     def describe_metadata bundle, item
