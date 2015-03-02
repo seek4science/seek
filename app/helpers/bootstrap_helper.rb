@@ -18,7 +18,18 @@ module BootstrapHelper
 
   # A collapsible panel
   def folding_panel(title = nil, collapsed = false, options = {})
-    options = options.merge(:collapsible => true, :collapsed => collapsed)
+    title += ' <span class="caret"></span>'
+
+    options[:collapsible] = true
+    options[:heading_options] = merge_options({:class => 'clickable collapsible', 'data-toggle' => 'collapse-next'}, options[:heading_options])
+    options[:collapse_options] = {:class => 'panel-collapse collapse', 'aria-expanded' => true}
+    if collapsed
+      options[:heading_options][:class] += ' collapsed'
+      options[:collapse_options]['aria-expanded'] = false
+    else
+      options[:collapse_options][:class] += ' in'
+    end
+
     panel(title, options) do
       yield
     end
@@ -26,51 +37,32 @@ module BootstrapHelper
 
   # A panel with a heading section and body
   def panel(title = nil, options = {})
-    collapsible = options.delete(:collapsible)
-    collapse_options = {}
-
-    if collapsible
-      collapsed = options.delete(:collapsed)
-      options[:heading_options] = merge_options({:class => 'clickable collapsible', 'data-toggle' => 'collapse-next'}, options[:heading_options])
-      collapse_options = {:class => 'panel-collapse collapse', 'aria-expanded' => true}
-      if collapsed
-        options[:heading_options][:class] += ' collapsed'
-        collapse_options['aria-expanded'] = false
-      else
-        collapse_options[:class] += ' in'
-      end
-    end
-
     heading_options = merge_options({:class => 'panel-heading'}, options.delete(:heading_options))
     body_options = merge_options({:class => 'panel-body'}, options.delete(:body_options))
     options = merge_options({:class => "panel #{options[:type] || 'panel-default'}"}, options)
 
-    content_tag(:div, options) do
+    # The body of the panel
+    body = content_tag(:div, body_options) do
+      yield
+    end
+
+    content_tag(:div, options) do # The panel wrapper
       if title
-        content_tag(:div, heading_options) do
+        content_tag(:div, heading_options) do # The panel title
           title_html = ""
           unless (help_text = options.delete(:help_text)).nil?
             title_html << help_icon(help_text) + " "
           end
           title_html << title
-          title_html << ' <span class="caret"></span>' if collapsible
           title_html.html_safe
-        end +
-        if collapsible
-          content_tag(:div, collapse_options) do
-            content_tag(:div, body_options) do
-              yield
-            end
-          end
-        else
-          content_tag(:div, body_options) do
-            yield
-          end
         end
       else
-        content_tag(:div, body_options) do
-          yield
-        end
+        ''.html_safe
+      end +
+      if options.delete(:collapsible)
+        content_tag(:div, body, options.delete(:collapse_options)) # The "collapse" wrapper around the body
+      else
+        body
       end
     end
   end
@@ -148,21 +140,22 @@ module BootstrapHelper
     if typeahead_opts[:values]
       options['data-typeahead-local-values'] = typeahead_opts[:values].to_json
     else
-      if typeahead_opts[:prefetch_url]
-        options['data-typeahead-prefetch-url'] = typeahead_opts[:prefetch_url]
-      elsif typeahead_opts[:type]
-        options['data-typeahead-prefetch-url'] = latest_tags_path(:type => typeahead_opts[:type])
-      else
-        options['data-typeahead-prefetch-url'] = latest_tags_path
-      end
-
-      if typeahead_opts[:query_url]
-        options['data-typeahead-query-url'] = typeahead_opts[:query_url]
-      elsif typeahead_opts[:type]
-        options['data-typeahead-query-url'] = (query_tags_path(:type => typeahead_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
-      else
-        options['data-typeahead-query-url'] = (query_tags_path + '?query=%QUERY').html_safe
-      end
+      options['data-typeahead-prefetch-url'] =
+          if typeahead_opts[:prefetch_url]
+            typeahead_opts[:prefetch_url]
+          elsif typeahead_opts[:type]
+            latest_tags_path(:type => typeahead_opts[:type])
+          else
+            latest_tags_path
+          end
+      options['data-typeahead-query-url'] =
+          if typeahead_opts[:query_url]
+            typeahead_opts[:query_url]
+          elsif typeahead_opts[:type]
+            (query_tags_path(:type => typeahead_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
+          else
+            (query_tags_path + '?query=%QUERY').html_safe
+          end
     end
 
     if typeahead_opts[:handlebars_template]
