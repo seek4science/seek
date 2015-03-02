@@ -80,7 +80,7 @@ gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.
 gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
 
 gem 'taverna-t2flow'
-gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :branch => 'list-inputs', :ref=>"bf7512faafa819a8df6ae692f4ba8ce41a9fa3e4"
+gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :branch => 'list-inputs', :ref=>"b36e19c85b7a58d08a73aa418c0f838442c6dfd3"
 gem 'jquery-rails', '~> 3'
 gem 'jquery-ui-rails', '~>3'
 gem "recaptcha"
