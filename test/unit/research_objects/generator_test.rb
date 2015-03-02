@@ -1,4 +1,5 @@
 require 'test_helper'
+
 class GeneratorTest < ActiveSupport::TestCase
 
   test "generate for investigation" do
