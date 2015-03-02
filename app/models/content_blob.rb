@@ -175,7 +175,6 @@ class ContentBlob < ActiveRecord::Base
     image_directory (Seek::Config.temporary_filestore_path + '/image_assets')
     use_creation_date_based_directories false
     image_storage_format :png
-    output_image_jpg_quality 85
     require_image false
     invalid_image_message 'was not a readable image'
   end
@@ -183,7 +182,8 @@ class ContentBlob < ActiveRecord::Base
   acts_as_fleximage_extension
 
   def copy_image
-    copy_to_path = image_assets_storage_directory + "/#{id}.jpg"
+    copy_to_path = image_assets_storage_directory
+    copy_to_path << "/#{id}.#{ContentBlob.image_storage_format.to_s}"
     if file_exists? && !File.exist?(copy_to_path)
       FileUtils.cp filepath, copy_to_path
     end

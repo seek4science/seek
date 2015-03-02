@@ -304,6 +304,12 @@ namespace :seek do
     YAML.load(File.read(filename.to_s)).each_pair {|k,v| Rails.cache.write(k,v)}
   end
 
+  desc("Synchronised the assay and technology types assigned to assays according to the current ontology, resolving any suggested types that have been added")
+  task(:resynchronise_ontology_types=>[:environment,"tmp:create"]) do
+    synchronizer = Seek::Ontologies::Synchronize.new
+    synchronizer.synchronize_assay_types
+    synchronizer.synchronize_technology_types
+  end
 
   def set_projects_parent array, parent
     array.each do |proj|
