@@ -19,6 +19,7 @@ module Seek::ResearchObjects
         bundle.created_by=create_agent
         gather_entries(investigation).each do |entry|
           describe_metadata(bundle,entry)
+          store_files(bundle,entry) if entry.is_asset?
         end
         bundle.created_on=Time.now
       end
@@ -45,6 +46,22 @@ module Seek::ResearchObjects
       an.created_on=Time.now
       an.created_by=create_agent
       bundle.add_annotation(an)
+    end
+
+    def store_files(bundle,asset)
+      blobs = asset_blobs(asset)
+      blobs.each do |blob|
+        store_blob_file(bundle,asset,blob) if blob.file_exists?
+      end
+    end
+
+    def store_blob_file(bundle,asset,blob)
+      path=File.join(asset.package_path,blob.original_filename)
+      bundle.add(path,blob.filepath,:aggregate=>true)
+    end
+
+    def asset_blobs(asset)
+      asset.respond_to?(:content_blob) ? [asset.content_blob] : asset.content_blobs
     end
 
   end
