@@ -37,6 +37,10 @@ class Study < ActiveRecord::Base
     END_EVAL
   end
 
+  def assets
+    data_files + sops + models + publications
+  end
+
   def project_ids
     projects.map(&:id)
   end

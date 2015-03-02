@@ -20,7 +20,6 @@ module Seek::ResearchObjects
         gather_entries(investigation).each do |entry|
           describe_metadata(bundle,entry)
         end
-
         bundle.created_on=Time.now
       end
 
@@ -30,7 +29,7 @@ module Seek::ResearchObjects
     private
 
     def gather_entries(investigation)
-      entries = [investigation] + [investigation.studies] + [investigation.studies.collect{|study| study.assays}]
+      entries = [investigation] + [investigation.studies] + [investigation.assays] + [investigation.assets]
       entries.flatten
     end
 
