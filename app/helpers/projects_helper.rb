@@ -61,7 +61,7 @@ module ProjectsHelper
     if project.people.empty?
       html = "<span class='none_text'>No people in this #{t('project')}</span>";
     else
-      html = "<span>" + mailing_list_links.join(";<br/>") + "</span>";
+      html = "<span>" + mailing_list_links(project).join(";<br/>") + "</span>";
     end
     html.html_safe
   end
