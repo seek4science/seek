@@ -15,7 +15,7 @@ env:
   - SUITE="rake test:functionals" DB_TYPE=mysql
   - SUITE="rake test:integration" DB_TYPE=mysql
   - SUITE="rspec spec" DB_TYPE=mysql
-  - SUITE="rake assets:precompile" DB_TYPE=mysql
+  - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
   - SUITE="rake test:units" DB_TYPE=postgres
   - SUITE="rake test:functionals" DB_TYPE=postgres
   - SUITE="rake test:integration" DB_TYPE=postgres
@@ -26,5 +26,7 @@ before_script:
   - cp test/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
   - RAILS_ENV=test bundle exec rake db:schema:load
+  - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then RAILS_ENV=production bundle exec rake db:create; fi"
+  - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then RAILS_ENV=production bundle exec rake db:schema:load; fi"
   
 script: bundle exec $SUITE
