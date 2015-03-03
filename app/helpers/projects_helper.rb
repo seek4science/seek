@@ -66,7 +66,7 @@ module ProjectsHelper
     html.html_safe
   end
 
-  def content_for_project_mailing_list project
+  def mailing_list_links project
     people = project.people.sort_by(&:last_name).select(&:can_view?)
     people.map do |p|
       link_to(h(p.name), p) + " (" + p.email + ")"
