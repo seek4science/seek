@@ -92,7 +92,8 @@ class AssaysControllerTest < ActionController::TestCase
     assays = assigns(:assays)
     first_assay = assays.first
     assert_not_nil first_assay
-    assert_select "a[id*=?]", /drag_Assay_#{first_assay.id}/
+    assert_select "a[data-favourite-url=?]", h(add_favourites_path(:resource_id =>first_assay.id,
+                                                                   :resource_type => first_assay.class.name))
   end
 
   test "should show index in xml" do
@@ -799,7 +800,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3", :text=>"#{I18n.t('sop').pluralize} (1+1)", :count=>1
       assert_select "h3", :text=>"#{I18n.t('data_file').pluralize} (1+1)", :count=>1
     end
@@ -1227,15 +1228,15 @@ class AssaysControllerTest < ActionController::TestCase
     get :edit, :id=>assay.id
     assert_response :success
 
-    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
-    assert_select "div#tag_ids",:count=>1
+    assert_select "div.panel-heading",:text=>/Tags/,:count=>1
+    assert_select "input#tag_list",:count=>1
   end
 
   test "new should include tags element" do
     get :new,:class=>:experimental
     assert_response :success
-    assert_select "div.foldTitle",:text=>/Tags/,:count=>1
-    assert_select "div#tag_ids",:count=>1
+    assert_select "div.panel-heading",:text=>/Tags/,:count=>1
+    assert_select "input#tag_list",:count=>1
   end
 
   test "edit should include not include tags element when tags disabled" do
@@ -1244,8 +1245,8 @@ class AssaysControllerTest < ActionController::TestCase
       get :edit, :id=>assay.id
       assert_response :success
 
-      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
-      assert_select "div#tag_ids",:count=>0
+      assert_select "div.panel-heading",:text=>/Tags/,:count=>0
+      assert_select "input#tag_list",:count=>0
     end
   end
 
@@ -1253,8 +1254,8 @@ class AssaysControllerTest < ActionController::TestCase
     with_config_value :tagging_enabled,false do
       get :new,:class=>:experimental
       assert_response :success
-      assert_select "div.foldTitle",:text=>/Tags/,:count=>0
-      assert_select "div#tag_ids",:count=>0
+      assert_select "div.panel-heading",:text=>/Tags/,:count=>0
+      assert_select "input#tag_list",:count=>0
     end
   end
 

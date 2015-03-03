@@ -163,7 +163,7 @@ class DataFilesController < ApplicationController
       assay_ids = params[:assay_ids] || []
 
       if @data_file.save
-        update_annotations @data_file
+        update_annotations(params[:tag_list], @data_file)
         update_scales @data_file
 
         create_content_blobs
@@ -245,7 +245,7 @@ class DataFilesController < ApplicationController
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
     data_file_params=filter_protected_update_params(params[:data_file])
 
-    update_annotations @data_file
+    update_annotations(params[:tag_list], @data_file)
     update_scales @data_file
 
     respond_to do |format|

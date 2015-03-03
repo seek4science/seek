@@ -1,7 +1,5 @@
 class TagsController < ApplicationController
 
-
-
   before_filter :find_tag,:only=>[:show]
   
   def show
@@ -25,6 +23,22 @@ class TagsController < ApplicationController
       format.html
     end
   end
+
+  def latest
+    @tags = get_tags.limit(params[:limit] || 50).map {|t| t.text}
+
+    respond_to do |format|
+      format.json { render :json => @tags.to_json }
+    end
+  end
+
+  def query
+    @tags = get_tags.where("text LIKE ?", "#{params[:query]}%").limit(10).map {|t| t.text}
+
+    respond_to do |format|
+      format.json { render :json => @tags.to_json }
+    end
+  end
   
   private
 
@@ -43,6 +57,14 @@ class TagsController < ApplicationController
   #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
   def select_authorised collection
     collection.select {|el| el.can_view?}
+  end
+
+  def get_tags
+    attribute = AnnotationAttribute.where(:name => params[:type] || 'tag').first
+    TextValue.select(:text).
+        joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" +
+                                  "LEFT OUTER JOIN annotation_value_seeds ON annotation_value_seeds.value_id = text_values.id").
+        where("annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id", :attribute_id => attribute)
   end
 
 end

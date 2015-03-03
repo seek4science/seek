@@ -1,16 +1,14 @@
 // Patch to fix compatibility with bootstrap and prototype.
-// Stops dropdown elements disappearing when clicked on.
+// Stops various elements (dropdowns, tabs etc.) disappearing when clicked on.
+//
 // http://stackoverflow.com/questions/19139063/twitter-bootstrap-3-dropdown-menu-disappears-when-used-with-prototype-js
 
 (function() {
     var isBootstrapEvent = false;
     if (window.jQuery) {
         var all = jQuery('*');
-        jQuery.each(['hide.bs.dropdown',
-            'hide.bs.collapse',
-            'hide.bs.modal',
-            'hide.bs.tooltip',
-            'hide.bs.popover'], function(index, eventName) {
+        jQuery.each(['hide.bs.dropdown','hide.bs.collapse','hide.bs.modal',
+                     'hide.bs.tooltip','hide.bs.popover','hide.bs.tab'], function(index, eventName) {
             all.on(eventName, function( event ) {
                 isBootstrapEvent = true;
             });

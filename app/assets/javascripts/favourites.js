@@ -1,56 +1,73 @@
-// Script to open the user dropdown menu when a favouritable icon is dragged, and highlight the appropriate 'drop zone'
-
-var draggedFavourite = false;
-var draggedFavouritable = false;
+var closeDropdownWhenDone = false;
 
 $j(document).ready(function () {
-    $j('.favouritable').mousedown(handleFavouritableDrag);
 
-    $j(document).mouseup(function (e) {
-        if(draggedFavourite) {
-            $j('#delete-favourite-zone').hide();
-        }
-        if(draggedFavouritable) {
-            $j('#drop_favourites').removeClass('active');
-            $j('#drop-favourite-text').hide();
+    $j("#add-favourites-zone").droppable({
+        //activeClass: "ui-state-default",
+        //hoverClass: "ui-state-hover",
+        accept: ".favouritable",
+        drop: function(event, ui) {
+            $j('#fav_ajax-loader').show();
+            $j.post(ui.draggable.data('favouriteUrl')).always(function() {
+                $j('#fav_ajax-loader').hide();
+            });
         }
     });
 
-    $j("#user-menu").on("hide.bs.dropdown",function(e) {
-        // After dragging a favouritable icon, wait a bit before closing the user menu
-        if(draggedFavouritable) {
-            e.stopPropagation();
-            draggedFavouritable = false;
-            setTimeout(function () {
-                if(!draggedFavouritable && $j('#user-menu').hasClass('open'))
-                    $j('#user-menu-button').dropdown('toggle');
-            }, 800);
-            return false;
-        }
-        // Don't automatically close the menu when dragging an existing favourite, as it wasn't opened automatically
-        if(draggedFavourite) {
-            e.stopPropagation();
-            draggedFavourite = false;
-            return false;
+    $j("#delete-favourite-zone").droppable({
+        greedy: true,
+        accept: ".favourite",
+        drop: function(event, ui) {
+            $j('#fav_ajax-loader').show();
+            $j.ajax({
+                url: ui.draggable.data('deleteUrl'),
+                type: 'DELETE',
+                success: function() {
+                    $j('#fav_ajax-loader').hide();
+                }
+            });
         }
     });
+
+    bindFavouritables($j('.favouritable'));
+    bindFavourites($j('.favourite'));
 });
 
-var handleFavouritableDrag = function (e) {
-    var userMenu = $j('#user-menu');
-    var userMenuButton = $j('#user-menu-button');
-    var deleteFavouriteZone = $j('#delete-favourite-zone');
-    var addFavouriteZone = $j('#drop_favourites');
-    var dropFavouritesText = $j('#drop-favourite-text');
+function bindFavouritables(elements) {
+    elements.draggable({
+        revert: true,
+        appendTo: 'body',
+        start: function () {
+            if (!$j('#user-menu').hasClass('open')) {
+                closeDropdownWhenDone = true;
+                $j('#user-menu-button').dropdown('toggle');
+            } else {
+                closeDropdownWhenDone = false;
+            }
+            $j('#add-favourites-zone').addClass('active');
+            $j('#add-favourites-zone-text').show();
+        },
+        stop: function () {
+            $j('#add-favourites-zone').removeClass('active');
+            $j('#add-favourites-zone-text').hide();
+            if(closeDropdownWhenDone)
+                setTimeout(function () {
+                    if ($j('#user-menu').hasClass('open'))
+                        $j('#user-menu-button').dropdown('toggle');
+                }, 800);
+        }
+    });
+}
 
-    if($j(this).hasClass('favourite')) { // Show delete section if its already a favourite
-        deleteFavouriteZone.fadeIn();
-        draggedFavourite = true;
-    } else { // Otherwise open the user menu to expose the drop zone
-        if(!userMenu.hasClass('open'))
-            userMenuButton.dropdown('toggle');
-        addFavouriteZone.addClass('active');
-        dropFavouritesText.show();
-        draggedFavouritable = true;
-    }
-};
+function bindFavourites(elements) {
+    elements.draggable({
+        revert: true,
+        appendTo: 'body',
+        start: function () {
+            $j('#delete-favourite-zone').fadeIn();
+        },
+        stop: function () {
+            $j('#delete-favourite-zone').hide();
+        }
+    });
+}

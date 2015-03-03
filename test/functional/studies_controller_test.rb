@@ -44,7 +44,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study.id
     assert_response :success
 
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3",:text=>"Publications (3)",:count=>1
     end
   end
@@ -55,7 +55,8 @@ class StudiesControllerTest < ActionController::TestCase
     studies = assigns(:studies)
     first_study = studies.first
     assert_not_nil first_study
-    assert_select "a[id*=?]",/drag_Study_#{first_study.id}/
+    assert_select "a[data-favourite-url=?]", h(add_favourites_path(:resource_id =>first_study.id,
+                                                                   :resource_type => first_study.class.name))
   end
   
   def test_title
@@ -277,7 +278,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study
     assert_response :success
 
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
       assert_select "h3",:text=>"#{I18n.t('sop').pluralize} (1+1)",:count=>1
       assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
@@ -357,7 +358,7 @@ class StudiesControllerTest < ActionController::TestCase
     s=studies(:metabolomics_study)
     get :show,:id=>s
     assert_response :success
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3",:text=>"#{I18n.t('investigation').pluralize} (1)",:count=>1
     end
   end

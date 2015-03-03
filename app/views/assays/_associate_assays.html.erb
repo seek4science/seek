@@ -44,14 +44,8 @@
     end
 %>
 
-<div class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you can associate #{assay_class_text} in SEEK to this #{resource_text}. You can only associate #{assay_class_text} you are authorized to edit.") -%>
-    <%= assay_class_text -%>
-  </div>
-
-  <div id="associate_assay_fold_content" class="foldContent" style="display:<%= associated_assays.blank? ? 'none' : 'block' -%>">
+<%= folding_panel(assay_class_text, associated_assays.blank?, :body_options => {:id => 'associate_assay_fold_content'},
+                  :help_text => "Here you can associate #{assay_class_text} in SEEK to this #{resource_text}. You can only associate #{assay_class_text} you are authorized to edit.") do %>
     <div class="yui-u first" style="width:66%; float:left">
 
       <p style="color: #666666;">
@@ -105,8 +99,7 @@
   
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>
   
-  </div>
-</div>
+<% end %>
   
 
 <script type="text/javascript">

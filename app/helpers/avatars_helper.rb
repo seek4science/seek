@@ -16,12 +16,12 @@ module AvatarsHelper
   # 4) url - when the avatar is clicked, this is the url to redirect to; by default - the url of the "object";
   # 5) alt - text to show as 'alt' / 'tooltip'; by default "name" attribute of the "object"; when empty string - nothing is shown;
   # 6) "show_tooltip" - when set to true, text in "alt" get shown as tooltip; otherwise put in "alt" attribute
-  def avatar(object, size = 200, return_image_tag_only = false, url = nil, alt = nil, show_tooltip = true)
+  def avatar(object, size = 200, return_image_tag_only = false, url = nil, alt = nil, show_tooltip = true, css_class = 'framed')
     title = get_object_title(object)
 
     alternative, tooltip_text = avatar_alternative_and_tooltip_text(alt, show_tooltip, title)
 
-    img = avatar_image_tag_for_item(object, alternative, size, alt)
+    img = avatar_image_tag_for_item(object, alternative, size, alt, css_class)
 
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
     if return_image_tag_only
@@ -32,36 +32,18 @@ module AvatarsHelper
     end
   end
 
-  def avatar_image_tag_for_item(item, alternative, size, alt)
-    case item.class.name.downcase
+  def avatar_image_tag_for_item(item, alternative, size, alt, css_class = 'framed')
+    case item.class.name.split('::').first.downcase
       when 'person', 'institution', 'project', 'programme'
-        avatar_according_to_user_upload(alternative, item, size)
-      when 'datafile', 'sop'
-        avatar_according_to_item_mime_type(item, alt)
-      when 'model', 'investigation', 'study', 'publication', 'assay'
-        avatar_according_to_item_type(item, alt)
+        avatar_according_to_user_upload(alternative, item, size, css_class)
+      else
+        resource_avatar(item, :alt => alt, :class => css_class, :style => "width: #{size}px; height: #{size}px")
     end
   end
 
-  def avatar_according_to_item_type(item, alt)
-    if item.is_a?(Assay)
-      key = item.is_modelling? ? 'modelling' : 'experimental'
-      key = "#{item.class.name.downcase}_#{key}_avatar"
-    else
-      key = "#{item.class.name.downcase}_avatar"
-    end
-    image key, alt: alt, class: 'avatar framed'
-  end
-
-  def avatar_according_to_item_mime_type(item, alt)
-    image_tag file_type_icon_url(item),
-              alt: alt,
-              class: 'avatar framed'
-  end
-
-  def avatar_according_to_user_upload(alternative, item, size)
+  def avatar_according_to_user_upload(alternative, item, size, css_class = 'framed')
     if item.avatar_selected?
-      image_tag avatar_url(item, item.avatar_id, size), alt: alternative, class: 'framed'
+      image_tag avatar_url(item, item.avatar_id, size), alt: alternative, class: css_class
     else
       default_avatar(item.class.name, size, alternative)
     end

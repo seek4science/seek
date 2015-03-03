@@ -1,40 +1,85 @@
 module BootstrapHelper
 
+  # A link with an icon next to it
   def icon_link_to(text, icon_key, url, options = {})
     icon = icon_tag(icon_key, options.delete(:icon_options) || {})
-    link_to((icon + text).html_safe, url, options)
+    if url.nil?
+      content_tag(:a, (icon + text).html_safe, options)
+    else
+      link_to((icon + text).html_safe, url, options)
+    end
   end
 
+  # A button with an icon and text
   def button_link_to(text, icon, url, options = {})
     options[:class] = "btn #{options[:type] || 'btn-default'} #{options[:class]}".strip
     icon_link_to(text, icon, url, options)
   end
 
+  # A collapsible panel
+  def folding_panel(title = nil, collapsed = false, options = {})
+    title += ' <span class="caret"></span>'.html_safe
+
+    options[:collapsible] = true
+    options[:heading_options] = merge_options({:class => 'clickable collapsible', 'data-toggle' => 'collapse-next'}, options[:heading_options])
+    options[:collapse_options] = {:class => 'panel-collapse collapse', 'aria-expanded' => true}
+    if collapsed
+      options[:heading_options][:class] += ' collapsed'
+      options[:collapse_options]['aria-expanded'] = false
+    else
+      options[:collapse_options][:class] += ' in'
+    end
+
+    panel(title, options) do
+      yield
+    end
+  end
+
+  # A panel with a heading section and body
   def panel(title = nil, options = {})
     heading_options = merge_options({:class => 'panel-heading'}, options.delete(:heading_options))
     body_options = merge_options({:class => 'panel-body'}, options.delete(:body_options))
     options = merge_options({:class => "panel #{options[:type] || 'panel-default'}"}, options)
 
-    content_tag(:div, options) do
+    # The body of the panel
+    body = content_tag(:div, body_options) do
+      yield
+    end
+
+    content_tag(:div, options) do # The panel wrapper
       if title
-        content_tag(:div, heading_options) do
-          help_icon_html = ""
+        content_tag(:div, heading_options) do # The panel title
+          title_html = ""
           unless (help_text = options.delete(:help_text)).nil?
-            help_icon_html = help_icon(help_text) + " "
+            title_html << help_icon(help_text) + " "
           end
-          "#{help_icon_html}#{title}".html_safe
-        end +
-        content_tag(:div, body_options) do
-          yield
+          title_html << title
+          title_html.html_safe
         end
       else
-        content_tag(:div, body_options) do
-          yield
-        end
+        ''.html_safe
+      end +
+      if options.delete(:collapsible)
+        content_tag(:div, body, options.delete(:collapse_options)) # The "collapse" wrapper around the body
+      else
+        body
       end
     end
   end
 
+  # A coloured information box with an X button to close it
+  def alert_box(style = 'info', options = {}, &block)
+    hide_button = options.delete(:hide_button)
+    content_tag(:div, merge_options(options, {:class => "alert alert-#{style} alert-dismissable", :role => 'alert'})) do
+      if hide_button
+        capture(&block)
+      else
+        dismiss_button + capture(&block)
+      end
+    end
+  end
+
+  # A button that displays a dropdown menu when clicked
   def dropdown_button(text, icon_key = nil, options = {})
     content_tag(:div, :class => "btn-group") do
       content_tag(:div, :type => 'button', :class => "btn dropdown-toggle #{options[:type] || 'btn-default'}".strip,
@@ -48,6 +93,8 @@ module BootstrapHelper
     end
   end
 
+  # A dropdown menu for admin commands. Will not display if the content is blank.
+  # (Saves having to check privileges twice)
   def admin_dropdown(text = 'Administration', icon = 'manage')
     opts = capture do
       yield
@@ -60,7 +107,69 @@ module BootstrapHelper
     end
   end
 
+  def tags_input(name, existing_tags = [], options = {})
+    options['data-role'] = 'seek-tagsinput'
+    options['data-tags-limit'] = options.delete(:limit) if options[:limit]
+    options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
+
+    text_field_tag(name, existing_tags.join(','), options)
+  end
+
+  def objects_input(name, existing_objects = [], options = {})
+    options['data-role'] = 'seek-objectsinput'
+    options['data-tags-limit'] = options.delete(:limit) if options[:limit]
+    options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
+
+    unless existing_objects.empty?
+      if existing_objects.is_a?(String)
+        options['data-existing-objects'] = existing_objects
+      else
+        options['data-existing-objects'] = existing_objects.map {|o| {id: o.id, name: o.try(:name) || o.try(:title)}}.to_json
+      end
+    end
+
+    text_field_tag(name, nil, options)
+  end
+
   private
+
+  def typeahead_options(typeahead_opts)
+    typeahead_opts = {} if typeahead_opts.is_a?(TrueClass)
+    options = {}
+    options['data-typeahead'] = true
+    if typeahead_opts[:values]
+      options['data-typeahead-local-values'] = typeahead_opts[:values].to_json
+    else
+      options['data-typeahead-prefetch-url'] =
+          if typeahead_opts[:prefetch_url]
+            typeahead_opts[:prefetch_url]
+          elsif typeahead_opts[:type]
+            latest_tags_path(:type => typeahead_opts[:type])
+          else
+            latest_tags_path
+          end
+      options['data-typeahead-query-url'] =
+          if typeahead_opts[:query_url]
+            typeahead_opts[:query_url]
+          elsif typeahead_opts[:type]
+            (query_tags_path(:type => typeahead_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
+          else
+            (query_tags_path + '?query=%QUERY').html_safe
+          end
+    end
+
+    if typeahead_opts[:handlebars_template]
+      options['data-typeahead-template'] = typeahead_opts[:handlebars_template]
+    end
+
+    options
+  end
+
+  def dismiss_button
+    content_tag(:button, :class => 'close', 'data-dismiss' => 'alert', 'aria-label' => 'Close') do
+      content_tag(:span, '&times'.html_safe, 'aria-hidden' => 'true')
+    end
+  end
 
   def icon_tag(key, options = {})
     filename = icon_filename_for_key(key)

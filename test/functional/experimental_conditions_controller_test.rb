@@ -31,7 +31,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     compound_name = 'ATP'
     compound_annotation = Seek::SabiorkWebservices.new.get_compound_annotation(compound_name)
 
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_autocompleter_unrecognized_items: [compound_name]
+    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_list: compound_name
 
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -83,7 +83,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     cp = compounds(:compound_glucose)
     unit = units(:gram)
     ec = { measured_item_id: mi.id, start_value: 1, unit_id: unit.id }
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_autocompleter_selected_ids: ["#{cp.id},Compound"]
+    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_list: cp.name
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?
@@ -97,7 +97,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     syn = synonyms(:glucose_synonym)
     unit = units(:gram)
     ec = { measured_item_id: mi.id, start_value: 1, unit_id: unit.id }
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_autocompleter_selected_ids: ["#{syn.id},Synonym"]
+    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, substance_list: syn.name
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?
@@ -128,7 +128,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
 
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
-    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => { measured_item_id: mi.id },  "#{ec.id}_substance_autocompleter_selected_ids" => ["#{cp.id},Compound"]
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => { measured_item_id: mi.id },  :substance_list => cp.name
     ec_updated = assigns(:experimental_condition)
     assert_not_nil ec_updated
     assert ec_updated.valid?
@@ -158,7 +158,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal ec.experimental_condition_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
-    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {}, "#{ec.id}_substance_autocompleter_selected_ids" => ["#{cp.id},Compound"]
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {}, :substance_list => cp.name
     ec_updated = assigns(:experimental_condition)
     assert_not_nil ec_updated
     assert ec_updated.valid?

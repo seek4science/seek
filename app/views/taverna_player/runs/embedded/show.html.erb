@@ -28,16 +28,11 @@
 
 
 <div id="run-outputs" style="<%= 'display: none' unless @run.complete? && @run.outputs.size > 0-%>">
-  <div class="fold">
-    <div class="foldTitle">
-      Outputs
-    </div>
-    <div class="foldContent">
+  <%= folding_panel('Outputs') do %>
       <% if @run.complete? %>
         <%= render(:partial => "taverna_player/runs/embedded/outputs", :locals => { :run => @run }) -%>
       <% end %>
-    </div>
-  </div>
+  <% end %>
 </div>
 
 <%

@@ -22,12 +22,8 @@
 
 <br/>
 
-<div class="fold">
-  <div class="foldTitle">
-    <%= t('investigation') %> details
-  </div>
-  <div class="foldContent">
 
+<%= folding_panel("#{t('investigation')} details") do %>
     <p>
       <%= t('investigation') %><span class="required">*</span>
       <%=link_to "New #{t('investigation')}?",new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
@@ -44,20 +40,17 @@
         <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
       </div>
     </p>
+<% end %>
 
-  </div>
-  <% if show_scales? %>
-      <p>
+<% if show_scales? %>
+    <p>
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
-      </p>
-  <% end %>
+    </p>
+<% end %>
 
-  <p>
-    <%= render :seek_partial=>"assets/sharing_form" if @study.can_manage? -%>
-  </p>
-</div>
-
-
+<p>
+  <%= render :seek_partial=>"assets/sharing_form" if @study.can_manage? -%>
+</p>
 
 <script type="text/javascript">
   var CREATE_INVESTIGATION_LINK = "<%= create_investigation_url %>";

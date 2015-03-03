@@ -17,21 +17,12 @@
    possibilities_collection_id = "possible_#{collection_id}"
    possibilities_options ||= {}
    possibilities_options[:onchange]="javascript:possibilities_selection_changed();"
-
-   fold_title = help_icon("Here you can associate the #{t('model')} with specific #{t('scale').pluralize}")
-   fold_title << " #{t('scale').pluralize}"
 %>
 
 <%= javascript_include_tag "scales/scales_selection" %>
 
-<div id="add_scales_form" class="fold">
-
-  <div class="foldTitle">
-    <%= fold_title %>
-  </div>
-
-  <div id="add_scales_form_fold_content" class="foldContent">
-
+<%= folding_panel("#{t('scale').pluralize}", false, :id => 'add_scales_form', :body_options => {:id => 'add_scales_form_fold_content'},
+                  :help_text => "Here you can associate the #{t('model')} with specific #{t('scale').pluralize}") do %>
     <div class="yui-u first" <%= html_options %>>
       <p style="color: #666666;">
         <%= intro %>
@@ -67,8 +58,7 @@
 
 
     </div>
-  </div>
-</div>
+<% end %>
 <script type="text/javascript">
     Event.observe(window, 'load', function () {
         updateFancyMultiselect2('<%= collection_id %>');

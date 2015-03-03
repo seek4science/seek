@@ -132,6 +132,7 @@ SEEK::Application.routes.draw do
 
   resources :people do
     collection do
+      get :typeahead
       get :select
       get :get_work_group
       post :userless_project_selected_ajax
@@ -239,6 +240,7 @@ SEEK::Application.routes.draw do
 
   resources :assays do
     collection do
+      get :typeahead
       get :preview
       post :items_for_result
       #MERGENOTE - these should be gets and are tested as gets, using post to fix later
@@ -276,6 +278,7 @@ SEEK::Application.routes.draw do
 
   resources :data_files do
     collection do
+      get :typeahead
       get :preview
       post :test_asset_url
       post :upload_for_tool
@@ -321,6 +324,7 @@ SEEK::Application.routes.draw do
 
   resources :presentations do
     collection do
+      get :typeahead
       get :preview
       post :test_asset_url
       post :items_for_result
@@ -350,6 +354,7 @@ SEEK::Application.routes.draw do
 
   resources :models do
     collection do
+      get :typeahead
       get :preview
       post :test_asset_url
       post :items_for_result
@@ -398,6 +403,7 @@ SEEK::Application.routes.draw do
 
   resources :sops do
     collection do
+      get :typeahead
       get :preview
       post :test_asset_url
       post :items_for_result
@@ -455,6 +461,7 @@ SEEK::Application.routes.draw do
 
   resources :publications do
     collection do
+      get :typeahead
       get :preview
       post :fetch_preview
       post :items_for_result
@@ -469,6 +476,7 @@ SEEK::Application.routes.draw do
 
   resources :events do
     collection do
+      get :typeahead
       get :preview
       post :items_for_result
       post :resource_in_tab
@@ -498,6 +506,7 @@ SEEK::Application.routes.draw do
 
   resources :samples do
     collection do
+      get :typeahead
       get :preview
       post :items_for_result
       post :resource_in_tab
@@ -550,6 +559,7 @@ SEEK::Application.routes.draw do
 
   resources :workflows do
     collection do
+      get :typeahead
       post :test_asset_url
 #      get :preview
     end
@@ -600,12 +610,13 @@ SEEK::Application.routes.draw do
 
   resources :statistics, :only => [:index]
   ### MISC MATCHES ###
-
   match '/search/' => 'search#index', :as => :search
   match '/search/save' => 'search#save', :as => :save_search
   match '/search/delete' => 'search#delete', :as => :delete_search
   match '/search/items_for_result' => 'search#items_for_result', :via => :post
   match 'svg/:id.:format' => 'svg#show', :as => :svg
+  match '/tags/latest' => 'tags#latest', :as => :latest_tags
+  match '/tags/query' => 'tags#query', :as => :query_tags
   match '/tags' => 'tags#index', :as => :all_tags
   match '/tags/:id' => 'tags#show', :as => :show_tag
   match '/tags' => 'tags#index', :as => :all_anns
@@ -623,8 +634,6 @@ SEEK::Application.routes.draw do
   match 'studies/new_investigation_redbox' => 'studies#new_investigation_redbox', :as => :new_investigation_redbox, :via => :post
   match 'experiments/create_investigation' => 'studies#create_investigation', :as => :create_investigation, :via => :post
   match '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group, :via => :post
-  match '/tool_list_autocomplete' => 'people#auto_complete_for_tools_name', :as => :tool_list_autocomplete
-  match '/expertise_list_autocomplete' => 'people#auto_complete_for_expertise_name', :as => :expertise_list_autocomplete
   match ':controller/:id/approve_or_reject_publish' => ":controller#show"
 
   match '/signup' => 'users#new', :as => :signup

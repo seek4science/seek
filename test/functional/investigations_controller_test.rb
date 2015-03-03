@@ -57,7 +57,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     get :show,:id=>study.investigation.id
     assert_response :success
 
-    assert_select "div.tabbertab" do
+    assert_select "div.tab-pane" do
       assert_select "h3",:text=>"Publications (3)",:count=>1
     end
   end
@@ -68,7 +68,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigations = assigns(:investigations)
     first_investigations = investigations.first
     assert_not_nil first_investigations
-    assert_select "a[id*=?]",/drag_Investigation_#{first_investigations.id}/
+    assert_select "a[data-favourite-url=?]", h(add_favourites_path(:resource_id =>first_investigations.id,
+                                                                   :resource_type => first_investigations.class.name))
   end
 
   test "should show item" do

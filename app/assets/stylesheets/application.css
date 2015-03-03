@@ -2,7 +2,6 @@
 *= require yui-grids
 *= require bootstrap_include
 *= require my_exp
-*= require folds
 *= require gadgets
 *= require acts_as_taggable_stylesheet
 *= require styles
@@ -36,4 +35,7 @@
 *= require publishing
 *= require settings
 *= require new_styles
+*= require jquery-ui-drag-drop
+*= require bootstrap-tagsinput
+*= require bootstrap-typeahead-rails
 */

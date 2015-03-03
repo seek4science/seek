@@ -7,8 +7,8 @@
     <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes,:creators=>creators,:title=>authors_title } -%>
 <% end -%>
 
-<% if resource.class.is_taggable? -%>
-    <%= item_tags_and_tag_entry -%>
+<% if resource.class.is_taggable? && current_user-%>
+    <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
 <% end -%>
 
 <% if resource.respond_to? :attributions_objects -%>

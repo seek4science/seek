@@ -236,14 +236,12 @@ class AdminsController < ApplicationController
     if request.post?
       replacement_tags = []
 
-      params[:tags_autocompleter_selected_ids].each do |selected_id|
-        replacement_tags << TextValue.find(selected_id)
-      end unless params[:tags_autocompleter_selected_ids].nil?
-      params[:tags_autocompleter_unrecognized_items].select { |t| !t.blank? }.each do |item|
+      params[:tag_list].split(',').each do |item|
+        item.strip!
         tag = TextValue.find_by_text(item)
-        tag = TextValue.create text: item if tag.nil?
+        tag = TextValue.create(text: item) if tag.nil?
         replacement_tags << tag
-      end unless params[:tags_autocompleter_unrecognized_items].nil?
+      end
 
       @tag.annotations.each do |a|
         annotatable = a.annotatable

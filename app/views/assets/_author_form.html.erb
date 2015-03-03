@@ -1,227 +1,43 @@
 <%# This partial is expecting 3 parameters to be defined: -%>
 <%# - resource_type - type of resource for which the creators form is displayed (required because various types of resources have different requirements for attributions) -%>
 <%# - existing_creators - list of creators for the current resource (this should be collection of Person objects) -%>
-<%# - creator_suggestions - JSON array of data to be used to generate autocompleter suggestions -%>
-
-
-<!-- Creator -->
-
-<%# this hidden input will submit all permission data with the form -%>
-<%= hidden_field_tag "creators", "" -%>
-
-<% resource_type_attributed_to_types = "Contributors" -%>
+<%# - other_creators - list of non-SEEK creators for the current resource (this should be a string) -%>
 
 <% original_resource_type = resource_type -%>
 <% resource_type = text_for_resource(resource_type) -%>
 
-
-<div class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you attribute this #{resource_type} to other people.") -%>
-    Contributors
-  </div>
-
-  <div id="creator_fold_content" class="foldContent" style="display:<%= existing_creators.blank? ? 'none' : 'block' -%>">
-
+<%= folding_panel('Contributors', existing_creators.blank?, :body_options => {:id => 'creator_fold_content'},
+                  :help_text => "Here you attribute this #{resource_type} to other people.") do %>
     <p>
       If this <%= resource_type %> was contributed by, or together with, other <%= Seek::Config.project_name %> members, please list their names below. <br/>
       The contributors you specify will have the right to 'view and edit summary and contents' of this <%= resource_type %>.
     </p>
 
-    <div class="box_editing">
-      <p style="color: #666666;">
-        So far you have specified the following contributors:
-      </p>
-      <p id="creators_list" class="box_editing_inner">
-        <span class="none_text" id="creators_text">Loading...</span>
-      </p>      
-      <p>
-        Please type contributors into the box below - suggestions will be displayed as you type.
-        Select contributors that you want to include and click "Add" to add them to the list.
-      </p>
+    <p style="color: #666666;">
+      So far you have specified the following contributors:
+    </p>
+    <p id="creators_list" class="box_editing_inner">
+      <span class="none_text" id="creators_text">Loading...</span>
+    </p>
+    <p>
+      Please type contributors into the box below - suggestions will be displayed as you type.
+      Select contributors that you want to include and click "Add" to add them to the list.
+    </p>
+    <%= objects_input('creator-typeahead', [], :typeahead => {:query_url => typeahead_people_path + '?query=%QUERY'}) -%>
+    <%# this hidden input will submit all permission data with the form -%>
+    <%= hidden_field_tag "creators", "" -%>
 
-      <table id="facebook" class="clearfix">
-        <tr>
-          <td>
-            <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('creator_autocomplete_input').focus();" style="width: 400px;">
-              <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="creator_hidden_input" tabindex="-1" ></span>
-
-              <div id="creator_autocomplete_display" class="tokenizer_input">
-                <input type="text" size="1" tabindex="" id="creator_autocomplete_input" />
-              </div>
-            </div>
-            <div id="creator_autocomplete_populate" class="clearfix autocomplete typeahead_list" onclick="addCreators(); return(false);" style="width: 403px; height: auto; overflow-y: hidden;display:none">
-              <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
-            </div>
-          </td>
-        </tr>
-      </table>
-
-      <script type="text/javascript">
-        var suggestion_list = <%= Person.get_all_as_json.html_safe  -%>;
-        var prepopulate_with = [];
-
-        var creator_autocompleter = new Autocompleter.LocalAdvanced(
-        creator_autocompleter_id, 'creator_autocomplete_input', 'creator_autocomplete_display', 'creator_autocomplete_populate', suggestion_list, prepopulate_with, {
-          frequency: 0.1,
-          updateElement: addAction,
-          search_field: "name",
-          <%= "hint_field: \"email\",".html_safe  unless hide_contact_details? -%>
-          id_field: "id",
-          validation_type: "only_suggested"
-        });
-        var hidden_input = new HiddenInput('creator_hidden_input', creator_autocompleter);
-
-        autocompleters[creator_autocompleter_id] = creator_autocompleter;
-      </script>
-	  
-	  <%= render :partial => 'assets/advanced_creator_select' %>	  
-	  
-    </div>
-    <br/>
-    <div>
-      <p>
-        If anyone not registered with SEEK assisted with the contribution of this <%= resource_type %>, you can specify them below.
-      </p>
-      <%= text_field_tag original_resource_type.underscore+"[other_creators]", other_creators, :size=>90 %>
-    </div>
-  </div>
-</div>
-
-
+    <%= render :partial => 'assets/advanced_creator_select' %>
+    <%= folding_panel('Add non-SEEK creators') do %>
+        <p>
+          If anyone not registered with SEEK assisted with the contribution of this <%= resource_type %>, you can specify them below.
+        </p>
+        <%= text_field_tag original_resource_type.underscore+"[other_creators]", other_creators, :size=>90 %>
+    <% end %>
+<% end %>
 
 <script type="text/javascript">
-// ***************  Creator  *****************
-
-  // recreate internal store of creators..
-<% existing_creators.each do |c| -%>
-    creator_name = '<%= h(c.name) -%>';
-    creator_id = <%= c.id -%>;
-    creator_email = '<%= h(c.email) -%>';
-
-    //creator_settings.push([creator_name, creator_email, creator_id]);
-    addCreator(decodeHTML(creator_name),creator_email,creator_id);
-<% end -%>
-
-  // ..and update the page to make existing creators visible
-  updateCreatorSettings();
-
-
-function updateCreatorSettings() {
-    // iterate through all creators and build the "shared with" list;
-    // in the meanwhile also assemble a minimized version of the array that
-    // could be posted with the form (this won't have item titles in it)
-
-    var creators = '';
-    var creators_arr = new Array();
-
-    for(var i = 0; i < creator_settings.length; i++) {
-        creator_name = encodeHTML(creator_settings[i][0]);
-        creator_email = creator_settings[i][1];
-        creator_id = creator_settings[i][2];
-        creator_email_text = "";
-        if (<%= hide_contact_details? -%> == "true") {
-          creator_email_text = ': ' + creator_email
-        }
-        creators += '<b>' + creator_name + '</b>' + creator_email_text
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + ' [<a href="" onclick="javascript:deleteCreator(' + creator_id +'); return(false);">remove</a>]</small><br/>';
-
-        creators_arr.push([creator_name, creator_id]);
-    }
-
-
-    // remove the last line break
-    if(creators.length > 0) {
-        creators = creators.slice(0,-5);
-    }
-
-
-    // update the page
-    if(creators.length == 0) {
-        $('creators_list').innerHTML = '<span class="none_text">No creators</span>';
-    }
-    else {
-        $('creators_list').innerHTML = creators;
-    }
-
-
-    // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
-    $('creators').value = Object.toJSON(creators_arr);
-}
-
-
-function checkCreatorNotInList(creator_name, creator_id) {
-    rtn = true;
-
-    for(var i = 0; i < creator_settings.length; i++)
-        if(creator_settings[i][0] == creator_name && creator_settings[i][2] == creator_id) {
-            rtn = false;
-            break;
-        }
-
-    return(rtn);
-}
-
-
-// adds an creator to the list and updates the displayed list
-function addCreator(creator_name, creator_email, creator_id) {
-    if(checkCreatorNotInList(creator_name, creator_id)) {
-        creator_settings.push([creator_name, creator_email, creator_id]);
-
-        // update visible page
-        updateCreatorSettings();
-    }
-    else {
-       // alert('The following entity was not added (already in the list of creators):\n\n' +
-       //     creator_name + ': ' + creator_email);
-    }
-}
-
-
-// removes creator from creator list and updates the displayed list
-function deleteCreator(creator_id) {
-    // remove the actual record for the creator
-    for(var i = 0; i < creator_settings.length; i++)
-        if(creator_settings[i][2] == creator_id) {
-            creator_settings.splice(i, 1);
-            break;
-        }
-
-    // update the page
-    updateCreatorSettings();
-}
-
-
-function addCreators() {
-    var selIDs = autocompleters[creator_autocompleter_id].getRecognizedSelectedIDs();
-
-    if(selIDs == "") {
-        // no creators to add
-        alert("Please choose some contributors!");
-        return(false);
-    }
-    else {
-        // some creators to add - known that don't have duplicates
-        // within the new list, but some entries in the new list
-        // may replicate those in the main creator list: this
-        // will be checked by addCreator()
-
-        for(var i = 0; i < selIDs.length; i++) {
-            id = parseInt(selIDs[i]);
-            email = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'email');
-            name = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
-            addCreator(name, email, id);
-        }
-
-        // remove all tokens from autocomplete text box
-        autocompleters[creator_autocompleter_id].deleteAllTokens();
-
-        return(true);
-    }
-}
-
-
-// ********************************************************
+    // recreate internal store of attributions..
+    var creators = <%= existing_creators.map { |c| {id: c.id, name: h(c.name), email: h(c.email) }}.to_json.html_safe -%>;
+    updateCreatorSettings(); // ..and update the page to make existing attributions visible
 </script>

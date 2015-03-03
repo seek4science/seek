@@ -5,14 +5,8 @@
     select_truncate_length=120
     associated_sops = resource.is_a?(Publication) ? resource.related_sops : resource.sops
 -%>
-<div class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you associate #{t('sop')} in SEEK to this #{resource_text}.") -%>
-    <%= t('sop').pluralize %>
-  </div>
-
-  <div id="associate_model_fold_content" class="foldContent" style="display:<%= associated_sops.blank? ? 'none' : 'block' -%>">
+<%= folding_panel(t('sop').pluralize, associated_sops.blank?, :body_options => {:id => 'associate_sop_fold_content'},
+                  :help_text => "Here you associate #{t('sop')} in SEEK to this #{resource_text}.") do %>
     <div class="yui-u first" style="width:66%; float:left">
       <p style="color: #666666;">
         The following <%= t('sop').pluralize %> are involved in this <%= resource_text -%>:
@@ -43,8 +37,7 @@
     </div>
     <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'sop'} %>
   
-  </div>
-</div>
+<% end %>
 
 <script type="text/javascript">
     function toggle_sop_list() {

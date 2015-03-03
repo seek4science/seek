@@ -1,5 +1,3 @@
-<% drag_id=model_to_drag_id @institution %>
-
 <%= render :partial => "general/item_title",:locals=>{:item=>@institution, :buttons_partial => 'institutions/buttons'} -%>
 
 <div class="row">
@@ -22,7 +20,7 @@
   </div>
 
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @institution, :drag_id => drag_id } -%>
+    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @institution } -%>
   </div>
 </div>
 

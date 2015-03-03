@@ -1,8 +1,8 @@
 <% if SiteAnnouncement.headline_announcement -%>
-    <div class="alert alert-warning" role="alert">
+    <%= alert_box('warning') do %>
         <%= site_annoucements_headline %>
-    </div>
-<% end -%>
+    <% end %>
+<% end %>
 
 <div class="row">
   <div class="col-md-9">

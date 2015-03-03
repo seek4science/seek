@@ -21,9 +21,19 @@
     </p>  
     
     <%= f.label :body %><br/>
-    <%= render :partial => 'layouts/collapsable_div', :locals => {:div_options => {:style => "width: 50%"}, :header_options => {:style => "padding: 0.2em"}, :title => "Legend", :partial => 'legend'} %>
-    <%= render :partial => 'layouts/collapsable_div', :locals => {:div_options => {:style => "width: 50%"}, :header_options => {:style => "padding: 0.2em"}, :title => "List of pages", :partial => 'page_list'} %>
-    <%= f.text_area :body, :size => "80x20" %><br/>     
+    <div class="row">
+      <div class="col-md-6">
+        <%= folding_panel('Legend', true) do %>
+            <%= render :partial => 'legend', :locals => {:div_options => {:style => "width: 50%"}} %>
+        <% end %>
+      </div>
+      <div class="col-md-6">
+        <%= folding_panel('List of pages', true) do %>
+            <%= render :partial => 'page_list', :locals => {:div_options => {:style => "width: 50%"}} %>
+        <% end %>
+      </div>
+    </div>
+    <%= f.text_area :body, :size => "80x20", :style => 'width: 100%' %><br/>
     
     <%= submit_tag "Preview" %>
     <%= submit_tag action.to_s.titleize %>

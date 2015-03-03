@@ -105,7 +105,7 @@ class AssaysController < ApplicationController
 
     @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
 
-    update_annotations @assay #this saves the assay
+    update_annotations(params[:tag_list], @assay) #this saves the assay
     update_scales @assay
 
 
@@ -136,7 +136,7 @@ class AssaysController < ApplicationController
   def update
     update_assay_organisms @assay, params
 
-    update_annotations @assay
+    update_annotations(params[:tag_list], @assay)
     update_scales @assay
 
     @assay.update_attributes(params[:assay])

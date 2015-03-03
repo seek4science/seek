@@ -40,11 +40,4 @@ module TagsHelper
     end.join("").html_safe
   end
 
-  #defines the tag box, with AJAX tag entry and removal
-  def item_tags_and_tag_entry
-    #only show the tag box if a user is logged in
-    return unless current_user
-    render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..."
-  end
-
 end

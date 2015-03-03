@@ -283,42 +283,9 @@ module ApplicationHelper
       return false
     end
   end
-  
-  def fast_auto_complete_field(field_id, options={})
-    div_id = "#{field_id}_auto_complete"
-    url = options.delete(:url) or raise "url required"
-    options = options.merge(:tokens => ',', :frequency => 0.01 )
-    script = javascript_tag <<-end
-    new Ajax.Request('#{url}', {
-      method: 'get',
-      onSuccess: function(transport) {
-        new Autocompleter.Local('#{field_id}', '#{div_id}', eval(transport.responseText), #{options.to_json});
-      }
-    });
-    end
-    content_tag 'div', script, :class => 'auto_complete', :id => div_id
-  end
 
-  def link_to_draggable(link_name, url, link_options = {}, drag_options = {})
-    if !link_options[:id]
-      return ":id mandatory"
-    end
-    
-    can_click_var = "can_click_for_#{link_options[:id]}"
-    html = javascript_tag("var #{can_click_var} = true;");
-    html << link_to(
-      link_name,
-      url,
-      :id => link_options[:id],
-      :class => link_options[:class] || "",
-      :title => link_options[:title] || "",
-      :onclick => "if (!#{can_click_var}) {#{can_click_var}=true;return(false);} else {return true;}",
-      :onMouseUp => "setTimeout('#{can_click_var} = true;', 200);")
-      html << draggable_element(link_options[:id],
-      :revert => drag_options[:revert] || true,
-      :ghosting => drag_options[:ghosting] || false,
-      :change => "function(element){#{can_click_var} = false;}")
-    return html.html_safe
+  def link_to_draggable(link_name, url, link_options = {})
+    link_to(link_name, url, link_options)
   end
 
   def page_title controller_name, action_name

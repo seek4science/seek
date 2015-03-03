@@ -35,7 +35,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     compound_name = 'CTP'
     compound_annotation = Seek::SabiorkWebservices.new.get_compound_annotation(compound_name)
 
-    post :create, studied_factor: fs, data_file_id: df.id, version: df.version, substance_autocompleter_unrecognized_items: [compound_name]
+    post :create, studied_factor: fs, data_file_id: df.id, version: df.version, substance_list: compound_name
 
     fs = assigns(:studied_factor)
     assert_not_nil fs
@@ -87,7 +87,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     cp = compounds(:compound_glucose)
     unit = units(:gram)
     fs = { measured_item_id: mi.id, start_value: 1, end_value: 10, unit_id: unit.id }
-    post :create, studied_factor: fs, data_file_id: df.id, version: df.version, substance_autocompleter_selected_ids: ["#{cp.id},Compound"]
+    post :create, studied_factor: fs, data_file_id: df.id, version: df.version, substance_list: cp.name
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?
@@ -101,7 +101,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     syn = synonyms(:glucose_synonym)
     unit = units(:gram)
     fs = { measured_item_id: mi.id, start_value: 1, end_value: 10, unit_id: unit.id }
-    post :create, studied_factor: fs, data_file_id: df.id, version: df.version, substance_autocompleter_selected_ids: ["#{syn.id},Synonym"]
+    post :create, studied_factor: fs, data_file_id: df.id, version: df.version, substance_list: syn.name
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?
@@ -132,7 +132,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
-    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => { measured_item_id: mi.id },  "#{fs.id}_substance_autocompleter_selected_ids" => ["#{cp.id},Compound"]
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => { measured_item_id: mi.id },  :substance_list => cp.name
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -162,7 +162,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs.studied_factor_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
-    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {}, "#{fs.id}_substance_autocompleter_selected_ids" => ["#{cp.id},Compound"]
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {}, :substance_list => cp.name
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?

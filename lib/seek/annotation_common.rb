@@ -14,10 +14,15 @@ module Seek
       entity=controller_name.singularize.camelize.constantize.find(params[:id])
       if entity.can_view?
         clear_cloud = immediately_clear_tag_cloud?
-        update_owned_annotations entity
+        update_owned_annotations(entity, current_user, 'tag', params[:tag_list])
         eval("@#{controller_name.singularize} = entity")
         render :update do |page|
-          page.replace 'tags_box', :partial=>'assets/tags_box'
+          page.replace 'tag_cloud', :partial=>'tags/tag_cloud',
+                       :locals=>{:tags=>fetch_tags_for_item(entity)[1],
+                                 :show_overall_count=>false,
+                                 :id=>"tag_cloud",
+                                 :tags_smaller=>true,
+                                 :no_tags_text=>"This item has not yet been tagged."}
 
           # The tag cloud is generation is quite an expensive process and doesn't need to automatically update when filled up already.
           # When it is small its nice to see new tags appear in the cloud.
@@ -27,13 +32,11 @@ module Seek
             RebuildTagCloudsJob.create_job
           end
 
-          page.visual_effect :highlight, 'tags_box'
+          page.visual_effect :highlight, 'tag_cloud'
           page.visual_effect :highlight, 'sidebar_tag_cloud'
         end
       else
-        render :update do |page|
-          #this is to prevent a missing template error. If permission is not allowed, then the entity is silently left unchanged
-        end
+        render :nothing => true, :status => 400
       end
     end
 
@@ -58,9 +61,9 @@ module Seek
 
     #Updates all annotations as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.
     #New tags are assigned to the owner, which defaults to the current user.
-    def update_annotations entity, attr='tag', owner=User.current_user
+    def update_annotations(param, entity, attr='tag', owner=User.current_user)
       unless owner.nil?
-        entity.tag_with_params params, attr
+        entity.tag_annotations(param, attr)
         if immediately_clear_tag_cloud?
           expire_annotation_fragments(attr)
         else
@@ -72,9 +75,9 @@ module Seek
 
     #Updates tags for a given owner using the params passed through the tagging web interface. This just updates the tags for a given owner, which defaults
     #to the current user - it doesn't affect other peoples tags for that item.
-    def update_owned_annotations entity, attr='tag', owner=User.current_user
+    def update_owned_annotations(entity, owner, attr, annotations)
       unless owner.nil?
-        entity.tag_as_user_with_params params, attr
+        entity.tag_annotations_as_user(annotations, attr, owner)
         if immediately_clear_tag_cloud?
           expire_annotation_fragments(attr)
         else

@@ -184,7 +184,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert_response :success
       assert_select 'div.association_step p', :text => /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
     end
-    assert_select 'div.foldTitle', :text => /#{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div.panel-heading', :text => /#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p', :text => /The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
   end
 
@@ -202,7 +202,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert_response :success
       assert_select 'div.association_step p',:text=>/You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
     end
-    assert_select 'div.foldTitle',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
+    assert_select 'div.panel-heading',:text=>/#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p',:text=>/The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
   end
 
@@ -829,7 +829,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     golf=Factory :tag,:annotatable=>dummy_model,:source=>p2,:value=>"golf"
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_model,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_model,:tag_list=>golf.value.text}
 
     viewable_model.reload
 
@@ -840,7 +840,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert !private_model.can_view?(p.user)
     assert !private_model.can_edit?(p.user)
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>private_model,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>private_model,:tag_list=>golf.value.text}
 
     private_model.reload
     assert private_model.annotations.empty?
@@ -867,7 +867,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal [],model.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
     assert_equal ["golf","sparrow"],model.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>model,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>model,:tag_list=>"soup,#{golf.value.text}"}
 
     model.reload
 
