@@ -108,6 +108,15 @@ GIT
     my_annotations (0.6.0)
 
 GIT
+  remote: https://github.com/myGrid/ruby-ro-bundle
+  revision: 57730a8afc83ac4453efabb8679dee6be45dbf4e
+  specs:
+    ro-bundle (0.1.0)
+      json (~> 1.8)
+      ucf (~> 2.0)
+      uuid (~> 2.3)
+
+GIT
   remote: https://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
@@ -562,10 +571,6 @@ GEM
       netrc (~> 0.7)
     rfc-822 (0.4.0)
     rmagick (2.13.2)
-    ro-bundle (0.1.0)
-      json (~> 1.8)
-      ucf (~> 1.0)
-      uuid (~> 2.3)
     rsolr (1.0.11)
       builder (>= 2.1.2)
     rspec-core (3.2.1)
@@ -685,8 +690,8 @@ GEM
       railties (> 3.2.8, < 4.0.0)
       sprockets (>= 2.2.0)
     tzinfo (0.3.43)
-    ucf (1.1.0)
-      zip-container (~> 2.2)
+    ucf (2.0.0)
+      zip-container (~> 3.0.1)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.6)
@@ -725,7 +730,7 @@ GEM
       rake (>= 0.8.7)
     yard (0.8.7.6)
     yui-compressor (0.12.0)
-    zip-container (2.2.0)
+    zip-container (3.0.1)
       rubyzip (~> 1.1.6)
 
 PLATFORMS
@@ -810,7 +815,7 @@ DEPENDENCIES
   rest-client
   rfc-822
   rmagick (= 2.13.2)
-  ro-bundle (~> 0.1)
+  ro-bundle!
   rspec-rails
   rubocop
   ruby-openid

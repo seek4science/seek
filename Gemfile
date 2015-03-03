@@ -93,7 +93,7 @@ gem 'datacite_doi_ify'
 gem 'bootstrap-sass', '~>3.3.1'
 gem 'sass-rails', '>= 3.2'
 
-gem 'ro-bundle', '~> 0.1'
+gem 'ro-bundle', :git=>"https://github.com/myGrid/ruby-ro-bundle"
 gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
 gem 'handlebars_assets'

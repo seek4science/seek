@@ -29,6 +29,10 @@ class Investigation < ActiveRecord::Base
     END_EVAL
   end
 
+  def assets
+    data_files + sops + models + publications
+  end
+
   def clone_with_associations
     new_object= self.dup
     new_object.policy = self.policy.deep_copy
