@@ -78,6 +78,7 @@ module Seek
       include Seek::ActsAsAsset::ISA::InstanceMethods
       include Seek::ActsAsAsset::Relationships::InstanceMethods
       include Seek::ActsAsAsset::Folders::InstanceMethods
+      include Seek::ResearchObjects::Packaging
 
       # sets the last_used_at time to the current time
       def just_used
