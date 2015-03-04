@@ -32,7 +32,10 @@
 
       <div>
         <%= preview_permission_popup_link(@presentation)-%>
-        <%= submit_tag "Upload and Save", :id => "presentation_submit_btn", :onclick => "javascript: validateResourceFields(true,'presentation',true); return(false);" -%> or <%= link_to 'Cancel', presentations_path -%>
+        <%= submit_tag "Upload and Save", :id => "presentation_submit_btn",
+                       :onclick => "javascript: validateResourceFields(true,'presentation',true); return(false);",
+                       :class => 'btn btn-primary' -%>
+        or <%= link_to 'Cancel', presentations_path, :class => 'btn btn-default' -%>
       </div>
     </div>
 <% end -%>
