@@ -398,6 +398,7 @@ class PeopleController < ApplicationController
       params.delete param if params
     end
   end
+
   def project_or_institution_details projects_or_institutions
     details = ''
     unless params[projects_or_institutions].blank?
