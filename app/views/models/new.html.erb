@@ -22,7 +22,7 @@
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => true } -%>
 
-      <%= render :partial=>"model_metadata" -%>
+      <%= render :partial => "model_metadata" -%>
 
       <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
 
@@ -37,7 +37,10 @@
 
       <div>
         <%= preview_permission_popup_link(@model)-%>
-        <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateResourceFields(true, 'model',true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
+        <%= submit_tag "Upload and Save", :id => "model_submit_btn",
+                       :onclick => "javascript: validateResourceFields(true, 'model',true); return(false);",
+                       :class => 'btn btn-primary' -%>
+        or <%= link_to 'Cancel', models_path, :class => 'btn btn-default' -%>
       </div>
     </div>
 <% end -%>
