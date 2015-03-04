@@ -5,19 +5,17 @@
     <div class="asset_form">
         <%= error_messages_for :presentation -%>
         <%= render :partial=>"assets/upload_box" -%>
-        <p style="margin-top: 1.5em;">
-            <b>Title</b>
-            <span class="required">*</span>
-            <br/>
+      <div class="form-group">
+        <label>Title</label>
             <% presentation_title_value = (params[:presentation].blank? || params[:presentation][:title].blank?) ? nil : params[:presentation][:title] -%>
-            <%= text_area_tag "presentation[title]", presentation_title_value, :class=>"title_text_entry" -%>
-        </p>
-        <p style="margin-top: 0.5em;">
-            <b>Description</b>
-            <br/>
+            <%= text_area_tag "presentation[title]", presentation_title_value, :class=>"form-control" -%>
+        </div>
+      <%= render :partial=>"assets/upload_box" -%>
+      <div class="form-group">
+        <label>Description</label>
             <% presentation_description_value = (params[:presentation].blank? || params[:presentation][:description].blank?) ? nil : params[:presentation][:description] -%>
-            <%= text_area_tag "presentation[description]", presentation_description_value,:class=>"large_text_entry" -%>
-        </p>
+            <%= text_area_tag "presentation[description]", presentation_description_value,:class=>"form-control" -%>
+        </div>
         <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
           <p>
             <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} if show_scales?%>
