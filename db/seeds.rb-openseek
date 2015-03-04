@@ -25,7 +25,7 @@ puts "Seeded #{count} workflow output port types."
 
 #default project and institution
 
-project = Project.create(:title=>"Default project")
-institution = Institution.create(:title=>"Default institution",:country=>"uk")
+project = Project.create(:title=>"Default Project")
+institution = Institution.create(:title=>"Default Institution",:country=>"uk")
 project.institutions=[institution]
 project.save!
