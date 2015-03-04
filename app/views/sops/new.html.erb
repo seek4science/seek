@@ -30,7 +30,10 @@
 
       <div>
         <%= preview_permission_popup_link(@sop)-%>
-        <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "validateResourceFields(true,'sop',true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>
+        <%= submit_tag "Upload and Save", :id => "sop_submit_btn",
+                       :onclick => "validateResourceFields(true,'sop',true); return(false);",
+                       :class => 'btn btn-primary' -%>
+        or <%= link_to 'Cancel', sops_path, :class => 'btn btn-default' -%>
       </div>
     </div>
 <% end -%>
