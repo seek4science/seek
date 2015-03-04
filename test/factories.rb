@@ -139,6 +139,11 @@ end
     f.association :content_blob,:factory=>:pdf_content_blob
   end
 
+  #A SOP that has been registered as a URI
+  Factory.define(:url_sop,:parent=>:sop) do |f|
+    f.association :content_blob,:factory=>:url_content_blob
+  end
+
 
   #Policy
   Factory.define(:policy, :class => Policy) do |f|
