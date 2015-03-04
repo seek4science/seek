@@ -1,47 +1,43 @@
 <h1>New <%= t('model') %></h1>
 
-<div class="show_basic">
-    <%= form_tag({:action => :create}, :multipart => true) do -%>
+<%= form_tag({:action => :create}, :multipart => true) do -%>
     <div class="asset_form">
-        <%= error_messages_for :model -%>
-        <%= render :partial => "form_import_details" -%>
-        <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@model} -%>
+      <%= error_messages_for :model -%>
+
+      <%= render :partial => "form_import_details" -%>
+
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@model} -%>
+
       <div class="form-group">
         <label>Title</label>
-            <% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
-            <%= text_field_tag 'model[title]', model_title_value, :class=>"form-control" -%>
-        </div>
+        <% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
+        <%= text_field_tag 'model[title]', model_title_value, :class=>"form-control" -%>
+      </div>
+
       <div class="form-group">
-            <label>Description</label>
-            <% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
-            <%= text_area_tag 'model[description]', model_description_value, :class=>"form-control" -%>
-        </div>
+        <label>Description</label>
+        <% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
+        <%= text_area_tag 'model[description]', model_description_value, :class=>"form-control" -%>
+      </div>
 
-        <p>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => true } -%>
 
+      <%= render :partial=>"model_metadata" -%>
 
-                  <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => true } -%>
-                    <%= render :partial=>"model_metadata" -%>
+      <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
 
-        </p>
+      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} if show_scales?%>
 
-        <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
-          <p>
-            <%= render :partial => "scales/scales_selector",:locals=>{:object=>@model} if show_scales?%>
-          </p>
+      <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
 
-        <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
-       
-
-        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
+      <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
       <%= fields_for(@model) do |f|
         f.fancy_multiselect(:samples, {:hidden => @model.samples.blank? ? true : false, :other_projects_checkbox => true})
       end -%>
 
-        <p>
-          <%= preview_permission_popup_link(@model)-%>
-          <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateResourceFields(true, 'model',true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
-        </p>
-		</div>
-        <% end -%>    
-</div>
+      <div>
+        <%= preview_permission_popup_link(@model)-%>
+        <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateResourceFields(true, 'model',true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
+      </div>
+    </div>
+<% end -%>
