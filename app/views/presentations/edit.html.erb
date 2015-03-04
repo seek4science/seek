@@ -1,11 +1,9 @@
-
 <% current_user_authorized_to_manage = @presentation.can_manage? -%>
-
 <h1>Editing <%= t('presentation') %>: <%= link_to(h(@presentation.title), edit_presentation_path) -%></h1>
-<div class="show_basic">
-    <%= form_for(@presentation) do |f| %>
+
+<%= form_for(@presentation) do |f| %>
     <div class="asset_form">
-        <%= f.error_messages %>
+      <%= f.error_messages %>
 
       <div class="form-group">
         <label>Title</label>
@@ -17,29 +15,27 @@
         <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
       </div>
 
-        <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
-        <% if current_user_authorized_to_manage -%>
-            <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
-        <% end -%>
+      <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
+      <% if current_user_authorized_to_manage -%>
+          <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
+      <% end -%>
+
       <% if show_scales? %>
           <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} %>
       <% end %>
-        <%# only the owner should be able to change sharing permissions -%>
-        <% if current_user_authorized_to_manage -%>
 
-		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f} -%>
-        
-        <p>
-            <% if Seek::Config.events_enabled -%>
-                <%= render :partial => "assets/associate_event", :locals=>{:resource => @presentation} -%>
-            <% end -%>
-        </p>
+      <%# only the owner should be able to change sharing permissions -%>
+      <% if current_user_authorized_to_manage -%>
+          <%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f} -%>
 
-        <% end -%>
-        <p>
-          <%= preview_permission_popup_link(@presentation)-%>
-          <%= f.submit "Update", :id => "presentation_submit_btn", :onclick => "javascript: validateResourceFields(false, 'presentation', #{current_user_authorized_to_manage});  return(false);" -%> or <%= link_to "Cancel", edit_presentation_path -%>
-        </p>
-		</div>
-        <% end %>
-</div>
+          <% if Seek::Config.events_enabled -%>
+              <%= render :partial => "assets/associate_event", :locals=>{:resource => @presentation} -%>
+          <% end -%>
+      <% end -%>
+
+      <div>
+        <%= preview_permission_popup_link(@presentation)-%>
+        <%= f.submit "Update", :id => "presentation_submit_btn", :onclick => "javascript: validateResourceFields(false, 'presentation', #{current_user_authorized_to_manage});  return(false);" -%> or <%= link_to "Cancel", edit_presentation_path -%>
+      </div>
+    </div>
+<% end %>
