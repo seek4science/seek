@@ -1,9 +1,10 @@
 <% if Seek::Config.organisms_enabled %>
     <%= folding_panel("Details about the organism") do %>
-            <label>
-                Organism:
-            </label>
-            <br/>
-            <%= select model_class.name.underscore.to_sym,:organism_id,Organism.order(:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%>
+        <div class="form-group">
+            <label>Organism</label>
+            <%= select model_class.name.underscore.to_sym, :organism_id,
+                       Organism.order(:title).collect{|o| [o.title.capitalize,o.id]},
+                       {:include_blank=>"Not specified"}, {:class => 'form-control'} -%>
+        </div>
     <% end %>
 <% end %>
