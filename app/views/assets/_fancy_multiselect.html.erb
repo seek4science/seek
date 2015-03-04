@@ -16,7 +16,7 @@
  collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
  possibilities_collection_id = "possible_#{collection_id}"
  possibilities_options ||= {}
-
+ possibilities_options.merge!(:class => 'form-control')
 %>
 
     <div class="yui-u first" <%= html_options %>>
@@ -46,8 +46,6 @@
                        {:multiple=>true, :style=>"display:none;"} -%>
         <%= association_step_content -%>
       </div>
-
-		<br/>
 
       <script type="text/javascript">
           Event.observe(window, 'load', function () {
