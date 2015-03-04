@@ -31,12 +31,16 @@ class GeneratorTest < ActiveSupport::TestCase
     asset2 = Factory(:assay_asset,:asset=>Factory(:sop,:policy=>Factory(:public_policy)))
     asset3 = Factory(:assay_asset,:asset=>Factory(:model,:policy=>Factory(:public_policy)))
     asset4 = Factory(:assay_asset,:asset=>Factory(:url_sop,:policy=>Factory(:public_policy)))
+    asset5 = Factory(:assay_asset,:asset=>Factory(:model_with_image,:policy=>Factory(:public_policy)))
+
+    asset5.asset.save! #this seems to be required to save the model_image and record its association.
+
 
     inv = Factory(:investigation,:policy=>Factory(:public_policy))
     study = Factory(:study,:policy=>Factory(:public_policy),:investigation=>inv)
 
     assay = Factory(:experimental_assay,
-                    :assay_assets=>[asset1,asset2,asset3,asset4],
+                    :assay_assets=>[asset1,asset2,asset3,asset4,asset5],
                     :policy=>Factory(:public_policy),
                     :study=>study)
     inv

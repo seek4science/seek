@@ -1,7 +1,7 @@
 #A couple of these rely on certain things existing in the test db ahead of time.
 #:pal relies on Role.pal_role being able to find an appropriate role in the db.
 #:assay_modelling and :assay_experimental rely on the existence of the AssayClass's
-
+include ActionDispatch::TestProcess
 #Person
   Factory.define(:admin_defined_role_project, :class=>AdminDefinedRoleProject) do |f|
 
@@ -389,8 +389,8 @@ end
   end
 
   Factory.define(:model_image) do |f|
-    f.original_filename "#{Rails.root}/test/fixtures/files/file_picture.png"
-    f.image_file File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb")
+    f.original_filename "file_picture.png"
+    f.image_file fixture_file_upload("#{Rails.root}/test/fixtures/files/file_picture.png","image/png")
     f.content_type "image/png"
   end
 

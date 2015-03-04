@@ -44,6 +44,10 @@ module Seek::ResearchObjects
       blobs.each do |blob|
         store_blob_file(bundle,asset,blob) if blob.file_exists?
       end
+
+      if asset.respond_to?(:model_image) && asset.model_image
+        store_image_file(bundle,asset,asset.model_image)
+      end
     end
 
     def store_blob_file(bundle,asset,blob)
@@ -51,7 +55,10 @@ module Seek::ResearchObjects
       bundle.add(path,blob.filepath,:aggregate=>true)
     end
 
-
+    def store_image_file(bundle,asset,model_image)
+      path=File.join(asset.package_path,model_image.original_filename)
+      bundle.add(path,model_image.stored_original_path,:aggregate=>true)
+    end
 
   end
 end

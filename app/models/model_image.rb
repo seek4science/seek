@@ -2,7 +2,7 @@ class ModelImage < ActiveRecord::Base
   DEFAULT_SIZE = '200x200'
   LARGE_SIZE = '1000x1000'
   belongs_to :model
-  #after_create :change_filename unless Rails.env == 'test'
+  after_create :change_filename
 
   acts_as_fleximage do
     image_directory Seek::Config.model_image_filestore_path
@@ -42,9 +42,12 @@ class ModelImage < ActiveRecord::Base
     File.join(ModelImage.original_path, "#{original_filename}.#{original_image_format}")
   end
 
+  def stored_original_path
+    File.join(ModelImage.original_path, "#{id}.#{original_image_format}")
+  end
 
   def change_filename
-    File.rename original_path, File.join(ModelImage.original_path, "#{id}.#{original_image_format}")
+    File.rename original_path, stored_original_path
   end
 
   def select!
