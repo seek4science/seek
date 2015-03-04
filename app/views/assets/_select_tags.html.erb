@@ -16,7 +16,7 @@
 
 <%= folding_panel('Tags', item_tags.blank?,
                   :help_text => "Here you can provide some tags to help describe, and allow other people to find, your #{type_name}.") do %>
-    <p class="box_infotext" style="margin-bottom: 0.5em;">
+    <p>
       <% if object.id.nil? -%>
           Here you can provide some initial tags to help describe this <%= type_name -%>. You can change these tags
           (including those provided by other people), anytime in the future.

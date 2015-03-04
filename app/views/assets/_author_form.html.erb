@@ -32,7 +32,7 @@
         <p>
           If anyone not registered with SEEK assisted with the contribution of this <%= resource_type %>, you can specify them below.
         </p>
-        <%= text_field_tag original_resource_type.underscore+"[other_creators]", other_creators, :size=>90 %>
+        <%= text_field_tag original_resource_type.underscore+"[other_creators]", other_creators, :class => 'form-control' %>
     <% end %>
 <% end %>
 
