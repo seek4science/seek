@@ -142,12 +142,12 @@ class UsersControllerTest < ActionController::TestCase
   def test_system_message_on_signup_no_users
     get :new
     assert_response :success
-    assert_select "p.system_message",:count=>0
+    assert_select "div.alert",:count=>0
 
     User.destroy_all
     get :new
     assert_response :success
-    assert_select "p.system_message",:count=>1
+    assert_select "div.alert",:count=>1
   end
   
   def test_should_allow_signup
