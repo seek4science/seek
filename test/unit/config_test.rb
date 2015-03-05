@@ -90,7 +90,6 @@ class ConfigTest < ActiveSupport::TestCase
 
     assert_equal "#{Rails.root}/tmp/testing-filestore/assets/#{cb.uuid}.dat", cb.filepath
     assert_equal "#{Rails.root}/tmp/testing-filestore/model_images", ModelImage.image_directory
-    assert_equal "#{Rails.root}/tmp/testing-filestore/model_images/original", ModelImage.original_path
 
     assert_equal "#{Rails.root}/tmp/testing-filestore/tmp", Seek::Config.temporary_filestore_path
     assert_equal "#{Rails.root}/tmp/testing-filestore/tmp/converted", Seek::Config.converted_filestore_path
