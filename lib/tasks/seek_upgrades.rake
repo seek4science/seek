@@ -94,4 +94,28 @@ namespace :seek do
       end
     end
   end
+
+  private
+
+  def read_label_map type
+    file = "#{type.to_s}_label_mappings.yml"
+    file = File.join(Rails.root, "config", "default_data", file)
+    YAML::load_file(file)
+  end
+
+  def normalize_name(name, remove_special_character=true, replace_umlaut=false)
+    #handle the characters that can't be handled through normalization
+    %w[ØO].each do |s|
+      name.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
+    end
+
+    codepoints = name.mb_chars.normalize(:d).split(//u)
+    if remove_special_character
+      ascii=codepoints.map(&:to_s).reject { |e| e.bytesize > 1 }.join
+    end
+    if replace_umlaut
+      ascii=codepoints.map(&:to_s).collect { |e| e == '̈' ? 'e' : e }.join
+    end
+    ascii
+  end
 end

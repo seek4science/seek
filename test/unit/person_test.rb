@@ -231,6 +231,28 @@ class PersonTest < ActiveSupport::TestCase
     p.reload
     assert p.is_admin?, "Should automatically be admin, since it is the first created person"
   end
+
+  test "first person in default project" do
+    assert Person.count>0 #should already be people from fixtures
+    p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
+    p.save!
+    assert !p.is_admin?, "Should not automatically be admin, since people already exist"
+    assert_empty p.projects
+    assert_empty p.institutions
+
+    Person.delete_all
+
+    project = Project.first
+    institution = project.institutions.first
+
+    assert_equal 0,Person.count #no people should exist
+    p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
+    p.save
+    p.reload
+    assert_equal [project],p.projects
+    assert_equal [institution],p.institutions
+  end
+
   
   def test_registered
     registered=Person.registered
