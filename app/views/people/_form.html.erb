@@ -1,65 +1,13 @@
 <%= javascript_include_tag "people" %>
 <%= f.error_messages %>
-<h2>Personal Information & Contact Details</h2>
-<table style="width: 100%;" class="box_simple">
-    <tr>
-        <td style="width: 45%;">
 
-                <div style="width: 90%;">
-                    <p>
-                        <%= f.label :first_name -%><span class="required">*</span>
-                        <br/>
-                        <%= f.text_field :first_name, :style => "width: 100%;" -%>
-                    </p>
-                    <p>
-                        <%= f.label :last_name %><span class="required">*</span>
-                        <br/>
-                        <%= f.text_field :last_name, :style => "width: 100%;" %>
-                    </p>
-                    <p>
-                        <%= f.label :email %><span class="required">*</span>
-                        <br/>
-                        <%= f.text_field :email, :style => "width: 100%;" %>
-                    </p>
-                    <p>
-                      <label>ORCID Identifier
-                        <%= help_icon("<b>ORCID</b> is an open, non-profit, community-based effort to provide a registry of unique researcher identifiers and a transparent method of linking research activities and outputs to these identifiers.<br/><b>An ORCID identifier looks like http://orcid.org/XXXX-XXXX-XXXX-XXXX</b><br/>To find out more and get your ORCID ID please visit http://orcid.org") -%>
-                      </label>
-                      <br/>
-                      <%= f.text_field :orcid, :style => "width: 100%;" %>
-                    </p>
+<%= render :partial => 'contact_details_form', :locals => {:f => f} %>
 
-                </div>
+<div class="form-group">
+  <label>Description about myself</label>
+  <%= f.text_area :description, :class=>"description form-control", :rows => 5 -%>
+</div>
 
-        </td>
-        <td style="width: 45%;">
-
-                <div style="width: 90%">
-                    <p>
-                        <%= f.label :phone %>
-                        <br/>
-                        <%= f.text_field :phone, :style => "width: 100%;" %>
-                    </p>
-                    <p>
-                        <%= f.label :skype_name %>
-                        <br/>
-                        <%= f.text_field :skype_name, :style => "width: 100%;" %>
-                    </p>
-                    <p>
-                        <%= f.label :web_page %>
-                        <br/>
-                        <%= f.text_field :web_page, :style => "width: 100%;" %>
-                    </p>
-                </div>
-
-        </td>
-    </tr>
-</table>
-<h2>Description about myself</h2>
-<p>
-    <%= f.text_area :description, :class=>"description large_text_entry" -%>
-</p>
-<br/>
 <% if person -%>
     <%= folding_panel("Knowledge and expertise") do %>
         <%= render :partial=>"people/discipline_select",:locals=>{:f=>f} %>
@@ -67,19 +15,20 @@
         <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
         <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
     <% end %>
-<%= render :partial=>"project_roles",:locals=>{:editable=>true} -%>
+    <%= render :partial=>"project_roles",:locals=>{:editable=>true} -%>
 <% end %>
+
 <% if person && person.notifiee_info -%>
-<h2>Email announcements</h2>
-<p>
-    <%= check_box_tag "receive_notifications",true,person.notifiee_info.receive_notifications -%>&nbsp;I wish to receive occasional email announcements?&nbsp;
-</p>
-<br/>
-   <%= render :partial=>"people/subscriptions",:locals=>{:f=>f} %>
-<br/>
+    <%= folding_panel("Email announcements") do %>
+        <div class="checkbox">
+          <label>
+            <%= check_box_tag "receive_notifications",true,person.notifiee_info.receive_notifications -%> I wish to receive occasional email announcements
+          </label>
+        </div>
+    <% end %>
+    <%= render :partial=>"people/subscriptions",:locals=>{:f=>f} %>
+
 <% end -%>
 
-<p style="text-align: center; margin-top: 1.5em;">
-    <%= f.submit((person ? "Update" : "Create"), :disable_with=>(person ? "Updating..." : "Creating...")) -%>
-    or <%= link_to 'Cancel', (person ? person_path(person.id) : people_path) -%>
-</p>
+<%= f.submit((person ? "Update" : "Create"), :disable_with=>(person ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
+ or <%= link_to 'Cancel', (person ? person_path(person.id) : people_path), :class => 'btn btn-default' -%>

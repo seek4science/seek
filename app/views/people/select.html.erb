@@ -1,30 +1,25 @@
 <%= javascript_include_tag 'profile_project_selection' %>
-
-<% if Seek::Config.profile_select_by_default
-     create_display = "display:none"
-     select_display = "display:block"
-   else
-     create_display = "display:block"
-     select_display = "display:none"
-   end
-%>
+<% select_display = Seek::Config.profile_select_by_default && !(@userless_projects.blank? || !error_messages_for(:person).empty?) %>
 
 <div id="profile_select">
-  <div class="show_basic">
-    <div id="profile_selection" style="<%= select_display %>">
-      <%= render :partial => "registration_profile_selection" -%>
-    </div>
-    <div id="profile_creation" style="<%= create_display %>">
+  <ul class="nav nav-tabs" role="tablist">
+    <% unless @userless_projects.blank? %>
+        <li role="presentation" <%= 'class="active"'.html_safe if select_display %>>
+          <a href="#profile_selection" aria-controls="profile_selection" role="tab" data-toggle="tab">Select profile</a>
+        </li>
+    <% end %>
+    <li role="presentation" <%= 'class="active"'.html_safe unless select_display %>>
+      <a href="#profile_creation" aria-controls="openid" role="tab" data-toggle="tab">Create profile</a>
+    </li>
+  </ul>
+  <div class="tab-content">
+    <% unless @userless_projects.blank? %>
+        <div role="tabpanel" class="tab-pane <%= 'active'.html_safe if select_display %>" id="profile_selection">
+          <%= render :partial => "registration_profile_selection" -%>
+        </div>
+    <% end %>
+    <div role="tabpanel" class="tab-pane <%= 'active'.html_safe unless select_display %>" id="profile_creation">
       <%= render :partial => "registration_profile_creation" %>
     </div>
   </div>
 </div>
-
-
-
-<% if @userless_projects.blank? || !error_messages_for(:person).empty? %>
-  <script type="text/javascript">
-    $("profile_creation").style.display="block"
-    $("profile_selection").style.display="none"
-  </script>
-<% end %>

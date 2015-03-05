@@ -1,73 +1,70 @@
-<center>
-  <div id="signup">
+<h1>Signup for <%= Seek::Config.application_name %></h1>
 
-    <h1>Signup for <%= Seek::Config.application_name %></h1>
+<% if User.count == 0 -%>
+    <%= alert_box('info', :hide_button => true) do %>
+        There are currently no users defined in the system. You should now register an initial user.
+        This initial user will become the Administrator of the system.
+    <% end %>
+<% end -%>
 
-    <p class="box_infotext">
+<div class="row">
+  <div class="col-md-5 col-md-push-7">
+    <p>
       <b>By registering, you are indicating that you have read and agree that:</b>
       You are responsible for any content that you upload. We receive and store certain types of information whenever you
       interact with us which we will use only for operational purposes. We will not make
       personally identifiable data available to third parties without consent.
       Please contact us if you have any queries about our terms or our privacy policy.
-      <br/><br/>
+    </p>
+    <p>
       If you have previously provided a login and password but didn't select or create a profile, then your details have already been stored
       and you should Login to continue the registration process.
     </p>
-
-    <% if User.count == 0 -%>
-      <br/>
-      <p class="box_infotext system_message">
-        There are currently no users defined in the system. You should now register an initial user.
-        This initial user will become the Administrator of the system.
-      </p>
-    <% end -%>
-
-    <% if error_messages_for :user -%>
-      <p><%= error_messages_for :user %></p>
-    <% end -%>
-
-    <h2>Please provide your details <%= help_icon("Please note that fields marked with an asterisk are compulsory.") %></h2>
-
+  </div>
+  <div class="col-md-7 col-md-pull-5">
     <%= form_tag users_path do -%>
-      <div id="login_details">
-        <p>          
-            <b><font style="color: #FF0000;">*</font> Login name</b>
-            <%= help_icon("Login should contain a minimum of 3 characters") -%>
-          <br/>
-          <%= text_field_tag :login, nil %>
-        </p>
+        <%= error_messages_for :user %>
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active">
+            <a href="#login" aria-controls="login" role="tab" data-toggle="tab">SEEK login</a>
+          </li>
+          <li role="presentation">
+            <a href="#openid" aria-controls="openid" role="tab" data-toggle="tab"><%= image_tag "openid-16x16.gif" %> OpenID</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="login">
+            <div class="form-group">
+              <label>Login name</label>
+              <%= text_field_tag :login, nil, :class => 'form-control' %>
+              <p class="help-block">Login should contain a minimum of 3 characters.</p>
+            </div>
 
-        <p>
-          <b><font style="color: #FF0000;">*</font> Password</b>
-            <%= help_icon("Password should contain a minimum of 4 characters") -%>
-          <br/>
-          <%= password_field_tag :password, nil %>
-        </p>
+            <div class="form-group">
+              <label>Password</label>
+              <%= password_field_tag :password, nil, :class => 'form-control' %>
+              <p class="help-block">Password should contain a minimum of 4 characters.</p>
+            </div>
 
-        <p>
-          <b><font style="color: #FF0000;">*</font> Confirm Password</b><br/>
-          <%= password_field_tag :password_confirmation, nil %>
-        </p>
-      </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <%= password_field_tag :password_confirmation, nil, :class => 'form-control' %>
+            </div>
+          </div>
 
-      <p style="text-align: center;">
-        <%= submit_tag 'Register',:disable_with=>"Registering..." %>
-      </p>
-      
-      <h2>Alternatively, register with an <a href="http://openid.net/" target="_blank">OpenID</a> <%= help_icon("If you aren't sure what an OpenID is or whether or not you have one, you can safely ignore this an register using a username and password using the form above.") %></h2>     
-      
-      <div style="width: 90%; border: 1px dashed #CCC; padding: 5px;">
-        <p>
-          <label for="user_login">
-            <%= image_tag "openid-16x16.gif" %><b> OpenID</b>
-          </label><br/>
-          <%= text_field_tag :openid_identifier, nil, :style => "width: 95%" %>
-        </p>
-      </div>
+          <div role="tabpanel" class="tab-pane" id="openid">
+            <p>
+              If you aren't sure what an <a href="http://openid.net/" target="_blank">OpenID</a> is or whether or not you have one,
+              you can safely ignore this an register using a username and password using the form above.
+            </p>
+            <div class="form-group">
+              <label><%= image_tag "openid-16x16.gif" %> OpenID</label>
+              <%= text_field_tag :openid_identifier, nil, :class => 'form-control' %>
+            </div>
+          </div>
+        </div>
 
-      <p style="text-align: center;">
-        <%= submit_tag 'Register',:disable_with=>"Registering..." %>
-      </p>
+        <%= submit_tag 'Register', :disable_with=>"Registering...", :class => 'btn btn-primary' %>
     <% end -%>
   </div>
-</center>
+</div>
