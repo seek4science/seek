@@ -3,6 +3,8 @@ module Seek::ResearchObjects
     include Singleton
     include Utils
 
+    DEFAULT_FILENAME="ro-bundle.zip"
+
     # :call-seq
     # generate(investigation,file) -> File
     # generate(investigation) ->
@@ -13,7 +15,7 @@ module Seek::ResearchObjects
     # in both cases the file is returned
     #
     def generate(investigation, file = nil)
-      file ||= temp_file('ro-bundle.zip')
+      file ||= temp_file(DEFAULT_FILENAME)
       ROBundle::File.create(file) do |bundle|
         bundle.created_by = create_agent
         gather_entries(investigation).each do |entry|
