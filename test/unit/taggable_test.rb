@@ -68,5 +68,26 @@ class TaggableTest < ActiveSupport::TestCase
     assert p.tag_with(["golf","fishing"],attr)
   end
 
+  test "no duplication tags" do
+    p=Factory :person
+    User.current_user = p.user
+    attr="tag"
+
+    p.tag_with ["coffee", "coffee"],attr
+    p.reload
+
+    assert_equal ["coffee"], p.annotations_as_text_array
+  end
+
+  test "ignore case sensitive" do
+    p=Factory :person
+    User.current_user = p.user
+    attr="expertise"
+
+    p.tag_with ["coffee", "Coffee"],attr
+    p.reload
+
+    assert_equal ["coffee"], p.annotations_as_text_array
+  end
 
 end
