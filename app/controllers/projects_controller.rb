@@ -38,7 +38,7 @@ class ProjectsController < ApplicationController
       #now select those with a policy set to downloadable to all-sysmo-users
       projects_shared  = projects_shared.select do |item|
         access_type = type.is_isa? ? Policy::VISIBLE : Policy::ACCESSIBLE
-        (item.policy.sharing_scope == Policy::ALL_SYSMO_USERS && item.policy.access_type == access_type)
+        (item.policy.sharing_scope == Policy::ALL_USERS && item.policy.access_type == access_type)
       end
       #just those shared with sysmo but NOT shared publicly
       @semi_public_assets[type]  = projects_shared  - @public_assets[type]

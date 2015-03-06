@@ -73,8 +73,8 @@
         <!-- within your project ... and with all sysmo project members ...-->
         <p>
           <label>
-            <%= radio_button_tag 'sharing[sharing_scope]', Policy::ALL_SYSMO_USERS, (@sharing_mode == Policy::ALL_SYSMO_USERS),
-                                 :id => "sharing_scope_#{Policy::ALL_SYSMO_USERS}",
+            <%= radio_button_tag 'sharing[sharing_scope]', Policy::ALL_USERS, (@sharing_mode == Policy::ALL_USERS),
+                                 :id => "sharing_scope_#{Policy::ALL_USERS}",
                                  :onclick => admin_logged_in? ? "" :
                                          "return confirm('Are you sure you really want to share this #{@resource_type.downcase} with all project members?')" -%>
             - Members of <%= t('project').pluralize.downcase %> associated with this <%= @resource_type.downcase -%>:
@@ -85,12 +85,12 @@
              <br/>
              <% if admin_logged_in? %>
                <span style="margin-left:10em;">... and all other <%= t('project').downcase %> members:</span>
-               <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
-                                                                                               :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => (@resource.respond_to?(:policy) && @resource.policy.try(:sharing_scope)==Policy::ALL_SYSMO_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::ACCESSIBLE,Policy::EDITING] } -%>
+               <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_USERS,
+                                                                                               :sharing_scope => Policy::ALL_USERS, :access_type => (@resource.respond_to?(:policy) && @resource.policy.try(:sharing_scope)==Policy::ALL_USERS ? @access_mode : default_consortium_access_type), :access_type_options=>[Policy::NO_ACCESS,Policy::ACCESSIBLE,Policy::EDITING] } -%>
              <% else %>
                <%= hidden_field_tag 'sharing[access_type_2]', '0' -%>
              <% end %>
-             <%= additional_advanced_permissions_included @resource, Policy::ALL_SYSMO_USERS -%>
+             <%= additional_advanced_permissions_included @resource, Policy::ALL_USERS -%>
         </p>
 
         <!-- public -->

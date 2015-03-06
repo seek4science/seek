@@ -25,7 +25,7 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should show the preview permission when choosing network scope' do
-    post :preview_permissions, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file'
+    post :preview_permissions, :sharing_scope => Policy::ALL_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file'
 
     assert_response :success
     assert_select "p", :text => "All the #{I18n.t('project')} members within the network can #{Policy.get_access_type_wording(Policy::VISIBLE, 'data_file'.camelize.constantize.new()).downcase}", :count => 1
@@ -222,7 +222,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
     #with additional text for permissions
     project = Factory(:project)
-    post :preview_permissions, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file',
+    post :preview_permissions, :sharing_scope => Policy::ALL_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file',
                                :project_ids => project.id, :project_access_type => Policy::ACCESSIBLE
 
 
@@ -234,7 +234,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
     #with additional text for both permissions and privileged people
     asset_manager = Factory(:asset_manager)
-    post :preview_permissions, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file',
+    post :preview_permissions, :sharing_scope => Policy::ALL_USERS, :access_type => Policy::VISIBLE, :resource_name => 'data_file',
                                :project_ids => asset_manager.projects.first.id, :project_access_type => Policy::ACCESSIBLE
 
   end

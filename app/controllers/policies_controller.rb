@@ -147,7 +147,7 @@ class PoliciesController < ApplicationController
       new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])
 
       #if share with your project and with all_sysmo_user is chosen
-      if (policy.sharing_scope == Policy::ALL_SYSMO_USERS)
+      if (policy.sharing_scope == Policy::ALL_USERS)
           your_proj_access_type = params["project_access_type"].blank? ? nil : params["project_access_type"].to_i
           selected_projects = get_selected_projects params[:project_ids], params[:resource_name]
           selected_projects.each do |selected_project|
