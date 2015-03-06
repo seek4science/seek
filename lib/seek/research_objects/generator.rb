@@ -57,7 +57,7 @@ module Seek::ResearchObjects
 
     def store_image_file(bundle,asset,model_image)
       path=File.join(asset.package_path,model_image.original_filename)
-      bundle.add(path,model_image.stored_original_path,:aggregate=>true)
+      bundle.add(path,model_image.file_path,:aggregate=>true)
     end
 
   end
