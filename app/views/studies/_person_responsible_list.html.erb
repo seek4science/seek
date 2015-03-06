@@ -5,7 +5,8 @@
 <%= select_tag :study_person_responsible_id,
   options_for_select(people_options,person_value),
   {
-    :style=>"width:82%",:disabled=>(people.nil? || people.empty?),
-    :name=>"study[person_responsible_id]"
+    :disabled=>(people.nil? || people.empty?),
+    :name=>"study[person_responsible_id]",
+    :class => 'form-control'
   }
 -%>
