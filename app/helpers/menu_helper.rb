@@ -99,7 +99,7 @@ module MenuHelper
 
   def current_second_level_section sections
     sections.find do |section|
-      request.path.end_with?(determine_path(section))
+      determine_path(section).end_with?(controller_name)
     end
   end
 

@@ -11,7 +11,7 @@ class Person < ActiveRecord::Base
   acts_as_yellow_pages
   scope :default_order, order("last_name, first_name")
 
-  before_save :first_person_admin
+  before_save :first_person_admin_and_add_to_default_project
   before_destroy :clean_up_and_assign_permissions
 
   acts_as_notifiee
@@ -414,8 +414,14 @@ class Person < ActiveRecord::Base
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
-  def first_person_admin
-    self.is_admin = true if Person.count==0
+  def first_person_admin_and_add_to_default_project
+    if Person.count==0
+      self.is_admin = true
+      project = Project.first
+      if (project && project.institutions.any?)
+        add_to_project_and_institution(project,project.institutions.first)
+      end
+    end
   end
 
   def orcid_id_must_be_valid_or_blank
