@@ -395,7 +395,7 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory(:study, :contributor => User.current_user.person,
                     :investigation => Factory(:investigation, :project_ids => [proj.id]),
                     :policy => Factory(:policy,
-                                       :sharing_scope => Policy::ALL_SYSMO_USERS,
+                                       :sharing_scope => Policy::ALL_USERS,
                                        :access_type => Policy::NO_ACCESS,
                                        :permissions => [Factory(:permission, :contributor => proj, :access_type => Policy::EDITING)]))
     get :edit, :id => study.id

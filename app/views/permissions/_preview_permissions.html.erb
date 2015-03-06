@@ -41,7 +41,7 @@
   <div class="body">
       <% if policy.sharing_scope == Policy::PRIVATE %>
         <%= policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name) %>
-      <% elsif policy.sharing_scope == Policy::ALL_SYSMO_USERS %>
+      <% elsif policy.sharing_scope == Policy::ALL_USERS %>
         <%= policy_and_permissions_for_network_scope(policy, permissions, privileged_people, resource_name) %>
       <% elsif policy.sharing_scope == Policy::EVERYONE  %>
         <%= policy_and_permissions_for_public_scope(policy, permissions, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval) %>

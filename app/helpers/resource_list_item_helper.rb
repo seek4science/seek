@@ -199,7 +199,7 @@ module ResourceListItemHelper
           title = "Custom policy"
           html << image('manage', :title=>title, :class => css_class)
         end
-      when Policy::ALL_SYSMO_USERS
+      when Policy::ALL_USERS
         if policy.access_type > 0
           title = "Visible to all #{Seek::Config.project_name} #{t('project').pluralize}"
           html << image('open', :title=>title, :class => css_class)

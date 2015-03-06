@@ -567,7 +567,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?(user), "sop should be editable but not manageable for this test"
     assert !sop.can_manage?(user), "sop should be editable but not manageable for this test"
     assert_equal Policy::EDITING, sop.policy.access_type, "data file should have an initial policy with access type for editing"
-    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS}
+    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_USERS, "access_type_#{Policy::ALL_USERS}"=>Policy::NO_ACCESS}
     assert_redirected_to sop_path(sop)
     sop.reload
 
@@ -580,9 +580,9 @@ class SopsControllerTest < ActionController::TestCase
     user = Factory(:user)
     login_as(user)
 
-    sop = Factory :sop, :contributor => User.current_user, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING)
+    sop = Factory :sop, :contributor => User.current_user, :policy => Factory(:policy, :sharing_scope => Policy::ALL_USERS, :access_type => Policy::EDITING)
 
-    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS}
+    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_USERS, "access_type_#{Policy::ALL_USERS}"=>Policy::NO_ACCESS}
     assert_redirected_to sop_path(sop)
     sop.reload
 
@@ -663,7 +663,7 @@ class SopsControllerTest < ActionController::TestCase
       sop = assigns(:sop)
       assert_redirected_to (sop)
       policy = sop.policy
-      assert_equal Policy::ALL_SYSMO_USERS, policy.sharing_scope
+      assert_equal Policy::ALL_USERS, policy.sharing_scope
       assert_equal Policy::VISIBLE, policy.access_type
       assert_equal 1, policy.permissions.count
       assert_equal gatekeeper.projects.first, policy.permissions.first.contributor

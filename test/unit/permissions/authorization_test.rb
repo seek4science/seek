@@ -156,17 +156,17 @@ class AuthorizationTest < ActiveSupport::TestCase
   # 'all SysMO users' policy
   def test_authorized_by_policy_all_sysmo_users_policy_anonymous_user
     res = temp_authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), sops(:sop_with_all_sysmo_users_policy), "download", nil, nil)
-    assert !res, "policy with sharing_scope = 'Policy::ALL_SYSMO_USERS' would allow not logged in users to perform allowed action"
+    assert !res, "policy with sharing_scope = 'Policy::ALL_USERS' would allow not logged in users to perform allowed action"
   end
   
   def test_authorized_by_policy_all_sysmo_users_policy_registered_user
     res = temp_authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), sops(:sop_with_all_sysmo_users_policy), "download", users(:registered_user_with_no_projects), users(:registered_user_with_no_projects).person)
-    assert !res, "policy with sharing_scope = 'Policy::ALL_SYSMO_USERS' would allow registered user to perform allowed action"
+    assert !res, "policy with sharing_scope = 'Policy::ALL_USERS' would allow registered user to perform allowed action"
   end
   
   def test_authorized_by_policy_all_sysmo_users_policy_sysmo_user
     res = temp_authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), sops(:sop_with_all_sysmo_users_policy), "download", users(:owner_of_my_first_sop), users(:owner_of_my_first_sop).person)
-    assert res, "policy with sharing_scope = 'Policy::ALL_SYSMO_USERS' wouldn't allow SysMO user to perform allowed action"
+    assert res, "policy with sharing_scope = 'Policy::ALL_USERS' wouldn't allow SysMO user to perform allowed action"
   end
   
   # 'private' policy
@@ -878,18 +878,18 @@ class AuthorizationTest < ActiveSupport::TestCase
   test 'unauthorized_change_to_autosave?' do
     df = Factory(:data_file)
     assert_equal Policy::PRIVATE, df.policy.sharing_scope
-    df.policy.sharing_scope = Policy::ALL_SYSMO_USERS
+    df.policy.sharing_scope = Policy::ALL_USERS
     assert !df.save
     assert !df.errors.empty?
     df.reload
     assert_equal Policy::PRIVATE, df.policy.sharing_scope
 
     disable_authorization_checks do
-      df.policy.sharing_scope = Policy::ALL_SYSMO_USERS
+      df.policy.sharing_scope = Policy::ALL_USERS
       assert df.save
       assert df.errors.empty?
       df.reload
-      assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+      assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     end
   end
 
@@ -935,7 +935,7 @@ class AuthorizationTest < ActiveSupport::TestCase
         if user.person && user.person.projects.empty?
           scope = Policy::EVERYONE
         else
-          scope = Policy::ALL_SYSMO_USERS
+          scope = Policy::ALL_USERS
         end
       end
     end

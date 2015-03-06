@@ -47,8 +47,16 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  def test_first_registered_person_is_admin
+  def test_first_registered_person_is_admin_and_default_project
     Person.destroy_all
+    Project.delete_all
+
+    project = Factory(:work_group).project
+    refute_empty project.institutions
+    institution = project.institutions.first
+    refute_nil(institution)
+
+
     assert_equal 0, Person.count, 'There should be no people in the database'
     user = Factory(:activated_user)
     login_as user
@@ -62,6 +70,8 @@ class PeopleControllerTest < ActionController::TestCase
     person = Person.find(assigns(:person).id)
     assert person.is_admin?
     assert person.only_first_admin_person?
+    assert_equal [project],person.projects
+    assert_equal [institution],person.institutions
     assert_redirected_to registration_form_admin_path(during_setup: 'true')
   end
 

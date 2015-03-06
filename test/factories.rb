@@ -163,12 +163,12 @@ end
   end
 
   Factory.define(:all_sysmo_viewable_policy,:parent=>:policy) do |f|
-    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::VISIBLE
   end
 
   Factory.define(:all_sysmo_downloadable_policy,:parent=>:policy) do |f|
-    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::ACCESSIBLE
   end
     
@@ -178,7 +178,7 @@ end
   end
 
   Factory.define(:public_download_and_no_custom_sharing,:parent=>:policy) do |f|
-    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::ACCESSIBLE
   end
   

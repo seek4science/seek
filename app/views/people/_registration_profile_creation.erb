@@ -65,40 +65,44 @@
 
 
     <br/>
-    <h2><%= t('project').pluralize %> & Institutions</h2>
-    <div class="yui-g box_simple">
-      <center>
-        <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
-          <span style="font-weight:bold;float: left">Projects:</span> <br/>
-          <%= select_tag "projects",
-                         options_for_select(Project.all.collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
-                         {:onchange => "Javascript:others('projects')", :multiple => true, :style => "width: 100%"}
-          -%>
-          <div id='other_projects' style='display: none'>
-            <br/>
-            <span style="font-weight:bold;float: left">Other <%= t('project').pluralize %>:</span>
-            <br/> <%= text_field_tag :other_projects, nil, {:style => "width: 100%", :value => params['other_projects']} %>
-          </div>
-        </div>
-      </center>
 
-      <center>
-        <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
-          <span style="font-weight:bold;float: left">Institutions:</span> <br/>
-          <%= select_tag "institutions",
-                         options_for_select(Institution.all.collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
-                         {:onchange => "Javascript:others('institutions')", :multiple => true, :style => "width: 100%;"}
-          -%>
-          <div id='other_institutions' style='display: none'>
-            <br/>
-            <span style="font-weight:bold;float: left">Other institutions:</span>
-            <br/> <%= text_field_tag :other_institutions, nil, {:style => "width: 100%", :value => params['other_institutions']} %>
-          </div>
-        </div>
-      </center>
-    </div>
+    <% unless Person.count==0 %> <%# not for the first person %>
 
-    <br/>
+        <h2><%= t('project').pluralize %> & Institutions</h2>
+        <div class="yui-g box_simple">
+          <center>
+            <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
+              <span style="font-weight:bold;float: left">Projects:</span> <br/>
+              <%= select_tag "projects",
+                             options_for_select(Project.all.collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
+                             {:onchange => "Javascript:others('projects')", :multiple => true, :style => "width: 100%"}
+              -%>
+              <div id='other_projects' style='display: none'>
+                <br/>
+                <span style="font-weight:bold;float: left">Other <%= t('project').pluralize %>:</span>
+                <br/> <%= text_field_tag :other_projects, nil, {:style => "width: 100%", :value => params['other_projects']} %>
+              </div>
+            </div>
+          </center>
+
+          <center>
+            <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
+              <span style="font-weight:bold;float: left">Institutions:</span> <br/>
+              <%= select_tag "institutions",
+                             options_for_select(Institution.all.collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
+                             {:onchange => "Javascript:others('institutions')", :multiple => true, :style => "width: 100%;"}
+              -%>
+              <div id='other_institutions' style='display: none'>
+                <br/>
+                <span style="font-weight:bold;float: left">Other institutions:</span>
+                <br/> <%= text_field_tag :other_institutions, nil, {:style => "width: 100%", :value => params['other_institutions']} %>
+              </div>
+            </div>
+          </center>
+        </div>
+
+        <br/>
+    <% end %>
 
   <%=  f.submit("Create",:disable_with=>"Creating...") %>
   <%= render :partial=>"cancel_registration" %>
