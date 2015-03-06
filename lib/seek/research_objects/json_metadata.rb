@@ -3,9 +3,11 @@ module Seek::ResearchObjects
     include Singleton
 
     def metadata_content item
-      json = {title: item.title, description: item.description}
-      json[:assay_type]=item.assay_type_uri if item.respond_to?(:assay_type_uri)
-      json[:technology_type]=item.technology_type_uri if item.respond_to?(:technology_type_uri)
+      json={id: item.id}
+      [:title, :description, :assay_type_uri, :technology_type_uri, :version].each do |method|
+        json[method]=item.send(method) if item.respond_to?(method)
+      end
+
       json[:contributor]=create_agent(item.contributor)
       if item.is_asset?
         json[:contains] = contained_files(item)
