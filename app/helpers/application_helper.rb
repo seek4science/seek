@@ -349,22 +349,13 @@ module ApplicationHelper
   end
 
   def preview_permission_popup_link resource
-    resource_name = resource.class.name.underscore
-    resource_id = resource.id
-    url = preview_permissions_policies_path
-    is_new_file = resource.new_record?
-    contributor_id = resource.contributing_user.try(:id)
-    return link_to_remote_redbox("preview permission",
-      { :url => url ,
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-        :with => "'sharing_scope=' + selectedSharingScope() + '&access_type=' + selectedAccessType(selectedSharingScope())
-        + '&project_ids=' + getProjectIds('#{resource_name}') + '&project_access_type=' + $F('sharing_your_proj_access_type')
-        + '&contributor_types=' + $F('sharing_permissions_contributor_types') + '&contributor_values=' + $F('sharing_permissions_values')
-        + '&creators=' + encodeURIComponent(getCreators()) + '&contributor_id=' + '#{contributor_id}' + '&resource_name=' + '#{resource_name}' + '&resource_id=' + '#{resource_id}' + '&is_new_file=' + '#{is_new_file}'"},
-      { :id => 'preview_permission',
-        :style => 'display:none'
-      }
-    )
+    locals = {}
+    locals[:resource_name] = resource.class.name.underscore
+    locals[:resource_id] = resource.id
+    locals[:url] = preview_permissions_policies_path
+    locals[:is_new_file] = resource.new_record?
+    locals[:contributor_id] = resource.contributing_user.try(:id)
+    render :partial => 'assets/preview_permission_link', :locals => locals
   end
   #Return whether or not to hide contact details from this user
   #Current decided by Seek::Config.hide_details_enabled in config.rb
