@@ -135,6 +135,30 @@ class PersonTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
+  test "orcid_uri" do
+    disable_authorization_checks do
+      p = Factory :person
+      p.orcid = "http://orcid.org/0000-0003-2130-0865"
+      assert p.valid?
+      p.save!
+      p.reload
+      pp p.orcid
+      assert_equal "http://orcid.org/0000-0003-2130-0865",p.orcid_uri
+
+      p.orcid = "0000-0002-1694-233X"
+      p.save!
+      p.reload
+      assert_equal "http://orcid.org/0000-0002-1694-233X",p.orcid_uri
+
+      p.orcid=nil
+      p.save!
+      p.reload
+      assert_nil p.orcid_uri
+    end
+
+
+  end
+
 
   test "email uri" do
     p = Factory :person, :email=>"sfkh^sd@weoruweoru.com"

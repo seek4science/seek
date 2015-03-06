@@ -2,13 +2,12 @@ module Seek::ResearchObjects
   class RdfMetadata < Metadata
     include Singleton
 
-    def metadata_content item
+    def metadata_content(item)
       item.to_rdf
     end
 
     def metadata_filename
-      "metadata.rdf"
+      'metadata.rdf'
     end
-
   end
 end
