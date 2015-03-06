@@ -1,5 +1,5 @@
 module Seek::ResearchObjects
-  class JsonMetadata < Metadata
+  class JSONMetadata < Metadata
     include Singleton
 
     def metadata_content item

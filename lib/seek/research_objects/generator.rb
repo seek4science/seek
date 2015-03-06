@@ -36,7 +36,7 @@ module Seek::ResearchObjects
 
     def describe_metadata bundle, item
       Seek::ResearchObjects::RdfMetadata.instance.store(bundle,item)
-      Seek::ResearchObjects::JsonMetadata.instance.store(bundle,item)
+      Seek::ResearchObjects::JSONMetadata.instance.store(bundle,item)
     end
 
     def store_files(bundle,asset)
