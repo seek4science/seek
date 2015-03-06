@@ -14,8 +14,6 @@
 %>
 
 <div class="yui-u first isa_graph curved with_smaller_shadow">
-  <div id="cy"></div>
-
   <% if cytoscape_elements.size > reduced_elements.size %>
       <%= link_to_function ("Full graph "+image("expand")).html_safe,
                            "drawGraph(elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
@@ -29,6 +27,7 @@
                            :class => 'graph_toggle'
       -%>
   <% end %>
+  <div id="cy" style="margin-top: 3em;"></div>
 </div>
 
 <div class="yui-u node_info curved with_smaller_shadow" id="node_info">
