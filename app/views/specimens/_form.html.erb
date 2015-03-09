@@ -1,5 +1,3 @@
-<%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
-<%= stylesheet_link_tag 'calendar_date_select/default' %>
 <%= javascript_include_tag "biosample" %>
 
 <%
@@ -49,8 +47,8 @@
 </div>
 
 <% unless Seek::Config.is_virtualliver %>
-    <div class="form-group form-inline">
-      <%= f.label "Culture starting date" -%><br/>
+    <div class="form-group date-select">
+      <%= f.label "Culture starting date" -%>
       <%= f.calendar_date_select :born, :time => "mixed", :year_range => 100, :class => "form-control" -%>
     </div>
 <% end %>

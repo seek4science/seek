@@ -28,7 +28,6 @@ module SEEK
 
     config.assets.precompile += ['*.js',
                                  "prepended/*.css",
-                                 "calendar_date_select/default.css",
                                  "cytoscape_isa_graph.css",
                                  "data_tables.css",
                                  "datacite_doi.css",

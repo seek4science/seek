@@ -1,5 +1,3 @@
-<%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
-<%= stylesheet_link_tag 'calendar_date_select/default' %>
 <%= javascript_include_tag "biosample"%>
 
 <%= f.error_messages %>
@@ -33,8 +31,8 @@
           <%= f.text_field :explantation, :class=>"form-control" -%>
         </div>
 
-        <div class="form-group form-inline">
-          <%= f.label :donation_date -%><span class="required">*</span><br/>
+        <div class="form-group date-select">
+          <%= f.label :donation_date -%><span class="required">*</span>
           <%= f.calendar_date_select :donation_date, :time => "mixed", :class=>"form-control" -%>
         </div>
     <% end %>

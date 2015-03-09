@@ -1,8 +1,5 @@
 <% current_user_authorized_to_manage = @event.new_record?|| @event.can_manage? -%>
 
-<%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
-<%= stylesheet_link_tag 'calendar_date_select/default' %>
-
 <h1><%= @new ? "New #{t('event')}" : ("Editing #{t('event')}: ".html_safe + link_to(@event.title, event_path(@event))) -%></h1>
 <%= form_for @event do |f| %>
     <div class="asset_form">
@@ -18,13 +15,13 @@
         <%= f.text_area :description, :rows => 5, :class=>"form-control" %>
       </div>
 
-      <div class="form-group form-inline">
-        <%= f.label :start_date %><span class="required">*</span><br/>
+      <div class="form-group date-select">
+        <%= f.label :start_date %><span class="required">*</span>
         <%= f.calendar_date_select :start_date, :time => :mixed, :class=>"form-control" %>
       </div>
 
-      <div class="form-group form-inline">
-        <%= f.label :end_date %><br/>
+      <div class="form-group date-select">
+        <%= f.label :end_date %>
         <%= f.calendar_date_select :end_date, :time => :mixed, :class=>"form-control" %>
       </div>
 
