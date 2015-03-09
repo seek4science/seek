@@ -258,3 +258,17 @@ div.hidden_list_item {
   bottom: 8px;
   left: 8px;
 }
+
+a.select_assay_class {
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  padding: 20px;
+  @include rounded-box-shadow(#F5F5F5);
+  margin: 10px;
+}
+
+a.select_assay_class:hover {
+  background-color: #FCFCFC;
+  text-decoration: none;
+}
