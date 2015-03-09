@@ -7,72 +7,64 @@
 
 <%= f.error_messages -%>
 
-<div  id="strain_form">
-  <div class="yui-g">
-    <center>
-      <div class="yui-u first" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
-        <p style="margin-bottom: 0.5em">
-          <%= label_tag 'Name:', nil,  :style => 'float:left' %><span class="required">*</span>
-          <%= f.text_field :title, :style => 'float:right' %>
-        </p>
-
-        <p style="margin-bottom: 1.5em">
-          <%= label_tag "Provider's strain ID:", nil, :style => 'float:left' %>
-          <%= f.text_field :provider_id, :style => 'float:right' %>
-        </p>
-
-        <p style="margin-bottom: 1.5em">
-          <%= label_tag "Provider Name:", nil, :style => 'float:left' %>
-          <%= f.text_field :provider_name, :style => 'float:right' %>
-        </p>
-
+<div id="strain_form">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="form-group">
+        <%= label_tag 'Name' %><span class="required">*</span>
+        <%= f.text_field :title, :class => 'form-control' %>
       </div>
-    </center>
 
-    <center>
-      <div class="yui-u" style="width: 42%;margin-right: 2em; margin-top: 1em; margin-bottom: 1em;">
-
-        <p style="margin-bottom: 1.5em">
-          <%= label_tag "Synonym:", nil,  :style => 'float:left' %>
-          <%= f.text_field :synonym, :style => 'float:right' %>
-        </p>
-
-        <p style="margin-bottom: 1.5em">
-          <%= label_tag "Comment:", nil, :style => 'float:left' %>
-          <%= f.text_area :comment, :style => 'float:right', :cols => 33, :rows => 3 %>
-        </p>
-
+      <div class="form-group">
+        <%= label_tag "Provider's strain ID" %>
+        <%= f.text_field :provider_id, :class => 'form-control' %>
       </div>
-    </center>
+
+      <div class="form-group">
+        <%= label_tag "Provider Name" %>
+        <%= f.text_field :provider_name, :class => 'form-control' %>
+      </div>
+    </div>
+
+    <div class="col-sm-6">
+      <div class="form-group">
+        <%= label_tag "Synonym" %>
+        <%= f.text_field :synonym, :class => 'form-control' %>
+      </div>
+
+      <div class="form-group">
+        <%= label_tag "Comment" %>
+        <%= f.text_area :comment, :class => 'form-control', :cols => 33, :rows => 3 %>
+      </div>
+    </div>
   </div>
 
-  <div class="yui-g">
+  <div class="row">
     <%= render :partial => "genotype_form", :locals => {:item => @strain, :f => f, :action => action} %>
     <%= render :partial => "phenotype_form", :locals => {:item => @strain, :f => f, :action => action} %>
   </div>
-  <br/>
 
-  <p>
-    <%= f.label "Organism:" -%><span class="required">*</span>
+  <div class="form-group">
+    <%= f.label "Organism" -%><span class="required">*</span>
     <%= f.select :organism_id,
                  options_for_select([["Not specified", ""]] + Organism.all(:order => :title).collect { |o| [o.title, o.id] }, @strain.organism.try(:id) || current_user.try(:person).try(:projects).try(:first).try(:organism_ids).try(:first)), {},
-                 :onchange => "show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value,'strain_parent_id', 'strain[parent_id]');"
+                 :onchange => "show_ajax_loader('strains_of_selected_organism');strains_of_selected_organism(this.value,'strain_parent_id', 'strain[parent_id]');",
+                 :class => 'form-control'
     -%>
-  </p>
-
-  <p>
-            <% strains = @strain.organism.nil? ? [] : @strain.organism.strains.without_default.select(&:can_view?) -%>
-    <%= label_tag "Based on:", nil, :style => 'float:left' %>
-
-  <div id='strains_of_selected_organism'>
-    <%= f.collection_select :parent_id,
-                            strains, :id, :info, :include_blank => "Not specified" -%>
-
   </div>
-  </p>
+
+  <div class="form-group">
+    <% strains = @strain.organism.nil? ? [] : @strain.organism.strains.without_default.select(&:can_view?) -%>
+    <%= label_tag "Based on" %>
+
+    <div id='strains_of_selected_organism'>
+      <%= f.collection_select :parent_id, strains, :id, :info, {:include_blank => "Not specified"},
+                              {:class => 'form-control'} -%>
+
+    </div>
+  </div>
 
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
-  <br/>
 
   <% if (action == 'create') || (action == 'edit' && @strain.can_manage?) %>
       <%= render :seek_partial => "assets/sharing_form", :locals => {:object => @strain} -%>
@@ -85,14 +77,16 @@
      button_text=action=="edit" ? "Update" : "Create"
      disabled_text=action=="edit" ? "Updating..." : "Creating..."
   %>
-  <br/>
   <% if @strain.can_manage? %>
       <%= preview_permission_popup_link(@strain) -%>
-      <%= f.submit button_text, :id => "strain_submit_btn", :onclick => "previewPermissions();return(false);" -%>
+      <%= f.submit button_text, :id => "strain_submit_btn",
+                   :onclick => "previewPermissions();return(false);",
+                   :class => 'btn btn-primary' -%>
   <% else %>
-      <%= f.submit button_text, :disable_with => disabled_text, :id => "strain_submit_btn" -%>
+      <%= f.submit button_text, :disable_with => disabled_text, :id => "strain_submit_btn",
+                   :class => 'btn btn-primary' -%>
   <% end %>
-  or <%= link_to 'Cancel', (@strain.id ? strain_path(@strain.id) : strains_path) -%>
+  or <%= link_to 'Cancel', (@strain.id ? strain_path(@strain.id) : strains_path), :class => 'btn btn-default' -%>
 </div>
 
 <script type="text/javascript">

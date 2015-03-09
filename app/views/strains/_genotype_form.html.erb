@@ -2,17 +2,18 @@
 <% parent_name ||= item.class.name.underscore
    action ||=nil
 %>
-<center>
-  <div class="yui-u first  box_simple" style="width: 42%; margin-left: 2em; margin-top: 1em; margin-bottom: 1em;">
-    <label style="font-weight: bold; border-bottom: 1px solid #DDD"> Genotypes:</label>
-    <table id='genotype_table'>
+<div class="col-sm-6">
+  <div class="form-group">
+    <label>Genotypes</label>
+    <%= button_link_to 'Add gene and mutation', 'add', "javascript: addGenotypeRow('genotype_table','#{parent_name}','#{action}')", :class => 'btn-xs' %>
+
+    <table id="genotype_table" class="table">
       <tr>
         <th>Gene affected</th>
         <th>Kind of mutation</th>
       </tr>
       <% item.genotypes.each_with_index do |genotype, index| %>
-
-            <%= f.fields_for :genotypes, genotype do |genotype_form| %>
+          <%= f.fields_for :genotypes, genotype do |genotype_form| %>
               <tr id='genotype_row_<%= index %>'>
                 <td>
                   <%= genotype_form.fields_for :gene, genotype.gene do |gene_form| %>
@@ -29,11 +30,8 @@
                 </td>
               </tr>
               <%= genotype_form.hidden_field :_destroy,{:id => "genotype_#{index}",:value=>0} %>
-            <% end %>
+          <% end %>
       <% end %>
-
-
     </table>
-    <%= image_tag 'famfamfam_silk/add.png', :alt=>"Add more", :title=>"Add more gene and mutation", :onclick=>"addGenotypeRow('genotype_table','#{parent_name}','#{action}')" %>
   </div>
-</center>
+</div>
