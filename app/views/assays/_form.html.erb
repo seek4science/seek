@@ -1,179 +1,161 @@
 <%= javascript_include_tag 'strain' -%>
 <%
- select_truncate_length=120
-@assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.assay')}"
-@assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
+   @assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.assay')}"
+   @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
 %>
 
-
 <%= f.error_messages -%>
+
 <%= f.hidden_field :create_from_asset %>
-<div style="width: 90%;">
-  <% if !@assay.study.nil? and @assay.study.can_view? -%>
-    <p>
-      <%= label_tag "Associated study: " -%>
-      <%= h @assay.study.title.capitalize -%>
-    </p>
-  <% end -%>
 
-  <p>
-    <%= f.label :title-%><span class="required">*</span><br/>
-    <%= f.text_area :title,:class=>"title_text_entry" -%>
-  </p>
-
-  <p>
-    <%= f.label :description -%><br/>
-    <%= f.text_area :description,:class=>"large_text_entry" -%>
-  </p>
-  <% if Seek::Config.is_virtualliver -%>
-      <p>
-        <%= f.label "Institution" %><br/>
-        <%= collection_select(:assay, :institution_id, Institution.all, :id, :title, {:include_blank =>"Please Select ..."},{:style=>"width:90%"}) %>
+<% if !@assay.study.nil? and @assay.study.can_view? -%>
+    <div class="form-group">
+      <%= label_tag "Associated study" -%>
+      <p class="form-control-static">
+        <%= h @assay.study.title.capitalize -%>
       </p>
-  <% end -%>
-  <% if @assay.study.blank? or @assay.study.can_view? %>
-      <p>
-      <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
-    <%= t('study') -%>
-    <span class="required">*</span>
-     <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %> <br/>
-    <% investigations = Investigation.all.select &:can_view? -%>
+    </div>
+<% end -%>
+
+<div class="form-group">
+  <%= f.label :title-%><span class="required">*</span>
+  <%= f.text_field :title, :class=>"form-control" -%>
+</div>
+
+<div class="form-group">
+  <%= f.label :description -%><br/>
+  <%= f.text_area :description, :rows => 5, :class=>"form-control"  -%>
+</div>
+
+<% if Seek::Config.is_virtualliver -%>
+    <div class="form-group">
+      <%= f.label "Institution" %>
+      <%= collection_select(:assay, :institution_id, Institution.all, :id, :title, {:include_blank =>"Please Select ..."},{:class=>"form-control"}) %>
+    </div>
+<% end -%>
+
+<% if @assay.study.blank? or @assay.study.can_view? %>
+    <div class="form-group">
+      <label><%= t('study') -%></label><span class="required">*</span>
+      <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %>
+
+      <% investigations = Investigation.all.select &:can_view? -%>
       <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
       <% investigations.each do |i| %>
-         <% studies = i.studies.select(&:can_edit?) %>
-        <% unless studies.empty?%>
-          <% options << "<optgroup label=\"#{truncate(h(i.title), :length => 64)}\">\n" %>
-          <% studies.each do |s| %>
-            <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{h(s.title)}\')\">#{truncate(h(s.title), :length => 64)}</option>\n" %>
+          <% studies = i.studies.select(&:can_edit?) %>
+          <% unless studies.empty?%>
+              <% options << "<optgroup label=\"#{truncate(h(i.title), :length => 64)}\">\n" %>
+              <% studies.each do |s| %>
+                  <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" title=\"#{h(s.title)}\">#{truncate(h(s.title), :length => 256)}</option>\n" %>
+              <% end %>
+              <% options << "</optgroup>" %>
           <% end %>
-          <% options << "</optgroup>" %>
-        <% end %>
       <% end %>
-    <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" style="width:100%">
+      <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" class="form-control">
         <%= options.html_safe %>
-    </select>
-    </p>
-  <%end%>
-
-</div>
+      </select>
+    </div>
+<% end %>
 
 <%= f.hidden_field :assay_class_id -%>
 
-<table class="padded_table">
-  <tr>
-    <td><%= f.label "#{@assay_type_text.capitalize}: " %>
-        <%= create_suggested_type_popup_link @assay.assay_type_reader.ontology_term_type %>
-
-    </td>
-    <% unless @assay.is_modelling? -%>
-        <td><%= f.label "Technology type: " %>
-              <%= create_suggested_type_popup_link @assay.technology_type_reader.ontology_term_type %>
-        </td>
-    <% end -%>
-  </tr>
-  <tr>
-    <td style="width:50%">
+<div class="row">
+  <div class="col-sm-<%= @assay.is_modelling? ? '12' : '6' -%>">
+    <div class="form-group">
+      <%= f.label "#{@assay_type_text.capitalize}" %>
+      <%= create_suggested_type_popup_link @assay.assay_type_reader.ontology_term_type %>
       <div id="assay_<%= @assay.assay_type_reader.ontology_term_type %>_types_list">
-        <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay.assay_type_uri, {:style => "width:100%"} %>
+        <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay.assay_type_uri, {:class => "form-control"} %>
       </div>
-    </td>
-    <td style="width:50%">
-      <% unless @assay.is_modelling? -%>
+    </div>
+  </div>
+  <% unless @assay.is_modelling? -%>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <%= f.label "Technology type" %>
+          <%= create_suggested_type_popup_link @assay.technology_type_reader.ontology_term_type %>
           <div id="assay_<%= @assay.technology_type_reader.ontology_term_type %>_types_list">
-            <%= technology_type_select_tag f, "technology_type_uri", @assay.technology_type_uri, {:style => "width:100%"} %>
+            <%= technology_type_select_tag f, "technology_type_uri", @assay.technology_type_uri, {:class => "form-control"} %>
           </div>
-      <% end -%>
-    </td>
-  </tr>
-</table>
-
-<br style="clear:both"/>
-<% if User.current_user -%>
-<% if Seek::Config.is_virtualliver %>
-    <%= f.fancy_multiselect :samples, :object_type_text => @assay_text,:with_new_link=>true -%>
-<% end %>
-<div id="add_organism_form">
-    <%= render :partial=>"assays/select_organisms" -%>
+        </div>
+      </div>
+  <% end -%>
 </div>
+
+<% if User.current_user -%>
+    <% if Seek::Config.is_virtualliver %>
+        <%= f.fancy_multiselect :samples, :object_type_text => @assay_text,:with_new_link=>true -%>
+    <% end %>
+
+    <% if Seek::Config.organisms_enabled %>
+        <div id="add_organism_form">
+          <%= render :partial=>"assays/select_organisms" -%>
+        </div>
+    <% end %>
+
     <% if show_scales? %>
         <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} %>
     <% end %>
 
-<p>
-  <%= render :seek_partial=>"assets/sharing_form" if @assay.can_manage? -%>
-</p>
+    <%= render :seek_partial=>"assets/sharing_form" if @assay.can_manage? -%>
 
-<% if @assay.is_taggable? %>
-    <p>
-      <%= render :partial=>"assets/select_tags" %>
-    </p>
+    <% if @assay.is_taggable? %>
+        <%= render :partial=>"assets/select_tags" %>
+    <% end %>
+
+    <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
+
+    <%  if @assay.is_modelling? -%>
+        <%= render :partial=>"assets/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
+    <% end -%>
+
+    <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
+
+    <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
+                                                                            :related_publications => @assay.publications} -%>
+<% end -%>
+
+<%
+   button_text=action==:edit ? "Update" : "Create"
+   disabled_text=action==:edit ? "Updating..." : "Creating..."
+%>
+<% if @assay.can_manage? %>
+    <%= preview_permission_popup_link(@assay)-%>
+    <%= f.submit button_text, :id => "assay_submit_btn",
+                 :onclick => "javascript: previewPermissions();return(false);", :class => 'btn btn-primary' -%>
+<% else %>
+    <%= f.submit button_text, :disable_with=>disabled_text, :id => "assay_submit_btn",
+                 :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);", :class => 'btn btn-primary' -%>
 <% end %>
-
-<%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
-
-<%  if @assay.is_modelling? -%>
-  <%= render :partial=>"assets/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
-<% end -%>
-
-<%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
-
-<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
-                                                                        :related_publications => @assay.publications} -%>
-
-<% end -%>
-
-<p style="margin-top: 2em; text-align: center;" >
-  <%
-     button_text=action==:edit ? "Update" : "Create"
-     disabled_text=action==:edit ? "Updating..." : "Creating..."
-  %>
-  <% if @assay.can_manage? %>
-      <%= preview_permission_popup_link(@assay)-%>
-      <%= f.submit button_text, :id => "assay_submit_btn", :onclick => "javascript: previewPermissions();return(false);" -%>
-  <% else %>
-      <%= f.submit button_text, :disable_with=>disabled_text, :id => "assay_submit_btn", :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);" -%>
-  <% end %>
-  or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path) -%>
-</p>
+ or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path), :class => 'btn btn-default' -%>
 
 <script type="text/javascript">
 
-  function hide_organism_form(){
-      Effect.Fade('add_organism_form');
-  }
-  function showTitle(text){
-    var elem = document.getElementById("full_study_title");
-    elem.style.display = '';
-    elem.innerHTML = text;
-  }
-	
-  function hideTitle(){
-    var elem = document.getElementById("full_study_title");
-    elem.style.display = 'none';
-  }
+    function hide_organism_form(){
+        Effect.Fade('add_organism_form');
+    }
 
-  function check_show_organism_form() {
-      if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
-          Effect.Fade('add_organism_form');
-      }
-      else {
-          Effect.Appear('add_organism_form');
-      }
-  }
+    function check_show_organism_form() {
+        if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
+            Effect.Fade('add_organism_form');
+        }
+        else {
+            Effect.Appear('add_organism_form');
+        }
+    }
 
-  function check_show_sample_form() {
-      if ($F('assay_organism_ids') && $F('assay_organism_ids').length > 0) {
-          Effect.Fade('add_samples_form');
-      } else {
-          Effect.Appear('add_samples_form');
-      }
-  }
+    function check_show_sample_form() {
+        if ($F('assay_organism_ids') && $F('assay_organism_ids').length > 0) {
+            Effect.Fade('add_samples_form');
+        } else {
+            Effect.Appear('add_samples_form');
+        }
+    }
 
-  <%if @assay.is_modelling?%>
-      Event.observe(window, 'load', function() {
-          $('assay_sample_ids').fire('fancySelect:update');
-          updateOrganisms();
-      });
-  <% end %>
-
+    <%if @assay.is_modelling?%>
+    Event.observe(window, 'load', function() {
+        $('assay_sample_ids').fire('fancySelect:update');
+        updateOrganisms();
+    });
+    <% end %>
 </script>
