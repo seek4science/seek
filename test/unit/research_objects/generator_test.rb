@@ -9,10 +9,11 @@ class GeneratorTest < ActiveSupport::TestCase
     Dir.mktmpdir do |dir|
       filename = File.join(dir,filename)
       open(filename,"w+") do |f|
-        f2 = Seek::ResearchObjects::Generator.instance.generate(investigation,f)
+        inv = investigation
+        f2 = Seek::ResearchObjects::Generator.instance.generate(inv,f)
         assert_equal f,f2
+        check_contents(f2,inv)
       end
-      assert File.exist?(filename)
     end
   end
 
@@ -20,8 +21,8 @@ class GeneratorTest < ActiveSupport::TestCase
     inv = investigation
     file = Seek::ResearchObjects::Generator.instance.generate(inv)
     refute_nil file
-    assert File.exist?(file)
     check_contents(file,inv)
+    assert_equal Seek::ResearchObjects::Generator::DEFAULT_FILENAME,File.basename(file.path)
   end
 
 
@@ -30,7 +31,6 @@ class GeneratorTest < ActiveSupport::TestCase
 
   def check_contents file,inv
     assert File.exist?(file)
-    assert_equal Seek::ResearchObjects::Generator::DEFAULT_FILENAME,File.basename(file.path)
     paths = Zip::File.open(file) do |zip_file|
       zip_file.collect do |entry|
         entry.name
