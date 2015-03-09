@@ -129,7 +129,7 @@
   %>
   <% if @assay.can_manage? %>
       <%= preview_permission_popup_link(@assay)-%>
-      <%= f.submit button_text, :id => "assay_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
+      <%= f.submit button_text, :id => "assay_submit_btn", :onclick => "javascript: previewPermissions();return(false);" -%>
   <% else %>
       <%= f.submit button_text, :disable_with=>disabled_text, :id => "assay_submit_btn", :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);" -%>
   <% end %>

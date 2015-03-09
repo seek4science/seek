@@ -88,7 +88,7 @@
   <br/>
   <% if @strain.can_manage? %>
       <%= preview_permission_popup_link(@strain) -%>
-      <%= f.submit button_text, :id => "strain_submit_btn", :onclick => "clickLink($('preview_permission'));return(false);" -%>
+      <%= f.submit button_text, :id => "strain_submit_btn", :onclick => "previewPermissions();return(false);" -%>
   <% else %>
       <%= f.submit button_text, :disable_with => disabled_text, :id => "strain_submit_btn" -%>
   <% end %>

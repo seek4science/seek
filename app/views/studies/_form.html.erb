@@ -49,7 +49,7 @@
 <% if @study.can_manage? %>
     <%= preview_permission_popup_link(@study)-%>
     <%= f.submit button_text, :id => "study_submit_btn",
-                 :onclick => "javascript: clickLink($('preview_permission'));return(false);",
+                 :onclick => "javascript: previewPermissions();return(false);",
                  :class => 'btn btn-primary'-%>
 <% else %>
     <%= f.submit button_text, :disable_with=>disabled_text, :id => "study_submit_btn",
