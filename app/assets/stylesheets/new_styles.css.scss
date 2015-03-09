@@ -272,3 +272,9 @@ a.select_assay_class:hover {
   background-color: #FCFCFC;
   text-decoration: none;
 }
+
+.box_editing_inner {
+  @include rounded-box-shadow(#DDEEFF);
+  padding: 0.5em;
+  margin-bottom: 1em;
+}
