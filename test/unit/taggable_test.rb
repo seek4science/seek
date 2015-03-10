@@ -87,7 +87,8 @@ class TaggableTest < ActiveSupport::TestCase
     p.tag_with ["coffee", "Coffee"],attr
     p.reload
 
-    assert_equal ["coffee"], p.annotations_as_text_array
+    updated_expertises = Annotation.where(annotatable_type: p.class.name, annotatable_id: p.id).select{|a| a.attribute.name == attr}
+    assert_equal ["coffee"], updated_expertises.collect{|a| a.value.text}
   end
 
 end
