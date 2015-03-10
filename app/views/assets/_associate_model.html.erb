@@ -3,41 +3,46 @@
    resource_text ||= text_for_resource(resource)
    all_models=authorised_models
    project_models=authorised_models(current_user.person.projects)
-    select_truncate_length=120
-    associated_models = resource.models
+   select_truncate_length=120
+   associated_models = resource.models
 -%>
 
 <%= folding_panel(t('model').pluralize, associated_models.blank?, :body_options => {:id => 'associate_model_fold_content'},
                   :help_text => "Here you associate #{t('model').pluralize} in SEEK to this #{resource_text}.") do %>
-    <div class="yui-u first" style="width:66%; float:left">
-      <p style="color: #666666;">
-        The following  <%= t('model').pluralize %> are involved in this <%= resource_text -%>:
-      </p>
-      <div id="model_to_list" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="models">Loading ...</span>
-      </div>
-      <br/>
-      <div id="add_model_elements">
-        <div class="association_step">
-          <%= select_tag :possible_models,
-            options_for_select([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
-            {:style=>"width:90%",:onchange=>"addSelectedModel();"+remote_function(
-                    :method=>:get,
-              :url=>preview_models_path(:element=>"model_preview"),
-              :with=>"'id='+this.value",
-              :before=>"show_ajax_loader('model_preview')"
-            )+";return(false);"
-          } -%>
+    <div class="row">
+      <div class="col-md-8">
+        <p style="color: #666666;">
+          The following  <%= t('model').pluralize %> are involved in this <%= resource_text -%>:
+        </p>
 
-          <%= select_tag :model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
-
-          <br/>
-          <%= check_box_tag :include_other_project_models, nil, true, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate Models from other projects?
+        <div id="model_to_list" class="box_editing_inner" style="line-height: 1.5;">
+          <span class="none_text" id="models">Loading ...</span>
         </div>
-		<br/>
+
+        <div id="add_model_elements">
+          <div class="association_step">
+            <div class="form-group">
+              <%= select_tag :possible_models,
+                             options_for_select([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
+                             {:class => 'form-control',:onchange=>"addSelectedModel();"+remote_function(
+                                     :method=>:get,
+                                     :url=>preview_models_path(:element=>"model_preview"),
+                                     :with=>"'id='+this.value",
+                                     :before=>"show_ajax_loader('model_preview')"
+                             )+";return(false);"
+                             } -%>
+            </div>
+
+            <%= select_tag :model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+
+            <%= check_box_tag :include_other_project_models, nil, true, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate Models from other projects?
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'model'} %>
       </div>
     </div>
-    <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'model'} %>
 <% end %>
 
 <script type="text/javascript">
@@ -49,7 +54,7 @@
         selection_box.options.length=0;
 
         if (checked) {
-        <% ([["Select #{t('model')} ...",0]]|all_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
+            <% ([["Select #{t('model')} ...",0]]|all_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(model_details[0]) -%>';
             option.value = '<%= model_details[1] -%>';
@@ -59,10 +64,10 @@
             catch (ex) {
                 selection_box.add(option, null);
             }
-        <% end -%>
+            <% end -%>
         }
         else {
-        <% ([["Select #{t('model')} ...",0]]|project_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
+            <% ([["Select #{t('model')} ...",0]]|project_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(model_details[0]) -%>';
             option.value = '<%= model_details[1] -%>';
@@ -72,41 +77,41 @@
             catch (ex) {
                 selection_box.add(option, null);
             }
-        <% end -%>
+            <% end -%>
         }
         //selection_box.onchange();
     }
     function check_show_add_model() {
-    i = $('possible_models').selectedIndex;
-    selected_id = $('possible_models').options[i].value;
-    if (selected_id == '0') {
-      $('add_model_link').hide();
+        i = $('possible_models').selectedIndex;
+        selected_id = $('possible_models').options[i].value;
+        if (selected_id == '0') {
+            $('add_model_link').hide();
+        }
+        else {
+            $('add_model_link').show();
+        }
     }
-    else {
-      $('add_model_link').show();
-    }
-  }
 
-<% resource.models.each do |model| -%>
-  <% if model.can_view? -%>
-      model_id = '<%= model.id -%>';
-      model_title = '<%= escape_javascript(model.title) -%>';
-      addModel(model_title, model_id);
-  <% end -%>
-<% end -%>
+    <% resource.models.each do |model| -%>
+    <% if model.can_view? -%>
+    model_id = '<%= model.id -%>';
+    model_title = '<%= escape_javascript(model.title) -%>';
+    addModel(model_title, model_id);
+    <% end -%>
+    <% end -%>
 
-<% if params[:model_ids] %>
-  <% params[:model_ids].each do |id| -%>
+    <% if params[:model_ids] %>
+    <% params[:model_ids].each do |id| -%>
     <% model = Model.find(id) %>
     <% if model.can_view?-%>
-        model_id = '<%= model.id -%>';
-        model_title = '<%= escape_javascript(model.title) -%>';
-        addModel(model_title, model_id);
+    model_id = '<%= model.id -%>';
+    model_title = '<%= escape_javascript(model.title) -%>';
+    addModel(model_title, model_id);
     <% end -%>
-  <% end -%>
-<% end -%>
+    <% end -%>
+    <% end -%>
 
 
-  updateModels();
-  toggle_model_list()
+    updateModels();
+    toggle_model_list()
 </script>
