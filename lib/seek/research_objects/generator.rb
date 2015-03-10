@@ -78,7 +78,7 @@ module Seek
       end
 
       # create an empty temp file, and return the opened file ready for writing.
-      # unlike Tempfile, the temporary file is persistented until it is explicitly deleted.
+      # unlike Tempfile, the temporary file is persisted until it is explicitly deleted.
       def temp_file(filename, prefix = '')
         dir = Dir.mktmpdir(prefix)
         open(File.join(dir, filename), 'w+')
