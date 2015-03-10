@@ -11,7 +11,7 @@ class Person < ActiveRecord::Base
   acts_as_yellow_pages
   scope :default_order, order("last_name, first_name")
 
-  before_save :first_person_admin
+  before_save :first_person_admin_and_add_to_default_project
   before_destroy :clean_up_and_assign_permissions
 
   acts_as_notifiee
@@ -40,8 +40,6 @@ class Person < ActiveRecord::Base
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
   has_many :presentations_for_person,:as=>:contributor, :class_name=>"Presentation"
 
-  validate :orcid_id_must_be_valid_or_blank
-
   has_one :user, :dependent=>:destroy
 
   has_many :assets_creators, :dependent => :destroy, :foreign_key => "creator_id"
@@ -67,6 +65,7 @@ class Person < ActiveRecord::Base
   alias_attribute :webpage,:web_page
 
   include Seek::Subscriptions::PersonProjectSubscriptions
+  include Seek::OrcidSupport
 
   after_commit :queue_update_auth_table
 
@@ -415,33 +414,14 @@ class Person < ActiveRecord::Base
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
-  def first_person_admin
-    self.is_admin = true if Person.count==0
-  end
-
-  def orcid_id_must_be_valid_or_blank
-    unless orcid.blank? || valid_orcid_id?(orcid.gsub("http://orcid.org/",""))
-        errors.add("Orcid identifier"," isn't a valid ORCID identifier.")
+  def first_person_admin_and_add_to_default_project
+    if Person.count==0
+      self.is_admin = true
+      project = Project.first
+      if (project && project.institutions.any?)
+        add_to_project_and_institution(project,project.institutions.first)
+      end
     end
-  end
-
-  #checks the structure of the id, and whether is conforms to ISO/IEC 7064:2003
-  def valid_orcid_id? id
-    if id =~ /[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9,X]{4}/
-      id = id.gsub("-","")
-      id[15] == orcid_checksum(id)
-    else
-      false
-    end
-  end
-
-  #calculating the checksum according to ISO/IEC 7064:2003, MOD 11-2 ; see - http://support.orcid.org/knowledgebase/articles/116780-structure-of-the-orcid-identifier
-  def orcid_checksum(id)
-    total=0
-    (0...15).each { |x| total = (total + id[x].to_i) * 2 }
-    remainder = total % 11
-    result = (12 - remainder) % 11
-    result == 10 ? "X" : result.to_s
   end
 
   include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled

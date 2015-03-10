@@ -165,7 +165,7 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test "should not be able to update the policy of the strain when having no manage rights" do
-    strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING))
+    strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_USERS, :access_type => Policy::EDITING))
     user = Factory(:user)
     assert strain.can_edit? user
     assert !strain.can_manage?(user)
@@ -175,11 +175,11 @@ class StrainsControllerTest < ActionController::TestCase
     assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
-    assert_equal Policy::ALL_SYSMO_USERS, updated_strain.policy.sharing_scope
+    assert_equal Policy::ALL_USERS, updated_strain.policy.sharing_scope
   end
 
   test "should not be able to update the permissions of the strain when having no manage rights" do
-    strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => Policy::EDITING))
+    strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_USERS, :access_type => Policy::EDITING))
     user = Factory(:user)
     assert strain.can_edit? user
     assert !strain.can_manage?(user)

@@ -1,7 +1,7 @@
 #A couple of these rely on certain things existing in the test db ahead of time.
 #:pal relies on Role.pal_role being able to find an appropriate role in the db.
 #:assay_modelling and :assay_experimental rely on the existence of the AssayClass's
-
+include ActionDispatch::TestProcess
 #Person
   Factory.define(:admin_defined_role_project, :class=>AdminDefinedRoleProject) do |f|
 
@@ -139,6 +139,11 @@ end
     f.association :content_blob,:factory=>:pdf_content_blob
   end
 
+  #A SOP that has been registered as a URI
+  Factory.define(:url_sop,:parent=>:sop) do |f|
+    f.association :content_blob,:factory=>:url_content_blob
+  end
+
 
   #Policy
   Factory.define(:policy, :class => Policy) do |f|
@@ -158,12 +163,12 @@ end
   end
 
   Factory.define(:all_sysmo_viewable_policy,:parent=>:policy) do |f|
-    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::VISIBLE
   end
 
   Factory.define(:all_sysmo_downloadable_policy,:parent=>:policy) do |f|
-    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::ACCESSIBLE
   end
     
@@ -173,7 +178,7 @@ end
   end
 
   Factory.define(:public_download_and_no_custom_sharing,:parent=>:policy) do |f|
-    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::ACCESSIBLE
   end
   
@@ -384,8 +389,8 @@ end
   end
 
   Factory.define(:model_image) do |f|
-    f.original_filename "#{Rails.root}/test/fixtures/files/file_picture.png"
-    f.image_file File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb")
+    f.original_filename "file_picture.png"
+    f.image_file fixture_file_upload("#{Rails.root}/test/fixtures/files/file_picture.png","image/png")
     f.content_type "image/png"
   end
 

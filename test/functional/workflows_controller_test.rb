@@ -50,7 +50,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_select "span[class=visibility public]",:text=>/Public/
 
     policy = workflow.policy
-    policy.sharing_scope = Policy::ALL_SYSMO_USERS
+    policy.sharing_scope = Policy::ALL_USERS
     policy.access_type = Policy::VISIBLE
     policy.save
     workflow.reload

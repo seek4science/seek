@@ -53,7 +53,7 @@ class Policy < ActiveRecord::Base
   
   # sharing_scope
   PRIVATE = 0
-  ALL_SYSMO_USERS = 2
+  ALL_USERS = 2
   EVERYONE = 4
   
   # access_type
@@ -131,7 +131,7 @@ class Policy < ActiveRecord::Base
 
         #if share with your project is chosen
 
-        if (sharing[:sharing_scope].to_i == Policy::ALL_SYSMO_USERS) and !projects.map(&:id).compact.blank?
+        if (sharing[:sharing_scope].to_i == Policy::ALL_USERS) and !projects.map(&:id).compact.blank?
           #add Project to contributor_type
           contributor_types << "Project" if !contributor_types.include? "Project"
           #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
@@ -180,7 +180,7 @@ class Policy < ActiveRecord::Base
 
   def self.registered_users_accessible_policy
     Policy.new(:name => "default accessible",
-               :sharing_scope => ALL_SYSMO_USERS,
+               :sharing_scope => ALL_USERS,
                :access_type => ACCESSIBLE,
                :use_whitelist => false,
                :use_blacklist => false)
@@ -195,7 +195,7 @@ class Policy < ActiveRecord::Base
 
   def self.sysmo_and_projects_policy projects=[]
       policy = Policy.new(:name => "default sysmo and projects policy",
-                          :sharing_scope => ALL_SYSMO_USERS,
+                          :sharing_scope => ALL_USERS,
                           :access_type => VISIBLE
       )
       projects.each do |project|
@@ -343,7 +343,7 @@ class Policy < ActiveRecord::Base
   end
 
   def policy_to_people_group people_in_group, contributor=User.current_user.person
-      if sharing_scope == Policy::ALL_SYSMO_USERS
+      if sharing_scope == Policy::ALL_USERS
          people_in_network = get_people_in_network access_type
          people_in_group['Network'] |= people_in_network unless people_in_network.blank?
       elsif sharing_scope == Policy::EVERYONE

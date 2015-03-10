@@ -35,6 +35,6 @@ div.node_info ul.items {
 a.graph_toggle {
     float: right;
     margin-right:1em;
-    margin-bottom:1em;
+    margin-top:1em;
     font-weight: bold;
 }

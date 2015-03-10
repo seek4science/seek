@@ -575,7 +575,7 @@ module ApplicationHelper
       text << "Private "
       text << "with some exceptions " unless model.policy.permissions.empty?
       text << image('lock', :style => 'vertical-align: middle')
-    elsif model.policy.sharing_scope == Policy::ALL_SYSMO_USERS && model.policy.access_type == Policy::NO_ACCESS
+    elsif model.policy.sharing_scope == Policy::ALL_USERS && model.policy.access_type == Policy::NO_ACCESS
       css_class = 'group'
       text << "Only visible to members of "
       text << model.policy.permissions.select {|p| p.contributor_type == 'Project'}.map {|p| p.contributor.title}.to_sentence

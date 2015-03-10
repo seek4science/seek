@@ -52,7 +52,7 @@ module Seek
             if user.person && user.person.projects.empty?
               scope = Policy::EVERYONE
             else
-              scope = Policy::ALL_SYSMO_USERS
+              scope = Policy::ALL_USERS
             end
           end
         end

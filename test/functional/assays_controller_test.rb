@@ -1036,7 +1036,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay = Factory(:assay, :contributor => User.current_user.person,
                     :study => Factory(:study, :investigation => Factory(:investigation, :project_ids => [proj.id])),
                     :policy => Factory(:policy,
-                                       :sharing_scope => Policy::ALL_SYSMO_USERS,
+                                       :sharing_scope => Policy::ALL_USERS,
                                        :access_type => Policy::NO_ACCESS,
                                        :permissions => [Factory(:permission, :contributor => proj, :access_type => Policy::EDITING)]))
     get :edit, :id => assay.id
@@ -1050,13 +1050,13 @@ class AssaysControllerTest < ActionController::TestCase
          :sample_ids=>[Factory(:sample).id]}
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
-        post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+        post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
       end
     end
 
     assay=assigns(:assay)
     assert_redirected_to assay_path(assay)
-    assert_equal Policy::ALL_SYSMO_USERS, assay.policy.sharing_scope
+    assert_equal Policy::ALL_USERS, assay.policy.sharing_scope
     assert_equal Policy::VISIBLE, assay.policy.access_type
     assert_equal assay.policy.permissions.count, 1
 
@@ -1082,12 +1082,12 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.policy.permissions.empty?
 
     assert_difference('ActivityLog.count') do
-      put :update, :id => assay, :assay => {}, :sharing => {"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::ACCESSIBLE, :sharing_scope => Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::EDITING}
+      put :update, :id => assay, :assay => {}, :sharing => {"access_type_#{Policy::ALL_USERS}"=>Policy::ACCESSIBLE, :sharing_scope => Policy::ALL_USERS, :your_proj_access_type => Policy::EDITING}
     end
 
     assay.reload
     assert_redirected_to assay_path(assay)
-    assert_equal Policy::ALL_SYSMO_USERS, assay.policy.sharing_scope
+    assert_equal Policy::ALL_USERS, assay.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE, assay.policy.access_type
     assert_equal 2, assay.policy.permissions.length
 

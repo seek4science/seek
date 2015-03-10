@@ -292,8 +292,8 @@ class DataciteDoiTest < ActionController::IntegrationTest
       assert latest_version.save
       assert asset.is_doi_minted?(latest_version.version)
 
-      unpublic_sharing = {:sharing_scope =>Policy::ALL_SYSMO_USERS,
-                        "access_type_#{Policy::ALL_SYSMO_USERS}".to_sym => Policy::VISIBLE
+      unpublic_sharing = {:sharing_scope =>Policy::ALL_USERS,
+                        "access_type_#{Policy::ALL_USERS}".to_sym => Policy::VISIBLE
       }
       put "/#{type.pluralize}/#{asset.id}", :sharing=>unpublic_sharing
 

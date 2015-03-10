@@ -22,7 +22,7 @@ class AnonymousAuthorizationTest < ActiveSupport::TestCase
   test "anonymous cannot view access or edit non public sop" do
     sop=Factory :sop,:policy=>Factory(:all_sysmo_downloadable_policy)
 
-    assert_equal Policy::ALL_SYSMO_USERS,sop.policy.sharing_scope
+    assert_equal Policy::ALL_USERS,sop.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE,sop.policy.access_type
 
     assert !Seek::Permissions::Authorization.is_authorized?("view",nil,sop,nil)
@@ -77,7 +77,7 @@ class AnonymousAuthorizationTest < ActiveSupport::TestCase
     # these can't affect anonymous user; hence can only check the final result of authorization
 
     # verify that the policy really provides access to anonymous users
-    public_download_and_no_custom_sharing_policy =  Factory :policy, :sharing_scope=> Policy::ALL_SYSMO_USERS,:access_type=> Policy::ACCESSIBLE,:use_whitelist=>false,:use_blacklist=>false
+    public_download_and_no_custom_sharing_policy =  Factory :policy, :sharing_scope=> Policy::ALL_USERS,:access_type=> Policy::ACCESSIBLE,:use_whitelist=>false,:use_blacklist=>false
     sop_with_public_download_and_no_custom_sharing = Factory :sop,:policy=>public_download_and_no_custom_sharing_policy
     temp = sop_with_public_download_and_no_custom_sharing.policy.sharing_scope
     assert temp < Policy::EVERYONE, "policy should not include anonymous users into the sharing scope"

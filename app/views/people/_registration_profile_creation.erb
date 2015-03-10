@@ -14,36 +14,39 @@
     <%= render :partial => 'contact_details_form', :locals => {:f => f} %>
     <%= hidden_field_tag :sysmo_member, true -%>
 
-    <h2><%= t('project').pluralize %> & Institutions</h2>
-    <div class="row">
-      <div class="col-sm-6">
-        <label>Projects</label>
-        <%= select_tag "projects",
-                       options_for_select(Project.all.collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
-                       {:onchange => "Javascript:others('projects')", :multiple => true, :class => "form-control"}
-        -%>
-        <div id='other_projects' style='display: none' class="form-group">
-          <label>Other <%= t('project').pluralize %></label>
-          <%= text_field_tag :other_projects, nil, {:style => "width: 100%", :value => params['other_projects'], :class => 'form-control'} %>
-        </div>
-      </div>
+    <% unless Person.count==0 %> <%# not for the first person %>
+        <h2><%= t('project').pluralize %> & Institutions</h2>
+        <div class="row">
+          <div class="col-sm-6">
+            <label>Projects</label>
+            <%= select_tag "projects",
+                           options_for_select(Project.all.collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
+                           {:onchange => "Javascript:others('projects')", :multiple => true, :class => "form-control"}
+            -%>
+            <div id='other_projects' style='display: none' class="form-group">
+              <label>Other <%= t('project').pluralize %></label>
+              <%= text_field_tag :other_projects, nil, {:style => "width: 100%", :value => params['other_projects'], :class => 'form-control'} %>
+            </div>
+          </div>
 
-      <div class="col-sm-6">
-        <label>Institutions</label>
-        <%= select_tag "institutions",
-                       options_for_select(Institution.all.collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
-                       {:onchange => "Javascript:others('institutions')", :multiple => true, :class => "form-control"}
-        -%>
-        <div id='other_institutions' style='display: none' class="form-group">
-          <label>Other institutions</label>
-          <%= text_field_tag :other_institutions, nil, {:style => "width: 100%", :value => params['other_institutions'], :class => 'form-control'} %>
+          <div class="col-sm-6">
+            <label>Institutions</label>
+            <%= select_tag "institutions",
+                           options_for_select(Institution.all.collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
+                           {:onchange => "Javascript:others('institutions')", :multiple => true, :class => "form-control"}
+            -%>
+            <div id='other_institutions' style='display: none' class="form-group">
+              <label>Other institutions</label>
+              <%= text_field_tag :other_institutions, nil, {:style => "width: 100%", :value => params['other_institutions'], :class => 'form-control'} %>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+    <% end %>
 
     <%= f.submit("Create",:disable_with=>"Creating...", :class => 'btn btn-primary') %>
     <%= render :partial=>"cancel_registration" %>
     <%= javascript_tag "others('projects')"-%>
     <%= javascript_tag "others('institutions')"-%>
+
 <% end -%>
 

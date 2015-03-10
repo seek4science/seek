@@ -1159,7 +1159,7 @@ class DataFilesControllerTest < ActionController::TestCase
      assert !df.can_manage?(user), "data file should be editable but not manageable for this test"
      assert_equal Policy::EDITING,df.policy.access_type,"data file should have an initial policy with access type for editing"
      assert_difference('ActivityLog.count') do
-      put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS }
+      put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_USERS, "access_type_#{Policy::ALL_USERS}"=>Policy::NO_ACCESS }
      end
 
      assert_redirected_to data_file_path(df)
@@ -1200,7 +1200,7 @@ class DataFilesControllerTest < ActionController::TestCase
      assert df.can_manage?(user), "data file should be editable and manageable for this test"
      assert_equal Policy::EDITING,df.policy.access_type,"data file should have an initial policy with access type for editing"
      assert_difference('ActivityLog.count') do
-      put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_SYSMO_USERS,"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS }
+      put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_USERS,"access_type_#{Policy::ALL_USERS}"=>Policy::NO_ACCESS }
      end
 
      assert_redirected_to data_file_path(df)
@@ -1302,7 +1302,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file =>data_file,:content_blob=>blob, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+          post :create, :data_file =>data_file,:content_blob=>blob, :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
         end
       end
     end
@@ -1310,7 +1310,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     df=assigns(:data_file)
     assert_redirected_to data_file_path(df)
-    assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+    assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     assert_equal Policy::VISIBLE, df.policy.access_type
     assert_equal df.policy.permissions.count, 1
 
@@ -1325,7 +1325,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:datafile_owner)
     df=data_files(:editable_data_file)
     assert df.can_manage?
-    assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+    assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     assert_equal Policy::EDITING, df.policy.access_type
     assert_equal df.policy.permissions.length, 1
 
@@ -1334,12 +1334,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
     assert_difference('ActivityLog.count') do
-      put :update, :id => df, :data_file => {}, :sharing => {"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::ACCESSIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::EDITING}
+      put :update, :id => df, :data_file => {}, :sharing => {"access_type_#{Policy::ALL_USERS}"=>Policy::ACCESSIBLE,:sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::EDITING}
     end
     df.reload
 
     assert_redirected_to data_file_path(df)
-    assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+    assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE, df.policy.access_type
     assert_equal 1, df.policy.permissions.length
 
