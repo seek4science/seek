@@ -3,38 +3,38 @@
 
 
 <%
-  current_item ||= nil
-  max_node_number ||= 10
-  force_max_node ||= true
-  cytoscape_elements = cytoscape_elements(root_item, deep, current_item)
+   current_item ||= nil
+   max_node_number ||= 10
+   force_max_node ||= true
+   cytoscape_elements = cytoscape_elements(root_item, deep, current_item)
 
-  #show only current node and connected nodes
-  #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
-  reduced_elements = reduced_elements(cytoscape_elements, max_node_number, force_max_node, root_item, current_item)
+   #show only current node and connected nodes
+   #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
+   reduced_elements = reduced_elements(cytoscape_elements, max_node_number, force_max_node, root_item, current_item)
 %>
 <div class="hidden-xs clearfix">
-    <div class="yui-u first isa_graph curved with_smaller_shadow">
-      
-  <% if cytoscape_elements.size > reduced_elements.size %>
-      <%= link_to_function ("Full graph "+image("expand")).html_safe,
-                           "drawGraph(elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
-                           :id => 'full_graph_expand_image',
-                           :class => 'graph_toggle'
-      -%>
-      <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
-                           "drawGraph(reduced_elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
-                           :id => 'reduced_graph_collapse_image',
-                           :style => "display:none",
-                           :class => 'graph_toggle'
-      -%>
-  <% end %>
-  <div id="cy" style="margin-top: 3em;"></div>
-</div>
+  <div class="yui-u first isa_graph curved with_smaller_shadow">
 
-<div class="yui-u node_info curved with_smaller_shadow" id="node_info">
-</div>
-<span id="ruler" style="visibility: hidden"></span>
+    <% if cytoscape_elements.size > reduced_elements.size %>
+        <%= link_to_function ("Full graph "+image("expand")).html_safe,
+                             "drawGraph(elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                             :id => 'full_graph_expand_image',
+                             :class => 'graph_toggle'
+        -%>
+        <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
+                             "drawGraph(reduced_elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                             :id => 'reduced_graph_collapse_image',
+                             :style => "display:none",
+                             :class => 'graph_toggle'
+        -%>
+    <% end %>
+    <div id="cy" style="margin-top: 3em;"></div>
+  </div>
 
+  <div class="yui-u node_info curved with_smaller_shadow" id="node_info">
+  </div>
+  <span id="ruler" style="visibility: hidden"></span>
+</div>
 <script type="text/javascript">
     var isa_graph = $j('.isa_graph')[0];
     var elements = <%= cytoscape_elements.to_json.html_safe %>;
@@ -47,7 +47,7 @@
     else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)){
         isa_graph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
         isa_graph.style['text-align'] = 'center';
-   }else{
+    }else{
         drawGraph(reduced_elements, current_element_id);
-   }
+    }
 </script>
