@@ -96,13 +96,13 @@ class OrganismsControllerTest < ActionController::TestCase
     y=organisms(:human)
     get :show,:id=>y
     assert_response :success
-    assert_select "a[href=?]",edit_organism_path(y),:count=>1
-    assert_select "a",:text=>/Edit Organism/,:count=>1
+    assert_select "#content a[href=?]",edit_organism_path(y),:count=>1
+    assert_select "#content a",:text=>/Edit Organism/,:count=>1
     
-    assert_select "a[href=?]",new_organism_path,:count=>1
-    assert_select "a",:text=>/Add Organism/,:count=>1
+    assert_select "#content a[href=?]",new_organism_path,:count=>1
+    assert_select "#content a",:text=>/Add Organism/,:count=>1
         
-    assert_select "a",:text=>/Delete Organism/,:count=>1
+    assert_select "#content a",:text=>/Delete Organism/,:count=>1
   end
   
   test "non admin does not see edit, create and delete buttons" do
@@ -110,13 +110,13 @@ class OrganismsControllerTest < ActionController::TestCase
     y=organisms(:human)
     get :show,:id=>y
     assert_response :success
-    assert_select "a[href=?]",edit_organism_path(y),:count=>0
-    assert_select "a",:text=>/Edit Organism/,:count=>0
+    assert_select "#content a[href=?]",edit_organism_path(y),:count=>0
+    assert_select "#content a",:text=>/Edit Organism/,:count=>0
     
-    assert_select "a[href=?]",new_organism_path,:count=>0
-    assert_select "a",:text=>/Add Organism/,:count=>0
+    assert_select "#content a[href=?]",new_organism_path,:count=>0
+    assert_select "#content a",:text=>/Add Organism/,:count=>0
     
-    assert_select "a",:text=>/Delete Organism/,:count=>0
+    assert_select "#content a",:text=>/Delete Organism/,:count=>0
   end
   
   test "delete as admin" do
