@@ -60,7 +60,7 @@ module Seek
       end
 
       tags.each do |tag|
-        exists = TextValue.where({:text=>tag})
+        exists = TextValue.where("lower(text) = ?", tag.downcase)
         # text_value exists for this attr
         if !exists.empty?
 
