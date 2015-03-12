@@ -1,4 +1,3 @@
-
 <% if admin_logged_in? -%>
     <% content_for(:buttons) do %>
         <%= button_link_to("Return to index", 'back', help_documents_path) -%>
@@ -8,5 +7,5 @@
 <%= render :partial=>"general/page_title", :locals=>{ :title => "New Help Page"} %>
 
 <%= render :partial => "form", :locals => {:action=>:create } -%>
-<br/>
-<span style="margin-left: 2em;" class="none_text">Attachments and images may be added after the page has been created.</span>
+
+<p class="none_text">Attachments and images may be added after the page has been created.</p>

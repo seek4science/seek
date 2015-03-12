@@ -23,36 +23,20 @@ Help-page link:
 [example]
 '
 
-help_code = help_text.gsub("\n","<br/>").html_safe
-help_result = escape_javascript(RedCloth.new(help_text.gsub("\n","\r\n").gsub(/\[([-a-zA-Z0-9]+)\]/) {|match| HelpDocument.friendly_redcloth_link($1)}, [ :hard_breaks ]).to_html).html_safe
-
+   help_code = help_text.gsub("\n","<br/>").html_safe
+   help_result = RedCloth.new(help_text.gsub("\n","\r\n").gsub(/\[([-a-zA-Z0-9]+)\]/) {|match| HelpDocument.friendly_redcloth_link($1)}, [ :hard_breaks ]).to_html.html_safe
 %>
-<script type="text/javascript">
-  var help_code = '<%= help_code -%>';
-  var help_result = '<%= help_result -%>';
-  var toggle = 0;
-  
-  function switch_content() {
-    var elem = $('help_legend_preview');
-    var toggle_elem = $('markup_toggle');
-    if (toggle == 0) {
-      elem.innerHTML = help_result;
-      toggle_elem.innerHTML = 'Show markup <%= escape_javascript(image('markup', :style=>'vertical-align: middle'))-%>';
-      toggle = 1;
-    }
-    else {
-      elem.innerHTML = help_code;
-      toggle_elem.innerHTML = 'Show output <%= escape_javascript(image('show', :style=>'vertical-align: middle'))-%>';
-      toggle = 0;
-    }
-  }
-</script>
 
-Below is a basic reference of some of the markup usable in the help page body.<br/>
-You can preview the output generated from the markup by clicking the link directly below.<br/>
-<a id="markup_toggle" href="#" onclick="switch_content(); return false">Show output <%= image 'show', :style=>'vertical-align: middle'%></a>
-<div id="help_legend_preview" class="help_document">
-  <%= help_code -%>
-  <br/>
+<div role="tabpanel">
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#markup" aria-controls="markup" role="tab" data-toggle="tab">Markup</a></li>
+    <li role="presentation"><a href="#result" aria-controls="result" role="tab" data-toggle="tab">Result</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane help_document active" id="markup"><%= help_code %></div>
+    <div role="tabpanel" class="tab-pane help_document" id="result"><%= help_result %></div>
+  </div>
 </div>
+
 For a full reference, visit: <a target="_blank" href="http://redcloth.org/textile/">http://redcloth.org/textile/</a>
