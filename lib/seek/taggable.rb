@@ -70,15 +70,15 @@ module Seek
       end
 
       tags.each do |tag|
-        exists = TextValue.where({:text=>tag})
+        exists = TextValue.where("lower(text) = ?", tag.downcase)
         # text_value exists for this attr
         if !exists.empty?
 
           # isn't already used as an annotation for this entity
           if owned_tags_only
-            matching = Annotation.for_annotatable(self.class.name, self.id).with_attribute_name(attr).by_source(owner.class.name,owner.id).select { |a| a.value.text==tag }
+            matching = Annotation.for_annotatable(self.class.name, self.id).with_attribute_name(attr).by_source(owner.class.name,owner.id).select { |a| a.value.text.downcase==tag.downcase }
           else
-            matching = Annotation.for_annotatable(self.class.name, self.id).with_attribute_name(attr).select { |a| a.value.text==tag }
+            matching = Annotation.for_annotatable(self.class.name, self.id).with_attribute_name(attr).select { |a| a.value.text.downcase==tag.downcase }
           end
 
           if matching.empty?
