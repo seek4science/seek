@@ -1,0 +1,1 @@
+Annotations::Config.attribute_names_to_allow_duplicates = []
