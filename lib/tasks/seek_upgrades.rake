@@ -16,6 +16,7 @@ namespace :seek do
       :repopulate_missing_publication_book_titles,
       :resynchronise_ontology_types,
       :convert_publication_authors,
+      :update_jws_online,
       :clear_filestore_tmp,
       :repopulate_auth_lookup_tables,
   ]
@@ -36,6 +37,10 @@ namespace :seek do
     end
 
     puts "Upgrade completed successfully"
+  end
+
+  task(:update_jws_online=>:environment) do
+    Seek::Config.jws_online_root="https://jws2.sysmo-db.org"
   end
 
   task(:update_content_types=>:environment) do
