@@ -15,7 +15,7 @@
                               :id,
                               :title,
                               {:include_blank => "Not specified"},
-                              {:onchange => "model_type_selection_changed();"} -%>
+                              {} -%>
       </span>
 
 
@@ -29,7 +29,7 @@
       <span id="model_format_selection">
         <%= collection_select :model, :model_format_id, ModelFormat.all, :id, :title,
                               {:include_blank => "Not specified"},
-                              {:onchange => "model_format_selection_changed();"}
+                              {}
         -%>
       </span>
 
@@ -49,27 +49,3 @@
     </p>
   </div>
 </div>
-<script type="text/javascript">
-<%
-ModelFormat.all.each do |format|
-  if (format.models.empty?)
-    -%>
-      model_formats_for_deletion.push(<%=  format.id -%>);
-  <%
-  end
-end
-
-%>
-
-<%
-ModelType.all.each do |type|
-  if (type.models.empty?)
-    -%>
-      model_types_for_deletion.push(<%=  type.id -%>);
-  <%
-  end
-end
-
-%>
-
-</script>
