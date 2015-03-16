@@ -126,12 +126,19 @@ ul.feed .file-type-icon img {
 
 #advanced-search {
   vertical-align: middle;
-  padding: 5px;
+  padding: 10px;
+  right: 0;
+  border-style: solid;
+  border-color: #ddd;
+  border-width: 1px;
+  background: #fff;
+  border-radius: 4px;
+  margin-top: 2px;
 }
 
-@media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
-  #search_box {
-    width: 18em;
+@media (min-width: $screen-md-min) {
+  #advanced-search {
+    position: absolute;
   }
 }
 
@@ -243,4 +250,43 @@ div.hidden_list_item {
 
 .favourite .framed {
   margin-bottom: 4px;
+}
+
+.date-select {
+  position: relative;
+}
+
+.date-select input {
+  padding-left: 32px;
+}
+
+.date-select img.calendar_date_select_popup_icon {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+}
+
+a.select_assay_class {
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  padding: 20px;
+  @include rounded-box-shadow(#F5F5F5);
+  margin: 10px;
+}
+
+a.select_assay_class:hover {
+  background-color: #FCFCFC;
+  text-decoration: none;
+}
+
+.box_editing_inner {
+  @include rounded-box-shadow(#DDEEFF);
+  padding: 0.5em;
+  margin-bottom: 1em;
+}
+
+
+#search_box {
+  position: relative;
 }

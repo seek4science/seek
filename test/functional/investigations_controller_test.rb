@@ -250,7 +250,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     inv = Factory :investigation,:title=>"the inv",:policy=>Factory(:public_policy)
     get :new_object_based_on_existing_one,:id=>inv.id
     assert_response :success
-    assert_select "textarea#investigation_title",:text=>"the inv"
+    assert_select "#investigation_title[value=?]", "the inv"
   end
 
   test "object based on existing one when unauthorised" do

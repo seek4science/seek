@@ -3,70 +3,57 @@
 <%= f.hidden_field :create_from_asset %>
 <%= f.hidden_field :new_link_from_assay -%>
 
-<div style="margin-right: 0.4em;">
-    <p style="margin-top: 1.5em;">
-      <%= f.label :title %><span class="required">*</span><br/>
-      <%= f.text_area :title,:class=>"title_text_entry" %>
-    </p>
-
-    <p style="margin-top: 0.5em;">
-      <%= f.label :description %><br/>
-      <%= f.text_area :description,:class=>"large_text_entry" %>
-    </p>
-
-    <p>
-      <%= f.label "Experimentalist(s)" %>
-      <%= f.text_area :experimentalists,:style=>"width: 100%;",:rows=>1 %>
-    </p>
+<div class="form-group">
+  <%= f.label :title %><span class="required">*</span>
+  <%= f.text_field :title,:class=>"form-control" %>
 </div>
 
-<br/>
+<div class="form-group">
+  <%= f.label :description %>
+  <%= f.text_area :description, :rows=>5, :class=>"form-control" %>
+</div>
 
+<div class="form-group">
+  <%= f.label "Experimentalist(s)" %>
+  <%= f.text_area :experimentalists, :rows => 1, :class=>"form-control" %>
+</div>
 
 <%= folding_panel("#{t('investigation')} details") do %>
-    <p>
-      <%= t('investigation') %><span class="required">*</span>
-      <%=link_to "New #{t('investigation')}?",new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
-      <div id="investigation_collection">
-        <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
-      </div>
-      <br/>
-    </p>
+    <label><%= t('investigation') %></label><span class="required">*</span>
+    <%=link_to "New #{t('investigation')}?",new_investigation_path(:new_link_from_study=>true), :onclick => "window.open(this.href);return false;"%><br/>
+    <div id="investigation_collection">
+      <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
+    </div>
 
-    <p>
-      <%= f.label "Contributor" %><br/>
-      <div id="person_responsible_collection">
-        <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
-        <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
-      </div>
-    </p>
+    <%= f.label "Contributor" %>
+    <div id="person_responsible_collection">
+      <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
+      <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
+    </div>
 <% end %>
 
 <% if show_scales? %>
-    <p>
-      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
-    </p>
+    <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
 <% end %>
 
-<p>
-  <%= render :seek_partial=>"assets/sharing_form" if @study.can_manage? -%>
-</p>
+<%= render :seek_partial=>"assets/sharing_form" if @study.can_manage? -%>
 
 <script type="text/javascript">
-  var CREATE_INVESTIGATION_LINK = "<%= create_investigation_url %>";
+    var CREATE_INVESTIGATION_LINK = "<%= create_investigation_url %>";
 </script>
 
-
-<p style="margin-top: 2em; text-align: center;">
-  <%
-     button_text=action==:edit ? "Update" : "Create"
-     disabled_text=action==:edit ? "Updating..." : "Creating..."
-  %>
-  <% if @study.can_manage? %>
-      <%= preview_permission_popup_link(@study)-%>
-      <%= f.submit button_text, :id => "study_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
-  <% else %>
-      <%= f.submit button_text, :disable_with=>disabled_text, :id => "study_submit_btn", :onclick => "javascript: $('study_submit_btn').form.submit();return(false);" -%>
-  <% end %>
-  or <%= link_to 'Cancel', (@study.id ? study_path(@study.id) : studies_path) -%>
-</p>
+<%
+   button_text=action==:edit ? "Update" : "Create"
+   disabled_text=action==:edit ? "Updating..." : "Creating..."
+%>
+<% if @study.can_manage? %>
+    <%= preview_permission_popup_link(@study)-%>
+    <%= f.submit button_text, :id => "study_submit_btn",
+                 :onclick => "javascript: previewPermissions();return(false);",
+                 :class => 'btn btn-primary'-%>
+<% else %>
+    <%= f.submit button_text, :disable_with=>disabled_text, :id => "study_submit_btn",
+                 :onclick => "javascript: $('study_submit_btn').form.submit();return(false);",
+                 :class => 'btn btn-primary'-%>
+<% end %>
+ or <%= link_to 'Cancel', (@study.id ? study_path(@study.id) : studies_path), :class => 'btn btn-default' -%>

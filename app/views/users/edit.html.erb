@@ -1,57 +1,45 @@
 <%= button_link_to('Return to profile', 'arrow_left', person_path(@user.person)) -%>
 
 <h1>Manage Account</h1>
-<div class="show_basic">
-    <% unless @user.login.nil? && @user.openid %>
-    <h2>Login Details</h2>
-    <p>
-        <label>
-            Login:
-        </label>
-        <br/>
-        <b><%= @user.login %></b>
-    </p>
-    <h2>Change password</h2>
-    <%= form_for @user do |f| -%>
-    <%= f.error_messages %>
-    <p>
-        <label>
-            New password:
-        </label>
-        <br/>
-        <%= f.password_field :password %>
-    </p>
-    <p>
-        <label>
-            Confirm new password:
-        </label>
-        <br/>
-        <%= f.password_field :password_confirmation %>
-    </p>
-    <p>
-        <%= submit_tag 'Update',:disable_with=>"Updating..." %>
-    </p>
-    <% end -%>
-    <% end -%>
-    <h2>OpenID</h2>
-    <% if error_messages_for :user -%>
-    <p>
-        <%= error_messages_for :user %>
-    </p>
-    <% end -%>
+
+<% unless @user.login.nil? && @user.openid %>
+    <%= panel('Login Details') do %>
+        <div class="form-group">
+          <label>Login</label>
+          <p class="form-control-static"><%= @user.login %></p>
+        </div>
+
+        <h3>Change password</h3>
+        <%= form_for @user do |f| -%>
+            <%= f.error_messages %>
+
+            <div class="form-group">
+              <label>New password</label>
+              <%= f.password_field :password, :class => 'form-control' %>
+            </div>
+
+            <div class="form-group">
+              <label>Confirm new password</label>
+              <%= f.password_field :password_confirmation, :class => 'form-control' %>
+            </div>
+
+            <%= submit_tag 'Update',:disable_with=>"Updating...", :class => 'btn btn-primary' %>
+        <% end -%>
+    <% end %>
+<% end -%>
+
+<%= panel('OpenID') do %>
     <%= form_tag set_openid_user_path(@user), :method => :put do -%>
-    <p>
-        <label>
-            <%= image_tag "openid-16x16.gif" %>OpenID: 
-        </label>
-        <br/>
-        <%= text_field_tag :openid_identifier, @user.openid, :size => 40 %>
-    </p>
-    <p>
-        <%= submit_tag 'Update',:disable_with=>"Updating..." %>
-    </p>
+        <%= error_messages_for :user %>
+
+        <div class="form-group">
+          <label><%= image_tag "openid-16x16.gif" %>OpenID</label>
+          <%= text_field_tag :openid_identifier, @user.openid, :class => 'form-control' %>
+          <p class="help-block">
+            To find out more about OpenID, <a href="http://openid.net" target="_blank">click here</a>.
+          </p>
+        </div>
+
+        <%= submit_tag 'Update',:disable_with=>"Updating...", :class => 'btn btn-primary' %>
     <% end -%>
-    <p>
-        To find out more about OpenID, <a href="http://openid.net" target="_blank">click here</a>.
-    </p>
-</div>
+<% end %>

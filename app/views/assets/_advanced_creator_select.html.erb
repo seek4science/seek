@@ -9,7 +9,7 @@
                                                 :method => :get,
                                                 :with => "'id='+$j(this).val()",
                                                 :loading => "$j('#adv_creator_select_project_spinner').hide()",
-                                                :complete => "projectName = $j('#adv_creator_select_projects options:selected').text();updateInstitutionList(request.responseText,projectName)")) -%>
+                                                :complete => "updateInstitutionList(request.responseText, $j('#adv_creator_select_projects option:selected').text())")) -%>
     <%= image 'spinner', :id => "adv_creator_select_project_spinner", :style => "display: none;" %>
     <%= select_tag("adv_institution_id", "<option value=\"0\">N/A</option>".html_safe, :id => "adv_creator_select_institutions",:style=>"display:none;") %>
     <br/>

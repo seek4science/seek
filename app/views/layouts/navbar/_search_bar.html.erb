@@ -3,23 +3,32 @@
 <% if Seek::Config.solr_enabled -%>
     <%= form_tag main_app.search_path, :class => 'navbar-form navbar-left' do -%>
         <div id="search_box">
+
           <div class="input-group">
             <%= text_field_tag :search_query, @search_query, :class=>"form-control", :placeholder=>"Search here..." %>
             <div class="input-group-btn">
-                <%= submit_tag "Search", :class => 'btn btn-default' -%>
-                <button title="<%= tooltip_title_attrib('Click for more search options') -%>" type="button" class="btn btn-default" data-toggle="button" aria-pressed="false" onclick="$j('#advanced-search').fadeToggle()">
-                  <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-                  <span class="caret"></span>
-                </button>
+              <%= submit_tag "Search", :class => 'btn btn-default' -%>
+              <button title="<%= tooltip_title_attrib('Click for more search options') -%>" type="button" class="btn btn-default" data-toggle="button" aria-pressed="false" onclick="$j('#advanced-search').slideToggle()">
+                &nbsp;<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;
+              </button>
             </div>
           </div>
+
           <div id="advanced-search" style="display: none">
-            <%= select_tag :search_type, options_for_select(search_type_options,@search_type) %>
+            <div class="form-group">
+              <%= select_tag :search_type, options_for_select(search_type_options,@search_type),
+                             :class => 'form-control' %>
+            </div>
             <% if show_scales? && Seek::Config.is_virtualliver %>
-                <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])) %>
+                <div class="form-group">
+                  <%= select_tag :scale,
+                                 (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) +
+                                         options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])),
+                                 :class => 'form-control' %>
+                </div>
             <% end %>
             <% if Seek::Config.external_search_enabled %>
-                <div class="checkbox" style="display: inline-block">
+                <div class="checkbox">
                   <label title="<%= tooltip_title_attrib(external_search_tooltip_text) -%>">
                     <%= check_box_tag :include_external_search, 1, @include_external_search, :class => "checkbox" -%> External
                   </label>

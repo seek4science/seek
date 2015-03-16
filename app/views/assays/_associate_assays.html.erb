@@ -1,189 +1,194 @@
 <%
-    return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
-    return unless Seek::Config.assays_enabled
+   return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
+   return unless Seek::Config.assays_enabled
 
-    show_relationships = resource.is_a?(DataFile)
-    resource_text ||= text_for_resource(resource)
-    authorized_action = "edit"
-    authorized_action = "view" if Seek::Config.is_virtualliver
+   show_relationships = resource.is_a?(DataFile)
+   resource_text ||= text_for_resource(resource)
+   authorized_action = "edit"
+   authorized_action = "view" if Seek::Config.is_virtualliver
 
-    all_assays = authorised_assays(nil,authorized_action)
+   all_assays = authorised_assays(nil,authorized_action)
 
-    project_assays=authorised_assays(current_user.person.projects,authorized_action)
-    if resource.is_a?(Model)
-      all_assays = all_assays.select do |assay|
-        assay.is_modelling?
-      end
-      project_assays=project_assays.select do |assay|
-        assay.is_modelling?
-      end
-    end
+   project_assays=authorised_assays(current_user.person.projects,authorized_action)
+   if resource.is_a?(Model)
+     all_assays = all_assays.select do |assay|
+       assay.is_modelling?
+     end
+     project_assays=project_assays.select do |assay|
+       assay.is_modelling?
+     end
+   end
 
 
 
-    select_truncate_length=120
-    associated_assays = resource.assays
+   select_truncate_length=120
+   associated_assays = resource.assays
 
-    if resource.is_a? Model
-      single_assay_class_text = t 'assays.modelling_analysis'
-      assay_class_text = single_assay_class_text.pluralize
-    else
-      if Seek::Config.modelling_analysis_enabled
-        assay_class_text = "#{t('assays.experimental_assay').pluralize} and #{t('assays.modelling_analysis').pluralize}"
-        single_assay_class_text = "#{t('assays.experimental_assay')} or #{t('assays.modelling_analysis')}"
-      else
-        assay_class_text = "#{t('assays.experimental_assay').pluralize}"
-        single_assay_class_text = "#{t('assays.experimental_assay')}"
-      end
-    end
+   if resource.is_a? Model
+     single_assay_class_text = t 'assays.modelling_analysis'
+     assay_class_text = single_assay_class_text.pluralize
+   else
+     if Seek::Config.modelling_analysis_enabled
+       assay_class_text = "#{t('assays.experimental_assay').pluralize} and #{t('assays.modelling_analysis').pluralize}"
+       single_assay_class_text = "#{t('assays.experimental_assay')} or #{t('assays.modelling_analysis')}"
+     else
+       assay_class_text = "#{t('assays.experimental_assay').pluralize}"
+       single_assay_class_text = "#{t('assays.experimental_assay')}"
+     end
+   end
 
-    if Seek::Config.is_virtualliver
-      add_new_assay_title = " or create #{link_to(h("new #{single_assay_class_text}"), new_assay_path(:create_from_asset => :true), :onclick => "window.open(this.href);return false;")}".html_safe
-    else
-      add_new_assay_title = ""
-    end
+   if Seek::Config.is_virtualliver
+     add_new_assay_title = " or create #{link_to(h("new #{single_assay_class_text}"), new_assay_path(:create_from_asset => :true), :onclick => "window.open(this.href);return false;")}".html_safe
+   else
+     add_new_assay_title = ""
+   end
 %>
 
 <%= folding_panel(assay_class_text, associated_assays.blank?, :body_options => {:id => 'associate_assay_fold_content'},
                   :help_text => "Here you can associate #{assay_class_text} in SEEK to this #{resource_text}. You can only associate #{assay_class_text} you are authorized to edit.") do %>
-    <div class="yui-u first" style="width:66%; float:left">
+    <div class="row">
+      <div class="col-md-8">
 
-      <p style="color: #666666;">
-        The following <%= assay_class_text -%> are associated with this <%= resource_text -%>:
-      </p>
-      <div id="assay_to_list" class="box_editing_inner" style="line-height: 1.5">
-        <span class="none_text" id="assay_files">Loading ...</span>
-      </div>
-      <div class="association_step">
         <p style="color: #666666;">
-          You may select an existing editable <%= single_assay_class_text -%><%= add_new_assay_title -%> to associate with this <%= resource_text -%>.
+          The following <%= assay_class_text -%> are associated with this <%= resource_text -%>:
         </p>
+        <div id="assay_to_list" class="box_editing_inner" style="line-height: 1.5">
+          <span class="none_text" id="assay_files">Loading ...</span>
+        </div>
+        <div class="association_step">
+          <p style="color: #666666;">
+            You may select an existing editable <%= single_assay_class_text -%><%= add_new_assay_title -%> to associate with this <%= resource_text -%>.
+          </p>
 
-        <% if show_relationships -%>
-            <%= select_tag :possible_assays,
-              options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-              {:style=>"width:90%",:onchange=>"addSelectedAssay();"+remote_function(
-                :method=>:get,
-                :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
-                :with=>"'id='+this.value",
-                :before=>"show_ajax_loader('assay_preview')"
-              )+";check_show_add_assay();selected_assay();return(false);"
-            } -%>
-              <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-              <br/>
-              <div id="relationship" style="display:none;">
-                <%= label_tag "How is the data used in this #{t('assays.modelling_analysis')}" %><br/>
-                <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
+          <% if show_relationships -%>
+              <div class="form-group">
+                <%= select_tag :possible_assays,
+                               options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+                               {:class => 'form-control',:onchange=>"addSelectedAssay();"+remote_function(
+                                       :method=>:get,
+                                       :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
+                                       :with=>"'id='+this.value",
+                                       :before=>"show_ajax_loader('assay_preview')"
+                               )+";check_show_add_assay();selected_assay();return(false);"
+                               } -%>
               </div>
-              <br/>
-        <% else %>
-            <%= select_tag :possible_assays,
-                  options_for_select([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-                  {:style=>"width:90%",:onchange=>"addSelectedAssay();"+remote_function(
-                    :method=>:get,
-                    :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
-                    :with=>"'id='+this.value",
-                    :before=>"show_ajax_loader('assay_preview')"
-                  )+";check_show_add_assay();return(false);"
-            } -%>
-            <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-            <br/>
-            <br/>
-        <% end %>
+              <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+
+              <div id="relationship" style="display:none;" class="form-group">
+                <%= label_tag "How is the data used in this #{t('assays.modelling_analysis')}" %>
+                <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),
+                               :class => 'form-control' %>
+              </div>
+
+          <% else %>
+              <div class="form-group">
+                <%= select_tag :possible_assays,
+                               options_for_select([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+                               {:class => 'form-control',:onchange=>"addSelectedAssay();"+remote_function(
+                                       :method=>:get,
+                                       :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
+                                       :with=>"'id='+this.value",
+                                       :before=>"show_ajax_loader('assay_preview')"
+                               )+";check_show_add_assay();return(false);"
+                               } -%>
+              </div>
+
+              <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+          <% end %>
+        </div>
+
+        <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
       </div>
-
-	  <br/>
-
-      <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Associate <%= assay_class_text -%> from other projects?
+      <div class="col-md-4">
+        <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>
+      </div>
     </div>
-  
-    <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'assay'}%>
-  
+
 <% end %>
-  
+
 
 <script type="text/javascript">
     function selected_assay(){
-       i = $('possible_assays').selectedIndex;
-       id = $('possible_assays').options[i].value;
-       for (var j = 0; j < id_rel_array.length; j++) {
-           if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'true'))  {
-              Effect.Appear('relationship',{duration:0.2});
-           }
-           else if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'false'))  {
-              $('assay_relationship_type').selectedIndex = 0;
-              Effect.Fade('relationship',{duration:0.2});
-           }
-       }
+        i = $('possible_assays').selectedIndex;
+        id = $('possible_assays').options[i].value;
+        for (var j = 0; j < id_rel_array.length; j++) {
+            if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'true'))  {
+                Effect.Appear('relationship',{duration:0.2});
+            }
+            else if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'false'))  {
+                $('assay_relationship_type').selectedIndex = 0;
+                Effect.Fade('relationship',{duration:0.2});
+            }
+        }
     }
 
-  function toggle_assay_list() {
-          var checked = $('include_other_project_assays').checked;
-          var selection_box = $('possible_assays');
-          var option;
+    function toggle_assay_list() {
+        var checked = $('include_other_project_assays').checked;
+        var selection_box = $('possible_assays');
+        var option;
 
-          selection_box.options.length = 0;
+        selection_box.options.length = 0;
 
-          if (checked) {
-          <% ([["Select #{t('assays.assay')} ...",0]]|all_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
-              option = document.createElement("OPTION");
-              option.text = '<%= escape_javascript(df_details[0]) -%>';
-              option.value = '<%= df_details[1] -%>';
-              try {
-                  selection_box.add(option); //for older IE version
-              }
-              catch (ex) {
-                  selection_box.add(option, null);
-              }
-          <% end -%>
-          }
-          else {
-          <% ([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
-              option = document.createElement("OPTION");
-              option.text = '<%= escape_javascript(df_details[0]) -%>';
-              option.value = '<%= df_details[1] -%>';
-              try {
-                  selection_box.add(option); //for older IE version
-              }
-              catch (ex) {
-                  selection_box.add(option, null);
-              }
-          <% end -%>
-          }
-          //selection_box.onchange();
-      }
+        if (checked) {
+            <% ([["Select #{t('assays.assay')} ...",0]]|all_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(df_details[0]) -%>';
+            option.value = '<%= df_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+            <% end -%>
+        }
+        else {
+            <% ([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(df_details[0]) -%>';
+            option.value = '<%= df_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+            <% end -%>
+        }
+        //selection_box.onchange();
+    }
 
-<% associated_assay_ids = resource.assays.collect(&:id) %>
-  <% associated_assay_ids.each do |associated_assay_id|%>
+    <% associated_assay_ids = resource.assays.collect(&:id) %>
+    <% associated_assay_ids.each do |associated_assay_id|%>
     <% assay = Assay.find(associated_assay_id) %>
     <% if assay.try :can_view? -%>
-      assay_id = '<%= assay.id -%>';
-      assay_title = '<%= assay.title -%>';
-      relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None'-%>';
-      addAssay(assay_title,assay_id,relationship_type);
+    assay_id = '<%= assay.id -%>';
+    assay_title = '<%= assay.title -%>';
+    relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None'-%>';
+    addAssay(assay_title,assay_id,relationship_type);
     <% end %>
-<% end -%>
+    <% end -%>
 
-<% all_assays.each do |assay|%>
+    <% all_assays.each do |assay|%>
     assay_id = '<%= assay.id -%>';
     assay_relationship = '<%=(assay.is_modelling?) -%>';
     id_rel_array.push([assay_id, assay_relationship])
-<% end -%>
+    <% end -%>
 
-<% if params[:assay_ids] %>
-  <% params[:assay_ids].each do |id| -%>
+    <% if params[:assay_ids] %>
+    <% params[:assay_ids].each do |id| -%>
     <% assay = Assay.find(id) %>
     <% if assay.can_view?-%>
-        assay_id = '<%= assay.id -%>';
-        assay_title = '<%= escape_javascript(assay.title) -%>';
-        relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None' -%>';
-        addAssay(assay_title,assay_id,relationship_type);
+    assay_id = '<%= assay.id -%>';
+    assay_title = '<%= escape_javascript(assay.title) -%>';
+    relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None' -%>';
+    addAssay(assay_title,assay_id,relationship_type);
     <% end -%>
-  <% end -%>
-<% end -%>
+    <% end -%>
+    <% end -%>
 
 
 
-  updateAssays();
-  toggle_assay_list()
+    updateAssays();
+    toggle_assay_list()
 </script>

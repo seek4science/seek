@@ -1,5 +1,3 @@
-
-
 <style>
   #preview_permissions p.private {
       color: red;
@@ -33,25 +31,29 @@
    permissions, privileged_people = uniq_people_permissions_and_privileged_people(policy.permissions, privileged_people)
 %>
 
-<div class="redbox_contents" id="preview_permissions" style="width:600px;">
-  <div class="head">
-    <span style="float:center;">Preview of your sharing settings</span>
-  </div>
+<div class="modal fade" id="preview_permissions" tabindex="-1" role="dialog" aria-labelledby="preview_permissions_title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="preview_permissions_title">Preview of your sharing settings</h4>
+      </div>
+      <div class="modal-body">
+        <% if policy.sharing_scope == Policy::PRIVATE %>
+            <%= policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name) %>
+        <% elsif policy.sharing_scope == Policy::ALL_USERS %>
+            <%= policy_and_permissions_for_network_scope(policy, permissions, privileged_people, resource_name) %>
+        <% elsif policy.sharing_scope == Policy::EVERYONE  %>
+            <%= policy_and_permissions_for_public_scope(policy, permissions, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval) %>
+        <% end %>
 
-  <div class="body">
-      <% if policy.sharing_scope == Policy::PRIVATE %>
-        <%= policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name) %>
-      <% elsif policy.sharing_scope == Policy::ALL_USERS %>
-        <%= policy_and_permissions_for_network_scope(policy, permissions, privileged_people, resource_name) %>
-      <% elsif policy.sharing_scope == Policy::EVERYONE  %>
-        <%= policy_and_permissions_for_public_scope(policy, permissions, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval) %>
-      <% end %>
+        <%= process_privileged_people(privileged_people, resource_name) %>
 
-      <%= process_privileged_people(privileged_people, resource_name) %>
-
-    <div align="center" style="margin-top: 1em">
-      <input type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
-      <input type=button value='Cancel' onclick="RedBox.close()">
+      </div>
+      <div class="modal-footer">
+        <input class="btn btn-primary" type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
+        <input class="btn btn-default" type=button value='Cancel' data-dismiss="modal">
+      </div>
     </div>
   </div>
 </div>

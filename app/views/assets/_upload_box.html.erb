@@ -4,7 +4,7 @@
 %>
  <% resource ||=nil %>
 
-<%= folding_panel('Upload', false) do %>
+<%= panel('Upload') do %>
     <% if !resource.nil? && resource.respond_to?(:content_blobs) %>
         <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version,:batch=>true, :with_image_file=>resource.is_a?(Model)} -%>
     <% else %>

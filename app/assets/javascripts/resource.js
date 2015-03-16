@@ -49,7 +49,7 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
             $('attributions_autocomplete_input').focus();
             return(false);
         }
-        clickLink($('preview_permission'));
+        previewPermissions();
     }
     else{
         // filename and title set - can submit

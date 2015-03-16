@@ -203,7 +203,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   test "non-project manager  doesnt has a 'New Institution' link in the institution index" do
     get :index
-    assert_select "a[href=?]", new_institution_path(), :count => 0
+    assert_select "#content a[href=?]", new_institution_path(), :count => 0
   end
 
 end

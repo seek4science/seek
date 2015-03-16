@@ -1,69 +1,56 @@
 <%= folding_panel("#{t('model')} type details") do %>
-    <p>
+    <div class="form-group">
       <span id="model_type_info" style="display:none;"></span>
-      <b><%= t('model') %> type:</b><br/>
+      <label><%= t('model') %> type</label>
 
       <span id="model_type_selection">
-        <%= collection_select :model,
-                              :model_type_id,
-                              ModelType.all,
-                              :id,
-                              :title,
+        <%= collection_select :model, :model_type_id, ModelType.all, :id, :title,
                               {:include_blank => "Not specified"},
-                              {:onchange => "model_type_selection_changed();"} -%>
+                              {:onchange => "model_type_selection_changed();", :class => 'form-control'} -%>
       </span>
+    </div>
 
-
-    </p>
-
-
-    <p>
+    <div class="form-group">
       <span id="model_format_info" style="display:none;"></span>
-      <b><%= t('model') %> format:</b><br/>
+      <label><%= t('model') %> format</label>
 
       <span id="model_format_selection">
         <%= collection_select :model, :model_format_id, ModelFormat.all, :id, :title,
                               {:include_blank => "Not specified"},
-                              {:onchange => "model_format_selection_changed();"}
+                              {:onchange => "model_format_selection_changed();", :class => 'form-control'}
         -%>
       </span>
+    </div>
 
-    </p>
-
-    <%
-       environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.all.collect { |e| [h(e.title), e.id] }
-    %>
-    <p>
-      <b>Preferred execution or visualisation environment:</b><br/>
+    <% environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.all.collect { |e| [h(e.title), e.id] } %>
+    <div class="form-group">
+      <label>Preferred execution or visualisation environment</label>
       <%= select_tag 'model[recommended_environment_id]',
                      options_for_select(environment_options, @model.recommended_environment_id),
-                     {
-                             :name => "model[recommended_environment_id]"
-                     }
-      %>
-    </p>
+                     :name => "model[recommended_environment_id]", :class => 'form-control'%>
+    </div>
 <% end %>
+
 <script type="text/javascript">
-<%
-ModelFormat.all.each do |format|
-  if (format.models.empty?)
-    -%>
-      model_formats_for_deletion.push(<%=  format.id -%>);
-  <%
+    <%
+    ModelFormat.all.each do |format|
+      if (format.models.empty?)
+        -%>
+    model_formats_for_deletion.push(<%=  format.id -%>);
+    <%
+    end
   end
-end
 
-%>
+  %>
 
-<%
-ModelType.all.each do |type|
-  if (type.models.empty?)
-    -%>
-      model_types_for_deletion.push(<%=  type.id -%>);
-  <%
+    <%
+    ModelType.all.each do |type|
+      if (type.models.empty?)
+        -%>
+    model_types_for_deletion.push(<%=  type.id -%>);
+    <%
+    end
   end
-end
 
-%>
-
+  %>
 </script>

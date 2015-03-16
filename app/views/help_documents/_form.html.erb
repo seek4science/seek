@@ -1,44 +1,44 @@
-<div class="show_basic">
-  <% if @preview %>
-    <b>Preview for: <%= @help_document.title -%></b>
-    <%= render :partial => 'help_document', :object => @help_document %>
-  <% end %>
-  <%= form_for @help_document, :url => {:action => action } do |f| %>
-  
-    <%= f.error_messages %><br/>
-    
-    <p>      
-      <%= f.label :identifier %><br/>
-      The identifier is a unique reference to this page, which will be present in links and URLs, e.g. http://example.com/help/example-identifier<br/>
-      It cannot be editted once the page has been created.<br/>
-      Identifiers must start with a letter or a number, and may only contain lowercase alphanumeric characters and hyphens.
-      <%= f.text_field :identifier, :disabled => (action == :update ? 'disabled' : nil) %><br/>
-    </p>
-      
-    <p> 
-      <%= f.label :title %><br/>
-      <%= f.text_field :title %><br/>
-    </p>  
-    
-    <%= f.label :body %><br/>
+<% if @preview %>
+    <%= folding_panel("Preview for: #{@help_document.title.blank? ? 'New document' : @help_document.title}") do %>
+        <%= render :partial => 'help_document', :object => @help_document %>
+    <% end %>
+<% end %>
+<%= form_for @help_document, :url => {:action => action } do |f| %>
+
+    <%= f.error_messages %>
+
+    <div class="form-group">
+      <%= f.label :identifier %>
+      <p>
+        The identifier is a unique reference to this page, which will be present in links and URLs, e.g. http://example.com/help/example-identifier<br/>
+        It cannot be editted once the page has been created.
+      </p>
+      <%= f.text_field :identifier, :disabled => (action == :update ? 'disabled' : nil), :class => 'form-control' %>
+      <p class="help-block">
+        Identifiers must start with a letter or a number, and may only contain lowercase alphanumeric characters and hyphens.
+      </p>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :title %>
+      <%= f.text_field :title, :class => 'form-control' %>
+    </div>
+
+    <%= f.label :body %>
+    <%= folding_panel('List of pages', true) do %>
+        <%= render :partial => 'page_list', :locals => {:div_options => {:style => "width: 50%"}} %>
+    <% end %>
     <div class="row">
-      <div class="col-md-6">
-        <%= folding_panel('Legend', true) do %>
+      <div class="col-md-9">
+        <%= f.text_area :body, :rows => "36", :class => 'form-control' %>
+
+        <%= submit_tag "Preview", :class => 'btn btn-default' %>
+        <%= submit_tag action.to_s.titleize, :class => 'btn btn-primary' %>
+      </div>
+      <div class="col-md-3">
+        <%= panel('Legend') do %>
             <%= render :partial => 'legend', :locals => {:div_options => {:style => "width: 50%"}} %>
         <% end %>
       </div>
-      <div class="col-md-6">
-        <%= folding_panel('List of pages', true) do %>
-            <%= render :partial => 'page_list', :locals => {:div_options => {:style => "width: 50%"}} %>
-        <% end %>
-      </div>
     </div>
-    <%= f.text_area :body, :size => "80x20", :style => 'width: 100%' %><br/>
-    
-    <%= submit_tag "Preview" %>
-    <%= submit_tag action.to_s.titleize %>
-    
-  <% end %>
-</div>
-
-
+<% end %>

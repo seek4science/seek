@@ -1,7 +1,7 @@
 #encoding: utf-8
 module SuggestedTypesHelper
   def create_suggested_type_popup_link term_type
-    link_name = image('new') + " " + "new #{term_type.humanize.downcase} type"
+    link_name = image('new') + " " + "New #{term_type.humanize.downcase} type"
     url = eval "new_suggested_#{term_type}_type_path"
 
     return link_to_remote_redbox(link_name,

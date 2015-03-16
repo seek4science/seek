@@ -19,7 +19,6 @@
     <li><%= link_to t("study").pluralize, studies_path %></li>
     <li><%= link_to t("assays.assay").pluralize, assays_path %></li>
 
-
     <li role="presentation" class="dropdown-header"><%= t("menu.assets") -%></li>
     <li><%= link_to t("data_file").pluralize, data_files_path %></li>
     <% if Seek::Config.models_enabled %>

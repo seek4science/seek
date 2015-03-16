@@ -3,28 +3,28 @@
 <%= f.error_messages %>
 
 <%= panel("#{t('programme')} Details") do %>
-    <p>
-      <%= f.label :title -%><br />
-      <%= f.text_area :title, :class=>"title_text_entry" -%>
-    </p>
-    <p>
-      <%= f.label "Web page"-%><br />
-      <%= f.text_field :web_page, :class=>"text_entry" -%>
-    </p>
+    <div class="form-group">
+      <%= f.label :title -%>
+      <%= f.text_field :title, :class=>"form-control" -%>
+    </div>
 
-    <p>
-      <%= f.label :description -%><br/>
-      <%= f.text_area :description, :class=>"large_text_entry"  %>
-    </p>
-    <p>
-      <%= f.label :funding_details -%></br>
-      <%= f.text_area :funding_details, :class=>"large_text_entry" -%>
-    </p>
+    <div class="form-group">
+      <%= f.label "Web page"-%>
+      <%= f.text_field :web_page, :class=>"form-control" -%>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :description -%>
+      <%= f.text_area :description, :rows => 5, :class=>"form-control"  %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :funding_details -%>
+      <%= f.text_area :funding_details, :rows => 5, :class=>"form-control" -%>
+    </div>
 <% end %>
 
 <%= render :partial => "projects/project_selector", :locals => { :resource => @programme, :allow_nil => true, :possibilities=>(Project.without_programme | @programme.projects) } -%>
 
-<p>
-  <%= f.submit(programme ? "Update" : "Create",:disable_with=>(programme ? "Updating..." : "Creating...")) -%>
-  or <%= link_to 'Cancel', (programme ? programme_path(programme.id) : programmes_path) -%>
-</p>
+<%= f.submit(programme ? "Update" : "Create",:disable_with=>(programme ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
+ or <%= link_to 'Cancel', (programme ? programme_path(programme.id) : programmes_path), :class => 'btn btn-default' -%>

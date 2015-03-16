@@ -417,7 +417,7 @@ class StudiesControllerTest < ActionController::TestCase
                     :investigation => Factory(:investigation, :policy => Factory(:public_policy))
     get :new_object_based_on_existing_one,:id=>study.id
     assert_response :success
-    assert_select "textarea#study_title",:text=>"the study"
+    assert_select "#study_title[value=?]", "the study"
     assert_select "select#study_investigation_id option[selected][value=?]",study.investigation.id,:count=>1
   end
 
@@ -451,7 +451,7 @@ class StudiesControllerTest < ActionController::TestCase
     refute study.investigation.can_edit?
     get :new_object_based_on_existing_one,:id=>study.id
     assert_response :success
-    assert_select "textarea#study_title",:text=>"the private study"
+    assert_select "#study_title[value=?]", "the private study"
     assert_select "select#study_investigation_id option[selected][value=?]",study.investigation.id,:count=>0
     refute_nil flash.now[:notice]
   end

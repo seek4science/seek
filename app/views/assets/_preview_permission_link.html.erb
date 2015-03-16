@@ -1,0 +1,37 @@
+<script type="text/javascript">
+    function previewPermissions() {
+        $j('#permissions_spinner').show();
+        $j.ajax({
+            type: "POST",
+            url: '<%= url -%>',
+            data: {
+                sharing_scope: selectedSharingScope(),
+                access_type: selectedAccessType(selectedSharingScope()),
+                project_ids: getProjectIds('<%= resource_name -%>'), // Controller expects this to be a string containing IDs separated by a comma
+                project_access_type: $j('#sharing_your_proj_access_type').val(),
+                contributor_types: $j('#sharing_permissions_contributor_types').val(),
+                contributor_values: $j('#sharing_permissions_values').val(),
+                creators: getCreators(),
+                contributor_id: '<%= contributor_id -%>',
+                resource_name: '<%= resource_name -%>',
+                resource_id: '<%= resource_id -%>',
+                is_new_file: '<%= is_new_file -%>',
+                authenticity_token: $j('meta[name=csrf-token]').attr('content') // is this necessary?
+            },
+            success: function (result) {
+                $j('#permissions-preview-wrapper').html(result);
+                $j('#preview_permissions').modal('show');
+            },
+            error: function () {
+                alert('Sorry, an error has occurred.');
+            },
+            complete: function () {
+                $j('#permissions_spinner').hide();
+            }
+        });
+        return false;
+    }
+</script>
+
+<%= image_tag("ajax-loader.gif", :id => 'permissions_spinner', :style => 'display: none') -%>
+<div id="permissions-preview-wrapper"></div>

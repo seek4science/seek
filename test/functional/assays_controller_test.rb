@@ -1267,7 +1267,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.study.can_edit?
     get :new_object_based_on_existing_one,:id=>assay.id
     assert_response :success
-    assert_select "textarea#assay_title",:text=>"the assay"
+    assert_select "#assay_title[value=?]", "the assay"
     assert_select "select#assay_study_id option[selected][value=?]",assay.study.id,:count=>1
   end
 
