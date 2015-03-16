@@ -54,8 +54,7 @@ module Seek
       # stores the actual physical files defined by the contentblobs for the asset, and adds the appropriate
       # aggregation to the RO manifest
       def store_files(bundle, asset)
-        blobs = asset_blobs(asset)
-        blobs.each do |blob|
+        asset.all_content_blobs.each do |blob|
           store_blob_file(bundle, asset, blob) if blob.file_exists?
         end
 

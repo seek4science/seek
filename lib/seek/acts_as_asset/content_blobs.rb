@@ -20,23 +20,13 @@ module Seek
 
         # the search terms coming from the content-blob(s)
         def content_blob_search_terms
-          if self.respond_to?(:content_blob) || self.respond_to?(:content_blobs)
-            blobs = self.respond_to?(:content_blobs) ? content_blobs : [content_blob]
-            blobs.compact.map do |blob|
-              [blob.original_filename] | [blob.pdf_contents_for_search]
-            end.flatten.compact.uniq
-          else
-            # for assets with no content-blobs, e.g. Publication
-            []
-          end
+          all_content_blobs.map do |blob|
+            [blob.original_filename] | [blob.pdf_contents_for_search]
+          end.flatten.compact.uniq
         end
 
         def cache_remote_content_blob
-          blobs = []
-          blobs << content_blob if self.respond_to?(:content_blob)
-          blobs = blobs | content_blobs if self.respond_to?(:content_blobs)
-          blobs.compact!
-          blobs.each do |blob|
+          all_content_blobs.each do |blob|
             if blob.url && projects.first
               begin
                 p = projects.first
