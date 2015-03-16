@@ -37,7 +37,7 @@ module Seek
       end
 
       def contained_blobs(asset)
-        asset_blobs(asset).collect do |blob|
+        asset.all_content_blobs.collect do |blob|
           if blob.file_exists?
             File.join(asset.research_object_package_path, blob.original_filename)
           elsif blob.url

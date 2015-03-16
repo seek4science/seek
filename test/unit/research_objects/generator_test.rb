@@ -45,7 +45,7 @@ class GeneratorTest < ActiveSupport::TestCase
       end
     end
     assets = inv.assets
-    assert_equal 6,assets.count
+    assert_equal 7,assets.count
     assets.each do |asset|
       assert_include paths,"#{asset.class.name.underscore.pluralize}/#{asset.id}/metadata.json"
       assert_include paths,"#{asset.class.name.underscore.pluralize}/#{asset.id}/metadata.rdf"
@@ -80,10 +80,12 @@ class GeneratorTest < ActiveSupport::TestCase
     inv = Factory(:investigation,:policy=>Factory(:public_policy))
     study = Factory(:study,:policy=>Factory(:public_policy),:investigation=>inv)
 
-    Factory(:experimental_assay,
+    expassay = Factory(:experimental_assay,
                     :assay_assets=>[assay_asset1,assay_asset2,assay_asset3,assay_asset4],
                     :policy=>Factory(:public_policy),
                     :study=>study)
+
+    Factory :relationship, :subject=>expassay, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>Factory(:publication)
 
     Factory(:experimental_assay,
             :assay_assets=>[@assay_asset5,@assay_asset6],
