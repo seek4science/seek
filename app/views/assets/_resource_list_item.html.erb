@@ -9,6 +9,7 @@
 
    #dont show JERM avatar for strain without contributor, as there are strains without contributor and are not harvested
    avatar_partial = nil if resource.kind_of?(Strain) && resource.contributor.try(:person).nil?
+   avatar_content = avatar_partial ? render(:partial=> avatar_partial,:locals=>{:resource => resource}) : nil
 
    access_based_css_class = "list_item"
    if Seek::Config.is_virtualliver
@@ -39,9 +40,9 @@
   </div>
   <div class="panel-body">
     <div class="row">
-      <% unless avatar_partial.blank? %>
+      <% unless avatar_content.blank? %>
           <div class="col-md-1 col-sm-2 col-xs-3 <%='hidden-xs' unless resource.is_a?(Person)-%> text-center list_item_avatar">
-            <%= render :partial=> avatar_partial,:locals=>{:resource => resource} %>
+            <%= avatar_content %>
           </div>
       <% end %>
       <div class="col-md-<%=content_grid_size-%> col-sm-<%=content_grid_size - 1-%> <%='col-xs-9' if resource.is_a?(Person)-%> list_item_content">
