@@ -126,19 +126,21 @@ ul.feed .file-type-icon img {
 
 #advanced-search {
   vertical-align: middle;
-  padding: 10px;
-  right: 0;
-  border-style: solid;
-  border-color: #ddd;
-  border-width: 1px;
-  background: #fff;
-  border-radius: 4px;
-  margin-top: 2px;
+  padding: 10px 0 0 0;
 }
 
 @media (min-width: $screen-md-min) {
   #advanced-search {
     position: absolute;
+    right: 0;
+    border-style: solid;
+    border-color: #ddd;
+    border-width: 1px;
+    background: #fff;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 2px;
+    z-index: 10;
   }
 }
 
