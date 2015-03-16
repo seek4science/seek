@@ -6,7 +6,7 @@
       <span id="model_type_selection">
         <%= collection_select :model, :model_type_id, ModelType.all, :id, :title,
                               {:include_blank => "Not specified"},
-                              {:onchange => "model_type_selection_changed();", :class => 'form-control'} -%>
+                              {:class => 'form-control'} -%>
       </span>
     </div>
 
@@ -17,7 +17,7 @@
       <span id="model_format_selection">
         <%= collection_select :model, :model_format_id, ModelFormat.all, :id, :title,
                               {:include_blank => "Not specified"},
-                              {:onchange => "model_format_selection_changed();", :class => 'form-control'}
+                              {:class => 'form-control'}
         -%>
       </span>
     </div>
@@ -30,27 +30,3 @@
                      :name => "model[recommended_environment_id]", :class => 'form-control'%>
     </div>
 <% end %>
-
-<script type="text/javascript">
-    <%
-    ModelFormat.all.each do |format|
-      if (format.models.empty?)
-        -%>
-    model_formats_for_deletion.push(<%=  format.id -%>);
-    <%
-    end
-  end
-
-  %>
-
-    <%
-    ModelType.all.each do |type|
-      if (type.models.empty?)
-        -%>
-    model_types_for_deletion.push(<%=  type.id -%>);
-    <%
-    end
-  end
-
-  %>
-</script>
