@@ -220,18 +220,27 @@ module ResourceListItemHelper
     html.html_safe
   end
 
-  def list_item_contributor_list(contributors, other_contributors = nil)
+  def list_item_contributor_list(contributors, other_contributors = nil, key = 'Contributor')
     contributor_count = contributors.count
     contributor_count += 1 unless other_contributors.blank?
-    html = "<p class=\"list_item_attribute\"><b>Contributor#{contributor_count == 1 ? '' : 's'}:</b> "
-    html << contributors.map { |c| link_to truncate(c.title, :length => 75), show_resource_path(c), :title => get_object_title(c) }.join(', ')
-    unless other_contributors.blank?
-      html << ', ' unless contributors.empty?
-      html << h(other_contributors)
+    html = ''
+    other_html = ''
+    content_tag(:p, :class => 'list_item_attribute') do
+      html << content_tag(:b, "#{contributor_count == 1 ? key : key.pluralize}: ")
+      html << contributors.map { |c| link_to truncate(c.title, :length => 75), show_resource_path(c), :title => get_object_title(c) }.join(', ')
+      unless other_contributors.blank?
+        other_html << ', ' unless contributors.empty?
+        other_html << other_contributors
+      end
+      other_html << 'None' if contributor_count == 0
+      html.html_safe + other_html
     end
-    html << "None" if contributor_count == 0
-    html << "</p>"
-    html.html_safe
+  end
+
+  def list_item_author_list(all_authors)
+    authors = all_authors.select {|a| a.person && a.person.can_view? }
+    other_authors = all_authors.select {|a| a.person.nil? }.map {|a| a.last_name + ' ' + a.first_name}.join(',')
+    list_item_contributor_list(authors.map {|a| a.person}, other_authors, 'Author')
   end
 
 end
