@@ -72,9 +72,8 @@
       </ul>
     </div>
 
-    <li>
-        <%= submit_tag "Update",:disable_with=>"Updating..." -%> or <%= link_to 'Cancel', admin_path -%>
-    </li>
+    <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
+    <%= link_to 'Cancel', admin_path, :class => 'btn btn-default'-%>
   </ul>
   <% end -%>
   

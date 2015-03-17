@@ -47,16 +47,15 @@ module AdminHelper
     case action
       when "activate"
         if user_or_person.is_a?(User) && user_or_person.person
-          admin_activate_user_button = content_tag(:li, image_tag_for_key('activate', activate_path(:activation_code => user_or_person.activation_code), "user activation", {}, "Activate now"))
-          resend_activation_email_button = content_tag(:li, image_tag_for_key('message', resend_activation_email_user_path(user_or_person), "Resend activation email", {:method => :post}, "Resend activation email"))
-          buttons =  admin_activate_user_button + resend_activation_email_button
+          admin_activate_user_button = button_link_to("Activate now", 'activate', activate_path(:activation_code => user_or_person.activation_code))
+          resend_activation_email_button = button_link_to("Resend activation email", 'message', resend_activation_email_user_path(user_or_person), :method => :post)
+          admin_activate_user_button + ' ' + resend_activation_email_button
         end
       when "delete"
-        buttons = content_tag(:li, image_tag_for_key('destroy', user_or_person , "delete", {:method => :delete, :confirm => "Are you sure you wish to delete this #{user_or_person.class.name}?"}, "Delete"))
+        button_link_to("Delete", 'destroy', user_or_person, {:method => :delete, :confirm => "Are you sure you wish to delete this #{user_or_person.class.name}?"})
       else
         nil
     end
-    content_tag(:ul, buttons, :class => "sectionIcons")
   end
 
 end
