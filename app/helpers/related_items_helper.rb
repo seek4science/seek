@@ -48,13 +48,21 @@ module RelatedItemsHelper
     resource_type[:is_external] ||= false
 
     resource_type[:visible_resource_type] = internationalized_resource_name(resource_type[:type], !resource_type[:is_external])
-    resource_type[:tab_title] = "#{resource_type[:visible_resource_type]} "+
-        "(#{(resource_type[:items].length+resource_type[:extra_count]).to_s}" +
-        ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : "") + ")"
+    resource_type[:tab_title] = resource_type_tab_title(resource_type)
 
     resource_type[:tab_id] = resource_type[:type].downcase.pluralize.html_safe
     resource_type[:title_class] = resource_type[:is_external] ? "external_result" : ""
-    resource_type[:total_visible] = resource_type[:items].count + resource_type[:extra_count]
+    resource_type[:total_visible] = resource_type_total_visible_count(resource_type)
+  end
+
+  def resource_type_total_visible_count(resource_type)
+    resource_type[:items].count + resource_type[:extra_count]
+  end
+
+  def resource_type_tab_title(resource_type)
+    "#{resource_type[:visible_resource_type]} "+
+        "(#{(resource_type[:items].length+resource_type[:extra_count]).to_s}" +
+        ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : "") + ")"
   end
 
   def ordered_keys(resource_hash)
