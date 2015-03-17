@@ -48,7 +48,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
   test "all_in_project" do
     project = Factory(:project)
     ps = Factory(:project_subscription, :project => project)
-    assets = ProjectSubscriptionJob.new.all_in_project project
+    assets = ProjectSubscriptionJob.new.send(:all_in_project, project)
     assert assets.empty?
 
     #create items for project

@@ -1,37 +1,36 @@
-class ReindexingJob
-
-  @@my_yaml = ReindexingJob.new.to_yaml
+class ReindexingJob < SeekJob
 
   BATCHSIZE=10
-  DEFAULT_PRIORITY=2
-  TIMELIMIT = 15.minutes
 
-  def perform
-    todo = ReindexingQueue.order("id ASC").limit(BATCHSIZE).collect do |queued|
-      todo = queued.item
-      queued.destroy
-      todo
-    end
+  def perform_job item
     if Seek::Config.solr_enabled
-      todo.uniq.compact.each do |item|
-        begin
-          Timeout::timeout(TIMELIMIT) do
-            item.solr_index!
-          end
-        rescue Exception => e
-          Rails.logger.error(e)
-          if Seek::Config.exception_notification_enabled
-            ExceptionNotifier.notify_exception(e,:data=>{:item_type=>item.class.name,:item_id=>item.try(:id),:message=>'Problem reindexing'})
-          end
-        end
-      end
-    end
-    if ReindexingQueue.count>0 && !ReindexingJob.exists?
-      Delayed::Job.enqueue(ReindexingJob.new, :priority=>DEFAULT_PRIORITY, :run_at=>1.seconds.from_now)
+      item.solr_index!
     end
   end
 
-  def self.add_items_to_queue items, t=1.seconds.from_now, priority=DEFAULT_PRIORITY
+  def gather_items
+    ReindexingQueue.order("id ASC").limit(BATCHSIZE).collect do |queued|
+      take_queued_item(queued)
+    end.uniq.compact
+  end
+
+  def default_priority
+    2
+  end
+
+  def default_delay
+    1.seconds
+  end
+
+  def follow_on_job?
+    ReindexingQueue.count>0 && !exists?
+  end
+
+  def self.add_items_to_queue items, t=nil, priority=nil
+    self.new.add_items_to_queue items, t,priority
+  end
+
+  def add_items_to_queue items, t=default_delay, priority=default_priority
     items = Array(items)
 
     disable_authorization_checks do
@@ -39,11 +38,8 @@ class ReindexingJob
         ReindexingQueue.create :item => item
       end
     end
-    Delayed::Job.enqueue(ReindexingJob.new, :priority=>priority, :run_at=>t) unless ReindexingJob.exists?
+    create_job(priority, t) unless exists?
 
   end
 
-  def self.exists?
-    Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ? ', @@my_yaml, nil, nil]).first != nil
-  end
 end

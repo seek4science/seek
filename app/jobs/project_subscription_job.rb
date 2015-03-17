@@ -15,25 +15,27 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
     Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?', ProjectSubscriptionJob.new(project_subscription_id).to_yaml, nil, nil]).first != nil
   end
 
-  def self.create_job project_subscription_id, t=15.seconds.from_now, priority=DEFAULT_PRIORITY
-    Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), :priority=>priority, :run_at=>t) unless exists? project_subscription_id
+  def self.create_job project_subscription_id, time=15.seconds.from_now, priority=DEFAULT_PRIORITY
+    Delayed::Job.enqueue(ProjectSubscriptionJob.new(project_subscription_id), :priority=>priority, :run_at=>time) unless exists?(project_subscription_id)
   end
+
 
   #all direct assets in the project, but related_#{asset_type} includes also assets from descendants
   def all_in_project project
-    assets = []
-    assets |= project.studies
-    assets |= project.assays
+    project.studies | project.assays | assets_for_subscribable_types(project)
+  end
 
-    #assay and study dont have project association table
-    subscribable_types = Seek::Util.persistent_classes.select(&:subscribable?).collect(&:name).reject{|t| t=='Assay' || t=='Study'}
-
-    assets |= subscribable_types.collect do |type|
+  def assets_for_subscribable_types(project)
+    subscribable_types.collect do |type|
       # e.g.: 'data_files_projects'
-      assets_projects_table = ["#{type.underscore.gsub('/','_').pluralize}", 'projects'].sort.join('_')
+      assets_projects_table = ["#{type.underscore.gsub('/', '_').pluralize}", 'projects'].sort.join('_')
       assets_for_project project, type, assets_projects_table
     end.flatten.uniq
-    assets
+  end
+
+  def subscribable_types
+    #assay and study dont have project association table
+    Seek::Util.persistent_classes.select(&:subscribable?).collect(&:name).reject{|t| t=='Assay' || t=='Study'}
   end
 
   def assets_for_project project, asset_type, assets_projects_table

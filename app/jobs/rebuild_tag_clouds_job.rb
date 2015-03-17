@@ -14,6 +14,8 @@ class RebuildTagCloudsJob
     count!=0
   end
 
+
+
   def self.create_job priority=2,t=15.minutes.from_now
     Delayed::Job.enqueue(RebuildTagCloudsJob.new,:priority=>priority,:run_at=>t) unless exists?
   end
