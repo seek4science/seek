@@ -11,26 +11,14 @@ module Seek
     end
 
     def update_annotations_ajax
-      entity=controller_name.singularize.camelize.constantize.find(params[:id])
+      entity=controller_name.classify.constantize.find(params[:id])
       if entity.can_view?
-        clear_cloud = immediately_clear_tag_cloud?
         update_owned_annotations(entity, current_user, 'tag', params[:tag_list])
         eval("@#{controller_name.singularize} = entity")
         render :update do |page|
-          page.replace 'tag_cloud', :partial=>'tags/tag_cloud',
-                       :locals=>{:tags=>fetch_tags_for_item(entity)[1],
-                                 :show_overall_count=>false,
-                                 :id=>"tag_cloud",
-                                 :tags_smaller=>true,
-                                 :no_tags_text=>"This item has not yet been tagged."}
+          refresh_tag_cloud(entity, page)
 
-          # The tag cloud is generation is quite an expensive process and doesn't need to automatically update when filled up already.
-          # When it is small its nice to see new tags appear in the cloud.
-          if clear_cloud
-            page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/tag_cloud_gadget'
-          else
-            RebuildTagCloudsJob.create_job
-          end
+          handle_clearing_tag_cloud(page)
 
           page.visual_effect :highlight, 'tag_cloud'
           page.visual_effect :highlight, 'sidebar_tag_cloud'
@@ -40,7 +28,26 @@ module Seek
       end
     end
 
+    def refresh_tag_cloud(entity, page)
+      page.replace 'tag_cloud', :partial => 'tags/tag_cloud',
+                   :locals => {:tags => fetch_tags_for_item(entity)[1],
+                               :show_overall_count => false,
+                               :id => "tag_cloud",
+                               :tags_smaller => true,
+                               :no_tags_text => "This item has not yet been tagged."}
+    end
+
     protected
+
+    # The tag cloud is generation is quite an expensive process and doesn't need to automatically update when filled up already.
+    # When it is small its nice to see new tags appear in the cloud.
+    def handle_clearing_tag_cloud(page)
+      if immediately_clear_tag_cloud?
+        page.replace_html 'sidebar_tag_cloud', :partial => 'gadgets/tag_cloud_gadget'
+      else
+        RebuildTagCloudsJob.create_job
+      end
+    end
 
     def update_scales entity
       scale_ids = params[:scale_ids]
