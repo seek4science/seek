@@ -40,7 +40,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def spreadsheet_annotations
-    worksheets.map { |w| w.cell_ranges.map { |c| c.annotations } }.flatten
+    worksheets.map { |worksheet| worksheet.cell_ranges.map { |cell| cell.annotations } }.flatten
   end
 
   # returns the size of the file in bytes, or nil if the file doesn't exist
@@ -138,19 +138,11 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def data_storage_directory
-    path = Seek::Config.asset_filestore_path
-    unless File.exist?(path)
-      FileUtils.mkdir_p path
-    end
-    path
+    Seek::Config.asset_filestore_path
   end
 
   def converted_storage_directory
-    path = Seek::Config.converted_filestore_path
-    unless File.exist?(path)
-      FileUtils.mkdir_p path
-    end
-    path
+    Seek::Config.converted_filestore_path
   end
 
   def dump_data_to_file

@@ -196,7 +196,14 @@ module Seek
       unless path.start_with? '/'
         path = File.join(Rails.root, path)
       end
-      File.join(path, inner_dir)
+      check_path_exists(File.join(path, inner_dir))
+    end
+
+    def check_path_exists(path)
+      unless File.exist?(path)
+        FileUtils.mkdir_p path
+      end
+      path
     end
 
     def smtp_settings(field)
