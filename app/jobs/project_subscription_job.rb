@@ -22,20 +22,22 @@ class ProjectSubscriptionJob < Struct.new(:project_subscription_id)
 
   #all direct assets in the project, but related_#{asset_type} includes also assets from descendants
   def all_in_project project
-    project.studies | project.assays | assets_for_subscribable_types(project)
+    #assay and study dont have project association table
+    project.studies | project.assays | assets_with_association_table(project)
   end
 
-  def assets_for_subscribable_types(project)
-    subscribable_types.collect do |type|
+  def assets_with_association_table(project)
+    subscribable_types_with_association_table.collect do |type|
       # e.g.: 'data_files_projects'
       assets_projects_table = ["#{type.underscore.gsub('/', '_').pluralize}", 'projects'].sort.join('_')
       assets_for_project project, type, assets_projects_table
     end.flatten.uniq
   end
 
-  def subscribable_types
+  def subscribable_types_with_association_table
     #assay and study dont have project association table
-    Seek::Util.persistent_classes.select(&:subscribable?).collect(&:name).reject{|t| t=='Assay' || t=='Study'}
+    names = Seek::Util.persistent_classes.select(&:subscribable?).collect(&:name)
+    names.reject{|name| name=='Assay' || name=='Study'}
   end
 
   def assets_for_project project, asset_type, assets_projects_table
