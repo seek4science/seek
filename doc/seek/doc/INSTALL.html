@@ -132,7 +132,7 @@ href="http://rubyonrails.org/documentation">rubyonrails.org/documentation</a>
 <p>SEEK is based on the 3.2 version of Rails, and requires Ruby 2.1.</p>
 
 <p>We recommend that you run SEEK on a Linux system. This guide is based on an
-Ubuntu (12.04 LTS) system. However, running on other Linux distributions
+Ubuntu (14.04 LTS) system. However, running on other Linux distributions
 the main difference is the name of the required packages that have to be
 installed for that distribution, other than that the steps will be the
 same. If you want to install on different distribution or version please
@@ -148,7 +148,7 @@ is troublesome and is not covered here.</p>
 
 <h2 id="label-Installing+packages">Installing packages</h2>
 
-<p>These are the packages required to run SEEK with Ubuntu 12.04 (Desktop or
+<p>These are the packages required to run SEEK with Ubuntu 14.04 (Desktop or
 Server). For other distributions or versions please visit our <a
 href="OTHER-DISTRIBUTIONS.html">Other Distributions</a> notes.</p>
 
@@ -167,11 +167,10 @@ requested - you will need this later.</p>
 <p>The remaining packages are:</p>
 
 <pre>sudo apt-get install wget curl mercurial ruby libssl-dev build-essential openssh-server git libreadline-dev
-sudo apt-get install libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3
+sudo apt-get install libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3 libcurl4-gnutls-dev
 sudo apt-get install poppler-utils libreoffice libmysqlclient-dev libmagick++-dev libxslt1-dev libpq-dev</pre>
 
-<p>Installing these packages now will make installing Ruby 1.9.3 easier later
-on:</p>
+<p>Installing these packages now will make installing Ruby easier later on:</p>
 
 <pre>sudo apt-get install libtool gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev</pre>
 
@@ -219,15 +218,28 @@ each other, for different applications. To create the gemset run:</p>
 
 <h2 id="label-Getting+SEEK">Getting SEEK</h2>
 
-<p>Now you are ready for installing SEEK. To fetch the latest version of SEEK
-<em>(v0.22.0)</em> change to the directory you want to install it and then
-run:</p>
+<p>Now you are ready for installing SEEK. You can either download SEEK or
+install from GitHub. You can download SEEK from <a
+href="https://bitbucket.org/seek4science/seek/downloads/seek-0.22.0.tgz">bitbucket.org/seek4science/seek/downloads/seek-0.22.0.tgz</a>
+, then unpack the file with:</p>
+
+<pre>tar zxfv seek-0.22.0.tgz</pre>
+
+<p>If you wish to install directly from GitHub, the latest version of SEEK is
+tagged as <em>(v0.22.0)</em>. To fetch this run:</p>
 
 <pre>git clone https://github.com/seek4science/seek.git
 cd seek/
 git checkout v0.22.0</pre>
 
-<p>Now to install the ruby gems SEEK needs:</p>
+<h2 id="label-Installing+Gems">Installing Gems</h2>
+
+<p>Before installing the gems the following is needed, otherwise an error may
+occur whilst trying to install this gem:</p>
+
+<pre>bundle config build.nokogiri --use-system-libraries</pre>
+
+<p>Next install the ruby gems SEEK needs:</p>
 
 <pre>gem install bundler
 bundle install</pre>

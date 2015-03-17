@@ -23,18 +23,18 @@ body.file-popup {
 h1 {
   font-size: 300%;
   text-shadow: rgba(135,145,135,0.65) 2px 2px 3px;
-  color: #6C8C22;
+  color: #2e3e6e;
 }
 h2,h3,h4 { margin-top: 1.5em; }
 
 :link,
 :visited {
-  color: #6C8C22;
+  color: #2e3e6e;
   text-decoration: none;
 }
 :link:hover,
 :visited:hover {
-  border-bottom: 1px dotted #6C8C22;
+  border-bottom: 1px dotted #2e3e6e;
 }
 
 pre {
