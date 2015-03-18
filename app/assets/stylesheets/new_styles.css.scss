@@ -289,7 +289,19 @@ a.select_assay_class:hover {
   margin-bottom: 1em;
 }
 
-
 #search_box {
   position: relative;
+}
+
+.index-page-setting {
+  width: 16em;
+  display: inline-block;
+}
+
+.index-page-setting > label {
+  display: block;
+}
+
+.index-page-setting .btn-group label {
+  width: 6em;
 }
