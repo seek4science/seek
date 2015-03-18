@@ -28,7 +28,9 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
     handlers = Delayed::Job.all.collect(&:handler).join(',')
     assert_includes(handlers, 'RdfGenerationJob')
 
+    #check a new job isn't created when nothing (except the last used timestamp) has changed
     item = Factory :model
+    item.save!
     item.last_used_at=Time.now
     assert_no_difference("Delayed::Job.count") do
       item.save!
@@ -41,7 +43,7 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
     Delayed::Job.delete_all
 
     assert_difference("Delayed::Job.count",1) do
-      RdfGenerationJob.create_job item
+      RdfGenerationJob.new(item).create_job
     end
     job = Delayed::Job.last
     assert_equal 3,job.priority
@@ -54,18 +56,18 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
 
     Delayed::Job.delete_all
 
-    assert !RdfGenerationJob.exists?(project,true)
-    assert !RdfGenerationJob.exists?(project,false)
+    assert !RdfGenerationJob.new(project,true).exists?
+    assert !RdfGenerationJob.new(project,false).exists?
 
-    Delayed::Job.enqueue RdfGenerationJob.new(project.class.name,project.id,true),:priority=>1,:run_at=>Time.now
-    assert RdfGenerationJob.exists?(project,true)
-    assert RdfGenerationJob.exists?(project,false), "should reports exists, because one alreayd exists with refresh_dependents true"
-    assert !RdfGenerationJob.exists?(project2,true)
-    assert !RdfGenerationJob.exists?(project2,false)
+    Delayed::Job.enqueue RdfGenerationJob.new(project,true),:priority=>1,:run_at=>Time.now
+    assert RdfGenerationJob.new(project,true).exists?
+    assert RdfGenerationJob.new(project,false).exists?, "should say that it exists, because one already exists with refresh_dependents true"
+    assert !RdfGenerationJob.new(project2,true).exists?
+    assert !RdfGenerationJob.new(project2,false).exists?
 
-    Delayed::Job.enqueue RdfGenerationJob.new(project2.class.name,project2.id,false),:priority=>1,:run_at=>Time.now
-    assert RdfGenerationJob.exists?(project2,false)
-    assert !RdfGenerationJob.exists?(project2,true) ,"shouldn't reports exists, because one alreayd exists with refresh_dependents false, but this is true"
+    Delayed::Job.enqueue RdfGenerationJob.new(project2,false),:priority=>1,:run_at=>Time.now
+    assert RdfGenerationJob.new(project2,false).exists?
+    assert !RdfGenerationJob.new(project2,true).exists? ,"shouldn't reports exists, because one already exists with refresh_dependents false, but this is true"
 
   end
 
@@ -77,7 +79,7 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
     assert_equal expected_rdf_file, item.rdf_storage_path
     FileUtils.rm expected_rdf_file if File.exists?(expected_rdf_file)
 
-    job = RdfGenerationJob.new "Assay",item.id
+    job = RdfGenerationJob.new(item)
     job.perform
 
     assert File.exists?(expected_rdf_file)

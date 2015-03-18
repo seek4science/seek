@@ -138,7 +138,7 @@ module Seek
 
       def create_rdf_generation_job force=false,refresh_dependents=true
         unless !force && (self.changed - ["updated_at","last_used_at"]).empty?
-          RdfGenerationJob.create_job self,refresh_dependents
+          RdfGenerationJob.new(self,refresh_dependents).create_job
         end
       end
 

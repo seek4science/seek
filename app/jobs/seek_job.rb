@@ -89,7 +89,7 @@ class SeekJob
 
   def report_exception exception,message=nil,data={}
     message||= "Error executing job for #{self.class.name}"
-    data[:message]=messsage
+    data[:message]=message
     if Seek::Config.exception_notification_enabled
       ExceptionNotifier.notify_exception(exception,:data=>data)
     end
