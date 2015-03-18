@@ -11,7 +11,7 @@ class FavouriteGroupMembership < ActiveRecord::Base
 
     people << Person.find_by_id(person_id_was) unless person_id_was.blank?
 
-    AuthLookupUpdateJob.add_items_to_queue people.compact
+    AuthLookupUpdateJob.new.add_items_to_queue people.compact
   end
 
 

@@ -18,7 +18,7 @@ class GroupMembership < ActiveRecord::Base
     people = [Person.find_by_id(person_id)]
     people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
 
-    AuthLookupUpdateJob.add_items_to_queue people.compact
+    AuthLookupUpdateJob.new.add_items_to_queue people.compact
   end
 
 end

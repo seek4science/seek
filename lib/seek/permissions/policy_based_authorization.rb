@@ -125,7 +125,7 @@ module Seek
 
           #trigger off a full update for that user if the count is zero and items should exist for that type
           if (c==0 && !last_asset_id.nil?)
-            AuthLookupUpdateJob.add_items_to_queue User.find_by_id(user_id)
+            AuthLookupUpdateJob.new.add_items_to_queue User.find_by_id(user_id)
           end
           c==count && (count==0 || (last_stored_asset_id == last_asset_id))
         end
@@ -227,7 +227,7 @@ module Seek
       #triggers a background task to update or create the authorization lookup table records for this item
       def check_to_queue_update_auth_table
         unless (self.previous_changes.keys & ["contributor_id","owner_id"]).empty?
-          AuthLookupUpdateJob.add_items_to_queue self
+          AuthLookupUpdateJob.new.add_items_to_queue self
         end
       end
 

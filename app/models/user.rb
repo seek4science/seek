@@ -54,7 +54,7 @@ class User < ActiveRecord::Base
   after_commit :queue_update_auth_table, :on=>:create
 
   def queue_update_auth_table
-    AuthLookupUpdateJob.add_items_to_queue self
+    AuthLookupUpdateJob.new.add_items_to_queue self
   end
 
   cattr_accessor :current_user

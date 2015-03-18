@@ -2,11 +2,8 @@ class AuthLookupUpdateJob < SeekJob
 
   BATCHSIZE=3
 
-  def self.add_items_to_queue(items, time=nil, priority=nil, queuepriority=nil)
-    self.new.add_items_to_queue(items, time, priority, queuepriority)
-  end
 
-  def add_items_to_queue items, time=5.seconds.from_now, priority=0, queuepriority=default_priority
+  def add_items_to_queue items, time=default_delay.from_now, priority=0, queuepriority=default_priority
     if Seek::Config.auth_lookup_enabled
       items = [items] if items.nil?
       items = Array(items)
@@ -44,6 +41,10 @@ class AuthLookupUpdateJob < SeekJob
 
   def retry_item item
     add_items_to_queue(item, 15.seconds.from_now, 1)
+  end
+
+  def default_delay
+    1.second
   end
 
 

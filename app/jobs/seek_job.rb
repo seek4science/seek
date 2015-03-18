@@ -29,14 +29,6 @@ class SeekJob
     count!=0
   end
 
-  def self.exists?
-    self.new.exists?
-  end
-
-  def self.count ignore_locked=true
-    self.new.count(ignore_locked)
-  end
-
   def count ignore_locked=true
     if ignore_locked
       Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?',job_yaml,nil,nil]).count

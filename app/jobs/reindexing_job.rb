@@ -26,11 +26,7 @@ class ReindexingJob < SeekJob
     ReindexingQueue.count>0 && !exists?
   end
 
-  def self.add_items_to_queue items, t=nil, priority=nil
-    self.new.add_items_to_queue items, t,priority
-  end
-
-  def add_items_to_queue items, t=default_delay, priority=default_priority
+  def add_items_to_queue items, time=default_delay.from_now, priority=default_priority
     items = Array(items)
 
     disable_authorization_checks do
@@ -38,7 +34,7 @@ class ReindexingJob < SeekJob
         ReindexingQueue.create :item => item
       end
     end
-    create_job(priority, t) unless exists?
+    create_job(priority, time) unless exists?
 
   end
 

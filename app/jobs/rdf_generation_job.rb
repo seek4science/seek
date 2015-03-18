@@ -45,15 +45,4 @@ class RdfGenerationJob < SeekJob
     result
   end
 
-  # def self.exists? item, refresh_dependents=true
-  #   yml = RdfGenerationJob.new(item.class.name,item.id,refresh_dependents).to_yaml
-  #   result = Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?',yml,nil,nil]).count>0
-  #
-  #   #if we don't want to refresh_dependents, but a job exists that does, then we can say it exists
-  #   unless result || refresh_dependents
-  #     result = self.exists?(item,true)
-  #   end
-  #   result
-  # end
-
 end

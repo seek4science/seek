@@ -29,7 +29,7 @@ class Policy < ActiveRecord::Base
 
   def queue_update_auth_table
     unless (previous_changes.keys - ["updated_at"]).empty?
-      AuthLookupUpdateJob.add_items_to_queue(assets) unless assets.empty?
+      AuthLookupUpdateJob.new.add_items_to_queue(assets) unless assets.empty?
     end
   end
 

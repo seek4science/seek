@@ -14,40 +14,40 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
   end
 
   test "exists" do
-    assert !AuthLookupUpdateJob.exists?
+    assert !AuthLookupUpdateJob.new.exists?
     assert_difference("Delayed::Job.count",1) do
       Delayed::Job.enqueue AuthLookupUpdateJob.new
     end
 
-    assert AuthLookupUpdateJob.exists?
+    assert AuthLookupUpdateJob.new.exists?
     job=Delayed::Job.first
 
     assert_nil job.failed_at
     job.failed_at = Time.now
     job.save!
-    assert !AuthLookupUpdateJob.exists?,"Should ignore failed jobs"
+    assert !AuthLookupUpdateJob.new.exists?,"Should ignore failed jobs"
 
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.failed_at = nil
     job.save!
-    assert !AuthLookupUpdateJob.exists?,"Should ignore locked jobs"
+    assert !AuthLookupUpdateJob.new.exists?,"Should ignore locked jobs"
   end
 
   test "count" do
-    assert_equal 0,AuthLookupUpdateJob.count
+    assert_equal 0,AuthLookupUpdateJob.new.count
 
     Delayed::Job.enqueue AuthLookupUpdateJob.new
 
 
-    assert_equal 1, AuthLookupUpdateJob.count
+    assert_equal 1, AuthLookupUpdateJob.new.count
 
     job=Delayed::Job.first
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
-    assert_equal 0, AuthLookupUpdateJob.count,"Should ignore locked jobs"
-    assert_equal 1,AuthLookupUpdateJob.count(false),"Should not ignore locked jobs when requested"
+    assert_equal 0, AuthLookupUpdateJob.new.count,"Should ignore locked jobs"
+    assert_equal 1,AuthLookupUpdateJob.new.count(false),"Should not ignore locked jobs when requested"
   end
 
   test "add items to queue" do
@@ -60,7 +60,7 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
 
     assert_difference("Delayed::Job.count",1) do
       assert_difference("AuthLookupUpdateQueue.count",2) do
-        AuthLookupUpdateJob.add_items_to_queue [sop,data,sop]
+        AuthLookupUpdateJob.new.add_items_to_queue [sop,data,sop]
       end
     end
 
@@ -70,7 +70,7 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
     Delayed::Job.destroy_all
     assert_difference("Delayed::Job.count",1) do
       assert_difference("AuthLookupUpdateQueue.count",1) do
-        AuthLookupUpdateJob.add_items_to_queue nil
+        AuthLookupUpdateJob.new.add_items_to_queue nil
       end
     end
     assert_nil AuthLookupUpdateQueue.first.item
@@ -82,7 +82,7 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
     other_user = Factory :user
     sop = Factory :sop, :contributor=>user, :policy=>Factory(:editing_public_policy)
     AuthLookupUpdateQueue.destroy_all
-    AuthLookupUpdateJob.add_items_to_queue sop
+    AuthLookupUpdateJob.new.add_items_to_queue sop
     Sop.clear_lookup_table
 
     assert_difference("AuthLookupUpdateQueue.count",-1) do

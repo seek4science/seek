@@ -11,7 +11,7 @@ module Seek
       commands =
           ["--queue=#{Delayed::Worker.default_queue_name} -i #{number} #{action}"]
       if Seek::Config.auth_lookup_enabled
-        commands << "--queue=#{AuthLookupUpdateJob.job_queue_name} -i #{number+1} #{action}"
+        commands << "--queue=#{AuthLookupUpdateJob.new.job_queue_name} -i #{number+1} #{action}"
       end
       if number > 0
         commands << "--queue=#{TavernaPlayer.job_queue_name} -n #{number} #{action}"

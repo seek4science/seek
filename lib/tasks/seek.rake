@@ -186,10 +186,10 @@ namespace :seek do
   
   desc "Creates background jobs to rebuild all authorization lookup table for all users."
   task(:repopulate_auth_lookup_tables=>:environment) do
-    AuthLookupUpdateJob.add_items_to_queue nil,5.seconds.from_now,1
+    AuthLookupUpdateJob.new.add_items_to_queue nil,5.seconds.from_now,1
     User.all.each do |user|
       unless AuthLookupUpdateQueue.exists?(user)
-        AuthLookupUpdateJob.add_items_to_queue user,5.seconds.from_now,1
+        AuthLookupUpdateJob.new.add_items_to_queue user,5.seconds.from_now,1
       end
     end
   end
@@ -221,7 +221,7 @@ namespace :seek do
   desc "Creates background jobs to reindex all searchable things"
   task(:reindex_all=>:environment) do
     Seek::Util.searchable_types.each do |type|
-      ReindexingJob.add_items_to_queue type.all, 5.seconds.from_now,2
+      ReindexingJob.new.add_items_to_queue type.all, 5.seconds.from_now,2
     end
   end
 
