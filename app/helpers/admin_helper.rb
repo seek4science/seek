@@ -59,18 +59,26 @@ module AdminHelper
   end
 
   def admin_text_setting(name, value, title, description = nil, options = {})
-    content_tag(:div, :class => 'form-group') do
-      content_tag(:label, title) +
-          (description ? content_tag(:p, description.html_safe, :class => 'help-block') : ''.html_safe) +
-          text_field_tag(name, value, options.merge!(:class => 'form-control'))
+    admin_setting_block(title, description) do
+      text_field_tag(name, value, options.merge!(:class => 'form-control'))
     end
   end
 
   def admin_textarea_setting(name, value, title, description = nil, options = {})
-    content_tag(:div, :class => 'form-group') do
-      content_tag(:label, title) +
-          (description ? content_tag(:p, description.html_safe, :class => 'help-block') : ''.html_safe) +
-          text_area_tag(name, value, options.merge!(:rows => 5, :class => 'form-control'))
+    admin_setting_block(title, description) do
+      text_area_tag(name, value, options.merge!(:rows => 5, :class => 'form-control'))
+    end
+  end
+
+  def admin_file_setting(name, title, description = nil, options = {})
+    admin_setting_block(title, description) do
+      file_field_tag(name, options)
+    end
+  end
+
+  def admin_password_setting(name, value, title, description = nil, options = {})
+    admin_setting_block(title, description) do
+      password_field_tag(name, value, options.merge!(:autocomplete => 'off', :class => 'form-control'))
     end
   end
 
@@ -80,6 +88,16 @@ module AdminHelper
         check_box_tag(name, value, checked, options) + title.html_safe
       end +
           (description ? content_tag(:p, description.html_safe, :class => 'help-block') : ''.html_safe)
+    end
+  end
+
+  private
+
+  def admin_setting_block(title, description)
+    content_tag(:div, :class => 'form-group') do
+      content_tag(:label, title) +
+          (description ? content_tag(:p, description.html_safe, :class => 'help-block') : ''.html_safe) +
+          yield
     end
   end
 

@@ -24,13 +24,8 @@
                                :onchange => toggle_appear_javascript('header_image_details')) %>
 
     <div id="header_image_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.header_image_enabled -%>">
-      <div class="form-group">
-        <label>Upload a header logo image file</label>
-        <p class="help-block">
-          The file for the header logo image. It should be a valid image file, such as JPEG or PNG.
-        </p>
-        <%= file_field_tag(:header_image_file) %>
-      </div>
+      <%= admin_file_setting(:header_image_file,
+                             'Upload a header logo image file',  'The file for the header logo image. It should be a valid image file, such as JPEG or PNG.') %>
 
       <%= admin_text_setting(:header_image_link, Seek::Config.header_image_link,
                              "Header image link", "A URL that is used as the link in the header image.") %>
