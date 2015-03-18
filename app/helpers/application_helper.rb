@@ -413,10 +413,8 @@ module ApplicationHelper
   end
 
   def toggle_appear_javascript block_id
-    "Effect.toggle('#{block_id}','slide',{duration:0.5})".html_safe
+    "$j('##{block_id}').slideToggle()".html_safe
   end
-
-
 
   def set_parameters_for_sharing_form object=nil
     object ||= eval "@#{controller_name.singularize}"

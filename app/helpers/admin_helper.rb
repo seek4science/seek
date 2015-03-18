@@ -66,9 +66,17 @@ module AdminHelper
     end
   end
 
+  def admin_textarea_setting(name, value, title, description = nil, options = {})
+    content_tag(:div, :class => 'form-group') do
+      content_tag(:label, title) +
+          (description ? content_tag(:p, description.html_safe, :class => 'help-block') : ''.html_safe) +
+          text_area_tag(name, value, options.merge!(:rows => 5, :class => 'form-control'))
+    end
+  end
+
   def admin_checkbox_setting(name, value, checked, title, description = nil, options = {})
     content_tag(:div, :class => 'checkbox') do
-      content_tag(:label) do
+      content_tag(:label, :class => 'admin-checkbox') do
         check_box_tag(name, value, checked, options) + title.html_safe
       end +
           (description ? content_tag(:p, description.html_safe, :class => 'help-block') : ''.html_safe)
