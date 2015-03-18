@@ -21,54 +21,54 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     end
 
     assert SendPeriodicEmailsJob.daily_exists?
-    assert SendPeriodicEmailsJob.exists? "daily"
-    assert SendPeriodicEmailsJob.exists? "daily",true
+    assert SendPeriodicEmailsJob.new('daily').exists?
+    assert SendPeriodicEmailsJob.new('daily').exists?(true)
 
     job=Delayed::Job.first
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
     assert SendPeriodicEmailsJob.daily_exists?,"Should not ignore locked jobs"
-    assert SendPeriodicEmailsJob.exists?("daily")
-    assert !SendPeriodicEmailsJob.exists?("daily",true)
+    assert SendPeriodicEmailsJob.new("daily").exists?
+    assert !SendPeriodicEmailsJob.new("daily").exists?(true)
 
     job.locked_at=nil
     job.failed_at = Time.now
     job.save!
     assert !SendPeriodicEmailsJob.daily_exists?,"Should ignore failed jobs"
-    assert !SendPeriodicEmailsJob.exists?("daily")
-    assert !SendPeriodicEmailsJob.exists?("daily",true)
+    assert !SendPeriodicEmailsJob.new("daily").exists?
+    assert !SendPeriodicEmailsJob.new("daily").exists?(true)
 
     job.failed_at = nil
     job.save!
     assert SendPeriodicEmailsJob.daily_exists?
-    assert SendPeriodicEmailsJob.exists?("daily")
+    assert SendPeriodicEmailsJob.new("daily").exists?
 
     assert !SendPeriodicEmailsJob.weekly_exists?
     assert_difference("Delayed::Job.count",1) do
       job=Delayed::Job.enqueue SendPeriodicEmailsJob.new("weekly")
     end
     assert SendPeriodicEmailsJob.weekly_exists?
-    assert SendPeriodicEmailsJob.exists?("weekly")
-    assert SendPeriodicEmailsJob.exists?("weekly", true)
+    assert SendPeriodicEmailsJob.new("weekly").exists?
+    assert SendPeriodicEmailsJob.new("weekly").exists?(true)
     job.locked_at=Time.now
     job.save!
     assert SendPeriodicEmailsJob.weekly_exists?
-    assert SendPeriodicEmailsJob.exists?("weekly")
-    assert !SendPeriodicEmailsJob.exists?("weekly",true)
+    assert SendPeriodicEmailsJob.new("weekly").exists?
+    assert !SendPeriodicEmailsJob.new("weekly").exists?(true)
 
     assert !SendPeriodicEmailsJob.monthly_exists?
     assert_difference("Delayed::Job.count",1) do
       job=Delayed::Job.enqueue SendPeriodicEmailsJob.new("monthly")
     end
     assert SendPeriodicEmailsJob.monthly_exists?
-    assert SendPeriodicEmailsJob.exists?("monthly")
-    assert SendPeriodicEmailsJob.exists?("monthly",true)
+    assert SendPeriodicEmailsJob.new("monthly").exists?
+    assert SendPeriodicEmailsJob.new("monthly").exists?(true)
     job.locked_at=Time.now
     job.save!
     assert SendPeriodicEmailsJob.weekly_exists?
-    assert SendPeriodicEmailsJob.exists?("monthly")
-    assert !SendPeriodicEmailsJob.exists?("monthly",true)
+    assert SendPeriodicEmailsJob.new("monthly").exists?
+    assert !SendPeriodicEmailsJob.new("monthly").exists?(true)
 
   end
 
@@ -103,7 +103,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
   test "create job" do
       assert_equal 0,Delayed::Job.count
       assert_difference("Delayed::Job.count",1) do
-        SendPeriodicEmailsJob.create_job('daily', Time.now)
+        SendPeriodicEmailsJob.new('daily').create_job
       end
 
       assert_equal 1,Delayed::Job.count
@@ -112,24 +112,21 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       assert_equal 3,job.priority
 
       assert_no_difference("Delayed::Job.count") do
-        SendPeriodicEmailsJob.create_job('daily', Time.now)
+        SendPeriodicEmailsJob.new('daily').create_job
       end
 
       assert_equal 1,Delayed::Job.count
 
       assert_difference("Delayed::Job.count",1) do
-        job = SendPeriodicEmailsJob.create_job('weekly', Time.now)
+        job = SendPeriodicEmailsJob.new('weekly').create_job
       end
       assert_no_difference("Delayed::Job.count") do
-        SendPeriodicEmailsJob.create_job('weekly', Time.now)
+        SendPeriodicEmailsJob.new('weekly').create_job
       end
       job.locked_at = Time.now
       job.save!
       assert_no_difference("Delayed::Job.count") do
-        SendPeriodicEmailsJob.create_job('weekly', Time.now)
-      end
-      assert_difference("Delayed::Job.count",1) do
-        SendPeriodicEmailsJob.create_job('weekly', Time.now,1, true)
+        SendPeriodicEmailsJob.new('weekly').create_job
       end
 
   end
@@ -141,7 +138,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     person1 = Factory(:person)
     job = nil
     assert_difference("Delayed::Job.count",1) do
-      job = SendPeriodicEmailsJob.create_job('daily', 15.minutes.from_now)
+      job = SendPeriodicEmailsJob.new('daily').create_job(1, 15.minutes.from_now)
     end
     job.locked_at = Time.now
     job.save!
@@ -168,9 +165,9 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     ProjectSubscriptionJob.new(project_subscription4.id).perform
     sop.reload
 
-    SendPeriodicEmailsJob.create_job('daily', 15.minutes.from_now)
-    SendPeriodicEmailsJob.create_job('weekly', 15.minutes.from_now)
-    SendPeriodicEmailsJob.create_job('monthly', 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('daily').create_job(1,15.minutes.from_now)
+    SendPeriodicEmailsJob.new('weekly').create_job(1, 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('monthly').create_job(1, 15.minutes.from_now)
 
     Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'create'
     Factory :activity_log,:activity_loggable=>nil,:culprit => Factory(:user), :action => 'search'
@@ -201,9 +198,9 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     ProjectSubscriptionJob.new(project_subscription3.id).perform
     sop.reload
 
-    SendPeriodicEmailsJob.create_job('daily', 15.minutes.from_now)
-    SendPeriodicEmailsJob.create_job('weekly', 15.minutes.from_now)
-    SendPeriodicEmailsJob.create_job('monthly', 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('daily').create_job(1, 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('weekly').create_job(1, 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('monthly').create_job(1, 15.minutes.from_now)
 
     user = Factory :user
 

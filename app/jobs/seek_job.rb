@@ -5,7 +5,6 @@ class SeekJob
   include CommonSweepers
 
   def perform
-
       gather_items.each do |item|
         begin
           Timeout::timeout(timelimit) do
@@ -17,16 +16,22 @@ class SeekJob
         end
       end
       if follow_on_job?
-        create_job(follow_on_priority,follow_on_delay.from_now)
+        create_job(follow_on_priority,follow_on_delay.from_now,true)
       end
   end
 
-  def create_job priority=default_priority,time=default_delay.from_now
-    Delayed::Job.enqueue(self, :priority=>priority, :queue=>queue_name,:run_at=>time)
+  def create_job priority=default_priority,time=default_delay.from_now,allow_duplicate=allow_duplicate_jobs
+    if (allow_duplicate || !exists?)
+      Delayed::Job.enqueue(self, :priority=>priority, :queue=>queue_name,:run_at=>time)
+    end
   end
 
-  def exists?
-    count!=0
+  def exists? ignore_locked=true
+    count(ignore_locked)!=0
+  end
+
+  def allow_duplicate_jobs
+    true
   end
 
   def count ignore_locked=true
