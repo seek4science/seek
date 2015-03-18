@@ -32,10 +32,6 @@ class SendPeriodicEmailsJob < SeekJob
     [nil]
   end
 
-  def job_yaml
-    SendPeriodicEmailsJob.new(frequency).to_yaml
-  end
-
   def follow_on_job?
     true
   end
@@ -129,10 +125,14 @@ class SendPeriodicEmailsJob < SeekJob
     t=Time.now
     # start tomorrow if time now is later than midday
     t = t + 1.day if t > Time.local_time(t.year, t.month, t.day, 12, 00, 00)
-    SendPeriodicEmailsJob.new('daily').create_job(job.send(:default_priority), Time.local_time(t.year, t.month, t.day, 12, 00, 00))
-    SendPeriodicEmailsJob.new('weekly').create_job(job.send(:default_priority), Time.local_time(t.year, t.month, t.day, 12, 05, 00))
-    SendPeriodicEmailsJob.new('monthly').create_job(job.send(:default_priority), Time.local_time(t.year, t.month, t.day, 12, 10, 00))
+    SendPeriodicEmailsJob.new('daily').create_job(default_priority, Time.local_time(t.year, t.month, t.day, 12, 00, 00))
+    SendPeriodicEmailsJob.new('weekly').create_job(default_priority, Time.local_time(t.year, t.month, t.day, 12, 05, 00))
+    SendPeriodicEmailsJob.new('monthly').create_job(default_priority, Time.local_time(t.year, t.month, t.day, 12, 10, 00))
 
+  end
+
+  def self.default_priority
+    SendPeriodicEmailsJob.new('daily').send(:default_priority)
   end
 
 

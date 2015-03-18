@@ -86,8 +86,8 @@ module Subscribable
   end
 
   def set_subscription_job
-      project_ids = ( Seek::Config.project_hierarchy_enabled)?  self.projects_and_descendants.map(&:id) : self.projects.collect(&:id)
-      SetSubscriptionsForItemJob.create_job(self.class.name, self.id, project_ids)
+      projects = ( Seek::Config.project_hierarchy_enabled)?  self.projects_and_descendants : self.projects
+      SetSubscriptionsForItemJob.new(self,projects).create_job
   end
 
   def update_subscription_job_if_study_or_assay
@@ -96,18 +96,18 @@ module Subscribable
       old_investigation_id = self.investigation_id_was
       old_investigation = Investigation.find_by_id old_investigation_id
       project_ids_to_remove = old_investigation.nil? ? [] : old_investigation.projects.collect(&:id)
-      project_ids_to_add = self.investigation.projects.collect(&:id)
-      update_subscriptions_for self, project_ids_to_add, project_ids_to_remove
+      projects_to_add = self.investigation.projects
+      update_subscriptions_for self, projects_to_add, project_ids_to_remove
       #update subscriptions for assays associated with this study
       self.assays.each do |assay|
-        update_subscriptions_for assay, project_ids_to_add, project_ids_to_remove
+        update_subscriptions_for assay, projects_to_add, project_ids_to_remove
       end
     elsif self.kind_of?(Assay) && self.study_id_changed?
       old_study_id = self.study_id_was
       old_study = Study.find_by_id old_study_id
       project_ids_to_remove = old_study.nil? ? [] : old_study.projects.collect(&:id)
-      project_ids_to_add = self.study.projects.collect(&:id)
-      update_subscriptions_for self, project_ids_to_add, project_ids_to_remove
+      projects_to_add = self.study.projects
+      update_subscriptions_for self, projects_to_add, project_ids_to_remove
     end
   end
 
@@ -119,8 +119,8 @@ module Subscribable
 
   private
 
-  def update_subscriptions_for item, project_ids_to_add, project_ids_to_remove
-    SetSubscriptionsForItemJob.create_job(item.class.name, item.id, project_ids_to_add)
+  def update_subscriptions_for item, projects_to_add, project_ids_to_remove
+    SetSubscriptionsForItemJob.new(item, projects_to_add).create_job
     RemoveSubscriptionsForItemJob.create_job(item.class.name, item.id, project_ids_to_remove)
   end
 end

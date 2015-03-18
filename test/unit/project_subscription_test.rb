@@ -29,8 +29,8 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
     ps = current_person.project_subscriptions.create :project => @proj
     ProjectSubscriptionJob.new(ps.id).perform
     s = Factory(:subscribable, :projects => [Factory(:project),@proj])
-    assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, s.projects.collect(&:id))
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, s.projects.collect(&:id)).perform
+    assert SetSubscriptionsForItemJob.new(s,s.projects).exists?
+    SetSubscriptionsForItemJob.new(s,s.projects).perform
 
     assert s.subscribed?
   end
@@ -63,8 +63,8 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
     ps = current_person.project_subscriptions.create :project => @proj
     ProjectSubscriptionJob.new(ps.id).perform
     publication = Factory(:publication, :projects => [Factory(:project),@proj])
-    assert SetSubscriptionsForItemJob.exists?(publication.class.name, publication.id, publication.projects.collect(&:id))
-    SetSubscriptionsForItemJob.new(publication.class.name, publication.id, publication.projects.collect(&:id)).perform
+    assert SetSubscriptionsForItemJob.new(publication, publication.projects).exists?
+    SetSubscriptionsForItemJob.new(publication,publication.projects).perform
 
     assert publication.subscribed?
   end

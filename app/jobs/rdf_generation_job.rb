@@ -1,30 +1,27 @@
 class RdfGenerationJob < SeekJob
 
-  attr_reader :item,:refresh_dependants
+  attr_reader :item_type_name,:item_id,:refresh_dependants
 
   def initialize(item,refresh_dependants=true)
-    @item=item
+    @item_type_name=item.class.name
+    @item_id=item.id
     @refresh_dependants=refresh_dependants
   end
 
   #executes the job - if a triple store is configured it will also update the triple store, otherwise just saves the rdf
   #to a file.
-  def perform_job item
-    if item.rdf_repository_configured?
-      item.update_repository_rdf
+  def perform_job job_item
+    if job_item.rdf_repository_configured?
+      job_item.update_repository_rdf
     else
-      item.delete_rdf_file
-      item.save_rdf_file
+      job_item.delete_rdf_file
+      job_item.save_rdf_file
     end
-    item.refresh_dependents_rdf if refresh_dependents
+    job_item.refresh_dependents_rdf if refresh_dependents
   end
 
   def gather_items
     [item].compact
-  end
-
-  def job_yaml
-    RdfGenerationJob.new(item,refresh_dependants).to_yaml
   end
 
   def default_delay
@@ -33,6 +30,10 @@ class RdfGenerationJob < SeekJob
 
   def default_priority
     3
+  end
+
+  def item
+    item_type_name.constantize.find_by_id(item_id)
   end
 
   def exists?

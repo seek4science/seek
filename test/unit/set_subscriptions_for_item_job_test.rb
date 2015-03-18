@@ -9,40 +9,40 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
 
   test "exists" do
     subscribable = Factory(:subscribable)
-    project_ids = subscribable.projects.collect(&:id)
+
     Delayed::Job.destroy_all
-    assert !SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, project_ids)
+    assert !SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).exists?
     assert_difference("Delayed::Job.count",1) do
-      Delayed::Job.enqueue SetSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, project_ids)
+      Delayed::Job.enqueue SetSubscriptionsForItemJob.new(subscribable, subscribable.projects)
     end
 
-    assert SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, project_ids)
+    assert SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).exists?
 
     job=Delayed::Job.first
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
     assert_not_nil job.locked_at
-    assert !SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, project_ids),"Should ignore locked jobs"
+    assert !SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).exists?,"Should ignore locked jobs"
 
     job.locked_at=nil
     job.failed_at = Time.now
     job.save!
-    assert !SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, project_ids),"Should ignore failed jobs"
+    assert !SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).exists?,"Should ignore failed jobs"
   end
 
   test "create job" do
       subscribable = Factory(:subscribable)
-      project_ids = subscribable.projects.collect(&:id)
+
       Delayed::Job.destroy_all
       assert_equal 0,Delayed::Job.count
-      SetSubscriptionsForItemJob.create_job(subscribable.class.name, subscribable.id, project_ids)
+      SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).create_job
       assert_equal 1,Delayed::Job.count
 
       job = Delayed::Job.first
       assert_equal 1,job.priority
 
-      SetSubscriptionsForItemJob.create_job(subscribable.class.name, subscribable.id, project_ids)
+      SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).create_job
       assert_equal 1,Delayed::Job.count
   end
 
@@ -59,9 +59,9 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
     assert !subscribable.subscribed?(person1)
     assert !subscribable.subscribed?(person2)
     #when subscribable is created, SetSubscriptionsForItemJob is also created
-    assert SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id))
+    assert SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).exists?
 
-    SetSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id)).perform
+    SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).perform
 
     subscribable.reload
     assert subscribable.subscribed? person1
@@ -80,9 +80,9 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
     assert !subscribable.subscribed?(person1)
     assert !subscribable.subscribed?(person2)
     #when subscribable is created, SetSubscriptionsForItemJob is also created
-    assert SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id))
+    assert SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).exists?
 
-    SetSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id)).perform
+    SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).perform
 
     subscribable.reload
     assert subscribable.subscribed? person1
@@ -101,9 +101,9 @@ class SetSubscriptionsForItemJobTest < ActiveSupport::TestCase
     assert !subscribable.subscribed?(person1)
     assert !subscribable.subscribed?(person2)
     #when subscribable is created, SetSubscriptionsForItemJob is also created
-    assert SetSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id))
+    assert SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).exists?
 
-    SetSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id)).perform
+    SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).perform
 
     subscribable.reload
     assert subscribable.subscribed? person1

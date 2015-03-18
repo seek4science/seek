@@ -9,7 +9,7 @@ module ProjectCompat
                               :before_remove => :react_to_project_removal
 
       def react_to_project_addition project
-        SetSubscriptionsForItemJob.create_job(self.class.name, self.id, [project.id]) if (!self.new_record? && self.subscribable?)
+        SetSubscriptionsForItemJob.new(self, [project]).create_job if (!self.new_record? && self.subscribable?)
         self.update_rdf_on_associated_change(project) if self.respond_to?(:update_rdf_on_associated_change)
       end
 

@@ -166,8 +166,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert Subscription.all.empty?
 
     s = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
-    assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, s.projects.collect(&:id))
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, s.projects.collect(&:id)).perform
+    assert SetSubscriptionsForItemJob.new(s,s.projects).exists?
+    SetSubscriptionsForItemJob.new(s,s.projects).perform
 
     assert s.subscribed?(current_person)
     assert_equal 1, current_person.subscriptions.count
@@ -182,11 +182,11 @@ class SubscriptionTest < ActiveSupport::TestCase
     investigation = Factory(:investigation, :projects => [proj])
     study = Factory(:study, :investigation => investigation, :policy => Factory(:public_policy))
 
-    assert SetSubscriptionsForItemJob.exists?(study.class.name, study.id, study.projects.collect(&:id))
-    assert SetSubscriptionsForItemJob.exists?(investigation.class.name, investigation.id, investigation.projects.collect(&:id))
+    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
+    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
 
-    SetSubscriptionsForItemJob.new(study.class.name, study.id, study.projects.collect(&:id)).perform
-    SetSubscriptionsForItemJob.new(investigation.class.name, investigation.id, investigation.projects.collect(&:id)).perform
+    SetSubscriptionsForItemJob.new(study, study.projects).perform
+    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
 
     assert study.subscribed?(current_person)
     assert investigation.subscribed?(current_person)
@@ -202,13 +202,13 @@ class SubscriptionTest < ActiveSupport::TestCase
     study = Factory(:study, :investigation => investigation)
     assay = Factory(:assay, :study => study, :policy => Factory(:public_policy))
 
-    assert SetSubscriptionsForItemJob.exists?(assay.class.name, assay.id, assay.projects.collect(&:id))
-    assert SetSubscriptionsForItemJob.exists?(study.class.name, study.id, study.projects.collect(&:id))
-    assert SetSubscriptionsForItemJob.exists?(investigation.class.name, investigation.id, investigation.projects.collect(&:id))
+    assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
+    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
+    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
 
-    SetSubscriptionsForItemJob.new(assay.class.name, assay.id, assay.projects.collect(&:id)).perform
-    SetSubscriptionsForItemJob.new(study.class.name, study.id, study.projects.collect(&:id)).perform
-    SetSubscriptionsForItemJob.new(investigation.class.name, investigation.id, investigation.projects.collect(&:id)).perform
+    SetSubscriptionsForItemJob.new(assay,assay.projects).perform
+    SetSubscriptionsForItemJob.new(study,study.projects).perform
+    SetSubscriptionsForItemJob.new(investigation,investigation.projects).perform
 
     assert assay.subscribed?(current_person)
     assert study.subscribed?(current_person)
@@ -254,8 +254,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     projects = [Factory(:project), proj]
     s = Factory(:subscribable, :projects => projects, :policy => Factory(:public_policy))
 
-    assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, s.projects.collect(&:id))
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, s.projects.collect(&:id)).perform
+    assert SetSubscriptionsForItemJob.new(s, s.projects).exists?
+    SetSubscriptionsForItemJob.new(s, s.projects).perform
 
     assert s.subscribed?(current_person)
     assert_equal 1, current_person.subscriptions.count
@@ -275,8 +275,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     RemoveSubscriptionsForItemJob.new(s.class.name, s.id, [projects.first.id]).perform
     RemoveSubscriptionsForItemJob.new(s.class.name, s.id, [projects[1].id]).perform
 
-    assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, [updated_project.id])
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, [updated_project.id]).perform
+    assert SetSubscriptionsForItemJob.new(s, [updated_project]).exists?
+    SetSubscriptionsForItemJob.new(s,[updated_project]).perform
 
     assert_equal 1, s.projects.count
     assert_equal updated_project, s.projects.first
@@ -289,8 +289,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     s = Factory(:subscribable, :policy => Factory(:public_policy))
     project = s.projects.first
 
-    assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, s.projects.collect(&:id))
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, s.projects.collect(&:id)).perform
+    assert SetSubscriptionsForItemJob.new(s, s.projects).exists?
+    SetSubscriptionsForItemJob.new(s, s.projects).perform
 
     assert !s.subscribed?(current_person)
 
@@ -303,8 +303,8 @@ class SubscriptionTest < ActiveSupport::TestCase
       s.save
     end
 
-    assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, [proj.id])
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, [proj.id]).perform
+    assert SetSubscriptionsForItemJob.new(s, [proj]).exists?
+    SetSubscriptionsForItemJob.new(s, [proj]).perform
 
     s.reload
     assert s.subscribed?(current_person)
@@ -329,11 +329,11 @@ class SubscriptionTest < ActiveSupport::TestCase
       s.save
     end
 
-    assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, [proj1.id])
-    assert SetSubscriptionsForItemJob.exists?(s.class.name, s.id, [proj2.id])
+    assert SetSubscriptionsForItemJob.new(s, [proj1]).exists?
+    assert SetSubscriptionsForItemJob.new(s, [proj2]).exists?
     assert RemoveSubscriptionsForItemJob.exists?(s.class.name, s.id, [project.id])
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, [proj1.id]).perform
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, [proj2.id]).perform
+    SetSubscriptionsForItemJob.new(s,[proj1]).perform
+    SetSubscriptionsForItemJob.new(s,[proj2]).perform
 
     s.reload
     assert s.subscribed?(current_person)
@@ -347,12 +347,12 @@ class SubscriptionTest < ActiveSupport::TestCase
     study = Factory(:study, :investigation => investigation)
     assay = Factory(:assay, :study => study, :policy => Factory(:public_policy))
 
-    assert SetSubscriptionsForItemJob.exists?(assay.class.name, assay.id, assay.projects.collect(&:id))
-    assert SetSubscriptionsForItemJob.exists?(study.class.name, study.id, study.projects.collect(&:id))
-    assert SetSubscriptionsForItemJob.exists?(investigation.class.name, investigation.id, investigation.projects.collect(&:id))
-    SetSubscriptionsForItemJob.new(assay.class.name, assay.id, assay.projects.collect(&:id)).perform
-    SetSubscriptionsForItemJob.new(study.class.name, study.id, study.projects.collect(&:id)).perform
-    SetSubscriptionsForItemJob.new(investigation.class.name, investigation.id, investigation.projects.collect(&:id)).perform
+    assert SetSubscriptionsForItemJob.new(assay,assay.projects).exists?
+    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
+    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
+    SetSubscriptionsForItemJob.new(assay,assay.projects).perform
+    SetSubscriptionsForItemJob.new(study, study.projects).perform
+    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
 
     assert investigation.subscribed?(current_person)
     assert study.subscribed?(current_person)
@@ -366,8 +366,8 @@ class SubscriptionTest < ActiveSupport::TestCase
       investigation.save
     end
 
-    assert SetSubscriptionsForItemJob.exists?(investigation.class.name, investigation.id, investigation.projects.collect(&:id))
-    SetSubscriptionsForItemJob.new(investigation.class.name, investigation.id, investigation.projects.collect(&:id)).perform
+    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
+    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
 
     assert RemoveSubscriptionsForItemJob.exists?(investigation.class.name, investigation.id, [proj.id])
     RemoveSubscriptionsForItemJob.new(investigation.class.name, investigation.id, [proj.id]).perform
@@ -389,12 +389,12 @@ class SubscriptionTest < ActiveSupport::TestCase
     study = Factory(:study, :investigation => investigation)
     assay = Factory(:assay, :study => study, :policy => Factory(:public_policy))
 
-    assert SetSubscriptionsForItemJob.exists?(assay.class.name, assay.id, assay.projects.collect(&:id))
-    assert SetSubscriptionsForItemJob.exists?(study.class.name, study.id, study.projects.collect(&:id))
-    assert SetSubscriptionsForItemJob.exists?(investigation.class.name, investigation.id, investigation.projects.collect(&:id))
-    SetSubscriptionsForItemJob.new(assay.class.name, assay.id, assay.projects.collect(&:id)).perform
-    SetSubscriptionsForItemJob.new(study.class.name, study.id, study.projects.collect(&:id)).perform
-    SetSubscriptionsForItemJob.new(investigation.class.name, investigation.id, investigation.projects.collect(&:id)).perform
+    assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
+    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
+    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
+    SetSubscriptionsForItemJob.new(assay, assay.projects).perform
+    SetSubscriptionsForItemJob.new(study, study.projects).perform
+    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
 
     assert !investigation.subscribed?(current_person)
     assert !study.subscribed?(current_person)
@@ -407,8 +407,8 @@ class SubscriptionTest < ActiveSupport::TestCase
       investigation.save
     end
 
-    assert SetSubscriptionsForItemJob.exists?(investigation.class.name, investigation.id, [proj.id])
-    SetSubscriptionsForItemJob.new(investigation.class.name, investigation.id, [proj.id]).perform
+    assert SetSubscriptionsForItemJob.new(investigation, [proj]).exists?
+    SetSubscriptionsForItemJob.new(investigation, [proj]).perform
 
     investigation.reload
     study.reload
@@ -428,12 +428,12 @@ class SubscriptionTest < ActiveSupport::TestCase
       study = Factory(:study, :investigation => investigation)
       assay = Factory(:assay, :study => study, :policy => Factory(:public_policy))
 
-      assert SetSubscriptionsForItemJob.exists?(assay.class.name, assay.id, assay.projects.collect(&:id))
-      assert SetSubscriptionsForItemJob.exists?(study.class.name, study.id, study.projects.collect(&:id))
-      assert SetSubscriptionsForItemJob.exists?(investigation.class.name, investigation.id, investigation.projects.collect(&:id))
-      SetSubscriptionsForItemJob.new(assay.class.name, assay.id, assay.projects.collect(&:id)).perform
-      SetSubscriptionsForItemJob.new(study.class.name, study.id, study.projects.collect(&:id)).perform
-      SetSubscriptionsForItemJob.new(investigation.class.name, investigation.id, investigation.projects.collect(&:id)).perform
+      assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
+      assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
+      assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
+      SetSubscriptionsForItemJob.new(assay, assay.projects).perform
+      SetSubscriptionsForItemJob.new(study, study.projects).perform
+      SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
 
       assert investigation.subscribed?(current_person)
       assert study.subscribed?(current_person)
@@ -470,12 +470,12 @@ class SubscriptionTest < ActiveSupport::TestCase
         study = Factory(:study, :investigation => Factory(:investigation))
         assay = Factory(:assay, :study => study, :policy => Factory(:public_policy))
 
-        assert SetSubscriptionsForItemJob.exists?(assay.class.name, assay.id, assay.projects.collect(&:id))
-        assert SetSubscriptionsForItemJob.exists?(study.class.name, study.id, study.projects.collect(&:id))
-        assert SetSubscriptionsForItemJob.exists?(investigation.class.name, investigation.id, investigation.projects.collect(&:id))
-        SetSubscriptionsForItemJob.new(assay.class.name, assay.id, assay.projects.collect(&:id)).perform
-        SetSubscriptionsForItemJob.new(study.class.name, study.id, study.projects.collect(&:id)).perform
-        SetSubscriptionsForItemJob.new(investigation.class.name, investigation.id, investigation.projects.collect(&:id)).perform
+        assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
+        assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
+        assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
+        SetSubscriptionsForItemJob.new(assay, assay.projects).perform
+        SetSubscriptionsForItemJob.new(study, study.projects).perform
+        SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
 
         assert investigation.subscribed?(current_person)
         assert !study.subscribed?(current_person)
@@ -488,10 +488,10 @@ class SubscriptionTest < ActiveSupport::TestCase
           study.save
         end
 
-        assert SetSubscriptionsForItemJob.exists?(assay.class.name, assay.id, assay.projects.collect(&:id))
-        assert SetSubscriptionsForItemJob.exists?(study.class.name, study.id, study.projects.collect(&:id))
-        SetSubscriptionsForItemJob.new(assay.class.name, assay.id, assay.projects.collect(&:id)).perform
-        SetSubscriptionsForItemJob.new(study.class.name, study.id, study.projects.collect(&:id)).perform
+        assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
+        assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
+        SetSubscriptionsForItemJob.new(assay, assay.projects).perform
+        SetSubscriptionsForItemJob.new(study, study.projects).perform
 
         investigation.reload
         study.reload

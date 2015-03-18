@@ -1179,7 +1179,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.project_subscriptions.map(&:project).include?(project)
 
     s = Factory(:subscribable, project_ids: [project.id])
-    SetSubscriptionsForItemJob.new(s.class.name, s.id, [project.id]).perform
+    SetSubscriptionsForItemJob.new(s, [project]).perform
     s.reload
     assert s.subscribed?(person)
 

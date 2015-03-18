@@ -1681,8 +1681,8 @@ class DataFilesControllerTest < ActionController::TestCase
 
     df = assigns(:data_file)
 
-    assert SetSubscriptionsForItemJob.exists?(df.class.name, df.id, df.projects.collect(&:id))
-    SetSubscriptionsForItemJob.new(df.class.name, df.id, df.projects.collect(&:id)).perform
+    assert SetSubscriptionsForItemJob.new(df,df.projects).exists?
+    SetSubscriptionsForItemJob.new(df,df.projects).perform
 
     assert df.subscribed?(current_person)
     assert !df.subscribed?(a_person)

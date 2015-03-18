@@ -49,7 +49,7 @@ class SeekJob
   end
 
   def job_yaml
-    self.class.new.to_yaml
+    self.to_yaml
   end
 
   def default_priority

@@ -58,7 +58,7 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
     project_subscription1 = person1.project_subscriptions.create :project => project, :frequency => 'weekly'
     project_subscription2 = person2.project_subscriptions.create :project => project, :frequency => 'weekly'
 
-    SetSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, subscribable.projects.collect(&:id)).perform
+    SetSubscriptionsForItemJob.new(subscribable, subscribable.projects).perform
 
     assert subscribable.subscribed? person1
     assert subscribable.subscribed? person2
