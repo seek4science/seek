@@ -45,6 +45,11 @@ module Seek
       end
     end
 
+
+    def self.publishable_types
+      authorized_types.select{|klass| klass.is_isa? || klass.first.try(:is_in_isa_publishable?) }
+    end
+
     def self.authorized_types
       @@policy_authorised_types ||= begin
         persistent_classes.select do |c|
