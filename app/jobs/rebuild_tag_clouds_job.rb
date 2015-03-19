@@ -1,26 +1,24 @@
-class RebuildTagCloudsJob
+class RebuildTagCloudsJob < SeekJob
 
-
-  @@my_yaml = RebuildTagCloudsJob.new.to_yaml
-
-  def perform
-    keys = ["sidebar_tag_cloud","suggestions_for_tag","suggestions_for_expertise","suggestions_for_tool"]
-    keys.each do |key|
-      ApplicationController.new.expire_fragment key
-    end
+  def perform_job key
+    ApplicationController.new.expire_fragment key
   end
 
-  def self.exists?
-    count!=0
+  def gather_items
+    ["sidebar_tag_cloud","suggestions_for_tag","suggestions_for_expertise","suggestions_for_tool"]
+  end
+
+  def allow_duplicate_jobs
+    false
+  end
+
+  def default_priority
+    3
+  end
+
+  def default_delay
+    5.minutes
   end
 
 
-
-  def self.create_job priority=2,t=15.minutes.from_now
-    Delayed::Job.enqueue(RebuildTagCloudsJob.new,:priority=>priority,:run_at=>t) unless exists?
-  end
-
-  def self.count
-    Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?',@@my_yaml,nil,nil]).count
-  end
 end

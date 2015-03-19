@@ -61,7 +61,7 @@ module TagsHelper
     if immediately_clear_tag_cloud?
       page.replace_html 'sidebar_tag_cloud', :partial => 'gadgets/tag_cloud_gadget'
     else
-      RebuildTagCloudsJob.create_job
+      RebuildTagCloudsJob.new.create_job
     end
   end
 
