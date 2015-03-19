@@ -16,37 +16,37 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
   test "exists" do
     site_announcement_id = 1
     from_notifiee_id = 1
-    assert !SendAnnouncementEmailsJob.exists?(site_announcement_id,from_notifiee_id)
+    assert !SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).exists?
     assert_difference("Delayed::Job.count",1) do
       Delayed::Job.enqueue SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id)
     end
 
-    assert SendAnnouncementEmailsJob.exists?(site_announcement_id,from_notifiee_id)
+    assert SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).exists?
 
     job=Delayed::Job.first
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
-    assert !SendAnnouncementEmailsJob.exists?(site_announcement_id,from_notifiee_id),"Should ignore locked jobs"
+    assert !SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).exists?,"Should ignore locked jobs"
 
     job.locked_at=nil
     job.failed_at = Time.now
     job.save!
-    assert !SendAnnouncementEmailsJob.exists?(site_announcement_id,from_notifiee_id),"Should ignore failed jobs"
+    assert !SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).exists?,"Should ignore failed jobs"
   end
 
   test "create job" do
       site_announcement_id = 1
       from_notifiee_id = 1
       assert_difference("Delayed::Job.count",1) do
-        SendAnnouncementEmailsJob.create_job(site_announcement_id,from_notifiee_id)
+        SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).create_job
       end
 
       job = Delayed::Job.first
       assert_equal 3,job.priority
 
       assert_no_difference("Delayed::Job.count") do
-        SendAnnouncementEmailsJob.create_job(site_announcement_id,from_notifiee_id)
+        SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).create_job
       end
   end
 
@@ -67,7 +67,7 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
 
     #checks 1 email is sent for the first batch
     site_announcement = SiteAnnouncement.create(:title => 'test announcement', :body => 'test', :email_notification => true)
-    assert SendAnnouncementEmailsJob.exists?(site_announcement.id,1)
+    assert SendAnnouncementEmailsJob.new(site_announcement.id,1).exists?
     Delayed::Job.delete_all
     assert_emails 1 do
       assert_difference("Delayed::Job.count",1,"a new job should have been created for the next batch") do
@@ -77,7 +77,7 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
 
     #..and 1 email is sent for the 2nd batch
     from_new_notifiee_id = notifiee1.id + SendAnnouncementEmailsJob::BATCHSIZE + 1
-    assert SendAnnouncementEmailsJob.exists?(site_announcement.id,from_new_notifiee_id)
+    assert SendAnnouncementEmailsJob.new(site_announcement.id,from_new_notifiee_id).exists?
     Delayed::Job.delete_all
     assert_emails 1 do
       assert_no_difference("Delayed::Job.count","no new jobs should have been created, since there is need for a new batch") do

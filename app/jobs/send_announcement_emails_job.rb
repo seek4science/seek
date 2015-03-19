@@ -1,42 +1,52 @@
-class SendAnnouncementEmailsJob < Struct.new(:site_announcement_id, :from_notifiee_id)
-  DEFAULT_PRIORITY=3
-  BATCHSIZE=50
+class SendAnnouncementEmailsJob < SeekJob
+  BATCHSIZE = 50
 
-  def before(job)
-    #make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
+  attr_reader :site_announcement_id, :from_notifiee_id
+
+  def initialize(site_annoucement_id, from_notifiee_id = 1)
+    @site_announcement_id = site_annoucement_id
+    @from_notifiee_id = from_notifiee_id
+  end
+
+  def before(_job)
+    # make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
     Seek::Config.smtp_propagate
     Seek::Config.site_base_host_propagate
   end
 
-  def perform
-    site_announcement = SiteAnnouncement.find_by_id(site_announcement_id)
-    if site_announcement
-      send_announcement_emails site_announcement, from_notifiee_id
-    end  
-    from_new_notifiee_id = from_notifiee_id + BATCHSIZE + 1
-    if NotifieeInfo.last.id >= from_new_notifiee_id
-       SendAnnouncementEmailsJob.create_job(site_announcement_id,from_new_notifiee_id)
-    end
+  def perform_job(announcement)
+    send_announcement_emails announcement, from_notifiee_id
+    @from_notifiee_id = from_notifiee_id + BATCHSIZE + 1
   end
 
-  def self.exists? site_announcement_id, from_notifiee_id
-    Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?', SendAnnouncementEmailsJob.new(site_announcement_id, from_notifiee_id).to_yaml, nil, nil]).first != nil
+  def follow_on_job?
+    NotifieeInfo.last && NotifieeInfo.last.id >= from_notifiee_id
   end
 
-  def self.create_job site_announcement_id, from_notifiee_id, t=30.seconds.from_now, priority=DEFAULT_PRIORITY
-    unless exists?(site_announcement_id, from_notifiee_id)
-      Delayed::Job.enqueue(SendAnnouncementEmailsJob.new(site_announcement_id, from_notifiee_id), :priority=>priority, :run_at=>t)
-    end
+  def gather_items
+    [SiteAnnouncement.find_by_id(site_announcement_id)].compact
   end
 
-  def send_announcement_emails site_announcement, from_notifiee_id
+  def default_priority
+    3
+  end
+
+  def default_delay
+    30.seconds
+  end
+
+  def allow_duplicate_jobs
+    false
+  end
+
+  def send_announcement_emails(site_announcement, from_notifiee_id)
     if Seek::Config.email_enabled
-      NotifieeInfo.where(["id IN (?) AND receive_notifications=?", (from_notifiee_id .. (from_notifiee_id + BATCHSIZE)), true]).each do |notifiee_info|
+      NotifieeInfo.where(['id IN (?) AND receive_notifications=?', (from_notifiee_id..(from_notifiee_id + BATCHSIZE)), true]).each do |notifiee_info|
         begin
           unless notifiee_info.notifiee.nil?
-            Mailer.announcement_notification(site_announcement, notifiee_info, Seek::Config.site_base_host.gsub(/https?:\/\//,'')).deliver
+            Mailer.announcement_notification(site_announcement, notifiee_info, Seek::Config.site_base_host.gsub(/https?:\/\//, '')).deliver
           end
-        rescue Exception=>e
+        rescue Exception => e
           if defined? Rails.logger
             Rails.logger.error "There was a problem sending an announcement email to #{notifiee_info.notifiee.try(:email)} - #{e.message}."
           end

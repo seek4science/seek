@@ -5,7 +5,7 @@ SiteAnnouncement.class_eval do
 
   def send_announcement_emails
     if email_notification?
-      SendAnnouncementEmailsJob.create_job(id, 1)
+      SendAnnouncementEmailsJob.new(id).create_job
     end
   end
 end
