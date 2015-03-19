@@ -31,11 +31,7 @@ class SendAnnouncementEmailsJob < SeekJob
     3
   end
 
-  def default_delay
-    30.seconds
-  end
-
-  def allow_duplicate_jobs
+  def allow_duplicate_jobs?
     false
   end
 

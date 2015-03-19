@@ -1,9 +1,7 @@
 class AuthLookupUpdateJob < SeekJob
+  BATCHSIZE = 3
 
-  BATCHSIZE=3
-
-
-  def add_items_to_queue items, time=default_delay.from_now, priority=0, queuepriority=default_priority
+  def add_items_to_queue(items, time = default_delay.from_now, priority = 0, queuepriority = default_priority)
     if Seek::Config.auth_lookup_enabled
       items = [items] if items.nil?
       items = Array(items)
@@ -19,9 +17,9 @@ class AuthLookupUpdateJob < SeekJob
 
   private
 
-  def perform_job item
-    #including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to tha happy coincidence
-    #that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
+  def perform_job(item)
+    # including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to tha happy coincidence
+    # that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
 
     if item.nil?
       update_assets_for_user nil
@@ -35,27 +33,22 @@ class AuthLookupUpdateJob < SeekJob
       Delayed::Job.logger.error("Unexepected type encountered: #{item.class.name}")
     end
 
-    #required to make sure that cached fragments that contain details related to authorization are regenerated after the job has run
+    # required to make sure that cached fragments that contain details related to authorization are regenerated after the job has run
     expire_auth_related_fragments
   end
 
-  def retry_item item
+  def retry_item(item)
     add_items_to_queue(item, 15.seconds.from_now, 1)
   end
 
-  def default_delay
-    1.second
-  end
-
-
   def gather_items
-    AuthLookupUpdateQueue.order("priority,item_type,id").limit(BATCHSIZE).collect do |queued|
+    AuthLookupUpdateQueue.order('priority,item_type,id').limit(BATCHSIZE).collect do |queued|
       take_queued_item(queued)
     end.uniq.compact
   end
 
-  def update_for_each_user item
-    User.transaction(:requires_new => :true) do
+  def update_for_each_user(item)
+    User.transaction(requires_new: :true) do
       item.update_lookup_table(nil)
       User.all.each do |user|
         item.update_lookup_table(user)
@@ -64,8 +57,8 @@ class AuthLookupUpdateJob < SeekJob
     GC.start
   end
 
-  def update_assets_for_user user
-    User.transaction(:requires_new => :true) do
+  def update_assets_for_user(user)
+    User.transaction(requires_new: :true) do
       Seek::Util.authorized_types.each do |type|
         type.all.each do |item|
           item.update_lookup_table(user)
@@ -76,11 +69,11 @@ class AuthLookupUpdateJob < SeekJob
   end
 
   def queue_name
-    "authlookup"
+    'authlookup'
   end
 
   def follow_on_job?
-    AuthLookupUpdateQueue.count>0 && !exists?
+    AuthLookupUpdateQueue.count > 0 && !exists?
   end
 
   def follow_on_priority
@@ -88,7 +81,7 @@ class AuthLookupUpdateJob < SeekJob
   end
 
   def add_item_to_queue(item, queuepriority)
-    #immediately update for the current user and anonymous user
+    # immediately update for the current user and anonymous user
     if item.respond_to?(:authorization_supported?) && item.authorization_supported?
       item.update_lookup_table(User.current_user)
       item.update_lookup_table(nil) unless User.current_user.nil?
@@ -97,8 +90,6 @@ class AuthLookupUpdateJob < SeekJob
     # but with some slowdown until the changes have been reapplied.
     # for assets its simply - item.remove_from_lookup_table
     # for users some additional simple code is required.
-    AuthLookupUpdateQueue.create(:item => item, :priority => queuepriority) unless AuthLookupUpdateQueue.exists?(item)
+    AuthLookupUpdateQueue.create(item: item, priority: queuepriority) unless AuthLookupUpdateQueue.exists?(item)
   end
-
-
 end

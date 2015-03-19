@@ -64,7 +64,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     assert_emails(registered_receivers.count) do
       post :create,:site_announcement=>{:title=>"fred", :email_notification => true}
       site_announcement = assigns(:site_announcement)
-      assert SendAnnouncementEmailsJob.exists?(site_announcement.id,1)
+      assert SendAnnouncementEmailsJob.new(site_announcement.id,1).exists?
       first_id = people.collect(&:notifiee_info).collect(&:id).min
       SendAnnouncementEmailsJob.new(site_announcement.id, first_id).perform
     end

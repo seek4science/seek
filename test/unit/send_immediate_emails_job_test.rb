@@ -15,35 +15,35 @@ class SendImmediateEmailsJobTest < ActiveSupport::TestCase
 
   test "exists" do
     activity_log_id = 1
-    assert !SendImmediateEmailsJob.exists?(activity_log_id)
+    assert !SendImmediateEmailsJob.new(activity_log_id).exists?
     assert_difference("Delayed::Job.count",1) do
       Delayed::Job.enqueue SendImmediateEmailsJob.new(activity_log_id)
     end
 
-    assert SendImmediateEmailsJob.exists?(activity_log_id)
+    assert SendImmediateEmailsJob.new(activity_log_id).exists?
 
     job=Delayed::Job.first
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
-    assert !SendImmediateEmailsJob.exists?(activity_log_id),"Should ignore locked jobs"
+    assert !SendImmediateEmailsJob.new(activity_log_id).exists?,"Should ignore locked jobs"
 
     job.locked_at=nil
     job.failed_at = Time.now
     job.save!
-    assert !SendImmediateEmailsJob.exists?(activity_log_id),"Should ignore failed jobs"
+    assert !SendImmediateEmailsJob.new(activity_log_id).exists?,"Should ignore failed jobs"
   end
 
   test "create job" do
       assert_difference("Delayed::Job.count",1) do
-        SendImmediateEmailsJob.create_job(1)
+        SendImmediateEmailsJob.new(1).create_job
       end
 
       job = Delayed::Job.first
       assert_equal 3,job.priority
 
       assert_no_difference("Delayed::Job.count") do
-        SendImmediateEmailsJob.create_job(1)
+        SendImmediateEmailsJob.new(1).create_job
       end
   end
 

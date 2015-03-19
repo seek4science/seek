@@ -1,14 +1,13 @@
 class RebuildTagCloudsJob < SeekJob
-
-  def perform_job key
+  def perform_job(key)
     ApplicationController.new.expire_fragment key
   end
 
   def gather_items
-    ["sidebar_tag_cloud","suggestions_for_tag","suggestions_for_expertise","suggestions_for_tool"]
+    %w(sidebar_tag_cloud suggestions_for_tag suggestions_for_expertise suggestions_for_tool)
   end
 
-  def allow_duplicate_jobs
+  def allow_duplicate_jobs?
     false
   end
 
@@ -19,6 +18,4 @@ class RebuildTagCloudsJob < SeekJob
   def default_delay
     5.minutes
   end
-
-
 end

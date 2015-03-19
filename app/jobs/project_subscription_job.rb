@@ -23,7 +23,7 @@ class ProjectSubscriptionJob < SeekJob
     15.seconds
   end
 
-  def allow_duplicate_jobs
+  def allow_duplicate_jobs?
     false
   end
 

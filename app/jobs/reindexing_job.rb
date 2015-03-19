@@ -1,15 +1,14 @@
 class ReindexingJob < SeekJob
+  BATCHSIZE = 20
 
-  BATCHSIZE=10
-
-  def perform_job item
+  def perform_job(item)
     if Seek::Config.solr_enabled
       item.solr_index!
     end
   end
 
   def gather_items
-    ReindexingQueue.order("id ASC").limit(BATCHSIZE).collect do |queued|
+    ReindexingQueue.order('id ASC').limit(BATCHSIZE).collect do |queued|
       take_queued_item(queued)
     end.uniq.compact
   end
@@ -18,24 +17,18 @@ class ReindexingJob < SeekJob
     2
   end
 
-  def default_delay
-    1.seconds
-  end
-
   def follow_on_job?
-    ReindexingQueue.count>0 && !exists?
+    ReindexingQueue.count > 0 && !exists?
   end
 
-  def add_items_to_queue items, time=default_delay.from_now, priority=default_priority
+  def add_items_to_queue(items, time = default_delay.from_now, priority = default_priority)
     items = Array(items)
 
     disable_authorization_checks do
       items.uniq.each do |item|
-        ReindexingQueue.create :item => item
+        ReindexingQueue.create item: item
       end
     end
     create_job(priority, time) unless exists?
-
   end
-
 end

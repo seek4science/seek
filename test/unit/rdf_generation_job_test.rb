@@ -46,7 +46,7 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
       RdfGenerationJob.new(item).create_job
     end
     job = Delayed::Job.last
-    assert_equal 3,job.priority
+    assert_equal 2,job.priority
 
   end
 

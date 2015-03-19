@@ -1,17 +1,16 @@
-#abstract superclass for common methods for handling subscription items, common to SetSubcriptionsForItemJob
-#and RemoveSubscriptionForItemJob.
-#perform_job methods is implemented in those subclasses
+# abstract superclass for common methods for handling subscription items, common to SetSubcriptionsForItemJob
+# and RemoveSubscriptionForItemJob.
+# perform_job methods is implemented in those subclasses
 class SubscriptionsForItemJob < SeekJob
+  attr_reader :subscribable_type, :subscribable_id, :project_ids
 
-  attr_reader :subscribable_type,:subscribable_id,:project_ids
-
-  def before(job)
-    #make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
+  def before(_job)
+    # make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
     Seek::Config.smtp_propagate
     Seek::Config.site_base_host_propagate
   end
 
-  def initialize subscribable,projects
+  def initialize(subscribable, projects)
     @subscribable_type = subscribable.class.name
     @subscribable_id = subscribable.id
     @project_ids = projects.collect(&:id)
@@ -30,15 +29,14 @@ class SubscriptionsForItemJob < SeekJob
   end
 
   def default_delay
-    5.seconds
+    30.seconds
   end
 
   def subscribable
     subscribable_type.constantize.find_by_id(subscribable_id)
   end
 
-  def allow_duplicate_jobs
+  def allow_duplicate_jobs?
     false
   end
-
 end

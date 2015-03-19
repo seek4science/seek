@@ -1,25 +1,32 @@
-class SendImmediateEmailsJob < Struct.new(:activity_log_id)
-  DEFAULT_PRIORITY=3
+class SendImmediateEmailsJob < SeekJob
+  DEFAULT_PRIORITY = 3
 
-  def before(job)
-    #make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
+  attr_reader :activity_log_id
+
+  def before(_job)
+    # make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
     Seek::Config.smtp_propagate
     Seek::Config.site_base_host_propagate
   end
 
-  def perform
-    activity_log = ActivityLog.find_by_id(activity_log_id)
-    if activity_log
-      activity_loggable = activity_log.activity_loggable
-      activity_loggable.send_immediate_subscriptions(activity_log) if activity_loggable.respond_to? :send_immediate_subscriptions
-    end
+  def initialize(activity_log_id)
+    @activity_log_id = activity_log_id
   end
 
-  def self.exists? activity_log_id
-    Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?', SendImmediateEmailsJob.new(activity_log_id).to_yaml, nil, nil]).first != nil
+  def perform_job(activity_log)
+    activity_loggable = activity_log.activity_loggable
+    activity_loggable.send_immediate_subscriptions(activity_log) if activity_loggable.respond_to? :send_immediate_subscriptions
   end
 
-  def self.create_job activity_log_id, t=30.seconds.from_now, priority=DEFAULT_PRIORITY
-    Delayed::Job.enqueue(SendImmediateEmailsJob.new(activity_log_id), :priority=>priority, :run_at=>t) unless exists? activity_log_id
+  def gather_items
+    [ActivityLog.find_by_id(activity_log_id)].compact
+  end
+
+  def default_priority
+    3
+  end
+
+  def allow_duplicate_jobs?
+    false
   end
 end
