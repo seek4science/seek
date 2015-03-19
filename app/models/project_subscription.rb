@@ -52,6 +52,6 @@ class ProjectSubscription < ActiveRecord::Base
   after_create :subscribe_to_all_in_project
 
   def subscribe_to_all_in_project
-      ProjectSubscriptionJob.create_job id
+      ProjectSubscriptionJob.new(id).create_job
   end
 end

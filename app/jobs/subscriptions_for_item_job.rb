@@ -5,6 +5,12 @@ class SubscriptionsForItemJob < SeekJob
 
   attr_reader :subscribable_type,:subscribable_id,:project_ids
 
+  def before(job)
+    #make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
+    Seek::Config.smtp_propagate
+    Seek::Config.site_base_host_propagate
+  end
+
   def initialize subscribable,projects
     @subscribable_type = subscribable.class.name
     @subscribable_id = subscribable.id

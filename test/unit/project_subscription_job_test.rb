@@ -13,42 +13,42 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
 
   test "exists" do
     project_subscription_id = 1
-    assert !ProjectSubscriptionJob.exists?(project_subscription_id)
+    assert !ProjectSubscriptionJob.new(project_subscription_id).exists?
     assert_difference("Delayed::Job.count",1) do
       Delayed::Job.enqueue ProjectSubscriptionJob.new(project_subscription_id)
     end
 
-    assert ProjectSubscriptionJob.exists?(project_subscription_id)
+    assert ProjectSubscriptionJob.new(project_subscription_id).exists?
 
     job=Delayed::Job.first
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
-    assert !ProjectSubscriptionJob.exists?(project_subscription_id),"Should ignore locked jobs"
+    assert !ProjectSubscriptionJob.new(project_subscription_id).exists?,"Should ignore locked jobs"
 
     job.locked_at=nil
     job.failed_at = Time.now
     job.save!
-    assert !ProjectSubscriptionJob.exists?(project_subscription_id),"Should ignore failed jobs"
+    assert !ProjectSubscriptionJob.new(project_subscription_id).exists?,"Should ignore failed jobs"
   end
 
   test "create job" do
       assert_difference("Delayed::Job.count",1) do
-        ProjectSubscriptionJob.create_job(1)
+        ProjectSubscriptionJob.new(1).create_job
       end
 
       job = Delayed::Job.first
       assert_equal 2,job.priority
 
       assert_no_difference("Delayed::Job.count") do
-        ProjectSubscriptionJob.create_job(1)
+        ProjectSubscriptionJob.new(1).create_job
       end
   end
 
   test "all_in_project" do
     project = Factory(:project)
     ps = Factory(:project_subscription, :project => project)
-    assets = ProjectSubscriptionJob.new.send(:all_in_project, project)
+    assets = ProjectSubscriptionJob.new(1).send(:all_in_project, project)
     assert assets.empty?
 
     #create items for project
@@ -61,7 +61,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     #assay
     Factory(:assay, :study => study)
 
-    assets = ProjectSubscriptionJob.new.all_in_project project
+    assets = ProjectSubscriptionJob.new(1).all_in_project project
     assert_equal ps.subscribable_types.count, assets.count
   end
 
