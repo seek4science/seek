@@ -9,25 +9,24 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
 
   test "exists" do
     subscribable = Factory(:subscribable)
-    project_ids = subscribable.projects.collect(&:id)
     Delayed::Job.destroy_all
-    assert !RemoveSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, project_ids)
+    assert !RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).exists?
     assert_difference("Delayed::Job.count",1) do
-      Delayed::Job.enqueue RemoveSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, project_ids)
+      Delayed::Job.enqueue RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects)
     end
 
-    assert RemoveSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, project_ids)
+    assert RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).exists?
 
     job=Delayed::Job.first
     assert_nil job.locked_at
     job.locked_at = Time.now
     job.save!
-    assert !RemoveSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, project_ids),"Should ignore locked jobs"
+    assert !RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).exists?,"Should ignore locked jobs"
 
     job.locked_at=nil
     job.failed_at = Time.now
     job.save!
-    assert !RemoveSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, project_ids),"Should ignore failed jobs"
+    assert !RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).exists?,"Should ignore failed jobs"
   end
 
   test "create job" do
@@ -36,13 +35,13 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
 
       Delayed::Job.destroy_all
       assert_equal 0,Delayed::Job.count
-      RemoveSubscriptionsForItemJob.create_job(subscribable.class.name, subscribable.id, project_ids)
+      RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).create_job
       assert_equal 1,Delayed::Job.count
 
       job = Delayed::Job.first
       assert_equal 1,job.priority
 
-      RemoveSubscriptionsForItemJob.create_job(subscribable.class.name, subscribable.id, project_ids)
+      RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).create_job
       assert_equal 1,Delayed::Job.count
   end
 
@@ -66,10 +65,10 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
     #when subscribable changes the projects, RemoveSubscriptionsForItemJob is also created
     subscribable.projects = [Factory(:project)]
     subscribable.save
-    assert RemoveSubscriptionsForItemJob.exists?(subscribable.class.name, subscribable.id, [project.id])
+    assert RemoveSubscriptionsForItemJob.new(subscribable,[project]).exists?
 
     #now remove subscriptions
-    RemoveSubscriptionsForItemJob.new(subscribable.class.name, subscribable.id, [project.id]).perform
+    RemoveSubscriptionsForItemJob.new(subscribable, [project]).perform
     subscribable.reload
     assert !subscribable.subscribed?(person1)
     assert !subscribable.subscribed?(person2)

@@ -14,7 +14,7 @@ module ProjectCompat
       end
 
       def react_to_project_removal project
-        RemoveSubscriptionsForItemJob.create_job(self.class.name, self.id, [project.id]) if self.subscribable?
+        RemoveSubscriptionsForItemJob.new(self, [project]).create_job if self.subscribable?
         self.create_rdf_generation_job(true) if self.respond_to?(:create_rdf_generation_job)
       end
 
