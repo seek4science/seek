@@ -9,7 +9,8 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
            :environment,
-           :convert_image_to_png
+           :convert_image_to_png,
+           :clear_delayed_jobs
        ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -37,6 +38,9 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
+  task(:clear_delayed_jobs=>:environment) do
+    Delayed::Job.destroy_all
+  end
 
 
   desc "convert the avatar and model image from jpg to png"
