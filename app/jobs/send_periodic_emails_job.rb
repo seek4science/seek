@@ -119,7 +119,7 @@ class SendPeriodicEmailsJob < SeekJob
   def self.create_initial_jobs
     time = time_for_initial_job
     %w(daily weekly monthly).each do |freq|
-      SendPeriodicEmailsJob.new(freq).create_job(default_priority, time)
+      SendPeriodicEmailsJob.new(freq).queue_job(default_priority, time)
       time += 5.minutes
     end
   end

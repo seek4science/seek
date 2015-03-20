@@ -358,7 +358,7 @@ class PeopleController < ApplicationController
         expire_annotation_fragments("expertise") if exp_changed
         expire_annotation_fragments("tool") if tools_changed
       else
-         RebuildTagCloudsJob.new.create_job
+         RebuildTagCloudsJob.new.queue_job
       end
   end
 

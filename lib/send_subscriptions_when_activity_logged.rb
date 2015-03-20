@@ -3,7 +3,7 @@ ActivityLog.class_eval do
 
   def send_notification
     if Seek::Config.email_enabled && activity_loggable.try(:subscribable?) && activity_loggable.subscribers_are_notified_of?(action)
-      SendImmediateEmailsJob.new(id).create_job
+      SendImmediateEmailsJob.new(id).queue_job
     end
   end
 end

@@ -43,7 +43,7 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
     Delayed::Job.delete_all
 
     assert_difference("Delayed::Job.count",1) do
-      RdfGenerationJob.new(item).create_job
+      RdfGenerationJob.new(item).queue_job
     end
     job = Delayed::Job.last
     assert_equal 2,job.priority

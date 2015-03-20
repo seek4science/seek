@@ -103,7 +103,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
   test "create job" do
       assert_equal 0,Delayed::Job.count
       assert_difference("Delayed::Job.count",1) do
-        SendPeriodicEmailsJob.new('daily').create_job
+        SendPeriodicEmailsJob.new('daily').queue_job
       end
 
       assert_equal 1,Delayed::Job.count
@@ -112,21 +112,21 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       assert_equal 3,job.priority
 
       assert_no_difference("Delayed::Job.count") do
-        SendPeriodicEmailsJob.new('daily').create_job
+        SendPeriodicEmailsJob.new('daily').queue_job
       end
 
       assert_equal 1,Delayed::Job.count
 
       assert_difference("Delayed::Job.count",1) do
-        job = SendPeriodicEmailsJob.new('weekly').create_job
+        job = SendPeriodicEmailsJob.new('weekly').queue_job
       end
       assert_no_difference("Delayed::Job.count") do
-        SendPeriodicEmailsJob.new('weekly').create_job
+        SendPeriodicEmailsJob.new('weekly').queue_job
       end
       job.locked_at = Time.now
       job.save!
       assert_no_difference("Delayed::Job.count") do
-        SendPeriodicEmailsJob.new('weekly').create_job
+        SendPeriodicEmailsJob.new('weekly').queue_job
       end
 
   end
@@ -138,7 +138,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     person1 = Factory(:person)
     job = nil
     assert_difference("Delayed::Job.count",1) do
-      job = SendPeriodicEmailsJob.new('daily').create_job(1, 15.minutes.from_now)
+      job = SendPeriodicEmailsJob.new('daily').queue_job(1, 15.minutes.from_now)
     end
     job.locked_at = Time.now
     job.save!
@@ -165,9 +165,9 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     ProjectSubscriptionJob.new(project_subscription4.id).perform
     sop.reload
 
-    SendPeriodicEmailsJob.new('daily').create_job(1,15.minutes.from_now)
-    SendPeriodicEmailsJob.new('weekly').create_job(1, 15.minutes.from_now)
-    SendPeriodicEmailsJob.new('monthly').create_job(1, 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('daily').queue_job(1,15.minutes.from_now)
+    SendPeriodicEmailsJob.new('weekly').queue_job(1, 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('monthly').queue_job(1, 15.minutes.from_now)
 
     Factory :activity_log,:activity_loggable => sop, :culprit => Factory(:user), :action => 'create'
     Factory :activity_log,:activity_loggable=>nil,:culprit => Factory(:user), :action => 'search'
@@ -198,9 +198,9 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     ProjectSubscriptionJob.new(project_subscription3.id).perform
     sop.reload
 
-    SendPeriodicEmailsJob.new('daily').create_job(1, 15.minutes.from_now)
-    SendPeriodicEmailsJob.new('weekly').create_job(1, 15.minutes.from_now)
-    SendPeriodicEmailsJob.new('monthly').create_job(1, 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('daily').queue_job(1, 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('weekly').queue_job(1, 15.minutes.from_now)
+    SendPeriodicEmailsJob.new('monthly').queue_job(1, 15.minutes.from_now)
 
     user = Factory :user
 

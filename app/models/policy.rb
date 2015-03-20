@@ -401,14 +401,7 @@ class Policy < ActiveRecord::Base
 
   #review people WG
   def get_people_in_WG wg_id, access_type
-      w_group = WorkGroup.find(wg_id)
-    if w_group
-      people_in_wg = [] #id, name, access_type
-      w_group.people.each do |person|
-        people_in_wg.push [person.id, "#{person.name}", access_type ] unless person.blank?
-      end
-    end
-    return people_in_wg
+      collect_people_details(WorkGroup.find(wg_id),access_type)
   end
 
   #review people in black list, white list and normal workgroup
@@ -422,37 +415,27 @@ class Policy < ActiveRecord::Base
     end
 
     if f_group
-      people_in_FG = [] #id, name, access_type
-      f_group.favourite_group_memberships.each do |fgm|
-        people_in_FG.push [fgm.person.id, "#{fgm.person.name}", fgm.access_type] if !fgm.blank? and !fgm.person.blank?
-      end
-      return people_in_FG
+      return f_group.favourite_group_memberships.collect do |fgm|
+        [fgm.person.id, "#{fgm.person.name}", fgm.access_type] if !fgm.blank? and !fgm.person.blank?
+      end.compact
     end
   end
 
 
   #review people in project
   def get_people_in_project project_id, access_type
-      project = Project.find(project_id)
-    if project
-      people_in_project = [] #id, name, access_type
-      project.people.each do |person|
-        people_in_project.push [person.id, "#{person.name}", access_type] unless person.blank?
-      end
-      return people_in_project
-    end
+    collect_people_details(Project.find(project_id),access_type)
   end
 
   #review people in institution
   def get_people_in_institution institution_id, access_type
-      institution = Institution.find(institution_id)
-    if institution
-      people_in_institution = [] #id, name, access_type
-      institution.people.each do |person|
-        people_in_institution.push [person.id, "#{person.name}", access_type] unless person.blank?
-      end
-      return people_in_institution
-    end
+    collect_people_details(Institution.find(institution_id),access_type)
+  end
+
+  def collect_people_details resource,access_type
+    resource.people.collect do |person|
+        [person.id, "#{person.name}", access_type] unless person.blank?
+    end.compact
   end
 
   #review people in network

@@ -47,13 +47,13 @@ class RebuildTagCloudsJobTest < ActiveSupport::TestCase
 
   test "create job" do
     assert_equal 0,Delayed::Job.count
-    RebuildTagCloudsJob.new.create_job
+    RebuildTagCloudsJob.new.queue_job
     assert_equal 1,Delayed::Job.count
 
     job = Delayed::Job.first
     assert_equal 3,job.priority
 
-    RebuildTagCloudsJob.new.create_job
+    RebuildTagCloudsJob.new.queue_job
     assert_equal 1,Delayed::Job.count
   end
 

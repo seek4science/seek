@@ -87,7 +87,7 @@ module Subscribable
 
   def set_subscription_job
       projects = ( Seek::Config.project_hierarchy_enabled)?  self.projects_and_descendants : self.projects
-      SetSubscriptionsForItemJob.new(self,projects).create_job
+      SetSubscriptionsForItemJob.new(self,projects).queue_job
   end
 
   def update_subscription_job_if_study_or_assay
@@ -120,8 +120,8 @@ module Subscribable
   private
 
   def update_subscriptions_for item, projects_to_add, projects_to_remove
-    SetSubscriptionsForItemJob.new(item, projects_to_add).create_job
-    RemoveSubscriptionsForItemJob.new(item, projects_to_remove).create_job
+    SetSubscriptionsForItemJob.new(item, projects_to_add).queue_job
+    RemoveSubscriptionsForItemJob.new(item, projects_to_remove).queue_job
   end
 end
 

@@ -52,7 +52,7 @@ module Seek
         if immediately_clear_tag_cloud?
           expire_annotation_fragments(attr)
         else
-          RebuildTagCloudsJob.new.create_job
+          RebuildTagCloudsJob.new.queue_job
         end
       end
       

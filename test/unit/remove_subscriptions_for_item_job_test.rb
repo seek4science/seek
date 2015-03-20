@@ -35,13 +35,13 @@ class RemoveSubscriptionsForItemJobTest < ActiveSupport::TestCase
 
       Delayed::Job.destroy_all
       assert_equal 0,Delayed::Job.count
-      RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).create_job
+      RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).queue_job
       assert_equal 1,Delayed::Job.count
 
       job = Delayed::Job.first
       assert_equal 1,job.priority
 
-      RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).create_job
+      RemoveSubscriptionsForItemJob.new(subscribable,subscribable.projects).queue_job
       assert_equal 1,Delayed::Job.count
   end
 

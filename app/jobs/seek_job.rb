@@ -17,11 +17,13 @@ class SeekJob
       end
     end
     if follow_on_job?
-      create_job(follow_on_priority, follow_on_delay.from_now, true)
+      queue_job(follow_on_priority, follow_on_delay.from_now, true)
     end
   end
 
-  def create_job(priority = default_priority, time = default_delay.from_now, allow_duplicate = allow_duplicate_jobs?)
+  #adds the job to the Delayed Job queue. Will not create it if it already exists and allow_duplicate is false,
+  #or by default allow_duplicate_jobs? returns false.
+  def queue_job(priority = default_priority, time = default_delay.from_now, allow_duplicate = allow_duplicate_jobs?)
     if allow_duplicate || !exists?
       Delayed::Job.enqueue(self, priority: priority, queue: queue_name, run_at: time)
     end

@@ -10,7 +10,7 @@ class AuthLookupUpdateJob < SeekJob
         items.uniq.each do |item|
           add_item_to_queue(item, queuepriority)
         end
-        create_job(priority, time)
+        queue_job(priority, time)
       end
     end
   end

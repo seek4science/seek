@@ -34,14 +34,14 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
 
   test "create job" do
       assert_difference("Delayed::Job.count",1) do
-        ProjectSubscriptionJob.new(1).create_job
+        ProjectSubscriptionJob.new(1).queue_job
       end
 
       job = Delayed::Job.first
       assert_equal 2,job.priority
 
       assert_no_difference("Delayed::Job.count") do
-        ProjectSubscriptionJob.new(1).create_job
+        ProjectSubscriptionJob.new(1).queue_job
       end
   end
 

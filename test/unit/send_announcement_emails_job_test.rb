@@ -39,14 +39,14 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
       site_announcement_id = 1
       from_notifiee_id = 1
       assert_difference("Delayed::Job.count",1) do
-        SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).create_job
+        SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).queue_job
       end
 
       job = Delayed::Job.first
       assert_equal 3,job.priority
 
       assert_no_difference("Delayed::Job.count") do
-        SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).create_job
+        SendAnnouncementEmailsJob.new(site_announcement_id,from_notifiee_id).queue_job
       end
   end
 

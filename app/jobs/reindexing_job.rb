@@ -29,6 +29,6 @@ class ReindexingJob < SeekJob
         ReindexingQueue.create item: item
       end
     end
-    create_job(priority, time) unless exists?
+    queue_job(priority, time) unless exists?
   end
 end
