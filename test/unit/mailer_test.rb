@@ -243,6 +243,17 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
+  test "welcome no projects" do
+    @expected.subject = 'Welcome to Sysmo SEEK'
+    @expected.to = "Quentin Jones <quentin@email.com>"
+    @expected.from    = "no-reply@sysmo-db.org"
+
+    @expected.body = read_fixture('welcome_no_projects')
+
+    assert_equal encode_mail(@expected), encode_mail(Mailer.welcome_no_projects(users(:quentin),"localhost"))
+
+  end
+
   test "test mail" do
     with_config_value(:application_name,"SEEK EMAIL TEST") do
       with_config_value(:site_base_host,"http://fred.com") do

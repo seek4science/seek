@@ -116,12 +116,7 @@ class Mailer < ActionMailer::Base
   end
   
   def welcome_no_projects(user,base_host)
-    @name = user.person.name
-    @person = user.person
-    @host = base_host
-    mail(:from=>Seek::Config.noreply_sender,
-         :to=>user.person.email_with_name,
-         :subject=>"Welcome to #{Seek::Config.application_name}")
+    welcome(user,base_host) #the only difference is the view template, which is picked from the method name
   end
 
   def contact_admin_new_user(details,user,base_host)
