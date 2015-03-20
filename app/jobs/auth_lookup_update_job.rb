@@ -15,6 +15,10 @@ class AuthLookupUpdateJob < SeekJob
     end
   end
 
+  def queue_name
+    'authlookup'
+  end
+
   private
 
   def perform_job(item)
@@ -66,10 +70,6 @@ class AuthLookupUpdateJob < SeekJob
       end
     end
     GC.start
-  end
-
-  def queue_name
-    'authlookup'
   end
 
   def follow_on_job?
