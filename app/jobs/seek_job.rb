@@ -3,7 +3,7 @@
 # utility methods for counting and checking if a job exists, and creating a new job.
 class SeekJob
   include CommonSweepers
-  include DefaultJobParameters # the default parameters - these are methods that can be overridden in the job implementation
+  include DefaultJobProperties # the default properties - these are methods that can be overridden in the job implementation
 
   def perform
     gather_items.each do |item|

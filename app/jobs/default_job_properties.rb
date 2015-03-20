@@ -1,4 +1,4 @@
-module DefaultJobParameters
+module DefaultJobProperties
   # whether create_job will create a new job if one already exists with the same properties
   def allow_duplicate_jobs?
     true
