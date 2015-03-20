@@ -47,16 +47,58 @@ module AdminHelper
     case action
       when "activate"
         if user_or_person.is_a?(User) && user_or_person.person
-          admin_activate_user_button = content_tag(:li, image_tag_for_key('activate', activate_path(:activation_code => user_or_person.activation_code), "user activation", {}, "Activate now"))
-          resend_activation_email_button = content_tag(:li, image_tag_for_key('message', resend_activation_email_user_path(user_or_person), "Resend activation email", {:method => :post}, "Resend activation email"))
-          buttons =  admin_activate_user_button + resend_activation_email_button
+          admin_activate_user_button = button_link_to("Activate now", 'activate', activate_path(:activation_code => user_or_person.activation_code))
+          resend_activation_email_button = button_link_to("Resend activation email", 'message', resend_activation_email_user_path(user_or_person), :method => :post)
+          admin_activate_user_button + ' ' + resend_activation_email_button
         end
       when "delete"
-        buttons = content_tag(:li, image_tag_for_key('destroy', user_or_person , "delete", {:method => :delete, :confirm => "Are you sure you wish to delete this #{user_or_person.class.name}?"}, "Delete"))
+        button_link_to("Delete", 'destroy', user_or_person, {:method => :delete, :confirm => "Are you sure you wish to delete this #{user_or_person.class.name}?"})
       else
         nil
     end
-    content_tag(:ul, buttons, :class => "sectionIcons")
+  end
+
+  def admin_text_setting(name, value, title, description = nil, options = {})
+    admin_setting_block(title, description) do
+      text_field_tag(name, value, options.merge!(:class => 'form-control'))
+    end
+  end
+
+  def admin_textarea_setting(name, value, title, description = nil, options = {})
+    admin_setting_block(title, description) do
+      text_area_tag(name, value, options.merge!(:rows => 5, :class => 'form-control'))
+    end
+  end
+
+  def admin_file_setting(name, title, description = nil, options = {})
+    admin_setting_block(title, description) do
+      file_field_tag(name, options)
+    end
+  end
+
+  def admin_password_setting(name, value, title, description = nil, options = {})
+    admin_setting_block(title, description) do
+      password_field_tag(name, value, options.merge!(:autocomplete => 'off', :class => 'form-control'))
+    end
+  end
+
+  def admin_checkbox_setting(name, value, checked, title, description = nil, options = {})
+    content_tag(:div, :class => 'checkbox') do
+      content_tag(:label, :class => 'admin-checkbox') do
+        check_box_tag(name, value, checked, options) + title.html_safe
+      end +
+          (description ? content_tag(:p, description.html_safe, :class => 'help-block') : ''.html_safe)
+    end
+  end
+
+  private
+
+  def admin_setting_block(title, description)
+    content_tag(:div, :class => 'form-group') do
+      content_tag(:label, title) +
+          (description ? content_tag(:p, description.html_safe, :class => 'help-block') : ''.html_safe) +
+          yield
+    end
   end
 
 end

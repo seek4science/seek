@@ -3,6 +3,7 @@
   there items queued, or jobs running or waiting to run, it is not uncommon
   for there to be a mismatch.
 </p>
+
 <p style="font-weight: bolder;">
   <% if AuthLookupUpdateQueue.new.count>0 -%>
       There are <%= AuthLookupUpdateQueue.new.count -%> items queued to be processed.
@@ -18,7 +19,9 @@
       There are no jobs waiting to be run, or currently running.
   <% end -%>
 </p>
-<table>
+
+<table class="table table-hover">
+  <thead>
   <tr>
     <th>User ID</th>
     <th>Item type</th>
@@ -27,6 +30,7 @@
     <th>Lookup table last ID</th>
     <th>Asset last ID</th>
   </tr>
+  </thead>
   <% User.all.push(nil).each do |user| -%>
       <% Seek::Util.authorized_types.each do |type| -%>
 

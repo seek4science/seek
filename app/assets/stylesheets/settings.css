@@ -25,6 +25,7 @@ ul.settings {
 }
 
 .additional_settings {
-    padding-left: 1em;
-    padding-bottom: 0.3em;
+    padding-left: 2em;
+    margin: 1em;
+    border-left: 1px solid #ddd;
 }
