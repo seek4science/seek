@@ -28,7 +28,8 @@
                                               :update => {:success => 'user_stats_list'},
                                               :success => "Element.show('user_stats_list'); new Effect.Highlight('user_stats_list', { duration: 1.0 });",
                                               :loading => "Element.show('spinner_for_user_stats');Element.hide('user_stats_list');Element.hide('refresh_button_for_user_stats');",
-                                              :complete => "Element.hide('spinner_for_user_stats');Element.show('user_stats_list');Element.show('refresh_button_for_user_stats');"),
+                                              :complete => "Element.hide('spinner_for_user_stats');Element.show('user_stats_list');Element.show('refresh_button_for_user_stats');") +
+                                              '; return false;',
                      :id=>'refresh_button_for_user_stats', :style=>'display:none;'
   %>
 </div>
