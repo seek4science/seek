@@ -1,5 +1,5 @@
 <h1>Choose an analysis...</h1>
-<div style="width: <%= logged_in? ? '900px' : '770px'-%>; margin: auto; text-align: center; overflow: auto">
+<div>
   <% WorkflowCategory.all.each do |category| %>
     <% if category.name != WorkflowCategory::OTHER %>
       <% visible_workflow_count = Workflow.where(:category_id => category.id).select {|w| w.can_view?}.count %>

@@ -6,10 +6,10 @@
 <head>
   <meta http-equiv="X-UA-Compatible"/>
   <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BioVeL Portal</title>
   <link rel="shortcut icon" href="<%= asset_path('biovel-logo-no-text.png')%>" type="image/png"/>
 
-  <%= analytics_init if Seek::Config.google_analytics_enabled %>
   <%= csrf_meta_tag %>
 
   <%= seek_stylesheet_tags %>
@@ -23,82 +23,52 @@
           $(element).innerHTML =<%= ("'" + image_tag("ajax-loader-large.gif") + "'").html_safe -%>
       }
   </script>
+
+  <link href="#data" type="application/json" rel="exhibit-data" />
 </head>
 
 <body id="body">
-<div id="container">
 
-  <div id="header" class="clearfix">
-    <div>
-      <%= link_to image_tag("biovel-logo-official-small.png", :alt => "BioVeL", :title => "BioVeL", :style => "height: 50px"), "http://www.biovel.eu/", :style => "float: left", :target => '_blank' %>
-      <ul class="biovel-menutabs clearfix">
-        <%= navigation_link 'Home', main_app.root_path, nil, controller_name == 'homes' -%>
-        <%= navigation_link t('data_file').pluralize, main_app.data_files_path, nil, controller_name == 'data_files' -%>
-        <%= navigation_link 'Workflows', main_app.workflows_path, nil, controller_name == 'workflows' -%>
-        <%= navigation_link 'Runs', taverna_player.runs_path, nil, controller_name == 'runs' -%>
-      </ul>
-      <ul class="biovel-menutabs clearfix" style="float: right; margin-right: 20px">
-        <%= navigation_link('Contact', main_app.contact_path, nil, false) -%>
-        <% if logged_in? && current_user.person && !current_user.person.new_record? %>
-            <%= navigation_link current_user.person.name, main_app.person_path(current_user.person), nil, false -%>
-            <%= navigation_link('Admin', main_app.admin_path, nil, false) if admin_logged_in? -%>
-            <%= navigation_link 'Log out', main_app.logout_path, nil, false -%>
-        <% else %>
-            <li><a href="#" onclick="$('menubar-login-form').toggle();">Log in / Register</a></li>
-            <div id="menubar-login-form" style="display: none"><%= render :partial => "gadgets/sign_in" %></div>
-        <% end %>
-      </ul>
-    </div>
-  </div>
-  <div id="bd">
-    <div id="yui-main">
-      <div id="content">
-        <table width="100%">
-          <tr>
-            <td>
-            </td>
+<%= render :partial=>"layouts/navbar/biovel_navbar" %>
 
-            <td class="return_to_search" id='return_to_search'>
-              <%= add_return_to_search %>
-            </td>
-          </tr>
-        </table>
+<div id="content">
+  <div class="container-fluid">
+    <% unless breadcrumbs.empty? %>
+        <div class="breadcrumbs">
+          <ol class="breadcrumb">
+            <%= render_breadcrumbs :tag => 'li', :separator => ' ' %>
+          </ol>
+        </div>
+    <% end %>
 
-        <%# applying styling to error / notice messages -%>
-        <% if flash[:error] %>
-            <div id="error_flash" class="box_standout curved with_smaller_shadow" style="color: red; margin: 0.8em 0.8em; line-height: 1.4;">
-              <%= link_to_function image_tag("close.gif", :style => "float: right;"), "new Effect.toggle('error_flash','slide',{duration:0.3});" %>
-              <%= flash[:error] %>
-            </div>
+    <%= add_return_to_search %>
+
+    <%# applying styling to error / notice messages -%>
+    <% if flash[:error] %>
+        <%= alert_box('danger', :id => 'error_flash', :class => 'fade in') do %>
+            <%= flash[:error] %>
         <% end %>
-        <% if flash[:notice] %>
-            <div id="notice_flash" class="box_standout curved with_smaller_shadow" style="color: green; margin: 0.8em 0.8em; line-height: 1.4;">
-              <%= link_to_function image_tag("close.gif", :style => "float: right;"), "new Effect.toggle('notice_flash','slide',{duration:0.3});" %>
-              <%= flash[:notice] %>
-            </div>
+    <% end %>
+    <% if flash[:notice] %>
+        <%= alert_box('success', :id => 'notice_flash', :class => 'fade in') do %>
+            <%= flash[:notice] %>
         <% end %>
-        <% if logged_in? && current_user.person && current_user.person.projects.empty? %>
-          <div class="box_standout curved with_smaller_shadow" style="margin: 0.8em 0.8em; line-height: 1.4;">
+    <% end %>
+    <% if logged_in? && current_user.person && current_user.person.projects.empty? %>
+        <%= alert_box('warning') do %>
             <%= image 'denied', :class => 'icon' %> Your project membership has not been confirmed.
             You will be unable to run or upload workflows until an administrator confirms your membership.
-          </div>
         <% end %>
+    <% end %>
 
-
-        <%# main content part of every page -%>
-        <%= yield :layout %>
-
-      </div>
-    </div>
+    <%# main content part of every page -%>
+    <%= yield :layout %>
   </div>
-
-  <div id="ft">
-    <div>
-      <%= render :partial => "layouts/biovel_footer" %>
-    </div>
-  </div>
-
-  <%= piwik_tracking_tag %>
 </div>
+
+<%= render :partial=>"layouts/biovel_footer" %>
+
+<%= piwik_tracking_tag %>
+<%= analytics_init if Seek::Config.google_analytics_enabled %>
 </body>
 </html>

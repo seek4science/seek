@@ -1,7 +1,15 @@
-<%= image_tag "logos/eu_logo.jpg", :style => "float: left; margin: 0 20px" %>
+<div id="ft">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-10">
+        <%= image_tag "logos/eu_logo.jpg", :style => "float: left; margin: 0 20px" %>
+        <%= link_to "BioVeL", "http://biovel.eu/", :target => '_blank' %> has received funding from the European Union's Seventh Framework Programme for research,
+        technological development and demonstration under grant agreement no. 283359.
+      </div>
 
-<div style="width: 800px"><%= link_to "BioVeL", "http://biovel.eu/", :target => '_blank' %> has received funding from the European Union's Seventh Framework Programme for research,
-  technological development and demonstration under grant agreement no. 283359.
+      <div class="col-sm-2 text-right">
+        Portal version: <%= $version -%>
+      </div>
+    </div>
+  </div>
 </div>
-
-<p style="text-align: right;">Portal version: <%= $version -%></p>

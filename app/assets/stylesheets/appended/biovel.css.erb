@@ -7,25 +7,10 @@
     clear: both;
 }
 
-/* Max Width */
-
-#header > div, #bd > div {
-    max-width: 1400px;
-    min-width: 900px;
-    margin: auto;
-}
-
-#ft > div {
-  max-width: 1360px;
-  min-width: 860px;
-  padding: 0 20px;
-  margin: auto;}
-
 .workflow-category {
-    display: block;
-    float: left;
-    width: 116px;
-    height: 116px;
+    display: inline-block;
+    width: 130px;
+    height: 130px;
     background-color: #f4f4f4;
     font-size: 14px;
     box-shadow: 1px 1px 3px #ccc;
@@ -34,6 +19,7 @@
     color: #333333;
     text-align: center;
     border-radius: 8px;
+    vertical-align: middle;
 }
 
 .workflow-category:hover {
@@ -42,10 +28,10 @@
     border-color: #77aa11;
 }
 
-
 #modal-interaction-dialog {
     background-color: #FFFFCC;
 }
+
 .interaction-modal .ui-dialog-titlebar {
     padding: 15px;
     background-color: #b1e10f;
@@ -53,48 +39,18 @@
     border-color: #77aa11;
     background-image: none;
 }
+
 .modal-interaction-body {
     background-color: #ffffff;
 }
 
-body, html {
-    background: #FAFAFA;
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    color: #444;
-}
-
 #ft {
-    position: absolute;
-    width: 100%;
-    height: 70px;
-    border: none;
     background: #dddddd;
     color: #555555;
-    padding-top: 20px;
-    font-weight: normal;
-    text-align: justify;
-    margin-bottom: 0;
 }
 
 #ft a {
     font-weight: bold;
-}
-
-#bd {
-    min-height: 0;
-    padding: 50px 20px 130px;
-}
-
-#container {
-    position: relative;
-    min-height: 100%;
-}
-
-#content {
-  padding-bottom: 20px;
-  overflow: auto;
 }
 
 a {
@@ -363,12 +319,6 @@ div.your_recent.full_width {
     padding: 5px;
 }
 
-body {
-    text-align: left;
-    border: none;
-    min-width: 960px;
-}
-
 #run-interaction iframe {
     margin: 20px auto;
     border: 1px solid #999;
@@ -551,6 +501,10 @@ a.doc-link:hover, a.button-link:hover {
   box-shadow: 0 0 8px #333;
 }
 
+.logo_link {
+    margin-right: 0;
+}
+
 .contribution_title {
   margin-left: 0;
   border: 0;
@@ -631,7 +585,7 @@ a.doc-link:hover, a.button-link:hover {
   background-repeat: repeat;
   position: absolute;
   bottom: 0;
-  width: 880px;
+  width: 890px;
   padding: 10px;
   text-align: left;
 }
