@@ -1,3 +1,5 @@
+@import 'biovel_variables';
+
 .clearfix:before, .clearfix:after {
     content: " ";
     display: table;
@@ -11,9 +13,9 @@
     display: inline-block;
     width: 130px;
     height: 130px;
-    background-color: #f4f4f4;
+    background-color: #fff;
     font-size: 14px;
-    box-shadow: 1px 1px 3px #ccc;
+    box-shadow: 1px 1px 3px $biovel-shadow;
     border: 1px solid #ccc;
     margin: 5px;
     color: #333333;
@@ -23,9 +25,9 @@
 }
 
 .workflow-category:hover {
-    background-color: #b1e10f;
+    background-color: $biovel-light-green;
     color: #333333;
-    border-color: #77aa11;
+    border-color: $biovel-green-border;
 }
 
 #modal-interaction-dialog {
@@ -34,9 +36,9 @@
 
 .interaction-modal .ui-dialog-titlebar {
     padding: 15px;
-    background-color: #b1e10f;
+    background-color: $biovel-light-green;
     color: #333333;
-    border-color: #77aa11;
+    border-color: $biovel-green-border;
     background-image: none;
 }
 
@@ -45,33 +47,13 @@
 }
 
 #ft {
-    background: #dddddd;
+    background: $biovel-grey;
     color: #555555;
+    border: none;
 }
 
 #ft a {
     font-weight: bold;
-}
-
-a {
-    color: #003355;
-}
-
-a:hover {
-    color: #225577;
-}
-
-#header {
-    box-shadow: 0 3px 5px #ccc;
-    height: 50px;
-    background-color: #99cc33;
-    border-bottom: 1px solid #88bb22;
-    position: absolute;
-    width: 100%;
-}
-
-div.asset_form {
-    text-align: left;
 }
 
 td.port-name, th.port-name {
@@ -269,25 +251,6 @@ table.display tr td:first-child {
     background-color: #ACF;
 }
 
-#workflow_list {
-    min-width: 640px;
-    max-width: 1140px;
-    margin-left: 260px;
-}
-
-#menubar-login-form {
-    position: absolute;
-    top: 50px;
-    border-width: 0 1px 1px;
-    border-style: solid;
-    border-color: #ccc;
-    box-shadow: 0 3px 5px #ccc;
-    width: 200px;
-    margin-left: 30px;
-    background: white;
-    z-index: 999999;
-}
-
 #workflow_runs_table_wrapper {
     position: static;
 }
@@ -336,18 +299,6 @@ span.mime_type {
 
 .chk-select-column {
   vertical-align: middle;
-}
-
-input[type="submit"], button {
-    background: none repeat scroll 0 0 #EEEEEE;
-    border: 1px solid #AAAAAA;
-    border-radius: 3px 3px 3px 3px;
-    color: #000000;
-    cursor: pointer;
-    padding: 3px 4px;
-    font-size: 14px;
-    font-family: arial, sans-serif;
-    margin-top: 5px;
 }
 
 h2.standout {
@@ -537,35 +488,6 @@ a.doc-link:hover, a.button-link:hover {
   opacity: 0.2;
 }
 
-.biovel-menutabs {
-    margin: 0;
-    border-top: 0px;
-    border-bottom: 0px;
-    float: left;
-}
-
-.biovel-menutabs li {
-    list-style: none;
-    margin: 0;
-    float: left;
-}
-
-.biovel-menutabs li.spacer_before {
-    margin-left: 1em;
-}
-
-.biovel-menutabs li a {
-    padding: 15px 20px;
-    text-decoration: none;
-    color: #283a12;
-    line-height: 20px;
-    display: block;
-}
-
-.biovel-menutabs li a:hover, .biovel-menutabs li.active a {
-    background-color: #b1e10f;
-}
-
 .dataTables_wrapper {
   font-size: 12px;
 }
@@ -588,6 +510,10 @@ a.doc-link:hover, a.button-link:hover {
   width: 890px;
   padding: 10px;
   text-align: left;
+}
+
+.jcarousel-wrapper  {
+    border-color: $biovel-border;
 }
 
 .image-credit {
@@ -645,4 +571,3 @@ div.workflow-port:first-child {
 .visibility.private { border-color: red }
 .visibility.group { border-color: yellow }
 .visibility.public { border-color: green }
-
