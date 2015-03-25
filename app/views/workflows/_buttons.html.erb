@@ -50,4 +50,8 @@
     <% if item.is_doiable?(version) %>
         <li><%= image_tag_for_key('doi', polymorphic_path(item, :action => 'mint_doi_confirm', :version => version), nil, {}, "Generate a DOI") -%></li>
     <% end %>
+    <% if @workflow.runs.empty? %>
+        <li><%= delete_icon(@workflow, current_user) %></li>
+    <% end %>
+    <li><%= share_icon %></li>
 <% end %>

@@ -1,23 +1,15 @@
-<% if logged_in? && current_user.person.member? -%>
-  <div id="upload_new_version_form" style="display:none">
-    <%= form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
-
-      <div id="upload_from_file">
-        <b>File to upload:</b>
-        <span class="required">*</span>
-        <br/>
-        <%= file_field :workflow, :data -%>
-      </div>
-      <p style="display: none">
-        <b>Revision comments (optional)</b>
-        <br/>
-        <%= text_area_tag :revision_comment, nil, :size=>"55x4" -%>
-        <br/>
-      </p>
-      <p>
-        <%= submit_tag "Upload", :id => "new_version_submit_btn"-%>
-      </p>
-
-    <% end -%>
-  </div>
-<%end%>
+<% if logged_in_and_member? -%>
+    <%= panel('New version', :id => 'upload_new_version_form', :style => 'display: none') do %>
+        <%= form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
+            <div class="form-group">
+              <label>File to upload<span class="required">*</span></label>
+              <%= file_field :workflow, :data -%>
+            </div>
+            <div class="form-group">
+              <label>Revision comments (optional)</label>
+              <%= text_area_tag :revision_comment, nil, :size=>"55x4", :class => 'form-control' -%>
+            </div>
+            <%= submit_tag "Upload", :id => "new_version_submit_btn", :class => 'btn btn-primary'-%>
+        <% end %>
+    <% end %>
+<% end %>
