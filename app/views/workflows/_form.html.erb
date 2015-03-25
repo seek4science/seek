@@ -1,40 +1,42 @@
 <%= form_for(@workflow, :html => {:multipart => true}) do |f| -%>
-  <!-- Delete button -->
-  <div class="asset_form">
+    <!-- Delete button -->
     <%= error_messages_for :workflow -%>
     <%= hidden_field_tag 'workflow[title]', 'A workflow' -%>
     <% if @workflow.new_record? %>
-      <label>File</label><br/>
-      <p>
-        <%= file_field_tag 'content_blob[data]' %>
-      </p>
+        <div class="form-group">
+          <label>File</label>
+          <div>
+            <%= file_field_tag 'content_blob[data]' %>
+          </div>
+        </div>
     <% end %>
 
-    <p>
-      <label>Category</label><br/>
-      <%= f.select(:category_id, WorkflowCategory.all.collect { |c| [c.name, c.id] }) %>
-    </p>
+    <div class="form-group">
+      <label>Category</label>
+      <%= f.select(:category_id, WorkflowCategory.all.collect { |c| [c.name, c.id] }, {}, :class => 'form-control') %>
+    </div>
 
-    <p>
-      <label>MyExperiment Link</label><br/>
-      <%= f.text_field(:myexperiment_link) -%>
-    </p>
-    <p>
-      <label>Documentation Link</label><br/>
-      <%= f.text_field(:documentation_link) -%>
-    </p>
+    <div class="form-group">
+      <label>MyExperiment Link</label>
+      <%= f.text_field(:myexperiment_link, :class => 'form-control') -%>
+    </div>
 
-    <p style="margin: 1em 0">
+    <div class="form-group">
+      <label>Documentation Link</label>
+      <%= f.text_field(:documentation_link, :class => 'form-control') -%>
+    </div>
+
+    <div class="form-group">
       <label for="workflow_sweepable" class="enable-data-sweeps">
         <%= help_icon("Ticking this box will allow users to run batches of runs with this workflow. "+
-                      "It may not be appropriate for all workflows to be ran in this manner, for example certain workflows with interactions.") -%>
+                              "It may not be appropriate for all workflows to be ran in this manner, for example certain workflows with interactions.") -%>
         Allow data sweeps?
         <%= f.check_box(:sweepable, :style => "vertical-align: middle") -%>
       </label>
-    </p>
+    </div>
 
     <% unless @workflow.new_record? %>
-      <%= render :partial => 'port_type_table', :locals => {:f => f} %>
+        <%= render :partial => 'port_type_table', :locals => {:f => f} %>
     <% end %>
 
     <div<%= ' style="display: none"'.html_safe if current_user.guest_project_member? -%>>
@@ -45,12 +47,12 @@
         <%= render :partial => "assets/asset_form_bottom",
                    :locals => {:f => form, :attribution_enable => false, :creators_enable => false, :show_publications => false, :sharing_enable => !current_user.guest_project_member?, :sharing_link => false} %>
     <% end %>
-    <p>
-      <%= preview_permission_popup_link(@workflow) -%>
-      <%= submit_tag @workflow.new_record? ? "Next" : "Save Changes", :id => "workflow_submit_btn", :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);" -%>
-      or
-      <%= link_to 'Cancel', @workflow.new_record? ? workflows_path : workflow_path -%>
-    </p>
-  </div>
 
+    <%= preview_permission_popup_link(@workflow) -%>
+    <%= submit_tag (@workflow.new_record? ? "Next" : "Save Changes"),
+                   :id => "workflow_submit_btn",
+                   :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);",
+                   :class => 'btn btn-primary'-%>
+    or
+    <%= link_to 'Cancel', (@workflow.new_record? ? workflows_path : workflow_path), :class => 'btn btn-default' -%>
 <% end %>
