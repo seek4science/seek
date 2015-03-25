@@ -90,7 +90,7 @@ gem 'mimemagic'
 
 gem 'datacite_doi_ify'
 
-gem 'bootstrap-sass', '~>3.3.1'
+gem 'bootstrap-sass', '3.1.1.0'
 gem 'sass-rails', '>= 3.2'
 
 gem 'ro-bundle', :git=>"https://github.com/myGrid/ruby-ro-bundle"

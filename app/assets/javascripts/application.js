@@ -10,7 +10,7 @@
 //= require boxover
 //= require scriptaculous
 //= require controls
-//= require bootstrap-sprockets
+//= require bootstrap
 //= require collapsible_panels
 //= require redbox
 //= require builder
