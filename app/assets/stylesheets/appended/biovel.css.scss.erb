@@ -354,21 +354,23 @@ div.csv table td {
   padding: 2px 5px;
 }
 
+ul.sweep_input_selection {
+    padding-left: 0;
+}
+
 ul.sweep_input_selection li {
   margin: 3px 0;
+  list-style: none;
 }
 
 ul.sweep_input_selection label {
-  background: #CDE;
+  background: $biovel-light-yellow;
+  border: 1px solid $biovel-border;
   padding: 5px;
   display: block;
   width: 20em;
-  border-radius: 5px;
+  border-radius: 3px;
   cursor: pointer;
-}
-
-ul.sweep_input_selection label:hover {
-  background: #DEF;
 }
 
 ul.sweep_input_selection li input {
@@ -381,27 +383,14 @@ div.output, div.input {
   border: 1px solid #ccc;
 }
 
-div.main_content_left_box {
-  float: left;
-  width: 79%;
-}
-
 pre {
   text-align: left;
-}
-
-
-#upload_new_version_form {
-  margin-bottom: 30px;
-  border-bottom: 1px solid #333;
-  padding-bottom: 30px;
 }
 
 a.with_icon img {
   margin-right: 0.5em;
   vertical-align: text-top;
 }
-
 
 .inline_pdf {
   width: 100%;
@@ -464,8 +453,8 @@ a.doc-link:hover, a.button-link:hover {
 }
 
 .enable-data-sweeps {
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: $biovel-light-yellow;
+  border: 1px solid $biovel-border;
   padding: 8px;
   border-radius: 3px;
 }
