@@ -62,6 +62,9 @@ $nav-tabs-active-link-hover-bg: $biovel-light-yellow;
 $nav-tabs-active-link-hover-border-color: $biovel-border;
 $nav-link-hover-bg: $biovel-light-yellow;
 
+$well-bg: lighten($biovel-light-yellow, 5%);
+$well-border: $biovel-border;
+
 // Seek overrides
 $info-box-colour: $biovel-light-yellow;
 $seek-button-colour: $biovel-light-yellow;
