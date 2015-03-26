@@ -245,11 +245,7 @@ class DataciteDoiTest < ActionController::IntegrationTest
       assert latest_version.save
       assert asset.is_doi_minted?(latest_version.version)
 
-      if type == 'workflow'
-        get "/#{type.pluralize}/#{asset.id}/edit"
-      else
-        get "/#{type.pluralize}/#{asset.id}"
-      end
+      get "/#{type.pluralize}/#{asset.id}"
 
       assert_select "span[class='disabled_icon disabled']", :text => /Delete/
     end
