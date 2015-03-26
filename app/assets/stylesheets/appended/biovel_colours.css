@@ -8,12 +8,6 @@
 /* Light green:       #99CC33 */
 /* Footer grey:       #CFD5AF */
 
-.workflow {
-  background-color: #ffc;
-  border-color: #918e5b;
-  box-shadow: 1px 1px 3px #918e5b;
-}
-
 .workflow-category {
   background-color: #fff;
   box-shadow: 1px 1px 3px #918e5b;
@@ -81,13 +75,6 @@ h2.standout {
   border: none;
 }
 
-.dataTables_wrapper th {
-  background-color: white;
-}
-
-.dataTables_wrapper table {
-  border: 1px solid #918e5b;
-}
 
 .with_shadow {
   box-shadow: -4px -4px 6px #b2af6a;
