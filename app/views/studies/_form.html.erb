@@ -38,6 +38,9 @@
 
 <%= render :seek_partial=>"assets/sharing_form" if @study.can_manage? -%>
 
+<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => t('study'),
+                                                                        :related_publications => @study.publications} -%>
+
 <script type="text/javascript">
     var CREATE_INVESTIGATION_LINK = "<%= create_investigation_url %>";
 </script>
