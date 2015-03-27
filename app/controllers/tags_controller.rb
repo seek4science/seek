@@ -33,7 +33,7 @@ class TagsController < ApplicationController
   end
 
   def query
-    @tags = get_tags.where("text LIKE ?", "#{params[:query]}%").limit(10).map {|t| t.text}
+    @tags = get_tags.where("text LIKE ?", "#{params[:query]}%").uniq.limit(10).map {|t| t.text}
 
     respond_to do |format|
       format.json { render :json => @tags.to_json }
