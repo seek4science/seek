@@ -1,47 +1,45 @@
 <!-- Workflow icon, title and category (category not really needed if we are already inside a category?) -->
-<% image = resource_avatar workflow,:style=>"width: 24px; height: 24px; vertical-align: middle; float: left; padding-right: 5px;"  %>
-<h3 style="float: left; width: 100%; margin: 0; padding: 0; vertical-align:middle;">
-  <%= link_to image, show_resource_path(workflow) %>
-  <%= link_to workflow.title, show_resource_path(workflow) %>
-  <% if show_category %>
-      <div class="category" style="float: right; font-weight:normal;">
-        <%= workflow.category.name %>
+
+<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <%= list_item_title workflow %>
+    <% if show_category %>
+        <div class="pull-right small">
+          <%= workflow.category.name %>
+        </div>
+    <% end %>
+  </div>
+
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-9 list_item_content">
+        <% project = workflow.projects.first %>
+        <% unless project.avatar.nil? %>
+            <%= image_tag avatar_url(project, project.avatar_id), :title => "Workflow contributed by #{project.title}",
+                          :alt => "#{project.title} avatar", :class => 'framed project-avatar' %>
+        <% end %>
+
+        <%= text_or_not_specified(workflow.description, :description => true, :auto_link=>true, :length=>300) %>
+
+        <!-- Workflow visibility, e.g. 'private' -->
+        <% ((workflow.authorization_supported? && workflow.can_manage?) ? list_item_visibility(workflow) : "").html_safe %>
+
+        <!-- Uploader and creators -->
+        <!--<div style="padding-top: 3px;">-->
+        <!--<%= list_item_contributor workflow -%>-->
+        <!--<% list_item_authorized_list workflow.creators, "Creator" %>-->
+        <!--<% list_item_optional_attribute "Other creators", h(workflow.other_creators), nil -%>-->
+        <!--</div>-->
       </div>
-  <% end %>
-</h3>
+      <% if workflow.can_run? %>
+          <div class="col-sm-3 text-right list_item_actions">
+            <%= button_link_to('Run workflow', 'run_workflow', taverna_player.new_run_path(:workflow_id => workflow.id, :version => workflow.version, :based_off => nil)) -%>
+          </div>
+      <% end %>
+    </div>
+  </div>
 
-<!-- Workflow visibility, e.g. 'private' -->
-<% ((workflow.authorization_supported? && workflow.can_manage?) ? list_item_visibility(workflow) : "").html_safe %>
-
-<!-- Uploader and creators -->
-<!--<div style="padding-top: 3px;">-->
-  <!--<%= list_item_contributor workflow -%>-->
-  <!--<% list_item_authorized_list workflow.creators, "Creator" %>-->
-  <!--<% list_item_optional_attribute "Other creators", h(workflow.other_creators), nil -%>-->
-<!--</div>-->
-
-<div style="clear: both;"></div>
-
-<!-- Avatar -->
-<% project = workflow.projects.first %>
-<% unless project.avatar.nil? %>
-    <%= image_tag avatar_url(project, project.avatar_id), :title => "Workflow contributed by #{project.title}",
-                  :alt => "#{project.title} avatar", :class => 'framed project-avatar' %>
-<% end %>
-
-<!-- Description -->
-<div class="description">
-  <%= text_or_not_specified(workflow.description, :description => true, :auto_link=>true, :length=>300) %>
+  <div class="panel-footer hidden-xs small">
+    Uploaded <%= workflow.created_at.strftime("%e %b %Y %H:%M:%S %Z") -%>
+  </div>
 </div>
-
-<!-- Action buttons -->
-<div style="float: left; margin-top: 10px; font-size: 80%; color: #666;">
-  Uploaded <%= workflow.created_at.strftime("%e %b %Y %H:%M:%S %Z") -%>
-</div>
-<ul class="sectionIcons" style="position: absolute; margin: 0px; padding: 0px; right: 10px; bottom: 10px;">
-  <% if workflow.can_run? %>
-    <li>
-      <%= image_tag_for_key('run_workflow', taverna_player.new_run_path(:workflow_id => workflow.id, :version => workflow.version, :based_off => nil), nil, {:style => "font-size: smaller;"}, 'Run workflow') -%>
-    </li>
-  <% end %>
-</ul>

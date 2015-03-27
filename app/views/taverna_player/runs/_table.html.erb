@@ -4,9 +4,9 @@
 <% poll_interval ||= 20000 %>
 <% show_user ||= false %>
 <%
-  unless defined?(poll)
+   unless defined?(poll)
      poll = true
-  end
+   end
 %>
 <script type="text/javascript">
     jQuery.noConflict();
@@ -48,32 +48,30 @@
             ]
         });
         <% if poll %>
-          $j('#<%= id -%>').data('poller', window.setInterval(function () { $j.get("<%= polling_url.html_safe %>", null, null, "script") }, <%= poll_interval -%>));
+        $j('#<%= id -%>').data('poller', window.setInterval(function () { $j.get("<%= polling_url.html_safe %>", null, null, "script") }, <%= poll_interval -%>));
         <% end %>
     });
 </script>
 
 <% redirect_to ||= taverna_player.runs_path %>
 <div id="workflow_runs">
-  <div class="scroll_box">
-    <table cellpadding="0" cellspacing="0" class="display" id="<%= id -%>" style="">
-      <thead>
-      <tr>
-        <th>Run</th>
-        <th>User</th>
-        <th>Workflow</th>
-        <th>Category</th>
-        <th>State</th>
-        <th>Created</th>
-        <th>Created Timestamp</th>
-        <th>Finished</th>
-        <th>Finished Timestamp</th>
-        <th>Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <%= render :partial => 'taverna_player/runs/table_body', :locals => { :runs => runs, :redirect_to => redirect_to } %>
-      </tbody>
-    </table>
-  </div>
+  <table cellpadding="0" cellspacing="0" class="display" id="<%= id -%>" style="">
+    <thead>
+    <tr>
+      <th>Run</th>
+      <th>User</th>
+      <th>Workflow</th>
+      <th>Category</th>
+      <th>State</th>
+      <th>Created</th>
+      <th>Created Timestamp</th>
+      <th>Finished</th>
+      <th>Finished Timestamp</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%= render :partial => 'taverna_player/runs/table_body', :locals => { :runs => runs, :redirect_to => redirect_to } %>
+    </tbody>
+  </table>
 </div>

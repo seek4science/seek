@@ -5,15 +5,15 @@
 </p>
 
 <p style="font-weight: bolder;">
-  <% if AuthLookupUpdateQueue.new.count>0 -%>
-      There are <%= AuthLookupUpdateQueue.new.count -%> items queued to be processed.
+  <% if AuthLookupUpdateQueue.count>0 -%>
+      There are <%= AuthLookupUpdateQueue.count -%> items queued to be processed.
   <% else -%>
       There are no items waiting to be processed.
   <% end -%>
 </p>
 
 <p style="font-weight: bolder;">
-  <% if AuthLookupUpdateJob.count(false)>0 -%>
+  <% if AuthLookupUpdateJob.new.count(false)>0 -%>
       There are <%= AuthLookupUpdateJob.new.count(false) -%> jobs waiting to run, or currently running.
   <% else -%>
       There are no jobs waiting to be run, or currently running.

@@ -1,5 +1,3 @@
-<%= javascript_include_tag "sharing.js" %>
-
 <div class="breadcrumbs">
   <a href="/">Home</a> &gt;
   <%= link_to @run.workflow.category.name, main_app.workflows_path(:category_id => @run.workflow.category) -%> &gt;
@@ -13,7 +11,6 @@
 
 <h1>Manage run: <%= @run.name %></h1>
 
-<div class="show_basic">
   <%= form_for @run, :url => main_app.run_path(@run.id), :method => "put" do |f| -%>
     <div class="asset_form">
       <%= error_messages_for :run -%>
@@ -29,10 +26,9 @@
       <% end %>
 
       <p>
-        <%= submit_tag 'Save' -%>
+        <%= submit_tag 'Save', :class => 'btn btn-primary' -%>
         or
-        <%= link_to 'Cancel', main_app.run_path(@run) -%>
+        <%= link_to 'Cancel', main_app.run_path(@run), :class => 'btn btn-default' -%>
       </p>
     </div>
   <% end %>
-</div>
