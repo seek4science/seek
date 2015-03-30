@@ -1,11 +1,11 @@
-<div id="workflow_search_box">
-  <% if Seek::Config.solr_enabled %>
-    <%= form_tag workflows_path, :method => :get do -%>
-      <%= text_field_tag :query, (params[:commit] == "Search") ? params[:query] : "", :placeholder => "Search workflows...", :class=>"curved" -%>
-      <%= (hidden_field_tag :category_id, params[:category_id]) unless params[:category_id].nil? %>
-      <%= (hidden_field_tag :uploader_id, params[:uploader_id]) unless params[:uploader_id].nil? %>
-      <%= submit_tag "Search" -%>
-      <%= submit_tag "Clear" %>
-    <% end %>
-  <% end %>
-</div>
+<% if Seek::Config.solr_enabled %>
+    <div id="workflow_search_box" class="form-group form-inline">
+      <%= form_tag workflows_path, :method => :get do -%>
+          <%= text_field_tag :query, (params[:commit] == "Search") ? params[:query] : "", :placeholder => "Search workflows...", :class=>"form-control" -%>
+          <%= (hidden_field_tag :category_id, params[:category_id]) unless params[:category_id].nil? %>
+          <%= (hidden_field_tag :uploader_id, params[:uploader_id]) unless params[:uploader_id].nil? %>
+          <%= submit_tag "Search", :class => 'btn btn-primary' -%>
+          <%= submit_tag "Clear", :class => 'btn btn-default' %>
+      <% end %>
+    </div>
+<% end %>

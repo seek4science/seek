@@ -11,7 +11,7 @@
 
             <p>
               <strong>Description:</strong>
-              <%= simple_format(p.description) %>
+              <%= text_or_not_specified(p.description) %>
             </p>
 
             <% unless p.example_value.blank? %>

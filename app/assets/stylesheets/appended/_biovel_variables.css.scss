@@ -38,6 +38,9 @@ $navbar-default-link-active-color: $navbar-default-link-color;
 $navbar-default-link-hover-color: $navbar-default-link-color;
 $navbar-default-link-hover-bg: $biovel-light-green;
 $navbar-default-link-active-bg: $biovel-light-green;
+$navbar-default-toggle-hover-bg: $biovel-light-green;
+$navbar-default-toggle-icon-bar-bg: $biovel-green-border;
+$navbar-default-toggle-border-color: $biovel-green-border;
 
 //$btn-default-color: ;
 $btn-default-bg: $biovel-light-yellow;
@@ -54,11 +57,11 @@ $panel-default-heading-bg: $biovel-light-yellow;
 $panel-inner-border: $biovel-border;
 
 $breadcrumb-bg: $biovel-light-yellow;
-$breadcrumb-color: $biovel-green;
+$breadcrumb-color: $biovel-border;
 
 $nav-tabs-border-color: $biovel-border;
 $nav-tabs-link-hover-border-color: $biovel-border;
-$nav-tabs-active-link-hover-bg: $biovel-light-yellow;
+$nav-tabs-active-link-hover-bg: #fff;
 $nav-tabs-active-link-hover-border-color: $biovel-border;
 $nav-link-hover-bg: $biovel-light-yellow;
 

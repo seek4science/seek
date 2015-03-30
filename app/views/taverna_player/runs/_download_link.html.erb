@@ -1,10 +1,7 @@
 <%
    download_link_name ||= 'Download'
    download_url ||= ''
-
-   image_filename = icon_filename_for_key('download')
-   image_options = { :alt => download_link_name }
-   img_tag = image_tag(image_filename, image_options).html_safe
-   download_tag = "#{img_tag} #{download_link_name}".html_safe
+   css_class ||= ''
 %>
-<%= link_to ('<span class="icon">' + download_tag + '</span>').html_safe, download_url -%>
+
+<%= button_link_to(download_link_name, 'download', download_url, :class => css_class) -%>

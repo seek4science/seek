@@ -129,9 +129,7 @@ module MenuHelper
 
   def navigation_link(text, url, icon = nil, active = false)
     content_tag(:li, :class => (active ? 'active' : nil)) do
-      link_to(url) do
-        %(<b class="#{icon}"></b> #{text}).html_safe
-      end
+      link_to(text, url)
     end
   end
 

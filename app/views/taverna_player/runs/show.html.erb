@@ -1,6 +1,4 @@
-<%= javascript_include_tag 'jquery-1.5.1.min.js' %>
 <script>
-    $j = jQuery.noConflict();
     // scroll to top thing
     //plugin
     jQuery.fn.topLink = function(settings) {
@@ -41,7 +39,6 @@
             $('top-link-box').hide();
         });
     });
-
 </script>
 
 <div class="run_results">
@@ -64,52 +61,36 @@
     <div id='top-link-close'><%=image("destroy")%></div>
   </div>
 
-  <div class="contribution_title">
-    <% project = @run.workflow.projects.first %>
-    <% unless project.avatar.nil? %>
-      <%= image_tag avatar_url(project, project.avatar_id), :class => 'framed project-avatar' %>
-    <% end %>
-    <h1><%= @run.name -%></h1>
-  </div>
+  <%= render :partial => "title",:locals => { :run=>@run } -%>
 
-  <%= render :partial => 'buttons', :locals => {:run => @run, :redirect_to => taverna_player.runs_path} %>
-  <br/>
+  <%= render :partial => "info", :locals => {:run => @run} %>
 
-  <div class="show_basic">
-    <%= render :partial => "info", :locals => {:run => @run} %>
+  <%= render :partial => "interaction", :locals =>
+                                              {:run => @run, :interaction => @interaction} %>
 
-    <div style="clear: both;"></div>
-
-    <%= render :partial => "interaction", :locals =>
-            {:run => @run, :interaction => @interaction} %>
-
-
-    <a href=''></a>
-    <div id="run-outputs" style="<%= 'display: none' unless @run.complete? && @run.outputs.size > 0-%>">
-      <%= folding_panel('Outputs') do %>
-          <% if @run.finished? && @run.outputs.any? %>
-              <%= render :partial => "outputs", :locals => {:run => @run} %>
-          <% end %>
-      <% end %>
-    </div>
-
-    <% if @run.inputs.any? %>
-        <div id="run-inputs">
-          <%= folding_panel('Inputs') do %>
-              <%= render :partial => "inputs", :locals => {:run => @run} %>
-          <% end %>
-        </div>
-    <% end %>
-
-    <div id="advanced" style="<%= 'display: none' unless @run.complete? -%>">
-      <%= folding_panel('Advanced', true) do %>
-          <%= render :partial => "advanced_info", :locals => {:run => @run} %>
-      <% end %>
-    </div>
-
-    <% unless @run.complete? %>
-        <%= render :partial => "poll", :locals => {:reload => run_path(@run)} %>
+  <div id="run-outputs" style="<%= 'display: none' unless @run.complete? && @run.outputs.size > 0-%>">
+    <%= folding_panel('Outputs') do %>
+        <% if @run.finished? && @run.outputs.any? %>
+            <%= render :partial => "outputs", :locals => {:run => @run} %>
+        <% end %>
     <% end %>
   </div>
+
+  <% if @run.inputs.any? %>
+      <div id="run-inputs">
+        <%= folding_panel('Inputs') do %>
+            <%= render :partial => "inputs", :locals => {:run => @run} %>
+        <% end %>
+      </div>
+  <% end %>
+
+  <div id="advanced" style="<%= 'display: none' unless @run.complete? -%>">
+    <%= folding_panel('Advanced', true) do %>
+        <%= render :partial => "advanced_info", :locals => {:run => @run} %>
+    <% end %>
+  </div>
+
+  <% unless @run.complete? %>
+      <%= render :partial => "poll", :locals => {:reload => run_path(@run)} %>
+  <% end %>
 </div>
-

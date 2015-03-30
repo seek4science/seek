@@ -1,4 +1,6 @@
 <h1><%= 'Workflow Runs' -%></h1>
+
+<%= panel do %>
 <div role="tabpanel">
   <ul class="nav nav-tabs" role="tablist">
     <% if logged_in? %>
@@ -32,6 +34,7 @@
     </div>
   </div>
 </div>
+<% end %>
 
 <%= javascript_include_tag 'easytabs.js' -%>
 <script type="text/javascript">

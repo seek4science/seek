@@ -1,0 +1,25 @@
+<%
+   project = run.workflow.projects.first
+   avatar = nil
+   unless project.avatar.nil?
+     avatar = image_tag avatar_url(project, project.avatar_id), :class => 'framed project-avatar'
+   end
+   buttons = render(:partial => 'buttons', :locals => {:run => @run, :redirect_to => taverna_player.runs_path})
+   col_width = buttons.blank? ? 12 : 6
+%>
+
+<div class="row contribution-header">
+  <div class="col-md-<%= col_width -%>">
+    <% unless avatar.blank? -%>
+        <%= avatar -%>
+    <% end %>
+    <h1>
+      <%= run.title -%>
+    </h1>
+  </div>
+  <% unless buttons.blank? %>
+      <div class="col-md-6 text-right-md" id="buttons">
+        <%= buttons %>
+      </div>
+  <% end %>
+</div>

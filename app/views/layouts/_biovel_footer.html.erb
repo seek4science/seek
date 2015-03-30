@@ -3,8 +3,13 @@
     <div class="row">
       <div class="col-sm-9 text-left">
         <%= image_tag "logos/eu_logo.jpg", :style => "float: left; margin: 0 20px" %>
-        <%= link_to "BioVeL", "http://biovel.eu/", :target => '_blank' %> has received funding from the European Union's Seventh Framework Programme for research,
-        technological development and demonstration under grant agreement no. 283359.
+        <p class="hidden-xs">
+          <%= link_to "BioVeL", "http://biovel.eu/", :target => '_blank' %> has received funding from the European Union's Seventh Framework Programme for research,
+          technological development and demonstration under grant agreement no. 283359.
+        </p>
+        <p class="visible-xs">
+          <%= link_to "BioVeL", "http://biovel.eu/", :target => '_blank' %> (FP7 grant no. 283359)
+        </p>
       </div>
 
       <div class="col-sm-3 text-right">

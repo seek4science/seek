@@ -1,5 +1,23 @@
 @import 'biovel_variables';
 
+/* Footer stuff */
+$footer-height: 80px;
+
+body {
+    position: relative;
+}
+#ft {
+    position: absolute;
+    height: $footer-height;
+    width: 100%;
+    overflow: hidden;
+    bottom: 0;
+}
+#content {
+    padding-bottom: $footer-height + 20px;
+    min-height: 800px;
+}
+
 .workflow-category {
     display: inline-block;
     width: 130px;
@@ -66,20 +84,6 @@ td.port-type input {
 
 td.port-type label {
     font-weight: normal;
-}
-
-#workflow_search_box {
-    padding: 12px 10px;
-    text-align: right;
-}
-
-#workflow_search_box input[type="submit"] {
-    line-height: 20px;
-}
-
-#workflow_search_box input[type="text"] {
-    height: 20px;
-    width: 15em;
 }
 
 .CodeRay > .code > pre, .script_example_data_box {
@@ -313,6 +317,7 @@ a.preview_result {
 
 ul.runs_and_sweeps_list  {
   margin: 0;
+  padding-left: 0;
 }
 
 ul.runs_and_sweeps_list li {
@@ -357,12 +362,6 @@ ul.sweep_input_selection label {
 
 ul.sweep_input_selection li input {
   vertical-align: middle;
-}
-
-div.output, div.input {
-  padding: 10px;
-  margin: 5px;
-  border: 1px solid #ccc;
 }
 
 pre {
@@ -538,12 +537,22 @@ div.workflow-port:first-child {
     background-color: white;
     margin-top: 5px;
     margin-bottom: 5px;
+    border-radius: 3px;
+}
+
+.visibility.private {
+    border-color: #f00;
+    background-color: #fcc;
+}
+.visibility.group {
+    border-color: #ff0;
+    background-color: #ffc;
+}
+.visibility.public {
+    border-color: #0b0;
+    background-color: #cfc;
 }
 
 .originating_data_file {
     font-weight: lighter;
 }
-
-.visibility.private { border-color: red }
-.visibility.group { border-color: yellow }
-.visibility.public { border-color: green }

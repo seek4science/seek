@@ -1,7 +1,7 @@
 
 $j("#run-info").replaceWith('<%= escape_javascript(render(:partial => "info", :locals => { :run => @run })) %>');
 
-$j("#buttons").replaceWith('<%= escape_javascript(render(:partial => "buttons", :locals => { :run => @run })) %>');
+$j("#buttons").html('<%= escape_javascript(render(:partial => "buttons", :locals => { :run => @run })) %>');
 
 <% if @interaction.nil? || @new_interaction %>
   $j('#modal-interaction-dialog').remove();

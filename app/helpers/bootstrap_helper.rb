@@ -87,7 +87,7 @@ module BootstrapHelper
         ((icon_key ? icon_tag(icon_key, options.delete(:icon_options) || {}) : '') +
         text + ' <span class="caret"></span>'.html_safe)
       end +
-      content_tag(:ul, merge_options({:class => 'dropdown-menu', :role => 'menu'}, options.delete(:menu_options))) do
+      content_tag(:ul, merge_options({:class => 'dropdown-menu text-left', :role => 'menu'}, options.delete(:menu_options))) do
         yield
       end
     end

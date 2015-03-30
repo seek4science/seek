@@ -1,4 +1,3 @@
 <%= render :partial => 'results_navigator', :locals => { :run => @run } %>
 <%= render :partial => "output_list", :locals => { :ports => run.result_outputs, :title => "Results"} -%>
 <%= render :partial => "output_list", :locals => { :ports => run.error_log_outputs, :title => "Errors/Logs"} -%>
-

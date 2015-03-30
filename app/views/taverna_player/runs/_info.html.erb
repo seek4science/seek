@@ -1,58 +1,60 @@
-<div id="run-info" style="padding-top: 10px;">
+<div id="run-info">
   <%= form_for run, :url => main_app.run_path(run.id), :method => "put" do |f| -%>
-    <p>
       <%= error_messages_for :run -%>
-      <b>Name:</b>
-      <%= f.text_field :name, :size => 80 -%>
-      <%= submit_tag('Save') -%>
-    </p>
+      <div class="form-group">
+      <div class="input-group">
+        <%= f.text_field :name, :class => 'form-control'-%>
+        <span class="input-group-btn">
+            <%= submit_tag('Update', :class => 'btn btn-default') -%>
+          </span>
+      </div>
+      </div>
   <% end %>
 
   <% if run.can_manage? && !current_user.guest? -%>
-      <p>
-        <%= describe_visibility(run) -%>
-      </p>
+      <p><%= describe_visibility(run) -%></p>
   <% end %>
+  <div class="row">
+    <div class="col-sm-6">
+      <p>
+        <strong>Workflow</strong><br/>
+        <% workflow = run.workflow %>
+        <% workflow_version = workflow.find_version(run.workflow_version) %>
 
-  <div style="float: left; width: 300px; margin-right: 50px;">
-    <p>
-      <b>Workflow:</b>
-      <% workflow = run.workflow %>
-      <% workflow_version = workflow.find_version(run.workflow_version) %>
+        <%= link_to workflow_version.title, main_app.workflow_path(workflow, :version => workflow_version.version) %>
+      </p>
+      <p>
+        <strong>Category</strong><br/>
+        <%= workflow.category.name %>
+      </p>
+      <p>
+        <strong>Status</strong><br/>
+        <%= run.status_message %> <%= image_tag('ajax-loader.gif', :style => "vertical-align: middle") unless run.complete? %>
+        <%= "(Report submitted)" if @run.reported? %>
+      </p>
+    </div>
 
-      <%= link_to workflow_version.title, main_app.workflow_path(workflow, :version => workflow_version.version) %>
-    </p>
-    <p>
-      <b>Category:</b>
-      <%= workflow.category.name %>
-    </p>
-    <p>
-      <b>Status:</b>
-      <%= run.status_message %> <%= image_tag('ajax-loader.gif', :style => "vertical-align: middle") unless run.complete? %>
-      <%= "(Report submitted)" if @run.reported? %>
-    </p>
-  </div>
+    <div class="col-sm-6">
+      <%
+         created_at = run.created_at.strftime("%e %b %Y %H:%M:%S %Z")
+         start_time = run.start_time.blank? ? 'N/A' : run.start_time.strftime("%e %b %Y %H:%M:%S %Z")
+         finish_time = run.finish_time.blank? ? 'N/A' : run.finish_time.strftime("%e %b %Y %H:%M:%S %Z")
+      %>
 
-  <div style="float: left">
-    <%
-       created_at = run.created_at.strftime("%e %b %Y %H:%M:%S %Z")
-       start_time = run.start_time.blank? ? 'N/A' : run.start_time.strftime("%e %b %Y %H:%M:%S %Z")
-       finish_time = run.finish_time.blank? ? 'N/A' : run.finish_time.strftime("%e %b %Y %H:%M:%S %Z")
-    %>
+      <p>
+        <strong>Created at</strong><br/>
+        <%= created_at %>
+      </p>
 
-    <p>
-      <b>Created at:</b>
-      <%= created_at %>
-    </p>
+      <p>
+        <strong>Started at</strong><br/>
+        <%= start_time %>
+      </p>
 
-    <p>
-      <b>Started at:</b>
-      <%= start_time %>
-    </p>
-
-    <p>
-      <b>Finished at:</b>
-      <%= finish_time %>
-    </p>
+      <p>
+        <strong>Finished at</strong><br/>
+        <%= finish_time %>
+      </p>
+    </div>
   </div>
 </div>
