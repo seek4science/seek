@@ -3,8 +3,12 @@
 /* Footer stuff */
 $footer-height: 80px;
 
+html {
+    height: 100%;
+}
 body {
     position: relative;
+    min-height: 100%;
 }
 #ft {
     position: absolute;
@@ -15,7 +19,6 @@ body {
 }
 #content {
     padding-bottom: $footer-height + 20px;
-    min-height: 800px;
 }
 
 .workflow-category {
