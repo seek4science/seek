@@ -1,6 +1,8 @@
 <div class="iteration" data-iteration-number="{{iteration_number}}">
   <h2 class="standout">Iteration <span class="iteration_number">{{iteration_number}}</span>
-    <a href="#" onclick="remove_iteration(this); return false">(Remove)</a>
+    <a href="#" onclick="remove_iteration(this); return false" class="btn btn-danger btn-xs">
+      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+    </a>
   </h2>
   {{inputs}}
 </div>

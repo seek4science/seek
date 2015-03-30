@@ -62,7 +62,9 @@
           <%# Iterations get added dynamically with javascript %>
         </div>
         <p>
-          <%= button_tag('Add Iteration', :onclick => "add_iteration(); return false;") %>
+          <%= button_tag(:onclick => "add_iteration(); return false;", :class => 'btn btn-primary') do %>
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Iteration
+          <% end %>
         </p>
     <% end %>
 

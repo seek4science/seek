@@ -1,4 +1,5 @@
 @import 'biovel_variables';
+@import 'mixins';
 
 /* Footer stuff */
 $footer-height: 80px;
@@ -536,26 +537,30 @@ div.workflow-port:first-child {
 
 .visibility {
     padding: 5px;
-    border: 1px solid #ccc;
-    background-color: white;
     margin-top: 5px;
     margin-bottom: 5px;
-    border-radius: 3px;
 }
 
 .visibility.private {
-    border-color: #f00;
-    background-color: #fcc;
+    @include rounded-box(#ff9d8f);
 }
 .visibility.group {
-    border-color: #ff0;
-    background-color: #ffc;
+    @include rounded-box(#ffef91);
 }
 .visibility.public {
-    border-color: #0b0;
-    background-color: #cfc;
+    @include rounded-box(#b7ff7d);
 }
 
 .originating_data_file {
     font-weight: lighter;
+}
+
+div.iteration {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+div.iteration h2, div.iteration h3 {
+    margin: 5px 0;
 }
