@@ -291,6 +291,7 @@ a.select_assay_class:hover {
 
 #search_box {
   position: relative;
+  width: 300px; /* overflows in chrome without this */
 }
 
 .index-page-setting {
