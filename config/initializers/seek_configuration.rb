@@ -1,1 +1,1 @@
-seek_configuration.rb-biovel
+seek_configuration.rb-openseek
