@@ -12,8 +12,11 @@
    #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
    reduced_elements = reduced_elements(cytoscape_elements, max_node_number, force_max_node, root_item, current_item)
 %>
+
+<div class="row">
+
 <div class="hidden-xs clearfix">
-  <div class="yui-u first isa_graph curved with_smaller_shadow">
+  <div class="col-md-9 col-sm-8 isa_graph box_about_actor curved with_smaller_shadow">
 
     <% if cytoscape_elements.size > reduced_elements.size %>
         <%= link_to_function ("Full graph "+image("expand")).html_safe,
@@ -31,9 +34,11 @@
     <div id="cy" style="margin-top: 3em;"></div>
   </div>
 
-  <div class="yui-u node_info curved with_smaller_shadow" id="node_info">
+  <div class="col-md-3 col-sm-4" id="node_info">
+
   </div>
   <span id="ruler" style="visibility: hidden"></span>
+</div>
 </div>
 <script type="text/javascript">
     var isa_graph = $j('.isa_graph')[0];
