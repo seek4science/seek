@@ -20,13 +20,13 @@ module JwsOnlineTestHelper
   end
 
   def setup_jws_mocking
-    stub_request(:head, "http://jws2.sysmo-db.org/models/upload/").to_return(:status => 200, :body => "", :headers => {"Set-Cookie"=>["csrftoken=wejfvn322mnslWA"]})
+    stub_request(:head, "#{Seek::Config.jws_online_root}/models/upload/").to_return(:status => 200, :body => "", :headers => {"Set-Cookie"=>["csrftoken=wejfvn322mnslWA"]})
 
-    stub_request(:post, "http://jws2.sysmo-db.org/models/upload/").to_return(:status => 302, :body => "", :headers => {:location=>"http://jwsonline.net/models/fish-2/"})
+    stub_request(:post, "#{Seek::Config.jws_online_root}/models/upload/").to_return(:status => 302, :body => "", :headers => {:location=>"http://jwsonline.net/models/fish-2/"})
 
-    stub_request(:head, "https://jws2.sysmo-db.org/models/upload/").to_return(:status => 200, :body => "", :headers => {"Set-Cookie"=>["csrftoken=wejfvn322mnslWA"]})
+    stub_request(:head, "https://#{URI.parse(Seek::Config.jws_online_root).host}/models/upload/").to_return(:status => 200, :body => "", :headers => {"Set-Cookie"=>["csrftoken=wejfvn322mnslWA"]})
 
-    stub_request(:post, "https://jws2.sysmo-db.org/models/upload/").to_return(:status => 302, :body => "", :headers => {:location=>"http://jwsonline.net/models/fish-2/"})
+    stub_request(:post, "https://#{URI.parse(Seek::Config.jws_online_root).host}/models/upload/").to_return(:status => 302, :body => "", :headers => {:location=>"http://jwsonline.net/models/fish-2/"})
   end
 
 end
