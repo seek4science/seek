@@ -241,10 +241,6 @@ function max_container_width() {
     return max_width;
 }
 
-function adjust_container_dimensions1() {
-
-}
-
 function adjust_container_dimensions() {
     var max_width = max_container_width();
     var spreadsheet_container_width = $j("div.spreadsheet_container").width();
