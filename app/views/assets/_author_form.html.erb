@@ -67,7 +67,7 @@
           frequency: 0.1,
           updateElement: addAction,
           search_field: "name",
-          <%= "hint_field: \"email\",".html_safe  unless hide_contact_details? -%>
+          hint_field: "projects",
           id_field: "id",
           validation_type: "only_suggested"
         });
@@ -98,10 +98,9 @@
 <% existing_creators.each do |c| -%>
     creator_name = '<%= h(c.name) -%>';
     creator_id = <%= c.id -%>;
-    creator_email = '<%= h(c.email) -%>';
+    creator_projects = '<%= h(c.projects.collect{|p| p.title}.join(",")) -%>';
 
-    //creator_settings.push([creator_name, creator_email, creator_id]);
-    addCreator(decodeHTML(creator_name),creator_email,creator_id);
+    addCreator(decodeHTML(creator_name),creator_projects,creator_id);
 <% end -%>
 
   // ..and update the page to make existing creators visible
@@ -118,13 +117,10 @@ function updateCreatorSettings() {
 
     for(var i = 0; i < creator_settings.length; i++) {
         creator_name = encodeHTML(creator_settings[i][0]);
-        creator_email = creator_settings[i][1];
+        creator_projects = creator_settings[i][1];
         creator_id = creator_settings[i][2];
-        creator_email_text = "";
-        if (<%= hide_contact_details? -%> == "true") {
-          creator_email_text = ': ' + creator_email
-        }
-        creators += '<b>' + creator_name + '</b>' + creator_email_text
+
+        creators += '<b>' + creator_name + '</b> (' + creator_projects + ')'
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + ' [<a href="" onclick="javascript:deleteCreator(' + creator_id +'); return(false);">remove</a>]</small><br/>';
 
@@ -166,9 +162,9 @@ function checkCreatorNotInList(creator_name, creator_id) {
 
 
 // adds an creator to the list and updates the displayed list
-function addCreator(creator_name, creator_email, creator_id) {
+function addCreator(creator_name, creator_projects, creator_id) {
     if(checkCreatorNotInList(creator_name, creator_id)) {
-        creator_settings.push([creator_name, creator_email, creator_id]);
+        creator_settings.push([creator_name, creator_projects, creator_id]);
 
         // update visible page
         updateCreatorSettings();

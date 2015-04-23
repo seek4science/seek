@@ -62,7 +62,7 @@
   </div>
   <div style="clear:both;">
     <br/>
-    <%= render :partial=>"people/contact_details" unless hide_contact_details? %>
+    <%= render :partial=>"people/contact_details" unless hide_contact_details?(@person) %>
     <%= render :partial=>"people/project_roles", :locals=>{:editable=>false} %>
     <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>

@@ -1,6 +1,6 @@
 <% person = resource %>
 
-<% cache "rli_#{person.cache_key}_#{hide_contact_details?}" do -%>
+<% cache "rli_#{person.cache_key}_#{hide_contact_details?(resource)}" do -%>
     <%= list_item_title person, :title=>person.name %>
 
     <!--<div class="list_item_left_column">-->
@@ -10,7 +10,7 @@
 
       <!--<%= list_item_simple_list(resource.expertise, "Expertise") {|i| link_for_ann(i, :type=>:expertise)} %>-->
 
-      <!--<% unless hide_contact_details?%>-->
+      <!--<% unless hide_contact_details?(resource)%>-->
         <!--<%= list_item_optional_attribute "Email", mail_to(h(resource.email)) %>-->
 
         <!--<%= list_item_optional_attribute "Web page", h(resource.web_page), h(resource.web_page) %>-->
@@ -23,7 +23,7 @@
       <!--<%= list_item_simple_list resource.institutions, "Institutions" %>-->
       <!--<%= list_item_simple_list(resource.tools, "Tools") {|i| link_for_ann(i, :type=>:tool)} %>-->
 
-      <!--<% unless hide_contact_details? %>-->
+      <!--<% unless hide_contact_details?(resource) %>-->
         <!--<%= list_item_optional_attribute "Phone", h(resource.phone)%>-->
 
         <!--<%= list_item_optional_attribute "Skype", h(resource.skype_name)%>-->

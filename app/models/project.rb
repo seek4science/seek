@@ -34,6 +34,11 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
+  #FIXME: temporary handler, projects need to support multiple programmes
+  def programmes
+    [programme]
+  end
+
   # SEEK projects suffer from having 2 types of ancestor and descendant,that were added separately - those from the historical lineage of the project, and also from
   # the hierarchical tree structure that can be. For this reason and to avoid the clash, these anscestors and descendants have been renamed.
   # However, in the future it would probably be more appropriate to change these back to simply ancestor and descendant, and rename the hierarchy struture
