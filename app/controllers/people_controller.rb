@@ -313,7 +313,7 @@ class PeopleController < ApplicationController
       @people.sort!{|a,b| a.last_name<=>b.last_name}
       render :partial=>"userless_people_list",:locals=>{:people=>@people}
     else
-      render :text=>""
+      render :partial=>"cancel_registration"
     end
     
   end
@@ -341,7 +341,8 @@ class PeopleController < ApplicationController
   def typeahead
     results = Person.where("first_name LIKE :query OR last_name LIKE :query", :query => "#{params[:query]}%").limit(params[:limit] || 10)
     items = results.map do |person|
-      {id: person.id, name: person.name, hint: person.email}
+      projects = person.projects.collect{|p| p.title}.join(", ")
+      {id: person.id, name: person.name, projects:projects,  hint:projects}
     end
 
     respond_to do |format|

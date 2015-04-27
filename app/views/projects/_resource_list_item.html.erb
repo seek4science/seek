@@ -5,7 +5,7 @@
     <%= list_item_programme_attribute(resource) if Seek::Config.programmes_enabled %>
     <%= list_item_optional_attribute "Public web page", h(resource.web_page), h(resource.web_page) %>
 
-    <% unless hide_contact_details? %>
+    <% unless hide_contact_details?(resource) %>
         <%= list_item_optional_attribute "Internal web page", h(resource.wiki_page), h(resource.wiki_page) %>
     <% end %>
   </div>

@@ -52,5 +52,15 @@ module PeopleHelper
     end
     return text.html_safe
   end
-  
+
+  #Return whether or not to hide contact details from this user
+  #Current decided by Seek::Config.hide_details_enabled or
+  # is hidden if the current person doesn't share the same programme as the person being viewed
+  def hide_contact_details? displayed_person_or_project
+    if logged_in? && current_user.person.shares_programme?(displayed_person_or_project)
+      Seek::Config.hide_details_enabled
+    else
+      true
+    end
+  end
 end

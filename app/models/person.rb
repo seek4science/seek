@@ -135,6 +135,10 @@ class Person < ActiveRecord::Base
     self.projects.collect{|p| p.programme}.uniq
   end
 
+  #whether this person belongs to a programme in common with the other item - generally a person or project
+  def shares_programme? other_item
+    (self.programmes & other_item.programmes).any?
+  end
 
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
   RELATED_RESOURCE_TYPES.each do |type|
@@ -167,7 +171,7 @@ class Person < ActiveRecord::Base
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json
     Person.order("ID asc").collect do |p|
-      {"id" => p.id,"name" => p.name,"email" => p.email}
+      {"id" => p.id,"name" => p.name,"email" => p.email,"projects" => p.projects.collect{|p| p.title}.join(", ")}
     end.to_json
   end
 
