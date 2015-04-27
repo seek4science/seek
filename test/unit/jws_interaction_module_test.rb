@@ -22,7 +22,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
   end
 
   test "upload model blob using https" do
-    with_config_value :jws_online_root,"https://jws2.sysmo-db.org" do
+    with_config_value :jws_online_root,"https://#{URI.parse(Seek::Config.jws_online_root).host}" do
       model = Factory(:teusink_model)
       blob = model.content_blobs.first
       slug = upload_model_blob(blob)
@@ -46,7 +46,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
   end
 
   test "model_simulate_url_from_slug" do
-    expected="http://jws2.sysmo-db.org/models/bob-2/simulate?embedded=1"
+    expected="#{Seek::Config.jws_online_root}/models/bob-2/simulate?embedded=1"
     assert_equal expected,model_simulate_url_from_slug("bob-2")
   end
 

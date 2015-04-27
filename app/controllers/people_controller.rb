@@ -322,7 +322,7 @@ class PeopleController < ApplicationController
       @people.sort!{|a,b| a.last_name<=>b.last_name}
       render :partial=>"userless_people_list",:locals=>{:people=>@people}
     else
-      render :text=>""
+      render :partial=>"cancel_registration"
     end
     
   end
