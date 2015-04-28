@@ -15,9 +15,12 @@
     <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
                                "Search enabled", "Whether search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after chaning this setting.") %>
 
+    <%= admin_checkbox_setting(:show_announcements, 1, Seek::Config.show_announcements,
+                               "Show announcements enabled", "Whether the announcements panel is displayed. If you don't make many announcements you may want to hide it to avoid showing old announcements") %>
+
     <%= admin_checkbox_setting(:pdf_conversion_enabled, 1, Seek::Config.pdf_conversion_enabled,
                                "Pdf conversion enabled", "Whether pdf conversion is enabled. It allows converting some document types to pdf format. If enabled, you need to ensure open office is running") %>
-
+  
     <%= admin_checkbox_setting(:forum_enabled, 1, Seek::Config.forum_enabled,
                                "Forum enabled", "Whether the Activities/Forum tab is displayed and forum functionalities are available") %>
 

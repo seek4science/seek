@@ -168,6 +168,12 @@ class Person < ActiveRecord::Base
     return dup
   end
 
+  def cache_key
+    groups = group_memberships.compact.collect{|gm| gm.id.to_s}.join('.')
+    progs = programmes.compact.collect{|pg| pg.id.to_s}.join('.')
+    "#{super}-#{groups}-#{progs}"
+  end
+
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json
     Person.order("ID asc").collect do |p|
