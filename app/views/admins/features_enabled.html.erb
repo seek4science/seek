@@ -28,6 +28,12 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
+                                             :description=>"Whether the annoucement panel is displayed. If you don't make many announcements you may want to hide it to avoid showing old announcements",
+                                             :name=>"Show announcements panel",
+                                             :field=>check_box_tag(:show_announcements, 1, Seek::Config.show_announcements, :title => 'show announcements panel')
+                                     } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
             :description=>"Whether pdf conversion is enabled. It allows converting some document types to pdf format. If enabled, you need to ensure open office is running",
             :name=>"Pdf conversion enabled",
             :field=>check_box_tag(:pdf_conversion_enabled, 1, Seek::Config.pdf_conversion_enabled)

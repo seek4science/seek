@@ -2,7 +2,7 @@
 
     <%= render :partial => "gadgets/new_object_gadget" -%>
     <%= render :partial => "gadgets/my_project_gadget" -%>
-    <%= render :partial=>"gadgets/announcements_gadget" %>
+    <%= render :partial=>"gadgets/announcements_gadget" if Seek::Config.show_announcements %>
     <%= render :partial => "gadgets/favourites" -%>
 
 <% else -%>
