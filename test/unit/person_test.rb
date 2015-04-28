@@ -834,4 +834,12 @@ class PersonTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "cache-key changes with workgroup" do
+    person = Factory :person
+    refute_empty person.projects
+    cachekey = person.cache_key
+    person.add_to_project_and_institution(Factory(:project),Factory(:institution))
+    refute_equal cachekey,person.cache_key
+  end
 end
