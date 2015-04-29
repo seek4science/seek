@@ -206,9 +206,9 @@ function addCreators() {
 
         for(var i = 0; i < selIDs.length; i++) {
             id = parseInt(selIDs[i]);
-            email = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'email');
+            projects = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'projects');
             name = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
-            addCreator(name, email, id);
+            addCreator(name, projects, id);
         }
 
         // remove all tokens from autocomplete text box
