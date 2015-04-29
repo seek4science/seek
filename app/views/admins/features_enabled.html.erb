@@ -1,11 +1,6 @@
 <h1>Enable or disable features</h1>
 
-<%= form_tag :action=>"update_features_enabled" do -%>
-    <%# render :partial=>'setting_li',:locals=>{
-            :description=>"Whether the Public SEEK is enabled.",
-            :name=>"Public SEEK enabled",
-            :field=>check_box_tag(:public_seek_enabled, 1,Seek::Config.public_seek_enabled)
-    } -%>
+<%= form_tag :action=>"update_features_enabled" do -%>    
     <%= admin_checkbox_setting(:events_enabled, 1,Seek::Config.events_enabled,
                                "#{t('event').pluralize} enabled","Whether the #{t('event').pluralize} are displayed and can be added.") %>
 

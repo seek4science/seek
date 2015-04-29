@@ -5,8 +5,6 @@ require 'seek/seek_render_override'
 
 SEEK::Application.configure do
   #Main settings
-  #NOTE: Seek::Config.public_seek_enabled is still needed? it is always true in SEEK via resetting true even it is false here
-  Seek::Config.default :public_seek_enabled,true
 
   Seek::Config.default :sycamore_enabled,true
   Seek::Config.default :events_enabled,true
