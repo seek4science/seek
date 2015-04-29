@@ -8,8 +8,8 @@ module ISAHelper
   FILL_COLOURS = {'Sop'=>"#7ac5cd", #cadetblue3
                   'Model'=>"#cdcd00", #yellow3
                   'DataFile'=>"#eec591", #burlywood2
-                  'Investigation'=>"#C7E9C0",
-                  'Study'=>"#91c98b",
+                  'Investigation'=>"#E6E600",
+                  'Study'=>"#B8E62E",
                   'Assay'=> {'EXP'=>"#64b466",'MODEL'=>"#92CD00"},
                   'Publication'=>"#84B5FD",
                   'Presentation' => "#8ee5ee", #cadetblue2

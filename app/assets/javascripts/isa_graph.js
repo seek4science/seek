@@ -1,5 +1,5 @@
 var cy;
-var default_node_width = 175;
+var default_node_width = 195;
 var default_node_height = 35;
 var default_font_size = 11;
 var default_color = '#323232';
@@ -37,7 +37,7 @@ function drawGraph(elements, current_element_id){
             .css({
                 'width': 1.5,
                 'target-arrow-shape': 'none',
-                'line-color': 'data(faveColor)',
+                'line-color': '#191975',
                 'source-arrow-color': 'data(faveColor)',
                 'target-arrow-color': 'data(faveColor)',
                 'content': 'data(name)',
