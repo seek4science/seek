@@ -5,7 +5,6 @@ require 'seek/seek_render_override'
 
 SEEK::Application.configure do
   #Main settings
-  Seek::Config.default :public_seek_enabled,true
   Seek::Config.default :sycamore_enabled,false
   Seek::Config.default :events_enabled,false
   Seek::Config.default :jerm_enabled,false
