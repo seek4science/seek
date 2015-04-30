@@ -40,6 +40,8 @@ namespace :seek do
 
   task(:clear_delayed_jobs=>:environment) do
     Delayed::Job.destroy_all
+    #need to add a new authlookup job as these were added before being cleared as part of the standard_upgrade_tasks
+    AuthLookupUpdateJob.new.queue_job(0,Time.now)
   end
 
 
