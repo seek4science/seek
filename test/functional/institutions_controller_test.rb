@@ -96,21 +96,8 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  #Checks that the edit option is availabe to the user
-  #with can_edit_project set and he belongs to that project
-  def test_user_can_edit
-    login_as(:can_edit)
-    get :show, :id=>institutions(:two)
-    assert_select "a",:text=>/Edit Institution/,:count=>1
 
-    get :edit, :id=>institutions(:two)
-    assert_response :success
-
-    put :update, :id=>institutions(:two).id,:institution=>{}
-    assert_redirected_to institution_path(assigns(:institution))
-  end
-
-    def test_user_project_manager
+  def test_project_manager_can_edit
     pm = Factory(:project_manager)
     institution = pm.institutions.first
     login_as(pm.user)
@@ -126,7 +113,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_user_cant_edit_project
-    login_as(:cant_edit)
+    login_as(Factory(:user))
     get :show, :id=>institutions(:two)
     assert_select "a",:text=>/Edit Institution/,:count=>0
 

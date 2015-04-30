@@ -291,24 +291,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert !p.is_admin?
   end
 
-  def test_non_admin_cant_set_can_edit_institutions
-    login_as(:aaron)
-    p = people(:aaron_person)
-    assert !p.can_edit_institutions?
-    put :administer_update, id: p.id, person: { id: p.id, can_edit_institutions: true, email: 'ssfdsd@sdfsdf.com' }
-    p.reload
-    assert !p.can_edit_institutions?
-  end
-
-  def test_non_admin_cant_set_can_edit_projects
-    login_as(:aaron)
-    p = people(:aaron_person)
-    assert !p.can_edit_projects?
-    put :administer_update, id: p.id, person: { id: p.id, can_edit_projects: true, email: 'ssfdsd@sdfsdf.com' }
-    p.reload
-    assert !p.can_edit_projects?
-  end
-
   def test_can_edit_person_and_user_id_different
     # where a user_id for a person are not the same
     login_as(:fred)
@@ -984,69 +966,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test 'project manager can set can_edit_project of person inside their projects' do
-    pm = Factory(:project_manager)
-    other_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: pm.group_memberships.first.work_group)])
-    assert !(pm.projects & other_person.projects).empty?, 'Project manager should belong to the same project as the person he is trying to edit'
-
-    login_as(pm)
-    assert !other_person.can_edit_projects?
-
-    get :admin, id: other_person
-    assert_response :success
-    assert_select 'input#person_can_edit_projects', count: 1
-
-    put :administer_update, id: other_person.id, person: { can_edit_projects: true }
-    other_person.reload
-    assert other_person.can_edit_projects?
-  end
-
-  test 'project manager can not set can_edit_project of person outside their projects' do
-    pm = Factory(:project_manager)
-    other_person = Factory(:person)
-    assert (pm.projects & other_person.projects).empty?, 'Project manager should not belong to the same project as the person he is trying to edit'
-
-    login_as(pm)
-
-    assert !other_person.can_edit_projects?
-
-    put :administer_update, id: other_person.id, person: { can_edit_projects: true }
-    other_person.reload
-    assert !other_person.can_edit_projects?
-  end
-
-  test 'project manager can set can_edit_projects of person inside their projects' do
-
-    pm = Factory(:project_manager)
-    other_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: pm.group_memberships.first.work_group)])
-    assert !(pm.projects & other_person.projects).empty?, 'Project manager should belong to the same project as the person he is trying to edit'
-
-    login_as(pm)
-
-    assert !other_person.can_edit_institutions?
-
-    get :admin, id: other_person
-    assert_response :success
-    assert_select 'input#person_can_edit_institutions', count: 1
-
-    put :administer_update, id: other_person.id, person: { can_edit_institutions: true }
-    other_person.reload
-    assert other_person.can_edit_institutions?
-  end
-
-  test 'project manager can not set can_edit_institutions of person outside their projects' do
-    pm = Factory(:project_manager)
-    other_person = Factory(:person)
-    assert (pm.projects & other_person.projects).empty?, 'Project manager should not belong to the same project as the person he is trying to edit'
-    login_as(pm)
-
-    assert (pm.projects & other_person.projects).empty?
-    assert !other_person.can_edit_institutions?
-
-    put :administer_update, id: other_person.id, person: { can_edit_institutions: true }
-    other_person.reload
-    assert !other_person.can_edit_institutions?
-  end
 
   test 'if not admin login should not show the registered date for this person' do
     login_as(:aaron)

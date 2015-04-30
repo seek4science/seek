@@ -244,8 +244,6 @@ class PeopleController < ApplicationController
 
     passed_params=    {:roles                 =>  User.admin_logged_in?,
                        :roles_mask            => User.admin_logged_in?,
-                       :can_edit_projects     => (User.admin_logged_in? || (User.project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?)),
-                       :can_edit_institutions => (User.admin_logged_in? || (User.project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?)),
                        :work_group_ids        => (User.admin_logged_in? || User.project_manager_logged_in?)}
     temp = params.clone
     params[:person] = {}
@@ -394,7 +392,7 @@ class PeopleController < ApplicationController
   def removed_params
     # make sure to update people/_form if this changes
     #                   param                 => allowed access?
-    removed_params = [:roles, :roles_mask, :can_edit_projects, :can_edit_institutions, :work_group_ids]
+    removed_params = [:roles, :roles_mask, :work_group_ids]
 
     removed_params.each do |param|
       params[:person].delete(param) if params[:person]

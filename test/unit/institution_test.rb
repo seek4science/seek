@@ -1,8 +1,10 @@
 require 'test_helper'
 
 class InstitutionTest < ActiveSupport::TestCase
+
   fixtures :institutions,:projects,:work_groups,:users,:group_memberships, :people
   # Replace this with your real tests.
+
   def test_delete_inst_deletes_workgroup
     n_wg = WorkGroup.find(:all).size
     n_inst = Institution.find(:all).size
@@ -67,15 +69,6 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_can_be_edited_by
-    u=users(:can_edit)
-    i=institutions(:two)
-    assert i.can_be_edited_by?(u),"Institution :two should be editable by user :can_edit"
-
-    i=institutions(:one)
-    assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :can_edit as he is not a member"
-
-    i=institutions(:one)
-    assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :project_manager since this institution is not participating in any of his projects"
 
     pm = Factory(:project_manager)
     i = pm.institutions.first
@@ -83,17 +76,14 @@ class InstitutionTest < ActiveSupport::TestCase
     assert i.can_be_edited_by?(pm.user), "This institution should be editable as this user is project manager of a project this institution is linked to"
     assert !i2.can_be_edited_by?(pm.user), "This institution should be not editable as this user is project manager but not of a project this institution is linked to"
 
-    i=institutions(:one)
+    i=Factory(:institution)
     u=Factory(:admin).user
     assert i.can_be_edited_by?(u),"Institution :one should be editable by this user, as he's an admin"
 
-    u=users(:cant_edit)
-    i=institutions(:two)
-    assert !i.can_be_edited_by?(u),"Institution :two should not be editable by user :cant_edit"
   end
 
   def test_valid
-    i=institutions(:one)
+    i=Factory(:institution)
     assert i.valid?
 
     i.title=nil

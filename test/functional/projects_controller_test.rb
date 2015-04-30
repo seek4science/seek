@@ -261,20 +261,6 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert_select "a",:text=>/Edit Project/,:count=>0
 	end
 
-	#Checks that the edit option is availabe to the user
-	#with can_edit_project set and he belongs to that project
-	def test_user_can_edit_project
-		login_as(:can_edit)
-		get :show, :id=>projects(:three)
-		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
-
-		get :edit, :id=>projects(:three)
-		assert_response :success
-
-		put :update, :id=>projects(:three).id,:project=>{}
-		assert_redirected_to project_path(assigns(:project))
-	end
-
 	def test_user_project_manager
     pm = Factory(:project_manager)
     proj = pm.projects.first
@@ -292,7 +278,7 @@ class ProjectsControllerTest < ActionController::TestCase
 	end
 
 	def test_user_cant_edit_project
-		login_as(:cant_edit)
+		login_as(Factory(:user))
 		get :show, :id=>projects(:three)
 		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>0
 

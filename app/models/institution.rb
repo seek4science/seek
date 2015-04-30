@@ -35,9 +35,9 @@ class Institution < ActiveRecord::Base
     projects.collect{|p| p.programme}.uniq
   end
 
-   def can_be_edited_by?(subject)
-    return false if subject.nil?
-    subject.is_admin? || (subject.can_edit_institutions? && self.people.include?(subject.person)) || self.is_managed_by?(subject)
+   def can_be_edited_by?(user)
+    return false if user.nil?
+    user.is_admin? || self.is_managed_by?(user)
    end
 
   #determines if this person is the member of a project for which the user passed is a project manager

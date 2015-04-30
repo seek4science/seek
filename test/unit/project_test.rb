@@ -176,26 +176,12 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_can_be_edited_by
-    u=users(:can_edit)
-    p=projects(:three)
-    assert p.can_be_edited_by?(u),"Project :three should be editable by user :can_edit"
-
-    p=projects(:four)
-    assert !p.can_be_edited_by?(u),"Project :four should not be editable by user :can_edit as he is not a member"
-
-    u=users(:quentin)
-    assert p.can_be_edited_by?(u),"Project :four should be editable by user :quentin as he's an admin"
-
-    u=users(:cant_edit)
-    p=projects(:three)
-    assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :cant_edit"
-
     u=Factory(:project_manager).user
     p=u.person.projects.first
-    assert p.can_be_edited_by?(u),"Project :three should be editable by user :project_manager"
+    assert p.can_be_edited_by?(u),"Project should be editable by user :project_manager"
 
-    p=projects(:four)
-    assert !p.can_be_edited_by?(u),"Project :four should not be editable by user :can_edit as he is not a member"
+    p=Factory(:project)
+    assert !p.can_be_edited_by?(u),"other project should not be editable by project manager, since it is not a project he manages"
   end
 
   test "can be administered by" do

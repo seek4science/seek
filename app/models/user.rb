@@ -201,15 +201,7 @@ class User < ActiveRecord::Base
   end
 
   def is_project_manager? project
-    !person.nil? && person.is_project_manager?(project)
-  end
-  
-  def can_edit_projects?
-    !person.nil? && person.can_edit_projects?
-  end
-  
-  def can_edit_institutions?
-    !person.nil? && person.can_edit_institutions?
+    person && person.is_project_manager?(project)
   end
 
   def can_manage_types?

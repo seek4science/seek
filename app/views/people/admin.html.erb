@@ -12,19 +12,6 @@
           <% end %>
 
           <p style="line-height: 1.8;">
-            <% if admin_logged_in? || (project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?) %>
-
-                <label for="can_edit_projects" style="font-weight: normal;">
-                  <%= f.check_box :can_edit_projects -%>Allow this person to edit <b><%= t('project').pluralize %></b>
-                  they work in.
-                </label>
-                <br/>
-                <label for="can_edit_institutions" style="font-weight: normal;">
-                  <%= f.check_box :can_edit_institutions -%>Allow this person to edit <b>Institutions</b>
-                  they work in.
-                </label>
-                <br/>
-            <% end -%>
 
             <% if admin_logged_in? %>
                     <h2>Administer defined roles</h2>
