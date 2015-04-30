@@ -14,8 +14,6 @@ class Workflow < ActiveRecord::Base
 
   scope :default_order, order('title')
 
-  title_trimmer
-
   validates_presence_of :title
 
   validates :myexperiment_link, :format => { :with => /^http:\/\/(www\.)?myexperiment\.org\/workflows\/[0-9]+/,

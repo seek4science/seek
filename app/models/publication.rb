@@ -5,7 +5,7 @@ require 'libxml'
 
 class Publication < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
-  title_trimmer
+
   alias_attribute :description, :abstract
   #searchable must come before acts_as_asset is called
   searchable(:auto_index=>false) do

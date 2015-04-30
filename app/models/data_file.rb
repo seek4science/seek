@@ -24,7 +24,6 @@ class DataFile < ActiveRecord::Base
 
    scope :default_order, order('title')
 
-  title_trimmer
 
   validates_presence_of :title
 

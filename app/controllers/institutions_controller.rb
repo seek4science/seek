@@ -1,7 +1,7 @@
 class InstitutionsController < ApplicationController
 
   include WhiteListHelper
-  include IndexPager
+  include Seek::IndexPager
   include CommonSweepers
   include Seek::DestroyHandling
 

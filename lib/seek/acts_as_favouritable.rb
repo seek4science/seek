@@ -1,4 +1,4 @@
-module Acts #:nodoc:
+module Seek #:nodoc:
   module Favouritable #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
@@ -16,14 +16,14 @@ module Acts #:nodoc:
                  :dependent => :destroy
 
         class_eval do
-          extend Acts::Favouritable::SingletonMethods
+          extend Seek::Favouritable::SingletonMethods
         end
-        include Acts::Favouritable::InstanceMethods
+        include Seek::Favouritable::InstanceMethods
 
       end
 
       def is_favouritable?
-        include?(Acts::Favouritable::InstanceMethods)
+        include?(Seek::Favouritable::InstanceMethods)
       end
 
 
@@ -42,5 +42,5 @@ end
 
 
 ActiveRecord::Base.class_eval do
-  include Acts::Favouritable
+  include Seek::Favouritable
 end

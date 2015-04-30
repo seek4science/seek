@@ -2,7 +2,7 @@ require 'seek/custom_exception'
 
 class ProjectsController < ApplicationController
   include WhiteListHelper
-  include IndexPager
+  include Seek::IndexPager
   include CommonSweepers
   include Seek::DestroyHandling
 

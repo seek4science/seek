@@ -1,6 +1,6 @@
 class SamplesController < ApplicationController
 
-  include IndexPager
+  include Seek::IndexPager
   include Seek::PreviewHandling
   include Seek::DestroyHandling
 

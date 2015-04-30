@@ -1,8 +1,8 @@
 #encoding: utf-8
 class PublicationsController < ApplicationController
   
-  include IndexPager
-  include DotGenerator
+  include Seek::IndexPager
+  include Seek::DotGenerator
   include Seek::AssetsCommon
   include Seek::BioExtension
 

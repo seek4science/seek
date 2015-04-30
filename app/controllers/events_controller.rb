@@ -8,7 +8,7 @@ class EventsController < ApplicationController
 
   before_filter :events_enabled?
 
-  include IndexPager
+  include Seek::IndexPager
 
   include Seek::Publishing::PublishingCommon
 

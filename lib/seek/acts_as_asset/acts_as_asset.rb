@@ -36,6 +36,7 @@ module Seek
         acts_as_favouritable
         acts_as_trashable
         grouped_pagination
+        title_trimmer
 
         attr_writer :original_filename, :content_type
         does_not_require_can_edit :last_used_at
@@ -51,8 +52,8 @@ module Seek
         include Seek::ActsAsAsset::Search
 
         include Seek::ActsAsAsset::InstanceMethods
-        include BackgroundReindexing
-        include Subscribable
+        include Seek::BackgroundReindexing
+        include Seek::Subscribable
 
         def get_all_as_json(user)
           all = all_authorized_for 'view', user

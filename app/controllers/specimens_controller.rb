@@ -1,5 +1,5 @@
 class SpecimensController < ApplicationController
-  include IndexPager
+  include Seek::IndexPager
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
   include Seek::DestroyHandling

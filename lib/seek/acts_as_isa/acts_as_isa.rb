@@ -34,7 +34,7 @@ module Seek
 
         include Seek::Stats::ActivityCounts
         include Seek::Search::CommonFields
-        include Seek::ActsAsISA::InstanceMethods, BackgroundReindexing, Subscribable
+        include Seek::ActsAsISA::InstanceMethods, Seek::BackgroundReindexing, Seek::Subscribable
         include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
         include Seek::ResearchObjects::Packaging
 

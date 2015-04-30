@@ -8,11 +8,10 @@ class Project < ActiveRecord::Base
   include Seek::Rdf::ReactToAssociatedChange
 
   acts_as_yellow_pages
+  title_trimmer
   validates :title, :uniqueness=>true
 
   include SimpleCrypt
-
-  title_trimmer
 
   has_and_belongs_to_many :investigations
 

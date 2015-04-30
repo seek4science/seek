@@ -3,7 +3,7 @@ require 'dot_generator'
 
 module ISAHelper
 
-  include DotGenerator
+  include Seek::DotGenerator
 
   FILL_COLOURS = {'Sop'=>"#7ac5cd", #cadetblue3
                   'Model'=>"#cdcd00", #yellow3

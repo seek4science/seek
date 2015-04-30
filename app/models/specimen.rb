@@ -2,11 +2,11 @@ require 'grouped_pagination'
 require 'subscribable'
 
 class Specimen < ActiveRecord::Base
-  include Subscribable
+  include Seek::Subscribable
 
   include Seek::Rdf::RdfGeneration
   include Seek::Biosamples::PhenoTypesAndGenoTypes
-  include BackgroundReindexing
+  include Seek::BackgroundReindexing
   include Seek::Stats::ActivityCounts
 
   acts_as_scalable if Seek::Config.is_virtualliver

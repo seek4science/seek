@@ -7,8 +7,6 @@ class Model < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
 
-  title_trimmer
-
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
     text :organism_terms,:model_contents_for_search

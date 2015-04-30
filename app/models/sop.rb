@@ -18,8 +18,6 @@ class Sop < ActiveRecord::Base
 
   scope :default_order, order("title")
 
-  title_trimmer
-
   validates_presence_of :title
 
   # allow same titles, but only if these belong to different users

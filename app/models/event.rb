@@ -7,7 +7,7 @@ class Event < ActiveRecord::Base
   has_and_belongs_to_many :publications , :uniq => true
   has_and_belongs_to_many :presentations , :uniq => true
 
-  include Subscribable
+  include Seek::Subscribable
 
   scope :default_order, order("start_date DESC")
 

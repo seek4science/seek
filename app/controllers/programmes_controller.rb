@@ -1,5 +1,5 @@
 class ProgrammesController < ApplicationController
-  include IndexPager
+  include Seek::IndexPager
   include Seek::DestroyHandling
 
   before_filter :programmes_enabled?

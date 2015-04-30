@@ -4,8 +4,8 @@ require 'bives'
 class ModelsController < ApplicationController
 
   include WhiteListHelper
-  include IndexPager
-  include DotGenerator
+  include Seek::IndexPager
+  include Seek::DotGenerator
   include Seek::AssetsCommon
 
   before_filter :models_enabled?

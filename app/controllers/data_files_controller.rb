@@ -3,10 +3,10 @@ require 'simple-spreadsheet-extractor'
 
 class DataFilesController < ApplicationController
 
-  include IndexPager
+  include Seek::IndexPager
   include SysMODB::SpreadsheetExtractor
   include MimeTypesHelper
-  include DotGenerator
+  include Seek::DotGenerator
 
   include Seek::AssetsCommon
 

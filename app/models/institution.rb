@@ -5,9 +5,8 @@ class Institution < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
 
-  title_trimmer
-
   acts_as_yellow_pages
+  title_trimmer
 
   validates :title, :uniqueness=>true
   scope :default_order, order("title")

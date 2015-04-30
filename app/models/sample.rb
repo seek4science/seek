@@ -2,11 +2,11 @@ require 'grouped_pagination'
 
 
 class Sample < ActiveRecord::Base
-  include Subscribable
+  include Seek::Subscribable
 
   acts_as_scalable if Seek::Config.is_virtualliver
   include Seek::Rdf::RdfGeneration
-  include BackgroundReindexing
+  include Seek::BackgroundReindexing
   include Seek::Stats::ActivityCounts
 
   acts_as_authorized

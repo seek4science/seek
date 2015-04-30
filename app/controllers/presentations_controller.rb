@@ -2,8 +2,8 @@
 class PresentationsController < ApplicationController
 
 
-  include IndexPager
-  include DotGenerator
+  include Seek::IndexPager
+  include Seek::DotGenerator
 
   include Seek::AssetsCommon
 
