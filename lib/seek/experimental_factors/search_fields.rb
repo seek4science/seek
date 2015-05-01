@@ -1,7 +1,7 @@
 module Seek
-  module Search
+  module ExperimentalFactors
     # search fields for the factors studied and experimental conditions
-    module FactorsAndExperimentalSearchFields
+    module SearchFields
       def fs_search_fields
         exp_or_fs_search_fields studied_factors
       end
