@@ -1,6 +1,8 @@
 module Seek
   module Search
     module CommonFields
+      include Seek::Search::FactorsAndExperimentalSearchFields
+
       def self.included klass
         klass.class_eval do
           searchable do
