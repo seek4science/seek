@@ -31,17 +31,23 @@ module SamplesHelper
 
 
       if sample
-        sample.tissue_and_cell_types.each do |tt|
-          result += " [" if tt== sample.tissue_and_cell_types.first
-          result += link_to h(tt.title), tt
-          result += " | " unless tt == sample.tissue_and_cell_types.last
-          result += "]" if tt == sample.tissue_and_cell_types.last
-        end
+        result += describe_sample_tissue_and_cell_types(sample)
       end
       result += "</td></tr>"
      end
      result += "</table>"
     return result.html_safe
    end
+
+  def describe_sample_tissue_and_cell_types(sample)
+    result = ""
+    sample.tissue_and_cell_types.each do |tt|
+      result += " [" if tt== sample.tissue_and_cell_types.first
+      result += link_to h(tt.title), tt
+      result += " | " unless tt == sample.tissue_and_cell_types.last
+      result += "]" if tt == sample.tissue_and_cell_types.last
+    end
+    result
+  end
 
 end
