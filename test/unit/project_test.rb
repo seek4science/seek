@@ -455,7 +455,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 2,p2.work_groups.size
 
     assert_equal p.institutions.sort,p2.institutions.sort
-    assert_equal p.people,p2.people
+    assert_equal p.people.sort,p2.people.sort
     assert_equal 3,p2.people.size
 
     assert_includes p2.people,person
