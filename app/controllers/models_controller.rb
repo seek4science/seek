@@ -45,8 +45,7 @@ class ModelsController < ApplicationController
   end
 
   def select_blobs_for_comparison
-    blobs = @display_model.sbml_content_blobs
-    blobs = [:file_id, :other_file_id].collect do |param_key|
+    blobs = {:other_file_id=>@other_version.sbml_content_blobs,:file_id=>@display_model.sbml_content_blobs}.collect do |param_key,blobs|
       params[param_key] ? blobs.find { |blob| blob.id.to_s == params[param_key] } : blobs.first
     end
     @blob1=blobs[0]
