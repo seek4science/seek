@@ -6,7 +6,7 @@ module BootstrapHelper
     if url.nil?
       content_tag(:a, (icon + text).html_safe, options)
     else
-      link_to((icon + text).html_safe, url.html_safe, options)
+      link_to((icon + text).html_safe, url, options)
     end
   end
 
