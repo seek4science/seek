@@ -25,7 +25,7 @@ class ModelsHelperTest < ActionView::TestCase
       Factory(:cronwright_model_content_blob,:asset_version=>model.version,:asset=>model)
     end
     model.reload
-    assert allow_model_comparison(model,model.latest_version)
+    assert allow_model_comparison(model,model.versions.first)
 
     #2 sbml, not downloadable - refute
     model = Factory(:teusink_model,:contributor=>p,:policy=>Factory(:publicly_viewable_policy))
@@ -34,7 +34,7 @@ class ModelsHelperTest < ActionView::TestCase
       Factory(:cronwright_model_content_blob,:asset_version=>model.version,:asset=>model)
     end
     model.reload
-    refute allow_model_comparison(model,model.latest_version)
+    refute allow_model_comparison(model,model.versions.first)
 
     #2 sbml & 1 non-sbml, current sbml - allow
     model = Factory(:teusink_model,:contributor=>p,:policy=>Factory(:public_policy))

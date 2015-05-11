@@ -1125,7 +1125,7 @@ class ModelsControllerTest < ActionController::TestCase
     get :show,:id=>model
     assert_response :success
     (model.versions - [model.latest_version]).each do |version|
-      assert_select "a.btn", :href => compare_versions_model_path(model,:other_version=>version.version,:version=>model.version)
+      assert_select "a.btn[href=?]", compare_versions_model_path(model,:version=>model.version, :other_version=>version.version)
     end
   end
 
@@ -1146,7 +1146,9 @@ class ModelsControllerTest < ActionController::TestCase
     get :show,:id=>model
     assert_response :success
 
-    assert_select "select#compare_versions",:count=>0
+    (model.versions - [model.latest_version]).each do |version|
+      assert_select "a.btn[href=?]", compare_versions_model_path(model,:other_version=>version.version,:version=>model.version), :count=>0
+    end
   end
 
 
