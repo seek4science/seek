@@ -123,4 +123,3 @@ group :test do
   gem 'sunspot_matchers'
   gem 'pg'
 end
-
