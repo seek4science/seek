@@ -349,4 +349,8 @@ end
     Seek::Config.bioportal_api_key = 'frog'
     assert_equal 'frog', Organism.bioportal_api_key
   end
+
+  test 'imprint' do
+    assert_equal 'Here is imprint example', Seek::Config.imprint_description
+  end
 end

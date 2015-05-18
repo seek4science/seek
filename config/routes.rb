@@ -26,6 +26,7 @@ SEEK::Application.routes.draw do
       get :get_stats
       get :registration_form
       get :edit_tag
+      get :imprint_setting
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -39,6 +40,7 @@ SEEK::Application.routes.draw do
       post :update_pagination
       post :delete_tag
       post :edit_tag
+      post :update_imprint_setting
     end
   end
 
@@ -47,6 +49,7 @@ SEEK::Application.routes.draw do
       get :index
       get :feedback
       post :send_feedback
+      get :imprint
     end
   end
 

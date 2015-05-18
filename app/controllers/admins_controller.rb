@@ -119,6 +119,11 @@ class AdminsController < ApplicationController
     update_redirect_to validation_flag, 'home_settings'
   end
 
+  def update_imprint_setting
+    Seek::Config.imprint_description = params[:imprint_description]
+    update_redirect_to true, 'imprint_setting'
+  end
+
   def rebrand
     respond_to do |format|
       format.html

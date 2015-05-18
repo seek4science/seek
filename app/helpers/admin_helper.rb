@@ -65,8 +65,9 @@ module AdminHelper
   end
 
   def admin_textarea_setting(name, value, title, description = nil, options = {})
+    rows = options[:rows].nil? ? 5 : options[:rows]
     admin_setting_block(title, description) do
-      text_area_tag(name, value, options.merge!(:rows => 5, :class => 'form-control'))
+      text_area_tag(name, value, options.merge!(:rows => rows, :class => 'form-control'))
     end
   end
 

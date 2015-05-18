@@ -95,6 +95,17 @@ SEEK::Application.configure do
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
+  #Imprint
+  imprint_example = ''
+  File.open(Rails.root.join('config/default_data/imprint_example')) do |infile|
+    while (line = infile.gets)
+      imprint_example << line
+    end
+  end
+
+  Seek::Config.default :imprint_description, imprint_example
+
+
   #the maximum size, in Mb, for a spreadsheet file that can be extracted and explored
   Seek::Config.default :max_extractable_spreadsheet_size,10
 
