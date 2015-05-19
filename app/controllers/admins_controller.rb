@@ -120,6 +120,7 @@ class AdminsController < ApplicationController
   end
 
   def update_imprint_setting
+    Seek::Config.imprint_enabled = string_to_boolean params[:imprint_enabled]
     Seek::Config.imprint_description = params[:imprint_description]
     update_redirect_to true, 'imprint_setting'
   end

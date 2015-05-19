@@ -85,7 +85,8 @@ SEEK::Application.configure do
       Settings.defaults[:solr_enabled] = true
       Sunspot.session = SunspotMatchers::SunspotSessionSpy.new(Sunspot.session)
 
-      Settings.defaults[:imprint_description]='Here is imprint example'
+      Settings.defaults[:imprint_enabled]= false
+      Settings.defaults[:imprint_description]= 'Here is imprint example'
 
     end
   end

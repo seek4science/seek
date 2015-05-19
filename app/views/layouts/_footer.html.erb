@@ -15,7 +15,7 @@
 
             <span class="subtle"><%= version_text -%></span>
             <br/>
-            <%= link_to "Imprint", imprint_home_path %>
+            <%= link_to("Imprint", imprint_home_path) if Seek::Config.imprint_enabled %>
           </div>
           <div class="col-md-8">
             <div class="row logo-section">

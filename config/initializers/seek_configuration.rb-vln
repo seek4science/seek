@@ -90,6 +90,7 @@ SEEK::Application.configure do
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
   #Imprint
+  Settings.defaults[:imprint_enabled]= true
   imprint_example = ''
   File.open(Rails.root.join('config/default_data/imprint_example')) do |infile|
     while (line = infile.gets)
