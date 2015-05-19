@@ -364,7 +364,8 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
-  test "should display feed announcements in gadget" do
+  test "should display feed announcements when logged in" do
+    login_as(Factory(:person))
     headline=Factory :headline_announcement, :show_in_feed=>false, :title=>"a headline announcement"
     feed=Factory :feed_announcement, :show_in_feed=>true,:title=>"a feed announcement"
     get :index
