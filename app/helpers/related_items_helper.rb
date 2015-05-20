@@ -50,7 +50,7 @@ module RelatedItemsHelper
     resource_type[:visible_resource_type] = internationalized_resource_name(resource_type[:type], !resource_type[:is_external])
     resource_type[:tab_title] = resource_type_tab_title(resource_type)
 
-    resource_type[:tab_id] = resource_type[:type].downcase.pluralize.html_safe
+    resource_type[:tab_id] = resource_type[:type].downcase.pluralize.gsub(" ","-").html_safe
     resource_type[:title_class] = resource_type[:is_external] ? "external_result" : ""
     resource_type[:total_visible] = resource_type_total_visible_count(resource_type)
   end
