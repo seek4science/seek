@@ -37,6 +37,7 @@ module FancyMultiselectHelper
     # - SetDefaults
     #set default values for locals being sent to the partial
 
+    hidden = object.send(association).blank?
     object_type_text = determine_object_type_text(object, options[:object_type_text])
     {
         :intro => "The following #{association.to_s.singularize.humanize.pluralize.downcase} are associated with this #{object_type_text.downcase}:",
@@ -52,7 +53,7 @@ module FancyMultiselectHelper
         :other_projects_checkbox => false,
         :object_type => object.class.name,
         :possibilities_options => {},
-        :hidden => false,
+        :hidden => hidden,
         :required => false
     }
   end

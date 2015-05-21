@@ -18,4 +18,4 @@
    end
 %>
 
-<%= fancy_multiselect resource, :projects, :possibilities => possibilities, :selected => selected_project_ids, :required => (!allow_nil) %>
+<%= fancy_multiselect resource, :projects, :hidden=>false, :possibilities => possibilities, :selected => selected_project_ids, :required => (!allow_nil) %>
