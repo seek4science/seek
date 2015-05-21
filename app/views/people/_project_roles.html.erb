@@ -1,10 +1,10 @@
 <%= panel("#{t('project')} roles") do %>
     <% @person.group_memberships.each do |group_membership| -%>
-        <h3>
+        <p>
           <%= link_to group_membership.work_group.project.title, group_membership.work_group.project -%>
           at
           <%= link_to group_membership.work_group.institution.title, group_membership.work_group.institution -%>
-        </h3>
+        </p>
         <% if editable -%>
             <%=  link_to_function "[edit]","startRolesEdit(#{group_membership.id});return(false);",:id=>"edit_link_#{group_membership.id}" %>
             <%= link_to("[delete]", group_membership, :method => :delete, :confirm => "Are you sure?") unless @person.group_memberships.count < 2%>
