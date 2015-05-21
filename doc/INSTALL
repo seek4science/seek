@@ -71,9 +71,9 @@ if you already had RVM installed, bring it up to date with:
 
   rvm get stable
 
-now install Ruby 2.1.5
+now install Ruby 2.1.6
 
-  rvm install ruby-2.1.5
+  rvm install ruby-2.1.6
 
 you may be asked for your password so that some additional packages can be installed. You will then need to wait for Ruby to be downloaded and compiled.
 
