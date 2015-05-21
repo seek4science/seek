@@ -46,6 +46,6 @@
 <% end %>
 
 <% if show_publications -%>
-    <%= render :partial => "assets/publication_relation_form", :locals => {:resource_type => resource_type,
+    <%= render :partial => "assets/associate_publication", :locals => {:resource_type => resource_type,
                                                                            :related_publications => related_publications} -%>
 <% end -%>

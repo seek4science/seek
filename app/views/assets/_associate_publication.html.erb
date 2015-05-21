@@ -35,7 +35,7 @@
               <%= select_tag :publication_relationship_type, options_for_select([["None",0]]),:class => 'form-control' %>
           <% end -%>
 
-          <%= check_box_tag :include_other_project_publications, nil, true, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other projects?
+          <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Associate Publications from other projects?
         </div>
       </div>
       <div class="col-md-4">

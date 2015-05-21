@@ -32,7 +32,7 @@
 
           <%= select_tag :assay_sop_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
-          <%= check_box_tag :include_other_project_sops, nil, true, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate SOPs from other projects?
+          <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Associate SOPs from other projects?
         </div>
       </div>
       <div class="col-md-4">

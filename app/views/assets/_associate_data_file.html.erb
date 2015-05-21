@@ -38,8 +38,7 @@
           </div>
 
           <%= select_tag :data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-
-          <%= check_box_tag :include_other_project_data_files, nil, true, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate Data files from other projects?
+          <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate Data files from other projects?
         </div>
       </div>
       <div class="col-md-4">
