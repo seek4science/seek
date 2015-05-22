@@ -16,7 +16,8 @@ module JwsOnlineTestHelper
 
   def live_jws_tests?
     #not if running travis
-    ENV["TRAVIS"].nil?
+    #ENV["TRAVIS"].nil?
+    false
   end
 
   def setup_jws_mocking
