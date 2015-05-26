@@ -336,7 +336,9 @@ class ApplicationController < ActionController::Base
 
     respond_to do |format|
       format.html do
-        render :template => "general/landing_page_for_not_found_item", :status => :not_found
+        User.with_current_user current_user do
+          render :template => "general/landing_page_for_not_found_item", :status => :not_found
+        end
       end
 
       format.rdf { render  :text=>"Not found",:status => :not_found }
