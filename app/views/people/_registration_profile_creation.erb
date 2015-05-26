@@ -20,7 +20,7 @@
           <div class="col-sm-6">
             <label>Projects</label>
             <%= select_tag "projects",
-                           options_for_select(Project.all.collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
+                           options_for_select(Project.all.sort_by(&:title).collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
                            {:onchange => "Javascript:others('projects')", :multiple => true, :class => "form-control"}
             -%>
             <div id='other_projects' style='display: none' class="form-group">
@@ -32,7 +32,7 @@
           <div class="col-sm-6">
             <label>Institutions</label>
             <%= select_tag "institutions",
-                           options_for_select(Institution.all.collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
+                           options_for_select(Institution.all.sort_by(&:title).collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
                            {:onchange => "Javascript:others('institutions')", :multiple => true, :class => "form-control"}
             -%>
             <div id='other_institutions' style='display: none' class="form-group">
