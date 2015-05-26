@@ -123,7 +123,8 @@ class SessionsController < ApplicationController
     logout_user
     flash[:error] = message
     respond_to do |format|
-      format.html { redirect_to(:root) }
+      return_to = params[:called_from] ? params[:called_from][:url] : nil
+      format.html { redirect_to(login_path(:return_to=>return_to)) }
       format.xml { head :not_found }
     end
   end
