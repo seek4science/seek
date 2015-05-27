@@ -109,12 +109,12 @@ module HomesHelper
     Rails.cache.fetch("create_activity_#{current_user_id}") do
       item_types = Seek::Util.user_creatable_types.collect(&:name) | [Project, Programme]
       activity_logs = ActivityLog.where(['action = ? AND created_at > ? AND activity_loggable_type in (?)', 'create', time, item_types]).order('created_at DESC')
+      activity_logs.select! do |log|
+        log.activity_loggable && item_types.include?(log.activity_loggable_type) && log.activity_loggable.can_view?
+      end
       selected_activity_logs = []
       activity_logs.each do |activity_log|
-        item = activity_log.activity_loggable
-        if !item.nil? && item_types.include?(activity_log.activity_loggable_type) && item.can_view?
-          selected_activity_logs << activity_log
-        end
+        selected_activity_logs << activity_log
         break if selected_activity_logs.length >= number_of_item
       end
       convert_logs_to_hash selected_activity_logs
