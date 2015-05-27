@@ -43,7 +43,6 @@ class JsonMetaTest < ActiveSupport::TestCase
     item = Factory :publication, :doi=>"10.111.1.1", :pubmed_id=>nil
     json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
     json = JSON.parse(json)
-    pp json
 
     assert_equal item.id,json["id"]
     assert_equal item.title,json["title"]
@@ -65,6 +64,14 @@ class JsonMetaTest < ActiveSupport::TestCase
     assert_equal "https://www.ncbi.nlm.nih.gov/pubmed/4",json["pubmed_uri"]
     assert_nil json["doi"]
     assert_nil json["doi_uri"]
+  end
+
+  test "should not encode filename in encodes block if it has a space" do
+    item = Factory :data_file,:content_blob=>Factory(:content_blob,:original_filename=>"file with space.xls"),:policy=>Factory(:public_policy)
+    json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
+    json = JSON.parse(json)
+    filename = json["contains"].first
+    assert_equal "data_files/#{item.id}/file with space.xls",filename
   end
 
 end

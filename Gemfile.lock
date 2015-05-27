@@ -109,7 +109,7 @@ GIT
 
 GIT
   remote: https://github.com/myGrid/ruby-ro-bundle
-  revision: 4a439101d042648033b557f68871f6f79842e1c4
+  revision: 03d3ca892a8ac17e23147528761b93db27f27ee4
   specs:
     ro-bundle (0.1.0)
       json (~> 1.8)

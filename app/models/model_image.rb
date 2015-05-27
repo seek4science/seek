@@ -15,6 +15,9 @@ class ModelImage < ActiveRecord::Base
 
   validates_presence_of :model
 
+  #FIXME: to make it look like a content blob, migration needs creating
+  alias_method :filepath, :file_path
+
   def select!
     unless selected?
       model.update_attribute :model_image_id, id

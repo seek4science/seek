@@ -59,7 +59,7 @@ module Seek
         end
 
         if asset.respond_to?(:model_image) && asset.model_image
-          store_model_image_file(bundle, asset, asset.model_image)
+          store_blob_file(bundle, asset, asset.model_image)
         end
       end
 
@@ -67,13 +67,6 @@ module Seek
       def store_blob_file(bundle, asset, blob)
         path = File.join(asset.research_object_package_path, blob.original_filename)
         bundle.add(path, blob.filepath, aggregate: true)
-      end
-
-      # special case for storing an image file associated with a model, and adding
-      # the aggregate to the RO manifest.
-      def store_model_image_file(bundle, asset, model_image)
-        path = File.join(asset.research_object_package_path, model_image.original_filename)
-        bundle.add(path, model_image.file_path, aggregate: true)
       end
 
       # create an empty temp file, and return the opened file ready for writing.
