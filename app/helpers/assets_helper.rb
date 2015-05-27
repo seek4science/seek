@@ -55,27 +55,6 @@ module AssetsHelper
     text
   end
 
-  def resource_version_selection versioned_resource, displayed_resource_version
-    versions=versioned_resource.versions.reverse
-    disabled=versions.size==1
-    options=""
-    versions.each do |v|
-      if (v.version==versioned_resource.version)
-        options << "<option value='#{url_for(:id => versioned_resource)}'"
-      else
-        options << "<option value='#{url_for(:id => versioned_resource, :version => v.version)}'"
-      end
-
-      options << " selected='selected'" if v.version==displayed_resource_version.version
-      options << "> #{v.version.to_s} #{versioned_resource.describe_version(v.version)} </option>"
-    end
-    select_tag(:resource_versions,
-               options.html_safe,
-               :disabled => disabled,
-               :onchange => "showResourceVersion($('show_version_form'));"
-    ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
-  end
-
   def get_original_model_name(model)
     class_name = model.class.name
     if class_name.end_with?("::Version")
@@ -260,59 +239,6 @@ module AssetsHelper
   #code is for authorization of temporary link
   def can_view_asset? asset, code=params[:code], can_view=asset.can_view?
     can_view || (code && asset.auth_by_code?(code))
-  end
-
-
-  def link_to_view_all_in_new_window item, resource_type
-    path = item ? [item, resource_type.tableize] : eval("#{resource_type.pluralize.underscore}_path")
-    link_text = item ? "View all items with nested url in new window" : "View all items in new window"
-    link_to link_text, path, {:target => "_blank"}
-  end
-
-  def link_to_view_all_related_items item, resources, authorized_resources, scale_title
-    link = ""
-    resource_type = resources.first.class.name
-    count = authorized_resources.size
-    tab_content_view_all = scale_title + '_' + resource_type + '_view_all'
-    tab_content_view_some = scale_title + '_' + resource_type + '_view_some'
-    ajax_link_to_view_in_current_window =
-        link_to_with_callbacks "View all #{count} items here",
-                               {:url => url_for(:action => 'related_items_tab_ajax'),
-                                :method => "get",
-                                :condition => "check_tab_content('#{tab_content_view_all}', '#{tab_content_view_some}')",
-                                :with => "'resource_type=' + '#{resource_type}'
-                                          +  '&scale_title=' + '#{scale_title}'
-                                          +  '&view_type=' + 'view_all'
-                                          +  '#{item ? '&item_id='+ item.id.to_s + '&item_type=' + item.class.name : ''}'",
-                                :before => "$('#{tab_content_view_some}').hide();
-                                                   $('#{tab_content_view_all}').show();
-                                                   show_large_ajax_loader('#{tab_content_view_all}');"},
-                               {:remote => true}
-
-    link << ajax_link_to_view_in_current_window
-    link << " || "
-    link << link_to_view_all_in_new_window(item, resource_type)
-    link.html_safe
-  end
-
-  def ajax_link_to_view_limited_related_items item, resources, scale_title, limit
-    resource_type = resources.first.class.name
-    tab_content_view_all = scale_title + '_' + resource_type + '_view_all'
-    tab_content_view_some = scale_title + '_' + resource_type + '_view_some'
-    link =
-        link_to_with_callbacks "View only " + limit.to_s + " items",
-                               {:url => url_for(:action => 'related_items_tab_ajax'),
-                                :method => "get",
-                                :condition => "check_tab_content('#{tab_content_view_some}', '#{tab_content_view_all}')",
-                                :with => "'resource_type=' + '#{resource_type}'
-                                                                         +  '&scale_title=' + '#{scale_title}'
-                                                                         +  '&view_type=' + 'view_some'
-                                                                         +  '#{item ? '&item_id='+ item.id.to_s + '&item_type=' + item.class.name : ''}'",
-                                :before => "$('#{tab_content_view_all}').hide();
-                                               $('#{tab_content_view_some}').show();
-                                               show_large_ajax_loader('#{tab_content_view_some}');"},
-                               {:remote => true}
-    link.html_safe
   end
 
   def asset_link_url asset
