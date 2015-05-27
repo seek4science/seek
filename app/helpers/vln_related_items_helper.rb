@@ -1,4 +1,20 @@
 module VlnRelatedItemsHelper
+
+  #Resource hash for lazy loaded tabs, key: resource_type, value: resource
+  #Each hash value
+  def resource_hash_lazy_load resource
+    resource_hash = {}
+    all_related_items_hash = collect_related_items(resource)
+    all_related_items_hash.each_key do |resource_type|
+      all_related_items_hash[resource_type][:items].uniq!
+      all_related_items_hash[resource_type][:items].compact!
+      unless all_related_items_hash[resource_type][:items].empty?
+        resource_hash[resource_type] = all_related_items_hash[resource_type][:items]
+      end
+    end
+    resource_hash
+  end
+
   def link_to_view_all_in_new_window item, resource_type
     path = item ? [item, resource_type.tableize] : eval("#{resource_type.pluralize.underscore}_path")
     link_text = item ? "View all items with nested url in new window" : "View all items in new window"
