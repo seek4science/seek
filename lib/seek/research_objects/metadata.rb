@@ -15,10 +15,16 @@ module Seek
         bundle.add(targetpath, tmpfile, aggregate: false)
         bundle.commit
 
-        an = ROBundle::Annotation.new(item.rdf_resource.to_uri.to_s, targetpath)
+        an = ROBundle::Annotation.new(item_uri(item), targetpath)
         an.created_on = Time.now
         an.created_by = create_agent
         bundle.add_annotation(an)
+      end
+
+      def item_uri item
+        uri = item.rdf_resource.to_uri.to_s
+        uri << "?version=#{item.version}" if item.respond_to?(:version)
+        uri
       end
     end
   end
