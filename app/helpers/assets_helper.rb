@@ -222,15 +222,6 @@ module AssetsHelper
     render :partial => "assets/asset_buttons", :locals => {:asset => asset, :version => version}
   end
 
-  def asset_version_links asset_versions
-    asset_version_links = []
-    asset_versions.select(&:can_view?).each do |asset_version|
-      asset_name = asset_version.class.name.split('::').first.underscore
-      asset_version_links << link_to(asset_version.title, eval("#{asset_name}_path(#{asset_version.send("#{asset_name}_id")})") + "?version=#{asset_version.version}")
-    end
-    asset_version_links
-  end
-
   #code is for authorization of temporary link
   def can_download_asset? asset, code=params[:code], can_download=asset.can_download?
     can_download || (code && asset.auth_by_code?(code))
