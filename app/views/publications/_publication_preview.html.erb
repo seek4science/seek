@@ -1,7 +1,7 @@
 <%= panel(publication.title, :id => 'publication_preview', :class => 'list_item') do %>
-    <%= list_item_attribute "PubMed ID", publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{publication.pubmed_id}", {:onclick => "window.open(this.href);return false;"} unless publication.pubmed_id.nil? %>
+    <%= list_item_attribute "PubMed ID", publication.pubmed_id, publication.pubmed_uri,{:target => "_blank"} unless publication.pubmed_id.nil? %>
 
-    <%= list_item_attribute "DOI", publication.doi, "http://dx.doi.org/#{publication.doi}", {:onclick => "window.open(this.href);return false;"} unless publication.doi.nil? %>
+    <%= list_item_attribute "DOI", publication.doi, publication.doi_uri, {:target => "_blank"} unless publication.doi.nil? %>
 
     <%= list_item_simple_list(authors, "Author(s)") {|a| a.first_name + " " + a.last_name} -%>
 

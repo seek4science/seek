@@ -9,13 +9,13 @@
         <% unless @publication.pubmed_id.nil? %>
             <p>
               <strong>PubMed ID:</strong>
-              <%= link_to @publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}",{:target => "_blank"} %>
+              <%= link_to @publication.pubmed_id, @publication.pubmed_uri,{:target => "_blank"} %>
             </p>
         <% end %>
         <% unless @publication.doi.nil? %>
             <p>
               <strong>DOI:</strong>
-              <%= link_to @publication.doi, "http://dx.doi.org/#{@publication.doi}",{:target => "_blank"} %>
+              <%= link_to @publication.doi, @publication.doi_uri,{:target => "_blank"} %>
             </p>
         <% end %>
 

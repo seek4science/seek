@@ -60,6 +60,14 @@ class Publication < ActiveRecord::Base
 
   end
 
+  def pubmed_uri
+    "https://www.ncbi.nlm.nih.gov/pubmed/#{pubmed_id}" if pubmed_id
+  end
+
+  def doi_uri
+    "https://dx.doi.org/#{doi}" if doi
+  end
+
   def default_policy
     policy = Policy.new(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
     #add managers (authors + contributor)
