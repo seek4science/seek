@@ -5,6 +5,16 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
     def setup
       @repository = Seek::Rdf::RdfRepository.instance
       @project = Factory(:project,:title=>"Test for RDF storage")
+      @data_file_1 = Factory(:data_file)
+      @data_file_1.description = "this is data file 1"
+      @data_file_1.version = 1
+      @data_file_2 = Factory(:data_file)
+      @data_file_2.description = "this is data file 1" #yes really, just for testing.
+      @data_file_2.version = 2
+      @data_file_3 = Factory(:data_file)
+      @data_file_3.description = "this is data file 3"
+      @data_file_3.version = 2
+
       skip("these tests need a configured triple store setup") unless @repository.configured?
       WebMock.allow_net_connect!
       @graph = RDF::URI.new @repository.get_configuration.private_graph
@@ -25,6 +35,28 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       end
     end
 
+    test "query store" do
+      @repository.send_rdf(@project)
+      @repository.send_rdf(@data_file_1)
+      @repository.send_rdf(@data_file_2)
+      @repository.send_rdf(@data_file_3)
+
+      q = @repository.query.select.where([:s, RDF::URI.new("http://purl.org/dc/terms/description"), 'this is data file 1']).from(@graph)
+      results = @repository.select(q)
+      #puts results.pretty_inspect
+      assert_equal 2, results.count
+
+      q = @repository.query.select.where([:s, RDF::URI.new("http://purl.org/dc/terms/hasVersion"), '2']).from(@graph)
+      results = @repository.select(q)
+      puts results.pretty_inspect
+      assert_equal 2, results.count
+
+      q = @repository.query.select.where([:s, RDF::URI.new("http://purl.org/dc/terms/hasVersion"), '2'],
+                                         [:s, RDF::URI.new("http://purl.org/dc/terms/description"), 'this is data file 1']).from(@graph)
+      puts q.pretty_inspect
+      results = @repository.select(q)
+      assert_equal 1, results.count
+    end
 
     test "singleton repository" do
       repo = Seek::Rdf::RdfRepository.instance
