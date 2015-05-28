@@ -777,6 +777,24 @@ class PersonTest < ActiveSupport::TestCase
     refute person2.shares_programme?(person3.projects.first)
   end
 
+  test "shares project?" do
+    person1 = Factory(:person)
+    project = person1.projects.first
+    person2 = Factory(:person,:work_groups=>[project.work_groups.first])
+    person3 = Factory(:person)
+
+    assert person1.shares_project?(person2)
+    refute person1.shares_project?(person3)
+
+    assert person1.shares_project?(project)
+    refute person1.shares_project?(person3.projects.first)
+
+    assert person1.shares_project?([project])
+    assert person1.shares_project?([project,Factory(:project)])
+    refute person1.shares_project?([person3.projects.first])
+    refute person1.shares_project?([person3.projects.first,Factory(:project)])
+  end
+
   test "add to project and institution" do
     proj1=Factory :project
     proj2=Factory :project
