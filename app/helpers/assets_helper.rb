@@ -150,4 +150,6 @@ module AssetsHelper
     end
     sharing_text.html_safe
   end
+
+
 end

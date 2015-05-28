@@ -118,6 +118,13 @@ module BiosamplesHelper
     end
   end
 
+  def asset_version_links asset_versions
+    asset_versions.select(&:can_view?).collect do |asset_version|
+      asset_name = asset_version.class.name.split('::').first.underscore
+      link_to(asset_version.title, eval("#{asset_name}_path(#{asset_version.send("#{asset_name}_id")})") + "?version=#{asset_version.version}")
+    end
+  end
+
   def sample_row_data sample
     explanation = unable_to_delete_text sample
     disabled_delete_icon =  image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
