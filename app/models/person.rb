@@ -140,6 +140,21 @@ class Person < ActiveRecord::Base
     (self.programmes & other_item.programmes).any?
   end
 
+  #whether this person belongs to a project in common with the other item - whcih can eb a person, project or enumeration of projects
+  def shares_project? other_item
+    if other_item.is_a?(Project) || other_item.is_a?(Enumerable)
+      projects = Array(other_item)
+    else
+      projects = other_item.projects
+    end
+
+    (self.projects & projects).any?
+  end
+
+  def shares_project_or_programme? other_item
+    self.shares_project?(other_item) || self.shares_programme?(other_item)
+  end
+
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do

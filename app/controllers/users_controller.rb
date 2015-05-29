@@ -137,6 +137,9 @@ class UsersController < ApplicationController
     person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?
     @user.person=person if !person.nil?
 
+    #user was assigned to person, so auth update is needed
+    do_auth_update = params[:user][:person_id]
+
     if params[:user]
       [:id, :person_id].each do |column_name|
         params[:user].delete(column_name)
@@ -148,6 +151,7 @@ class UsersController < ApplicationController
     respond_to do |format|
       
       if @user.save
+        AuthLookupUpdateJob.add_items_to_queue(@user) if do_auth_update
         #user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
           Mailer.signup(@user,base_host).deliver
@@ -162,7 +166,6 @@ class UsersController < ApplicationController
         format.html { render :action => 'edit' }
       end
     end
-    
   end
 
   def destroy

@@ -64,10 +64,8 @@ module PeopleHelper
   #Current decided by Seek::Config.hide_details_enabled or
   # is hidden if the current person doesn't share the same programme as the person being viewed
   def hide_contact_details? displayed_person_or_project
-    if logged_in? && current_user.person.shares_programme?(displayed_person_or_project)
-      Seek::Config.hide_details_enabled
-    else
-      true
-    end
+    return true if Seek::Config.hide_details_enabled || !logged_in?
+    !current_user.person.shares_project_or_programme?(displayed_person_or_project)
   end
+
 end

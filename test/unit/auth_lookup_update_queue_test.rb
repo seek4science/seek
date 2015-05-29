@@ -218,15 +218,6 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     end
   end
 
-  test "updates for user" do
-    person = Factory :person
-    user=nil
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      user = Factory :user, :person=>person
-    end
-    assert_equal user, AuthLookupUpdateQueue.last(:order=>:id).item
-  end
-
   test "updates for person" do
     user = Factory :user
     person=nil
