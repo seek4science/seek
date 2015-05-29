@@ -11,6 +11,7 @@
 
 <%= form_for @person do |f| %>
     <%= f.error_messages %>
+    <%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
     <%= render :partial => 'contact_details_form', :locals => {:f => f} %>
     <%= hidden_field_tag :sysmo_member, true -%>
 

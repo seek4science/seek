@@ -1,32 +1,7 @@
 <%= javascript_include_tag "people" %>
 <%= f.error_messages %>
 
-<div class="row">
-  <div class="col-sm-6">
-    <div class="form-group">
-      <%= f.label :first_name -%><span class="required">*</span>
-
-      <%= f.text_field :first_name, :class => 'form-control' -%>
-    </div>
-    <div class="form-group">
-      <%= f.label :last_name %><span class="required">*</span>
-
-      <%= f.text_field :last_name, :class => 'form-control' %>
-    </div>
-  </div>
-
-  <div class="col-sm-6">
-    <div class="form-group">
-      <label>ORCID Identifier
-        <%= help_icon('<b>ORCID</b> is an open, non-profit, community-based effort to provide a registry of unique researcher identifiers and a transparent method of linking research activities and outputs to these identifiers.<b>An ORCID identifier looks like http://orcid.org/XXXX-XXXX-XXXX-XXXX</b>To find out more and get your ORCID ID please visit http://orcid.org') -%>
-      </label>
-
-      <%= f.text_field :orcid, :class => 'form-control' %>
-    </div>
-
-
-  </div>
-</div>
+<%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
 
 <div class="form-group">
   <label>Description about myself</label>
