@@ -51,12 +51,6 @@ class User < ActiveRecord::Base
 
   acts_as_uniquely_identifiable
 
-  after_commit :queue_update_auth_table, :on=>:create
-
-  def queue_update_auth_table
-    AuthLookupUpdateJob.add_items_to_queue self
-  end
-
   cattr_accessor :current_user
 
   # related_#{type} are resources that user created
