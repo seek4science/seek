@@ -151,7 +151,7 @@ class UsersController < ApplicationController
     respond_to do |format|
       
       if @user.save
-        AuthLookupUpdateJob.add_items_to_queue(@user) if do_auth_update
+        AuthLookupUpdateJob.new.add_items_to_queue(@user) if do_auth_update
         #user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
           Mailer.signup(@user,base_host).deliver
