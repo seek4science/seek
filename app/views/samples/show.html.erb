@@ -55,9 +55,6 @@
         </p>
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sample} %>
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @sample, :versioned_resource=>@sample } -%>
-      </div>
     </div>
   </div>
   <div class="col-md-3 col-sm-4">
@@ -71,7 +68,7 @@
         <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
       </div>
       <div class="col-md-3 col-sm-4">
-        <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen, :title => 'Contributor and creators'} %>
+        <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen } %>
       </div>
   <% else %>
       <%= hidden_items_html([@sample.specimen], "This item is hidden")  %>

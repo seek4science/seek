@@ -38,15 +38,10 @@
           <%= strain_organism_list @strain.organism %>
         </p>
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @strain, :versioned_resource=>@strain } -%>
-      </div>
     </div>
   </div>
   <div class="col-md-3 col-sm-4">
-    <% #dont show creator box with JERM avatar for strain without contributor, as there are strains without contributor and are not harvested %>
-    <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @strain, :creators => [@strain.contributor.try(:person)]} unless @strain.contributor.try(:person).nil? -%>
-    <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." if current_user-%>
+    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @strain } %>
   </div>
 </div>
 

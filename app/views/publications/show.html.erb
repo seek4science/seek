@@ -49,16 +49,12 @@
           <% end %>
         </p>
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @publication , :versioned_resource=> @publication } -%>
-      </div>
     </div>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @publication, :current_item => @publication, :deep => true} %>
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @publication, :authors_title=>"Authors" } -%>
   </div>
 </div>
-
-<%= render :partial=>"general/isa_graph", :locals => {:root_item => @publication, :current_item => @publication, :deep => true} %>
 
 <%= render :partial=>"general/items_related_to",:object => @publication %>

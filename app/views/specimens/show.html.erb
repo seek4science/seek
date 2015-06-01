@@ -6,13 +6,10 @@
       <div class="col-md-6">
         <%= render :partial => "samples/sample_specimen_details", :object => @specimen %>
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @specimen, :versioned_resource=>@specimen } -%>
-      </div>
     </div>
   </div>
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @specimen, :title => 'Contributor and creators'} %>
+    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @specimen } %>
   </div>
 </div>
 

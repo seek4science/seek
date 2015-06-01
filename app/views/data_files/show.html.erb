@@ -15,19 +15,14 @@
 
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @data_file , :versioned_resource=> @display_data_file } -%>
-      </div>
     </div>
-
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :current_item => @data_file, :deep => true} %>
   </div>
 
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } -%>
   </div>
 </div>
-
-<%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :current_item => @data_file, :deep => true} %>
 
 <%= render :partial=>"data_files/studied_factors" if Seek::Config.factors_studied_enabled %>
 

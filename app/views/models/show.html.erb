@@ -45,19 +45,15 @@
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_model} %>
 
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @model , :versioned_resource=> @display_model } -%>
-      </div>
     </div>
 
     <%= render :partial=>"model_visualisation" -%>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @model, :current_item => @model, :deep => true} %>
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model,:versioned_resource=>@display_model } %>
   </div>
 </div>
-
-<%= render :partial=>"general/isa_graph", :locals => {:root_item => @model, :current_item => @model, :deep => true} %>
 
 <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
 

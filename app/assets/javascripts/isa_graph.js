@@ -120,41 +120,23 @@ function animateNode(node){
 }
 
 function displayNodeInfo(node){
-    var html = "<div class='panel panel-default'>";
-    html += "<div class='panel-heading'>Chosen item</div>";
-    html += "<div class='panel-body>";
-    html += "<ul class='list-group'>";
+
+    html = "<div class='isa-selected-item'><strong>Selected item: </strong>";
     var item_data = node.data();
     html += itemInfo(item_data);
-    html += '</ul>';
-
-    html += '</div></div>';
-
-    html += "<div class='panel panel-default'>";
-    html += "<div class='panel-heading'>Connected items</div>";
-    html += "<div class='panel-body>";
-    html += "<ul class='list-group'>";
-    var connected_nodes = connectedNodes(node);
-    for(var i=0;i<connected_nodes.length;i++){
-        var node_data = connected_nodes[i].data();
-        html += itemInfo(node_data);
-    }
-
-    html += '</ul>';
-    html += '</div></div>';
+    html += '</div>';
 
     var node_info = $('node_info');
     $('node_info').innerHTML = html;
 
-    //can not use Effect.Appear here, it does not activate clientHeight
-    //node_info.style.display = 'block';
-    //alignCenterVertical(node_info, node_info.clientHeight);
+
 }
 
+
 function itemInfo(item_data){
-    var html = '<li class="list-group-item">';
+    var html = '<span>';
     html += item_data.item_info;
-    html += '</li>';
+    html += '</span>';
     return html;
 }
 

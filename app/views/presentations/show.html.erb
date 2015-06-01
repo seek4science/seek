@@ -13,10 +13,8 @@
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @presentation} %>
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @presentation , :versioned_resource=> @display_presentation } -%>
-      </div>
     </div>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @presentation, :current_item => @presentation, :deep => true} %>
   </div>
 
   <div class="col-md-3 col-sm-4">
@@ -24,7 +22,6 @@
   </div>
 </div>
 
-<%= render :partial=>"general/isa_graph", :locals => {:root_item => @presentation, :current_item => @presentation, :deep => true} %>
 
 <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
 

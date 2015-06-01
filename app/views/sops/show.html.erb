@@ -15,17 +15,17 @@
 
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_sop} %>
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @sop , :versioned_resource=> @display_sop } -%>
-      </div>
     </div>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :current_item => @sop, :deep => true} %>
   </div>
+
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop, :versioned_resource=>@display_sop } %>
   </div>
 </div>
 
-<%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :current_item => @sop, :deep => true} %>
+
+
 
 <% if Seek::Config.experimental_conditions_enabled %>
     <h2>Experimental Conditions</h2>

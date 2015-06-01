@@ -65,9 +65,6 @@
             <%= list_samples_and_assay_organisms("Organisms", @assay.samples, @assay.assay_organisms,{:id=>"organism"}) %>
         <% end %>
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @assay , :versioned_resource=> @assay } -%>
-      </div>
     </div>
     <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
         <div class="data_model_relationship">
@@ -103,12 +100,13 @@
           <% end %>
         </div>
     <% end %>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @assay.study, :current_item => @assay, :deep => true} %>
   </div>
+
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @assay, :creators=>[@assay.owner] } %>
   </div>
 </div>
 
-<%= render :partial=>"general/isa_graph", :locals => {:root_item => @assay.study, :current_item => @assay, :deep => true} %>
 
 <%= render :partial=>"general/items_related_to",:object => @assay %>
