@@ -1,6 +1,6 @@
 = Installing SEEK for other Linux distributions
 
-Our main {Install Guide}[link:doc/INSTALL.html] is based upon the Ubuntu 12.04 (LTS) distribution and version. However, other than the distribution
+Our main {Install Guide}[link:doc/INSTALL.html] is based upon the Ubuntu 14.04 (LTS) distribution and version. However, other than the distribution
 packages the install process should be very similar for other distributions.
 
 For some other common distributions, we describe here the required distribution packages, and any other differences we are aware of from our general install guide.
