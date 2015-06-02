@@ -1,21 +1,39 @@
 <div class="main">
   <div class="container">
     <h1>Search RDF</h1></h1>
-    <p>Enter search details: </p>
     <%= form_tag '/searchRdf' do -%>
         <div id="search_box">
 
           <div class="input-group">
-            <%= text_field_tag :rdf_search_query, @rdf_search_query, :class => "form-control", :placeholder => "Search rdf here..." %>
-            <div class="input-group-btn">
-              <%= submit_tag "Search RDF", :class => 'btn btn-default' -%>
-            </div>
+
+            <p>Sugar:
+              <%= text_field_tag :sugar_query, @sugar_query, :class => "form-control", :placeholder => "Search sugar here..." %>
+            </p>
+            </br>
+            </br>
+            <p>Factor:
+              <%= text_field_tag :factor_query, @factor_query, :class => "form-control", :placeholder => "Search factor here..." %>
+            </p>
           </div>
 
+          <div class="input-group-btn">
+            <%= submit_tag "Search", :class => 'btn btn-default' -%>
+          </div>
         </div>
     <% end -%>
 
-    <p>Results are: </p>
-    <%= @results -%>
+    <% if !@list_of_queries.empty? && @results.blank? %>
+        <p>No results found for this query.</p>
+    <% end -%>
+
+    <!--TODO faceted browsing here? (see search/index.html.erb)-->
+    <% if !@results.blank? %>
+
+        <% resource_hash = classify_for_tabs @results -%>
+        <%= render :partial => "assets/resource_listing_tabbed_by_class",
+                   :locals => {:resource_hash => resource_hash,
+                               :narrow_view => true,
+                               :authorization_already_done => true} -%>
+    <% end %>
   </div>
 </div>
