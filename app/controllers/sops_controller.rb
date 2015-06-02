@@ -81,28 +81,11 @@ class SopsController < ApplicationController
   end
 
   # POST /sops
-  def create    
-
+  def create
     if handle_upload_data
       @sop = Sop.new(params[:sop])
-      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
-      update_annotations(params[:tag_list], @sop)
-      update_scales @sop
-
-      respond_to do |format|
-        if @sop.save
-          create_content_blobs
-          update_relationships(@sop,params)
-          update_assay_assets(@sop,params[:assay_ids])
-          flash[:notice] = "#{t('sop')} was successfully uploaded and saved."
-          format.html { redirect_to sop_path(@sop) }
-        else
-          format.html { 
-            render :action => "new" 
-          }
-        end
-      end
+      create_asset_and_respond(@sop)
     else
       handle_upload_data_failure
     end

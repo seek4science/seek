@@ -222,37 +222,6 @@ class ModelsController < ApplicationController
 
   end
 
-  # POST /models
-  # POST /models.xml
-  def create
-    if handle_upload_data
-      @model = Model.new(params[:model])
-
-      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
-
-      update_annotations(params[:tag_list], @model)
-      update_scales @model
-      build_model_image @model, params[:model_image]
-
-      respond_to do |format|
-        if @model.save
-          create_content_blobs
-          update_relationships(@model, params)
-          update_assay_assets(@model, params[:assay_ids])
-          flash[:notice] = "#{t('model')} was successfully uploaded and saved."
-          format.html { redirect_to model_path(@model) }
-        else
-          format.html {
-            render :action => "new"
-          }
-        end
-      end
-    else
-      handle_upload_data_failure
-    end
-
-  end
-
 
   # PUT /models/1
   # PUT /models/1.xml
