@@ -35,25 +35,6 @@ class PresentationsController < ApplicationController
 
   end
 
-  # GET /presentations/new
-  # GET /presentations/new.xml
-  def new
-    @presentation=Presentation.new
-    @presentation.parent_name = params[:parent_name]
-    respond_to do |format|
-      if User.logged_in_and_member?
-        format.html # new.html.erb
-      else
-        flash[:error] = "You are not authorized to upload new Presentations. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html { redirect_to presentations_path }
-      end
-    end
-  end
-
-
-
-
-
   # GET /presentations/1
   # GET /presentations/1.xml
   def show
@@ -66,10 +47,6 @@ class PresentationsController < ApplicationController
       format.html # show.html.erb
       format.xml
     end
-  end
-
-  def edit
-
   end
 
  # PUT /presentations/1

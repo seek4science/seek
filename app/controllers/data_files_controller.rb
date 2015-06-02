@@ -89,21 +89,6 @@ class DataFilesController < ApplicationController
       redirect_to @data_file
     end
   end
-  
-  def new
-    @data_file = DataFile.new
-    @data_file.parent_name = params[:parent_name]
-    @data_file.is_with_sample= params[:is_with_sample]
-    @page_title = params[:page_title]
-    respond_to do |format|
-      if User.logged_in_and_member?
-        format.html # new.html.erb
-      else
-        flash[:error] = "You are not authorized to upload new Data files. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html { redirect_to data_files_path }
-      end
-    end
-  end
 
   def upload_for_tool
 
@@ -235,10 +220,6 @@ class DataFilesController < ApplicationController
       format.rdf { render :template=>'rdf/show'}
       format.json
     end
-  end
-  
-  def edit
-    
   end
   
   def update

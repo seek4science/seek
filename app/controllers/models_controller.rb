@@ -202,20 +202,6 @@ class ModelsController < ApplicationController
     end
   end
 
-  # GET /models/new
-  # GET /models/new.xml
-  def new
-    @model=Model.new
-    @content_blob= ContentBlob.new
-    respond_to do |format|
-      if User.logged_in_and_member?
-        format.html # new.html.erb
-      else
-        flash[:error] = "You are not authorized to upload new Models. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html { redirect_to models_path }
-      end
-    end
-  end
 
   # GET /models/1/edit
   def edit

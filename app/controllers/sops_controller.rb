@@ -62,24 +62,6 @@ class SopsController < ApplicationController
     end
   end
 
-  # GET /sops/new
-  def new
-    @sop=Sop.new
-    respond_to do |format|
-      if User.logged_in_and_member?
-        format.html # new.html.erb
-      else
-        flash[:error] = "You are not authorized to upload new SOPs. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html { redirect_to sops_path }
-      end
-    end
-  end
-  
-  # GET /sops/1/edit
-  def edit
-    
-  end
-
   # POST /sops
   def create
     if handle_upload_data

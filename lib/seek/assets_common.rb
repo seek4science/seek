@@ -9,6 +9,27 @@ module Seek
     include Seek::PreviewHandling
     include Seek::DestroyHandling
 
+    def new
+      item=class_for_controller_name.new
+      item.parent_name = params[:parent_name] if item.respond_to?(:parent_name)
+      item.is_with_sample = params[:is_with_sample] if item.respond_to?(:is_with_sample)
+      set_shared_item_variable(item)
+      @content_blob = ContentBlob.new
+      @page_title = params[:page_title]
+      respond_to do |format|
+        if User.logged_in_and_member?
+          format.html # new.html.erb
+        else
+          flash[:error] = "You are not authorized to upload a new #{t(item.class.name.underscore)}. Only members of known projects, institutions or work groups are allowed to create new content."
+          format.html { redirect_to eval("#{controller_name}_path") }
+        end
+      end
+    end
+
+    def edit
+
+    end
+
     def create
       if handle_upload_data
         item = class_for_controller_name.new(params[controller_name.singularize.to_sym])
@@ -83,13 +104,19 @@ module Seek
       end
     end
 
+    #i.e. Model, or DataFile according to the controller name
     def class_for_controller_name
       controller_name.classify.constantize
     end
 
+    #i.e. @model = item, or @data_file = item - according to the item class name
+    def set_shared_item_variable(item)
+      eval("@#{item.class.name.underscore}=item")
+    end
+
     # the standard response block after created a new asset
     def create_asset_and_respond(item)
-      eval("@#{item.class.name.underscore}=item")
+      set_shared_item_variable(item)
       item.policy.set_attributes_with_sharing params[:sharing], item.projects
       update_annotations(params[:tag_list], item)
       update_scales item
