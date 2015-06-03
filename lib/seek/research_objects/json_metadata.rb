@@ -16,6 +16,7 @@ module Seek
         json[:contributor] = create_agent(item.contributor)
 
         json[:contains] = contained_files(item) if item.is_asset?
+        json[:contains] = contained_assets(item) if item.is_a?(Assay)
 
         JSON.pretty_generate(json)
       end
@@ -25,6 +26,13 @@ module Seek
       end
 
       private
+
+      def contained_assets(assay)
+        assets = assay.assets.select{|asset| asset.permitted_for_research_object?}
+        assets.collect do |asset|
+          asset.research_object_package_path
+        end
+      end
 
       def contained_files(asset)
         contained_blobs(asset) | contained_model_images(asset)
