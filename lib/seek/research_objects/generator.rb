@@ -65,8 +65,20 @@ module Seek
 
       # stores a content blob file, added the aggregate to the manifest
       def store_blob_file(bundle, asset, blob)
-        path = File.join(asset.research_object_package_path, blob.original_filename)
+        path = resolve_entry_path(bundle,asset,blob)
         bundle.add(path, blob.filepath, aggregate: true)
+      end
+
+      #resolves the entry path, to avoid duplicates. If an asset has multiple files
+      #with some the same name, a "c-" is prepended t the file name, where c starts at 1 and increments
+      def resolve_entry_path(bundle, asset, blob)
+        path = File.join(asset.research_object_package_path, blob.original_filename)
+        while(bundle.find_entry(path))
+          c||=1
+          path = File.join(asset.research_object_package_path, "#{c}-#{blob.original_filename}")
+          c+=1
+        end
+        path
       end
 
       # create an empty temp file, and return the opened file ready for writing.
