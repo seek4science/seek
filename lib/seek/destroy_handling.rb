@@ -26,5 +26,19 @@ module Seek
       eval("@#{name}")
     end
 
+    def destroy_version
+      asset = determine_asset_from_controller
+      if Seek::Config.delete_asset_version_enabled
+        asset.destroy_version params[:version]
+        flash[:notice] = "Version #{params[:version]} was deleted!"
+      else
+        flash[:error] = "Deleting a version of #{asset.class.name.underscore.humanize} is not enabled!"
+      end
+      respond_to do |format|
+        format.html { redirect_to(polymorphic_path(asset)) }
+        format.xml { head :ok }
+      end
+    end
+
   end
 end
