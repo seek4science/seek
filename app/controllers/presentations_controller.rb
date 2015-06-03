@@ -35,20 +35,6 @@ class PresentationsController < ApplicationController
 
   end
 
-  # GET /presentations/1
-  # GET /presentations/1.xml
-  def show
-    # store timestamp of the previous last usage
-    @last_used_before_now = @presentation.last_used_at
-
-    @presentation.just_used
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml
-    end
-  end
-
  # PUT /presentations/1
   # PUT /presentations/1.xml
   def update

@@ -4,7 +4,6 @@ module Seek
   module AssetsCommon
     include Seek::AnnotationCommon
     include Seek::ContentBlobCommon
-    include Seek::DownloadHandling::DataDownload
     include Seek::PreviewHandling
     include Seek::AssetsStandardControllerActions
 

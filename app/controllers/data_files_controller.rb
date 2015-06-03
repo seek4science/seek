@@ -206,22 +206,7 @@ class DataFilesController < ApplicationController
   end
 
 
-  def show
-    # store timestamp of the previous last usage
-    @last_used_before_now = @data_file.last_used_at
 
-    @data_file.just_used
-
-    #Rails.logger.warn "template in data_files_controller/show : #{params[:parsing_template]}"
-
-    respond_to do |format|
-      format.html #{render :locals => {:template => params[:parsing_template]}}# show.html.erb
-      format.xml
-      format.rdf { render :template=>'rdf/show'}
-      format.json
-    end
-  end
-  
   def update
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
     data_file_params=filter_protected_update_params(params[:data_file])

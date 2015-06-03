@@ -185,30 +185,6 @@ class ModelsController < ApplicationController
     end
   end
 
-
-  # GET /models/1
-  # GET /models/1.xml
-  def show
-    # store timestamp of the previous last usage
-    @last_used_before_now = @model.last_used_at
-
-
-    @model.just_used
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml
-      format.rdf { render :template => 'rdf/show' }
-    end
-  end
-
-
-  # GET /models/1/edit
-  def edit
-
-  end
-
-
   # PUT /models/1
   # PUT /models/1.xml
   def update

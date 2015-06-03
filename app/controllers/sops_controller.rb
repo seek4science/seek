@@ -44,36 +44,6 @@ class SopsController < ApplicationController
     
   end
 
-  # GET /sops/1
-  def show
-    # store timestamp of the previous last usage
-    @last_used_before_now = @sop.last_used_at
-    
-    # update timestamp in the current SOP record 
-    # (this will also trigger timestamp update in the corresponding Asset)
-    if @sop.instance_of?(Sop)
-      @sop.just_used
-    end  
-    
-    respond_to do |format|
-      format.html
-      format.xml
-      format.rdf { render :template=>'rdf/show'}
-    end
-  end
-
-  # POST /sops
-  def create
-    if handle_upload_data
-      @sop = Sop.new(params[:sop])
-
-      create_asset_and_respond(@sop)
-    else
-      handle_upload_data_failure
-    end
-  end
-  
-  
   # PUT /sops/1
   def update
     sop_params=filter_protected_update_params(params[:sop])
