@@ -12,6 +12,14 @@ class Assay < ActiveRecord::Base
     study.try(:projects) || []
   end
 
+  #needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
+  searchable(:auto_index=>false) do
+    text :organism_terms, :assay_type_label,:technology_type_label
+
+    text :strains do
+      strains.compact.map{|s| s.title}
+    end
+  end if Seek::Config.solr_enabled
   acts_as_isa
 
   acts_as_annotatable :name_field=>:title
@@ -59,15 +67,6 @@ class Assay < ActiveRecord::Base
   attr_reader :pending_related_assets
 
   alias_attribute :contributor, :owner
-
-  searchable(:auto_index=>false) do
-    text :organism_terms, :assay_type_label,:technology_type_label
-
-    text :strains do
-      strains.compact.map{|s| s.title}
-    end
-  end if Seek::Config.solr_enabled
-
 
   def project_ids
     projects.map(&:id)

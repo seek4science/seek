@@ -9,6 +9,12 @@ class Study < ActiveRecord::Base
     investigation.try(:projects) || []
   end
 
+  searchable(:auto_index => false) do
+    text :experimentalists
+    text :person_responsible do
+      person_responsible.try(:name)
+    end
+  end if Seek::Config.solr_enabled
   acts_as_isa
 
   attr_accessor :new_link_from_assay
@@ -17,13 +23,6 @@ class Study < ActiveRecord::Base
   has_many :assays
   belongs_to :person_responsible, :class_name => "Person"
   validates :investigation, :presence => true
-
-  searchable(:auto_index => false) do
-    text :experimentalists
-    text :person_responsible do
-      person_responsible.try(:name)
-    end
-  end if Seek::Config.solr_enabled
 
   ["data_file","sop","model","publication"].each do |type|
     eval <<-END_EVAL

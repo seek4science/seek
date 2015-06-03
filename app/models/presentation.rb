@@ -8,7 +8,6 @@ class Presentation < ActiveRecord::Base
 
    #searchable must come before acts_as_asset call - although empty is seems this is needed to avoid the autoindex
    #even though in Seek::ActsAsAsset::Search it is already set to false!
-   searchable(:auto_index=>false) {} if Seek::Config.solr_enabled
    acts_as_asset
 
    scope :default_order, order("title")
