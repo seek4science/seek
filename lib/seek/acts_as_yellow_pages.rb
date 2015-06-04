@@ -34,7 +34,7 @@ module Seek #:nodoc:
 
         include Seek::Search::CommonFields
 
-        searchable do
+        searchable(auto_index: false) do
           text :locations do
             if self.respond_to?(:country)
               country

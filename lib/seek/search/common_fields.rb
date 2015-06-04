@@ -5,7 +5,7 @@ module Seek
 
       def self.included klass
         klass.class_eval do
-          searchable do
+          searchable(auto_index: false) do
             text :title do
               if self.respond_to?(:title)
                 title
@@ -41,7 +41,7 @@ module Seek
         klass.class_eval do
           include Seek::Search::CommonFields
 
-          searchable do
+          searchable(auto_index: false) do
             text :genotype_info do
               if self.respond_to?(:genotype_info)
                 genotype_info

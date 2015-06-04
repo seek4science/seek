@@ -4,6 +4,7 @@ module Seek
       extend ActiveSupport::Concern
 
       included do
+        include Seek::Search::CommonFields
         searchable(auto_index: false) do
           text :creators do
             if self.respond_to?(:creators)
@@ -20,7 +21,6 @@ module Seek
           end
           text :assay_type_titles, :technology_type_titles
         end if Seek::Config.solr_enabled
-        include Seek::Search::CommonFields
       end
     end
   end

@@ -8,6 +8,10 @@ require 't2flow/dot'
 
 class Workflow < ActiveRecord::Base
 
+  searchable(ignore_attribute_changes_of: [:updated_at],auto_index:false) do
+    text :category
+  end if Seek::Config.solr_enabled
+
   acts_as_asset
 
   include Seek::Dois::DoiGeneration
@@ -99,10 +103,6 @@ class Workflow < ActiveRecord::Base
       !user.nil? # just checks if user is logged in for now
     end
   end
-
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
-    text :category
-  end if Seek::Config.solr_enabled
 
   def self.user_creatable?
     Seek::Config.workflows_enabled

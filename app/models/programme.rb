@@ -1,6 +1,12 @@
 class Programme < ActiveRecord::Base
   attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details
 
+  searchable(:auto_index=>false) do
+    text :funding_details
+    text :institutions do
+      institutions.compact.map(&:title)
+    end
+  end if Seek::Config.solr_enabled
   acts_as_yellow_pages
 
   #associations
@@ -11,14 +17,6 @@ class Programme < ActiveRecord::Base
   validates :title,:uniqueness=>true
 
   scope :default_order, order('title')
-
-
-  searchable(:auto_index=>false) do
-    text :funding_details
-    text :institutions do
-      institutions.compact.map(&:title)
-    end
-  end if Seek::Config.solr_enabled
 
   def people
     projects.collect{|p| p.people}.flatten.uniq
