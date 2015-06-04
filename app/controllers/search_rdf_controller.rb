@@ -1,5 +1,5 @@
 class SearchRdfController < ApplicationController
-
+  include Seek::Rdf::RdfRepositoryStorage
   def index
 
   end
@@ -51,34 +51,59 @@ class SearchRdfController < ApplicationController
     @list_of_queries.pretty_inspect
 
     unless (@list_of_queries.empty?)
+
       # do query
       q = @repository.query.select.where(*@list_of_queries).from(@graph)
-      results = @repository.select(q)
+      results = @repository.select(q).collect { |result| result[:s] }
 
-      puts "***** Results ******"
-      puts results.pretty_inspect
+      results.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq
 
-      @results = []
-      results.each { |result| @results.push(get_object_from_url(result)) }
+      puts "*** results ***"
+      results.pretty_inspect
+      puts "class"
+      print(results[0].class.name)
+
+      #    @results = []
+      #   results.each { |result| @results.push(get_object_from_url(result)) }
+
+      @results = get_active_records_from_urls(results)
+      puts "*** @results ***"
+      @results.pretty_inspect
 
       @results = select_authorised @results
     end
 
   end
 
-  # @param [RDF::URI] url
-  def get_object_from_url url
-    url_string = url.[](:s).to_str
-    class_string = url_string.split('/')[-2]
-    object_id = url_string.split('/')[-1]
-
-    #TODO build a map of class_string -> list of ids
-    # Then get all of each type from a single query.
-    class_string.camelize.singularize.constantize.find_by_id(object_id)
-  end
-
   #Removes all results from the search results collection passed in that are not Authorised to show for the current user (if one is logged in)
   def select_authorised collection
     collection.select { |el| el.can_view? }
   end
+
+  #returns The active-record items that correspond to the given urls.
+  #TODO refactor common part of this function and Seek::Rdf::RdfRepositoryStorage.related_items_from_sparql function
+  def get_active_records_from_urls urls
+    items = []
+    if rdf_repository_configured?
+      urls.each do |uri|
+        begin
+          puts uri
+          route = SEEK::Application.routes.recognize_path(uri)
+          puts route
+          if !route.nil? && !route[:id].nil?
+            klass = route[:controller].singularize.camelize.constantize
+            puts klass
+            id = route[:id]
+
+            #TODO build a map of klass -> list of ids, then call find() for all of the same type at once (fewer db calls)
+            items << klass.find(id)
+          end
+        rescue Exception => e
+          puts e
+        end
+      end
+    end
+    items
+  end
+
 end
