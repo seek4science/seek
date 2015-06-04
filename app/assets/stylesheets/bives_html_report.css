@@ -26,12 +26,16 @@ div.bives_output li {
     list-style: none;
 }
 
-div.bives_output span.bives-delete {
+div.bives_output .bives-delete {
     color:red;
 }
 
-div.bives_output span.bives-insert {
+div.bives_output .bives-insert {
     color:blue;
+}
+
+div.bives_output .bives-update {
+    color:orange;
 }
 
 div.bives_output table {
