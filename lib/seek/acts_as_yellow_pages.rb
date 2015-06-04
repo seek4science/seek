@@ -48,7 +48,7 @@ module Seek #:nodoc:
           extend Seek::Yellow_Pages::SingletonMethods
         end
         include Seek::Yellow_Pages::InstanceMethods
-        include Seek::BackgroundReindexing
+        include Seek::Search::BackgroundReindexing
 
       end
 

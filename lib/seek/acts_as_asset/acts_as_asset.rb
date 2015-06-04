@@ -52,7 +52,7 @@ module Seek
         include Seek::ActsAsAsset::Search
 
         include Seek::ActsAsAsset::InstanceMethods
-        include Seek::BackgroundReindexing
+        include Seek::Search::BackgroundReindexing
         include Seek::Subscribable
 
         def get_all_as_json(user)

@@ -7,7 +7,7 @@ class Strain < ActiveRecord::Base
   include Seek::ActsAsCachedTree
   include Seek::Subscribable
   include Seek::Biosamples::PhenoTypesAndGenoTypes
-  include Seek::BackgroundReindexing
+  include Seek::Search::BackgroundReindexing
   include Seek::Stats::ActivityCounts
 
   acts_as_authorized

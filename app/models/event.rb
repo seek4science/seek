@@ -8,20 +8,15 @@ class Event < ActiveRecord::Base
   has_and_belongs_to_many :presentations , :uniq => true
 
   include Seek::Subscribable
-  include Seek::BackgroundReindexing
+  include Seek::Search::CommonFields
+  include Seek::Search::BackgroundReindexing
 
   scope :default_order, order("start_date DESC")
 
   searchable(ignore_attribute_changes_of: [:updated_at], auto_index:false) do
     text :address,:city,:country,:url
   end if Seek::Config.solr_enabled
-
-  include Seek::Search::CommonFields
-
-  def self.sort events
-    events.sort_by &:start_date
-  end
-
+  
   acts_as_authorized
   acts_as_uniquely_identifiable
   acts_as_favouritable

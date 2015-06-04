@@ -6,7 +6,7 @@ class Sample < ActiveRecord::Base
 
   acts_as_scalable if Seek::Config.is_virtualliver
   include Seek::Rdf::RdfGeneration
-  include Seek::BackgroundReindexing
+  include Seek::Search::BackgroundReindexing
   include Seek::Stats::ActivityCounts
 
   acts_as_authorized
@@ -48,7 +48,7 @@ class Sample < ActiveRecord::Base
 
   include Seek::Search::BiosampleFields
 
-  searchable(:auto_index=>false) do
+  searchable(auto_index: false) do
     text :specimen do
       if specimen
         text=[]
