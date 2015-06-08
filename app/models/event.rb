@@ -47,8 +47,6 @@ class Event < ActiveRecord::Base
   #validates_is_url_string :url
   validates_format_of :url, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
 
-  alias_attribute :data_file_masters, :data_files
-
   def show_contributor_avatars?
     false
   end

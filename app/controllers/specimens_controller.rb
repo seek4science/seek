@@ -16,7 +16,7 @@ class SpecimensController < ApplicationController
     @existing_specimen =  Specimen.find(params[:id])
     @specimen = @existing_specimen.clone_with_associations
 
-     @existing_specimen.sop_masters.each do |s|
+     @existing_specimen.sops.each do |s|
        if !s.sop.can_view?
        flash.now[:notice] = "Some or all #{t('sop').pluralize} of the existing #{t('biosamples.sample_parent_term')} cannot be viewed, you may specify your own!"
         break
@@ -24,7 +24,6 @@ class SpecimensController < ApplicationController
      end
 
     render :action=>"new"
-
   end
 
   def new
@@ -48,7 +47,7 @@ class SpecimensController < ApplicationController
     organism_id = params[:specimen].delete(:organism_id)
     @specimen = new_specimen
     sop_ids = (params[:specimen_sop_ids].nil? ? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
-    @specimen.build_sop_masters sop_ids
+    @specimen.build_sops sop_ids
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
     if @specimen.strain.nil? && !params[:organism].blank? && Seek::Config.is_virtualliver
@@ -89,7 +88,7 @@ class SpecimensController < ApplicationController
 
   def update
     sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
-    @specimen.build_sop_masters sop_ids
+    @specimen.build_sops sop_ids
 
     @specimen.attributes = params[:specimen]
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects

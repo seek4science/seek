@@ -68,10 +68,12 @@ class SpecimenTest < ActiveSupport::TestCase
     User.with_current_user Factory(:user) do
       specimen = Factory :specimen, :contributor => User.current_user.person
       sop = Factory :sop, :contributor => User.current_user.person
-      specimen.build_sop_masters [sop.id]
+      specimen.build_sops [sop.id]
       assert specimen.save
 
-      assert_equal [sop], specimen.related_sops
+      specimen.reload
+
+      assert_equal [sop], specimen.sops
     end
   end
 
@@ -80,20 +82,20 @@ class SpecimenTest < ActiveSupport::TestCase
     User.with_current_user person.user do
       specimen = Factory :specimen, :contributor => person
       sop = Factory :sop, :contributor => person
-      specimen.build_sop_masters [sop.id]
+      specimen.build_sops [sop.id]
       assert specimen.save
       specimen.reload
-      refute specimen.sop_masters.empty?
+      refute specimen.sop_versions.empty?
       assert_difference("SopSpecimen.count",-1) do
         sop.destroy
       end
       specimen.reload
-      assert specimen.sop_masters.empty?
       assert specimen.sops.empty?
+      assert specimen.sop_versions.empty?
 
       #now delete specimen
       sop = Factory :sop, :contributor => person
-      specimen.build_sop_masters [sop.id]
+      specimen.build_sops [sop.id]
       assert specimen.save
       sop.reload
       refute sop.specimens.empty?
@@ -165,14 +167,15 @@ class SpecimenTest < ActiveSupport::TestCase
     User.with_current_user Factory(:user) do
       specimen = Factory :specimen, :contributor => User.current_user
       sop = Factory :sop, :contributor => User.current_user
-      specimen.build_sop_masters [sop.id]
+      specimen.build_sops [sop.id]
       assert specimen.valid?
       assert specimen.save
+      specimen.reload
 
-      assert_equal 1, specimen.sop_masters.count
-      assert_equal sop, specimen.sop_masters.map(&:sop).first
       assert_equal 1, specimen.sops.count
-      assert_equal sop.latest_version, specimen.sops.first
+      assert_equal sop, specimen.sops.first
+      assert_equal 1, specimen.sop_versions.count
+      assert_equal sop.latest_version, specimen.sop_versions.first
     end
   end
 
@@ -184,14 +187,16 @@ class SpecimenTest < ActiveSupport::TestCase
       assert_equal 2, sop.versions.count
       assert_equal sop_version_2, sop.latest_version
 
-      specimen.build_sop_masters [sop.id]
+      specimen.build_sops [sop.id]
       assert specimen.valid?
       assert specimen.save
 
-      assert_equal 1, specimen.sop_masters.count
-      assert_equal sop, specimen.sop_masters.map(&:sop).first
+      specimen.reload
+
       assert_equal 1, specimen.sops.count
-      assert_equal sop_version_2, specimen.sops.first
+      assert_equal sop, specimen.sops.first
+      assert_equal 1, specimen.sop_versions.count
+      assert_equal sop_version_2, specimen.sop_versions.first
 
     end
   end

@@ -121,11 +121,12 @@ class SamplesControllerTest < ActionController::TestCase
       end
     end
     s = assigns(:sample)
+    s.reload
     assert_redirected_to sample_path(s)
     assert_equal "test",s.title
     assert_not_nil s.specimen
     assert_equal "Donor number",s.specimen.title
-    assert_equal [sop],s.specimen.sops.collect{|sop| sop.parent}
+    assert_equal [sop],s.specimen.sops
     assert s.specimen.creators.include?(creator)
     assert_equal 1,s.specimen.creators.count
     assert_equal "jesus jones",s.specimen.other_creators
@@ -468,10 +469,10 @@ test "should show organism and strain information of a sample if there is organi
     assert_redirected_to sample_path(s)
     assert_nil flash[:error]
     assert_equal "test", s.title
-    assert_equal 1, s.sop_masters.length
-    assert_equal sop, s.sop_masters.first
     assert_equal 1, s.sops.length
-    assert_equal sop_version_2, s.sops.first
+    assert_equal sop, s.sops.first
+    assert_equal 1, s.sop_versions.length
+    assert_equal sop_version_2, s.sop_versions.first
   end
 
   test "filter by specimen using nested routes" do

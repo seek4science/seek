@@ -29,19 +29,19 @@ class SamplesController < ApplicationController
       flash.now[:notice] = ""
     end
 
-    @existing_sample.data_file_masters.each do |df|
+    @existing_sample.data_files.each do |df|
        if !df.can_view?
        flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
-    @existing_sample.model_masters.each do |m|
+    @existing_sample.models.each do |m|
        if !m.can_view?
        flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
-    @existing_sample.sop_masters.each do |s|
+    @existing_sample.sops.each do |s|
        if !s.can_view?
        flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
@@ -187,7 +187,7 @@ class SamplesController < ApplicationController
   end
 
   def align_sops resource,new_sop_ids
-    existing_ids = resource.sop_masters.collect{|sm| sm.sop.id}
+    existing_ids = resource.sops.collect{|sm| sm.sop.id}
     to_remove = existing_ids - new_sop_ids
     join_class_string = ['Sop', resource.class.name].sort.join
     join_class = join_class_string.constantize

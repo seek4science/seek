@@ -248,13 +248,14 @@ test "should update genotypes and phenotypes" do
 
     end
     s = assigns(:specimen)
+    s.reload
     assert_redirected_to specimen_path(s)
     assert_nil flash[:error]
     assert_equal "running mouse NO.1", s.title
-    assert_equal 1, s.sop_masters.length
-    assert_equal sop, s.sop_masters.map(&:sop).first
     assert_equal 1, s.sops.length
-    assert_equal sop_version_2, s.sops.first
+    assert_equal sop, s.sops.first
+    assert_equal 1, s.sop_versions.length
+    assert_equal sop_version_2, s.sop_versions.first
   end
 
   test 'should associate sops' do
@@ -273,8 +274,10 @@ test "should update genotypes and phenotypes" do
     specimen = assigns(:specimen)
     assert !specimen.new_record?
 
+    specimen.reload
+
     assert_redirected_to specimen
-    associated_sops = specimen.sop_masters.collect(&:sop)
+    associated_sops = specimen.sops
     assert_equal 1, associated_sops.size
     assert_equal sop, associated_sops.first
   end
@@ -283,9 +286,8 @@ test "should update genotypes and phenotypes" do
     sop = Factory(:sop, :policy => Factory(:public_policy))
     specimen = Factory(:specimen)
     login_as specimen.contributor
-    sop_master = SopSpecimen.create!(:sop_id => sop.id, :sop_version => 1, :specimen_id => specimen.id)
-    specimen.sop_masters << sop_master
-    associated_sops = specimen.sop_masters.collect(&:sop)
+    specimen.sops << sop
+    associated_sops = specimen.sops
     specimen.reload
     assert_equal 1, associated_sops.size
     assert_equal sop, associated_sops.first
@@ -295,7 +297,7 @@ test "should update genotypes and phenotypes" do
     end
 
     specimen.reload
-    associated_sops = specimen.sop_masters.collect(&:sop)
+    associated_sops = specimen.sops
     assert associated_sops.empty?
   end
 
