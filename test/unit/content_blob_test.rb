@@ -482,6 +482,9 @@ class ContentBlobTest < ActiveSupport::TestCase
     viewable_formats << "application/vnd.oasis.opendocument.text"
     viewable_formats << "application/vnd.oasis.opendocument.presentation"
     viewable_formats << "application/rtf"
+    viewable_formats << "text/csv"
+    viewable_formats << "text/x-comma-separated-values"
+    viewable_formats << "text/tab-separated-values"
     viewable_formats << "text/plain"
 
     viewable_formats.each do |viewable_format|

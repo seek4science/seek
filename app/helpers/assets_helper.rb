@@ -131,7 +131,9 @@ module AssetsHelper
   end
 
   def view_content_button(asset)
-    render partial: 'assets/view_content', locals: { content_blob: asset.single_content_blob, button_style: true } if asset.single_content_blob && !asset.single_content_blob.show_as_external_link?
+    if asset.single_content_blob && !asset.single_content_blob.show_as_external_link?
+      render partial: 'assets/view_content', locals: { content_blob: asset.single_content_blob, button_style: true }
+    end
   end
 
   def doi_link(doi)
