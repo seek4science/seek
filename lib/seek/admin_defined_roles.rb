@@ -50,6 +50,10 @@ module Seek
       def is_in_any_gatekept_projects?
         !projects.collect(&:gatekeepers).flatten.empty?
       end
+
+      def is_admin_or_project_manager?
+        is_admin? || is_project_manager_of_any_project?
+      end
     end
 
     module ClassMethods

@@ -62,6 +62,10 @@ module OrganismsHelper
     end
     result.empty? ? "<span class='none_text'>#{none_text}</span>".html_safe : result.html_safe
   end
+
+  def can_create_organisms?
+    admin_or_project_manager_logged_in?
+  end
   
   
   

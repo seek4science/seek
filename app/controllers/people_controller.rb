@@ -237,14 +237,14 @@ class PeopleController < ApplicationController
     end
   end
 
-    # PUT /people/1
+  # PUT /people/1
   # PUT /people/1.xml
   def administer_update
     had_no_projects = @person.work_groups.empty?
 
     passed_params=    {:roles                 =>  User.admin_logged_in?,
                        :roles_mask            => User.admin_logged_in?,
-                       :work_group_ids        => (User.admin_logged_in? || User.project_manager_logged_in?)}
+                       :work_group_ids        => (User.admin_or_project_manager_logged_in?)}
     temp = params.clone
     params[:person] = {}
     passed_params.each do |param, allowed|
@@ -273,7 +273,6 @@ class PeopleController < ApplicationController
   end
 
   def set_group_membership_project_role_ids person,params
-    #FIXME: Consider updating to Rails 2.3 and use Nested forms to handle this more cleanly.
     prefix="group_membership_role_ids_"
     person.group_memberships.each do |gr|
       key=prefix+gr.id.to_s
