@@ -8,23 +8,29 @@ class UserTest < ActiveSupport::TestCase
   fixtures :users,:sops,:data_files,:models,:assets
 
   def test_without_profile
-    without_profile=User.without_profile
-    without_profile.each do |u|
-      assert u.person.nil?
-    end
-    assert without_profile.include?(users(:part_registered))
-    assert !without_profile.include?(users(:aaron))
+    user_with_profile = Factory(:user)
+    user_without_profile = Factory(:brand_new_user)
 
-    aaron=users(:aaron)
-    aaron.person=nil
-    aaron.save!
+    assert_nil user_without_profile.person
+    refute_nil user_with_profile.person
 
     without_profile=User.without_profile
     without_profile.each do |u|
       assert u.person.nil?
     end
-    assert without_profile.include?(users(:part_registered))
-    assert without_profile.include?(users(:aaron))
+    assert without_profile.include?(user_without_profile)
+    assert !without_profile.include?(user_with_profile)
+
+
+    user_with_profile.person=nil
+    user_with_profile.save!
+
+    without_profile=User.without_profile
+    without_profile.each do |u|
+      assert u.person.nil?
+    end
+    assert without_profile.include?(user_without_profile)
+    assert without_profile.include? user_with_profile
   end
 
   test "with magic_guest_enabled" do
@@ -126,12 +132,6 @@ class UserTest < ActiveSupport::TestCase
     assert_no_difference 'User.count' do
       u = create_user(:password_confirmation => nil)
       assert u.errors.get(:password_confirmation)
-    end
-  end
-
-  def test_should_not_require_email
-    assert_difference 'User.count' do
-      u = create_user(:email => nil)
     end
   end
 
@@ -241,7 +241,7 @@ class UserTest < ActiveSupport::TestCase
 
 protected
   def create_user(options = {})
-    record = User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' }.merge(options))
+    record = User.new({ :login => 'quire', :password => 'quire', :password_confirmation => 'quire' }.merge(options))
     record.save
     record
   end

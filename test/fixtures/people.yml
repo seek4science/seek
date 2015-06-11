@@ -53,10 +53,7 @@ double_barrelled_lastname:
   last_name: "Smith-Jones"
   email: "Fred2@email.com"
 
-not_registered:
-  id: 13
-  first_name: "Fred"
-  email: "test@test.com"
+
 
 
 

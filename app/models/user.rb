@@ -42,7 +42,7 @@ class User < ActiveRecord::Base
 
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :password, :password_confirmation, :openid
+  attr_accessible :login, :password, :password_confirmation, :openid
 
     
   has_many :favourite_groups, :dependent => :destroy
@@ -142,7 +142,7 @@ class User < ActiveRecord::Base
 
   def remember_me_until(time)
     self.remember_token_expires_at = time
-    self.remember_token            = encrypt("#{email}--#{remember_token_expires_at}")
+    self.remember_token            = encrypt("#{login}--#{remember_token_expires_at}")
     save(:validate=>false)
   end
 
@@ -247,7 +247,7 @@ class User < ActiveRecord::Base
 
   def reset_password
     self.reset_password_code_until = 1.day.from_now
-    self.reset_password_code =  Digest::SHA1.hexdigest( "#{user.email}#{Time.now.to_s.split(//).sort_by {rand}.join}" )
+    self.reset_password_code =  Digest::SHA1.hexdigest( "#{user.login}#{Time.now.to_s.split(//).sort_by {rand}.join}" )
   end
 
   def self.without_profile

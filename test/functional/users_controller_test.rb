@@ -227,17 +227,18 @@ class UsersControllerTest < ActionController::TestCase
   end  
   
   def test_associated_with_person
-    login_as :part_registered
-    u=users(:part_registered)
-    p=people(:not_registered)
+    u=Factory(:brand_new_user)
+    login_as u
+    assert_nil u.person
+    p=Factory(:brand_new_person)
     post :update, :id=>u.id,:user=>{:id=>u.id,:person_id=>p.id}
     assert_nil flash[:error]
     assert_equal p,User.find(u.id).person
   end
   
   def test_assocated_with_pal
-    login_as :part_registered
-    u=users(:part_registered)
+    u=Factory(:brand_new_user)
+    login_as u
     
     p=Factory(:pal)
     post :update, :id=>u.id,:user=>{:id=>u.id,:person_id=>p.id}
