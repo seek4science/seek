@@ -66,7 +66,10 @@ module OrganismsHelper
   def can_create_organisms?
     admin_or_project_manager_logged_in?
   end
-  
+
+  def bioportal_search_enabled?
+    !Seek::Config.bioportal_api_key.blank?
+  end
   
   
 end

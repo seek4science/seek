@@ -1,12 +1,15 @@
 <%
     show_attributes = (params[:action] == "edit")
+    show_attributes = show_attributes || !bioportal_search_enabled?
 
     attributes_display = show_attributes ? 'block' : 'none'
 %>
 
-<div id="organism-search">
-  <%= render :partial=>"search_bioportal" %>
-</div>
+<% if bioportal_search_enabled? %>
+    <div id="organism-search">
+      <%= render :partial=>"search_bioportal" %>
+    </div>
+<% end %>
 
 <div id="organism-attributes" style='display:<%= attributes_display %>;'>
   <%= render :partial=>"organism_attributes_form" %>
