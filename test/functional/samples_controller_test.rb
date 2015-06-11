@@ -133,7 +133,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 2,s.projects.count
     assert s.projects.include?(proj1)
     assert s.projects.include?(proj2)
-    assert_equal s.projects,s.specimen.projects
+    assert_equal s.projects.sort_by(&:id),s.specimen.projects.sort_by(&:id)
   end
 
   test "should create sample and specimen with default strain if missing" do
