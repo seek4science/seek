@@ -1,21 +1,44 @@
 <%
-    show_attributes = (params[:action] == "edit")
-    show_attributes = show_attributes || !bioportal_search_enabled?
+   details_active = (params[:action] == "edit")
+   details_active = details_active || !bioportal_search_enabled?
 
-    attributes_display = show_attributes ? 'block' : 'none'
+   if details_active
+     search_status=""
+     details_status="active"
+   else
+     search_status="active"
+     details_status=""
+   end
+
 %>
 
-<% if bioportal_search_enabled? %>
-    <div id="organism-search">
-      <%= render :partial=>"search_bioportal" %>
-    </div>
-<% elsif admin_logged_in? %>
-    <div class="alert alert-warning" role="alert">
-      If you wish to add the ability to search the NCBI taxonomy, please register with http://bioportal.bioontology.org to get an API key.<br/>
-      You can then add the API key under Server admin -> Site configuration -> Additional settings
-    </div>
-<% end %>
+<div class="container">
+  <ul class="nav nav-tabs">
+    <li role="search" class="<%= search_status %>"><a data-toggle="tab" href="#search">Search</a></li>
+    <li role="details" class="<%= details_status %>"><a data-toggle="tab" href="#details">Organism details</a></li>
+  </ul>
 
-<div id="organism-attributes" style='display:<%= attributes_display %>;'>
-  <%= render :partial=>"organism_attributes_form" %>
+  <div class="tab-content">
+    <div class="tab-pane <%= search_status %>" id="search">
+      <% if bioportal_search_enabled? %>
+          <div id="organism-search">
+            <%= render :partial => "search_bioportal" %>
+          </div>
+      <% elsif admin_logged_in? %>
+          <div class="alert alert-warning" role="alert">
+            If you wish to add the ability to search the NCBI taxonomy, please register with
+            http://bioportal.bioontology.org to get an API key.<br/>
+            You can then add the API key under Server admin -> Site configuration -> Additional settings
+          </div>
+      <% end %>
+    </div>
+    <div class="tab-pane <%= details_status %>" id="details">
+      <div id="organism-attributes">
+        <%= render :partial => "organism_attributes_form" %>
+      </div>
+    </div>
+  </div>
 </div>
+
+
+

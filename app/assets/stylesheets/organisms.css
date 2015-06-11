@@ -11,6 +11,6 @@ th#organism-id {
 }
 
 div#organism-search-results {
-    max-height: 20em;
+    max-height: 30em;
     overflow: auto;
 }

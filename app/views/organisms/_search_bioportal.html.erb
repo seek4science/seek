@@ -27,8 +27,8 @@
         $j('#organism_title').val(label);
         $j('#organism_ontology_id').val(ont_acronym);
         $j('#organism_concept_uri').val(conc_id);
-        $j('#organism-attributes').show();
-        $j(window).scrollTop($j('#organism-attributes').offset().top);
+        //jump to the details tab and highlight the fields
+        $j('.nav-tabs a[href="#details"]').tab('show');
         new Effect.Highlight("organism_title");
         new Effect.Highlight("organism_concept_uri");
     }
