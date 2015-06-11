@@ -1,0 +1,20 @@
+<%= panel("Organism details") do %>
+    <%= form_for(@organism) do |f| %>
+
+        <%= f.error_messages -%>
+
+        <div class="form-group">
+          <%= f.label :display_name -%><span class="required">*</span>
+          <%= f.text_field :title, :class => "form-control" -%>
+        </div>
+        <%= f.hidden_field :ontology_id -%>
+
+        <div class="form-group">
+          <label>Taxonomy uri</label>
+          <%= f.text_field :concept_uri, :class => "form-control" -%>
+        </div>
+
+        <%= f.submit @organism.id ? "Update" : "Create", :disable_with => @organism.id ? "Updating..." : "Creating...",
+                     :class => 'btn btn-primary' -%>
+    <% end %>
+<% end %>
