@@ -9,6 +9,11 @@
     <div id="organism-search">
       <%= render :partial=>"search_bioportal" %>
     </div>
+<% elsif admin_logged_in? %>
+    <div class="alert alert-warning" role="alert">
+      If you wish to add the ability to search the NCBI taxonomy, please register with http://bioportal.bioontology.org to get an API key.<br/>
+      You can then add the API key under Server admin -> Site configuration -> Additional settings
+    </div>
 <% end %>
 
 <div id="organism-attributes" style='display:<%= attributes_display %>;'>
