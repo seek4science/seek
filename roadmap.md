@@ -21,4 +21,3 @@ and timing may change - however, these items are very high in our priorities. Th
 | LDAP support for authentication | TBA  |
 | Improved Samples/Treatments/SOP handling | January 2016  |
 | Integration with openBIS | January 2016  |
-| Upgrade to Rails 4.2 | January 2016  |
