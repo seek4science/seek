@@ -16,9 +16,8 @@ SEEK is incorporating semantic technology allowing sophisticated queries over th
 For an example of SEEK please visit our [Demo](http://demo.seek4science.org).
 
 
-## Source code
+## Getting SEEK
+SEEK is open source software, and is distributed under a [BSD License](https://github.com/seek4science/seek/blob/master/BSD-LICENSE). The source code is all available on [GitHub](https://github.com/seek4science/seek).
 
-The source code for SEEK is available on GitHub at [https://github.com/seek4science/seek](https://github.com/seek4science/seek)
-
-It is licensed according to the [BSD 3-clause](https://raw.githubusercontent.com/seek4science/seek/master/BSD-LICENSE) license.
+Further information about obtaining and installing SEEK is available on the [SEEK4Science website](http://seek4science.org/get_seek).
 
