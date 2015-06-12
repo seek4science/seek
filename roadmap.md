@@ -7,7 +7,9 @@ layout: page
 
 This is an outline of plans the core SEEK development team will be working on in the near future.
 
-It is an overview of the main priorities, and milestones. SEEK is developed following an Agile development process, meaning some of the features and timing may change - however, these items are very high in our priorities. They are expected to be added to SEEK in the order they are presented here.
+It is an overview of the main priorities, and milestones. SEEK is developed following an Agile development process, meaning some of the features and timing may change - however, these items are very high in our priorities. 
+
+They are expected to be added to SEEK in roughly the order they are presented here.
 
 
 
