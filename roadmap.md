@@ -14,11 +14,11 @@ and timing may change - however, these items are very high in our priorities. Th
 
 | Feature | Milestone date |
 | --- | --- |
-| New user-interface based on [Bootstrap](http://getbootstrap.com) | October 2015  |
-| Self management of organisms | October 2015  |
+| New user-interface based on [Bootstrap](http://getbootstrap.com) | July 2015  |
+| Self management of organisms | August 2015  |
 | Improved registration workflow | October 2015  |
 | Self management of projects and programmes | October 2015  |
-| LDAP support for authentication | October 2015  |
+| LDAP support for authentication | TBA  |
 | Improved Samples/Treatments/SOP handling | January 2016  |
 | Integration with openBIS | January 2016  |
 | Upgrade to Rails 4.2 | January 2016  |
