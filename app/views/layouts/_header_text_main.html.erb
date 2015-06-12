@@ -1,7 +1,0 @@
-<% if Seek::Config.header_tagline_text_enabled %>
-    <p id='header_text_main'  class="box_standout">
-    <%= Seek::Config.tagline_prefix.html_safe %> <%= link_to Seek::Config.project_long_name, Seek::Config.project_link,:popup=>true %>.
-    </p>
-<% else %>
-    <p id='header_text_main'>&nbsp;</p>
-<% end %>

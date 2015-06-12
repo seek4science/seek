@@ -1,5 +1,0 @@
-<h1>New <%= (I18n.t 'biosamples.sample_parent_term').capitalize %></h1>
-
-<%= form_for @specimen do |f| %>
-    <%= render :partial => "form", :locals => { :f => f, :action => :new}-%>
-<% end %>

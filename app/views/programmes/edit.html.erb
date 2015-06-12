@@ -1,5 +1,0 @@
-<h1>Edit <%= t('programme') %>: <%= link_to @programme.title, programme_path(@programme) -%></h1>
-
-<%= form_for(@programme) do |f| %>
-    <%= render :partial => "form", :locals => { :f => f, :programme => @programme } -%>
-<% end %>

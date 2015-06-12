@@ -1,5 +1,0 @@
-<%= render :partial => "general/page_title",:locals=>{:title=>"Edit #{t('project') } #{link_to(h(@project.title), @project)}".html_safe} %>
-
-<%= form_for(@project) do |f| %>
-    <%= render :partial => "form", :locals => { :f => f, :project => @project } -%>
-<% end %>

@@ -1,7 +1,0 @@
-<h1> Statistics </h1>
-
-<% if logged_in? and current_user.person.member? %>
-    <div class="show_basic">
-        <%= render :partial => "admins/content_stats", :locals => {:stats => Seek::Stats::ContentStats.generate} -%>
-    </div>
-<% end %>

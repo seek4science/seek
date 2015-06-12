@@ -1,9 +1,0 @@
-<ul class="runs_and_sweeps_list">
-  <% items.each do |item| %>
-    <li>
-      <%= link_to item, :class => 'with_icon' do %>
-        <%= image(item.is_a?(Sweep) ? 'sweep_run' : 'simple_run')-%><%= item.name -%>
-      <% end %>
-    </li>
-  <% end %>
-</ul>

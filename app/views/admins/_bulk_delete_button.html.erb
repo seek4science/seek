@@ -1,7 +1,0 @@
-<% path = eval("bulk_destroy_#{collection.first.class.name.underscore.pluralize}_path") %>
-<%= form_tag path do %>
-    <% collection.each do |item| %>
-        <%= hidden_field_tag "ids[]", item.id %>
-    <% end %>
-    <%= button_link_to('Destroy All', 'destroy', '#', :onclick => "if(confirm('Are you sure?')){$(this).up('form').submit()}", :id => "bulk") %>
-<% end %>

@@ -1,5 +1,0 @@
-<% work_groups = Project.first.work_groups %>
-<h2>Institution</h2>
-<div class="yui-g box_simple">
-  <%= select_tag("work_group", options_for_select(work_groups.map {|w| [ w.institution.title, w.id ] })) %>
-</div>

@@ -1,8 +1,0 @@
-<%= list_item_description resource.description %>
-
-<%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>
-
-<div class="hidden-xs">
-  <%= @assay ? (list_item_optional_attribute "Relationship type", resource.relationship_type(@assay).try(:title)) : "" -%>
-  <%= scales_list_for_list_item resource %>
-</div>

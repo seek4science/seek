@@ -1,9 +1,0 @@
-<%
-   resource ||= nil
-   existing_substances = resource ? tagged_substances(resource) : []
-%>
-
-<div>
-  Please enter the concentration of which substance:
-  <%= tags_input(:substance_list, existing_substances, :typeahead => {:values => all_substances.map(&:name)}) %>
-</div>

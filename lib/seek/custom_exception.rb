@@ -1,2 +1,0 @@
-class WorkGroupDeleteError < StandardError
-end

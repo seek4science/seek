@@ -1,1 +1,0 @@
-json.extract! @data_file, :id, :version,:title, :description

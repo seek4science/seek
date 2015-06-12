@@ -1,6 +1,0 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-cheese:
-  search_query: "cheese"
-  search_type: "All"
-  user: pal_user

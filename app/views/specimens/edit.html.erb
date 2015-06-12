@@ -1,5 +1,0 @@
-<h1><%= "Edit #{I18n.t 'biosamples.sample_parent_term'}: "%><%= link_to @specimen.title, specimen_path(@specimen) -%></h1>
-
-<%= form_for(@specimen) do |f| %>
-    <%= render :partial => "form", :locals => { :f => f, :action=>:edit} -%>
-<% end %>

@@ -1,7 +1,0 @@
-<%= panel('Scales', :help_text => "Scales of different level for this item.") do %>
-  <%if resource.scales.blank?%>
-      <span class='none_text'>Not Specified</span>
-  <% else %>
-      <%= scales_list resource-%>
-  <% end %>
-<% end %>
