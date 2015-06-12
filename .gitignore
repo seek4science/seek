@@ -1,5 +1,6 @@
 syntax: glob
 .idea/
+_site/
 
 *.DS_Store
 
