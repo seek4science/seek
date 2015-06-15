@@ -26,10 +26,11 @@ module ModelsHelper
     model.contains_xgmml?
   end
 
-  def allow_model_comparison(model, displayed_model, user = User.current_user)
-    return false if model.version == displayed_model.version
-    return false unless model.is_a?(Model) && model.can_download?(user) && displayed_model.contains_sbml?
-    return false unless model.versions.select { |version| version.contains_sbml? }.count > 1
+  def allow_model_comparison(displayed_version_model, other_version_model, user = User.current_user)
+    return false if displayed_version_model.version == other_version_model.version
+    parent = displayed_version_model.parent
+    return false unless parent.is_a?(Model) && parent.can_download?(user) && other_version_model.contains_sbml?
+    return false unless parent.versions.select { |version| version.contains_sbml? }.count > 1
     true
   end
 
