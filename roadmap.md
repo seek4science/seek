@@ -18,6 +18,7 @@ and timing may change - however, these items are very high in our priorities. Th
 | Self management of organisms | August 2015  |
 | Improved registration workflow | October 2015  |
 | Self management of projects and programmes | October 2015  |
+| Support for [Research Objects](http://www.researchobject.org/) | October 2015 |
 | LDAP support for authentication | TBA  |
 | Improved Samples/Treatments/SOP handling | January 2016  |
 | Integration with openBIS | January 2016  |
