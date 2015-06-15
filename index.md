@@ -1,5 +1,4 @@
 ---
-title: SEEK
 layout: page
 ---
 
