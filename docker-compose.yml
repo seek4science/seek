@@ -1,0 +1,10 @@
+db:
+  image: postgres
+  ports:
+    - "5432"
+seek:
+  build: .
+  ports:
+    - "3000:3000"
+  links:
+    - db
