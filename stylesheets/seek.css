@@ -53,3 +53,12 @@ html {
     border-color: rgba(255, 255, 255, 0.3); }
 
 
+
+#seek-logo {
+    background: url('../images/seek-logo-header.png');
+    background-repeat: no-repeat;
+    width: 50px; /*or your image's width*/
+    height: 50px; /*or your image's height*/
+    margin-top: 10px;
+    display: inline-block;
+}
