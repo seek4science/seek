@@ -333,7 +333,7 @@ class StudiesControllerTest < ActionController::TestCase
         assert_select "p.list_item_attribute a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
       end
 
-      get :resource_in_tab, {:resource_ids => study.sops.map(&:id).join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      get :resource_in_tab, {:resource_ids => study.related_sops.map(&:id).join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
       assert_select "div.list_item" do
         # Sops resource_list_item
@@ -342,7 +342,7 @@ class StudiesControllerTest < ActionController::TestCase
         assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
         assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
       end
-      get :resource_in_tab, {:resource_ids => study.data_files.map(&:id).join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      get :resource_in_tab, {:resource_ids => study.related_data_files.map(&:id).join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
       assert_select "div.list_item" do
         #DataFiles resource_list_item

@@ -30,20 +30,20 @@ class Study < ActiveRecord::Base
 
   validates :investigation, :presence => true
 
-  ["data_file","sop","model","publication"].each do |type|
+  ["data_file","sop","model"].each do |type|
     eval <<-END_EVAL
       def #{type}_versions
         assays.collect{|a| a.send(:#{type}_versions)}.flatten.uniq
       end
 
-      def #{type}s
+      def related_#{type}s
         assays.collect{|a| a.send(:#{type}s)}.flatten.uniq
       end
     END_EVAL
   end
 
   def assets
-    data_files + sops + models + publications
+    related_data_files + related_sops + related_models + related_publications
   end
 
   def project_ids
@@ -64,5 +64,11 @@ class Study < ActiveRecord::Base
   def publications
     self.relationships.select {|a| a.other_object_type == "Publication"}.collect { |a| a.other_object }
   end
+
+  #includes publications directly related, plus those related to associated assays
+  def related_publications
+    assays.collect{|a| a.publications}.flatten.uniq | publications
+  end
+
 
 end

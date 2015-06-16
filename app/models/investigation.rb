@@ -19,8 +19,8 @@ class Investigation < ActiveRecord::Base
 
   ["data_file","sop","model","publication"].each do |type|
     eval <<-END_EVAL
-      def #{type}s
-        studies.collect{|study| study.send(:#{type}s)}.flatten.uniq
+      def related_#{type}s
+        studies.collect{|study| study.send(:related_#{type}s)}.flatten.uniq
       end
 
       def #{type}_versions
@@ -30,7 +30,7 @@ class Investigation < ActiveRecord::Base
   end
 
   def assets
-    data_files + sops + models + publications
+    related_data_files + related_sops + related_models + related_publications
   end
 
   def clone_with_associations

@@ -16,7 +16,7 @@ class PackagingTest < ActiveSupport::TestCase
     assert_equal "investigations/#{inv.id}/studies/#{study.id}/assays/#{assay.id}/",assay.research_object_package_path
 
     #for data file in an assay
-    data_file = inv.data_files.first
+    data_file = inv.related_data_files.first
     assert_equal "data_files/#{data_file.id}/",data_file.research_object_package_path
   end
 

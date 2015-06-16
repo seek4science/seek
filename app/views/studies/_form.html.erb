@@ -38,7 +38,7 @@
 
 <%= render :seek_partial=>"assets/sharing_form" if @study.can_manage? -%>
 
-<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => t('study'),
+<%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('study'),
                                                                         :related_publications => @study.publications} -%>
 
 <script type="text/javascript">
