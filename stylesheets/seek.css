@@ -6,6 +6,12 @@ html {
     font-size: 15px;
 }
 
+#top-banner {
+    text-align: center;
+    background-color: #3f68a9;
+    color: #FFF;
+    background-image: linear-gradient(120deg, #2c4a76, rgba(72, 103, 156, 0.68));
+}
 
 .page-header {
     color: #fff;
