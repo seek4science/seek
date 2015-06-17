@@ -5,7 +5,7 @@ layout: page
 
 # Installing SEEK for other Linux distributions
 
-Our main [Install Guide](doc/INSTALL.html) is based upon the Ubuntu 14.04
+Our main [Install Guide](install.html) is based upon the Ubuntu 14.04
 (LTS) distribution and version. However, other than the distribution packages
 the install process should be very similar for other distributions.
 
@@ -66,7 +66,7 @@ installed as follows
 
 ### Installing RVM
 
-Install as usual following the [INSTALL guide](doc/INSTALL.html) but pay
+Install as usual following the [INSTALL guide](install.html) but pay
 particular attention to any messages it reports about updating your .profile
 or .bash_profile
 
@@ -239,7 +239,7 @@ found under the menu *Edit*, *Profile Preferences* and then under the tab
 ## Mavericks
 
 This section will guide you to install prerequisite packages, for other steps
-please read the main [Install Guide](doc/INSTALL.html)
+please read the main [Install Guide](install.html)
 
 You will need first to install Fink and MacPorts, two package manager tools
 for Mac OS X. Most of the packages will be installed by Finks, while some will
