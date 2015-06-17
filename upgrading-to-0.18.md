@@ -8,7 +8,7 @@ layout: page
 ## Backing up
 
 We always recommend you backup before doing an upgrade, but in this case it is
-even more important. Please read our [Backup Guide](doc/BACKUPS.html) for
+even more important. Please read our [Backup Guide](backups.html) for
 details on what to backup and some tips on how to do so.
 
 ## Upgrading a Production SEEK
@@ -30,15 +30,15 @@ services, please stop them using that script. Otherwise do:
 ## Installating Package dependencies
 
 Please install the packages described in the [Installation
-Guide](doc/INSTALL.html). If you are running a production server, please also
+Guide](install.html). If you are running a production server, please also
 install the packages described in the [Production Installation
-Guide](doc/INSTALL-PRODUCTION.html)
+Guide](install-production.html)
 
 ## Installing Ruby 1.9.3 with RVM
 
 If you are upgrading a production service, we recommend installing RVM as the
 www-data user, or installing it system wide. Please check the [Production
-Installation Guide](doc/INSTALL-PRODUCTION.html) for details about creating a
+Installation Guide](install-production.html) for details about creating a
 home directory as www-data and how to switch to that user before carrying out
 the following steps.
 

@@ -12,10 +12,10 @@ to us in the future when we try and raise further funding to develop and
 support SEEK and the associated tools.
 
 **Always backup your SEEK data before starting to upgrade!!** - see the
-[Backup Guide](doc/BACKUPS.html).
+[Backup Guide](backups.html).
 
 This guide assumes that SEEK has been installed following the [Installation
-Guide](doc/INSTALL.html) guide. It assumes it is a production server that is
+Guide](install.html) guide. It assumes it is a production server that is
 being updated, and that commands are run from the root directory of the SEEK
 application.
 
@@ -126,4 +126,4 @@ and other necessary changes:
 ## Earlier upgrade notes
 
 For details of how to upgrade to 0.21.x and for earlier versions please visit
-[Upgrades to 0.21 and earlier](doc/EARLIER-UPGRADES.html)
+[Upgrades to 0.21 and earlier](earlier-upgrades.html)

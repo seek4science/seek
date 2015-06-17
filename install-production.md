@@ -12,7 +12,7 @@ By reading and following these extra notes, you will more performance out of
 SEEK, and reduce the ongoing maintenance.
 
 If you wish to run under a sub URI (e.g. <host>/seek) then please read and
-follow [Installing under a sub URI](doc/INSTALL-ON-A-SUBURI.html) at the end
+follow [Installing under a sub URI](install-on-suburi.html) at the end
 of the installation.
 
 ## Before you install SEEK
@@ -53,7 +53,7 @@ you will need to reset this variable if you close your shell and start a new
 session
 
 
-You can now follow the overall [Installation Guide](doc/INSTALL.html), and
+You can now follow the overall [Installation Guide](install.html), and
 then return to this page for some additional steps to get SEEK running
 together with Apache, and also automating the required services.
 

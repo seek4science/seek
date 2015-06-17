@@ -12,7 +12,7 @@ short,optional [SEEK Registration
 Form](http://www.sysmo-db.org/seek-registration)
 
 If you have any problems or questions, you should contact us. The following
-link will give you details on how to [Contact Us](doc/CONTACTING_US.html)
+link will give you details on how to [Contact Us](contacting_us.html)
 
 SEEK is based upon the Ruby on Rails platform. Although the information on
 this page should provide you with everything you need to get a basic
@@ -28,7 +28,7 @@ Ubuntu (14.04 LTS) system. However, running on other Linux distributions the
 main difference is the name of the required packages that have to be installed
 for that distribution, other than that the steps will be the same. If you want
 to install on different distribution or version please visit [Other
-Distributions](doc/OTHER-DISTRIBUTIONS.html) and see if it is listed there.
+Distributions](other-distributions.html) and see if it is listed there.
 
 You will need to have *sudo* access on the machine you are installing SEEK, or
 be able to login as root. You will also need an active internet connection
@@ -41,7 +41,7 @@ troublesome and is not covered here.
 
 These are the packages required to run SEEK with Ubuntu 14.04 (Desktop or
 Server). For other distributions or versions please visit our [Other
-Distributions](doc/OTHER-DISTRIBUTIONS.html) notes.
+Distributions](other-distributions.html) notes.
 
 You should run an update first
 
@@ -73,7 +73,7 @@ Installing these packages now will make installing Ruby easier later on:
 The following steps are suitable for either setting up SEEK for development,
 or in a production environment. However, when setting up a production
 environment there are some minor differences - please visit [Installing SEEK
-for Production](doc/INSTALL-PRODUCTION.html)
+for Production](install-production.html)
 
 ## Setting up Ruby and RubyGems with RVM
 
@@ -179,7 +179,7 @@ However, before continuing, stop SEEK with CTRL+C and start up some services.
 This describes a quick way to start up the services SEEK needs. If setting up
 a production server, following these steps is fine to check things are
 working. However, you should also read the [Installation for
-Production](doc/INSTALL-PRODUCTION.html) guide for automating these services.
+Production](install-production.html) guide for automating these services.
 
 ### Starting and Stopping the Search Service
 
@@ -261,9 +261,9 @@ and funding of SEEK.
 ## Final steps
 
 If you are setting up SEEK for production use, please now return to our
-[Installing SEEK for Production Guide](doc/INSTALL-PRODUCTION.html).
+[Installing SEEK for Production Guide](install-production.html).
 
-You should also now read our [Administration Guide](doc/ADMINISTRATION.html)
+You should also now read our [Administration Guide](administration.html)
 for details of some basic tasks and settings.
 
 

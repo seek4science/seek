@@ -132,7 +132,7 @@ Rails to version 3.2 - this means the upgrade process is a little bit more
 involved that usual. For this reason we have a seperate page detailing this
 upgrade.
 
-Please visit [Upgrading to 0.18](doc/UPGRADING-TO-0-18.html) for details of
+Please visit [Upgrading to 0.18](upgrading-to-0.18.html) for details of
 how to do this upgrade.
 
 ## Steps to upgrade from 0.16.x to 0.17.x
