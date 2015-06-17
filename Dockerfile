@@ -22,15 +22,9 @@ RUN bundle install
 # App code
 ADD . /seek
 
-# DB
-RUN bundle exec rake db:setup
-
 # Config
 RUN cp config/database.docker.yml config/database.yml
 RUN cp config/sunspot.default.yml config/sunspot.yml
-
-# Assets (CSS/JS)
-RUN bundle exec rake assets:precompile
 
 # Network
 EXPOSE 3000 22
@@ -40,6 +34,3 @@ ENTRYPOINT ["/seek/docker/entrypoint.sh"]
 
 # Shared
 VOLUME ["/seek/filestore", "/seek/config", "/seek/log"]
-
-CMD ["rails", "server"]
-
