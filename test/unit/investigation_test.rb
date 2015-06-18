@@ -30,8 +30,8 @@ class InvestigationTest < ActiveSupport::TestCase
 
     inv = Factory(:investigation, :studies=>[Factory(:study,:assays=>[assay1]),Factory(:study,:assays=>[assay2])])
 
-    assert_equal 3,inv.publications.size
-    assert_equal [pub1,pub2,pub3],inv.publications.sort_by(&:id)
+    assert_equal 3,inv.related_publications.size
+    assert_equal [pub1,pub2,pub3],inv.related_publications.sort_by(&:id)
   end
 
   test "assays through association" do

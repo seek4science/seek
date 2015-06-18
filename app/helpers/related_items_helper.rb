@@ -113,12 +113,12 @@ module RelatedItemsHelper
       method_name = item_type.underscore.pluralize
     end
 
-    if resource.respond_to? method_name
-      resource.send method_name
-    elsif resource.respond_to? "related_#{method_name}"
+    if resource.respond_to? "related_#{method_name}"
       resource.send "related_#{method_name}"
     elsif resource.respond_to? "related_#{method_name.singularize}"
       Array(resource.send("related_#{method_name.singularize}"))
+    elsif resource.respond_to? method_name
+        resource.send method_name
     elsif resource.respond_to? method_name.singularize
       Array(resource.send(method_name.singularize))
     else

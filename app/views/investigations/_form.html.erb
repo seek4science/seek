@@ -19,6 +19,9 @@
 
 <%= render :seek_partial=>"assets/sharing_form" if @investigation.can_manage? -%>
 
+<%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('investigation'),
+                                                                    :related_publications => @investigation.publications} -%>
+
 <%
    button_text=action==:edit ? "Update" : "Create"
    disabled_text=action==:edit ? "Updating..." : "Creating..."
