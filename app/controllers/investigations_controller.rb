@@ -3,6 +3,7 @@ class InvestigationsController < ApplicationController
   include Seek::DotGenerator
   include Seek::IndexPager
   include Seek::DestroyHandling
+  include Seek::AssetsCommon
 
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_authorize_requested_item,:only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
@@ -57,7 +58,8 @@ class InvestigationsController < ApplicationController
     @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
 
     if @investigation.save
-      update_scales @investigation
+      update_scales(@investigation)
+      update_relationships(@investigation, params)
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
@@ -112,7 +114,10 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.save
-        update_scales @investigation
+
+        update_scales(@investigation)
+        update_relationships(@investigation, params)
+
         flash[:notice] = "#{t('investigation')} was successfully updated."
         format.html { redirect_to(@investigation) }
         format.xml  { head :ok }

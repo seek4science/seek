@@ -40,4 +40,9 @@ class Investigation < ActiveRecord::Base
     return new_object
   end
 
+  #includes publications directly related, plus those related to associated assays
+  def related_publications
+    studies.collect{|a| a.related_publications}.flatten.uniq | publications
+  end
+
 end

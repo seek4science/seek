@@ -23,11 +23,6 @@ class Study < ActiveRecord::Base
   has_many :assays
   belongs_to :person_responsible, :class_name => "Person"
 
-  has_many :relationships,
-           :class_name => 'Relationship',
-           :as => :subject,
-           :dependent => :destroy
-
   validates :investigation, :presence => true
 
   ["data_file","sop","model"].each do |type|
@@ -61,14 +56,7 @@ class Study < ActiveRecord::Base
     return new_object
   end
 
-  def publications
-    self.relationships.select {|a| a.other_object_type == "Publication"}.collect { |a| a.other_object }
-  end
 
-  #includes publications directly related, plus those related to associated assays
-  def related_publications
-    assays.collect{|a| a.publications}.flatten.uniq | publications
-  end
 
 
 end
