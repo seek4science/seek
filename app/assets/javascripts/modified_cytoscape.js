@@ -1,167 +1,310 @@
 /*
-   Some cystoscape functions are overiden here, in order to:
-   - Fix bugs
-   - Change the default behavior which can not do through api or configuration
+ Some cystoscape functions are overiden here, in order to:
+ - Fix bugs
+ - Change the default behavior which can not do through api or configuration
  */
 
-(function($$){
+;
+(function ($$) {
+    'use strict';
 
-    $$("layout", "breadthfirst").prototype.run = function(){
+    var defaults = {
+        fit: true, // whether to fit the viewport to the graph
+        directed: false, // whether the tree is directed downwards (or edges can point in any direction if false)
+        padding: 30, // padding on fit
+        circle: false, // put depths in concentric circles if true, put depths top down if false
+        spacingFactor: 1.75, // positive spacing factor, larger => more space between nodes (N.B. n/a if causes overlap)
+        boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+        avoidOverlap: true, // prevents node overlap, may overflow boundingBox if not enough space
+        roots: undefined, // the roots of the trees
+        maximalAdjustments: 0, // how many times to try to position the nodes in a maximal way (i.e. no backtracking)
+        animate: false, // whether to transition the node positions
+        animationDuration: 500, // duration of animation in ms if enabled
+        ready: undefined, // callback on layoutready
+        stop: undefined // callback on layoutstop
+    };
+
+    function BreadthFirstLayout(options) {
+        this.options = $$.util.extend({}, defaults, options);
+    }
+
+    BreadthFirstLayout.prototype.run = function () {
         var params = this.options;
         var options = params;
 
         var cy = params.cy;
-        var nodes = cy.nodes();
-        var edges = cy.edges();
+        var eles = options.eles;
+        var nodes = eles.nodes().not(':parent');
+        var graph = eles;
         var container = cy.container();
 
-        //var width = container.clientWidth;
-        //var height = container.clientHeight;
+        var bb = $$.util.makeBoundingBox(options.boundingBox ? options.boundingBox : {
+            x1: 0, y1: 0, w: cy.width(), h: cy.height()
+        });
 
         var roots;
-        if( $$.is.elementOrCollection(options.roots) ){
+        if ($$.is.elementOrCollection(options.roots)) {
             roots = options.roots;
-        } else if( $$.is.array(options.roots) ){
+        } else if ($$.is.array(options.roots)) {
             var rootsArray = [];
 
-            for( var i = 0; i < options.roots.length; i++ ){
+            for (var i = 0; i < options.roots.length; i++) {
                 var id = options.roots[i];
-                var ele = cy.getElementById( id );
-                roots.push( ele );
+                var ele = cy.getElementById(id);
+                rootsArray.push(ele);
             }
 
-            roots = new $$.Collection( cy, rootsArray );
+            roots = new $$.Collection(cy, rootsArray);
+        } else if ($$.is.string(options.roots)) {
+            roots = cy.$(options.roots);
+
         } else {
-            roots = nodes.roots();
+            if (options.directed) {
+                roots = nodes.roots();
+            } else {
+                var components = [];
+                var unhandledNodes = nodes;
+
+                while (unhandledNodes.length > 0) {
+                    var currComp = cy.collection();
+
+                    eles.bfs({
+                        roots: unhandledNodes[0],
+                        visit: function (i, depth, node, edge, pNode) {
+                            currComp = currComp.add(node);
+                        },
+                        directed: false
+                    });
+
+                    unhandledNodes = unhandledNodes.not(currComp);
+                    components.push(currComp);
+                }
+
+                roots = cy.collection();
+                for (var i = 0; i < components.length; i++) {
+                    var comp = components[i];
+                    var maxDegree = comp.maxDegree(false);
+                    var compRoots = comp.filter(function () {
+                        return this.degree(false) === maxDegree;
+                    });
+
+                    roots = roots.add(compRoots);
+                }
+
+            }
         }
 
 
         var depths = [];
         var foundByBfs = {};
         var id2depth = {};
+        var prevNode = {};
+        var prevEdge = {};
+        var successors = {};
 
         // find the depths of the nodes
-        roots.bfs(function(i, depth){
-            var ele = this[0];
+        graph.bfs({
+            roots: roots,
+            directed: options.directed,
+            visit: function (i, depth, node, edge, pNode) {
+                var ele = this[0];
+                var id = ele.id();
 
-            if( !depths[depth] ){
-                depths[depth] = [];
+                if (!depths[depth]) {
+                    depths[depth] = [];
+                }
+
+                depths[depth].push(ele);
+                foundByBfs[id] = true;
+                id2depth[id] = depth;
+                prevNode[id] = pNode;
+                prevEdge[id] = edge;
+
+                if (pNode) {
+                    var prevId = pNode.id();
+                    var succ = successors[prevId] = successors[prevId] || [];
+
+                    succ.push(node);
+                }
             }
-
-            depths[depth].push( ele );
-            foundByBfs[ ele.id() ] = true;
-            id2depth[ ele.id() ] = depth;
-        }, options.directed);
+        });
 
         // check for nodes not found by bfs
         var orphanNodes = [];
-        for( var i = 0; i < nodes.length; i++ ){
+        for (var i = 0; i < nodes.length; i++) {
             var ele = nodes[i];
 
-            if( foundByBfs[ ele.id() ] ){
+            if (foundByBfs[ele.id()]) {
                 continue;
             } else {
-                orphanNodes.push( ele );
+                orphanNodes.push(ele);
             }
         }
 
         // assign orphan nodes a depth from their neighborhood
         var maxChecks = orphanNodes.length * 3;
         var checks = 0;
-        while( orphanNodes.length !== 0 && checks < maxChecks ){
+        while (orphanNodes.length !== 0 && checks < maxChecks) {
             var node = orphanNodes.shift();
             var neighbors = node.neighborhood().nodes();
             var assignedDepth = false;
 
-            for( var i = 0; i < neighbors.length; i++ ){
-                var depth = id2depth[ neighbors[i].id() ];
+            for (var i = 0; i < neighbors.length; i++) {
+                var depth = id2depth[neighbors[i].id()];
 
-                if( depth !== undefined ){
-                    depths[depth].push( node );
+                if (depth !== undefined) {
+                    depths[depth].push(node);
                     assignedDepth = true;
                     break;
                 }
             }
 
-            if( !assignedDepth ){
-                orphanNodes.push( node );
+            if (!assignedDepth) {
+                orphanNodes.push(node);
             }
 
             checks++;
         }
 
         // assign orphan nodes that are still left to the depth of their subgraph
-        while( orphanNodes.length !== 0 ){
+        while (orphanNodes.length !== 0) {
             var node = orphanNodes.shift();
-            var subgraph = node.bfs();
+            //var subgraph = graph.bfs( node ).path;
             var assignedDepth = false;
 
-            for( var i = 0; i < subgraph.length; i++ ){
-                var depth = id2depth[ subgraph[i].id() ];
+            // for( var i = 0; i < subgraph.length; i++ ){
+            //   var depth = id2depth[ subgraph[i].id() ];
 
-                if( depth !== undefined ){
-                    depths[depth].push( node );
-                    assignedDepth = true;
-                    break;
-                }
-            }
+            //   if( depth !== undefined ){
+            //     depths[depth].push( node );
+            //     assignedDepth = true;
+            //     break;
+            //   }
+            // }
 
-            if( !assignedDepth ){ // worst case if the graph really isn't tree friendly, then just dump it in 0
-                if( depths.length === 0 ){
+            if (!assignedDepth) { // worst case if the graph really isn't tree friendly, then just dump it in 0
+                if (depths.length === 0) {
                     depths.push([]);
                 }
 
-                depths[0].push( node );
+                depths[0].push(node);
             }
         }
 
         // assign the nodes a depth and index
-        function assignDepthsToEles(){
-            for( var i = 0; i < depths.length; i++ ){
+        var assignDepthsToEles = function () {
+            for (var i = 0; i < depths.length; i++) {
                 var eles = depths[i];
 
-                for( var j = 0; j < eles.length; j++ ){
+                for (var j = 0; j < eles.length; j++) {
                     var ele = eles[j];
 
-                    ele._private.scratch.BreadthFirstLayout = {
+                    ele._private.scratch.breadthfirst = {
                         depth: i,
                         index: j
                     };
                 }
             }
-        }
+        };
         assignDepthsToEles();
+
+
+        var intersectsDepth = function (node) { // returns true if has edges pointing in from a higher depth
+            var edges = node.connectedEdges(function () {
+                return this.data('target') === node.id();
+            });
+            var thisInfo = node._private.scratch.breadthfirst;
+            var highestDepthOfOther = 0;
+            var highestOther;
+            for (var i = 0; i < edges.length; i++) {
+                var edge = edges[i];
+                var otherNode = edge.source()[0];
+                var otherInfo = otherNode._private.scratch.breadthfirst;
+
+                if (thisInfo.depth <= otherInfo.depth && highestDepthOfOther < otherInfo.depth) {
+                    highestDepthOfOther = otherInfo.depth;
+                    highestOther = otherNode;
+                }
+            }
+
+            return highestOther;
+        };
+
+        // make maximal if so set by adjusting depths
+        for (var adj = 0; adj < options.maximalAdjustments; adj++) {
+
+            var nDepths = depths.length;
+            var elesToMove = [];
+            for (var i = 0; i < nDepths; i++) {
+                var depth = depths[i];
+
+                var nDepth = depth.length;
+                for (var j = 0; j < nDepth; j++) {
+                    var ele = depth[j];
+                    var info = ele._private.scratch.breadthfirst;
+                    var intEle = intersectsDepth(ele);
+
+                    if (intEle) {
+                        info.intEle = intEle;
+                        elesToMove.push(ele);
+                    }
+                }
+            }
+
+            for (var i = 0; i < elesToMove.length; i++) {
+                var ele = elesToMove[i];
+                var info = ele._private.scratch.breadthfirst;
+                var intEle = info.intEle;
+                var intInfo = intEle._private.scratch.breadthfirst;
+
+                depths[info.depth].splice(info.index, 1); // remove from old depth & index
+
+                // add to end of new depth
+                var newDepth = intInfo.depth + 1;
+                while (newDepth > depths.length - 1) {
+                    depths.push([]);
+                }
+                depths[newDepth].push(ele);
+
+                info.depth = newDepth;
+                info.index = depths[newDepth].length - 1;
+            }
+
+            assignDepthsToEles();
+        }
 
         // find min distance we need to leave between nodes
         var minDistance = 0;
-        for( var i = 0; i < nodes.length; i++ ){
-            var w = nodes[i].outerWidth();
-            var h = nodes[i].outerHeight();
+        if (options.avoidOverlap) {
+            for (var i = 0; i < nodes.length; i++) {
+                var w = nodes[i].outerWidth();
+                var h = nodes[i].outerHeight();
 
-            minDistance = Math.max(minDistance, w, h);
+                minDistance = Math.max(minDistance, w, h);
+            }
+            minDistance *= options.spacingFactor; // just to have some nice spacing
         }
-        minDistance *= 1.75; // just to have some nice spacing
 
         // get the weighted percent for an element based on its connectivity to other levels
         var cachedWeightedPercent = {};
-        function getWeightedPercent( ele ){
-            if( cachedWeightedPercent[ ele.id() ] ){
-                return cachedWeightedPercent[ ele.id() ];
+        var getWeightedPercent = function (ele) {
+            if (cachedWeightedPercent[ele.id()]) {
+                return cachedWeightedPercent[ele.id()];
             }
 
-            var eleDepth = ele._private.scratch.BreadthFirstLayout.depth;
-            var neighbors = ele.neighborhood().nodes();
+            var eleDepth = ele._private.scratch.breadthfirst.depth;
+            var neighbors = ele.neighborhood().nodes().not(':parent');
             var percent = 0;
             var samples = 0;
 
-            for( var i = 0; i < neighbors.length; i++ ){
+            for (var i = 0; i < neighbors.length; i++) {
                 var neighbor = neighbors[i];
-                var nEdges = neighbor.edgesWith( ele );
-                var index = neighbor._private.scratch.BreadthFirstLayout.index;
-                var depth = neighbor._private.scratch.BreadthFirstLayout.depth;
+                var bf = neighbor._private.scratch.breadthfirst;
+                var index = bf.index;
+                var depth = bf.depth;
                 var nDepth = depths[depth].length;
 
-                if( eleDepth > depth || eleDepth === 0 ){ // only get influenced by elements above
+                if (eleDepth > depth || eleDepth === 0) { // only get influenced by elements above
                     percent += index / nDepth;
                     samples++;
                 }
@@ -170,148 +313,158 @@
             samples = Math.max(1, samples);
             percent = percent / samples;
 
-            if( samples === 0 ){ // so lone nodes have a "don't care" state in sorting
+            if (samples === 0) { // so lone nodes have a "don't care" state in sorting
                 percent = undefined;
             }
 
-            cachedWeightedPercent[ ele.id() ] = percent;
+            cachedWeightedPercent[ele.id()] = percent;
             return percent;
-        }
+        };
+
 
         // rearrange the indices in each depth level based on connectivity
-        for( var times = 0; times < 3; times++ ){ // do it a few times b/c the depths are dynamic and we want a more stable result
 
-            for( var i = 0; i < depths.length; i++ ){
-                var depth = i;
-                var newDepths = [];
+        var sortFn = function (a, b) {
+            var apct = getWeightedPercent(a);
+            var bpct = getWeightedPercent(b);
 
-                depths[i] = depths[i].sort(function(a, b){
-                    var apct = getWeightedPercent( a );
-                    var bpct = getWeightedPercent( b );
+            return apct - bpct;
+        };
 
+        for (var times = 0; times < 3; times++) { // do it a few times b/c the depths are dynamic and we want a more stable result
 
-                    return apct - bpct;
-                });
+            for (var i = 0; i < depths.length; i++) {
+                depths[i] = depths[i].sort(sortFn);
             }
             assignDepthsToEles(); // and update
 
         }
 
+        var biggestDepthSize = 0;
+        for (var i = 0; i < depths.length; i++) {
+            biggestDepthSize = Math.max(depths[i].length, biggestDepthSize);
+        }
+
         var center = {
-            x: width/2,
-            y: height/2
+            //x: bb.x1 + bb.w/2,
+            //y: bb.x1 + bb.h/2
+            x: width / 2,
+            y: height / 2
         };
-        nodes.positions(function(){
-            var ele = this[0];
-            var info = ele._private.scratch.BreadthFirstLayout;
+
+        var getPosition = function (ele, isBottomDepth) {
+            var info = ele._private.scratch.breadthfirst;
             var depth = info.depth;
             var index = info.index;
+            var depthSize = depths[depth].length;
+
+            //var distanceX = Math.max( bb.w / (depthSize + 1), minDistance );
+            //var distanceY = Math.max( bb.h / (depths.length + 1), minDistance );
 
             var width = container.clientWidth;
             //calculate the height dynamically
             var height = graphHeight();
-            container.style.height = height+'px';
+            container.style.height = height + 'px';
 
-            function graphHeight(){
+            function graphHeight() {
                 var max_index = 0;
-                for (var i=0;i<depths.length;i++){
+                for (var i = 0; i < depths.length; i++) {
                     max_index = Math.max(depths[i].length, max_index);
                 }
-                return (2*max_index + 1)*nodes[0].outerHeight();
+                return (2 * max_index + 1) * nodes[0].outerHeight();
             }
 
-            var distanceX = Math.max(width / (depths.length + 1), minDistance );
+            var distanceX = Math.max(width / (depths.length + 1), minDistance);
             var distanceY = height / (depths[depth].length + 1);
-            var radiusStepSize = Math.min( width / 2 / depths.length, height / 2 / depths.length );
-            radiusStepSize = Math.max( radiusStepSize, minDistance );
 
-            if( options.circle ){
-                var radius = radiusStepSize * depth + radiusStepSize - (depths.length > 0 && depths[0].length <= 3 ? radiusStepSize/2 : 0);
-                var theta = 2 * Math.PI / depths[depth].length * index;
+            var radiusStepSize = Math.min(bb.w / 2 / depths.length, bb.h / 2 / depths.length);
+            radiusStepSize = Math.max(radiusStepSize, minDistance);
 
-                if( depth === 0 && depths[0].length === 1 ){
-                    radius = 1;
-                }
+            if (!options.circle) {
 
-                return {
-                    x: center.x + radius * Math.cos(theta),
-                    y: center.y + radius * Math.sin(theta)
-                };
-
-            } else {
-                return {
+                var epos = {
+                    //x: center.x + (index + 1 - (depthSize + 1)/2) * distanceX,
+                    //y: (depth + 1) * distanceY
                     y: (index + 1) * distanceY,
                     x: (depth + 1) * distanceX
                 };
+
+                if (isBottomDepth) {
+                    return epos;
+                }
+
+                // var succs = successors[ ele.id() ];
+                // if( succs ){
+                //   epos.x = 0;
+                //
+                //   for( var i = 0 ; i < succs.length; i++ ){
+                //     var spos = pos[ succs[i].id() ];
+                //
+                //     epos.x += spos.x;
+                //   }
+                //
+                //   epos.x /= succs.length;
+                // } else {
+                //   //debugger;
+                // }
+
+                return epos;
+
+            } else {
+                if (options.circle) {
+                    var radius = radiusStepSize * depth + radiusStepSize - (depths.length > 0 && depths[0].length <= 3 ? radiusStepSize / 2 : 0);
+                    var theta = 2 * Math.PI / depths[depth].length * index;
+
+                    if (depth === 0 && depths[0].length === 1) {
+                        radius = 1;
+                    }
+
+                    return {
+                        x: center.x + radius * Math.cos(theta),
+                        y: center.y + radius * Math.sin(theta)
+                    };
+
+                } else {
+                    return {
+                        x: center.x + (index + 1 - (depthSize + 1) / 2) * distanceX,
+                        y: (depth + 1) * distanceY
+                    };
+                }
             }
 
-        });
+        };
 
-        if( params.fit ){
-            cy.fit( options.padding );
+        // get positions in reverse depth order
+        var pos = {};
+        for (var i = depths.length - 1; i >= 0; i--) {
+            var depth = depths[i];
+
+            for (var j = 0; j < depth.length; j++) {
+                var node = depth[j];
+
+                pos[node.id()] = getPosition(node, i === depths.length - 1);
+            }
         }
 
-        cy.one("layoutready", params.ready);
-        cy.trigger("layoutready");
+        nodes.layoutPositions(this, options, function () {
+            return pos[this.id()];
+        });
 
-        cy.one("layoutstop", params.stop);
-        cy.trigger("layoutstop");
+        return this; // chaining
     };
 
-    var canvas_prototype = $$("renderer", "canvas").prototype;
-    var CANVAS_LAYERS = 5, SELECT_BOX = 0, DRAG = 2, OVERLAY = 3, NODE = 4, BUFFER_COUNT = 2;
+    $$('layout', 'breadthfirst', BreadthFirstLayout);
 
     // Change the dault value for SEEK, it looks better with 6 instead of 10
-    canvas_prototype.getRoundRectangleRadius = function(width, height) {
+    $$.math.getRoundRectangleRadius = function (width, height) {
         return Math.min(width / 2, height / 2, 6);
     }
 
-    //Fix for the case that the graph disappears when browser is in the zoom mode
-    canvas_prototype.matchCanvasSize = function(container) {
-        var data = this.data; var width = container.clientWidth; var height = container.clientHeight;
-
-        var canvas, canvasWidth = width, canvasHeight = height;
-
-        // Comment out these lines to fix that the graph disappears when browser is in the zoom mode
-        //if ('devicePixelRatio' in window) {
-        //	canvasWidth *= devicePixelRatio;
-        //	canvasHeight *= devicePixelRatio;
-        //}
-
-        for (var i = 0; i < CANVAS_LAYERS; i++) {
-
-            canvas = data.canvases[i];
-
-            if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
-
-                canvas.width = canvasWidth;
-                canvas.height = canvasHeight;
-
-                canvas.style.width = width + 'px';
-                canvas.style.height = height + 'px';
-            }
-        }
-
-        for (var i = 0; i < BUFFER_COUNT; i++) {
-
-            canvas = data.bufferCanvases[i];
-
-            if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
-
-                canvas.width = canvasWidth;
-                canvas.height = canvasHeight;
-            }
-        }
-
-        this.data.overlay.style.width = width + 'px';
-        this.data.overlay.style.height = height + 'px';
-    }
-
     // Fix the safari 6.1 and above quits unexpectedly
-    canvas_prototype.roundRectangleIntersectLine = function(
-        x, y, nodeX, nodeY, width, height, padding) {
+    $$.math.roundRectangleIntersectLine = function (x, y, nodeX, nodeY, width, height, padding) {
 
-        //Manually change for seek to fix that safari quits unexpectedly
+        //change for seek
+        //var cornerRadius = this.getRoundRectangleRadius(width, height);
         var cornerRadius = 0;
 
         var halfWidth = width / 2;
@@ -386,7 +539,7 @@
         // Top Left
         {
             var topLeftCenterX = nodeX - halfWidth + cornerRadius;
-            var topLeftCenterY = nodeY - halfHeight + cornerRadius
+            var topLeftCenterY = nodeY - halfHeight + cornerRadius;
             arcIntersections = this.intersectLineCircle(
                 x, y, nodeX, nodeY,
                 topLeftCenterX, topLeftCenterY, cornerRadius + padding);
@@ -402,7 +555,7 @@
         // Top Right
         {
             var topRightCenterX = nodeX + halfWidth - cornerRadius;
-            var topRightCenterY = nodeY - halfHeight + cornerRadius
+            var topRightCenterY = nodeY - halfHeight + cornerRadius;
             arcIntersections = this.intersectLineCircle(
                 x, y, nodeX, nodeY,
                 topRightCenterX, topRightCenterY, cornerRadius + padding);
@@ -418,7 +571,7 @@
         // Bottom Right
         {
             var bottomRightCenterX = nodeX + halfWidth - cornerRadius;
-            var bottomRightCenterY = nodeY + halfHeight - cornerRadius
+            var bottomRightCenterY = nodeY + halfHeight - cornerRadius;
             arcIntersections = this.intersectLineCircle(
                 x, y, nodeX, nodeY,
                 bottomRightCenterX, bottomRightCenterY, cornerRadius + padding);
@@ -434,7 +587,7 @@
         // Bottom Left
         {
             var bottomLeftCenterX = nodeX - halfWidth + cornerRadius;
-            var bottomLeftCenterY = nodeY + halfHeight - cornerRadius
+            var bottomLeftCenterY = nodeY + halfHeight - cornerRadius;
             arcIntersections = this.intersectLineCircle(
                 x, y, nodeX, nodeY,
                 bottomLeftCenterX, bottomLeftCenterY, cornerRadius + padding);
@@ -446,369 +599,8 @@
                 return [arcIntersections[0], arcIntersections[1]];
             }
         }
-    }
 
-    // Fix the safari 6.1 and above quits unexpectedly
-    canvas_prototype.redraw = function( forcedContext, drawAll, forcedZoom, forcedPan ) {
-        var r = this;
-
-        if( this.averageRedrawTime === undefined ){ this.averageRedrawTime = 0; }
-
-        var minRedrawLimit = 1000/60; // people can't see much better than 60fps
-        var maxRedrawLimit = 1000; // don't cap max b/c it's more important to be responsive than smooth
-
-        var redrawLimit = this.averageRedrawTime; // estimate the ideal redraw limit based on how fast we can draw
-
-        redrawLimit = Math.max(minRedrawLimit, redrawLimit);
-        redrawLimit = Math.min(redrawLimit, maxRedrawLimit);
-
-        //console.log('--\nideal: %i; effective: %i', this.averageRedrawTime, redrawLimit);
-
-        if( this.lastDrawTime === undefined ){ this.lastDrawTime = 0; }
-
-        var nowTime = +new Date;
-        var timeElapsed = nowTime - this.lastDrawTime;
-        var callAfterLimit = timeElapsed >= redrawLimit;
-
-        if( !forcedContext ){
-            if( !callAfterLimit ){
-                clearTimeout( this.redrawTimeout );
-                this.redrawTimeout = setTimeout(function(){
-                    r.redraw();
-                }, redrawLimit);
-
-                return;
-            }
-
-            this.lastDrawTime = nowTime;
-        }
-
-
-        // start on thread ready
-        setTimeout(function(){
-
-            var startTime = nowTime;
-
-            var looperMax = 100;
-            //console.log('-- redraw --')
-
-            // console.time('init'); for( var looper = 0; looper <= looperMax; looper++ ){
-
-            var cy = r.data.cy; var data = r.data;
-            var nodes = r.getCachedNodes(); var edges = r.getCachedEdges();
-            r.matchCanvasSize(data.container);
-
-            var zoom = cy.zoom();
-            var effectiveZoom = forcedZoom !== undefined ? forcedZoom : zoom;
-            var pan = cy.pan();
-            var effectivePan = {
-                x: pan.x,
-                y: pan.y
-            };
-
-            if( forcedPan ){
-                effectivePan = forcedPan;
-            }
-
-            // Comment out these lines to fix that the graph disappears when browser is in the zoom mode
-            //if( 'devicePixelRatio' in window ){
-            //	effectiveZoom *= devicePixelRatio;
-            //	effectivePan.x *= devicePixelRatio;
-            //	effectivePan.y *= devicePixelRatio;
-            //}
-
-            var elements = [];
-            for( var i = 0; i < nodes.length; i++ ){
-                elements.push( nodes[i] );
-            }
-            for( var i = 0; i < edges.length; i++ ){
-                elements.push( edges[i] );
-            }
-
-            // } console.timeEnd('init')
-
-
-
-            if (data.canvasNeedsRedraw[DRAG] || data.canvasNeedsRedraw[NODE] || drawAll) {
-                //NB : VERY EXPENSIVE
-                //console.time('edgectlpts'); for( var looper = 0; looper <= looperMax; looper++ ){
-
-                if( r.hideEdgesOnViewport && (r.pinching || r.hoverData.dragging || r.data.wheel || r.swipePanning) ){
-                } else {
-                    r.findEdgeControlPoints(edges);
-                }
-
-                //} console.timeEnd('edgectlpts')
-
-
-
-                // console.time('sort'); for( var looper = 0; looper <= looperMax; looper++ ){
-                var elements = r.getCachedZSortedEles();
-                // } console.timeEnd('sort')
-
-                // console.time('updatecompounds'); for( var looper = 0; looper <= looperMax; looper++ ){
-                // no need to update graph if there is no compound node
-                if ( cy.hasCompoundNodes() )
-                {
-                    r.updateAllCompounds(elements);
-                }
-                // } console.timeEnd('updatecompounds')
-            }
-
-            var elesInDragLayer;
-            var elesNotInDragLayer;
-            var element;
-
-
-            // console.time('drawing'); for( var looper = 0; looper <= looperMax; looper++ ){
-            if (data.canvasNeedsRedraw[NODE] || drawAll) {
-                // console.log("redrawing node layer", data.canvasRedrawReason[NODE]);
-
-                if( !elesInDragLayer || !elesNotInDragLayer ){
-                    elesInDragLayer = [];
-                    elesNotInDragLayer = [];
-
-                    for (var index = 0; index < elements.length; index++) {
-                        element = elements[index];
-
-                        if ( element._private.rscratch.inDragLayer ) {
-                            elesInDragLayer.push( element );
-                        } else {
-                            elesNotInDragLayer.push( element );
-                        }
-                    }
-                }
-
-                var context = forcedContext || data.canvases[NODE].getContext("2d");
-
-                context.setTransform(1, 0, 0, 1, 0, 0);
-                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-
-                if( !drawAll ){
-                    context.translate(effectivePan.x, effectivePan.y);
-                    context.scale(effectiveZoom, effectiveZoom);
-                }
-                if( forcedPan ){
-                    context.translate(forcedPan.x, forcedPan.y);
-                }
-                if( forcedZoom ){
-                    context.scale(forcedZoom, forcedZoom);
-                }
-
-                for (var index = 0; index < elesNotInDragLayer.length; index++) {
-                    element = elesNotInDragLayer[index];
-
-                    if (element._private.group == "nodes") {
-                        r.drawNode(context, element);
-
-                    } else if (element._private.group == "edges") {
-                        r.drawEdge(context, element);
-                    }
-                }
-
-                for (var index = 0; index < elesNotInDragLayer.length; index++) {
-                    element = elesNotInDragLayer[index];
-
-                    if (element._private.group == "nodes") {
-                        r.drawNodeText(context, element);
-                    } else if (element._private.group == "edges") {
-                        r.drawEdgeText(context, element);
-                    }
-
-                    // draw the overlay
-                    if (element._private.group == "nodes") {
-                        r.drawNode(context, element, true);
-                    } else if (element._private.group == "edges") {
-                        r.drawEdge(context, element, true);
-                    }
-                }
-
-                if( !drawAll ){
-                    data.canvasNeedsRedraw[NODE] = false; data.canvasRedrawReason[NODE] = [];
-                }
-            }
-
-            if (data.canvasNeedsRedraw[DRAG] || drawAll) {
-                // console.log("redrawing drag layer", data.canvasRedrawReason[DRAG]);
-
-                if( !elesInDragLayer || !elesNotInDragLayer ){
-                    elesInDragLayer = [];
-                    elesNotInDragLayer = [];
-
-                    for (var index = 0; index < elements.length; index++) {
-                        element = elements[index];
-
-                        if ( element._private.rscratch.inDragLayer ) {
-                            elesInDragLayer.push( element );
-                        } else {
-                            elesNotInDragLayer.push( element );
-                        }
-                    }
-                }
-
-                var context = forcedContext || data.canvases[DRAG].getContext("2d");
-
-                if( !drawAll ){
-                    context.setTransform(1, 0, 0, 1, 0, 0);
-                    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-
-                    context.translate(effectivePan.x, effectivePan.y);
-                    context.scale(effectiveZoom, effectiveZoom);
-                }
-                if( forcedPan ){
-                    context.translate(forcedPan.x, forcedPan.y);
-                }
-                if( forcedZoom ){
-                    context.scale(forcedZoom, forcedZoom);
-                }
-
-                var element;
-
-                for (var index = 0; index < elesInDragLayer.length; index++) {
-                    element = elesInDragLayer[index];
-
-                    if (element._private.group == "nodes") {
-                        r.drawNode(context, element);
-                    } else if (element._private.group == "edges") {
-                        r.drawEdge(context, element);
-                    }
-                }
-
-                for (var index = 0; index < elesInDragLayer.length; index++) {
-                    element = elesInDragLayer[index];
-
-                    if (element._private.group == "nodes") {
-                        r.drawNodeText(context, element);
-                    } else if (element._private.group == "edges") {
-                        r.drawEdgeText(context, element);
-                    }
-
-                    // draw the overlay
-                    if (element._private.group == "nodes") {
-                        r.drawNode(context, element, true);
-                    } else if (element._private.group == "edges") {
-                        r.drawEdge(context, element, true);
-                    }
-                }
-
-                if( !drawAll ){
-                    data.canvasNeedsRedraw[DRAG] = false; data.canvasRedrawReason[DRAG] = [];
-                }
-            }
-
-            if (data.canvasNeedsRedraw[SELECT_BOX]) {
-                // console.log("redrawing selection box", data.canvasRedrawReason[SELECT_BOX]);
-
-                var context = forcedContext || data.canvases[SELECT_BOX].getContext("2d");
-
-                if( !drawAll ){
-                    context.setTransform(1, 0, 0, 1, 0, 0);
-                    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-
-                    context.translate(effectivePan.x, effectivePan.y);
-                    context.scale(effectiveZoom, effectiveZoom);
-                }
-                if( forcedPan ){
-                    context.translate(forcedPan.x, forcedPan.y);
-                }
-                if( forcedZoom ){
-                    context.scale(forcedZoom, forcedZoom);
-                }
-
-                var coreStyle = cy.style()._private.coreStyle;
-
-                if (data.select[4] == 1) {
-                    var zoom = data.cy.zoom();
-                    var borderWidth = coreStyle["selection-box-border-width"].value / zoom;
-
-                    context.lineWidth = borderWidth;
-                    context.fillStyle = "rgba("
-                        + coreStyle["selection-box-color"].value[0] + ","
-                        + coreStyle["selection-box-color"].value[1] + ","
-                        + coreStyle["selection-box-color"].value[2] + ","
-                        + coreStyle["selection-box-opacity"].value + ")";
-
-                    context.fillRect(
-                        data.select[0],
-                        data.select[1],
-                        data.select[2] - data.select[0],
-                        data.select[3] - data.select[1]);
-
-                    if (borderWidth > 0) {
-                        context.strokeStyle = "rgba("
-                            + coreStyle["selection-box-border-color"].value[0] + ","
-                            + coreStyle["selection-box-border-color"].value[1] + ","
-                            + coreStyle["selection-box-border-color"].value[2] + ","
-                            + coreStyle["selection-box-opacity"].value + ")";
-
-                        context.strokeRect(
-                            data.select[0],
-                            data.select[1],
-                            data.select[2] - data.select[0],
-                            data.select[3] - data.select[1]);
-                    }
-                }
-
-                if( data.bgActivePosistion ){
-                    var zoom = data.cy.zoom();
-                    var pos = data.bgActivePosistion;
-
-                    context.fillStyle = "rgba("
-                        + coreStyle["active-bg-color"].value[0] + ","
-                        + coreStyle["active-bg-color"].value[1] + ","
-                        + coreStyle["active-bg-color"].value[2] + ","
-                        + coreStyle["active-bg-opacity"].value + ")";
-
-                    context.beginPath();
-                    context.arc(pos.x, pos.y, coreStyle["active-bg-size"].pxValue / zoom, 0, 2 * Math.PI);
-                    context.fill();
-                }
-
-                if( !drawAll ){
-                    data.canvasNeedsRedraw[SELECT_BOX] = false; data.canvasRedrawReason[SELECT_BOX] = [];
-                }
-            }
-
-            if( r.options.showOverlay ){
-                var context = data.canvases[OVERLAY].getContext("2d");
-
-                context.lineJoin = 'round';
-                context.font = '14px helvetica';
-                context.strokeStyle = '#fff';
-                context.lineWidth = '4';
-                context.fillStyle = '#666';
-                context.textAlign = 'right';
-
-                var text = 'cytoscape.js';
-
-                var w = context.canvas.width;
-                var h = context.canvas.height;
-                var p = 4;
-                var tw = context.measureText(text).width;
-                var th = 14;
-
-                context.clearRect(0, 0, w, h);
-                context.strokeText(text, w - p, h - p);
-                context.fillText(text, w - p, h - p);
-
-                data.overlayDrawn = true;
-            }
-
-            // } console.timeEnd('drawing')
-
-            var endTime = +new Date;
-
-            if( r.averageRedrawTime === undefined ){
-                r.averageRedrawTime = endTime - startTime;
-            }
-
-            // use a weighted average with a bias from the previous average so we don't spike so easily
-            r.averageRedrawTime = r.averageRedrawTime/2 + (endTime - startTime)/2;
-            //console.log('actual: %i, average: %i', endTime - startTime, this.averageRedrawTime);
-
-
-            // end on thread ready
-        }, 0);
+        return []; // if nothing
     };
-})( cytoscape );
+})(cytoscape);
 
