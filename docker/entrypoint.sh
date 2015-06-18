@@ -14,4 +14,6 @@ bundle exec rake seek:workers:start
 # Search
 bundle exec rake sunspot:solr:start
 
-rails server -e production -p 3000
+chown -R app:app /home/app/seek
+
+exec "$@"
