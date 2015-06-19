@@ -15,10 +15,8 @@ general install guide.
 
 ## Linux Mint 16
 
-Ubuntu 14.04 has only recently been released and we haven't yet fully migrated
-over to testing on that platform. These differences also relate to Linux Mint
-16. We don't expect any particular problems once SEEK is installed and
-running, but there are a couple of minor differences that need to be followed.
+There shoudn't be any problems once SEEK is installed and
+running, but there are a couple of minor differences that need to be followed during the installation.
 
 First, there is an additional package required:
 
