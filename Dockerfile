@@ -8,12 +8,10 @@ RUN apt-get install -y libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3 libc
 RUN apt-get install -y poppler-utils libreoffice libmagick++-dev libxslt1-dev libpq-dev
 RUN apt-get install -y nodejs
 
-CMD ["/sbin/my_init"]
-
 # Passenger stuff
 RUN rm -f /etc/service/nginx/down
 RUN rm /etc/nginx/sites-enabled/default
-ADD nginx.conf /etc/nginx/sites-enabled/seek.conf
+ADD docker/nginx.conf /etc/nginx/sites-enabled/seek.conf
 
 # Environment
 WORKDIR /home/app/seek
@@ -30,15 +28,22 @@ RUN bundle install
 ADD . /home/app/seek
 RUN chown -R app:app /home/app/seek
 
+# Temp Database (for asset compilation)
+RUN cp config/database.sqlite.yml config/database.yml
+RUN bundle exec rake db:setup
+
+# Compile assets
+RUN bundle exec rake assets:precompile
+
 # Config
-RUN cp config/database.docker.yml config/database.yml
+RUN cp docker/database.docker.yml config/database.yml
 RUN cp config/sunspot.default.yml config/sunspot.yml
+
+# Cleanup
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* db/*.sqlite3
 
 # Network
 EXPOSE 80
-
-# Runtime
-ENTRYPOINT ["/home/app/seek/docker/entrypoint.sh"]
 
 # Shared
 VOLUME ["/home/app/seek/filestore", "/home/app/seek/config", "/home/app/seek/log"]

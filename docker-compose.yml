@@ -4,6 +4,7 @@ db:
     - "5432:5432"
 seek:
   build: .
+  command: docker/entrypoint.sh
   ports:
     - "80:80"
   links:
