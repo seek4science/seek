@@ -7,10 +7,12 @@
 
 ## Quick start
 
-1. Load the database schema and seed data:
+Load the database schema and seed data:
+
     docker-compose run seek bundle exec rake db:setup
 
-2. Start the docker containers (add the argument `-d` to start the containers in "detached" mode):
+Start the docker containers (add the argument `-d` to start the containers in "detached" mode):
+
     docker-compose up
 
-3. Visit "localhost" in your browser.
+Visit "localhost" in your browser.
