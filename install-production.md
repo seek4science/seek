@@ -11,7 +11,7 @@ for real use rather than for development).
 By reading and following these extra notes, you will more performance out of
 SEEK, and reduce the ongoing maintenance.
 
-If you wish to run under a sub URI (e.g. <host>/seek) then please read and
+If you wish to run under a sub URI, e.g. example.com/seek, then please read and
 follow [Installing under a sub URI](install-on-suburi.html) at the end
 of the installation.
 
