@@ -30,7 +30,8 @@ function drawGraph(elements, current_element_id){
                 'color':default_color,
                 'width':default_node_width,
                 'height':default_node_height,
-                'font-size':default_font_size
+                'font-size':default_font_size,
+                'text-max-width': 250
             })
 
             .selector('edge')
@@ -111,7 +112,7 @@ function animateNode(node){
         duration: 300
     });
     // set font style here for better animation (instead of in animate function).
-    node.css('font-size', 14);
+    node.css('font-size', 13);
     node.css('font-weight', 'bolder');
     if (node.data().name !== 'Hidden item'){
         node.css('color', '#0000e5');
