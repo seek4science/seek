@@ -10,7 +10,7 @@
 
     var defaults = {
         fit: true, // whether to fit the viewport to the graph
-        directed: false, // whether the tree is directed downwards (or edges can point in any direction if false)
+        directed: true, // whether the tree is directed downwards (or edges can point in any direction if false)
         padding: 30, // padding on fit
         circle: false, // put depths in concentric circles if true, put depths top down if false
         spacingFactor: 1.75, // positive spacing factor, larger => more space between nodes (N.B. n/a if causes overlap)
