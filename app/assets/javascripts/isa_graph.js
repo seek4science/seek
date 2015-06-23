@@ -1,6 +1,6 @@
 var cy;
-var default_node_width = 195;
-var default_node_height = 35;
+var default_node_width = 215;
+var default_node_height = 40;
 var default_font_size = 11;
 var default_color = '#323232';
 
@@ -17,7 +17,7 @@ function drawGraph(elements, current_element_id){
 
         style: cytoscape.stylesheet()
             .selector('node')
-            .css({
+            .style({
                 'shape': 'roundrectangle',
                 'border-color': 'data(borderColor)',
                 'border-width': 2,
@@ -31,11 +31,11 @@ function drawGraph(elements, current_element_id){
                 'width':default_node_width,
                 'height':default_node_height,
                 'font-size':default_font_size,
-                'text-max-width': 250
+                'text-max-width': 220
             })
 
             .selector('edge')
-            .css({
+            .style({
                 'width': 1.5,
                 'target-arrow-shape': 'none',
                 'line-color': '#191975',
@@ -105,17 +105,15 @@ function animateNode(node){
         }
     });
 
-    //then animate the chosen node
-    node.animate({
-        css: { 'width':250, 'height':50 }
-    }, {
-        duration: 300
-    });
-    // set font style here for better animation (instead of in animate function).
-    node.css('font-size', 13);
-    node.css('font-weight', 'bolder');
+    node.style({
+        'width': 250,
+        'height': 50,
+        'font-size': 13,
+        'font-weight': 'bolder'
+    })
+
     if (node.data().name !== 'Hidden item'){
-        node.css('color', '#0000e5');
+        node.style({'color': '#0000e5'});
     }
     node.select();
 }
@@ -192,27 +190,29 @@ function alignCenterVertical(element, element_height){
 }
 
 function appearingNodes(nodes){
-    nodes.css('opacity', 1);
+    nodes.style({'opacity': 1});
 }
 
 function appearingEdges(edges){
-    edges.css('opacity', 1);
+    edges.style({'opacity': 1});
 }
 
 function fadingNodes(nodes){
-    nodes.css('opacity', 0.3);
+    nodes.style({'opacity': 0.3});
 }
 
 function fadingEdges(edges){
-    edges.css('opacity', 0.2);
+    edges.style({'opacity': 0.2});
 }
 
 function normalizingNodes(nodes){
-    nodes.css('width',default_node_width);
-    nodes.css('height',default_node_height);
-    nodes.css('font-size',default_font_size);
-    nodes.css('font-weight', 'normal');
-    nodes.css('color',default_color);
+    nodes.style({
+        'width': default_node_width,
+        'height': default_node_height,
+        'font-size': default_font_size,
+        'font-weight': 'normal',
+        'color': default_color
+    })
     nodes.unselect();
 }
 
