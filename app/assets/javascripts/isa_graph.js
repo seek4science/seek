@@ -3,6 +3,7 @@ var default_node_width = 215;
 var default_node_height = 40;
 var default_font_size = 11;
 var default_color = '#323232';
+var default_text_max_width = 220;
 
 jQuery.noConflict();
 var $j = jQuery;
@@ -31,7 +32,7 @@ function drawGraph(elements, current_element_id){
                 'width':default_node_width,
                 'height':default_node_height,
                 'font-size':default_font_size,
-                'text-max-width': 220
+                'text-max-width': default_text_max_width
             })
 
             .selector('edge')
@@ -109,7 +110,8 @@ function animateNode(node){
         'width': 250,
         'height': 50,
         'font-size': 13,
-        'font-weight': 'bolder'
+        'font-weight': 'bolder',
+        'text-max-width': 250
     })
 
     if (node.data().name !== 'Hidden item'){
@@ -211,7 +213,8 @@ function normalizingNodes(nodes){
         'height': default_node_height,
         'font-size': default_font_size,
         'font-weight': 'normal',
-        'color': default_color
+        'color': default_color,
+        'text-max-width': default_text_max_width
     })
     nodes.unselect();
 }
@@ -224,32 +227,77 @@ function resizeGraph(){
     }
 }
 
-function labelPosition(node){
+function labelPosition(node, label_part, line_index, total_line){
     var label_pos = {};
     var graph_pos = $j('#cy')[0].getBoundingClientRect();
     var node_posX = node.renderedPosition().x + graph_pos.left;
     var node_posY = node.renderedPosition().y + graph_pos.top;
     var font_size = node.renderedCss()['font-size'];
-    var label = node.data().name;
     var ruler = $j('#ruler')[0];
     ruler.style.fontSize = font_size;
     ruler.style.fontWeight = 'bolder';
-    ruler.innerHTML = label;
-    var zoom_level = cy.zoom();
-    var label_width = ruler.offsetWidth + 2*zoom_level;
+    ruler.innerHTML = label_part;    
+    var label_width = ruler.offsetWidth;
     var label_height = ruler.offsetHeight;
     label_pos.minX = node_posX - label_width/2;
     label_pos.maxX = node_posX + label_width/2;
-    label_pos.minY = node_posY - label_height/2;
-    label_pos.maxY = node_posY + label_height/2;
+    label_pos.maxY = node_posY + (line_index - total_line/2)*label_height;
+    label_pos.minY = label_pos.maxY - label_height;
+    
     return label_pos;
 }
 
+function labelLines(node){
+    var label = node.data().name;
+    var font_size = node.renderedCss()['font-size'];
+    var ruler = $j('#ruler')[0];
+    ruler.style.fontSize = font_size;
+    ruler.style.fontWeight = 'bolder';
+    ruler.innerHTML = label;    
+    var label_width = ruler.offsetWidth;
+    var text_max_width = node.renderedCss()['text-max-width'];
+    var max_width = text_max_width.split('px')[0];
+    var max_width_integer = parseInt(max_width);
+    var lines = [];
+    if (label_width > max_width_integer){
+        var words = label.split(' ');
+        var line = '';
+        for( var i=0; i<words.length; i++){
+            var testLine = line + words[i] + ' ';
+            ruler.innerHTML = testLine;
+            var testWidth = ruler.offsetWidth;
+            if (testWidth > max_width_integer && i > 0) {
+                lines.push(line.trim());
+                line = words[i] + ' ';
+            }
+            else {
+                line = testLine;
+            }
+            //when last word, push line to lines
+            if (i === words.length-1){
+                lines.push(line.trim());
+            }
+        }
+    }else{
+        lines.push(label);
+    }
+    return lines;
+}
+
 function mouseOnLabel(node, mouse_event){
-    var label_pos = labelPosition(node);
-    var mouse_posX = mouse_event.clientX;
-    var mouse_posY = mouse_event.clientY;
-    var mouse_on_label = mouse_posX > label_pos.minX && mouse_posX < label_pos.maxX && mouse_posY > label_pos.minY && mouse_posY < label_pos.maxY;
+    var lines = labelLines(node);
+    var mouse_on_label = false;
+    for (var i=0; i<lines.length; i++){
+    	var label_pos = labelPosition(node, lines[i], i+1, lines.length);
+    	var mouse_posX = mouse_event.clientX;
+    	var mouse_posY = mouse_event.clientY;
+	mouse_on_label = mouse_posX > label_pos.minX && mouse_posX < label_pos.maxX && mouse_posY > label_pos.minY && mouse_posY < label_pos.maxY;
+        if (mouse_on_label == true){
+	    alert(mouse_on_label);
+	    return mouse_on_label;		   
+	}
+    }   
+	alert(mouse_on_label);
     return mouse_on_label;
 }
 
