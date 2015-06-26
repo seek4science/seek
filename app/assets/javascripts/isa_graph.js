@@ -116,7 +116,7 @@ function animateNode(node){
     node.css({
         'font-size': 12,
         'font-weight': 'bolder',
-        'text-max-width': default_text_max_width+50
+        'text-max-width': default_text_max_width+40
     })
 
     if (node.data().name !== 'Hidden item'){
@@ -300,7 +300,7 @@ function mouseOnLabel(node, mouse_event){
         if (mouse_on_label == true){
 	        return mouse_on_label;
 	    }
-    }   
+    }
 
     return mouse_on_label;
 }
