@@ -18,7 +18,7 @@ function drawGraph(elements, current_element_id){
 
         style: cytoscape.stylesheet()
             .selector('node')
-            .style({
+            .css({
                 'shape': 'roundrectangle',
                 'border-color': 'data(borderColor)',
                 'border-width': 2,
@@ -32,11 +32,12 @@ function drawGraph(elements, current_element_id){
                 'width':default_node_width,
                 'height':default_node_height,
                 'font-size':default_font_size,
+                'text-wrap': 'wrap',
                 'text-max-width': default_text_max_width
             })
 
             .selector('edge')
-            .style({
+            .css({
                 'width': 1.5,
                 'target-arrow-shape': 'none',
                 'line-color': '#191975',
@@ -106,16 +107,20 @@ function animateNode(node){
         }
     });
 
-    node.style({
-        'width': 250,
-        'height': 50,
-        'font-size': 13,
+    node.animate({
+        css: { 'width':default_node_width+65, 'height':default_node_height+15 }
+    }, {
+        duration: 300
+    });
+
+    node.css({
+        'font-size': 12,
         'font-weight': 'bolder',
-        'text-max-width': 250
+        'text-max-width': default_text_max_width+50
     })
 
     if (node.data().name !== 'Hidden item'){
-        node.style({'color': '#0000e5'});
+        node.css({'color': '#0000e5'});
     }
     node.select();
 }
@@ -192,23 +197,23 @@ function alignCenterVertical(element, element_height){
 }
 
 function appearingNodes(nodes){
-    nodes.style({'opacity': 1});
+    nodes.css({'opacity': 1});
 }
 
 function appearingEdges(edges){
-    edges.style({'opacity': 1});
+    edges.css({'opacity': 1});
 }
 
 function fadingNodes(nodes){
-    nodes.style({'opacity': 0.3});
+    nodes.css({'opacity': 0.3});
 }
 
 function fadingEdges(edges){
-    edges.style({'opacity': 0.2});
+    edges.css({'opacity': 0.2});
 }
 
 function normalizingNodes(nodes){
-    nodes.style({
+    nodes.css({
         'width': default_node_width,
         'height': default_node_height,
         'font-size': default_font_size,
@@ -291,13 +296,12 @@ function mouseOnLabel(node, mouse_event){
     	var label_pos = labelPosition(node, lines[i], i+1, lines.length);
     	var mouse_posX = mouse_event.clientX;
     	var mouse_posY = mouse_event.clientY;
-	mouse_on_label = mouse_posX > label_pos.minX && mouse_posX < label_pos.maxX && mouse_posY > label_pos.minY && mouse_posY < label_pos.maxY;
+	    mouse_on_label = mouse_posX > label_pos.minX && mouse_posX < label_pos.maxX && mouse_posY > label_pos.minY && mouse_posY < label_pos.maxY;
         if (mouse_on_label == true){
-	    alert(mouse_on_label);
-	    return mouse_on_label;		   
-	}
+	        return mouse_on_label;
+	    }
     }   
-	alert(mouse_on_label);
+
     return mouse_on_label;
 }
 
