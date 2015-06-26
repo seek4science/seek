@@ -66,13 +66,14 @@ module HomesHelper
 
     entry_date, entry_title, feed_title, tooltip = feed_item_content_for_html(entry)
     html = '<li>'
-    html << link_to("#{(entry_title)}", "#{entry.url}", title: tooltip, target: '_blank')
+    html << link_to(entry_title.html_safe, entry.url, title: tooltip, target: '_blank')
     html << "<br/><span class='subtle'>"
     html << feed_title
     html << " - #{time_ago_in_words(entry_date)} ago" unless entry_date.nil?
     html << '</span>'
     html << '</li>'
     html.html_safe
+
   end
 
   def determine_entry_date(entry)
