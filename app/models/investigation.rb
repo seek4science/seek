@@ -1,9 +1,11 @@
+require 'seek/research_objects/acts_as_snapshottable'
 
 class Investigation < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
 
   acts_as_isa
+  acts_as_snapshottable
 
   attr_accessor :new_link_from_study
 

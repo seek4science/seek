@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150625131437) do
+ActiveRecord::Schema.define(:version => 20150629140310) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1256,6 +1256,15 @@ ActiveRecord::Schema.define(:version => 20150625131437) do
     t.boolean  "email_notification",            :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "snapshots", :force => true do |t|
+    t.string   "resource_type"
+    t.integer  "resource_id"
+    t.string   "doi"
+    t.integer  "snapshot_number"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
   end
 
   create_table "sop_auth_lookup", :id => false, :force => true do |t|
