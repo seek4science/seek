@@ -41,6 +41,7 @@ module Seek #:nodoc:
           snapshot = snapshots.create
           blob.asset = snapshot
           blob.save
+          snapshot
         end
 
       end

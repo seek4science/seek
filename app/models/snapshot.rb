@@ -29,7 +29,7 @@ class Snapshot < ActiveRecord::Base
   private
 
   def set_snapshot_number
-    snapshot_number = (resource.snapshots.select(:snapshot_number).map(&:snapshot_number).max || 0) + 1
+    self.snapshot_number = (resource.snapshots.select(:snapshot_number).map(&:snapshot_number).max || 0) + 1
   end
 
 end

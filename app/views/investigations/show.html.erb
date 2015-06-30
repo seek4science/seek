@@ -14,9 +14,8 @@
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => [@investigation.contributing_user.try(:person)] } %>
+    <%= render :partial=>"snapshots/snapshots",:locals => { :snapshots => @investigation.snapshots } %>
   </div>
 </div>
-
-
 
 <%= render :partial=>"general/items_related_to",:object => @investigation %>

@@ -1,2 +1,12 @@
-<h1><%= @snapshot.resource %> <small>snapshot <%= @snapshot.snapshot_number -%></small></h1>
+<h1><%= @snapshot.resource.title %> <small>snapshot <%= @snapshot.snapshot_number -%></small></h1>
 
+Made on <%= @snapshot.created_at %>
+
+<% if @snapshot.doi %>
+    DOI: <%= @snapshot.doi %>
+<% end %>
+
+<% h = JSON.parse(@snapshot.manifest) %>
+<pre>
+<%= h.pretty_inspect %>
+</pre>

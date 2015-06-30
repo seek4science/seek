@@ -1,0 +1,8 @@
+<%= panel("Snapshots") do %>
+    <% snapshots.order("created_at DESC").each do |snapshot| %>
+        <div>
+          <%= link_to "Snapshot #{snapshot.snapshot_number}", investigation_snapshot_path(@investigation.id, snapshot.snapshot_number) %>
+          <span class="subtle">(<%= time_ago_in_words(snapshot.created_at) %> ago)</span>
+        </div>
+    <% end %>
+<% end %>
