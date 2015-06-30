@@ -1,52 +1,52 @@
 module Seek #:nodoc:
+  module ResearchObjects
+    module Snapshottable #:nodoc:
 
-  module Snapshottable #:nodoc:
+      def self.included(mod)
+        mod.extend(ClassMethods)
+      end
 
-    def self.included(mod)
-      mod.extend(ClassMethods)
-    end
+      module ClassMethods
 
-    module ClassMethods
+        def acts_as_snapshottable
 
-      def acts_as_snapshottable
+          has_many :snapshots, as: :resource, foreign_key: :resource_id
 
-        has_many :snapshots, as: :resource, foreign_key: :resource_id
+          class_eval do
+            extend Seek::Snapshottable::SingletonMethods
+          end
 
-        class_eval do
-          extend Seek::Snapshottable::SingletonMethods
+          include Seek::Snapshottable::InstanceMethods
+
         end
 
-        include Seek::Snapshottable::InstanceMethods
+        def is_snapshottable?
+          include?(Seek::Snapshottable::InstanceMethods)
+        end
 
       end
 
-      def is_snapshottable?
-        include?(Seek::Snapshottable::InstanceMethods)
+      module SingletonMethods
+      end
+
+      module InstanceMethods
+
+        def snapshot
+          ro_file = Seek::ResearchObjects::Generator.instance.generate(self) # This only works for investigations
+          blob = ContentBlob.new({
+                                     tmp_io_object: ro_file,
+                                     content_type: Mime::Type.lookup_by_extension("ro").to_s,
+                                     original_filename: self.research_object_filename
+                                 })
+          snapshot = snapshots.create
+          blob.asset = snapshot
+          blob.save
+        end
+
       end
 
     end
-
-    module SingletonMethods
-    end
-
-    module InstanceMethods
-
-      def snapshot
-        ro_file = Seek::ResearchObjects::Generator.instance.generate(self) # This only works for investigations
-        blob = ContentBlob.new({
-            tmp_io_object: ro_file,
-            content_type: Mime::Type.lookup_by_extension("ro").to_s,
-            original_filename: self.research_object_filename
-        })
-        snapshot = snapshots.create
-        blob.asset = snapshot
-        blob.save
-      end
-
-    end
-
   end
-
 end
 
 ActiveRecord::Base.class_eval do
