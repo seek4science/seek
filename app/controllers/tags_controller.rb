@@ -25,16 +25,14 @@ class TagsController < ApplicationController
   end
 
   def latest
-    @tags = get_tags.limit(params[:limit] || 50).map {|t| t.text}
-
+    @tags = get_tags.limit(params[:limit] || 50).map(&:text)
     respond_to do |format|
       format.json { render :json => @tags.to_json }
     end
   end
 
   def query
-    @tags = get_tags.where("text LIKE ?", "#{params[:query]}%").uniq.limit(10).map {|t| t.text}
-
+    @tags = get_tags.where("text LIKE ?", "#{params[:query]}%").limit(20).map(&:text)
     respond_to do |format|
       format.json { render :json => @tags.to_json }
     end
@@ -64,7 +62,7 @@ class TagsController < ApplicationController
     TextValue.select(:text).
         joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" +
                                   "LEFT OUTER JOIN annotation_value_seeds ON annotation_value_seeds.value_id = text_values.id").
-        where("annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id", :attribute_id => attribute)
+        where("annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id", :attribute_id => attribute.id).uniq
   end
 
 end
