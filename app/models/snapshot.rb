@@ -1,3 +1,5 @@
+require 'zip'
+
 class Snapshot < ActiveRecord::Base
 
   belongs_to :resource, polymorphic: true
@@ -8,6 +10,20 @@ class Snapshot < ActiveRecord::Base
 
   def version # Hack to stop content blob moaning
     nil
+  end
+
+  def manifest
+    zip = Zip::File.open(content_blob.filepath)
+
+    begin
+      value = zip.read('.ro/manifest.json')
+    rescue Errno::ENOENT
+      value = nil
+    ensure
+      zip.close
+    end
+
+    value
   end
 
   private
