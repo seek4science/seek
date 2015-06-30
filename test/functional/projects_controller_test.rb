@@ -127,8 +127,20 @@ class ProjectsControllerTest < ActionController::TestCase
 		login_as(:aaron)
 		get :manage,:id=> Factory(:project)
     assert_not_nil flash[:error]
+ end
+
+
+  test "asset report with stuff in it can be accessed" do
+    person = Factory(:person)
+    publication = Factory(:publication)
+    publication.projects = person.projects
+    publication.save
+    project = person.projects.first
+    login_as(person.user)
+    get :asset_report,:id=>project.id
+    assert_response :success
   end
-  
+
   test "asset report visible to project member" do
     person = Factory :person
     project = person.projects.first
