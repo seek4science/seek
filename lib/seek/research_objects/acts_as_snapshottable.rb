@@ -13,15 +13,15 @@ module Seek #:nodoc:
           has_many :snapshots, as: :resource, foreign_key: :resource_id
 
           class_eval do
-            extend Seek::Snapshottable::SingletonMethods
+            extend Seek::ResearchObjects::Snapshottable::SingletonMethods
           end
 
-          include Seek::Snapshottable::InstanceMethods
+          include Seek::ResearchObjects::Snapshottable::InstanceMethods
 
         end
 
         def is_snapshottable?
-          include?(Seek::Snapshottable::InstanceMethods)
+          include?(Seek::ResearchObjects::Snapshottable::InstanceMethods)
         end
 
       end
@@ -50,5 +50,5 @@ module Seek #:nodoc:
 end
 
 ActiveRecord::Base.class_eval do
-  include Seek::Snapshottable
+  include Seek::ResearchObjects::Snapshottable
 end
