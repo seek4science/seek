@@ -2,7 +2,7 @@
    publications = @project.publications.select { |p| p.has_assets? }
 
    publications_all_public = publications.select do |pub|
-     assets = pub.all_related_models | pub.all_related_data_files
+     assets = pub.related_models | pub.related_data_files
      assets.detect { |asset| !asset.can_download?(nil) }.nil?
    end
    publications_not_all_public = publications - publications_all_public
