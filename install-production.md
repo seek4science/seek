@@ -153,7 +153,7 @@ restart the server.
 #### Search Service
 
 Create the file /etc/init.d/solr-seek and copy the contents of
-https://gist.github.com/3143434 into it.
+[https://gist.github.com/3143434](https://gist.github.com/3143434) into it.
 
 Then run
 
@@ -167,7 +167,7 @@ start it up with:
 #### Delayed Job Background Service
 
 Create the file /etc/init.d/delayed_job-seek and copy the contents of
-https://gist.github.com/e4219ec7cb161129f1c7 into it.
+[https://gist.github.com/e4219ec7cb161129f1c7](https://gist.github.com/e4219ec7cb161129f1c7) into it.
 
 The run:
 
@@ -181,7 +181,7 @@ start it up with:
 ### The LibreOffice Soffice service
 
 Create the file /etc/init.d/soffice and copy the contents of
-https://gist.github.com/3787679 into it.
+[https://gist.github.com/3787679](https://gist.github.com/3787679) into it.
 
 The run:
 
