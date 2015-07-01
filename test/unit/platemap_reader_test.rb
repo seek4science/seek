@@ -14,13 +14,12 @@ class PlatemapReaderTest < ActiveSupport::TestCase
 
     platemap_reader = PlatemapReader.new
 
-    sugar_and_strain_names = platemap_reader.read_in(df)
+    actual_sample_set = platemap_reader.read_in(df)
 
-    sugar_set = Set.new(['Raf', 'Gal'])
-    strain_set = Set.new(['WT', 'GAL1', 'GAL2', 'GAL3', 'GAL7', 'GAL80', 'GAL10'])
+    expected_sample_set = Set.new [[nil, 'Raf'], [nil, 'Gal'], ['WT', 'Raf'], ['WT', 'Gal'], ['GAL1', 'Raf'], ['GAL1', 'Gal'],
+                                   ['GAL2', 'Raf'], ['GAL2', 'Gal'], ['GAL3', 'Raf'], ['GAL3', 'Gal'], ['GAL7', 'Raf'],
+                                   ['GAL7', 'Gal'], ['GAL10', 'Raf'], ['GAL10', 'Gal'], ['GAL80', 'Raf'], ['GAL80', 'Gal']]
 
-    expected_s_and_s_names = {:sugar_names => sugar_set, :strain_names => strain_set}
-
-    assert_equal(expected_s_and_s_names, sugar_and_strain_names)
+    assert_equal(expected_sample_set, actual_sample_set)
   end
 end
