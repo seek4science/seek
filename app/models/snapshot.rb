@@ -1,16 +1,17 @@
 require 'zip'
 
+# Investigation "snapshot"
 class Snapshot < ActiveRecord::Base
 
   belongs_to :resource, polymorphic: true
-
   has_one :content_blob, as: :asset, foreign_key: :asset_id
 
   before_save :set_snapshot_number
 
-  def version # Hack to stop content blob moaning
-    nil
-  end
+  # Must quack like an asset version to behave with DOI code
+  alias_attribute :parent, :resource
+  alias_attribute :parent_id, :resource_id
+  alias_attribute :version, :snapshot_number
 
   def manifest
     zip = Zip::File.open(content_blob.filepath)
@@ -29,7 +30,7 @@ class Snapshot < ActiveRecord::Base
   private
 
   def set_snapshot_number
-    self.snapshot_number = (resource.snapshots.select(:snapshot_number).map(&:snapshot_number).max || 0) + 1
+    self.snapshot_number = (resource.snapshots.maximum(:snapshot_number) || 0) + 1
   end
 
 end
