@@ -28,23 +28,28 @@ class User < ActiveRecord::Base
   # Virtual attribute for the unencrypted password
   attr_accessor :password, :password_confirmation
   
-  validates_presence_of     :login,                      :unless => :using_openid?
-  validates_presence_of     :password,                   :if => :password_required?, :unless => :using_openid?
-  validates_presence_of     :password_confirmation,      :if => :password_required?, :unless => :using_openid?
+  validates     :login,presence: true, :unless => :using_openid?
+  validates     :password,presence: true, :if => :password_required?, :unless => :using_openid?
+  validates     :password_confirmation,presence: true, :if => :password_required?, :unless => :using_openid?
   validates_length_of       :password, :within => 4..40, :if => :password_required?, :unless => :using_openid?
   validates_confirmation_of :password,                   :if => :password_required?, :unless => :using_openid?
   validates_length_of       :login,    :within => 3..40, :unless => :using_openid?
   validates_uniqueness_of   :login, :case_sensitive => false
   validates_uniqueness_of   :openid, :case_sensitive => false, :allow_nil => true
+
+  validates :email,format: {with: RFC822::EMAIL}, if: "email"
+  validates :email, presence: true, if: :check_email_present?
   
   before_save :encrypt_password
   before_create :make_activation_code
 
+  attr_accessor :email
+  attr_writer :check_email_present
+
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :password, :password_confirmation, :openid
+  attr_accessible :login, :password, :password_confirmation, :openid, :email
 
-    
   has_many :favourite_groups, :dependent => :destroy
   
   scope :not_activated,where('activation_code IS NOT NULL')
@@ -59,6 +64,10 @@ class User < ActiveRecord::Base
     define_method "related_#{type}" do
       person.send "related_#{type}"
     end
+  end
+
+  def check_email_present?
+    !!@check_email_present
   end
 
   def user
@@ -191,7 +200,7 @@ class User < ActiveRecord::Base
   end
   
   def using_openid?
-    !openid.nil?
+    !openid.blank?
   end
 
   def is_admin?

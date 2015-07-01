@@ -11,6 +11,7 @@ class UsersController < ApplicationController
   
   # render new.rhtml
   def new
+    @user = User.new
   end
 
   def create
@@ -22,7 +23,8 @@ class UsersController < ApplicationController
     if using_open_id?
       open_id_authentication(params[:openid_identifier])
     else
-      @user = User.new(:login => params[:login], :password => params[:password], :password_confirmation => params[:password_confirmation])
+      @user = User.new(params[:user])
+      @user.check_email_present=true
       check_registration
     end
 
@@ -271,8 +273,8 @@ class UsersController < ApplicationController
   end
   
   def failed_registration(message)
-    flash[:error] = message
-    redirect_to(new_user_url)
+    flash.now[:error] = message
+    render :new
   end
   
   def successful_registration
