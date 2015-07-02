@@ -18,6 +18,8 @@ New pages require a formatter at the top, that looks like:
     layout: page
     ---
 
+For example, this page can be found at [https://raw.githubusercontent.com/seek4science/seek/gh-pages/contributing-to-pages.md](https://raw.githubusercontent.com/seek4science/seek/gh-pages/contributing-to-pages.md)
+
 If you want to view your changes as you edit them, with Ruby and Bundler installed you can do:
 
     bundle install
