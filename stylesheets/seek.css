@@ -6,6 +6,10 @@ html {
     font-size: 15px;
 }
 
+.main-content h1 {
+    font-weight: bolder;
+}
+
 #top-banner {
     text-align: center;
     background-color: #3f68a9;
