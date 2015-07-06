@@ -256,10 +256,6 @@ module Seek
             ActiveRecord::Base.connection.execute(sql)
           end
         end
-
-
-
-
       end
 
       def contributor_credited?
