@@ -117,7 +117,7 @@ function animateNode(node){
         'font-size': 12,
         'font-weight': 'bolder',
         'text-max-width': default_text_max_width+40
-    })
+    });
 
     if (node.data().name !== 'Hidden item'){
         node.css({'color': '#0000e5'});
@@ -220,7 +220,7 @@ function normalizingNodes(nodes){
         'font-weight': 'normal',
         'color': default_color,
         'text-max-width': default_text_max_width
-    })
+    });
     nodes.unselect();
 }
 
@@ -297,7 +297,7 @@ function mouseOnLabel(node, mouse_event){
     	var mouse_posX = mouse_event.clientX;
     	var mouse_posY = mouse_event.clientY;
 	    mouse_on_label = mouse_posX > label_pos.minX && mouse_posX < label_pos.maxX && mouse_posY > label_pos.minY && mouse_posY < label_pos.maxY;
-        if (mouse_on_label == true){
+        if (mouse_on_label === true){
 	        return mouse_on_label;
 	    }
     }
