@@ -13,7 +13,6 @@
     <%= f.error_messages %>
     <%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
     <%= render :partial => 'contact_details_form', :locals => {:f => f} %>
-    <%= hidden_field_tag :sysmo_member, true -%>
 
     <% unless Person.count==0 %> <%# not for the first person %>
         <h2><%= t('project').pluralize %> & Institutions</h2>

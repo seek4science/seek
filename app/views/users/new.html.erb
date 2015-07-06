@@ -25,36 +25,27 @@
   <div class="col-md-7 col-md-pull-5">
     <%= form_for @user do |f| -%>
 
-        <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="active">
-            <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Register</a>
-          </li>
-        </ul>
-        <div class="tab-content">
-          <div role="tabpanel" class="tab-pane active" id="login">
-            <div class="form-group">
-              <label>Login name</label>
-              <%= f.text_field :login, :class => 'form-control' %>
-              <p class="help-block">Login should contain a minimum of 3 characters.</p>
-            </div>
 
-            <div class="form-group">
-              <label>Email address</label>
-              <%= f.text_field :email, :class => 'form-control' %>
-            </div>
+        <div class="form-group">
+          <label>Login name</label>
+          <%= f.text_field :login, :class => 'form-control' %>
+          <p class="help-block">Login should contain a minimum of 3 characters.</p>
+        </div>
 
-            <div class="form-group">
-              <label>Password</label>
-              <%= f.password_field :password, :class => 'form-control' %>
-              <p class="help-block">Password should contain a minimum of 4 characters.</p>
-            </div>
+        <div class="form-group">
+          <label>Email address</label>
+          <%= f.text_field :email, :class => 'form-control' %>
+        </div>
 
-            <div class="form-group">
-              <label>Confirm Password</label>
-              <%= f.password_field :password_confirmation, :class => 'form-control' %>
-            </div>
-          </div>
+        <div class="form-group">
+          <label>Password</label>
+          <%= f.password_field :password, :class => 'form-control' %>
+          <p class="help-block">Password should contain a minimum of 4 characters.</p>
+        </div>
 
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <%= f.password_field :password_confirmation, :class => 'form-control' %>
         </div>
 
         <%= submit_tag 'Register', :disable_with=>"Registering...", :class => 'btn btn-primary' %>

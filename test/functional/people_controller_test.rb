@@ -108,7 +108,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'cannot access select form as registered user, even admin' do
     login_as Factory(:admin)
-    get :select
+    get :register
     assert_redirected_to(root_path)
     refute_nil flash[:error]
   end
@@ -1341,8 +1341,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_emails(3) do
       post :create,
            :person=>{:first_name=>"Fred",:last_name=>"BBB",:email=>"fred.bbb@email.com"},
-           :projects=>[proj1.id,proj2.id,project_without_manager.id],
-           :sysmo_member=>true
+           :projects=>[proj1.id,proj2.id,project_without_manager.id]
     end
 
     assert assigns(:person)
@@ -1394,4 +1393,26 @@ class PeopleControllerTest < ActionController::TestCase
 
   end
 
+  test "is this you? page for register with matching email" do
+    u = Factory(:brand_new_user)
+    refute u.person
+    p = Factory(:brand_new_person,:email=>"jkjkjk@theemail.com")
+    login_as(u)
+    get :register,:email=>"jkjkjk@theemail.com"
+    assert_response :success
+    assert_select "h1",:text=>"Is this you?",:count=>1
+    assert_select "p.list_item_attribute",:text=>/#{p.name}/,:count=>1
+    assert_select "h1",:text=>"New profile",:count=>0
+  end
+
+  test "new profile page when matching email matches person already registered" do
+    u = Factory(:brand_new_user)
+    refute u.person
+    p = Factory(:person,:email=>"jkjkjk@theemail.com")
+    login_as(u)
+    get :register,:email=>"jkjkjk@theemail.com"
+    assert_response :success
+    assert_select "h1",:text=>"Is this you?",:count=>0
+    assert_select "h1",:text=>"New profile",:count=>1
+  end
 end

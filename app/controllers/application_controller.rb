@@ -15,6 +15,8 @@ class ApplicationController < ActionController::Base
 
   before_filter :log_extra_exception_data
 
+  #if the logged in user is currently partially registered, force the continuation of the registration process
+  before_filter :partially_registered?
 
   after_filter :log_event
 
@@ -35,6 +37,10 @@ class ApplicationController < ActionController::Base
     User.with_current_user current_user do
       yield
     end
+  end
+
+  def partially_registered?
+    redirect_to register_people_path if (current_user && current_user.person.nil?)
   end
 
   def strip_root_for_xml_requests
