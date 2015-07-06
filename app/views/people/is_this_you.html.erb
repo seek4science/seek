@@ -1,0 +1,26 @@
+<%
+   person = Person.not_registered_with_matching_email(params[:email]).first
+%>
+Is this you?
+
+<%= form_for current_user do |f| %>
+    <div class="form-group">
+      <%= avatar(person) %><br/>
+      <label>Name: </label><%= person.name %><br/>
+      <label>Project(s): </label><%= person.projects.collect(&:title).join(", ") %><br/>
+      <label>Institution(s): </label><%= person.institutions.collect(&:title).join(", ") %><br/>
+      <%= f.hidden_field :person_id, value: person.id %>
+      <%= f.hidden_field :email, value: person.email %>
+
+      <%= f.submit "Yes", :class => 'btn btn-primary' %>
+      <%= link_to "No",
+                  register_people_path,
+                  :confirm => "Next you will be asked to create a profile, and you will need to select a different email address",
+                  :class => 'btn btn-primary' %>
+      <%= render :partial => "cancel_registration" %>
+    </div>
+<% end %>
+
+
+
+

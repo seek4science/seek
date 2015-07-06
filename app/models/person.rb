@@ -69,6 +69,11 @@ class Person < ActiveRecord::Base
 
   after_commit :queue_update_auth_table
 
+  #not registered profiles that match this email
+  def self.not_registered_with_matching_email email
+    self.not_registered.select{|person| person.email == email}
+  end
+
   def queue_update_auth_table
     if previous_changes.keys.include?("roles_mask")
       AuthLookupUpdateJob.new.add_items_to_queue self

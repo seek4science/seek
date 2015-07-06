@@ -27,10 +27,7 @@
 
         <ul class="nav nav-tabs" role="tablist">
           <li role="presentation" class="active">
-            <a href="#login" aria-controls="login" role="tab" data-toggle="tab">SEEK login</a>
-          </li>
-          <li role="presentation">
-            <a href="#openid" aria-controls="openid" role="tab" data-toggle="tab"><%= image_tag "openid-16x16.gif" %> OpenID</a>
+            <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Register</a>
           </li>
         </ul>
         <div class="tab-content">
@@ -58,16 +55,6 @@
             </div>
           </div>
 
-          <div role="tabpanel" class="tab-pane" id="openid">
-            <p>
-              If you aren't sure what an <a href="http://openid.net/" target="_blank">OpenID</a> is or whether or not you have one,
-              you can safely ignore this an register using a username and password using the form above.
-            </p>
-            <div class="form-group">
-              <label><%= image_tag "openid-16x16.gif" %> OpenID</label>
-              <%= f.text_field :openid, :class => 'form-control' %>
-            </div>
-          </div>
         </div>
 
         <%= submit_tag 'Register', :disable_with=>"Registering...", :class => 'btn btn-primary' %>

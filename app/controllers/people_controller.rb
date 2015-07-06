@@ -8,15 +8,15 @@ class PeopleController < ApplicationController
   include Seek::AdminBulkAction
 
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
-  before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
-  before_filter :is_during_registration,:only=>[:select]
+  before_filter :current_user_exists,:only=>[:register,:userless_project_selected_ajax,:create,:new]
+  before_filter :is_during_registration,:only=>[:register]
   before_filter :is_user_admin_auth,:only=>[:destroy,:new]
   before_filter :removed_params,:only=>[:update,:create]
   before_filter :administerable_by_user, :only => [:admin, :administer_update]
   before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
   skip_before_filter :project_membership_required, :only => [:create, :new]
-  skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
+  skip_before_filter :profile_for_login_required,:only=>[:register,:userless_project_selected_ajax,:create]
   skip_after_filter :request_publish_approval,:log_publishing, :only => [:create,:update]
 
   after_filter :reset_notifications, :only => [:administer_update]
@@ -133,18 +133,13 @@ class PeopleController < ApplicationController
   #
   #Page for after registration that allows you to select yourself from a list of
   #people yet to be assigned, or create a new one if you don't exist
-  def select
-    @userless_projects=Project.with_userless_people
-
-    #strip out project with no people with email addresses
-    #TODO: can be made more efficient by putting into a direct query in Project.with_userless_people - but not critical as this is only used during registration
-    @userless_projects = @userless_projects.select do |proj|
-      !proj.people.find{|person| !person.email.nil? && person.user.nil?}.nil?
+  def register
+    email = params[:email]
+    if email && Person.not_registered_with_matching_email(email).any?
+      render :is_this_you,:locals=>{:email=>email}
+    else
+      @person = Person.new(:email=>email)
     end
-
-    @userless_projects.sort!{|a,b|a.title<=>b.title}
-    @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
-
   end
 
   # POST /people

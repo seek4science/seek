@@ -136,14 +136,18 @@ class UsersController < ApplicationController
   
   def update    
     @user = User.find(params[:id])
-    person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?
-    @user.person=person if !person.nil?
-
-    #user was assigned to person, so auth update is needed
-    do_auth_update = params[:user][:person_id]
+    if @user==current_user && @user.person.nil? && (params[:user][:person_id]) && (params[:user][:email])
+      person_id = params[:user][:person_id]
+      email = params[:user][:email]
+      person=Person.not_registered.detect do |person|
+        person.id.to_s == person_id && person.email == email && person.user.nil?
+      end
+      @user.person=person
+      do_auth_update = !person.nil?
+    end
 
     if params[:user]
-      [:id, :person_id].each do |column_name|
+      [:id, :person_id,:email].each do |column_name|
         params[:user].delete(column_name)
       end
     end
@@ -151,7 +155,6 @@ class UsersController < ApplicationController
     @user.attributes=params[:user]    
 
     respond_to do |format|
-      
       if @user.save
         AuthLookupUpdateJob.new.add_items_to_queue(@user) if do_auth_update
         #user has associated himself with a person, so activation email can now be sent
@@ -281,7 +284,7 @@ class UsersController < ApplicationController
     @user.activate unless activation_required?
     self.current_user = @user
     @openid_details ||= nil
-    redirect_to(select_people_path(:openid_details => @openid_details))
+    redirect_to(register_people_path(:email=>@user.email))
   end
   
   def activation_required?

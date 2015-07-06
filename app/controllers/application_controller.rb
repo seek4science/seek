@@ -24,8 +24,6 @@ class ApplicationController < ActionController::Base
 
   rescue_from "ActiveRecord::RecordNotFound", :with=>:render_not_found_error
 
-  before_filter :profile_for_login_required
-
   before_filter :project_membership_required,:only=>[:create,:new]
 
   before_filter :restrict_guest_user, :only => [:new, :edit, :batch_publishing_preview]
@@ -58,18 +56,6 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
-  
-  #Overridden from restful_authentication
-  #Does a second check that there is a profile assigned to the user, and if not goes to the profile
-  #selection page (GET people/select)
-  def authorized?
-    if super
-      redirect_to(select_people_path) if current_user.person.nil?
-      true
-    else
-      false
-    end
-  end
 
   def is_current_user_auth
     begin
@@ -244,13 +230,6 @@ class ApplicationController < ActionController::Base
   #required for the Savage Beast
   def admin?
     User.admin_logged_in?
-  end
-
-  def profile_for_login_required
-    if User.logged_in? && !User.logged_in_and_registered?
-      flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
-      redirect_to main_app.select_people_path
-    end
   end
 
   def translate_action action_name
