@@ -1,8 +1,10 @@
 /*
-   Some cystoscape functions are overiden here, in order to:
-   - Fix bugs
-   - Change the default behavior which can not do through api or configuration
+ Some cystoscape functions are overiden here, in order to:
+ - Fix bugs
+ - Change the default behavior which can not do through api or configuration
  */
+
+
 
 (function($$){
 
@@ -810,5 +812,515 @@
             // end on thread ready
         }, 0);
     };
-})( cytoscape );
 
+
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+        var words = text.split(' ');
+        var line = '';
+
+        for (var n = 0; n < words.length; n++) {
+            var testLine = line + words[n] + ' ';
+            var metrics = context.measureText(testLine);
+            var testWidth = metrics.width;
+            testWidth = testWidth / ((lineHeight - 1) / 7);
+            if (testWidth > maxWidth && n > 0) {
+                context.fillText(line, x, y);
+                line = words[n] + ' ';
+                y += lineHeight;
+            }
+            else {
+                line = testLine;
+            }
+        }
+
+        context.fillText(line, x, y);
+    }
+
+    canvas_prototype.calculateLabelDimensions = function( ele, text, extraKey ){
+        var r = this;
+        var style = ele._private.style;
+        var fStyle = style['font-style'].strValue;
+        var size = style['font-size'].pxValue + 'px';
+        var family = style['font-family'].strValue;
+        // var variant = style['font-variant'].strValue;
+        var weight = style['font-weight'].strValue;
+
+        var cacheKey = ele._private.labelKey;
+
+        if( extraKey ){
+            cacheKey += '$@$' + extraKey;
+        }
+
+        var cache = r.labelDimCache || (r.labelDimCache = {});
+
+        if( cache[cacheKey] ){
+            return cache[cacheKey];
+        }
+
+        var div = this.labelCalcDiv;
+
+        if( !div ){
+            div = this.labelCalcDiv = document.createElement('div');
+            document.body.appendChild( div );
+        }
+
+        var ds = div.style;
+
+        // from ele style
+        ds.fontFamily = family;
+        ds.fontStyle = fStyle;
+        ds.fontSize = size;
+        // ds.fontVariant = variant;
+        ds.fontWeight = weight;
+
+        // forced style
+        ds.position = 'absolute';
+        ds.left = '-9999px';
+        ds.top = '-9999px';
+        ds.zIndex = '-1';
+        ds.visibility = 'hidden';
+        ds.pointerEvents = 'none';
+        ds.padding = '0';
+        ds.lineHeight = '1';
+
+        if( style['text-wrap'].value === 'wrap' ){
+            ds.whiteSpace = 'pre'; // so newlines are taken into account
+        } else {
+            ds.whiteSpace = 'normal';
+        }
+
+        // put label content in div
+        div.textContent = text;
+
+        cache[cacheKey] = {
+            width: div.clientWidth,
+            height: div.clientHeight
+        };
+
+        return cache[cacheKey];
+    };
+
+
+    canvas_prototype.getLabelText = function( ele ){
+        var style = ele._private.style;
+        var text = ele._private.style['content'].strValue;
+        var textTransform = style['text-transform'].value;
+        var rscratch = ele._private.rscratch;
+
+        if (textTransform == 'none') {
+        } else if (textTransform == 'uppercase') {
+            text = text.toUpperCase();
+        } else if (textTransform == 'lowercase') {
+            text = text.toLowerCase();
+        }
+
+        if(ele.isNode() && style['text-wrap'].value === 'wrap' ){
+            //console.log('wrap');
+
+            // save recalc if the label is the same as before
+            if( ele._private.labelWrapKey === ele._private.labelKey && ele._private.labelKey != null ){
+                // console.log('wrap cache hit');
+                return ele._private.labelWrapCachedText;
+            }
+            // console.log('wrap cache miss');
+
+            var lines = text.split('\n');
+            var maxW = style['text-max-width'].pxValue;
+            var wrappedLines = [];
+
+            for( var l = 0; l < lines.length; l++ ){
+                var line = lines[l];
+                var lineDims = this.calculateLabelDimensions( ele, line, 'line=' + line );
+                var lineW = lineDims.width;
+
+                if( lineW > maxW ){ // line is too long
+                    var words = line.split(/\s+/); // NB: assume collapsed whitespace into single space
+                    var subline = '';
+
+                    for( var w = 0; w < words.length; w++ ){
+                        var word = words[w];
+                        var testLine = subline.length === 0 ? word : subline + ' ' + word;
+                        var testDims = this.calculateLabelDimensions( ele, testLine, 'testLine=' + testLine );
+                        var testW = testDims.width;
+
+                        if( testW <= maxW ){ // word fits on current line
+                            subline += word + ' ';
+                        } else { // word starts new line
+                            wrappedLines.push( subline );
+                            subline = word + ' ';
+                        }
+                    }
+
+                    // if there's remaining text, put it in a wrapped line
+                    if( !subline.match(/^\s+$/) ){
+                        wrappedLines.push( subline );
+                    }
+                } else { // line is already short enough
+                    wrappedLines.push( line );
+                }
+            } // for
+
+            ele._private.labelWrapCachedLines = wrappedLines;
+            ele._private.labelWrapCachedText = text = wrappedLines.join('\n');
+            ele._private.labelWrapKey = ele._private.labelKey;
+
+            // console.log(text)
+        } // if wrap
+
+        return text;
+    };
+
+    // Draw text
+    canvas_prototype.drawText = function(context, element, textX, textY) {
+
+        var parentOpacity = 1;
+        var parents = element.parents();
+        for( var i = 0; i < parents.length; i++ ){
+            var parent = parents[i];
+            var opacity = parent._private.style.opacity.value;
+
+            parentOpacity = opacity * parentOpacity;
+
+            if( opacity === 0 ){
+                return;
+            }
+        }
+
+        // Font style
+        var labelStyle = element._private.style["font-style"].strValue;
+        var labelSize = element._private.style["font-size"].value + "px";
+        var labelFamily = element._private.style["font-family"].strValue;
+        var labelVariant = element._private.style["font-variant"].strValue;
+        var labelWeight = element._private.style["font-weight"].strValue;
+
+        context.font = labelStyle + " " + labelWeight + " "
+            + labelSize + " " + labelFamily;
+
+        //var text = String(element._private.style["content"].value);
+
+        var text = this.getLabelText( element );
+
+        // Calculate text draw position based on text alignment
+
+        // so text outlines aren't jagged
+        context.lineJoin = 'round';
+
+        context.fillStyle = "rgba("
+            + element._private.style["color"].value[0] + ","
+            + element._private.style["color"].value[1] + ","
+            + element._private.style["color"].value[2] + ","
+            + (element._private.style["text-opacity"].value
+            * element._private.style["opacity"].value * parentOpacity) + ")";
+
+        context.strokeStyle = "rgba("
+            + element._private.style["text-outline-color"].value[0] + ","
+            + element._private.style["text-outline-color"].value[1] + ","
+            + element._private.style["text-outline-color"].value[2] + ","
+            + (element._private.style["text-opacity"].value
+            * element._private.style["opacity"].value * parentOpacity) + ")";
+
+        if (text != undefined) {
+            var lineWidth = 2  * element._private.style["text-outline-width"].value; // *2 b/c the stroke is drawn centred on the middle
+            if (lineWidth > 0) {
+                context.lineWidth = lineWidth;
+                //context.strokeText(text, textX, textY);
+            }
+
+            // Thanks sysord@github for the isNaN checks!
+            if (isNaN(textX)) { textX = 0; }
+            if (isNaN(textY)) { textY = 0; }
+
+            //context.fillText("" + text, textX, textY);
+            var style = element._private.style;
+            var halign = style['text-halign'].value;
+            var valign = style['text-valign'].value;
+
+            var rstyle = element._private.rstyle;
+            var rscratch = element._private.rscratch;
+            if( element.isNode() && style['text-wrap'].value === 'wrap' ){ //console.log('draw wrap');
+                var lines = element._private.labelWrapCachedLines;
+                //var lineHeight = rstyle.labelHeight / lines.length;
+                var lineHeight = style['font-size'].value + 1;
+
+                //console.log('lines', lines);
+
+                switch( valign ){
+                    case 'top':
+                        textY -= (lines.length - 1) * lineHeight;
+                        break;
+
+                    case 'bottom':
+                        // nothing required
+                        break;
+
+                    default:
+                    case 'center':
+                        textY -= (lines.length - 1) * lineHeight / 2;
+                }
+
+                for( var l = 0; l < lines.length; l++ ){
+                    if( lineWidth > 0 ){
+                        context.strokeText( lines[l], textX, textY );
+                    }
+
+                    context.fillText( lines[l], textX, textY );
+
+                    textY += lineHeight;
+                }
+
+                // var fontSize = style['font-size'].pxValue;
+                // wrapText(context, text, textX, textY, style['text-max-width'].pxValue, fontSize + 1);
+            } else {
+                if( lineWidth > 0 ){
+                    context.strokeText(text, textX, textY);
+                }
+
+                if (element.isNode() && style['text-wrap'].value == 'wrap') {
+                    var fontSize = style['font-size'].pxValue;
+                    wrapText(context, text, textX, textY, style['text-max-width'].value, fontSize + 1);
+                } else {
+                    context.fillText(text, textX, textY);
+                }
+            }
+
+            // record the text's width for use in bounding box calc
+            element._private.rstyle.labelWidth = context.measureText( text ).width;
+        }
+    };
+
+    (function(){
+        var number = $$.util.regex.number;
+        var rgba = $$.util.regex.rgbaNoBackRefs;
+        var hsla = $$.util.regex.hslaNoBackRefs;
+        var hex3 = $$.util.regex.hex3;
+        var hex6 = $$.util.regex.hex6;
+
+        // each visual style property has a type and needs to be validated according to it
+        $$.style.types = {
+            zeroOneNumber: { number: true, min: 0, max: 1, unitless: true },
+            nonNegativeInt: { number: true, min: 0, integer: true, unitless: true },
+            size: { number: true, min: 0, enums: ["auto"] },
+            bgSize: { number: true, min: 0, allowPercent: true },
+            color: { color: true },
+            lineStyle: { enums: ["solid", "dotted", "dashed"] },
+            curveStyle: { enums: ["bundled", "bezier"] },
+            fontFamily: { regex: "^([\\w- ]+(?:\\s*,\\s*[\\w- ]+)*)$" },
+            fontVariant: { enums: ["small-caps", "normal"] },
+            fontStyle: { enums: ["italic", "normal", "oblique"] },
+            fontWeight: { enums: ["normal", "bold", "bolder", "lighter", "100", "200", "300", "400", "500", "600", "800", "900", 100, 200, 300, 400, 500, 600, 700, 800, 900] },
+            textDecoration: { enums: ["none", "underline", "overline", "line-through"] },
+            textTransform: { enums: ["none", "capitalize", "uppercase", "lowercase"] },
+            nodeShape: { enums: ["rectangle", "roundrectangle", "ellipse", "triangle",
+                "square", "pentagon", "hexagon", "heptagon", "octagon"] },
+            arrowShape: { enums: ["tee", "triangle", "square", "circle", "diamond", "none"] },
+            visibility: { enums: ["hidden", "visible"] },
+            valign: { enums: ["top", "center", "bottom"] },
+            halign: { enums: ["left", "center", "right"] },
+            positionx: { enums: ["left", "center", "right"], number: true, allowPercent: true },
+            positiony: { enums: ["top", "center", "bottom"], number: true, allowPercent: true },
+            bgRepeat: { enums: ["repeat", "repeat-x", "repeat-y", "no-repeat"] },
+            cursor: { enums: ["auto", "crosshair", "default", "e-resize", "n-resize", "ne-resize", "nw-resize", "pointer", "progress", "s-resize", "sw-resize", "text", "w-resize", "wait", "grab", "grabbing"] },
+            text: { string: true },
+            data: { mapping: true, regex: "^data\\s*\\(\\s*([\\w\\.]+)\\s*\\)$" },
+            mapData: { mapping: true, regex: "^mapData\\(([\\w\\.]+)\\s*\\,\\s*(" + number + ")\\s*\\,\\s*(" + number + ")\\s*,\\s*(" + number + "|\\w+|" + rgba + "|" + hsla + "|" + hex3 + "|" + hex6 + ")\\s*\\,\\s*(" + number + "|\\w+|" + rgba + "|" + hsla + "|" + hex3 + "|" + hex6 + ")\\)$" },
+            url: { regex: "^url\\s*\\(\\s*([^\\s]+)\\s*\\s*\\)|none|(.+)$" },
+            textWrap: { enums: ['none', 'wrap'] }
+        };
+
+        // define visual style properties
+        var t = $$.style.types;
+        $$.style.properties = [
+            // these are for elements
+            { name: "cursor", type: t.cursor },
+            { name: "text-valign", type: t.valign },
+            { name: "text-halign", type: t.halign },
+            { name: "color", type: t.color },
+            { name: "content", type: t.text },
+            { name: "text-outline-color", type: t.color },
+            { name: "text-outline-width", type: t.size },
+            { name: "text-outline-opacity", type: t.zeroOneNumber },
+            { name: "text-opacity", type: t.zeroOneNumber },
+            { name: "text-decoration", type: t.textDecoration },
+            { name: "text-transform", type: t.textTransform },
+            { name: "font-family", type: t.fontFamily },
+            { name: "font-style", type: t.fontStyle },
+            { name: "font-variant", type: t.fontVariant },
+            { name: "font-weight", type: t.fontWeight },
+            { name: "font-size", type: t.size },
+            { name: "min-zoomed-font-size", type: t.size },
+            { name: "visibility", type: t.visibility },
+            { name: "opacity", type: t.zeroOneNumber },
+            { name: "z-index", type: t.nonNegativeInt },
+            { name: "overlay-padding", type: t.size },
+            { name: "overlay-color", type: t.color },
+            { name: "overlay-opacity", type: t.zeroOneNumber },
+            { name: 'text-wrap', type: t.textWrap },
+            { name: 'text-max-width', type: t.size },
+
+            // these are just for nodes
+            { name: "background-color", type: t.color },
+            { name: "background-opacity", type: t.zeroOneNumber },
+            { name: "background-image", type: t.url },
+            { name: "background-position-x", type: t.positionx },
+            { name: "background-position-y", type: t.positiony },
+            { name: "background-repeat", type: t.bgRepeat },
+            { name: "background-size-x", type: t.bgSize },
+            { name: "background-size-y", type: t.bgSize },
+            { name: "border-color", type: t.color },
+            { name: "border-opacity", type: t.zeroOneNumber },
+            { name: "border-width", type: t.size },
+            { name: "border-style", type: t.lineStyle },
+            { name: "height", type: t.size },
+            { name: "width", type: t.size },
+            { name: "padding-left", type: t.size },
+            { name: "padding-right", type: t.size },
+            { name: "padding-top", type: t.size },
+            { name: "padding-bottom", type: t.size },
+            { name: "shape", type: t.nodeShape },
+
+            // these are just for edges
+            { name: "source-arrow-shape", type: t.arrowShape },
+            { name: "target-arrow-shape", type: t.arrowShape },
+            { name: "source-arrow-color", type: t.color },
+            { name: "target-arrow-color", type: t.color },
+            { name: "line-style", type: t.lineStyle },
+            { name: "line-color", type: t.color },
+            { name: "control-point-step-size", type: t.size },
+            { name: "curve-style", type: t.curveStyle },
+
+            // these are just for the core
+            { name: "selection-box-color", type: t.color },
+            { name: "selection-box-opacity", type: t.zeroOneNumber },
+            { name: "selection-box-border-color", type: t.color },
+            { name: "selection-box-border-width", type: t.size },
+            { name: "panning-cursor", type: t.cursor },
+            { name: "active-bg-color", type: t.color },
+            { name: "active-bg-opacity", type: t.zeroOneNumber },
+            { name: "active-bg-size", type: t.size }
+        ];
+
+        // allow access of properties by name ( e.g. $$.style.properties.height )
+        var props = $$.style.properties;
+        for( var i = 0; i < props.length; i++ ){
+            var prop = props[i];
+
+            props[ prop.name ] = prop; // allow lookup by name
+        }
+    })();
+
+
+    $$.styfn.updateStyleHints = function(ele){
+        if (ele.isNode()) {
+            var _p = ele._private;
+            var self = this;
+            var style = _p.style;
+
+            // set whether has pie or not; for greater efficiency
+            var hasPie = false;
+            if (_p.group === 'nodes' && self._private.hasPie) {
+                for (var i = 1; i <= $$.style.pieBackgroundN; i++) { // 1..N
+                    var size = _p.style['pie-' + i + '-background-size'].value;
+
+                    if (size > 0) {
+                        hasPie = true;
+                        break;
+                    }
+                }
+            }
+
+            _p.hasPie = hasPie;
+
+            var transform = style['text-transform'].strValue;
+            var content = style['content'].strValue;
+            var fStyle = style['font-style'].strValue;
+            var size = style['font-size'].pxValue + 'px';
+            var family = style['font-family'].strValue;
+            // var variant = style['font-variant'].strValue;
+            var weight = style['font-weight'].strValue;
+            var valign = style['text-valign'].strValue;
+            var halign = style['text-valign'].strValue;
+            var oWidth = style['text-outline-width'].pxValue;
+            var wrap = style['text-wrap'].strValue;
+            var wrapW = style['text-max-width'].pxValue;
+            _p.labelKey = fStyle + '$' + size + '$' + family + '$' + weight + '$' + content + '$' + transform + '$' + valign + '$' + halign + '$' + oWidth + '$' + wrap + '$' + wrapW;
+            _p.fontKey = fStyle + '$' + weight + '$' + size + '$' + family;
+
+            var width = style['width'].pxValue;
+            var height = style['height'].pxValue;
+            var borderW = style['border-width'].pxValue;
+            _p.boundingBoxKey = width + '$' + height + '$' + borderW;
+
+            if (ele._private.group === 'edges') {
+                var cpss = style['control-point-step-size'].pxValue;
+                var cpd = style['control-point-distance'] ? style['control-point-distance'].pxValue : undefined;
+                var cpw = style['control-point-weight'].value;
+                var curve = style['curve-style'].strValue;
+
+                _p.boundingBoxKey += '$' + cpss + '$' + cpd + '$' + cpw + '$' + curve;
+            }
+
+            _p.styleKey = Date.now(); // probably safe to use applied time and much faster
+            // for( var i = 0; i < $$.style.properties.length; i++ ){
+            //   var prop = $$.style.properties[i];
+            //   var eleProp = _p.style[ prop.name ];
+            //   var val = eleProp && eleProp.strValue ? eleProp.strValue : 'undefined';
+
+            //   _p.styleKey += '$' + val;
+            // }
+        }
+    };
+
+
+    $$.styfn.apply = function( eles ){
+        var self = this;
+
+        for( var ie = 0; ie < eles.length; ie++ ){
+            var ele = eles[ie];
+
+            if( self._private.newStyle ){
+                ele._private.styleCxts = [];
+                ele._private.style = {};
+            }
+
+            // apply the styles
+            for( var i = 0; i < this.length; i++ ){
+                var context = this[i];
+                var contextSelectorMatches = context.selector && context.selector.filter( ele ).length > 0; // NB: context.selector may be null for "core"
+                var props = context.properties;
+
+                if( contextSelectorMatches ){ // then apply its properties
+
+                    // apply the properties in the context
+
+                    for( var j = 0; j < props.length; j++ ){ // for each prop
+                        var prop = props[j];
+
+                        //if(prop.mapped) debugger;
+
+                        if( !ele._private.styleCxts[i] || prop.mapped ){
+                            this.applyParsedProperty( ele, prop, context );
+                        }
+                    }
+
+                    // keep a note that this context matches
+                    ele._private.styleCxts[i] = context;
+                } else {
+
+                    // roll back style cxts that don't match now
+                    if( ele._private.styleCxts[i] ){
+                        this.rollBackContext( ele, context );
+                    }
+
+                    delete ele._private.styleCxts[i];
+                }
+
+            } // for context
+
+        } // for elements
+
+        this.updateStyleHints(ele);
+
+        self._private.newStyle = false;
+    };
+
+})( cytoscape );
