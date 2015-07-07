@@ -39,10 +39,12 @@ class User < ActiveRecord::Base
 
   validates :email,format: {with: RFC822::EMAIL}, if: "email"
   validates :email, presence: true, if: :check_email_present?
+  validate :email_available?, if: :check_email_present?
   
   before_save :encrypt_password
   before_create :make_activation_code
 
+  #virtual attribute to hold email used to determine whether this user links to an existing
   attr_accessor :email
   attr_writer :check_email_present
 
@@ -286,6 +288,14 @@ class User < ActiveRecord::Base
     
   def make_activation_code
     self.activation_code = Digest::SHA1.hexdigest( Time.now.to_s.split(//).sort_by {rand}.join )
+  end
+
+  def email_available?
+    found = Person.where(:email=>email).select{|p| p.user}.any?
+    if found
+      errors.add(:email,"The email has already been registered")
+      return false
+    end
   end
     
 end

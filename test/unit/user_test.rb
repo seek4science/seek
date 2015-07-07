@@ -35,6 +35,22 @@ class UserTest < ActiveSupport::TestCase
     assert u.valid?
   end
 
+  test "check email available" do
+    #email must not belong to another person, unless that person is unregistered
+    u = Factory :user
+    u.check_email_present=true
+    u.email="ghghgh@email.com"
+    assert u.valid?
+    Factory(:person,:email=>"ghghgh@email.com")
+
+    refute u.valid?
+
+    Factory(:brand_new_person,:email=>"zzzzzz@email.com")
+    u.email="zzzzzz@email.com"
+    assert u.valid?
+
+  end
+
   test "validation of login" do
     u = Factory :user
     assert u.valid?
