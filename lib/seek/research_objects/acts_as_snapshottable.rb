@@ -44,14 +44,6 @@ module Seek #:nodoc:
           snapshot
         end
 
-        def find_version(v)
-          snapshots.where(:snapshot_number => v).first
-        end
-
-        def latest_version
-          snapshots.order('snapshot_number DESC').first
-        end
-
       end
 
     end
