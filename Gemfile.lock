@@ -848,3 +848,6 @@ DEPENDENCIES
   will_paginate (~> 3.0.4)
   yaml_db
   yui-compressor
+
+BUNDLED WITH
+   1.10.3

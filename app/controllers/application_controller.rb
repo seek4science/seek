@@ -451,7 +451,7 @@ class ApplicationController < ActionController::Base
         expire_download_activity
       elsif action=="create" && controller!="sessions"
         expire_create_activity
-      elsif action=="destroy"
+      elsif action=="destroy" && controller!="sessions"
         expire_create_activity
         expire_download_activity
       elsif action=="update" && @@auth_types.include?(controller) #may have had is permission changed

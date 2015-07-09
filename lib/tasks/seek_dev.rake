@@ -2,6 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'colorize'
+require 'benchmark'
 
 include SysMODB::SpreadsheetExtractor
 
@@ -231,6 +232,104 @@ namespace :seek_dev do
         puts "Error adding #{person.name}".red
         puts e
       end
+    end
+  end
+
+  desc "Benchmark data_file_auth_lookup"
+  task :benchmark_lookup_table => :environment do
+    data_file_step = 10000
+    user_step = 500
+
+    total_data_files = DataFile.count
+    total_users = User.count
+
+    user_count = 100
+    while (user_count < total_users)
+      data_file_count = 100
+      while (data_file_count < total_data_files)
+        bench = Benchmark.measure do
+          users = User.all.take(user_count)
+          table_name = DataFile.lookup_table_name
+          assets = DataFile.all(:include => :policy).take(data_file_count)
+          ActiveRecord::Base.transaction do
+            users.each do |user|
+              ActiveRecord::Base.connection.execute("delete from #{table_name} where user_id = #{user.id}")
+              c=0
+              assets.each do |asset|
+                asset.update_lookup_table user
+                c+=1
+                puts "#{c} done out of #{data_file_count} for #{DataFile.name}" if c%100==0
+              end
+              #count = ActiveRecord::Base.connection.select_one("select count(*) from #{table_name} where user_id = #{user.id}").values[0]
+              #puts "inserted #{count} records for #{DataFile.name}"
+            end
+          end
+          GC.start
+        end
+        puts "Insert into csv performance result for #{data_file_count} data files on #{user_count} users"
+
+        path = Rails.root.join('auth_lookup.csv')
+        row = [data_file_count, bench.total, bench.real, bench.utime, bench.stime, user_count]
+        if File.exists?(path)
+          CSV.open(Rails.root.join('auth_lookup.csv'), "a") do |csv|
+            csv << row
+          end
+        else
+          CSV.open(Rails.root.join('auth_lookup.csv'), "a", :write_headers => true, :headers => ["number of items", "total(s)", "real(s)", "user time(s)", "system time(s)", "number of user"]) do |csv|
+            csv << row
+          end
+        end
+        data_file_count += data_file_step
+      end
+      user_count += user_step
+    end
+  end
+
+  # after finishing benchmark, need to restart delayed jobs to remove the DataFileAuthLookupJob and get the normal jobs run.
+  desc "Benchmark data_file_auth_lookup table with delayed jobs"
+  task :benchmark_lookup_table_with_delayed_jobs => :environment do
+    user_step = 1000
+    total_users = User.count
+
+    delayed_job_step = 1
+    total_delayed_jobs = 1
+
+    user_count = 100
+    data_file_count = 100
+
+    while (user_count <= total_users)
+      delayed_job_count = 1
+      while (delayed_job_count <= total_delayed_jobs)
+        puts "Restart delayed jobs"
+	      Seek::Workers.stop
+	      Seek::Workers.start_data_file_auth_lookup_worker(delayed_job_count, data_file_count)
+        Delayed::Job.destroy_all
+        AuthLookupUpdateQueue.destroy_all
+        #DataFile.clear_lookup_table
+        users = User.all.take(user_count)
+        bench = Benchmark.measure do
+          puts "Start benchmark"
+          DataFileAuthLookupJob.new(data_file_count).add_items_to_queue(users, 1.seconds.from_now, 1)
+          #DataFileAuthLookupJob.new(data_file_count).add_items_to_queue(users.take(50), 1.seconds.from_now, 1)
+          #DataFileAuthLookupJob.new(data_file_count).add_items_to_queue(users.drop(50), 1.seconds.from_now, 1)
+          DataFileAuthLookupJob.new(data_file_count).perform
+        end
+        puts "Insert into csv performance result for #{user_count} users on #{delayed_job_count} delayed jobs"
+
+        path = Rails.root.join('auth_lookup.csv')
+        row = [user_count, bench.total, bench.real, bench.utime, bench.stime, delayed_job_count]
+        if File.exists?(path)
+          CSV.open(Rails.root.join('auth_lookup.csv'), "a") do |csv|
+            csv << row
+          end
+        else
+          CSV.open(Rails.root.join('auth_lookup.csv'), "a", :write_headers => true, :headers => [ "number of users", "total(s)", "real(s)", "user time(s)", "system time(s)", "number of delayed jobs"]) do |csv|
+            csv << row
+          end
+        end
+        delayed_job_count += delayed_job_step
+      end
+      user_count += user_step
     end
   end
 

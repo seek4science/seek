@@ -11,20 +11,20 @@
         <span class="caret"></span>
       </a>
       <ul class="dropdown-menu" role="menu">
-        <li role="presentation" class="dropdown-header"> Your details</li>
-        <li><%= link_to 'Your profile', person_path(current_person) -%></li>
+        <li role="presentation" class="dropdown-header"> My details</li>
+        <li><%= link_to 'My profile', person_path(current_person) -%></li>
         <li><%= link_to 'Edit profile', edit_person_path(current_person) -%></li>
         <li><%= link_to 'Change password', edit_user_path(current_user) -%></li>
 
         <% unless current_person.projects.empty? %>
-            <li role="presentation" class="dropdown-header"> Your projects</li>
+            <li role="presentation" class="dropdown-header"> My projects</li>
             <% current_person.projects.each do |project| %>
                 <li><%= link_to project.title, project_path(project) -%></li>
             <% end %>
         <% end %>
 
         <li role="presentation" class="dropdown-header">
-          Your favourites
+          My favourites
           <%= image_tag("ajax-loader.gif", :alt => "loading...", :title => "loading...",
                         :id => "fav_ajax-loader", :style => 'display: none') %>
         </li>
