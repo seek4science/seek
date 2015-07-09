@@ -26,6 +26,7 @@ module Seek
         rdf_graph = describe_type(rdf_graph)
         rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph = additional_triples rdf_graph
+        rdf_graph = parse_spreadsheet rdf_graph
         rdf_graph
       end
 
@@ -113,6 +114,50 @@ module Seek
 
         end
         rdf_graph
+      end
+
+      def parse_spreadsheet rdf_graph
+        if self.is_a? DataFile
+          if (self.respond_to?(:contains_extractable_spreadsheet?) && self.contains_extractable_spreadsheet?)
+            #TODO test if spreadsheet is swains
+            reader = PlatemapReader.new
+            samples = reader.read_in(self) #[[nil, 'Raf'],[nil, 'Gal'],['WT', 'Raf']...]
+            sample_no = 1
+            samples.each do |sample|
+              strain = sample.first
+              sugar = sample.second
+              sample_to_triple(strain, sugar, sample_no, self, rdf_graph)
+              sample_no = sample_no + 1
+            end
+          end
+        end
+        rdf_graph
+      end
+
+      def sample_to_triple strain, sugar, sample_no, data_file, rdf_graph
+        # TODO remove hardcoded uris
+        sample_uri = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/sample/DF#{self.id}_#{sample_no}")
+        strain_uri = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/#{strain}")
+        sugar_uri = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/#{sugar}")
+        associated_with = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith")
+        contains = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains")
+        derived_from = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#derivedFrom")
+        data_file_uri = data_file.rdf_resource
+
+        unless strain.nil? && sugar.nil?
+          # Data file associated with sample
+          rdf_graph << [data_file_uri, associated_with, sample_uri]
+
+          # Sample contains sugar
+          unless sugar.nil?
+            rdf_graph << [sample_uri, contains, sugar_uri]
+          end
+
+          # Sample derived from strain
+          unless strain.nil?
+            rdf_graph << [sample_uri, derived_from, strain_uri]
+          end
+        end
       end
 
       def describe_type rdf_graph

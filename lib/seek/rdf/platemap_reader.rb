@@ -1,4 +1,4 @@
-class PlatemapReader
+class Seek::Rdf::PlatemapReader
   require 'set'
   require 'csv'
   include SysMODB::SpreadsheetExtractor
@@ -36,4 +36,5 @@ class PlatemapReader
     end
     samples
   end
+
 end
