@@ -63,6 +63,29 @@ class BioSamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test "should have sop links in specimen table" do
+    strain = strains(:yeast1)
+    sop = Factory(:sop, :contributor => User.current_user)
+
+    specimen = Factory(:specimen, :strain => strain, :contributor => User.current_user)
+    login_as specimen.contributor
+    specimen.sops = [sop]
+    assert specimen.save
+    specimen.reload
+
+    assert specimen.can_view?
+    assert sop.can_view?
+
+    strain_ids = strain.id.to_s
+    get :existing_specimens, :strain_ids => strain_ids
+    assert_response :success
+
+    assert_select "table#specimen_table tbody" do
+      assert_select 'tr td a[href=?]', sop_path(sop), :count => 1
+      assert_select 'tr td', :text => specimen.id, :count => 1
+    end
+  end
+
   test "should show existing samples for selected specimens" do
     specimen1 = specimens("running mouse")
     samples_of_specimen1 = specimen1.samples.select(&:can_view?)
