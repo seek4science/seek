@@ -15,6 +15,12 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       @data_file_3.description = "this is data file 3"
       @data_file_3.version = 2
 
+
+      @strain_sugar_data_file = Factory(:data_file,
+                                        :content_blob => Factory(:spreadsheet_content_blob,
+                                                                 :data => File.new("#{Rails.root}/test/fixtures/files/rdf/GALgenes_contents.xlsx",
+                                                                                   "rb").read))
+
       skip("these tests need a configured triple store setup") unless @repository.configured?
       WebMock.allow_net_connect!
       @graph = RDF::URI.new @repository.get_configuration.private_graph
@@ -56,6 +62,45 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       puts q.pretty_inspect
       results = @repository.select(q)
       assert_equal 1, results.count
+    end
+
+
+    test 'query sugar and strain' do
+      @repository.send_rdf(@project)
+      @repository.send_rdf(@strain_sugar_data_file)
+      # SELECT ?s WHERE {
+      #  {?s <http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith> ?p}
+      # {?p <http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains> <http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf>}
+      #{?p <http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#derivedFrom> <http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/GAL1>}
+      # }
+      q = @repository.query.select.where(
+          [:s, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith"), :p],
+          [:p, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains"),
+           RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf")],
+          [:p, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#derivedFrom"),
+           RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/GAL1")]).from(@graph)
+
+      puts q.pretty_inspect
+      results = @repository.select(q)
+      assert_equal 1, results.count
+    end
+
+    test "create strain" do
+      @organism = Factory(:organism)
+
+      @strain = Factory(:strain)
+      @strain.organism = @organism
+      @strain.synonym = "another name for the strain"
+      @strain.title = "strain A"
+      @strain.description = "One of the strains"
+      @strain.pretty_inspect
+
+      @repository.send_rdf(@organism)
+      @repository.send_rdf(@strain)
+      q = @repository.query.select.where([:s, :p, :o]).from(@graph)
+      results = @repository.select(q)
+      puts results.pretty_inspect
+
     end
 
     test "singleton repository" do

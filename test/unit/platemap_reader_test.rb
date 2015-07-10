@@ -1,5 +1,7 @@
 require 'test_helper'
 require 'set'
+require 'csv'
+include SysMODB::SpreadsheetExtractor
 
 class PlatemapReaderTest < ActiveSupport::TestCase
 
@@ -9,28 +11,34 @@ class PlatemapReaderTest < ActiveSupport::TestCase
 
   test "read in platemap" do
 
-    df = Factory(:data_file,
-                 :content_blob => Factory(:spreadsheet_content_blob,
-                                          :data => File.new("#{Rails.root}/test/fixtures/files/rdf/GALgenes_contents.xlsx",
-                                                            "rb").read))
+    #   df = Factory(:data_file,
+    #               :content_blob => Factory(:spreadsheet_content_blob,
+    #                                       :data => File.new("#{Rails.root}/test/fixtures/files/rdf/GALgenes_contents.xlsx",
+    #                                                        "rb").read))
 
-    blob = df.content_blob
+    csv_data = spreadsheet_to_csv(open("#{Rails.root}/test/fixtures/files/rdf/GALgenes_contents.xlsx"))
+    platemap_reader = Seek::Rdf::PlatemapReader.new
 
-    platemap_reader = PlatemapReader.new
-
-    actual_sample_set = platemap_reader.read_in(df)
+    actual_sample_set = platemap_reader.read_in(csv_data)
 
     assert_equal(expected_sample_set, actual_sample_set)
   end
 
-  test "convert samples to rdf" do
+  # test "convert samples to rdf" do
+  # See "to rdf platemap spreadsheet" in data_file_test.rb
+  # end
 
-    platemap_reader = PlatemapReader.new
+  test "is platemap file" do
+    csv_data = spreadsheet_to_csv(open("#{Rails.root}/test/fixtures/files/rdf/GALgenes_contents.xlsx"))
+    platemap_reader = Seek::Rdf::PlatemapReader.new
+    actual = platemap_reader.is_platemap_file? csv_data
+    assert(actual==true, "Should recognise #{Rails.root}/test/fixtures/files/rdf/GALgenes_contents.xlsx as a platemap file")
+  end
 
-    actual_rdf = platemap_reader.to_rdf(expected_sample_set)
-
-    actual_sample_set = platemap_reader.read_in(df)
-
-    assert_equal(expected_sample_set, actual_sample_set)
+  test "is not platemap file" do
+    csv_data = spreadsheet_to_csv(open("#{Rails.root}/test/fixtures/files/rdf/glucoseAndpH.xls"))
+    platemap_reader = Seek::Rdf::PlatemapReader.new
+    actual = platemap_reader.is_platemap_file? csv_data
+    assert(actual==false, "Should recognise that #{Rails.root}/test/fixtures/files/rdf/glucoseAndpH.xls is not a platemap file")
   end
 end

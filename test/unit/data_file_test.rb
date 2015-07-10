@@ -288,13 +288,7 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-
-  test "to rdf swain spreadsheet" do
-
-    expected_sample_set = Set.new [[nil, 'Raf'], [nil, 'Gal'], ['WT', 'Raf'], ['WT', 'Gal'], ['GAL1', 'Raf'], ['GAL1', 'Gal'],
-                                   ['GAL2', 'Raf'], ['GAL2', 'Gal'], ['GAL3', 'Raf'], ['GAL3', 'Gal'], ['GAL7', 'Raf'],
-                                   ['GAL7', 'Gal'], ['GAL10', 'Raf'], ['GAL10', 'Gal'], ['GAL80', 'Raf'], ['GAL80', 'Gal']]
-
+  test "to rdf platemap spreadsheet" do
     df = Factory(:data_file,
                  :content_blob => Factory(:spreadsheet_content_blob,
                                           :data => File.new("#{Rails.root}/test/fixtures/files/rdf/GALgenes_contents.xlsx",
@@ -304,7 +298,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert_not_nil rdf
     #just checks it is valid rdf/xml and contains some statements for now
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert reader.statements.count > 0
+      assert reader.statements.count > 16
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
 
       #   enumerable.has_triple?([subject, predicate, object])
@@ -333,7 +327,7 @@ class DataFileTest < ActiveSupport::TestCase
                                  RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/GAL1"),])
     end
   end
-  #TODO test if spreadsheet is swains
+
   test "convert to presentation" do
       user = Factory :user
       attribution_df = Factory :data_file

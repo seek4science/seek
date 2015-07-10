@@ -16,11 +16,11 @@ class SearchRdfController < ApplicationController
     has_associated_item_uri = RDF::URI.new("http://www.mygrid.org.uk/ontology/JERMOntology#hasAssociatedItem")
 
     @sugar_query = params[:sugar_query]
-    @factor_query = params[:factor_query]
+    @strain_query = params[:strain_query]
 
-    logger.info "ET search query"
+    logger.info "rdf search query"
     logger.info @sugar_query
-    logger.info @factor_query
+    logger.info @strain_query
 
     @list_of_queries = []
 
@@ -34,12 +34,12 @@ class SearchRdfController < ApplicationController
       end
     end
 
-    if (!@factor_query.nil?)
-      @factor_query = Seek::Search::SearchTermFilter.filter @factor_query
+    if (!@strain_query.nil?)
+      @strain_query = Seek::Search::SearchTermFilter.filter @strain_query
 
-      if (!@factor_query.blank?) #TODO Also check if virtuoso is enabled
+      if (!@strain_query.blank?) #TODO Also check if virtuoso is enabled
         # http://www.semanticweb.org/eilidhtroup/ontologies/2015/2/sugar#glucose
-        factorQuery = RDF::URI.new("http://www.mygrid.org.uk/ontology/JERMOntology##{@factor_query}")
+        factorQuery = RDF::URI.new("http://www.mygrid.org.uk/ontology/JERMOntology##{@strain_query}")
         @list_of_queries.push([:s, has_associated_item_uri, factorQuery])
       end
     end
