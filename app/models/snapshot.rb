@@ -1,4 +1,5 @@
 require 'zip'
+require 'datacite/acts_as_doi_mintable'
 
 # Investigation "snapshot"
 class Snapshot < ActiveRecord::Base
@@ -12,6 +13,8 @@ class Snapshot < ActiveRecord::Base
   alias_attribute :parent, :resource
   alias_attribute :parent_id, :resource_id
   alias_attribute :version, :snapshot_number
+
+  acts_as_doi_mintable
 
   def manifest
     zip = Zip::File.open(content_blob.filepath)
@@ -33,4 +36,20 @@ class Snapshot < ActiveRecord::Base
     self.snapshot_number = (resource.snapshots.maximum(:snapshot_number) || 0) + 1
   end
 
+  # DOI overrides
+  def datacite_metadata # TODO: this needs to come from the RO
+    resource.datacite_metadata.merge(:identifier => suggested_doi)
+  end
+
+  def doi_resource_type
+    resource_type.downcase
+  end
+
+  def doi_resource_id
+    "#{resource_id}.#{snapshot_number}"
+  end
+
+  def doi_target_url
+    investigation_snapshot_url(resource, snapshot_number, :host => DataCite::DoiMintable.host)
+  end
 end
