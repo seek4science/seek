@@ -25,7 +25,7 @@ module DataCite
       def acts_as_doi_mintable
         include DataCite::DoiMintable::InstanceMethods
 
-        include Rails.application.routes.helpers # For URL generation
+        include Rails.application.routes.url_helpers # For URL generation
       end
 
     end
