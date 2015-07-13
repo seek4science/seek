@@ -22,6 +22,7 @@ module Seek
         file ||= temp_file(DEFAULT_FILENAME)
         ROBundle::File.create(file) do |bundle|
           bundle.created_by = create_agent
+          store_metadata(bundle, investigation, '')
           gather_entries(investigation).each do |entry|
             store_metadata(bundle, entry)
             store_files(bundle, entry) if entry.is_asset?
@@ -42,8 +43,8 @@ module Seek
 
       # generates and stores the metadata for the item, using the handlers
       # defined by #metdata_handlers
-      def store_metadata(bundle, item)
-        metadata_handlers.each { |handler| handler.store(bundle, item) }
+      def store_metadata(bundle, item, path = nil)
+        metadata_handlers.each { |handler| handler.store(bundle, item, path) }
       end
 
       # the current metadata handlers - JSON and RDF

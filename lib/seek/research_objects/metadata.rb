@@ -6,12 +6,19 @@ module Seek
     class Metadata
       include Seek::ResearchObjects::Utils
 
-      def store(bundle, item)
+      def store(bundle, item, path = nil)
         tmpfile = Tempfile.new(metadata_filename)
         tmpfile << metadata_content(item)
         tmpfile.close
 
-        targetpath = File.join(item.research_object_package_path, metadata_filename)
+        if path.nil?
+          targetpath = File.join(item.research_object_package_path, metadata_filename)
+        elsif path.blank?
+          targetpath = metadata_filename
+        else
+          targetpath = File.join(item.research_object_package_path, metadata_filename)
+        end
+
         bundle.add(targetpath, tmpfile, aggregate: false)
         bundle.commit
 
