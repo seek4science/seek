@@ -53,7 +53,7 @@ function drawGraph(elements, current_element_id){
 
             //process only when having nodes
             if (nodes.length > 0){
-                processPanzoom();
+                //processPanzoom();
 
                 nodes.on('click', function(e){
                     var node = e.cyTarget;
