@@ -9,7 +9,7 @@ module Seek
         prefix = research_object_package_path(item.study, prefix) if item.is_a?(Assay)
         prefix = research_object_package_path(item.investigation, prefix) if item.is_a?(Study)
 
-        prefix + ro_package_path_type_fragment(item) + '/' + ro_package_path_id_fragment(item)
+        prefix + ro_package_path_type_fragment(item) + '/' + ro_package_path_id_fragment(item) + '/'
       end
 
       def ro_package_path_type_fragment(item = self)
