@@ -60,7 +60,6 @@ module DataCite
           :title => title,
           :description => description,
           :creators => [contributor.try(:person)],
-          :content_type => ['Dataset', 'Dataset'],
           :year => Time.now.year.to_s,
           :publisher => Seek::Config.project_name
         )
