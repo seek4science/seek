@@ -48,10 +48,12 @@ module DataCite
     end
 
     def description(desc)
-      @xml.descriptions do
-        @xml.description ActionView::Base.full_sanitizer.sanitize(desc),
-                         'xml:lang' => 'en-gb',
-                         'descriptionType' => 'Abstract'
+      unless desc.blank?
+        @xml.descriptions do
+          @xml.description ActionView::Base.full_sanitizer.sanitize(desc),
+                           'xml:lang' => 'en-gb',
+                           'descriptionType' => 'Abstract'
+        end
       end
     end
 
