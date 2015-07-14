@@ -31,7 +31,7 @@ module Seek #:nodoc:
 
       module InstanceMethods
 
-        def snapshot
+        def create_snapshot
           ro_file = Seek::ResearchObjects::Generator.instance.generate(self) # This only works for investigations
           blob = ContentBlob.new({
                                      tmp_io_object: ro_file,
@@ -42,6 +42,10 @@ module Seek #:nodoc:
           blob.asset = snapshot
           blob.save
           snapshot
+        end
+
+        def snapshot(number)
+          snapshots.where(:snapshot_number => number).first
         end
 
       end
