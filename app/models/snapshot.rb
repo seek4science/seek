@@ -30,15 +30,28 @@ class Snapshot < ActiveRecord::Base
     value
   end
 
+  def title
+    research_object_metadata['title']
+  end
+
+  def description
+    research_object_metadata['description']
+  end
+
+  def contributor
+    Person.find(research_object_metadata['contributor']['uri'].match(/people\/(.)/)[1])
+  end
+
+  def research_object
+    ROBundle::File.open(content_blob.filepath) do |ro|
+      yield ro
+    end
+  end
+
   private
 
   def set_snapshot_number
     self.snapshot_number = (resource.snapshots.maximum(:snapshot_number) || 0) + 1
-  end
-
-  # DOI overrides
-  def datacite_metadata # TODO: this needs to come from the RO
-    resource.datacite_metadata.merge(:identifier => suggested_doi)
   end
 
   def doi_resource_type
@@ -51,5 +64,17 @@ class Snapshot < ActiveRecord::Base
 
   def doi_target_url
     investigation_snapshot_url(resource, snapshot_number, :host => DataCite::DoiMintable.host)
+  end
+
+  def research_object_metadata
+    @ro_data ||= parse_manifest
+  end
+
+  def parse_manifest
+    json = {}
+    research_object do |ro|
+      json = JSON.parse(ro.read('metadata.json'))
+    end
+    json
   end
 end
