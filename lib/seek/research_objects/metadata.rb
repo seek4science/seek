@@ -16,7 +16,7 @@ module Seek
         elsif path.blank?
           targetpath = metadata_filename
         else
-          targetpath = File.join(item.research_object_package_path, metadata_filename)
+          targetpath = File.join(path, metadata_filename)
         end
 
         bundle.add(targetpath, tmpfile, aggregate: false)
