@@ -80,22 +80,21 @@ module Seek
       endpoint = Datacite.new(username, password, url)
 
       metadata_xml = generate_metadata_xml
-      upload_response = endpoint.upload_metadata metadata_xml
-      return false unless validate_response(upload_response)
+      begin
+        endpoint.upload_metadata metadata_xml
+      rescue Exception => e
+        flash[:error] = "There is a problem working with DataCite Metadata Store service: #{e.inspect}"
+        return false
+      end
 
       url = asset_url
-      mint_response = endpoint.mint(@doi, url)
-      return false unless validate_response(mint_response)
-      true
-    end
-
-    def validate_response response
-      if response.include?('OK')
-        true
-      else
-        flash[:error] = "There is a problem working with DataCite Metadata Store service: #{response}"
-        false
+      begin
+        endpoint.mint(@doi, url)
+      rescue Exception => e
+        flash[:error] = "There is a problem working with DataCite Metadata Store service: #{e.inspect}"
+        return false
       end
+      true
     end
 
     def concat_attribute_to(node, attribute, value, xml)

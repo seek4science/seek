@@ -88,7 +88,7 @@ gem 'metainspector'
 gem 'mechanize'
 gem 'mimemagic'
 
-gem 'datacite_doi_ify'
+gem 'datacite_doi_ify', '~>1.1.0'
 
 gem 'bootstrap-sass', '3.1.1.0'
 gem 'sass-rails', '>= 3.2'

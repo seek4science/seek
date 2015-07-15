@@ -239,7 +239,7 @@ GEM
       safe_yaml (~> 1.0.0)
     curb (0.8.8)
     daemons (1.1.9)
-    datacite_doi_ify (1.0.0)
+    datacite_doi_ify (1.1.0)
       rest-client (~> 1.7)
     delayed_job (4.0.6)
       activesupport (>= 3.0, < 5.0)
@@ -763,7 +763,7 @@ DEPENDENCIES
   country-select
   coveralls
   daemons
-  datacite_doi_ify
+  datacite_doi_ify (~> 1.1.0)
   delayed_job_active_record
   docsplit
   doi_query_tool!
