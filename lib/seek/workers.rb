@@ -31,5 +31,11 @@ module Seek
     def self.restart(number = 0)
       start(number, true)
     end
+
+    def self.start_data_file_auth_lookup_worker(number=1, data_file_count=1)
+      action = "start"
+      commands = ["--queue=#{DataFileAuthLookupJob.new(data_file_count).queue_name} -n #{number} #{action}"]
+      commands.map { |c| Delayed::Command.new(c.split).daemonize }
+    end
   end
 end
