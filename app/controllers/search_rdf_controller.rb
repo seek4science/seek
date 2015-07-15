@@ -5,6 +5,9 @@ class SearchRdfController < ApplicationController
   end
 
   def search
+    @sugar_query = nil
+    @strain_query = nil
+    @results = nil
 
     # skip("these tests need a configured triple store setup") unless @repository.configured?
     # TODO handle repository not set up/ accessable
@@ -13,8 +16,9 @@ class SearchRdfController < ApplicationController
     @repository = Seek::Rdf::RdfRepository.instance
     @graph = RDF::URI.new @repository.get_configuration.private_graph
     @public_graph = RDF::URI.new @repository.get_configuration.public_graph
-    has_associated_item_uri = RDF::URI.new("http://www.mygrid.org.uk/ontology/JERMOntology#hasAssociatedItem")
-
+    associated_with = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith")
+    contains = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains")
+    derived_from = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#derivedFrom")
     @sugar_query = params[:sugar_query]
     @strain_query = params[:strain_query]
 
@@ -24,27 +28,33 @@ class SearchRdfController < ApplicationController
 
     @list_of_queries = []
 
+    #   q = @repository.query.select.where(
+    #       [:s, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith"), :p],
+    #       [:p, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains"),
+    #        RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf")],
+    #       [:p, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#derivedFrom"),
+    #        RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/GAL1")]).from(@graph)
+
     if (!@sugar_query.nil?)
       @sugar_query = Seek::Search::SearchTermFilter.filter @sugar_query
 
       if (!@sugar_query.blank?) #TODO Also check if virtuoso is enabled
         # http://www.semanticweb.org/eilidhtroup/ontologies/2015/2/sugar#glucose
-        sugarQuery = RDF::URI.new("http://www.semanticweb.org/eilidhtroup/ontologies/2015/2/sugar##{@sugar_query}")
-        @list_of_queries.push([:s, has_associated_item_uri, sugarQuery])
+        @sugar_query.capitalize!
+        sugarQuery = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/#{@sugar_query}")
+        @list_of_queries.push([:sample, contains, sugarQuery])
       end
     end
 
     if (!@strain_query.nil?)
       @strain_query = Seek::Search::SearchTermFilter.filter @strain_query
-
+      @strain_query.upcase!
       if (!@strain_query.blank?) #TODO Also check if virtuoso is enabled
         # http://www.semanticweb.org/eilidhtroup/ontologies/2015/2/sugar#glucose
-        factorQuery = RDF::URI.new("http://www.mygrid.org.uk/ontology/JERMOntology##{@strain_query}")
-        @list_of_queries.push([:s, has_associated_item_uri, factorQuery])
+        strainQuery = RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/#{@strain_query}")
+        @list_of_queries.push([:sample, derived_from, strainQuery])
       end
     end
-#    q = @repository.query.select.where([:s, RDF::URI.new("http://purl.org/dc/terms/hasVersion"), '2'],
-#                                      [:s, RDF::URI.new("http://purl.org/dc/terms/description"), 'this is data file 1']).from(@graph)
 
     puts "@list_of_queries"
     puts @list_of_queries
@@ -52,23 +62,14 @@ class SearchRdfController < ApplicationController
 
     unless (@list_of_queries.empty?)
 
+      @list_of_queries.push([:data_file, associated_with, :sample])
       # do query
       q = @repository.query.select.where(*@list_of_queries).from(@graph)
-      results = @repository.select(q).collect { |result| result[:s] }
+      @results = @repository.select(q).collect { |result| result[:data_file] }
 
-      results.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq
+      @results = @results.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq
 
-      puts "*** results ***"
-      results.pretty_inspect
-      puts "class"
-      print(results[0].class.name)
-
-      #    @results = []
-      #   results.each { |result| @results.push(get_object_from_url(result)) }
-
-      @results = get_active_records_from_urls(results)
-      puts "*** @results ***"
-      @results.pretty_inspect
+      @results = get_active_records_from_urls(@results)
 
       @results = select_authorised @results
     end

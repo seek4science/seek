@@ -80,10 +80,51 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
           [:p, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#derivedFrom"),
            RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/GAL1")]).from(@graph)
 
+      #   q = @repository.query.select.where(*@list_of_queries).from(@graph)
+      #   results = @repository.select(q).collect { |result| result[:data_file] }
+
+      #    results.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq!
+
       puts q.pretty_inspect
       results = @repository.select(q)
+      puts results.pretty_inspect
+
       assert_equal 1, results.count
     end
+
+    test 'query for sugar only returns one data file, although there are many samples' do
+      @repository.send_rdf(@project)
+      @repository.send_rdf(@strain_sugar_data_file)
+
+      q = @repository.query.select.where(
+          [:s, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith"), :p],
+          [:p, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains"),
+           RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf")]).from(@graph)
+
+      #   q = @repository.query.select.where(*@list_of_queries).from(@graph)
+      #   results = @repository.select(q).collect { |result| result[:data_file] }
+
+      #    results.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq!
+
+      puts q.pretty_inspect
+      results = @repository.select(q)
+      puts "Results"
+      puts results.pretty_inspect
+
+      collected = results.collect { |result| result[:s] }
+      puts 'Collected'
+      puts collected.pretty_inspect
+
+      unique = collected.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq
+
+      puts 'unique'
+      puts unique.pretty_inspect
+      puts 'Collected'
+      puts collected.pretty_inspect
+
+      assert_equal 1, unique.count, "should remove duplicate answers"
+    end
+
 
     test "create strain" do
       @organism = Factory(:organism)

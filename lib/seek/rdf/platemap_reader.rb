@@ -49,10 +49,10 @@ class Seek::Rdf::PlatemapReader
             sample = [nil, nil]
             # Strain = first word
             strain = cell[/^\w+/]
-            sample[0] = strain unless strain == 'null'
+            sample[0] = strain.upcase unless strain == 'null'
             # Sugar = last word
             sugar = cell[/\w+$/]
-            sample[1] = sugar
+            sample[1] = sugar.capitalize
             samples.add(sample)
           end
         end
