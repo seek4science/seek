@@ -7,7 +7,7 @@ class Snapshot < ActiveRecord::Base
   belongs_to :resource, polymorphic: true
   has_one :content_blob, as: :asset, foreign_key: :asset_id
 
-  before_save :set_snapshot_number
+  before_create :set_snapshot_number
 
   # Must quack like an asset version to behave with DOI code
   alias_attribute :parent, :resource
