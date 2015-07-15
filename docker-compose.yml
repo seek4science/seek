@@ -1,11 +1,26 @@
-db:
+db: # Database implementation
   image: postgres
-  ports:
-    - "5432:5432"
-seek:
+  volumes_from:
+    - dbdata
+
+dbdata: # Data container for DB
+  image: postgres
+  command: /bin/echo Postgres data container
+
+seekdata: # Data container for SEEK filestore
+  image: ubuntu:14.04
+  command: mkdir /home/app/seek/filestore && /bin/echo SEEK data container
+  volumes:
+    - /home/app/seek/filestore
+
+seek: # The SEEK application, passenger, solr and delayed_job worker
   build: .
   command: docker/entrypoint.sh
+  environment:
+      RAILS_ENV: production
   ports:
     - "80:80"
   links:
     - db
+  volumes_from:
+    - seekdata
