@@ -70,10 +70,18 @@ class SearchRdfController < ApplicationController
       @results = @results.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq
 
       @results = get_active_records_from_urls(@results)
-
+      @assays = get_assays_for_data_files(@results)
+      @results.push(@assays).flatten!
       @results = select_authorised @results
     end
+  end
 
+  def get_assays_for_data_files active_records
+    assays = []
+    active_records.each do |record|
+      assays << record.assays if record.is_a? DataFile
+    end
+    assays
   end
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current user (if one is logged in)
