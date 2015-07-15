@@ -224,7 +224,11 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
-    resources :snapshots, :only => [:show, :create]
+    resources :snapshots, :only => [:show, :create] do
+      member do
+        post :mint_doi
+      end
+    end
     member do
       get :new_object_based_on_existing_one
     end

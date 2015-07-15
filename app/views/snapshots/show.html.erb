@@ -1,12 +1,21 @@
-<h1><%= @snapshot.resource.title %> <small>snapshot <%= @snapshot.snapshot_number -%></small></h1>
-
-Made on <%= @snapshot.created_at %>
-
-<% if @snapshot.doi %>
-    DOI: <%= @snapshot.doi %>
+<% title = capture do %>
+    <%= @snapshot.title -%>
+    <small>(snapshot <%= @snapshot.snapshot_number -%>)</small>
 <% end %>
+<%= render :partial => "general/page_title", :locals => { :title => title, :buttons_partial => 'snapshots/buttons' } %>
 
-<% h = JSON.parse(@snapshot.manifest) %>
-<pre>
-<%= h.pretty_inspect %>
-</pre>
+
+<div class="row">
+  <div class="col-md-9 col-sm-8">
+    <%= item_description @snapshot.description -%>
+    <% if @snapshot.doi %>
+        <p><strong>DOI:</strong> <%= @snapshot.doi -%></p>
+    <% end %>
+    <p><strong>Created at:</strong> <%= @snapshot.created_at %></p>
+    <% h = JSON.parse(@snapshot.manifest) %>
+    <pre><%= h.pretty_inspect %></pre>
+  </div>
+  <div class="col-md-3 col-sm-4">
+    <%= render :partial=>"snapshots/snapshots",:locals => { :snapshots => @snapshot.resource.snapshots, :selected => @snapshot } %>
+  </div>
+</div>

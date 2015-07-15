@@ -1,0 +1,3 @@
+<% if @investigation.can_manage? && @snapshot.doi.blank? %>
+    <%= button_link_to("Generate a DOI", 'doi', mint_doi_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), :method => :post) %>
+<% end %>

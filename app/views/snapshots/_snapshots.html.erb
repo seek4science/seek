@@ -1,7 +1,12 @@
+<% selected ||= nil %>
 <%= panel("Snapshots") do %>
     <% snapshots.order("created_at DESC").each do |snapshot| %>
         <div>
-          <%= link_to "Snapshot #{snapshot.snapshot_number}", investigation_snapshot_path(@investigation.id, snapshot.snapshot_number) %>
+          <% if snapshot == selected %>
+              <%= content_tag :strong, "Snapshot #{snapshot.snapshot_number}" %>
+          <% else %>
+              <%= link_to "Snapshot #{snapshot.snapshot_number}", investigation_snapshot_path(@investigation.id, snapshot.snapshot_number) %>
+          <% end %>
           <span class="subtle">(<%= time_ago_in_words(snapshot.created_at) %> ago)</span>
         </div>
     <% end %>

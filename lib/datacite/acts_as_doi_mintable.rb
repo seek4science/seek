@@ -33,25 +33,26 @@ module DataCite
     module InstanceMethods
 
       def mint_doi
+        unless doi.blank?
+          errors.add(:doi, 'already minted')
+          return false
+        end
         # username = Seek::Config.datacite_username
         # password = Seek::Config.datacite_password_decrypt
         # url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
         # endpoint = Datacite.new(username, password, url)
         #
-        # upload_response = endpoint.upload_metadata(datacite_metadata.to_s)
-        # return false unless validate_response(upload_response)
+        # endpoint.upload_metadata(datacite_metadata.to_s)
+        # endpoint.mint(suggested_doi, doi_target_url)
         #
-        # url = asset_url
-        # mint_response = endpoint.mint(generate_doi, url)
-        # return false unless validate_response(mint_response)
+
         puts datacite_metadata.to_s
         puts
         puts suggested_doi
         puts
         puts doi_target_url
         puts
-
-        true
+        update_attribute(:doi, suggested_doi)
       end
 
       def datacite_metadata
