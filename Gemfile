@@ -96,6 +96,7 @@ gem 'sass-rails', '>= 3.2'
 gem 'ro-bundle'
 gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
+gem 'bootstrap-multiselect-rails'
 gem 'handlebars_assets'
 
 group :assets do

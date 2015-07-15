@@ -1,0 +1,42 @@
+<%= panel("#{t('project').pluralize} and Institutions") do %>
+    <p>
+      If you already belong to a <%= t('project') %>, please see it is listed below and if so select it. If you are in a
+      project that is not listed, then please select "Other" and provide the name of the project.
+      Likewise, also indicate if you belong to an already defined Institution, or provide the name if you cannot find it listed.
+    </p>
+    <div class="row">
+      <div class="col-sm-4">
+        <label><%= t('project').pluralize %></label>
+        <%= select_tag "projects",
+                       options_for_select(Project.all.sort_by(&:title).collect { |p| [p.title, p.id] }|[['Others', 0]], :selected => params['projects']),
+                       {:onchange => "Javascript:others('projects')", :multiple => true, :class => "form-control"}
+        -%>
+        <div id='other_projects' style='display: none' class="form-group">
+          <label>Other <%= t('project').pluralize %></label>
+          <%= text_field_tag :other_projects, nil, {:style => "width: 100%", :value => params['other_projects'], :class => 'form-control'} %>
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <label>Institutions</label>
+        <%= select_tag "institutions",
+                       options_for_select(Institution.all.sort_by(&:title).collect { |i| [i.title, i.id] }|[['Others', 0]], :selected => params['institutions']),
+                       {:onchange => "Javascript:others('institutions')", :multiple => true, :class => "form-control"}
+        -%>
+        <div id='other_institutions' style='display: none' class="form-group">
+          <label>Other institutions</label>
+          <%= text_field_tag :other_institutions, nil, {:style => "width: 100%", :value => params['other_institutions'], :class => 'form-control'} %>
+        </div>
+      </div>
+    </div>
+<% end %>
+
+<script type="text/javascript">
+    $j(document).ready(function () {
+        $j('#projects').multiselect({maxHeight: 250});
+        $j('#institutions').multiselect({maxHeight: 250});
+    });
+</script>
+
+<%= javascript_tag "others('projects')" -%>
+<%= javascript_tag "others('institutions')" -%>

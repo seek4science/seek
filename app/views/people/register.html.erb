@@ -1,10 +1,18 @@
 <%= javascript_include_tag 'profile_project_selection' %>
-<% select_display = Seek::Config.profile_select_by_default && !(@userless_projects.blank? || !error_messages_for(:person).empty?) %>
+<h1>New profile</h1>
 
-<div id="profile_select">
 
-    <div role="tabpanel" class="tab-pane <%= 'active'.html_safe unless select_display %>" id="profile_creation">
-      <%= render :partial => "registration_profile_creation" %>
-    </div>
+<%= form_for @person do |f| %>
+    <%= f.error_messages %>
+    <%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
+    <%= render :partial => 'contact_details_form', :locals => {:f => f} %>
 
-</div>
+    <% unless Person.count==0 %> <%# not for the first person %>
+        <%= render :partial => 'project_and_institution_selection', :locals => {:f => f} %>
+    <% end %>
+
+    <%= f.submit("Create",:disable_with=>"Creating...", :class => 'btn btn-primary') %>
+    <%= render :partial=>"cancel_registration" %>
+
+<% end -%>
+
