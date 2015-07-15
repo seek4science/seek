@@ -37,6 +37,7 @@ RUN bundle exec rake assets:precompile
 
 # Config
 RUN cp docker/database.docker.yml config/database.yml
+RUN cp docker/seek_local.rb config/initializers/seek_local.rb
 RUN cp config/sunspot.default.yml config/sunspot.yml
 
 # Cleanup
