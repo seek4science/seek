@@ -11,8 +11,10 @@ Load the database schema and seed data:
 
     docker-compose run seek bundle exec rake db:setup
 
-Start the docker containers (add the argument `-d` to start the containers in "detached" mode):
+Start the docker containers:
 
-    docker-compose up
+    docker-compose up -d
 
-Visit "localhost" in your browser.
+Wait a minute for the app to boot, then visit "localhost" in your browser.
+
+(Note: You may get a "connection was reset" error if the SEEK application has not finished booting up)
