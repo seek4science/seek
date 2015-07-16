@@ -19,17 +19,7 @@ class Snapshot < ActiveRecord::Base
   acts_as_doi_mintable
 
   def manifest
-    zip = Zip::File.open(content_blob.filepath)
-
-    begin
-      value = zip.read('.ro/manifest.json')
-    rescue Errno::ENOENT
-      value = nil
-    ensure
-      zip.close
-    end
-
-    value
+    parse_manifest
   end
 
   def title
@@ -46,7 +36,7 @@ class Snapshot < ActiveRecord::Base
 
   def research_object
     ROBundle::File.open(content_blob.filepath) do |ro|
-      yield ro
+      yield ro if block_given?
     end
   end
 
@@ -73,10 +63,11 @@ class Snapshot < ActiveRecord::Base
   end
 
   def parse_manifest
-    json = {}
+    manifest = {}
     research_object do |ro|
-      json = JSON.parse(ro.read('metadata.json'))
+      json = ro.read(File.join(resource.ro_package_path_fragment, 'metadata.json'))
+      manifest = JSON.parse(json)
     end
-    json
+    manifest
   end
 end
