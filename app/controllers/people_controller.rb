@@ -153,25 +153,13 @@ class PeopleController < ApplicationController
     unless current_user.registration_complete?
       current_user.person=@person
       redirect_action="register"
-
-      member_details = ''
-      member_details.concat(project_or_institution_details 'projects')
-      member_details.concat(project_or_institution_details 'institutions')
-
+      during_registration=true
     end
 
     respond_to do |format|
       if @person.save && current_user.save
-        #send notification email to admin and project managers, if a new member is registering as a new person
-        if Seek::Config.email_enabled && !current_user.registration_complete?
-          #send mail to admin
-          Mailer.contact_admin_new_user(member_details, current_user, base_host).deliver
-
-          #send mail to project managers
-          project_managers = project_managers_of_selected_projects params[:projects]
-          project_managers.each do |project_manager|
-            Mailer.contact_project_manager_new_user(project_manager, member_details, current_user, base_host).deliver
-          end
+        if Seek::Config.email_enabled && during_registration
+          notify_admin_and_project_managers_of_new_user
         end
         if current_user.active?
           flash[:notice] = 'Person was successfully created.'
@@ -180,7 +168,6 @@ class PeopleController < ApplicationController
           else
             format.html { redirect_to(@person) }
           end
-
           format.xml { render :xml => @person, :status => :created, :location => @person }
         else
           Mailer.signup(current_user, base_host).deliver
@@ -192,6 +179,16 @@ class PeopleController < ApplicationController
         format.html { render redirect_action }
         format.xml { render :xml => @person.errors, :status => :unprocessable_entity }
       end
+    end
+  end
+
+  def notify_admin_and_project_managers_of_new_user
+    Mailer.contact_admin_new_user(params,current_user, base_host).deliver
+
+    #send mail to project managers
+    project_managers = project_managers_of_selected_projects params[:projects]
+    project_managers.each do |project_manager|
+      Mailer.contact_project_manager_new_user(project_manager, params,current_user, base_host).deliver
     end
   end
 
@@ -371,32 +368,14 @@ class PeopleController < ApplicationController
     end
   end
 
-  def project_or_institution_details projects_or_institutions
-    details = ''
-    unless params[projects_or_institutions].blank?
-      params[projects_or_institutions].each do |project_or_institution|
-        if project_or_institution.to_s=='0'
-          details.concat("Other #{projects_or_institutions.singularize.humanize.pluralize}: #{params["other_#{projects_or_institutions}"]}; ")
-        else
-          entity = projects_or_institutions.classify.constantize.find_by_id(project_or_institution)
-          details.concat("#{projects_or_institutions.singularize.humanize.capitalize}: #{entity.try(:title)}, Id: #{project_or_institution}; ")
-        end
-      end
+  def project_managers_of_selected_projects project_ids
+    if project_ids.blank?
+      []
+    else
+      Project.find_all_by_id(project_ids).collect do |project|
+        project.project_managers
+      end.flatten.uniq
     end
-    details
-  end
-
-  def project_managers_of_selected_projects projects_param
-    project_manager_list = []
-    unless projects_param.blank?
-      projects_param.each do |project_param|
-        id = project_param
-        project = Project.find_by_id(id)
-        project_managers = project.try(:project_managers)
-        project_manager_list |= project_managers unless project_managers.nil?
-      end
-    end
-    project_manager_list
   end
 
   def do_projects_belong_to_project_manager_projects
@@ -408,7 +387,6 @@ class PeopleController < ApplicationController
             project = work_group.try(:project)
             projects << project unless project.nil?
           end
-        project_manager_projects = Seek::Config.project_hierarchy_enabled==true ? current_user.person.projects_and_descendants : current_user.person.projects
           flag = true
           projects.each do |project|
           unless @person.projects.include?(project) || project.can_be_administered_by?(current_user)

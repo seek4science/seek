@@ -119,8 +119,8 @@ class Mailer < ActionMailer::Base
     welcome(user,base_host) #the only difference is the view template, which is picked from the method name
   end
 
-  def contact_admin_new_user(details,user,base_host)
-    @details = details
+  def contact_admin_new_user(params,user,base_host)
+    @details = Seek::Mail::NewMemberAffiliationDetails.new(params).message
     @person = user.person
     @user = user
     @host = base_host
@@ -131,9 +131,8 @@ class Mailer < ActionMailer::Base
 
   end
 
-  def contact_project_manager_new_user(project_manager,details,user,base_host)
-
-    @details = details
+  def contact_project_manager_new_user(project_manager,params,user,base_host)
+    @details = Seek::Mail::NewMemberAffiliationDetails.new(params).message
     @person = user.person
     @user = user
     @host = base_host
@@ -192,7 +191,7 @@ class Mailer < ActionMailer::Base
   end
 
   private
-  
+
   def admin_emails
     begin      
       admins.map { |p| p.email_with_name }
