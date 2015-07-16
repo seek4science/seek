@@ -1,6 +1,6 @@
 module Seek #:nodoc:
   module ResearchObjects
-    module Snapshottable #:nodoc:
+    module ActsAsSnapshottable #:nodoc:
 
       def self.included(mod)
         mod.extend(ClassMethods)
@@ -13,15 +13,15 @@ module Seek #:nodoc:
           has_many :snapshots, as: :resource, foreign_key: :resource_id
 
           class_eval do
-            extend Seek::ResearchObjects::Snapshottable::SingletonMethods
+            extend Seek::ResearchObjects::ActsAsSnapshottable::SingletonMethods
           end
 
-          include Seek::ResearchObjects::Snapshottable::InstanceMethods
+          include Seek::ResearchObjects::ActsAsSnapshottable::InstanceMethods
 
         end
 
         def is_snapshottable?
-          include?(Seek::ResearchObjects::Snapshottable::InstanceMethods)
+          include?(Seek::ResearchObjects::ActsAsSnapshottable::InstanceMethods)
         end
 
       end
@@ -55,5 +55,5 @@ module Seek #:nodoc:
 end
 
 ActiveRecord::Base.class_eval do
-  include Seek::ResearchObjects::Snapshottable
+  include Seek::ResearchObjects::ActsAsSnapshottable
 end
