@@ -117,4 +117,17 @@ class InvestigationTest < ActiveSupport::TestCase
     inv = Factory(:experimental_assay,:assay_assets=>assay_assets).investigation
     assert_equal data_files.sort,inv.assets.sort
   end
+
+  test 'can create snapshot of investigation' do
+    investigation = Factory(:investigation, :studies => [Factory(:study)], :contributor => Factory(:user))
+    snapshot = nil
+
+    assert_difference('Snapshot.count') do
+      snapshot = investigation.create_snapshot
+    end
+
+    assert_equal 1, investigation.snapshots.count
+    assert_equal investigation.title, snapshot.title
+  end
+
 end

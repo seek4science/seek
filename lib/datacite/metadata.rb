@@ -30,6 +30,8 @@ module DataCite
           raise MissingMetadataException.new("Creator missing last name: #{creator.inspect}")
         end
       end
+
+      true
     end
 
   end

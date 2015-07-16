@@ -14,6 +14,8 @@ class Snapshot < ActiveRecord::Base
   alias_attribute :parent_id, :resource_id
   alias_attribute :version, :snapshot_number
 
+  validates :snapshot_number, :uniqueness => { :scope =>  [:resource_type, :resource_id] }
+
   acts_as_doi_mintable
 
   def manifest
@@ -39,7 +41,7 @@ class Snapshot < ActiveRecord::Base
   end
 
   def contributor
-    Person.find(research_object_metadata['contributor']['uri'].match(/people\/(.)/)[1])
+    Person.find(research_object_metadata['contributor']['uri'].match(/people\/([1-9][0-9]*)/)[1])
   end
 
   def research_object
@@ -51,7 +53,7 @@ class Snapshot < ActiveRecord::Base
   private
 
   def set_snapshot_number
-    self.snapshot_number = (resource.snapshots.maximum(:snapshot_number) || 0) + 1
+    self.snapshot_number ||= (resource.snapshots.maximum(:snapshot_number) || 0) + 1
   end
 
   def doi_resource_type
