@@ -270,6 +270,11 @@ class User < ActiveRecord::Base
     self.reset_password_code =  Digest::SHA1.hexdigest( "#{user.login}#{Time.now.to_s.split(//).sort_by {rand}.join}" )
   end
 
+  #indicates whether the user has completed the registration process, and is associated with a profile and link has been saved
+  def registration_complete?
+    person.present? && person.user.present?
+  end
+
   def self.without_profile
     User.includes(:person).select{|u| u.person.nil?}
   end

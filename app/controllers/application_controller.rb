@@ -40,7 +40,7 @@ class ApplicationController < ActionController::Base
   end
 
   def partially_registered?
-    redirect_to register_people_path if (current_user && current_user.person.nil?)
+    redirect_to register_people_path if (current_user && !current_user.registration_complete?)
   end
 
   def strip_root_for_xml_requests

@@ -22,6 +22,22 @@ class UserTest < ActiveSupport::TestCase
     assert u.valid?
   end
 
+  test "registration_compelete?" do
+    u = Factory :brand_new_user
+    refute u.person
+    refute u.registration_complete?
+
+    #its not complete until the association has been saved
+    u.person = Factory(:brand_new_person)
+    assert u.person
+    refute u.registration_complete?
+
+    u = Factory :user
+    assert u.person
+    assert u.registration_complete?
+
+  end
+
   test "check email present?" do
     u = Factory :user
     assert u.email.nil?

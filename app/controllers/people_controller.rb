@@ -150,11 +150,7 @@ class PeopleController < ApplicationController
 
     redirect_action="new"
 
-    set_tools_and_expertise(@person, params)
-   
-    registration = current_user.person.nil? #indicates a profile is being created during the registration process
-
-    if registration    
+    unless current_user.registration_complete?
       current_user.person=@person
       redirect_action="register"
 
@@ -167,7 +163,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.save && current_user.save
         #send notification email to admin and project managers, if a new member is registering as a new person
-        if Seek::Config.email_enabled && registration
+        if Seek::Config.email_enabled && !current_user.registration_complete?
           #send mail to admin
           Mailer.contact_admin_new_user(member_details, current_user, base_host).deliver
 
@@ -177,12 +173,7 @@ class PeopleController < ApplicationController
             Mailer.contact_project_manager_new_user(project_manager, member_details, current_user, base_host).deliver
           end
         end
-        if (!current_user.active?)
-          Mailer.signup(current_user, base_host).deliver
-          flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
-          logout_user
-          format.html { redirect_to :controller => "users", :action => "activation_required" }
-        else
+        if current_user.active?
           flash[:notice] = 'Person was successfully created.'
           if @person.only_first_admin_person?
             format.html { redirect_to registration_form_admin_path(:during_setup=>"true") }
@@ -191,8 +182,12 @@ class PeopleController < ApplicationController
           end
 
           format.xml { render :xml => @person, :status => :created, :location => @person }
+        else
+          Mailer.signup(current_user, base_host).deliver
+          flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
+          logout_user
+          format.html { redirect_to :controller => "users", :action => "activation_required" }
         end
-
       else
         format.html { render redirect_action }
         format.xml { render :xml => @person.errors, :status => :unprocessable_entity }
@@ -351,7 +346,7 @@ class PeopleController < ApplicationController
 
 
   def is_user_admin_or_personless
-    unless User.admin_logged_in? || current_user.person.nil?
+    unless User.admin_logged_in? || !current_user.registration_complete?
       error("You do not have permission to create new people","Is invalid (not admin)")
       return false
     end
