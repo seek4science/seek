@@ -228,6 +228,7 @@ SEEK::Application.routes.draw do
     resources :snapshots, :only => [:show, :create] do
       member do
         post :mint_doi
+        get :download
       end
     end
     member do
