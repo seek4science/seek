@@ -51,7 +51,7 @@ SEEK is developed using the [RubyMine IDE](http://www.jetbrains.com/ruby/), for 
 
 ![JetBrains](http://seek4science.org/sites/default/files/logo_jetbrains_smaller.gif)
 
-Please check our [CREDITS file](doc/CREDITS) for additional credits and acknowledgements
+Please check our [CREDITS](http://seek4science.github.io/seek/credits.html) for additional credits and acknowledgements
 
 
 [![Build Status](https://travis-ci.org/seek4science/seek.svg?branch=master)](https://travis-ci.org/seek4science/seek)
