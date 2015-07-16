@@ -1,0 +1,10 @@
+<%= javascript_include_tag 'profile_project_selection' %>
+<% select_display = Seek::Config.profile_select_by_default && !(@userless_projects.blank? || !error_messages_for(:person).empty?) %>
+
+<div id="profile_select">
+
+    <div role="tabpanel" class="tab-pane <%= 'active'.html_safe unless select_display %>" id="profile_creation">
+      <%= render :partial => "registration_profile_creation" %>
+    </div>
+
+</div>

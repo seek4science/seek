@@ -8,15 +8,16 @@ class PeopleController < ApplicationController
   include Seek::AdminBulkAction
 
   before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
-  before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
-  before_filter :is_during_registration,:only=>[:select]
+  before_filter :current_user_exists,:only=>[:register,:create,:new]
+  before_filter :is_during_registration,:only=>[:register]
   before_filter :is_user_admin_auth,:only=>[:destroy,:new]
   before_filter :removed_params,:only=>[:update,:create]
   before_filter :administerable_by_user, :only => [:admin, :administer_update]
   before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
+
+  skip_before_filter :partially_registered?,:only=>[:register,:create]
   skip_before_filter :project_membership_required, :only => [:create, :new]
-  skip_before_filter :profile_for_login_required,:only=>[:select,:userless_project_selected_ajax,:create]
   skip_after_filter :request_publish_approval,:log_publishing, :only => [:create,:update]
 
   after_filter :reset_notifications, :only => [:administer_update]
@@ -133,18 +134,13 @@ class PeopleController < ApplicationController
   #
   #Page for after registration that allows you to select yourself from a list of
   #people yet to be assigned, or create a new one if you don't exist
-  def select
-    @userless_projects=Project.with_userless_people
-
-    #strip out project with no people with email addresses
-    #TODO: can be made more efficient by putting into a direct query in Project.with_userless_people - but not critical as this is only used during registration
-    @userless_projects = @userless_projects.select do |proj|
-      !proj.people.find{|person| !person.email.nil? && person.user.nil?}.nil?
+  def register
+    email = params[:email]
+    if email && Person.not_registered_with_matching_email(email).any?
+      render :is_this_you,:locals=>{:email=>email}
+    else
+      @person = Person.new(:email=>email)
     end
-
-    @userless_projects.sort!{|a,b|a.title<=>b.title}
-    @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
-
   end
 
   # POST /people
@@ -156,28 +152,22 @@ class PeopleController < ApplicationController
 
     set_tools_and_expertise(@person, params)
    
-    registration = false
-    registration = true if (current_user.person.nil?) #indicates a profile is being created during the registration process
+    registration = current_user.person.nil? #indicates a profile is being created during the registration process
 
     if registration    
-      current_user.person=@person      
-      @userless_projects=Project.with_userless_people
-      @userless_projects.sort!{|a,b|a.title<=>b.title}
-      is_sysmo_member=params[:sysmo_member]
+      current_user.person=@person
+      redirect_action="register"
 
-      if (is_sysmo_member)
-        member_details = ''
-        member_details.concat(project_or_institution_details 'projects')
-        member_details.concat(project_or_institution_details 'institutions')
-      end
+      member_details = ''
+      member_details.concat(project_or_institution_details 'projects')
+      member_details.concat(project_or_institution_details 'institutions')
 
-      redirect_action="select"
     end
 
     respond_to do |format|
       if @person.save && current_user.save
         #send notification email to admin and project managers, if a new member is registering as a new person
-        if Seek::Config.email_enabled && registration && is_sysmo_member
+        if Seek::Config.email_enabled && registration
           #send mail to admin
           Mailer.contact_admin_new_user(member_details, current_user, base_host).deliver
 
@@ -301,19 +291,6 @@ class PeopleController < ApplicationController
     end
   end
 
-  def userless_project_selected_ajax
-    project_id=params[:project_id]
-    unless project_id=="0"
-      proj=Project.find(project_id)
-      #ignore people with no email address
-      @people=proj.userless_people.select{|person| !person.email.blank? }
-      @people.sort!{|a,b| a.last_name<=>b.last_name}
-      render :partial=>"userless_people_list",:locals=>{:people=>@people}
-    else
-      render :partial=>"cancel_registration"
-    end
-    
-  end
   
   def get_work_group
     people = nil

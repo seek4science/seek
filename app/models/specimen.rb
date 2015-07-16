@@ -86,7 +86,7 @@ class Specimen < ActiveRecord::Base
     sop_ids = sop_ids.map &:to_i
     sop_ids.each do |sop_id|
       if sop = Sop.find(sop_id)
-        self.sop_specimens.build :sop_id => sop.id, :sop_version => sop.version unless sops.map(&:sop_id).include?(sop_id)
+        self.sop_specimens.build :sop_id => sop.id, :sop_version => sop.version unless sops.map(&:id).include?(sop_id)
       end
     end
     self.sop_specimens = self.sop_specimens.select { |s| sop_ids.include? s.sop_id }

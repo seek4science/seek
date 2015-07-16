@@ -120,7 +120,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert session[:user_id]
     assert_equal user.id,session[:user_id]
     assert_not_nil flash.now[:notice]
-    assert_redirected_to select_people_path
+    assert_redirected_to register_people_path
   end
 
   test 'should redirect to root after logging out from the search result page' do

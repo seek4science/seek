@@ -15,6 +15,8 @@ class ApplicationController < ActionController::Base
 
   before_filter :log_extra_exception_data
 
+  #if the logged in user is currently partially registered, force the continuation of the registration process
+  before_filter :partially_registered?
 
   after_filter :log_event
 
@@ -23,8 +25,6 @@ class ApplicationController < ActionController::Base
   around_filter :with_current_user
 
   rescue_from "ActiveRecord::RecordNotFound", :with=>:render_not_found_error
-
-  before_filter :profile_for_login_required
 
   before_filter :project_membership_required,:only=>[:create,:new]
 
@@ -37,6 +37,10 @@ class ApplicationController < ActionController::Base
     User.with_current_user current_user do
       yield
     end
+  end
+
+  def partially_registered?
+    redirect_to register_people_path if (current_user && current_user.person.nil?)
   end
 
   def strip_root_for_xml_requests
@@ -58,18 +62,6 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
-  
-  #Overridden from restful_authentication
-  #Does a second check that there is a profile assigned to the user, and if not goes to the profile
-  #selection page (GET people/select)
-  def authorized?
-    if super
-      redirect_to(select_people_path) if current_user.person.nil?
-      true
-    else
-      false
-    end
-  end
 
   def is_current_user_auth
     begin
@@ -244,13 +236,6 @@ class ApplicationController < ActionController::Base
   #required for the Savage Beast
   def admin?
     User.admin_logged_in?
-  end
-
-  def profile_for_login_required
-    if User.logged_in? && !User.logged_in_and_registered?
-      flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
-      redirect_to main_app.select_people_path
-    end
   end
 
   def translate_action action_name
@@ -451,7 +436,7 @@ class ApplicationController < ActionController::Base
         expire_download_activity
       elsif action=="create" && controller!="sessions"
         expire_create_activity
-      elsif action=="destroy"
+      elsif action=="destroy" && controller!="sessions"
         expire_create_activity
         expire_download_activity
       elsif action=="update" && @@auth_types.include?(controller) #may have had is permission changed

@@ -7,6 +7,64 @@ class UserTest < ActiveSupport::TestCase
   include AuthenticatedTestHelper
   fixtures :users,:sops,:data_files,:models,:assets
 
+
+  test "validates email if set" do
+    u = Factory :user
+    assert u.valid?
+
+    u.email="fish"
+    refute u.valid?
+
+    u.email="http://fish.com"
+    refute u.valid?
+
+    u.email="fish@example.com"
+    assert u.valid?
+  end
+
+  test "check email present?" do
+    u = Factory :user
+    assert u.email.nil?
+    assert u.valid?
+
+    u.check_email_present=true
+    refute u.valid?
+    u.email=""
+    refute u.valid?
+    u.email="fish@example.com"
+    assert u.valid?
+  end
+
+  test "check email available" do
+    #email must not belong to another person, unless that person is unregistered
+    u = Factory :user
+    u.check_email_present=true
+    u.email="ghghgh@email.com"
+    assert u.valid?
+    Factory(:person,:email=>"ghghgh@email.com")
+
+    refute u.valid?
+
+    Factory(:brand_new_person,:email=>"zzzzzz@email.com")
+    u.email="zzzzzz@email.com"
+    assert u.valid?
+
+  end
+
+  test "validation of login" do
+    u = Factory :user
+    assert u.valid?
+    u.login=nil
+    refute u.valid?
+    u.login=""
+    refute u.valid?
+    u.login="aa"
+    refute u.valid?
+    u.login="zhsdfkhsdksdfh11"
+    assert u.valid?
+
+  end
+
   def test_without_profile
     user_with_profile = Factory(:user)
     user_without_profile = Factory(:brand_new_user)

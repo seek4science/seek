@@ -12,9 +12,9 @@ The SEEK platform is a web-based resource for sharing heterogeneous scientific r
 Underpinning SEEK is the ISA infrastructure, a standard format for describing how individual experiments are aggregated into wider studies and investigations. Within SEEK, ISA has been extended and is configurable to allow the structure to be used outside of Biology.
 SEEK is incorporating semantic technology allowing sophisticated queries over the data, yet without getting in the way of your users.
 
-For an example of SEEK please visit our [Demo](http://demo.euro-seek.org).
+For an example of SEEK please visit our [Demo](http://demo.seek4science.org/).
 
-To see SEEK being used for real science, as part of [SysMO](http://sysmo.net) please visit [SysMO SEEK](http://seek.sysmo-db.org)
+To see SEEK being used for real science, as part of [SysMO](http://sysmo.net) please visit [FAIRDOM SEEK](http://fairdomhub.org)
 
 For more information please visit: [SEEK for Science](http://www.seek4science.org/)
 
@@ -29,16 +29,20 @@ For more information please visit: [FAIRDOM](http://fair-dom.org).
 We recommend installing SEEK on Debian or Ubuntu.
 
 To install the latest release please visit:
-[SEEK install guide](http://seek4science.org/sites/default/files/seekdocs/doc/INSTALL.html)
+[SEEK install guide](http://seek4science.github.io/seek/install.html)
 
 For details about other distributions and installing on Mac OS X please visit:
-[Other distributions guide](http://seek4science.org/sites/default/files/seekdocs/doc/OTHER-DISTRIBUTIONS.html)
+[Other distributions guide](http://seek4science.github.io/seek/other-distributions.html)
 
-The latest versions of these documents are also [included](doc).
+The documentation is available on the *ghpages* branch.
 
 ## Contacting Us
 
-For details about how to contact us, to raise bugs or offer suggestion, please visit [Contacting Us](http://seek4science.org/contact)
+For details about how to contact us, to raise bugs or offer suggestion, please visit [Contacting Us](http://seek4science.github.io/seek/contacting_us.html)
+
+## Contributing to SEEK
+
+For details on how you can contribute to SEEK please visit [Contributing](http://seek4science.github.io/seek/contributing.html)
 
 
 ## Credit
@@ -47,7 +51,7 @@ SEEK is developed using the [RubyMine IDE](http://www.jetbrains.com/ruby/), for 
 
 ![JetBrains](http://seek4science.org/sites/default/files/logo_jetbrains_smaller.gif)
 
-Please check our [CREDITS file](doc/CREDITS) for additional credits and acknowledgements
+Please check our [CREDITS](http://seek4science.github.io/seek/credits.html) for additional credits and acknowledgements
 
 
 [![Build Status](https://travis-ci.org/seek4science/seek.svg?branch=master)](https://travis-ci.org/seek4science/seek)

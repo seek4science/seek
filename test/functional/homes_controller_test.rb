@@ -381,6 +381,18 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+  test "documentation only shown when enabled" do
+    with_config_value :documentation_enabled,true do
+      get :index
+      assert_select "li.dropdown span",:text=>"Documentation",:count=>1
+    end
+
+    with_config_value :documentation_enabled,false do
+      get :index
+      assert_select "li.dropdown span",:text=>"Documentation",:count=>0
+    end
+  end
+
   def uri_to_guardian_feed
     uri_to_feed "guardian_atom.xml"
   end

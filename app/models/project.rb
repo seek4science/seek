@@ -155,21 +155,6 @@ class Project < ActiveRecord::Base
     res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
   end
 
-  # provides a list of people that are said to be members of this project, but are not associated with any user
-  def userless_people
-    people.select{|p| p.user.nil?}
-  end
-
-  def includes_userless_people?
-    !userless_people.empty?
-  end
-
-  # Returns a list of projects that contain people that do not have users assigned to them
-  def self.with_userless_people
-    p=Project.all(:include=>:work_groups)
-    return p.select { |proj| proj.includes_userless_people? }
-  end
-
   def studies
     investigations.collect(&:studies).flatten.uniq
   end
