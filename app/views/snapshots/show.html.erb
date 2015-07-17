@@ -12,7 +12,8 @@
         <p><strong>DOI:</strong> <%= @snapshot.doi -%></p>
     <% end %>
     <p><strong>Created at:</strong> <%= @snapshot.created_at %></p>
-    <pre><%= @snapshot.manifest.pretty_inspect %></pre>
+    <pre><%= @snapshot.metadata.pretty_inspect %></pre>
+    <pre><%= @snapshot.research_object.read('.ro/manifest.json') %></pre>
     <pre><%= @snapshot.research_object.entries.map(&:name).join("\n") %></pre>
   </div>
   <div class="col-md-3 col-sm-4">
