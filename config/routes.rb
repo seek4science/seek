@@ -2,8 +2,8 @@ SEEK::Application.routes.draw do
 
   mount TavernaPlayer::Engine, :at => (SEEK::Application.config.relative_url_root || "/")
 
-  get 'searchRdf' => 'search_rdf#search'
-  post 'searchRdf' => 'search_rdf#search'
+  get 'searchSwainLab' => 'search_rdf#search'
+  post 'searchSwainLab' => 'search_rdf#search'
 
   resources :scales do
     collection do
