@@ -3,6 +3,9 @@ source 'https://rubygems.org'
 gem "rails", "3.2.21"
 gem "rdoc"
 
+#added by TZ to fix problem with compiling the assets without js env.
+gem 'therubyracer', :platforms => :ruby
+
 gem "feedjira","~>1"
 gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
