@@ -22,7 +22,11 @@ module Seek
         file ||= temp_file(DEFAULT_FILENAME)
         ROBundle::File.create(file) do |bundle|
           bundle.created_by = create_agent
-          aggregate_resource(bundle, investigation)
+          store_metadata(bundle, investigation, '')
+          gather_entries(investigation).each do |entry|
+            store_metadata(bundle, entry)
+            store_files(bundle, entry) if entry.is_asset?
+          end
           bundle.created_on = Time.now
         end
         file
@@ -30,36 +34,11 @@ module Seek
 
       private
 
-      # Traverse ISA + assets tree and aggregate metadata and files
-      def aggregate_resource(bundle, resource, base_path = nil)
-        if true || resource.permitted_for_research_object?
-          if base_path.blank?
-            path = resource.ro_package_path_fragment
-          else
-            path = File.join(base_path, resource.ro_package_path_fragment)
-          end
-          # Add metadata and content to RO
-          store_metadata(bundle, resource, path)
-          store_files(bundle, resource, path) if resource.is_asset?
-          # Recurse over child resources
-          child_resources(resource).each do |child_resource|
-            aggregate_resource(bundle, child_resource, path)
-          end
-        end
-      end
-
-      # I -> S -> A -> Assets
-      def child_resources(resource)
-        case resource
-          when Investigation
-            resource.studies
-          when Study
-            resource.assays
-          when Assay
-            resource.assets
-          else
-            []
-        end
+      # collects the entries contained by the investigation for inclusion in
+      # the research object
+      def gather_entries(investigation)
+        entries = [investigation] + [investigation.studies] + [investigation.assays] + [investigation.assets]
+        entries.flatten.select(&:permitted_for_research_object?)
       end
 
       # generates and stores the metadata for the item, using the handlers
@@ -75,31 +54,30 @@ module Seek
 
       # stores the actual physical files defined by the contentblobs for the asset, and adds the appropriate
       # aggregation to the RO manifest
-      def store_files(bundle, asset, path = nil)
+      def store_files(bundle, asset)
         asset.all_content_blobs.each do |blob|
-          store_blob_file(bundle, asset, blob, path) if blob.file_exists?
+          store_blob_file(bundle, asset, blob) if blob.file_exists?
         end
 
         if asset.respond_to?(:model_image) && asset.model_image
-          store_blob_file(bundle, asset, asset.model_image, path)
+          store_blob_file(bundle, asset, asset.model_image)
         end
       end
 
       # stores a content blob file, added the aggregate to the manifest
-      def store_blob_file(bundle, asset, blob, path = nil)
-        path = resolve_entry_path(bundle, asset, blob, path)
+      def store_blob_file(bundle, asset, blob)
+        path = resolve_entry_path(bundle,asset,blob)
         bundle.add(path, blob.filepath, aggregate: true)
       end
 
       #resolves the entry path, to avoid duplicates. If an asset has multiple files
       #with some the same name, a "c-" is prepended t the file name, where c starts at 1 and increments
-      def resolve_entry_path(bundle, asset, blob, base_path = nil)
-        base_path ||= asset.research_object_package_path
-        path = File.join(base_path, blob.original_filename)
-        while bundle.find_entry(path)
-          c ||= 1
-          path = File.join(base_path, "#{c}-#{blob.original_filename}")
-          c += 1
+      def resolve_entry_path(bundle, asset, blob)
+        path = File.join(asset.research_object_package_path, blob.original_filename)
+        while(bundle.find_entry(path))
+          c||=1
+          path = File.join(asset.research_object_package_path, "#{c}-#{blob.original_filename}")
+          c+=1
         end
         path
       end

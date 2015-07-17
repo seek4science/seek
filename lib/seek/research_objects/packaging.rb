@@ -13,8 +13,11 @@ module Seek
       end
 
       def ro_package_path_fragment(item = self)
-        # ro_package_path_type_fragment(item) + '/' +
-        ro_package_path_id_fragment(item)
+        if item.is_asset?
+          ro_package_path_type_fragment(item) + '/' + ro_package_path_id_fragment(item)
+        else
+          ro_package_path_id_fragment(item)
+        end
       end
 
       def ro_package_path_type_fragment(item = self)
@@ -22,7 +25,7 @@ module Seek
       end
 
       def ro_package_path_id_fragment(item = self)
-        "#{item.id}-#{item.title[0..128].parameterize}"
+        "#{item.title[0..128].parameterize}"
       end
 
       # whether an item is permitted to be included within a research objec
@@ -37,7 +40,7 @@ module Seek
       end
 
       #the filename for research object when downloaded. Takes the form [type]-[id].ro.zip
-      def research_object_filename(item=self)
+      def research_object_filename(item = self)
         "#{item.class.name.underscore}-#{item.id}.ro.zip"
       end
     end
