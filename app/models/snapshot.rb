@@ -18,8 +18,8 @@ class Snapshot < ActiveRecord::Base
 
   acts_as_doi_mintable
 
-  def manifest
-    parse_manifest
+  def metadata
+    parse_metadata
   end
 
   def title
@@ -59,15 +59,15 @@ class Snapshot < ActiveRecord::Base
   end
 
   def research_object_metadata
-    @ro_data ||= parse_manifest
+    @ro_data ||= parse_metadata
   end
 
-  def parse_manifest
-    manifest = {}
+  def parse_metadata
+    metadata = {}
     research_object do |ro|
-      json = ro.read(File.join(resource.ro_package_path_fragment, 'metadata.json'))
-      manifest = JSON.parse(json)
+      json = ro.read('metadata.json')
+      metadata = JSON.parse(json)
     end
-    manifest
+    metadata
   end
 end
