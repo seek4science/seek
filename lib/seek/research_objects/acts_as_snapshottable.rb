@@ -33,12 +33,12 @@ module Seek #:nodoc:
 
         def create_snapshot
           ro_file = Seek::ResearchObjects::Generator.instance.generate(self) # This only works for investigations
+          snapshot = snapshots.create
           blob = ContentBlob.new({
                                      tmp_io_object: ro_file,
                                      content_type: Mime::Type.lookup_by_extension("ro").to_s,
-                                     original_filename: self.research_object_filename
+                                     original_filename: "#{self.class.name.underscore}-#{self.id}-#{snapshot.snapshot_number}.ro.zip"
                                  })
-          snapshot = snapshots.create
           blob.asset = snapshot
           blob.save
           snapshot
