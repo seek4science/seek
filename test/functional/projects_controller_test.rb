@@ -376,8 +376,8 @@ class ProjectsControllerTest < ActionController::TestCase
 		project_administrator = Factory(:project_administrator)
     login_as project_administrator.user
     get :show,:id=>project_administrator.projects.first
-		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "strong",:text=>"#{I18n.t('project')} Managers:",:count=>1
+		assert_select "div.box_about_actor p.project_administrators" do
+			assert_select "strong",:text=>"#{I18n.t('project')} Administrators:",:count=>1
 			assert_select "a",:count=>1
 			assert_select "a[href=?]",person_path(project_administrator),:text=>project_administrator.name,:count=>1
 		end
@@ -413,7 +413,7 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select "strong", :text => "Asset Managers:", :count => 0
       assert_select "a[href=?]", person_path(asset_manager), :text => asset_manager.name, :count => 0
 
-      assert_select "strong", :text => "Project Managers:", :count => 0
+      assert_select "strong", :text => "Project Administrators:", :count => 0
       assert_select "a[href=?]", person_path(project_administrator), :text => project_administrator.name, :count => 0
 
       assert_select "strong", :text => "Gatekeepers:", :count => 0
@@ -460,10 +460,10 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     login_as person.user
     get :show,:id=>project
-		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "strong",:text=>"#{I18n.t('project')} Managers:",:count=>1
+		assert_select "div.box_about_actor p.project_administrators" do
+			assert_select "strong",:text=>"#{I18n.t('project')} Administrators:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Managers for this #{I18n.t('project')}",:count=>1
+			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Administrators for this #{I18n.t('project')}",:count=>1
 		end
 	end
 

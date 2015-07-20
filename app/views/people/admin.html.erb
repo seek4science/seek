@@ -23,7 +23,7 @@
                     </p>
                     <br/>
                     <%
-                       roles = [["pal", "a PAL"], ["project_administrator", "a Project Manager"], ["asset_manager", "an Asset Manager"], ["gatekeeper", "a Gatekeeper"]]
+                       roles = [["pal", "a PAL"], ["project_administrator", "a Project Administrator"], ["asset_manager", "an Asset Manager"], ["gatekeeper", "a Gatekeeper"]]
                        roles.each do |role|
                     %>
                         <%= render :partial => "roles_selector", :locals => {:role => role[0], :role_title => role[1]} -%>

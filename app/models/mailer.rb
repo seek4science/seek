@@ -139,7 +139,7 @@ class Mailer < ActionMailer::Base
     mail(:from=>Seek::Config.noreply_sender,
          :to=>project_administrator_email(project_administrator),
          :reply_to=>user.person.email_with_name,
-         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} of which you are #{I18n.t('project').downcase} manager")
+         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} of which you are #{I18n.t('project')} Administrator")
   end
 
   def resources_harvested(harvester_responses,user,base_host)
