@@ -151,25 +151,25 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_can_be_edited_by
-    u=Factory(:project_manager).user
+    u=Factory(:project_administrator).user
     p=u.person.projects.first
-    assert p.can_be_edited_by?(u),"Project should be editable by user :project_manager"
+    assert p.can_be_edited_by?(u),"Project should be editable by user :project_administrator"
 
     p=Factory(:project)
-    assert !p.can_be_edited_by?(u),"other project should not be editable by project manager, since it is not a project he manages"
+    assert !p.can_be_edited_by?(u),"other project should not be editable by project administrator, since it is not a project he administers"
   end
 
   test "can be administered by" do
     admin = Factory(:admin)
-    pm = Factory(:project_manager)
+    project_administrator = Factory(:project_administrator)
     normal = Factory(:person)
     another_proj = Factory(:project)
 
-    assert pm.projects.first.can_be_administered_by?(pm.user)
+    assert project_administrator.projects.first.can_be_administered_by?(project_administrator.user)
     assert !normal.projects.first.can_be_administered_by?(normal.user)
 
     assert !another_proj.can_be_administered_by?(normal.user)
-    assert !another_proj.can_be_administered_by?(pm.user)
+    assert !another_proj.can_be_administered_by?(project_administrator.user)
     assert another_proj.can_be_administered_by?(admin.user)
   end
 
@@ -302,7 +302,7 @@ class ProjectTest < ActiveSupport::TestCase
     end
   end
 
-  test "project_managers" do
+  test "project_administrators" do
     User.with_current_user(Factory(:admin)) do
       person=Factory(:person_in_multiple_projects)
       proj1 = person.projects.first

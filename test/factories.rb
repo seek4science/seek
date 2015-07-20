@@ -53,7 +53,7 @@ include ActionDispatch::TestProcess
     end
   end
 
-  Factory.define(:project_manager,:parent=>:person) do |f|
+  Factory.define(:project_administrator,:parent=>:person) do |f|
     f.after_build do |pm|
       Factory(:admin_defined_role_project,:project=>pm.projects.first,:person=>pm,:role_mask=>4)
       pm.roles_mask = 4

@@ -11,22 +11,22 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_can_be_edited_by?
     admin = Factory(:admin)
-    project_manager = Factory(:project_manager)
-    project_manager2 = Factory(:project_manager)
-    person = Factory :person,:group_memberships=>[Factory(:group_membership,:work_group=>project_manager.group_memberships.first.work_group)]
+    project_administrator = Factory(:project_administrator)
+    project_administrator2 = Factory(:project_administrator)
+    person = Factory :person,:group_memberships=>[Factory(:group_membership,:work_group=>project_administrator.group_memberships.first.work_group)]
     another_person = Factory :person
 
-    assert_equal person.projects,project_manager.projects
-    assert_not_equal person.projects,project_manager2.projects
+    assert_equal person.projects,project_administrator.projects
+    assert_not_equal person.projects,project_administrator2.projects
 
     assert person.can_be_edited_by?(person.user)
-    assert person.can_be_edited_by?(project_manager.user),"should be editable by the project manager of the same project"
+    assert person.can_be_edited_by?(project_administrator.user),"should be editable by the project administrator of the same project"
     assert person.can_be_edited_by?(admin.user)
     assert !person.can_be_edited_by?(another_person.user)
-    assert !person.can_be_edited_by?(project_manager2.user),"should be not editable by the project manager of another project"
+    assert !person.can_be_edited_by?(project_administrator2.user),"should be not editable by the project administrator of another project"
 
     assert person.can_be_edited_by?(person), "You can also ask by passing in a person"
-    assert person.can_be_edited_by?(project_manager),"You can also ask by passing in a person"
+    assert person.can_be_edited_by?(project_administrator),"You can also ask by passing in a person"
 
   end
 
@@ -53,36 +53,36 @@ class PersonTest < ActiveSupport::TestCase
   test "can be administered by" do
     admin = Factory(:admin)
     admin2 = Factory(:admin)
-    project_manager = Factory(:project_manager)
-    person_in_same_project = Factory :person,:group_memberships=>[Factory(:group_membership,:work_group=>project_manager.group_memberships.first.work_group)]
+    project_administrator = Factory(:project_administrator)
+    person_in_same_project = Factory :person,:group_memberships=>[Factory(:group_membership,:work_group=>project_administrator.group_memberships.first.work_group)]
     person_in_different_project = Factory :person
 
     assert admin.can_be_administered_by?(admin.user),"admin can administer themself"
     assert admin2.can_be_administered_by?(admin.user),"admin can administer another admin"
 
-    assert project_manager.can_be_administered_by?(admin.user),"admin should be able to administer another project manager"
-    assert person_in_same_project.can_be_administered_by?(project_manager.user),"project manager should be able to administer someone from same project"
-    assert person_in_different_project.can_be_administered_by?(project_manager.user),"project manager should be able to administer someone from another project"
+    assert project_administrator.can_be_administered_by?(admin.user),"admin should be able to administer another project administrator"
+    assert person_in_same_project.can_be_administered_by?(project_administrator.user),"project administrator should be able to administer someone from same project"
+    assert person_in_different_project.can_be_administered_by?(project_administrator.user),"project administrator should be able to administer someone from another project"
 
-    assert !project_manager.can_be_administered_by?(person_in_same_project.user),"a normal person cannot administer someone else"
-    assert !project_manager.can_be_administered_by?(project_manager.user),"project manager should not administer himself"
+    assert !project_administrator.can_be_administered_by?(person_in_same_project.user),"a normal person cannot administer someone else"
+    assert !project_administrator.can_be_administered_by?(project_administrator.user),"project administrator should not administer himself"
     assert !person_in_same_project.can_be_administered_by?(person_in_same_project.user), "person should not administer themself"
     assert !person_in_same_project.can_be_administered_by?(nil)
 
-    assert project_manager.can_be_administered_by?(admin),"you can also ask by passing a person"
-    assert person_in_same_project.can_be_administered_by?(project_manager),"you can also ask by passing a person"
+    assert project_administrator.can_be_administered_by?(admin),"you can also ask by passing a person"
+    assert person_in_same_project.can_be_administered_by?(project_administrator),"you can also ask by passing a person"
 
 
   end
 
-  test "project manager cannot edit an admin within their project" do
+  test "project administrator cannot edit an admin within their project" do
     admin = Factory(:admin)
-    project_manager = Factory(:project_manager,:group_memberships=>[Factory(:group_membership,:work_group=>admin.group_memberships.first.work_group)])
+    project_administrator = Factory(:project_administrator,:group_memberships=>[Factory(:group_membership,:work_group=>admin.group_memberships.first.work_group)])
 
 
-    assert !(admin.projects & project_manager.projects).empty?
+    assert !(admin.projects & project_administrator.projects).empty?
 
-    assert !admin.can_be_edited_by?(project_manager)
+    assert !admin.can_be_edited_by?(project_administrator)
   end
 
   #checks the updated_at doesn't get artificially changed between created and reloading

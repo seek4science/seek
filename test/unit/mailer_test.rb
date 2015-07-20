@@ -222,10 +222,10 @@ class MailerTest < ActionMailer::TestCase
                  encode_mail(Mailer.contact_admin_new_user(params, users(:aaron), "localhost"))
   end
 
-  test "contact_project_manager_new_user" do
-    project_manager = Factory(:project_manager)
-    @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are project manager'
-    @expected.to = project_manager.email_with_name
+  test "contact_project_administrator_new_user" do
+    project_administrator = Factory(:project_administrator)
+    @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are project administrator'
+    @expected.to = project_administrator.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 
@@ -238,7 +238,7 @@ class MailerTest < ActionMailer::TestCase
     @expected.body = read_fixture('contact_project_administrator_new_user')
 
     assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_project_administrator_new_user(project_manager, params, users(:aaron), "localhost"))
+                 encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron), "localhost"))
 
 
   end

@@ -82,20 +82,20 @@ class OrganismTest < ActiveSupport::TestCase
   end
   
   test "can_delete?" do
-    pm = Factory(:project_manager)
+    project_administrator = Factory(:project_administrator)
     admin = Factory(:admin)
     non_admin=Factory(:user)
     o=organisms(:yeast)
     refute o.can_delete?(admin)
-    refute o.can_delete?(pm)
+    refute o.can_delete?(project_administrator)
     refute o.can_delete?(non_admin)
     o=organisms(:human)
     assert o.can_delete?(admin)
-    assert o.can_delete?(pm)
+    assert o.can_delete?(project_administrator)
     refute o.can_delete?(non_admin)
     o=organisms(:organism_linked_project_only)
     refute o.can_delete?(admin)
-    refute o.can_delete?(pm)
+    refute o.can_delete?(project_administrator)
     refute o.can_delete?(non_admin)
   end
 
