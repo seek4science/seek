@@ -148,11 +148,11 @@ class UserTest < ActiveSupport::TestCase
     pm = Factory :project_manager
     normal = Factory :person
     User.with_current_user(pm.user) do
-      assert User.project_manager_logged_in?
+      assert User.project_administrator_logged_in?
     end
 
     User.with_current_user(normal.user) do
-      assert !User.project_manager_logged_in?
+      assert !User.project_administrator_logged_in?
     end
   end
 

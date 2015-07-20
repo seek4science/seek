@@ -36,8 +36,8 @@ module ProjectsHelper
     link_list_for_role("Asset Manager",project.asset_managers)
   end
 
-  def project_managers_link_list project
-    link_list_for_role("#{t('project')} Manager",project.project_managers)
+  def project_administrator_link_list project
+    link_list_for_role("#{t('project')} Manager",project.project_administrator)
   end
 
   def gatekeepers_link_list project

@@ -15,17 +15,17 @@ test "admin defined roles in projects should be also the roles in sub projects" 
 
     [@proj, @proj_child1, @proj_child2].each do |p|
       assert_equal false, person.is_asset_manager?(p)
-      assert_equal false, person.is_project_manager?(p)
+      assert_equal false, person.is_project_administrator?(p)
       assert_equal false, person.is_pal?(p)
       assert_equal false, person.is_gatekeeper?(p)
 
       assert p.asset_managers.empty?
-      assert p.project_managers.empty?
+      assert p.project_administrator.empty?
       assert p.pals.empty?
       assert p.gatekeepers.empty?
     end
 
-    person.roles = [["asset_manager", @proj.id.to_s], ["project_manager", @proj.id.to_s], ["pal", @proj.id.to_s], ["gatekeeper", @proj.id.to_s]]
+    person.roles = [["asset_manager", @proj.id.to_s], ["project_administrator", @proj.id.to_s], ["pal", @proj.id.to_s], ["gatekeeper", @proj.id.to_s]]
     disable_authorization_checks do
       person.save!
     end
@@ -33,12 +33,12 @@ test "admin defined roles in projects should be also the roles in sub projects" 
 
     [@proj, @proj_child1, @proj_child2].each do |p|
       assert_equal true, person.is_asset_manager?(p)
-      assert_equal true, person.is_project_manager?(p)
+      assert_equal true, person.is_project_administrator?(p)
       assert_equal true, person.is_pal?(p)
       assert_equal true, person.is_gatekeeper?(p)
 
       assert_equal [person], p.asset_managers
-      assert_equal [person], p.project_managers
+      assert_equal [person], p.project_administrator
       assert_equal [person], p.pals
       assert_equal [person], p.gatekeepers
     end

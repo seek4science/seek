@@ -19,7 +19,7 @@ class Organism < ActiveRecord::Base
 
   
   def can_delete? user=User.current_user
-    !user.nil? && user.is_admin_or_project_manager? && models.empty? && assays.empty? && projects.empty?
+    !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
   end
 
   def searchable_terms

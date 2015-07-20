@@ -3,6 +3,7 @@ require 'test_helper'
 class ProjectTest < ActiveSupport::TestCase
   
   fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users,  :publications, :assets, :organisms
+
   #checks that the dependent work_groups are destroyed when the project s
   def test_delete_work_groups_when_project_deleted
     n_wg=WorkGroup.all.size
@@ -306,11 +307,11 @@ class ProjectTest < ActiveSupport::TestCase
       person=Factory(:person_in_multiple_projects)
       proj1 = person.projects.first
       proj2 = person.projects.last
-      person.is_project_manager=true,proj1
+      person.is_project_administrator=true,proj1
       person.save!
 
-      assert proj1.project_managers.include?(person)
-      assert !proj2.project_managers.include?(person)
+      assert proj1.project_administrator.include?(person)
+      assert !proj2.project_administrator.include?(person)
     end
   end
 

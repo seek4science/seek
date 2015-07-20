@@ -122,8 +122,8 @@ class Project < ActiveRecord::Base
   end
 
   #this is seek role
-  def project_managers
-    people_with_the_role("project_manager")
+  def project_administrator
+    people_with_the_role("project_administrator")
   end
 
   #this is seek role
@@ -196,11 +196,11 @@ class Project < ActiveRecord::Base
   end
 
   def can_be_edited_by?(user)
-    user ? (user.is_admin? || user.is_project_manager?(self)) : false
+    user ? (user.is_admin? || user.is_project_administrator?(self)) : false
   end
 
   def can_be_administered_by?(user)
-    user ? (user.is_admin? || user.is_project_manager?(self)) : false
+    user ? (user.is_admin? || user.is_project_administrator?(self)) : false
   end
 
   def can_delete?(user=User.current_user)

@@ -42,7 +42,7 @@ class Institution < ActiveRecord::Base
   #determines if this person is the member of a project for which the user passed is a project manager
   def is_managed_by? user
     match = self.projects.find do |p|
-      user.person.is_project_manager?(p)
+      user.person.is_project_administrator?(p)
     end
     !match.nil?
   end

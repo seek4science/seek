@@ -9,7 +9,7 @@ class InstitutionsController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :only => [:destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :is_admin_or_is_project_manager, :only => [:new, :create]
+  before_filter :is_admin_or_is_project_administrator, :only => [:new, :create]
 
   cache_sweeper :institutions_sweeper,:only=>[:update,:create,:destroy]
   include Seek::BreadCrumbs

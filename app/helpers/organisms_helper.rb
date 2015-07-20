@@ -64,7 +64,7 @@ module OrganismsHelper
   end
 
   def can_create_organisms?
-    admin_or_project_manager_logged_in?
+    admin_or_project_administrator_logged_in?
   end
 
   def bioportal_search_enabled?

@@ -85,8 +85,8 @@ class ApplicationController < ActionController::Base
     return true
   end
 
-  def is_admin_or_is_project_manager
-    unless User.admin_or_project_manager_logged_in?
+  def is_admin_or_is_project_administrator
+    unless User.admin_or_project_administrator_logged_in?
       error("You do not have the permission", "Not admin or #{t('project')} manager")
       return false
     end

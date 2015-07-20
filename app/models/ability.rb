@@ -36,7 +36,7 @@ class Ability
 
   end
 
-  def project_manager project_manager
+  def project_administrator project_administrator
 
   end
 

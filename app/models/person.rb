@@ -304,15 +304,15 @@ class Person < ActiveRecord::Base
   def can_be_edited_by?(subject)
     return false unless subject
     subject = subject.user if subject.is_a?(Person)
-    subject == self.user || subject.is_admin? || self.is_managed_by?(subject)
+    subject == self.user || subject.is_admin? || self.is_administered_by?(subject)
   end
 
   #determines if this person is the member of a project for which the user passed is a project manager,
   # #and the current person is not an admin
-  def is_managed_by? user
+  def is_administered_by? user
     return false if self.is_admin?
     match = self.projects.find do |p|
-      user.person.is_project_manager?(p)
+      user.person.is_project_administrator?(p)
     end
     !match.nil?
   end
@@ -325,7 +325,7 @@ class Person < ActiveRecord::Base
   def can_be_administered_by?(user)
     person = user.try(:person)
     return false unless user && person
-    user.is_admin? || (person.is_project_manager_of_any_project? && (self.is_admin? || self!=person))
+    user.is_admin? || (person.is_project_administrator_of_any_project? && (self.is_admin? || self!=person))
   end
 
   def can_view? user = User.current_user

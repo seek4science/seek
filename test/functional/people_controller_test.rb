@@ -503,10 +503,10 @@ class PeopleControllerTest < ActionController::TestCase
 
     person = assigns(:person)
     project = work_group.project
-    put :administer_update, id: person, person: { work_group_ids: [work_group.id] }, roles: { project_manager: [project.id] }
+    put :administer_update, id: person, person: { work_group_ids: [work_group.id] }, roles: { project_administrator: [project.id] }
     person = assigns(:person)
     assert_not_nil person
-    assert person.is_project_manager?(project)
+    assert person.is_project_administrator?(project)
   end
 
   test 'update roles for a person' do
@@ -515,12 +515,12 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil person
     assert person.is_pal?(project)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: { project_manager: [project.id] }
+    put :administer_update, id: person.id, person: { id: person.id }, roles: { project_administrator: [project.id] }
 
     person = assigns(:person)
     person.reload
     assert_not_nil person
-    assert person.is_project_manager?(project)
+    assert person.is_project_administrator?(project)
     assert !person.is_pal?(project)
   end
 
@@ -529,13 +529,13 @@ class PeopleControllerTest < ActionController::TestCase
     proj1 = person.projects[0]
     proj2 = person.projects[1]
     assert !person.is_asset_manager?(proj1)
-    assert !person.is_project_manager?(proj2)
+    assert !person.is_project_administrator?(proj2)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: { project_manager: [proj2.id], asset_manager: [proj1.id] }
+    put :administer_update, id: person.id, person: { id: person.id }, roles: { project_administrator: [proj2.id], asset_manager: [proj1.id] }
 
     person = assigns(:person)
     assert person.is_asset_manager?(proj1)
-    assert person.is_project_manager?(proj2)
+    assert person.is_project_administrator?(proj2)
   end
 
   test 'remove somebody from a role' do
@@ -571,14 +571,14 @@ class PeopleControllerTest < ActionController::TestCase
     project = person.projects.first
     assert_not_nil project
 
-    put :administer_update, id: person.id, person: {}, roles: { project_manager: [project.id] }
+    put :administer_update, id: person.id, person: {}, roles: { project_administrator: [project.id] }
 
     person = assigns(:person)
 
     assert_not_nil person
-    assert person.is_project_manager?(project)
+    assert person.is_project_administrator?(project)
     assert person.is_admin?
-    assert_equal %w(admin project_manager), person.role_names.sort
+    assert_equal %w(admin project_administrator), person.role_names.sort
   end
 
   test 'set the asset manager role for a person with workgroup' do
@@ -601,7 +601,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person)
     get :admin, id: person
     assert_select 'select#_roles_asset_manager', count: 1
-    assert_select 'select#_roles_project_manager', count: 1
+    assert_select 'select#_roles_project_administrator', count: 1
     assert_select 'select#_roles_gatekeeper', count: 1
   end
 
@@ -698,7 +698,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     get :index
 
-    project_manager_number = assigns(:people).select(&:is_project_manager_of_any_project?).count
+    project_manager_number = assigns(:people).select(&:is_project_administrator_of_any_project?).count
     assert_select 'img[src*=?]', /medal_gold_1.png/, count: project_manager_number
   end
 
@@ -706,10 +706,10 @@ class PeopleControllerTest < ActionController::TestCase
     project_manager = Factory(:person_in_multiple_projects)
     managed_project = project_manager.projects.first
     not_managed_project = project_manager.projects.last
-    project_manager.is_project_manager = true, managed_project
+    project_manager.is_project_administrator = true, managed_project
     project_manager.save!
 
-    assert project_manager.is_project_manager_of_any_project?
+    assert project_manager.is_project_administrator_of_any_project?
     assert managed_project.can_be_administered_by?(project_manager)
     refute not_managed_project.can_be_administered_by?(project_manager)
 
@@ -754,8 +754,8 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person)
     refute_empty person.projects
 
-    refute project_manager.is_project_manager?(person.projects.first)
-    assert project_manager.is_project_manager?(project_manager.projects.first)
+    refute project_manager.is_project_administrator?(person.projects.first)
+    assert project_manager.is_project_administrator?(project_manager.projects.first)
 
     existing_wg = person.projects.first.work_groups.first
     project_manager_wg = project_manager.projects.first.work_groups.first
@@ -773,10 +773,10 @@ class PeopleControllerTest < ActionController::TestCase
     project_manager = Factory(:person_in_multiple_projects)
     managed_project = project_manager.projects.first
     not_managed_project = project_manager.projects.last
-    project_manager.is_project_manager = true, managed_project
+    project_manager.is_project_administrator = true, managed_project
     project_manager.save!
 
-    assert project_manager.is_project_manager_of_any_project?
+    assert project_manager.is_project_administrator_of_any_project?
     refute not_managed_project.can_be_administered_by?(project_manager)
 
     subject = Factory(:person)
@@ -850,7 +850,7 @@ class PeopleControllerTest < ActionController::TestCase
     refute_includes project_manager.institutions, person.institutions.first, 'they should not be in the same institution'
     assert_equal 1, person.institutions.count, 'should only be in 1 project'
 
-    assert project_manager.is_project_manager?(project)
+    assert project_manager.is_project_administrator?(project)
 
     login_as(project_manager)
     get :edit, id: person

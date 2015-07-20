@@ -235,10 +235,10 @@ class MailerTest < ActionMailer::TestCase
     params[:other_projects]="Another Project"
     params[:other_institutions]="Another Institute"
 
-    @expected.body = read_fixture('contact_project_manager_new_user')
+    @expected.body = read_fixture('contact_project_administrator_new_user')
 
     assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_project_manager_new_user(project_manager, params, users(:aaron), "localhost"))
+                 encode_mail(Mailer.contact_project_administrator_new_user(project_manager, params, users(:aaron), "localhost"))
 
 
   end

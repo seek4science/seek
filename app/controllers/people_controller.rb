@@ -13,7 +13,7 @@ class PeopleController < ApplicationController
   before_filter :is_user_admin_auth,:only=>[:destroy,:new]
   before_filter :removed_params,:only=>[:update,:create]
   before_filter :administerable_by_user, :only => [:admin, :administer_update]
-  before_filter :do_projects_belong_to_project_manager_projects,:only=>[:administer_update]
+  before_filter :do_projects_belong_to_project_administrator_projects,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
 
   skip_before_filter :partially_registered?,:only=>[:register,:create]
@@ -159,7 +159,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.save && current_user.save
         if Seek::Config.email_enabled && during_registration
-          notify_admin_and_project_managers_of_new_user
+          notify_admin_and_project_administrators_of_new_user
         end
         if current_user.active?
           flash[:notice] = 'Person was successfully created.'
@@ -182,13 +182,13 @@ class PeopleController < ApplicationController
     end
   end
 
-  def notify_admin_and_project_managers_of_new_user
+  def notify_admin_and_project_administrators_of_new_user
     Mailer.contact_admin_new_user(params,current_user, base_host).deliver
 
     #send mail to project managers
-    project_managers = project_managers_of_selected_projects params[:projects]
-    project_managers.each do |project_manager|
-      Mailer.contact_project_manager_new_user(project_manager, params,current_user, base_host).deliver
+    project_administrators = project_administrators_of_selected_projects params[:projects]
+    project_administrators.each do |project_administrator|
+      Mailer.contact_project_administrator_new_user(project_administrator, params,current_user, base_host).deliver
     end
   end
 
@@ -226,7 +226,7 @@ class PeopleController < ApplicationController
 
     passed_params=    {:roles                 =>  User.admin_logged_in?,
                        :roles_mask            => User.admin_logged_in?,
-                       :work_group_ids        => (User.admin_or_project_manager_logged_in?)}
+                       :work_group_ids        => (User.admin_or_project_administrator_logged_in?)}
     temp = params.clone
     params[:person] = {}
     passed_params.each do |param, allowed|
@@ -368,19 +368,19 @@ class PeopleController < ApplicationController
     end
   end
 
-  def project_managers_of_selected_projects project_ids
+  def project_administrators_of_selected_projects project_ids
     if project_ids.blank?
       []
     else
       Project.find_all_by_id(project_ids).collect do |project|
-        project.project_managers
+        project.project_administrator
       end.flatten.uniq
     end
   end
 
-  def do_projects_belong_to_project_manager_projects
+  def do_projects_belong_to_project_administrator_projects
       if (params[:person] and params[:person][:work_group_ids])
-        if User.project_manager_logged_in? && !User.admin_logged_in?
+        if User.admin_or_project_administrator_logged_in?
           projects = []
           params[:person][:work_group_ids].each do |id|
             work_group = WorkGroup.find_by_id(id)
