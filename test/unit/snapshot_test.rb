@@ -25,7 +25,7 @@ class SnapshotTest < ActiveSupport::TestCase
     investigation = Factory(:investigation)
     s1 = investigation.create_snapshot
     s2 = investigation.create_snapshot
-    s3 = investigation.create_snapshot#
+    s3 = investigation.create_snapshot
 
     assert_equal 3, investigation.snapshots.count
     assert_equal s2, investigation.snapshot(2)
