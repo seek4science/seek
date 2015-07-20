@@ -1,14 +1,15 @@
 module Seek
   module Mail
-    #utility for creating the text for list of projects and institutions a
+    # utility for creating the text for list of projects and institutions a
     # new registration has indicated they are involved with, based on the params
     class NewMemberAffiliationDetails
-      attr :projects,:institutions,:other_projects,:other_institutions
-      def initialize params
-        @projects = Array(params[:projects]).collect{|id| Project.find_by_id(id)}.compact
-        @institutions = Array(params[:institutions]).collect{|id| Institution.find_by_id(id)}.compact
-        @other_projects = params[:other_projects] || ""
-        @other_institutions = params[:other_institutions] || ""
+      attr_reader :projects, :institutions, :other_projects, :other_institutions
+
+      def initialize(params)
+        @projects = Array(params[:projects]).collect { |id| Project.find_by_id(id) }.compact
+        @institutions = Array(params[:institutions]).collect { |id| Institution.find_by_id(id) }.compact
+        @other_projects = params[:other_projects] || ''
+        @other_institutions = params[:other_institutions] || ''
       end
 
       def message
@@ -21,12 +22,11 @@ module Seek
 
       private
 
-      def details_existing items
+      def details_existing(items)
         items.collect do |item|
           "#{item.class.name}: #{item.title}"
         end.join("\r\n")
       end
-
     end
   end
 end
