@@ -59,18 +59,18 @@ class GeneratorTest < ActiveSupport::TestCase
       end
     end
     inv.studies.each do |study|
-      assert_include paths, "investigations/#{inv.ro_package_path_id_fragment}/studies/#{study.ro_package_path_id_fragment}/metadata.rdf"
-      assert_include paths, "investigations/#{inv.ro_package_path_id_fragment}/studies/#{study.ro_package_path_id_fragment}/metadata.json"
+      assert_include paths, "#{study.research_object_package_path}metadata.rdf"
+      assert_include paths, "#{study.research_object_package_path}metadata.json"
       study.assays.each do |assay|
-        assert_include paths, "investigations/#{inv.ro_package_path_id_fragment}/studies/#{study.ro_package_path_id_fragment}/assays/#{assay.ro_package_path_id_fragment}/metadata.rdf"
-        assert_include paths, "investigations/#{inv.ro_package_path_id_fragment}/studies/#{study.ro_package_path_id_fragment}/assays/#{assay.ro_package_path_id_fragment}/metadata.json"
+        assert_include paths, "#{assay.research_object_package_path}metadata.rdf"
+        assert_include paths, "#{assay.research_object_package_path}metadata.json"
       end
     end
     assets = inv.assets
     assert_equal 7,assets.count
     assets.each do |asset|
-      assert_include paths,"#{asset.class.name.underscore.pluralize}/#{asset.ro_package_path_id_fragment}/metadata.json"
-      assert_include paths,"#{asset.class.name.underscore.pluralize}/#{asset.ro_package_path_id_fragment}/metadata.rdf"
+      assert_include paths, "#{asset.research_object_package_path}metadata.json"
+      assert_include paths, "#{asset.research_object_package_path}metadata.json"
     end
 
     #simple check for assets contents, using model with image to check the image is there
