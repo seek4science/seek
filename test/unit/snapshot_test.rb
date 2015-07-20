@@ -13,11 +13,12 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal 2, s2.snapshot_number
   end
 
-  test 'can access snapshot RO manifest' do
+  test 'can access snapshot metadata' do
     investigation = Factory(:investigation)
     snapshot = investigation.create_snapshot
 
-    assert_not_nil JSON.parse(snapshot.manifest)
+    assert snapshot.metadata.is_a?(Hash)
+    assert_equal investigation.title, snapshot.metadata['title']
   end
 
   test 'can fetch by snapshot number' do
