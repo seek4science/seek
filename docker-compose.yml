@@ -1,15 +1,15 @@
+dbdata: # Data container for DB
+  image: postgres
+  command: /bin/echo Postgres data container
+
 db: # Database implementation
   image: postgres
   volumes_from:
     - dbdata
 
-dbdata: # Data container for DB
-  image: postgres
-  command: /bin/echo Postgres data container
-
 seekdata: # Data container for SEEK filestore
-  image: ubuntu:14.04
-  command: mkdir /home/app/seek/filestore && /bin/echo SEEK data container
+  image: busybox
+  command: mkdir /home/app/seek/filestore && echo SEEK data container
   volumes:
     - /home/app/seek/filestore
 
