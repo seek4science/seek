@@ -13,6 +13,9 @@ class SnapshotsController < ApplicationController
   def show
   end
 
+  def new
+  end
+
   def download
     @content_blob = @snapshot.content_blob
     send_file @content_blob.filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type || "application/octet-stream"

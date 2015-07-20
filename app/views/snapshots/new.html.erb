@@ -1,0 +1,31 @@
+<%= render :partial => "general/page_title", :locals => { :title => 'Snapshot Preview' } %>
+<% items = Seek::ResearchObjects::Generator.instance.gather_entries(@investigation, true).group_by(&:permitted_for_research_object?) %>
+
+<p>
+  The following public resources will be included in the snapshot. Please ensure this list is correct before clicking the "Create Snapshot" button below.<br/>
+</p>
+
+<div class="row">
+  <% [{title: 'Included', panel_type: 'panel-success', list: items[true]},
+      {title: 'Excluded', panel_type: 'panel-danger', list: items[false]}].each do |options| %>
+      <div class="col-md-6">
+        <%= panel(options[:title] + " (#{options[:list].count})", :type => options[:panel_type]) do %>
+            <% if options[:list].empty? %>
+                Nothing
+            <% end %>
+            <% options[:list].group_by(&:class).each do |type, resources| %>
+                <h5><%= type.name.titleize.pluralize %> (<%= resources.count -%>)</h5>
+                <ul>
+                  <% resources.each do |resource| %>
+                      <li><%= link_to resource.title, resource %></li>
+                  <% end %>
+                </ul>
+            <% end %>
+        <% end %>
+      </div>
+  <% end %>
+</div>
+
+<%= link_to('Create Snapshot', investigation_snapshots_path(@investigation), :method => :post, :class => 'btn btn-primary') %>
+
+or <%= link_to 'Cancel', investigation_path(@investigation), :class => 'btn btn-default' -%>

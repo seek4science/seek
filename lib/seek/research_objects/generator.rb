@@ -32,14 +32,17 @@ module Seek
         file
       end
 
-      private
-
       # collects the entries contained by the investigation for inclusion in
       # the research object
-      def gather_entries(investigation)
+      def gather_entries(investigation, show_all = false)
         entries = [investigation] + [investigation.studies] + [investigation.assays] + [investigation.assets]
-        entries.flatten.select(&:permitted_for_research_object?)
+        entries.flatten!
+        entries.select!(&:permitted_for_research_object?) unless show_all
+
+        entries
       end
+
+      private
 
       # generates and stores the metadata for the item, using the handlers
       # defined by #metdata_handlers

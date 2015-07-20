@@ -225,7 +225,7 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
-    resources :snapshots, :only => [:show, :create] do
+    resources :snapshots, :only => [:show, :new, :create] do
       member do
         post :mint_doi
         get :download
