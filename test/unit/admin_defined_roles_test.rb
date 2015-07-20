@@ -411,7 +411,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
   end
 
   test "order of ROLES" do
-    assert_equal %w[admin pal project_administrator asset_manager gatekeeper],Person::ROLES,"The order of the ROLES is critical as it determines the mask that is used."
+    assert_equal %w[admin pal project_administrator asset_manager gatekeeper programme_administrator],Person::ROLES,"The order of the ROLES is critical as it determines the mask that is used."
   end
 
   test "factories for roles" do

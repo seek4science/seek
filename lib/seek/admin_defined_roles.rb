@@ -5,14 +5,38 @@ module Seek
 
     end
 
-    ROLES = %w[admin pal project_administrator asset_manager gatekeeper]
+    #roles not linked to a project or programme
+    INDEPENDENT_ROLES = %w[admin]
     PROJECT_DEPENDENT_ROLES = %w[pal project_administrator asset_manager gatekeeper]
+    PROGRAMME_DEPENDENT_ROLES = %w[programme_administrator]
+
+    ROLES = INDEPENDENT_ROLES | PROJECT_DEPENDENT_ROLES | PROGRAMME_DEPENDENT_ROLES
 
     def self.included(base)
       raise "Only People can have roles" unless base==Person
 
       base.extend(ClassMethods)
-      ROLES.each do |role|
+
+      define_independent_role_methods
+      define_project_dependent_role_methods
+
+      base.class_eval do
+        requires_can_manage :roles_mask
+        has_many :admin_defined_role_projects, :dependent=>:destroy
+        after_save :resolve_admin_defined_role_projects
+      end
+
+      def is_in_any_gatekept_projects?
+        !projects.collect(&:gatekeepers).flatten.empty?
+      end
+
+      def is_admin_or_project_administrator?
+        is_admin? || is_project_administrator_of_any_project?
+      end
+    end
+
+    def self.define_project_dependent_role_methods
+      PROJECT_DEPENDENT_ROLES.each do |role|
         eval <<-END_EVAL
             def is_#{role}?(project=nil,ignore_project=false)
               role_names.include?('#{role}') && (ignore_project || roles(project).include?('#{role}'))
@@ -41,18 +65,23 @@ module Seek
             end
         END_EVAL
       end
-      base.class_eval do
-        requires_can_manage :roles_mask
-        has_many :admin_defined_role_projects, :dependent=>:destroy
-        after_save :resolve_admin_defined_role_projects
-      end
+    end
 
-      def is_in_any_gatekept_projects?
-        !projects.collect(&:gatekeepers).flatten.empty?
-      end
+    def self.define_independent_role_methods
+      INDEPENDENT_ROLES.each do |role|
+        eval <<-END_EVAL
+          def is_#{role}?
+            role_names.include?('#{role}')
+          end
 
-      def is_admin_or_project_administrator?
-        is_admin? || is_project_administrator_of_any_project?
+          def is_#{role}=flag
+            if flag
+              add_roles([ ['#{role}',[]] ])
+            else
+              remove_roles([ ['#{role}',[]] ])
+            end
+          end
+        END_EVAL
       end
     end
 
