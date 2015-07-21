@@ -5,15 +5,15 @@ class PackagingTest < ActiveSupport::TestCase
   test "research object package path" do
     inv = Factory(:experimental_assay,:assay_assets=>[Factory(:assay_asset),Factory(:assay_asset)]).investigation
     #for inv
-    assert_equal "investigations/#{inv.ro_package_path_id_fragment}/",inv.research_object_package_path
+    assert_equal "#{inv.ro_package_path_id_fragment}/",inv.research_object_package_path
 
     #for study
     study = inv.studies.first
-    assert_equal "investigations/#{inv.ro_package_path_id_fragment}/studies/#{study.ro_package_path_id_fragment}/",study.research_object_package_path
+    assert_equal "#{inv.ro_package_path_id_fragment}/#{study.ro_package_path_id_fragment}/",study.research_object_package_path
 
     #for assay
     assay = study.assays.first
-    assert_equal "investigations/#{inv.ro_package_path_id_fragment}/studies/#{study.ro_package_path_id_fragment}/assays/#{assay.ro_package_path_id_fragment}/",assay.research_object_package_path
+    assert_equal "#{inv.ro_package_path_id_fragment}/#{study.ro_package_path_id_fragment}/#{assay.ro_package_path_id_fragment}/",assay.research_object_package_path
 
     #for data file in an assay
     data_file = inv.related_data_files.first
