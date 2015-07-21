@@ -1,6 +1,7 @@
 class SnapshotsController < ApplicationController
   before_filter :find_investigation
   before_filter :auth_investigation, only: [:mint_doi, :new, :create]
+  before_filter :check_investigation_permitted_for_ro, only: [:new, :create]
   before_filter :find_snapshot, only: [:show, :mint_doi, :download]
 
   include Seek::BreadCrumbs
@@ -38,6 +39,13 @@ class SnapshotsController < ApplicationController
   def auth_investigation
     unless is_auth?(@investigation, :manage)
       flash[:error] = "You are not authorized to manage snapshots of this investigation."
+      redirect_to investigation_path(@investigation)
+    end
+  end
+
+  def check_investigation_permitted_for_ro
+    unless @investigation.permitted_for_research_object?
+      flash[:error] = "You may only create snapshots of publicly accessible investigations."
       redirect_to investigation_path(@investigation)
     end
   end
