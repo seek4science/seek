@@ -1,5 +1,6 @@
 class SnapshotsController < ApplicationController
   before_filter :find_investigation
+  before_filter :auth_investigation, only: [:mint_doi, :new, :create]
   before_filter :find_snapshot, only: [:show, :mint_doi, :download]
 
   include Seek::BreadCrumbs
@@ -32,6 +33,13 @@ class SnapshotsController < ApplicationController
 
   def find_investigation
     @investigation = Investigation.find(params[:investigation_id])
+  end
+
+  def auth_investigation
+    unless is_auth?(@investigation, :manage)
+      flash[:error] = "You are not authorized to manage snapshots of this investigation."
+      redirect_to investigation_path(@investigation)
+    end
   end
 
   def find_snapshot
