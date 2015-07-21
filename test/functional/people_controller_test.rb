@@ -566,7 +566,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:admin)
     login_as(person)
     assert person.is_admin?
-    assert_equal ['admin'], person.role_names
+    assert_equal ['admin'], person.roles
 
     project = person.projects.first
     assert_not_nil project
@@ -578,7 +578,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil person
     assert person.is_project_administrator?(project)
     assert person.is_admin?
-    assert_equal %w(admin project_administrator), person.role_names.sort
+    assert_equal %w(admin project_administrator), person.roles.sort
   end
 
   test 'set the asset manager role for a person with workgroup' do

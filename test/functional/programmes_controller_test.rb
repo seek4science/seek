@@ -77,7 +77,6 @@ class ProgrammesControllerTest < ActionController::TestCase
     Factory(:avatar,:owner=>p)
     get :edit, :id=>p
     assert_response :success
-
   end
 
   test "edit page not accessible to non-admin" do

@@ -19,6 +19,7 @@ module Seek
 
       define_independent_role_methods
       define_project_dependent_role_methods
+      define_programme_dependent_role_methods
 
       base.class_eval do
         requires_can_manage :roles_mask
@@ -35,11 +36,31 @@ module Seek
       end
     end
 
+    def self.define_programme_dependent_role_methods
+      PROGRAMME_DEPENDENT_ROLES.each do |role|
+        eval <<-END_EVAL
+          def is_#{role}?(programme=nil,ignore_programme=false)
+
+          end
+
+          def is_#{role}_of_any_programme?
+            is_#{role}?(nil,true)
+          end
+
+          def is_#{role}=(flag_and_programme)
+
+          end
+
+
+        END_EVAL
+      end
+    end
+
     def self.define_project_dependent_role_methods
       PROJECT_DEPENDENT_ROLES.each do |role|
         eval <<-END_EVAL
             def is_#{role}?(project=nil,ignore_project=false)
-              role_names.include?('#{role}') && (ignore_project || roles(project).include?('#{role}'))
+              roles.include?('#{role}') && (ignore_project || roles_for_project(project).include?('#{role}'))
             end
 
             def is_#{role}_of_any_project?
@@ -71,7 +92,7 @@ module Seek
       INDEPENDENT_ROLES.each do |role|
         eval <<-END_EVAL
           def is_#{role}?
-            role_names.include?('#{role}')
+            roles.include?('#{role}')
           end
 
           def is_#{role}=flag
@@ -114,7 +135,6 @@ module Seek
       self.class.mask_for_role(role)
     end
 
-
     def roles=(roles)
       #TODO a bit heavy handed, but works for the moment
       self.roles_mask= 0
@@ -125,7 +145,7 @@ module Seek
 
     def projects_for_role role
       raise UnknownRoleException.new("Unrecognised role name #{role}") unless ROLES.include?(role)
-      if self.role_names.include?(role)
+      if self.roles.include?(role)
         mask = mask_for_role(role)
         AdminDefinedRoleProject.where(role_mask: mask, person_id: self.id).collect{|r| r.project}
       else
@@ -135,23 +155,19 @@ module Seek
     end
 
     #fetch the roles assigned for this project
-    def roles(project=nil)
+    def roles_for_project(project)
       project_id = (project.is_a?(Project)) ? project.id : project.to_i
-      role_names.select do |role_name|
+      roles.select do |role_name|
         if self.class.is_project_dependent_role?(role_name)
-          if project_id.nil?
-            false
-          else
             mask = mask_for_role(role_name)
             !self.admin_defined_role_projects.where(project_id: project_id,role_mask: mask).empty?
-          end
         else
           true
         end
       end
     end
 
-    def role_names
+    def roles
       ROLES.reject do |r|
         ((roles_mask || 0) & mask_for_role(r)).zero?
       end
@@ -213,7 +229,7 @@ module Seek
         end
       end
       new_mask = self.roles_mask
-      roles_to_check = role_names & PROJECT_DEPENDENT_ROLES
+      roles_to_check = roles & PROJECT_DEPENDENT_ROLES
       roles_to_check.collect{|name| mask_for_role(name)}.each do |mask|
         if AdminDefinedRoleProject.where(role_mask: mask, person_id: self.id).empty?
           new_mask -= mask
