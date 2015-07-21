@@ -22,7 +22,6 @@ module Seek
         file ||= temp_file(DEFAULT_FILENAME)
         ROBundle::File.create(file) do |bundle|
           bundle.created_by = create_agent
-          store_metadata(bundle, investigation, '')
           gather_entries(investigation).each do |entry|
             store_metadata(bundle, entry)
             store_files(bundle, entry) if entry.is_asset?

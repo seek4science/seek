@@ -65,7 +65,7 @@ class Snapshot < ActiveRecord::Base
   def parse_metadata
     metadata = {}
     research_object do |ro|
-      json = ro.read('metadata.json')
+      json = ro.read(File.join(resource.research_object_package_path, 'metadata.json'))
       metadata = JSON.parse(json)
     end
     metadata
