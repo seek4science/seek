@@ -40,7 +40,7 @@ module Seek
       PROGRAMME_DEPENDENT_ROLES.each do |role|
         eval <<-END_EVAL
           def is_#{role}?(programme=nil,ignore_programme=false)
-
+            roles.include?('#{role}')
           end
 
           def is_#{role}_of_any_programme?

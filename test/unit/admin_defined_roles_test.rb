@@ -355,6 +355,40 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     end
   end
 
+  test "project administrator of multiple projects" do
+    person = Factory(:person_in_multiple_projects)
+    other_project = Factory(:project)
+    projects = person.projects
+    assert projects.count>1
+    refute person.is_project_administrator_of_any_project?
+
+    person.is_project_administrator=true,projects
+    assert person.is_project_administrator_of_any_project?
+    assert person.is_project_administrator?(projects.first)
+    assert person.is_project_administrator?(projects[1])
+    refute person.is_project_administrator?(other_project)
+
+    person.is_project_administrator=false,projects.first
+    refute person.is_project_administrator?(projects.first)
+    assert person.is_project_administrator?(projects[1])
+    refute person.is_project_administrator?(other_project)
+
+  end
+
+  test "is project administrator regardless of project" do
+    admin = Factory(:admin)
+    project_admin = Factory(:project_administrator)
+    normal = Factory(:person)
+    assert !admin.is_project_administrator?(nil,true)
+    assert !normal.is_project_administrator?(nil,true)
+    assert project_admin.is_project_administrator?(nil,true)
+
+    assert !admin.is_project_administrator_of_any_project?
+    assert !normal.is_project_administrator_of_any_project?
+    assert project_admin.is_project_administrator_of_any_project?
+
+  end
+
   test 'is_gatekeeper?' do
     User.with_current_user Factory(:admin).user do
       person = Factory(:person)
@@ -445,19 +479,9 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
 
   end
 
-  test "is project administrator regardless of project" do
-    admin = Factory(:admin)
-    project_admin = Factory(:project_administrator)
-    normal = Factory(:person)
-    assert !admin.is_project_administrator?(nil,true)
-    assert !normal.is_project_administrator?(nil,true)
-    assert project_admin.is_project_administrator?(nil,true)
 
-    assert !admin.is_project_administrator_of_any_project?
-    assert !normal.is_project_administrator_of_any_project?
-    assert project_admin.is_project_administrator_of_any_project?
 
-  end
+
 
   test 'Person.pals' do
       admin = Factory(:admin)
@@ -525,6 +549,8 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert !project_administrators.include?(normal)
   end
 
+
+
   test "is_in_any_gatekept_projects?" do
     normal = Factory(:person)
     gatekeeper = Factory(:gatekeeper)
@@ -548,14 +574,37 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     refute_includes admins,normal
   end
 
-  test "programme adminstrator" do
+  test "programme administrator" do
     person = Factory(:person)
     programme = Factory(:programme)
+    other_programme = Factory(:programme)
     refute person.is_programme_administrator_of_any_programme?
     refute person.is_programme_administrator?(programme)
+
     person.is_programme_administrator=true,programme
     assert person.is_programme_administrator_of_any_programme?
     assert person.is_programme_administrator?(programme)
+    refute person.is_programme_administrator?(other_programme)
+  end
+
+  test "programme administrator multiple programmes" do
+    person = Factory(:person)
+    programmes = [Factory(:programme),Factory(:programme)]
+    other_programme=Factory(:programme)
+    refute person.is_programme_administrator_of_any_programme?
+
+    person.is_programme_administrator=true,programmes
+    assert person.is_programme_administrator_of_any_programme?
+    assert person.is_programme_administrator_of?(programmes[0])
+    assert person.is_programme_administrator_of?(programmes[1])
+    refute person.is_programme_administrator_of?(other_programme)
+
+    person.is_programme_administrator_of=false,progammes[0]
+    person.is_programme_administrator_of=true,other_programme
+    assert person.is_programme_administrator_of_any_programme?
+    refute person.is_programme_administrator_of?(programmes[0])
+    assert person.is_programme_administrator_of?(programmes[1])
+    assert person.is_programme_administrator_of?(other_programme)
   end
 
 end
