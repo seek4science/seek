@@ -167,8 +167,8 @@ class ApplicationController < ActionController::Base
             path = nil
             begin
               path = eval("main_app.#{controller_name}_path")
-            rescue Exception=>e
-              logger.error("No path found for controller - #{controller_name}",e)
+            rescue NoMethodError => e
+              logger.error("No path found for controller - #{controller_name}")
               path = main_app.root_path
             end
             redirect_to path
