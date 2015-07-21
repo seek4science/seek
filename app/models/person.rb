@@ -4,7 +4,7 @@ class Person < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::Taggable
-  include Seek::AdminDefinedRoles
+  include Seek::Roles::AdminDefinedRoles
 
   alias_attribute :title, :name
 

@@ -137,8 +137,7 @@ class Project < ActiveRecord::Base
 
   #returns people belong to the admin defined seek 'role' for this project
   def people_with_the_role role
-    mask = Person.mask_for_role(role)
-    AdminDefinedRoleProject.where(role_mask: mask,project_id: self.id).collect{|r| r.person}
+    Seek::Roles::ProjectDependentRoles.instance.people_with_project_and_role(self,role)
   end
 
   def locations

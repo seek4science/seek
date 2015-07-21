@@ -44,7 +44,7 @@ test "admin defined roles in projects should be also the roles in sub projects" 
     end
 
     # test assigning roles to admins
-    person.roles_mask = Person.mask_for_role("admin")
+    person.roles_mask = Seek::Roles::Roles.instance.mask_for_role("admin")
     disable_authorization_checks do
       person.save!
     end

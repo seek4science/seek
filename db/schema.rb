@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150625131437) do
+ActiveRecord::Schema.define(:version => 20150721134955) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -35,6 +35,12 @@ ActiveRecord::Schema.define(:version => 20150625131437) do
   add_index "activity_logs", ["culprit_type", "culprit_id"], :name => "act_logs_culprit_index"
   add_index "activity_logs", ["format"], :name => "act_logs_format_index"
   add_index "activity_logs", ["referenced_type", "referenced_id"], :name => "act_logs_referenced_index"
+
+  create_table "admin_defined_role_programmes", :force => true do |t|
+    t.integer "programme_id"
+    t.integer "person_id"
+    t.integer "role_mask"
+  end
 
   create_table "admin_defined_role_projects", :force => true do |t|
     t.integer "project_id"

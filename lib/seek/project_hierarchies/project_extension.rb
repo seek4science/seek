@@ -83,7 +83,7 @@ module Seek
           end
 
           #admin defined project roles, in the project and its ancestors
-          Person::PROJECT_DEPENDENT_ROLES.each do |role|
+          Seek::Roles::ProjectDependentRoles.role_names.each do |role|
             define_method "#{role.pluralize}" do
               self_and_ancestors = [self] + self.ancestors
               self_and_ancestors.map { |proj| proj.people_with_the_role(role) }.flatten.uniq
