@@ -11,6 +11,18 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "new page works even when no programme-less projects" do
+    programme = Factory(:programme)
+    work_group = Factory(:work_group, :project => programme.projects.first)
+    admin = Factory(:admin, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+
+    Project.without_programme.delete_all
+
+    login_as(admin)
+    get :new
+    assert_response :success
+  end
+
   test "new page not accessible to non admin" do
     login_as(Factory(:person))
     get :new

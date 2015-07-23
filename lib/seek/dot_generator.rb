@@ -196,7 +196,7 @@ end
 
 class InvestigationNode < SeekNode
   def children
-    item.studies
+    item.studies | item.publications
   end
 end
 

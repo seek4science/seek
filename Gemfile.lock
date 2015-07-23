@@ -32,7 +32,8 @@ GIT
 
 GIT
   remote: https://github.com/SysMO-DB/fleximage
-  revision: 658985eb1460fb5d6612f624463e6cbf067ad973
+  revision: af4da1ca93020749490331a50556d5094fb1cd0e
+  ref: af4da1ca93020749490331a50556d5094fb1cd0e
   specs:
     fleximage (0.1)
 
@@ -572,7 +573,7 @@ GEM
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     rfc-822 (0.4.0)
-    rmagick (2.13.2)
+    rmagick (2.15.2)
     ro-bundle (0.2.0)
       json (~> 1.8)
       ucf (~> 2.0)
@@ -821,7 +822,7 @@ DEPENDENCIES
   request-log-analyzer
   rest-client
   rfc-822
-  rmagick (= 2.13.2)
+  rmagick (= 2.15.2)
   ro-bundle
   rspec-rails
   rubocop
@@ -851,3 +852,6 @@ DEPENDENCIES
   will_paginate (~> 3.0.4)
   yaml_db
   yui-compressor
+
+BUNDLED WITH
+   1.10.3
