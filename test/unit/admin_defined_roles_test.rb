@@ -595,6 +595,13 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     refute person.is_programme_administrator?(programmes[0])
     assert person.is_programme_administrator?(programmes[1])
     assert person.is_programme_administrator?(other_programme)
+
+    person.save!
+    person = Person.find(person.id)
+    assert person.is_programme_administrator_of_any_programme?
+    refute person.is_programme_administrator?(programmes[0])
+    assert person.is_programme_administrator?(programmes[1])
+    assert person.is_programme_administrator?(other_programme)
   end
 
 end

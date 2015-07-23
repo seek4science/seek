@@ -23,11 +23,18 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "new page not accessible to non admin" do
+  test "new page accessible to non admin" do
     login_as(Factory(:person))
     get :new
-    assert_redirected_to :root
-    refute_nil flash[:error]
+    assert_response :success
+  end
+
+  test "new page accessible to projectless user" do
+    p = Factory(:brand_new_person)
+    login_as(p)
+    assert p.projects.empty?
+    get :new
+    assert_response :success
   end
 
   test "only admin can destroy" do
@@ -79,7 +86,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "edit page not accessible to non-admin" do
+  test "edit page accessible to non-admin" do
     login_as(Factory(:person))
     p = Factory(:programme)
     get :edit, :id=>p
@@ -202,6 +209,18 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select "#errorExplanation" do
       assert_select "li",:text=>/Title can.*t be blank/,:count=>1
     end
+  end
+
+  test "user can create programme, and becomes programme administrator" do
+    p = Factory(:person)
+    login_as(p)
+    assert_difference("Programme.count") do
+      post :create, :programme=>{:title=>"A programme"}
+    end
+    prog = assigns(:programme)
+    assert_redirected_to prog
+    p.reload
+    assert p.is_programme_administrator?(prog)
   end
 
 end

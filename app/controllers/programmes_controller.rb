@@ -5,7 +5,9 @@ class ProgrammesController < ApplicationController
   before_filter :programmes_enabled?
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:initiate_spawn_project,:spawn_project]
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_user_admin_auth,:except=>[:show,:index]
+  before_filter :is_user_admin_auth,:only=>[:destroy,:initiate_spawn_project,:spawn_project]
+
+  skip_before_filter :project_membership_required
 
   include Seek::BreadCrumbs
 
@@ -14,6 +16,11 @@ class ProgrammesController < ApplicationController
   def create
     @programme = Programme.new(params[:programme])
     flash[:notice] = "The #{t('programme').capitalize} was successfully created." if @programme.save
+
+    #current person becomes the administrator
+    User.current_user.person.is_programme_administrator=true,@programme
+    disable_authorization_checks{User.current_user.person.save!}
+
     respond_with(@programme)
   end
 

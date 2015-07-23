@@ -30,6 +30,9 @@ class Programme < ActiveRecord::Base
     !user.nil? && user.is_admin?
   end
 
+  def administrators
+    Seek::Roles::ProgrammeDependentRoles.instance.people_with_programme_and_role(self,"programme_administrator")
+  end
 
 end
 

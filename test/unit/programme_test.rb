@@ -86,5 +86,19 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert_nil project.programme_id
   end
 
+  test "administrators" do
+    person = Factory(:person)
+    programme = Factory(:programme)
+    refute person.is_programme_administrator?(programme)
+    assert_empty programme.administrators
+    person.is_programme_administrator=true,programme
+    disable_authorization_checks{person.save!}
+
+    assert person.is_programme_administrator?(programme)
+    refute_empty programme.administrators
+    assert_equal [person],programme.administrators
+
+  end
+
 
 end

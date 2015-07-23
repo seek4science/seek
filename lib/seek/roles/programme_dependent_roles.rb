@@ -41,6 +41,11 @@ module Seek
         person.roles_mask -= mask if (current_programme_ids - programme_ids).empty?
       end
 
+      def people_with_programme_and_role(programme, role)
+        mask = mask_for_role(role)
+        AdminDefinedRoleProgramme.where(role_mask: mask, programme_id: programme.id).collect(&:person)
+      end
+
       def associated_item_class
         Programme
       end
