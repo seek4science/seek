@@ -6,6 +6,10 @@ module AssetsHelper
     controller_name.downcase.singularize.underscore
   end
 
+  def can_create_new_items?
+    logged_in_and_registered? && current_user.person.can_create_new_items?
+  end
+
   def request_request_label(resource)
     icon_filename = icon_filename_for_key('message')
     resource_type = text_for_resource(resource)

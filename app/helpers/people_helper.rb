@@ -1,5 +1,9 @@
 module PeopleHelper
 
+  def can_create_profiles?
+    User.admin_or_project_administrator_logged_in?
+  end
+
   def contact_details_warning_message
     msg = "This information is only visible to other people whom you share a #{t('project')}"
     msg << " or #{t('programme')}" if Seek::Config.programmes_enabled

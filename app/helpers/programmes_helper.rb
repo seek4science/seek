@@ -12,4 +12,8 @@ module ProgrammesHelper
     html.html_safe
   end
 
+  def can_create_programmes?
+    logged_in_and_registered? && Seek::Config.programmes_enabled
+  end
+
 end
