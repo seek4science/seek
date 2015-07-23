@@ -52,7 +52,7 @@ class ProgrammesControllerTest < ActionController::TestCase
       delete :destroy,:id=>prog.id
     end
     refute_nil flash[:error]
-    assert_redirected_to :root
+    assert_redirected_to prog
     proj.reload
     assert_equal prog,proj.programme
   end
@@ -72,7 +72,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_nil proj.programme_id
   end
 
-  test "update" do
+  test "admin can update" do
     login_as(Factory(:admin))
     prog = Factory(:programme,:description=>"ggggg")
     put :update, :id=>prog, :programme=>{:title=>"fish"}
@@ -80,6 +80,29 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute_nil prog
     assert_redirected_to prog
     assert_equal "fish",prog.title
+    assert_equal "ggggg",prog.description
+  end
+
+  test "programme administrator can update" do
+    person = Factory(:person)
+    login_as(person)
+    prog = Factory(:programme,:description=>"ggggg")
+    person.is_programme_administrator=true,prog
+    disable_authorization_checks{person.save!}
+    put :update, :id=>prog, :programme=>{:title=>"fish"}
+    prog = assigns(:programme)
+    refute_nil prog
+    assert_redirected_to prog
+    assert_equal "fish",prog.title
+    assert_equal "ggggg",prog.description
+  end
+
+  test "normal user cannot update" do
+    login_as(Factory(:person))
+    prog = Factory(:programme,:description=>"ggggg",:title=>"eeeee")
+    put :update, :id=>prog, :programme=>{:title=>"fish"}
+    assert_redirected_to prog
+    assert_equal "eeeee",prog.title
     assert_equal "ggggg",prog.description
   end
 
@@ -91,19 +114,29 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "edit page accessible to non-admin" do
+  test "edit page not accessible to user" do
     login_as(Factory(:person))
     p = Factory(:programme)
     get :edit, :id=>p
-    assert_redirected_to :root
+    assert_redirected_to p
     refute_nil flash[:error]
+  end
+
+  test "edit page accessible to programme_administrator" do
+    person = Factory(:person)
+    login_as(person)
+    p = Factory(:programme)
+    person.is_programme_administrator=true,p
+    disable_authorization_checks{person.save!}
+    get :edit, :id=>p
+    assert_response :success
   end
 
   test "should show index" do
     p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
     avatar = Factory(:avatar,:owner=>p)
     p.avatar = avatar
-    p.save!
+    disable_authorization_checks{p.save!}
     Factory(:programme)
 
     get :index
@@ -114,7 +147,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
     avatar = Factory(:avatar,:owner=>p)
     p.avatar = avatar
-    p.save!
+    disable_authorization_checks{p.save!}
 
     get :show,:id=>p
     assert_response :success
@@ -124,7 +157,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
     avatar = Factory(:avatar,:owner=>p)
     p.avatar = avatar
-    p.save!
+    disable_authorization_checks{p.save!}
     login_as(Factory(:admin))
     put :update, :id=>p, :programme=>{:avatar_id=>"0"}
     prog = assigns(:programme)

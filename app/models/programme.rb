@@ -27,7 +27,15 @@ class Programme < ActiveRecord::Base
   end
 
   def can_be_edited_by?(user)
-    !user.nil? && user.is_admin?
+    can_edit?(user)
+  end
+
+  def can_edit?(user=User.current_user)
+    user && (new_record? || user.is_admin? || user.person.is_programme_administrator?(self))
+  end
+
+  def can_delete?(user=User.current_user)
+    User.admin_logged_in?
   end
 
   def administrators
