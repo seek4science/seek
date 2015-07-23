@@ -38,6 +38,10 @@ class Programme < ActiveRecord::Base
     User.admin_logged_in?
   end
 
+  def self.can_create?
+    User.logged_in_and_registered? && Seek::Config.programmes_enabled
+  end
+
   def administrators
     Seek::Roles::ProgrammeDependentRoles.instance.people_with_programme_and_role(self,"programme_administrator")
   end

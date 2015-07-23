@@ -13,7 +13,7 @@ module ProgrammesHelper
   end
 
   def can_create_programmes?
-    logged_in_and_registered? && Seek::Config.programmes_enabled
+    Programme.can_create?
   end
 
 end

@@ -56,4 +56,8 @@ class Institution < ActiveRecord::Base
     user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
   end
 
+  def self.can_create?
+    User.admin_or_project_administrator_logged_in?
+  end
+
 end

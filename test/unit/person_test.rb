@@ -746,20 +746,6 @@ class PersonTest < ActiveSupport::TestCase
 
   end
 
-  test "can_create_new_items" do
-    p=Factory :person
-    assert p.can_create_new_items?
-    assert p.member?
-
-    p.group_memberships.destroy_all
-
-    #this is necessary because Person caches the projects in the instance variable @known_projects
-    p = Person.find(p.id)
-    assert !p.member?
-    assert !p.can_create_new_items?
-
-  end
-
   test "should be able to remove the workgroup whose project is not subcribed" do
     p=Factory :person
     wg = Factory :work_group
@@ -888,5 +874,19 @@ class PersonTest < ActiveSupport::TestCase
     cachekey = person.cache_key
     person.add_to_project_and_institution(Factory(:project),Factory(:institution))
     refute_equal cachekey,person.cache_key
+  end
+
+  test "can create" do
+    User.current_user = nil
+    refute Person.can_create?
+
+    User.current_user=Factory(:person).user
+    refute Person.can_create?
+
+    User.current_user=Factory(:project_administrator).user
+    assert Person.can_create?
+
+    User.current_user=Factory(:admin).user
+    assert Person.can_create?
   end
 end

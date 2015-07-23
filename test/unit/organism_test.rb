@@ -39,6 +39,17 @@ class OrganismTest < ActiveSupport::TestCase
     end
   end
 
+  test "can create" do
+    User.current_user=nil
+    refute Organism.can_create?
+
+    User.current_user = Factory(:person).user
+    refute Organism.can_create?
+
+    User.current_user = Factory(:project_administrator).user
+    assert Organism.can_create?
+  end
+
   test "can_view" do
     o=Factory(:organism)
     assert o.can_view?

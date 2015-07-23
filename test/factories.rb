@@ -65,6 +65,7 @@ include ActionDispatch::TestProcess
     end
   end
 
+
   Factory.define(:gatekeeper,:parent=>:person) do |f|
     f.after_build do |gk|
       Factory(:admin_defined_role_project,:project=>gk.projects.first,:person=>gk,:role_mask=>16)

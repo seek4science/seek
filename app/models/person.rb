@@ -219,10 +219,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def can_create_new_items?
-    member?
-  end
-
   def workflows
      self.try(:user).try(:workflows) || []
   end
@@ -452,6 +448,10 @@ class Person < ActiveRecord::Base
         add_to_project_and_institution(project,project.institutions.first)
       end
     end
+  end
+
+  def self.can_create?
+    User.admin_or_project_administrator_logged_in?
   end
 
   include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled

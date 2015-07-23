@@ -167,4 +167,18 @@ class InstitutionTest < ActiveSupport::TestCase
     array = Institution.get_all_institutions_listing
     assert_include array,["Inst X",inst.id]
   end
+
+  test "can create" do
+    User.current_user=nil
+    refute Institution.can_create?
+
+    User.current_user = Factory(:person).user
+    refute Institution.can_create?
+
+    User.current_user = Factory(:admin).user
+    assert Institution.can_create?
+
+    User.current_user = Factory(:project_administrator).user
+    assert Institution.can_create?
+  end
 end

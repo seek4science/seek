@@ -17,7 +17,6 @@ class Organism < ActiveRecord::Base
 
   validates_presence_of :title
 
-  
   def can_delete? user=User.current_user
     !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
   end
@@ -29,6 +28,10 @@ class Organism < ActiveRecord::Base
       terms = terms | concept[:definitions].collect{|s| s.gsub("\"","")} if concept[:definitions]
     end
     terms
+  end
+
+  def self.can_create?
+    User.admin_or_project_administrator_logged_in?
   end
 
 end

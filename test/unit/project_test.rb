@@ -480,4 +480,18 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal p.people,p2.people
   end
 
+  test "can create?" do
+    User.current_user = nil
+    refute Project.can_create?
+
+    User.current_user=Factory(:person).user
+    refute Project.can_create?
+
+    User.current_user=Factory(:project_administrator).user
+    refute Project.can_create?
+
+    User.current_user=Factory(:admin).user
+    assert Project.can_create?
+  end
+
 end

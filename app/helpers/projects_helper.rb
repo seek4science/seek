@@ -74,7 +74,7 @@ module ProjectsHelper
   end
 
   def can_create_projects?
-    User.admin_logged_in?
+    Project.can_create?
   end
 
 

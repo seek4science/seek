@@ -7,7 +7,8 @@ module AssetsHelper
   end
 
   def can_create_new_items?
-    logged_in_and_registered? && current_user.person.can_create_new_items?
+    #the state of being able to create assets is the same for all assets
+    DataFile.can_create?
   end
 
   def request_request_label(resource)

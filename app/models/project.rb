@@ -231,6 +231,10 @@ class Project < ActiveRecord::Base
     child
   end
 
+  def self.can_create?
+    User.admin_logged_in?
+  end
+
    #should put below at the bottom in order to override methods for hierarchies,
    #Try to find a better way for overriding methods regardless where to include the module
     include Seek::ProjectHierarchies::ProjectExtension if Seek::Config.project_hierarchy_enabled

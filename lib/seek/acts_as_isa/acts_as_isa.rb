@@ -36,9 +36,8 @@ module Seek
         include Seek::ResearchObjects::Packaging
         include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-        class_eval do
-          extend Seek::ActsAsISA::SingletonMethods
-        end
+        extend Seek::ActsAsISA::SingletonMethods
+
       end
 
       def is_isa?
@@ -50,6 +49,9 @@ module Seek
       # defines that this is a user_creatable object type, and appears in the "New Object" gadget
       def user_creatable?
         true
+      end
+      def can_create?
+        User.logged_in_and_member?
       end
     end
 

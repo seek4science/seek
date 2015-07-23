@@ -1,7 +1,7 @@
 module PeopleHelper
 
   def can_create_profiles?
-    User.admin_or_project_administrator_logged_in?
+    Person.can_create?
   end
 
   def contact_details_warning_message

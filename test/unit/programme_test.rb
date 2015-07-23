@@ -5,11 +5,11 @@ class ProgrammeTest < ActiveSupport::TestCase
   test "uuid" do
     p = Programme.new :title=>"fish"
     assert_nil p.attributes["uuid"]
-    p.save!
+    disable_authorization_checks{p.save!}
     refute_nil p.attributes["uuid"]
     uuid = p.uuid
     p.title="frog"
-    p.save!
+    disable_authorization_checks{p.save!}
     assert_equal uuid,p.uuid
   end
 
@@ -18,7 +18,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute p.valid?
     p.title="frog"
     assert p.valid?
-    p.save!
+    disable_authorization_checks{p.save!}
 
     #title must be unique
     p2 = Programme.new :title=>p.title
@@ -81,6 +81,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     programme = Factory(:programme)
     project = programme.projects.first
     assert_equal programme.id,project.programme_id
+    User.current_user=Factory(:admin).user
     programme.destroy
     project.reload
     assert_nil project.programme_id
@@ -97,6 +98,19 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert person.is_programme_administrator?(programme)
     refute_empty programme.administrators
     assert_equal [person],programme.administrators
+
+  end
+
+  test "can create" do
+
+    User.current_user=nil
+    refute Programme.can_create?
+
+    User.current_user=Factory(:brand_new_person).user
+    refute Programme.can_create?
+
+    User.current_user = Factory(:person).user
+    assert Programme.can_create?
 
   end
 
