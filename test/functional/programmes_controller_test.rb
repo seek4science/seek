@@ -30,11 +30,16 @@ class ProgrammesControllerTest < ActionController::TestCase
   end
 
   test "new page accessible to projectless user" do
-    p = Factory(:brand_new_person)
+    p = Factory(:person_not_in_project)
     login_as(p)
     assert p.projects.empty?
     get :new
     assert_response :success
+  end
+
+  test "new page not accessible to logged out user" do
+    get :new
+    assert_redirected_to :root
   end
 
   test "only admin can destroy" do
@@ -221,6 +226,13 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_redirected_to prog
     p.reload
     assert p.is_programme_administrator?(prog)
+  end
+
+  test "logged out user cannot create" do
+    assert_no_difference("Programme.count") do
+      post :create, :programme=>{:title=>"A programme"}
+    end
+    assert_redirected_to :root
   end
 
 end

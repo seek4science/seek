@@ -3,9 +3,11 @@ class ProgrammesController < ApplicationController
   include Seek::DestroyHandling
 
   before_filter :programmes_enabled?
+  before_filter :login_required,:except=>[:show,:index]
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:initiate_spawn_project,:spawn_project]
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth,:only=>[:destroy,:initiate_spawn_project,:spawn_project]
+
 
   skip_before_filter :project_membership_required
 
