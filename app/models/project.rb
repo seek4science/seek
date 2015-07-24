@@ -122,7 +122,7 @@ class Project < ActiveRecord::Base
   end
 
   #this is seek role
-  def project_administrator
+  def project_administrators
     people_with_the_role("project_administrator")
   end
 
@@ -232,7 +232,7 @@ class Project < ActiveRecord::Base
   end
 
   def self.can_create?
-    User.admin_logged_in?
+    User.admin_logged_in? || User.programme_administrator_logged_in?
   end
 
    #should put below at the bottom in order to override methods for hierarchies,

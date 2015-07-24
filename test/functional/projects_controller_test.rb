@@ -45,7 +45,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  def test_should_create_project
+  def test_should_create_project_with_hierarchy
     parent = Factory(:project,:title=>"Test Parent")
 		assert_difference('Project.count') do
 			post :create, :project => {:title=>"test",:parent_id=>parent.id}
@@ -53,7 +53,23 @@ class ProjectsControllerTest < ActionController::TestCase
 
 		assert_redirected_to project_path(assigns(:project))
     assert_includes assigns(:project).ancestors,parent
-	end
+  end
+
+  test "programme administrator can view new" do
+    login_as(Factory(:programme_administrator))
+    get :new
+    assert_response :success
+  end
+
+  test "programme_administrator can create project" do
+    login_as(Factory(:programme_administrator))
+    assert_difference('Project.count') do
+      post :create, :project => {:title=>"test2"}
+    end
+
+    project = assigns(:project)
+    assert_redirected_to project_path(project)
+  end
 
 	def test_should_show_project
 

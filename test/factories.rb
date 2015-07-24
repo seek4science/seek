@@ -7,6 +7,10 @@ include ActionDispatch::TestProcess
 
   end
 
+  Factory.define(:admin_defined_role_programme, :class=>AdminDefinedRoleProgramme) do |f|
+
+  end
+
   Factory.define(:brand_new_person, :class => Person) do |f|
     f.sequence(:email) { |n| "test#{n}@test.com" }
     f.sequence(:first_name) { |n| "Person#{n}" }
@@ -23,7 +27,6 @@ include ActionDispatch::TestProcess
   Factory.define(:person_not_in_project, :parent=>:brand_new_person) do |f|
     f.association :user, :factory => :activated_user
   end
-
 
   Factory.define(:person_in_multiple_projects, :parent=>:brand_new_person) do |f|
     f.association :user, :factory => :activated_user
@@ -62,6 +65,14 @@ include ActionDispatch::TestProcess
     f.after_build do |pm|
       Factory(:admin_defined_role_project,:project=>pm.projects.first,:person=>pm,:role_mask=>4)
       pm.roles_mask = 4
+    end
+  end
+
+  Factory.define(:programme_administrator,:parent=>:project_administrator) do |f|
+    f.after_build do |pm|
+      programme=Factory(:programme,:projects=>[pm.projects.first])
+      Factory(:admin_defined_role_programme,:programme=>programme,:person=>pm,:role_mask=>32)
+      pm.roles_mask = 32
     end
   end
 

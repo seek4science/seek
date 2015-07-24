@@ -84,6 +84,10 @@ class User < ActiveRecord::Base
     self.logged_in_and_registered? && self.current_user.person.is_project_administrator_of_any_project?
   end
 
+  def self.programme_administrator_logged_in?
+    self.logged_in_and_registered? && self.current_user.person.is_programme_administrator_of_any_programme?
+  end
+
   def self.admin_or_project_administrator_logged_in?
     project_administrator_logged_in? || admin_logged_in?
   end

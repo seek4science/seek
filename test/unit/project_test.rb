@@ -310,8 +310,8 @@ class ProjectTest < ActiveSupport::TestCase
       person.is_project_administrator=true,proj1
       person.save!
 
-      assert proj1.project_administrator.include?(person)
-      assert !proj2.project_administrator.include?(person)
+      assert proj1.project_administrators.include?(person)
+      assert !proj2.project_administrators.include?(person)
     end
   end
 
@@ -491,6 +491,9 @@ class ProjectTest < ActiveSupport::TestCase
     refute Project.can_create?
 
     User.current_user=Factory(:admin).user
+    assert Project.can_create?
+
+    User.current_user=Factory(:programme_administrator).user
     assert Project.can_create?
   end
 

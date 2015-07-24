@@ -20,7 +20,7 @@ test "admin defined roles in projects should be also the roles in sub projects" 
       assert_equal false, person.is_gatekeeper?(p)
 
       assert p.asset_managers.empty?
-      assert p.project_administrator.empty?
+      assert p.project_administrators.empty?
       assert p.pals.empty?
       assert p.gatekeepers.empty?
     end
@@ -38,7 +38,7 @@ test "admin defined roles in projects should be also the roles in sub projects" 
       assert_equal true, person.is_gatekeeper?(p)
 
       assert_equal [person], p.asset_managers
-      assert_equal [person], p.project_administrator
+      assert_equal [person], p.project_administrators
       assert_equal [person], p.pals
       assert_equal [person], p.gatekeepers
     end

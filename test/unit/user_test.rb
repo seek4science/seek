@@ -156,6 +156,22 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  test "programme administrator logged in?" do
+    programme_administrator = Factory :programme_administrator
+    normal = Factory :person
+    User.with_current_user(programme_administrator.user) do
+      assert User.programme_administrator_logged_in?
+    end
+
+    User.with_current_user(normal.user) do
+      return User.programme_administrator_logged_in?
+    end
+
+    User.with_current_user(nil) do
+      return User.programme_administrator_logged_in?
+    end
+  end
+
   def test_activate
     user = Factory :brand_new_user
 

@@ -466,6 +466,11 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       refute project_administrator.projects.empty?
       assert project_administrator.is_project_administrator?(project_administrator.projects.first)
       assert project_administrator.save
+
+      programme_administrator = Factory(:programme_administrator)
+      refute programme_administrator.projects.empty?
+      refute programme_administrator.programmes.empty?
+      assert programme_administrator.is_programme_administrator_of_any_programme?
     end
 
   end

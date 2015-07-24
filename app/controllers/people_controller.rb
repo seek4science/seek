@@ -373,7 +373,7 @@ class PeopleController < ApplicationController
       []
     else
       Project.find_all_by_id(project_ids).collect do |project|
-        project.project_administrator
+        project.project_administrators
       end.flatten.uniq
     end
   end

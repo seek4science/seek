@@ -1,6 +1,7 @@
 require 'seek/custom_exception'
 
 class ProjectsController < ApplicationController
+
   include WhiteListHelper
   include Seek::IndexPager
   include CommonSweepers
@@ -8,8 +9,8 @@ class ProjectsController < ApplicationController
 
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:update_members]
   before_filter :find_assets, :only=>[:index]
-  #before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report,:admin_members,:update_members,:resource_in_tab]
-  before_filter :is_user_admin_auth, :only => [:new, :create, :manage, :destroy]
+  before_filter :auth_to_create, :only=>[:new,:update]
+  before_filter :is_user_admin_auth, :only => [:manage, :destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin,:admin_members,:update_members]
   before_filter :auth_params,:only=>[:update]
@@ -165,7 +166,6 @@ class ProjectsController < ApplicationController
 
     @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]
 
-
     respond_to do |format|
       if @project.save
         flash[:notice] = "#{t('project')} was successfully created."
@@ -181,7 +181,6 @@ class ProjectsController < ApplicationController
   # PUT /projects/1
   # PUT /projects/1.xml
   def update
-
 
     @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:sharing], [@project] if params[:sharing]
 
@@ -301,7 +300,7 @@ class ProjectsController < ApplicationController
 
   def administerable_by_user
     @project = Project.find(params[:id])
-    unless User.admin_logged_in? || @project.can_be_administered_by?(current_user)
+    unless @project.can_be_administered_by?(current_user)
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
       return false
     end
@@ -317,5 +316,10 @@ class ProjectsController < ApplicationController
       params[:project].delete(param) if params[:project] and not allowed
       params.delete param if params and not allowed
     end
+  end
+
+  #FIXME: make into a general method for all controllers
+  def auth_to_create
+    Project.can_create?
   end
 end
