@@ -13,8 +13,8 @@
 
           <p style="line-height: 1.8;">
 
-            <% if admin_logged_in? %>
-                    <h2>Administer defined roles</h2>
+            <% if admin_logged_in? || @person.is_project_administered_by?(User.current_user) %>
+                    <h2>Administrative roles</h2>
                     <p class="box_infotext">
                       These are the roles that can be assigned to a person by an Adminster, to allow this person to carry out specific tasks within that role. Each role is
                       associated with, and only applies to, a particular <%= t('Project').downcase.html_safe %>.
@@ -23,10 +23,9 @@
                     </p>
                     <br/>
                     <%
-                       roles = [["pal", "a PAL"], ["project_administrator", "a Project Administrator"], ["asset_manager", "an Asset Manager"], ["gatekeeper", "a Gatekeeper"]]
-                       roles.each do |role|
+                       admin_defined_project_roles_hash.each do |role,role_title|
                     %>
-                        <%= render :partial => "roles_selector", :locals => {:role => role[0], :role_title => role[1]} -%>
+                        <%= render :partial => "roles_selector", :locals => {:role => role, :role_title => role_title} -%>
                         <%= tag("hr")  %>
                     <%
                        end

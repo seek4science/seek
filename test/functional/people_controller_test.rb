@@ -226,26 +226,29 @@ class PeopleControllerTest < ActionController::TestCase
     assert Person.find(p.id).notifiee_info.receive_notifications?
   end
 
-  def test_admin_can_set_is_admin_flag
-    login_as(:quentin)
-    p = people(:fred)
+  test "admin cannot set roles_mask" do
+    login_as(Factory(:admin))
+    p = Factory(:person)
     assert !p.is_admin?
     put :administer_update, id: p.id, person: { id: p.id, roles_mask: mask_for_admin }
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
-    p.reload
-    assert p.is_admin?
+    refute assigns(:person).is_admin?
   end
 
-  def test_non_admin_cant_set__is_admin_flag
-    login_as(:aaron)
-    p = people(:fred)
-    assert !p.is_admin?
-    put :administer_update, id: p.id, person: { id: p.id, roles_mask: mask_for_admin }
-    assert_not_nil flash[:error]
-    p.reload
-    assert !p.is_admin?
+  test "project admin cannot set roles_mask" do
+    p = Factory(:project_administrator)
+    login_as(p)
+    person = Factory(:person)
+    person.add_to_project_and_institution(p.projects.first,p.institutions.first)
+    refute person.is_admin?
+    put :administer_update, id: person.id, person: { id: person.id, roles_mask: mask_for_admin }
+    assert_redirected_to person_path(person)
+    assert_nil flash[:error]
+    refute assigns(:person).is_admin?
   end
+
+
 
   def test_admin_can_set_pal_flag
     p = Factory(:person_in_multiple_projects)
@@ -521,7 +524,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.reload
     assert_not_nil person
     assert person.is_project_administrator?(project)
-    assert !person.is_pal?(project)
+    refute person.is_pal?(project)
   end
 
   test 'assign somebody to multiple roles and different projects' do
@@ -597,7 +600,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_asset_manager?(project)
   end
 
-  test 'admin should see the session of assigning roles to a person' do
+  test 'admin should see the section of assigning roles to a person' do
     person = Factory(:person)
     get :admin, id: person
     assert_select 'select#_roles_asset_manager', count: 1
@@ -605,13 +608,36 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select 'select#_roles_gatekeeper', count: 1
   end
 
-  test 'non-admin should not see the session of assigning roles to a person' do
+  test 'non-admin should not see the section of assigning roles to a person' do
     login_as(:aaron)
     person = Factory(:person)
     get :admin, id: person
     assert_select 'select#_roles_asset_manager', count: 0
     assert_select 'select#_roles_project_administrator', count: 0
     assert_select 'select#_roles_gatekeeper', count: 0
+  end
+
+  test 'project_administrator should see the section assigning roles for administered project' do
+    project_admin = Factory(:project_administrator)
+    login_as(project_admin)
+    project = project_admin.projects.first
+    institution = project_admin.institutions.first
+
+    managed_person = Factory(:person)
+    managed_person.add_to_project_and_institution(project,institution)
+    get :admin, id:managed_person.id
+    assert_response :success
+    assert_select 'select#_roles_asset_manager', count: 1
+    assert_select 'select#_roles_project_administrator', count: 1
+    assert_select 'select#_roles_gatekeeper', count: 1
+
+    non_managed_person = Factory(:person)
+    get :admin, id:non_managed_person.id
+    assert_response :success
+    assert_select 'select#_roles_asset_manager', count: 0
+    assert_select 'select#_roles_project_administrator', count: 0
+    assert_select 'select#_roles_gatekeeper', count: 0
+
   end
 
   test 'should show that the person is asset manager for admin' do
@@ -864,6 +890,15 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal 'blabla', person.first_name
   end
 
+  test 'cannot update person roles mask' do
+    login_as(Factory(:admin))
+    person = Factory(:person)
+    put :update, id: person, person: { first_name: 'blabla', roles_mask: mask_for_admin }
+    assert_redirected_to person_path(assigns(:person))
+    refute assigns(:person).is_admin?
+    assert_equal 'blabla', assigns(:person).first_name
+  end
+
   test 'not allow project administrator to edit people outside their projects' do
     project_admin = Factory(:project_administrator)
     a_person = Factory(:person)
@@ -920,6 +955,99 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to person_path(admin)
     assert assigns(:person).is_gatekeeper?(project)
     assert assigns(:person).is_admin?
+  end
+
+  test "project admin can set roles for people in projects he admins" do
+    project_admin = Factory(:project_administrator)
+    login_as(project_admin)
+    person = Factory(:person)
+    project = project_admin.projects.first
+    person.add_to_project_and_institution(project,project_admin.institutions.first)
+    person.save!
+    refute person.is_project_administrator?(project)
+    refute person.is_gatekeeper?(project)
+
+    put :administer_update, id: person, person: {}, roles: { gatekeeper: [project.id], project_administrator:[project.id] }
+    assert_redirected_to person_path(person)
+    assert assigns(:person).is_gatekeeper?(project)
+    assert assigns(:person).is_project_administrator?(project)
+  end
+
+  test "project admin cannot set roles for people in projects he doesn't admin" do
+    project_admin = Factory(:project_administrator)
+    login_as(project_admin)
+    person = Factory(:person)
+    project = person.projects.first
+
+    refute_nil project
+    refute project_admin.is_project_administrator?(project)
+    refute person.is_project_administrator?(project)
+    refute person.is_gatekeeper?(project)
+
+    put :administer_update, id: person, person: {}, roles: { gatekeeper: [project.id], project_administrator:[project.id] }
+    assert_redirected_to person_path(person)
+
+    refute assigns(:person).is_gatekeeper?(project)
+    refute assigns(:person).is_project_administrator?(project)
+  end
+
+  test "roles are preserved for a project the project admin doesn't admin but was already set" do
+    project_admin = Factory(:project_administrator)
+    login_as(project_admin)
+    person = Factory(:person)
+    project = person.projects.first
+    managed_project = project_admin.projects.first
+    person.add_to_project_and_institution managed_project,person.institutions.first
+
+    #make project admin for other project
+    person.is_project_administrator=true,project
+    person.is_admin=true
+    disable_authorization_checks{person.save!}
+
+    assert project_admin.is_project_administrator?(managed_project)
+    assert person.is_project_administrator?(project)
+    refute person.is_project_administrator?(managed_project)
+
+    put :administer_update, id: person, person: {}, roles: { project_administrator:[managed_project.id] }
+    assert_redirected_to person_path(person)
+
+    assert assigns(:person).is_admin?
+    assert assigns(:person).is_project_administrator?(project)
+    assert assigns(:person).is_project_administrator?(managed_project)
+  end
+
+  test "non project roles are not removed" do
+    person = Factory(:programme_administrator)
+    prog = person.programmes.first
+    proj = person.projects.first
+    person.is_admin=true
+    person.save!
+    person.reload
+
+    assert person.is_admin?
+    assert person.is_programme_administrator?(prog)
+    refute person.is_project_administrator?(proj)
+
+    put :administer_update, id: person, person: {}, roles: { project_administrator:[proj.id] }
+    assert_redirected_to person_path(person)
+
+    assert assigns(:person).is_admin?
+    assert assigns(:person).is_project_administrator?(proj)
+    assert assigns(:person).is_programme_administrator?(prog)
+  end
+
+  test "project admin cannot make somebody an system admin even in the same project" do
+    project_admin = Factory(:project_administrator)
+    login_as(project_admin)
+    person = Factory(:person)
+    project = project_admin.projects.first
+    person.add_to_project_and_institution(project,project_admin.institutions.first)
+    person.save!
+    refute person.is_admin?
+
+    put :administer_update, id: person, person: {}, roles: { admin: [] }
+    assert_redirected_to person_path(person)
+    refute assigns(:person).is_admin?
   end
 
   test 'admin can edit other admin' do

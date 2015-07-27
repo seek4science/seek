@@ -18,11 +18,13 @@ module Seek
               end
               !match.nil?
             end
+
           END_EVAL
         end
       end
 
       def add_roles(person, role_name, items)
+        return if items.empty?
         project_ids = items.collect { |p| p.is_a?(Project) ? p.id : p.to_i }
 
         # filter out any projects that the person is not a member of

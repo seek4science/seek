@@ -64,6 +64,12 @@ module PeopleHelper
     return text.html_safe
   end
 
+  def admin_defined_project_roles_hash
+    roles = {"pal"=>"a PAL","project_administrator"=>"a Project Administrator", "asset_manager"=>"an Asset Manager","gatekeeper"=>"a Gatekeeper"}
+    roles.delete("pal") unless admin_logged_in?
+    roles
+  end
+
   #Return whether or not to hide contact details from this user
   #Current decided by Seek::Config.hide_details_enabled or
   # is hidden if the current person doesn't share the same programme as the person being viewed

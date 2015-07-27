@@ -30,6 +30,11 @@ module Seek
         Seek::Roles::ProjectDependentRoles.instance.projects_for_person_with_role(self, role)
       end
 
+      def programmes_for_role(role)
+        fail UnknownRoleException.new("Unrecognised role name #{role}") unless ROLES.include?(role)
+        Seek::Roles::ProgrammeDependentRoles.instance.programmes_for_person_with_role(self, role)
+      end
+
       def roles_for_project(project)
         Seek::Roles::ProjectDependentRoles.instance.roles_for_person_and_item(self, project)
       end
@@ -80,6 +85,19 @@ module Seek
       def is_admin_or_project_administrator?
         is_admin? || is_project_administrator_of_any_project?
       end
+
+      #determines if this person is the member of a project for which the user passed is a project manager,
+      # #and the current person is not an admin
+      def is_project_administered_by? user_or_person
+        return false if self.is_admin?
+        return false if user_or_person.nil?
+        person = user_or_person.person
+        match = self.projects.find do |p|
+          person.is_project_administrator?(p)
+        end
+        !match.nil?
+      end
+
 
       include Seek::ProjectHierarchies::AdminDefinedRolesExtension if Seek::Config.project_hierarchy_enabled
     end

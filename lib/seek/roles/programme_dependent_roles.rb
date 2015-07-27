@@ -17,6 +17,7 @@ module Seek
       end
 
       def add_roles(person, role_name, items)
+        return if items.empty?
         programme_ids = items.collect { |p| p.is_a?(Programme) ? p.id : p.to_i }
 
         mask = mask_for_role(role_name)
@@ -39,6 +40,15 @@ module Seek
           AdminDefinedRoleProgramme.where(programme_id: programme_id, role_mask: mask, person_id: person.id).destroy_all
         end
         person.roles_mask -= mask if (current_programme_ids - programme_ids).empty?
+      end
+
+      def programmes_for_person_with_role(person, role)
+        if person.roles.include?(role)
+          mask = mask_for_role(role)
+          AdminDefinedRoleProgramme.where(role_mask: mask, person_id: person.id).collect(&:programme)
+        else
+          []
+        end
       end
 
       def people_with_programme_and_role(programme, role)

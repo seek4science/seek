@@ -111,6 +111,23 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     end
   end
 
+  test "setting empty array doesn't set role" do
+    User.with_current_user Factory(:admin).user do
+      person = Factory(:person)
+      person.roles=[["project_administrator",[]]]
+      refute person.is_project_administrator_of_any_project?
+      refute_includes person.roles,"project_administrator"
+
+      person.roles=[["pal",[]]]
+      refute person.is_pal_of_any_project?
+      refute_includes person.roles,"pal"
+
+      person.roles=[["programme_administrator",[]]]
+      refute person.is_programme_administrator_of_any_programme?
+      refute_includes person.roles,"programme_administrator"
+    end
+  end
+
   test "setting and retrieving roles using a string or int project id" do
     User.with_current_user Factory(:admin).user do
       person = Factory(:person_in_multiple_projects)

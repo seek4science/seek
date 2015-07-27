@@ -13,7 +13,7 @@ class PeopleController < ApplicationController
   before_filter :is_user_admin_auth,:only=>[:destroy,:new]
   before_filter :removed_params,:only=>[:update,:create]
   before_filter :administerable_by_user, :only => [:admin, :administer_update]
-  before_filter :do_projects_belong_to_project_administrator_projects,:only=>[:administer_update]
+  before_filter :do_projects_belong_to_project_administrator_projects?,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
 
   skip_before_filter :partially_registered?,:only=>[:register,:create]
@@ -224,19 +224,17 @@ class PeopleController < ApplicationController
   def administer_update
     had_no_projects = @person.work_groups.empty?
 
-    passed_params=    {:roles                 =>  User.admin_logged_in?,
-                       :roles_mask            => User.admin_logged_in?,
-                       :work_group_ids        => (User.admin_or_project_administrator_logged_in?)}
+    passed_params=    {:work_group_ids        => (User.admin_or_project_administrator_logged_in?)}
     temp = params.clone
     params[:person] = {}
     passed_params.each do |param, allowed|
-      params[:person]["#{param}"] = temp[:person]["#{param}"] if temp[:person]["#{param}"] and allowed
-      params["#{param}"] = temp["#{param}"] if temp["#{param}"] and allowed
+      params[:person]["#{param}"] = temp[:person]["#{param}"] if temp[:person]["#{param}"] && allowed
+      params["#{param}"] = temp["#{param}"] if temp["#{param}"] && allowed
     end
 
     respond_to do |format|
       if @person.update_attributes(params[:person])
-        set_roles(@person, params) if User.admin_logged_in?
+        set_project_related_roles(@person, params)
 
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
@@ -329,16 +327,31 @@ class PeopleController < ApplicationController
       end
   end
 
-  def set_roles person, params
-    roles = person.is_admin? ? [['admin']] : []
-    if params[:roles]
-      params[:roles].each_key do |key|
-        project_ids=params[:roles][key]
+  def set_project_related_roles person, params
+    return unless params[:roles]
+    params[:roles].delete("admin") unless User.admin_logged_in?
+    administered_project_ids = Project.all.select{|proj| proj.can_be_administered_by?(User.current_user)}.collect{|p| p.id.to_s}
 
-        roles << [key,project_ids]
-      end
+    roles = {}
+
+    #preserve existing roles for projects that cannot be administered
+    Seek::Roles::ProjectDependentRoles.role_names.each do |role_name|
+      existing_project_ids = person.projects_for_role(role_name).collect{|p| p.id.to_s}
+      roles[role_name]= existing_project_ids - administered_project_ids
     end
-    person.roles=roles
+
+    #preserve programme related roles
+    Seek::Roles::ProgrammeDependentRoles.role_names.each do |role_name|
+      roles[role_name] = person.programmes_for_role(role_name).collect{|p| p.id.to_s}
+    end
+
+    params[:roles].each do |role, project_ids|
+      roles[role] = (roles[role] || []) | (project_ids & administered_project_ids)
+    end
+
+
+    roles["admin"]=[] if person.is_admin?
+    person.roles=roles.keys.collect{|key| [key,roles[key]]}
   end
 
 
@@ -378,7 +391,7 @@ class PeopleController < ApplicationController
     end
   end
 
-  def do_projects_belong_to_project_administrator_projects
+  def do_projects_belong_to_project_administrator_projects?
       if (params[:person] and params[:person][:work_group_ids])
         if User.admin_or_project_administrator_logged_in?
           projects = []

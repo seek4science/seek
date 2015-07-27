@@ -98,6 +98,7 @@ class Person < ActiveRecord::Base
     !user.nil?
   end
 
+  #to allow you to call .person on a Person or User to avoid having to check its type
   def person
     self
   end
@@ -300,18 +301,10 @@ class Person < ActiveRecord::Base
   def can_be_edited_by?(subject)
     return false unless subject
     subject = subject.user if subject.is_a?(Person)
-    subject == self.user || subject.is_admin? || self.is_administered_by?(subject)
+    subject == self.user || subject.is_admin? || self.is_project_administered_by?(subject)
   end
 
-  #determines if this person is the member of a project for which the user passed is a project manager,
-  # #and the current person is not an admin
-  def is_administered_by? user
-    return false if self.is_admin?
-    match = self.projects.find do |p|
-      user.person.is_project_administrator?(p)
-    end
-    !match.nil?
-  end
+
 
   def me?
     user && user==User.current_user

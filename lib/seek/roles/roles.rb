@@ -75,7 +75,7 @@ module Seek
       end
 
       def mask_for_role(role)
-        2**Seek::Roles::Roles.role_names.index(role)
+        2**Seek::Roles::Roles.role_names.index(role.to_s)
       end
 
       def role_names
