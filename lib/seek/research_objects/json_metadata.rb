@@ -15,8 +15,19 @@ module Seek
 
         json[:contributor] = create_agent(item.contributor)
 
-        json[:contains] = contained_files(item) if item.is_asset?
-        json[:contains] = contained_assets(item) if item.is_a?(Assay)
+        if item.is_a?(Investigation)
+          json[:studies] = item.studies.select { |s| s.permitted_for_research_object? }.map do |s|
+            s.research_object_package_path
+          end
+        elsif item.is_a?(Study)
+          json[:assays] = item.assays.select { |a| a.permitted_for_research_object? }.map do |a|
+            a.research_object_package_path
+          end
+        elsif item.is_a?(Assay)
+          json[:assets] = contained_assets(item)
+        elsif item.is_asset?
+          json[:contains] = contained_files(item)
+        end
 
         JSON.pretty_generate(json)
       end
