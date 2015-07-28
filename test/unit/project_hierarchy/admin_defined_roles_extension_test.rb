@@ -3,10 +3,9 @@ require 'project_hierarchy_test_helper'
 class AdminDefinedRolesExtensionTest < ActiveSupport::TestCase
   include ProjectHierarchyTestHelper
 
-
-test "admin defined roles in projects should be also the roles in sub projects" do
+  test 'admin defined roles in projects should be also the roles in sub projects' do
     person = new_person_with_hierarchical_projects
-    person.work_groups.create :project => @proj, :institution => Factory(:institution)
+    person.work_groups.create project: @proj, institution: Factory(:institution)
     disable_authorization_checks do
       person.save!
     end
@@ -25,7 +24,10 @@ test "admin defined roles in projects should be also the roles in sub projects" 
       assert p.gatekeepers.empty?
     end
 
-    person.roles = [["asset_manager", @proj.id.to_s], ["project_administrator", @proj.id.to_s], ["pal", @proj.id.to_s], ["gatekeeper", @proj.id.to_s]]
+    person.roles = [Seek::Roles::RoleInfo.new(role_name: 'asset_manager', items: @proj.id.to_s),
+                    Seek::Roles::RoleInfo.new(role_name: 'project_administrator', items: @proj.id.to_s),
+                    Seek::Roles::RoleInfo.new(role_name: 'pal', items: @proj.id.to_s),
+                    Seek::Roles::RoleInfo.new(role_name: 'gatekeeper', items: @proj.id.to_s)]
     disable_authorization_checks do
       person.save!
     end
@@ -44,14 +46,14 @@ test "admin defined roles in projects should be also the roles in sub projects" 
     end
 
     # test assigning roles to admins
-    person.roles_mask = Seek::Roles::Roles.instance.mask_for_role("admin")
+    person.roles_mask = Seek::Roles::Roles.instance.mask_for_role('admin')
     disable_authorization_checks do
       person.save!
     end
     person.reload
     assert person.is_admin?
 
-    person.roles = [["admin"], ["asset_manager", @proj.id.to_s]]
+    person.roles = [Seek::Roles::RoleInfo.new(role_name: 'admin'), Seek::Roles::RoleInfo.new(role_name: 'asset_manager', items: @proj.id.to_s)]
     disable_authorization_checks do
       person.save!
     end
@@ -61,6 +63,5 @@ test "admin defined roles in projects should be also the roles in sub projects" 
       assert_equal true, person.is_asset_manager?(p)
       assert_equal [person], p.asset_managers
     end
-
-end
+  end
 end

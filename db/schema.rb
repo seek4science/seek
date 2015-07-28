@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150721134955) do
+ActiveRecord::Schema.define(:version => 20150728133757) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -818,7 +818,7 @@ ActiveRecord::Schema.define(:version => 20150721134955) do
     t.integer  "status_id",                  :default => 0
     t.string   "first_letter", :limit => 10
     t.string   "uuid"
-    t.integer  "roles_mask"
+    t.integer  "roles_mask",                 :default => 0
     t.string   "orcid"
   end
 

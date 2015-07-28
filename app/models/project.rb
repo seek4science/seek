@@ -137,7 +137,7 @@ class Project < ActiveRecord::Base
 
   #returns people belong to the admin defined seek 'role' for this project
   def people_with_the_role role
-    Seek::Roles::ProjectDependentRoles.instance.people_with_project_and_role(self,role)
+    Seek::Roles::ProjectRelatedRoles.instance.people_with_project_and_role(self,role)
   end
 
   def locations
@@ -198,8 +198,16 @@ class Project < ActiveRecord::Base
     user ? (user.is_admin? || user.is_project_administrator?(self)) : false
   end
 
-  def can_be_administered_by?(user)
+  #whether this project can be administered by the given user, or current user if none is specified
+  def can_be_administered_by?(user=User.current_user)
     user ? (user.is_admin? || user.is_project_administrator?(self)) : false
+  end
+
+  #all projects that can be administered by the given user, or ghe current user if none is specified
+  def self.all_can_be_administered(user=User.current_user)
+    Project.all.select do |project|
+      project.can_be_administered_by?(user)
+    end
   end
 
   def can_delete?(user=User.current_user)

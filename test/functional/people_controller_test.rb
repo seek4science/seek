@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
+
   fixtures :people, :users, :projects, :work_groups, :group_memberships, :project_roles, :institutions
 
   include AuthenticatedTestHelper
@@ -270,7 +271,6 @@ class PeopleControllerTest < ActionController::TestCase
     p = Factory(:person)
     assert !p.is_pal?
     put :administer_update, id: p.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [p.projects.first.id] }
-    assert_not_nil flash[:error]
     p.reload
     assert !p.is_pal?(p.projects.first)
   end
@@ -699,10 +699,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should have asset manager icon on people index page' do
-    i = 0
-    while i < 5
+    (0..5).each do
       Factory(:asset_manager)
-      i += 1
     end
     get :index
     asset_manager_number = assigns(:people).select(&:is_asset_manager_of_any_project?).count
@@ -716,10 +714,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should have project administrator icon on people index page' do
-    i = 0
-    while i < 5
+    (0..5).each do
       Factory(:project_administrator)
-      i += 1
     end
 
     get :index
@@ -1017,6 +1013,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test "non project roles are not removed" do
+
     person = Factory(:programme_administrator)
     prog = person.programmes.first
     proj = person.projects.first
@@ -1148,10 +1145,8 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should have gatekeeper icon on people index page' do
-    i = 0
-    while i < 5
+    (0..5).each do
       Factory(:gatekeeper)
-      i += 1
     end
     get :index
     gatekeeper_number = assigns(:people).select(&:is_gatekeeper_of_any_project?).count

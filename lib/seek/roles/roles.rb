@@ -5,7 +5,7 @@ module Seek
       include Singleton
 
       def self.role_names
-        IndependentRoles.role_names | ProjectDependentRoles.role_names | ProgrammeDependentRoles.role_names
+        StandAloneRoles.role_names | ProjectRelatedRoles.role_names | ProgrammeRelatedRoles.role_names
       end
 
       def self.define_methods(base)
@@ -19,8 +19,8 @@ module Seek
       def self.define_common_methods(base)
         role_names.each do |role|
           base.class_eval <<-END_EVAL
-            def is_#{role}?(item=nil,ignore_item=false)
-              self.roles.include?('#{role}') && (ignore_item || Seek::Roles::Roles.instance.check_role_for_item(self,'#{role}',item))
+            def is_#{role}?(item=nil)
+              has_role?('#{role}') && Seek::Roles::Roles.instance.check_role_for_item(self,'#{role}',item)
             end
 
             def is_#{role}=(flag_and_items)
@@ -81,6 +81,7 @@ module Seek
       def role_names
         self.class.role_names
       end
+
     end
   end
 end

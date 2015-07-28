@@ -329,30 +329,20 @@ class PeopleController < ApplicationController
 
   def set_project_related_roles person, params
     return unless params[:roles]
-    params[:roles].delete("admin") unless User.admin_logged_in?
-    administered_project_ids = Project.all.select{|proj| proj.can_be_administered_by?(User.current_user)}.collect{|p| p.id.to_s}
 
-    roles = {}
+    administered_project_ids = Project.all_can_be_administered.collect{|p| p.id.to_s}
 
-    #preserve existing roles for projects that cannot be administered
-    Seek::Roles::ProjectDependentRoles.role_names.each do |role_name|
-      existing_project_ids = person.projects_for_role(role_name).collect{|p| p.id.to_s}
-      roles[role_name]= existing_project_ids - administered_project_ids
+    Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
+      #remove for the project ids that can be administered
+      person.remove_roles(Seek::Roles::RoleInfo.new(role_name:role_name,items:administered_project_ids))
+
+      #add only the project ids that can be administered
+      if project_ids = (params[:roles][role_name] & administered_project_ids)
+        person.add_roles(Seek::Roles::RoleInfo.new(role_name:role_name,items:project_ids))
+      end
     end
-
-    #preserve programme related roles
-    Seek::Roles::ProgrammeDependentRoles.role_names.each do |role_name|
-      roles[role_name] = person.programmes_for_role(role_name).collect{|p| p.id.to_s}
-    end
-
-    params[:roles].each do |role, project_ids|
-      roles[role] = (roles[role] || []) | (project_ids & administered_project_ids)
-    end
-
-
-    roles["admin"]=[] if person.is_admin?
-    person.roles=roles.keys.collect{|key| [key,roles[key]]}
   end
+
 
 
   def is_user_admin_or_personless
