@@ -7,16 +7,15 @@ module Seek
       # investigations/{investigation_id}/studies/{study_id}/assays{assay_id}/
       def research_object_package_path(item = self, prefix = '')
         prefix = research_object_package_path(item.study, prefix) if item.is_a?(Assay)
-        prefix = research_object_package_path(item.investigation, prefix) if item.is_a?(Study)
 
         prefix + ro_package_path_fragment(item) + '/'
       end
 
       def ro_package_path_fragment(item = self)
-        if item.is_asset?
-          ro_package_path_type_fragment(item) + '/' + ro_package_path_id_fragment(item)
+        if item.is_a?(Investigation)
+          ''
         else
-          ro_package_path_id_fragment(item)
+          ro_package_path_type_fragment(item) + '/' + ro_package_path_id_fragment(item)
         end
       end
 
