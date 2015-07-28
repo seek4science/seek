@@ -18,7 +18,7 @@ module Seek
           targetpath = File.join(folder_path, metadata_filename)
         end
 
-        bundle.add(targetpath, tmpfile, aggregate: false)
+        bundle.add(targetpath.sub(/^\//, ''), tmpfile, aggregate: false)
         bundle.commit
 
         an = ROBundle::Annotation.new(item.research_object_package_path, targetpath)

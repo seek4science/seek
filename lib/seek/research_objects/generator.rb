@@ -74,7 +74,7 @@ module Seek
       # stores a content blob file, added the aggregate to the manifest
       def store_blob_file(bundle, asset, blob)
         path = resolve_entry_path(bundle,asset,blob)
-        bundle.add(path, blob.filepath, aggregate: true)
+        bundle.add(path.sub(/^\//, ''), blob.filepath, aggregate: true)
       end
 
       #resolves the entry path, to avoid duplicates. If an asset has multiple files
