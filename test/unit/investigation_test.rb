@@ -119,7 +119,7 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test 'can create snapshot of investigation' do
-    investigation = Factory(:investigation, :studies => [Factory(:study)], :contributor => Factory(:user))
+    investigation = Factory(:investigation, :policy => Factory(:publicly_viewable_policy), :studies => [Factory(:study)], :contributor => Factory(:user))
     snapshot = nil
 
     assert_difference('Snapshot.count') do
