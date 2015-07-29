@@ -877,16 +877,33 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test "can create" do
+    User.current_user=Factory(:project_administrator).user
+    assert Person.can_create?
+
+    User.current_user=Factory(:admin).user
+    assert Person.can_create?
+
+    User.current_user=Factory(:brand_new_user)
+    refute User.current_user.registration_complete?
+    assert Person.can_create?
+
     User.current_user = nil
     refute Person.can_create?
 
     User.current_user=Factory(:person).user
     refute Person.can_create?
 
-    User.current_user=Factory(:project_administrator).user
-    assert Person.can_create?
+    User.current_user=Factory(:pal).user
+    refute Person.can_create?
 
-    User.current_user=Factory(:admin).user
-    assert Person.can_create?
+    User.current_user=Factory(:gatekeeper).user
+    refute Person.can_create?
+
+    User.current_user=Factory(:asset_manager).user
+    refute Person.can_create?
+
+    User.current_user=Factory(:programme_administrator).user
+    refute Person.can_create?
+
   end
 end

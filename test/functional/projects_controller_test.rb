@@ -301,7 +301,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
 		put :update, :id=>proj.id,:project=>{:title=>"fish"}
     proj = assigns(:project)
-		assert_redirected_to project_path(proj)
+		assert_redirected_to proj
     assert_equal "fish",proj.title
 	end
 
@@ -569,7 +569,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     new_institution = Institution.create(:title => 'a test institution')
     put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
-    assert_redirected_to project_path(project)
+    assert_redirected_to project
     project.reload
     assert project.institutions.include?new_institution
   end
@@ -634,7 +634,7 @@ class ProjectsControllerTest < ActionController::TestCase
     a_institution = Factory(:institution)
 
     put :update, :id => project, :project => {:institution_ids => Institution.all.collect(&:id)}
-    assert_redirected_to project_path(project)
+    assert_redirected_to project
     project.reload
     assert_equal Institution.count, project.institutions.count
   end

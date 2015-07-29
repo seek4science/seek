@@ -118,11 +118,14 @@ class PeopleControllerTest < ActionController::TestCase
 
     new_user = Factory(:brand_new_user)
     assert new_user.person.nil?
+
     login_as(new_user)
+
     assert_no_difference('Person.count') do
       post :create, person: { first_name: 'test' }
     end
     assert_response :success
+
     assert_select 'div#errorExplanation' do
       assert_select 'ul > li', text: 'Email can&#x27;t be blank'
     end
@@ -157,19 +160,16 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'non_admin_should_not_create_pal' do
-    pal = Factory(:pal)
-    login_as(pal.user)
-    assert_difference('Person.count') do
-      post :create, person: { first_name: 'test', email: 'hghg@sdfsd.com' }
-    end
 
-    p = assigns(:person)
-    assert_redirected_to person_path(p)
+    login_as(Factory(:person))
+    person = Factory(:person)
 
-    put :administer_update, id: assigns(:person), person: { roles_mask: mask_for_pal }
 
-    p = assigns(:person)
+    put :administer_update, id: person, person: { roles_mask: mask_for_pal }
     assert_redirected_to :root
+
+    p = assigns(:person)
+
     assert !p.is_pal?
     assert !Person.find(p.id).is_pal?
   end
@@ -884,6 +884,39 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to person_path(assigns(:person))
     person = assigns(:person)
     assert_equal 'blabla', person.first_name
+  end
+
+  test "project administrator can view profile creation" do
+    login_as(Factory(:project_administrator))
+    get :new
+    assert_response :success
+  end
+
+  test "project administrator can create new profile" do
+    login_as(Factory(:project_administrator))
+    assert_difference('Person.count') do
+      post :create, person: { first_name: 'test', email: 'ttt@email.com' }
+    end
+    person = assigns(:person)
+    refute_nil person
+    assert_equal "test",person.first_name
+    assert_equal "ttt@email.com",person.email
+  end
+
+  test "normal user cannot can view profile creation" do
+    login_as(Factory(:person))
+    get :new
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test "normal user cannot create new profile" do
+    login_as(Factory(:person))
+    assert_no_difference('Person.count') do
+      post :create, person: { first_name: 'test', email: 'ttt@email.com' }
+    end
+    assert_redirected_to :root
+    refute_nil flash[:error]
   end
 
   test 'cannot update person roles mask' do

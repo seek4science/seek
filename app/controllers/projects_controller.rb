@@ -9,7 +9,7 @@ class ProjectsController < ApplicationController
 
   before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:update_members]
   before_filter :find_assets, :only=>[:index]
-  before_filter :auth_to_create, :only=>[:new,:update]
+  before_filter :auth_to_create, :only=>[:new,:create]
   before_filter :is_user_admin_auth, :only => [:manage, :destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin,:admin_members,:update_members]
@@ -318,8 +318,5 @@ class ProjectsController < ApplicationController
     end
   end
 
-  #FIXME: make into a general method for all controllers
-  def auth_to_create
-    Project.can_create?
-  end
+
 end

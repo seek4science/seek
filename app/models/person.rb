@@ -444,7 +444,7 @@ class Person < ActiveRecord::Base
   end
 
   def self.can_create?
-    User.admin_or_project_administrator_logged_in?
+    User.admin_or_project_administrator_logged_in? || (User.logged_in? && !User.current_user.registration_complete?)
   end
 
   include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled
