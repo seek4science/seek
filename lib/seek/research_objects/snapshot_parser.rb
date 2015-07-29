@@ -20,7 +20,7 @@ module Seek
         hash = JSON.parse(@ro.read(path))
         ['contents', 'assays', 'studies', 'assets'].each do |key|
           if hash[key] && hash[key].any?
-            hash[key].map! { |p| parse_isa_tree("#{p.sub(/^\//,'')}/metadata.json") }
+            hash[key].map! { |p| parse_isa_tree("#{p}metadata.json") }
           end
         end
 

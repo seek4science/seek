@@ -12,12 +12,12 @@ module Seek
         tmpfile.close
 
         folder_path = item.research_object_package_path
-        targetpath = File.join(folder_path, metadata_filename)
+        targetpath = folder_path + metadata_filename
 
-        bundle.add(targetpath.sub(/^\//, ''), tmpfile, aggregate: true)
+        bundle.add(targetpath, tmpfile, aggregate: true)
         bundle.commit
 
-        an = ROBundle::Annotation.new(item.research_object_package_path, targetpath)
+        an = ROBundle::Annotation.new('/' + item.research_object_package_path, targetpath)
         an.created_on = Time.now
         bundle.manifest.annotations << an
       end

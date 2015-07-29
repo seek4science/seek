@@ -55,7 +55,7 @@ module Seek
 
       # stores a reference to the `resource` in the RO manifest
       def store_reference(bundle, resource)
-        bundle.manifest.aggregates << ROBundle::Aggregate.new(:uri => resource.research_object_package_path,
+        bundle.manifest.aggregates << ROBundle::Aggregate.new(:uri => '/' + resource.research_object_package_path,
                                                               'pav:importedFrom' => item_uri(resource))
       end
 
@@ -74,7 +74,7 @@ module Seek
       # stores a content blob file, added the aggregate to the manifest
       def store_blob_file(bundle, asset, blob)
         path = resolve_entry_path(bundle,asset,blob)
-        bundle.add(path.sub(/^\//, ''), blob.filepath, aggregate: true)
+        bundle.add(path, blob.filepath, aggregate: true)
       end
 
       #resolves the entry path, to avoid duplicates. If an asset has multiple files
