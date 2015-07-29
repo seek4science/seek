@@ -19,19 +19,19 @@ class Snapshot < ActiveRecord::Base
   acts_as_doi_mintable
 
   def metadata
-    parse_metadata
+    @ro_metadata ||= parse_metadata
   end
 
   def title
-    research_object_metadata['title']
+    metadata['title']
   end
 
   def description
-    research_object_metadata['description']
+    metadata['description']
   end
 
   def contributor
-    Person.find(research_object_metadata['contributor']['uri'].match(/people\/([1-9][0-9]*)/)[1])
+    Person.find(metadata['contributor']['uri'].match(/people\/([1-9][0-9]*)/)[1])
   end
 
   def research_object
@@ -58,16 +58,8 @@ class Snapshot < ActiveRecord::Base
     investigation_snapshot_url(resource, snapshot_number, :host => DataCite::DoiMintable.host)
   end
 
-  def research_object_metadata
-    @ro_data ||= parse_metadata
+  def parse_metadata
+    Seek::ResearchObjects::SnapshotParser.new(research_object).parse
   end
 
-  def parse_metadata
-    metadata = {}
-    research_object do |ro|
-      json = ro.read('metadata.json')
-      metadata = JSON.parse(json)
-    end
-    metadata
-  end
 end
