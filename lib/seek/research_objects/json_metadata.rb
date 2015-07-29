@@ -8,7 +8,7 @@ module Seek
                               :version, :doi, :doi_uri, :pubmed_id, :pubmed_uri]
 
       def metadata_content(item)
-        json = { id: item.id }
+        json = { id: item.id, uri: item_uri(item) }
         CANDIDATE_PROPERTIES.each do |method|
           json[method] = item.send(method) if item.respond_to?(method)
         end

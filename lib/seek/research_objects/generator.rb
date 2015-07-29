@@ -95,12 +95,6 @@ module Seek
         dir = Dir.mktmpdir(prefix)
         open(File.join(dir, filename), 'w+')
       end
-
-      def item_uri item
-        uri = item.rdf_resource.to_uri.to_s
-        uri << "?version=#{item.version}" if item.respond_to?(:version)
-        uri
-      end
     end
   end
 end
