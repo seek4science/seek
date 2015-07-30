@@ -106,6 +106,67 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal "ggggg",prog.description
   end
 
+  test "programme administrator can add new administrators, but not remove themself" do
+    pa = Factory(:programme_administrator)
+    login_as(pa)
+    prog = pa.programmes.first
+    p1 = Factory(:person)
+    p2 = Factory(:person)
+    p3 = Factory(:person)
+
+    assert pa.is_programme_administrator?(prog)
+    refute p1.is_programme_administrator?(prog)
+    refute p2.is_programme_administrator?(prog)
+    refute p3.is_programme_administrator?(prog)
+
+    ids = [p1.id,p2.id].join(",")
+    put :update, :id=>prog,:programme=>{:administrator_ids=>ids}
+
+    assert_redirected_to prog
+
+    pa.reload
+    p1.reload
+    p2.reload
+    p3.reload
+
+    assert pa.is_programme_administrator?(prog)
+    assert p1.is_programme_administrator?(prog)
+    assert p2.is_programme_administrator?(prog)
+    refute p3.is_programme_administrator?(prog)
+
+  end
+
+  test "admin can add new administrators, and not remove themself" do
+    admin = Factory(:programme_administrator)
+    admin.is_admin=true
+    disable_authorization_checks{admin.save!}
+    login_as(admin)
+    prog = admin.programmes.first
+    p1 = Factory(:person)
+    p2 = Factory(:person)
+    p3 = Factory(:person)
+
+    assert admin.is_programme_administrator?(prog)
+    refute p1.is_programme_administrator?(prog)
+    refute p2.is_programme_administrator?(prog)
+    refute p3.is_programme_administrator?(prog)
+
+    ids = [p1.id,p2.id].join(",")
+    put :update, :id=>prog,:programme=>{:administrator_ids=>ids}
+
+    assert_redirected_to prog
+
+    admin.reload
+    p1.reload
+    p2.reload
+    p3.reload
+
+    refute admin.is_programme_administrator?(prog)
+    assert p1.is_programme_administrator?(prog)
+    assert p2.is_programme_administrator?(prog)
+    refute p3.is_programme_administrator?(prog)
+  end
+
   test "edit page accessible to admin" do
     login_as(Factory(:admin))
     p = Factory(:programme)

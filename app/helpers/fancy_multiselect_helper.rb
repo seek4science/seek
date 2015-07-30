@@ -54,7 +54,8 @@ module FancyMultiselectHelper
         :object_type => object.class.name,
         :possibilities_options => {},
         :hidden => hidden,
-        :required => false
+        :required => false,
+        :title=>nil
     }
   end
 
