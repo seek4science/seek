@@ -41,8 +41,8 @@ class Programme < ActiveRecord::Base
     user && (user.is_admin? || user.person.is_programme_administrator?(self))
   end
 
-  def can_delete?(_user = User.current_user)
-    User.admin_logged_in?
+  def can_delete?(user = User.current_user)
+    user && user.is_admin?
   end
 
   def self.can_create?

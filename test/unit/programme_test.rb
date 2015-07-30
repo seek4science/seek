@@ -64,6 +64,18 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute_includes inst, person3.institutions.first
   end
 
+  test "can delete" do
+    person = Factory(:person)
+    admin = Factory(:admin)
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+
+    assert programme.can_delete?(admin)
+    refute programme.can_delete?(programme_administrator)
+    refute programme.can_delete?(person)
+    refute programme.can_delete?(nil)
+  end
+
   test 'can be edited by' do
     # for now programmes can only be created and editing by an admin
     person = Factory(:person)
