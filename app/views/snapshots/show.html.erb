@@ -8,13 +8,14 @@
 <div class="row">
   <div class="col-md-9 col-sm-8">
     <%= item_description @snapshot.description -%>
-    <% if @snapshot.doi %>
-        <p><strong>DOI:</strong> <%= @snapshot.doi -%></p>
-    <% end %>
+    <p><strong>DOI:</strong> <%= @snapshot.doi || 'None' -%></p>
+    <p><strong>Zenodo URL:</strong> None</p>
     <p><strong>Created at:</strong> <%= @snapshot.created_at %></p>
-    <pre><%= @snapshot.metadata.pretty_inspect %></pre>
-    <pre><%= @snapshot.research_object.read('.ro/manifest.json') %></pre>
-    <pre><%= @snapshot.research_object.entries.map(&:name).join("\n") %></pre>
+    <%= panel('Contents') do %>
+        <% @snapshot.metadata['studies'].each do |resource| %>
+            <%= render :partial => 'tree', locals: { resource: resource } %>
+        <% end %>
+    <% end %>
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"snapshots/snapshots",:locals => { :snapshots => @snapshot.resource.snapshots, :selected => @snapshot } %>
