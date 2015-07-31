@@ -34,4 +34,8 @@ module StudiesHelper
     return result.html_safe
   end
 
+  def authorised_studies projects=nil
+    authorised_assets(Study,projects,'view')
+  end
+
 end
