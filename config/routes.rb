@@ -233,6 +233,7 @@ SEEK::Application.routes.draw do
 
   resources :studies do
     collection do
+      get :preview
       post :investigation_selected_ajax
       post :items_for_result
       post :resource_in_tab
