@@ -5,6 +5,7 @@ class PublicationsController < ApplicationController
   include Seek::DotGenerator
   include Seek::AssetsCommon
   include Seek::BioExtension
+  include Seek::PreviewHandling
 
   before_filter :publications_enabled?
 
@@ -102,6 +103,7 @@ class PublicationsController < ApplicationController
 
     update_annotations(params[:tag_list], @publication)
 
+    investigation_ids = params[:investigation_ids] || []
     assay_ids = params[:assay_ids] || []
     data_file_ids = params[:data_file_ids] || []
     model_ids = params[:model_ids] || []
@@ -111,6 +113,7 @@ class PublicationsController < ApplicationController
       if valid && @publication.update_attributes(publication_params)
 
         # Update association
+        create_or_update_associations investigation_ids, "Investigation", "view"
         create_or_update_associations assay_ids, "Assay", "edit"
 
         data_file_ids = data_file_ids.collect{|data_file_id| data_file_id.split(',').first}

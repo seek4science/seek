@@ -143,6 +143,10 @@ class Publication < ActiveRecord::Base
     self.backwards_relationships.select {|a| a.subject_type == "Study"}.collect { |a| a.subject }
   end
 
+  def investigations
+    self.backwards_relationships.select {|a| a.subject_type == "Investigation"}.collect { |a| a.subject }
+  end
+
   def presentations
     self.backwards_relationships.select {|a| a.subject_type == "Presentation"}.collect { |a| a.subject }
   end
