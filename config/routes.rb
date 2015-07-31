@@ -220,6 +220,7 @@ SEEK::Application.routes.draw do
 
   resources :investigations do
     collection do
+      get :preview
       post :items_for_result
       post :resource_in_tab
     end
