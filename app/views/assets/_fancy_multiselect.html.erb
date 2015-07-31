@@ -56,7 +56,7 @@
             Event.observe(window, 'load', function () {
                 updateFancyMultiselect('<%= collection_id %>');
                 <% if other_projects_checkbox && !project_possibilities.empty? %>
-                var include_other_projects_checkbox = document.getElementById('include_other_project_<%=association-%>}');
+                var include_other_projects_checkbox = document.getElementById('include_other_project_<%=association-%>');
                 if (include_other_projects_checkbox.checked == false){
                     swapSelectListContents('possible_<%=object_type.underscore-%>_<%=association.to_s.singularize-%>_ids',
                             'alternative_<%=association.to_s.singularize-%>_ids');
