@@ -37,6 +37,8 @@ module DataCite
           errors.add(:doi, 'already minted')
           return false
         end
+        # TODO: Implement me
+        raise "NOT IMPLEMENTED"
         puts datacite_metadata.to_s
         puts
         puts suggested_doi
