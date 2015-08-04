@@ -150,6 +150,7 @@ workflow_avatar: 'logos/taverna_logo.png'
 world: 'famfamfam_silk/world.png'
 zoom_in: 'famfamfam_silk/zoom_in.png'
 zoom_out: 'famfamfam_silk/zoom_out.png'
+zenodo: 'logos/zenodo2.png'
 
 
 #images for mime types

@@ -9,7 +9,7 @@
   <div class="col-md-9 col-sm-8">
     <%= item_description @snapshot.description -%>
     <p><strong>DOI:</strong> <%= @snapshot.doi || 'None' -%></p>
-    <p><strong>Zenodo URL:</strong> None</p>
+    <p><strong>Zenodo URL:</strong> <%= link_to @snapshot.zenodo_url, @snapshot.zenodo_url || 'None' -%></p>
     <p><strong>Created at:</strong> <%= @snapshot.created_at %></p>
     <%= panel('Contents') do %>
         <% @snapshot.metadata['studies'].each do |resource| %>

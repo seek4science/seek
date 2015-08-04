@@ -4,6 +4,9 @@ require 'datacite/acts_as_doi_mintable'
 # Investigation "snapshot"
 class Snapshot < ActiveRecord::Base
 
+  # TODO: Move this to module
+  ZENODO_DEPOSITION_URL = 'https://zenodo.org/record/'
+
   belongs_to :resource, polymorphic: true
   has_one :content_blob, as: :asset, foreign_key: :asset_id
 
@@ -42,6 +45,10 @@ class Snapshot < ActiveRecord::Base
 
   def in_zenodo?
     !zenodo_deposition_id.blank?
+  end
+
+  def zenodo_url
+    ZENODO_DEPOSITION_URL + zenodo_deposition_id if in_zenodo?
   end
 
   private

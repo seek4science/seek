@@ -7,6 +7,12 @@
           <% else %>
               <%= link_to "Snapshot #{snapshot.snapshot_number}", investigation_snapshot_path(@investigation.id, snapshot.snapshot_number) %>
           <% end %>
+          <% if snapshot.has_doi? %>
+              <%= image('doi') %>
+          <% end %>
+          <% if snapshot.in_zenodo? %>
+              <%= image('zenodo') %>
+          <% end %>
           <span class="subtle">(<%= time_ago_in_words(snapshot.created_at) %> ago)</span>
         </div>
     <% end %>

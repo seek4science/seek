@@ -75,6 +75,10 @@ module DataCite
         "#{Seek::Config.doi_prefix}/#{Seek::Config.doi_suffix}.#{doi_resource_type}.#{doi_resource_id}"
       end
 
+      def has_doi?
+        !doi.blank?
+      end
+
       private
 
       def doi_target_url
