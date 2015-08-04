@@ -1,5 +1,5 @@
 <h4><%= link_to resource['title'], resource['uri'] %></h4>
-<p><%= resource['description'] %></p>
+<p><%= text_or_not_specified resource['description'], description: true, auto_link: true, length: 500 %></p>
 
 <% children = resource['studies'] || resource['assays'] || resource['assets'] || [] %>
 <% children.each do |child| %>
