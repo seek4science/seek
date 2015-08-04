@@ -6,7 +6,7 @@
 
 <% workflow = resource.workflow %>
 <% unless workflow.nil? %>
-    <%= list_item_attribute "Run of Workflow", workflow.title, workflow_path(workflow) %>
+    <%= list_item_authorized_list([workflow],  "Run of Workflow", true, 50, true) %>
 <% end %>
 
 <%= list_item_attribute "Status", resource.status_message %>
