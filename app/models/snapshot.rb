@@ -40,6 +40,10 @@ class Snapshot < ActiveRecord::Base
     end
   end
 
+  def in_zenodo?
+    !zenodo_deposition_id.blank?
+  end
+
   private
 
   def set_snapshot_number

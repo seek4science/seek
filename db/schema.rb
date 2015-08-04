@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150629140310) do
+ActiveRecord::Schema.define(:version => 20150804121500) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1263,8 +1263,9 @@ ActiveRecord::Schema.define(:version => 20150629140310) do
     t.integer  "resource_id"
     t.string   "doi"
     t.integer  "snapshot_number"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
+    t.datetime "created_at",           :null => false
+    t.datetime "updated_at",           :null => false
+    t.string   "zenodo_deposition_id"
   end
 
   create_table "sop_auth_lookup", :id => false, :force => true do |t|
