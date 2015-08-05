@@ -126,6 +126,7 @@ show_announcements:
 imprint_enabled:
 imprint_description:
 zenodo_publishing_enabled:
-zenodo_url:
+zenodo_api_url:
+zenodo_oauth_url:
 zenodo_client_id:
 zenodo_client_secret:

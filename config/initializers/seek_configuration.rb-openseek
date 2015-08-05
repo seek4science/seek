@@ -156,7 +156,8 @@ SEEK::Application.configure do
 
   Seek::Config.default :datacite_url, 'https://mds.datacite.org/'
   Seek::Config.default :zenodo_publishing_enabled, false
-  Seek::Config.default :zenodo_url, 'https://zenodo.org/api'
+  Seek::Config.default :zenodo_api_url, 'https://zenodo.org/api'
+  Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
 
 end
 

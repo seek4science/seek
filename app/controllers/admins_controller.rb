@@ -80,7 +80,8 @@ class AdminsController < ApplicationController
     Seek::Config.doi_suffix = params[:doi_suffix]
 
     Seek::Config.zenodo_publishing_enabled = string_to_boolean params[:zenodo_publishing_enabled]
-    Seek::Config.zenodo_url = params[:zenodo_url]
+    Seek::Config.zenodo_api_url = params[:zenodo_api_url]
+    Seek::Config.zenodo_oauth_url = params[:zenodo_oauth_url]
     Seek::Config.zenodo_client_id = params[:zenodo_client_id]
     Seek::Config.zenodo_client_secret = params[:zenodo_client_secret]
 

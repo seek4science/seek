@@ -31,7 +31,7 @@ module Zenodo
           return false
         end
 
-        client = Zenodo::Client.new(@access_token, Seek::Config.zenodo_url)
+        client = Zenodo::Client.new(@access_token, Seek::Config.zenodo_api_url)
         deposition = client.create_deposition(zenodo_metadata)
         deposition_file = deposition.create_file(zenodo_depositable_file)
 
@@ -47,7 +47,7 @@ module Zenodo
 
       def zenodo_deposition
         if zenodo_deposition_id
-          client = Zenodo::Client.new(@access_token, Seek::Config.zenodo_url)
+          client = Zenodo::Client.new(@access_token, Seek::Config.zenodo_api_url)
 
           client.deposition(zenodo_deposition_id)
         end
