@@ -142,5 +142,8 @@ SEEK::Application.configure do
   Seek::Config.fixed :css_appended,''
   Seek::Config.fixed :main_layout,'application'
 
+  Seek::Config.default :zenodo_publishing_enabled, false
+  Seek::Config.default :zenodo_url, 'https://zenodo.org/api'
+
 end
 

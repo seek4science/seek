@@ -357,4 +357,8 @@ end
   test 'imprint_description' do
     assert_equal 'Here is imprint example', Seek::Config.imprint_description
   end
+
+  test 'zenodo_url' do
+    assert_equal "https://sandbox.zenodo.org/api", Seek::Config.zenodo_url
+  end
 end

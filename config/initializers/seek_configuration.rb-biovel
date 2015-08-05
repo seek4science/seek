@@ -140,5 +140,8 @@ SEEK::Application.configure do
   ActionView::Renderer.define_alternative({:seek_partial=>"projects/resource_list_item"},"projects/resource_list_item_biovel")
   ActionView::Renderer.define_alternative({:seek_partial=>"assets/sharing_form"},"assets/sharing_form_biovel")
 
+  Seek::Config.default :zenodo_publishing_enabled, false
+  Seek::Config.default :zenodo_url, 'https://zenodo.org/api'
+
 end
 
