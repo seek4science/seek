@@ -32,8 +32,8 @@ GIT
 
 GIT
   remote: https://github.com/SysMO-DB/fleximage
-  revision: af4da1ca93020749490331a50556d5094fb1cd0e
-  ref: af4da1ca93020749490331a50556d5094fb1cd0e
+  revision: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
+  ref: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
   specs:
     fleximage (0.1)
 
@@ -851,4 +851,4 @@ DEPENDENCIES
   yui-compressor
 
 BUNDLED WITH
-   1.10.3
+   1.10.6
