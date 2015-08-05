@@ -8,9 +8,26 @@
 <div class="row">
   <div class="col-md-9 col-sm-8">
     <%= item_description @snapshot.description -%>
-    <p><strong>DOI:</strong> <%= @snapshot.doi || 'None' -%></p>
-    <p><strong>Zenodo URL:</strong> <%= link_to @snapshot.zenodo_url, @snapshot.zenodo_url || 'None' -%></p>
+    <p>
+      <strong>DOI:</strong>
+      <% if @snapshot.doi %>
+          <%= @snapshot.doi %>
+      <% else %>
+          <span class="none_text">None</span>
+      <% end %>
+    </p>
+
+    <p>
+      <strong>Zenodo URL:</strong>
+      <% if @snapshot.zenodo_url %>
+          <%= link_to @snapshot.zenodo_url, @snapshot.zenodo_url %>
+      <% else %>
+          <span class="none_text">None</span>
+      <% end %>
+    </p>
+
     <p><strong>Created at:</strong> <%= @snapshot.created_at %></p>
+
     <%= panel('Contents') do %>
         <% @snapshot.metadata['studies'].each do |resource| %>
             <%= render :partial => 'tree', locals: { resource: resource } %>
