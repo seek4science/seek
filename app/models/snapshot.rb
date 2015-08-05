@@ -1,5 +1,6 @@
 require 'zip'
 require 'datacite/acts_as_doi_mintable'
+require 'zenodo/acts_as_zenodo_depositable'
 
 # Investigation "snapshot"
 class Snapshot < ActiveRecord::Base
@@ -20,6 +21,9 @@ class Snapshot < ActiveRecord::Base
   validates :snapshot_number, :uniqueness => { :scope =>  [:resource_type, :resource_id] }
 
   acts_as_doi_mintable
+  acts_as_zenodo_depositable do |snapshot|
+    snapshot.research_object # The thing to be deposited
+  end
 
   def metadata
     @ro_metadata ||= parse_metadata
@@ -41,10 +45,6 @@ class Snapshot < ActiveRecord::Base
     ROBundle::File.open(content_blob.filepath) do |ro|
       yield ro if block_given?
     end
-  end
-
-  def in_zenodo?
-    !zenodo_deposition_id.blank?
   end
 
   def zenodo_url
