@@ -66,7 +66,7 @@ class Snapshot < ActiveRecord::Base
   end
 
   def doi_target_url
-    investigation_snapshot_url(resource, snapshot_number, :host => DataCite::DoiMintable.host)
+    investigation_snapshot_url(resource, snapshot_number, :host => Seek::Util.host)
   end
 
   def parse_metadata

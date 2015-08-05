@@ -1,29 +1,17 @@
 require_relative 'metadata'
+require 'seek/util'
 
 module DataCite
-  module DoiMintable
+  module ActsAsDoiMintable
 
     def self.included(mod)
       mod.extend(ClassMethods)
     end
 
-    ##
-    # Returns "hostname:port" or just "hostname" if the port is a default one.
-    # Used in URL helpers for generating URLs outside of controllers/views
-    def self.host # TODO: Move this to somewhere more appropriate
-      base_uri = URI(Seek::Config.site_base_host)
-      host = base_uri.host
-      unless (base_uri.port == 80 && base_uri.scheme == 'http') ||
-             (base_uri.port == 443 && base_uri.scheme == 'https')
-        host << ":#{base_uri.port}"
-      end
-      host
-    end
-
     module ClassMethods
 
       def acts_as_doi_mintable
-        include DataCite::DoiMintable::InstanceMethods
+        include DataCite::ActsAsDoiMintable::InstanceMethods
 
         include Rails.application.routes.url_helpers # For URL generation
       end
@@ -82,7 +70,7 @@ module DataCite
       private
 
       def doi_target_url
-        polymorphic_url(self, :host => DataCite::DoiMintable.host)
+        polymorphic_url(self, :host => Seek::Util.host)
       end
 
       def doi_resource_type
@@ -102,5 +90,5 @@ module DataCite
 end
 
 ActiveRecord::Base.class_eval do
-  include DataCite::DoiMintable
+  include DataCite::ActsAsDoiMintable
 end

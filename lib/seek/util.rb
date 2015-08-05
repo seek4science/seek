@@ -103,5 +103,15 @@ module Seek
         end.sort_by(&:name)
       end
     end
+
+    def self.host
+      base_uri = URI(Seek::Config.site_base_host)
+      host = base_uri.host
+      unless (base_uri.port == 80 && base_uri.scheme == 'http') ||
+          (base_uri.port == 443 && base_uri.scheme == 'https')
+        host << ":#{base_uri.port}"
+      end
+      host
+    end
   end
 end
