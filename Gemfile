@@ -75,7 +75,7 @@ gem 'acts_as_trashable',:git=> "https://github.com/SysMO-DB/acts_as_trashable.gi
 gem "app_version", :git => "https://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "https://github.com/SysMO-DB/doi_query_tool.git"
 gem 'convert_office',:git=>"https://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
-gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage", :ref=>"af4da1ca93020749490331a50556d5094fb1cd0e"
+gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage", :ref=>"bb1182f2716a9bf1b5d85e186d8bb7eec436797b"
 gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
 
