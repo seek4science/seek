@@ -3,6 +3,8 @@ class SnapshotsController < ApplicationController
   before_filter :auth_investigation, only: [:mint_doi, :new, :create]
   before_filter :check_investigation_permitted_for_ro, only: [:new, :create]
   before_filter :find_snapshot, only: [:show, :mint_doi, :download]
+  before_filter :doi_minting_enabled?, only: [:mint_doi]
+  before_filter :doi_minted?, only: [:mint_doi]
 
   include Seek::BreadCrumbs
 
@@ -26,6 +28,9 @@ class SnapshotsController < ApplicationController
   def mint_doi
     if @snapshot.mint_doi
       flash[:notice] = "DOI successfully minted"
+      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    else
+      flash[:error] = @snapshot.errors.full_messages
       redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     end
   end
@@ -52,6 +57,13 @@ class SnapshotsController < ApplicationController
 
   def find_snapshot
     @snapshot = @investigation.snapshots.where(snapshot_number: params[:id]).first
+  end
+
+  def doi_minting_enabled?
+    unless Seek::Config.doi_minting_enabled
+      flash[:error] = "DOI minting is not enabled."
+      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    end
   end
 
 end

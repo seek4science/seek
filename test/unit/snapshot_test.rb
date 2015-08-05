@@ -59,4 +59,35 @@ class SnapshotTest < ActiveSupport::TestCase
     assert snapshot.datacite_metadata.validate
   end
 
+  test 'creates DOI via datacite' do
+    datacite_mock
+
+    snapshot = @investigation.create_snapshot
+
+    res = snapshot.mint_doi
+    assert res
+    assert_equal snapshot.suggested_doi, snapshot.doi
+    assert_empty snapshot.errors
+  end
+
+
+  test "doesn't create DOI if already minted" do
+    datacite_mock
+
+    snapshot = @investigation.create_snapshot
+    snapshot.doi = '123'
+
+    res = snapshot.mint_doi
+    assert !res
+    assert_equal '123', snapshot.doi
+    assert_not_empty snapshot.errors
+  end
+
+  private
+
+  def datacite_mock
+    stub_request(:post, "https://test:test@test.datacite.org/mds/metadata").to_return(:body => 'OK (10.5072/my_test)', :status => 201)
+    stub_request(:post, "https://test:test@test.datacite.org/mds/doi").to_return(:body => 'OK', :status => 201)
+  end
+
 end
