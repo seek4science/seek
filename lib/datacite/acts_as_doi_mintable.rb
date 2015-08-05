@@ -25,27 +25,16 @@ module DataCite
           errors.add(:doi, 'already minted')
           return false
         end
-        # TODO: Implement me
-        raise "NOT IMPLEMENTED"
-        puts datacite_metadata.to_s
-        puts
-        puts suggested_doi
-        puts
-        puts doi_target_url
-        puts
-        if Rails.env.test?
-          update_attribute(:doi, suggested_doi)
-        else
-          # username = Seek::Config.datacite_username
-          # password = Seek::Config.datacite_password_decrypt
-          # url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
-          # endpoint = Datacite.new(username, password, url)
-          #
-          # endpoint.upload_metadata(datacite_metadata.to_s)
-          # endpoint.mint(suggested_doi, doi_target_url)
-          #
-          update_attribute(:doi, suggested_doi)
-        end
+
+        username = Seek::Config.datacite_username
+        password = Seek::Config.datacite_password_decrypt
+        url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
+        endpoint = Datacite.new(username, password, url)
+
+        endpoint.upload_metadata(datacite_metadata.to_s)
+        endpoint.mint(suggested_doi, doi_target_url)
+
+        update_attribute(:doi, suggested_doi)
       end
 
       def datacite_metadata
