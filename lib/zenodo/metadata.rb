@@ -1,4 +1,4 @@
-require_relative 'datacite/metadata'
+require 'datacite/metadata'
 
 module Zenodo
   class Metadata
