@@ -1,8 +1,11 @@
+require 'zenodo/oauth2/client'
+
 class SnapshotsController < ApplicationController
   before_filter :find_investigation
   before_filter :auth_investigation, only: [:mint_doi, :new, :create]
   before_filter :check_investigation_permitted_for_ro, only: [:new, :create]
   before_filter :find_snapshot, only: [:show, :mint_doi, :download]
+  before_filter :zenodo_oauth
   before_filter :doi_minting_enabled?, only: [:mint_doi]
   before_filter :doi_minted?, only: [:mint_doi]
 
@@ -64,6 +67,15 @@ class SnapshotsController < ApplicationController
       flash[:error] = "DOI minting is not enabled."
       redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     end
+  end
+
+  def zenodo_oauth
+    @zenodo_oauth_client = Zenodo::Oauth2::Client.new(
+        Seek::Config.zenodo_client_id,
+        Seek::Config.zenodo_client_secret,
+        zenodo_oauth_callback_url,
+        Seek::Config.zenodo_oauth_url
+    )
   end
 
 end
