@@ -97,6 +97,7 @@ gem 'ro-bundle'
 gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
 gem 'handlebars_assets'
+gem "zenodo-client", :git=>"https://github.com/seek4science/zenodo-client.git"
 
 group :assets do
   gem 'turbo-sprockets-rails3'

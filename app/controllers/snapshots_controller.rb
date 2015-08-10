@@ -1,13 +1,13 @@
 require 'zenodo/oauth2/client'
+require 'zenodo-client'
 
 class SnapshotsController < ApplicationController
   before_filter :find_investigation
-  before_filter :auth_investigation, only: [:mint_doi, :new, :create]
+  before_filter :auth_investigation, only: [:mint_doi, :new, :create, :publish_preview, :publish_submit]
   before_filter :check_investigation_permitted_for_ro, only: [:new, :create]
-  before_filter :find_snapshot, only: [:show, :mint_doi, :download]
+  before_filter :find_snapshot, only: [:show, :mint_doi, :download, :publish_preview, :publish_submit]
   before_filter :zenodo_oauth
   before_filter :doi_minting_enabled?, only: [:mint_doi]
-  before_filter :doi_minted?, only: [:mint_doi]
 
   include Seek::BreadCrumbs
 
@@ -34,6 +34,22 @@ class SnapshotsController < ApplicationController
       redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     else
       flash[:error] = @snapshot.errors.full_messages
+      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    end
+  end
+
+  def publish_preview
+  end
+
+  def publish_submit
+    begin
+      access_token = @zenodo_oauth_client.get_token(params[:code])
+      # client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)
+      # deposition = client.create_deposition()
+      # deposition.create_file()
+
+    rescue Exception => e
+      flash[:error] = "Publish failed: #{e.inspect}"
       redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     end
   end

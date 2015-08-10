@@ -140,6 +140,14 @@ GIT
   specs:
     calendar_date_select (1.16.2)
 
+GIT
+  remote: https://github.com/seek4science/zenodo-client.git
+  revision: 4d97c5584f139248f10ad0e42073b41b36c62b4d
+  specs:
+    zenodo-client (0.1.1)
+      json (~> 1.8)
+      rest-client (~> 1.7)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -848,6 +856,7 @@ DEPENDENCIES
   will_paginate (~> 3.0.4)
   yaml_db
   yui-compressor
+  zenodo-client!
 
 BUNDLED WITH
    1.10.3

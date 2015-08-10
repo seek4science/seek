@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-md-8 col-md-push-2">
+    <%= panel("Confirmation", body_options: {class: 'text-center'}) do %>
+        <%= image_tag('logos/zenodo.png', :class => 'zenodo-publish') %>
+        You are about to publish the investigation:
+        <strong><%= @investigation.title %></strong> to Zenodo. <br/>Please click the button below to confirm this action.
+        <hr/>
+        <%= form_tag(publish_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), method: :post) do %>
+            <%= hidden_field_tag(:code, params[:code]) %>
+
+            <%= submit_tag 'Yes, publish', :class => 'btn btn-primary' %>
+            <%= link_to 'No, cancel', investigation_path(@investigation), :class => 'btn btn-default' %>
+        <% end %>
+    <% end %>
+  </div>
+</div>

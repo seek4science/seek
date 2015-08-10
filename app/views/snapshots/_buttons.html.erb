@@ -1,6 +1,6 @@
 <% if @investigation.can_manage? && @snapshot.doi.blank? %>
     <%= button_link_to("Generate a DOI", 'doi', mint_doi_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), :method => :post) %>
-    <%= button_link_to("Export to Zenodo", 'zenodo', @zenodo_oauth_client.authorize_url(investigation_snapshot_path(@investigation, @snapshot.snapshot_number))) %>
+    <%= button_link_to("Export to Zenodo", 'zenodo', @zenodo_oauth_client.authorize_url(publish_investigation_snapshot_path(@investigation, @snapshot.snapshot_number))) %>
 <% end %>
 <% if @investigation.can_view? %>
     <%= button_link_to("Download", 'download', download_investigation_snapshot_path(@investigation, @snapshot.snapshot_number)) %>
