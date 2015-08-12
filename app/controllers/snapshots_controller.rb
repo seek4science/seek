@@ -42,16 +42,8 @@ class SnapshotsController < ApplicationController
   end
 
   def publish_submit
-    begin
-      access_token = @zenodo_oauth_client.get_token(params[:code])
-      # client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)
-      # deposition = client.create_deposition()
-      # deposition.create_file()
-
-    rescue Exception => e
-      flash[:error] = "Publish failed: #{e.inspect}"
-      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
-    end
+    access_token = @zenodo_oauth_client.get_token(params[:code])
+    @snapshot.publish_to_zenodo(access_token)
   end
 
   private
