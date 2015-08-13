@@ -11,7 +11,7 @@
               <%= image('doi') %>
           <% end %>
           <% if snapshot.in_zenodo? %>
-              <%= image('zenodo') %>
+              <%= image('snapshot_export') %>
           <% end %>
           <span class="subtle">(<%= time_ago_in_words(snapshot.created_at) %> ago)</span>
         </div>
