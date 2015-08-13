@@ -32,7 +32,7 @@ module Zenodo
         end
 
         client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)
-        deposition = client.create_deposition({ metadata: zenodo_metadata })
+        deposition = client.create_deposition({ metadata: zenodo_metadata.build })
         deposition_file = deposition.create_file(zenodo_depositable_file)
 
         update_attribute(:zenodo_deposition_id, deposition.id)
