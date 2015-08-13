@@ -22,7 +22,7 @@ class Snapshot < ActiveRecord::Base
 
   acts_as_doi_mintable
   acts_as_zenodo_depositable do |snapshot|
-    snapshot.research_object # The thing to be deposited
+    snapshot.content_blob # The thing to be deposited
   end
 
   def metadata

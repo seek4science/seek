@@ -33,6 +33,8 @@ class ContentBlob < ActiveRecord::Base
 
   validate :original_filename_or_url
 
+  delegate :read, :close, :rewind, :path, to: :file
+
   def original_filename_or_url
     if original_filename.blank? && url.blank?
       errors.add(:base, 'Need to specifiy either original_filename or url')
@@ -179,6 +181,10 @@ class ContentBlob < ActiveRecord::Base
     if file_exists? && !File.exist?(copy_to_path)
       FileUtils.cp filepath, copy_to_path
     end
+  end
+
+  def file
+    @file ||= File.open(filepath)
   end
 
   private
