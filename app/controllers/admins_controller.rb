@@ -82,8 +82,8 @@ class AdminsController < ApplicationController
     Seek::Config.zenodo_publishing_enabled = string_to_boolean params[:zenodo_publishing_enabled]
     Seek::Config.zenodo_api_url = params[:zenodo_api_url]
     Seek::Config.zenodo_oauth_url = params[:zenodo_oauth_url]
-    Seek::Config.zenodo_client_id = params[:zenodo_client_id].strip
-    Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].strip
+    Seek::Config.zenodo_client_id = params[:zenodo_client_id].try(:strip)
+    Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].try(:strip)
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
