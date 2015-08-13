@@ -26,6 +26,10 @@ module Zenodo
       end
 
       def publish_to_zenodo(access_token)
+        if !has_doi?
+          errors.add(:base, "Please generate a DOI before exporting to Zenodo.")
+          return false
+        end
         if in_zenodo?
           errors.add(:base, "Already deposited in Zenodo, ID: #{zenodo_deposition_id}")
           return false
