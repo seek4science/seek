@@ -25,7 +25,9 @@ class SnapshotsController < ApplicationController
 
   def download
     @content_blob = @snapshot.content_blob
-    send_file @content_blob.filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type || "application/octet-stream"
+    send_file @content_blob.filepath,
+              :filename => @content_blob.original_filename,
+              :type => @content_blob.content_type || "application/octet-stream"
   end
 
   def mint_doi
@@ -44,7 +46,7 @@ class SnapshotsController < ApplicationController
   def publish_submit
     access_token = @zenodo_oauth_client.get_token(params[:code])
 
-    if @snapshot.publish_to_zenodo(access_token)
+    if @snapshot.publish_to_zenodo(access_token, params[:metadata])
       flash[:notice] = "Snapshot successfully published to Zenodo"
       redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     else

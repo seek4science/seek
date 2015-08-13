@@ -25,7 +25,7 @@ module Zenodo
         !zenodo_deposition_id.blank?
       end
 
-      def publish_to_zenodo(access_token)
+      def publish_to_zenodo(access_token, extra_metadata = {})
         if !has_doi?
           errors.add(:base, "Please generate a DOI before exporting to Zenodo.")
           return false
@@ -35,8 +35,10 @@ module Zenodo
           return false
         end
 
+        metadata = zenodo_metadata.merge(extra_metadata)
+
         client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)
-        deposition = client.create_deposition({ metadata: zenodo_metadata.build })
+        deposition = client.create_deposition({ metadata: metadata.build })
         deposition_file = deposition.create_file(zenodo_depositable_file)
 
         update_attribute(:zenodo_deposition_id, deposition.id)
