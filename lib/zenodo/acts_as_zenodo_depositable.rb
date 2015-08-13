@@ -57,9 +57,9 @@ module Zenodo
         metadata
       end
 
-      def zenodo_deposition
+      def zenodo_deposition(access_token)
         if zenodo_deposition_id
-          client = Zenodo::Client.new(@access_token, Seek::Config.zenodo_api_url)
+          client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)
 
           client.deposition(zenodo_deposition_id)
         end
