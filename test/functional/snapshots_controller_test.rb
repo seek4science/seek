@@ -3,6 +3,7 @@ require 'test_helper'
 class SnapshotsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include MockHelper
 
   test "can get snapshot preview page" do
     user = Factory(:user)
@@ -78,6 +79,78 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert investigation.can_manage?(user)
     assert_redirected_to investigation_path(investigation)
     assert flash[:error].include?('accessible')
+  end
+
+  test "can mint DOI for snapshot" do
+    datacite_mock
+    create_snapshot
+    login_as(@user)
+
+    post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    assert assigns(:snapshot).doi
+  end
+
+  test "can't mint DOI for snapshot if no manage permissions" do
+    datacite_mock
+    create_snapshot
+    other_user = Factory(:user)
+    login_as(other_user)
+
+    post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+
+    @snapshot = @snapshot.reload
+    assert !@investigation.can_manage?(other_user)
+    assert_redirected_to investigation_path(@investigation)
+    assert @snapshot.doi.nil?
+  end
+
+  test "can retrieve Zenodo preivew page" do
+    create_snapshot
+    login_as(@user)
+
+    get :publish_preview, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc'
+
+    assert_response :success
+  end
+
+  test "can export snapshot to Zenodo" do
+    zenodo_mock
+    zenodo_oauth_mock
+    create_snapshot
+    @snapshot.doi = '123'
+    @snapshot.save
+    login_as(@user)
+
+    post :publish_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc'
+
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    assert !assigns(:snapshot).zenodo_deposition_id.nil?
+  end
+
+  test "can't export snapshot to Zenodo if no manage permissions" do
+    zenodo_mock
+    zenodo_oauth_mock
+    create_snapshot
+    @snapshot.doi = '123'
+    @snapshot.save
+    other_user = Factory(:user)
+    login_as(other_user)
+
+    post :publish_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc'
+
+    @snapshot = @snapshot.reload
+    assert_redirected_to investigation_path(@investigation)
+    assert @snapshot.zenodo_deposition_id.nil?
+  end
+
+  private
+
+  def create_snapshot
+    @user = Factory(:user)
+    @investigation = Factory(:investigation, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
+    @snapshot = @investigation.create_snapshot
   end
 
 end

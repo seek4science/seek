@@ -43,7 +43,14 @@ class SnapshotsController < ApplicationController
 
   def publish_submit
     access_token = @zenodo_oauth_client.get_token(params[:code])
-    @snapshot.publish_to_zenodo(access_token)
+
+    if @snapshot.publish_to_zenodo(access_token)
+      flash[:notice] = "Snapshot successfully published to Zenodo"
+      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    else
+      flash[:error] = @snapshot.errors.full_messages
+      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    end
   end
 
   private

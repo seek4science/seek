@@ -40,6 +40,7 @@ module Zenodo
         deposition_file = deposition.create_file(zenodo_depositable_file)
 
         update_attribute(:zenodo_deposition_id, deposition.id)
+        true
       end
 
       def zenodo_metadata

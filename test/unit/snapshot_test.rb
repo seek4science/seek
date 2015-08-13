@@ -2,10 +2,12 @@ require 'test_helper'
 
 class SnapshotTest < ActiveSupport::TestCase
 
+  include MockHelper
+
   fixtures :investigations
   
   setup do
-    @investigation = Factory(:investigation, :policy => Factory(:publicly_viewable_policy))
+    @investigation = Factory(:investigation, :description => 'not blank', :policy => Factory(:publicly_viewable_policy))
   end
 
   test 'snapshot number correctly set' do
@@ -83,11 +85,46 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_not_empty snapshot.errors
   end
 
-  private
+  test "publishes to Zenodo" do
+    zenodo_mock
 
-  def datacite_mock
-    stub_request(:post, "https://test:test@test.datacite.org/mds/metadata").to_return(:body => 'OK (10.5072/my_test)', :status => 201)
-    stub_request(:post, "https://test:test@test.datacite.org/mds/doi").to_return(:body => 'OK', :status => 201)
+    snapshot = @investigation.create_snapshot
+    snapshot.doi = '123'
+    snapshot.save
+
+    assert_nil snapshot.zenodo_deposition_id
+
+    res = snapshot.publish_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
+
+    assert res
+    assert_not_nil snapshot.zenodo_deposition_id
+    assert_empty snapshot.errors
+  end
+
+  test "doesn't publish to Zenodo if already published" do
+    zenodo_mock
+
+    snapshot = @investigation.create_snapshot
+    snapshot.zenodo_deposition_id = 'abc'
+    snapshot.save
+
+    res = snapshot.publish_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
+
+    assert !res
+    assert_equal 'abc', snapshot.zenodo_deposition_id
+    assert_not_empty snapshot.errors
+  end
+
+  test "doesn't publish to Zenodo if no DOI" do
+    zenodo_mock
+
+    snapshot = @investigation.create_snapshot
+
+    res = snapshot.publish_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
+
+    assert !res
+    assert_nil snapshot.zenodo_deposition_id
+    assert_not_empty snapshot.errors
   end
 
 end
