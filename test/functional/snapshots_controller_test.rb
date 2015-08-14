@@ -123,7 +123,8 @@ class SnapshotsControllerTest < ActionController::TestCase
     @snapshot.save
     login_as(@user)
 
-    post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc'
+    post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
+         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
 
     assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     assert !assigns(:snapshot).zenodo_deposition_id.nil?
@@ -138,7 +139,8 @@ class SnapshotsControllerTest < ActionController::TestCase
     other_user = Factory(:user)
     login_as(other_user)
 
-    post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc'
+    post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
+         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
 
     @snapshot = @snapshot.reload
     assert_redirected_to investigation_path(@investigation)
