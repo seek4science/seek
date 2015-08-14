@@ -13,7 +13,7 @@
           <% if snapshot.in_zenodo? %>
               <%= image('snapshot_export', :alt => 'Exported to Zenodo', :title => 'Exported to Zenodo') %>
           <% end %>
-          <span class="subtle">(<%= time_ago_in_words(snapshot.created_at) %> ago)</span>
+          <span class="subtle">(<%= snapshot.created_at.strftime('%F') %>)</span>
         </div>
     <% end %>
 <% end %>
