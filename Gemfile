@@ -98,6 +98,9 @@ gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
 gem 'bootstrap-multiselect-rails'
 gem 'handlebars_assets'
+gem 'evergreen', :require => 'evergreen/rails'
+gem 'selenium-webdriver'
+
 
 group :assets do
   gem 'turbo-sprockets-rails3'
