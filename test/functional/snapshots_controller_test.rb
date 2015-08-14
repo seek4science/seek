@@ -81,6 +81,15 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert flash[:error].include?('accessible')
   end
 
+  test "can get snapshot show page" do
+    create_snapshot
+    login_as(@user)
+
+    get :show, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+
+    assert_response :success
+  end
+
   test "can mint DOI for snapshot" do
     datacite_mock
     create_snapshot
