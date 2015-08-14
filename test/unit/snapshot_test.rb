@@ -85,7 +85,7 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_not_empty snapshot.errors
   end
 
-  test "publishes to Zenodo" do
+  test "exports to Zenodo" do
     zenodo_mock
 
     snapshot = @investigation.create_snapshot
@@ -94,33 +94,33 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert_nil snapshot.zenodo_deposition_id
 
-    res = snapshot.publish_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
+    res = snapshot.export_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
 
     assert res
     assert_not_nil snapshot.zenodo_deposition_id
     assert_empty snapshot.errors
   end
 
-  test "doesn't publish to Zenodo if already published" do
+  test "doesn't export to Zenodo if already exported" do
     zenodo_mock
 
     snapshot = @investigation.create_snapshot
     snapshot.zenodo_deposition_id = 'abc'
     snapshot.save
 
-    res = snapshot.publish_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
+    res = snapshot.export_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
 
     assert !res
     assert_equal 'abc', snapshot.zenodo_deposition_id
     assert_not_empty snapshot.errors
   end
 
-  test "doesn't publish to Zenodo if no DOI" do
+  test "doesn't export to Zenodo if no DOI" do
     zenodo_mock
 
     snapshot = @investigation.create_snapshot
 
-    res = snapshot.publish_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
+    res = snapshot.export_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
 
     assert !res
     assert_nil snapshot.zenodo_deposition_id

@@ -3,9 +3,9 @@ require 'zenodo-client'
 
 class SnapshotsController < ApplicationController
   before_filter :find_investigation
-  before_filter :auth_investigation, only: [:mint_doi, :new, :create, :publish_preview, :publish_submit]
+  before_filter :auth_investigation, only: [:mint_doi, :new, :create, :export_preview, :export_submit]
   before_filter :check_investigation_permitted_for_ro, only: [:new, :create]
-  before_filter :find_snapshot, only: [:show, :mint_doi, :download, :publish_preview, :publish_submit]
+  before_filter :find_snapshot, only: [:show, :mint_doi, :download, :export_preview, :export_submit]
   before_filter :zenodo_oauth
   before_filter :doi_minting_enabled?, only: [:mint_doi]
 
@@ -40,14 +40,16 @@ class SnapshotsController < ApplicationController
     end
   end
 
-  def publish_preview
+  def export_preview
   end
 
-  def publish_submit
+  def export_submit
     access_token = @zenodo_oauth_client.get_token(params[:code])
 
-    if @snapshot.publish_to_zenodo(access_token, params[:metadata])
-      flash[:notice] = "Snapshot successfully published to Zenodo"
+    metadata = params[:metadata].delete_if { |k,v| v.blank? }
+
+    if @snapshot.export_to_zenodo(access_token, metadata)
+      flash[:notice] = "Snapshot successfully exported to Zenodo"
       redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     else
       flash[:error] = @snapshot.errors.full_messages

@@ -229,8 +229,8 @@ SEEK::Application.routes.draw do
       member do
         post :mint_doi
         get :download
-        get :publish, to: :publish_preview
-        post :publish, to: :publish_submit
+        get :export, to: :export_preview
+        post :export, to: :export_submit
       end
     end
     member do

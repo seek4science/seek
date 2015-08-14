@@ -25,7 +25,7 @@ module Zenodo
         !zenodo_deposition_id.blank?
       end
 
-      def publish_to_zenodo(access_token, extra_metadata = {})
+      def export_to_zenodo(access_token, extra_metadata = {})
         if !has_doi?
           errors.add(:base, "Please generate a DOI before exporting to Zenodo.")
           return false

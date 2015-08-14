@@ -1,11 +1,11 @@
 <div class="row">
   <div class="col-md-8 col-md-push-2">
     <%= panel("Confirmation") do %>
-        <%= form_tag(publish_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), method: :post) do %>
+        <%= form_tag(export_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), method: :post) do %>
             <%= hidden_field_tag(:code, params[:code]) %>
             <%= image_tag('logos/zenodo.png', :class => 'zenodo-publish') %>
             <p>
-              You are about to publish the investigation:
+              You are about to export the investigation:
               <strong><%= @investigation.title %></strong> to Zenodo. <br/>
               Please fill out some additional metadata required by Zenodo before submitting.
             </p>
@@ -55,7 +55,7 @@
 
             <hr/>
             <p class="text-center">
-              <%= submit_tag 'Publish', :class => 'btn btn-primary' %>
+              <%= submit_tag 'Export', :class => 'btn btn-primary' %>
               <%= link_to 'Cancel', investigation_path(@investigation), :class => 'btn btn-default' %>
             </p>
         <% end %>
