@@ -1,16 +1,104 @@
 <div class="row">
   <div class="col-md-8 col-md-push-2">
-    <%= panel("Confirmation", body_options: {class: 'text-center'}) do %>
-        <%= image_tag('logos/zenodo.png', :class => 'zenodo-publish') %>
-        You are about to publish the investigation:
-        <strong><%= @investigation.title %></strong> to Zenodo. <br/>Please click the button below to confirm this action.
-        <hr/>
+    <%= panel("Confirmation") do %>
         <%= form_tag(publish_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), method: :post) do %>
             <%= hidden_field_tag(:code, params[:code]) %>
+            <%= image_tag('logos/zenodo.png', :class => 'zenodo-publish') %>
+            <p>
+              You are about to publish the investigation:
+              <strong><%= @investigation.title %></strong> to Zenodo. <br/>
+              Please fill out some additional metadata required by Zenodo before submitting.
+            </p>
 
-            <%= submit_tag 'Yes, publish', :class => 'btn btn-primary' %>
-            <%= link_to 'No, cancel', investigation_path(@investigation), :class => 'btn btn-default' %>
+            <div class="form-group" id="access-right-section">
+              <label>Access Right</label>
+              <div class="btn-group btn-group-justified" data-toggle="buttons">
+                <label class="btn btn-default active">
+                  <input type="radio" name="metadata[access_right]" id="access-right-open" value="open" checked>
+                  Open
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" name="metadata[access_right]" id="access-right-embargoed" value="embargoed" autocomplete="off">
+                  Embargoed
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" name="metadata[access_right]" id="access-right-restricted" value="restricted" autocomplete="off">
+                  Restricted
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" name="metadata[access_right]" id="access-right-closed" value="closed" autocomplete="off">
+                  Closed
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group" id="license-section">
+              <label>License</label>
+              <%= license_select('metadata[license]', 'CC-BY-4.0', :id => 'license-select', :class => 'form-control') %>
+              <span class="help-block">
+                For more information on this license, please visit
+                <a id="license-url" href="" target="_blank"></a>
+              </span>
+            </div>
+
+            <div class="form-group" id="access-conditions-section" style="display: none">
+              <label>Access Conditions</label>
+              <%= text_area_tag('metadata[access_conditions]','', :class => 'form-control') %>
+              <span class="help-block">The conditions under which this investigation can be accessed.</span>
+            </div>
+
+            <div class="form-group" id="embargo-date-section" style="display: none">
+              <label>Embargo Date</label>
+              <%= text_field_tag('metadata[embargo_date]','', :placeholder => 'YYYY-MM-DD', :class => 'form-control') %>
+              <span class="help-block">The date at which the embargo is lifted, e.g. 2015-08-15.</span>
+            </div>
+
+            <hr/>
+            <p class="text-center">
+              <%= submit_tag 'Publish', :class => 'btn btn-primary' %>
+              <%= link_to 'Cancel', investigation_path(@investigation), :class => 'btn btn-default' %>
+            </p>
         <% end %>
     <% end %>
   </div>
 </div>
+
+<script>
+    function setLicenseUrl() {
+        var element = $j('#license-select option:selected');
+        var link = $j('#license-url');
+
+        link.attr('href', element.data('url'));
+        link.html(element.data('url'));
+    }
+
+    $j('#license-select').change(function () {
+        setLicenseUrl();
+    });
+
+    $j('#access-right-section input:radio').change(function () {
+        var licenseSection = $j('#license-section');
+        var dateSection = $j('#embargo-date-section');
+        var conditionsSection = $j('#access-conditions-section');
+
+        if (this.value == 'open') {
+            licenseSection.show();
+            dateSection.hide();
+            conditionsSection.hide();
+        } else if (this.value == 'embargoed') {
+            licenseSection.show();
+            dateSection.show();
+            conditionsSection.hide();
+        } else if (this.value == 'restricted') {
+            licenseSection.hide();
+            dateSection.hide();
+            conditionsSection.show();
+        } else if (this.value == 'closed') {
+            licenseSection.hide();
+            dateSection.hide();
+            conditionsSection.hide();
+        }
+    });
+
+    setLicenseUrl();
+</script>
