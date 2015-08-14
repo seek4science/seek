@@ -11,7 +11,7 @@ class TestSuite < Test::Unit::TestCase
     user_name = STDIN.gets.chomp
     puts "Please provide the password:"
     password = STDIN.noecho(&:gets).chomp
-    #for_firefox(user_name, password)
+    for_firefox(user_name, password)
     for_chrome(user_name, password)
   end
 
