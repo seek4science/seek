@@ -25,6 +25,10 @@ module Zenodo
         !zenodo_deposition_id.blank?
       end
 
+      def published_in_zenodo?
+        !zenodo_record_url.blank?
+      end
+
       def export_to_zenodo(access_token, extra_metadata = {})
         if !has_doi?
           errors.add(:base, "Please generate a DOI before exporting to Zenodo.")
@@ -42,7 +46,26 @@ module Zenodo
         deposition_file = deposition.create_file(zenodo_depositable_file)
 
         update_attribute(:zenodo_deposition_id, deposition.id)
-        true
+
+        deposition
+      end
+
+      def publish_in_zenodo(access_token)
+        if !in_zenodo?
+          errors.add(:base, "Please export to Zenodo first.")
+          return false
+        end
+        if published_in_zenodo?
+          errors.add(:base, "Already published in Zenodo, ID: #{zenodo_deposition_url}")
+          return false
+        end
+
+        client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)
+        deposition = client.deposition(zenodo_deposition_id)
+
+        if deposition.publish
+          update_attribute(:zenodo_deposition_url, deposition.details['record_url'])
+        end
       end
 
       def zenodo_metadata
