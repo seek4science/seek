@@ -105,13 +105,13 @@ class SnapshotTest < ActiveSupport::TestCase
     zenodo_mock
 
     snapshot = @investigation.create_snapshot
-    snapshot.zenodo_deposition_id = 'abc'
+    snapshot.zenodo_deposition_id = 123
     snapshot.save
 
     res = snapshot.export_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
 
     assert !res
-    assert_equal 'abc', snapshot.zenodo_deposition_id
+    assert_equal 123, snapshot.zenodo_deposition_id
     assert_not_empty snapshot.errors
   end
 
