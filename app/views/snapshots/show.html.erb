@@ -19,8 +19,10 @@
 
     <p>
       <strong>Zenodo URL:</strong>
-      <% if @snapshot.zenodo_url %>
-          <%= link_to @snapshot.zenodo_url, @snapshot.zenodo_url %>
+      <% if @snapshot.published_in_zenodo? %>
+          <%= link_to @snapshot.zenodo_record_url, @snapshot.zenodo_record_url %>
+      <% elsif @snapshot.in_zenodo? %>
+          <span class="none_text">Not yet published</span>
       <% else %>
           <span class="none_text">None</span>
       <% end %>
