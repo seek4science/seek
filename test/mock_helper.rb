@@ -1,6 +1,7 @@
 module MockHelper
 
   ZENODO_ACCESS_TOKEN = '123'
+  ZENODO_REFRESH_TOKEN = 'ref'
   ZENODO_DEPOSITION_ID = '456'
   ZENODO_FILE_ID = '789'
 
@@ -28,8 +29,27 @@ module MockHelper
   def zenodo_oauth_mock
     stub_request(:post,
                  "https://sandbox.zenodo.org/oauth/token"
-    ).to_return(
-        :body => {:access_token => ZENODO_ACCESS_TOKEN.to_s}.to_json,
+    ).with(:body => {:grant_type => 'authorization_code'}).to_return(
+        :body => {
+            :access_token => ZENODO_ACCESS_TOKEN.to_s,
+            :refresh_token => ZENODO_REFRESH_TOKEN.to_s,
+            :expires_in => 3600,
+            :scope => "deposit:write deposit:actions",
+            :token_type => "Bearer"
+        }.to_json,
+        :status => 200
+    )
+
+    stub_request(:post,
+                 "https://sandbox.zenodo.org/oauth/token"
+    ).with(:body => {:grant_type => 'refresh_token'}).to_return(
+        :body => {
+            :access_token => ZENODO_ACCESS_TOKEN.to_s,
+            :refresh_token => ZENODO_REFRESH_TOKEN.to_s,
+            :expires_in => 3600,
+            :scope => "deposit:write deposit:actions",
+            :token_type => "Bearer"
+        }.to_json,
         :status => 200
     )
   end

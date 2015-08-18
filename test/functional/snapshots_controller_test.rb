@@ -141,6 +141,23 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert !assigns(:snapshot).zenodo_deposition_id.nil?
   end
 
+  test "redirects to Zenodo auth page if no existing OAuth session" do
+    zenodo_mock
+    zenodo_oauth_mock
+    create_snapshot
+
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    login_as(@user)
+
+    assert_empty @user.oauth_sessions.where(:provider => 'Zenodo')
+
+    post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
+         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+
+    assert_redirected_to assigns(:zenodo_oauth_client).authorize_url(request.original_url)
+  end
+
   test "can't export snapshot to Zenodo if no manage permissions" do
     zenodo_mock
     zenodo_oauth_mock
