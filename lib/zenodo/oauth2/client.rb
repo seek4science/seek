@@ -40,8 +40,22 @@ module Zenodo
             redirect_uri: @redirect_uri # Not sure why this is needed, but the request fails otherwise
         }
 
-        json = RestClient.post(url.to_s, body)
-        JSON.parse(json)["access_token"]
+        JSON.parse RestClient.post(url.to_s, body)
+      end
+
+      # Performs a POST request to refresh an expired access token using the refresh token
+      def refresh(refresh_token)
+        url = URI::join(@endpoint, 'token')
+
+        body = {
+            client_id: @client_id,
+            client_secret: @client_secret,
+            grant_type: 'refresh_token',
+            refresh_token: refresh_token,
+            redirect_uri: @redirect_uri
+        }
+
+        JSON.parse RestClient.post(url.to_s, body)
       end
     end
   end

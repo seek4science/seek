@@ -6,10 +6,12 @@ class SnapshotsController < ApplicationController
   before_filter :auth_investigation, only: [:mint_doi, :new, :create, :export_preview, :export_submit]
   before_filter :check_investigation_permitted_for_ro, only: [:new, :create]
   before_filter :find_snapshot, only: [:show, :mint_doi, :download, :export_preview, :export_submit]
-  before_filter :zenodo_oauth
   before_filter :doi_minting_enabled?, only: [:mint_doi]
+  before_filter :zenodo_oauth_client
+  before_filter :zenodo_oauth_session, only: [:export_submit]
 
   include Seek::BreadCrumbs
+  include Zenodo::Oauth2::SessionHelper
 
   def create
     @snapshot = @investigation.create_snapshot
@@ -44,7 +46,7 @@ class SnapshotsController < ApplicationController
   end
 
   def export_submit
-    access_token = @zenodo_oauth_client.get_token(params[:code])
+    access_token = @oauth_session.access_token
 
     metadata = params[:metadata].delete_if { |k,v| v.blank? }
 
@@ -86,15 +88,6 @@ class SnapshotsController < ApplicationController
       flash[:error] = "DOI minting is not enabled."
       redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     end
-  end
-
-  def zenodo_oauth
-    @zenodo_oauth_client = Zenodo::Oauth2::Client.new(
-        Seek::Config.zenodo_client_id,
-        Seek::Config.zenodo_client_secret,
-        zenodo_oauth_callback_url,
-        Seek::Config.zenodo_oauth_url
-    )
   end
 
 end

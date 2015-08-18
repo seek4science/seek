@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150817133253) do
+ActiveRecord::Schema.define(:version => 20150818095633) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -783,6 +783,18 @@ ActiveRecord::Schema.define(:version => 20150817133253) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "oauth_sessions", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "provider"
+    t.string   "access_token"
+    t.string   "refresh_token"
+    t.datetime "expires_at"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "oauth_sessions", ["user_id"], :name => "index_oauth_sessions_on_user_id"
 
   create_table "organisms", :force => true do |t|
     t.string   "title"

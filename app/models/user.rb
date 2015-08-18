@@ -24,6 +24,8 @@ class User < ActiveRecord::Base
   has_many :taverna_player_runs, :class_name => 'TavernaPlayer::Run', :as => :contributor
   has_many :sweeps, :as => :contributor
 
+  has_many :oauth_sessions, :dependent => :destroy
+
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
   attr_accessor :password, :password_confirmation

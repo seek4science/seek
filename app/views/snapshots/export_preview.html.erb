@@ -2,7 +2,6 @@
   <div class="col-md-8 col-md-push-2">
     <%= panel("Confirmation") do %>
         <%= form_tag(export_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), method: :post) do %>
-            <%= hidden_field_tag(:code, params[:code]) %>
             <%= image_tag('logos/zenodo.png', :class => 'zenodo-publish') %>
             <p>
               You are about to export the investigation:
