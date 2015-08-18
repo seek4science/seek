@@ -14,7 +14,7 @@
               <label>Access Right</label>
               <div class="btn-group btn-group-justified" data-toggle="buttons">
                 <label class="btn btn-default active">
-                  <input type="radio" name="metadata[access_right]" id="access-right-open" value="open" checked>
+                  <input type="radio" name="metadata[access_right]" id="access-right-open" value="open" autocomplete="off" checked>
                   Open
                 </label>
                 <label class="btn btn-default">
@@ -72,33 +72,43 @@
         link.html(element.data('url'));
     }
 
-    $j('#license-select').change(function () {
-        setLicenseUrl();
-    });
+    function enableSection(sectionElement) {
+        sectionElement.show().children(":input").prop("disabled", false);
+    }
 
-    $j('#access-right-section input:radio').change(function () {
+    function disableSection(sectionElement) {
+        sectionElement.hide().children(":input").prop("disabled", true);
+    }
+
+    function toggleSections() {
         var licenseSection = $j('#license-section');
         var dateSection = $j('#embargo-date-section');
         var conditionsSection = $j('#access-conditions-section');
 
         if (this.value == 'open') {
-            licenseSection.show();
-            dateSection.hide();
-            conditionsSection.hide();
+            enableSection(licenseSection);
+            disableSection(dateSection);
+            disableSection(conditionsSection);
         } else if (this.value == 'embargoed') {
-            licenseSection.show();
-            dateSection.show();
-            conditionsSection.hide();
+            enableSection(licenseSection);
+            enableSection(dateSection);
+            disableSection(conditionsSection);
         } else if (this.value == 'restricted') {
-            licenseSection.hide();
-            dateSection.hide();
-            conditionsSection.show();
+            disableSection(licenseSection);
+            disableSection(dateSection);
+            enableSection(conditionsSection);
         } else if (this.value == 'closed') {
-            licenseSection.hide();
-            dateSection.hide();
-            conditionsSection.hide();
+            disableSection(licenseSection);
+            disableSection(dateSection);
+            disableSection(conditionsSection);
         }
-    });
+    }
 
-    setLicenseUrl();
+    $j(document).ready(function () {
+        $j('#license-select').change(setLicenseUrl);
+        $j('#access-right-section input:radio').change(toggleSections);
+
+        toggleSections();
+        setLicenseUrl();
+    });
 </script>
