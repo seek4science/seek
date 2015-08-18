@@ -128,7 +128,9 @@ class SnapshotsControllerTest < ActionController::TestCase
     zenodo_mock
     zenodo_oauth_mock
     create_snapshot
-    @snapshot.doi = '123'
+    Factory(:oauth_session, :user_id => @user.id)
+
+    @snapshot.doi = '10.5072/123'
     @snapshot.save
     login_as(@user)
 

@@ -998,3 +998,11 @@ end
     f.status_message_key 'failed'
     f.state :failed
   end
+
+  Factory.define(:oauth_session) do |f|
+    f.association :user, :factory => :user
+    f.provider 'Zenodo'
+    f.access_token '123'
+    f.refresh_token 'ref'
+    f.expires_at (Time.now + 1.hour)
+  end
