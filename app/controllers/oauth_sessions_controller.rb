@@ -10,7 +10,7 @@ class OauthSessionsController < ApplicationController
     @oauth_session = OauthSession.find(params[:id])
 
     @oauth_session.destroy
-    redirect_to user_oauth_sessions_path(@user, @oauth_session)
+    redirect_to user_oauth_sessions_path(@user)
   end
 
   private
