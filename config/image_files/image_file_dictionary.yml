@@ -151,6 +151,7 @@ world: 'famfamfam_silk/world.png'
 zoom_in: 'famfamfam_silk/zoom_in.png'
 zoom_out: 'famfamfam_silk/zoom_out.png'
 snapshot_export: 'famfamfam_silk/folder_go.png'
+oauth: 'famfamfam_silk/link.png'
 
 
 #images for mime types

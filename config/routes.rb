@@ -118,6 +118,7 @@ SEEK::Application.routes.draw do
       put :set_openid
       post :resend_activation_email
     end
+    resources :oauth_sessions, only: [:index, :destroy]
   end
 
   resource :session do
