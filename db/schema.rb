@@ -36,6 +36,12 @@ ActiveRecord::Schema.define(:version => 20150818095633) do
   add_index "activity_logs", ["format"], :name => "act_logs_format_index"
   add_index "activity_logs", ["referenced_type", "referenced_id"], :name => "act_logs_referenced_index"
 
+  create_table "admin_defined_role_programmes", :force => true do |t|
+    t.integer "programme_id"
+    t.integer "person_id"
+    t.integer "role_mask"
+  end
+
   create_table "admin_defined_role_projects", :force => true do |t|
     t.integer "project_id"
     t.integer "role_mask"
@@ -824,7 +830,7 @@ ActiveRecord::Schema.define(:version => 20150818095633) do
     t.integer  "status_id",                  :default => 0
     t.string   "first_letter", :limit => 10
     t.string   "uuid"
-    t.integer  "roles_mask"
+    t.integer  "roles_mask",                 :default => 0
     t.string   "orcid"
   end
 
