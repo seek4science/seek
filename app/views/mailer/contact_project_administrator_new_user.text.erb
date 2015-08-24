@@ -2,7 +2,7 @@ Hi,
 
 The new user <%= @person.name %> just signed up and indicated that they are a member of the following projects and/or institutions:
 
-"<%= @details %>"
+<%= @details %>
 
 If you know they are a genuine member of the <%= t('project').pluralize.downcase %> you can manage, please assign him/her to the <%= t('project').pluralize.downcase %> by:
 - Go to the users profile at <%= person_url(@person, :host=>@host) %>

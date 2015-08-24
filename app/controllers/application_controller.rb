@@ -40,7 +40,7 @@ class ApplicationController < ActionController::Base
   end
 
   def partially_registered?
-    redirect_to register_people_path if (current_user && current_user.person.nil?)
+    redirect_to register_people_path if (current_user && !current_user.registration_complete?)
   end
 
   def strip_root_for_xml_requests
@@ -83,13 +83,6 @@ class ApplicationController < ActionController::Base
       return false
     end
     return true
-  end
-
-  def is_admin_or_is_project_manager
-    unless User.admin_or_project_manager_logged_in?
-      error("You do not have the permission", "Not admin or #{t('project')} manager")
-      return false
-    end
   end
 
   def can_manage_announcements?
@@ -289,7 +282,7 @@ class ApplicationController < ActionController::Base
 
     return if action.nil?
 
-    object = name.camelize.constantize.find(params[:id])
+    object = self.controller_name.classify.constantize.find(params[:id])
 
     if is_auth?(object, action)
       eval "@#{name} = object"
@@ -313,6 +306,13 @@ class ApplicationController < ActionController::Base
         format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
         format.json { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
       end
+      return false
+    end
+  end
+
+  def auth_to_create
+    unless self.controller_name.classify.constantize.can_create?
+      error("You do not have permission", "No permission")
       return false
     end
   end

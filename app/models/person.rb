@@ -4,7 +4,7 @@ class Person < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::Taggable
-  include Seek::AdminDefinedRoles
+  include Seek::Roles::AdminDefinedRoles
 
   alias_attribute :title, :name
 
@@ -98,6 +98,7 @@ class Person < ActiveRecord::Base
     !user.nil?
   end
 
+  #to allow you to call .person on a Person or User to avoid having to check its type
   def person
     self
   end
@@ -219,10 +220,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def can_create_new_items?
-    member?
-  end
-
   def workflows
      self.try(:user).try(:workflows) || []
   end
@@ -304,18 +301,10 @@ class Person < ActiveRecord::Base
   def can_be_edited_by?(subject)
     return false unless subject
     subject = subject.user if subject.is_a?(Person)
-    subject == self.user || subject.is_admin? || self.is_managed_by?(subject)
+    subject == self.user || subject.is_admin? || self.is_project_administered_by?(subject)
   end
 
-  #determines if this person is the member of a project for which the user passed is a project manager,
-  # #and the current person is not an admin
-  def is_managed_by? user
-    return false if self.is_admin?
-    match = self.projects.find do |p|
-      user.person.is_project_manager?(p)
-    end
-    !match.nil?
-  end
+
 
   def me?
     user && user==User.current_user
@@ -325,7 +314,7 @@ class Person < ActiveRecord::Base
   def can_be_administered_by?(user)
     person = user.try(:person)
     return false unless user && person
-    user.is_admin? || (person.is_project_manager_of_any_project? && (self.is_admin? || self!=person))
+    user.is_admin? || (person.is_project_administrator_of_any_project? && (self.is_admin? || self!=person))
   end
 
   def can_view? user = User.current_user
@@ -452,6 +441,10 @@ class Person < ActiveRecord::Base
         add_to_project_and_institution(project,project.institutions.first)
       end
     end
+  end
+
+  def self.can_create?
+    User.admin_or_project_administrator_logged_in? || (User.logged_in? && !User.current_user.registration_complete?)
   end
 
   include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled

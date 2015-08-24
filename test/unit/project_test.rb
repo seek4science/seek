@@ -3,6 +3,7 @@ require 'test_helper'
 class ProjectTest < ActiveSupport::TestCase
   
   fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users,  :publications, :assets, :organisms
+
   #checks that the dependent work_groups are destroyed when the project s
   def test_delete_work_groups_when_project_deleted
     n_wg=WorkGroup.all.size
@@ -150,25 +151,25 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_can_be_edited_by
-    u=Factory(:project_manager).user
+    u=Factory(:project_administrator).user
     p=u.person.projects.first
-    assert p.can_be_edited_by?(u),"Project should be editable by user :project_manager"
+    assert p.can_be_edited_by?(u),"Project should be editable by user :project_administrator"
 
     p=Factory(:project)
-    assert !p.can_be_edited_by?(u),"other project should not be editable by project manager, since it is not a project he manages"
+    assert !p.can_be_edited_by?(u),"other project should not be editable by project administrator, since it is not a project he administers"
   end
 
   test "can be administered by" do
     admin = Factory(:admin)
-    pm = Factory(:project_manager)
+    project_administrator = Factory(:project_administrator)
     normal = Factory(:person)
     another_proj = Factory(:project)
 
-    assert pm.projects.first.can_be_administered_by?(pm.user)
+    assert project_administrator.projects.first.can_be_administered_by?(project_administrator.user)
     assert !normal.projects.first.can_be_administered_by?(normal.user)
 
     assert !another_proj.can_be_administered_by?(normal.user)
-    assert !another_proj.can_be_administered_by?(pm.user)
+    assert !another_proj.can_be_administered_by?(project_administrator.user)
     assert another_proj.can_be_administered_by?(admin.user)
   end
 
@@ -301,16 +302,16 @@ class ProjectTest < ActiveSupport::TestCase
     end
   end
 
-  test "project_managers" do
+  test "project_administrators" do
     User.with_current_user(Factory(:admin)) do
       person=Factory(:person_in_multiple_projects)
       proj1 = person.projects.first
       proj2 = person.projects.last
-      person.is_project_manager=true,proj1
+      person.is_project_administrator=true,proj1
       person.save!
 
-      assert proj1.project_managers.include?(person)
-      assert !proj2.project_managers.include?(person)
+      assert proj1.project_administrators.include?(person)
+      assert !proj2.project_administrators.include?(person)
     end
   end
 
@@ -477,6 +478,23 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 2,p2.work_groups.count
     refute_equal p.work_groups.sort,p2.work_groups.sort
     assert_equal p.people,p2.people
+  end
+
+  test "can create?" do
+    User.current_user = nil
+    refute Project.can_create?
+
+    User.current_user=Factory(:person).user
+    refute Project.can_create?
+
+    User.current_user=Factory(:project_administrator).user
+    refute Project.can_create?
+
+    User.current_user=Factory(:admin).user
+    assert Project.can_create?
+
+    User.current_user=Factory(:programme_administrator).user
+    assert Project.can_create?
   end
 
 end

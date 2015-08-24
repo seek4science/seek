@@ -45,7 +45,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  def test_should_create_project
+  def test_should_create_project_with_hierarchy
     parent = Factory(:project,:title=>"Test Parent")
 		assert_difference('Project.count') do
 			post :create, :project => {:title=>"test",:parent_id=>parent.id}
@@ -53,7 +53,23 @@ class ProjectsControllerTest < ActionController::TestCase
 
 		assert_redirected_to project_path(assigns(:project))
     assert_includes assigns(:project).ancestors,parent
-	end
+  end
+
+  test "programme administrator can view new" do
+    login_as(Factory(:programme_administrator))
+    get :new
+    assert_response :success
+  end
+
+  test "programme_administrator can create project" do
+    login_as(Factory(:programme_administrator))
+    assert_difference('Project.count') do
+      post :create, :project => {:title=>"test2"}
+    end
+
+    project = assigns(:project)
+    assert_redirected_to project_path(project)
+  end
 
 	def test_should_show_project
 
@@ -273,10 +289,10 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert_select "a",:text=>/Edit Project/,:count=>0
 	end
 
-	def test_user_project_manager
-    pm = Factory(:project_manager)
-    proj = pm.projects.first
-		login_as(pm.user)
+	def test_user_project_administrator
+    project_admin = Factory(:project_administrator)
+    proj = project_admin.projects.first
+		login_as(project_admin.user)
 		get :show, :id=>proj.id
 		assert_select "a",:text=>/Edit #{I18n.t('project')}/,:count=>1
 
@@ -285,7 +301,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
 		put :update, :id=>proj.id,:project=>{:title=>"fish"}
     proj = assigns(:project)
-		assert_redirected_to project_path(proj)
+		assert_redirected_to proj
     assert_equal "fish",proj.title
 	end
 
@@ -372,14 +388,14 @@ class ProjectsControllerTest < ActionController::TestCase
       end
     end
 
-  	test "project_managers displayed in show page" do
-		project_manager = Factory(:project_manager)
-    login_as project_manager.user
-    get :show,:id=>project_manager.projects.first
-		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "strong",:text=>"#{I18n.t('project')} Managers:",:count=>1
+  	test "project administrators displayed in show page" do
+		project_administrator = Factory(:project_administrator)
+    login_as project_administrator.user
+    get :show,:id=>project_administrator.projects.first
+		assert_select "div.box_about_actor p.project_administrators" do
+			assert_select "strong",:text=>"#{I18n.t('project')} Administrators:",:count=>1
 			assert_select "a",:count=>1
-			assert_select "a[href=?]",person_path(project_manager),:text=>project_manager.name,:count=>1
+			assert_select "a[href=?]",person_path(project_administrator),:text=>project_administrator.name,:count=>1
 		end
     end
 
@@ -399,7 +415,7 @@ class ProjectsControllerTest < ActionController::TestCase
     work_group = Factory(:work_group, :project => project)
 
     asset_manager = Factory(:asset_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    project_manager = Factory(:project_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    project_administrator = Factory(:project_administrator, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     gatekeeper = Factory(:gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     pal = Factory(:pal, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
 
@@ -413,8 +429,8 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select "strong", :text => "Asset Managers:", :count => 0
       assert_select "a[href=?]", person_path(asset_manager), :text => asset_manager.name, :count => 0
 
-      assert_select "strong", :text => "Project Managers:", :count => 0
-      assert_select "a[href=?]", person_path(project_manager), :text => project_manager.name, :count => 0
+      assert_select "strong", :text => "Project Administrators:", :count => 0
+      assert_select "a[href=?]", person_path(project_administrator), :text => project_administrator.name, :count => 0
 
       assert_select "strong", :text => "Gatekeepers:", :count => 0
       assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 0
@@ -454,16 +470,16 @@ class ProjectsControllerTest < ActionController::TestCase
 		end
   end
 
-  test "no project managers displayed for project with no project managers" do
+  test "no project administrator displayed for project with no project managers" do
     project = Factory(:project)
     work_group = Factory(:work_group, :project => project)
     person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     login_as person.user
     get :show,:id=>project
-		assert_select "div.box_about_actor p.project_managers" do
-			assert_select "strong",:text=>"#{I18n.t('project')} Managers:",:count=>1
+		assert_select "div.box_about_actor p.project_administrators" do
+			assert_select "strong",:text=>"#{I18n.t('project')} Administrators:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Managers for this #{I18n.t('project')}",:count=>1
+			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Administrators for this #{I18n.t('project')}",:count=>1
 		end
 	end
 
@@ -539,10 +555,10 @@ class ProjectsControllerTest < ActionController::TestCase
 		assert Permission.find_by_policy_id(project.default_policy).contributor_id == person.id
 	end
 
-  test 'project manager can administer their projects' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    login_as(project_manager.user)
+  test 'project administrator can administer their projects' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
 
     get :show, :id => project
     assert_response :success
@@ -553,16 +569,16 @@ class ProjectsControllerTest < ActionController::TestCase
 
     new_institution = Institution.create(:title => 'a test institution')
     put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
-    assert_redirected_to project_path(project)
+    assert_redirected_to project
     project.reload
     assert project.institutions.include?new_institution
   end
 
-  test 'project manager can not administer the projects that they are not in' do
-    project_manager = Factory(:project_manager)
+  test 'project administrator can not administer the projects that they are not in' do
+    project_administrator = Factory(:project_administrator)
     a_project = Factory(:project)
-    assert !(project_manager.projects.include?a_project)
-    login_as(project_manager.user)
+    assert !(project_administrator.projects.include?a_project)
+    login_as(project_administrator.user)
 
     get :show, :id => a_project
     assert_response :success
@@ -598,10 +614,10 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'project manager can only see all institutions' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    login_as(project_manager.user)
+  test 'project administrator can only see all institutions' do
+    project_admin = Factory(:project_administrator)
+    project = project_admin.projects.first
+    login_as(project_admin.user)
     Factory(:institution)
 
     get :admin, :id => project
@@ -611,21 +627,21 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'project manager can assign all institutions to their project' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
-    login_as(project_manager.user)
+  test 'project administrator can assign all institutions to their project' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
     a_institution = Factory(:institution)
 
     put :update, :id => project, :project => {:institution_ids => Institution.all.collect(&:id)}
-    assert_redirected_to project_path(project)
+    assert_redirected_to project
     project.reload
     assert_equal Institution.count, project.institutions.count
   end
 
-  test 'project manager can not administer sharing policy' do
-    project_manager = Factory(:project_manager)
-    project = project_manager.projects.first
+  test 'project administrator can not administer sharing policy' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
     policy = project.default_policy
 
 		sharing = {}
@@ -635,7 +651,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_not_equal policy.sharing_scope, sharing[:sharing_scope]
     assert_not_equal policy.access_type, sharing["access_type_#{sharing[:sharing_scope]}"]
 
-    login_as(project_manager.user)
+    login_as(project_administrator.user)
 		put :update, :id => project.id, :project => valid_project, :sharing => sharing
     project.reload
     assert_redirected_to project
@@ -643,15 +659,15 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_not_equal project.default_policy.access_type, sharing["access_type_#{sharing[:sharing_scope]}"]
   end
 
-  test 'project manager can not administer jerm detail' do
+  test 'project administrator can not administer jerm detail' do
     with_config_value :jerm_enabled,true do
-      project_manager = Factory(:project_manager)
-      project = project_manager.projects.first
+      project_administrator = Factory(:project_administrator)
+      project = project_administrator.projects.first
       assert_nil project.site_root_uri
       assert_nil project.site_username
       assert_nil project.site_password
 
-      login_as(project_manager.user)
+      login_as(project_administrator.user)
       put :update, :id => project.id, :project => {:site_root_uri => 'test', :site_username => 'test', :site_password => 'test'}
 
       project.reload
@@ -885,8 +901,8 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "admin_members available to project manager" do
-    person = Factory(:project_manager)
+  test "admin_members available to project administrator" do
+    person = Factory(:project_administrator)
     login_as(person)
     project = person.projects.first
     get :admin_members,:id=>project
@@ -944,8 +960,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
-  test "update members as project manager" do
-    person = Factory(:project_manager)
+  test "update members as project administrator" do
+    person = Factory(:project_administrator)
     project = person.projects.first
     login_as(person)
 

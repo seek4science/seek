@@ -15,7 +15,7 @@ class Ability
     person = user.try(:person)
     if person
       person.projects.each do |proj|
-        person.roles(proj).each do |role|
+        person.roles_for_project(proj).each do |role|
           send(role, person)
         end
       end
@@ -36,7 +36,7 @@ class Ability
 
   end
 
-  def project_manager project_manager
+  def project_administrator project_administrator
 
   end
 

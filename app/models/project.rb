@@ -122,8 +122,8 @@ class Project < ActiveRecord::Base
   end
 
   #this is seek role
-  def project_managers
-    people_with_the_role("project_manager")
+  def project_administrators
+    people_with_the_role("project_administrator")
   end
 
   #this is seek role
@@ -137,8 +137,7 @@ class Project < ActiveRecord::Base
 
   #returns people belong to the admin defined seek 'role' for this project
   def people_with_the_role role
-    mask = Person.mask_for_role(role)
-    AdminDefinedRoleProject.where(role_mask: mask,project_id: self.id).collect{|r| r.person}
+    Seek::Roles::ProjectRelatedRoles.instance.people_with_project_and_role(self,role)
   end
 
   def locations
@@ -196,11 +195,19 @@ class Project < ActiveRecord::Base
   end
 
   def can_be_edited_by?(user)
-    user ? (user.is_admin? || user.is_project_manager?(self)) : false
+    user ? (user.is_admin? || user.is_project_administrator?(self)) : false
   end
 
-  def can_be_administered_by?(user)
-    user ? (user.is_admin? || user.is_project_manager?(self)) : false
+  #whether this project can be administered by the given user, or current user if none is specified
+  def can_be_administered_by?(user=User.current_user)
+    user ? (user.is_admin? || user.is_project_administrator?(self)) : false
+  end
+
+  #all projects that can be administered by the given user, or ghe current user if none is specified
+  def self.all_can_be_administered(user=User.current_user)
+    Project.all.select do |project|
+      project.can_be_administered_by?(user)
+    end
   end
 
   def can_delete?(user=User.current_user)
@@ -230,6 +237,10 @@ class Project < ActiveRecord::Base
     child.avatar=nil
     child.lineage_ancestor=self
     child
+  end
+
+  def self.can_create?
+    User.admin_logged_in? || User.programme_administrator_logged_in?
   end
 
    #should put below at the bottom in order to override methods for hierarchies,

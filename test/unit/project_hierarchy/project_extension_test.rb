@@ -48,15 +48,6 @@ class ProjectExtensionTest <  ActiveSupport::TestCase
     end
   end
 
-   test "project roles of child project is also of parent project" do
-     # PIs
-     # Project Coordinators
-   end
-
-   test "admin defined roles of parent project is also of child project" do
-      # pal project_manager asset_manager gatekeeper
-
-   end
   test "projects with children cannot be deleted" do
 
     assert !@proj.children.empty?

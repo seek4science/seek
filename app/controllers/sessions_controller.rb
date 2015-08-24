@@ -76,7 +76,7 @@ class SessionsController < ApplicationController
   
   def check_login    
     session[:user_id] = @user.id
-    if @user.person.nil?
+    if !@user.registration_complete?
       flash[:notice] = "You have successfully registered your account, but you need to create a profile"
       redirect_to(register_people_path)
 	  elsif !@user.active?

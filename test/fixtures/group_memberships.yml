@@ -67,8 +67,8 @@ group_for_pal:
   person: pal
   work_group: sysmo_at_manchester_uni_workgroup
 
-group_for_project_manager:
-  person: person_for_project_manager
+group_for_project_administrator:
+  person: person_for_project_administrator
   work_group_id: 4
 
 person_for_sysmo_user_who_wants_to_access_different_things_in_sysmo_at_manchester_uni_workgroup:

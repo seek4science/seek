@@ -82,12 +82,16 @@ class User < ActiveRecord::Base
     self.logged_in_and_registered? && self.current_user.person.is_admin?
   end
 
-  def self.project_manager_logged_in?
-    self.logged_in_and_registered? && self.current_user.person.is_project_manager_of_any_project?
+  def self.project_administrator_logged_in?
+    self.logged_in_and_registered? && self.current_user.person.is_project_administrator_of_any_project?
   end
 
-  def self.admin_or_project_manager_logged_in?
-    project_manager_logged_in? || admin_logged_in?
+  def self.programme_administrator_logged_in?
+    self.logged_in_and_registered? && self.current_user.person.is_programme_administrator_of_any_programme?
+  end
+
+  def self.admin_or_project_administrator_logged_in?
+    project_administrator_logged_in? || admin_logged_in?
   end
 
   def self.asset_manager_logged_in?
@@ -211,13 +215,13 @@ class User < ActiveRecord::Base
     person && person.is_admin?
   end
 
-  def is_project_manager? project
-    person && person.is_project_manager?(project)
+  def is_project_administrator? project
+    person && person.is_project_administrator?(project)
   end
 
 
-  def is_admin_or_project_manager?
-    person && person.is_admin_or_project_manager?
+  def is_admin_or_project_administrator?
+    person && person.is_admin_or_project_administrator?
   end
 
   def can_manage_types?
@@ -270,6 +274,11 @@ class User < ActiveRecord::Base
   def reset_password
     self.reset_password_code_until = 1.day.from_now
     self.reset_password_code =  Digest::SHA1.hexdigest( "#{user.login}#{Time.now.to_s.split(//).sort_by {rand}.join}" )
+  end
+
+  #indicates whether the user has completed the registration process, and is associated with a profile and link has been saved
+  def registration_complete?
+    person.present? && person.user.present?
   end
 
   def self.without_profile

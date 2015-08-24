@@ -5,6 +5,37 @@ class AssetTest < ActiveSupport::TestCase
   fixtures :all
   include ApplicationHelper
 
+  test "can create" do
+    refute DataFile.can_create?
+    refute Model.can_create?
+    refute Sop.can_create?
+    refute Presentation.can_create?
+    refute Publication.can_create?
+    refute Investigation.can_create?
+    refute Study.can_create?
+    refute Assay.can_create?
+
+    User.current_user=Factory(:person_not_in_project).user
+    refute DataFile.can_create?
+    refute Model.can_create?
+    refute Sop.can_create?
+    refute Presentation.can_create?
+    refute Publication.can_create?
+    refute Investigation.can_create?
+    refute Study.can_create?
+    refute Assay.can_create?
+
+    User.current_user=Factory(:person).user
+    assert DataFile.can_create?
+    assert Model.can_create?
+    assert Sop.can_create?
+    assert Presentation.can_create?
+    assert Publication.can_create?
+    assert Investigation.can_create?
+    assert Study.can_create?
+    assert Assay.can_create?
+  end
+
   test "default contributor or nil" do
     User.current_user = users(:owner_of_my_first_sop)
     model = Model.new(Factory.attributes_for(:model).tap{|h|h[:contributor] = nil; h[:policy] = Factory(:private_policy)})

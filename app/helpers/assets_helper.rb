@@ -6,6 +6,11 @@ module AssetsHelper
     controller_name.downcase.singularize.underscore
   end
 
+  def can_create_new_items?
+    #the state of being able to create assets is the same for all assets
+    DataFile.can_create?
+  end
+
   def request_request_label(resource)
     icon_filename = icon_filename_for_key('message')
     resource_type = text_for_resource(resource)

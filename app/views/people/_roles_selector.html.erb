@@ -4,9 +4,7 @@
    project_list = projects.collect(&:title).collect{|t| "<strong>#{h(t)}</strong>"}.join(", ").html_safe
    project_ids = projects.collect(&:id)
    select_name = "[roles][#{role}]"
-   select_id = "_roles_#{role}"
    hidden_block = "edit_#{role}"
-   add_method = "add_project_to_#{role}"
    ul_block = "project_list_for_#{role}"
    user_selection_id = "possible_project_for_#{role}"
 

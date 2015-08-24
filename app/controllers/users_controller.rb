@@ -137,7 +137,7 @@ class UsersController < ApplicationController
   
   def update    
     @user = User.find(params[:id])
-    if @user==current_user && @user.person.nil? && (params[:user][:person_id]) && (params[:user][:email])
+    if @user==current_user && !@user.registration_complete? && (params[:user][:person_id]) && (params[:user][:email])
       person_id = params[:user][:person_id]
       email = params[:user][:email]
       person=Person.not_registered.detect do |person|

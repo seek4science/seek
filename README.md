@@ -42,7 +42,15 @@ For details about how to contact us, to raise bugs or offer suggestion, please v
 
 ## Contributing to SEEK
 
-For details on how you can contribute to SEEK please visit [Contributing](http://seek4science.github.io/seek/contributing.html)
+In general :
+
+1. Fork it ( https://github.com/seek4science/seek/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
+
+For more details on how and what you can contribute to SEEK please visit [Contributing](http://seek4science.github.io/seek/contributing.html)
 
 
 ## Credit

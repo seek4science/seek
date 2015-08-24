@@ -1,13 +1,16 @@
 <%
    selected ||= nil
-   new_association_path = eval "new_#{association.to_s.singularize}_path(:parent_name=>'#{controller_name.underscore.singularize}')"
    default_choice = [default_choice_text, 0]
    collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
    possibilities_collection_id = "possible_#{collection_id}"
    possibilities_options ||= {}
    possibilities_options.merge!(:class => 'form-control')
-   title = association.to_s.singularize.humanize.pluralize
+   title ||= association.to_s.singularize.humanize.pluralize
    title += ' <span class="required">*</span>'.html_safe if required
+
+   if with_new_link
+     new_association_path = eval "new_#{association.to_s.singularize}_path(:parent_name=>'#{controller_name.underscore.singularize}')"
+   end
 %>
 
 <%= folding_panel(title, hidden, :id => "add_#{association}_form",

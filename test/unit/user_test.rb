@@ -22,6 +22,22 @@ class UserTest < ActiveSupport::TestCase
     assert u.valid?
   end
 
+  test "registration_compelete?" do
+    u = Factory :brand_new_user
+    refute u.person
+    refute u.registration_complete?
+
+    #its not complete until the association has been saved
+    u.person = Factory(:brand_new_person)
+    assert u.person
+    refute u.registration_complete?
+
+    u = Factory :user
+    assert u.person
+    assert u.registration_complete?
+
+  end
+
   test "check email present?" do
     u = Factory :user
     assert u.email.nil?
@@ -128,15 +144,31 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "project manager logged in?" do
-    pm = Factory :project_manager
+  test "project administrator logged in?" do
+    project_administrator = Factory :project_administrator
     normal = Factory :person
-    User.with_current_user(pm.user) do
-      assert User.project_manager_logged_in?
+    User.with_current_user(project_administrator.user) do
+      assert User.project_administrator_logged_in?
     end
 
     User.with_current_user(normal.user) do
-      assert !User.project_manager_logged_in?
+      assert !User.project_administrator_logged_in?
+    end
+  end
+
+  test "programme administrator logged in?" do
+    programme_administrator = Factory :programme_administrator
+    normal = Factory :person
+    User.with_current_user(programme_administrator.user) do
+      assert User.programme_administrator_logged_in?
+    end
+
+    User.with_current_user(normal.user) do
+      return User.programme_administrator_logged_in?
+    end
+
+    User.with_current_user(nil) do
+      return User.programme_administrator_logged_in?
     end
   end
 

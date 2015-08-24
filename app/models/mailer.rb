@@ -119,8 +119,8 @@ class Mailer < ActionMailer::Base
     welcome(user,base_host) #the only difference is the view template, which is picked from the method name
   end
 
-  def contact_admin_new_user(details,user,base_host)
-    @details = details
+  def contact_admin_new_user(params,user,base_host)
+    @details = Seek::Mail::NewMemberAffiliationDetails.new(params).message
     @person = user.person
     @user = user
     @host = base_host
@@ -131,16 +131,15 @@ class Mailer < ActionMailer::Base
 
   end
 
-  def contact_project_manager_new_user(project_manager,details,user,base_host)
-
-    @details = details
+  def contact_project_administrator_new_user(project_administrator,params,user,base_host)
+    @details = Seek::Mail::NewMemberAffiliationDetails.new(params).message
     @person = user.person
     @user = user
     @host = base_host
     mail(:from=>Seek::Config.noreply_sender,
-         :to=>project_manager_email(project_manager),
+         :to=>project_administrator_email(project_administrator),
          :reply_to=>user.person.email_with_name,
-         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} of which you are #{I18n.t('project').downcase} manager")
+         :subject=>"#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} of which you are #{I18n.t('project')} Administrator")
   end
 
   def resources_harvested(harvester_responses,user,base_host)
@@ -192,7 +191,7 @@ class Mailer < ActionMailer::Base
   end
 
   private
-  
+
   def admin_emails
     begin      
       admins.map { |p| p.email_with_name }
@@ -202,11 +201,11 @@ class Mailer < ActionMailer::Base
     end
   end
 
-  def project_manager_email project_manager
+  def project_administrator_email project_administrator
     begin
-      project_manager.email_with_name
+      project_administrator.email_with_name
     rescue
-      Rails.logger.error("Error determining #{I18n.t('project')} manager #{project_manager.name} email addresses")
+      Rails.logger.error("Error determining #{I18n.t('project')} manager #{project_madministrator.name} email addresses")
       ["sowen@cs.man.ac.uk"]
     end
   end

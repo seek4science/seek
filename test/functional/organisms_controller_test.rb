@@ -57,8 +57,8 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
-  test "project manager can get new" do
-    login_as(Factory(:project_manager))
+  test "project administrator can get new" do
+    login_as(Factory(:project_administrator))
     get :new
     assert_response :success
     assert_nil flash[:error]
@@ -82,8 +82,8 @@ class OrganismsControllerTest < ActionController::TestCase
     end
   end
 
-  test "project manager has create organism menu option" do
-    login_as(Factory(:project_manager))
+  test "project administrator has create organism menu option" do
+    login_as(Factory(:project_administrator))
     get :show, :id=>Factory(:organism)
     assert_response :success
     assert_select "li#create-menu" do
@@ -113,8 +113,8 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_redirected_to organism_path(assigns(:organism))
   end
 
-  test "project manager can create new organism" do
-    login_as(Factory(:project_manager))
+  test "project administrator can create new organism" do
+    login_as(Factory(:project_administrator))
     assert_difference("Organism.count") do
       post :create, :organism=>{:title=>"An organism"}
     end
@@ -154,8 +154,8 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_select "#content a",:text=>/Delete Organism/,:count=>1
   end
 
-  test "project manager sees create buttons" do
-    login_as(Factory(:project_manager))
+  test "project administrator sees create buttons" do
+    login_as(Factory(:project_administrator))
     y=organisms(:human)
     get :show,:id=>y
     assert_response :success
@@ -188,8 +188,8 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_redirected_to organisms_path
   end
 
-  test "delete as project manager" do
-    login_as(Factory(:project_manager))
+  test "delete as project administrator" do
+    login_as(Factory(:project_administrator))
     o=organisms(:human)
     assert_difference('Organism.count', -1) do
       delete :destroy, :id => o

@@ -12,7 +12,7 @@ gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
 gem 'uuid',"~>2.3"
 gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"~>0.15.0"
-gem "rmagick","2.13.2", :require => 'RMagick'
+gem "rmagick","2.15.2", :require => 'RMagick'
 gem "mysql2"
 gem 'rest-client'
 gem 'factory_girl', "2.6.4"
@@ -75,7 +75,7 @@ gem 'acts_as_trashable',:git=> "https://github.com/SysMO-DB/acts_as_trashable.gi
 gem "app_version", :git => "https://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "https://github.com/SysMO-DB/doi_query_tool.git"
 gem 'convert_office',:git=>"https://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
-gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage"
+gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage", :ref=>"af4da1ca93020749490331a50556d5094fb1cd0e"
 gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
 
@@ -96,6 +96,7 @@ gem 'sass-rails', '>= 3.2'
 gem 'ro-bundle'
 gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
+gem 'bootstrap-multiselect-rails'
 gem 'handlebars_assets'
 gem "zenodo-client", :git=>"https://github.com/seek4science/zenodo-client.git"
 

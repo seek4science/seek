@@ -212,22 +212,33 @@ class MailerTest < ActionMailer::TestCase
 
     @expected.body = read_fixture('contact_admin_new_user')
 
+    params={}
+    params[:projects]=[Factory(:project,:title=>"Project X").id.to_s,Factory(:project,:title=>"Project Y").id.to_s]
+    params[:institutions]=[Factory(:institution,:title=>"The Institute").id.to_s]
+    params[:other_projects]="Another Project"
+    params[:other_institutions]="Another Institute"
+
     assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_admin_new_user("test message", users(:aaron), "localhost"))
+                 encode_mail(Mailer.contact_admin_new_user(params, users(:aaron), "localhost"))
   end
 
-  test "contact_project_manager_new_user" do
-    project_manager = Factory(:project_manager)
-    @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are project manager'
-    @expected.to = project_manager.email_with_name
+  test "contact_project_administrator_new_user" do
+    project_administrator = Factory(:project_administrator)
+    @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are Project Administrator'
+    @expected.to = project_administrator.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 
+    params={}
+    params[:projects]=[Factory(:project,:title=>"Project X").id.to_s,Factory(:project,:title=>"Project Y").id.to_s]
+    params[:institutions]=[Factory(:institution,:title=>"The Institute").id.to_s]
+    params[:other_projects]="Another Project"
+    params[:other_institutions]="Another Institute"
 
-    @expected.body = read_fixture('contact_project_manager_new_user')
+    @expected.body = read_fixture('contact_project_administrator_new_user')
 
     assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_project_manager_new_user(project_manager, "test message", users(:aaron), "localhost"))
+                 encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron), "localhost"))
 
 
   end
