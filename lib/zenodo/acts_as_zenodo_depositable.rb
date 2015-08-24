@@ -73,7 +73,7 @@ module Zenodo
         metadata = Zenodo::Metadata.new({
           title: title,
           description: description,
-          creators: related_people.map {|p| "#{p.last_name}, #{p.first_name}"},
+          creators: related_people.map { |p| {name: "#{p.last_name}, #{p.first_name}"} },
           publication_date: Time.now.strftime("%F"),
           access_right: :closed,
           upload_type: :dataset
