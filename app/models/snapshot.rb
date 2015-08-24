@@ -38,6 +38,38 @@ class Snapshot < ActiveRecord::Base
     Person.find(metadata['contributor']['uri'].match(/people\/([1-9][0-9]*)/)[1])
   end
 
+  def creators
+    if metadata['creators']
+      metadata['creators'].map do |contributor|
+        Person.find_by_id(contributor['uri'].match(/people\/([1-9][0-9]*)/)[1])
+      end
+    else
+      []
+    end
+  end
+
+  def related_people
+    ([contributor] + creators).uniq
+  end
+
+  def all_related_people(node = metadata)
+    people = []
+
+    node.each do |k, v|
+      if k == 'contributor'
+        people << Person.find_by_id(v['uri'].match(/people\/([1-9][0-9]*)/)[1])
+      elsif k == 'creators'
+        people |= v.map { |p| Person.find_by_id(p['uri'].match(/people\/([1-9][0-9]*)/)[1]) }
+      elsif v.is_a?(Hash)
+        people |= all_related_people(v)
+      elsif v.is_a?(Array)
+        people |= v.map { |n| all_related_people(n) if n.is_a?(Hash) }.flatten
+      end
+    end
+
+    people.uniq.compact
+  end
+
   def research_object
     ROBundle::File.open(content_blob.filepath) do |ro|
       yield ro if block_given?

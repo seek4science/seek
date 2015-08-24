@@ -39,6 +39,7 @@ module Zenodo
           return false
         end
 
+        extra_metadata = extra_metadata.symbolize_keys
         metadata = zenodo_metadata.merge(extra_metadata)
 
         client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)
@@ -72,7 +73,7 @@ module Zenodo
         metadata = Zenodo::Metadata.new({
           title: title,
           description: description,
-          creators: [contributor.try(:person)], # TODO: This isn't the full list of creators
+          creators: related_people.map {|p| "#{p.last_name}, #{p.first_name}"},
           publication_date: Time.now.strftime("%F"),
           access_right: :closed,
           upload_type: :dataset

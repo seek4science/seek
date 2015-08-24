@@ -42,7 +42,7 @@ module DataCite
           :identifier => suggested_doi,
           :title => title,
           :description => description,
-          :creators => [contributor.try(:person)],
+          :creators => related_people,
           :year => Time.now.year.to_s,
           :publisher => Seek::Config.project_name
         )

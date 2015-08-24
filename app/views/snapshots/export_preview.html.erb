@@ -53,6 +53,27 @@
             </div>
 
             <hr/>
+
+            <label>Creators</label>
+            <div class="row">
+              <div class="col-sm-8">
+                <span class="help-block">The following people will be credited as "creators" of this investigation.</span>
+              </div>
+              <div class="col-sm-4">
+                <div class="input-group input-group-sm">
+                  <input id="add-creator" type="text" class="form-control" placeholder="Add another creator (e.g. Doe, John)">
+                  <span class="input-group-btn">
+                    <button id="add-creator-button" class="btn btn-success" type="button">Add</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div id="creators">
+              <span class="subtle">No one</span>
+            </div>
+
+            <hr/>
+
             <p class="text-center">
               <%= submit_tag 'Export', :class => 'btn btn-primary' %>
               <%= link_to 'Cancel', investigation_path(@investigation), :class => 'btn btn-default' %>
@@ -63,6 +84,8 @@
 </div>
 
 <script>
+    var creatorList = <%= @snapshot.all_related_people.map {|p| {name: "#{p.last_name}, #{p.first_name}"} }.sort.to_json.html_safe %>;
+
     function setLicenseUrl() {
         var element = $j('#license-select option:selected');
         var link = $j('#license-url');
@@ -103,11 +126,39 @@
         }
     }
 
+    function renderCreatorList() {
+        var html = '';
+
+        creatorList.each(function (c) {
+            html += HandlebarsTemplates['zenodo/creator'](c);
+        });
+
+        $j('#creators').html(html);
+    }
+
+    function addCreator() {
+        var creator = { name: $j('#add-creator').val() };
+        creatorList.push(creator);
+        $j('#add-creator').val('');
+        // I'm not calling renderCreatorList() here because it will forget which checkboxes have been
+        //   checked/unchecked
+        $j('#creators').append(HandlebarsTemplates['zenodo/creator'](creator));
+    }
+
     $j(document).ready(function () {
         $j('#license-select').change(setLicenseUrl);
         $j('#access-right-section input:radio').change(toggleSections);
+        $j('#add-creator-button').click(addCreator);
+        $j('#add-creator').keypress(function(e) {
+            if(e.which == 13) {
+                addCreator();
+                e.preventDefault();
+                return false;
+            }
+        });
 
         toggleSections();
         setLicenseUrl();
+        renderCreatorList();
     });
 </script>

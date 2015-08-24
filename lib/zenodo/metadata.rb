@@ -10,14 +10,6 @@ module Zenodo
     end
 
     def build
-      self[:creators] = self[:creators].map do |c|
-        if c.is_a?(Person)
-          { name: "#{c.last_name}, #{c.first_name}" }
-        else
-          c
-        end
-      end
-
       validate
       self
     end
