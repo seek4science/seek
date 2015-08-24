@@ -143,7 +143,7 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/zenodo-client.git
-  revision: 4d97c5584f139248f10ad0e42073b41b36c62b4d
+  revision: 5c300cf4b74f8c09ca8265b2b6567472147d8e24
   specs:
     zenodo-client (0.1.1)
       json (~> 1.8)
