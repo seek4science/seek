@@ -65,7 +65,7 @@ module Zenodo
         deposition = client.deposition(zenodo_deposition_id)
 
         if deposition.publish
-          update_attribute(:zenodo_deposition_url, deposition.details['record_url'])
+          update_attribute(:zenodo_record_url, deposition.details['record_url'])
         end
       end
 

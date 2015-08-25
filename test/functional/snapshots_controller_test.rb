@@ -139,6 +139,7 @@ class SnapshotsControllerTest < ActionController::TestCase
 
     assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     assert !assigns(:snapshot).zenodo_deposition_id.nil?
+    assert !assigns(:snapshot).zenodo_record_url.nil?
   end
 
   test "redirects to Zenodo auth page if no existing OAuth session" do

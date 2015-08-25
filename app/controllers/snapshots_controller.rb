@@ -45,12 +45,12 @@ class SnapshotsController < ApplicationController
   def export_preview
   end
 
-  def export_submit
+  def export_submit # Export AND publish
     access_token = @oauth_session.access_token
 
     metadata = params[:metadata].delete_if { |k,v| v.blank? }
 
-    if @snapshot.export_to_zenodo(access_token, metadata)
+    if @snapshot.export_to_zenodo(access_token, metadata) && @snapshot.publish_in_zenodo(access_token)
       flash[:notice] = "Snapshot successfully exported to Zenodo"
       redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     else
