@@ -1,7 +1,12 @@
 SEEK::Application.configure do
 
   Delayed::Worker.destroy_failed_jobs = false
-  Delayed::Worker.sleep_delay = 3
+  if Rails.env.development?
+    Delayed::Worker.sleep_delay = 45
+  else
+    Delayed::Worker.sleep_delay = 3
+  end
+
   Delayed::Worker.max_attempts = 1
   Delayed::Worker.max_run_time = 1.day
   Delayed::Worker.read_ahead = 20
