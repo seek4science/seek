@@ -43,4 +43,5 @@
 //= require objects_input
 //= require handlebars.runtime
 //= require calendar_date_select/calendar_date_select
+//= require zenodo_form
 //= require_tree ./templates

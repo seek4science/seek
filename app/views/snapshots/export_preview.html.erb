@@ -84,81 +84,22 @@
 </div>
 
 <script>
-    var creatorList = <%= @snapshot.all_related_people.map {|p| {name: "#{p.last_name}, #{p.first_name}"} }.sort.to_json.html_safe %>;
-
-    function setLicenseUrl() {
-        var element = $j('#license-select option:selected');
-        var link = $j('#license-url');
-
-        link.attr('href', element.data('url'));
-        link.html(element.data('url'));
-    }
-
-    function enableSection(sectionElement) {
-        sectionElement.show().children(":input").prop("disabled", false);
-    }
-
-    function disableSection(sectionElement) {
-        sectionElement.hide().children(":input").prop("disabled", true);
-    }
-
-    function toggleSections() {
-        var licenseSection = $j('#license-section');
-        var dateSection = $j('#embargo-date-section');
-        var conditionsSection = $j('#access-conditions-section');
-
-        if (this.value == 'open') {
-            enableSection(licenseSection);
-            disableSection(dateSection);
-            disableSection(conditionsSection);
-        } else if (this.value == 'embargoed') {
-            enableSection(licenseSection);
-            enableSection(dateSection);
-            disableSection(conditionsSection);
-        } else if (this.value == 'restricted') {
-            disableSection(licenseSection);
-            disableSection(dateSection);
-            enableSection(conditionsSection);
-        } else if (this.value == 'closed') {
-            disableSection(licenseSection);
-            disableSection(dateSection);
-            disableSection(conditionsSection);
-        }
-    }
-
-    function renderCreatorList() {
-        var html = '';
-
-        creatorList.each(function (c) {
-            html += HandlebarsTemplates['zenodo/creator'](c);
-        });
-
-        $j('#creators').html(html);
-    }
-
-    function addCreator() {
-        var creator = { name: $j('#add-creator').val() };
-        creatorList.push(creator);
-        $j('#add-creator').val('');
-        // I'm not calling renderCreatorList() here because it will forget which checkboxes have been
-        //   checked/unchecked
-        $j('#creators').append(HandlebarsTemplates['zenodo/creator'](creator));
-    }
+    zenodoExport.creatorList = <%= @snapshot.all_related_people.map {|p| {name: "#{p.last_name}, #{p.first_name}"} }.sort.to_json.html_safe %>;
 
     $j(document).ready(function () {
-        $j('#license-select').change(setLicenseUrl);
-        $j('#access-right-section input:radio').change(toggleSections);
-        $j('#add-creator-button').click(addCreator);
+        $j('#license-select').change(zenodoExport.setLicenseUrl);
+        $j('#access-right-section input:radio').change(zenodoExport.toggleSections);
+        $j('#add-creator-button').click(zenodoExport.addCreator);
         $j('#add-creator').keypress(function(e) {
             if(e.which == 13) {
-                addCreator();
+                zenodoExport.addCreator();
                 e.preventDefault();
                 return false;
             }
         });
 
-        toggleSections();
-        setLicenseUrl();
-        renderCreatorList();
+        zenodoExport.toggleSections();
+        zenodoExport.setLicenseUrl();
+        zenodoExport.renderCreatorList();
     });
 </script>
