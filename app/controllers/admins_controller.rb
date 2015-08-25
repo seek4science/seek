@@ -209,7 +209,7 @@ class AdminsController < ApplicationController
 
   def restart_delayed_job
     error = nil
-    if Rails.env != 'test'
+    if !Rails.env.test?
       begin
         Seek::Workers.restart
         wait_for_delayed_job_to_start
@@ -510,7 +510,7 @@ class AdminsController < ApplicationController
   end
 
   def execute_command(command)
-    return nil if Rails.env == 'test'
+    return nil if Rails.env.test?
     begin
       cl = Cocaine::CommandLine.new(command)
       cl.run

@@ -141,7 +141,7 @@ module Seek
       end
 
       def tmp_zip_file_dir
-        if Rails.env=="test"
+        if Rails.env.test?
           dir = File.join(Dir.tmpdir,"seek-tmp","zip-files")
         else
           dir = File.join(Rails.root,"tmp","zip-files")

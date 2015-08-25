@@ -149,7 +149,7 @@ module Seek
 
       #the directory used to contain the cached spreadsheets
       def cached_spreadsheet_dir
-        if Rails.env=="test"
+        if Rails.env.test?
           dir = File.join(Dir.tmpdir,"seek-cache","spreadsheet-xml")
         else
           dir = File.join(Rails.root,"tmp","cache","spreadsheet-xml")
