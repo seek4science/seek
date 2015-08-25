@@ -98,8 +98,6 @@ gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
 gem 'bootstrap-multiselect-rails'
 gem 'handlebars_assets'
-gem 'evergreen', :require => 'evergreen/rails'
-gem 'selenium-webdriver'
 
 
 group :assets do
@@ -135,4 +133,5 @@ group :test do
   gem 'sunspot_matchers'
   gem 'pg'
   gem 'selenium-webdriver'
+  gem 'evergreen', :require => 'evergreen/rails'
 end
