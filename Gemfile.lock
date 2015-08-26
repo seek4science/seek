@@ -412,7 +412,7 @@ GEM
       minitest (>= 2.12, < 5.0)
       powerbar
     modporter-plugin (0.1.0)
-    multi_json (1.11.1)
+    multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     mysql2 (0.3.18)
@@ -462,7 +462,7 @@ GEM
       pry (~> 0.9)
       slop (~> 3.0)
     psych (2.0.13)
-    rack (1.4.6)
+    rack (1.4.7)
     rack-cache (1.2)
       rack (>= 0.4)
     rack-openid (1.4.2)
