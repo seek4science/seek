@@ -18,8 +18,8 @@ gem 'rest-client'
 gem 'factory_girl', "2.6.4"
 gem 'rubyzip', "~> 1.1.4"
 gem 'bio'
-gem 'sunspot_rails',"~>2.1.0"
-gem 'sunspot_solr',"~>2.1.0"
+gem 'sunspot_rails',"~>2.2.0"
+gem 'sunspot_solr',"~>2.2.0"
 gem 'savon',"1.1.0"
 gem "dynamic_form"
 gem "prototype-rails"

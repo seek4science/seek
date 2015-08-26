@@ -658,15 +658,15 @@ GEM
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
     sqlite3 (1.3.10)
-    sunspot (2.1.1)
+    sunspot (2.2.0)
       pr_geohash (~> 1.0)
       rsolr (~> 1.0.7)
-    sunspot_matchers (2.2.0.0)
-    sunspot_rails (2.1.1)
+    sunspot_matchers (2.2.0.3)
+    sunspot_rails (2.2.0)
       nokogiri
       rails (>= 3)
-      sunspot (= 2.1.1)
-    sunspot_solr (2.1.1)
+      sunspot (= 2.2.0)
+    sunspot_solr (2.2.0)
     sxp (0.1.5)
     systemu (2.6.5)
     t2-server (1.3.0)
@@ -837,8 +837,8 @@ DEPENDENCIES
   site_announcements!
   sqlite3
   sunspot_matchers
-  sunspot_rails (~> 2.1.0)
-  sunspot_solr (~> 2.1.0)
+  sunspot_rails (~> 2.2.0)
+  sunspot_solr (~> 2.2.0)
   taverna-player!
   taverna-t2flow
   test_after_commit
