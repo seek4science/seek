@@ -154,6 +154,11 @@ class PersonTest < ActiveSupport::TestCase
       p.save!
       p.reload
       assert_nil p.orcid_uri
+
+      p.orcid=""
+      p.save!
+      p.reload
+      assert_nil p.orcid_uri
     end
 
 
