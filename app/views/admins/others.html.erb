@@ -28,8 +28,9 @@
                                'Captcha enabled', 'Enable to show a captcha on forms susceptible to spam',
                                :onchange=>toggle_appear_javascript('captcha_key_settings')) %>
 
-    <%= access_type_options = [Policy::NO_ACCESS, Policy::VISIBLE, Policy::EDITING]
-        option_tags = policy_selection_options(access_type_options, nil, Seek::Config.default_consortium_access_type)
+    <%= access_type_options = [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING]
+        # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
+        option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_consortium_access_type)
         admin_dropdown_setting(:default_consortium_access_type, option_tags, 'Consortium default',
                                description = 'Default permissions option for all registered users', options = {}) %>
 
