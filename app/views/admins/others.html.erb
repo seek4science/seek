@@ -28,6 +28,11 @@
                                'Captcha enabled', 'Enable to show a captcha on forms susceptible to spam',
                                :onchange=>toggle_appear_javascript('captcha_key_settings')) %>
 
+    <%= access_type_options = [Policy::NO_ACCESS, Policy::VISIBLE, Policy::EDITING]
+        option_tags = policy_selection_options(access_type_options, nil, Seek::Config.default_consortium_access_type)
+        admin_dropdown_setting(:default_consortium_access_type, option_tags, 'Consortium default',
+                               description = 'Default permissions option for all registered users', options = {}) %>
+
     <div id="captcha_key_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.recaptcha_enabled) %>">
       <p>
         You can request a private and public key for Recaptcha by visiting

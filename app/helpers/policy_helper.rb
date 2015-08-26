@@ -2,6 +2,10 @@ module PolicyHelper
   
   def policy_selection_options policies = nil, resource = nil, access_type = nil
     policies ||= [Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING]
+    #TODO handle access_type = ACCESSIBLE, and !resource.is_downloadable?
+    #TODO  Seek::Config.default :default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::EDITING
+    # In that case set access_type to VISIBLE
+    #  if !access_type.try(:)
     policies.delete(Policy::ACCESSIBLE) unless resource.try(:is_downloadable?)
     options=""
     policies.each do |policy|
