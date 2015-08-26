@@ -162,6 +162,12 @@ class ProjectsController < ApplicationController
   # POST /projects
   # POST /projects.xml
   def create
+    #strip out programme_id if permissions do not allow
+    if params[:project][:programme_id]
+      unless Programme.find(params[:project][:programme_id]).can_manage?
+        params[:project].delete(:programme_id)
+      end
+    end
     @project = Project.new(params[:project])
 
     @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]

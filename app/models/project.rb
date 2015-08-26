@@ -35,7 +35,7 @@ class Project < ActiveRecord::Base
 
   #FIXME: temporary handler, projects need to support multiple programmes
   def programmes
-    [programme]
+    [programme].compact
   end
 
   # SEEK projects suffer from having 2 types of ancestor and descendant,that were added separately - those from the historical lineage of the project, and also from

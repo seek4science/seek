@@ -16,8 +16,16 @@ module SessionsHelper
     User.project_administrator_logged_in?
   end
 
+  def programme_administrator_logged_in?
+    User.programme_administrator_logged_in?
+  end
+
+  def admin_or_programme_administrator_logged_in?
+    admin_logged_in? || programme_administrator_logged_in?
+  end
+
   def admin_or_project_administrator_logged_in?
-    project_administrator_logged_in? || admin_logged_in?
+    admin_logged_in? || project_administrator_logged_in?
   end
 
   #returns true if there is somebody logged in and they are member of a project

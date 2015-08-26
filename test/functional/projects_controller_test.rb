@@ -55,6 +55,36 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes assigns(:project).ancestors,parent
   end
 
+  test "create project with programme" do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    prog = person.programmes.first
+    refute_nil prog
+
+    assert_difference("Project.count") do
+      post :create, :project => {:title=>"proj with prog",:programme_id=>prog.id}
+    end
+
+    project = assigns(:project)
+    assert_equal [prog],project.programmes
+
+
+  end
+
+  test "cannot create project with programme if not administrator of programme" do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    prog = Factory(:programme)
+    refute_nil prog
+
+    assert_difference("Project.count") do
+      post :create, :project => {:title=>"proj with prog",:programme_id=>prog.id}
+    end
+
+    project = assigns(:project)
+    assert_empty project.programmes
+  end
+
   test "programme administrator can view new" do
     login_as(Factory(:programme_administrator))
     get :new

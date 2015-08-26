@@ -497,4 +497,15 @@ class ProjectTest < ActiveSupport::TestCase
     assert Project.can_create?
   end
 
+  test "project programmes" do
+    project = Factory(:project)
+    assert_empty project.programmes
+    assert_nil project.programme
+
+    prog = Factory(:programme)
+    project = prog.projects.first
+    assert_equal [prog],project.programmes
+  end
+
+
 end

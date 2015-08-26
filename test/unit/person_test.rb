@@ -906,4 +906,17 @@ class PersonTest < ActiveSupport::TestCase
     refute Person.can_create?
 
   end
+
+  test "administered programmes" do
+    pa = Factory(:programme_administrator)
+    admin = Factory(:admin)
+    other_prog = Factory(:programme)
+    progs = pa.programmes
+    assert_equal progs.sort,pa.administered_programmes.sort
+    refute_includes pa.administered_programmes,other_prog
+
+    assert_empty Factory(:person).administered_programmes
+    assert_equal Programme.all.sort,admin.administered_programmes
+  end
+
 end

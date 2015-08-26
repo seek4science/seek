@@ -48,6 +48,14 @@ module Seek
           fail UnknownRoleException.new("Unrecognised programme role name #{role}") unless Seek::Roles::ProgrammeRelatedRoles.role_names.include?(role)
           Seek::Roles::ProgrammeRelatedRoles.instance.programmes_for_person_with_role(self, role)
         end
+
+        def administered_programmes
+          if is_admin?
+            Programme.all
+          else
+            programmes_for_role('programme_administrator')
+          end
+        end
       end
     end
   end
