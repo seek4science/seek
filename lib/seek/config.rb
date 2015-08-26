@@ -355,6 +355,7 @@ module Seek
 
 
     # Settings that require a conversion to integer
+    # These are defined here instead of in config_setting_attributes.yml
     setting :tag_threshold, convert: 'to_i'
     setting :limit_latest, convert: 'to_i'
     setting :max_visible_tags, convert: 'to_i'
@@ -363,6 +364,7 @@ module Seek
     setting :community_news_number_of_entries, convert: 'to_i'
     setting :home_feeds_cache_timeout, convert: 'to_i'
     setting :time_lock_doi_for, convert: 'to_ig'
+    setting :default_consortium_access_type, convert: 'to_i'
 
     read_setting_attributes.each do |sym|
       setting sym

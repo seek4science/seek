@@ -91,6 +91,14 @@ module AdminHelper
     end
   end
 
+  def admin_dropdown_setting(name, option_tags, title, description = nil, options = {})
+    admin_setting_block(title, description) do
+      #   select_tag "people", "<option>David</option>".html_safe
+      #   # => <select id="people" name="people"><option>David</option></select>
+      select_tag(name, option_tags, options)
+    end
+  end
+
   private
 
   def admin_setting_block(title, description)

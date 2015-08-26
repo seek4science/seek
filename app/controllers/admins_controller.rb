@@ -191,6 +191,7 @@ class AdminsController < ApplicationController
     Seek::Config.recaptcha_enabled = string_to_boolean params[:recaptcha_enabled]
     Seek::Config.recaptcha_private_key = params[:recaptcha_private_key]
     Seek::Config.recaptcha_public_key = params[:recaptcha_public_key]
+    Seek::Config.default_consortium_access_type = params[:default_consortium_access_type]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || (crossref_email_valid)) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
     update_redirect_to update_flag, 'others'
   end

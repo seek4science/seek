@@ -126,7 +126,10 @@ SEEK::Application.configure do
   Seek::Config.default :recaptcha_enabled, true
 
   Seek::Config.default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
-  
+
+  # Set default permissions
+  Seek::Config.default :default_consortium_access_type, Policy::VISIBLE
+
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,'biovel_application'
   Seek::Config.fixed :javascript_prepended,''

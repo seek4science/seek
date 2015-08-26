@@ -146,6 +146,16 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 5, Seek::Config.tag_threshold
   end
 
+  test 'tag as integer' do
+    Seek::Config.tag_threshold = 6
+    assert_equal 6, Seek::Config.tag_threshold
+  end
+
+  test 'changing default_consortium_access_type integer conversion' do
+    Seek::Config.default_consortium_access_type = '0'
+    assert_equal 0, Seek::Config.default_consortium_access_type
+  end
+
   test 'smtp_settings authentication' do
     assert_equal :plain, Seek::Config.smtp_settings('authentication')
   end
@@ -290,6 +300,16 @@ end
   test 'convert setting from database' do
     Settings.limit_latest = '6'
     assert_equal 6, Seek::Config.limit_latest
+  end
+
+  test 'default consortium access permission is visible' do
+    assert_equal Policy::VISIBLE, Seek::Config.default_consortium_access_type
+  end
+
+  test 'changing default_consortium_access_type' do
+    Seek::Config.default_consortium_access_type = Policy::NO_ACCESS
+    assert_equal Policy::NO_ACCESS, Seek::Config.default_consortium_access_type
+    assert_equal Policy::NO_ACCESS.class, Seek::Config.default_consortium_access_type.class
   end
 
   test 'invalid setting accessor' do

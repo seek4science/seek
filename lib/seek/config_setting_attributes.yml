@@ -1,5 +1,8 @@
-#keys that create the Seek::Config settigs.
+#keys that create the Seek::Config settings.
 #e.g. Seek::Config.home_description
+
+# N.B. Settings that require a conversion to integer should NOT be set here.
+# They should be set in config.rb, in the Config class.
 home_description:
 home_feeds_cache_timeout:
 public_seek_enabled:
