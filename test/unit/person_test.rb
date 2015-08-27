@@ -72,6 +72,10 @@ class PersonTest < ActiveSupport::TestCase
     assert project_administrator.can_be_administered_by?(admin),"you can also ask by passing a person"
     assert person_in_same_project.can_be_administered_by?(project_administrator),"you can also ask by passing a person"
 
+    #can be administered by a programme administrator
+    pa = Factory :programme_administrator
+    assert Factory(:person).can_be_administered_by?(pa.user)
+
 
   end
 
