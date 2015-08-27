@@ -77,5 +77,37 @@ module ProjectsHelper
     Project.can_create?
   end
 
+  def project_administrators_input_box(project)
+    administrators = project.project_administrators
+    members = project.people
+    box = ''
+    box << objects_input('project[administrator_ids]', administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
+    box.html_safe
+  end
+
+  def project_gatekeepers_input_box(project)
+    administrators = project.gatekeepers
+    members = project.people
+    box = ''
+    box << objects_input('project[gatekeeper_ids]', administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
+    box.html_safe
+  end
+
+  def project_asset_managers_input_box(project)
+    administrators = project.asset_managers
+    members = project.people
+    box = ''
+    box << objects_input('project[asset_manager_ids]', administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
+    box.html_safe
+  end
+
+  def project_pals_input_box(project)
+    administrators = project.pals
+    members = project.people
+    box = ''
+    box << objects_input('project[pal_ids]', administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
+    box.html_safe
+  end
+
 
 end

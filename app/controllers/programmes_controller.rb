@@ -63,7 +63,7 @@ class ProgrammesController < ApplicationController
   def spawn_project
     proj_params = params[:project]
     @ancestor_project = Project.find(proj_params[:ancestor_id])
-    @project = @ancestor_project.spawn(title: proj_params[:title], description: proj_params[:description], web_page: proj_params[:web_page], programme: @programme)
+    @project = @ancestor_project.spawn(title: proj_params[:title], description: proj_params[:description], web_page: proj_params[:web_page], programme_id: @programme.id)
     if @project.save
       flash[:notice] = "The #{t('project')} '#{@ancestor_project.title}' was successfully spawned for the '#{t('programme')}' #{@programme.title}"
       redirect_to project_path(@project)

@@ -252,6 +252,27 @@ class ProjectsController < ApplicationController
   end
 
   def update_members
+    add_and_remove_members_and_institutions
+    update_administrative_roles
+
+    flash[:notice]="The members and institutions of the #{t('project').downcase} '#{@project.title}' have been updated"
+
+    respond_with(@project) do |format|
+      format.html {redirect_to project_path(@project)}
+    end
+  end
+
+  def update_administrative_roles
+    unless params[:project].blank?
+      #need convverting to an array from a comma separated string
+      params[:project].keys.each do |k|
+        params[:project][k] = params[:project][k].split(",")
+      end
+      @project.update_attributes(params[:project])
+    end
+  end
+
+  def add_and_remove_members_and_institutions
     groups_to_remove = params[:group_memberships_to_remove] || []
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
     groups_to_remove.each do |group|
@@ -270,15 +291,9 @@ class ProjectsController < ApplicationController
       person = Person.find(person_id)
       institution = Institution.find(institution_id)
       unless person.nil? || institution.nil?
-        person.add_to_project_and_institution(@project,institution)
+        person.add_to_project_and_institution(@project, institution)
         person.save!
       end
-    end
-
-    flash[:notice]="The members and institutions of the #{t('project').downcase} '#{@project.title}' have been updated"
-
-    respond_with(@project) do |format|
-      format.html {redirect_to project_path(@project)}
     end
   end
 
