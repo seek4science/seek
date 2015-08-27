@@ -912,7 +912,7 @@ class PersonTest < ActiveSupport::TestCase
     refute Person.can_create?
 
     User.current_user=Factory(:programme_administrator).user
-    refute Person.can_create?
+    assert Person.can_create?
 
   end
 
