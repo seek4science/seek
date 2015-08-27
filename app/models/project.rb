@@ -195,12 +195,13 @@ class Project < ActiveRecord::Base
   end
 
   def can_be_edited_by?(user)
-    user ? (user.is_admin? || user.is_project_administrator?(self)) : false
+    can_be_administered_by?(user)
   end
 
   #whether this project can be administered by the given user, or current user if none is specified
   def can_be_administered_by?(user=User.current_user)
-    user ? (user.is_admin? || user.is_project_administrator?(self)) : false
+    return false unless user
+    user.is_admin? || user.is_project_administrator?(self) || user.person.is_programme_administrator?(self.programme)
   end
 
   #all projects that can be administered by the given user, or ghe current user if none is specified

@@ -163,7 +163,7 @@ class ProjectsController < ApplicationController
   # POST /projects.xml
   def create
     #strip out programme_id if permissions do not allow
-    if params[:project][:programme_id]
+    unless params[:project][:programme_id].blank?
       unless Programme.find(params[:project][:programme_id]).can_manage?
         params[:project].delete(:programme_id)
       end

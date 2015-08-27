@@ -71,6 +71,21 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test "create project with blank programme" do
+    login_as(Factory(:admin))
+
+    assert_difference("Project.count") do
+      post :create, :project => {:title=>"proj with prog",:programme_id=>""}
+    end
+
+    project = assigns(:project)
+    assert_redirected_to project
+    refute_nil project
+    assert_empty project.programmes
+
+
+  end
+
   test "cannot create project with programme if not administrator of programme" do
     person = Factory(:programme_administrator)
     login_as(person)

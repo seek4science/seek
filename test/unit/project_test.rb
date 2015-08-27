@@ -159,6 +159,15 @@ class ProjectTest < ActiveSupport::TestCase
     assert !p.can_be_edited_by?(u),"other project should not be editable by project administrator, since it is not a project he administers"
   end
 
+  test "can be edited by programme adminstrator" do
+    pa = Factory(:programme_administrator)
+    project = pa.programmes.first.projects.first
+    other_project = Factory(:project)
+
+    assert project.can_be_edited_by?(pa.user)
+    refute other_project.can_be_edited_by?(pa.user)
+  end
+
   test "can be administered by" do
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator)
@@ -172,6 +181,18 @@ class ProjectTest < ActiveSupport::TestCase
     assert !another_proj.can_be_administered_by?(project_administrator.user)
     assert another_proj.can_be_administered_by?(admin.user)
   end
+
+  test "can be administered by programme administrator" do
+    #programme administrator should be able to administer projects belonging to programme
+    pa = Factory(:programme_administrator)
+    project = pa.programmes.first.projects.first
+    other_project = Factory(:project)
+
+    assert project.can_be_administered_by?(pa.user)
+    refute other_project.can_be_administered_by?(pa.user)
+
+  end
+
 
   def test_update_first_letter
     p=Project.new(:title=>"test project")
