@@ -193,7 +193,7 @@ class ProjectTest < ActiveSupport::TestCase
 
   end
 
-  test "update with attributes for administrator ids" do
+  test "update with attributes for project_administrator_ids ids" do
     person = Factory(:person)
     another_person = Factory(:person)
 
@@ -206,19 +206,19 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes project.project_administrators,person
     refute_includes project.project_administrators,another_person
 
-    project.update_attributes({:administrator_ids=>[person.id.to_s]})
+    project.update_attributes({:project_administrator_ids=>[person.id.to_s]})
 
     assert_includes project.project_administrators,person
     refute_includes project.project_administrators,another_person
 
-    project.update_attributes({:administrator_ids=>[another_person.id.to_s]})
+    project.update_attributes({:project_administrator_ids=>[another_person.id.to_s]})
 
     refute_includes project.project_administrators,person
     assert_includes project.project_administrators,another_person
 
     #cannot change to a person from another project
     person_in_other_project = Factory(:person)
-    project.update_attributes({:administrator_ids=>[person_in_other_project.id.to_s]})
+    project.update_attributes({:project_administrator_ids=>[person_in_other_project.id.to_s]})
 
     refute_includes project.project_administrators,person
     refute_includes project.project_administrators,another_person
@@ -683,7 +683,7 @@ class ProjectTest < ActiveSupport::TestCase
         :institution_ids=>[institution.id],
         :parent_id=>[other_project.id],
         :description=>"Project description",
-        :administrator_ids=>[person.id],
+        :project_administrator_ids=>[person.id],
         :gatekeeper_ids=>[person.id],
         :pal_ids=>[person.id],
         :asset_manager_ids=>[person.id],
@@ -706,7 +706,7 @@ class ProjectTest < ActiveSupport::TestCase
     person.reload
 
     attr = {
-        :administrator_ids=>[person.id],
+        :project_administrator_ids=>[person.id],
         :gatekeeper_ids=>[person.id],
         :pal_ids=>[person.id],
         :asset_manager_ids=>[person.id],

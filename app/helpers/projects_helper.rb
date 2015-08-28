@@ -78,36 +78,27 @@ module ProjectsHelper
   end
 
   def project_administrators_input_box(project)
-    administrators = project.project_administrators
-    members = project.people
-    box = ''
-    box << objects_input('project[administrator_ids]', administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
-    box.html_safe
+    project_role_input_box project,:project_administrator
   end
 
   def project_gatekeepers_input_box(project)
-    administrators = project.gatekeepers
-    members = project.people
-    box = ''
-    box << objects_input('project[gatekeeper_ids]', administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
-    box.html_safe
+    project_role_input_box project,:gatekeeper
   end
 
   def project_asset_managers_input_box(project)
-    administrators = project.asset_managers
-    members = project.people
-    box = ''
-    box << objects_input('project[asset_manager_ids]', administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
-    box.html_safe
+    project_role_input_box project,:asset_manager
   end
 
   def project_pals_input_box(project)
-    administrators = project.pals
-    members = project.people
-    box = ''
-    box << objects_input('project[pal_ids]', administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
-    box.html_safe
+    project_role_input_box project,:pal
   end
 
+  def project_role_input_box project, role
+    administrators = project.send(role.to_s.pluralize)
+    members = project.people
+    box = ''
+    box << objects_input("project[#{role.to_s}_ids]", administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
+    box.html_safe
+  end
 
 end

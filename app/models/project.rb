@@ -32,12 +32,12 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
-  attr_accessible :administrator_ids, :gatekeeper_ids, :pal_ids, :asset_manager_ids, :title, :programme_id, :description,
+  attr_accessible :project_administrator_ids, :gatekeeper_ids, :pal_ids, :asset_manager_ids, :title, :programme_id, :description,
                   :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids
 
   # for handling the assignment for roles
-  attr_accessor :administrator_ids, :gatekeeper_ids, :pal_ids, :asset_manager_ids
-  after_save :handle_administrator_ids, if: '@administrator_ids'
+  attr_accessor :project_administrator_ids, :gatekeeper_ids, :pal_ids, :asset_manager_ids
+  after_save :handle_project_administrator_ids, if: '@project_administrator_ids'
   after_save :handle_gatekeeper_ids, if: '@gatekeeper_ids'
   after_save :handle_pal_ids, if: '@pal_ids'
   after_save :handle_asset_manager_ids, if: '@asset_manager_ids'
@@ -248,62 +248,40 @@ class Project < ActiveRecord::Base
     User.admin_logged_in? || User.programme_administrator_logged_in?
   end
 
-  # set the administrators, assigned from the params to :adminstrator_ids
-  def handle_administrator_ids
-    new_administrators = Person.find(administrator_ids)
-    to_add = new_administrators - project_administrators
-    to_remove = project_administrators - new_administrators
-    to_add.each do |person|
-      person.is_project_administrator = true, self
-      disable_authorization_checks { person.save! }
-    end
-    to_remove.each do |person|
-      person.is_project_administrator = false, self
-      disable_authorization_checks { person.save! }
-    end
+  # set the administrators, assigned from the params to :project_administrator_ids
+  def handle_project_administrator_ids
+    handle_admin_role_ids :project_administrator
   end
 
   # set the gatekeepers, assigned from the params to :gatekeeper_ids
   def handle_gatekeeper_ids
-    new_gatekeepers = Person.find(gatekeeper_ids)
-    to_add = new_gatekeepers - gatekeepers
-    to_remove = gatekeepers - new_gatekeepers
-    to_add.each do |person|
-      person.is_gatekeeper = true, self
-      disable_authorization_checks { person.save! }
-    end
-    to_remove.each do |person|
-      person.is_gatekeeper = false, self
-      disable_authorization_checks { person.save! }
-    end
+    handle_admin_role_ids :gatekeeper
   end
 
   # set the pals, assigned from the params to :pal_ids
   def handle_pal_ids
-    new_pals = Person.find(pal_ids)
-    to_add = new_pals - pals
-    to_remove = pals - new_pals
-    to_add.each do |person|
-      person.is_pal = true, self
-      disable_authorization_checks { person.save! }
-    end
-    to_remove.each do |person|
-      person.is_pal = false, self
-      disable_authorization_checks { person.save! }
-    end
+    handle_admin_role_ids :pal
   end
 
   # set the asset managers, assigned from the params to :asset_manager_ids
   def handle_asset_manager_ids
-    new_asset_managers = Person.find(asset_manager_ids)
-    to_add = new_asset_managers - asset_managers
-    to_remove = asset_managers - new_asset_managers
+    handle_admin_role_ids :asset_manager
+  end
+
+  #general method for assigning the people with roles, according to the role passed in.
+  #e.g. for a role of :gatekeeper, gatekeeper_ids attribute is used to set the people for that role
+  def handle_admin_role_ids role
+    current_members = self.send(role.to_s.pluralize)
+    new_members = Person.find(self.send("#{role.to_s}_ids"))
+
+    to_add = new_members - current_members
+    to_remove = current_members - new_members
     to_add.each do |person|
-      person.is_asset_manager = true, self
+      person.send("is_#{role.to_s}=",[true, self])
       disable_authorization_checks { person.save! }
     end
     to_remove.each do |person|
-      person.is_asset_manager = false, self
+      person.send("is_#{role.to_s}=",[false, self])
       disable_authorization_checks { person.save! }
     end
   end

@@ -1044,6 +1044,32 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test "project administrator can access admin member roles" do
+    pa = Factory(:project_administrator)
+    login_as(pa)
+    project = pa.projects.first
+    get :admin_member_roles, :id=>project
+    assert_response :success
+  end
+
+  test "admin can access admin member roles" do
+    pa = Factory(:admin)
+    login_as(pa)
+    project = pa.projects.first
+    get :admin_member_roles, :id=>project
+    assert_response :success
+  end
+
+  test "normal user cannot access admin member roles" do
+    pa = Factory(:person)
+    login_as(pa)
+    project = pa.projects.first
+    get :admin_member_roles, :id=>project
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+
   test "update member admin roles" do
     pa = Factory(:programme_administrator)
     login_as(pa)
@@ -1070,7 +1096,7 @@ class ProjectsControllerTest < ActionController::TestCase
     ids = "#{person.id},#{person2.id}"
 
     post :update_members,
-         :id=>project,:project=>{:administrator_ids=>ids,:gatekeeper_ids=>ids,:asset_manager_ids=>ids,:pal_ids=>ids}
+         :id=>project,:project=>{:project_administrator_ids=>ids,:gatekeeper_ids=>ids,:asset_manager_ids=>ids,:pal_ids=>ids}
 
     assert_redirected_to project_path(project)
     assert_nil flash[:error]
