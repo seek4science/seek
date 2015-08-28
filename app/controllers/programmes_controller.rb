@@ -21,8 +21,11 @@ class ProgrammesController < ApplicationController
 
     flash[:notice] = "The #{t('programme').capitalize} was successfully created." if @programme.save
 
-    # current person becomes the administrator
-    User.current_user.person.is_programme_administrator = true, @programme
+    # current person becomes the programme administrator, unless they are logged in
+    unless User.admin_logged_in?
+      User.current_user.person.is_programme_administrator = true, @programme
+    end
+
     disable_authorization_checks { User.current_user.person.save! }
 
     respond_with(@programme)
