@@ -41,24 +41,8 @@
         <% end %>
       </div>
     <% end %>
+
     <%= form_tag(update_members_project_path(@project)) do %>
-    <%= panel('Administrative Roles') do %>
-        <%= label_tag("#{t('project')} Administrators") %>
-        <%= project_administrators_input_box(@project) %>
-
-        <%= label_tag("#{t('project')} Gatekeepers") %>
-        <%= project_gatekeepers_input_box(@project) %>
-
-        <%= label_tag("#{t('project')} Asset Managers") %>
-        <%= project_asset_managers_input_box(@project) %>
-
-        <% if admin_logged_in? %>
-            <%= label_tag("#{t('project')} PALs") %>
-            <%= project_pals_input_box(@project) %>
-        <% end %>
-    <% end %>
-
-
         <div style="display:none">
           <div>Techy stuff should be hidden</div>
           Groups to remove:<%= select_tag :group_memberships_to_remove, [], :multiple => true -%>
