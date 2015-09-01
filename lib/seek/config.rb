@@ -364,7 +364,10 @@ module Seek
     setting :community_news_number_of_entries, convert: 'to_i'
     setting :home_feeds_cache_timeout, convert: 'to_i'
     setting :time_lock_doi_for, convert: 'to_ig'
+    setting :default_associated_projects_access_type, convert: 'to_i'
     setting :default_consortium_access_type, convert: 'to_i'
+    setting :default_all_visitors_access_type, convert: 'to_i'
+    setting :default_project_members_access_type, convert: 'to_i'
 
     read_setting_attributes.each do |sym|
       setting sym

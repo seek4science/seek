@@ -3,8 +3,9 @@
    set_parameters_for_sharing_form object
    disable_advanced_view ||= nil
    show_advanced_permissions = !@resource.respond_to?(:has_advanced_permissions?) || @resource.has_advanced_permissions?
-   default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::EDITING
+   default_projects_access_type = Seek::Config.default_associated_projects_access_type
    default_consortium_access_type = Seek::Config.default_consortium_access_type
+   default_all_visitors_access_type = Seek::Config.default_all_visitors_access_type
    can_publish = @resource.respond_to?(:can_publish?) ? @resource.can_publish? : true
 %>
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
@@ -119,7 +120,7 @@
                      :locals => {:access_type_selector_for_scope => Policy::EVERYONE,
                                  :sharing_scope => @sharing_mode,
                                  :access_type => @access_mode,
-                                 :default_access_type => Policy::ACCESSIBLE} -%>
+                                 :default_access_type => default_all_visitors_access_type} -%>
            <%= additional_advanced_permissions_included @resource, Policy::EVERYONE -%>
           <br/>
         </p>
