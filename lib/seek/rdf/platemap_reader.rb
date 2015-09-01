@@ -5,8 +5,16 @@ class Seek::Rdf::PlatemapReader
 
   def file_to_rdf df, rdf_graph
 
-    # Would be nice to trim the empty rows here, but that doesn't work with xlsx files.
-    csv_data = spreadsheet_to_csv(open(df.content_blob.filepath))
+    begin
+      # Would be nice to trim the empty rows here, but that doesn't work with xlsx files.
+      csv_data = spreadsheet_to_csv(open(df.content_blob.filepath))
+    rescue Exception => ex
+      #sometimes this fails, for example with this input:
+      # df=Factory :xlsx_spreadsheet_datafile
+      # In that case, we assume it's not a platemap file and break out of method.
+      return rdf_graph
+    end
+
     if (is_platemap_file? csv_data)
       samples = read_in(csv_data) #[[nil, 'Raf'],[nil, 'Gal'],['WT', 'Raf']...]
       rdf_graph = samples_to_rdf df, samples, rdf_graph

@@ -310,11 +310,6 @@ class DataFileTest < ActiveSupport::TestCase
                                  RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains"),
                                  RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf"),])
 
-      print "hello world"
-      print reader.statements
-      reader.statements.each do |statement|
-        print "\nstatement #{statement}"
-      end
       # ['GAL1', 'Raf']
       assert reader.has_triple?([RDF::URI.new("http://localhost:3000/data_files/#{df.id}"),
                                  RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith"),
