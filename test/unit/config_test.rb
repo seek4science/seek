@@ -151,9 +151,19 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 6, Seek::Config.tag_threshold
   end
 
+  test 'changing default_associated_projects_access_type integer conversion' do
+    Seek::Config.default_associated_projects_access_type = '0'
+    assert_equal 0, Seek::Config.default_associated_projects_access_type
+  end
+
   test 'changing default_consortium_access_type integer conversion' do
     Seek::Config.default_consortium_access_type = '0'
     assert_equal 0, Seek::Config.default_consortium_access_type
+  end
+
+  test 'changing default_all_visitors_access_type integer conversion' do
+    Seek::Config.default_all_visitors_access_type = '0'
+    assert_equal 0, Seek::Config.default_all_visitors_access_type
   end
 
   test 'smtp_settings authentication' do
@@ -302,8 +312,16 @@ end
     assert_equal 6, Seek::Config.limit_latest
   end
 
+  test 'default associated projects access permission is accessible' do
+    assert_equal Policy::ACCESSIBLE, Seek::Config.default_associated_projects_access_type
+  end
+
   test 'default consortium access permission is visible' do
     assert_equal Policy::VISIBLE, Seek::Config.default_consortium_access_type
+  end
+
+  test 'default all visitors access permission is accessible' do
+    assert_equal Policy::ACCESSIBLE, Seek::Config.default_all_visitors_access_type
   end
 
   test 'changing default_consortium_access_type' do
