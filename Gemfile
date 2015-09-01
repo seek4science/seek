@@ -132,6 +132,4 @@ group :test do
   gem 'rspec-rails'
   gem 'sunspot_matchers'
   gem 'pg'
-  gem 'selenium-webdriver'
-  gem 'evergreen', :require => 'evergreen/rails'
 end
