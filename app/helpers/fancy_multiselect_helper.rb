@@ -28,8 +28,8 @@ module FancyMultiselectHelper
       #get 'view' from :can_view?
       access = required_access.to_s.split('_').last.gsub('?', '')
       association_class = options.delete(:association_class) || reflection.klass
-      options[:project_possibilities] = authorised_assets(association_class, current_user.person.projects, access) if options[:other_projects_checkbox]
-      options[:possibilities] = authorised_assets(association_class, nil, access) unless options[:possibilities]
+      options[:project_possibilities] = authorised_assets(association_class, nil, access) if options[:other_projects_checkbox]
+      options[:possibilities] = authorised_assets(association_class, current_user.person.projects, access) unless options[:possibilities]
     end
   end
 
@@ -37,12 +37,13 @@ module FancyMultiselectHelper
     # - SetDefaults
     #set default values for locals being sent to the partial
 
+    hidden = object.send(association).blank?
     object_type_text = determine_object_type_text(object, options[:object_type_text])
     {
         :intro => "The following #{association.to_s.singularize.humanize.pluralize.downcase} are associated with this #{object_type_text.downcase}:",
         :default_choice_text => "Select #{association.to_s.singularize.humanize} ...",
         :name => "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
-        :possibilities => [],
+        :possibilities => nil,
         :project_possibilities => [],
         :value_method => :id,
         :text_method => :title,
@@ -52,8 +53,9 @@ module FancyMultiselectHelper
         :other_projects_checkbox => false,
         :object_type => object.class.name,
         :possibilities_options => {},
-        :hidden => false,
-        :required => false
+        :hidden => hidden,
+        :required => false,
+        :title=>nil
     }
   end
 

@@ -16,31 +16,28 @@ module Seek
         acts_as_favouritable
         acts_as_scalable
         acts_as_authorized
+        acts_as_uniquely_identifiable
 
         title_trimmer
 
         attr_accessor :create_from_asset
-
-        has_many :favourites,
-                 as: :resource,
-                 dependent: :destroy
 
         scope :default_order, order('title')
         validates :title, presence: true
 
         grouped_pagination
 
-        acts_as_uniquely_identifiable
+        include Seek::ActsAsISA::InstanceMethods
+        include Seek::ActsAsISA::Relationships
 
         include Seek::Stats::ActivityCounts
-        include Seek::Search::CommonFields
-        include Seek::ActsAsISA::InstanceMethods, BackgroundReindexing, Subscribable
-        include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
+        include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
+        include Seek::Subscribable
         include Seek::ResearchObjects::Packaging
+        include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-        class_eval do
-          extend Seek::ActsAsISA::SingletonMethods
-        end
+        extend Seek::ActsAsISA::SingletonMethods
+
       end
 
       def is_isa?
@@ -52,6 +49,9 @@ module Seek
       # defines that this is a user_creatable object type, and appears in the "New Object" gadget
       def user_creatable?
         true
+      end
+      def can_create?
+        User.logged_in_and_member?
       end
     end
 

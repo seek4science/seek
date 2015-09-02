@@ -50,25 +50,11 @@ module AssaysHelper
 
       culture_growth_type = as.specimen.culture_growth_type
 
-      if organism
-        result += link_to organism.title, organism, {:class => "assay_organism_info"}
-      end
-
-      if strain && !strain.is_dummy? && strain.can_view?
-        result += " :<span class='strain_info'> "
-        result += link_to strain.info, strain, {:class => "strain_info"}
-        result += "</span>"
-      end
+      result += describe_organism_and_strain_for_list(organism, strain)
 
       if sample && sample.tissue_and_cell_types.count > 0
         result += " : "
-       # result += link_to sample.title, sample
-        sample.tissue_and_cell_types.each do |tt|
-          result += "[" if tt== sample.tissue_and_cell_types.first
-          result += link_to h(tt.title), tt
-          result += "|" unless tt == sample.tissue_and_cell_types.last
-          result += "]" if tt == sample.tissue_and_cell_types.last
-        end
+        result += describe_sample_tissue_and_cell_types(sample)
       end
 
       if culture_growth_type
@@ -82,6 +68,20 @@ module AssaysHelper
     result += "</p>"
 
     return result.html_safe
+  end
+
+  def describe_organism_and_strain_for_list(organism, strain)
+    result = ""
+    if organism
+      result += link_to organism.title, organism, {:class => "assay_organism_info"}
+    end
+
+    if strain && !strain.is_dummy? && strain.can_view?
+      result += " :<span class='strain_info'> "
+      result += link_to strain.info, strain, {:class => "strain_info"}
+      result += "</span>"
+    end
+    result
   end
 
 
@@ -127,15 +127,8 @@ module AssaysHelper
 
       one_group_tissue_and_cell_types = tissue_and_cell_types[group_index]
 
-      if organism
-        result += link_to h(organism.title), organism, {:class => "assay_organism_info"}
-      end
+      result += describe_organism_and_strain_for_list(organism, strain)
 
-      if strain && !strain.is_dummy? && strain.can_view?
-        result += " :<span class='strain_info'> "
-        result += link_to strain.info, strain, {:class => "strain_info"}
-        result += "</span>"
-      end
       if one_group_tissue_and_cell_types.compact.length > 0
         result += " : "
         one_group_tissue_and_cell_types = one_group_tissue_and_cell_types.compact

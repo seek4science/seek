@@ -7,24 +7,104 @@ class UserTest < ActiveSupport::TestCase
   include AuthenticatedTestHelper
   fixtures :users,:sops,:data_files,:models,:assets
 
+
+  test "validates email if set" do
+    u = Factory :user
+    assert u.valid?
+
+    u.email="fish"
+    refute u.valid?
+
+    u.email="http://fish.com"
+    refute u.valid?
+
+    u.email="fish@example.com"
+    assert u.valid?
+  end
+
+  test "registration_compelete?" do
+    u = Factory :brand_new_user
+    refute u.person
+    refute u.registration_complete?
+
+    #its not complete until the association has been saved
+    u.person = Factory(:brand_new_person)
+    assert u.person
+    refute u.registration_complete?
+
+    u = Factory :user
+    assert u.person
+    assert u.registration_complete?
+
+  end
+
+  test "check email present?" do
+    u = Factory :user
+    assert u.email.nil?
+    assert u.valid?
+
+    u.check_email_present=true
+    refute u.valid?
+    u.email=""
+    refute u.valid?
+    u.email="fish@example.com"
+    assert u.valid?
+  end
+
+  test "check email available" do
+    #email must not belong to another person, unless that person is unregistered
+    u = Factory :user
+    u.check_email_present=true
+    u.email="ghghgh@email.com"
+    assert u.valid?
+    Factory(:person,:email=>"ghghgh@email.com")
+
+    refute u.valid?
+
+    Factory(:brand_new_person,:email=>"zzzzzz@email.com")
+    u.email="zzzzzz@email.com"
+    assert u.valid?
+
+  end
+
+  test "validation of login" do
+    u = Factory :user
+    assert u.valid?
+    u.login=nil
+    refute u.valid?
+    u.login=""
+    refute u.valid?
+    u.login="aa"
+    refute u.valid?
+    u.login="zhsdfkhsdksdfh11"
+    assert u.valid?
+
+  end
+
   def test_without_profile
-    without_profile=User.without_profile
-    without_profile.each do |u|
-      assert u.person.nil?
-    end
-    assert without_profile.include?(users(:part_registered))
-    assert !without_profile.include?(users(:aaron))
+    user_with_profile = Factory(:user)
+    user_without_profile = Factory(:brand_new_user)
 
-    aaron=users(:aaron)
-    aaron.person=nil
-    aaron.save!
+    assert_nil user_without_profile.person
+    refute_nil user_with_profile.person
 
     without_profile=User.without_profile
     without_profile.each do |u|
       assert u.person.nil?
     end
-    assert without_profile.include?(users(:part_registered))
-    assert without_profile.include?(users(:aaron))
+    assert without_profile.include?(user_without_profile)
+    assert !without_profile.include?(user_with_profile)
+
+
+    user_with_profile.person=nil
+    user_with_profile.save!
+
+    without_profile=User.without_profile
+    without_profile.each do |u|
+      assert u.person.nil?
+    end
+    assert without_profile.include?(user_without_profile)
+    assert without_profile.include? user_with_profile
   end
 
   test "with magic_guest_enabled" do
@@ -64,15 +144,31 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "project manager logged in?" do
-    pm = Factory :project_manager
+  test "project administrator logged in?" do
+    project_administrator = Factory :project_administrator
     normal = Factory :person
-    User.with_current_user(pm.user) do
-      assert User.project_manager_logged_in?
+    User.with_current_user(project_administrator.user) do
+      assert User.project_administrator_logged_in?
     end
 
     User.with_current_user(normal.user) do
-      assert !User.project_manager_logged_in?
+      assert !User.project_administrator_logged_in?
+    end
+  end
+
+  test "programme administrator logged in?" do
+    programme_administrator = Factory :programme_administrator
+    normal = Factory :person
+    User.with_current_user(programme_administrator.user) do
+      assert User.programme_administrator_logged_in?
+    end
+
+    User.with_current_user(normal.user) do
+      return User.programme_administrator_logged_in?
+    end
+
+    User.with_current_user(nil) do
+      return User.programme_administrator_logged_in?
     end
   end
 
@@ -126,12 +222,6 @@ class UserTest < ActiveSupport::TestCase
     assert_no_difference 'User.count' do
       u = create_user(:password_confirmation => nil)
       assert u.errors.get(:password_confirmation)
-    end
-  end
-
-  def test_should_not_require_email
-    assert_difference 'User.count' do
-      u = create_user(:email => nil)
     end
   end
 
@@ -241,7 +331,7 @@ class UserTest < ActiveSupport::TestCase
 
 protected
   def create_user(options = {})
-    record = User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' }.merge(options))
+    record = User.new({ :login => 'quire', :password => 'quire', :password_confirmation => 'quire' }.merge(options))
     record.save
     record
   end

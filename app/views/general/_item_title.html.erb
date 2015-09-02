@@ -24,7 +24,7 @@ col_width = buttons_partial.nil? && !content_for?(:buttons) ? 12 : 6
             <ul class="dropdown-menu" role="menu">
               <% item.versions.reverse.each do |v| %>
                   <li>
-                    <%= link_to({:version => v.version}) do -%>
+                    <%= link_to({:version => v.version},:method=>request.request_method) do -%>
                         Version <%= v.version %> <%= item.describe_version(v.version)-%><br/>
                     <% end %>
                   </li>

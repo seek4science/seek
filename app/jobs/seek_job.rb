@@ -12,7 +12,7 @@ class SeekJob
           perform_job(item)
         end
       rescue Exception => exception
-        report_exception(exception)
+        report_exception(exception,item)
         retry_item(item)
       end
     end
@@ -55,9 +55,10 @@ class SeekJob
     # by default doesn't retry
   end
 
-  def report_exception(exception, message = nil, data = {})
+  def report_exception(exception, item, message = nil, data = {})
     message ||= "Error executing job for #{self.class.name}"
     data[:message] = message
+    data[:item] = item.inspect
     if Seek::Config.exception_notification_enabled
       ExceptionNotifier.notify_exception(exception, data: data)
     end

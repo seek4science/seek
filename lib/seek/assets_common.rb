@@ -2,19 +2,18 @@ require 'seek/annotation_common'
 
 module Seek
   module AssetsCommon
-
     include Seek::AnnotationCommon
     include Seek::ContentBlobCommon
-    include Seek::UploadHandling::DataUpload
-    include Seek::DownloadHandling::DataDownload
     include Seek::PreviewHandling
-    include Seek::DestroyHandling
+    include Seek::AssetsStandardControllerActions
 
-    def find_display_asset asset=eval("@#{self.controller_name.singularize}")
+
+
+    def find_display_asset(asset = eval("@#{controller_name.singularize}"))
       requested_version = params[:version] || asset.latest_version.version
       found_version = asset.find_version(requested_version)
       if !found_version || anonymous_request_for_previous_version?(asset, requested_version)
-        error('This version is not available', "invalid route")
+        error('This version is not available', 'invalid route')
         return false
       else
         eval "@display_#{asset.class.name.underscore} = asset.find_version(found_version)"
@@ -25,28 +24,28 @@ module Seek
       (!(User.logged_in_and_member?) && requested_version.to_i != asset.latest_version.version)
     end
 
-    def update_relationships asset, params
+    def update_relationships(asset, params)
       Relationship.create_or_update_attributions(asset, params[:attributions])
 
       # update related publications
       publication_params = (params[:related_publication_ids] || []).collect do |id|
-        ["Publication", id.split(",").first]
+        ['Publication', id.split(',').first]
       end
       Relationship.create_or_update_attributions(asset, publication_params, Relationship::RELATED_TO_PUBLICATION)
 
-      #Add creators
+      # Add creators
       AssetsCreator.add_or_update_creator_list(asset, params[:creators])
     end
 
-    def update_assay_assets(asset,assay_ids,relationship_type_titles=nil)
+    def update_assay_assets(asset, assay_ids, relationship_type_titles = nil)
       assay_ids ||= []
       relationship_type_titles ||= Array.new(assay_ids.size)
-      create_assay_assets(asset,assay_ids, relationship_type_titles)
+      create_assay_assets(asset, assay_ids, relationship_type_titles)
 
-      destroy_redundant_assay_assets(asset,assay_ids)
+      destroy_redundant_assay_assets(asset, assay_ids)
     end
 
-    def destroy_redundant_assay_assets(asset,assay_ids)
+    def destroy_redundant_assay_assets(asset, assay_ids)
       asset.assay_assets.each do |assay_asset|
         if assay_asset.assay.can_edit? && !assay_ids.include?(assay_asset.assay_id.to_s)
           AssayAsset.destroy(assay_asset.id)
@@ -54,7 +53,7 @@ module Seek
       end
     end
 
-    def create_assay_assets(asset,assay_ids, relationship_type_titles)
+    def create_assay_assets(asset, assay_ids, relationship_type_titles)
       assay_ids.each.with_index do |assay_id, index|
         if (assay = Assay.find(assay_id)).can_edit?
           relationship = RelationshipType.find_by_title(relationship_type_titles[index])
@@ -64,9 +63,9 @@ module Seek
     end
 
     def request_resource
-      resource = self.controller_name.classify.constantize.find(params[:id])
+      resource = class_for_controller_name.find(params[:id])
       details = params[:details]
-      mail = Mailer.request_resource(current_user,resource,details,base_host)
+      mail = Mailer.request_resource(current_user, resource, details, base_host)
       mail.deliver
 
       render :update do |page|
@@ -75,35 +74,20 @@ module Seek
       end
     end
 
-    def destroy_version
-      asset = determine_asset_from_controller
-      if Seek::Config.delete_asset_version_enabled
-        asset.destroy_version  params[:version]
-        flash[:notice] = "Version #{params[:version]} was deleted!"
-      else
-        flash[:error] = "Deleting a version of #{asset.class.name.underscore.humanize} is not enabled!"
-      end
-      respond_to do |format|
-        format.html { redirect_to(polymorphic_path(asset)) }
-        format.xml { head :ok }
-      end
-    end
-
     # For use in autocompleters
     def typeahead
       model_name = controller_name.classify
-      model_class = model_name.constantize
+      model_class = class_for_controller_name
 
-      results = model_class.authorize_asset_collection(model_class.where("title LIKE ?", "#{params[:query]}%"), 'view')
+      results = model_class.authorize_asset_collection(model_class.where('title LIKE ?', "#{params[:query]}%"), 'view')
       items = results.first(params[:limit] || 10).map do |item|
         contributor_name = item.contributor.person.name
-        {id: item.id, name: item.title, hint: contributor_name, type: model_name, contributor: contributor_name}
+        { id: item.id, name: item.title, hint: contributor_name, type: model_name, contributor: contributor_name }
       end
 
       respond_to do |format|
-        format.json { render :json => items.to_json }
+        format.json { render json: items.to_json }
       end
     end
-
   end
 end

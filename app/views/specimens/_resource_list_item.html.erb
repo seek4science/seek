@@ -10,7 +10,7 @@
   <div class="col-sm-6">
     <%= list_item_attribute "Organism", resource.strain.organism.title, organism_path(resource.strain.organism) -%>
     <%= list_item_authorized_list (resource.strain.is_dummy? ? [] : [resource.strain]),"Strain", true, 50, true %>
-    <%= list_item_authorized_list resource.sop_masters.map(&:sop).compact, t('sop').pluralize, true, 50, true %>
+    <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
   </div>
 </div>
 

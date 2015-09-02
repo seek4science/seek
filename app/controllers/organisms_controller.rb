@@ -5,7 +5,8 @@ class OrganismsController < ApplicationController
   before_filter :organisms_enabled?
   before_filter :find_requested_item, :only=>[:show,:edit,:more_ajax,:visualise,:destroy, :update]
   before_filter :login_required,:except=>[:show,:index,:visualise]
-  before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create,:destroy]
+  before_filter :is_user_admin_auth,:only=>[:edit,:update]
+  before_filter :auth_to_create, :only=>[:new,:create, :destroy]
   
   cache_sweeper :organisms_sweeper,:only=>[:update,:create,:destroy]
 
@@ -44,7 +45,7 @@ class OrganismsController < ApplicationController
     pagenum=params[:pagenum]
     pagenum||=1
     search_term=params[:search_term]
-    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>50,:pagenum=>pagenum,:ontologies=>"NCBITAXON",:apikey=>Seek::Config.bioportal_api_key}
+    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>100,:page=>pagenum,:ontologies=>"NCBITAXON",:apikey=>Seek::Config.bioportal_api_key}
     render :update do |page|
       if results
         page.replace_html 'search_results',:partial=>"search_results",:object=>results,:locals=>{:pages=>pages,:pagenum=>pagenum,:search_term=>search_term}

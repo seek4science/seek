@@ -4,10 +4,10 @@ require 'acts_as_cached_tree'
 class Strain < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
-  include ActsAsCachedTree
-  include Subscribable
+  include Seek::ActsAsCachedTree
+  include Seek::Subscribable
   include Seek::Biosamples::PhenoTypesAndGenoTypes
-  include BackgroundReindexing
+  include Seek::Search::BackgroundReindexing
   include Seek::Stats::ActivityCounts
 
   acts_as_authorized

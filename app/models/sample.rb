@@ -2,11 +2,11 @@ require 'grouped_pagination'
 
 
 class Sample < ActiveRecord::Base
-  include Subscribable
+  include Seek::Subscribable
 
   acts_as_scalable if Seek::Config.is_virtualliver
   include Seek::Rdf::RdfGeneration
-  include BackgroundReindexing
+  include Seek::Search::BackgroundReindexing
   include Seek::Stats::ActivityCounts
 
   acts_as_authorized
@@ -27,12 +27,13 @@ class Sample < ActiveRecord::Base
   has_many :sample_assets, :dependent => :destroy
   has_many :treatments, :dependent=>:destroy
 
-  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
-  has_many :models, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
-  has_many :sops, :class_name => "Sop::Version", :finder_sql => Proc.new { self.asset_sql("Sop") }
-  has_many :data_file_masters, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
-  has_many :model_masters, :through => :sample_assets, :source => :asset, :source_type => 'Model'
-  has_many :sop_masters, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
+  has_many :data_file_versions, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
+  has_many :model_versions, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
+  has_many :sop_versions, :class_name => "Sop::Version", :finder_sql => Proc.new { self.asset_sql("Sop") }
+
+  has_many :data_files, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
+  has_many :models, :through => :sample_assets, :source => :asset, :source_type => 'Model'
+  has_many :sops, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
 
   accepts_nested_attributes_for :specimen
   alias_attribute :description, :comments
@@ -48,7 +49,7 @@ class Sample < ActiveRecord::Base
 
   include Seek::Search::BiosampleFields
 
-  searchable(:auto_index=>false) do
+  searchable(auto_index: false) do
     text :specimen do
       if specimen
         text=[]
@@ -71,25 +72,6 @@ class Sample < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
-
-  ["data_file","sop","model"].each do |type|
-     eval <<-END_EVAL
-       #related items hash will use data_file_masters instead of data_files, etc. (sops, models)
-       def related_#{type.pluralize}
-         #{type}_masters
-       end
-     END_EVAL
-  end
-
-
-
-  def self.sop_sql()
-    'SELECT sop_versions.* FROM sop_versions ' +
-        'INNER JOIN sample_sops ' +
-        'ON sample_sops.sop_id = sop_versions.sop_id ' +
-        'WHERE (sample_sops.sop_version = sop_versions.version ' +
-        "AND sample_sops.sample_id = #{self.id})"
-  end
 
   def asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
@@ -169,9 +151,9 @@ class Sample < ActiveRecord::Base
   def clone_with_associations
     new_object= self.dup
     new_object.policy = self.policy.deep_copy
-    new_object.data_file_masters = self.data_file_masters.select(&:can_view?)
-   new_object.model_masters = self.model_masters.select(&:can_view?)  
-    new_object.sop_masters = self.sop_masters.select(&:can_view?)
+    new_object.data_files = self.data_files.select(&:can_view?)
+   new_object.models = self.models.select(&:can_view?)
+    new_object.sops = self.sops.select(&:can_view?)
    new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
     new_object.project_ids = self.project_ids
     return new_object

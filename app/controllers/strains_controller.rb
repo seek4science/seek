@@ -1,5 +1,5 @@
 class StrainsController < ApplicationController
-  include IndexPager
+  include Seek::IndexPager
   include Seek::AnnotationCommon
   include Seek::DestroyHandling
 

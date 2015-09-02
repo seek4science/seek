@@ -1,53 +1,44 @@
-<div id="edit_organisms">
-  <%= form_for(@organism) do |f| %>
+<%
+   details_active = (params[:action] == "edit")
+   details_active = details_active || !bioportal_search_enabled?
 
-      <%= f.error_messages -%>
+   if details_active
+     search_status=""
+     details_status="active"
+   else
+     search_status="active"
+     details_status=""
+   end
 
-      <div class="form-group">
-        <%= f.label :display_name -%><span class="required">*</span>
-        <%= f.text_field :title, :class => "form-control" -%>
-      </div>
+%>
 
-      <%= panel('BioPortal ontology details') do %>
-          <p>
-            By providing ontology details about the organism, the information about it will be richer.
-            The easiest way to populate these values is the use the NCBI search tool below.
-            You can also manually discover these values by using the
-            <%= link_to "BioPortal website", "http://bioportal.bioontology.org/", :target=>"_blank" -%>.
-          </p>
+<div class="container">
+  <ul class="nav nav-tabs">
+    <li role="search" class="<%= search_status %>"><a data-toggle="tab" href="#search">Search</a></li>
+    <li role="details" class="<%= details_status %>"><a data-toggle="tab" href="#details">Organism details</a></li>
+  </ul>
 
-          <div class="form-group">
-            <label>Ontology acroymn</label>
-            <%= f.text_field :ontology_id, :class => "form-control" -%>
+  <div class="tab-content">
+    <div class="tab-pane <%= search_status %>" id="search">
+      <% if bioportal_search_enabled? %>
+          <div id="organism-search">
+            <%= render :partial => "search_bioportal" %>
           </div>
-
-          <div class="form-group">
-            <label>Class uri</label>
-            <%= f.text_field :concept_uri, :class => "form-control" -%>
+      <% elsif admin_logged_in? %>
+          <div class="alert alert-warning" role="alert">
+            If you wish to add the ability to search the NCBI taxonomy, please register with
+            http://bioportal.bioontology.org to get an API key.<br/>
+            You can then add the API key under Server admin -> Site configuration -> Additional settings
           </div>
-
-          <%= f.submit @organism.id ? "Update" : "Create", :disable_with=>@organism.id ? "Updating..." : "Creating...",
-                       :class => 'btn btn-primary' -%>
       <% end %>
-  <% end %>
+    </div>
+    <div class="tab-pane <%= details_status %>" id="details">
+      <div id="organism-attributes">
+        <%= render :partial => "organism_attributes_form" %>
+      </div>
+    </div>
+  </div>
 </div>
 
-<%= panel('Search the NCBI Ontology at BioPortal') do %>
-    <p>
-      Search the NCBI Ontology for the organism you are looking for, and the click then preferred name to populate the
-      fields above.
-    </p>
 
-    <div id="search_results">
-      <%= render :partial=>"search_results", :object=>[], :locals=>{:search_term=>@organism.title, :pagenum=>1} %>
-    </div>
-<% end %>
 
-<script type="text/javascript">
-    function add_concept(label, ont_acronym, conc_id) {
-        $('organism_title').value = label;
-        $('organism_ontology_id').value = ont_acronym;
-        $('organism_concept_uri').value = conc_id;
-        new Effect.Highlight("edit_organism");
-    }
-</script>

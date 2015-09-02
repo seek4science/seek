@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150501134150) do
+ActiveRecord::Schema.define(:version => 20150728133757) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -35,6 +35,12 @@ ActiveRecord::Schema.define(:version => 20150501134150) do
   add_index "activity_logs", ["culprit_type", "culprit_id"], :name => "act_logs_culprit_index"
   add_index "activity_logs", ["format"], :name => "act_logs_format_index"
   add_index "activity_logs", ["referenced_type", "referenced_id"], :name => "act_logs_referenced_index"
+
+  create_table "admin_defined_role_programmes", :force => true do |t|
+    t.integer "programme_id"
+    t.integer "person_id"
+    t.integer "role_mask"
+  end
 
   create_table "admin_defined_role_projects", :force => true do |t|
     t.integer "project_id"
@@ -147,18 +153,11 @@ ActiveRecord::Schema.define(:version => 20150501134150) do
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
   add_index "assay_organisms", ["organism_id"], :name => "index_assay_organisms_on_organism_id"
 
-  create_table "assay_types_edges", :id => false, :force => true do |t|
-    t.integer "parent_id"
-    t.integer "child_id"
-  end
-
   create_table "assays", :force => true do |t|
     t.string   "title"
     t.text     "description"
-    t.integer  "assay_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "technology_type_id"
     t.integer  "study_id"
     t.integer  "owner_id"
     t.string   "first_letter",                 :limit => 1
@@ -816,12 +815,10 @@ ActiveRecord::Schema.define(:version => 20150501134150) do
     t.string   "web_page"
     t.text     "description"
     t.integer  "avatar_id"
-    t.integer  "status_id",                           :default => 0
-    t.string   "first_letter",          :limit => 10
+    t.integer  "status_id",                  :default => 0
+    t.string   "first_letter", :limit => 10
     t.string   "uuid"
-    t.boolean  "can_edit_projects",                   :default => false
-    t.boolean  "can_edit_institutions",               :default => false
-    t.integer  "roles_mask"
+    t.integer  "roles_mask",                 :default => 0
     t.string   "orcid"
   end
 
@@ -1659,11 +1656,6 @@ ActiveRecord::Schema.define(:version => 20150501134150) do
     t.datetime "updated_at",  :null => false
   end
 
-  create_table "technology_types_edges", :id => false, :force => true do |t|
-    t.integer "parent_id"
-    t.integer "child_id"
-  end
-
   create_table "text_value_versions", :force => true do |t|
     t.integer  "text_value_id",                          :null => false
     t.integer  "version",                                :null => false
@@ -1750,7 +1742,6 @@ ActiveRecord::Schema.define(:version => 20150501134150) do
 
   create_table "users", :force => true do |t|
     t.string   "login"
-    t.string   "email"
     t.string   "crypted_password",          :limit => 40
     t.string   "salt",                      :limit => 40
     t.datetime "created_at"

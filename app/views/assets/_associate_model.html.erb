@@ -23,7 +23,7 @@
           <div class="association_step">
             <div class="form-group">
               <%= select_tag :possible_models,
-                             options_for_select([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
+                             options_for_select([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(s.title, :length=>select_truncate_length).html_safe, s.id]}),
                              {:class => 'form-control',:onchange=>"addSelectedModel();"+remote_function(
                                      :method=>:get,
                                      :url=>preview_models_path(:element=>"model_preview"),
@@ -35,7 +35,7 @@
 
             <%= select_tag :model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
-            <%= check_box_tag :include_other_project_models, nil, true, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate Models from other projects?
+            <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Associate Models from other projects?
           </div>
         </div>
       </div>
@@ -54,7 +54,7 @@
         selection_box.options.length=0;
 
         if (checked) {
-            <% ([["Select #{t('model')} ...",0]]|all_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
+            <% ([["Select #{t('model')} ...",0]]|all_models.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |model_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(model_details[0]) -%>';
             option.value = '<%= model_details[1] -%>';
@@ -67,7 +67,7 @@
             <% end -%>
         }
         else {
-            <% ([["Select #{t('model')} ...",0]]|project_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |model_details| -%>
+            <% ([["Select #{t('model')} ...",0]]|project_models.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |model_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= escape_javascript(model_details[0]) -%>';
             option.value = '<%= model_details[1] -%>';

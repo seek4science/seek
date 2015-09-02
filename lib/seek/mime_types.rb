@@ -22,6 +22,7 @@ module Seek
         "text/plain" => {:name => "Plain text document", :icon_key => "txt_file", :extensions=>["txt"]},
         "text/csv" => {:name => "Comma-separated values document", :icon_key => "misc_file", :extensions=>["csv"]},
         "text/x-comma-separated-values" => {:name => "Comma-separated values document", :icon_key => "misc_file", :extensions=>["csv"]},
+        "text/tab-separated-values" => {:name => "Tab-separated values document", :icon_key => "misc_file", :extensions=>["tsv"]},
         "application/sbml+xml" => {:name => "SBML and XML document", :icon_key => "xml_file", :extensions=>["xml"]},
         "application/xml" => {:name => "XML document", :icon_key => "xml_file", :extensions=>["xml"]},
         "text/xml" => {:name => "XML document", :icon_key => "xml_file", :extensions=>["xml"]},

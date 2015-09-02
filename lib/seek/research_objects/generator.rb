@@ -59,21 +59,26 @@ module Seek
         end
 
         if asset.respond_to?(:model_image) && asset.model_image
-          store_model_image_file(bundle, asset, asset.model_image)
+          store_blob_file(bundle, asset, asset.model_image)
         end
       end
 
       # stores a content blob file, added the aggregate to the manifest
       def store_blob_file(bundle, asset, blob)
-        path = File.join(asset.research_object_package_path, blob.original_filename)
+        path = resolve_entry_path(bundle,asset,blob)
         bundle.add(path, blob.filepath, aggregate: true)
       end
 
-      # special case for storing an image file associated with a model, and adding
-      # the aggregate to the RO manifest.
-      def store_model_image_file(bundle, asset, model_image)
-        path = File.join(asset.research_object_package_path, model_image.original_filename)
-        bundle.add(path, model_image.file_path, aggregate: true)
+      #resolves the entry path, to avoid duplicates. If an asset has multiple files
+      #with some the same name, a "c-" is prepended t the file name, where c starts at 1 and increments
+      def resolve_entry_path(bundle, asset, blob)
+        path = File.join(asset.research_object_package_path, blob.original_filename)
+        while(bundle.find_entry(path))
+          c||=1
+          path = File.join(asset.research_object_package_path, "#{c}-#{blob.original_filename}")
+          c+=1
+        end
+        path
       end
 
       # create an empty temp file, and return the opened file ready for writing.

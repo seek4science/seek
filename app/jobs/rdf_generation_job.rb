@@ -1,10 +1,10 @@
 class RdfGenerationJob < SeekJob
-  attr_reader :item_type_name, :item_id, :refresh_dependants
+  attr_reader :item_type_name, :item_id, :refresh_dependents
 
-  def initialize(item, refresh_dependants = true)
+  def initialize(item, refresh_dependents = true)
     @item_type_name = item.class.name
     @item_id = item.id
-    @refresh_dependants = refresh_dependants
+    @refresh_dependents = refresh_dependents
   end
 
   # executes the job - if a triple store is configured it will also update the triple store, otherwise just saves the rdf
@@ -31,7 +31,7 @@ class RdfGenerationJob < SeekJob
     result = super
 
     # if we don't want to refresh_dependents, but a job exists that does, then we can say it exists
-    unless result || refresh_dependants
+    unless result || refresh_dependents
       result = RdfGenerationJob.new(item, true).exists?
     end
     result

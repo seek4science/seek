@@ -1,6 +1,6 @@
 class SamplesController < ApplicationController
 
-  include IndexPager
+  include Seek::IndexPager
   include Seek::PreviewHandling
   include Seek::DestroyHandling
 
@@ -19,36 +19,39 @@ class SamplesController < ApplicationController
   include Seek::BreadCrumbs
 
   def new_object_based_on_existing_one
-    @existing_sample =  Sample.find(params[:id])
+    @existing_sample = Sample.find(params[:id])
     @sample = @existing_sample.clone_with_associations
 
+    notice_message = ''
     unless @sample.specimen.can_view?
       @sample.specimen = nil
-      flash.now[:notice] = "The #{t('biosamples.sample_parent_term')} of the existing Sample cannot be viewed, please specify your own #{t('biosamples.sample_parent_term')}! <br/> "
-    else
-      flash.now[:notice] = ""
+      notice_message << "The #{t('biosamples.sample_parent_term')} of the existing Sample cannot be viewed, please specify your own #{t('biosamples.sample_parent_term')}! <br/> "
     end
 
-    @existing_sample.data_file_masters.each do |df|
-       if !df.can_view?
-       flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
+    @existing_sample.data_files.each do |df|
+      if !df.can_view?
+        notice_message << "Some or all #{t('data_file').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
-    @existing_sample.model_masters.each do |m|
-       if !m.can_view?
-       flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
+    @existing_sample.models.each do |m|
+      if !m.can_view?
+        notice_message << "Some or all #{t('model').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
-    @existing_sample.sop_masters.each do |s|
-       if !s.can_view?
-       flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
+    @existing_sample.sops.each do |s|
+      if !s.can_view?
+        notice_message << "Some or all #{t('sop').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
 
-    render :action=>"new"
+    unless notice_message.blank?
+      flash.now[:notice] = notice_message.html_safe
+    end
+
+    render :action => "new"
 
   end
 
@@ -187,7 +190,7 @@ class SamplesController < ApplicationController
   end
 
   def align_sops resource,new_sop_ids
-    existing_ids = resource.sop_masters.collect{|sm| sm.sop.id}
+    existing_ids = resource.sops.collect{|sm| sm.sop.id}
     to_remove = existing_ids - new_sop_ids
     join_class_string = ['Sop', resource.class.name].sort.join
     join_class = join_class_string.constantize

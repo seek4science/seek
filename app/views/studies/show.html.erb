@@ -33,16 +33,14 @@
         </p>
 
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @study , :versioned_resource=> @study } -%>
-      </div>
     </div>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @study.investigation, :current_item => @study, :deep => false} %>
   </div>
+
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => [@study.contributing_user.try(:person)] } %>
   </div>
 </div>
 
-<%= render :partial=>"general/isa_graph", :locals => {:root_item => @study.investigation, :current_item => @study, :deep => false} %>
 
 <%= render :partial=>"general/items_related_to", :object => @study %>

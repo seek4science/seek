@@ -1,7 +1,7 @@
 <% if !item.pubmed_id.nil? %>
-    <%= button_link_to('View Publication On PubMed', 'visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{item.pubmed_id}", :target => "_blank") -%>
+    <%= button_link_to('View Publication On PubMed', 'visit_pubmed', item.pubmed_uri, :target => "_blank") -%>
 <% elsif !item.doi.nil? %>
-    <%= button_link_to('View Publication', 'visit_pubmed', "http://dx.doi.org/#{item.doi}", :target => "_blank") -%>
+    <%= button_link_to('View Publication', 'visit_pubmed', item.doi_uri, :target => "_blank") -%>
 <% end -%>
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item } -%>
 <%= button_link_to('Export to EndNote', 'endnote', publication_path(:id => item.id, :format => 'enw')) %>

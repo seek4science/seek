@@ -105,20 +105,22 @@ class SessionsControllerTest < ActionController::TestCase
     assert !@controller.send(:logged_in?)
   end
 
-  def test_non_validated_user_should_redirect_to_new_with_message
-    post :create, :login => 'aaron', :password => 'test'
+  def test_non_activated_user_should_redirect_to_new_with_message
+    user = Factory(:brand_new_user,:person=>Factory(:person))
+    post :create, :login => user.login, :password => user.password
     assert !session[:user_id]
-    assert_redirected_to "/"
+    assert_redirected_to login_path
     assert_not_nil flash[:error]    
     assert flash[:error].include?("You still need to activate your account.")
   end
 
   def test_partly_registed_user_should_redirect_to_select_person
-    post :create, :login => 'part_registered', :password => 'test'
+    user = Factory(:brand_new_user)
+    post :create, :login => user.login, :password => user.password
     assert session[:user_id]
-    assert_equal users(:part_registered).id,session[:user_id]
+    assert_equal user.id,session[:user_id]
     assert_not_nil flash.now[:notice]
-    assert_redirected_to select_people_path
+    assert_redirected_to register_people_path
   end
 
   test 'should redirect to root after logging out from the search result page' do

@@ -13,8 +13,8 @@
   <div class="col-sm-6">
     <%= list_item_attribute "Organism", resource.specimen.strain.organism.title, organism_path(resource.specimen.strain.organism) -%>
     <%= list_item_authorized_list (resource.specimen.strain.is_dummy? ? [] : [resource.specimen.strain]),"Strain", true, 50, true %>
-    <%= list_item_authorized_list resource.data_file_masters,t('data_file').pluralize, true, 50, true %>
-    <%= list_item_authorized_list resource.sop_masters,t('sop').pluralize, true, 50, true %>
+    <%= list_item_authorized_list resource.data_files,t('data_file').pluralize, true, 50, true %>
+    <%= list_item_authorized_list resource.sops,t('sop').pluralize, true, 50, true %>
   </div>
 </div>
 

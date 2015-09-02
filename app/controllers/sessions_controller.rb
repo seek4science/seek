@@ -5,6 +5,7 @@ class SessionsController < ApplicationController
   skip_before_filter :restrict_guest_user
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:new,:destroy]
+  skip_before_filter :partially_registered?,:only=>[:create,:new]
   prepend_before_filter :strip_root_for_xml_requests
   
   # render new.rhtml
@@ -75,9 +76,9 @@ class SessionsController < ApplicationController
   
   def check_login    
     session[:user_id] = @user.id
-    if @user.person.nil?
-      flash[:notice] = "You have successfully registered your account, but now must select a profile, or create your own."
-      redirect_to(select_people_path)
+    if !@user.registration_complete?
+      flash[:notice] = "You have successfully registered your account, but you need to create a profile"
+      redirect_to(register_people_path)
 	  elsif !@user.active?
       failed_login "You still need to activate your account. You should have been sent a validation email."
     else      
@@ -123,7 +124,8 @@ class SessionsController < ApplicationController
     logout_user
     flash[:error] = message
     respond_to do |format|
-      format.html { redirect_to(:root) }
+      return_to = params[:called_from] ? params[:called_from][:url] : nil
+      format.html { redirect_to(login_path(:return_to=>return_to)) }
       format.xml { head :not_found }
     end
   end

@@ -62,7 +62,14 @@ module OrganismsHelper
     end
     result.empty? ? "<span class='none_text'>#{none_text}</span>".html_safe : result.html_safe
   end
-  
+
+  def can_create_organisms?
+    Organism.can_create?
+  end
+
+  def bioportal_search_enabled?
+    !Seek::Config.bioportal_api_key.blank?
+  end
   
   
 end

@@ -4,7 +4,7 @@ class Person < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::Taggable
-  include Seek::AdminDefinedRoles
+  include Seek::Roles::AdminDefinedRoles
 
   alias_attribute :title, :name
 
@@ -69,6 +69,11 @@ class Person < ActiveRecord::Base
 
   after_commit :queue_update_auth_table
 
+  #not registered profiles that match this email
+  def self.not_registered_with_matching_email email
+    self.not_registered.select{|person| person.email == email}
+  end
+
   def queue_update_auth_table
     if previous_changes.keys.include?("roles_mask")
       AuthLookupUpdateJob.new.add_items_to_queue self
@@ -93,6 +98,7 @@ class Person < ActiveRecord::Base
     !user.nil?
   end
 
+  #to allow you to call .person on a Person or User to avoid having to check its type
   def person
     self
   end
@@ -135,6 +141,25 @@ class Person < ActiveRecord::Base
     self.projects.collect{|p| p.programme}.uniq
   end
 
+  #whether this person belongs to a programme in common with the other item - generally a person or project
+  def shares_programme? other_item
+    (self.programmes & other_item.programmes).any?
+  end
+
+  #whether this person belongs to a project in common with the other item - whcih can eb a person, project or enumeration of projects
+  def shares_project? other_item
+    if other_item.is_a?(Project) || other_item.is_a?(Enumerable)
+      projects = Array(other_item)
+    else
+      projects = other_item.projects
+    end
+
+    (self.projects & projects).any?
+  end
+
+  def shares_project_or_programme? other_item
+    self.shares_project?(other_item) || self.shares_programme?(other_item)
+  end
 
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
   RELATED_RESOURCE_TYPES.each do |type|
@@ -164,10 +189,16 @@ class Person < ActiveRecord::Base
     return dup
   end
 
+  def cache_key
+    groups = group_memberships.compact.collect{|gm| gm.id.to_s}.join('.')
+    progs = programmes.compact.collect{|pg| pg.id.to_s}.join('.')
+    "#{super}-#{groups}-#{progs}"
+  end
+
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json
     Person.order("ID asc").collect do |p|
-      {"id" => p.id,"name" => p.name,"email" => p.email}
+      {"id" => p.id,"name" => p.name,"email" => p.email,"projects" => p.projects.collect{|p| p.title}.join(", ")}
     end.to_json
   end
 
@@ -187,10 +218,6 @@ class Person < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def can_create_new_items?
-    member?
   end
 
   def workflows
@@ -274,18 +301,10 @@ class Person < ActiveRecord::Base
   def can_be_edited_by?(subject)
     return false unless subject
     subject = subject.user if subject.is_a?(Person)
-    subject == self.user || subject.is_admin? || self.is_managed_by?(subject)
+    subject == self.user || subject.is_admin? || self.is_project_administered_by?(subject)
   end
 
-  #determines if this person is the member of a project for which the user passed is a project manager,
-  # #and the current person is not an admin
-  def is_managed_by? user
-    return false if self.is_admin?
-    match = self.projects.find do |p|
-      user.person.is_project_manager?(p)
-    end
-    !match.nil?
-  end
+
 
   def me?
     user && user==User.current_user
@@ -295,7 +314,7 @@ class Person < ActiveRecord::Base
   def can_be_administered_by?(user)
     person = user.try(:person)
     return false unless user && person
-    user.is_admin? || (person.is_project_manager_of_any_project? && (self.is_admin? || self!=person))
+    user.is_admin? || (person.is_project_administrator_of_any_project? && (self.is_admin? || self!=person))
   end
 
   def can_view? user = User.current_user
@@ -422,6 +441,10 @@ class Person < ActiveRecord::Base
         add_to_project_and_institution(project,project.institutions.first)
       end
     end
+  end
+
+  def self.can_create?
+    User.admin_or_project_administrator_logged_in? || (User.logged_in? && !User.current_user.registration_complete?)
   end
 
   include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled

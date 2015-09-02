@@ -25,6 +25,28 @@ class GeneratorTest < ActiveSupport::TestCase
     assert_equal Seek::ResearchObjects::Generator::DEFAULT_FILENAME,File.basename(file.path)
   end
 
+  test "generate for investigation with duplicate files" do
+    inv = investigation
+    model = Factory(:model, :policy=>Factory(:public_policy))
+    disable_authorization_checks do
+      model.content_blobs << Factory(:doc_content_blob, :original_filename=>"xxx.txt")
+      model.content_blobs << Factory(:doc_content_blob, :original_filename=>"xxx.txt")
+      model.content_blobs << Factory(:doc_content_blob, :original_filename=>"xxx.txt")
+      model.save!
+      inv.assays.last.associate(model)
+    end
+    inv.reload
+    file = Seek::ResearchObjects::Generator.instance.generate(inv)
+    paths = Zip::File.open(file) do |zip_file|
+      zip_file.collect do |entry|
+        entry.name
+      end
+    end
+    assert_include paths,"models/#{model.id}/xxx.txt"
+    assert_include paths,"models/#{model.id}/1-xxx.txt"
+    assert_include paths,"models/#{model.id}/2-xxx.txt"
+  end
+
 
 
   private

@@ -15,6 +15,8 @@ class ApplicationController < ActionController::Base
 
   before_filter :log_extra_exception_data
 
+  #if the logged in user is currently partially registered, force the continuation of the registration process
+  before_filter :partially_registered?
 
   after_filter :log_event
 
@@ -23,8 +25,6 @@ class ApplicationController < ActionController::Base
   around_filter :with_current_user
 
   rescue_from "ActiveRecord::RecordNotFound", :with=>:render_not_found_error
-
-  before_filter :profile_for_login_required
 
   before_filter :project_membership_required,:only=>[:create,:new]
 
@@ -37,6 +37,10 @@ class ApplicationController < ActionController::Base
     User.with_current_user current_user do
       yield
     end
+  end
+
+  def partially_registered?
+    redirect_to register_people_path if (current_user && !current_user.registration_complete?)
   end
 
   def strip_root_for_xml_requests
@@ -58,18 +62,6 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
-  
-  #Overridden from restful_authentication
-  #Does a second check that there is a profile assigned to the user, and if not goes to the profile
-  #selection page (GET people/select)
-  def authorized?
-    if super
-      redirect_to(select_people_path) if current_user.person.nil?
-      true
-    else
-      false
-    end
-  end
 
   def is_current_user_auth
     begin
@@ -91,13 +83,6 @@ class ApplicationController < ActionController::Base
       return false
     end
     return true
-  end
-
-  def is_admin_or_is_project_manager
-    unless User.admin_logged_in? || User.project_manager_logged_in?
-      error("You do not have the permission", "Not admin or #{t('project')} manager")
-      return false
-    end
   end
 
   def can_manage_announcements?
@@ -246,13 +231,6 @@ class ApplicationController < ActionController::Base
     User.admin_logged_in?
   end
 
-  def profile_for_login_required
-    if User.logged_in? && !User.logged_in_and_registered?
-      flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
-      redirect_to main_app.select_people_path
-    end
-  end
-
   def translate_action action_name
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
@@ -304,7 +282,7 @@ class ApplicationController < ActionController::Base
 
     return if action.nil?
 
-    object = name.camelize.constantize.find(params[:id])
+    object = self.controller_name.classify.constantize.find(params[:id])
 
     if is_auth?(object, action)
       eval "@#{name} = object"
@@ -332,11 +310,20 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def auth_to_create
+    unless self.controller_name.classify.constantize.can_create?
+      error("You do not have permission", "No permission")
+      return false
+    end
+  end
+
   def render_not_found_error
 
     respond_to do |format|
       format.html do
-        render :template => "general/landing_page_for_not_found_item", :status => :not_found
+        User.with_current_user current_user do
+          render :template => "general/landing_page_for_not_found_item", :status => :not_found
+        end
       end
 
       format.rdf { render  :text=>"Not found",:status => :not_found }
@@ -449,7 +436,7 @@ class ApplicationController < ActionController::Base
         expire_download_activity
       elsif action=="create" && controller!="sessions"
         expire_create_activity
-      elsif action=="destroy"
+      elsif action=="destroy" && controller!="sessions"
         expire_create_activity
         expire_download_activity
       elsif action=="update" && @@auth_types.include?(controller) #may have had is permission changed

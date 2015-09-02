@@ -2,7 +2,7 @@ require 'test_helper'
 
 class StudiedFactorTest < ActiveSupport::TestCase
   fixtures :all
-  include StudiedFactorsHelper
+  include SubstancesHelper
 
   test 'should not create FS with the concentration of no substance' do
     User.with_current_user  users(:aaron) do

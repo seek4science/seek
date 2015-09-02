@@ -29,6 +29,7 @@ SEEK::Application.routes.draw do
       get :get_stats
       get :registration_form
       get :edit_tag
+      get :imprint_setting
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -42,6 +43,7 @@ SEEK::Application.routes.draw do
       post :update_pagination
       post :delete_tag
       post :edit_tag
+      post :update_imprint_setting
     end
   end
 
@@ -50,6 +52,7 @@ SEEK::Application.routes.draw do
       get :index
       get :feedback
       post :send_feedback
+      get :imprint
     end
   end
 
@@ -136,7 +139,8 @@ SEEK::Application.routes.draw do
   resources :people do
     collection do
       get :typeahead
-      get :select
+      get :register
+      get :is_this_you
       get :get_work_group
       post :userless_project_selected_ajax
       post :items_for_result
@@ -220,6 +224,7 @@ SEEK::Application.routes.draw do
 
   resources :investigations do
     collection do
+      get :preview
       post :items_for_result
       post :resource_in_tab
     end
@@ -231,6 +236,7 @@ SEEK::Application.routes.draw do
 
   resources :studies do
     collection do
+      get :preview
       post :investigation_selected_ajax
       post :items_for_result
       post :resource_in_tab
@@ -642,6 +648,7 @@ SEEK::Application.routes.draw do
   match '/signup' => 'users#new', :as => :signup
 
   match '/logout' => 'sessions#destroy', :as => :logout
+  match '/login' => 'sessions#new', :as => :login
   match '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
   match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings

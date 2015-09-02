@@ -18,10 +18,6 @@ postdoc:
   id: 5
   name: Postdoc
 
-pal:
-  id: 6
-  name: <%= Seek::Config.dm_project_name %> Pal
-
 technician:
   id: 7
   name: Technician
@@ -29,7 +25,3 @@ technician:
 phd_student:
   id: 8
   name: PhD Student
-
-project_manager:
-  id: 9
-  name: Project Manager

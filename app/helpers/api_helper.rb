@@ -153,11 +153,13 @@ module ApiHelper
       api_partial_collection builder, (object.creators || [])
     end if !object.instance_of?(Publication) && object.respond_to?('creators')
 
-    unless hide_contact_details?
-      builder.tag! 'email', object.email if object.respond_to?('email')
-      builder.tag! 'webpage', object.webpage if object.respond_to?('webpage')
-      builder.tag! 'internal_webpage', object.internal_webpage if object.respond_to?('internal_webpage')
-      builder.tag! 'phone', object.phone if object.respond_to?('phone')
+    if object.is_a?(Person) || object.is_a?(Project)
+      unless hide_contact_details?(object)
+        builder.tag! 'email',object.email if object.respond_to?("email")
+        builder.tag! 'webpage',object.webpage if object.respond_to?("webpage")
+        builder.tag! 'internal_webpage',object.internal_webpage if object.respond_to?("internal_webpage")
+        builder.tag! 'phone',object.phone if object.respond_to?("phone")
+      end
     end
 
     builder.tag! 'bioportal_concepts' do

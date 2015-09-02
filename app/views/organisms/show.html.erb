@@ -6,7 +6,15 @@
           <li><%= delete_organism_icon(@organism)%></li>
         <% end %>
     <% end %>
+<% elsif can_create_organisms? %>
+    <% content_for(:buttons) do -%>
+        <%= admin_dropdown do %>
+            <li><%= image_tag_for_key('new', new_organism_path, "Add Organism", nil, 'Add Organism') -%></li>
+            <li><%= delete_organism_icon(@organism)%></li>
+        <% end %>
+    <% end %>
 <% end %>
+
 
 <%= render :partial => "general/item_title",:locals=>{:item=>@organism} %>
 

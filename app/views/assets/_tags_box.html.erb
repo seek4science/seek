@@ -2,18 +2,18 @@
    entity=controller_name.singularize
    object=eval("@"+entity)
    title||="Tags"
-   annotations,all_item_tags = fetch_tags_for_item object
+   all_tags,all_item_tags = fetch_tags_for_item object
    owner_item_tags = object.annotations.with_attribute_name("tag").by_source("User",User.current_user.id).collect{|a| a.value}.uniq
    create_tag_link_text = ((owner_item_tags.empty? ? "Add your tags" : "Update your tags") + ' <span class="caret"></span>').html_safe
-   existing_tags = owner_item_tags.map{ |t| t.text }
+   existing_tags = owner_item_tags.map(&:text).uniq
 %>
 
 <%= panel(title, :id => "tags_box", :help_text => "Tagging an item helps describe it and other people find it. You can contribute by applying your own tags to this item. The weight of a tag indicates how often it has been used.") do %>
-    <%= render :partial=>"tags/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>false, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
+    <%= render :partial=>"tags/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>true, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
 
     <hr/>
     <div class="text-center">
-        <%= button_link_to(create_tag_link_text, 'tag', nil, :onclick => "$j('#create_a_tag').toggle();") %>
+        <%= button_link_to(create_tag_link_text, 'tag', nil, :onclick => "$j('#create_a_tag').slideToggle();") %>
     </div>
 
     <div id="create_a_tag" style="display:none;">

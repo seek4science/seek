@@ -36,8 +36,8 @@ module ProjectsHelper
     link_list_for_role("Asset Manager",project.asset_managers)
   end
 
-  def project_managers_link_list project
-    link_list_for_role("#{t('project')} Manager",project.project_managers)
+  def project_administrator_link_list project
+    link_list_for_role("#{t('project')} Administrator",project.project_administrators)
   end
 
   def gatekeepers_link_list project
@@ -71,6 +71,10 @@ module ProjectsHelper
     people.map do |p|
       link_to(h(p.name), p) + " (" + p.email + ")"
     end
+  end
+
+  def can_create_projects?
+    Project.can_create?
   end
 
 

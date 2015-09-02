@@ -1,5 +1,16 @@
 module PeopleHelper
 
+  def can_create_profiles?
+    Person.can_create?
+  end
+
+  def contact_details_warning_message
+    msg = "This information is only visible to other people whom you share a #{t('project')}"
+    msg << " or #{t('programme')}" if Seek::Config.programmes_enabled
+    msg << "."
+    msg
+  end
+
   def person_list_item_extra_details? person
     !(person.projects.empty? and person.institutions.empty?)  
   end
@@ -13,7 +24,7 @@ module PeopleHelper
 
   def seek_role_icons person
     icons = ''
-    person.role_names.each do |role|
+    person.roles.each do |role|
       icons << image("#{role}",:alt=>"#{role}",:title=>tooltip_title_attrib(role.humanize), :style=>"vertical-align: middle")
     end
     icons.html_safe
@@ -52,5 +63,19 @@ module PeopleHelper
     end
     return text.html_safe
   end
-  
+
+  def admin_defined_project_roles_hash
+    roles = {"pal"=>"a PAL","project_administrator"=>"a Project Administrator", "asset_manager"=>"an Asset Manager","gatekeeper"=>"a Gatekeeper"}
+    roles.delete("pal") unless admin_logged_in?
+    roles
+  end
+
+  #Return whether or not to hide contact details from this user
+  #Current decided by Seek::Config.hide_details_enabled or
+  # is hidden if the current person doesn't share the same programme as the person being viewed
+  def hide_contact_details? displayed_person_or_project
+    return true if Seek::Config.hide_details_enabled || !logged_in?
+    !current_user.person.shares_project_or_programme?(displayed_person_or_project)
+  end
+
 end

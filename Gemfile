@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem "rails", "3.2.21"
+gem "rails", "3.2.22"
 gem "rdoc"
 
 #added by TZ to fix problem with compiling the assets without js env.
@@ -15,14 +15,14 @@ gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
 gem 'uuid',"~>2.3"
 gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"~>0.15.0"
-gem "rmagick","2.13.2", :require => 'RMagick'
+gem "rmagick","2.15.2"
 gem "mysql2"
 gem 'rest-client'
 gem 'factory_girl', "2.6.4"
 gem 'rubyzip', "~> 1.1.4"
 gem 'bio'
-gem 'sunspot_rails'
-gem 'sunspot_solr'
+gem 'sunspot_rails',"~>2.1.0"
+gem 'sunspot_solr',"~>2.1.0"
 gem 'savon',"1.1.0"
 gem "dynamic_form"
 gem "prototype-rails"
@@ -78,7 +78,7 @@ gem 'acts_as_trashable',:git=> "https://github.com/SysMO-DB/acts_as_trashable.gi
 gem "app_version", :git => "https://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "https://github.com/SysMO-DB/doi_query_tool.git"
 gem 'convert_office',:git=>"https://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
-gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage"
+gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage", :ref=>"bb1182f2716a9bf1b5d85e186d8bb7eec436797b"
 gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
 
@@ -96,10 +96,12 @@ gem 'datacite_doi_ify'
 gem 'bootstrap-sass', '3.1.1.0'
 gem 'sass-rails', '>= 3.2'
 
-gem 'ro-bundle', :git=>"https://github.com/myGrid/ruby-ro-bundle"
+gem 'ro-bundle'
 gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
+gem 'bootstrap-multiselect-rails'
 gem 'handlebars_assets'
+
 
 group :assets do
   gem 'turbo-sprockets-rails3'
@@ -134,4 +136,3 @@ group :test do
   gem 'sunspot_matchers'
   gem 'pg'
 end
-

@@ -38,13 +38,13 @@ class AdminsController < ApplicationController
   end
 
   def update_features_enabled
-    Seek::Config.public_seek_enabled = string_to_boolean(params[:public_seek_enabled] || true)
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.jerm_enabled = string_to_boolean params[:jerm_enabled]
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
     Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.forum_enabled = string_to_boolean params[:forum_enabled]
+    Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
@@ -117,6 +117,12 @@ class AdminsController < ApplicationController
 
     validation_flag = is_project_entries_integer && is_community_entries_integer
     update_redirect_to validation_flag, 'home_settings'
+  end
+
+  def update_imprint_setting
+    Seek::Config.imprint_enabled = string_to_boolean params[:imprint_enabled]
+    Seek::Config.imprint_description = params[:imprint_description]
+    update_redirect_to true, 'imprint_setting'
   end
 
   def rebrand

@@ -5,8 +5,9 @@ require 'libxml'
 
 class Publication < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
-  title_trimmer
+
   alias_attribute :description, :abstract
+
   #searchable must come before acts_as_asset is called
   searchable(:auto_index=>false) do
     text :journal,:pubmed_id, :doi, :published_date
@@ -58,6 +59,14 @@ class Publication < ActiveRecord::Base
 
     end
 
+  end
+
+  def pubmed_uri
+    "https://www.ncbi.nlm.nih.gov/pubmed/#{pubmed_id}" if pubmed_id
+  end
+
+  def doi_uri
+    "https://dx.doi.org/#{doi}" if doi
   end
 
   def default_policy
@@ -128,6 +137,14 @@ class Publication < ActiveRecord::Base
 
   def assays
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
+  end
+
+  def studies
+    self.backwards_relationships.select {|a| a.subject_type == "Study"}.collect { |a| a.subject }
+  end
+
+  def investigations
+    self.backwards_relationships.select {|a| a.subject_type == "Investigation"}.collect { |a| a.subject }
   end
 
   def presentations

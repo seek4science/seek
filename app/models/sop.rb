@@ -18,8 +18,6 @@ class Sop < ActiveRecord::Base
 
   scope :default_order, order("title")
 
-  title_trimmer
-
   validates_presence_of :title
 
   # allow same titles, but only if these belong to different users
@@ -48,7 +46,6 @@ class Sop < ActiveRecord::Base
     organism.nil? ? "" : organism.title
   end
 
-
   def use_mime_type_for_avatar?
     true
   end
@@ -56,22 +53,6 @@ class Sop < ActiveRecord::Base
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     true
-  end
-
-  #experimental_conditions, and related compound text that should be included in search
-  def exp_conditions_search_fields
-    flds = experimental_conditions.collect do |ec|
-      [ec.measured_item.title,
-       ec.substances.collect do |sub|
-         #FIXME: this makes the assumption that the synonym.substance appears like a Compound
-         sub = sub.substance if sub.is_a?(Synonym)
-         [sub.title] |
-             (sub.respond_to?(:synonyms) ? sub.synonyms.collect { |syn| syn.title } : []) |
-             (sub.respond_to?(:mappings) ? sub.mappings.collect { |mapping| ["CHEBI:#{mapping.chebi_id}", mapping.chebi_id, mapping.sabiork_id.to_s, mapping.kegg_id] } : [])
-       end
-      ]
-    end
-    flds.flatten.uniq
   end
     
 end

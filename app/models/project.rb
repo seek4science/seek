@@ -8,11 +8,10 @@ class Project < ActiveRecord::Base
   include Seek::Rdf::ReactToAssociatedChange
 
   acts_as_yellow_pages
+  title_trimmer
   validates :title, :uniqueness=>true
 
   include SimpleCrypt
-
-  title_trimmer
 
   has_and_belongs_to_many :investigations
 
@@ -33,6 +32,11 @@ class Project < ActiveRecord::Base
   has_many :institutions, :through=>:work_groups, :before_remove => :group_memberships_empty?
 
   belongs_to :programme
+
+  #FIXME: temporary handler, projects need to support multiple programmes
+  def programmes
+    [programme]
+  end
 
   # SEEK projects suffer from having 2 types of ancestor and descendant,that were added separately - those from the historical lineage of the project, and also from
   # the hierarchical tree structure that can be. For this reason and to avoid the clash, these anscestors and descendants have been renamed.
@@ -118,8 +122,8 @@ class Project < ActiveRecord::Base
   end
 
   #this is seek role
-  def project_managers
-    people_with_the_role("project_manager")
+  def project_administrators
+    people_with_the_role("project_administrator")
   end
 
   #this is seek role
@@ -133,8 +137,7 @@ class Project < ActiveRecord::Base
 
   #returns people belong to the admin defined seek 'role' for this project
   def people_with_the_role role
-    mask = Person.mask_for_role(role)
-    AdminDefinedRoleProject.where(role_mask: mask,project_id: self.id).collect{|r| r.person}
+    Seek::Roles::ProjectRelatedRoles.instance.people_with_project_and_role(self,role)
   end
 
   def locations
@@ -149,21 +152,6 @@ class Project < ActiveRecord::Base
     res = work_groups.collect(&:people).flatten.uniq.compact
     #TODO: write a test to check they are ordered
     res.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
-  end
-
-  # provides a list of people that are said to be members of this project, but are not associated with any user
-  def userless_people
-    people.select{|p| p.user.nil?}
-  end
-
-  def includes_userless_people?
-    !userless_people.empty?
-  end
-
-  # Returns a list of projects that contain people that do not have users assigned to them
-  def self.with_userless_people
-    p=Project.all(:include=>:work_groups)
-    return p.select { |proj| proj.includes_userless_people? }
   end
 
   def studies
@@ -207,11 +195,19 @@ class Project < ActiveRecord::Base
   end
 
   def can_be_edited_by?(user)
-    user == nil ? false : (user.is_admin? || (self.has_member?(user) && (user.can_edit_projects? || user.is_project_manager?(self))))
+    user ? (user.is_admin? || user.is_project_administrator?(self)) : false
   end
 
-  def can_be_administered_by?(user)
-    user == nil ? false : (user.is_admin? || user.is_project_manager?(self))
+  #whether this project can be administered by the given user, or current user if none is specified
+  def can_be_administered_by?(user=User.current_user)
+    user ? (user.is_admin? || user.is_project_administrator?(self)) : false
+  end
+
+  #all projects that can be administered by the given user, or ghe current user if none is specified
+  def self.all_can_be_administered(user=User.current_user)
+    Project.all.select do |project|
+      project.can_be_administered_by?(user)
+    end
   end
 
   def can_delete?(user=User.current_user)
@@ -241,6 +237,10 @@ class Project < ActiveRecord::Base
     child.avatar=nil
     child.lineage_ancestor=self
     child
+  end
+
+  def self.can_create?
+    User.admin_logged_in? || User.programme_administrator_logged_in?
   end
 
    #should put below at the bottom in order to override methods for hierarchies,

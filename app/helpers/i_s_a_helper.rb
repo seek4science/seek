@@ -3,13 +3,13 @@ require 'dot_generator'
 
 module ISAHelper
 
-  include DotGenerator
+  include Seek::DotGenerator
 
   FILL_COLOURS = {'Sop'=>"#7ac5cd", #cadetblue3
                   'Model'=>"#cdcd00", #yellow3
                   'DataFile'=>"#eec591", #burlywood2
-                  'Investigation'=>"#C7E9C0",
-                  'Study'=>"#91c98b",
+                  'Investigation'=>"#E6E600",
+                  'Study'=>"#B8E62E",
                   'Assay'=> {'EXP'=>"#64b466",'MODEL'=>"#92CD00"},
                   'Publication'=>"#84B5FD",
                   'Presentation' => "#8ee5ee", #cadetblue2
@@ -125,19 +125,15 @@ module ISAHelper
         if item.kind_of?(Assay)
           assay_class_title = item.assay_class.title
           assay_class_key = item.assay_class.key
-          name = truncate(assay_class_title + ': ' + item.title)
+          name = truncate("#{assay_class_title}: ".html_safe + h(item.title), :length => 120)
           item_info = link_to("<b>#{assay_class_title}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
           fave_color = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
         else
-          name = truncate(item_type.humanize + ': ' + item.title)
+          name = truncate("#{item_type.humanize}: ".html_safe + h(item.title), :length => 120)
           item_info = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
           fave_color = FILL_COLOURS[item_type] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
-        end
-        # give more space for title of isa elements
-        if item.is_isa?
-          name = truncate item.title
         end
       else
         name = 'Hidden item'

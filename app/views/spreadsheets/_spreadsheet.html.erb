@@ -7,9 +7,9 @@
 <% per_page = params[:page_rows].try(:to_i) || default_per_page %>
 
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
-  <% unless sheet.rows.empty? %>
-    <a index="<%= sheet_index + 1 -%>" class="sheet_tab curved_top with_smaller_shadow <%= "selected_tab" if workbook.sheets.first == sheet -%>"><%= h(sheet.name) -%></a>
-  <% end %>
+    <% unless sheet.rows.empty? %>
+        <a index="<%= sheet_index + 1 -%>" class="sheet_tab curved_top with_smaller_shadow <%= "selected_tab" if workbook.sheets.first == sheet -%>"><%= h(sheet.name) -%></a>
+    <% end %>
 <% end %>
 
 <div class="spreadsheet_container" onselectstart="return false;">
@@ -20,57 +20,57 @@
           <%
              wp_rows = generate_paginate_rows(sheet.rows, sheet_index, per_page)
           %>
-      <div style="display:none" class="sheet_container curved" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
-        <div class="corner_heading">&nbsp;</div>
-        <div class="col_headings <%= "odd_heading" if sheet.last_col % 2 == 0 -%>">
-          <div style="min-width:1000000px">
-            <div class="col_heading_spacer">&nbsp;</div>
-            <% sheet.columns.each_with_index do |col,c| -%>
-              <div style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>" class="col_heading <%= "odd_heading" if c % 2 == 0  -%>"><%= to_alpha(col.index) -%></div>
-            <% end -%>
-            <br style=" clear:both"/>
-          </div>
-        </div>
-
-        <div>
-          <div class="row_headings <%= "odd_heading" if sheet.last_row % 2 == 0 -%>" style="float:left">
-            <% wp_rows.each do |row| -%>
-                <% r = row.index  %>
-              <div <%= (sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%> class="row_heading <%= "odd_heading" if r % 2 == 1 -%>"><%= r -%></div>
-            <% end -%>
-            <div style="height: 20px">&nbsp;</div>
-          </div>
-          <div style="float: left" class="sheet" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
-            <table class="sheet" cellspacing="0" cellpadding="0">
-              <!--- Columns --->
-              <colgroup>
-                <% sheet.columns.each do |col| -%>
-                  <col style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil?  -%>">
+          <div style="display:none" class="sheet_container curved" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
+            <div class="corner_heading">&nbsp;</div>
+            <div class="col_headings <%= "odd_heading" if sheet.last_col % 2 == 0 -%>">
+              <div style="min-width:1000000px">
+                <div class="col_heading_spacer">&nbsp;</div>
+                <% sheet.columns.each_with_index do |col,c| -%>
+                    <div style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>" class="col_heading <%= "odd_heading" if c % 2 == 0  -%>"><%= to_alpha(col.index) -%></div>
                 <% end -%>
-              </colgroup>
+                <br style=" clear:both"/>
+              </div>
+            </div>
 
-              <!--- Rows --->
-              <% wp_rows.each do |row| -%>
-                <% r = row.index  %>
-                <% height =(sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%>
-                <tr <%= height -%>>
-                  <!--- Cells --->
-                  <% 1.upto(sheet.last_col) do |c| %>
-                    <% if sheet[r] && sheet[r][c] -%>
-                      <% cell = sheet[r][c] -%>
-                      <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= ("=" + cell.formula unless cell.formula.nil?) || "" -%>" class="cell <%= cell.style || ""-%>"><%= auto_link(h(cell.value),:html=>{:target=>"_blank"}) -%></td>
-                    <% else -%>
-                      <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" class="cell"></td>
+            <div>
+              <div class="row_headings <%= "odd_heading" if sheet.last_row % 2 == 0 -%>" style="float:left">
+                <% wp_rows.each do |row| -%>
+                    <% r = row.index  %>
+                    <div <%= (sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%> class="row_heading <%= "odd_heading" if r % 2 == 1 -%>"><%= r -%></div>
+                <% end -%>
+                <div style="height: 20px">&nbsp;</div>
+              </div>
+              <div class="sheet" id="<%= ("spreadsheet_" + sheet_index.to_s) -%>">
+                <table class="sheet" cellspacing="0" cellpadding="0">
+                  <!--- Columns --->
+                  <colgroup>
+                    <% sheet.columns.each do |col| -%>
+                        <col style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil?  -%>">
                     <% end -%>
-                  <% end -%>
-                </tr>
-              <% end -%>
+                  </colgroup>
 
-            </table>
+                  <!--- Rows --->
+                  <% wp_rows.each do |row| -%>
+                      <% r = row.index  %>
+                      <% height =(sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%>
+                      <tr <%= height -%>>
+                        <!--- Cells --->
+                        <% 1.upto(sheet.last_col) do |c| %>
+                            <% if sheet[r] && sheet[r][c] -%>
+                                <% cell = sheet[r][c] -%>
+                                <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= ("=" + cell.formula unless cell.formula.nil?) || "" -%>" class="cell <%= cell.style || ""-%>"><%= auto_link(h(cell.value),:html=>{:target=>"_blank"}) -%></td>
+                            <% else -%>
+                                <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" class="cell"></td>
+                            <% end -%>
+                        <% end -%>
+                      </tr>
+                  <% end -%>
+
+                </table>
+              </div>
+              <br style="clear:both"/>
+            </div>
           </div>
-          <br style="clear:both"/>
-        </div>
-      </div>
 
           <%= will_paginate(wp_rows,
                             :id => "paginate_sheet_#{sheet_index.to_s}",
@@ -78,36 +78,36 @@
                             :previous_label => "&#8593; Previous",
                             :next_label => "Next &#8595;") %>
 
-    <% end -%>
+      <% end -%>
   <% end -%>
 </div>
 <br/>
 
 <div id="rows_per_page" style="display:none">
-    Display <%= text_field_tag :per_page, per_page, :size => 4, :onkeypress => 'return onlyNumbers(event);' %> rows per page
-    <input type='button' value='Update' onclick='changeRowsPerPage()'/>
+  Display <%= text_field_tag :per_page, per_page, :size => 4, :onkeypress => 'return onlyNumbers(event);' %> rows per page
+  <input type='button' value='Update' onclick='changeRowsPerPage()'/>
 </div>
 
 <script type = "text/javascript">
-  var perPage = <%= default_per_page %>;
+    var perPage = <%= default_per_page %>;
 
-  <% if params[:page_rows] %>
-      perPage = <%= params[:page_rows] %>;
-  <% end %>
+    <% if params[:page_rows] %>
+    perPage = <%= params[:page_rows] %>;
+    <% end %>
 
-  window.onload=function(){
-  //"activate" the worksheet
-    activateSheet(<%= params[:sheet] || 1 %>);
-    displayAnnotation();
-    displayRowsPerPage();
-  }
+    window.onload=function(){
+        //"activate" the worksheet
+        activateSheet(<%= params[:sheet] || 1 %>);
+        displayAnnotation();
+        displayRowsPerPage();
+    }
 
-  function displayAnnotation(){
-      <% a = Annotation.find_by_id(params[:annotation_id]) %>
-      <% if a %>
+    function displayAnnotation(){
+        <% a = Annotation.find_by_id(params[:annotation_id]) %>
+        <% if a %>
         var ann = new annotation(<%= a.id -%>, '<%= a.attribute.name -%>', <%= a.annotatable.worksheet.sheet_number -%>, '<%= a.annotatable.cell_range -%>', '<%= h escape_javascript a.value.text -%>', '<%= time_ago_in_words(a.created_at) -%> ago')
         jumpToAnnotation(ann.id, ann.sheetNumber+1, ann.cellRange);
-      <% end %>
-  }
+        <% end %>
+    }
 </script>
       

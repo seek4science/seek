@@ -18,6 +18,8 @@
 //= require tagging
 //= require autocompleter_advanced
 //= require publication
+//= require investigation
+//= require study
 //= require top_menu
 //= require dropMenu
 //= require dynamic_menu
@@ -38,6 +40,7 @@
 //= require jquery-ui-drag-drop
 //= require bootstrap-tagsinput
 //= require bootstrap-typeahead-rails
+//= require bootstrap-multiselect
 //= require tags_input
 //= require objects_input
 //= require handlebars.runtime

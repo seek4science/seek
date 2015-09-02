@@ -5,9 +5,8 @@ class Institution < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
 
-  title_trimmer
-
   acts_as_yellow_pages
+  title_trimmer
 
   validates :title, :uniqueness=>true
   scope :default_order, order("title")
@@ -35,15 +34,15 @@ class Institution < ActiveRecord::Base
     projects.collect{|p| p.programme}.uniq
   end
 
-   def can_be_edited_by?(subject)
-    return false if subject.nil?
-    subject.is_admin? || (subject.can_edit_institutions? && self.people.include?(subject.person)) || self.is_managed_by?(subject)
+   def can_be_edited_by?(user)
+    return false if user.nil?
+    user.is_admin? || self.is_managed_by?(user)
    end
 
   #determines if this person is the member of a project for which the user passed is a project manager
   def is_managed_by? user
     match = self.projects.find do |p|
-      user.person.is_project_manager?(p)
+      user.person.is_project_administrator?(p)
     end
     !match.nil?
   end
@@ -55,6 +54,10 @@ class Institution < ActiveRecord::Base
 
   def can_delete?(user=User.current_user)
     user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
+  end
+
+  def self.can_create?
+    User.admin_or_project_administrator_logged_in?
   end
 
 end

@@ -38,6 +38,6 @@
 
 <script type="text/javascript">
     // recreate internal store of attributions..
-    var creators = <%= existing_creators.map { |c| {id: c.id, name: h(c.name), email: h(c.email) }}.to_json.html_safe -%>;
+    var creators = <%= existing_creators.map { |c| {id: c.id, name: h(c.name), email: h(c.email), projects:h(c.projects.collect{|p| p.title}.join(", ")) }}.to_json.html_safe -%>;
     updateCreatorSettings(); // ..and update the page to make existing attributions visible
 </script>

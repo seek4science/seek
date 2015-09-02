@@ -1,0 +1,35 @@
+
+
+<%= panel('Search the NCBI Ontology') do %>
+    <p>
+      Search below for the name of the organism. You can use its official name, or its common name or one of its synonyms.
+    </p>
+    <%= form_tag_with_callbacks(search_ajax_organisms_path,
+                                {:id => "search_organism", :before => "show_ajax_loader('search_results');", :remote => true}) do -%>
+
+        <%= hidden_field_tag :pagenum, 1 -%>
+
+        <div class="form-group">
+          <label>Search for</label>
+          <%= text_field_tag :search_term, @organism.title, :class => "form-control" %>
+        </div>
+
+        <%= submit_tag "Search", :disable_with => "Searching ...", :class => 'btn btn-primary' %>
+    <% end -%>
+
+    <div id="search_results">
+
+    </div>
+<% end %>
+
+<script type="text/javascript">
+    function add_concept(label, ont_acronym, conc_id) {
+        $j('#organism_title').val(label);
+        $j('#organism_ontology_id').val(ont_acronym);
+        $j('#organism_concept_uri').val(conc_id);
+        //jump to the details tab and highlight the fields
+        $j('.nav-tabs a[href="#details"]').tab('show');
+        new Effect.Highlight("organism_title");
+        new Effect.Highlight("organism_concept_uri");
+    }
+</script>

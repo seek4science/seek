@@ -64,7 +64,7 @@ class SendPeriodicEmailsJob < SeekJob
   def send_subscription_mails(logs)
     if Seek::Config.email_enabled
       # strip the logs down to those that are relevant
-      logs.select do |log|
+      logs.select! do |log|
         log.activity_loggable.try(:subscribable?)
       end
 
@@ -104,7 +104,7 @@ class SendPeriodicEmailsJob < SeekJob
 
   # returns an enumaration of the people subscribed to the items in the logs
   def people_subscribed_to_logged_items(logs)
-    items = logs.collect(&:activity_loggable).uniq
+    items = logs.collect(&:activity_loggable).uniq.compact
     items.collect do |item|
       Subscription.where(subscribable_type: item.class.name, subscribable_id: item.id).collect(&:person)
     end.flatten.compact.uniq

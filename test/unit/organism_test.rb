@@ -39,6 +39,17 @@ class OrganismTest < ActiveSupport::TestCase
     end
   end
 
+  test "can create" do
+    User.current_user=nil
+    refute Organism.can_create?
+
+    User.current_user = Factory(:person).user
+    refute Organism.can_create?
+
+    User.current_user = Factory(:project_administrator).user
+    assert Organism.can_create?
+  end
+
   test "can_view" do
     o=Factory(:organism)
     assert o.can_view?
@@ -82,15 +93,21 @@ class OrganismTest < ActiveSupport::TestCase
   end
   
   test "can_delete?" do
+    project_administrator = Factory(:project_administrator)
     admin = Factory(:admin)
     non_admin=Factory(:user)
     o=organisms(:yeast)
-    assert !o.can_delete?(admin)
+    refute o.can_delete?(admin)
+    refute o.can_delete?(project_administrator)
+    refute o.can_delete?(non_admin)
     o=organisms(:human)
     assert o.can_delete?(admin)
-    assert !o.can_delete?(non_admin)
+    assert o.can_delete?(project_administrator)
+    refute o.can_delete?(non_admin)
     o=organisms(:organism_linked_project_only)
-    assert !o.can_delete?(admin)
+    refute o.can_delete?(admin)
+    refute o.can_delete?(project_administrator)
+    refute o.can_delete?(non_admin)
   end
 
 

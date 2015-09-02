@@ -4,7 +4,7 @@ require 't2flow/dot'
 
 class WorkflowsController < ApplicationController
 
-  include IndexPager
+  include Seek::IndexPager
   include Seek::AssetsCommon
 
   before_filter :workflows_enabled?

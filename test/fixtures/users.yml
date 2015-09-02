@@ -1,7 +1,6 @@
 quentin:
   id: 1
   login: quentin
-  email: quentin@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 5.days.ago.to_s :db %>  
@@ -12,7 +11,6 @@ quentin:
 aaron:
   id: 2
   login: aaron
-  email: aaron@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>  
@@ -21,44 +19,11 @@ aaron:
   
 fred:  
   login: fred
-  email: fred@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a 
   person: fred
-  
-
-cant_edit:
-  id: 4
-  login: bob
-  email: fred@example.com
-  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
-  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
-  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  person_id: 11  
-
-can_edit:
-  id: 5
-  login: bob
-  email: fred@example.com
-  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
-  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
-  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  person_id: 12
-  
-
-#a user that is not activated and has no profile associated
-part_registered:
-  id: 6
-  login: part_registered
-  email: fred@example.com
-  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
-  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
-  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
 
 
 
@@ -66,7 +31,6 @@ part_registered:
 
 aaron_openid:
   login: aaron_openid
-  email: aaron@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>  
@@ -77,7 +41,6 @@ aaron_openid:
 owner_of_my_first_sop:
   person: person_for_owner_of_my_first_sop
   login: owner_of_my_first_sop_login
-  email: asset_owner@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -88,7 +51,6 @@ owner_of_my_first_sop:
 owner_of_fully_public_policy:
   person: person_for_owner_of_fully_public_policy
   login: owner_of_fully_public_policy_login
-  email: someone_elses_policy_owner@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -99,7 +61,6 @@ owner_of_fully_public_policy:
 owner_of_download_for_all_sysmo_users_policy:
   person: person_for_owner_of_download_for_all_sysmo_users_policy
   login: owner_of_download_for_all_sysmo_users_policy_login
-  email: all_registered_policy_owner@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -110,7 +71,6 @@ owner_of_download_for_all_sysmo_users_policy:
 owner_of_editing_for_all_sysmo_users_policy:
   person: person_for_owner_of_editing_for_all_sysmo_users_policy
   login: owner_of_editing_for_all_sysmo_users_policy_login
-  email: all_sysmo_policy_owner@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -121,7 +81,6 @@ owner_of_editing_for_all_sysmo_users_policy:
 owner_of_private_policy_using_custom_sharing:
   person: person_for_owner_of_private_policy_using_custom_sharing
   login: owner_of_private_policy_using_custom_sharing_login
-  email: owner_of_private_policy_using_custom_sharing@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -132,7 +91,6 @@ owner_of_private_policy_using_custom_sharing:
 owner_of_complex_permissions_policy:
   person: person_to_associate_with_sops_owning_users
   login: owner_of_complex_permissions_policy_login
-  email: owner_of_complex_policy@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -143,7 +101,6 @@ owner_of_complex_permissions_policy:
 owner_of_a_sop_with_complex_permissions:
   person: person_to_associate_with_sops_owning_users
   login: owner_of_a_sop_with_complex_permissions_login
-  email: complex_permission_owner@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -154,7 +111,6 @@ owner_of_a_sop_with_complex_permissions:
 registered_user_with_no_projects:
   person: person_not_associated_with_any_projects
   login: registered_user_with_no_projects_login
-  email: registered_user_with_no_projects@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -165,7 +121,6 @@ registered_user_with_no_projects:
 test_user_only_in_whitelist:
   person: person_for_test_user_only_in_whitelist
   login: test_user_only_in_whitelist_login
-  email: test_user_only_in_whitelist@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -176,7 +131,6 @@ test_user_only_in_whitelist:
 test_user_only_in_blacklist:
   person: person_for_test_user_only_in_blacklist
   login: test_user_only_in_blacklist_login
-  email: test_user_only_in_blacklist@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -187,7 +141,6 @@ test_user_only_in_blacklist:
 sysmo_user_in_blacklist:
   person: person_for_sysmo_user_in_blacklist
   login: sysmo_user_in_blacklist_login
-  email: sysmo_user_in_blacklist@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -198,7 +151,6 @@ sysmo_user_in_blacklist:
 sysmo_user_both_in_blacklist_and_whitelist:
   person: person_for_sysmo_user_both_in_blacklist_and_whitelist
   login: sysmo_user_both_in_blacklist_and_whitelist_login
-  email: sysmo_user_both_in_blacklist_and_whitelist@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -209,7 +161,6 @@ sysmo_user_both_in_blacklist_and_whitelist:
 sysmo_user_who_wants_to_access_different_things:
   person: person_for_sysmo_user_who_wants_to_access_different_things
   login: sysmo_user_who_wants_to_access_different_things_login
-  email: sysmo_user_who_wants_to_access_different_things@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -219,7 +170,6 @@ sysmo_user_who_wants_to_access_different_things:
 model_owner:
   person: person_for_model_owner
   login: model_owner
-  email: asset_owner@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -229,10 +179,7 @@ model_owner:
 datafile_owner:
   person: person_for_datafile_owner
   login: datafile_owner
-  email: asset_owner@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: nil
-
-

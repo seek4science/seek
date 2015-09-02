@@ -25,6 +25,10 @@
         <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
     <% end -%>
 
+    <%= render :partial => "assets/associate_investigation", :locals=>{:resource => @publication} -%>
+
+    <%= render :partial => "assets/associate_study", :locals=>{:resource => @publication} -%>
+
     <%= render :partial => "assays/associate_assays", :locals=>{:resource => @publication} -%>
 
     <%= render :partial => "assets/associate_data_file", :locals=>{:resource => @publication, :show_relationships => false} -%>

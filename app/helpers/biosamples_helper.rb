@@ -97,7 +97,7 @@ module BiosamplesHelper
     strain_info = 'Strain' + ": "+ strain.info + "(Seek ID=#{strain.id})"
 
     creators_list = creators.collect{|creator| creator}.join(", ").html_safe
-    sops_list = asset_version_links(specimen.sops).join(", ").html_safe
+    sops_list = asset_links(specimen.sops).join(", ").html_safe
     unless Seek::Config.is_virtualliver
       [strain_info,
        (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
@@ -115,6 +115,12 @@ module BiosamplesHelper
                                                                                                                         :with => "'specimen_ids=' + getSelectedSpecimens()",
                                                                                                                         :before=>"show_large_ajax_loader('existing_samples')") + ";show_existing_samples();"}),
            link_to(specimen.title, specimen_path(specimen.id)), text_or_not_specified(specimen.born_info), text_or_not_specified(specimen.culture_growth_type.try(:title)), text_or_not_specified(specimen.genotype_info),text_or_not_specified(specimen.phenotype_info),text_or_not_specified(creators_list), specimen.id, text_or_not_specified(sops_list), delete_icon, update_icon]
+    end
+  end
+
+  def asset_links assets
+    assets.select(&:can_view?).collect do |asset|
+      link_to(asset.title, polymorphic_path(asset))
     end
   end
 

@@ -111,7 +111,7 @@
 
     <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
 
-    <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
+    <%= render :partial => "assets/associate_publication", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
                                                                             :related_publications => @assay.publications} -%>
 <% end -%>
 

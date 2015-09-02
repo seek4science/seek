@@ -9,13 +9,13 @@
         <% unless @publication.pubmed_id.nil? %>
             <p>
               <strong>PubMed ID:</strong>
-              <%= link_to @publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}",{:target => "_blank"} %>
+              <%= link_to @publication.pubmed_id, @publication.pubmed_uri,{:target => "_blank"} %>
             </p>
         <% end %>
         <% unless @publication.doi.nil? %>
             <p>
               <strong>DOI:</strong>
-              <%= link_to @publication.doi, "http://dx.doi.org/#{@publication.doi}",{:target => "_blank"} %>
+              <%= link_to @publication.doi, @publication.doi_uri,{:target => "_blank"} %>
             </p>
         <% end %>
 
@@ -49,16 +49,12 @@
           <% end %>
         </p>
       </div>
-      <div class="col-md-6">
-        <%= render :partial => "assets/usage_info",:locals => { :resource => @publication , :versioned_resource=> @publication } -%>
-      </div>
     </div>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @publication, :current_item => @publication, :deep => true} %>
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @publication, :authors_title=>"Authors" } -%>
   </div>
 </div>
-
-<%= render :partial=>"general/isa_graph", :locals => {:root_item => @publication, :current_item => @publication, :deep => true} %>
 
 <%= render :partial=>"general/items_related_to",:object => @publication %>

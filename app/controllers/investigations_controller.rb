@@ -1,8 +1,9 @@
 class InvestigationsController < ApplicationController
 
-  include DotGenerator
-  include IndexPager
+  include Seek::DotGenerator
+  include Seek::IndexPager
   include Seek::DestroyHandling
+  include Seek::AssetsCommon
 
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_authorize_requested_item,:only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
@@ -38,14 +39,18 @@ class InvestigationsController < ApplicationController
       format.xml
       format.rdf { render :template=>'rdf/show' }
       format.ro do
-        ro_file = Seek::ResearchObjects::Generator.instance.generate(@investigation)
-        send_file(ro_file.path,
-                  type:Mime::Type.lookup_by_extension("ro").to_s,
-                  filename: "ro.zip")
-        headers["Content-Length"]=ro_file.size.to_s
+        ro_for_download
       end
 
     end
+  end
+
+  def ro_for_download
+    ro_file = Seek::ResearchObjects::Generator.instance.generate(@investigation)
+    send_file(ro_file.path,
+              type:Mime::Type.lookup_by_extension("ro").to_s,
+              filename: @investigation.research_object_filename)
+    headers["Content-Length"]=ro_file.size.to_s
   end
 
   def create
@@ -53,7 +58,8 @@ class InvestigationsController < ApplicationController
     @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
 
     if @investigation.save
-      update_scales @investigation
+      update_scales(@investigation)
+      update_relationships(@investigation, params)
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
@@ -108,7 +114,10 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.save
-        update_scales @investigation
+
+        update_scales(@investigation)
+        update_relationships(@investigation, params)
+
         flash[:notice] = "#{t('investigation')} was successfully updated."
         format.html { redirect_to(@investigation) }
         format.xml  { head :ok }

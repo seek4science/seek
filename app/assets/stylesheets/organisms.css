@@ -1,0 +1,16 @@
+th#organism-name {
+    min-width: 20em;
+}
+
+th#organism-synonyms {
+    width: auto;
+}
+
+th#organism-id {
+    width: 30em;
+}
+
+div#organism-search-results {
+    max-height: 30em;
+    overflow: auto;
+}

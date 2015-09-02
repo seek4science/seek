@@ -5,6 +5,7 @@
 <% end %>
 
 <div class="row">
+
   <div class="col-md-9">
     <%= render :partial=>"guide_box" -%>
 
@@ -15,7 +16,7 @@
     <%= render :partial=>"home_activity_notifications" -%>
   </div>
   <div class="col-md-3">
-    <%= render :partial=>"gadgets/announcements_gadget" %>
+    <%= render :partial=>"gadgets/announcements_gadget" if show_announcements? %>
 
     <% if Seek::Config.tagging_enabled %>
         <div id="sidebar_tag_cloud">

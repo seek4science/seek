@@ -2,8 +2,8 @@
 class PresentationsController < ApplicationController
 
 
-  include IndexPager
-  include DotGenerator
+  include Seek::IndexPager
+  include Seek::DotGenerator
 
   include Seek::AssetsCommon
 
@@ -32,86 +32,6 @@ class PresentationsController < ApplicationController
       flash[:error]=flash.now[:error]
       redirect_to @presentation
     end
-
-  end
-
-  # GET /presentations/new
-  # GET /presentations/new.xml
-  def new
-    @presentation=Presentation.new
-    @presentation.parent_name = params[:parent_name]
-    respond_to do |format|
-      if User.logged_in_and_member?
-        format.html # new.html.erb
-      else
-        flash[:error] = "You are not authorized to upload new Presentations. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html { redirect_to presentations_path }
-      end
-    end
-  end
-
-  # POST /presentations
-  # POST /presentations.xml
-  def create
-    if handle_upload_data
-      @presentation = Presentation.new(params[:presentation])
-
-      @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.projects
-
-      update_annotations(params[:tag_list], @presentation)
-      update_scales @presentation
-
-      assay_ids = params[:assay_ids] || []
-        if @presentation.save
-
-          create_content_blobs
-
-          update_relationships(@presentation,params)
-
-          if !@presentation.parent_name.blank?
-            render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@presentation, :parent_name=>@presentation.parent_name}
-          else
-            flash[:notice] =  "#{t('presentation')} was successfully uploaded and saved."
-            respond_to do |format|
-              format.html { redirect_to presentation_path(@presentation) }
-            end
-          end
-          Assay.find(assay_ids).each do |assay|
-            if assay.can_edit?
-              assay.relate(@presentation)
-            end
-          end
-        else
-          respond_to do |format|
-            format.html {
-              render :action => "new"
-            }
-          end
-        end
-    else
-      handle_upload_data_failure
-    end
-
-  end
-
-
-
-
-  # GET /presentations/1
-  # GET /presentations/1.xml
-  def show
-    # store timestamp of the previous last usage
-    @last_used_before_now = @presentation.last_used_at
-
-    @presentation.just_used
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml
-    end
-  end
-
-  def edit
 
   end
 

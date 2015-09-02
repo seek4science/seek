@@ -17,22 +17,20 @@
 
       <ul class="nav navbar-nav">
         <%= render :partial => "layouts/navbar/browse_menu" %>
-        <% if logged_in_and_registered? && current_user.person.can_create_new_items? -%>
-            <%= render :partial => "layouts/navbar/create_menu" %>
-        <% end %>
-        <%= render :partial => "layouts/navbar/help_menu" %>
+        <%= render :partial => "layouts/navbar/create_menu" if logged_in_and_registered? %>
+        <%= render :partial => "layouts/navbar/help_menu" if Seek::Config.documentation_enabled %>
         <!--TODO ET could check if member of Swain's group, then give option of Swain search -->
         <%= render :partial => "layouts/navbar/tools_menu" %>
       </ul>
 
-      <%= render :partial => 'layouts/navbar/search_bar' %>
+      <%= render :partial => 'layouts/navbar/search_bar' if Seek::Config.solr_enabled %>
 
       <ul class="nav navbar-nav navbar-right">
         <% if logged_in_and_registered? %>
             <%= render :partial => "layouts/navbar/user_menu" %>
         <% else %>
             <li><%= link_to 'Register', signup_path %></li>
-            <li><%= link_to 'Log in', new_session_path(:return_to => request.original_url) %></li>
+            <li><%= link_to 'Log in', login_path(:return_to => request.original_url) %></li>
         <% end %>
       </ul>
 

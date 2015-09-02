@@ -1,56 +1,40 @@
-<%= form_tag_with_callbacks(search_ajax_organisms_path,
-                            {:id=>"search_organism",:before=>"show_ajax_loader('search_results');", :remote => true}) do -%>
 
-    <%= hidden_field_tag :pagenum, 1 -%>
-
-    <div class="form-group">
-      <label>Search for</label>
-      <%= text_field_tag :search_term, search_term, :class=>"form-control" %>
-    </div>
-
-    <%= submit_tag "Search", :disable_with=>"Searching ...", :class => 'btn btn-primary' %>
-<% end -%>
 
 <% if !search_results.empty? -%>
-    <h3><%= link_to_with_callbacks image("arrow_left"),
-                                   {:url=>url_for(:action=>:search_ajax, :controller=>:organisms, :pagenum=>pagenum.to_i-1, :search_term=>search_term),
-                                    :before=>"show_ajax_loader('search_results');"},
+    <p><%= link_to_with_callbacks image("arrow_left"),
+                                   {:url => url_for(:action => :search_ajax, :controller => :organisms, :pagenum => pagenum.to_i-1, :search_term => search_term),
+                                    :before => "show_ajax_loader('search_results');"},
                                    {:remote => true} unless pagenum.to_i <= 1 -%>
       <%= "Page #{pagenum.to_s}  of #{pages.to_s}" -%>
       <%= link_to_with_callbacks image("arrow_right"),
-                                 {:url=>url_for(:action=>:search_ajax, :controller=>:organisms, :pagenum=>pagenum.to_i+1, :search_term=>search_term),
-                                  :before=>"show_ajax_loader('search_results');"},
+                                 {:url => url_for(:action => :search_ajax, :controller => :organisms, :pagenum => pagenum.to_i+1, :search_term => search_term),
+                                  :before => "show_ajax_loader('search_results');"},
                                  {:remote => true} unless pagenum.to_i >= pages.to_i -%>
-    </h3>
-    <table>
-      <tr>
-        <th>
-          Ontology label
-        </th>
-        <th>
-          Ontology acronym
-        </th>
-        <th>Concept synonmys</th>
-
-        <th>
-          Concept name (click to select)
-        </th>
-      </tr>
-      <% search_results.each do |result| %>
-          <tr>
-            <td>
-              <%= h(result[:ontology_name]) -%>
-            </td>
-            <td>
-              <%= result[:ontology_acronym] -%>
-            </td>
-            <td><%= h(result[:synonyms].join(", ")) %></td>
-            <td>
-              <%= link_to_function(h(result[:preferred_label]), "add_concept('#{result[:preferred_label]}','#{result[:ontology_acronym]}','#{result[:class_id]}');") -%>
-            </td>
-          </tr>
-      <% end %>
-    </table>
+    </p>
+    <div id="organism-search-results">
+      <table class="table">
+        <thead>
+        <tr>
+          <th id="organism-name">
+            Organism (click to select)
+          </th>
+          <th id="organism-synonyms">Synonyms</th>
+          <th id="organism-id">Taxonomy id</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% search_results.each do |result| %>
+            <tr>
+              <td>
+                <%= link_to_function(result[:preferred_label], "add_concept('#{result[:preferred_label]}','#{result[:ontology_acronym]}','#{result[:class_id]}');") -%>
+              </td>
+              <td><%= h(result[:synonyms].join(", ")) %></td>
+              <td><%= result[:class_id] %></td>
+            </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
 <% elsif !search_term.blank? %>
     <br/>
     <span class="none_text">No matches found for <b><%= h(search_term) -%></b></span>

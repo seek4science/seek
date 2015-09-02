@@ -1,15 +1,18 @@
 <%= javascript_include_tag "people" %>
 <%= f.error_messages %>
 
-<%= render :partial => 'contact_details_form', :locals => {:f => f} %>
+<%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
 
 <div class="form-group">
-  <label>Description about myself</label>
+  <label>Description</label>
   <%= f.text_area :description, :class=>"description form-control", :rows => 5 -%>
 </div>
 
+<%= render :partial => 'contact_details_form', :locals => {:f => f} %>
+
+
 <% if person -%>
-    <%= folding_panel("Knowledge and expertise") do %>
+    <%= panel("Knowledge and expertise") do %>
         <%= render :partial=>"people/discipline_select",:locals=>{:f=>f} %>
         <br/>
         <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>

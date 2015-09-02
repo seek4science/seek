@@ -22,8 +22,8 @@
               </div>
               <div class="col-sm-4 text-right">
                 <% if resource.versions.length > 1 %>
-                    <% if allow_model_comparison(resource, version) && version.version != displayed_resource.version-%>
-                        <%= button_link_to("Compare", 'show', compare_versions_model_path(resource, version: displayed_resource, other_version: version)) -%>
+                    <% if allow_model_comparison(displayed_resource, version) %>
+                        <%= button_link_to("Compare", 'show', compare_versions_model_path(resource, version: displayed_resource.version, other_version: version.version).html_safe) -%>
                     <% end %>
                 <% end %>
                 <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && resource.versions.length > 1 %>

@@ -1,8 +1,9 @@
 require 'test_helper'
 
 class ExperimentalConditionTest < ActiveSupport::TestCase
+
   fixtures :units, :sops, :measured_items, :users, :synonyms, :policies
-  include StudiedFactorsHelper
+  include SubstancesHelper
 
   test 'should not create experimental condition with the concentration of no substance' do
     User.with_current_user  users(:aaron) do

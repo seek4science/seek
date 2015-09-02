@@ -1,5 +1,4 @@
 module RelatedItemsHelper
-
   def prepare_resource_hash(resource_hash, authorization_already_done = false, limit = nil, show_empty_tabs = false)
     perform_authorization(resource_hash) unless authorization_already_done
     limit_items(resource_hash, limit) unless limit.nil?
@@ -36,7 +35,7 @@ module RelatedItemsHelper
   end
 
   def sort_items(resource_hash)
-    ordered_keys(resource_hash).map { |key| resource_hash[key].merge(:type => key) }.each do |resource_type|
+    ordered_keys(resource_hash).map { |key| resource_hash[key].merge(type: key) }.each do |resource_type|
       update_resource_type(resource_type)
     end
   end
@@ -50,8 +49,8 @@ module RelatedItemsHelper
     resource_type[:visible_resource_type] = internationalized_resource_name(resource_type[:type], !resource_type[:is_external])
     resource_type[:tab_title] = resource_type_tab_title(resource_type)
 
-    resource_type[:tab_id] = resource_type[:type].downcase.pluralize.html_safe
-    resource_type[:title_class] = resource_type[:is_external] ? "external_result" : ""
+    resource_type[:tab_id] = resource_type[:type].downcase.pluralize.gsub(' ', '-').html_safe
+    resource_type[:title_class] = resource_type[:is_external] ? 'external_result' : ''
     resource_type[:total_visible] = resource_type_total_visible_count(resource_type)
   end
 
@@ -60,14 +59,14 @@ module RelatedItemsHelper
   end
 
   def resource_type_tab_title(resource_type)
-    "#{resource_type[:visible_resource_type]} "+
-        "(#{(resource_type[:items].length+resource_type[:extra_count]).to_s}" +
-        ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : "") + ")"
+    "#{resource_type[:visible_resource_type]} "\
+        "(#{(resource_type[:items].length + resource_type[:extra_count])}" +
+      ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : '') + ')'
   end
 
   def ordered_keys(resource_hash)
     resource_hash.keys.sort_by do |asset|
-      ASSET_ORDER.index(asset) || (resource_hash[asset][:is_external] ? 10000 : 1000)
+      ASSET_ORDER.index(asset) || (resource_hash[asset][:is_external] ? 10_000 : 1000)
     end
   end
 
@@ -77,4 +76,97 @@ module RelatedItemsHelper
     end
   end
 
+  # Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
+  def get_related_resources(resource, limit = nil)
+    return resource_hash_lazy_load(resource) if Seek::Config.tabs_lazy_load_enabled
+    name = resource.class.name.split('::')[0]
+
+    related = collect_related_items(resource)
+
+    # Authorize
+    authorize_related_items(related)
+
+    order_related_items(related)
+
+    # Limit items viewable, and put the excess count in extra_count
+    related.each_key do |key|
+      if limit && related[key][:items].size > limit && %w(Project Investigation Study Assay Person Specimen Sample Run Workflow Sweep).include?(resource.class.name)
+        related[key][:extra_count] = related[key][:items].size - limit
+        related[key][:items] = related[key][:items][0...limit]
+      end
+    end
+
+    related
+  end
+
+  def relatable_types
+    { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
+      'Study' => {}, 'Assay' => {}, 'Specimen' => {}, 'Sample' => {}, 'DataFile' => {}, 'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
+      'Workflow' => {}, 'TavernaPlayer::Run' => {}, 'Sweep' => {}, 'Strain' => {}
+    }
+  end
+
+  def related_items_method(resource, item_type)
+    if item_type == 'TavernaPlayer::Run'
+      method_name = 'runs'
+    else
+      method_name = item_type.underscore.pluralize
+    end
+
+    if resource.respond_to? "related_#{method_name}"
+      resource.send "related_#{method_name}"
+    elsif resource.respond_to? "related_#{method_name.singularize}"
+      Array(resource.send("related_#{method_name.singularize}"))
+    elsif resource.respond_to? method_name
+        resource.send method_name
+    elsif resource.respond_to? method_name.singularize
+      Array(resource.send(method_name.singularize))
+    else
+      []
+    end
+  end
+
+  def order_related_items(related)
+    related.each do |_key, res|
+      res[:items].sort! { |item, item2| item2.updated_at <=> item.updated_at }
+    end
+  end
+
+  def authorize_related_items(related)
+    related.each do |key, res|
+      res[:items].uniq!
+      res[:items].compact!
+      unless res[:items].empty?
+        total_count = res[:items].size
+        if key == 'Project' || key == 'Institution'
+          res[:hidden_count] = 0
+        elsif key == 'Person'
+          if Seek::Config.is_virtualliver && User.current_user.nil?
+            res[:items] = []
+            res[:hidden_count] = total_count
+          else
+            res[:hidden_count] = 0
+          end
+        else
+          total = res[:items]
+          res[:items] = key.constantize.authorize_asset_collection res[:items], 'view', User.current_user
+          res[:hidden_count] = total_count - res[:items].size
+          res[:hidden_items] = total - res[:items]
+        end
+      end
+    end
+  end
+
+  def collect_related_items(resource)
+    related = relatable_types.delete_if { |k, _v| k == resource.class.name }
+
+    related.each_key do |type|
+      related[type][:items] = related_items_method(resource, type)
+      related[type][:hidden_items] = []
+      related[type][:hidden_count] = 0
+      related[type][:extra_count] = 0
+    end
+
+    related
+  end
 end

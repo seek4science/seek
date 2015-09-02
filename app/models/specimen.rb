@@ -2,11 +2,11 @@ require 'grouped_pagination'
 require 'subscribable'
 
 class Specimen < ActiveRecord::Base
-  include Subscribable
+  include Seek::Subscribable
 
   include Seek::Rdf::RdfGeneration
   include Seek::Biosamples::PhenoTypesAndGenoTypes
-  include BackgroundReindexing
+  include Seek::Search::BackgroundReindexing
   include Seek::Stats::ActivityCounts
 
   acts_as_scalable if Seek::Config.is_virtualliver
@@ -32,8 +32,9 @@ class Specimen < ActiveRecord::Base
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
-  has_many :sops,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
-  has_many :sop_masters,:class_name => "SopSpecimen",:dependent => :destroy
+  has_many :sop_versions,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
+  has_many :sop_specimens,:dependent => :destroy
+  has_many :sops, :through => :sop_specimens
 
   alias_attribute :description, :comments
 
@@ -80,25 +81,21 @@ class Specimen < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
 
-  def build_sop_masters sop_ids
+  def build_sops sop_ids
     # map string ids to int ids for ["1","2"].include? 1 == false
     sop_ids = sop_ids.map &:to_i
     sop_ids.each do |sop_id|
       if sop = Sop.find(sop_id)
-        self.sop_masters.build :sop_id => sop.id, :sop_version => sop.version unless sop_masters.map(&:sop_id).include?(sop_id)
+        self.sop_specimens.build :sop_id => sop.id, :sop_version => sop.version unless sops.map(&:id).include?(sop_id)
       end
     end
-    self.sop_masters = self.sop_masters.select { |s| sop_ids.include? s.sop_id }
+    self.sop_specimens = self.sop_specimens.select { |s| sop_ids.include? s.sop_id }
   end
 
 
 
   def related_people
     creators
-  end
-
-  def related_sops
-    sop_masters.collect(&:sop)
   end
   
 
@@ -148,7 +145,7 @@ class Specimen < ActiveRecord::Base
   def clone_with_associations
     new_object= self.dup
     new_object.policy = self.policy.deep_copy
-    new_object.sop_masters = self.try(:sop_masters)
+    new_object.sops = self.try(:sops)
     new_object.creators = self.try(:creators)
     new_object.project_ids = self.project_ids
     new_object.genotypes = self.genotypes.map &:clone

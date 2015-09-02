@@ -7,20 +7,16 @@ class Event < ActiveRecord::Base
   has_and_belongs_to_many :publications , :uniq => true
   has_and_belongs_to_many :presentations , :uniq => true
 
-  include Subscribable
+  include Seek::Subscribable
+  include Seek::Search::CommonFields
+  include Seek::Search::BackgroundReindexing
 
   scope :default_order, order("start_date DESC")
 
-  include Seek::Search::CommonFields
-
-  searchable(:ignore_attribute_changes_of=>[:updated_at]) do
+  searchable(ignore_attribute_changes_of: [:updated_at], auto_index:false) do
     text :address,:city,:country,:url
   end if Seek::Config.solr_enabled
-
-  def self.sort events
-    events.sort_by &:start_date
-  end
-
+  
   acts_as_authorized
   acts_as_uniquely_identifiable
   acts_as_favouritable
@@ -50,8 +46,6 @@ class Event < ActiveRecord::Base
 
   #validates_is_url_string :url
   validates_format_of :url, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
-
-  alias_attribute :data_file_masters, :data_files
 
   def show_contributor_avatars?
     false

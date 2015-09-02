@@ -6,6 +6,8 @@ class Presentation < ActiveRecord::Base
 
    attr_accessor :orig_data_file_id
 
+   #searchable must come before acts_as_asset call - although empty is seems this is needed to avoid the autoindex
+   #even though in Seek::ActsAsAsset::Search it is already set to false!
    acts_as_asset
 
    scope :default_order, order("title")

@@ -4,30 +4,17 @@
 
 <div class="show_basic">
   <%= form_for @person, :url => {:action => 'administer_update', :id => @person.id} do |f| -%>
-      <% if admin_logged_in? || project_manager_logged_in? -%>
+      <% if admin_logged_in? || project_administrator_logged_in? -%>
           
-          <% unless (project_manager_logged_in? && @person.me?) %>
+          <% unless (project_administrator_logged_in? && @person.me?) %>
             <h2 style="margin-top: 1.5em;">Choose <%= t('project') %> / Institution&nbsp;&nbsp;&nbsp;</h2>
             <%= render :partial => "work_groups", :locals=> {:person => @person} -%>
           <% end %>
 
           <p style="line-height: 1.8;">
-            <% if admin_logged_in? || (project_manager_logged_in? && !(@person.projects & current_user.try(:person).try(:projects).to_a).empty?) %>
 
-                <label for="can_edit_projects" style="font-weight: normal;">
-                  <%= f.check_box :can_edit_projects -%>Allow this person to edit <b><%= t('project').pluralize %></b>
-                  they work in.
-                </label>
-                <br/>
-                <label for="can_edit_institutions" style="font-weight: normal;">
-                  <%= f.check_box :can_edit_institutions -%>Allow this person to edit <b>Institutions</b>
-                  they work in.
-                </label>
-                <br/>
-            <% end -%>
-
-            <% if admin_logged_in? %>
-                    <h2>Administer defined roles</h2>
+            <% if admin_logged_in? || @person.is_project_administered_by?(User.current_user) %>
+                    <h2>Administrative roles</h2>
                     <p class="box_infotext">
                       These are the roles that can be assigned to a person by an Adminster, to allow this person to carry out specific tasks within that role. Each role is
                       associated with, and only applies to, a particular <%= t('Project').downcase.html_safe %>.
@@ -36,10 +23,9 @@
                     </p>
                     <br/>
                     <%
-                       roles = [["pal", "a PAL"], ["project_manager", "a Project Manager"], ["asset_manager", "an Asset Manager"], ["gatekeeper", "a Gatekeeper"]]
-                       roles.each do |role|
+                       admin_defined_project_roles_hash.each do |role,role_title|
                     %>
-                        <%= render :partial => "roles_selector", :locals => {:role => role[0], :role_title => role[1]} -%>
+                        <%= render :partial => "roles_selector", :locals => {:role => role, :role_title => role_title} -%>
                         <%= tag("hr")  %>
                     <%
                        end

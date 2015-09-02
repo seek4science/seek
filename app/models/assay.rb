@@ -12,6 +12,14 @@ class Assay < ActiveRecord::Base
     study.try(:projects) || []
   end
 
+  #needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
+  searchable(:auto_index=>false) do
+    text :organism_terms, :assay_type_label,:technology_type_label
+
+    text :strains do
+      strains.compact.map{|s| s.title}
+    end
+  end if Seek::Config.solr_enabled
   acts_as_isa
 
   acts_as_annotatable :name_field=>:title
@@ -38,11 +46,6 @@ class Assay < ActiveRecord::Base
   has_many :sops, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :models, :through => :assay_assets, :source => :asset, :source_type => "Model"
 
-  has_many :relationships,
-           :class_name => 'Relationship',
-           :as => :subject,
-           :dependent => :destroy
-
   has_one :investigation,:through=>:study
 
   validates_presence_of :assay_type_uri
@@ -59,15 +62,6 @@ class Assay < ActiveRecord::Base
   attr_reader :pending_related_assets
 
   alias_attribute :contributor, :owner
-
-  searchable(:auto_index=>false) do
-    text :organism_terms, :assay_type_label,:technology_type_label
-
-    text :strains do
-      strains.compact.map{|s| s.title}
-    end
-  end if Seek::Config.solr_enabled
-
 
   def project_ids
     projects.map(&:id)
@@ -138,10 +132,6 @@ class Assay < ActiveRecord::Base
 
   def assets
     data_files + models + sops
-  end
-  
-  def publications
-    self.relationships.select {|a| a.other_object_type == "Publication"}.collect { |a| a.other_object }
   end
 
   def avatar_key

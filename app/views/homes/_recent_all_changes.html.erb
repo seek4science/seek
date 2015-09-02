@@ -1,9 +1,0 @@
-<% item_hash=recent_changes_hash -%>
-<h2>New or recently changed items across <%= Seek::Config.project_name %></h2>
-
-<div id="recent_changes_tabs">
-  <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :resource_hash => item_hash,
-    :narrow_view => true,
-    :tabs_id=>"recent_changed_tabber",
-    :authorization_already_done => true } -%>
-</div>

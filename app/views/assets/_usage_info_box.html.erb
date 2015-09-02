@@ -1,0 +1,33 @@
+<%
+   show_downloads = resource.respond_to?(:contains_downloadable_items?) && resource.contains_downloadable_items?
+%>
+
+<%= panel("Activity") do %>
+
+    <p id="usage_count">
+      <strong>Views:</strong> <%= resource.view_count -%>
+      <% if show_downloads -%>
+          <span style="width: 2em">&nbsp;</span>
+          <strong>Downloads:</strong> <%= resource.download_count -%>
+      <% end -%>
+    </p>
+
+    <div id="usage_timestamps">
+
+      <p>
+        <strong>Created</strong>: <%= date_as_string(resource.created_at, true) -%>
+      </p>
+      <% unless resource.created_at == resource.updated_at -%>
+          <p>
+            <strong>Last updated</strong>: <%= date_as_string(resource.updated_at, true) -%>
+          </p>
+      <% end -%>
+
+      <% unless @last_used_before_now.blank? -%>
+          <p>
+          <strong>Last used</strong>: <%= date_as_string(@last_used_before_now, true) -%>
+          </p>
+      <% end -%>
+    </div>
+
+<% end %>

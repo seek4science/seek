@@ -4,8 +4,8 @@ require 'bives'
 class ModelsController < ApplicationController
 
   include WhiteListHelper
-  include IndexPager
-  include DotGenerator
+  include Seek::IndexPager
+  include Seek::DotGenerator
   include Seek::AssetsCommon
 
   before_filter :models_enabled?
@@ -45,8 +45,7 @@ class ModelsController < ApplicationController
   end
 
   def select_blobs_for_comparison
-    blobs = @display_model.sbml_content_blobs
-    blobs = [:file_id, :other_file_id].collect do |param_key|
+    blobs = {:other_file_id=>@other_version.sbml_content_blobs,:file_id=>@display_model.sbml_content_blobs}.collect do |param_key,blobs|
       params[param_key] ? blobs.find { |blob| blob.id.to_s == params[param_key] } : blobs.first
     end
     @blob1=blobs[0]
@@ -185,75 +184,6 @@ class ModelsController < ApplicationController
       page.visual_effect :appear, "model_format_info"
     end
   end
-
-
-  # GET /models/1
-  # GET /models/1.xml
-  def show
-    # store timestamp of the previous last usage
-    @last_used_before_now = @model.last_used_at
-
-
-    @model.just_used
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml
-      format.rdf { render :template => 'rdf/show' }
-    end
-  end
-
-  # GET /models/new
-  # GET /models/new.xml
-  def new
-    @model=Model.new
-    @content_blob= ContentBlob.new
-    respond_to do |format|
-      if User.logged_in_and_member?
-        format.html # new.html.erb
-      else
-        flash[:error] = "You are not authorized to upload new Models. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html { redirect_to models_path }
-      end
-    end
-  end
-
-  # GET /models/1/edit
-  def edit
-
-  end
-
-  # POST /models
-  # POST /models.xml
-  def create
-    if handle_upload_data
-      @model = Model.new(params[:model])
-
-      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
-
-      update_annotations(params[:tag_list], @model)
-      update_scales @model
-      build_model_image @model, params[:model_image]
-
-      respond_to do |format|
-        if @model.save
-          create_content_blobs
-          update_relationships(@model, params)
-          update_assay_assets(@model, params[:assay_ids])
-          flash[:notice] = "#{t('model')} was successfully uploaded and saved."
-          format.html { redirect_to model_path(@model) }
-        else
-          format.html {
-            render :action => "new"
-          }
-        end
-      end
-    else
-      handle_upload_data_failure
-    end
-
-  end
-
 
   # PUT /models/1
   # PUT /models/1.xml

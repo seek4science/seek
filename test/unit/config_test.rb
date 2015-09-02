@@ -2,9 +2,6 @@ require 'test_helper'
 
 class ConfigTest < ActiveSupport::TestCase
   # Features enabled
-  test 'public seek enabled' do
-    assert_equal true, Seek::Config.public_seek_enabled
-  end
 
   test 'events enabled' do
     assert_equal true, Seek::Config.events_enabled
@@ -389,5 +386,13 @@ end
     assert_equal 'fish', Organism.bioportal_api_key
     Seek::Config.bioportal_api_key = 'frog'
     assert_equal 'frog', Organism.bioportal_api_key
+  end
+
+  test 'imprint_enabled' do
+    assert_equal false, Seek::Config.imprint_enabled
+  end
+
+  test 'imprint_description' do
+    assert_equal 'Here is imprint example', Seek::Config.imprint_description
   end
 end

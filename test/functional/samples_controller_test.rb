@@ -32,7 +32,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "show xml validates with schema" do
-    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:roles_mask=> Person.mask_for_admin)),
+    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:admin)),
                 :title => "test sample",
                 :policy => policies(:policy_for_viewable_data_file))
     get :show, :id => s, :format =>"xml"
@@ -121,18 +121,19 @@ class SamplesControllerTest < ActionController::TestCase
       end
     end
     s = assigns(:sample)
+    s.reload
     assert_redirected_to sample_path(s)
     assert_equal "test",s.title
     assert_not_nil s.specimen
     assert_equal "Donor number",s.specimen.title
-    assert_equal [sop],s.specimen.sops.collect{|sop| sop.parent}
+    assert_equal [sop],s.specimen.sops
     assert s.specimen.creators.include?(creator)
     assert_equal 1,s.specimen.creators.count
     assert_equal "jesus jones",s.specimen.other_creators
     assert_equal 2,s.projects.count
     assert s.projects.include?(proj1)
     assert s.projects.include?(proj2)
-    assert_equal s.projects,s.specimen.projects
+    assert_equal s.projects.sort_by(&:id),s.specimen.projects.sort_by(&:id)
   end
 
   test "should create sample and specimen with default strain if missing" do
@@ -468,10 +469,10 @@ test "should show organism and strain information of a sample if there is organi
     assert_redirected_to sample_path(s)
     assert_nil flash[:error]
     assert_equal "test", s.title
-    assert_equal 1, s.sop_masters.length
-    assert_equal sop, s.sop_masters.first
     assert_equal 1, s.sops.length
-    assert_equal sop_version_2, s.sops.first
+    assert_equal sop, s.sops.first
+    assert_equal 1, s.sop_versions.length
+    assert_equal sop_version_2, s.sop_versions.first
   end
 
   test "filter by specimen using nested routes" do

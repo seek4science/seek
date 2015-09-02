@@ -96,24 +96,11 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  #Checks that the edit option is availabe to the user
-  #with can_edit_project set and he belongs to that project
-  def test_user_can_edit
-    login_as(:can_edit)
-    get :show, :id=>institutions(:two)
-    assert_select "a",:text=>/Edit Institution/,:count=>1
 
-    get :edit, :id=>institutions(:two)
-    assert_response :success
-
-    put :update, :id=>institutions(:two).id,:institution=>{}
-    assert_redirected_to institution_path(assigns(:institution))
-  end
-
-    def test_user_project_manager
-    pm = Factory(:project_manager)
-    institution = pm.institutions.first
-    login_as(pm.user)
+  def test_project_administrator_can_edit
+    project_admin = Factory(:project_administrator)
+    institution = project_admin.institutions.first
+    login_as(project_admin.user)
     get :show, :id=>institution
     assert_response :success
     assert_select "a",:text=>/Edit Institution/,:count=>1
@@ -126,7 +113,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_user_cant_edit_project
-    login_as(:cant_edit)
+    login_as(Factory(:user))
     get :show, :id=>institutions(:two)
     assert_select "a",:text=>/Edit Institution/,:count=>0
 
@@ -148,8 +135,8 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
 
-  test 'project manager can create institution' do
-    login_as(Factory(:project_manager).user)
+  test 'project administrator can create institution' do
+    login_as(Factory(:project_administrator).user)
     get :new
     assert_response :success
 
@@ -174,17 +161,17 @@ class InstitutionsControllerTest < ActionController::TestCase
     end
   end
 
-  test "project manager can edit institution, which belongs to project they are project manager, not necessary the institution they are in" do
-    project_manager = Factory(:project_manager)
-    assert_equal 1, project_manager.projects.count
-    project  = project_manager.projects.first
+  test "project administrator can edit institution, which belongs to project they are project administrator, not necessary the institution they are in" do
+    project_admin = Factory(:project_administrator)
+    assert_equal 1, project_admin.projects.count
+    project  = project_admin.projects.first
     institution = Factory(:institution)
     project.institutions << institution
 
     assert project.institutions.include?institution
-    assert !(project_manager.institutions.include?institution)
+    assert !(project_admin.institutions.include?institution)
 
-    login_as(project_manager.user)
+    login_as(project_admin.user)
     get :edit, :id => institution
     assert_response :success
 
@@ -194,14 +181,13 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal 'test', institution.title
   end
 
-  test "project manager has a 'New Institution' link in the institution index" do
-    login_as(Factory(:project_manager).user)
+  test "project administrator has a 'New Institution' link in the institution index" do
+    login_as(Factory(:project_administrator).user)
     get :index
-
-    assert_select "a[href=?]", new_institution_path(), :count => 1
+    assert_select "div#content a[href=?]", new_institution_path(), :count => 1
   end
 
-  test "non-project manager  doesnt has a 'New Institution' link in the institution index" do
+  test "non-project administrator  doesnt has a 'New Institution' link in the institution index" do
     get :index
     assert_select "#content a[href=?]", new_institution_path(), :count => 0
   end
