@@ -125,7 +125,7 @@ group :test do
   gem 'test_after_commit'
   gem "sqlite3"
   gem "ruby-prof"
-  #gem "webmock"
+  gem "webmock"
   gem "minitest","~> 4.0"
   gem 'minitest-reporters'
   gem 'coveralls', require: false
