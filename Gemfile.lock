@@ -860,3 +860,4 @@ DEPENDENCIES
   will_paginate (~> 3.0.4)
   yaml_db
   yui-compressor
+  zenodo-client!
