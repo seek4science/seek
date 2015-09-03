@@ -180,5 +180,8 @@ class InstitutionTest < ActiveSupport::TestCase
 
     User.current_user = Factory(:project_administrator).user
     assert Institution.can_create?
+
+    User.current_user = Factory(:programme_administrator).user
+    assert Institution.can_create?
   end
 end

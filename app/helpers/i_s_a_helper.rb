@@ -125,12 +125,12 @@ module ISAHelper
         if item.kind_of?(Assay)
           assay_class_title = item.assay_class.title
           assay_class_key = item.assay_class.key
-          name = truncate(assay_class_title + ': ' + item.title, :length => 120)
+          name = truncate("#{assay_class_title}: ".html_safe + h(item.title), :length => 120)
           item_info = link_to("<b>#{assay_class_title}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
           fave_color = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
         else
-          name = truncate(item_type.humanize + ': ' + item.title, :length => 120)
+          name = truncate("#{item_type.humanize}: ".html_safe + h(item.title), :length => 120)
           item_info = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
           fave_color = FILL_COLOURS[item_type] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type] || BORDER_COLOURS.default

@@ -211,11 +211,11 @@ class PublicationNode < SeekNode
     publication = item
     dot = ""
     pub_node = SeekNode.node_for(publication)
-    assays_and_studies = publication.assays | publication.studies
-    if assays_and_studies.empty?
+    isa = publication.assays | publication.studies | publication.investigations
+    if isa.empty?
       dot << pub_node.to_s
     end
-    (assays_and_studies | publication.data_files | publication.models).each do |asset|
+    (isa | publication.data_files | publication.models).each do |asset|
       dot << SeekNode.node_for(asset).to_s
     end
     return dot

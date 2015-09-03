@@ -125,6 +125,7 @@ max_extractable_spreadsheet_size:
 show_announcements:
 imprint_enabled:
 imprint_description:
+allow_user_programme_creation:
 zenodo_publishing_enabled:
 zenodo_api_url:
 zenodo_oauth_url:

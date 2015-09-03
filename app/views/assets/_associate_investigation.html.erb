@@ -1,0 +1,114 @@
+<% resource_type = text_for_resource(resource)
+   all_investigations=authorised_investigations.sort_by(&:title)
+   project_investigations=authorised_investigations(current_user.person.projects).sort_by &:title
+   select_truncate_length=120
+%>
+<%= folding_panel('Investigations', resource.investigations.blank?, :body_options => {:id => 'investigations_fold_content'},
+                  :help_text => "Here you attribute this #{resource_type} to any Investigations registered in SEEK, or vice versa.") do %>
+    <div class="row">
+      <div class="col-md-8">
+        <p class="pale_text">
+          The following Investigations are related to this <%= resource_type -%>:
+        </p>
+
+        <div id="investigation_to_list" class="box_editing_inner" style="line-height: 1.5">
+          <span class="none_text" id="investigations">Loading...</span>
+        </div>
+
+        <div class="association_step">
+          <div class="form-group">
+            <%= select_tag :possible_investigations,
+                           options_for_select([["Select Investigation ...",0]]|project_investigations.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}),
+                           {:class => 'form-control',:onchange=>"addSelectedInvestigation();"+remote_function(
+                                   :method=>:get,
+                                   :url=>preview_investigations_path(:element=>"investigation_preview"),
+                                   :with=>"'id='+this.value",
+                                   :before=>"show_ajax_loader('investigation_preview')"
+                           )+";return(false);"
+                           } -%>
+          </div>
+
+          <%= select_tag :investigation_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+
+
+          <%= check_box_tag :include_other_project_investigations, nil, false, {:onchange=>"toggle_investigation_list();",:style=>"margin-top:0.5em;"} -%> Associate Investigations from other projects?
+        </div>
+      </div>
+      <div class="col-md-4">
+        <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'investigation'} %>
+      </div>
+    </div>
+<% end %>
+<script type="text/javascript">
+    updateInvestigations();
+    toggle_investigation_list();
+
+    function toggle_investigation_list() {
+        var checked = $('include_other_project_investigations').checked;
+        var selection_box = $('possible_investigations');
+        var option;
+
+        selection_box.options.length=0;
+
+        if (checked) {
+            <% ([["Select Investigation...",0]]|all_investigations.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(details[0]) -%>';
+            option.value = '<%= details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+            <% end -%>
+        }
+        else {
+            <% ([["Select Investigation ...",0]]|project_investigations.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(details[0]) -%>';
+            option.value = '<%= details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+            <% end -%>
+        }
+        //selection_box.onchange();
+    }
+
+    <% resource.investigations.each do |investigation| -%>
+    <% if investigation.can_view?-%>
+    investigation_id = '<%= investigation.id -%>';
+    investigation_title = '<%= escape_javascript(investigation.title) -%>';
+    addInvestigation(investigation_title,investigation_id);
+    <% end -%>
+    <% end -%>
+
+    <% if params[:investigation_ids] %>
+    <% params[:investigation_ids].each do |id| -%>
+    <% investigation = Investigation.find(id) %>
+    <% if investigation.can_view? -%>
+    investigation_id = '<%= investigation.id -%>';
+    investigation_title = '<%= escape_javascript(investigation.title) -%>';
+    addInvestigation(investigation_title, investigation_id);
+    <% end -%>
+    <% end -%>
+    <% end -%>
+
+
+    function check_show_add_investigation() {
+        i=$('possible_investigations').selectedIndex;
+        selected_id=$('possible_investigations').options[i].value;
+        if (selected_id=='0') {
+            $('add_investigation_link').hide();
+        }
+        else {
+            $('add_investigation_link').show();
+        }
+    }
+
+    updateInvestigations();
+</script>

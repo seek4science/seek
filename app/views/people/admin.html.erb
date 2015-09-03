@@ -4,7 +4,7 @@
 
 <div class="show_basic">
   <%= form_for @person, :url => {:action => 'administer_update', :id => @person.id} do |f| -%>
-      <% if admin_logged_in? || project_administrator_logged_in? -%>
+      <% if @person.can_be_administered_by?(User.current_user) -%>
           
           <% unless (project_administrator_logged_in? && @person.me?) %>
             <h2 style="margin-top: 1.5em;">Choose <%= t('project') %> / Institution&nbsp;&nbsp;&nbsp;</h2>

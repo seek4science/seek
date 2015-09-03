@@ -6,7 +6,7 @@
   </div>
 
   <div class="panel-body">
-    <% unless Rails.env == "development" -%>
+    <% unless Rails.env.development? -%>
         <div class="tags_smaller">
           <div class="hTagcloud">
 

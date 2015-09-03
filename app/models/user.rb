@@ -62,6 +62,10 @@ class User < ActiveRecord::Base
 
   cattr_accessor :current_user
 
+  delegate :is_admin?, to: :person, allow_nil: true
+  delegate :is_project_administrator?, to: :person, allow_nil: true
+  delegate :is_admin_or_project_administrator?, to: :person, allow_nil: true
+
   # related_#{type} are resources that user created
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:events,:presentations,:publications]
   RELATED_RESOURCE_TYPES.each do |type|
@@ -209,19 +213,6 @@ class User < ActiveRecord::Base
   
   def using_openid?
     !openid.blank?
-  end
-
-  def is_admin?
-    person && person.is_admin?
-  end
-
-  def is_project_administrator? project
-    person && person.is_project_administrator?(project)
-  end
-
-
-  def is_admin_or_project_administrator?
-    person && person.is_admin_or_project_administrator?
   end
 
   def can_manage_types?

@@ -30,7 +30,7 @@
                                                                      :possibilities=>(Project.without_programme | @programme.projects) } %>
 <% end %>
 
-<% if admin_logged_in? || @programme.can_manage? %>
+<% if @programme.can_manage? %>
 
 <%= panel("#{t('programme')} Administrators") do %>
         <%= programme_administrators_input_box(@programme) %>
