@@ -174,6 +174,6 @@ Teaspoon.configure do |config|
     #coverage.functions = nil
     #coverage.branches = nil
     #coverage.lines = nil
-    WebMock.disable!
+    WebMock.allow_net_connect!
   end
 end
