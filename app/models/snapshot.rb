@@ -15,6 +15,8 @@ class Snapshot < ActiveRecord::Base
   alias_attribute :parent_id, :resource_id
   alias_attribute :version, :snapshot_number
 
+  delegate :md5sum, :sha1sum, to: :content_blob
+
   validates :snapshot_number, :uniqueness => { :scope =>  [:resource_type, :resource_id] }
 
   acts_as_doi_mintable

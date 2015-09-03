@@ -28,7 +28,16 @@
       <% end %>
     </p>
 
-    <p><strong>Created at:</strong> <%= @snapshot.created_at %></p>
+    <p><strong>Created at:</strong> <%= date_as_string(@snapshot.created_at,true) %></p>
+
+    <%= panel('Checksum') do %>
+    <p>
+      <strong>MD5:</strong> <%= @snapshot.md5sum %>
+    </p>
+    <p>
+      <strong>SHA1:</strong> <%= @snapshot.sha1sum %>
+    </p>
+    <% end %>
 
     <%= panel('Contents') do %>
         <% @snapshot.metadata['studies'].each do |resource| %>

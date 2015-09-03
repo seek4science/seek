@@ -18,6 +18,16 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal 2, s2.snapshot_number
   end
 
+  test 'sha1 and md5 checksum' do
+    s1 = @investigation.create_snapshot
+    refute_nil s1.md5sum
+    refute_nil s1.sha1sum
+    assert_equal s1.content_blob.md5sum,s1.md5sum
+    assert_equal s1.content_blob.sha1sum,s1.sha1sum
+
+    assert_match /\b([a-f0-9]{40})\b/,s1.sha1sum
+  end
+
   test 'can access snapshot metadata' do
     snapshot = @investigation.create_snapshot
 
