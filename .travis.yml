@@ -11,7 +11,17 @@ sudo: false
 cache: bundler
 
 env:
-  - DISPLAY=":99.0" DB_TYPE=mysql
+  - SUITE="rake test:units" DB_TYPE=mysql
+  - SUITE="rake test:functionals" DB_TYPE=mysql
+  - SUITE="rake test:integration" DB_TYPE=mysql
+  - SUITE="rspec spec" DB_TYPE=mysql
+  - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
+  - SUITE="rake teaspoon" DB_TYPE=mysql DISPLAY=":99.0"
+  - SUITE="rake test:units" DB_TYPE=postgres
+  - SUITE="rake test:functionals" DB_TYPE=postgres
+  - SUITE="rake test:integration" DB_TYPE=postgres
+  - SUITE="rspec spec" DB_TYPE=postgres
+  - SUITE="rake teaspoon" DB_TYPE=postgres DISPLAY=":99.0"
 
 before_script:
   - sh -e /etc/init.d/xvfb start
@@ -23,4 +33,4 @@ before_script:
   - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then RAILS_ENV=production bundle exec rake db:schema:load; fi"
 
   
-script: bundle exec rake teaspoon
+script: bundle exec $SUITE
