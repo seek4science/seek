@@ -11,9 +11,10 @@ sudo: false
 cache: bundler
 
 env:
-  - DISPLAY=":99.0"
+  - DISPLAY=":99.0" DB_TYPE=mysql
 
 before_script:
   - sh -e /etc/init.d/xvfb start
+  - cp test/database.travis.$DB_TYPE.yml config/database.yml
   
 script: bundle exec rake teaspoon
