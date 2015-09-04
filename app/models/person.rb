@@ -71,7 +71,7 @@ class Person < ActiveRecord::Base
 
   #not registered profiles that match this email
   def self.not_registered_with_matching_email email
-    self.not_registered.select{|person| person.email == email}
+    self.not_registered.where('UPPER(email) = ?',email.upcase)
   end
 
   def queue_update_auth_table

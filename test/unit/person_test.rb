@@ -928,4 +928,21 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal Programme.all.sort,admin.administered_programmes
   end
 
+  test "not_registered_with_matching_email" do
+    3.times do
+      Factory :person
+    end
+    p1 = Factory :brand_new_person, :email=>"FISH-sOup@email.com"
+    p2 = Factory :person, :email=>"FISH-registered@email.com"
+
+    refute p1.registered?
+    assert p2.registered?
+
+    assert_includes Person.not_registered_with_matching_email("FISH-sOup@email.com"),p1
+    assert_includes Person.not_registered_with_matching_email("fish-soup@email.com"),p1
+
+    refute_includes Person.not_registered_with_matching_email("FISH-registered@email.com"),p2
+    assert_empty Person.not_registered_with_matching_email("fffffxxxx11z@email.com")
+  end
+
 end
