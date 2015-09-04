@@ -861,6 +861,3 @@ DEPENDENCIES
   yaml_db
   yui-compressor
   zenodo-client!
-
-BUNDLED WITH
-   1.10.6

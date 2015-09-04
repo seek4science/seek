@@ -238,6 +238,11 @@ SEEK::Application.routes.draw do
     end
     member do
       get :new_object_based_on_existing_one
+      post :check_related_items
+      post :check_gatekeeper_required
+      post :publish_related_items
+      post :publish
+      get :published
     end
   end
 
@@ -303,7 +308,6 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     member do
-      post :check_related_items
       get :matching_models
       get :data
       post :check_gatekeeper_required
@@ -311,6 +315,7 @@ SEEK::Application.routes.draw do
       get :explore
       get :download
       get :published
+      post :check_related_items
       post :publish_related_items
       post :publish
       post :request_resource

@@ -2,7 +2,7 @@ module Seek
   module Publishing
     module PublishingCommon
       def self.included(base)
-        base.before_filter :set_asset, :only=>[:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
+        base.before_filter :set_asset, :only=>[:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish, :published]
         base.before_filter :set_assets, :only=>[:batch_publishing_preview]
         base.before_filter :set_items_for_publishing, :only => [:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
         base.before_filter :publish_auth, :only=>[:batch_publishing_preview,:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish,:waiting_approval_assets]
@@ -17,7 +17,7 @@ module Seek
       end
 
       def check_related_items
-        contain_related_items = !@items_for_publishing.collect(&:assays).flatten.empty?
+        contain_related_items = @items_for_publishing.collect(&:contains_publishable_items?).flatten.any?
         if contain_related_items
           respond_to do |format|
             format.html { render :template => "assets/publishing/publish_related_items_confirm"}
@@ -28,15 +28,17 @@ module Seek
       end
 
       def publish_related_items
+        #@items_for_publishing = @items_for_publishing.select{|item| item.can_publish?}
         respond_to do |format|
           format.html { render :template => "assets/publishing/publish_related_items"}
         end
       end
 
       def check_gatekeeper_required
+        @items_for_publishing = @items_for_publishing.select{|item| item.can_publish?}
         @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
         @items_for_immediate_publishing = @items_for_publishing - @waiting_for_publish_items
-        if !@waiting_for_publish_items.empty?
+        unless @waiting_for_publish_items.empty?
           respond_to do |format|
             format.html { render :template => "assets/publishing/waiting_approval_list" }
           end
@@ -52,6 +54,7 @@ module Seek
       end
 
       def publish
+        @items_for_publishing = @items_for_publishing.select{|item| item.can_publish?}
         @published_items = @items_for_publishing.select(&:publish!)
         @notified_items = (@items_for_publishing - @published_items).select{|item| !item.can_manage?}
         @waiting_for_publish_items = @items_for_publishing - @published_items - @notified_items
@@ -101,7 +104,7 @@ module Seek
             return false
           end
         else
-          if !@asset.can_publish?
+          unless @asset.can_publish? || @asset.contains_publishable_items?
             error("You are not permitted to perform this action", "is invalid")
             return false
           end
@@ -132,7 +135,7 @@ module Seek
       end
 
       def set_items_for_publishing
-        @items_for_publishing = resolve_publish_params(params[:publish]).select(&:can_publish?)
+        @items_for_publishing = resolve_publish_params(params[:publish]).select{|item| item.can_publish? || item.contains_publishable_items?}
       end
 
       def log_publishing
@@ -214,18 +217,19 @@ module Seek
 
       #returns an enumeration of assets for publishing based upon the parameters passed
       def resolve_publish_params param
-        assets = []
-        assets << @asset if @asset
-
-        return assets if param.nil?
-
-        param.keys.each do |asset_class|
-          param[asset_class].keys.each do |id|
-            assets << eval("#{asset_class}.find_by_id(#{id})")
+        if param.blank?
+          [@asset].compact
+        else
+          assets = []
+          param.keys.each do |asset_class|
+            param[asset_class].keys.each do |id|
+              assets << eval("#{asset_class}.find_by_id(#{id})")
+            end
           end
+          assets.compact.uniq
         end
-        assets.compact.uniq
       end
+
     end
   end
 end

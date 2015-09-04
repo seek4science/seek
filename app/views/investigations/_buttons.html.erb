@@ -23,6 +23,9 @@
     <% elsif item.can_edit?-%>
         <li><%= image_tag_for_key('edit', edit_investigation_path(item), "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
     <% end -%>
+    <% if (item.can_publish? || item.contains_publishable_items?) && item.can_manage? -%>
+        <li><%= image_tag_for_key('publish', polymorphic_path(item, :action => :check_related_items), nil, {:method=>:post}, "Publish #{t('investigation')}") -%></li>
+    <% end -%>
 
     <%= delete_icon item,current_user -%>
 <% end -%>
