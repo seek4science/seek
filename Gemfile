@@ -132,4 +132,5 @@ group :test do
   gem 'rspec-rails'
   gem 'sunspot_matchers'
   gem 'pg'
+  gem 'selenium-webdriver'
 end
