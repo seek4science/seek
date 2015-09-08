@@ -181,6 +181,7 @@ SEEK::Application.routes.draw do
       get :asset_report
       get :admin
       get :admin_members
+      get :admin_member_roles
       post :update_members
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
@@ -444,7 +445,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
-    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
 
   resources :content_blobs, :except => [:show, :index, :update, :create, :destroy] do

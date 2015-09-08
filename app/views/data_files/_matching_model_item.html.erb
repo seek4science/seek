@@ -9,7 +9,7 @@
         <%= list_item_title model -%>
         <span class="score">
                 - matched by <b><%= matching_model.search_terms.join(", ") -%></b>
-          <%= "( #{matching_model.score} )" if Rails.env=="development" %>
+          <%= "( #{matching_model.score} )" if Rails.env.development? %>
 
             </span>
 

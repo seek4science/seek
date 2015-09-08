@@ -31,7 +31,8 @@ module Seek::OrcidSupport
   end
 
   def orcid_uri
-    if uri = orcid
+    unless orcid.blank?
+      uri = orcid
       uri = "http://orcid.org/#{uri}" unless uri.start_with?('http://orcid.org/')
       uri
     end

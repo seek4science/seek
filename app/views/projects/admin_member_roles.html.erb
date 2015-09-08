@@ -1,0 +1,24 @@
+<%= render :partial => "general/page_title",:locals=>{:title=>"Administering the #{t('project').downcase} roles for #{link_to(h(@project.title),@project)}".html_safe} %>
+
+<div class="row">
+  <div class="col-md-8">
+  <%= form_tag(update_members_project_path(@project)) do %>
+      <%= panel('Administrative Roles') do %>
+          <%= label_tag("#{t('project')} Administrators") %>
+          <%= project_administrators_input_box(@project) %>
+
+          <%= label_tag("#{t('project')} Gatekeepers") %>
+          <%= project_gatekeepers_input_box(@project) %>
+
+          <%= label_tag("#{t('project')} Asset Managers") %>
+          <%= project_asset_managers_input_box(@project) %>
+
+          <% if admin_logged_in? %>
+              <%= label_tag("#{t('project')} PALs") %>
+              <%= project_pals_input_box(@project) %>
+          <% end %>
+      <% end %>
+      <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
+  <% end %>
+  </div>
+</div>

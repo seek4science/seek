@@ -55,6 +55,51 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes assigns(:project).ancestors,parent
   end
 
+  test "create project with programme" do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    prog = person.programmes.first
+    refute_nil prog
+
+    assert_difference("Project.count") do
+      post :create, :project => {:title=>"proj with prog",:programme_id=>prog.id}
+    end
+
+    project = assigns(:project)
+    assert_equal [prog],project.programmes
+
+
+  end
+
+  test "create project with blank programme" do
+    login_as(Factory(:admin))
+
+    assert_difference("Project.count") do
+      post :create, :project => {:title=>"proj with prog",:programme_id=>""}
+    end
+
+    project = assigns(:project)
+    assert_redirected_to project
+    refute_nil project
+    assert_empty project.programmes
+
+
+  end
+
+  test "cannot create project with programme if not administrator of programme" do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    prog = Factory(:programme)
+    refute_nil prog
+
+    assert_difference("Project.count") do
+      post :create, :project => {:title=>"proj with prog",:programme_id=>prog.id}
+    end
+
+    project = assigns(:project)
+    assert_empty project.programmes
+  end
+
   test "programme administrator can view new" do
     login_as(Factory(:programme_administrator))
     get :new
@@ -996,6 +1041,80 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes new_person.institutions,new_institution
     assert_includes new_person2.institutions,new_institution
     assert_includes project.work_groups,wg
+
+  end
+
+  test "project administrator can access admin member roles" do
+    pa = Factory(:project_administrator)
+    login_as(pa)
+    project = pa.projects.first
+    get :admin_member_roles, :id=>project
+    assert_response :success
+  end
+
+  test "admin can access admin member roles" do
+    pa = Factory(:admin)
+    login_as(pa)
+    project = pa.projects.first
+    get :admin_member_roles, :id=>project
+    assert_response :success
+  end
+
+  test "normal user cannot access admin member roles" do
+    pa = Factory(:person)
+    login_as(pa)
+    project = pa.projects.first
+    get :admin_member_roles, :id=>project
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+
+  test "update member admin roles" do
+    pa = Factory(:programme_administrator)
+    login_as(pa)
+    project = pa.projects.first
+    person = Factory(:person)
+    person.add_to_project_and_institution(project,Factory(:institution))
+    person.save!
+
+    person2 = Factory(:person)
+    person2.add_to_project_and_institution(project,Factory(:institution))
+    person2.save!
+    person2.reload
+
+    assert_equal [pa,person,person2].sort, project.people.sort
+    refute person.is_gatekeeper?(project)
+    refute person.is_asset_manager?(project)
+    refute person.is_project_administrator?(project)
+    refute person.is_pal?(project)
+    refute person2.is_gatekeeper?(project)
+    refute person2.is_asset_manager?(project)
+    refute person2.is_project_administrator?(project)
+    refute person2.is_pal?(project)
+
+    ids = "#{person.id},#{person2.id}"
+
+    post :update_members,
+         :id=>project,:project=>{:project_administrator_ids=>ids,:gatekeeper_ids=>ids,:asset_manager_ids=>ids,:pal_ids=>ids}
+
+    assert_redirected_to project_path(project)
+    assert_nil flash[:error]
+    refute_nil flash[:notice]
+
+    person.reload
+    person2.reload
+    assert_equal [pa,person,person2].sort, project.people.sort
+
+    assert person.is_gatekeeper?(project)
+    assert person.is_asset_manager?(project)
+    assert person.is_project_administrator?(project)
+    assert person.is_pal?(project)
+    assert person2.is_gatekeeper?(project)
+    assert person2.is_asset_manager?(project)
+    assert person2.is_project_administrator?(project)
+    assert person2.is_pal?(project)
+
 
   end
 

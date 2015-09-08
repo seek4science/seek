@@ -45,6 +45,7 @@ class AdminsController < ApplicationController
     Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.forum_enabled = string_to_boolean params[:forum_enabled]
     Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
+    Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
@@ -212,7 +213,7 @@ class AdminsController < ApplicationController
 
   def restart_delayed_job
     error = nil
-    if Rails.env != 'test'
+    if !Rails.env.test?
       begin
         Seek::Workers.restart
         wait_for_delayed_job_to_start
@@ -513,7 +514,7 @@ class AdminsController < ApplicationController
   end
 
   def execute_command(command)
-    return nil if Rails.env == 'test'
+    return nil if Rails.env.test?
     begin
       cl = Cocaine::CommandLine.new(command)
       cl.run

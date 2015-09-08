@@ -72,6 +72,10 @@ class PersonTest < ActiveSupport::TestCase
     assert project_administrator.can_be_administered_by?(admin),"you can also ask by passing a person"
     assert person_in_same_project.can_be_administered_by?(project_administrator),"you can also ask by passing a person"
 
+    #can be administered by a programme administrator
+    pa = Factory :programme_administrator
+    assert Factory(:person).can_be_administered_by?(pa.user)
+
 
   end
 
@@ -151,6 +155,11 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal "http://orcid.org/0000-0002-1694-233X",p.orcid_uri
 
       p.orcid=nil
+      p.save!
+      p.reload
+      assert_nil p.orcid_uri
+
+      p.orcid=""
       p.save!
       p.reload
       assert_nil p.orcid_uri
@@ -903,7 +912,37 @@ class PersonTest < ActiveSupport::TestCase
     refute Person.can_create?
 
     User.current_user=Factory(:programme_administrator).user
-    refute Person.can_create?
+    assert Person.can_create?
 
   end
+
+  test "administered programmes" do
+    pa = Factory(:programme_administrator)
+    admin = Factory(:admin)
+    other_prog = Factory(:programme)
+    progs = pa.programmes
+    assert_equal progs.sort,pa.administered_programmes.sort
+    refute_includes pa.administered_programmes,other_prog
+
+    assert_empty Factory(:person).administered_programmes
+    assert_equal Programme.all.sort,admin.administered_programmes
+  end
+
+  test "not_registered_with_matching_email" do
+    3.times do
+      Factory :person
+    end
+    p1 = Factory :brand_new_person, :email=>"FISH-sOup@email.com"
+    p2 = Factory :person, :email=>"FISH-registered@email.com"
+
+    refute p1.registered?
+    assert p2.registered?
+
+    assert_includes Person.not_registered_with_matching_email("FISH-sOup@email.com"),p1
+    assert_includes Person.not_registered_with_matching_email("fish-soup@email.com"),p1
+
+    refute_includes Person.not_registered_with_matching_email("FISH-registered@email.com"),p2
+    assert_empty Person.not_registered_with_matching_email("fffffxxxx11z@email.com")
+  end
+
 end

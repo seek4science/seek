@@ -71,7 +71,7 @@ class Person < ActiveRecord::Base
 
   #not registered profiles that match this email
   def self.not_registered_with_matching_email email
-    self.not_registered.select{|person| person.email == email}
+    self.not_registered.where('UPPER(email) = ?',email.upcase)
   end
 
   def queue_update_auth_table
@@ -298,13 +298,11 @@ class Person < ActiveRecord::Base
   #can be edited by:
   #(admin or project managers of this person) and (this person does not have a user or not the other admin)
   #themself
-  def can_be_edited_by?(subject)
-    return false unless subject
-    subject = subject.user if subject.is_a?(Person)
-    subject == self.user || subject.is_admin? || self.is_project_administered_by?(subject)
+  def can_be_edited_by?(user)
+    return false unless user
+    user = user.user if user.is_a?(Person)
+    user == self.user || user.is_admin? || self.is_project_administered_by?(user)
   end
-
-
 
   def me?
     user && user==User.current_user
@@ -314,7 +312,8 @@ class Person < ActiveRecord::Base
   def can_be_administered_by?(user)
     person = user.try(:person)
     return false unless user && person
-    user.is_admin? || (person.is_project_administrator_of_any_project? && (self.is_admin? || self!=person))
+    is_proj_or_prog_admin = person.is_project_administrator_of_any_project? || person.is_programme_administrator_of_any_programme?
+    user.is_admin? || (is_proj_or_prog_admin && (self.is_admin? || self!=person))
   end
 
   def can_view? user = User.current_user
@@ -444,7 +443,9 @@ class Person < ActiveRecord::Base
   end
 
   def self.can_create?
-    User.admin_or_project_administrator_logged_in? || (User.logged_in? && !User.current_user.registration_complete?)
+    User.admin_or_project_administrator_logged_in? ||
+        User.programme_administrator_logged_in? ||
+        (User.logged_in? && !User.current_user.registration_complete?)
   end
 
   include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled

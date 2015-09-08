@@ -1,0 +1,10 @@
+<%
+
+    include_blank = admin_logged_in? ? "No associated #{t('programme')}" : nil
+%>
+<p>
+<%= f.label "Associated #{t('programme')}" %>
+<%=
+    f.collection_select :programme_id,User.current_user.person.administered_programmes, :id, :title, include_blank:include_blank,:class => "form-control"
+%>
+</p>

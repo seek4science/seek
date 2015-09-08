@@ -20,6 +20,7 @@ env:
   - SUITE="rake test:functionals" DB_TYPE=postgres
   - SUITE="rake test:integration" DB_TYPE=postgres
   - SUITE="rspec spec" DB_TYPE=postgres
+  - SUITE="rake test:units" DB_TYPE=sqlite3
 
 before_script:
   - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test;' -U postgres; fi"
