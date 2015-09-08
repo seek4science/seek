@@ -1,9 +1,9 @@
 var cy;
 var default_node_width = 215;
-var default_node_height = 40;
-var default_font_size = 11;
+var default_node_height = 50;
+var default_font_size = 16;
 var default_color = '#323232';
-var default_text_max_width = 220;
+var default_text_max_width = 160;
 
 jQuery.noConflict();
 var $j = jQuery;
@@ -45,7 +45,7 @@ function drawGraph(elements, current_element_id){
                 'target-arrow-color': 'data(faveColor)',
                 'content': 'data(name)',
                 'color': '#323232',
-                'font-size': (default_font_size-2)
+                'font-size': (default_font_size)
             }),
 
         elements: elements,
@@ -108,15 +108,14 @@ function animateNode(node){
     });
 
     node.animate({
-        css: { 'width':default_node_width+65, 'height':default_node_height+15 }
+        css: { 'width':default_node_width+35, 'height':default_node_height+15 }
     }, {
         duration: 300
     });
 
     node.css({
-        'font-size': 12,
-        'font-weight': 'bolder',
-        'text-max-width': default_text_max_width+40
+        'font-size': default_font_size,
+        'text-max-width': default_text_max_width+15
     });
 
     if (node.data().name !== 'Hidden item'){
