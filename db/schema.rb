@@ -359,7 +359,7 @@ ActiveRecord::Schema.define(:version => 20150728133757) do
   add_index "data_files_projects", ["project_id"], :name => "index_data_files_projects_on_project_id"
 
   create_table "db_files", :force => true do |t|
-    t.binary "data"
+    t.binary "data", :limit => 2147483647
   end
 
   create_table "delayed_jobs", :force => true do |t|
