@@ -45,7 +45,7 @@
       <% if allow_skip %>
           <%= submit_tag "Skip", :onclick => "this.form.action='check_gatekeeper_required'", :class => 'btn btn-default' -%>
       <% end %>
-      <%= link_to "Cancel", polymorphic_path(resource) -%>
+      <%= link_to "Cancel", :back -%>
   <% end %>
 </div>
 
