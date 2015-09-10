@@ -2,7 +2,7 @@
     <%= @snapshot.title -%>
     <small>(snapshot <%= @snapshot.snapshot_number -%>)</small>
 <% end %>
-<%= render :partial => "general/page_title", :locals => { :title => title, :buttons_partial => 'snapshots/buttons' } %>
+<%= render :partial => "general/page_title", :locals => {:title => title, :buttons_partial => 'snapshots/buttons'} %>
 
 
 <div class="row">
@@ -28,24 +28,30 @@
       <% end %>
     </p>
 
-    <p><strong>Created at:</strong> <%= date_as_string(@snapshot.created_at,true) %></p>
-
-    <%= panel('Checksum') do %>
-    <p>
-      <strong>MD5:</strong> <%= @snapshot.md5sum %>
-    </p>
-    <p>
-      <strong>SHA1:</strong> <%= @snapshot.sha1sum %>
-    </p>
-    <% end %>
+    <p><strong>Created at:</strong> <%= date_as_string(@snapshot.created_at, true) %></p>
 
     <%= panel('Contents') do %>
         <% @snapshot.metadata['studies'].each do |resource| %>
-            <%= render :partial => 'tree', locals: { resource: resource } %>
+            <%= render :partial => 'tree', locals: {resource: resource} %>
         <% end %>
     <% end %>
+
+    <%= panel('Fingerprints') do %>
+        <p style="font-style: italic">
+          These checksums allow you to check a Snapshot you have downloaded hasn't been modified. For details on how to use these please visit
+          <%= link_to "this guide","http://seek4science.github.io/seek/investigation_checksum.html",:target=>"blank" %>
+        </p>
+        <p>
+          <strong>MD5:</strong> <%= @snapshot.md5sum %>
+        </p>
+
+        <p>
+          <strong>SHA1:</strong> <%= @snapshot.sha1sum %>
+        </p>
+    <% end %>
+
   </div>
   <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"snapshots/snapshots",:locals => { :snapshots => @snapshot.resource.snapshots, :selected => @snapshot } %>
+    <%= render :partial => "snapshots/snapshots", :locals => {:snapshots => @snapshot.resource.snapshots, :selected => @snapshot} %>
   </div>
 </div>
