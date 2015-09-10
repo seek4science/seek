@@ -194,6 +194,19 @@ namespace :seek_dev do
     end
   end
 
+  #quick way of setting up logins when setting up for, say a workshop
+  #creates logins with the provided password, based on first initial-lastname
+  #all lower case. John Smith would become jsmith It also activates them
+  #it does this for all people without logins
+  task :generate_logins, [:pwd] => :environment do |t,args|
+    password = args.pwd
+    Person.not_registered.each do |person|
+      login = "#{person.first_name[0]}#{person.last_name}".downcase
+      person.create_user login: login, password: password, password_confirmation: password
+      person.user.activate
+    end
+  end
+
   task :add_people_from_spreadsheet, [:path] => :environment do |t, args|
     path = args.path
     file = open(path)
