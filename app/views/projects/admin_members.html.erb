@@ -3,7 +3,7 @@
 <%= render :partial => "general/page_title",:locals=>{:title=>"Administering the #{t('project').downcase} members of #{link_to(h(@project.title),@project)}".html_safe} %>
 
 <div class="row">
-  <div class="col-md-6 col-md-push-6">
+
     <%= panel('Add members', :id => "add_member") do %>
         <p>
           Select the institution, and type the names of the people from that institution that need adding for this <%= t('project').downcase %></strong>
@@ -16,8 +16,7 @@
           <%= button_link_to('Add', 'new', 'javascript:add_selected_people()') -%>
         </p>
     <% end %>
-  </div>
-  <div class="col-md-6 col-md-pull-6">
+
     <%= panel('Current members', :id => "admin_members") do %>
       <div id="project_institutions">
         <% @project.work_groups.sort { |a, b| a.institution.title <=> b.institution.title }.each do |work_group| %>
@@ -51,6 +50,6 @@
           </div>
           <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
       <% end -%>
-    <% end %>
-  </div>
+  <% end %>
+
 </div>
