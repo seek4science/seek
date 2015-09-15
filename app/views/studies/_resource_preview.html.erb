@@ -1,0 +1,11 @@
+<%= list_item_title resource %>
+
+<%= list_item_attribute "ID", resource.id %>
+
+<%= list_item_authorized_list([resource.investigation], t('investigation').pluralize, true, 50, true)%>
+
+<%= list_item_authorized_list(resource.assays, t('assay').pluralize, true, 50, true)%>
+
+<%= list_item_attribute "Contributor", resource.contributor.try(:person).try(:name), resource.contributor %>
+
+<%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true} %>

@@ -13,6 +13,7 @@
 
         <% if item.try(:can_be_administered_by?, current_user) -%>
             <li><%= image_tag_for_key "group_edit", admin_members_project_path(item), "Administer", nil, "Administer #{t('project')} members" -%></li>
+            <li><%= image_tag_for_key "group_edit", admin_member_roles_project_path(item), "Administer", nil, "Administer #{t('project')} members roles" -%></li>
         <% end -%>
         <% if admin_logged_in? -%>
             <%= delete_icon(item,current_user) %>

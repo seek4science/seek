@@ -326,3 +326,10 @@ function disableMouseWheel(){
         }
     }
 }
+
+function decodeHTMLForElements(elements){
+    for( var i=0; i<elements.length; i++){
+        elements[i].data.name = decodeHTML(elements[i].data.name);
+        elements[i].data.item_info = decodeHTML(elements[i].data.item_info);
+    }
+}

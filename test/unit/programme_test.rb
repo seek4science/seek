@@ -24,6 +24,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute p2.valid?
     p2.title = 'sdfsdfsdf'
     assert p2.valid?
+    assert p2.valid?
   end
 
   test 'factory' do
@@ -146,13 +147,50 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'can create' do
-    User.current_user = nil
-    refute Programme.can_create?
+    with_config_value :allow_user_programme_creation,true do
+      User.current_user = nil
+      refute Programme.can_create?
 
-    User.current_user = Factory(:brand_new_person).user
-    refute Programme.can_create?
+      User.current_user = Factory(:brand_new_person).user
+      refute Programme.can_create?
 
-    User.current_user = Factory(:person).user
-    assert Programme.can_create?
+      User.current_user = Factory(:person).user
+      assert Programme.can_create?
+
+      User.current_user = Factory(:admin).user
+      assert Programme.can_create?
+    end
+
+    with_config_value :allow_user_programme_creation,false do
+      User.current_user = nil
+      refute Programme.can_create?
+
+      User.current_user = Factory(:brand_new_person).user
+      refute Programme.can_create?
+
+      User.current_user = Factory(:person).user
+      refute Programme.can_create?
+
+      User.current_user = Factory(:admin).user
+      assert Programme.can_create?
+    end
+
+    with_config_value :programmes_enabled, false do
+      User.current_user = nil
+      refute Programme.can_create?
+
+      User.current_user = Factory(:brand_new_person).user
+      refute Programme.can_create?
+
+      User.current_user = Factory(:person).user
+      refute Programme.can_create?
+
+      User.current_user = Factory(:admin).user
+      refute Programme.can_create?
+    end
+  end
+
+  test 'allow user programme creation' do
+
   end
 end

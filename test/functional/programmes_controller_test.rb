@@ -322,6 +322,18 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert p.is_programme_administrator?(prog)
   end
 
+  test "admin doesn't become programme administrator by default" do
+    p = Factory(:admin)
+    login_as(p)
+    assert_difference("Programme.count") do
+      post :create, :programme=>{:title=>"A programme"}
+    end
+    prog = assigns(:programme)
+    assert_redirected_to prog
+    p.reload
+    refute p.is_programme_administrator?(prog)
+  end
+
   test "logged out user cannot create" do
     assert_no_difference("Programme.count") do
       post :create, :programme=>{:title=>"A programme"}

@@ -2,7 +2,7 @@
 
 ## License
 
-Copyright (c) 2009-2014, University of Manchester and HITS gGmbH
+Copyright (c) 2009-2015, University of Manchester and HITS gGmbH
 
 [BSD 3-clause](BSD-LICENSE)
 

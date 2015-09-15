@@ -18,6 +18,8 @@
 //= require tagging
 //= require autocompleter_advanced
 //= require publication
+//= require investigation
+//= require study
 //= require top_menu
 //= require dropMenu
 //= require dynamic_menu

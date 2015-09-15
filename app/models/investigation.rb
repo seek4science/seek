@@ -46,7 +46,7 @@ class Investigation < ActiveRecord::Base
 
   #includes publications directly related, plus those related to associated assays
   def related_publications
-    studies.collect{|a| a.related_publications}.flatten.uniq | publications
+    studies.collect{|s| s.related_publications}.flatten.uniq | publications
   end
 
 end

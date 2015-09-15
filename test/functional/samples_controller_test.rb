@@ -508,4 +508,22 @@ test "should show organism and strain information of a sample if there is organi
       assert_select "a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
     end
   end
+
+  test "filter by sop using nested routes" do
+    assert_routing "sops/4/samples",{controller:"samples",action:"index",sop_id:"4"}
+    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:sops=>[Factory(:sop,:policy=>Factory(:public_policy))])
+    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:sops=>[Factory(:sop,:policy=>Factory(:public_policy))])
+
+    refute_empty sample1.sops
+    refute_empty sample2.sops
+    assert_equal sample1.sops.count,sample2.sops.count
+    refute_equal sample1.sops,sample2.sops
+
+    get :index,sop_id:sample1.sops.first.id
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]",sample_path(sample1),:text=>sample1.title
+      assert_select "a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
+    end
+  end
 end

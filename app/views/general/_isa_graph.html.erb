@@ -59,6 +59,9 @@
         isa_graph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
         isa_graph.style['text-align'] = 'center';
     } else {
+        decodeHTMLForElements(elements);
+        decodeHTMLForElements(reduced_elements);
+
         drawGraph(reduced_elements, current_element_id);
     }
 </script>

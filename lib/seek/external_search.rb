@@ -35,7 +35,7 @@ module Seek
         rescue Exception=>e
           Rails.logger.error("Error getting external item #{item_id} with #{adaptor} - #{e.class.name}:#{e.message}")
           []
-          raise e if Rails.env=="development"
+          raise e if Rails.env.development?
         end
       end.flatten.uniq
     end
@@ -47,7 +47,7 @@ module Seek
         rescue Exception=>e
           Rails.logger.error("Error performing external search with #{adaptor} - #{e.class.name}:#{e.message}")
           []
-          raise e if Rails.env=="development"
+          raise e if Rails.env.development?
         end
       end.flatten.uniq
     end

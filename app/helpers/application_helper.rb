@@ -291,7 +291,7 @@ module ApplicationHelper
   def page_title controller_name, action_name
     name=PAGE_TITLES[controller_name]
     name ||=""
-    name += " (Development)" if Rails.env=="development"
+    name += " (Development)" if Rails.env.development?
     return "The #{Seek::Config.application_name} "+name
   end
 

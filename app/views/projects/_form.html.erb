@@ -29,6 +29,10 @@
     </div>
 <% end -%>
 
+<% if Seek::Config.programmes_enabled && admin_or_programme_administrator_logged_in? %>
+    <%= render :partial=>"projects/programme_selection", :locals=>{:f=>f} -%>
+<% end %>
+
 <% if Seek::Config.organisms_enabled %>
     <%= folding_panel("Organisms Relevant To This #{t('project')}") do %>
         <%= render :partial=>"projects/organisms_selection", :locals=>{:f=>f} -%>

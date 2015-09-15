@@ -21,8 +21,11 @@ class ProgrammesController < ApplicationController
 
     flash[:notice] = "The #{t('programme').capitalize} was successfully created." if @programme.save
 
-    # current person becomes the administrator
-    User.current_user.person.is_programme_administrator = true, @programme
+    # current person becomes the programme administrator, unless they are logged in
+    unless User.admin_logged_in?
+      User.current_user.person.is_programme_administrator = true, @programme
+    end
+
     disable_authorization_checks { User.current_user.person.save! }
 
     respond_with(@programme)
@@ -63,7 +66,7 @@ class ProgrammesController < ApplicationController
   def spawn_project
     proj_params = params[:project]
     @ancestor_project = Project.find(proj_params[:ancestor_id])
-    @project = @ancestor_project.spawn(title: proj_params[:title], description: proj_params[:description], web_page: proj_params[:web_page], programme: @programme)
+    @project = @ancestor_project.spawn(title: proj_params[:title], description: proj_params[:description], web_page: proj_params[:web_page], programme_id: @programme.id)
     if @project.save
       flash[:notice] = "The #{t('project')} '#{@ancestor_project.title}' was successfully spawned for the '#{t('programme')}' #{@programme.title}"
       redirect_to project_path(@project)

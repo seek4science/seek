@@ -159,6 +159,15 @@ class ProjectTest < ActiveSupport::TestCase
     assert !p.can_be_edited_by?(u),"other project should not be editable by project administrator, since it is not a project he administers"
   end
 
+  test "can be edited by programme adminstrator" do
+    pa = Factory(:programme_administrator)
+    project = pa.programmes.first.projects.first
+    other_project = Factory(:project)
+
+    assert project.can_be_edited_by?(pa.user)
+    refute other_project.can_be_edited_by?(pa.user)
+  end
+
   test "can be administered by" do
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator)
@@ -172,6 +181,156 @@ class ProjectTest < ActiveSupport::TestCase
     assert !another_proj.can_be_administered_by?(project_administrator.user)
     assert another_proj.can_be_administered_by?(admin.user)
   end
+
+  test "can be administered by programme administrator" do
+    #programme administrator should be able to administer projects belonging to programme
+    pa = Factory(:programme_administrator)
+    project = pa.programmes.first.projects.first
+    other_project = Factory(:project)
+
+    assert project.can_be_administered_by?(pa.user)
+    refute other_project.can_be_administered_by?(pa.user)
+
+  end
+
+  test "update with attributes for project_administrator_ids ids" do
+    person = Factory(:person)
+    another_person = Factory(:person)
+
+    project = person.projects.first
+    refute_nil project
+
+    another_person.add_to_project_and_institution(project,Factory(:institution))
+    another_person.save!
+
+    refute_includes project.project_administrators,person
+    refute_includes project.project_administrators,another_person
+
+    project.update_attributes({:project_administrator_ids=>[person.id.to_s]})
+
+    assert_includes project.project_administrators,person
+    refute_includes project.project_administrators,another_person
+
+    project.update_attributes({:project_administrator_ids=>[another_person.id.to_s]})
+
+    refute_includes project.project_administrators,person
+    assert_includes project.project_administrators,another_person
+
+    #cannot change to a person from another project
+    person_in_other_project = Factory(:person)
+    project.update_attributes({:project_administrator_ids=>[person_in_other_project.id.to_s]})
+
+    refute_includes project.project_administrators,person
+    refute_includes project.project_administrators,another_person
+    refute_includes project.project_administrators,person_in_other_project
+  end
+
+  test "update with attributes for gatekeeper ids" do
+    person = Factory(:person)
+    another_person = Factory(:person)
+
+    project = person.projects.first
+    refute_nil project
+
+    another_person.add_to_project_and_institution(project,Factory(:institution))
+    another_person.save!
+
+    refute_includes project.gatekeepers,person
+    refute_includes project.gatekeepers,another_person
+
+    project.update_attributes({:gatekeeper_ids=>[person.id.to_s]})
+
+    assert_includes project.gatekeepers,person
+    refute_includes project.gatekeepers,another_person
+
+    project.update_attributes({:gatekeeper_ids=>[another_person.id.to_s]})
+
+    refute_includes project.gatekeepers,person
+    assert_includes project.gatekeepers,another_person
+
+    #2 at once
+    project.update_attributes({:gatekeeper_ids=>[person.id.to_s,another_person.id.to_s]})
+    assert_includes project.gatekeepers,person
+    assert_includes project.gatekeepers,another_person
+
+    #cannot change to a person from another project
+    person_in_other_project = Factory(:person)
+    project.update_attributes({:gatekeeper_ids=>[person_in_other_project.id.to_s]})
+
+    refute_includes project.gatekeepers,person
+    refute_includes project.gatekeepers,another_person
+    refute_includes project.gatekeepers,person_in_other_project
+  end
+
+  test "update with attributes for pal ids" do
+    person = Factory(:person)
+    another_person = Factory(:person)
+
+    project = person.projects.first
+    refute_nil project
+
+    another_person.add_to_project_and_institution(project,Factory(:institution))
+    another_person.save!
+
+    refute_includes project.pals,person
+    refute_includes project.pals,another_person
+
+    project.update_attributes({:pal_ids=>[person.id.to_s]})
+
+    assert_includes project.pals,person
+    refute_includes project.pals,another_person
+
+    project.update_attributes({:pal_ids=>[another_person.id.to_s]})
+
+    refute_includes project.pals,person
+    assert_includes project.pals,another_person
+
+    #cannot change to a person from another project
+    person_in_other_project = Factory(:person)
+    project.update_attributes({:pal_ids=>[person_in_other_project.id.to_s]})
+
+    refute_includes project.pals,person
+    refute_includes project.pals,another_person
+    refute_includes project.pals,person_in_other_project
+  end
+
+  test "update with attributes for asset manager ids" do
+    person = Factory(:person)
+    another_person = Factory(:person)
+
+    project = person.projects.first
+    refute_nil project
+
+    another_person.add_to_project_and_institution(project,Factory(:institution))
+    another_person.save!
+
+    refute_includes project.asset_managers,person
+    refute_includes project.asset_managers,another_person
+
+    project.update_attributes({:asset_manager_ids=>[person.id.to_s]})
+
+    assert_includes project.asset_managers,person
+    refute_includes project.asset_managers,another_person
+
+    project.update_attributes({:asset_manager_ids=>[another_person.id.to_s]})
+
+    refute_includes project.asset_managers,person
+    assert_includes project.asset_managers,another_person
+
+    #2 at once
+    project.update_attributes({:asset_manager_ids=>[person.id.to_s,another_person.id.to_s]})
+    assert_includes project.asset_managers,person
+    assert_includes project.asset_managers,another_person
+
+    #cannot change to a person from another project
+    person_in_other_project = Factory(:person)
+    project.update_attributes({:asset_manager_ids=>[person_in_other_project.id.to_s]})
+
+    refute_includes project.asset_managers,person
+    refute_includes project.asset_managers,another_person
+    refute_includes project.asset_managers,person_in_other_project
+  end
+
 
   def test_update_first_letter
     p=Project.new(:title=>"test project")
@@ -441,7 +600,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal [p2],p.lineage_descendants
 
     prog2=Factory(:programme)
-    p2=p.spawn({:title=>"fish project",:programme=>prog2,:description=>"about doing fishing"})
+    p2=p.spawn({:title=>"fish project",:programme_id=>prog2.id,:description=>"about doing fishing"})
     assert p2.new_record?
 
     assert_equal "fish project",p2.title
@@ -496,5 +655,70 @@ class ProjectTest < ActiveSupport::TestCase
     User.current_user=Factory(:programme_administrator).user
     assert Project.can_create?
   end
+
+  test "project programmes" do
+    project = Factory(:project)
+    assert_empty project.programmes
+    assert_nil project.programme
+
+    prog = Factory(:programme)
+    project = prog.projects.first
+    assert_equal [prog],project.programmes
+  end
+
+  test "mass assigment" do
+    #check it is possible to mass assign all the attributes
+    programme = Factory(:programme)
+    institution = Factory(:institution)
+    person = Factory(:person)
+    organism = Factory(:organism)
+    other_project = Factory(:project)
+
+
+    attr = {
+        :title=>"My Project",
+        :wiki_page=>"http://wikipage.com",
+        :web_page=>"http://webpage.com",
+        :organism_ids=>[organism.id],
+        :institution_ids=>[institution.id],
+        :parent_id=>[other_project.id],
+        :description=>"Project description",
+        :project_administrator_ids=>[person.id],
+        :gatekeeper_ids=>[person.id],
+        :pal_ids=>[person.id],
+        :asset_manager_ids=>[person.id],
+    }
+
+    project = Project.create(attr)
+    project.save!
+    project.reload
+
+    assert_include project.organisms, organism
+    assert_equal "Project description",project.description
+    assert_equal "http://wikipage.com",project.wiki_page
+    assert_equal "http://webpage.com",project.web_page
+    assert_equal "My Project",project.title
+
+    #people with special roles need setting after the person belongs to the project,
+    # otherwise non-members are stripped out when assigned
+    person.add_to_project_and_institution(project,Factory(:institution))
+    person.save!
+    person.reload
+
+    attr = {
+        :project_administrator_ids=>[person.id],
+        :gatekeeper_ids=>[person.id],
+        :pal_ids=>[person.id],
+        :asset_manager_ids=>[person.id],
+    }
+    project.update_attributes(attr)
+
+    assert_include project.project_administrators, person
+    assert_include project.gatekeepers, person
+    assert_include project.pals, person
+    assert_include project.asset_managers, person
+
+  end
+
 
 end

@@ -12,13 +12,11 @@
     <%= "<p class=\"list_item_attribute\"><b>Technology type</b>: #{link_to_technology_type(resource)}</p>".html_safe %>
 <% end -%>
 
-  <%= list_item_optional_attribute t('investigation'), h(resource.investigation.try(:title)), resource.investigation %>
+  <%= list_item_authorized_list([resource.investigation], t('investigation'), false, 50, true ) %>
 
-  <%= list_item_optional_attribute t('study'), h(resource.study.try(:title)), resource.study %>
+  <%= list_item_authorized_list([resource.study], t('study'), false, 50, true ) %>
 
   <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
-
-
 
 
   <%= list_item_attribute "Contributor", resource.owner.name, resource.owner %>
