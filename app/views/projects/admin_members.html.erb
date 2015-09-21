@@ -42,15 +42,16 @@
       </div>
     <% end %>
 
-    <%= form_tag(update_members_project_path(@project)) do %>
-        <div style="display:none">
-          <div>Techy stuff should be hidden</div>
-          Groups to remove:<%= select_tag :group_memberships_to_remove, [], :multiple => true -%>
-          <br/>
-          People and institution to add:<%= select_tag :people_and_institutions_to_add, [], :multiple => true %>
-        </div>
-        <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
-    <% end -%>
+      <%= form_tag(update_members_project_path(@project)) do %>
+          <div style="display:none">
+            <div>Techy stuff should be hidden</div>
+            Groups to remove:<%= select_tag :group_memberships_to_remove, [], :multiple => true -%>
+            <br/>
+            People and institution to add:<%= select_tag :people_and_institutions_to_add, [], :multiple => true %>
+          </div>
+          <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
+      <% end -%>
+    <% end %>
   </div>
 
 </div>
