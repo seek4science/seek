@@ -8,6 +8,7 @@ require 'rest-client'
 class ContentBlob < ActiveRecord::Base
   include Seek::ContentTypeDetection
   include Seek::PdfExtraction
+  include Seek::Data::Checksums
 
   belongs_to :asset, polymorphic: true
 
@@ -25,7 +26,7 @@ class ContentBlob < ActiveRecord::Base
   # an Exception is raised if both are defined
   before_save :dump_data_to_file
 
-  before_save :calculate_md5
+
 
   before_save :check_version
 
@@ -42,7 +43,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def spreadsheet_annotations
-    worksheets.map { |worksheet| worksheet.cell_ranges.map { |cell| cell.annotations } }.flatten
+    worksheets.map { |worksheet| worksheet.cell_ranges.map(&:annotations) }.flatten
   end
 
   # returns the size of the file in bytes, or nil if the file doesn't exist
@@ -77,9 +78,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def check_version
-    if asset_version.nil? && !asset.nil?
-      self.asset_version = asset.version
-    end
+    self.asset_version = asset.version if asset_version.nil? && !asset.nil?
   end
 
   def show_as_external_link?
@@ -90,18 +89,10 @@ class ContentBlob < ActiveRecord::Base
   end
   # include all image types
 
-  def md5sum
-    if super.nil?
-      other_changes = self.changed?
-      calculate_md5
-      # only save if there are no other changes - this is to avoid inadvertantly storing other potentially unwanted changes
-      save unless other_changes
-    end
-    super
-  end
+
 
   def cache_key
-    "#{super}-#{md5sum}"
+    "#{super}-#{sha1sum}"
   end
 
   # returns an IO Object to the data content, or nil if the data file doesn't exist.
@@ -113,14 +104,7 @@ class ContentBlob < ActiveRecord::Base
     nil
   end
 
-  def calculate_md5
-    # FIXME: only recalculate if the data has changed (should be able to do this with changes.keys.include?("data") or along those lines).
-    if file_exists?
-      digest = Digest::MD5.new
-      digest.file(filepath)
-      self.md5sum = digest.hexdigest
-    end
-  end
+
 
   def file_exists?
     File.exist?(filepath)
@@ -159,9 +143,7 @@ class ContentBlob < ActiveRecord::Base
 
   def image_assets_storage_directory
     path = Seek::Config.temporary_filestore_path + '/image_assets'
-    unless File.exist?(path)
-      FileUtils.mkdir_p path
-    end
+    FileUtils.mkdir_p path unless File.exist?(path)
     path
   end
 
@@ -177,7 +159,7 @@ class ContentBlob < ActiveRecord::Base
 
   def copy_image
     copy_to_path = image_assets_storage_directory
-    copy_to_path << "/#{id}.#{ContentBlob.image_storage_format.to_s}"
+    copy_to_path << "/#{id}.#{ContentBlob.image_storage_format}"
     if file_exists? && !File.exist?(copy_to_path)
       FileUtils.cp filepath, copy_to_path
     end

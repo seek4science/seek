@@ -8,15 +8,6 @@
 
 <%= f.hidden_field :create_from_asset %>
 
-<% if !@assay.study.nil? and @assay.study.can_view? -%>
-    <div class="form-group">
-      <%= label_tag "Associated study" -%>
-      <p class="form-control-static">
-        <%= h @assay.study.title.capitalize -%>
-      </p>
-    </div>
-<% end -%>
-
 <div class="form-group">
   <%= f.label :title-%><span class="required">*</span>
   <%= f.text_field :title, :class=>"form-control" -%>

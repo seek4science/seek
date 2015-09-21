@@ -35,7 +35,7 @@
       </ul>
   <% end -%>
 
-  <h2>The following items were published:</h2>
+  <p>The following items were published:
   <ul class="publishing_options" id="published">
     <% if published_items.empty? -%><li class="none_text">No items</li><% end -%>
     <% published_items.each do |item| -%>
@@ -44,6 +44,7 @@
         </li>
     <% end -%>
   </ul>
+  </p>
 
   <% if !notified_items.empty? -%>
       <h2>Items for which notifications to publish were sent the owners:</h2>
@@ -60,4 +61,7 @@
       </ul>
   <% end -%>
 
+  <% if @asset %>
+    <%= link_to 'Finished', @asset, :class=>"btn btn-primary" %>
+  <% end %>
 </div>

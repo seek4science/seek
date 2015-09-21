@@ -5,10 +5,16 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   fixtures :content_blobs
 
-  def test_md5sum_on_demand
+  test 'md5sum_on_demand' do
     blob=Factory :rightfield_content_blob
     assert_not_nil blob.md5sum
     assert_equal "01788bca93265d80e8127ca0039bb69b",blob.md5sum
+  end
+
+  test 'sha1 sum on demand' do
+    blob=Factory :rightfield_content_blob
+    assert_not_nil blob.sha1sum
+    assert_equal "ffd634ac7564083ab7b66bc3eb2053cbc3d608f5",blob.sha1sum
   end
 
   test "detects it is a webpage" do
@@ -74,7 +80,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_cache_key
     blob=Factory :rightfield_content_blob
-    assert_equal "content_blobs/#{blob.id}-01788bca93265d80e8127ca0039bb69b",blob.cache_key
+    assert_equal "content_blobs/#{blob.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5",blob.cache_key
   end
 
   def test_uuid_doesnt_change

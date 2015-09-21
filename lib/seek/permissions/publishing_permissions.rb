@@ -9,6 +9,16 @@ module Seek
         end
       end
 
+      def contains_publishable_items?
+        items = []
+        items = items | self.studies if self.respond_to?(:studies)
+        items << self.study if self.respond_to?(:study)
+        items = items | self.assays if self.respond_to?(:assays)
+        items << self.investigation if self.respond_to?(:investigation)
+        items = items | self.assets if self.respond_to?(:assets)
+        !items.uniq.compact.detect{|item| item.can_publish?}.nil?
+      end
+
       def can_publish? user=User.current_user
         (Ability.new(user).can? :publish, self) || (can_manage?(user) && state_allows_publish?(user))
       end

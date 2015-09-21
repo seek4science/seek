@@ -7,7 +7,7 @@
           <% else %>
               <%= link_to "Snapshot #{snapshot.snapshot_number}", investigation_snapshot_path(@investigation.id, snapshot.snapshot_number) %>
           <% end %>
-          <span class="subtle">(<%= snapshot.created_at.strftime('%F') %>)</span>
+          <span class="subtle">(<%= date_as_string(snapshot.created_at) %>)</span>
           <% if snapshot.has_doi? %>
               <%= image('doi', :alt => 'DOI', :title => "DOI: #{snapshot.doi}") %>
           <% end %>

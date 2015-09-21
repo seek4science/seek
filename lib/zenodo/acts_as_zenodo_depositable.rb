@@ -42,6 +42,9 @@ module Zenodo
         extra_metadata = extra_metadata.symbolize_keys
         metadata = zenodo_metadata.merge(extra_metadata)
 
+        #FIXME: this is a quick hack
+        metadata[:description] = 'not set' if metadata[:description].blank?
+
         client = Zenodo::Client.new(access_token, Seek::Config.zenodo_api_url)
         deposition = client.create_deposition({ metadata: metadata.build })
         deposition_file = deposition.create_file(zenodo_depositable_file)
@@ -72,7 +75,7 @@ module Zenodo
       def zenodo_metadata
         metadata = Zenodo::Metadata.new({
           title: title,
-          description: description,
+          description: description || "",
           creators: related_people.map { |p| {name: "#{p.last_name}, #{p.first_name}"} },
           publication_date: Time.now.strftime("%F"),
           access_right: :closed,

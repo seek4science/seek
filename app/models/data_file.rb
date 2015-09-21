@@ -10,7 +10,6 @@ class DataFile < ActiveRecord::Base
   include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
 
-
   attr_accessor :parent_name
 
   #searchable must come before acts_as_asset call
