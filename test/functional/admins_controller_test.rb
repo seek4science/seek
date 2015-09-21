@@ -97,6 +97,30 @@ class AdminsControllerTest < ActionController::TestCase
     assert_equal 9,Seek::Config.max_visible_tags
   end
 
+  test 'update default default_associated_projects_access_type permissions' do
+    login_as(:quentin)
+    Seek::Config.default_associated_projects_access_type=0
+    assert_equal 0, Seek::Config.default_associated_projects_access_type
+    post :update_others, :default_associated_projects_access_type => '2'
+    assert_equal 2, Seek::Config.default_associated_projects_access_type
+  end
+
+  test 'update default consortium permissions' do
+    login_as(:quentin)
+    Seek::Config.default_consortium_access_type=0
+    assert_equal 0, Seek::Config.default_consortium_access_type
+    post :update_others, :default_consortium_access_type => '2'
+    assert_equal 2, Seek::Config.default_consortium_access_type
+  end
+
+  test 'update default default_all_visitors_access_type permissions' do
+    login_as(:quentin)
+    Seek::Config.default_all_visitors_access_type=0
+    assert_equal 0, Seek::Config.default_all_visitors_access_type
+    post :update_others, :default_all_visitors_access_type => '2'
+    assert_equal 2, Seek::Config.default_all_visitors_access_type
+  end
+
   test 'invalid email address' do
     login_as(:quentin)
     post :update_others, :pubmed_api_email => 'quentin', :crossref_api_email => 'quentin@example.com', :tag_threshold => '1', :max_visible_tags => '20'
