@@ -2,11 +2,12 @@
 
 <%= render :partial => "general/page_title",:locals=>{:title=>"Administering the #{t('project').downcase} members of #{link_to(h(@project.title),@project)}".html_safe} %>
 
-<div class="row">
-
+<div class="row" style="margin:0.5em;">
+  <div style="width:45%; float:right;">
     <%= panel('Add members', :id => "add_member") do %>
         <p>
-          Select the institution, and type the names of the people from that institution that need adding for this <%= t('project').downcase %></strong>
+          Here you can add people to the project and associate then with a specific institution. Select the institution that they are associated with for this  <%= t('project').downcase %>
+           and then type the names and select the people you wish to add. If somebody is associated with more than one institution for this <%= t('project').downcase %> you will need to repeat for the other institution.
         </p>
         <p>
           <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title") %>
@@ -16,8 +17,9 @@
           <%= button_link_to('Add', 'new', 'javascript:add_selected_people()') -%>
         </p>
     <% end %>
-
-    <%= panel('Current members', :id => "admin_members") do %>
+  </div>
+  <div style="width:52%">
+    <%= panel("#{t('project')} members", :id => "admin_members") do %>
       <div id="project_institutions">
         <% @project.work_groups.sort { |a, b| a.institution.title <=> b.institution.title }.each do |work_group| %>
             <%
@@ -27,7 +29,7 @@
             <ul class="institution_members" id="<%= ul_id %>">
               <span class="institution_label" id="<%= institution_label_id %>"><%= work_group.institution.title %></span>
 
-              <% work_group.group_memberships.select { |gm| !gm.person.nil? }.each do |gm| %>
+              <% work_group.group_memberships.select{ |gm| !gm.person.nil? }.sort_by{|gm| gm.person.last_name}.each do |gm| %>
                   <li class="institution_member" id="membership_<%= gm.person_id %>_<%= gm.work_group.institution_id %>">
                     <%= gm.person.name %>&nbsp;
                     <% unless gm.person.me? %>
@@ -38,18 +40,22 @@
               <% end %>
             </ul>
         <% end %>
-
       </div>
+    <% end %>
 
-      <%= form_tag(update_members_project_path(@project)) do %>
-          <div style="display:none">
-            <div>Techy stuff should be hidden</div>
-            Groups to remove:<%= select_tag :group_memberships_to_remove, [], :multiple => true -%>
-            <br/>
-            People and institution to add:<%= select_tag :people_and_institutions_to_add, [], :multiple => true %>
-          </div>
-          <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
-      <% end -%>
-  <% end %>
+    <%= form_tag(update_members_project_path(@project)) do %>
+        <div style="display:none">
+          <div>Techy stuff should be hidden</div>
+          Groups to remove:<%= select_tag :group_memberships_to_remove, [], :multiple => true -%>
+          <br/>
+          People and institution to add:<%= select_tag :people_and_institutions_to_add, [], :multiple => true %>
+        </div>
+        <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
+    <% end -%>
+  </div>
 
 </div>
+
+
+
+
