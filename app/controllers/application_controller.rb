@@ -345,88 +345,99 @@ class ApplicationController < ActionController::Base
 
   def log_event
     User.with_current_user current_user do
-      c = self.controller_name.downcase
-      a = self.action_name.downcase
+      controller_name = self.controller_name.downcase
+      action = self.action_name.downcase
 
-      object = eval("@"+c.singularize)
+      object = object_for_request
 
-      object=current_user if c=="sessions" #logging in and out is a special case
+      object=current_user if controller_name=="sessions" #logging in and out is a special case
 
       #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
-      return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
+      return if object_invalid_or_unsaved?(object)
 
-      case c
+      case controller_name
         when "sessions"
-          if ["create", "destroy"].include?(a)
-            ActivityLog.create(:action => a,
+          if ["create", "destroy"].include?(action)
+            ActivityLog.create(:action => action,
                                :culprit => current_user,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :activity_loggable => object,
                                :user_agent => request.env["HTTP_USER_AGENT"])
           end
         when "sweeps", "runs"
-          if ["show", "update", "destroy", "download"].include?(a)
+          if ["show", "update", "destroy", "download"].include?(action)
             ref = object.projects.first
-          elsif a == "create"
+          elsif action == "create"
             ref = object.workflow
           end
 
-          check_log_exists(a, c, object)
-          ActivityLog.create(:action => a,
+          check_log_exists(action, controller_name, object)
+          ActivityLog.create(:action => action,
                              :culprit => current_user,
                              :referenced => ref,
-                             :controller_name => c,
+                             :controller_name => controller_name,
                              :activity_loggable => object,
                              :data => object.title,
                              :user_agent => request.env["HTTP_USER_AGENT"])
           break
         when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
-          a = "create" if a == "upload_for_tool"
-          a = "update" if a == "new_version"
-          a = "inline_view" if a == "explore"
-          if ["show", "create", "update", "destroy", "download", "inline_view"].include?(a)
-            check_log_exists(a, c, object)
-            ActivityLog.create(:action => a,
+          action = "create" if action == "upload_for_tool"
+          action = "update" if action == "new_version"
+          action = "inline_view" if action == "explore"
+          if ["show", "create", "update", "destroy", "download", "inline_view"].include?(action)
+            check_log_exists(action, controller_name, object)
+            ActivityLog.create(:action => action,
                                :culprit => current_user,
                                :referenced => object.projects.first,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :activity_loggable => object,
                                :data => object.title,
                                :user_agent => request.env["HTTP_USER_AGENT"])
           end
         when "people"
-          if ["show", "create", "update", "destroy"].include?(a)
-            ActivityLog.create(:action => a,
+          if ["show", "create", "update", "destroy"].include?(action)
+            ActivityLog.create(:action => action,
                                :culprit => current_user,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :activity_loggable => object,
                                :data => object.title,
                                :user_agent => request.env["HTTP_USER_AGENT"])
           end
         when "search"
-          if a=="index"
+          if action=="index"
             ActivityLog.create(:action => "index",
                                :culprit => current_user,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :user_agent => request.env["HTTP_USER_AGENT"],
                                :data => {:search_query => object, :result_count => @results.count})
           end
         when "content_blobs"
-          a = "inline_view" if a=="view_pdf_content"
-          if a=="inline_view" || (a=="download" && params['intent'].to_s != 'inline_view')
+          action = "inline_view" if action=="view_pdf_content"
+          if action=="inline_view" || (action=="download" && params['intent'].to_s != 'inline_view')
             activity_loggable = object.asset
-            ActivityLog.create(:action => a,
+            ActivityLog.create(:action => action,
                                :culprit => current_user,
                                :referenced => object,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :activity_loggable => activity_loggable,
                                :user_agent => request.env["HTTP_USER_AGENT"],
                                :data => activity_loggable.title)
           end
       end
 
-      expire_activity_fragment_cache(c, a)
+      expire_activity_fragment_cache(controller_name, action)
     end
+  end
+
+  def object_invalid_or_unsaved?(object)
+    object.nil? || (object.respond_to?('new_record?') && object.new_record?) || (object.respond_to?('errors') && !object.errors.empty?)
+  end
+
+  #determines and returns the object related to controller, e.g. @data_file
+  def object_for_request
+    c = controller_name.downcase
+
+    eval('@' + c.singularize)
   end
 
   def expire_activity_fragment_cache(controller,action)

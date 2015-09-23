@@ -114,7 +114,7 @@ class SamplesController < ApplicationController
     if @sample.save
       #send publishing request for specimen
       if !@sample.specimen.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-        deliver_request_publish_approval [@sample.specimen]
+        notify_gatekeepers_of_approval_request [@sample.specimen]
       end
 
         tissue_and_cell_types.each do |t|

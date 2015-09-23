@@ -104,7 +104,7 @@ class MailerTest < ActionMailer::TestCase
   test "request publish approval" do
     gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
     resources = [Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture"),Factory(:teusink_model,:projects=>gatekeeper.projects,:title=>"Teusink")]
-    requester=Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle").user
+    requester=Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle")
 
     @expected.subject = "A Sysmo SEEK member requested your approval to publish some items."
 
@@ -140,7 +140,7 @@ class MailerTest < ActionMailer::TestCase
 
     resources=[assays(:metabolomics_assay),data_files(:picture),models(:teusink),assays(:metabolomics_assay2),data_files(:sysmo_data_file)]
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publishing(publisher,owner,resources,"localhost"))
+    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publishing(owner,publisher,resources,"localhost"))
 
   end
 
@@ -153,7 +153,7 @@ class MailerTest < ActionMailer::TestCase
 
     @expected.to = requester.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
-
+    @expected.reply_to = gatekeeper.email_with_name
 
     @expected.body = read_fixture('gatekeeper_approval_feedback')
     expected_text = encode_mail(@expected)
