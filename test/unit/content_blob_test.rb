@@ -559,4 +559,16 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal ['This is a pdf format'], content
   end
 
+  test 'calculates file size' do
+    blob = Factory(:pdf_content_blob)
+    assert_equal 8827, blob.file_size
+  end
+
+  test 'updates file size' do
+    blob = Factory(:pdf_content_blob)
+    blob.data = '123456'
+    blob.save
+    assert_equal 6, blob.file_size
+  end
+
 end

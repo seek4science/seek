@@ -25,10 +25,8 @@ class ContentBlob < ActiveRecord::Base
   # this action saves the contents of @data or the contents contained within the @tmp_io_object to the storage file.
   # an Exception is raised if both are defined
   before_save :dump_data_to_file
-
-
-
   before_save :check_version
+  before_save :calculate_file_size
 
   has_many :worksheets, dependent: :destroy
 
@@ -89,8 +87,6 @@ class ContentBlob < ActiveRecord::Base
   end
   # include all image types
 
-
-
   def cache_key
     "#{super}-#{sha1sum}"
   end
@@ -103,8 +99,6 @@ class ContentBlob < ActiveRecord::Base
     return File.open(filepath, 'rb') if file_exists?
     nil
   end
-
-
 
   def file_exists?
     File.exist?(filepath)
@@ -204,4 +198,11 @@ class ContentBlob < ActiveRecord::Base
     end
     @tmp_io_object = nil
   end
+
+  def calculate_file_size
+    if file_exists?
+      self.file_size = File.size(self.filepath)
+    end
+  end
+
 end
