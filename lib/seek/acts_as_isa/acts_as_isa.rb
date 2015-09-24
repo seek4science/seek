@@ -53,13 +53,6 @@ module Seek
       end
     end
 
-    module InstanceMethods
-      def related_people
-        peeps = [contributor.try(:person)]
-        peeps << person_responsible if self.respond_to?(:person_responsible)
-        peeps.uniq.compact
-      end
-    end
   end
 end
 

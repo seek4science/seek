@@ -1,21 +1,34 @@
 module Seek
   module ActsAsISA
     module Relationships
-      extend ActiveSupport::Concern
-      included do
-        has_many :relationships,
-                 class_name: 'Relationship',
-                 as: :subject,
-                 dependent: :destroy
+      module InstanceMethods
+        def publications
+          relationships.select { |a| a.other_object_type == 'Publication' }.collect(&:other_object)
+        end
+
+        # includes publications directly related, plus those related to associated assays
+        def related_publications
+          child_isa.collect(&:related_publications).flatten.uniq | publications
+        end
+
+        def related_people
+          peeps = [contributor.try(:person)]
+          peeps << person_responsible if self.respond_to?(:person_responsible)
+          peeps.uniq.compact
+        end
       end
 
-      def publications
-        relationships.select { |a| a.other_object_type == 'Publication' }.collect(&:other_object)
-      end
+      module Associations
+        extend ActiveSupport::Concern
+        included do
+          has_many :relationships,
+                   class_name: 'Relationship',
+                   as: :subject,
+                   dependent: :destroy
+        end
 
-      # includes publications directly related, plus those related to associated assays
-      def related_publications
-        child_isa.collect(&:related_publications).flatten.uniq | publications
+        has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
+        has_many :creators, class_name: 'Person', through: :assets_creators, order: 'assets_creators.id', after_remove: :update_timestamp, after_add: :update_timestamp
       end
 
       private
