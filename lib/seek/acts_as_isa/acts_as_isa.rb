@@ -27,7 +27,6 @@ module Seek
 
         grouped_pagination
 
-        include Seek::ActsAsISA::InstanceMethods
         include Seek::ActsAsISA::Relationships
 
         include Seek::Stats::ActivityCounts
