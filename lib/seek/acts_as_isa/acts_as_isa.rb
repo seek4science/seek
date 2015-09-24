@@ -27,7 +27,8 @@ module Seek
 
         grouped_pagination
 
-        include Seek::ActsAsISA::Relationships
+        include Seek::ActsAsISA::Relationships::Associations
+        include Seek::ActsAsISA::Relationships::InstanceMethods
 
         include Seek::Stats::ActivityCounts
         include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
