@@ -285,4 +285,52 @@ class InvestigationsControllerTest < ActionController::TestCase
       end
     end
   end
+
+  test 'should add creators' do
+    investigation = Factory(:investigation, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    assert investigation.creators.empty?
+
+    put :update, :id=>investigation.id, :creators=>[[creator.name,creator.id]].to_json
+    assert_redirected_to investigation_path(investigation)
+
+    assert investigation.creators.include?(creator)
+  end
+
+  test 'should have creators association box' do
+    investigation = Factory(:investigation, :policy => Factory(:public_policy))
+
+    get :edit, :id=> investigation.id
+    assert_response :success
+    assert_select "p#creators_list"
+    assert_select "input[type=text,name=creator-typeahead]"
+    assert_select "input[type=text,name=creators]"
+    assert_select "input[type=text,name=investigation[other_creators]]"
+
+  end
+
+  test 'should show creators' do
+    investigation = Factory(:investigation, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    investigation.creators = [creator]
+    investigation.save
+    investigation.reload
+    assert investigation.creators.include?(creator)
+
+    get :show, :id=> investigation.id
+    assert_response :success
+    assert_select "span.author_avatar a[href=?]", "/people/#{creator.id}"
+  end
+
+  test 'should show other creators' do
+    investigation = Factory(:investigation, :policy => Factory(:public_policy))
+    other_creators = 'other creators'
+    investigation.other_creators = other_creators
+    investigation.save
+    investigation.reload
+
+    get :show, :id=> investigation.id
+    assert_response :success
+    assert_select "div.panel-body div", :text => other_creators
+  end
 end

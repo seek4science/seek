@@ -13,7 +13,13 @@
     <%= render :partial=>"general/isa_graph", :locals => {:root_item => @investigation, :deep => false} %>
   </div>
   <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => [@investigation.contributing_user.try(:person)] } %>
+    <%
+       creators = @investigation.creators
+       creators << @investigation.contributing_user.try(:person)
+       creators.compact!
+       creators.uniq!
+    %>
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => creators } %>
   </div>
 </div>
 

@@ -19,6 +19,14 @@
 
 <%= render :seek_partial=>"assets/sharing_form" if @investigation.can_manage? -%>
 
+<%  existing_creators = @investigation.creators
+    existing_creators =  [current_user.person] if existing_creators.blank?
+%>
+<%= render :partial => "assets/author_form", :locals => {:resource_type => t('investigation'), # this is only for presentation, not for any processing
+                                                         :existing_creators => existing_creators,
+                                                         :other_creators => @investigation.other_creators} -%>
+
+
 <%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('investigation'),
                                                                     :related_publications => @investigation.publications} -%>
 
