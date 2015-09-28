@@ -29,19 +29,19 @@ module Seek
           has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
           has_many :creators, class_name: 'Person', through: :assets_creators, order: 'assets_creators.id', after_remove: :update_timestamp, after_add: :update_timestamp
         end
-      end
 
-      private
+        private
 
-      # the child elements depending on the current type, for example for Investigation is would be studies
-      def child_isa
-        case self
-          when Investigation
-            studies
-          when Study
-            assays
-          else
-            []
+        # the child elements depending on the current type, for example for Investigation is would be studies
+        def child_isa
+          case self
+            when Investigation
+              studies
+            when Study
+              assays
+            else
+              []
+          end
         end
       end
     end
