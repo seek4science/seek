@@ -15,7 +15,8 @@
   <div class="col-md-3 col-sm-4">
     <%
        creators = @investigation.creators
-       creators << @investigation.contributing_user.try(:person)
+       contributor = @investigation.contributing_user.try(:person)
+       creators << contributor if !contributor.nil?
        creators.compact!
        creators.uniq!
     %>
