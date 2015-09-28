@@ -60,5 +60,16 @@
         isa_graph.style['text-align'] = 'center';
     } else {
         drawGraph(reduced_elements, current_element_id);
+
+        //this is to overcome a z-index problem that prevents the bootstrap menu working ontop of the isa-graph.
+        //it forces a generated div, which is created with z-index:1000, to have a lower z-index.
+        $j('div#cy > div').css('z-index','0');
+
     }
 </script>
+
+<style>
+  div#cy div {
+      z-index:0;
+  }
+</style>
