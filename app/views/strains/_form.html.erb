@@ -86,7 +86,7 @@
       <%= f.submit button_text, :disable_with => disabled_text, :id => "strain_submit_btn",
                    :class => 'btn btn-primary' -%>
   <% end %>
-  or <%= link_to 'Cancel', (@strain.id ? strain_path(@strain.id) : strains_path), :class => 'btn btn-default' -%>
+  or <%= cancel_button(@strain.id ? strain_path(@strain.id) : strains_path) %>
 </div>
 
 <script type="text/javascript">

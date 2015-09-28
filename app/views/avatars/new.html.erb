@@ -22,7 +22,7 @@
     <p>
 
     <%= submit_tag "Upload", :disable_with => "Uploading...", :class => "btn btn-primary" %>
-    or <%= link_to "Cancel", params[:return_to] ? params[:return_to] : eval("#{@avatar_for.downcase}_avatars_path(#{@avatar_for_id})") -%>
+    or <%= cancel_button(params[:return_to] ? params[:return_to] : eval("#{@avatar_for.downcase}_avatars_path(#{@avatar_for_id})")) -%>
 
     </p>
 <% end %>

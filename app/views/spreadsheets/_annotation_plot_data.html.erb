@@ -43,7 +43,7 @@
         </div>
         <br style="clear:both"/>
         <div id="annotation_controls" style="display:none">
-          <%= submit_tag 'Save Changes',:id=>"edit_plot_data_button" %> or <%= link_to "Cancel", "", :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;"-%>
+          <%= submit_tag 'Save Changes',:id=>"edit_plot_data_button" %> or <%= cancel_button("", :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;") %>
         </div>
       </div>
       <% end %>

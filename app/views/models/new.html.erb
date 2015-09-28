@@ -40,7 +40,7 @@
         <%= submit_tag "Upload and Save", :id => "model_submit_btn",
                        :onclick => "javascript: validateResourceFields(true, 'model',true); return(false);",
                        :class => 'btn btn-primary' -%>
-        or <%= link_to 'Cancel', models_path, :class => 'btn btn-default' -%>
+        or <%= cancel_button(models_path) -%>
       </div>
     </div>
 <% end -%>

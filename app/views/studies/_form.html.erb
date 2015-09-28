@@ -59,4 +59,4 @@
                  :onclick => "javascript: $('study_submit_btn').form.submit();return(false);",
                  :class => 'btn btn-primary'-%>
 <% end %>
- or <%= link_to 'Cancel', (@study.id ? study_path(@study.id) : studies_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(@study.id ? study_path(@study.id) : studies_path) -%>

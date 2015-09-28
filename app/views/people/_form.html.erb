@@ -34,4 +34,4 @@
 <% end -%>
 
 <%= f.submit((person ? "Update" : "Create"), :disable_with=>(person ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
- or <%= link_to 'Cancel', (person ? person_path(person.id) : people_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(person ? person_path(person.id) : people_path) %>

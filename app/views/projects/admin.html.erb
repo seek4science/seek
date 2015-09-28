@@ -41,7 +41,7 @@
 
     <p>
       <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateInstitutionIds();") -%>
-      or <%= link_to 'Cancel', project_path(@project.id) -%>
+      or <%= cancel_button(project_path(@project.id)) %>
     </p>
 
   <% end -%>

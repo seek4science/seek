@@ -32,7 +32,7 @@
       <br/>
       <%= submit_tag "Generate the DOI" -%>
       or
-      <%= link_to "Cancel", polymorphic_path(@asset_version.parent, :version => @asset_version.version) %>
+      <%= cancel_button(polymorphic_path(@asset_version.parent, :version => @asset_version.version)) %>
 
   <% end %>
 
