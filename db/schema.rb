@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150925145748) do
+ActiveRecord::Schema.define(:version => 20150928130911) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1476,6 +1476,7 @@ ActiveRecord::Schema.define(:version => 20150925145748) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+    t.text     "other_creators"
   end
 
   create_table "study_auth_lookup", :id => false, :force => true do |t|

@@ -20,14 +20,6 @@
         <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>
 
         <p>
-          <label>Contributor:</label>
-          <% if @study.person_responsible.try :can_view? -%>
-              <%= link_to @study.person_responsible.name,@study.person_responsible %>
-          <% else -%>
-              <span class="none_text">Not available</span>
-          <% end -%>
-        </p>
-        <p>
           <b>Experimentalists:</b>
           <%= text_or_not_specified(@study.experimentalists) %>
         </p>
@@ -38,7 +30,15 @@
   </div>
 
   <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => [@study.contributing_user.try(:person)] } %>
+    <%
+       creators = @study.creators
+       contributor = @study.contributing_user.try(:person)
+       creators << contributor if !contributor.nil?
+       creators.compact!
+       creators.uniq!
+    %>
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => creators } %>
+
   </div>
 </div>
 
