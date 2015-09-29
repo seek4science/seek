@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150928130911) do
+ActiveRecord::Schema.define(:version => 20150929131243) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1468,10 +1468,9 @@ ActiveRecord::Schema.define(:version => 20150928130911) do
     t.integer  "investigation_id"
     t.string   "experimentalists"
     t.datetime "begin_date"
-    t.integer  "person_responsible_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "first_letter",          :limit => 1
+    t.string   "first_letter",     :limit => 1
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "contributor_id"

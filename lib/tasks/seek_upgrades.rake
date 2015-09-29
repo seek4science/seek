@@ -44,6 +44,15 @@ namespace :seek do
     AuthLookupUpdateJob.new.queue_job(0,Time.now)
   end
 
+  desc "move person_responsible_id to creator_id in assets_creators table"
+  task(:move_person_responsible_to_creator => :environment) do
+    Study.all.select{|s| !s.person_responsible_id.nil? }.each do |study|
+      assets_creators = AssetsCreator.where(asset_id: study.id, asset_type: 'Study', creator_id: study.person_responsible_id)
+      if assets_creators.empty?
+        AssetsCreator.create(asset_id: study.id, asset_type: 'Study', creator_id: study.person_responsible_id)
+      end
+    end
+  end
 
   desc "convert the avatar and model image from jpg to png"
   task(:convert_image_to_png => :environment) do
