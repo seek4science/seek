@@ -14,7 +14,8 @@ module Seek
         def related_people
           # dont know why but it needs a reload here, otherwise creators are empty
           peeps = self.reload.creators
-          peeps << contributor.try(:person) if !contributor.try(:person).nil?
+          # need to use push, instead of <<, otherwise this person is associated as the creator
+          peeps.push(contributor.try(:person)) if !contributor.try(:person).nil?
           peeps.uniq.compact
         end
       end

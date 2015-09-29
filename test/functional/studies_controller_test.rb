@@ -519,4 +519,21 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "div.panel-body div", :text => other_creators
   end
+
+  test 'should not multiply creators after calling show' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    study.creators = [creator]
+    study.save
+    study.reload
+    assert study.creators.include?(creator)
+    assert_equal 1, study.creators.count
+
+    get :show, :id=> study.id
+    assert_response :success
+
+    study.reload
+    assert_equal 1, study.creators.count
+  end
+
 end
