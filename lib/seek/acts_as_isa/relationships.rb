@@ -12,8 +12,9 @@ module Seek
         end
 
         def related_people
-          peeps = [contributor.try(:person)]
-          peeps << person_responsible if self.respond_to?(:person_responsible)
+          # dont know why but it needs a reload here, otherwise creators are empty
+          peeps = self.reload.creators
+          peeps << contributor.try(:person) if !contributor.try(:person).nil?
           peeps.uniq.compact
         end
       end
