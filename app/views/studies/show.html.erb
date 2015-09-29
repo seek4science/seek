@@ -30,14 +30,7 @@
   </div>
 
   <div class="col-md-3 col-sm-4">
-    <%
-       creators = @study.creators
-       contributor = @study.contributing_user.try(:person)
-       creators << contributor if !contributor.nil?
-       creators.compact!
-       creators.uniq!
-    %>
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => creators } %>
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study, :creators => (@study.creators | [@study.contributing_user.try(:person)]).compact.uniq } %>
 
   </div>
 </div>
