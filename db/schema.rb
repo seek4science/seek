@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150929131243) do
+ActiveRecord::Schema.define(:version => 20150930120551) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -153,6 +153,11 @@ ActiveRecord::Schema.define(:version => 20150929131243) do
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
   add_index "assay_organisms", ["organism_id"], :name => "index_assay_organisms_on_organism_id"
 
+  create_table "assay_types_edges", :id => false, :force => true do |t|
+    t.integer "parent_id"
+    t.integer "child_id"
+  end
+
   create_table "assays", :force => true do |t|
     t.string   "title"
     t.text     "description"
@@ -169,6 +174,7 @@ ActiveRecord::Schema.define(:version => 20150929131243) do
     t.string   "technology_type_uri"
     t.integer  "suggested_assay_type_id"
     t.integer  "suggested_technology_type_id"
+    t.text     "other_creators"
   end
 
   create_table "assays_samples", :id => false, :force => true do |t|
@@ -791,18 +797,6 @@ ActiveRecord::Schema.define(:version => 20150929131243) do
     t.datetime "updated_at"
   end
 
-  create_table "oauth_sessions", :force => true do |t|
-    t.integer  "user_id"
-    t.string   "provider"
-    t.string   "access_token"
-    t.string   "refresh_token"
-    t.datetime "expires_at"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
-  end
-
-  add_index "oauth_sessions", ["user_id"], :name => "index_oauth_sessions_on_user_id"
-
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.datetime "created_at"
@@ -1277,17 +1271,6 @@ ActiveRecord::Schema.define(:version => 20150929131243) do
     t.datetime "updated_at"
   end
 
-  create_table "snapshots", :force => true do |t|
-    t.string   "resource_type"
-    t.integer  "resource_id"
-    t.string   "doi"
-    t.integer  "snapshot_number"
-    t.datetime "created_at",           :null => false
-    t.datetime "updated_at",           :null => false
-    t.integer  "zenodo_deposition_id"
-    t.string   "zenodo_record_url"
-  end
-
   create_table "sop_auth_lookup", :id => false, :force => true do |t|
     t.integer "user_id"
     t.integer "asset_id"
@@ -1468,9 +1451,10 @@ ActiveRecord::Schema.define(:version => 20150929131243) do
     t.integer  "investigation_id"
     t.string   "experimentalists"
     t.datetime "begin_date"
+    t.integer  "person_responsible_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "first_letter",     :limit => 1
+    t.string   "first_letter",          :limit => 1
     t.string   "uuid"
     t.integer  "policy_id"
     t.integer  "contributor_id"
@@ -1678,6 +1662,11 @@ ActiveRecord::Schema.define(:version => 20150929131243) do
     t.string   "file"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+  end
+
+  create_table "technology_types_edges", :id => false, :force => true do |t|
+    t.integer "parent_id"
+    t.integer "child_id"
   end
 
   create_table "text_value_versions", :force => true do |t|
