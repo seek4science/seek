@@ -7,7 +7,7 @@ module HomesHelper
   RECENT_SIZE = 5
 
   def home_description_text
-    simple_format(auto_link(Seek::Config.home_description.html_safe, sanitize: false), {}, sanitize: false)
+    Seek::Config.home_description.html_safe
   end
 
   def imprint_text
