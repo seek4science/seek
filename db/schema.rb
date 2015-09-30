@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150903134052) do
+ActiveRecord::Schema.define(:version => 20150930120551) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -169,6 +169,7 @@ ActiveRecord::Schema.define(:version => 20150903134052) do
     t.string   "technology_type_uri"
     t.integer  "suggested_assay_type_id"
     t.integer  "suggested_technology_type_id"
+    t.text     "other_creators"
   end
 
   create_table "assays_samples", :id => false, :force => true do |t|
@@ -607,6 +608,7 @@ ActiveRecord::Schema.define(:version => 20150903134052) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+    t.text     "other_creators"
   end
 
   create_table "investigations_projects", :id => false, :force => true do |t|
@@ -1476,6 +1478,7 @@ ActiveRecord::Schema.define(:version => 20150903134052) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+    t.text     "other_creators"
   end
 
   create_table "study_auth_lookup", :id => false, :force => true do |t|

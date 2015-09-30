@@ -1441,4 +1441,54 @@ class AssaysControllerTest < ActionController::TestCase
       assert !items_for_result.include?(assay2.title)
     end
   end
+
+  test 'should add creators' do
+    assay = Factory(:assay, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    assert assay.creators.empty?
+
+    put :update, :id=>assay.id, :creators=>[[creator.name,creator.id]].to_json
+    assert_redirected_to assay_path(assay)
+
+    assert assay.creators.include?(creator)
+  end
+
+  test 'should have creators association box' do
+    assay = Factory(:assay, :policy => Factory(:public_policy))
+
+    get :edit, :id=> assay.id
+    assert_response :success
+
+    assert_select "p#creators_list"
+    assert_select "input[type='text'][name='creator-typeahead']"
+    assert_select "input[type='hidden'][name='creators']"
+    assert_select "input[type='text'][name='assay[other_creators]']"
+
+  end
+
+  test 'should show creators' do
+    assay = Factory(:assay, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    assay.creators = [creator]
+    assay.save
+    assay.reload
+    assert assay.creators.include?(creator)
+
+    get :show, :id=> assay.id
+    assert_response :success
+    assert_select "span.author_avatar a[href=?]", "/people/#{creator.id}"
+  end
+
+  test 'should show other creators' do
+    assay = Factory(:assay, :policy => Factory(:public_policy))
+    other_creators = 'other creators'
+    assay.other_creators = other_creators
+    assay.save
+    assay.reload
+
+    get :show, :id=> assay.id
+    assert_response :success
+    assert_select "div.panel-body div", :text => other_creators
+  end
+
 end

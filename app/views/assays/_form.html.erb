@@ -94,6 +94,13 @@
         <%= render :partial=>"assets/select_tags" %>
     <% end %>
 
+    <%  existing_creators = @assay.creators
+        existing_creators =  [current_user.person] if existing_creators.blank?
+    %>
+    <%= render :partial => "assets/author_form", :locals => {:resource_type => t('assays.assay'), # this is only for presentation, not for any processing
+                                                             :existing_creators => existing_creators,
+                                                             :other_creators => @assay.other_creators} -%>
+
     <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
 
     <%  if @assay.is_modelling? -%>
