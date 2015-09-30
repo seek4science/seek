@@ -12,7 +12,7 @@ module Seek
         end
 
         def related_people
-          (creators | [contributor.try(:person)]).compact.uniq
+          (creators | [contributor.try(:person)] | ([person_responsible] if self.respond_to?(:person_responsible))).compact.uniq
         end
       end
 

@@ -24,6 +24,12 @@
     <div id="investigation_collection">
       <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
     </div>
+
+    <%= f.label "Person responsible" %>
+    <div id="person_responsible_collection">
+      <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
+      <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
+    </div>
 <% end %>
 
 <%  existing_creators = @study.creators
