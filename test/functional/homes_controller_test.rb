@@ -150,7 +150,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div#home_description .panel-body", :text=>/Blah blah blah/, :count=>1
-    assert_select "div#home_description .panel-body a[href=?]", "http://www.google.com", :count=>1
+    assert_select "div#home_description .panel-body", :text=>/http:\/\/www.google.com/, :count=>1
 
   end
 
