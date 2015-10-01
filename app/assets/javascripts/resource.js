@@ -106,10 +106,10 @@ function createOrUpdateResource(is_new_file, resource_name){
 
 function validateUploadFormFields(respond_to_content_blobs, resource_name) {
     if (respond_to_content_blobs) {
-        if ($('pending_files').children.length == 0 && $(resource_name + "_image_image_file") == null) {
+        if ($('pending-files').children.length == 0 && $(resource_name + "_image_image_file") == null) {
             alert("Please specify at least a file to upload or provide a URL.");
             return (false);
-        } else if ($('pending_files').children.length == 0 && $(resource_name + "_image_image_file") != null && $(resource_name + "_image_image_file").value == '' && $('previous_version_image') == null) {
+        } else if ($('pending-files').children.length == 0 && $(resource_name + "_image_image_file") != null && $(resource_name + "_image_image_file").value == '' && $('previous_version_image') == null) {
             alert("Please specify at least a file/image to upload or provide a URL.");
             return (false);
         }

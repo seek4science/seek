@@ -6,11 +6,11 @@ module Seek
 
       def handle_upload_data
         blob_params = content_blob_params
-        # MERGENOTE - the manipulation and validation of the params still needs a bit of cleaning up
-        blob_params = update_params_for_batch(blob_params)
         allow_empty_content_blob = model_image_present?
-        return false unless check_for_data_or_url(blob_params) unless allow_empty_content_blob || retained_content_blob_ids.present?
-        blob_params = arrayify_params(blob_params)
+
+        unless allow_empty_content_blob || retained_content_blob_ids.present?
+          return false if !blob_params || blob_params.none? { |p| check_for_data_or_url(p) }
+        end
 
         blob_params.each do |item_params|
           return false unless check_for_data_or_url(item_params) unless allow_empty_content_blob
@@ -87,14 +87,16 @@ module Seek
 
       def process_upload(blob_params)
         data = blob_params[:data]
-        filename = blob_params[:original_filename]
-        blob_params[:original_filename] = data.original_filename if filename.blank?
+        blob_params.delete(:data_url)
+        blob_params.delete(:original_filename)
+        blob_params[:original_filename] = data.original_filename
         blob_params[:tmp_io_object] = data
-        blob_params[:content_type] = data.content_type || content_type_from_filename(filename)
+        blob_params[:content_type] = data.content_type || content_type_from_filename(blob_params[:original_filename])
       end
 
       def process_from_url(blob_params)
         @data_url = blob_params[:data_url]
+        blob_params.delete(:data)
         code = check_url_response_code(@data_url)
         make_local_copy = blob_params[:make_local_copy] == '1'
 

@@ -20,7 +20,7 @@ function setup_url_field(examine_url_path,examine_button_id) {
 
 function submit_url_for_examination() {
     disallow_copy_option();
-    $j('#test_url_result')[0].innerHTML="<p id='large_spinner'/>";
+    $j('#test_url_result')[0].innerHTML="<p class='large_spinner'/>";
     var data_url = upload_url_field.val();
     $j.post(examine_url_href + "?data_url=" + data_url, function(data){} );
 }

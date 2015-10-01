@@ -1,6 +1,6 @@
 <% environment.context_class.instance_eval { include ImagesHelper } %>
 
-#large_spinner {
+.large_spinner {
     background: url(<%= asset_path(icon_filename_for_key('large_spinner')) %>);
     background-repeat: no-repeat;
     width: 75px; /*or your image's width*/
@@ -11,7 +11,7 @@
     display:inline-block;
 }
 
-#warning_icon {
+.warning_icon {
     background: url(<%= asset_path(icon_filename_for_key('warning')) %>);
     background-repeat: no-repeat;
     width: 22px; /*or your image's width*/
@@ -23,7 +23,7 @@
     display:inline-block;
 }
 
-#error_icon {
+.error_icon {
     background: url(<%= asset_path(icon_filename_for_key('error')) %>);
     background-repeat: no-repeat;
     width: 22px; /*or your image's width*/
@@ -35,7 +35,7 @@
     display:inline-block;
 }
 
-#generic_file_icon {
+.generic_file_icon {
     background: url(<%= asset_path('file_icons/small/genericGray.png') %>);
     background-repeat: no-repeat;
     width: 24px; /*or your image's width*/
@@ -48,7 +48,7 @@
     display:inline-block;
 }
 
-#remove_icon {
+.remove_icon {
     background: url(<%= asset_path(icon_filename_for_key('destroy')) %>);
     background-repeat: no-repeat;
     width: 22px; /*or your image's width*/

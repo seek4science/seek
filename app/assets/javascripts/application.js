@@ -46,4 +46,5 @@
 //= require handlebars.runtime
 //= require calendar_date_select/calendar_date_select
 //= require zenodo_form
+//= require batch_upload
 //= require_tree ./templates
