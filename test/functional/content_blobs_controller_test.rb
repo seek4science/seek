@@ -27,7 +27,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     stub_request(:head, "http://mockedlocation.com/a-piccy.png").to_return(:status => 200, :headers=>{'Content-Type' => 'image/png'})
     xml_http_request :get, :examine_url, :data_url=>"http://mockedlocation.com/a-piccy.png"
     assert_response :success
-    assert @response.body.include?("not a webpage")
+    assert !@response.body.include?("This is a webpage")
     refute assigns(:error)
     refute assigns(:error_msg)
     refute assigns(:unauthorized)
