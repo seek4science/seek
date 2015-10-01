@@ -30,14 +30,14 @@ class User < ActiveRecord::Base
   # Virtual attribute for the unencrypted password
   attr_accessor :password, :password_confirmation
   
-  validates     :login,presence: true, :unless => :using_openid?
-  validates     :password,presence: true, :if => :password_required?, :unless => :using_openid?
-  validates     :password_confirmation,presence: true, :if => :password_required?, :unless => :using_openid?
-  validates_length_of       :password, :within => 4..40, :if => :password_required?, :unless => :using_openid?
-  validates_confirmation_of :password,                   :if => :password_required?, :unless => :using_openid?
-  validates_length_of       :login,    :within => 3..40, :unless => :using_openid?
+  validates     :login,presence: true
+  validates     :password,presence: true, :if => :password_required?
+  validates     :password_confirmation,presence: true, :if => :password_required?
+  validates_length_of       :password, :within => 4..40, :if => :password_required?
+  validates_confirmation_of :password,                   :if => :password_required?
+  validates_length_of       :login,    :within => 3..40
   validates_uniqueness_of   :login, :case_sensitive => false
-  validates_uniqueness_of   :openid, :case_sensitive => false, :allow_nil => true
+
 
   validates :email,format: {with: RFC822::EMAIL}, if: "email"
   validates :email, presence: true, if: :check_email_present?
@@ -52,7 +52,7 @@ class User < ActiveRecord::Base
 
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :password, :password_confirmation, :openid, :email
+  attr_accessible :login, :password, :password_confirmation, :email
 
   has_many :favourite_groups, :dependent => :destroy
   
@@ -209,10 +209,6 @@ class User < ActiveRecord::Base
 
   def display_name
     person.name
-  end
-  
-  def using_openid?
-    !openid.blank?
   end
 
   def can_manage_types?

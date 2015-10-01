@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150930120551) do
+ActiveRecord::Schema.define(:version => 20151001131852) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1783,7 +1783,6 @@ ActiveRecord::Schema.define(:version => 20150930120551) do
     t.integer  "posts_count",                             :default => 0
     t.datetime "last_seen_at"
     t.string   "uuid"
-    t.string   "openid"
     t.boolean  "show_guide_box",                          :default => true
   end
 

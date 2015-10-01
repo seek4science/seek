@@ -6,8 +6,6 @@ gem "rdoc"
 gem "feedjira","~>1"
 gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
-gem 'ruby-openid'
-gem 'rack-openid'
 gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
 gem 'uuid',"~>2.3"
 gem "RedCloth","4.2.9"
@@ -67,7 +65,6 @@ gem 'my_savage_beast', :git => "https://github.com/SysMO-DB/my_savage_beast"
 gem 'redbox', :git=>"https://github.com/SysMO-DB/redbox"
 gem "my_responds_to_parent", :git => "https://github.com/SysMO-DB/my_responds_to_parent.git"
 gem 'site_announcements', :git => "https://github.com/SysMO-DB/site_announcements.git"
-gem 'open_id_authentication', :git => "https://github.com/SysMO-DB/open_id_authentication.git"
 gem 'bioportal',">=2.2"
 
 gem 'acts_as_activity_logged', :git => "https://github.com/SysMO-DB/acts_as_activity_logged.git"

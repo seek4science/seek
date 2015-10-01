@@ -126,10 +126,6 @@ module Seek
       end
     end
 
-    def open_id_authentication_store_propagate
-      OpenIdAuthentication.store = open_id_authentication_store.to_sym
-    end
-
     def solr_enabled_propagate
       # for now do nothing.
     end

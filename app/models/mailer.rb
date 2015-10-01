@@ -57,7 +57,6 @@ class Mailer < ActionMailer::Base
 
   def signup(user, base_host)
     @username = user.login
-    @openid = user.openid
     @name = user.person.name
     @admins = admins
     @activation_code = user.activation_code

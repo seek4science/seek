@@ -15,17 +15,6 @@ class MailerTest < ActionMailer::TestCase
     assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron),"localhost"))
   end
   
-  test "signup_open_id" do
-    @expected.subject = 'Sysmo SEEK account activation'
-    @expected.to = "Aaron Openid Spiggle <aaron_openid@email.com>"
-    @expected.from    = "no-reply@sysmo-db.org"
-
-    @expected.body    = read_fixture('signup_openid')
-
-    assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron_openid),"localhost"))
-    
-  end
-  
   test "announcement notification" do
     announcement = Factory(:mail_announcement)
     recipient = Factory(:person)
