@@ -18,7 +18,7 @@ class LogPublishingTest < ActionController::TestCase
     sop_params,blob = valid_sop
     sop_params[:project_ids] = [Factory(:project).id] #this project has no gatekeeper
     assert_difference ('ResourcePublishLog.count') do
-      post :create, :sop => sop_params,:content_blob=>blob, :sharing => public_sharing
+      post :create, :sop => sop_params,:content_blobs => [blob], :sharing => public_sharing
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
@@ -31,7 +31,7 @@ class LogPublishingTest < ActionController::TestCase
     sop,blob = valid_sop
     @controller = SopsController.new()
     assert_difference ('ResourcePublishLog.count') do
-      post :create, :sop => sop,:content_blob=>blob, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      post :create, :sop => sop,:content_blobs => [blob], :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -44,7 +44,8 @@ class LogPublishingTest < ActionController::TestCase
     @controller = SopsController.new()
     sop,blob = valid_sop
     assert_no_difference ('ResourcePublishLog.count') do
-      post :create, :sop => sop, :content_blob=>blob
+      post :create, :sop => sop, :content_blobs => [blob]
+
     end
 
     assert_not_equal Policy::EVERYONE, assigns(:sop).policy.sharing_scope

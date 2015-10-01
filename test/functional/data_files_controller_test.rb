@@ -213,7 +213,7 @@ class DataFilesControllerTest < ActionController::TestCase
      data_file_with_samples,blob = valid_data_file
      data_file_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
      assert_difference("DataFile.count") do
-       post :create,:data_file => data_file_with_samples,:content_blob=>blob, :sharing => valid_sharing
+       post :create,:data_file => data_file_with_samples,:content_blobs=>[blob], :sharing => valid_sharing
      end
 
     df = assigns(:data_file)
@@ -248,7 +248,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs=>[blob], :sharing=>valid_sharing
         end
       end
     end
@@ -261,7 +261,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>{}, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs=>[{}], :sharing=>valid_sharing
         end
       end
     end
@@ -276,7 +276,7 @@ class DataFilesControllerTest < ActionController::TestCase
     
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
       
@@ -297,7 +297,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
 
@@ -318,7 +318,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :data_file => { :title=>"Test"},:content_blob=>{:data_url=>uri.to_s}, :sharing=>valid_sharing
+          post :create, :data_file => { :title=>"Test"},:content_blobs => [{:data_url=>uri.to_s}], :sharing=>valid_sharing
         end
       end
     end
@@ -334,7 +334,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file=>data,:content_blob=>blob,
+          post :create, :data_file=>data,:content_blobs => [blob],
                :sharing=>valid_sharing
         end
       end
@@ -358,7 +358,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file=>data,:content_blob=>blob,
+          post :create, :data_file=>data,:content_blobs => [blob],
                :sharing=>valid_sharing
         end
       end
@@ -380,7 +380,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -396,7 +396,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('DataFile::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+            post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
           end
         end
 
@@ -428,7 +428,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
         post :upload_for_tool, :data_file => { :title=>"Test",:project_id=>projects(:sysmo_project).id},
-             :content_blob=>{:data=>file_for_upload},
+             :content_blobs => [{:data=>file_for_upload}],
              :recipient_id => people(:quentin_person).id
       end
     end
@@ -455,7 +455,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
         post :upload_from_email, :data_file => { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]},
-             :content_blob=>{:data=>file_for_upload},:recipient_ids => [people(:quentin_person).id], :sender_id => users(:datafile_owner).person_id
+             :content_blobs => [{:data=>file_for_upload}],:recipient_ids => [people(:quentin_person).id], :sender_id => users(:datafile_owner).person_id
       end
     end
 
@@ -479,7 +479,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => data_file,:content_blob=>blob
+          post :create, :data_file => data_file,:content_blobs => [blob]
+
         end
       end
     end
@@ -506,7 +507,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_no_difference('ActivityLog.count') do
         assert_no_difference('DataFile.count') do
           assert_no_difference('ContentBlob.count') do
-            post :create, :data_file => data_file,:content_blob=>blob
+            post :create, :data_file => data_file,:content_blobs => [blob]
+
           end
         end
       end
@@ -546,7 +548,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
 
@@ -569,7 +571,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
 
@@ -592,7 +594,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         @request.env['HTTP_USER_AGENT']="Windows"
-        post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
 
@@ -771,7 +773,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -795,7 +797,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -821,7 +823,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -845,7 +847,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -999,7 +1001,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert d.can_manage?
     assert_difference("DataFile::Version.count", 1) do
       assert_difference("StudiedFactor.count",1) do
-        post :new_version, :id=>d.id, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>d.id, :data_file=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision" #v2
       end
     end
 
@@ -1029,9 +1031,9 @@ class DataFilesControllerTest < ActionController::TestCase
       #upload a data file
       df = Factory :data_file, :contributor => User.current_user
       #upload new version 1 of the data file
-      post :new_version, :id=>df, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision 1"
+      post :new_version, :id=>df, :data_file=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision 1"
       #upload new version 2 of the data file
-      post :new_version, :id=>df, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision 2"
+      post :new_version, :id=>df, :data_file=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision 2"
 
       df.reload
       assert_equal 3, df.versions.length
@@ -1054,7 +1056,7 @@ class DataFilesControllerTest < ActionController::TestCase
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
     assert_difference("DataFile::Version.count", 1) do
       assert_difference("StudiedFactor.count",1) do
-        post :new_version, :id=>d, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>d, :data_file=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision" #v2
       end
     end
     
@@ -1302,7 +1304,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file =>data_file,:content_blob=>blob, :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+          post :create, :data_file =>data_file,:content_blobs => [blob], :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
         end
       end
     end
@@ -1677,7 +1679,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     df_param = { :title=>"Test",:project_ids=>[proj.id]}
     blob = {:data=>file_for_upload}
-    post :create, :data_file => df_param,:content_blob=>blob, :sharing=>valid_sharing
+    post :create, :data_file => df_param,:content_blobs => [blob], :sharing=>valid_sharing
 
     df = assigns(:data_file)
 

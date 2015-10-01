@@ -12,6 +12,8 @@ module Seek
           return false if !blob_params || blob_params.none? { |p| check_for_data_or_url(p) }
         end
 
+        blob_params.select! { |p| !(p[:data].blank? && p[:data_url].blank?) }
+
         blob_params.each do |item_params|
           return false unless check_for_data_or_url(item_params) unless allow_empty_content_blob
 
