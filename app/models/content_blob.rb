@@ -16,7 +16,7 @@ class ContentBlob < ActiveRecord::Base
   attr_writer :data
 
   # this is used as an alternative to passing the data contents directly (in memory).
-  # it is not stored in the database, but when the content_blob is saved is save, the IO object is read and stored in the correct location.
+  # it is not stored in the database, but when the content_blob is saved, the IO object is read and stored in the correct location.
   # if the file doesn't exist an error occurs
   attr_writer :tmp_io_object
 
@@ -27,6 +27,7 @@ class ContentBlob < ActiveRecord::Base
   before_save :dump_data_to_file
   before_save :check_version
   before_save :calculate_file_size
+  after_create :create_retrieval_job
 
   has_many :worksheets, dependent: :destroy
 
@@ -163,6 +164,16 @@ class ContentBlob < ActiveRecord::Base
     @file ||= File.open(filepath)
   end
 
+  def retrieve
+    f = Seek::DownloadHandling::RemoteContentHandler.new(self.url).fetch
+    if f
+      self.tmp_io_object = f
+      self.save
+    else
+      false
+    end
+  end
+
   private
 
   def retrieve_content_type_from_url
@@ -205,4 +216,9 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
+  def create_retrieval_job
+    if !file_exists? && !url.blank?
+      RemoteContentFetchingJob.new(self).queue_job
+    end
+  end
 end
