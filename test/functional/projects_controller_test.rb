@@ -132,12 +132,18 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test "asset report with stuff in it can be accessed" do
     person = Factory(:person)
-    publication = Factory(:publication)
-    publication.projects = person.projects
-    publication.save
+    publication = Factory(:publication, :projects=>person.projects)
+    model = Factory(:model,:policy=>Factory(:public_policy),:projects=>person.projects,:organism=>Factory(:organism))
+
+    model.save
+    publication.associate(model)
+    publication.save!
     project = person.projects.first
-    login_as(person.user)
+
+    assert_include publication.projects,project
+    login_as(person)
     get :asset_report,:id=>project.id
+
     assert_response :success
   end
 
