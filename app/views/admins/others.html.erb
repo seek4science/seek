@@ -59,6 +59,16 @@
                              'Private recaptcha key') %>
     </div>
 
+    <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
+                               "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
+                               :onchange=>toggle_appear_javascript('cache_remote_block')) %>
+    <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
+      <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
+                             'Maximum file size', 'The size limit (in bytes) below which SEEK will attempt to cache remote files. Remote files larger than this limit will be ignored.',
+                             :onkeypress => "javascript: return onlyNumbers(event);") %>
+    </div>
+
+
     <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
     <%= link_to 'Cancel', admin_path, :class => 'btn btn-default'-%>
 <% end -%>
