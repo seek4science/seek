@@ -68,6 +68,53 @@ task. Using seek:upgrade should still work, but could take a lot of
 unnecessary time. There is more details and an example towards the end of the
 this page.
 
+## Steps to upgrade from 0.22.x to 0.23.x
+
+**If you need to upgrade from v0.21 based on Mercurial rather than Git or the
+downloaded tarball, please contact us on our mailing lists.**
+
+### Dependencies
+You will need to install nodejs. First install this using
+
+    sudo apt-get install nodejs
+
+### Stopping services before upgrading
+
+    export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
+    bundle exec rake seek:workers:stop
+    bundle exec rake sunspot:solr:stop
+
+### Update Ruby with RVM
+
+Although not critical, we recommend updating Ruby to 2.1.6. If you are using
+RVM, as recommended in the installation, you can do this with:
+
+    rvm get stable
+    rvm install ruby-2.1.6
+
+### Updating from GitHub
+
+If you have an existing installation linked to our GitHub, you can fetch the
+files with:
+
+    git pull https://github.com/seek4science/seek.git
+    git checkout v0.23.0
+
+### Updating using the tarball
+
+Starting with version 0.22, we've started making SEEK available as a download.
+You can download the file from
+<https://bitbucket.org/seek4science/seek/downloads/seek-0.23.0.tgz> You can
+unpack this file using:
+
+    tar zxvf seek-0.23.0.tgz
+
+and then copy across your existing filestore and database configuration file
+from your previous installation and continue with the upgrade steps. The
+database configuration file you would need to copy is *config/database.yml*,
+and the filestore is simply *filestore/*
+
+
 ## Steps to upgrade from 0.21.x to 0.22.x
 
 **If you need to upgrade from v0.21 based on Mercurial rather than Git or the

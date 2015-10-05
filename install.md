@@ -82,7 +82,7 @@ Ruby and RubyGems version. Although you can use the version that comes with
 your linux distribution, it is more difficult to control the version you use
 and keep up to date.
 
-To install RVM follow the steps at https://rvm.io/rvm/install . The current
+To install RVM follow the steps at <https://rvm.io/rvm/install> . The current
 basic installation method is to run:
 
     \curl -L https://get.rvm.io | bash
@@ -112,17 +112,17 @@ different applications. To create the gemset run:
 
 Now you are ready for installing SEEK. You can either download SEEK or install
 from GitHub. You can download SEEK from
-https://bitbucket.org/seek4science/seek/downloads/seek-0.22.1.tgz , then
+<https://bitbucket.org/seek4science/seek/downloads/seek-0.23.0.tgz> , then
 unpack the file with:
 
-    tar zxfv seek-0.22.1.tgz
+    tar zxfv seek-0.23.0.tgz
 
 If you wish to install directly from GitHub, the latest version of SEEK is
-tagged as *(v0.22.1)*. To fetch this run:
+tagged as *(v0.23.0)*. To fetch this run:
 
     git clone https://github.com/seek4science/seek.git
     cd seek/
-    git checkout v0.22.1
+    git checkout v0.23.0
 
 ## Installing Gems
 
