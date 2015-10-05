@@ -26,9 +26,7 @@ module Seek
       end
 
       def fetch
-        if info[:content_length] && info[:content_length] < Seek::Config.max_cachable_size
-          open(@url)
-        end
+        open(@url)
       end
 
     end
