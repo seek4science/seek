@@ -20,6 +20,9 @@ class ContentBlob < ActiveRecord::Base
   # if the file doesn't exist an error occurs
   attr_writer :tmp_io_object
 
+  # Flag to decide whether a remote file should be retrieved and stored in SEEK
+  attr_accessor :make_local_copy
+
   acts_as_uniquely_identifiable
 
   # this action saves the contents of @data or the contents contained within the @tmp_io_object to the storage file.
@@ -168,9 +171,9 @@ class ContentBlob < ActiveRecord::Base
 
   def retrieve
     handler = Seek::DownloadHandling::RemoteContentHandler.new(self.url)
-    self.file_size ||= handler.info[:content_length]
+    size = handler.info[:content_length]
 
-    if self.file_size && self.file_size < Seek::Config.max_cachable_size
+    if size && size < Seek::Config.max_cachable_size
       self.tmp_io_object = handler.fetch
     end
 
@@ -220,7 +223,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def create_retrieval_job
-    if !file_exists? && !url.blank?
+    if !file_exists? && !url.blank? && make_local_copy
       RemoteContentFetchingJob.new(self).queue_job
     end
   end

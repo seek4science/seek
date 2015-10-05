@@ -63,6 +63,8 @@ module Seek
           external_link: !item_params[:make_local_copy] == '1',
           original_filename: item_params[:original_filename],
           content_type: item_params[:content_type],
+          make_local_copy: item_params[:make_local_copy],
+          file_size: item_params[:file_size],
           asset_version: version }
       end
 
@@ -100,20 +102,15 @@ module Seek
         @data_url = blob_params[:data_url]
         blob_params.delete(:data)
         code = check_url_response_code(@data_url)
-        make_local_copy = blob_params[:make_local_copy] == '1'
 
         case code
           when 200
             headers = fetch_url_headers(@data_url)
             filename = determine_filename_from_disposition(headers[:content_disposition])
             filename ||= determine_filename_from_url(@data_url)
-            if make_local_copy
-              downloader = RemoteDownloader.new
-              data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
-              blob_params[:tmp_io_object] = File.open data_hash[:data_tmp_path], 'r'
-            end
             blob_params[:original_filename] = filename || ''
             blob_params[:content_type] = (extract_mime_content_type(headers[:content_type]) || content_type_from_filename(filename) || '')
+            blob_params[:file_size] = headers[:content_length].try(:to_i)
           when 401, 403
             blob_params[:content_type] = ''
             blob_params[:original_filename] = ''
