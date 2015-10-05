@@ -1,0 +1,16 @@
+---
+title: Get SEEK
+layout: page
+---
+
+# Get SEEK
+
+SEEK is open source software, and is distributed under a [BSD License](https://github.com/seek4science/seek/blob/master/BSD-LICENSE). The source code is all available on [GitHub](https://github.com/seek4science/seek).
+
+For details on how to **install** SEEK please refer to our [Installation Guide](install.html)
+
+For details on how to **upgrade** an existing SEEK installation please refer to our [Upgrade Guide](upgrading.html)
+
+To review **changes and new features** introduced between SEEK versions please visit our [Change Log](http://seek4science.org/changes)
+
+We also provide Virtual Machine Images, available for [Virtual Box](http://www.virtualbox.org/). To download and for information on how to setup please refer to our [Virtual Image Guide](http://seek4science.org/seek-vm).
