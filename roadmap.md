@@ -15,11 +15,11 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| New user-interface based on [Bootstrap](http://getbootstrap.com) | July 2015  |
-| Self management of organisms | August 2015  |
-| Improved registration workflow | October 2015  |
-| Self management of projects and programmes | October 2015  |
-| Support for [Research Objects](http://www.researchobject.org/) | October 2015 |
+| <del>New user-interface based on [Bootstrap](http://getbootstrap.com)</del> | <del>September 2015</del>  |
+| Self management of organisms | December 2015  |
+| Improved registration workflow | December 2015  |
+| Self management of projects and programmes | December 2015  |
+| Support for [Research Objects](http://www.researchobject.org/) | December 2015 |
 | LDAP support for authentication | TBA  |
 | Improved Samples/Treatments/SOP handling | January 2016  |
 | Integration with openBIS | January 2016  |
