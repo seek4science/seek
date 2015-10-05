@@ -171,11 +171,8 @@ class ContentBlob < ActiveRecord::Base
 
   def retrieve
     handler = Seek::DownloadHandling::RemoteContentHandler.new(self.url)
-    size = handler.info[:content_length]
 
-    if size && size < Seek::Config.max_cachable_size
-      self.tmp_io_object = handler.fetch
-    end
+    self.tmp_io_object = handler.fetch
 
     self.save
   end
