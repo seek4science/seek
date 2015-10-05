@@ -49,6 +49,8 @@ class ContentBlob < ActiveRecord::Base
   def filesize
     if file_exists?
       File.size(filepath)
+    elsif file_size
+      file_size
     else
       nil
     end
