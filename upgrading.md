@@ -70,8 +70,6 @@ this page.
 
 ## Steps to upgrade from 0.22.x to 0.23.x
 
-**If you need to upgrade from v0.21 based on Mercurial rather than Git or the
-downloaded tarball, please contact us on our mailing lists.**
 
 ### Dependencies
 You will need to install nodejs. First install this using
