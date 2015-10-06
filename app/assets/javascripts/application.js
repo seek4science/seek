@@ -38,7 +38,7 @@
 //= require easytabs
 //= require favourites
 //= require jquery-ui-drag-drop
-//= require bootstrap-tagsinput
+//= require bootstrap-tagsinput-fixed
 //= require bootstrap-typeahead-rails
 //= require bootstrap-multiselect
 //= require tags_input
