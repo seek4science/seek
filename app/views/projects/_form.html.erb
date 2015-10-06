@@ -40,4 +40,4 @@
 <% end %>
 
 <%= f.submit(project ? "Update" : "Create",:disable_with=>(project ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
- or <%= link_to 'Cancel', (project ? project_path(project.id) : projects_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(project ? project_path(project.id) : projects_path) -%>

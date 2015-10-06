@@ -44,4 +44,4 @@
 
 <%= image_tag_for_key('publish', polymorphic_path(@investigation, :action => :check_related_items), nil, {:method=>:post,:class => 'btn btn-default'}, "Publish full #{t('investigation')}") if excluded_items.any? %>
 
-or <%= link_to 'Cancel', investigation_path(@investigation) -%>
+or <%= cancel_button investigation_path(@investigation) -%>

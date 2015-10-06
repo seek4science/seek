@@ -24,5 +24,5 @@
 
     <%= submit_tag 'Save', :class => 'btn btn-primary' -%>
     or
-    <%= link_to 'Cancel', main_app.run_path(@run), :class => 'btn btn-default' -%>
+    <%= cancel_button(main_app.run_path(@run)) -%>
 <% end %>

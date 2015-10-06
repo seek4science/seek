@@ -33,7 +33,7 @@
         <%= submit_tag "Upload and Save", :id => "sop_submit_btn",
                        :onclick => "validateResourceFields(true,'sop',true); return(false);",
                        :class => 'btn btn-primary' -%>
-        or <%= link_to 'Cancel', sops_path, :class => 'btn btn-default' -%>
+        or <%= cancel_button(sops_path) -%>
       </div>
     </div>
 <% end -%>

@@ -45,6 +45,6 @@
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
       <%= submit_tag "Confirm",:disable_with=>"Confirm" -%>
       Or
-      <%= link_to 'Cancel', resource %>
+      <%= cancel_button(resource) %>
   <% end %>
 </div>

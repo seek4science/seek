@@ -35,7 +35,7 @@
       <% end -%>
       <p style="margin-top: 2em; text-align: center;">
         <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateWorkGroupIds()") -%>
-        or <%= link_to 'Cancel', person_path(@person.id) -%>
+        or <%= cancel_button(person_path(@person.id)) -%>
       </p>
 
   <% end -%>

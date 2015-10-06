@@ -309,9 +309,7 @@ class PublicationsController < ApplicationController
     asset_ids.each do |id|
       asset = asset_type.constantize.find_by_id(id)
       if asset && asset.send("can_#{required_action}?")
-        unless Relationship.where(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object_type => "Publication", :other_object_id => @publication.id).first
-          Relationship.create(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object_type => "Publication", :other_object_id => @publication.id)
-        end
+        @publication.associate(asset)
       end
     end
     #Destroy asset relationship that aren't needed

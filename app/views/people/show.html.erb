@@ -51,12 +51,6 @@
                   <%= h @person.user.login %>
                 </p>
             <% end %>
-            <% if !@person.user.nil? && @person.user.openid %>
-                <p>
-                  <b>OpenID URL:</b>
-                  <%= h @person.user.openid %>
-                </p>
-            <% end %>
             <p>
               <b>Joined:</b>
               <%= @person.registered? ? date_as_string(@person.user.created_at, true) : 'This person has not yet registered' -%>

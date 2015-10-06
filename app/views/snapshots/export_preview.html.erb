@@ -76,7 +76,7 @@
 
             <p class="text-center">
               <%= submit_tag 'Publish', :class => 'btn btn-primary' %>
-              <%= link_to 'Cancel', investigation_path(@investigation), :class => 'btn btn-default' %>
+              <%= cancel_button(investigation_path(@investigation)) %>
             </p>
         <% end %>
     <% end %>

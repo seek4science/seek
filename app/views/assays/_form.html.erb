@@ -94,6 +94,13 @@
         <%= render :partial=>"assets/select_tags" %>
     <% end %>
 
+    <%  existing_creators = @assay.creators
+        existing_creators =  [current_user.person] if existing_creators.blank?
+    %>
+    <%= render :partial => "assets/author_form", :locals => {:resource_type => t('assays.assay'), # this is only for presentation, not for any processing
+                                                             :existing_creators => existing_creators,
+                                                             :other_creators => @assay.other_creators} -%>
+
     <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
 
     <%  if @assay.is_modelling? -%>
@@ -118,7 +125,7 @@
     <%= f.submit button_text, :disable_with=>disabled_text, :id => "assay_submit_btn",
                  :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);", :class => 'btn btn-primary' -%>
 <% end %>
- or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(@assay.id ? assay_path(@assay.id) : assays_path) -%>
 
 <script type="text/javascript">
 

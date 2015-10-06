@@ -73,7 +73,7 @@
           <br/>
           <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
           Or
-          <%= link_to "Cancel", person_path(params[:id].to_i) -%>
+          <%= cancel_button(person_path(params[:id].to_i)) -%>
       <% end %>
   <% end %>
 </div>

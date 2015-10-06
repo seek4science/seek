@@ -32,6 +32,13 @@
     </div>
 <% end %>
 
+<%  existing_creators = @study.creators
+    existing_creators =  [current_user.person] if existing_creators.blank?
+%>
+<%= render :partial => "assets/author_form", :locals => {:resource_type => t('study'), # this is only for presentation, not for any processing
+                                                         :existing_creators => existing_creators,
+                                                         :other_creators => @study.other_creators} -%>
+
 <% if show_scales? %>
     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
 <% end %>
@@ -59,4 +66,4 @@
                  :onclick => "javascript: $('study_submit_btn').form.submit();return(false);",
                  :class => 'btn btn-primary'-%>
 <% end %>
- or <%= link_to 'Cancel', (@study.id ? study_path(@study.id) : studies_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(@study.id ? study_path(@study.id) : studies_path) -%>

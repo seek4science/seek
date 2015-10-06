@@ -289,9 +289,7 @@ end
   test 'site_base_host' do
     assert_equal 'http://localhost:3000', Seek::Config.site_base_host
   end
-  test 'open_id_authentication_store' do
-    assert_equal :memory, Seek::Config.open_id_authentication_store
-  end
+  
   test 'copyright_addendum_enabled' do
     assert_equal false, Seek::Config.copyright_addendum_enabled
   end

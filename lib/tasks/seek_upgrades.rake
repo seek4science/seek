@@ -44,7 +44,6 @@ namespace :seek do
     AuthLookupUpdateJob.new.queue_job(0,Time.now)
   end
 
-
   desc "convert the avatar and model image from jpg to png"
   task(:convert_image_to_png => :environment) do
     avatar_filestore_path = Seek::Config.avatar_filestore_path
