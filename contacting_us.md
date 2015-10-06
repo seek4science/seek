@@ -24,9 +24,12 @@ You can also contact us through [FAIRDOM](http://fair-dom.org) using our [Contac
 This should be used if your query or feedback is of a more confidential nature. Remember to provide your email address.
 
 
-## Reporting Bugs and feature requests
+## Reporting bugs and feature requests
 
 You can report bugs or request new features using the Google groups described above, or using the [GitHub issue tracker](https://github.com/seek4science/seek/issues).
+
+When reporting your request please provide a clear description of the problem or new feature. In particular for bugs,
+please provide as much information as possible about your setup, SEEK version and the steps required to reproduce the bug.
 
 
 
