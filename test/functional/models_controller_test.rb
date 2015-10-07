@@ -493,8 +493,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 1,model.content_blobs.count
     assert !model.content_blobs.first.url.blank?
 
-
-    assert !model.content_blobs.first.data_io_object.nil?
     assert model.content_blobs.first.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
     assert_equal "image/png", model.content_blobs.first.content_type
