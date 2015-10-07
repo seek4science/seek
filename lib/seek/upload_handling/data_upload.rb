@@ -63,7 +63,7 @@ module Seek
           external_link: !item_params[:make_local_copy] == '1',
           original_filename: item_params[:original_filename],
           content_type: item_params[:content_type],
-          make_local_copy: item_params[:make_local_copy],
+          make_local_copy: item_params[:make_local_copy] == '1',
           file_size: item_params[:file_size],
           asset_version: version }
       end

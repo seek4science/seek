@@ -1945,6 +1945,102 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "p[class=comment]",:text=>/#{comment}/
   end
 
+  test "should create cache job for small file" do
+    mock_http
+    params = { data_file: {
+                       title: "Small File",
+                       project_ids: [projects(:sysmo_project).id]
+                   },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/small.txt",
+                                   make_local_copy: '0'
+                               }],
+               sharing: valid_sharing
+    }
+
+    assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    blob = assigns(:data_file).content_blob
+    assert blob.cachable?
+    assert !blob.url.blank?
+    assert_equal "small.txt", blob.original_filename
+    assert_equal "text/plain", blob.content_type
+    assert_equal 100, blob.file_size
+    assert RemoteContentFetchingJob.new(blob).exists?
+  end
+
+  test "should not automatically create cache job for large file" do
+    mock_http
+    params = { data_file: {
+        title: "Big File",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/big.txt",
+                                   make_local_copy: '0'
+                               }],
+               sharing: valid_sharing
+    }
+
+
+    assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    blob = assigns(:data_file).content_blob
+    assert !blob.make_local_copy
+    assert !blob.cachable?
+    assert !blob.url.blank?
+    assert_equal "big.txt", blob.original_filename
+    assert_equal "text/plain", blob.content_type
+    assert_equal 5000, blob.file_size
+    assert !RemoteContentFetchingJob.new(blob).exists?
+  end
+
+  test "should create cache job for large file if user requests 'make_local_copy'" do
+    mock_http
+    params = { data_file: {
+        title: "Big File",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/big.txt",
+                                   make_local_copy: '1'
+                               }],
+               sharing: valid_sharing
+    }
+
+    assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    blob = assigns(:data_file).content_blob
+    assert blob.make_local_copy
+    assert !blob.cachable?
+    assert !blob.url.blank?
+    assert_equal "big.txt", blob.original_filename
+    assert_equal "text/plain", blob.content_type
+    assert_equal 5000, blob.file_size
+    assert RemoteContentFetchingJob.new(blob).exists?
+  end
+
   private
 
   def mock_http
@@ -1962,6 +2058,12 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:any, "http://mocked401.com").to_return(:status=>401)
     stub_request(:any, "http://mocked403.com").to_return(:status=>403)
     stub_request(:any, "http://mocked404.com").to_return(:status=>404)
+
+    stub_request(:get, "http://mockedlocation.com/small.txt").to_return(body: 'bananafish'*10, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 100 })
+    stub_request(:head, "http://mockedlocation.com/small.txt").to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 100 })
+
+    stub_request(:get, "http://mockedlocation.com/big.txt").to_return(body: 'bananafish'*500, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
+    stub_request(:head, "http://mockedlocation.com/big.txt").to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
   end
 
   def mock_https

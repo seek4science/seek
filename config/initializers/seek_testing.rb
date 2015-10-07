@@ -92,6 +92,9 @@ SEEK::Application.configure do
       Settings.defaults[:zenodo_api_url] = "https://sandbox.zenodo.org/api"
       Settings.defaults[:zenodo_oauth_url] = "https://sandbox.zenodo.org/oauth"
 
+      Settings.defaults[:cache_remote_files] = true
+      Settings.defaults[:max_cachable_size] = 2000
+
     end
   end
 end
