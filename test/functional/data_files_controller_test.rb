@@ -343,7 +343,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.file_exists?
     assert_equal "txt_test.txt", assigns(:data_file).content_blob.original_filename
     assert_equal "text/plain", assigns(:data_file).content_blob.content_type
   end
@@ -366,7 +365,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.file_exists?
     assert_equal "txt_test.txt", assigns(:data_file).content_blob.original_filename
     assert_equal "text/plain", assigns(:data_file).content_blob.content_type
   end
