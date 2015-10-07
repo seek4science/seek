@@ -177,6 +177,12 @@ class ContentBlob < ActiveRecord::Base
     self.save
   end
 
+  def cachable?
+    Seek::Config.cache_remote_files &&
+        file_size &&
+        file_size < Seek::Config.max_cachable_size
+  end
+
   private
 
   def retrieve_content_type_from_url
@@ -220,7 +226,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def create_retrieval_job
-    if !file_exists? && !url.blank? && make_local_copy
+    if !file_exists? && !url.blank? && (make_local_copy || cachable?)
       RemoteContentFetchingJob.new(self).queue_job
     end
   end
