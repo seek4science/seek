@@ -70,21 +70,6 @@ module Seek
         end
       end
 
-      def show_via_url asset, content_blob=nil
-        content_blob = content_blob.nil? ? asset.content_blob : content_blob
-        code = url_response_code(content_blob.url)
-        if (["301","302", "401"].include?(code))
-          redirect_to(content_blob.url, :target=>"_blank")
-        elsif code=="404"
-          flash[:error]="This item is referenced at a remote location, which is currently unavailable"
-          redirect_to polymorphic_path(asset.parent, {:version=>asset.version})
-        else
-          downloader=Seek::RemoteDownloader.new
-          data_hash = downloader.get_remote_data content_blob.url
-          send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || content_blob.original_filename, :content_type => data_hash[:content_type] || content_blob.content_type, :disposition => 'inline'
-        end
-      end
-
       def handle_download_zip asset
         #get the list of filename and filepath, {:filename => filepath}
         files_to_download = {}
@@ -101,13 +86,6 @@ module Seek
             filename = check_and_rename_file files_to_download.keys, content_blob.original_filename
             files_to_download["#{filename}"] = content_blob.filepath
             content_type = content_blob.content_type
-          elsif !content_blob.url.nil?
-            downloader=Seek::RemoteDownloader.new
-            data_hash = downloader.get_remote_data content_blob.url, nil, nil, nil, true
-            original_filename = get_filename data_hash[:filename], content_blob.original_filename
-            filename = check_and_rename_file files_to_download.keys, original_filename
-            files_to_download["#{filename}"] = data_hash[:data_tmp_path]
-            content_type = data_hash[:content_type] || content_blob.content_type
           end
         end
 
