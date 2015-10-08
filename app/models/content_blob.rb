@@ -40,7 +40,7 @@ class ContentBlob < ActiveRecord::Base
 
   def original_filename_or_url
     if original_filename.blank? && url.blank?
-      errors.add(:base, 'Need to specifiy either original_filename or url')
+      errors.add(:base, 'Need to specify either original_filename or url')
     end
   end
 
