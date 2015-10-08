@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151001131852) do
+ActiveRecord::Schema.define(:version => 20151008141054) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -946,9 +946,10 @@ ActiveRecord::Schema.define(:version => 20151001131852) do
     t.string   "web_page"
     t.string   "first_letter",    :limit => 1
     t.string   "uuid"
-    t.datetime "created_at",                   :null => false
-    t.datetime "updated_at",                   :null => false
+    t.datetime "created_at",                                      :null => false
+    t.datetime "updated_at",                                      :null => false
     t.text     "funding_details"
+    t.boolean  "activated",                    :default => false
   end
 
   create_table "project_descendants", :id => false, :force => true do |t|

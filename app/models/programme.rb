@@ -18,6 +18,7 @@ class Programme < ActiveRecord::Base
   # validations
   validates :title, uniqueness: true
   after_save :handle_administrator_ids, if: '@administrator_ids'
+  before_create :activate
 
   scope :default_order, order('title')
 
@@ -48,12 +49,13 @@ class Programme < ActiveRecord::Base
   def self.can_create?
     return false unless Seek::Config.programmes_enabled
     (User.admin_logged_in?) || (User.logged_in_and_registered? && Seek::Config.allow_user_programme_creation)
-
   end
 
   def administrators
     Seek::Roles::ProgrammeRelatedRoles.instance.people_with_programme_and_role(self, 'programme_administrator')
   end
+
+  private
 
   # set the administrators, assigned from the params to :adminstrator_ids
   def handle_administrator_ids
@@ -68,5 +70,15 @@ class Programme < ActiveRecord::Base
       person.is_programme_administrator = false, self
       disable_authorization_checks { person.save! }
     end
+  end
+
+  # callback, activates if current user is an admin or nil, otherwise it needs activating
+  def activate
+    if User.current_user && !User.current_user.is_admin?
+      self.activated = false
+    else
+      self.activated = true
+    end
+    true
   end
 end
