@@ -18,7 +18,7 @@ module Seek
     end
 
     def is_extractable_spreadsheet?(blob = self)
-      within_size_limit(blob) && is_excel?(blob)
+      within_size_limit(blob) && is_excel?(blob) && blob.file_exists?
     end
 
     def is_in_simulatable_size_limit?(blob = self)
