@@ -7,7 +7,7 @@ function setup_url_field(examine_url_path,examine_button_id) {
     $j('#'+examine_button_id).on('click', function(event){
         submit_url_for_examination();
     });
-    upload_url_field.on('paste', function(event) {
+    upload_url_field.on('change', function(event) {
         setTimeout(function(e){
             submit_url_for_examination();
         },0);
