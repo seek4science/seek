@@ -78,7 +78,7 @@ module Seek
     end
 
     def is_content_viewable?(blob = self)
-      blob.asset.is_downloadable_asset? && blob.is_viewable_format?
+      blob.asset.is_downloadable_asset? && blob.is_viewable_format? && blob.file_exists?
     end
 
     def update_content_mime_type
