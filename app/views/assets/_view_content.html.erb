@@ -38,7 +38,7 @@
                     "Supported file formats are: " +  (Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT + ["pdf"]).join(" , ") +
                     "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(" , ") %>
         <% else %>
-            <% explanation = "This content is stored remotely and cannot be previewed." %>
+            <% explanation = "This content is stored externally and cannot be previewed." %>
         <% end %>
         <% if icon_view %>
             <%= image('show', :onclick => "javascript:alert('#{explanation}')", :title => tooltip_title_attrib(explanation)) %>
