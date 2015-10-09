@@ -21,6 +21,7 @@ class Programme < ActiveRecord::Base
   before_create :activate
 
   scope :default_order, order('title')
+  scope :activated, where(is_activated:true)
 
   def people
     projects.collect(&:people).flatten.uniq
@@ -75,9 +76,9 @@ class Programme < ActiveRecord::Base
   # callback, activates if current user is an admin or nil, otherwise it needs activating
   def activate
     if User.current_user && !User.current_user.is_admin?
-      self.activated = false
+      self.is_activated = false
     else
-      self.activated = true
+      self.is_activated = true
     end
     true
   end

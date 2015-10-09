@@ -195,37 +195,44 @@ class ProgrammeTest < ActiveSupport::TestCase
   test 'programme activated automatically when created by an admin' do
     User.with_current_user Factory(:admin).user do
       prog = Factory(:programme)
-      assert prog.activated?
+      assert prog.is_activated?
     end
   end
 
   test 'programme activated automatically when current_user is nil' do
     User.with_current_user nil do
       prog = Factory(:programme)
-      assert prog.activated?
+      assert prog.is_activated?
     end
   end
 
   test 'programme not activated automatically when created by a normal user' do
     Factory(:admin) # to avoid 1st person being an admin
-
     User.with_current_user Factory(:person).user do
       prog = Factory(:programme)
-      refute prog.activated?
+      refute prog.is_activated?
     end
-
   end
 
   test "doesn't change activation flag on later save" do
     Factory(:admin) # to avoid 1st person being an admin
     prog = Factory(:programme)
-    assert prog.activated?
+    assert prog.is_activated?
     User.with_current_user Factory(:person).user do
       prog.title="fish"
       disable_authorization_checks{prog.save!}
-      assert prog.activated?
+      assert prog.is_activated?
     end
   end
 
+  test "activated scope" do
+    activated_prog = Factory(:programme)
+    not_activated_prog = Factory(:programme)
+    not_activated_prog.is_activated=false
+    disable_authorization_checks{not_activated_prog.save!}
+
+    assert_includes Programme.activated,activated_prog
+    refute_includes Programme.activated,not_activated_prog
+  end
 
 end
