@@ -183,6 +183,16 @@ class ContentBlob < ActiveRecord::Base
         file_size < Seek::Config.max_cachable_size
   end
 
+  def caching_job(ignore_locked = true)
+    job_yaml = RemoteContentFetchingJob.new(self).to_yaml
+
+    if ignore_locked
+      Delayed::Job.where(['handler = ? AND locked_at IS NULL AND failed_at IS NULL', job_yaml]) # possibly a better way of doing this...
+    else
+      Delayed::Job.where(['handler = ? AND failed_at IS NULL', job_yaml])
+    end
+  end
+
   private
 
   def retrieve_content_type_from_url

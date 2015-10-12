@@ -1,4 +1,3 @@
-
 class ContentBlobsController < ApplicationController
 
   before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_pdf_content, :download]
@@ -33,30 +32,18 @@ class ContentBlobsController < ApplicationController
   end
 
   def get_pdf
-    if @content_blob.url.blank?
+    if @content_blob.file_exists?
       begin
         pdf_or_convert
-      rescue Exception=>e
-        raise ("#{e}")
+      rescue Exception => e
+        raise(e)
       end
     else
-      begin
-        if @asset_version.contributor.nil? #A jerm generated resource
-          get_and_process_file(false, true)  #from jerm
-        else
-          get_and_process_file(true, false)  #from url
-        end
-      rescue Seek::DownloadException=>de
-        raise ("#{de}")
-      rescue Jerm::JermException=>de
-        raise ("#{de}")
-      end
+      raise("Remote file") # TODO: Implement this
     end
   end
 
-
   def download
-
     @asset.just_used
 
     disposition = params[:disposition] || 'attachment'
@@ -70,70 +57,32 @@ class ContentBlobsController < ApplicationController
 
   private
 
-
-
   #check whether the file is pdf, otherwise convert to pdf
   #then return the pdf file
-  def pdf_or_convert dat_filepath=@content_blob.filepath
-
+  def pdf_or_convert filepath = @content_blob.filepath
     if @content_blob.is_pdf?
-      send_file dat_filepath, :filename => @content_blob.original_filename, :type => "application/pdf", :disposition => 'attachment'
-      headers["Content-Length"]=File.size(dat_filepath).to_s
+      pdf_filepath = @content_blob.filepath
+      pdf_filename = @content_blob.original_filename
     else
       pdf_filepath = @content_blob.filepath("pdf")
-      @content_blob.convert_to_pdf(dat_filepath,pdf_filepath)
+      @content_blob.convert_to_pdf(filepath, pdf_filepath)
 
       if File.exists?(pdf_filepath)
-        filename = File.basename(@content_blob.original_filename,File.extname(@content_blob.original_filename))+".pdf"
-        send_file pdf_filepath, :filename =>filename , :type => "application/pdf", :disposition => 'attachment'
-        headers["Content-Length"]=File.size(pdf_filepath).to_s
+        pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename))+".pdf"
       else
-        raise Exception.new('Unable to convert the file for display')
-      end
-    end
-  end
-
-  def get_and_process_file from_url=true,from_jerm=false
-    if from_url
-      data_hash = get_data_hash_from_url
-      #delete the previous conversion to refresh, but only if a copy of the original exists
-      pdf_path = @content_blob.filepath("pdf")
-      FileUtils.rm pdf_path if File.exist?(pdf_path) && @content_blob.file_exists?
-    else
-      begin
-        data_hash = get_data_hash_from_jerm
-      rescue Jerm::JermException=>e
-        if @content_blob.file_exists?
-          data_hash = nil
-        else
-          raise e
-        end
+        raise Exception.new("Couldn't find converted PDF file.")
       end
     end
 
-    if data_hash
-      pdf_or_convert data_hash[:data_tmp_path]
-    elsif File.exists?(@content_blob.filepath)
-      pdf_or_convert
-    else
-      redirect_on_error @asset_version,"Unable to find a copy of the file for viewing, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
-    end
+    send_file pdf_filepath,
+              :filename => pdf_filename,
+              :type => "application/pdf",
+              :disposition => 'attachment'
+
+    headers["Content-Length"] = File.size(pdf_filepath).to_s
   end
 
-  def get_data_hash_from_url
-    code = check_url_response_code(@content_blob.url)
-    if code == 200
-      downloader=Seek::RemoteDownloader.new
-      begin
-        data_hash = downloader.get_remote_data @content_blob.url
-        data_hash
-      rescue Exception=>e
-        nil
-      end
-    end
-  end
-
-  def get_data_hash_from_jerm
+  def get_file_from_jerm
     project=@asset_version.projects.first
     project.decrypt_credentials
     downloader=Jerm::DownloaderFactory.create project.title
@@ -159,8 +108,6 @@ class ContentBlobsController < ApplicationController
         return false
       end
     end
-
-
   end
 
   def asset_object
