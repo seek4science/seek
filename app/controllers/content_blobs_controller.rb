@@ -38,8 +38,18 @@ class ContentBlobsController < ApplicationController
       rescue Exception => e
         raise(e)
       end
+    elsif @content_blob.cachable?
+      if (caching_job = @content_blob.caching_job).exists?
+        caching_job.first.destroy
+      end
+      @content_blob.retrieve
+      begin
+        pdf_or_convert
+      rescue Exception => e
+        raise(e)
+      end
     else
-      raise("Remote file") # TODO: Implement this
+      raise("This remote file is too big to be displayed as PDF.")
     end
   end
 
@@ -50,8 +60,8 @@ class ContentBlobsController < ApplicationController
     image_size = params[:image_size]
 
     respond_to do |format|
-      format.html {handle_download(disposition, image_size)}
-      format.pdf {get_pdf}
+      format.html { handle_download(disposition, image_size) }
+      format.pdf { get_pdf }
     end
   end
 

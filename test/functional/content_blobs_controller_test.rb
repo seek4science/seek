@@ -158,7 +158,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get_pdf from url' do
-    mock_remote_file "#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'http://somewhere.com/piccy.pdf', 'Content-Type' => 'application/pdf'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/a_pdf_file.pdf",
+                     'http://somewhere.com/piccy.pdf',
+                     { 'Content-Type' => 'application/pdf',
+                       'Content-Length' => 500 }
     pdf_sop = Factory(:sop,
                       policy: Factory(:all_sysmo_downloadable_policy),
                       content_blob: Factory(:pdf_content_blob,
@@ -166,6 +169,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                             url: 'http://somewhere.com/piccy.pdf',
                                             uuid: UUID.generate))
     assert !pdf_sop.content_blob.file_exists?
+    assert pdf_sop.content_blob.cachable?
 
     get :get_pdf, sop_id: pdf_sop.id, id: pdf_sop.content_blob.id
 
