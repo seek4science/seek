@@ -1971,7 +1971,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "small.txt", blob.original_filename
     assert_equal "text/plain", blob.content_type
     assert_equal 100, blob.file_size
-    assert RemoteContentFetchingJob.new(blob).exists?
+    assert blob.caching_job.exists?
   end
 
   test "should not automatically create cache job for large file" do
@@ -2004,7 +2004,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "big.txt", blob.original_filename
     assert_equal "text/plain", blob.content_type
     assert_equal 5000, blob.file_size
-    assert !RemoteContentFetchingJob.new(blob).exists?
+    assert !blob.caching_job.exists?
   end
 
   test "should create cache job for large file if user requests 'make_local_copy'" do
@@ -2036,7 +2036,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "big.txt", blob.original_filename
     assert_equal "text/plain", blob.content_type
     assert_equal 5000, blob.file_size
-    assert RemoteContentFetchingJob.new(blob).exists?
+    assert blob.caching_job.exists?
   end
 
   private
