@@ -195,9 +195,20 @@ class ContentBlob < ActiveRecord::Base
 
   private
 
+  def remote_headers
+    if @headers
+      @headers
+    else
+      begin
+        RestClient.head(url).headers
+      rescue
+        {}
+      end
+    end
+  end
+
   def retrieve_content_type_from_url
-    response = RestClient.head url
-    type = response.headers[:content_type] || ''
+    type = remote_headers[:content_type] || ''
 
     # strip out the charset, e.g for content-type  "text/html; charset=utf-8"
     type.gsub(/;.*/, '').strip
@@ -232,6 +243,8 @@ class ContentBlob < ActiveRecord::Base
   def calculate_file_size
     if file_exists?
       self.file_size = File.size(self.filepath)
+    else
+      self.file_size = remote_headers[:content_length]
     end
   end
 
