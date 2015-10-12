@@ -179,13 +179,16 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal 'application/pdf', @response.header['Content-Type']
     assert_equal '8827', @response.header['Content-Length']
 
-    assert !File.exist?(pdf_sop.content_blob.filepath)
-    assert !File.exist?(pdf_sop.content_blob.filepath('pdf'))
+    assert File.exist?(pdf_sop.content_blob.filepath)
+    assert !File.exist?(pdf_sop.content_blob.filepath('pdf')), "Shouldn't generate an separate PDF file, as it is already a PDF"
   end
 
   test 'get_pdf of a doc file from url' do
     check_for_soffice
-    mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc", 'http://somewhere.com/piccy.doc', 'Content-Type' => 'application/pdf'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc",
+                     'http://somewhere.com/piccy.doc',
+                     { 'Content-Type' => 'application/pdf',
+                       'Content-Length' => 500 }
     doc_sop = Factory(:sop,
                       policy: Factory(:all_sysmo_downloadable_policy),
                       content_blob: Factory(:doc_content_blob,
@@ -200,8 +203,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     # assert_equal 16235, @response.header['Content-Length'].to_i
     assert_includes 9200..16_300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 9200-9300 bytes'
 
-    assert !File.exist?(doc_sop.content_blob.filepath)
-    assert File.exist?(doc_sop.content_blob.filepath('pdf')), 'the converted file should remain'
+    assert File.exist?(doc_sop.content_blob.filepath)
+    assert File.exist?(doc_sop.content_blob.filepath('pdf')), 'the generated PDF file should remain'
   end
 
   test 'should gracefully handle view_pdf for non existing asset' do
