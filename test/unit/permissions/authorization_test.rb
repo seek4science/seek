@@ -689,17 +689,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert sop.can_edit?(users(:aaron))
   end
 
-  test "anyone can do anything on policy free items, except the overriten can_action?" do
-    item = Factory :project
-    User.current_user = Factory :user
-    actions.reject{|a| a == :delete}.each {|a| assert item.can_perform? a}
-    assert item.can_edit?
-    assert item.can_view?
-    assert item.can_download?
-    assert item.can_manage?
-    assert !item.can_delete? #can_delete? is overriten for project
-  end
-
   def test_contributor_can_do_anything
     item = Factory :sop, :policy => Factory(:private_policy)
     User.current_user = item.contributor

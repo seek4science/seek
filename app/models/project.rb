@@ -211,7 +211,7 @@ class Project < ActiveRecord::Base
   end
 
   def can_be_edited_by?(user)
-    user ? (user.is_admin? || user.is_project_manager?(self)) : false
+    user && (has_member?(user) || can_be_administered_by?(user))
   end
 
   def can_be_administered_by?(user)
@@ -219,7 +219,11 @@ class Project < ActiveRecord::Base
   end
 
   def can_delete?(user=User.current_user)
-    user == nil ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
+    user == nil ? false : (user.is_admin? && people.empty?)
+  end
+
+  def can_edit?(user=User.current_user)
+    can_be_edited_by?(user)
   end
 
   def lineage_ancestor_cannot_be_self

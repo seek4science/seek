@@ -11,7 +11,7 @@ class ProjectExtensionTest <  ActiveSupport::TestCase
     assert_equal true, parent_proj.descendants.include?(proj)
     parent_proj_changed = Factory(:project, :title => "changed test parent")
     proj.parent = parent_proj_changed
-    proj.save!
+    disable_authorization_checks{proj.save!}
 
     assert_equal "changed test parent", proj.parent.title
 
@@ -22,7 +22,7 @@ class ProjectExtensionTest <  ActiveSupport::TestCase
     parent_proj = Factory :project, :title => "parent proj"
     project = Factory :project, :parent => parent_proj
     project.institutions = institutions
-    project.save!
+
     institutions.each do |ins|
       assert_equal true, parent_proj.institutions.include?(ins)
     end
@@ -48,18 +48,8 @@ class ProjectExtensionTest <  ActiveSupport::TestCase
     end
   end
 
-   test "project roles of child project is also of parent project" do
-     # PIs
-     # Project Coordinators
-   end
-
-   test "admin defined roles of parent project is also of child project" do
-      # pal project_manager asset_manager gatekeeper
-
-   end
   test "projects with children cannot be deleted" do
-
-    assert !@proj.children.empty?
-    assert !@proj.can_delete?(Factory(:admin))
+    refute @proj.children.empty?
+    refute @proj.can_delete?(Factory(:admin))
   end
 end

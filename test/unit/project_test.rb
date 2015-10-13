@@ -96,7 +96,7 @@ class ProjectTest < ActiveSupport::TestCase
 
   def test_title_trimmed 
    p=Project.new(:title=>" test project")
-   p.save!
+   disable_authorization_checks{p.save!}
    assert_equal("test project",p.title)
   end
 
@@ -104,7 +104,7 @@ class ProjectTest < ActiveSupport::TestCase
     p=Project.new(:title=>"test project")
     p.site_password="12345"
     p.site_username="fred"
-    p.save!
+    disable_authorization_checks{p.save!}
     assert_not_nil p.site_credentials
   end
 
@@ -127,13 +127,13 @@ class ProjectTest < ActiveSupport::TestCase
     p=Project.new(:title=>"fred")
     p.site_password="12345"
     p.site_username="fred"
-    p.save!
+    disable_authorization_checks{p.save!}
     cred=p.site_credentials
     p=Project.find(p.id)
     assert_equal cred,p.site_credentials
     assert_nil p.site_password
     assert_nil p.site_username
-    p.save!
+    disable_authorization_checks{p.save!}
     assert_equal cred,p.site_credentials
     p=Project.find(p.id)
     assert_equal cred,p.site_credentials
@@ -184,6 +184,27 @@ class ProjectTest < ActiveSupport::TestCase
     assert !p.can_be_edited_by?(u),"other project should not be editable by project manager, since it is not a project he manages"
   end
 
+  test "can be edited by project member" do
+    admin = Factory(:admin)
+    person = Factory(:person)
+    project = person.projects.first
+    refute_nil project
+    another_person = Factory(:person)
+
+    assert project.can_be_edited_by?(person.user)
+    refute project.can_be_edited_by?(another_person.user)
+
+    User.with_current_user person.user do
+      assert project.can_edit?
+    end
+
+    User.with_current_user another_person.user do
+      refute project.can_edit?
+    end
+
+  end
+
+
   test "can be administered by" do
     admin = Factory(:admin)
     pm = Factory(:project_manager)
@@ -191,16 +212,17 @@ class ProjectTest < ActiveSupport::TestCase
     another_proj = Factory(:project)
 
     assert pm.projects.first.can_be_administered_by?(pm.user)
-    assert !normal.projects.first.can_be_administered_by?(normal.user)
+    refute normal.projects.first.can_be_administered_by?(normal.user)
 
-    assert !another_proj.can_be_administered_by?(normal.user)
-    assert !another_proj.can_be_administered_by?(pm.user)
+    refute another_proj.can_be_administered_by?(normal.user)
+    refute another_proj.can_be_administered_by?(pm.user)
     assert another_proj.can_be_administered_by?(admin.user)
+    refute normal.projects.first.can_be_administered_by?(normal.user)
   end
 
   def test_update_first_letter
     p=Project.new(:title=>"test project")
-    p.save
+    disable_authorization_checks{p.save!}
     assert_equal "T",p.first_letter
   end
 
@@ -388,7 +410,7 @@ class ProjectTest < ActiveSupport::TestCase
 
     p2.lineage_ancestor = p
     assert p2.valid?
-    p2.save!
+    disable_authorization_checks{p2.save!}
     p2.reload
     p.reload
 
@@ -402,9 +424,12 @@ class ProjectTest < ActiveSupport::TestCase
     assert_nil p2.lineage_ancestor
     assert_empty p.lineage_descendants
 
-    p2.lineage_descendants << p
-    assert p2.valid?
-    p2.save!
+    disable_authorization_checks do
+      p2.lineage_descendants << p
+      assert p2.valid?
+      p2.save!
+    end
+
     p2.reload
     p.reload
 
@@ -412,8 +437,11 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal p2,p.lineage_ancestor
 
     p3=Factory(:project)
-    p2.lineage_descendants << p3
-    p2.save!
+    disable_authorization_checks do
+      p2.lineage_descendants << p3
+      p2.save!
+    end
+
     p2.reload
     assert_equal [p,p3],p2.lineage_descendants.sort_by(&:id)
   end
@@ -443,7 +471,7 @@ class ProjectTest < ActiveSupport::TestCase
 
     p2.title="sdfsdflsdfoosdfsdf" #to allow it to save
 
-    p2.save!
+    disable_authorization_checks{p2.save!}
     p2.reload
     p.reload
 
@@ -493,7 +521,7 @@ class ProjectTest < ActiveSupport::TestCase
         assert_difference("Project.count",1) do
           assert_no_difference("Person.count") do
             p2 = p.spawn(:title=>"sdfsdfsdfsdf")
-            p2.save!
+            disable_authorization_checks{p2.save!}
           end
         end
       end
