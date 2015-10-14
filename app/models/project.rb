@@ -216,7 +216,7 @@ class Project < ActiveRecord::Base
   end
 
   def can_edit?(user=User.current_user)
-    can_be_edited_by?(user)
+    new_record? || can_be_edited_by?(user)
   end
 
   def can_delete?(user = User.current_user)
