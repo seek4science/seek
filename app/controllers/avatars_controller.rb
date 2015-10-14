@@ -124,6 +124,11 @@ class AvatarsController < ApplicationController
       ## END
       
       @avatar.save #forces a update callback, which invokes the sweeper
+      if @avatar_owner_instance.is_a?(Project)
+        if (Seek::Config.email_enabled && !@avatar_owner_instance.can_be_administered_by?(current_user))
+          ProjectChangedEmailJob.new(@avatar_owner_instance).queue_job
+        end
+      end
       respond_to do |format|
         flash[:notice] = 'Profile avatar was successfully updated.'
         format.html { redirect_to eval("#{@avatar_owner_instance.class.name.downcase}_avatars_url(#{@avatar_owner_instance.id})") }

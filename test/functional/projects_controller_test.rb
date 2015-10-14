@@ -778,6 +778,38 @@ class ProjectsControllerTest < ActionController::TestCase
     assert !work_group.reload.people.empty?
   end
 
+  test 'email job created when edited by a member' do
+    person = Factory(:person)
+    project = person.projects.first
+    login_as(person)
+    Delayed::Job.delete_all
+
+    post :update, :id=>project, :project => {:description=>"sdfkuhsdfkhsdfkhsdf"}
+
+    assert ProjectChangedEmailJob.new(project).exists?
+  end
+
+  test 'no email job created when edited by an admin' do
+    person = Factory(:admin)
+    project = person.projects.first
+    login_as(person)
+    Delayed::Job.delete_all
+
+    post :update, :id=>project, :project => {:description=>"sdfkuhsdfkhsdfkhsdf"}
+
+    refute ProjectChangedEmailJob.new(project).exists?
+  end
+
+  test 'no email job created when edited by an project administrator' do
+    person = Factory(:project_manager)
+    project = person.projects.first
+    login_as(person)
+    Delayed::Job.delete_all
+
+    post :update, :id=>project, :project => {:description=>"sdfkuhsdfkhsdfkhsdf"}
+
+    refute ProjectChangedEmailJob.new(project).exists?
+  end
 
   test "projects belonging to an institution through nested route" do
     assert_routing "institutions/3/projects",{controller:"projects",action:"index",institution_id:"3"}
