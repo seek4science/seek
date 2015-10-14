@@ -801,7 +801,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'no email job created when edited by an project administrator' do
-    person = Factory(:project_manager)
+    person = Factory(:project_administrator)
     project = person.projects.first
     login_as(person)
     Delayed::Job.delete_all

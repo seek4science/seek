@@ -103,7 +103,7 @@ class Mailer < ActionMailer::Base
   def project_changed(project,base_host)
     @project = project
     @host=base_host
-    recipients = admin_emails | @project.project_managers.collect{|m| m.email_with_name}
+    recipients = admin_emails | @project.project_administrators.collect{|m| m.email_with_name}
     subject = "The #{Seek::Config.application_name} #{t('project')} #{@project.title} information has been changed"
 
     mail(:from=>Seek::Config.noreply_sender,

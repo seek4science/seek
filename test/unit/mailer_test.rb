@@ -255,7 +255,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "project changed" do
-    project_admin = Factory(:project_manager)
+    project_admin = Factory(:project_administrator)
     project = project_admin.projects.first
 
     @expected.subject = "The Sysmo SEEK Project #{project.title} information has been changed"

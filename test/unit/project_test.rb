@@ -716,7 +716,7 @@ class ProjectTest < ActiveSupport::TestCase
     }
 
     project = Project.create(attr)
-    project.save!
+    disable_authorization_checks{project.save!}
     project.reload
 
     assert_include project.organisms, organism
