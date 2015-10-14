@@ -571,4 +571,25 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal 6, blob.file_size
   end
 
+  test 'calculates file size for remote content' do
+    stub_request(:head, "http://www.abc.com").to_return(:headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+    blob = Factory(:url_content_blob)
+    assert_equal 500, blob.file_size
+  end
+
+  test 'can retrieve remote content' do
+    stub_request(:head, "http://www.abc.com").to_return(
+        :headers => {:content_length => nil, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, "http://www.abc.com").to_return(:body => 'abcdefghij'*500,
+                                                       :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal nil, blob.file_size
+
+    blob.retrieve
+    assert blob.file_exists?
+    assert_equal 5000, blob.file_size
+  end
+
 end
