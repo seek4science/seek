@@ -1,5 +1,4 @@
 class ProjectChangedEmailJob < SeekEmailJob
-
   attr_reader :project_id
 
   def initialize(project)
@@ -8,7 +7,7 @@ class ProjectChangedEmailJob < SeekEmailJob
 
   def perform_job(job_item)
     if Seek::Config.email_enabled
-      Mailer.project_changed(job_item,Seek::Config.site_base_host).deliver
+      Mailer.project_changed(job_item, Seek::Config.site_base_host).deliver
     end
   end
 
@@ -24,5 +23,4 @@ class ProjectChangedEmailJob < SeekEmailJob
   def allow_duplicate_jobs?
     false
   end
-
 end
