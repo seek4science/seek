@@ -205,7 +205,7 @@ class Project < ActiveRecord::Base
   # whether this project can be administered by the given user, or current user if none is specified
   def can_be_administered_by?(user = User.current_user)
     return false unless user
-    user.is_admin? || user.is_project_administrator?(self) || user.person.is_programme_administrator?(programme)
+    user.is_admin? || user.is_project_administrator?(self) || user.is_programme_administrator?(programme)
   end
 
   # all projects that can be administered by the given user, or ghe current user if none is specified
