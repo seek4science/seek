@@ -254,6 +254,21 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
+  test "project changed" do
+    project_admin = Factory(:project_manager)
+    project = project_admin.projects.first
+
+    @expected.subject = "The Sysmo SEEK Project #{project.title} information has been changed"
+    @expected.to = "Quentin Jones <quentin@email.com>, #{project_admin.email_with_name}"
+    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.body = read_fixture('project_changed')
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!('-pr_id-',project.id.to_s)
+
+    assert_equal expected_text, encode_mail(Mailer.project_changed(project,'localhost'))
+  end
+
   test "test mail" do
     with_config_value(:application_name,"SEEK EMAIL TEST") do
       with_config_value(:site_base_host,"http://fred.com") do
