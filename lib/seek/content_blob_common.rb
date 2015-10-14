@@ -83,13 +83,7 @@ module Seek
 
         begin
           self.response_body = Enumerator.new do |yielder|
-            Net::HTTP.start(uri.host, uri.port) do |http|
-              http.request(Net::HTTP::Get.new(uri)) do |res|
-                res.read_body do |chunk|
-                  yielder << chunk # yield chunk
-                end
-              end
-            end
+            Seek::DownloadHandling::Streamer.new(@url).stream_to(yielder)
           end
         rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
             Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e

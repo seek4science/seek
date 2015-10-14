@@ -26,7 +26,17 @@ module Seek
       end
 
       def fetch
-        open(@url)
+        uri = URI(@url)
+        file = Tempfile.new('remote-content')
+        file.binmode # Strange encoding issues occur if this is not set
+
+        begin
+          Seek::DownloadHandling::Streamer.new(@url).stream_to(file)
+        ensure
+          file.close
+        end
+
+        file
       end
 
     end
