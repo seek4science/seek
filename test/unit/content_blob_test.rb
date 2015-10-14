@@ -595,10 +595,10 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test "won't retrieve remote content over hard limit" do
     # Web server lies about content length:
-    stub_request(:head, "http://www.abc.com").to_return(
+    stub_request(:head, 'http://www.abc.com').to_return(
         :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
     # Size is actually 6kb:
-    stub_request(:get, "http://www.abc.com").to_return(:body => 'abcdefghij'*600,
+    stub_request(:get, 'http://www.abc.com').to_return(:body => 'abcdefghij'*600,
                                                        :headers => {:content_type => 'text/plain'}, :status => 200)
 
     blob = Factory(:url_content_blob)
@@ -606,6 +606,37 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal 500, blob.file_size
 
     assert_raise Seek::DownloadHandling::SizeLimitExceededException do
+      blob.retrieve
+    end
+    assert !blob.file_exists?
+  end
+
+  test "won't endlessly follow redirects when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(
+        :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+    # Infinitely redirects
+    stub_request(:get, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.abc.com'}, :status => 302)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal 500, blob.file_size
+
+    assert_raise Seek::DownloadHandling::RedirectLimitExceededException do
+      blob.retrieve
+    end
+    assert !blob.file_exists?
+  end
+
+  test "raises exception on bad response code when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(
+        :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, 'http://www.abc.com').to_return(:status => 404)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal 500, blob.file_size
+
+    assert_raise Seek::DownloadHandling::BadResponseCodeException do
       blob.retrieve
     end
     assert !blob.file_exists?
