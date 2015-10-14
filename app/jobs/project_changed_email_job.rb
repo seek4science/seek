@@ -1,15 +1,9 @@
-class ProjectChangedEmailJob < SeekJob
+class ProjectChangedEmailJob < SeekEmailJob
 
   attr_reader :project_id
 
   def initialize(project)
     @project_id = project.id
-  end
-
-  def before(_job)
-    # make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
-    Seek::Config.smtp_propagate
-    Seek::Config.site_base_host_propagate
   end
 
   def perform_job(job_item)
