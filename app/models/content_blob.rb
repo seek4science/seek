@@ -172,9 +172,9 @@ class ContentBlob < ActiveRecord::Base
   def retrieve
     handler = Seek::DownloadHandling::RemoteContentHandler.new(self.url)
 
-    self.tmp_io_object = handler.fetch
+    @tmp_io_object = handler.fetch
 
-    self.save
+    dump_data_to_file
   end
 
   def cachable?
