@@ -94,6 +94,7 @@ SEEK::Application.configure do
 
       Settings.defaults[:cache_remote_files] = true
       Settings.defaults[:max_cachable_size] = 2000
+      Settings.defaults[:hard_max_cachable_size] = 5000
 
     end
   end

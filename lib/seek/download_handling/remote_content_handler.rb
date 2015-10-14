@@ -26,7 +26,6 @@ module Seek
       end
 
       def fetch
-        uri = URI(@url)
         file = Tempfile.new('remote-content')
         file.binmode # Strange encoding issues occur if this is not set
 

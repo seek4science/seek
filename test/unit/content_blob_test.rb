@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'docsplit'
+require 'seek/download_handling/streamer' # Needed to load exceptions that are tested later
 
 class ContentBlobTest < ActiveSupport::TestCase
 
@@ -590,6 +591,24 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob.retrieve
     assert blob.file_exists?
     assert_equal 5000, blob.file_size
+  end
+
+  test "won't retrieve remote content over hard limit" do
+    # Web server lies about content length:
+    stub_request(:head, "http://www.abc.com").to_return(
+        :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+    # Size is actually 6kb:
+    stub_request(:get, "http://www.abc.com").to_return(:body => 'abcdefghij'*600,
+                                                       :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal 500, blob.file_size
+
+    assert_raise Seek::DownloadHandling::SizeLimitExceededException do
+      blob.retrieve
+    end
+    assert !blob.file_exists?
   end
 
 end

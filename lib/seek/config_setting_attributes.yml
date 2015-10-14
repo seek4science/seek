@@ -135,3 +135,4 @@ zenodo_client_secret:
 allow_user_programme_creation:
 cache_remote_files:
 max_cachable_size:
+hard_max_cachable_size:

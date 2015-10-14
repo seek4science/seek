@@ -88,6 +88,7 @@ class AdminsController < ApplicationController
 
     Seek::Config.cache_remote_files = params[:cache_remote_files]
     Seek::Config.max_cachable_size = params[:max_cachable_size]
+    Seek::Config.max_cachable_size = params[:hard_max_cachable_size]
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'

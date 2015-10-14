@@ -6,7 +6,6 @@ module Seek
     #  if it exceeds a given limit.
     class Streamer
 
-      SIZE_LIMIT = 1 * 1024 * 1024 * 1024 #TODO: Add this as a config option
       REDIRECT_LIMIT = 10
 
       def initialize(url)
@@ -28,7 +27,7 @@ module Seek
               total_size = 0
               res.read_body do |chunk|
                 total_size += chunk.size
-                raise SizeLimitExceededException.new(total_size) if total_size > SIZE_LIMIT
+                raise SizeLimitExceededException.new(total_size) if total_size > Seek::Config.hard_max_cachable_size
                 output << chunk
               end
               total_size
