@@ -716,12 +716,13 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
 
   test "items_for_person_and_role" do
     person = Factory(:programme_administrator)
-    programmes = person.administered_programmes
+    programmes = person.programmes
     result = Seek::Roles::ProgrammeRelatedRoles.instance.items_for_person_and_role(person, "programme_administrator")
     assert_equal programmes.sort, result.sort
 
     #needs to be an ActiveRecord::Relation so that it can be extended with scopes and other query clauses
     assert_instance_of ActiveRecord::Relation, result
+    assert_instance_of ActiveRecord::Relation, person.administered_programmes
 
   end
 
