@@ -647,6 +647,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     programme_admin.save!
 
     admins = Person.programme_administrators
+    assert_instance_of ActiveRecord::Relation, admins
     assert_includes admins,programme_admin
     refute_includes admins,normal
   end
@@ -710,6 +711,17 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       Seek::Roles::RoleInfo.new(role_name:"frog")
     end
 
+
+  end
+
+  test "items_for_person_and_role" do
+    person = Factory(:programme_administrator)
+    programmes = person.administered_programmes
+    result = Seek::Roles::ProgrammeRelatedRoles.instance.items_for_person_and_role(person, "programme_administrator")
+    assert_equal programmes.sort, result.sort
+
+    #needs to be an ActiveRecord::Relation so that it can be extended with scopes and other query clauses
+    assert_instance_of ActiveRecord::Relation, result
 
   end
 
