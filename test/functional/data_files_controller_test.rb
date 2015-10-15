@@ -1974,6 +1974,72 @@ class DataFilesControllerTest < ActionController::TestCase
     assert blob.caching_job.exists?
   end
 
+  test "should not create cache job if setting disabled" do
+    mock_http
+    params = { data_file: {
+        title: "Small File",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/small.txt",
+                                   make_local_copy: '0'
+                               }],
+               sharing: valid_sharing
+    }
+
+    with_config_value(:cache_remote_files, false) do
+      assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+        assert_difference('DataFile.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, params
+          end
+        end
+      end
+
+      assert_redirected_to data_file_path(assigns(:data_file))
+      blob = assigns(:data_file).content_blob
+      assert !blob.cachable?
+      assert !blob.url.blank?
+      assert_equal "small.txt", blob.original_filename
+      assert_equal "text/plain", blob.content_type
+      assert_equal 100, blob.file_size
+      assert !blob.caching_job.exists?
+    end
+  end
+
+  test "should not create cache job if setting disabled even if user requests 'make_local_copy'" do
+    mock_http
+    params = { data_file: {
+        title: "Big File",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/big.txt",
+                                   make_local_copy: '1'
+                               }],
+               sharing: valid_sharing
+    }
+    with_config_value(:cache_remote_files, false) do
+      assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+        assert_difference('DataFile.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, params
+          end
+        end
+      end
+
+      assert_redirected_to data_file_path(assigns(:data_file))
+      blob = assigns(:data_file).content_blob
+      assert blob.make_local_copy
+      assert !blob.cachable?
+      assert !blob.url.blank?
+      assert_equal "big.txt", blob.original_filename
+      assert_equal "text/plain", blob.content_type
+      assert_equal 5000, blob.file_size
+      assert !blob.caching_job.exists?
+    end
+  end
+
   test "should not automatically create cache job for large file" do
     mock_http
     params = { data_file: {

@@ -249,7 +249,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def create_retrieval_job
-    if !file_exists? && !url.blank? && (make_local_copy || cachable?)
+    if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?)
       RemoteContentFetchingJob.new(self).queue_job
     end
   end
