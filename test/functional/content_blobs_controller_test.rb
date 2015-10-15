@@ -171,7 +171,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert !pdf_sop.content_blob.file_exists?
     assert pdf_sop.content_blob.cachable?
 
-    get :get_pdf, sop_id: pdf_sop.id, id: pdf_sop.content_blob.id
+    with_config_value(:hard_max_cachable_size, 10000) do # Temporarily increase this, as the PDF is ~8kB
+      get :get_pdf, sop_id: pdf_sop.id, id: pdf_sop.content_blob.id
+    end
 
     assert_response :success
 
