@@ -65,6 +65,7 @@ class User < ActiveRecord::Base
   delegate :is_admin?, to: :person, allow_nil: true
   delegate :is_project_administrator?, to: :person, allow_nil: true
   delegate :is_admin_or_project_administrator?, to: :person, allow_nil: true
+  delegate :is_programme_administrator?, to: :person, allow_nil: true
 
   # related_#{type} are resources that user created
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:events,:presentations,:publications]

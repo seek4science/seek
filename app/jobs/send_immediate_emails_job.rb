@@ -1,13 +1,7 @@
-class SendImmediateEmailsJob < SeekJob
+class SendImmediateEmailsJob < SeekEmailJob
   DEFAULT_PRIORITY = 3
 
   attr_reader :activity_log_id
-
-  def before(_job)
-    # make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
-    Seek::Config.smtp_propagate
-    Seek::Config.site_base_host_propagate
-  end
 
   def initialize(activity_log_id)
     @activity_log_id = activity_log_id
