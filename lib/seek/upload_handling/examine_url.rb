@@ -6,8 +6,7 @@ module Seek
       def process_view_for_successful_url(url)
         headers = fetch_url_headers(url)
         @content_type = headers[:content_type]
-        @size = headers[:content_length]
-        @size_mb = @size.to_i / 10_000
+        @size = headers[:content_length].try(:to_i)
         if content_is_webpage?(@content_type)
           @is_webpage = true
           page = summarize_webpage(url)
