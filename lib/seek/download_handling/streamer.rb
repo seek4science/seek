@@ -21,13 +21,14 @@ module Seek
       private
 
       def get_uri(uri, output, redirect_count = 0)
+        max_size = Seek::Config.hard_max_cachable_size
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           http.request(Net::HTTP::Get.new(uri)) do |res|
             if res.code == '200'
               total_size = 0
               res.read_body do |chunk|
                 total_size += chunk.size
-                raise SizeLimitExceededException.new(total_size) if total_size > Seek::Config.hard_max_cachable_size
+                raise SizeLimitExceededException.new(total_size) if total_size > max_size
                 output << chunk
               end
               total_size
