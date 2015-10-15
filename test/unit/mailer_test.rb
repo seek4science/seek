@@ -266,7 +266,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-pr_id-',project.id.to_s)
 
-    assert_equal expected_text, encode_mail(Mailer.project_changed(project,'localhost'))
+    assert_equal expected_text, encode_mail(Mailer.project_changed(project))
   end
 
   test "test mail" do

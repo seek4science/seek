@@ -131,9 +131,9 @@ class Mailer < ActionMailer::Base
 
   end
 
-  def project_changed(project,base_host)
+  def project_changed(project)
     @project = project
-    @host=base_host
+    @host=Seek::Config.site_base_host.gsub(/https?:\/\//, '')
     recipients = admin_emails | @project.project_managers.collect{|m| m.email_with_name}
     subject = "The #{Seek::Config.application_name} #{t('project')} #{@project.title} information has been changed"
 
