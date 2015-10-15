@@ -679,8 +679,19 @@ class ProjectTest < ActiveSupport::TestCase
     assert Project.can_create?
 
     User.current_user=Factory(:programme_administrator).user
+    assert User.current_user.person.administered_programmes.first.is_activated?
     assert Project.can_create?
+
+    #only if the programme is activated
+    person = Factory(:programme_administrator)
+    programme = person.administered_programmes.first
+    programme.is_activated=false
+    programme.save!
+    User.current_user = person.user
+    refute Project.can_create?
+
   end
+
 
   test "project programmes" do
     project = Factory(:project)

@@ -22,6 +22,7 @@ module Seek
         if person.roles.include?(role)
           mask = mask_for_role(role)
 
+          #FIXME: refactor this to do a full query rather than gathering up the items, this allows a scope to be added to the result
           related_items_association(person).where(role_mask: mask).collect(&:item)
         else
           []

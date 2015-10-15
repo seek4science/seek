@@ -56,6 +56,7 @@ module Seek
             programmes_for_role('programme_administrator')
           end
         end
+
       end
     end
   end

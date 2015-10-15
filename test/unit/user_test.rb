@@ -38,6 +38,27 @@ class UserTest < ActiveSupport::TestCase
 
   end
 
+  test "is_programme_adminstrator_logged_in?" do
+    refute User.programme_administrator_logged_in?
+    person = Factory(:programme_administrator)
+    programme = person.administered_programmes.first
+
+    #check programme is activated an is the only administered programme
+    assert person.administered_programmes.first.is_activated?
+    assert_equal [programme],person.administered_programmes
+
+    User.with_current_user person.user do
+      assert User.programme_administrator_logged_in?
+    end
+
+    #not true unless the programme is activated
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    User.with_current_user person.user do
+      refute User.programme_administrator_logged_in?
+    end
+  end
+
   test "check email present?" do
     u = Factory :user
     assert u.email.nil?
