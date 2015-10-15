@@ -215,7 +215,7 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def can_edit?(user=User.current_user)
+  def can_edit?(user = User.current_user)
     new_record? || can_be_edited_by?(user)
   end
 
@@ -272,20 +272,20 @@ class Project < ActiveRecord::Base
     handle_admin_role_ids :asset_manager
   end
 
-  #general method for assigning the people with roles, according to the role passed in.
-  #e.g. for a role of :gatekeeper, gatekeeper_ids attribute is used to set the people for that role
-  def handle_admin_role_ids role
-    current_members = self.send(role.to_s.pluralize)
-    new_members = Person.find(self.send("#{role.to_s}_ids"))
+  # general method for assigning the people with roles, according to the role passed in.
+  # e.g. for a role of :gatekeeper, gatekeeper_ids attribute is used to set the people for that role
+  def handle_admin_role_ids(role)
+    current_members = send(role.to_s.pluralize)
+    new_members = Person.find(send("#{role}_ids"))
 
     to_add = new_members - current_members
     to_remove = current_members - new_members
     to_add.each do |person|
-      person.send("is_#{role.to_s}=",[true, self])
+      person.send("is_#{role}=", [true, self])
       disable_authorization_checks { person.save! }
     end
     to_remove.each do |person|
-      person.send("is_#{role.to_s}=",[false, self])
+      person.send("is_#{role}=", [false, self])
       disable_authorization_checks { person.save! }
     end
   end

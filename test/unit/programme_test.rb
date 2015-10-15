@@ -194,14 +194,16 @@ class ProgrammeTest < ActiveSupport::TestCase
 
   test 'programme activated automatically when created by an admin' do
     User.with_current_user Factory(:admin).user do
-      prog = Factory(:programme)
+      prog = Programme.create(:title=>"my prog")
+      prog.save!
       assert prog.is_activated?
     end
   end
 
   test 'programme activated automatically when current_user is nil' do
     User.with_current_user nil do
-      prog = Factory(:programme)
+      prog = Programme.create(:title=>"my prog")
+      prog.save!
       assert prog.is_activated?
     end
   end
@@ -209,7 +211,8 @@ class ProgrammeTest < ActiveSupport::TestCase
   test 'programme not activated automatically when created by a normal user' do
     Factory(:admin) # to avoid 1st person being an admin
     User.with_current_user Factory(:person).user do
-      prog = Factory(:programme)
+      prog = Programme.create(:title=>"my prog")
+      prog.save!
       refute prog.is_activated?
     end
   end

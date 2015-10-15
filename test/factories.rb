@@ -115,6 +115,10 @@ include ActionDispatch::TestProcess
   Factory.define(:programme) do |f|
     f.sequence(:title) { |n| "A Programme: #{n}"}
     f.projects {[Factory.build(:project)]}
+    f.after_create do |p|
+      p.is_activated=true
+      p.save
+    end
   end
 
 #Project

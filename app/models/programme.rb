@@ -21,7 +21,7 @@ class Programme < ActiveRecord::Base
   before_create :activate
 
   scope :default_order, order('title')
-  scope :activated, where(is_activated:true)
+  scope :activated, where(is_activated: true)
 
   def people
     projects.collect(&:people).flatten.uniq
