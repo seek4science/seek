@@ -12,4 +12,12 @@ class RemoteContentFetchingJob < SeekJob
   def gather_items
     [content_blob]
   end
+
+  def self.queue_name
+    'remotecontent'
+  end
+
+  def queue_name
+    self.class.queue_name
+  end
 end
