@@ -130,5 +130,9 @@ group :test do
   gem 'rspec-rails'
   gem 'sunspot_matchers'
   gem 'pg'
+  gem 'teaspoon'
+  gem "teaspoon-mocha"
+  gem "magic_lamp"
+  gem 'database_cleaner'
   gem 'selenium-webdriver'
 end
