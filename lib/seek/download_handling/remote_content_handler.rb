@@ -29,7 +29,9 @@ module Seek
         file = Tempfile.new('remote-content')
         file.binmode # Strange encoding issues occur if this is not set
 
-        Seek::DownloadHandling::Streamer.new(@url).stream_to(file)
+        Seek::DownloadHandling::Streamer.new(@url).stream do |chunk|
+          file << chunk
+        end
 
         file
       end

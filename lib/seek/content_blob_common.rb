@@ -82,7 +82,9 @@ module Seek
 
         begin
           self.response_body = Enumerator.new do |yielder|
-            Seek::DownloadHandling::Streamer.new(@content_blob.url).stream_to(yielder)
+            Seek::DownloadHandling::Streamer.new(@content_blob.url).stream do |chunk|
+              yielder << chunk
+            end
           end
         rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
             Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
