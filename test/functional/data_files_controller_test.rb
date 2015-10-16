@@ -739,9 +739,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should download from url" do
     mock_http
+    data_file = data_files(:url_based_data_file)
     assert_difference('ActivityLog.count') do
       get :download, :id => data_files(:url_based_data_file)
     end
+    assert_not_empty @response.body
     assert_response :success
   end
 
