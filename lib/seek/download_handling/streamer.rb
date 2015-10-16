@@ -14,18 +14,18 @@ module Seek
 
       # yields a chunk of data to the given block
       def stream(&block)
-        get_uri(URI(@url), &block)
+        get_uri(URI(@url), 0, block)
       end
 
       private
 
-      def get_uri(uri, redirect_count = 0, &block)
+      def get_uri(uri, redirect_count, block)
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           http.request(Net::HTTP::Get.new(uri)) do |response|
             if response.code == '200'
               begin_stream(response, block)
             elsif response.code == '301' || response.code == '302'
-              follow_redirect(response, redirect_count)
+              follow_redirect(response, redirect_count, block)
             else
               raise BadResponseCodeException.new(response)
             end
@@ -46,11 +46,11 @@ module Seek
         total_size
       end
 
-      def follow_redirect(response, redirect_count)
+      def follow_redirect(response, redirect_count, block)
         if redirect_count >= REDIRECT_LIMIT
           raise RedirectLimitExceededException.new(redirect_count)
         else
-          get_uri(URI(response.header['location']), redirect_count + 1, &block)
+          get_uri(URI(response.header['location']), redirect_count + 1, block)
         end
       end
 
