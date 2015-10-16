@@ -79,11 +79,10 @@ module Seek
         self.response.headers["Content-Type"] ||= @content_blob.content_type
         self.response.headers["Content-Disposition"] = "attachment; filename=#{@content_blob.original_filename}"
         self.response.headers['Last-Modified'] = Time.now.ctime.to_s
-        uri = URI(@content_blob.url)
 
         begin
           self.response_body = Enumerator.new do |yielder|
-            Seek::DownloadHandling::Streamer.new(@url).stream_to(yielder)
+            Seek::DownloadHandling::Streamer.new(@content_blob.url).stream_to(yielder)
           end
         rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
             Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
