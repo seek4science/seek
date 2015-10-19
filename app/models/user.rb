@@ -92,8 +92,7 @@ class User < ActiveRecord::Base
   end
 
   def self.programme_administrator_logged_in?
-    #FIXME: administered_programmes needs fixing to allow .activated scope to be used, see RelatedRoles#items_for_person_and_role
-    self.logged_in_and_registered? && self.current_user.person.administered_programmes.detect{|prog| prog.is_activated}.present?
+    self.logged_in_and_registered? && self.current_user.person.administered_programmes.activated.present?
   end
 
   def self.admin_or_project_administrator_logged_in?

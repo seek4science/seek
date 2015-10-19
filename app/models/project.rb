@@ -30,6 +30,8 @@ class Project < ActiveRecord::Base
   has_many :work_groups, dependent: :destroy
   has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?
 
+  has_many :admin_defined_role_projects
+
   belongs_to :programme
 
   attr_accessible :project_administrator_ids, :gatekeeper_ids, :pal_ids, :asset_manager_ids, :title, :programme_id, :description,

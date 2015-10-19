@@ -13,6 +13,7 @@ class Programme < ActiveRecord::Base
 
   # associations
   has_many :projects, dependent: :nullify
+  has_many :admin_defined_role_programmes
   accepts_nested_attributes_for :projects
 
   # validations

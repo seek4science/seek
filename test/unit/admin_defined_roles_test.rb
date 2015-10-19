@@ -724,6 +724,12 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert_instance_of ActiveRecord::Relation, result
     assert_instance_of ActiveRecord::Relation, person.administered_programmes
 
+    #no roles but should not just return an empty array
+    person = Factory(:person)
+    result = Seek::Roles::ProgrammeRelatedRoles.instance.items_for_person_and_role(person, "programme_administrator")
+    assert_instance_of ActiveRecord::Relation, result
+    assert_instance_of ActiveRecord::Relation, person.administered_programmes
+
   end
 
 

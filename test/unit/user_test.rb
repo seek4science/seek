@@ -38,26 +38,7 @@ class UserTest < ActiveSupport::TestCase
 
   end
 
-  test "is_programme_adminstrator_logged_in?" do
-    refute User.programme_administrator_logged_in?
-    person = Factory(:programme_administrator)
-    programme = person.administered_programmes.first
 
-    #check programme is activated an is the only administered programme
-    assert person.administered_programmes.first.is_activated?
-    assert_equal [programme],person.administered_programmes
-
-    User.with_current_user person.user do
-      assert User.programme_administrator_logged_in?
-    end
-
-    #not true unless the programme is activated
-    programme.is_activated=false
-    disable_authorization_checks{programme.save!}
-    User.with_current_user person.user do
-      refute User.programme_administrator_logged_in?
-    end
-  end
 
   test "check email present?" do
     u = Factory :user
@@ -173,7 +154,7 @@ class UserTest < ActiveSupport::TestCase
     end
 
     User.with_current_user(normal.user) do
-      assert !User.project_administrator_logged_in?
+      refute User.project_administrator_logged_in?
     end
   end
 
@@ -185,11 +166,32 @@ class UserTest < ActiveSupport::TestCase
     end
 
     User.with_current_user(normal.user) do
-      return User.programme_administrator_logged_in?
+      refute User.programme_administrator_logged_in?
     end
 
     User.with_current_user(nil) do
-      return User.programme_administrator_logged_in?
+      refute User.programme_administrator_logged_in?
+    end
+  end
+
+  test "programme_adminstrator_logged_in? only if activated" do
+    refute User.programme_administrator_logged_in?
+    person = Factory(:programme_administrator)
+    programme = person.administered_programmes.first
+
+    #check programme is activated an is the only administered programme
+    assert person.administered_programmes.first.is_activated?
+    assert_equal [programme],person.administered_programmes
+
+    User.with_current_user person.user do
+      assert User.programme_administrator_logged_in?
+    end
+
+    #not true unless the programme is activated
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    User.with_current_user person.user do
+      refute User.programme_administrator_logged_in?
     end
   end
 
