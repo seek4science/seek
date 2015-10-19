@@ -3,40 +3,6 @@ require 'net/ftp'
 module Seek
   module DownloadHandling
     module DataDownload
-      #MERGENOTE - replace this with check_url_response_code from upload_handling
-      def url_response_code asset_url
-        url = URI.parse(URI.encode(asset_url.strip))
-        code=""
-        begin
-          if (["http","https"].include?(url.scheme))
-            http =  Net::HTTP.new(url.host, url.port)
-            http.use_ssl=true if url.scheme=="https"
-            http.start do |http|
-              code = http.head(url.request_uri).code
-            end
-          elsif (url.scheme=="ftp")
-            username = 'anonymous'
-            password = nil
-            username, password = url.userinfo.split(/:/) if url.userinfo
-
-            ftp = Net::FTP.new(url.host)
-            ftp.login(username,password)
-            ftp.getbinaryfile(url.path, '/dev/null', 20) { break }
-            ftp.close
-            code="200"
-          else
-            raise Seek::IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")
-          end
-        rescue Net::FTPPermError
-          code="401"
-        rescue Errno::ECONNREFUSED,SocketError,Errno::EHOSTUNREACH
-          #FIXME:also using 404 for uknown host, which wouldn't actually really be a http response code
-          #indicating that using response codes is not the best approach here.
-          code="404"
-        end
-
-        return code
-      end
 
       def download
         if self.controller_name=="models"
@@ -48,7 +14,6 @@ module Seek
 
       #current model is the only type with multiple content-blobs, this may change in the future
       def download_model
-
         @model.just_used
 
         handle_download_zip @display_model
@@ -66,7 +31,7 @@ module Seek
         disposition = params[:disposition] || 'attachment'
 
         respond_to do |format|
-          format.html {handle_download disposition}
+          format.html { handle_download(disposition) }
         end
       end
 

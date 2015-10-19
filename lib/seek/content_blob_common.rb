@@ -73,7 +73,7 @@ module Seek
     end
 
     def stream_from_url
-      code = url_response_code(@content_blob.url).to_i
+      code = check_url_response_code(@content_blob.url)
       case code
       when 200
         self.response.headers["Content-Type"] ||= @content_blob.content_type
