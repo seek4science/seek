@@ -258,12 +258,12 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_filesize
     cb = Factory :content_blob, :data=>"z"
-    assert_equal 1, cb.filesize
+    assert_equal 1, cb.file_size
     File.delete(cb.filepath)
-    assert_equal 1, cb.filesize
+    assert_equal 1, cb.file_size
     cb = Factory :rightfield_content_blob
-    assert_not_nil cb.filesize
-    assert_equal 9216,cb.filesize
+    assert_not_nil cb.file_size
+    assert_equal 9216,cb.file_size
   end
 
   def test_exception_when_both_data_and_io_object

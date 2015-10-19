@@ -18,7 +18,7 @@ module AssetsHelper
   end
 
   def filesize_as_text(content_blob)
-    size = content_blob.nil? ? 0 : content_blob.filesize
+    size = content_blob.nil? ? 0 : content_blob.file_size
     if size.nil?
       html = "<span class='none_text'>Unknown</span>"
     else

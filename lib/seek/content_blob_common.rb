@@ -22,7 +22,7 @@ module Seek
           else
             filepath = @content_blob.filepath
             #added for the benefit of the tests after rails3 upgrade - but doubt it is required
-            headers["Content-Length"]=@content_blob.filesize.to_s
+            headers["Content-Length"]=@content_blob.file_size.to_s
           end
           send_file filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type || "application/octet-stream", :disposition => disposition
         else

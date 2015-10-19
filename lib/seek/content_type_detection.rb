@@ -22,7 +22,7 @@ module Seek
     end
 
     def is_in_simulatable_size_limit?(blob = self)
-      !blob.filesize.nil? && blob.filesize < MAX_SIMULATABLE_SIZE
+      !blob.file_size.nil? && blob.file_size < MAX_SIMULATABLE_SIZE
     end
 
     def is_xlsx?(blob = self)
@@ -92,7 +92,7 @@ module Seek
     private
 
     def within_size_limit(blob)
-      !blob.filesize.nil? && blob.filesize < MAX_EXTRACTABLE_SPREADSHEET_SIZE
+      !blob.file_size.nil? && blob.file_size < MAX_EXTRACTABLE_SPREADSHEET_SIZE
     end
 
     def check_content(blob, str, max_length = 1500)

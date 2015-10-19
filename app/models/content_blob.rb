@@ -50,13 +50,7 @@ class ContentBlob < ActiveRecord::Base
 
   # returns the size of the file in bytes, or nil if the file doesn't exist
   def filesize
-    if file_exists?
-      File.size(filepath)
-    elsif file_size
-      file_size
-    else
-      nil
-    end
+    raise "DEPRECATED" #TODO: Remove me when tests pass
   end
 
   # allows you to run something on a temporary copy of the blob file, which is deleted once finished

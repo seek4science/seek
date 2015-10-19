@@ -390,7 +390,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal "attachment; filename=\"#{first_content_blob.original_filename}\"", @response.header['Content-Disposition']
     assert_equal first_content_blob.content_type, @response.header['Content-Type']
-    assert_equal first_content_blob.filesize.to_s, @response.header['Content-Length']
+    assert_equal first_content_blob.file_size.to_s, @response.header['Content-Length']
   end
 
   private
