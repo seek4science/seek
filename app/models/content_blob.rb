@@ -237,8 +237,10 @@ class ContentBlob < ActiveRecord::Base
   def calculate_file_size
     if file_exists?
       self.file_size = File.size(self.filepath)
-    else
+    elsif url
       self.file_size = remote_headers[:content_length]
+    else
+      self.file_size = nil
     end
   end
 
