@@ -257,8 +257,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal 'content_blobs', al.controller_name
   end
 
-  # This test is quite fragile, because it relies on an external resource
-  test 'should redirect on download for 302 url' do
+  test 'should transparently redirect on download for 302 url' do
     mock_http
     df  = Factory :data_file,
                   policy: Factory(:all_sysmo_downloadable_policy),
@@ -268,11 +267,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert !df.content_blob.file_exists?
 
     get :download, data_file_id: df, id: df.content_blob
-    assert_redirected_to 'http://mocked302.com'
+    assert_response :success
   end
 
-  # This test is quite fragile, because it relies on an external resource
-  test 'should redirect on download for 401 url' do
+  test 'should error on download for 401 url' do
     mock_http
     df  = Factory :data_file,
                   policy: Factory(:all_sysmo_downloadable_policy),
@@ -282,7 +280,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert !df.content_blob.file_exists?
 
     get :download, data_file_id: df, id: df.content_blob
-    assert_redirected_to 'http://mocked401.com'
+    assert_response :redirect
+    assert_not_nil flash[:error]
   end
 
   test 'should download' do
@@ -399,7 +398,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     stub_request(:get, 'http://mockedlocation.com/a-piccy.png').to_return(body: File.new(file), status: 200, headers: { 'Content-Type' => 'image/png' })
     stub_request(:head, 'http://mockedlocation.com/a-piccy.png')
 
-    stub_request(:any, 'http://mocked302.com').to_return(status: 302)
+    stub_request(:any, 'http://mocked302.com').to_return(status: 302, headers: { location: 'http://www.mocked302.com' })
+    stub_request(:any, 'http://www.mocked302.com').to_return(status: 200)
     stub_request(:any, 'http://mocked401.com').to_return(status: 401)
     stub_request(:any, 'http://mocked404.com').to_return(status: 404)
 

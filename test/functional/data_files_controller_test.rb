@@ -764,7 +764,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
 
-  test "should create and redirect on download for 401 url" do
+  test "should redirect and show error on download for 401 url" do
     mock_http
     df = {:title=>"401",:project_ids=>[projects(:sysmo_project).id]}
     blob = {:data_url=>"http://mocked401.com"}
@@ -785,10 +785,11 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked401.com"
+    assert_response :redirect
+    assert_not_nil flash[:error]
   end
 
-  test "should create and redirect on download for 403 url" do
+  test "should redirect and show error on download for 403 url" do
     mock_http
     df = {:title=>"401",:project_ids=>[projects(:sysmo_project).id]}
     blob = {:data_url=>"http://mocked403.com"}
@@ -809,10 +810,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked403.com"
+    assert_response :redirect
+    assert_not_nil flash[:error]
   end
-
-
 
   test "should create and redirect on download for 302 url" do
     mock_http
@@ -835,10 +835,10 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "text/html",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked302.com"
+    assert_response :success
   end
 
-  test "should create and redirect on download for 301 url" do
+  test "should create and transparently redirect on download for 301 url" do
     mock_http
     df = {:title=>"301",:project_ids=>[projects(:sysmo_project).id]}
     blob = {:data_url=>"http://mocked301.com", :make_local_copy => "0"}
@@ -859,7 +859,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "text/html",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked301.com"
+    assert_response :success
   end
 
   test "report error when file unavailable for download" do
@@ -2123,6 +2123,7 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:get, "http://redirectlocation.com").to_return(:body=>"<html><head></head><body></body></html>",:status=>200,headers: {content_type: 'text/html'})
 
     stub_request(:any, "http://mocked301.com").to_return(:status=>301, :headers=>{:location=>"http://redirectlocation.com"})
+    stub_request(:any, "http://mockedbad301.com").to_return(:status=>301, :headers=>{:location=>"http://mocked404.com"})
     stub_request(:any, "http://mocked302.com").to_return(:status=>302, :headers=>{:location=>"http://redirectlocation.com"})
     stub_request(:any, "http://mocked401.com").to_return(:status=>401)
     stub_request(:any, "http://mocked403.com").to_return(:status=>403)
