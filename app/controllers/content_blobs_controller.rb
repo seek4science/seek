@@ -6,7 +6,6 @@ class ContentBlobsController < ApplicationController
 
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
-  include Seek::ContentBlobCommon
 
   def view_pdf_content
     #param code is used for temporary link
