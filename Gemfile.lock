@@ -245,6 +245,7 @@ GEM
       safe_yaml (~> 1.0.0)
     curb (0.8.8)
     daemons (1.1.9)
+    database_cleaner (1.4.1)
     datacite_doi_ify (1.1.0)
       rest-client (~> 1.7)
     delayed_job (4.0.6)
@@ -383,6 +384,9 @@ GEM
     lumberjack (1.0.9)
     macaddr (1.7.1)
       systemu (~> 2.6.2)
+    magic_lamp (1.0.0)
+      rails (>= 3.2)
+      rake
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -682,6 +686,10 @@ GEM
       builder (~> 3.0)
     taverna-t2flow (0.5.1)
       libxml-ruby (>= 1.1.4)
+    teaspoon (1.0.2)
+      railties (>= 3.2.5, < 5)
+    teaspoon-mocha (2.2.4)
+      teaspoon (>= 1.0.0)
     term-ansicolor (1.3.0)
       tins (~> 1.0)
     test_after_commit (0.4.1)
@@ -772,6 +780,7 @@ DEPENDENCIES
   country-select
   coveralls
   daemons
+  database_cleaner
   datacite_doi_ify (~> 1.1.0)
   delayed_job_active_record
   docsplit
@@ -794,6 +803,7 @@ DEPENDENCIES
   libxml-ruby (>= 2.6.0)
   linkeddata
   lograge
+  magic_lamp
   mechanize
   metainspector
   mimemagic
@@ -844,6 +854,8 @@ DEPENDENCIES
   sunspot_solr (~> 2.2.0)
   taverna-player!
   taverna-t2flow
+  teaspoon
+  teaspoon-mocha
   test_after_commit
   transaction_isolation
   turbo-sprockets-rails3

@@ -193,6 +193,9 @@ class ProjectsController < ApplicationController
     begin
       respond_to do |format|
         if @project.update_attributes(params[:project])
+          if (Seek::Config.email_enabled && !@project.can_be_administered_by?(current_user))
+            ProjectChangedEmailJob.new(@project).queue_job
+          end
           expire_resource_list_item_content
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
