@@ -44,4 +44,5 @@
 //= require objects_input
 //= require handlebars.runtime
 //= require calendar_date_select/calendar_date_select
+//= require bootstrap_tab_memory
 //= require_tree ./templates
