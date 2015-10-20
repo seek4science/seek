@@ -22,4 +22,4 @@ They are expected to be added to SEEK in roughly the order they are presented he
 | Support for [Research Objects](http://www.researchobject.org/) | December 2015 |
 | LDAP support for authentication | TBA  |
 | Improved Samples/Treatments/SOP handling | January 2016  |
-| Integration with openBIS | January 2016  |
+| Integration with openBIS | March 2016  |
