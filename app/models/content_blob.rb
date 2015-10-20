@@ -48,11 +48,6 @@ class ContentBlob < ActiveRecord::Base
     worksheets.map { |worksheet| worksheet.cell_ranges.map(&:annotations) }.flatten
   end
 
-  # returns the size of the file in bytes, or nil if the file doesn't exist
-  def filesize
-    raise "DEPRECATED" #TODO: Remove me when tests pass
-  end
-
   # allows you to run something on a temporary copy of the blob file, which is deleted once finished
   # e.g. blob.with_temporary_copy{|copy_path| <some stuff with the copy>}
   def with_temporary_copy
