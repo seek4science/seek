@@ -168,5 +168,7 @@ SEEK::Application.configure do
   Seek::Config.default :cache_remote_files, true
   Seek::Config.default :max_cachable_size, 20_000_000
   Seek::Config.default :hard_max_cachable_size, 100_000_000
+
+  Seek::Config.default :orcid_required, false
 end
 

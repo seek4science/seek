@@ -96,6 +96,7 @@ SEEK::Application.configure do
       Settings.defaults[:max_cachable_size] = 2000
       Settings.defaults[:hard_max_cachable_size] = 5000
 
+      Settings.defaults[:orcid_required] = false
     end
   end
 end

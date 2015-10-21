@@ -90,6 +90,8 @@ class AdminsController < ApplicationController
     Seek::Config.max_cachable_size = params[:max_cachable_size]
     Seek::Config.max_cachable_size = params[:hard_max_cachable_size]
 
+    Seek::Config.orcid_required = params[:orcid_required]
+
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
     Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
