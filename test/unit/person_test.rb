@@ -949,7 +949,7 @@ class PersonTest < ActiveSupport::TestCase
     with_config_value(:orcid_required, true) do
       assert_nothing_raised do
         has_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com",
-                      :orcid => 'http://orcid.org/0000-1234-5678-9999'
+                            :orcid => 'http://orcid.org/0000-0002-0048-3300'
         assert has_orcid.valid?
         assert_empty has_orcid.errors[:orcid]
       end
