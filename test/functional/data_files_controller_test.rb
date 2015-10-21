@@ -1945,6 +1945,15 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "p[class=comment]",:text=>/#{comment}/
   end
 
+  test "description should get saved when creating a new datafile" do
+    description = 'test description'
+    post :create, :data_file => { :title=>"Test", :description => description, :project_ids=>[projects(:sysmo_project).id]}, :content_blob => {:data=>file_for_upload}, :sharing=>valid_sharing
+
+    df = assigns(:data_file)
+    assert_redirected_to data_file_path(df)
+    assert_equal description, df.description
+  end
+
   private
 
   def mock_http
