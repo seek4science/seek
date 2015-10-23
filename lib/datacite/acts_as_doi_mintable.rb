@@ -26,6 +26,16 @@ module DataCite
           return false
         end
 
+        unless Seek::Config.doi_minting_enabled
+          errors.add(:base, 'DOI minting is not enabled')
+          return false
+        end
+
+        if time_locked?
+          errors.add(:base, "DOIs may only be minted for resources older than #{Seek::Config.time_lock_doi_for} days.")
+          return false
+        end
+
         username = Seek::Config.datacite_username
         password = Seek::Config.datacite_password_decrypt
         url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
@@ -54,6 +64,14 @@ module DataCite
 
       def has_doi?
         !doi.blank?
+      end
+
+      def can_mint_doi?
+        Seek::Config.doi_minting_enabled && !time_locked?
+      end
+
+      def time_locked?
+        (created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) > Time.now
       end
 
       private

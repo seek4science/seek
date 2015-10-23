@@ -78,6 +78,11 @@ class Snapshot < ActiveRecord::Base
     end
   end
 
+  def can_mint_doi?
+    Seek::Config.doi_minting_enabled &&
+         (resource.created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) <= Time.now
+  end
+
   private
 
   def set_snapshot_number

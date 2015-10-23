@@ -3,7 +3,7 @@
         <% if !@snapshot.in_zenodo? %>
             <%= button_link_to("Export to Zenodo", 'snapshot_export', @zenodo_oauth_client.authorize_url(export_investigation_snapshot_path(@investigation, @snapshot.snapshot_number))) %>
         <% end %>
-    <% else %>
+    <% elsif @snapshot.can_mint_doi? %>
         <%= button_link_to("Generate a DOI", 'doi', mint_doi_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), :method => :post) %>
     <% end %>
 <% end %>
