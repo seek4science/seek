@@ -96,19 +96,20 @@ class SearchRdfController < ApplicationController
     if rdf_repository_configured?
       urls.each do |uri|
         begin
-          puts uri
-          route = SEEK::Application.routes.recognize_path(uri)
-          puts route
-          if !route.nil? && !route[:id].nil?
-            klass = route[:controller].singularize.camelize.constantize
-            puts klass
-            id = route[:id]
+          split_uri = URI(uri).path.split('/')
+          id = split_uri.pop()
+          data_type = split_uri.pop()
+
+          #   if !route.nil? && !route[:id].nil?
+          if !id.nil? && !data_type.nil? && !(id =~ /\A\d+\z/).nil? # check if the url did provide an id as a number.
+            klass = data_type.singularize.camelize.constantize
 
             #TODO build a map of klass -> list of ids, then call find() for all of the same type at once (fewer db calls)
             items << klass.find(id)
           end
         rescue Exception => e
-          puts e
+          logger.error "Error in get_active_records_from_urls in search_rdf_controller"
+          logger.error e
         end
       end
     end
