@@ -9,5 +9,5 @@ Institution: The Institute
 New Institutions: Another Institute
 
 
-For the person details: http://test.host:3000/people/2, whose email address is aaron@email.com .
+For the person details: http://localhost:3000/people/2, whose email address is aaron@email.com .
 -- end --

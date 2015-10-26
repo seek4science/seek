@@ -287,7 +287,7 @@ end
     assert_equal 'sowen@cs.man.ac.uk', Seek::Config.crossref_api_email
   end
   test 'site_base_host' do
-    assert_equal 'http://test.host:3000', Seek::Config.site_base_host
+    assert_equal 'http://localhost:3000', Seek::Config.site_base_host
   end
   
   test 'copyright_addendum_enabled' do

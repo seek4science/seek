@@ -1,7 +1,7 @@
 Hi,
     A Sysmo SEEK project that you administer has been edited by member of the project. To check the change please visit
 
-    http://test.host:3000/projects/-pr_id-
+    http://localhost:3000/projects/-pr_id-
 
     This is an automated email
 
