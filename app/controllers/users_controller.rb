@@ -42,12 +42,12 @@ class UsersController < ApplicationController
     if logged_in? && !current_user.active?
       current_user.activate      
       if (current_user.person.projects.empty? && User.count>1)
-        Mailer.welcome_no_projects(current_user, base_host).deliver
+        Mailer.welcome_no_projects(current_user).deliver
         logout_user
         flash[:notice] = "Signup complete! However, you will need to wait for an administrator to associate you with your project(s) before you can login."        
         redirect_to main_app.root_path
       else
-        Mailer.welcome(current_user, base_host).deliver
+        Mailer.welcome(current_user).deliver
         flash[:notice] = "Signup complete!"
         redirect_to current_user.person
       end
@@ -96,7 +96,7 @@ class UsersController < ApplicationController
           user.reset_password
 
           user.save!
-          Mailer.forgot_password(user, base_host).deliver if Seek::Config.email_enabled
+          Mailer.forgot_password(user).deliver if Seek::Config.email_enabled
           flash[:notice] = "Instructions on how to reset your password have been sent to #{user.person.email}"
           format.html { render :action => "forgot_password" }
         else
@@ -139,7 +139,7 @@ class UsersController < ApplicationController
         AuthLookupUpdateJob.new.add_items_to_queue(@user) if do_auth_update
         #user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
-          Mailer.signup(@user,base_host).deliver
+          Mailer.signup(@user).deliver
           flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
           logout_user
           format.html { redirect_to :action=>"activation_required" }
@@ -165,7 +165,7 @@ class UsersController < ApplicationController
   def resend_activation_email
     user = User.find(params[:id])
     if user && user.person && !user.active?
-      Mailer.signup(user,base_host).deliver
+      Mailer.signup(user).deliver
       flash[:notice]="An email has been sent to user: #{user.person.name}"
     else
       flash[:notice] = "No email sent. User was already activated."

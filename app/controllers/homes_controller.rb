@@ -30,7 +30,7 @@ class HomesController < ApplicationController
     @details=params[:details]
 
     if validate_feedback
-      Mailer.feedback(current_user,@subject,@details,@anon,base_host).deliver
+      Mailer.feedback(current_user,@subject,@details,@anon).deliver
       flash[:notice]="Your feedback has been delivered. Thank You."
       redirect_to root_path
     else

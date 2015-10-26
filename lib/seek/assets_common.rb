@@ -65,7 +65,7 @@ module Seek
     def request_resource
       resource = class_for_controller_name.find(params[:id])
       details = params[:details]
-      mail = Mailer.request_resource(current_user, resource, details, base_host)
+      mail = Mailer.request_resource(current_user, resource, details)
       mail.deliver
 
       render :update do |page|
