@@ -12,7 +12,7 @@ class MailerTest < ActionMailer::TestCase
     @expected.body    = read_fixture('signup')
     
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron),"localhost"))
+    assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron), Seek::Config.site_base_host))
   end
   
   test "announcement notification" do
@@ -28,7 +28,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!("-unique_key-",recipient.notifiee_info.unique_key)
 
-    assert_equal expected_text, encode_mail(Mailer.announcement_notification(announcement,recipient.notifiee_info,"localhost"))
+    assert_equal expected_text, encode_mail(Mailer.announcement_notification(announcement,recipient.notifiee_info, Seek::Config.site_base_host))
 
   end
 
@@ -40,7 +40,7 @@ class MailerTest < ActionMailer::TestCase
 
     @expected.body    = read_fixture('feedback_anon')
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.feedback(users(:aaron),"This is a test feedback","testing the feedback message",true,"localhost"))
+    assert_equal encode_mail(@expected),encode_mail(Mailer.feedback(users(:aaron),"This is a test feedback","testing the feedback message",true, Seek::Config.site_base_host))
 
   end
 
@@ -52,7 +52,7 @@ class MailerTest < ActionMailer::TestCase
 
     @expected.body    = read_fixture('feedback_non_anon')
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.feedback(users(:aaron),"This is a test feedback","testing the feedback message",false,"localhost"))
+    assert_equal encode_mail(@expected),encode_mail(Mailer.feedback(users(:aaron),"This is a test feedback","testing the feedback message",false, Seek::Config.site_base_host))
 
   end
 
@@ -68,7 +68,7 @@ class MailerTest < ActionMailer::TestCase
     user=users(:aaron)
     details="here are some more details"
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.request_resource(user,resource,details,"localhost"))
+    assert_equal encode_mail(@expected),encode_mail(Mailer.request_resource(user,resource,details, Seek::Config.site_base_host))
 
   end
 
@@ -86,7 +86,7 @@ class MailerTest < ActionMailer::TestCase
     user=users(:aaron)
     details=""
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.request_resource(user,resource,details,"localhost"))
+    assert_equal encode_mail(@expected),encode_mail(Mailer.request_resource(user,resource,details, Seek::Config.site_base_host))
 
   end
 
@@ -111,7 +111,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text.gsub!("-model_id-",resources[1].id.to_s)
     expected_text.gsub!("-requester_id-",requester.person.id.to_s)
 
-    assert_equal expected_text,encode_mail(Mailer.request_publish_approval(gatekeeper,requester,resources,"localhost"))
+    assert_equal expected_text,encode_mail(Mailer.request_publish_approval(gatekeeper,requester,resources, Seek::Config.site_base_host))
 
   end
 
@@ -129,7 +129,7 @@ class MailerTest < ActionMailer::TestCase
 
     resources=[assays(:metabolomics_assay),data_files(:picture),models(:teusink),assays(:metabolomics_assay2),data_files(:sysmo_data_file)]
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publishing(owner,publisher,resources,"localhost"))
+    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publishing(owner,publisher,resources, Seek::Config.site_base_host))
 
   end
 
@@ -149,7 +149,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text.gsub!("-person_id-",gatekeeper.id.to_s)
     expected_text.gsub!("-df_id-",item.id.to_s)
 
-    assert_equal expected_text,encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, items_and_comments,"localhost"))
+    assert_equal expected_text,encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, items_and_comments, Seek::Config.site_base_host))
 
   end
 
@@ -172,7 +172,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text.gsub!("-person_id-",gatekeeper.id.to_s)
     expected_text.gsub!("-df_id-",item.id.to_s)
 
-    assert_equal expected_text,encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, items_and_comments, "localhost"))
+    assert_equal expected_text,encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, items_and_comments,  Seek::Config.site_base_host))
   end
 
 
@@ -189,7 +189,7 @@ class MailerTest < ActionMailer::TestCase
     u.reset_password_code="fred"
     
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.forgot_password(users(:aaron),"localhost"))
+    assert_equal encode_mail(@expected), encode_mail(Mailer.forgot_password(users(:aaron), Seek::Config.site_base_host))
 
   end
 
@@ -208,7 +208,7 @@ class MailerTest < ActionMailer::TestCase
     params[:other_institutions]="Another Institute"
 
     assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_admin_new_user(params, users(:aaron), "localhost"))
+                 encode_mail(Mailer.contact_admin_new_user(params, users(:aaron),  Seek::Config.site_base_host))
   end
 
   test "contact_project_administrator_new_user" do
@@ -227,7 +227,7 @@ class MailerTest < ActionMailer::TestCase
     @expected.body = read_fixture('contact_project_administrator_new_user')
 
     assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron), "localhost"))
+                 encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron),  Seek::Config.site_base_host))
 
 
   end
@@ -239,7 +239,7 @@ class MailerTest < ActionMailer::TestCase
     
     @expected.body = read_fixture('welcome')
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.welcome(users(:quentin),"localhost"))
+    assert_equal encode_mail(@expected), encode_mail(Mailer.welcome(users(:quentin), Seek::Config.site_base_host))
 
   end
 
@@ -250,7 +250,7 @@ class MailerTest < ActionMailer::TestCase
 
     @expected.body = read_fixture('welcome_no_projects')
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.welcome_no_projects(users(:quentin),"localhost"))
+    assert_equal encode_mail(@expected), encode_mail(Mailer.welcome_no_projects(users(:quentin), Seek::Config.site_base_host))
 
   end
 
@@ -266,7 +266,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-pr_id-',project.id.to_s)
 
-    assert_equal expected_text, encode_mail(Mailer.project_changed(project,'localhost'))
+    assert_equal expected_text, encode_mail(Mailer.project_changed(project, Seek::Config.site_base_host))
   end
 
   test "test mail" do

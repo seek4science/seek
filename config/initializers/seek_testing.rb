@@ -97,6 +97,7 @@ SEEK::Application.configure do
       Settings.defaults[:hard_max_cachable_size] = 5000
 
       Settings.defaults[:orcid_required] = false
+      Settings.defaults[:site_base_host] = "http://test.host:3000"
     end
   end
 end
