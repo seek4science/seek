@@ -77,7 +77,9 @@ module DataCite
       private
 
       def doi_target_url
-        polymorphic_url(self, :host => Seek::Util.host)
+        polymorphic_url(self,
+                        :host => Seek::Config.host_with_port,
+                        :protocol => Seek::Config.host_scheme)
       end
 
       def doi_resource_type

@@ -39,8 +39,10 @@ module Seek
   module Propagators
     def site_base_host_propagate
       script_name = (SEEK::Application.config.relative_url_root || '/')
-      ActionMailer::Base.default_url_options = { host: site_base_host.gsub(/https?:\/\//, '').gsub(/\/$/, ''),
-						                                           script_name: script_name }
+      ActionMailer::Base.default_url_options = { host: host_with_port,
+                                                 protocol: host_scheme,
+                                                 script_name: script_name
+      }
     end
 
     def smtp_propagate
@@ -265,6 +267,21 @@ module Seek
       merge! :default_pages, controller => value
       value
     end
+
+    def host_with_port
+      base_uri = URI(Seek::Config.site_base_host)
+      host = base_uri.host
+      unless (base_uri.port == 80 && base_uri.scheme == 'http') ||
+          (base_uri.port == 443 && base_uri.scheme == 'https')
+        host << ":#{base_uri.port}"
+      end
+      host
+    end
+
+    def host_scheme
+      URI(Seek::Config.site_base_host).scheme
+    end
+
   end
 
   # The inner wiring. Ideally this should be hidden away,
