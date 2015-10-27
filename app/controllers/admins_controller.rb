@@ -191,7 +191,7 @@ class AdminsController < ApplicationController
     if Seek::Config.tag_threshold.to_s != params[:tag_threshold] || Seek::Config.max_visible_tags.to_s != params[:max_visible_tags]
       expire_annotation_fragments
     end
-    Seek::Config.site_base_host = params[:site_base_host] unless params[:site_base_host].nil?
+    Seek::Config.site_base_host = params[:site_base_host].chomp('/') unless params[:site_base_host].nil?
     # check valid email
     pubmed_email = params[:pubmed_api_email]
     pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
