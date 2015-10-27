@@ -42,9 +42,10 @@ class Ability
 
   #asset manager can manage the assets belonging to their project
   def asset_manager asset_manager
-     can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
-        asset_manager.is_asset_manager_of?(item)
-     end
+    can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
+      asset_manager.is_asset_manager_of?(item) &&
+          (item.projects - item.contributor.person.former_projects).none?
+    end
   end
 
   #gatekeeper can publish the assets belonging to their project if as well can manage or the item is waiting for his approval
