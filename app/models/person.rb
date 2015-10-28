@@ -31,12 +31,12 @@ class Person < ActiveRecord::Base
   has_many :work_groups, :through=>:group_memberships
 
   has_many :former_group_memberships, :class_name => 'GroupMembership',
-           :conditions => ["time_left_at IS NOT NULL AND time_left_at < ?", Time.now], :dependent => :destroy
+           :conditions => proc { ["time_left_at IS NOT NULL AND time_left_at <= ?", Time.now] }, :dependent => :destroy
   has_many :former_work_groups, :class_name => 'WorkGroup', :through => :former_group_memberships,
            :source => :work_group
 
   has_many :current_group_memberships, :class_name => 'GroupMembership',
-           :conditions => ["time_left_at IS NULL OR time_left_at > ?", Time.now], :dependent => :destroy
+           :conditions =>  proc { ["time_left_at IS NULL OR time_left_at > ?", Time.now] }, :dependent => :destroy
   has_many :current_work_groups, :class_name => 'WorkGroup', :through => :current_group_memberships,
            :source => :work_group
 
