@@ -1015,8 +1015,9 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes person.projects, project
 
     gm = person.group_memberships.first
-    gm.has_left = true
+    gm.time_left_at = 1.day.ago
     gm.save
+    assert gm.has_left
     person.reload
 
     assert_includes person.former_projects, project
