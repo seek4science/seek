@@ -1,11 +1,11 @@
 Hi Gatekeeper Last,
 
-    The Sysmo SEEK user Aaron Spiggle, http://localhost/people/-requester_id-, has requested your approval to publish the following item(s):
-        Data file: Picture - http://localhost/data_files/-df_id-
-        Model: Teusink - http://localhost/models/-model_id-
+    The Sysmo SEEK user Aaron Spiggle, http://localhost:3000/people/-requester_id-, has requested your approval to publish the following item(s):
+        Data file: Picture - http://localhost:3000/data_files/-df_id-
+        Model: Teusink - http://localhost:3000/models/-model_id-
 
     You can approve or reject by clicking on this link:
-    http://localhost/people/-person_id-/requested_approval_assets
+    http://localhost:3000/people/-person_id-/requested_approval_assets
     (Remember to login first!)
 
     You can also reply to Aaron by replying to this email.

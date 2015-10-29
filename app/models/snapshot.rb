@@ -98,7 +98,9 @@ class Snapshot < ActiveRecord::Base
   end
 
   def doi_target_url
-    investigation_snapshot_url(resource, snapshot_number, :host => Seek::Util.host)
+    investigation_snapshot_url(resource, snapshot_number,
+                               :host => Seek::Config.host_with_port,
+                               :protocol => Seek::Config.host_scheme)
   end
 
   def parse_metadata

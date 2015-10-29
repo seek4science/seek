@@ -169,7 +169,7 @@ module Seek
 
           recipient_items.keys.each do |recipient|
             begin
-              Mailer.send(delivery_method, recipient, User.current_user.person, recipient_items[recipient], base_host).deliver
+              Mailer.send(delivery_method, recipient, User.current_user.person, recipient_items[recipient]).deliver
             rescue Exception => e
               Rails.logger.error("Error sending notification email to the owner #{gatekeeper.name} - #{e.message}")
             end
