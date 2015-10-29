@@ -945,4 +945,65 @@ class PersonTest < ActiveSupport::TestCase
     assert_empty Person.not_registered_with_matching_email("fffffxxxx11z@email.com")
   end
 
+  test "orcid required for new person" do
+    with_config_value(:orcid_required, true) do
+      assert_nothing_raised do
+        has_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com",
+                            :orcid => 'http://orcid.org/0000-0002-0048-3300'
+        assert has_orcid.valid?
+        assert_empty has_orcid.errors[:orcid]
+      end
+      assert_raises ActiveRecord::RecordInvalid do
+        no_orcid = Factory :brand_new_person, :email => "FISH-sOup2@email.com"
+        assert !no_orcid.valid?
+        assert_not_empty no_orcid.errors[:orcid]
+      end
+      assert_raises ActiveRecord::RecordInvalid do
+        bad_orcid = Factory :brand_new_person, :email => "FISH-sOup3@email.com",
+                            :orcid => 'banana'
+        assert !bad_orcid.valid?
+        assert_not_empty bad_orcid.errors[:orcid]
+      end
+    end
+  end
+
+  test "orcid not required for existing person" do
+    no_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com"
+
+    with_config_value(:orcid_required, true) do
+      assert_nothing_raised do
+        no_orcid.update_attributes(:email => "FISH-sOup99@email.com")
+        assert no_orcid.valid?
+      end
+    end
+  end
+
+  test "orcid must be valid even if not required" do
+    bad_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com"
+
+    with_config_value(:orcid_required, true) do
+      bad_orcid.update_attributes(:email => "FISH-sOup99@email.com", :orcid => 'big mac')
+      assert !bad_orcid.valid?
+      assert_not_empty bad_orcid.errors[:orcid]
+    end
+
+    with_config_value(:orcid_required, false) do
+      assert_raises ActiveRecord::RecordInvalid do
+        another_bad_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com", :orcid => 'こんにちは'
+        assert !another_bad_orcid.valid?
+        assert_not_empty bad_orcid.errors[:orcid]
+      end
+    end
+  end
+
+  test "ensures full orcid uri is stored" do
+    semi_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com",
+                         :orcid => '0000-0002-0048-3300'
+    full_orcid = Factory :brand_new_person, :email => "FISH-sOup2@email.com",
+                         :orcid => 'http://orcid.org/0000-0002-0048-3300'
+
+    assert_equal 'http://orcid.org/0000-0002-0048-3300', semi_orcid.orcid
+    assert_equal 'http://orcid.org/0000-0002-0048-3300', full_orcid.orcid
+  end
+
 end

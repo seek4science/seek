@@ -16,19 +16,21 @@ class ContentBlob < ActiveRecord::Base
   attr_writer :data
 
   # this is used as an alternative to passing the data contents directly (in memory).
-  # it is not stored in the database, but when the content_blob is saved is save, the IO object is read and stored in the correct location.
+  # it is not stored in the database, but when the content_blob is saved, the IO object is read and stored in the correct location.
   # if the file doesn't exist an error occurs
   attr_writer :tmp_io_object
+
+  # Flag to decide whether a remote file should be retrieved and stored in SEEK
+  attr_accessor :make_local_copy
 
   acts_as_uniquely_identifiable
 
   # this action saves the contents of @data or the contents contained within the @tmp_io_object to the storage file.
   # an Exception is raised if both are defined
   before_save :dump_data_to_file
-
-
-
   before_save :check_version
+  before_save :calculate_file_size
+  after_create :create_retrieval_job
 
   has_many :worksheets, dependent: :destroy
 
@@ -38,21 +40,12 @@ class ContentBlob < ActiveRecord::Base
 
   def original_filename_or_url
     if original_filename.blank? && url.blank?
-      errors.add(:base, 'Need to specifiy either original_filename or url')
+      errors.add(:base, 'Need to specify either original_filename or url')
     end
   end
 
   def spreadsheet_annotations
     worksheets.map { |worksheet| worksheet.cell_ranges.map(&:annotations) }.flatten
-  end
-
-  # returns the size of the file in bytes, or nil if the file doesn't exist
-  def filesize
-    if file_exists?
-      File.size(filepath)
-    else
-      nil
-    end
   end
 
   # allows you to run something on a temporary copy of the blob file, which is deleted once finished
@@ -89,8 +82,6 @@ class ContentBlob < ActiveRecord::Base
   end
   # include all image types
 
-
-
   def cache_key
     "#{super}-#{sha1sum}"
   end
@@ -103,8 +94,6 @@ class ContentBlob < ActiveRecord::Base
     return File.open(filepath, 'rb') if file_exists?
     nil
   end
-
-
 
   def file_exists?
     File.exist?(filepath)
@@ -169,11 +158,46 @@ class ContentBlob < ActiveRecord::Base
     @file ||= File.open(filepath)
   end
 
+  def retrieve
+    handler = Seek::DownloadHandling::RemoteContentHandler.new(self.url)
+
+    self.tmp_io_object = handler.fetch
+
+    self.save
+  end
+
+  def cachable?
+    Seek::Config.cache_remote_files &&
+        file_size &&
+        file_size < Seek::Config.max_cachable_size
+  end
+
+  def caching_job(ignore_locked = true)
+    job_yaml = RemoteContentFetchingJob.new(self).to_yaml
+
+    if ignore_locked
+      Delayed::Job.where(['handler = ? AND locked_at IS NULL AND failed_at IS NULL', job_yaml]) # possibly a better way of doing this...
+    else
+      Delayed::Job.where(['handler = ? AND failed_at IS NULL', job_yaml])
+    end
+  end
+
   private
 
+  def remote_headers
+    if @headers
+      @headers
+    else
+      begin
+        RestClient.head(url).headers
+      rescue
+        {}
+      end
+    end
+  end
+
   def retrieve_content_type_from_url
-    response = RestClient.head url
-    type = response.headers[:content_type] || ''
+    type = remote_headers[:content_type] || ''
 
     # strip out the charset, e.g for content-type  "text/html; charset=utf-8"
     type.gsub(/;.*/, '').strip
@@ -203,5 +227,21 @@ class ContentBlob < ActiveRecord::Base
       FileUtils.mv @tmp_io_object.path, filepath
     end
     @tmp_io_object = nil
+  end
+
+  def calculate_file_size
+    if file_exists?
+      self.file_size = File.size(self.filepath)
+    elsif url
+      self.file_size = remote_headers[:content_length]
+    else
+      self.file_size = nil
+    end
+  end
+
+  def create_retrieval_job
+    if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?)
+      RemoteContentFetchingJob.new(self).queue_job
+    end
   end
 end

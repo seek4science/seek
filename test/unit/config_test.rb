@@ -283,11 +283,45 @@ end
   test 'pubmed_api_email' do
     assert_equal nil, Seek::Config.pubmed_api_email
   end
+
   test 'crossref_api_email' do
     assert_equal 'sowen@cs.man.ac.uk', Seek::Config.crossref_api_email
   end
+
   test 'site_base_host' do
     assert_equal 'http://localhost:3000', Seek::Config.site_base_host
+  end
+
+  test 'host_with_port' do
+    assert_equal 'localhost:3000', Seek::Config.host_with_port
+
+    with_config_value(:site_base_host, 'https://secure.website:443') do
+      assert_equal 'secure.website', Seek::Config.host_with_port
+    end
+
+    with_config_value(:site_base_host, 'http://insecure.website:80') do
+      assert_equal 'insecure.website', Seek::Config.host_with_port
+    end
+
+    with_config_value(:site_base_host, 'http://localhost') do
+      assert_equal 'localhost', Seek::Config.host_with_port
+    end
+  end
+
+  test 'host_scheme' do
+    assert_equal 'http', Seek::Config.host_scheme
+
+    with_config_value(:site_base_host, 'https://secure.website:443') do
+      assert assert_equal 'https', Seek::Config.host_scheme
+    end
+
+    with_config_value(:site_base_host, 'http://insecure.website:80') do
+      assert_equal 'http', Seek::Config.host_scheme
+    end
+
+    with_config_value(:site_base_host, 'http://localhost') do
+      assert_equal 'http', Seek::Config.host_scheme
+    end
   end
   
   test 'copyright_addendum_enabled' do

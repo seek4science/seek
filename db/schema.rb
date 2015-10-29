@@ -261,9 +261,10 @@ ActiveRecord::Schema.define(:version => 20151009130408) do
     t.integer "asset_id"
     t.string  "asset_type"
     t.integer "asset_version"
-    t.boolean "is_webpage",        :default => false
+    t.boolean "is_webpage",                     :default => false
     t.boolean "external_link"
     t.string  "sha1sum"
+    t.integer "file_size",         :limit => 8
   end
 
   add_index "content_blobs", ["asset_id", "asset_type"], :name => "index_content_blobs_on_asset_id_and_asset_type"

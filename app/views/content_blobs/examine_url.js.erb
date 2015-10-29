@@ -3,8 +3,11 @@ el = $j('#test_url_result')[0];
 el.innerHTML="<%= escape_javascript(content) %>";
 el.show();
 
-<% copy_allowed = !@is_webpage && !@unauthorized && !@error %>
-
+<% copy_allowed =
+    !@is_webpage &&
+    !@unauthorized &&
+    !@error &&
+    !(@size && (@size > Seek::Config.hard_max_cachable_size)) %>
 
 <% if copy_allowed %>
     allow_copy_option();

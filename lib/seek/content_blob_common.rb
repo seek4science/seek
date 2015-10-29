@@ -22,7 +22,7 @@ module Seek
           else
             filepath = @content_blob.filepath
             #added for the benefit of the tests after rails3 upgrade - but doubt it is required
-            headers["Content-Length"]=@content_blob.filesize.to_s
+            headers["Content-Length"]=@content_blob.file_size.to_s
           end
           send_file filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type || "application/octet-stream", :disposition => disposition
         else
@@ -33,7 +33,7 @@ module Seek
           if @asset_version.contributor.nil? #A jerm generated resource
             download_jerm_asset
           else
-            download_via_url
+            stream_from_url
           end
         rescue Seek::DownloadException=>de
           redirect_on_error @asset_version,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
@@ -72,22 +72,31 @@ module Seek
       end
     end
 
-    def download_via_url
-      code = url_response_code(@content_blob.url)
-      if code == "200"
-        downloader=Seek::RemoteDownloader.new
+    def stream_from_url
+      code = check_url_response_code(@content_blob.url)
+      case code
+      when 200
+        self.response.headers["Content-Type"] ||= @content_blob.content_type
+        self.response.headers["Content-Disposition"] = "attachment; filename=#{@content_blob.original_filename}"
+        self.response.headers['Last-Modified'] = Time.now.ctime.to_s
+
         begin
-          data_hash = downloader.get_remote_data @content_blob.url
-          filename = get_filename data_hash[:filename], @content_blob.original_filename
-          send_file data_hash[:data_tmp_path], :filename => filename, :type => data_hash[:content_type] || @content_blob.content_type, :disposition => 'attachment'
-        rescue Exception=>e
+          self.response_body = Enumerator.new do |yielder|
+            Seek::DownloadHandling::Streamer.new(@content_blob.url).stream do |chunk|
+              yielder << chunk
+            end
+          end
+        rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+            Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
           error_message = "There is a problem downloading this file. #{e}"
           redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
           return_file_or_redirect_to redirected_url, error_message
         end
-      elsif (["301","302","401","403"].include?(code))
-        return_file_or_redirect_to @content_blob.url
-      elsif code=="404"
+      when 401, 403
+        error_message = "This item is referenced at a remote location, which is currently inaccessible"
+        redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
+        return_file_or_redirect_to redirected_url, error_message
+      when 404
         error_message = "This item is referenced at a remote location, which is currently unavailable"
         redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
         return_file_or_redirect_to redirected_url, error_message
@@ -98,7 +107,4 @@ module Seek
       end
     end
   end
-
-
-
 end

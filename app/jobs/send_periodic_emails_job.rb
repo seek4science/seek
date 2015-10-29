@@ -83,9 +83,9 @@ class SendPeriodicEmailsJob < SeekEmailJob
 
     # get the logs for this persons subscribable items, where the subscription has the correct frequency
     logs_for_visible_items.select do |log|
-      !person.subscriptions.for_subscribable(log.activity_loggable).select do |subscription|
+      person.subscriptions.for_subscribable(log.activity_loggable).any? do |subscription|
         subscription.frequency == frequency
-      end.empty?
+      end
     end
   end
 

@@ -101,6 +101,38 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert assigns(:snapshot).doi
   end
 
+  test "can't mint DOI for snapshot if DOI minting disabled" do
+    datacite_mock
+    create_snapshot
+    login_as(@user)
+
+    with_config_value(:doi_minting_enabled, false) do
+      post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    end
+
+    @snapshot = @snapshot.reload
+
+    assert flash[:error].to_s.include?('minting')
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    assert @snapshot.doi.nil?
+  end
+
+  test "can't mint DOI for snapshot if not old enough" do
+    datacite_mock
+    create_snapshot
+    login_as(@user)
+
+    with_config_value(:time_lock_doi_for, 100) do
+      post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    end
+
+    @snapshot = @snapshot.reload
+
+    assert flash[:error].to_s.include?('older')
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    assert @snapshot.doi.nil?
+  end
+
   test "can't mint DOI for snapshot if no manage permissions" do
     datacite_mock
     create_snapshot

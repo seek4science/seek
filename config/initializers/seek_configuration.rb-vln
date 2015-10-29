@@ -151,5 +151,6 @@ SEEK::Application.configure do
   Seek::Config.default :zenodo_api_url, 'https://zenodo.org/api'
   Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
 
+  Seek::Config.default :orcid_required, false
 end
 

@@ -97,6 +97,7 @@ gem 'bootstrap-multiselect-rails'
 gem 'handlebars_assets'
 gem "zenodo-client", :git=>"https://github.com/seek4science/zenodo-client.git"
 
+gem 'unicorn-rails'
 
 group :assets do
   gem 'turbo-sprockets-rails3'
@@ -115,7 +116,6 @@ group :development do
   gem "rubocop",:require=>false
   gem "rubycritic",:require=>false
   gem "guard-rubycritic",:require=>false
-  gem 'unicorn-rails'
   gem 'rails_best_practices'
 end
 
@@ -130,5 +130,9 @@ group :test do
   gem 'rspec-rails'
   gem 'sunspot_matchers'
   gem 'pg'
+  gem 'teaspoon'
+  gem "teaspoon-mocha"
+  gem "magic_lamp"
+  gem 'database_cleaner'
   gem 'selenium-webdriver'
 end

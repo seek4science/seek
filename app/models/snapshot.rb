@@ -78,6 +78,11 @@ class Snapshot < ActiveRecord::Base
     end
   end
 
+  def can_mint_doi?
+    Seek::Config.doi_minting_enabled &&
+         (resource.created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) <= Time.now
+  end
+
   private
 
   def set_snapshot_number
@@ -93,7 +98,9 @@ class Snapshot < ActiveRecord::Base
   end
 
   def doi_target_url
-    investigation_snapshot_url(resource, snapshot_number, :host => Seek::Util.host)
+    investigation_snapshot_url(resource, snapshot_number,
+                               :host => Seek::Config.host_with_port,
+                               :protocol => Seek::Config.host_scheme)
   end
 
   def parse_metadata

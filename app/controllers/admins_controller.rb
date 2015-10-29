@@ -86,6 +86,12 @@ class AdminsController < ApplicationController
     Seek::Config.zenodo_client_id = params[:zenodo_client_id].try(:strip)
     Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].try(:strip)
 
+    Seek::Config.cache_remote_files = params[:cache_remote_files]
+    Seek::Config.max_cachable_size = params[:max_cachable_size]
+    Seek::Config.max_cachable_size = params[:hard_max_cachable_size]
+
+    Seek::Config.orcid_required = params[:orcid_required]
+
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
     Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
@@ -185,12 +191,12 @@ class AdminsController < ApplicationController
     if Seek::Config.tag_threshold.to_s != params[:tag_threshold] || Seek::Config.max_visible_tags.to_s != params[:max_visible_tags]
       expire_annotation_fragments
     end
-    Seek::Config.site_base_host = params[:site_base_host] unless params[:site_base_host].nil?
+    Seek::Config.site_base_host = params[:site_base_host].chomp('/') unless params[:site_base_host].nil?
     # check valid email
     pubmed_email = params[:pubmed_api_email]
-    pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed api email')
+    pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
     crossref_email = params[:crossref_api_email]
-    crossref_email_valid = check_valid_email(crossref_email, 'crossref api email')
+    crossref_email_valid = check_valid_email(crossref_email, 'crossref API email address')
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 
@@ -473,11 +479,11 @@ class AdminsController < ApplicationController
   end
 
   def check_valid_email(email_address, field)
-    if email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/
-      return true
+    if email_address.blank? || email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/
+      true
     else
-      flash[:error] = "Please input the correct #{field}"
-      return false
+      flash[:error] = "Please input a valid #{field}"
+      false
     end
   end
 
@@ -503,9 +509,9 @@ class AdminsController < ApplicationController
 
   def string_to_boolean(string)
     if string == '1'
-      return true
+      true
     else
-      return false
+      false
     end
   end
 
