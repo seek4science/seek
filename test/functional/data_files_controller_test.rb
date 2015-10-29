@@ -1932,7 +1932,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show,:id=>123
     assert_response :not_found
     assert_select "h1", :text=>'404'
-    assert_select "h2",:text=>/The #{I18n.t('data_file')} does not exist./
+    assert_select "h2",:text=>"The requested page or resource does not exist."
   end
 
   test "landing page for deleted item which DOI was minted" do
