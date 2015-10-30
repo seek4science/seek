@@ -21,7 +21,7 @@ This will make sure some of the rake tasks affect the appropriate database.
 
 To save time later there are also some additional packages to install:
 
-    sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
+    sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev
 
 You will need to install SEEK as the www-data user. First, to make the
 installation simpler, give this user a dedicated home directory:
