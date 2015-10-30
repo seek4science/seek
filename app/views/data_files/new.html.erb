@@ -43,7 +43,7 @@
       <div class="form-group">
         <label>Description</label>
         <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
-        <%= text_area_tag :description, data_file_description_value, :class=>"form-control", :rows => 5 -%>
+        <%= text_area_tag 'data_file[description]', data_file_description_value, :class=>"form-control", :rows => 5 -%>
       </div>
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file,:allow_nil=>true } -%>

@@ -1,7 +1,7 @@
 <div class="landing_page">
   <h1>404</h1>
   <% asset_type = t("#{controller_name.singularize}") %>
-  <h2>The <%= asset_type %> does not exist.</h2>
+  <h2>The requested page or resource does not exist.</h2>
 
   <% klass = controller_name.singularize.camelize %>
   <% version = params[:version] %>
@@ -12,6 +12,6 @@
           <p class="comment">The authors left the reason for removing the <%= asset_type %>: <%= comment.html_safe %></p>
       <% end %>
   <% else %>
-      <p>You may have mistyped the address or the <%= asset_type %> may have been deleted.</p>
+      <p>You may have mistyped the address or the item may have been deleted.</p>
   <% end %>
 </div>
