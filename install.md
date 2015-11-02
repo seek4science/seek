@@ -59,7 +59,7 @@ The remaining packages are:
 
     sudo apt-get install wget curl mercurial ruby libssl-dev
     sudo apt-get install build-essential openssh-server git libreadline-dev
-    sudo apt-get install libxml++2.6-dev openjdk-7-jdk
+    sudo apt-get install libxml++2.6-dev openjdk-7-jdk libgmp-dev
     sudo apt-get install libsqlite3-dev sqlite3 libcurl4-gnutls-dev nodejs
     sudo apt-get install poppler-utils libreoffice libmysqlclient-dev
     sudo apt-get install libmagick++-dev imagemagick libxslt1-dev libpq-dev

@@ -68,6 +68,13 @@ task. Using seek:upgrade should still work, but could take a lot of
 unnecessary time. There is more details and an example towards the end of the
 this page.
 
+## Steps to upgrade from 0.23.x to 0.24.x
+
+libgmp-dev is needed for RedCloth with ruby 2.1.7
+
+    sudo apt-get install libgmp-dev
+
+
 ## Steps to upgrade from 0.22.x to 0.23.x
 
 
