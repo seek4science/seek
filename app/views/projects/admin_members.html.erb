@@ -22,10 +22,35 @@
       <div id="project_institutions"></div>
     <% end %>
 
+    <div class="modal" id="leaving-date-form" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Flag as leaving</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group date-select">
+              <label>Leaving date</label>
+              <%= calendar_date_select_tag :leaving_date, Date.today, :time => "mixed", :class => "form-control" -%>
+              <input id="leaving-person-id" type="hidden" value=""/>
+              <input id="leaving-person-name" type="hidden" value=""/>
+              <input id="leaving-membership-id" type="hidden" value=""/>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button id="confirm-leaving" type="button" class="btn btn-primary">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <%= form_tag(update_members_project_path(@project)) do %>
         <%= panel("Pending changes") do %>
             <ul id="change-list"></ul>
             <div id="empty-change-list" class="subtle">No changes</div>
+            <%= button_link_to 'Undo all changes', 'undo', '#', :class => 'btn-sm pull-right', :id => 'undo-all' %>
         <% end %>
         <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
     <% end -%>
@@ -38,9 +63,11 @@
     @project.work_groups.map do |wg|
         wg.group_memberships.map do |gm|
             {
-                id: gm.id,
-                person: { id: gm.person_id, name: gm.person.name },
-                institution: { id: gm.work_group.institution.id, title: gm.work_group.institution.title }
+                id: gm.id.to_s,
+                person: { id: gm.person_id.to_s, name: gm.person.name },
+                institution: { id: gm.work_group.institution.id.to_s, title: gm.work_group.institution.title },
+                leftAt: gm.time_left_at,
+                cannotRemove: current_user.person.id == gm.person_id
             }
         end
     end.flatten.to_json.html_safe %>;

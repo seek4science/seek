@@ -20,7 +20,7 @@ ul.institution_members li.institution_member {
     list-style-type: none;
 }
 
-.remove_member_icon, .flag_as_left_icon {
+.remove_member_icon, .flag_as_left_icon, .unflag_as_left_icon, .undo-action {
     display: inline-block;
     vertical-align: middle;
     width: 16px;
@@ -29,50 +29,54 @@ ul.institution_members li.institution_member {
 }
 
 .remove_member_icon {
-    background: url(<%= asset_path(icon_filename_for_key("destroy")) %>) left center no-repeat;
+    background: url(<%= asset_path(icon_filename_for_key("project_membership_delete")) %>) left center no-repeat;
 }
 
 .flag_as_left_icon {
-    background: url(<%= asset_path(icon_filename_for_key("logout")) %>) left center no-repeat;
+    background: url(<%= asset_path(icon_filename_for_key("project_membership_flag")) %>) left center no-repeat;
+}
+
+.unflag_as_left_icon {
+    background: url(<%= asset_path(icon_filename_for_key("project_membership_unflag")) %>) left center no-repeat;
+}
+
+.undo-action {
+    background: url(<%= asset_path(icon_filename_for_key("undo")) %>) left center no-repeat;
 }
 
 div#project_institutions table {
     display:inline;
 }
 
-li.institution_member.left-project {
-    color: #aaa;
-    text-decoration: line-through;
-}
-
 .undo-action {
     display: none;
 }
 
-.added-membership .action-button,
-.removed-membership .action-button,
-.flagged-membership .action-button {
+.mutated-membership .action-button {
     display: none;
 }
 
-.added-membership .undo-action,
-.removed-membership .undo-action,
-.flagged-membership .undo-action,
+.mutated-membership .undo-action,
 .change-item .undo-action,
 .new-member .undo-action {
-    display: inline;
+    display: inline-block;
 }
 
-.added-membership, .new-member {
+.added-membership span,
+.left-project.unflagged-membership span,
+.new-member span {
     color: green;
+    text-decoration: none;
 }
 
-.removed-membership {
+.left-project.removed-membership span, /* Needed for specificity reasons */
+.removed-membership span {
     color: red;
     text-decoration: line-through;
 }
 
-.flagged-membership {
-    color: grey;
+.left-project span,
+.flagged-membership span {
+    color: #aaa;
     text-decoration: line-through;
 }

@@ -117,36 +117,87 @@ var projectActions = {
     },
     undo: function () {
         var item = $j(this).parent('.institution_member');
-        var id = parseInt(item.data('personId'));
-        console.log(id);
-        for(var i = 0; i < membershipChanges.length; i++) {
-            if(membershipChanges[i].person.id === id) {
-                membershipChanges.splice(i, 1);
-                break;
-            }
-        }
-        renderMemberships();
+        var id = item.data('personId');
+        removeChange(id);
     },
     remove: function () {
         var item = $j(this).parent('.institution_member');
         var change = {
-            id: parseInt(item.data('membershipId')),
+            id: item.data('membershipId'),
             person: { id: item.data('personId'), name: item.data('personName') },
             action: 'removed'
         };
-        membershipChanges.push(change);
-        renderMemberships();
+        addChange(change);
+    },
+    flag: function () {
+        var item = $j(this).parent('.institution_member');
+        $j('#leaving-person-id').val(item.data('personId'));
+        $j('#leaving-person-name').val(item.data('personName'));
+        $j('#leaving-membership-id').val(item.data('membershipId'));
+        $j('#leaving-date-form').modal('show');
+    },
+    confirmFlag: function () {
+        var change = {
+            id: $j('#leaving-membership-id').val(),
+            person: { id: $j('#leaving-person-id').val(), name: $j('#leaving-person-name').val() },
+            date: $j('#leaving_date').val(),
+            action: 'flagged'
+        };
+        $j('#leaving-date-form').modal('hide');
+        addChange(change);
+    },
+    unflag: function () {
+        var item = $j(this).parent('.institution_member');
+        var change = {
+            id: item.data('membershipId'),
+            person: { id: item.data('personId'), name: item.data('personName') },
+            action: 'unflagged'
+        };
+        addChange(change);
     }
 };
 
 $j(document).ready(function () {
     $j('#project-admin-page').on('click', '.undo-action', projectActions.undo);
     $j('#project-admin-page').on('click', '.remove-action', projectActions.remove);
-    //$j('#project-admin-page').on('click', '.flag-action', projectActions.flag);
+    $j('#project-admin-page').on('click', '.flag-action', projectActions.flag);
+    $j('#project-admin-page').on('click', '.unflag-action', projectActions.unflag);
+    $j('#project-admin-page').on('click', '#confirm-leaving', projectActions.confirmFlag);
+    $j('#undo-all').click(function () {
+        membershipChanges = [];
+        renderMemberships();
+    });
 });
 
 var memberships = []; // Array to hold all the current project memberships. Should not be modified!
 var membershipChanges = []; // to hold all the unsaved changes made on the current page
+
+function getPersonIndex(set, personId) {
+    for(var i = 0; i < set.length; i++) {
+        if(set[i].person.id == personId)
+            return i;
+    }
+
+    return -1;
+}
+
+function removeChange(id) {
+    var index = getPersonIndex(membershipChanges, id);
+    if(index > -1)
+        membershipChanges.splice(index, 1);
+
+    renderMemberships();
+}
+
+function addChange(change) {
+    var index = getPersonIndex(membershipChanges, change.person.id);
+    if(index > -1)
+        membershipChanges[index] = change;
+    else {
+        membershipChanges.push(change);
+    }
+    renderMemberships();
+}
 
 function renderMemberships() {
     var membershipListElement = $j('#project_institutions');
@@ -171,14 +222,15 @@ function renderMemberships() {
     }
 
     // Render the list of changes made
-    changeListElement.html('').toggle(membershipChanges.length !== 0);
-    $j('#empty-change-list').toggle(membershipChanges.length === 0);
+    var hasChanges = membershipChanges.length !== 0;
+    changeListElement.html('').toggle(hasChanges);
+    $j('#empty-change-list').toggle(!hasChanges);
+    $j('#undo-all').toggle(hasChanges);
     for(i = 0; i < membershipChanges.length; i++) {
         var change = membershipChanges[i];
         var element = membershipListElement.find('[data-membership-id="' + change.id + '"]')[0];
-        if(element) {
-            $j(element).addClass(change.action + '-membership');
-        }
+        if(element)
+            $j(element).addClass('mutated-membership ' + change.action + '-membership');
         changeListElement.append(HandlebarsTemplates['projects/changes/' + change.action + '_member'](change));
         // In the case that someone was added, also add them to the membership list
         if(change.action === 'added')
