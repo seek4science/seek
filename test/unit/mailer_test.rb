@@ -270,8 +270,8 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "programme activation required" do
-    programme_administrator = Factory(:programme_administrator)
-    programme = programme_administrator.programmes.first
+    creator = Factory(:programme_administrator)
+    programme = creator.programmes.first
     @expected.subject = "The Sysmo SEEK Programme #{programme.title} was created and needs activating"
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
@@ -279,10 +279,10 @@ class MailerTest < ActionMailer::TestCase
 
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-prog_id-',programme.id.to_s)
-    expected_text.gsub!('-person_id-',programme_administrator.id.to_s)
-    expected_text.gsub!('-person_email_address-',programme_administrator.email)
+    expected_text.gsub!('-person_id-',creator.id.to_s)
+    expected_text.gsub!('-person_email_address-',creator.email)
 
-    assert_equal expected_text, encode_mail(Mailer.programme_activation_required(programme))
+    assert_equal expected_text, encode_mail(Mailer.programme_activation_required(programme,creator))
   end
 
   test "test mail" do

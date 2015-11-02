@@ -314,7 +314,9 @@ class ProgrammesControllerTest < ActionController::TestCase
     p = Factory(:person)
     login_as(p)
     assert_difference("Programme.count") do
-      post :create, :programme=>{:title=>"A programme"}
+      assert_emails(1) do #activation email
+        post :create, :programme=>{:title=>"A programme"}
+      end
     end
     prog = assigns(:programme)
     assert_redirected_to prog
@@ -326,7 +328,9 @@ class ProgrammesControllerTest < ActionController::TestCase
     p = Factory(:admin)
     login_as(p)
     assert_difference("Programme.count") do
-      post :create, :programme=>{:title=>"A programme"}
+      assert_emails(0) do #no email for admin creation
+        post :create, :programme=>{:title=>"A programme"}
+      end
     end
     prog = assigns(:programme)
     assert_redirected_to prog

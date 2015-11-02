@@ -19,14 +19,17 @@ class ProgrammesController < ApplicationController
     handle_administrators if params[:programme][:administrator_ids]
     @programme = Programme.new(params[:programme])
 
-    flash[:notice] = "The #{t('programme').capitalize} was successfully created." if @programme.save
+    if @programme.save
+      flash[:notice] = "The #{t('programme').capitalize} was successfully created."
 
-    # current person becomes the programme administrator, unless they are logged in
-    unless User.admin_logged_in?
-      User.current_user.person.is_programme_administrator = true, @programme
+      # current person becomes the programme administrator, unless they are logged in
+      # also activation email is sent
+      unless User.admin_logged_in?
+        User.current_user.person.is_programme_administrator = true, @programme
+        Mailer.programme_activation_required(@programme,User.current_user.person).deliver
+      end
+      disable_authorization_checks { User.current_user.person.save! }
     end
-
-    disable_authorization_checks { User.current_user.person.save! }
 
     respond_with(@programme)
   end

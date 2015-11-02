@@ -148,7 +148,7 @@ class Mailer < ActionMailer::Base
          subject: "You have been assigned to a #{Seek::Config.application_name} project")
   end
 
-  def programme_activation_required(programme, creator=programme.administrators.first)
+  def programme_activation_required(programme, creator)
     @programme = programme
     @creator = creator
 
