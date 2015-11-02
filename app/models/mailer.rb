@@ -1,4 +1,5 @@
 class Mailer < ActionMailer::Base
+
   def feedback(user, topic, details, send_anonymously)
     @anon = send_anonymously
     @anon = true if user.try(:person).nil?
@@ -145,6 +146,16 @@ class Mailer < ActionMailer::Base
     mail(from: Seek::Config.noreply_sender,
          to: person.email_with_name,
          subject: "You have been assigned to a #{Seek::Config.application_name} project")
+  end
+
+  def programme_activation_required(programme, creator=programme.administrators.first)
+    @programme = programme
+    @creator = creator
+
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} was created and needs activating"
+    )
   end
 
   def report_run_problem(person, run)

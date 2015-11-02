@@ -477,6 +477,7 @@ SEEK::Application.routes.draw do
     end
     member do
       get :initiate_spawn_project
+      get :activation_review
       post :spawn_project
     end
     resources :people,:projects, :institutions
