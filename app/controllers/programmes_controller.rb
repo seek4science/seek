@@ -5,9 +5,10 @@ class ProgrammesController < ApplicationController
   before_filter :programmes_enabled?
   before_filter :login_required, except: [:show, :index]
   before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy]
-  before_filter :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project]
+  before_filter :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project,:activation_review]
   before_filter :find_assets, only: [:index]
-  before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project]
+  before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review]
+  before_filter :can_activate?, only: [:activation_review]
 
   skip_before_filter :project_membership_required
 
@@ -78,4 +79,15 @@ class ProgrammesController < ApplicationController
       render action: :initiate_spawn_project
     end
   end
+
+  private
+
+
+  def can_activate?
+    unless result=@programme.can_activate?
+      error("The #{t('programme')} cannot be activated. Maybe it is already or you are not an administrator", "cannot activate (not admin or already activated)")
+    end
+    result
+  end
+
 end

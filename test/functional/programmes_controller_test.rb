@@ -345,4 +345,36 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_redirected_to :root
   end
 
+  test "activation review available to admin" do
+    programme = Factory(:programme)
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(Factory(:admin))
+    get :activation_review,:id=>programme
+    assert_response :success
+    assert_nil flash[:error]
+  end
+
+  test "activation review not available none admin" do
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(person)
+    get :activation_review,:id=>programme
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test "activation review not available if active" do
+    programme = Factory(:programme)
+    login_as(Factory(:admin))
+    programme.activate
+    assert programme.is_activated?
+    get :activation_review,:id=>programme
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
 end

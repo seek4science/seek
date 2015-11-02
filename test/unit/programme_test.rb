@@ -238,4 +238,24 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute_includes Programme.activated,not_activated_prog
   end
 
+  test "activate" do
+    prog = Factory(:programme)
+    prog.is_activated=false
+    disable_authorization_checks{prog.save!}
+
+    #no current user
+    prog.activate
+    refute prog.is_activated?
+
+    #normal user
+    User.current_user=Factory(:person).user
+    prog.activate
+    refute prog.is_activated?
+
+    #admin
+    User.current_user=Factory(:admin).user
+    prog.activate
+    assert prog.is_activated?
+  end
+
 end

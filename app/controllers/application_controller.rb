@@ -82,7 +82,7 @@ class ApplicationController < ActionController::Base
       error("Admin rights required", "is invalid (not admin)")
       return false
     end
-    return true
+    true
   end
 
   def can_manage_announcements?
@@ -218,7 +218,6 @@ class ApplicationController < ActionController::Base
 
   def error(notice, message)
     flash[:error] = notice
-     (err = User.new.errors).add(:id, message)
 
     respond_to do |format|
       format.html { redirect_to root_url }

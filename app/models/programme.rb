@@ -19,7 +19,7 @@ class Programme < ActiveRecord::Base
   # validations
   validates :title, uniqueness: true
   after_save :handle_administrator_ids, if: '@administrator_ids'
-  before_create :activate
+  before_create :activate_on_create
 
   scope :default_order, order('title')
   scope :activated, where(is_activated: true)
@@ -46,6 +46,19 @@ class Programme < ActiveRecord::Base
 
   def can_delete?(user = User.current_user)
     user && user.is_admin?
+  end
+
+  # callback, activates if current user is an admin or nil, otherwise it needs activating
+  def activate
+    if can_activate?
+      self.update_attribute(:is_activated,true)
+    end
+
+    true
+  end
+
+  def can_activate?(user = User.current_user)
+    user && user.is_admin? && !is_activated?
   end
 
   def self.can_create?
@@ -75,7 +88,7 @@ class Programme < ActiveRecord::Base
   end
 
   # callback, activates if current user is an admin or nil, otherwise it needs activating
-  def activate
+  def activate_on_create
     if User.current_user && !User.current_user.is_admin?
       self.is_activated = false
     else
@@ -83,4 +96,6 @@ class Programme < ActiveRecord::Base
     end
     true
   end
+
+
 end
