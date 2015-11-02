@@ -26,6 +26,7 @@ env:
 
 before_script:
   - sh -e /etc/init.d/xvfb start
+  - sleep 3 # give time for xvfb to start
   - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test;' -U postgres; fi"
   - cp test/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
