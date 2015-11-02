@@ -95,95 +95,93 @@ function updateInstitutionIds(){
     institution_ids_element.setValue(institution_ids);
 }
 
-//project membership administration stuff
-var previouslyRemoved = {}
+// Namespacing...
+var projectActions = {
+    add: function () {
+        var people = $j('#people_ids').tagsinput('items');
 
-function mark_group_membership_for_removal(person_id,institution_id,group_id) {
-    var element_id = "#membership_"+person_id+"_"+institution_id;
-    $j(element_id).remove();
-    if ($j.isNumeric(group_id)) {
-        var option = document.createElement("option");
-        option.value = group_id;
-        option.text = group_id;
-        option.selected=true;
-        $j("#group_memberships_to_remove").append(option);
-        previouslyRemoved[person_id+"_"+institution_id]=group_id;
+        $j.each(people, function (index, value) {
+            var institution_id = $j("#institution_ids").val();
+            var institution_title = $j("#institution_ids option:selected").text();
+            var change = {
+                person: { id: value.id, name: value.name },
+                institution: { id: institution_id, title: institution_title},
+                action: 'added',
+                membershipData: JSON.stringify({person_id: value.id, institution_id: institution_id, institution_title: institution_title})
+            };
+            membershipChanges.push(change);
+            renderMemberships();
+        });
+
+        $j('#people_ids').tagsinput('removeAll');
+    },
+    undo: function () {
+        var item = $j(this).parent('.institution_member');
+        var id = parseInt(item.data('personId'));
+        console.log(id);
+        for(var i = 0; i < membershipChanges.length; i++) {
+            if(membershipChanges[i].person.id === id) {
+                membershipChanges.splice(i, 1);
+                break;
+            }
+        }
+        renderMemberships();
+    },
+    remove: function () {
+        var item = $j(this).parent('.institution_member');
+        var change = {
+            id: parseInt(item.data('membershipId')),
+            person: { id: item.data('personId'), name: item.data('personName') },
+            action: 'removed'
+        };
+        membershipChanges.push(change);
+        renderMemberships();
     }
-}
+};
 
-function add_selected_people() {
-    var people = $j('#people_ids').tagsinput('items');
+$j(document).ready(function () {
+    $j('#project-admin-page').on('click', '.undo-action', projectActions.undo);
+    $j('#project-admin-page').on('click', '.remove-action', projectActions.remove);
+    //$j('#project-admin-page').on('click', '.flag-action', projectActions.flag);
+});
 
-    $j.each(people, function (index, value) {
-        var person_id = value.id;
-        var person_name = value.name;
-        var institution_id = $j("#institution_ids").val();
-        var institution_title = $j("#institution_ids option:selected").text();
-        var li_id = "membership_" + person_id+"_"+institution_id;
-        if ($j("#"+li_id).length==0) {
-            var group_id = previouslyRemoved[person_id+"_"+institution_id];
-            if (group_id) {
-                $j("#group_memberships_to_remove option[value="+group_id+"]").remove();
-                var onclick = function () {
-                    mark_group_membership_for_removal(person_id,institution_id,group_id);
-                    return false;
-                }
-            }
-            else {
-                var dummy_id = guid();
-                var json = JSON.stringify({person_id: person_id, institution_id: institution_id, institution_title: institution_title});
-                var option = document.createElement('option');
-                option.value=json;
-                option.text=json;
-                option.selected=true;
-                $j("#people_and_institutions_to_add").append(option);
-                var onclick = "'mark_group_membership_for_removal("+person_id+","+institution_id+",\"" + dummy_id + "\");";
-                onclick = function() {
-                    remove_from_people_to_add(person_id,institution_id);
-                    mark_group_membership_for_removal(person_id,institution_id,dummy_id);
-                    return false;
-                }
-            }
+var memberships = []; // Array to hold all the current project memberships. Should not be modified!
+var membershipChanges = []; // to hold all the unsaved changes made on the current page
 
-            var block = $j("#institution_block_" + institution_id);
-            if (block.length == 0) {
-                var ul = document.createElement('ul');
-                ul.className = "institution_members";
-                ul.id = 'institution_block_' + institution_id;
-                var span = document.createElement('span');
-                span.className="institution_label";
-                span.id="institution_label_" + institution_id;
-                span.innerHTML = institution_title;
-                ul.appendChild(span);
-                $j("#project_institutions").append(ul);
-                block = $j("#institution_block_" + institution_id);
-            }
+function renderMemberships() {
+    var membershipListElement = $j('#project_institutions');
+    var changeListElement = $j('#change-list');
 
-            var li = document.createElement('li');
-            li.id=li_id;
-            li.className="institution_member";
-            li.innerHTML = person_name+"&nbsp;";
-            var a = document.createElement('a');
-            var icon_span = document.createElement("span");
-            icon_span.className='remove_member_icon';
-            a.appendChild(icon_span);
-            a.href="#";
-            a.onclick=onclick;
-            li.appendChild(a);
-
-            block.append(li);
+    var addToList = function (membership) {
+        var institutionElement = membershipListElement.find('[data-institution-id="' + membership.institution.id + '"]');
+        if(institutionElement.length === 0) {
+            // Create institution if not already there
+            membershipListElement.append(HandlebarsTemplates['projects/institution'](membership.institution));
+            institutionElement = membershipListElement.find('[data-institution-id="' + membership.institution.id + '"]');
         }
+        var templateName = membership.action === 'added' ? 'projects/new_member' : 'projects/member';
+        institutionElement.append(HandlebarsTemplates[templateName](membership));
+    };
 
-    });
+    // Render the existing members
+    membershipListElement.html('');
+    for(var i = 0; i < memberships.length; i++) {
+        var membership = memberships[i];
+        addToList(membership);
+    }
 
-    $j('#people_ids').tagsinput('removeAll');
-}
-
-function remove_from_people_to_add(person_id, institution_id) {
-    $j("#people_and_institutions_to_add > option").each(function (index, value) {
-        var json = JSON.parse(value.value);
-        if (json["person_id"] == person_id && json["institution_id"] == institution_id) {
-            value.remove();
+    // Render the list of changes made
+    changeListElement.html('').toggle(membershipChanges.length !== 0);
+    $j('#empty-change-list').toggle(membershipChanges.length === 0);
+    for(i = 0; i < membershipChanges.length; i++) {
+        var change = membershipChanges[i];
+        var element = membershipListElement.find('[data-membership-id="' + change.id + '"]')[0];
+        if(element) {
+            $j(element).addClass(change.action + '-membership');
         }
-    })
+        changeListElement.append(HandlebarsTemplates['projects/changes/' + change.action + '_member'](change));
+        // In the case that someone was added, also add them to the membership list
+        if(change.action === 'added')
+            addToList(change);
+    }
 }

@@ -8,10 +8,10 @@ div#project_institutions {
     padding-left: 0;
 }
 
-ul.institution_members .institution_label {
+.institution_label {
     font-size: larger;
     font-weight: bolder;
-    display:inline-block;
+    display: inline-block;
     margin-bottom: 0.5em;
 }
 
@@ -20,14 +20,59 @@ ul.institution_members li.institution_member {
     list-style-type: none;
 }
 
-.remove_member_icon {
+.remove_member_icon, .flag_as_left_icon {
     display: inline-block;
-    background: url(<%= asset_path(remove_member_icon_filename) %>) left center no-repeat;
-    background-size: 12px;
     vertical-align: middle;
-    padding: 6px 6px;
+    width: 16px;
+    height: 16px;
+    margin: 2px;
+}
+
+.remove_member_icon {
+    background: url(<%= asset_path(icon_filename_for_key("destroy")) %>) left center no-repeat;
+}
+
+.flag_as_left_icon {
+    background: url(<%= asset_path(icon_filename_for_key("logout")) %>) left center no-repeat;
 }
 
 div#project_institutions table {
     display:inline;
+}
+
+li.institution_member.left-project {
+    color: #aaa;
+    text-decoration: line-through;
+}
+
+.undo-action {
+    display: none;
+}
+
+.added-membership .action-button,
+.removed-membership .action-button,
+.flagged-membership .action-button {
+    display: none;
+}
+
+.added-membership .undo-action,
+.removed-membership .undo-action,
+.flagged-membership .undo-action,
+.change-item .undo-action,
+.new-member .undo-action {
+    display: inline;
+}
+
+.added-membership, .new-member {
+    color: green;
+}
+
+.removed-membership {
+    color: red;
+    text-decoration: line-through;
+}
+
+.flagged-membership {
+    color: grey;
+    text-decoration: line-through;
 }
