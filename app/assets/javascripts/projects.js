@@ -96,110 +96,105 @@ function updateInstitutionIds(){
 }
 
 // Namespacing...
-var projectActions = {
-    add: function () {
-        var people = $j('#people_ids').tagsinput('items');
+var Projects = {
+    memberships: [],
+    membershipChanges: [],
+    actions: {
+        add: function () {
+            var people = $j('#people_ids').tagsinput('items');
 
-        $j.each(people, function (index, value) {
-            var institution_id = $j("#institution_ids").val();
-            var institution_title = $j("#institution_ids option:selected").text();
+            $j.each(people, function (index, value) {
+                if(Projects.getPersonIndex(Projects.memberships, value.id) == -1) {
+                    var institution_id = $j("#institution_ids").val();
+                    var institution_title = $j("#institution_ids option:selected").text();
+                    var change = {
+                        person: { id: value.id, name: value.name },
+                        institution: { id: institution_id, title: institution_title },
+                        action: 'added',
+                        membershipData: JSON.stringify({
+                            person_id: value.id,
+                            institution_id: institution_id,
+                            institution_title: institution_title })
+                    };
+                    Projects.addChange(change);
+                } else {
+                    alert(value.name + ' is already a member of the project.')
+                }
+            });
+
+            $j('#people_ids').tagsinput('removeAll');
+        },
+        undo: function () {
+            var item = $j(this).parent('.institution_member');
+            var id = item.data('personId');
+            Projects.removeChange(id);
+        },
+        remove: function () {
+            var item = $j(this).parent('.institution_member');
             var change = {
-                person: { id: value.id, name: value.name },
-                institution: { id: institution_id, title: institution_title},
-                action: 'added',
-                membershipData: JSON.stringify({person_id: value.id, institution_id: institution_id, institution_title: institution_title})
+                id: item.data('membershipId'),
+                person: { id: item.data('personId'), name: item.data('personName') },
+                action: 'removed'
             };
-            membershipChanges.push(change);
-            renderMemberships();
-        });
-
-        $j('#people_ids').tagsinput('removeAll');
-    },
-    undo: function () {
-        var item = $j(this).parent('.institution_member');
-        var id = item.data('personId');
-        removeChange(id);
-    },
-    remove: function () {
-        var item = $j(this).parent('.institution_member');
-        var change = {
-            id: item.data('membershipId'),
-            person: { id: item.data('personId'), name: item.data('personName') },
-            action: 'removed'
-        };
-        addChange(change);
-    },
-    flag: function () {
-        var item = $j(this).parent('.institution_member');
-        $j('#leaving-person-id').val(item.data('personId'));
-        $j('#leaving-person-name').val(item.data('personName'));
-        $j('#leaving-membership-id').val(item.data('membershipId'));
-        $j('#leaving-date-form').modal('show');
-    },
-    confirmFlag: function () {
-        var change = {
-            id: $j('#leaving-membership-id').val(),
-            person: { id: $j('#leaving-person-id').val(), name: $j('#leaving-person-name').val() },
-            date: $j('#leaving_date').val(),
-            action: 'flagged'
-        };
-        $j('#leaving-date-form').modal('hide');
-        addChange(change);
-    },
-    unflag: function () {
-        var item = $j(this).parent('.institution_member');
-        var change = {
-            id: item.data('membershipId'),
-            person: { id: item.data('personId'), name: item.data('personName') },
-            action: 'unflagged'
-        };
-        addChange(change);
+            Projects.addChange(change);
+        },
+        flag: function () {
+            var item = $j(this).parent('.institution_member');
+            $j('#leaving-person-id').val(item.data('personId'));
+            $j('#leaving-person-name').val(item.data('personName'));
+            $j('#leaving-membership-id').val(item.data('membershipId'));
+            $j('#leaving-date-form').modal('show');
+        },
+        confirmFlag: function () {
+            var change = {
+                id: $j('#leaving-membership-id').val(),
+                person: { id: $j('#leaving-person-id').val(), name: $j('#leaving-person-name').val() },
+                date: $j('#leaving_date').val(),
+                action: 'flagged'
+            };
+            $j('#leaving-date-form').modal('hide');
+            Projects.addChange(change);
+        },
+        unflag: function () {
+            var item = $j(this).parent('.institution_member');
+            var change = {
+                id: item.data('membershipId'),
+                person: { id: item.data('personId'), name: item.data('personName') },
+                action: 'unflagged'
+            };
+            Projects.addChange(change);
+        }
     }
 };
 
-$j(document).ready(function () {
-    $j('#project-admin-page').on('click', '.undo-action', projectActions.undo);
-    $j('#project-admin-page').on('click', '.remove-action', projectActions.remove);
-    $j('#project-admin-page').on('click', '.flag-action', projectActions.flag);
-    $j('#project-admin-page').on('click', '.unflag-action', projectActions.unflag);
-    $j('#project-admin-page').on('click', '#confirm-leaving', projectActions.confirmFlag);
-    $j('#undo-all').click(function () {
-        membershipChanges = [];
-        renderMemberships();
-    });
-});
-
-var memberships = []; // Array to hold all the current project memberships. Should not be modified!
-var membershipChanges = []; // to hold all the unsaved changes made on the current page
-
-function getPersonIndex(set, personId) {
+Projects.getPersonIndex = function (set, personId) {
     for(var i = 0; i < set.length; i++) {
         if(set[i].person.id == personId)
             return i;
     }
 
     return -1;
-}
+};
 
-function removeChange(id) {
-    var index = getPersonIndex(membershipChanges, id);
+Projects.removeChange = function (id) {
+    var index = Projects.getPersonIndex(Projects.membershipChanges, id);
     if(index > -1)
-        membershipChanges.splice(index, 1);
+        Projects.membershipChanges.splice(index, 1);
 
-    renderMemberships();
-}
+    Projects.renderMemberships();
+};
 
-function addChange(change) {
-    var index = getPersonIndex(membershipChanges, change.person.id);
+Projects.addChange = function (change) {
+    var index = Projects.getPersonIndex(Projects.membershipChanges, change.person.id);
     if(index > -1)
-        membershipChanges[index] = change;
+        Projects.membershipChanges[index] = change;
     else {
-        membershipChanges.push(change);
+        Projects.membershipChanges.push(change);
     }
-    renderMemberships();
-}
+    Projects.renderMemberships();
+};
 
-function renderMemberships() {
+Projects.renderMemberships = function () {
     var membershipListElement = $j('#project_institutions');
     var changeListElement = $j('#change-list');
 
@@ -216,18 +211,18 @@ function renderMemberships() {
 
     // Render the existing members
     membershipListElement.html('');
-    for(var i = 0; i < memberships.length; i++) {
-        var membership = memberships[i];
+    for(var i = 0; i < Projects.memberships.length; i++) {
+        var membership = Projects.memberships[i];
         addToList(membership);
     }
 
     // Render the list of changes made
-    var hasChanges = membershipChanges.length !== 0;
+    var hasChanges = Projects.membershipChanges.length !== 0;
     changeListElement.html('').toggle(hasChanges);
     $j('#empty-change-list').toggle(!hasChanges);
     $j('#undo-all').toggle(hasChanges);
-    for(i = 0; i < membershipChanges.length; i++) {
-        var change = membershipChanges[i];
+    for(i = 0; i < Projects.membershipChanges.length; i++) {
+        var change = Projects.membershipChanges[i];
         var element = membershipListElement.find('[data-membership-id="' + change.id + '"]')[0];
         if(element)
             $j(element).addClass('mutated-membership ' + change.action + '-membership');
@@ -236,4 +231,17 @@ function renderMemberships() {
         if(change.action === 'added')
             addToList(change);
     }
-}
+};
+
+$j(document).ready(function () {
+    $j('#project-admin-page').on('click', '.undo-action', Projects.actions.undo);
+    $j('#project-admin-page').on('click', '.remove-action', Projects.actions.remove);
+    $j('#project-admin-page').on('click', '.flag-action', Projects.actions.flag);
+    $j('#project-admin-page').on('click', '.unflag-action', Projects.actions.unflag);
+    $j('#project-admin-page').on('click', '#confirm-leaving', Projects.actions.confirmFlag);
+
+    $j('#undo-all').click(function () {
+        Projects.membershipChanges = [];
+        Projects.renderMemberships();
+    });
+});
