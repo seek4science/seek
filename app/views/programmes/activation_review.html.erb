@@ -1,0 +1,24 @@
+<%= render :partial => "general/item_title",:locals => {:item=>@programme, :title_prefix=>"Acitivation required for: "} %>
+
+<p>
+  A <%= t('programme') %> has been created by a user, and requires activation. The <%= t('programme') %> created is <%= link_to @programme.title, @programme %>.
+</p>
+<p>
+  The administrators of the <%= t('programme') %> are:
+  <ul>
+    <% @programme.administrators.each do |admin| %>
+    <li>
+      <%= link_to admin.name, admin %>
+    </li>
+    <% end %>
+  </ul>
+</p>
+<p>
+  You can either <b>Accept</b> or <b>Reject</b> the <%= t('programme') %> by clicking the option below. The <%= t('programme') %> administrators will be notified of your decision, and if rejected a reason can be provided. </br>
+  A rejected <%= t('programme') %> will not be automatically deleted.
+</p>
+
+<p>
+  <%= link_to 'Accept',accept_activation_programme_path(@programme),:class=>'btn btn-success',:method=>:post, :confirm=>"You are about to accept this #{t('programme')}. Are you sure?" %>
+  <%= link_to 'Reject',reject_activation_confirmation_programme_path(@programme),:class=>'btn btn-danger' %>
+</p>

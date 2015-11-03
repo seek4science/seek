@@ -1,7 +1,7 @@
 class Programme < ActiveRecord::Base
-  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details, :administrator_ids
+  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details, :administrator_ids, :activation_rejection_reason
 
-  attr_accessor :administrator_ids
+  attr_accessor :administrator_ids, :activation_rejection_reason
 
   searchable(auto_index: false) do
     text :funding_details

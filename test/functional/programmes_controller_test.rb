@@ -377,4 +377,104 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_redirected_to :root
     refute_nil flash[:error]
   end
+
+  test 'accept_activation' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(Factory(:admin))
+
+    assert_emails(0) do #will change to 1
+      post :accept_activation, :id=>programme
+    end
+
+    assert_redirected_to programme
+    refute_nil flash[:notice]
+    assert_nil flash[:error]
+    programme.reload
+    assert programme.is_activated?
+  end
+
+  test 'no accept_activation for none admin' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(programme_administrator)
+
+    assert_emails(0) do
+      post :accept_activation, :id=>programme
+    end
+
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+    programme.reload
+    refute programme.is_activated?
+  end
+
+  test 'no accept_activation for not activated' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+
+    assert programme.is_activated?
+    login_as(Factory(:admin))
+
+    assert_emails(0) do
+      post :accept_activation, :id=>programme
+    end
+
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+    programme.reload
+    refute programme.is_activated?
+  end
+
+  test 'reject activation confirmation' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(Factory(:admin))
+
+    get :reject_activation_confirmation, :id=>programme
+    assert_response :success
+    assert assigns(:programme)
+
+  end
+
+  test 'no reject activation confirmation for already activated' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+
+    assert programme.is_activated?
+    login_as(Factory(:admin))
+
+    get :reject_activation_confirmation, :id=>programme
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+
+  end
+
+  test 'no reject activation confirmation for none admin' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(programme_administrator)
+
+    get :reject_activation_confirmation, :id=>programme
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+
+  end
+
 end

@@ -5,10 +5,10 @@ class ProgrammesController < ApplicationController
   before_filter :programmes_enabled?
   before_filter :login_required, except: [:show, :index]
   before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy]
-  before_filter :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project,:activation_review]
+  before_filter :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
   before_filter :find_assets, only: [:index]
-  before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review]
-  before_filter :can_activate?, only: [:activation_review]
+  before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
+  before_filter :can_activate?, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
 
   skip_before_filter :project_membership_required
 
@@ -78,6 +78,12 @@ class ProgrammesController < ApplicationController
       @available_projects = Project.where('programme_id != ? OR programme_id IS NULL', @programme.id)
       render action: :initiate_spawn_project
     end
+  end
+
+  def accept_activation
+    @programme.activate
+    flash[:notice]="The #{t('programme')} has been activated"
+    redirect_to @programme
   end
 
   private
