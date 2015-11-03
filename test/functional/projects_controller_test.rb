@@ -1090,7 +1090,6 @@ class ProjectsControllerTest < ActionController::TestCase
     wg = Factory(:work_group, :project => project)
     group_membership = Factory(:group_membership, :work_group => wg)
     person = Factory(:person, :group_memberships => [group_membership])
-    wg = Factory(:work_group, :project => project)
     former_group_membership = Factory(:group_membership, :time_left_at => 10.days.ago, :work_group => wg)
     former_person = Factory(:person, :group_memberships => [former_group_membership])
     assert_no_difference("GroupMembership.count") do
