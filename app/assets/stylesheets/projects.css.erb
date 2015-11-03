@@ -20,7 +20,7 @@ ul.institution_members li.institution_member {
     list-style-type: none;
 }
 
-.remove_member_icon, .flag_as_left_icon, .unflag_as_left_icon, .undo-action {
+.remove_member_icon, .flag_as_left_icon, .unflag_as_left_icon, .undo_icon {
     display: inline-block;
     vertical-align: middle;
     width: 16px;
@@ -40,7 +40,7 @@ ul.institution_members li.institution_member {
     background: url(<%= asset_path(icon_filename_for_key("project_membership_unflag")) %>) left center no-repeat;
 }
 
-.undo-action {
+.undo_icon {
     background: url(<%= asset_path(icon_filename_for_key("undo")) %>) left center no-repeat;
 }
 
