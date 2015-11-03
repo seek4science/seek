@@ -786,20 +786,28 @@ class AuthorizationTest < ActiveSupport::TestCase
     asset_manager = Factory(:asset_manager)
     work_group = asset_manager.work_groups.first
     project_member = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    leaving_project_member = Factory(:person, group_memberships: [Factory(:group_membership,
+                                                                          time_left_at: 10.day.from_now,
+                                                                          work_group: work_group)])
     datafile1 = Factory(:data_file, contributor: project_member.user,
                         projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
     datafile2 = Factory(:data_file, contributor: project_member.user,
+                        projects: asset_manager.projects, policy: Factory(:private_policy))
+    datafile3 = Factory(:data_file, contributor: leaving_project_member.user,
                         projects: asset_manager.projects, policy: Factory(:private_policy))
 
     ability = Ability.new(asset_manager.user)
 
     assert ability.cannot? :manage_asset, datafile1
     assert ability.cannot? :manage_asset, datafile2
+    assert ability.cannot? :manage_asset, datafile3
     assert ability.cannot? :manage, datafile2
+    assert ability.cannot? :manage, datafile3
 
     User.with_current_user asset_manager.user do
       assert !datafile1.can_manage?
       assert !datafile2.can_manage?
+      assert !datafile3.can_manage?
     end
   end
 

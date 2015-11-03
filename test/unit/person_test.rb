@@ -1025,4 +1025,23 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes person.projects, project
   end
 
+  test "can flag has leaving a project" do
+    person = Factory(:person)
+    project = person.projects.first
+
+    assert_not_includes person.former_projects, project
+    assert_includes person.current_projects, project
+    assert_includes person.projects, project
+
+    gm = person.group_memberships.first
+    gm.time_left_at = 1.day.from_now
+    gm.save
+    assert !gm.has_left
+    person.reload
+
+    assert_not_includes person.former_projects, project
+    assert_includes person.current_projects, project
+    assert_includes person.projects, project
+  end
+
 end
