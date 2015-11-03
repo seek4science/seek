@@ -9,6 +9,7 @@ class ProgrammesController < ApplicationController
   before_filter :find_assets, only: [:index]
   before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
   before_filter :can_activate?, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
+  before_filter :inactive_view_allowed?, only: [:show]
 
   skip_before_filter :project_membership_required
 
@@ -97,9 +98,19 @@ class ProgrammesController < ApplicationController
 
   private
 
+  #whether the item needs or can be activated, which affects steps around activation of rejection
   def can_activate?
     unless result=@programme.can_activate?
       error("The #{t('programme')} activation status cannot be changed. Maybe it is already activated or you are not an administrator", "cannot activate (not admin or already activated)")
+    end
+    result
+  end
+
+  #is the item inactive, and if so can the current person view it
+  def inactive_view_allowed?
+    return true if @programme.is_activated? || User.admin_logged_in?
+    unless result=(User.logged_in_and_registered? && @programme.administrators.include?(User.current_user.person))
+      error("This programme is not activated and cannot be viewed", "cannot view (not activated)")
     end
     result
   end

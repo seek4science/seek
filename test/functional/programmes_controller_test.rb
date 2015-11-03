@@ -537,4 +537,38 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
   end
 
+  test 'none activated programme only available to administrators' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+
+    get :show, :id=>programme
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    flash[:error]=nil
+
+    login_as(programme_administrator)
+    get :show, :id=>programme
+    assert_response :success
+    assert_nil flash[:error]
+    logout
+    flash[:error]=nil
+
+    login_as(Factory(:admin))
+    get :show, :id=>programme
+    assert_response :success
+    assert_nil flash[:error]
+    logout
+    flash[:error]=nil
+
+    login_as(Factory(:person))
+    get :show, :id=>programme
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+  end
+
+
 end
