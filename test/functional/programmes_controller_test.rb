@@ -386,7 +386,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_emails(0) do #will change to 1
+    assert_emails(1) do
       post :accept_activation, :id=>programme
     end
 

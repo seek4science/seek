@@ -285,6 +285,23 @@ class MailerTest < ActionMailer::TestCase
     assert_equal expected_text, encode_mail(Mailer.programme_activation_required(programme,creator))
   end
 
+  test 'programme activated' do
+    creator = Factory(:programme_administrator)
+    programme = creator.programmes.first
+
+    @expected.subject = "The Sysmo SEEK Programme #{programme.title} has been activated"
+    @expected.to = creator.email_with_name
+    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.body = read_fixture('programme_activated')
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!('-prog_id-',programme.id.to_s)
+    expected_text.gsub!('-prog_title-',programme.title)
+
+    assert_equal expected_text, encode_mail(Mailer.programme_activated(programme))
+
+  end
+
   test "test mail" do
     with_config_value(:application_name,"SEEK EMAIL TEST") do
       with_config_value(:site_base_host,"http://fred.com") do

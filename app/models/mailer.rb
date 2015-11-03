@@ -115,6 +115,8 @@ class Mailer < ActionMailer::Base
          subject: "#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} of which you are #{I18n.t('project')} Administrator")
   end
 
+
+
   def resources_harvested(harvester_responses, user)
     @resources = harvester_resources
     @person = user.person
@@ -155,6 +157,15 @@ class Mailer < ActionMailer::Base
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
          subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} was created and needs activating"
+    )
+  end
+
+  def programme_activated(programme)
+    @programme = programme
+
+    mail(from: Seek::Config.noreply_sender,
+         to: programme.administrators.map(&:email_with_name),
+         subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} has been activated"
     )
   end
 

@@ -83,6 +83,7 @@ class ProgrammesController < ApplicationController
   def accept_activation
     @programme.activate
     flash[:notice]="The #{t('programme')} has been activated"
+    Mailer.programme_activated(@programme).deliver
     redirect_to @programme
   end
 
