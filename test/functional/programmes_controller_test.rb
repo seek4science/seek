@@ -431,7 +431,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_nil flash[:notice]
     refute_nil flash[:error]
     programme.reload
-    refute programme.is_activated?
+    assert programme.is_activated?
   end
 
   test 'reject activation confirmation' do
