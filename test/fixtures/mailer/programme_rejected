@@ -1,0 +1,12 @@
+Hi,
+    Unfortunately your Programme -prog_title- has been rejected. The Programme can be found at:
+
+        http://localhost:3000/programmes/-prog_id-
+
+    The reason given for the rejection is:
+
+        "blah blah blah"
+
+    If you wish to respond to this rejection, please provide details at http://localhost:3000/home/feedback
+
+- The SysMO-DB Team

@@ -302,6 +302,23 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
+  test 'programme rejected' do
+    creator = Factory(:programme_administrator)
+    programme = creator.programmes.first
+
+    @expected.subject = "The Sysmo SEEK Programme #{programme.title} has been rejected"
+    @expected.to = creator.email_with_name
+    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.body = read_fixture('programme_rejected')
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!('-prog_id-',programme.id.to_s)
+    expected_text.gsub!('-prog_title-',programme.title)
+
+    message="blah blah blah"
+    assert_equal expected_text, encode_mail(Mailer.programme_rejected(programme, message))
+  end
+
   test "test mail" do
     with_config_value(:application_name,"SEEK EMAIL TEST") do
       with_config_value(:site_base_host,"http://fred.com") do

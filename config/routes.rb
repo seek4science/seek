@@ -478,8 +478,8 @@ SEEK::Application.routes.draw do
     member do
       get :initiate_spawn_project
       get :activation_review
-      post :accept_activation
-      post :reject_activation
+      put :accept_activation
+      put :reject_activation
       get :reject_activation_confirmation
       post :spawn_project
     end

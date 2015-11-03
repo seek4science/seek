@@ -169,6 +169,15 @@ class Mailer < ActionMailer::Base
     )
   end
 
+  def programme_rejected(programme, reason)
+    @programme = programme
+    @reason = reason
+    mail(from: Seek::Config.noreply_sender,
+         to: programme.administrators.map(&:email_with_name),
+         subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} has been rejected"
+    )
+  end
+
   def report_run_problem(person, run)
     @person = person
     @run = run

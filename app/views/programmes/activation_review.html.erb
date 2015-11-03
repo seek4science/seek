@@ -19,6 +19,6 @@
 </p>
 
 <p>
-  <%= link_to 'Accept',accept_activation_programme_path(@programme),:class=>'btn btn-success',:method=>:post, :confirm=>"You are about to accept this #{t('programme')}. Are you sure?" %>
+  <%= link_to 'Accept',accept_activation_programme_path(@programme),:class=>'btn btn-success',:method=>:put, :confirm=>"You are about to accept this #{t('programme')}. Are you sure?" %>
   <%= link_to 'Reject',reject_activation_confirmation_programme_path(@programme),:class=>'btn btn-danger' %>
 </p>
