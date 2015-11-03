@@ -15,8 +15,7 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def has_left
-    self.time_left_at &&
-        (self.time_left_at.past? || self.time_left_at.present?)
+    self.time_left_at && self.time_left_at.past?
   end
 
   def remember_previous_person
