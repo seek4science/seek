@@ -197,8 +197,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
                                             data: nil,
                                             url: 'http://somewhere.com/piccy.doc',
                                             uuid: UUID.generate))
-
-    get :get_pdf, sop_id: doc_sop.id, id: doc_sop.content_blob.id
+    with_config_value(:hard_max_cachable_size, 10000) do # Temporarily increase this, as the PDF is ~9kB
+      get :get_pdf, sop_id: doc_sop.id, id: doc_sop.content_blob.id
+    end
     assert_response :success
     assert_equal "attachment; filename=\"ms_word_test.pdf\"", @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
