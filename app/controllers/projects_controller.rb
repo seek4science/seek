@@ -260,6 +260,7 @@ class ProjectsController < ApplicationController
 
   def update_members
     add_and_remove_members_and_institutions
+    flag_memberships
     update_administrative_roles
 
     flash[:notice]="The members and institutions of the #{t('project').downcase} '#{@project.title}' have been updated"
@@ -278,6 +279,8 @@ class ProjectsController < ApplicationController
       @project.update_attributes(params[:project])
     end
   end
+
+  private
 
   def add_and_remove_members_and_institutions
     groups_to_remove = params[:group_memberships_to_remove] || []
@@ -304,7 +307,16 @@ class ProjectsController < ApplicationController
     end
   end
 
-  private  
+  def flag_memberships
+    unless params[:memberships_to_flag].blank?
+      GroupMembership.where(:id => params[:memberships_to_flag].keys).includes(:work_group).each do |membership|
+        if membership.work_group.project_id == @project.id # Prevent modification of other projects' memberships
+          left_at = params[:memberships_to_flag][membership.id.to_s][:time_left_at]
+          membership.update_attributes(:time_left_at => left_at)
+        end
+      end
+    end
+  end
 
   def editable_by_user
     @project = Project.find(params[:id])

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151009130408) do
+ActiveRecord::Schema.define(:version => 20151028145013) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -530,6 +530,7 @@ ActiveRecord::Schema.define(:version => 20151009130408) do
     t.integer  "work_group_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "time_left_at"
   end
 
   add_index "group_memberships", ["person_id"], :name => "index_group_memberships_on_person_id"

@@ -8,10 +8,10 @@ div#project_institutions {
     padding-left: 0;
 }
 
-ul.institution_members .institution_label {
+.institution_label {
     font-size: larger;
     font-weight: bolder;
-    display:inline-block;
+    display: inline-block;
     margin-bottom: 0.5em;
 }
 
@@ -20,14 +20,63 @@ ul.institution_members li.institution_member {
     list-style-type: none;
 }
 
-.remove_member_icon {
+.remove_member_icon, .flag_as_left_icon, .unflag_as_left_icon, .undo_icon {
     display: inline-block;
-    background: url(<%= asset_path(remove_member_icon_filename) %>) left center no-repeat;
-    background-size: 12px;
     vertical-align: middle;
-    padding: 6px 6px;
+    width: 16px;
+    height: 16px;
+    margin: 2px;
+}
+
+.remove_member_icon {
+    background: url(<%= asset_path(icon_filename_for_key("project_membership_delete")) %>) left center no-repeat;
+}
+
+.flag_as_left_icon {
+    background: url(<%= asset_path(icon_filename_for_key("project_membership_flag")) %>) left center no-repeat;
+}
+
+.unflag_as_left_icon {
+    background: url(<%= asset_path(icon_filename_for_key("project_membership_unflag")) %>) left center no-repeat;
+}
+
+.undo_icon {
+    background: url(<%= asset_path(icon_filename_for_key("undo")) %>) left center no-repeat;
 }
 
 div#project_institutions table {
     display:inline;
+}
+
+.undo-action {
+    display: none;
+}
+
+.mutated-membership .action-button {
+    display: none;
+}
+
+.mutated-membership .undo-action,
+.change-item .undo-action,
+.new-member .undo-action {
+    display: inline-block;
+}
+
+.added-membership span,
+.left-project.unflagged-membership span,
+.new-member span {
+    color: green;
+    text-decoration: none;
+}
+
+.left-project.removed-membership span, /* Needed for specificity reasons */
+.removed-membership span {
+    color: red;
+    text-decoration: line-through;
+}
+
+.left-project span,
+.flagged-membership span {
+    color: #aaa;
+    text-decoration: line-through;
 }

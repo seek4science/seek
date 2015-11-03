@@ -38,4 +38,5 @@
 *= require bootstrap-typeahead-rails
 *= require calendar_date_select/default
 *= require organisms
+*= require tweaks
 */

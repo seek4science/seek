@@ -152,6 +152,10 @@ zoom_in: 'famfamfam_silk/zoom_in.png'
 zoom_out: 'famfamfam_silk/zoom_out.png'
 snapshot_export: 'famfamfam_silk/folder_go.png'
 oauth: 'famfamfam_silk/link.png'
+undo: 'famfamfam_silk/arrow_undo.png'
+project_membership_flag: 'famfamfam_silk/user_go.png'
+project_membership_delete: 'famfamfam_silk/user_delete.png'
+project_membership_unflag: 'famfamfam_silk/user_add.png'
 
 
 #images for mime types

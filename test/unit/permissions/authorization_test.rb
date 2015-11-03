@@ -782,10 +782,43 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !item.can_manage?
   end
 
-  test "asset manager can manage the items inside their projects, even the entirely private items" do
+  test "asset manager can't manage the items inside their projects of members who have not left" do
     asset_manager = Factory(:asset_manager)
-    datafile1 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:publicly_viewable_policy))
-    datafile2 = Factory(:data_file, :projects => asset_manager.projects, :policy => Factory(:private_policy))
+    work_group = asset_manager.work_groups.first
+    project_member = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    leaving_project_member = Factory(:person, group_memberships: [Factory(:group_membership,
+                                                                          time_left_at: 10.day.from_now,
+                                                                          work_group: work_group)])
+    datafile1 = Factory(:data_file, contributor: project_member.user,
+                        projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
+    datafile2 = Factory(:data_file, contributor: project_member.user,
+                        projects: asset_manager.projects, policy: Factory(:private_policy))
+    datafile3 = Factory(:data_file, contributor: leaving_project_member.user,
+                        projects: asset_manager.projects, policy: Factory(:private_policy))
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.cannot? :manage_asset, datafile1
+    assert ability.cannot? :manage_asset, datafile2
+    assert ability.cannot? :manage_asset, datafile3
+    assert ability.cannot? :manage, datafile2
+    assert ability.cannot? :manage, datafile3
+
+    User.with_current_user asset_manager.user do
+      assert !datafile1.can_manage?
+      assert !datafile2.can_manage?
+      assert !datafile3.can_manage?
+    end
+  end
+
+  test "asset manager can manage the items inside their projects, even the entirely private items of former members" do
+    asset_manager = Factory(:asset_manager)
+    work_group = asset_manager.work_groups.first
+    former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
+    datafile1 = Factory(:data_file, contributor: former_project_member.user,
+                        projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
+    datafile2 = Factory(:data_file, contributor: former_project_member.user,
+                        projects: asset_manager.projects, policy: Factory(:private_policy))
 
     ability = Ability.new(asset_manager.user)
 
@@ -849,18 +882,27 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   test "should handle different types of contributor of resource (Person, User)" do
     asset_manager = Factory(:asset_manager)
+    work_group = asset_manager.work_groups.first
+    former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
 
     policy = Factory(:private_policy)
-    permission = Factory(:permission, :contributor => Factory(:person), :access_type => 1)
+    policy2 = Factory(:private_policy)
+    permission = Factory(:permission, :contributor => former_project_member, :access_type => 1)
+    permission2 = Factory(:permission, :contributor => former_project_member, :access_type => 1)
     policy.permissions = [permission]
+    policy2.permissions = [permission2]
 
     #resources are not entirely private
-    datafile = Factory(:data_file, :projects => asset_manager.projects, :policy => policy)
-    investigation = Factory(:investigation, :contributor => Factory(:person), :projects => asset_manager.projects, :policy => policy)
+    datafile = Factory(:data_file, :contributor => former_project_member, :projects => asset_manager.projects, :policy => policy)
+    datafile2 = Factory(:data_file, :contributor => former_project_member.user, :projects => asset_manager.projects, :policy => policy2)
+    investigation = Factory(:investigation, :contributor => former_project_member, :projects => asset_manager.projects, :policy => policy)
+    investigation2 = Factory(:investigation, :contributor => former_project_member.user, :projects => asset_manager.projects, :policy => policy2)
 
     User.with_current_user asset_manager.user do
       assert datafile.can_manage?
+      assert datafile2.can_manage?
       assert investigation.can_manage?
+      assert investigation2.can_manage?
     end
   end
 
