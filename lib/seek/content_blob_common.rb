@@ -36,6 +36,8 @@ module Seek
             case URI(@content_blob.url).scheme
               when 'http', 'https'
                 stream_from_http_url
+              when 'ftp'
+                stream_from_ftp_url
             end
 
           end
@@ -80,22 +82,7 @@ module Seek
       code = check_url_response_code(@content_blob.url)
       case code
       when 200
-        self.response.headers["Content-Type"] ||= @content_blob.content_type
-        self.response.headers["Content-Disposition"] = "attachment; filename=#{@content_blob.original_filename}"
-        self.response.headers['Last-Modified'] = Time.now.ctime.to_s
-
-        begin
-          self.response_body = Enumerator.new do |yielder|
-            Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url).stream do |chunk|
-              yielder << chunk
-            end
-          end
-        rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
-            Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
-          error_message = "There is a problem downloading this file. #{e}"
-          redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
-          return_file_or_redirect_to redirected_url, error_message
-        end
+        stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url))
       when 401, 403
         # Try redirecting the user to the URL if SEEK cannot access it
         redirect_to @content_blob.url
@@ -105,6 +92,29 @@ module Seek
         return_file_or_redirect_to redirected_url, error_message
       else
         error_message = "There is a problem downloading this file. Error code #{code}"
+        redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
+        return_file_or_redirect_to redirected_url, error_message
+      end
+    end
+
+    def stream_from_ftp_url
+      stream_with(Seek::DownloadHandling::FTPStreamer.new(@content_blob.url))
+    end
+
+    def stream_with(streamer)
+      self.response.headers["Content-Type"] ||= @content_blob.content_type
+      self.response.headers["Content-Disposition"] = "attachment; filename=#{@content_blob.original_filename}"
+      self.response.headers['Last-Modified'] = Time.now.ctime.to_s
+
+      begin
+        self.response_body = Enumerator.new do |yielder|
+          streamer.stream do |chunk|
+            yielder << chunk
+          end
+        end
+      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+          Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+        error_message = "There is a problem downloading this file. #{e}"
         redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
         return_file_or_redirect_to redirected_url, error_message
       end
