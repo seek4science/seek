@@ -93,15 +93,14 @@ module Seek
           return_file_or_redirect_to redirected_url, error_message
         end
       when 401, 403
-        error_message = "This item is referenced at a remote location, which is currently inaccessible"
-        redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
-        return_file_or_redirect_to redirected_url, error_message
+        # Try redirecting the user to the URL if SEEK cannot access it
+        redirect_to @content_blob.url
       when 404
         error_message = "This item is referenced at a remote location, which is currently unavailable"
         redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
         return_file_or_redirect_to redirected_url, error_message
       else
-        error_message = "There is a problem downloading this file."
+        error_message = "There is a problem downloading this file. Error code #{code}"
         redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
         return_file_or_redirect_to redirected_url, error_message
       end

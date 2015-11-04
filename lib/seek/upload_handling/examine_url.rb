@@ -22,7 +22,7 @@ module Seek
 
       def handle_non_200_response(code)
         case code
-          when 403
+          when 401, 403
             @unauthorized = true
           when 405
             @error = true
