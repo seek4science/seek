@@ -107,7 +107,7 @@ module Seek
           handler = Seek::DownloadHandling::HTTPHandler.new(@data_url)
           info = handler.info
           if info[:code] != 200
-            flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the URL is inaccessible."
+            flash.now[:error] = "Processing the URL responded with a response code (#{info[:code]}), indicating the URL is inaccessible."
             return false
           end
         when 'ftp'
