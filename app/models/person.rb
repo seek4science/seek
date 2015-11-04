@@ -466,7 +466,7 @@ class Person < ActiveRecord::Base
 
   def self.can_create?
     User.admin_or_project_administrator_logged_in? ||
-        User.programme_administrator_logged_in? ||
+        User.activated_programme_administrator_logged_in? ||
         (User.logged_in? && !User.current_user.registration_complete?)
   end
 

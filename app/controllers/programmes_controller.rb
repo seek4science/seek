@@ -6,7 +6,7 @@ class ProgrammesController < ApplicationController
   before_filter :login_required, except: [:show, :index]
   before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy]
   before_filter :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
-  before_filter :find_assets, only: [:index]
+  before_filter :find_activated_programmes, only: [:index]
   before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation,:awaiting_activation]
   before_filter :can_activate?, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
   before_filter :inactive_view_allowed?, only: [:show]
@@ -120,6 +120,16 @@ class ProgrammesController < ApplicationController
       error("This programme is not activated and cannot be viewed", "cannot view (not activated)")
     end
     result
+  end
+
+  def find_activated_programmes
+    if User.admin_logged_in?
+      @programmes = Programme.all
+    elsif User.programme_administrator_logged_in?
+      @programmes = Programme.activated | User.current_user.person.administered_programmes
+    else
+      @programmes = Programme.activated
+    end
   end
 
 end

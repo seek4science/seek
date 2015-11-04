@@ -92,7 +92,12 @@ class User < ActiveRecord::Base
   end
 
   def self.programme_administrator_logged_in?
-    self.logged_in_and_registered? && self.current_user.person.administered_programmes.activated.present?
+    self.logged_in_and_registered? && self.current_user.person.is_programme_administrator_of_any_programme?
+  end
+
+  #programme administrator logged in, but only of activated programmes
+  def self.activated_programme_administrator_logged_in?
+    self.programme_administrator_logged_in? && self.current_user.person.administered_programmes.activated.any?
   end
 
   def self.admin_or_project_administrator_logged_in?

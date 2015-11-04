@@ -251,7 +251,7 @@ class Project < ActiveRecord::Base
   end
 
   def self.can_create?
-    User.admin_logged_in? || User.programme_administrator_logged_in?
+    User.admin_logged_in? || User.activated_programme_administrator_logged_in?
   end
 
   # set the administrators, assigned from the params to :project_administrator_ids

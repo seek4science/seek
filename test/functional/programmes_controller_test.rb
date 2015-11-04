@@ -209,6 +209,67 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "index should not show inactivated except for admin and programme admin" do
+    login_as(Factory(:admin))
+    programme_admin = Factory(:person)
+    p1 = Factory(:programme,title:'activated programme')
+    p2 = Factory(:programme,title:'not activated programme')
+    p2.is_activated=false
+    p2.save!
+
+    p3 = Factory(:programme,title:'not activated or with programme administrator')
+    p3.is_activated=false
+    p3.save!
+
+    programme_admin.is_programme_administrator=true,p2
+    programme_admin.save!
+    programme_admin = Person.find(programme_admin.id)
+
+    assert p1.is_activated?
+    refute p2.is_activated?
+    refute p3.is_activated?
+
+    refute programme_admin.is_programme_administrator?(p1)
+    assert programme_admin.is_programme_administrator?(p2)
+    refute programme_admin.is_programme_administrator?(p3)
+
+    assert_includes programme_admin.administered_programmes,p2
+
+    logout
+
+    get :index
+    assert_response :success
+    assert_select "a[href=?]",programme_path(p1),text:p1.title,count:1
+    assert_select "a[href=?]",programme_path(p2),text:p2.title,count:0
+    assert_select "a[href=?]",programme_path(p3),text:p3.title,count:0
+
+    login_as(Factory(:person))
+    get :index
+    assert_response :success
+    assert_select "a[href=?]",programme_path(p1),text:p1.title,count:1
+    assert_select "a[href=?]",programme_path(p2),text:p2.title,count:0
+    assert_select "a[href=?]",programme_path(p3),text:p3.title,count:0
+    logout
+
+    login_as(Factory(:admin))
+    get :index
+    assert_response :success
+    assert_select "a[href=?]",programme_path(p1),text:p1.title,count:1
+    assert_select "a[href=?]",programme_path(p2),text:p2.title,count:1
+    assert_select "a[href=?]",programme_path(p3),text:p3.title,count:1
+    logout
+
+    login_as(programme_admin)
+    get :index
+    assert_response :success
+    assert_select "a[href=?]",programme_path(p1),text:p1.title,count:1
+    assert_select "a[href=?]",programme_path(p2),text:p2.title,count:1
+    assert_select "a[href=?]",programme_path(p3),text:p3.title,count:0
+    logout
+
+
+  end
+
   test "should get show" do
     p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
     avatar = Factory(:avatar,:owner=>p)

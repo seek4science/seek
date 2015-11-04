@@ -174,8 +174,8 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "programme_adminstrator_logged_in? only if activated" do
-    refute User.programme_administrator_logged_in?
+  test "activated_programme_administrator_logged_in? only if activated" do
+    refute User.activated_programme_administrator_logged_in?
     person = Factory(:programme_administrator)
     programme = person.administered_programmes.first
 
@@ -184,14 +184,14 @@ class UserTest < ActiveSupport::TestCase
     assert_equal [programme],person.administered_programmes
 
     User.with_current_user person.user do
-      assert User.programme_administrator_logged_in?
+      assert User.activated_programme_administrator_logged_in?
     end
 
     #not true unless the programme is activated
     programme.is_activated=false
     disable_authorization_checks{programme.save!}
     User.with_current_user person.user do
-      refute User.programme_administrator_logged_in?
+      refute User.activated_programme_administrator_logged_in?
     end
   end
 
