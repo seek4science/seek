@@ -764,7 +764,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
 
-  test "should redirect and show error on download for 401 url" do
+  test "should redirect on download for 401 url" do
     mock_http
     df = {:title=>"401",:project_ids=>[projects(:sysmo_project).id]}
     blob = {:data_url=>"http://mocked401.com"}
@@ -785,8 +785,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_response :redirect
-    assert_not_nil flash[:error]
+
+    assert_redirected_to assigns(:data_file).content_blob.url
   end
 
   test "should redirect and show error on download for 403 url" do
@@ -810,8 +810,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_response :redirect
-    assert_not_nil flash[:error]
+
+    assert_redirected_to assigns(:data_file).content_blob.url
   end
 
   test "should create and redirect on download for 302 url" do
