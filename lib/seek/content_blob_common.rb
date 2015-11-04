@@ -33,7 +33,11 @@ module Seek
           if @asset_version.contributor.nil? #A jerm generated resource
             download_jerm_asset
           else
-            stream_from_url
+            case URI(@content_blob.url).scheme
+              when 'http', 'https'
+                stream_from_http_url
+            end
+
           end
         rescue Seek::DownloadException=>de
           redirect_on_error @asset_version,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
@@ -72,7 +76,7 @@ module Seek
       end
     end
 
-    def stream_from_url
+    def stream_from_http_url
       code = check_url_response_code(@content_blob.url)
       case code
       when 200
@@ -82,7 +86,7 @@ module Seek
 
         begin
           self.response_body = Enumerator.new do |yielder|
-            Seek::DownloadHandling::Streamer.new(@content_blob.url).stream do |chunk|
+            Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url).stream do |chunk|
               yielder << chunk
             end
           end

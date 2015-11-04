@@ -3,7 +3,7 @@ require 'open-uri'
 
 module Seek
   module DownloadHandling
-    class RemoteContentHandler
+    class HTTPHandler
 
       def initialize(url)
         @url = url
@@ -29,7 +29,7 @@ module Seek
         file = Tempfile.new('remote-content')
         file.binmode # Strange encoding issues occur if this is not set
 
-        Seek::DownloadHandling::Streamer.new(@url).stream do |chunk|
+        Seek::DownloadHandling::HTTPStreamer.new(@url).stream do |chunk|
           file << chunk
         end
 
