@@ -1,6 +1,6 @@
 require 'test_helper'
 require 'docsplit'
-require 'seek/download_handling/streamer' # Needed to load exceptions that are tested later
+require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
 
 class ContentBlobTest < ActiveSupport::TestCase
 
