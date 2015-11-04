@@ -1,7 +1,7 @@
 class Programme < ActiveRecord::Base
   attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details, :administrator_ids, :activation_rejection_reason
 
-  attr_accessor :administrator_ids, :activation_rejection_reason
+  attr_accessor :administrator_ids
 
   searchable(auto_index: false) do
     text :funding_details
@@ -23,6 +23,7 @@ class Programme < ActiveRecord::Base
 
   scope :default_order, order('title')
   scope :activated, where(is_activated: true)
+  scope :rejected, where("is_activated = ? AND activation_rejection_reason IS NOT NULL",false)
 
   def people
     projects.collect(&:people).flatten.uniq
@@ -48,13 +49,16 @@ class Programme < ActiveRecord::Base
     user && user.is_admin?
   end
 
+  def rejected?
+    !(self.activation_rejection_reason.nil? || is_activated?)
+  end
+
   # callback, activates if current user is an admin or nil, otherwise it needs activating
   def activate
     if can_activate?
       self.update_attribute(:is_activated,true)
+      self.update_attribute(:activation_rejection_reason,nil)
     end
-
-    true
   end
 
   def can_activate?(user = User.current_user)

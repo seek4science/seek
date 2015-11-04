@@ -2,6 +2,11 @@ require 'test_helper'
 
 class ProgrammeTest < ActiveSupport::TestCase
 
+  def setup
+    #make sure an admin exists as the first user
+    Factory(:admin)
+  end
+
   test 'uuid' do
     p = Programme.new title: 'fish'
     assert_nil p.attributes['uuid']
@@ -256,6 +261,68 @@ class ProgrammeTest < ActiveSupport::TestCase
     User.current_user=Factory(:admin).user
     prog.activate
     assert prog.is_activated?
+
+    #reason is wiped
+    prog = Factory(:programme,activation_rejection_reason:'it is rubbish')
+    prog.is_activated=false
+    disable_authorization_checks{prog.save!}
+    refute_nil prog.activation_rejection_reason
+    prog.activate
+    assert prog.is_activated?
+    assert_nil prog.activation_rejection_reason
+  end
+
+  test "rejected?" do
+    prog = Factory(:programme)
+    prog.is_activated=false
+    disable_authorization_checks{prog.save!}
+
+    refute prog.rejected?
+
+    prog.activation_rejection_reason='xxx'
+    disable_authorization_checks{prog.save!}
+    assert prog.rejected?
+
+    prog.activation_rejection_reason=''
+    disable_authorization_checks{prog.save!}
+    assert prog.rejected?
+
+    prog.is_activated=true
+    disable_authorization_checks{prog.save!}
+    refute prog.rejected?
+  end
+
+  test "rejected scope" do
+    Programme.destroy_all
+    prog_no_1 = Factory(:programme)
+    prog_no_1.activation_rejection_reason=''
+    prog_no_1.is_activated=true
+    disable_authorization_checks{prog_no_1.save!}
+
+    prog_no_2 = Factory(:programme)
+    prog_no_2.activation_rejection_reason=nil
+    prog_no_2.is_activated=true
+    disable_authorization_checks{prog_no_2.save!}
+
+    prog_yes_1 = Factory(:programme)
+    prog_yes_1.activation_rejection_reason=''
+    prog_yes_1.is_activated=false
+    disable_authorization_checks{prog_yes_1.save!}
+
+    prog_yes_2 = Factory(:programme)
+    prog_yes_2.activation_rejection_reason='xxx'
+    prog_yes_2.is_activated=false
+    disable_authorization_checks{prog_yes_2.save!}
+
+    refute prog_no_1.rejected?
+    refute prog_no_2.rejected?
+    assert prog_yes_1.rejected?
+    assert prog_yes_2.rejected?
+
+    result = Programme.rejected
+    assert_instance_of ActiveRecord::Relation, result
+    assert_equal [prog_yes_1,prog_yes_2].sort,result.sort
+
   end
 
 end

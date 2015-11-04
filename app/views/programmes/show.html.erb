@@ -4,14 +4,7 @@
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
 
-    <% unless @programme.is_activated? %>
-        <div class='alert alert-danger'>
-          This <%= t('programme') %> is waiting to be activated by a <%= Seek::Config.project_name %> administrator.
-          <% if User.admin_logged_in? %>
-            <br/><%= link_to('Accept or Reject activation',activation_review_programme_path(@programme)) %>
-          <% end %>
-        </div>
-    <% end %>
+    <%= render :partial=>"activation_status" %>
 
     <%=  item_description @programme.description -%>
 

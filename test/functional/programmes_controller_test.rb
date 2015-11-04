@@ -4,6 +4,7 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
+  #this is needed to ensure the first user exists as admin, to stop it being automatically created as no fixtures are used.
   def setup
     Factory(:admin)
   end
@@ -498,6 +499,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_nil flash[:error]
     programme.reload
     refute programme.is_activated?
+    assert_equal 'rejection reason',programme.activation_rejection_reason
   end
 
   test 'no reject activation for none admin' do
@@ -517,6 +519,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
     programme.reload
     refute programme.is_activated?
+    assert_nil programme.activation_rejection_reason
   end
 
   test 'no reject_activation for not activated' do
@@ -535,6 +538,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
     programme.reload
     assert programme.is_activated?
+    assert_nil programme.activation_rejection_reason
   end
 
   test 'none activated programme only available to administrators' do

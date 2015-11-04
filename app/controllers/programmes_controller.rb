@@ -92,6 +92,7 @@ class ProgrammesController < ApplicationController
 
   def reject_activation
     flash[:notice]="The #{t('programme')} has been rejected"
+    @programme.update_attribute(:activation_rejection_reason,params[:programme][:activation_rejection_reason])
     Mailer.programme_rejected(@programme,@programme.activation_rejection_reason).deliver if Seek::Config.email_enabled
     redirect_to @programme
   end
