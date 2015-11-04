@@ -23,6 +23,7 @@ class Programme < ActiveRecord::Base
 
   scope :default_order, order('title')
   scope :activated, where(is_activated: true)
+  scope :not_activated, where(is_activated: false)
   scope :rejected, where("is_activated = ? AND activation_rejection_reason IS NOT NULL",false)
 
   def people

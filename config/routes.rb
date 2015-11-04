@@ -474,6 +474,7 @@ SEEK::Application.routes.draw do
     end
     collection do
       post :items_for_result
+      get :awaiting_activation
     end
     member do
       get :initiate_spawn_project

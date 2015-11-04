@@ -574,5 +574,59 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   end
 
+  test 'awaiting activation' do
+    login_as(Factory(:admin))
+    Programme.destroy_all
+    prog_not_activated = Factory(:programme)
+    prog_not_activated.is_activated=false
+    prog_not_activated.save!
+
+    prog_rejected = Factory(:programme)
+    prog_rejected.is_activated=false
+    prog_rejected.activation_rejection_reason = 'xxx'
+    prog_rejected.save!
+
+    prog_normal = Factory(:programme)
+
+    refute prog_not_activated.is_activated?
+    refute prog_rejected.is_activated?
+    assert prog_normal.is_activated?
+
+    refute prog_not_activated.rejected?
+    assert prog_rejected.rejected?
+    refute prog_normal.rejected?
+
+    get :awaiting_activation
+    assert_response :success
+
+    assert_includes assigns(:not_activated),prog_not_activated
+    refute_includes assigns(:not_activated),prog_rejected
+    refute_includes assigns(:not_activated),prog_normal
+
+    assert_includes assigns(:rejected),prog_rejected
+    refute_includes assigns(:rejected),prog_not_activated
+    refute_includes assigns(:rejected),prog_normal
+
+  end
+
+  test 'awaiting for activation blocked for none admin' do
+    programme_administrator = Factory(:programme_administrator)
+    normal = Factory(:person)
+
+    login_as(programme_administrator)
+    get :awaiting_activation
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    logout
+    flash[:error]=nil
+
+    login_as(normal)
+    get :awaiting_activation
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    logout
+    flash[:error]=nil
+  end
+
 
 end

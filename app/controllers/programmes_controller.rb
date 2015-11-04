@@ -7,7 +7,7 @@ class ProgrammesController < ApplicationController
   before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy]
   before_filter :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
   before_filter :find_assets, only: [:index]
-  before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
+  before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation,:awaiting_activation]
   before_filter :can_activate?, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
   before_filter :inactive_view_allowed?, only: [:show]
 
@@ -50,6 +50,12 @@ class ProgrammesController < ApplicationController
     if @programme && !User.admin_logged_in? && User.current_user.person.is_programme_administrator?(@programme)
       params[:programme][:administrator_ids] << User.current_user.person.id.to_s
     end
+  end
+
+  def awaiting_activation
+    @not_activated = Programme.not_activated
+    @rejected = @not_activated.rejected
+    @not_activated = @not_activated - @rejected
   end
 
   def edit
