@@ -26,7 +26,7 @@ class ContentBlobsController < ApplicationController
           if info[:code] == 200
             handle_good_http_response(url, info)
           else
-            handle_bad_http_response(info)
+            handle_bad_http_response(info[:code])
           end
         when 'ftp'
           handler = Seek::DownloadHandling::FTPHandler.new(url)
