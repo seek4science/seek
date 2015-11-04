@@ -1,9 +1,9 @@
 require 'rest-client'
-require 'open-uri'
 
 module Seek
   module DownloadHandling
     class HTTPHandler
+      include Seek::UploadHandling::ContentInspection
 
       def initialize(url)
         @url = url
@@ -14,15 +14,23 @@ module Seek
           response = RestClient.head(@url)
           content_type = response.headers[:content_type]
           content_length = response.headers[:content_length].try(:to_i)
+          file_name = determine_filename_from_disposition(response.headers[:content_disposition])
           code = response.code
         rescue RestClient::Exception => e
           code = e.http_code
           content_type = nil
           content_length = nil
         end
-        { content_type: content_type,
-          content_length: content_length,
-          code: code }
+
+        file_name ||= determine_filename_from_url(@url)
+        content_type ||= content_type_from_filename(file_name)
+
+        {
+            code: code,
+            file_size: content_length,
+            content_type: content_type,
+            file_name: file_name
+        }
       end
 
       def fetch

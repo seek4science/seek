@@ -3,10 +3,9 @@ module Seek
     module ExamineUrl
       include Seek::UploadHandling::ContentInspection
 
-      def process_view_for_successful_url(url)
-        headers = fetch_url_headers(url)
-        @content_type = headers[:content_type]
-        @size = headers[:content_length].try(:to_i)
+      def handle_good_http_response(url, info)
+        @content_type = info[:content_type]
+        @size = info[:file_size]
         if content_is_webpage?(@content_type)
           @is_webpage = true
           page = summarize_webpage(url)
@@ -15,12 +14,18 @@ module Seek
           @image = page.images.best
         else
           @is_webpage = false
-          @filename = determine_filename_from_disposition(headers[:content_disposition])
-          @filename ||= determine_filename_from_url(url)
+          @filename = info[:file_name]
         end
       end
 
-      def handle_non_200_response(code)
+      def handle_good_ftp_response(url, info)
+        @is_webpage = false
+        @size = info[:file_size]
+        @content_type = info[:content_type]
+        @filename = info[:file_name]
+      end
+
+      def handle_bad_http_response(code)
         case code
           when 401, 403
             @unauthorized = true
