@@ -46,9 +46,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert assigns(:is_webpage)
   end
 
+  test "examine url forbidden" do
+    #forbidden
+    stub_request(:head, "http://unauth.com/file.pdf").to_return(:status => 403, :headers=>{'Content-Type' => 'application/pdf'})
+    xml_http_request :get, :examine_url, :data_url=>"http://unauth.com/file.pdf"
+    assert_response :success
+    assert @response.body.include?("Access to this link is unauthorized")
+    refute assigns(:error)
+    refute assigns(:error_msg)
+    assert assigns(:unauthorized)
+  end
+
   test "examine url unauthorized" do
     #unauthorized
-    stub_request(:head, "http://unauth.com/file.pdf").to_return(:status => 403, :headers=>{'Content-Type' => 'application/pdf'})
+    stub_request(:head, "http://unauth.com/file.pdf").to_return(:status => 401, :headers=>{'Content-Type' => 'application/pdf'})
     xml_http_request :get, :examine_url, :data_url=>"http://unauth.com/file.pdf"
     assert_response :success
     assert @response.body.include?("Access to this link is unauthorized")
