@@ -10,6 +10,8 @@ module Seek
       end
 
       def info
+        content_type = nil
+        content_length = nil
         begin
           response = RestClient.head(@url)
           content_type = response.headers[:content_type]
@@ -18,8 +20,8 @@ module Seek
           code = response.code
         rescue RestClient::Exception => e
           code = e.http_code
-          content_type = nil
-          content_length = nil
+        rescue SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+          code = 404
         end
 
         file_name ||= determine_filename_from_url(@url)
