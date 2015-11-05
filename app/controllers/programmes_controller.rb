@@ -27,12 +27,12 @@ class ProgrammesController < ApplicationController
       # current person becomes the programme administrator, unless they are logged in
       # also activation email is sent
       unless User.admin_logged_in?
-        User.current_user.person.is_programme_administrator = true, @programme
+        current_person.is_programme_administrator = true, @programme
         if Seek::Config.email_enabled
-          Mailer.programme_activation_required(@programme,User.current_user.person).deliver
+          Mailer.programme_activation_required(@programme,current_person).deliver
         end
       end
-      disable_authorization_checks { User.current_user.person.save! }
+      disable_authorization_checks { current_person.save! }
     end
 
     respond_with(@programme)
@@ -46,9 +46,16 @@ class ProgrammesController < ApplicationController
 
   def handle_administrators
     params[:programme][:administrator_ids] = params[:programme][:administrator_ids].split(',')
-    # if the current person is the administrator, but not a system admin, they need to be added - they cannot remove themself.
-    if @programme && !User.admin_logged_in? && User.current_user.person.is_programme_administrator?(@programme)
-      params[:programme][:administrator_ids] << User.current_user.person.id.to_s
+
+    prevent_removal_of_self_as_programme_administrator
+  end
+
+  # if the current person is the administrator, but not a system admin, they need to be added - they cannot remove themself.
+  def prevent_removal_of_self_as_programme_administrator
+    return if User.admin_logged_in?
+    return unless @programme
+    if current_person.is_programme_administrator?(@programme)
+      params[:programme][:administrator_ids] << current_person.id.to_s
     end
   end
 
@@ -116,7 +123,7 @@ class ProgrammesController < ApplicationController
   #is the item inactive, and if so can the current person view it
   def inactive_view_allowed?
     return true if @programme.is_activated? || User.admin_logged_in?
-    unless result=(User.logged_in_and_registered? && @programme.administrators.include?(User.current_user.person))
+    unless result=(User.logged_in_and_registered? && @programme.administrators.include?(current_person))
       error("This programme is not activated and cannot be viewed", "cannot view (not activated)")
     end
     result
@@ -126,7 +133,7 @@ class ProgrammesController < ApplicationController
     if User.admin_logged_in?
       @programmes = Programme.all
     elsif User.programme_administrator_logged_in?
-      @programmes = Programme.activated | User.current_user.person.administered_programmes
+      @programmes = Programme.activated | current_person.administered_programmes
     else
       @programmes = Programme.activated
     end
