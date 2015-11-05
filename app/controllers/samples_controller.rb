@@ -67,7 +67,7 @@ class SamplesController < ApplicationController
     @sample = Sample.new
     @sample.parent_name = params[:parent_name]
     @sample.from_biosamples = params[:from_biosamples]
-    @sample.specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new(:creators=>[User.current_user.person])
+    @sample.specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new(:creators=>[current_person])
 
     respond_to do |format|
       format.html # new.html.erb

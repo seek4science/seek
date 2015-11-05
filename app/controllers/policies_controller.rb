@@ -63,7 +63,6 @@ class PoliciesController < ApplicationController
 
   def preview_permissions
       policy = sharing_params_to_policy
-      current_person = User.current_user.try(:person)
       contributor_person = (params['is_new_file'] == 'false') ?  User.find_by_id(params['contributor_id'].to_i).try(:person) : current_person
       creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
       creators.collect!{|c| Person.find(c[1])}

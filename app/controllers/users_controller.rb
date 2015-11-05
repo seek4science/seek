@@ -29,7 +29,7 @@ class UsersController < ApplicationController
   end
 
   def cancel_registration
-    user = User.current_user
+    user = current_user
     if user && !user.person
       logout_user
       user.destroy

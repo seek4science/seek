@@ -93,9 +93,9 @@ class StrainsController < ApplicationController
   end
 
   def existing_strains_for_assay_organism
-    if User.current_user && !Seek::Config.is_virtualliver
+    if current_user && !Seek::Config.is_virtualliver
       #restrict strains to those of that persons project
-      projects = User.current_user.person.projects
+      projects = current_user.person.projects
       @strains = @strains.select{|s| !(s.projects & projects).empty?}
     end
     render :update do |page|

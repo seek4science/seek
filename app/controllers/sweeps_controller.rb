@@ -180,7 +180,7 @@ class SweepsController < ApplicationController
   def auth
     action = translate_action(action_name)
     unless is_auth?(@sweep, action)
-      if User.current_user.nil?
+      if current_user.nil?
         flash[:error] = "You are not authorized to #{action} this Sweep, you may need to login first."
       else
         flash[:error] = "You are not authorized to #{action} this Sweep."
