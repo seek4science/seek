@@ -216,10 +216,6 @@ class ApplicationController < ActionController::Base
     params
   end
 
-  def currently_logged_in
-    current_user.person
-  end
-
   def error(notice, message)
     flash[:error] = notice
 

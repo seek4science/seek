@@ -41,7 +41,7 @@ class UsersController < ApplicationController
     self.current_user = params[:activation_code].blank? ? false : User.find_by_activation_code(params[:activation_code])
     if logged_in? && !current_user.active?
       current_user.activate      
-      if (current_user.person.projects.empty? && User.count>1)
+      if (current_person.projects.empty? && User.count>1)
         Mailer.welcome_no_projects(current_user).deliver
         logout_user
         flash[:notice] = "Signup complete! However, you will need to wait for an administrator to associate you with your project(s) before you can login."        
@@ -49,7 +49,7 @@ class UsersController < ApplicationController
       else
         Mailer.welcome(current_user).deliver
         flash[:notice] = "Signup complete!"
-        redirect_to current_user.person
+        redirect_to current_person
       end
     else
       redirect_back_or_default('/')

@@ -106,7 +106,7 @@ class FoldersController < ApplicationController
 
   def check_project
     @project = Project.find(params[:project_id])
-    if @project.nil? || !current_user.person.projects.include?(@project)
+    if @project.nil? || !current_person.projects.include?(@project)
       error("You must be a member of the project", "is invalid (not in project)")
     end
   end

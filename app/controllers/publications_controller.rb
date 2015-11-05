@@ -196,7 +196,7 @@ class PublicationsController < ApplicationController
   def associate_authors
     publication = @publication
     projects = publication.projects
-    projects = current_user.person.projects if projects.empty?
+    projects = current_person.projects if projects.empty?
     association = {}
     publication.publication_authors.each do |author|
       unless author.person
