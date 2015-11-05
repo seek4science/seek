@@ -106,7 +106,7 @@ module Seek
         when 'http', 'https'
           handler = Seek::DownloadHandling::HTTPHandler.new(@data_url)
           info = handler.info
-          if info[:code] != 200
+          unless [200, 401, 403].include?(info[:code])
             flash.now[:error] = "Processing the URL responded with a response code (#{info[:code]}), indicating the URL is inaccessible."
             return false
           end
