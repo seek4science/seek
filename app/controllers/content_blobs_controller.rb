@@ -19,13 +19,21 @@ class ContentBlobsController < ApplicationController
     #check content type and size
     url = params[:data_url]
     begin
-      code = check_url_response_code(url)
-      if code == 200
-        process_view_for_successful_url(url)
-      else
-        handle_non_200_response(code)
+      case URI(url).scheme
+        when 'http', 'https'
+          handler = Seek::DownloadHandling::HTTPHandler.new(url)
+          info = handler.info
+          if info[:code] == 200
+            handle_good_http_response(url, info)
+          else
+            handle_bad_http_response(info[:code])
+          end
+        when 'ftp'
+          handler = Seek::DownloadHandling::FTPHandler.new(url)
+          info = handler.info
+          handle_good_ftp_response(url, info)
       end
-    rescue Exception=>e
+    rescue Exception => e
       handle_exception_response(e)
     end
   end

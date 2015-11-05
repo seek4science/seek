@@ -33,7 +33,13 @@ module Seek
           if @asset_version.contributor.nil? #A jerm generated resource
             download_jerm_asset
           else
-            stream_from_url
+            case URI(@content_blob.url).scheme
+              when 'http', 'https'
+                stream_from_http_url
+              when 'ftp'
+                stream_from_ftp_url
+            end
+
           end
         rescue Seek::DownloadException=>de
           redirect_on_error @asset_version,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
@@ -72,36 +78,43 @@ module Seek
       end
     end
 
-    def stream_from_url
+    def stream_from_http_url
       code = check_url_response_code(@content_blob.url)
       case code
       when 200
-        self.response.headers["Content-Type"] ||= @content_blob.content_type
-        self.response.headers["Content-Disposition"] = "attachment; filename=#{@content_blob.original_filename}"
-        self.response.headers['Last-Modified'] = Time.now.ctime.to_s
-
-        begin
-          self.response_body = Enumerator.new do |yielder|
-            Seek::DownloadHandling::Streamer.new(@content_blob.url).stream do |chunk|
-              yielder << chunk
-            end
-          end
-        rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
-            Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
-          error_message = "There is a problem downloading this file. #{e}"
-          redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
-          return_file_or_redirect_to redirected_url, error_message
-        end
+        stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url))
       when 401, 403
-        error_message = "This item is referenced at a remote location, which is currently inaccessible"
-        redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
-        return_file_or_redirect_to redirected_url, error_message
+        # Try redirecting the user to the URL if SEEK cannot access it
+        redirect_to @content_blob.url
       when 404
         error_message = "This item is referenced at a remote location, which is currently unavailable"
         redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
         return_file_or_redirect_to redirected_url, error_message
       else
-        error_message = "There is a problem downloading this file."
+        error_message = "There is a problem downloading this file. Error code #{code}"
+        redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
+        return_file_or_redirect_to redirected_url, error_message
+      end
+    end
+
+    def stream_from_ftp_url
+      stream_with(Seek::DownloadHandling::FTPStreamer.new(@content_blob.url))
+    end
+
+    def stream_with(streamer)
+      self.response.headers["Content-Type"] ||= @content_blob.content_type
+      self.response.headers["Content-Disposition"] = "attachment; filename=#{@content_blob.original_filename}"
+      self.response.headers['Last-Modified'] = Time.now.ctime.to_s
+
+      begin
+        self.response_body = Enumerator.new do |yielder|
+          streamer.stream do |chunk|
+            yielder << chunk
+          end
+        end
+      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+          Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+        error_message = "There is a problem downloading this file. #{e}"
         redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
         return_file_or_redirect_to redirected_url, error_message
       end

@@ -764,10 +764,10 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
 
-  test "should redirect and show error on download for 401 url" do
+  test "should redirect on download for 401 url" do
     mock_http
     df = {:title=>"401",:project_ids=>[projects(:sysmo_project).id]}
-    blob = {:data_url=>"http://mocked401.com"}
+    blob = {:data_url=>"http://mocked401.com/file.txt"}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -781,18 +781,18 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).content_blob.original_filename
-    assert_equal "",assigns(:data_file).content_blob.content_type
+    assert_equal "file.txt",assigns(:data_file).content_blob.original_filename
+    assert_equal "text/plain",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_response :redirect
-    assert_not_nil flash[:error]
+
+    assert_redirected_to assigns(:data_file).content_blob.url
   end
 
   test "should redirect and show error on download for 403 url" do
     mock_http
     df = {:title=>"401",:project_ids=>[projects(:sysmo_project).id]}
-    blob = {:data_url=>"http://mocked403.com"}
+    blob = {:data_url=>"http://mocked403.com/file.txt"}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -806,12 +806,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).content_blob.original_filename
-    assert_equal "",assigns(:data_file).content_blob.content_type
+    assert_equal "file.txt",assigns(:data_file).content_blob.original_filename
+    assert_equal "text/plain",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_response :redirect
-    assert_not_nil flash[:error]
+
+    assert_redirected_to assigns(:data_file).content_blob.url
   end
 
   test "should create and redirect on download for 302 url" do
@@ -2125,8 +2125,8 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:any, "http://mocked301.com").to_return(:status=>301, :headers=>{:location=>"http://redirectlocation.com"})
     stub_request(:any, "http://mockedbad301.com").to_return(:status=>301, :headers=>{:location=>"http://mocked404.com"})
     stub_request(:any, "http://mocked302.com").to_return(:status=>302, :headers=>{:location=>"http://redirectlocation.com"})
-    stub_request(:any, "http://mocked401.com").to_return(:status=>401)
-    stub_request(:any, "http://mocked403.com").to_return(:status=>403)
+    stub_request(:any, "http://mocked401.com/file.txt").to_return(:status=>401)
+    stub_request(:any, "http://mocked403.com/file.txt").to_return(:status=>403)
     stub_request(:any, "http://mocked404.com").to_return(:status=>404)
 
     stub_request(:get, "http://mockedlocation.com/small.txt").to_return(body: 'bananafish'*10, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 100 })

@@ -159,7 +159,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def retrieve
-    handler = Seek::DownloadHandling::RemoteContentHandler.new(self.url)
+    handler = Seek::DownloadHandling::HTTPHandler.new(self.url)
 
     self.tmp_io_object = handler.fetch
 

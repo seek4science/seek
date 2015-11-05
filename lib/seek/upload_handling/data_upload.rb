@@ -101,23 +101,24 @@ module Seek
       def process_from_url(blob_params)
         @data_url = blob_params[:data_url]
         blob_params.delete(:data)
-        code = check_url_response_code(@data_url)
-
-        case code
-          when 200
-            headers = fetch_url_headers(@data_url)
-            filename = determine_filename_from_disposition(headers[:content_disposition])
-            filename ||= determine_filename_from_url(@data_url)
-            blob_params[:original_filename] = filename || ''
-            blob_params[:content_type] = (extract_mime_content_type(headers[:content_type]) || content_type_from_filename(filename) || '')
-            blob_params[:file_size] = headers[:content_length].try(:to_i)
-          when 401, 403
-            blob_params[:content_type] = ''
-            blob_params[:original_filename] = ''
-          else
-            flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the URL is inaccessible."
+        info = {}
+        case URI(@data_url).scheme
+        when 'http', 'https'
+          handler = Seek::DownloadHandling::HTTPHandler.new(@data_url)
+          info = handler.info
+          unless [200, 401, 403].include?(info[:code])
+            flash.now[:error] = "Processing the URL responded with a response code (#{info[:code]}), indicating the URL is inaccessible."
             return false
+          end
+        when 'ftp'
+          handler = Seek::DownloadHandling::FTPHandler.new(@data_url)
+          info = handler.info
         end
+
+        blob_params[:original_filename] = info[:file_name] || ''
+        blob_params[:content_type] = info[:content_type]
+        blob_params[:file_size] = info[:file_size]
+
         true
       end
 

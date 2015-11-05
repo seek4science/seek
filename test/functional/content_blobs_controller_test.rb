@@ -46,9 +46,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert assigns(:is_webpage)
   end
 
+  test "examine url forbidden" do
+    #forbidden
+    stub_request(:head, "http://unauth.com/file.pdf").to_return(:status => 403, :headers=>{'Content-Type' => 'application/pdf'})
+    xml_http_request :get, :examine_url, :data_url=>"http://unauth.com/file.pdf"
+    assert_response :success
+    assert @response.body.include?("Access to this link is unauthorized")
+    refute assigns(:error)
+    refute assigns(:error_msg)
+    assert assigns(:unauthorized)
+  end
+
   test "examine url unauthorized" do
     #unauthorized
-    stub_request(:head, "http://unauth.com/file.pdf").to_return(:status => 403, :headers=>{'Content-Type' => 'application/pdf'})
+    stub_request(:head, "http://unauth.com/file.pdf").to_return(:status => 401, :headers=>{'Content-Type' => 'application/pdf'})
     xml_http_request :get, :examine_url, :data_url=>"http://unauth.com/file.pdf"
     assert_response :success
     assert @response.body.include?("Access to this link is unauthorized")
@@ -271,7 +282,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'should error on download for 401 url' do
+  test 'should redirect on download for 401 url' do
     mock_http
     df  = Factory :data_file,
                   policy: Factory(:all_sysmo_downloadable_policy),
@@ -281,8 +292,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert !df.content_blob.file_exists?
 
     get :download, data_file_id: df, id: df.content_blob
-    assert_response :redirect
-    assert_not_nil flash[:error]
+
+    assert_redirected_to df.content_blob.url
   end
 
   test 'should download' do
