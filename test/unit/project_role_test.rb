@@ -14,6 +14,8 @@ class ProjectRoleTest < ActiveSupport::TestCase
   end
 
   test "project roles removed when person removed from project" do
+    person = Factory(:pal)
+
     assert_difference('GroupMembershipsProjectRole.count', -1) do
       person.group_memberships.destroy_all
     end
