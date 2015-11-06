@@ -1,44 +1,23 @@
-<style>
-  div.work_groups {
-      margin-top: 1em;
-      margin-bottom: 2em;
-      margin-left: 2em;
-      width: 90%;
-      height: 500px;
-      overflow: auto;
-  }
-
-  div.wg_project {
-      margin-top:1.5em;
-      margin-bottom: 0.5em;
-      font-weight: bolder;
-  }
-
-  div.wg_institution {
-      margin-left: 0.5em;
-  }
-</style>
-
 <%= fields_for person do |f| %>
     <% work_group_groups = work_group_groups_for_selection(person) %>
     <% chosen_wg_ids = person.work_groups.collect(&:id) %>
-      <div class="work_groups">
-        <% work_group_groups.each do |work_group_group| %>
-            <div class="wg_project"><%= work_group_group.project_name %></div>
-            <div class="wg_institution">
-                <% work_group_group.options.each do |option| %>
-                    <%= check_box_tag "workgroup_#{option.id}", option.id, chosen_wg_ids.include?(option.id), class: 'work_group_checkbox',disabled: !work_group_group.editable %>
-                    <%= option.institution_name %>
-                    <br/>
-                <% end %>
+
+    <% work_group_groups.each do |work_group_group| %>
+        <h4><%= work_group_group.project_name %></h4>
+        <% work_group_group.options.each do |option| %>
+            <div class="checkbox">
+              <label>
+                <%= option.institution_name %>
+                <%= check_box_tag "workgroup_#{option.id}", option.id, chosen_wg_ids.include?(option.id), class: 'work_group_checkbox',disabled: !work_group_group.editable %>
+              </label>
             </div>
         <% end %>
-      </div>
+    <% end %>
 
     <input name="person[work_group_ids][]" type="hidden" value/>
-      <select id="person_work_group_ids" multiple="multiple" name="person[work_group_ids][]" style="display:none;">
-        <%= option_groups_from_collection_for_select work_group_groups,
-                                                     :options, :project_name, :id, :institution_name, person.work_groups.map { |wg| wg.id }
-        %>
-      </select>
+    <select id="person_work_group_ids" multiple="multiple" name="person[work_group_ids][]" style="display:none;">
+      <%= option_groups_from_collection_for_select work_group_groups,
+                                                   :options, :project_name, :id, :institution_name, person.work_groups.map { |wg| wg.id }
+      %>
+    </select>
 <% end %>
