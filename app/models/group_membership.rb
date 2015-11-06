@@ -8,6 +8,7 @@ class GroupMembership < ActiveRecord::Base
 
   after_save :remember_previous_person
   after_commit :queue_update_auth_table
+  after_destroy :remove_admin_defined_role_projects
 
   validates :work_group,:presence => {:message=>"A workgroup is required"}
 
@@ -28,6 +29,13 @@ class GroupMembership < ActiveRecord::Base
     people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
 
     AuthLookupUpdateJob.new.add_items_to_queue people.compact
+  end
+
+  private
+
+  def remove_admin_defined_role_projects
+    project_id = WorkGroup.find(work_group_id_was).project_id
+    AdminDefinedRoleProject.where(:project_id => project_id, :person_id => person_id_was).destroy_all
   end
 
 end
