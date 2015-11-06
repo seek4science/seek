@@ -64,9 +64,7 @@ gem 'piwik_analytics',:git=>"https://github.com/SysMO-DB/piwik-ruby-tracking.git
 gem 'my_savage_beast', :git => "https://github.com/SysMO-DB/my_savage_beast"
 gem 'redbox', :git=>"https://github.com/SysMO-DB/redbox"
 gem "my_responds_to_parent", :git => "https://github.com/SysMO-DB/my_responds_to_parent.git"
-gem 'site_announcements', :git => "https://github.com/SysMO-DB/site_announcements.git"
 gem 'bioportal',">=2.2"
-
 gem 'acts_as_activity_logged', :git => "https://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_trashable',:git=> "https://github.com/SysMO-DB/acts_as_trashable.git"
 gem "app_version", :git => "https://github.com/SysMO-DB/app_version.git"
@@ -76,6 +74,7 @@ gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage", :ref=>"bb1182f27
 gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
 
+gem 'site_announcements'
 gem 'taverna-t2flow'
 gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :branch => 'list-inputs', :ref=>"b36e19c85b7a58d08a73aa418c0f838442c6dfd3"
 gem 'jquery-rails', '~> 3'
