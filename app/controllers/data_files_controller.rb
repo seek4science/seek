@@ -122,7 +122,7 @@ class DataFilesController < ApplicationController
           @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
 
           if @data_file.save
-            @data_file.creators = [current_user.person]
+            @data_file.creators = [User.current_user.person]
             create_content_blobs
 
             flash.now[:notice] ="#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
