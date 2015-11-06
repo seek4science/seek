@@ -15,7 +15,7 @@ class PoliciesController < ApplicationController
       
       # check that current user (the one sending AJAX request to get data from this handler)
       # is a member of the project for which they try to get the default policy
-      authorized = current_user.person.projects.include? Project.find(entity_id)
+      authorized = current_person.projects.include? Project.find(entity_id)
     else
       supported = false
     end
@@ -63,7 +63,6 @@ class PoliciesController < ApplicationController
 
   def preview_permissions
       policy = sharing_params_to_policy
-      current_person = User.current_user.try(:person)
       contributor_person = (params['is_new_file'] == 'false') ?  User.find_by_id(params['contributor_id'].to_i).try(:person) : current_person
       creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
       creators.collect!{|c| Person.find(c[1])}
@@ -73,7 +72,7 @@ class PoliciesController < ApplicationController
       cloned_resource = resource.dup
       cloned_resource= resource_with_assigned_projects cloned_resource,params[:project_ids]
       cloned_resource.policy = policy
-      cloned_resource.creators = creators if cloned_resource.respond_to?:creators
+      cloned_resource.creators = creators if cloned_resource.respond_to?(:creators)
       cloned_resource.contributor = contributor_person
 
       asset_managers = get_asset_managers cloned_resource
@@ -105,6 +104,7 @@ class PoliciesController < ApplicationController
     cloned_resource = resource_with_assigned_projects cloned_resource,project_ids
     if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
       updated_can_publish_immediately = true
+      #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
     elsif cloned_resource.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(cloned_resource)
       updated_can_publish_immediately = false
     else

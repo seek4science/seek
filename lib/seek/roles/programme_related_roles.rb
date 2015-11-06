@@ -41,7 +41,6 @@ module Seek
       end
       ###############################
 
-
       #Programme related instance methods that will be injected into the Person model
       module PersonInstanceMethods
         def programmes_for_role(role)
@@ -51,13 +50,14 @@ module Seek
 
         def administered_programmes
           if is_admin?
-            Programme.all
+            #this is to force an ActiveRecord::Relation whereas .all just returns an Array, causing an error when trying to chain scopes etc
+            Programme.where('id = id')
           else
             programmes_for_role('programme_administrator')
           end
         end
-
       end
+
     end
   end
 end

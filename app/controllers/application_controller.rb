@@ -119,7 +119,7 @@ class ApplicationController < ActionController::Base
       authorized_resources = clazz.authorized_partial_asset_collection(resources,"view")
     elsif resource_type == 'Project' || resource_type == 'Institution'
       authorized_resources = resources
-    elsif resource_type == "Person" && Seek::Config.is_virtualliver && User.current_user.nil?
+    elsif resource_type == "Person" && Seek::Config.is_virtualliver && current_user.nil?
       authorized_resources = []
     else
       authorized_resources = resources.select &:can_view?
@@ -192,8 +192,8 @@ class ApplicationController < ActionController::Base
       error("Type management disabled", "...")
       return false
     end
-    if User.current_user
-      if User.current_user.can_manage_types?
+    if current_user
+      if current_user.can_manage_types?
         return true
       else
         error("Admin rights required to manage types", "...")
@@ -214,10 +214,6 @@ class ApplicationController < ActionController::Base
       params[:last_used_at] = Time.now
     end
     params
-  end
-
-  def currently_logged_in
-    current_user.person
   end
 
   def error(notice, message)
@@ -294,7 +290,7 @@ class ApplicationController < ActionController::Base
         format.html do
           case action
             when 'publish', 'manage', 'edit', 'download', 'delete'
-              if User.current_user.nil?
+              if current_user.nil?
                 flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
               else
                 flash[:error] = "You are not authorized to #{action} this #{name.humanize}."
@@ -346,6 +342,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_event
+    #FIXME: why is needed to wrap in this block when the around filter already does ?
     User.with_current_user current_user do
       controller_name = self.controller_name.downcase
       action = self.action_name.downcase

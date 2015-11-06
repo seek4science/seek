@@ -77,13 +77,6 @@ GIT
     redbox (1.0.4)
 
 GIT
-  remote: https://github.com/SysMO-DB/site_announcements.git
-  revision: 305cca221bd2759a97c935871363acae0c54f0a9
-  specs:
-    site_announcements (1.2)
-      uuid (~> 2.3)
-
-GIT
   remote: https://github.com/SysMO-DB/white_list.git
   revision: 3f9798ec54f227e852b944bb14f6f90d05cde893
   specs:
@@ -648,6 +641,8 @@ GEM
       json (~> 1.8)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.0)
+    site_announcements (1.3)
+      uuid (~> 2.3)
     slop (3.6.0)
     sparql (1.1.5)
       builder (~> 3.0)
@@ -847,7 +842,7 @@ DEPENDENCIES
   search_biomodel (= 2.2.1)!
   selenium-webdriver
   simple-spreadsheet-extractor (~> 0.15.0)
-  site_announcements!
+  site_announcements
   sqlite3
   sunspot_matchers
   sunspot_rails (~> 2.2.0)
@@ -870,4 +865,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.10.3
+   1.10.6
