@@ -730,6 +730,10 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert_instance_of ActiveRecord::Relation, result
     assert_instance_of ActiveRecord::Relation, person.administered_programmes
 
+    #also for admin
+    person = Factory(:admin)
+    assert_instance_of ActiveRecord::Relation, person.administered_programmes
+
   end
 
 
