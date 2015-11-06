@@ -3,7 +3,8 @@ class GroupMembership < ActiveRecord::Base
   belongs_to :work_group
   has_one :project, :through=>:work_group
 
-  has_and_belongs_to_many :project_roles
+  has_many :group_memberships_project_roles, :dependent => :destroy
+  has_many :project_roles, :through => :group_memberships_project_roles
 
   after_save :remember_previous_person
   after_commit :queue_update_auth_table

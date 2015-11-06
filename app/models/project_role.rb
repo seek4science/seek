@@ -1,5 +1,6 @@
 class ProjectRole < ActiveRecord::Base
-  has_and_belongs_to_many :group_memberships
+  has_many :group_memberships_project_roles
+  has_many :group_memberships, :through => :group_memberships_project_roles
 
   alias_attribute :title,:name
 
