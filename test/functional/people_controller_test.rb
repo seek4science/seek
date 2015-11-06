@@ -200,15 +200,33 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to people(:aaron_person)
   end
 
-  def test_project_administrator_can_edit_others_inside_their_projects
+  test "project administrator can edit userless-profiles in their project" do
     project_admin = Factory(:project_administrator)
-    other_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: project_admin.group_memberships.first.work_group)])
-    assert !(project_admin.projects & other_person.projects).empty?, 'Project administrator should belong to the same project as the person he is trying to edit'
+    unregistered_person = Factory(:brand_new_person,
+                           group_memberships: [Factory(:group_membership,
+                                                       work_group: project_admin.group_memberships.first.work_group)])
+    assert !(project_admin.projects & unregistered_person.projects).empty?,
+           'Project administrator should belong to the same project as the person he is trying to edit'
 
     login_as(project_admin)
 
-    get :edit, id: other_person.id
+    get :edit, id: unregistered_person.id
     assert_response :success
+  end
+
+  test "project administrator cannot edit registered users' profiles in their project" do
+    project_admin = Factory(:project_administrator)
+    registered_person = Factory(:person,
+                           group_memberships: [Factory(:group_membership,
+                                                       work_group: project_admin.group_memberships.first.work_group)])
+    assert !(project_admin.projects & registered_person.projects).empty?,
+           'Project administrator should belong to the same project as the person he is trying to edit'
+
+    login_as(project_admin)
+
+    get :edit, id: registered_person.id
+    assert_response :redirect
+    assert_not_empty flash[:error]
   end
 
   def test_admin_can_edit_others
