@@ -106,7 +106,7 @@ class AssaysController < ApplicationController
 
     update_assay_organisms @assay, params
 
-    @assay.owner=current_user.person
+    @assay.owner=current_person
 
     @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
 

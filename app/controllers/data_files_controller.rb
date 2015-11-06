@@ -99,7 +99,7 @@ class DataFilesController < ApplicationController
       @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
-        @data_file.creators = [current_user.person]
+        @data_file.creators = [current_person]
         create_content_blobs
         #send email to the file uploader and receiver
         Mailer.file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file).deliver
