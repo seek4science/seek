@@ -882,10 +882,12 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select 'option', text: workgroup.institution.title, count: 0
   end
 
-  test 'allow project administrator to edit people inside their projects, even outside their institutions' do
+  test 'allow project administrator to edit unregistered people inside their projects, even outside their institutions' do
     project_admin = Factory(:project_administrator)
     project = project_admin.projects.first
-    person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: Factory(:work_group, project: project))])
+    person = Factory(:brand_new_person,
+                     group_memberships: [Factory(:group_membership,
+                                                 work_group: Factory(:work_group, project: project))])
     assert_includes project_admin.projects, person.projects.first, 'they should be in the same project'
     refute_includes project_admin.institutions, person.institutions.first, 'they should not be in the same institution'
     assert_equal 1, person.institutions.count, 'should only be in 1 project'
