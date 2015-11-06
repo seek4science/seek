@@ -323,7 +323,7 @@ class Person < ActiveRecord::Base
   def can_be_edited_by?(user)
     return false unless user
     user = user.user if user.is_a?(Person)
-    user == self.user || user.is_admin? || self.is_project_administered_by?(user)
+    (user == self.user) || user.is_admin? || (self.is_project_administered_by?(user) && self.user.nil?)
   end
 
   def me?
