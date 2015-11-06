@@ -45,7 +45,7 @@ class WorkflowsController < ApplicationController
     #@data_file.is_with_sample= params[:is_with_sample]
     @page_title = params[:page_title]
     respond_to do |format|
-      if current_person.member?
+      if current_user.person.member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new workflows. Only members of known projects, institutions or work groups are allowed to create new content."
