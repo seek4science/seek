@@ -4,7 +4,7 @@
 
 <%= form_for @person, :url => {:action => 'administer_update', :id => @person.id} do |f| -%>
     <% unless (project_administrator_logged_in? && @person.me?) %>
-        <%= panel("#{t('project')} / Institution Memberships") do %>
+        <%= panel("#{t('project')} / Institution Memberships", :id => 'work_groups') do %>
             <%= render :partial => "work_groups", :locals => { :person => @person } -%>
         <% end %>
     <% end %>

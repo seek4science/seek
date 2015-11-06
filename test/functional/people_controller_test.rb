@@ -761,9 +761,9 @@ class PeopleControllerTest < ActionController::TestCase
     get :admin, id: subject
     assert_response :success
 
-    assert_select 'div.work_groups' do
+    assert_select '#work_groups' do
       wg = managed_project.work_groups.first
-      assert_select 'div.wg_project', text: managed_project.title, count: 1
+      assert_select 'h4', text: managed_project.title, count: 1
       assert_select "input[type=checkbox]#workgroup_#{wg.id}", count: 1
       assert_select "input[type=checkbox][disabled='disabled']#workgroup_#{wg.id}", count: 0
 
@@ -783,8 +783,8 @@ class PeopleControllerTest < ActionController::TestCase
     login_as project_admin
     get :admin, id: person
     assert_response :success
-    assert_select 'div.work_groups' do
-      assert_select 'div.wg_project', text: existing_project.title, count: 1
+    assert_select '#work_groups' do
+      assert_select 'h4', text: existing_project.title, count: 1
       assert_select "input[type=checkbox][disabled='disabled']#workgroup_#{existing_wg.id}", count: 1
     end
   end
