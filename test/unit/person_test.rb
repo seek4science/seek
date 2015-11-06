@@ -9,7 +9,7 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 3,p.work_groups.size
   end
 
-  def test_can_be_edited_by?
+  test "registered user's profile can be edited by" do
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator)
     project_administrator2 = Factory(:project_administrator)
@@ -20,14 +20,31 @@ class PersonTest < ActiveSupport::TestCase
     assert_not_equal person.projects,project_administrator2.projects
 
     assert person.can_be_edited_by?(person.user)
-    assert person.can_be_edited_by?(project_administrator.user),"should be editable by the project administrator of the same project"
+    assert !person.can_be_edited_by?(project_administrator.user),"should not be editable by the project administrator of the same project, as user is registered"
     assert person.can_be_edited_by?(admin.user)
     assert !person.can_be_edited_by?(another_person.user)
     assert !person.can_be_edited_by?(project_administrator2.user),"should be not editable by the project administrator of another project"
 
     assert person.can_be_edited_by?(person), "You can also ask by passing in a person"
-    assert person.can_be_edited_by?(project_administrator),"You can also ask by passing in a person"
+    assert !person.can_be_edited_by?(project_administrator),"You can also ask by passing in a person"
+  end
 
+  test "userless profile can be edited by" do
+    admin = Factory(:admin)
+    project_administrator = Factory(:project_administrator)
+    project_administrator2 = Factory(:project_administrator)
+    profile = Factory :brand_new_person,:group_memberships=>[Factory(:group_membership,:work_group=>project_administrator.group_memberships.first.work_group)]
+    another_person = Factory :person
+
+    assert_equal profile.projects,project_administrator.projects
+    assert_not_equal profile.projects,project_administrator2.projects
+
+    assert profile.can_be_edited_by?(project_administrator.user),"should be editable by the project administrator of the same project, as user is not registered"
+    assert profile.can_be_edited_by?(admin.user)
+    assert !profile.can_be_edited_by?(another_person.user)
+    assert !profile.can_be_edited_by?(project_administrator2.user),"should be not editable by the project administrator of another project"
+
+    assert profile.can_be_edited_by?(project_administrator),"You can also ask by passing in a person"
   end
 
   test "me?" do
