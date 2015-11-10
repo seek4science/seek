@@ -22,7 +22,7 @@
 
 <div class="form-group">
   <%= f.label :country -%><br/>
-  <%= f.country_select :country, nil, {}, :class=>"form-control" -%>
+  <%= f.country_select :country, nil, { :include_blank => true }, :class=>"form-control" -%>
 </div>
 
 <%= f.submit(institution ? "Update" : "Create",:disable_with=>(institution ? "Updating..." : "Creating..."),
