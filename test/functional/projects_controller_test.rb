@@ -618,7 +618,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :admin, :id => project
     assert_response :success
 
-    new_institution = Institution.create(:title => 'a test institution')
+    new_institution = Institution.create(:title => 'a test institution', :country => 'Canada')
     put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
     assert_redirected_to project
     project.reload
