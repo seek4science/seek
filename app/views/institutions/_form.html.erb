@@ -1,28 +1,28 @@
 <%= f.error_messages -%>
 
 <div class="form-group">
-  <%= f.label :name -%><br/>
+  <%= f.label :name -%><span class="required">*</span>
   <%= f.text_field :title, :class=>"form-control" -%>
 </div>
 
 <div class="form-group">
-  <%= f.label :web_page -%><br/>
+  <%= f.label :web_page -%>
   <%= f.text_field :web_page, :class=>"form-control" -%>
 </div>
 
 <div class="form-group">
-  <%= f.label :address -%><br/>
+  <%= f.label :address -%>
   <%= f.text_area :address, :rows => 5, :class=>"form-control" -%>
 </div>
 
 <div class="form-group">
-  <%= f.label :city -%><br/>
+  <%= f.label :city -%>
   <%= f.text_field :city, :class=>"form-control" -%>
 </div>
 
 <div class="form-group">
-  <%= f.label :country -%><br/>
-  <%= f.country_select :country, nil, { :include_blank => true }, :class=>"form-control" -%>
+  <%= f.label :country -%><span class="required">*</span>
+  <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
 </div>
 
 <%= f.submit(institution ? "Update" : "Create",:disable_with=>(institution ? "Updating..." : "Creating..."),
