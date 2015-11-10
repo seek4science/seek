@@ -30,7 +30,8 @@ module Seek
       def filter_allowed_related_item_ids(item_ids, person)
         item_ids & person.projects.collect(&:id)
       end
-      #################
+
+      ####################################################################
 
       def self.define_extra_methods(base)
         role_names.each do |role|

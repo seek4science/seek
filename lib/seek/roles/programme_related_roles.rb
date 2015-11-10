@@ -50,8 +50,8 @@ module Seek
 
         def administered_programmes
           if is_admin?
-            #this is to force an ActiveRecord::Relation whereas .all just returns an Array, causing an error when trying to chain scopes etc
-            Programme.where('id = id')
+            #needs to return an ActiveRecord::Relation whereas .all just returns an Array, causing an error when trying to chain scopes etc
+            Programme.scoped
           else
             programmes_for_role('programme_administrator')
           end
