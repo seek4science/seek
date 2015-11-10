@@ -57,13 +57,13 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_title_trimmed
-    i=Institution.new(:title=>" an institution")
+    i=Institution.new(:title=>" an institution", :country => 'Ghana')
     i.save!
     assert_equal("an institution",i.title) 
   end
   
   def test_update_first_letter
-    i=Institution.new(:title=>"an institution")
+    i=Institution.new(:title=>"an institution", :country => 'Serbia')
     i.save
     assert_equal "A",i.first_letter
   end
