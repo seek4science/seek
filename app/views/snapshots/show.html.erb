@@ -1,0 +1,57 @@
+<% title = capture do %>
+    <%= @snapshot.title -%>
+    <small>(snapshot <%= @snapshot.snapshot_number -%>)</small>
+<% end %>
+<%= render :partial => "general/page_title", :locals => {:title => title, :buttons_partial => 'snapshots/buttons'} %>
+
+
+<div class="row">
+  <div class="col-md-9 col-sm-8">
+    <%= item_description @snapshot.description -%>
+    <p>
+      <strong>DOI:</strong>
+      <% if @snapshot.doi %>
+          <%= doi_link(@snapshot.doi) %>
+      <% else %>
+          <span class="none_text">None</span>
+      <% end %>
+    </p>
+
+    <p>
+      <strong>Zenodo URL:</strong>
+      <% if @snapshot.published_in_zenodo? %>
+          <%= link_to @snapshot.zenodo_record_url, @snapshot.zenodo_record_url %>
+      <% elsif @snapshot.in_zenodo? %>
+          <span class="none_text">Not yet published</span>
+      <% else %>
+          <span class="none_text">None</span>
+      <% end %>
+    </p>
+
+    <p><strong>Created at:</strong> <%= date_as_string(@snapshot.created_at, true) %></p>
+
+    <%= panel('Contents') do %>
+        <% @snapshot.metadata['studies'].each do |resource| %>
+            <%= render :partial => 'tree', locals: {resource: resource} %>
+        <% end %>
+    <% end %>
+
+    <%= panel('Fingerprints') do %>
+        <p style="font-style: italic">
+          These checksums allow you to check a Snapshot you have downloaded hasn't been modified. For details on how to use these please visit
+          <%= link_to "this guide","http://seek4science.github.io/seek/investigation_checksum.html",:target=>"blank" %>
+        </p>
+        <p>
+          <strong>MD5:</strong> <%= @snapshot.md5sum %>
+        </p>
+
+        <p>
+          <strong>SHA1:</strong> <%= @snapshot.sha1sum %>
+        </p>
+    <% end %>
+
+  </div>
+  <div class="col-md-3 col-sm-4">
+    <%= render :partial => "snapshots/snapshots", :locals => {:snapshots => @snapshot.resource.snapshots, :selected => @snapshot} %>
+  </div>
+</div>

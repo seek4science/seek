@@ -47,6 +47,6 @@
 
     <%= f.submit 'Start Run', :class => 'btn btn-primary' %>
     <% unless @run.embedded? %>
-        or <%= link_to 'Cancel', :back, :class => 'btn btn-default' %>
+        or <%= cancel_button(:back) %>
     <% end %>
 <% end %>

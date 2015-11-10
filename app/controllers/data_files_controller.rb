@@ -37,7 +37,7 @@ class DataFilesController < ApplicationController
           @data_file.destroy
         end
 
-        ActivityLog.create :action=>"create",:culprit=>User.current_user,:activity_loggable=>@presentation,:controller_name=>controller_name.downcase
+        ActivityLog.create :action=>"create",:culprit=>current_user,:activity_loggable=>@presentation,:controller_name=>controller_name.downcase
         flash[:notice]="#{t('data_file')} '#{@presentation.title}' is successfully converted to #{t('presentation')}"
         format.html { redirect_to presentation_path(@presentation) }
       else
@@ -99,10 +99,10 @@ class DataFilesController < ApplicationController
       @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
-        @data_file.creators = [current_user.person]
+        @data_file.creators = [current_person]
         create_content_blobs
         #send email to the file uploader and receiver
-        Mailer.file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host).deliver
+        Mailer.file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file).deliver
 
         flash.now[:notice] ="#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         render :text => flash.now[:notice]

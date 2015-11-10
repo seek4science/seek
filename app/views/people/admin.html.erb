@@ -2,42 +2,38 @@
 
 <h1>Administer Person: <%= link_to @person.name, person_path(@person) -%></h1>
 
-<div class="show_basic">
-  <%= form_for @person, :url => {:action => 'administer_update', :id => @person.id} do |f| -%>
-      <% if admin_logged_in? || project_manager_logged_in? -%>
-          
-          <% unless (project_manager_logged_in? && @person.me?) %>
-            <h2 style="margin-top: 1.5em;">Choose <%= t('project') %> / Institution&nbsp;&nbsp;&nbsp;</h2>
-            <%= render :partial => "work_groups", :locals=> {:person => @person} -%>
-          <% end %>
+<%= form_for @person, :url => {:action => 'administer_update', :id => @person.id} do |f| -%>
+    <% unless (project_administrator_logged_in? && @person.me?) %>
+        <%= panel("#{t('project')} / Institution Memberships", :id => 'work_groups') do %>
+            <%= render :partial => "work_groups", :locals => { :person => @person } -%>
+        <% end %>
+    <% end %>
+    <% if admin_logged_in? || @person.is_project_administered_by?(User.current_user) %>
+        <%= panel("Administrative Roles") do %>
+            <div class="row">
+              <div class="col-md-6 col-md-push-6">
+                <div class="alert alert-info">
+                  <p>
+                    These are the roles that can be assigned to a person by an administrator to allow this person to carry out specific tasks within that role.
+                    Each role is associated with, and only applies to, a particular <%= t('Project').downcase.html_safe %>.
+                  </p>
+                  <p>
+                    <strong>Note</strong> that if new projects are added to this person (above), they will
+                    need to be saved before the <%= t('Project').downcase.pluralize.html_safe %> you can associate with a role are available.
+                    If the person is removed from a <%= t('Project').downcase.html_safe %> then the role will also be automatically removed.
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-6 col-md-pull-6">
+                <% admin_defined_project_roles_hash.each do |role, role_title| %>
+                    <%= render :partial => "roles_selector", :locals => {:role => role, :role_title => role_title} -%>
+                    <hr/>
+                <% end %>
+              </div>
+            </div>
+        <% end %>
+    <% end %>
 
-          <p style="line-height: 1.8;">
-
-            <% if admin_logged_in? %>
-                    <h2>Administer defined roles</h2>
-                    <p class="box_infotext">
-                      These are the roles that can be assigned to a person by an Adminster, to allow this person to carry out specific tasks within that role. Each role is
-                      associated with, and only applies to, a particular <%= t('Project').downcase.html_safe %>.
-                      <br/><strong>Note</strong> that if new projects are added to this person (above), they will
-                      need to be saved before the <%= t('Project').downcase.pluralize.html_safe %> you can associate with a role are available. If the person is removed from a <%= t('Project').downcase.html_safe %> then the role will also be automatically removed.
-                    </p>
-                    <br/>
-                    <%
-                       roles = [["pal", "a PAL"], ["project_manager", "a Project Manager"], ["asset_manager", "an Asset Manager"], ["gatekeeper", "a Gatekeeper"]]
-                       roles.each do |role|
-                    %>
-                        <%= render :partial => "roles_selector", :locals => {:role => role[0], :role_title => role[1]} -%>
-                        <%= tag("hr")  %>
-                    <%
-                       end
-                    %>
-            <% end %>
-          </p>
-      <% end -%>
-      <p style="margin-top: 2em; text-align: center;">
-        <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateWorkGroupIds()") -%>
-        or <%= link_to 'Cancel', person_path(@person.id) -%>
-      </p>
-
-  <% end -%>
-</div>
+    <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateWorkGroupIds()", :class => 'btn btn-primary   ') -%>
+    or <%= cancel_button(person_path(@person.id)) -%>
+<% end -%>

@@ -1,25 +1,23 @@
 source 'https://rubygems.org'
 
-gem "rails", "3.2.21"
+gem "rails", "3.2.22"
 gem "rdoc"
 
 gem "feedjira","~>1"
 gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
-gem 'ruby-openid'
-gem 'rack-openid'
 gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
 gem 'uuid',"~>2.3"
 gem "RedCloth","4.2.9"
 gem 'simple-spreadsheet-extractor',"~>0.15.0"
-gem "rmagick","2.14.0", :require => 'rmagick'
+gem "rmagick","2.15.2"
 gem "mysql2"
 gem 'rest-client'
 gem 'factory_girl', "2.6.4"
 gem 'rubyzip', "~> 1.1.4"
 gem 'bio'
-gem 'sunspot_rails',"~>2.1.0"
-gem 'sunspot_solr',"~>2.1.0"
+gem 'sunspot_rails',"~>2.2.0"
+gem 'sunspot_solr',"~>2.2.0"
 gem 'savon',"1.1.0"
 gem "dynamic_form"
 gem "prototype-rails"
@@ -66,19 +64,17 @@ gem 'piwik_analytics',:git=>"https://github.com/SysMO-DB/piwik-ruby-tracking.git
 gem 'my_savage_beast', :git => "https://github.com/SysMO-DB/my_savage_beast"
 gem 'redbox', :git=>"https://github.com/SysMO-DB/redbox"
 gem "my_responds_to_parent", :git => "https://github.com/SysMO-DB/my_responds_to_parent.git"
-gem 'site_announcements', :git => "https://github.com/SysMO-DB/site_announcements.git"
-gem 'open_id_authentication', :git => "https://github.com/SysMO-DB/open_id_authentication.git"
 gem 'bioportal',">=2.2"
-
 gem 'acts_as_activity_logged', :git => "https://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_trashable',:git=> "https://github.com/SysMO-DB/acts_as_trashable.git"
 gem "app_version", :git => "https://github.com/SysMO-DB/app_version.git"
 gem 'doi_query_tool', :git => "https://github.com/SysMO-DB/doi_query_tool.git"
 gem 'convert_office',:git=>"https://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
-gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage"
+gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage", :ref=>"bb1182f2716a9bf1b5d85e186d8bb7eec436797b"
 gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
 
+gem 'site_announcements'
 gem 'taverna-t2flow'
 gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :branch => 'list-inputs', :ref=>"b36e19c85b7a58d08a73aa418c0f838442c6dfd3"
 gem 'jquery-rails', '~> 3'
@@ -88,7 +84,7 @@ gem 'metainspector'
 gem 'mechanize'
 gem 'mimemagic'
 
-gem 'datacite_doi_ify'
+gem 'datacite_doi_ify', '~>1.1.0'
 
 gem 'bootstrap-sass', '3.1.1.0'
 gem 'sass-rails', '>= 3.2'
@@ -96,7 +92,11 @@ gem 'sass-rails', '>= 3.2'
 gem 'ro-bundle'
 gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
+gem 'bootstrap-multiselect-rails'
 gem 'handlebars_assets'
+gem "zenodo-client", :git=>"https://github.com/seek4science/zenodo-client.git"
+
+gem 'unicorn-rails'
 
 group :assets do
   gem 'turbo-sprockets-rails3'
@@ -115,7 +115,6 @@ group :development do
   gem "rubocop",:require=>false
   gem "rubycritic",:require=>false
   gem "guard-rubycritic",:require=>false
-  gem 'unicorn-rails'
   gem 'rails_best_practices'
 end
 
@@ -130,4 +129,9 @@ group :test do
   gem 'rspec-rails'
   gem 'sunspot_matchers'
   gem 'pg'
+  gem 'teaspoon'
+  gem "teaspoon-mocha"
+  gem "magic_lamp"
+  gem 'database_cleaner'
+  gem 'selenium-webdriver'
 end

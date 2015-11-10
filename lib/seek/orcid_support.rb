@@ -1,39 +1,28 @@
-module Seek::OrcidSupport
-  extend ActiveSupport::Concern
+module Seek
+  module OrcidSupport
+    extend ActiveSupport::Concern
 
-  included do
-    validate :orcid_id_must_be_valid_or_blank
-  end
-
-  def orcid_id_must_be_valid_or_blank
-    unless orcid.blank? || valid_orcid_id?(orcid.gsub('http://orcid.org/', ''))
-      errors.add('Orcid identifier', " isn't a valid ORCID identifier.")
+    included do
+      # Validate orcid is present only on create, and only if config says so
+      validates :orcid, presence: true, on: :create, if: Proc.new { Seek::Config.orcid_required }
+      # If the orcid is there, validate its format
+      validates :orcid, orcid: true, allow_blank: true
+      # Store in full "http://orcid.org/..." format
+      before_save :format_orcid
     end
-  end
 
-  # checks the structure of the id, and whether is conforms to ISO/IEC 7064:2003
-  def valid_orcid_id?(id)
-    if id =~ /[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9,X]{4}/
-      id = id.gsub('-', '')
-      id[15] == orcid_checksum(id)
-    else
-      false
+    def orcid_uri
+      unless orcid.blank?
+        uri = orcid
+        uri = "http://orcid.org/#{uri}" unless uri.start_with?('http://orcid.org/')
+        uri
+      end
     end
-  end
 
-  # calculating the checksum according to ISO/IEC 7064:2003, MOD 11-2 ; see - http://support.orcid.org/knowledgebase/articles/116780-structure-of-the-orcid-identifier
-  def orcid_checksum(id)
-    total = 0
-    (0...15).each { |x| total = (total + id[x].to_i) * 2 }
-    remainder = total % 11
-    result = (12 - remainder) % 11
-    result == 10 ? 'X' : result.to_s
-  end
+    private
 
-  def orcid_uri
-    if uri = orcid
-      uri = "http://orcid.org/#{uri}" unless uri.start_with?('http://orcid.org/')
-      uri
+    def format_orcid
+      self.orcid = orcid_uri
     end
   end
 end

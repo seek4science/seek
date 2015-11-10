@@ -3,40 +3,6 @@ require 'net/ftp'
 module Seek
   module DownloadHandling
     module DataDownload
-      #MERGENOTE - replace this with check_url_response_code from upload_handling
-      def url_response_code asset_url
-        url = URI.parse(URI.encode(asset_url.strip))
-        code=""
-        begin
-          if (["http","https"].include?(url.scheme))
-            http =  Net::HTTP.new(url.host, url.port)
-            http.use_ssl=true if url.scheme=="https"
-            http.start do |http|
-              code = http.head(url.request_uri).code
-            end
-          elsif (url.scheme=="ftp")
-            username = 'anonymous'
-            password = nil
-            username, password = url.userinfo.split(/:/) if url.userinfo
-
-            ftp = Net::FTP.new(url.host)
-            ftp.login(username,password)
-            ftp.getbinaryfile(url.path, '/dev/null', 20) { break }
-            ftp.close
-            code="200"
-          else
-            raise Seek::IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")
-          end
-        rescue Net::FTPPermError
-          code="401"
-        rescue Errno::ECONNREFUSED,SocketError,Errno::EHOSTUNREACH
-          #FIXME:also using 404 for uknown host, which wouldn't actually really be a http response code
-          #indicating that using response codes is not the best approach here.
-          code="404"
-        end
-
-        return code
-      end
 
       def download
         if self.controller_name=="models"
@@ -48,7 +14,6 @@ module Seek
 
       #current model is the only type with multiple content-blobs, this may change in the future
       def download_model
-
         @model.just_used
 
         handle_download_zip @display_model
@@ -66,22 +31,7 @@ module Seek
         disposition = params[:disposition] || 'attachment'
 
         respond_to do |format|
-          format.html {handle_download disposition}
-        end
-      end
-
-      def show_via_url asset, content_blob=nil
-        content_blob = content_blob.nil? ? asset.content_blob : content_blob
-        code = url_response_code(content_blob.url)
-        if (["301","302", "401"].include?(code))
-          redirect_to(content_blob.url, :target=>"_blank")
-        elsif code=="404"
-          flash[:error]="This item is referenced at a remote location, which is currently unavailable"
-          redirect_to polymorphic_path(asset.parent, {:version=>asset.version})
-        else
-          downloader=Seek::RemoteDownloader.new
-          data_hash = downloader.get_remote_data content_blob.url
-          send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || content_blob.original_filename, :content_type => data_hash[:content_type] || content_blob.content_type, :disposition => 'inline'
+          format.html { handle_download(disposition) }
         end
       end
 
@@ -101,13 +51,6 @@ module Seek
             filename = check_and_rename_file files_to_download.keys, content_blob.original_filename
             files_to_download["#{filename}"] = content_blob.filepath
             content_type = content_blob.content_type
-          elsif !content_blob.url.nil?
-            downloader=Seek::RemoteDownloader.new
-            data_hash = downloader.get_remote_data content_blob.url, nil, nil, nil, true
-            original_filename = get_filename data_hash[:filename], content_blob.original_filename
-            filename = check_and_rename_file files_to_download.keys, original_filename
-            files_to_download["#{filename}"] = data_hash[:data_tmp_path]
-            content_type = data_hash[:content_type] || content_blob.content_type
           end
         end
 
@@ -141,7 +84,7 @@ module Seek
       end
 
       def tmp_zip_file_dir
-        if Rails.env=="test"
+        if Rails.env.test?
           dir = File.join(Dir.tmpdir,"seek-tmp","zip-files")
         else
           dir = File.join(Rails.root,"tmp","zip-files")

@@ -27,17 +27,17 @@ module Seek
 
         grouped_pagination
 
-        include Seek::ActsAsISA::InstanceMethods
+        include Seek::ActsAsISA::Relationships::Associations
 
+        include Seek::ActsAsISA::InstanceMethods
         include Seek::Stats::ActivityCounts
         include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
         include Seek::Subscribable
         include Seek::ResearchObjects::Packaging
         include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-        class_eval do
-          extend Seek::ActsAsISA::SingletonMethods
-        end
+        extend Seek::ActsAsISA::SingletonMethods
+
       end
 
       def is_isa?
@@ -50,14 +50,13 @@ module Seek
       def user_creatable?
         true
       end
+      def can_create?
+        User.logged_in_and_member?
+      end
     end
 
     module InstanceMethods
-      def related_people
-        peeps = [contributor.try(:person)]
-        peeps << person_responsible if self.respond_to?(:person_responsible)
-        peeps.uniq.compact
-      end
+      include Seek::ActsAsISA::Relationships::InstanceMethods
     end
   end
 end

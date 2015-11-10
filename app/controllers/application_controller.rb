@@ -15,6 +15,8 @@ class ApplicationController < ActionController::Base
 
   before_filter :log_extra_exception_data
 
+  #if the logged in user is currently partially registered, force the continuation of the registration process
+  before_filter :partially_registered?
 
   after_filter :log_event
 
@@ -23,8 +25,6 @@ class ApplicationController < ActionController::Base
   around_filter :with_current_user
 
   rescue_from "ActiveRecord::RecordNotFound", :with=>:render_not_found_error
-
-  before_filter :profile_for_login_required
 
   before_filter :project_membership_required,:only=>[:create,:new]
 
@@ -37,6 +37,14 @@ class ApplicationController < ActionController::Base
     User.with_current_user current_user do
       yield
     end
+  end
+
+  def current_person
+    current_user.try(:person)
+  end
+
+  def partially_registered?
+    redirect_to register_people_path if (current_user && !current_user.registration_complete?)
   end
 
   def strip_root_for_xml_requests
@@ -58,18 +66,6 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
-  
-  #Overridden from restful_authentication
-  #Does a second check that there is a profile assigned to the user, and if not goes to the profile
-  #selection page (GET people/select)
-  def authorized?
-    if super
-      redirect_to(select_people_path) if current_user.person.nil?
-      true
-    else
-      false
-    end
-  end
 
   def is_current_user_auth
     begin
@@ -90,14 +86,7 @@ class ApplicationController < ActionController::Base
       error("Admin rights required", "is invalid (not admin)")
       return false
     end
-    return true
-  end
-
-  def is_admin_or_is_project_manager
-    unless User.admin_or_project_manager_logged_in?
-      error("You do not have the permission", "Not admin or #{t('project')} manager")
-      return false
-    end
+    true
   end
 
   def can_manage_announcements?
@@ -107,7 +96,6 @@ class ApplicationController < ActionController::Base
   def logout_user
     current_user.forget_me if logged_in?
     cookies.delete :auth_token
-    cookies.delete :open_id
     reset_session
   end
 
@@ -131,7 +119,7 @@ class ApplicationController < ActionController::Base
       authorized_resources = clazz.authorized_partial_asset_collection(resources,"view")
     elsif resource_type == 'Project' || resource_type == 'Institution'
       authorized_resources = resources
-    elsif resource_type == "Person" && Seek::Config.is_virtualliver && User.current_user.nil?
+    elsif resource_type == "Person" && Seek::Config.is_virtualliver && current_user.nil?
       authorized_resources = []
     else
       authorized_resources = resources.select &:can_view?
@@ -175,8 +163,8 @@ class ApplicationController < ActionController::Base
             path = nil
             begin
               path = eval("main_app.#{controller_name}_path")
-            rescue Exception=>e
-              logger.error("No path found for controller - #{controller_name}",e)
+            rescue NoMethodError => e
+              logger.error("No path found for controller - #{controller_name}")
               path = main_app.root_path
             end
             redirect_to path
@@ -204,8 +192,8 @@ class ApplicationController < ActionController::Base
       error("Type management disabled", "...")
       return false
     end
-    if User.current_user
-      if User.current_user.can_manage_types?
+    if current_user
+      if current_user.can_manage_types?
         return true
       else
         error("Admin rights required to manage types", "...")
@@ -228,13 +216,8 @@ class ApplicationController < ActionController::Base
     params
   end
 
-  def currently_logged_in
-    current_user.person
-  end
-
   def error(notice, message)
     flash[:error] = notice
-     (err = User.new.errors).add(:id, message)
 
     respond_to do |format|
       format.html { redirect_to root_url }
@@ -244,13 +227,6 @@ class ApplicationController < ActionController::Base
   #required for the Savage Beast
   def admin?
     User.admin_logged_in?
-  end
-
-  def profile_for_login_required
-    if User.logged_in? && !User.logged_in_and_registered?
-      flash[:notice]="You have successfully registered your account, but now must select a profile, or create your own."
-      redirect_to main_app.select_people_path
-    end
   end
 
   def translate_action action_name
@@ -304,7 +280,7 @@ class ApplicationController < ActionController::Base
 
     return if action.nil?
 
-    object = name.camelize.constantize.find(params[:id])
+    object = self.controller_name.classify.constantize.find(params[:id])
 
     if is_auth?(object, action)
       eval "@#{name} = object"
@@ -314,7 +290,7 @@ class ApplicationController < ActionController::Base
         format.html do
           case action
             when 'publish', 'manage', 'edit', 'download', 'delete'
-              if User.current_user.nil?
+              if current_user.nil?
                 flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
               else
                 flash[:error] = "You are not authorized to #{action} this #{name.humanize}."
@@ -328,6 +304,13 @@ class ApplicationController < ActionController::Base
         format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
         format.json { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
       end
+      return false
+    end
+  end
+
+  def auth_to_create
+    unless self.controller_name.classify.constantize.can_create?
+      error("You do not have permission", "No permission")
       return false
     end
   end
@@ -359,89 +342,101 @@ class ApplicationController < ActionController::Base
   end
 
   def log_event
+    #FIXME: why is needed to wrap in this block when the around filter already does ?
     User.with_current_user current_user do
-      c = self.controller_name.downcase
-      a = self.action_name.downcase
+      controller_name = self.controller_name.downcase
+      action = self.action_name.downcase
 
-      object = eval("@"+c.singularize)
+      object = object_for_request
 
-      object=current_user if c=="sessions" #logging in and out is a special case
+      object=current_user if controller_name=="sessions" #logging in and out is a special case
 
       #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
-      return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
+      return if object_invalid_or_unsaved?(object)
 
-      case c
+      case controller_name
         when "sessions"
-          if ["create", "destroy"].include?(a)
-            ActivityLog.create(:action => a,
+          if ["create", "destroy"].include?(action)
+            ActivityLog.create(:action => action,
                                :culprit => current_user,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :activity_loggable => object,
                                :user_agent => request.env["HTTP_USER_AGENT"])
           end
         when "sweeps", "runs"
-          if ["show", "update", "destroy", "download"].include?(a)
+          if ["show", "update", "destroy", "download"].include?(action)
             ref = object.projects.first
-          elsif a == "create"
+          elsif action == "create"
             ref = object.workflow
           end
 
-          check_log_exists(a, c, object)
-          ActivityLog.create(:action => a,
+          check_log_exists(action, controller_name, object)
+          ActivityLog.create(:action => action,
                              :culprit => current_user,
                              :referenced => ref,
-                             :controller_name => c,
+                             :controller_name => controller_name,
                              :activity_loggable => object,
                              :data => object.title,
                              :user_agent => request.env["HTTP_USER_AGENT"])
           break
         when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
-          a = "create" if a == "upload_for_tool"
-          a = "update" if a == "new_version"
-          a = "inline_view" if a == "explore"
-          if ["show", "create", "update", "destroy", "download", "inline_view"].include?(a)
-            check_log_exists(a, c, object)
-            ActivityLog.create(:action => a,
+          action = "create" if action == "upload_for_tool"
+          action = "update" if action == "new_version"
+          action = "inline_view" if action == "explore"
+          if ["show", "create", "update", "destroy", "download", "inline_view"].include?(action)
+            check_log_exists(action, controller_name, object)
+            ActivityLog.create(:action => action,
                                :culprit => current_user,
                                :referenced => object.projects.first,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :activity_loggable => object,
                                :data => object.title,
                                :user_agent => request.env["HTTP_USER_AGENT"])
           end
         when "people"
-          if ["show", "create", "update", "destroy"].include?(a)
-            ActivityLog.create(:action => a,
+          if ["show", "create", "update", "destroy"].include?(action)
+            ActivityLog.create(:action => action,
                                :culprit => current_user,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :activity_loggable => object,
                                :data => object.title,
                                :user_agent => request.env["HTTP_USER_AGENT"])
           end
         when "search"
-          if a=="index"
+          if action=="index"
             ActivityLog.create(:action => "index",
                                :culprit => current_user,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :user_agent => request.env["HTTP_USER_AGENT"],
                                :data => {:search_query => object, :result_count => @results.count})
           end
         when "content_blobs"
-          a = "inline_view" if a=="view_pdf_content"
-          if a=="inline_view" || (a=="download" && params['intent'].to_s != 'inline_view')
+          action = "inline_view" if action=="view_pdf_content"
+          if action=="inline_view" || (action=="download" && params['intent'].to_s != 'inline_view')
             activity_loggable = object.asset
-            ActivityLog.create(:action => a,
+            ActivityLog.create(:action => action,
                                :culprit => current_user,
                                :referenced => object,
-                               :controller_name => c,
+                               :controller_name => controller_name,
                                :activity_loggable => activity_loggable,
                                :user_agent => request.env["HTTP_USER_AGENT"],
                                :data => activity_loggable.title)
           end
       end
 
-      expire_activity_fragment_cache(c, a)
+      expire_activity_fragment_cache(controller_name, action)
     end
+  end
+
+  def object_invalid_or_unsaved?(object)
+    object.nil? || (object.respond_to?('new_record?') && object.new_record?) || (object.respond_to?('errors') && !object.errors.empty?)
+  end
+
+  #determines and returns the object related to controller, e.g. @data_file
+  def object_for_request
+    c = controller_name.downcase
+
+    eval('@' + c.singularize)
   end
 
   def expire_activity_fragment_cache(controller,action)
@@ -451,7 +446,7 @@ class ApplicationController < ActionController::Base
         expire_download_activity
       elsif action=="create" && controller!="sessions"
         expire_create_activity
-      elsif action=="destroy"
+      elsif action=="destroy" && controller!="sessions"
         expire_create_activity
         expire_download_activity
       elsif action=="update" && @@auth_types.include?(controller) #may have had is permission changed

@@ -1,28 +1,28 @@
 <% avatar_for_object = eval("#{@avatar_for}.find(#{@avatar_for_id})") -%>
-<h1>Upload <%= @avatar_for.humanize -%> Picture: <%= link_to avatar_for_object.title, url_for(avatar_for_object) -%></h1>
+<h1>Upload <%= @avatar_for.humanize -%>
+  Picture: <%= link_to avatar_for_object.title, url_for(avatar_for_object) -%></h1>
 
 <%= error_messages_for :avatar -%>
 
 <%= form_tag({:action => :create}, :multipart => true) do %>
 
-  <%= hidden_field_tag(:owner_type, @avatar_for ) -%>
-  <%= hidden_field_tag(:owner_id, @avatar_for_id ) -%>
-  <%= hidden_field_tag(:return_to, params[:return_to] ? params[:return_to] : eval("#{@avatar_for.downcase}_avatars_path(#{@avatar_for_id})")) -%>
-  <br/>
-	<p>
-    <center>
+    <%= hidden_field_tag(:owner_type, @avatar_for) -%>
+    <%= hidden_field_tag(:owner_id, @avatar_for_id) -%>
+    <%= hidden_field_tag(:return_to, params[:return_to] ? params[:return_to] : eval("#{@avatar_for.downcase}_avatars_path(#{@avatar_for_id})")) -%>
+    <br/>
+    <p>
+
       <b>Picture file: </b>
       <br/>
-	  <h2><%= file_field 'avatar', 'image_file' %></h2>
-	</center>
-  </p>
-	
-  <br/>
-  
-  <p>
-  	<center>
-      <%= submit_tag "Upload", :disable_with => "Uploading..." %>
-	    or <%= link_to "Cancel", params[:return_to] ? params[:return_to] : eval("#{@avatar_for.downcase}_avatars_path(#{@avatar_for_id})") -%>
-	</center>
-  </p>
+      <%= file_field 'avatar', 'image_file' %>
+    </p>
+
+    <br/>
+
+    <p>
+
+    <%= submit_tag "Upload", :disable_with => "Uploading...", :class => "btn btn-primary" %>
+    or <%= cancel_button(params[:return_to] ? params[:return_to] : eval("#{@avatar_for.downcase}_avatars_path(#{@avatar_for_id})")) -%>
+
+    </p>
 <% end %>

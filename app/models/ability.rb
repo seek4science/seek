@@ -15,7 +15,7 @@ class Ability
     person = user.try(:person)
     if person
       person.projects.each do |proj|
-        person.roles(proj).each do |role|
+        person.roles_for_project(proj).each do |role|
           send(role, person)
         end
       end
@@ -36,15 +36,17 @@ class Ability
 
   end
 
-  def project_manager project_manager
+  def project_administrator project_administrator
 
   end
 
   #asset manager can manage the assets belonging to their project
   def asset_manager asset_manager
-     can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
-        asset_manager.is_asset_manager_of?(item)
-     end
+    can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
+      person = item.contributor.is_a?(Person) ? item.contributor : item.contributor.person
+      asset_manager.is_asset_manager_of?(item) &&
+          (item.projects - person.former_projects).none?
+    end
   end
 
   #gatekeeper can publish the assets belonging to their project if as well can manage or the item is waiting for his approval

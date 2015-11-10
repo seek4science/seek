@@ -21,9 +21,9 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
 
     new_parent_proj = Factory :project
     @proj_child1.parent_id = new_parent_proj.id
-    @proj_child1.save
+    disable_authorization_checks{@proj_child1.save!}
     @proj_child2.parent_id = new_parent_proj.id
-    @proj_child2.save
+    disable_authorization_checks{@proj_child2.save!}
     person.reload
 
     assert !person.project_subscriptions.map(&:project).include?(@proj)

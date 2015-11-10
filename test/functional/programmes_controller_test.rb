@@ -4,6 +4,11 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
+  #this is needed to ensure the first user exists as admin, to stop it being automatically created as no fixtures are used.
+  def setup
+    Factory(:admin)
+  end
+
   #for now just admins can create programmes, later we will change this
   test "new page accessible admin" do
     login_as(Factory(:admin))
@@ -11,11 +16,35 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "new page not accessible to non admin" do
+  test "new page works even when no programme-less projects" do
+    programme = Factory(:programme)
+    work_group = Factory(:work_group, :project => programme.projects.first)
+    admin = Factory(:admin, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+
+    Project.without_programme.delete_all
+
+    login_as(admin)
+    get :new
+    assert_response :success
+  end
+
+  test "new page accessible to non admin" do
     login_as(Factory(:person))
     get :new
+    assert_response :success
+  end
+
+  test "new page accessible to projectless user" do
+    p = Factory(:person_not_in_project)
+    login_as(p)
+    assert p.projects.empty?
+    get :new
+    assert_response :success
+  end
+
+  test "new page not accessible to logged out user" do
+    get :new
     assert_redirected_to :root
-    refute_nil flash[:error]
   end
 
   test "only admin can destroy" do
@@ -28,7 +57,7 @@ class ProgrammesControllerTest < ActionController::TestCase
       delete :destroy,:id=>prog.id
     end
     refute_nil flash[:error]
-    assert_redirected_to :root
+    assert_redirected_to prog
     proj.reload
     assert_equal prog,proj.programme
   end
@@ -48,7 +77,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_nil proj.programme_id
   end
 
-  test "update" do
+  test "admin can update" do
     login_as(Factory(:admin))
     prog = Factory(:programme,:description=>"ggggg")
     put :update, :id=>prog, :programme=>{:title=>"fish"}
@@ -59,39 +88,193 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal "ggggg",prog.description
   end
 
+  test "programme administrator can update" do
+    person = Factory(:person)
+    login_as(person)
+    prog = Factory(:programme,:description=>"ggggg")
+    person.is_programme_administrator=true,prog
+    disable_authorization_checks{person.save!}
+    put :update, :id=>prog, :programme=>{:title=>"fish"}
+    prog = assigns(:programme)
+    refute_nil prog
+    assert_redirected_to prog
+    assert_equal "fish",prog.title
+    assert_equal "ggggg",prog.description
+  end
+
+  test "normal user cannot update" do
+    login_as(Factory(:person))
+    prog = Factory(:programme,:description=>"ggggg",:title=>"eeeee")
+    put :update, :id=>prog, :programme=>{:title=>"fish"}
+    assert_redirected_to prog
+    assert_equal "eeeee",prog.title
+    assert_equal "ggggg",prog.description
+  end
+
+  test "programme administrator can add new administrators, but not remove themself" do
+    pa = Factory(:programme_administrator)
+    login_as(pa)
+    prog = pa.programmes.first
+    p1 = Factory(:person)
+    p2 = Factory(:person)
+    p3 = Factory(:person)
+
+    assert pa.is_programme_administrator?(prog)
+    refute p1.is_programme_administrator?(prog)
+    refute p2.is_programme_administrator?(prog)
+    refute p3.is_programme_administrator?(prog)
+
+    ids = [p1.id,p2.id].join(",")
+    put :update, :id=>prog,:programme=>{:administrator_ids=>ids}
+
+    assert_redirected_to prog
+
+    pa.reload
+    p1.reload
+    p2.reload
+    p3.reload
+
+    assert pa.is_programme_administrator?(prog)
+    assert p1.is_programme_administrator?(prog)
+    assert p2.is_programme_administrator?(prog)
+    refute p3.is_programme_administrator?(prog)
+
+  end
+
+  test "admin can add new administrators, and not remove themself" do
+    admin = Factory(:programme_administrator)
+    admin.is_admin=true
+    disable_authorization_checks{admin.save!}
+    login_as(admin)
+    prog = admin.programmes.first
+    p1 = Factory(:person)
+    p2 = Factory(:person)
+    p3 = Factory(:person)
+
+    assert admin.is_programme_administrator?(prog)
+    refute p1.is_programme_administrator?(prog)
+    refute p2.is_programme_administrator?(prog)
+    refute p3.is_programme_administrator?(prog)
+
+    ids = [p1.id,p2.id].join(",")
+    put :update, :id=>prog,:programme=>{:administrator_ids=>ids}
+
+    assert_redirected_to prog
+
+    admin.reload
+    p1.reload
+    p2.reload
+    p3.reload
+
+    refute admin.is_programme_administrator?(prog)
+    assert p1.is_programme_administrator?(prog)
+    assert p2.is_programme_administrator?(prog)
+    refute p3.is_programme_administrator?(prog)
+  end
+
   test "edit page accessible to admin" do
     login_as(Factory(:admin))
     p = Factory(:programme)
     Factory(:avatar,:owner=>p)
     get :edit, :id=>p
     assert_response :success
-
   end
 
-  test "edit page not accessible to non-admin" do
+  test "edit page not accessible to user" do
     login_as(Factory(:person))
     p = Factory(:programme)
     get :edit, :id=>p
-    assert_redirected_to :root
+    assert_redirected_to p
     refute_nil flash[:error]
+  end
+
+  test "edit page accessible to programme_administrator" do
+    person = Factory(:person)
+    login_as(person)
+    p = Factory(:programme)
+    person.is_programme_administrator=true,p
+    disable_authorization_checks{person.save!}
+    get :edit, :id=>p
+    assert_response :success
   end
 
   test "should show index" do
     p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
     avatar = Factory(:avatar,:owner=>p)
     p.avatar = avatar
-    p.save!
+    disable_authorization_checks{p.save!}
     Factory(:programme)
 
     get :index
     assert_response :success
   end
 
+  test "index should not show inactivated except for admin and programme admin" do
+    login_as(Factory(:admin))
+    programme_admin = Factory(:person)
+    p1 = Factory(:programme,title:'activated programme')
+    p2 = Factory(:programme,title:'not activated programme')
+    p2.is_activated=false
+    p2.save!
+
+    p3 = Factory(:programme,title:'not activated or with programme administrator')
+    p3.is_activated=false
+    p3.save!
+
+    programme_admin.is_programme_administrator=true,p2
+    programme_admin.save!
+    programme_admin = Person.find(programme_admin.id)
+
+    assert p1.is_activated?
+    refute p2.is_activated?
+    refute p3.is_activated?
+
+    refute programme_admin.is_programme_administrator?(p1)
+    assert programme_admin.is_programme_administrator?(p2)
+    refute programme_admin.is_programme_administrator?(p3)
+
+    assert_includes programme_admin.administered_programmes,p2
+
+    logout
+
+    get :index
+    assert_response :success
+    assert_select "a[href=?]",programme_path(p1),text:p1.title,count:1
+    assert_select "a[href=?]",programme_path(p2),text:p2.title,count:0
+    assert_select "a[href=?]",programme_path(p3),text:p3.title,count:0
+
+    login_as(Factory(:person))
+    get :index
+    assert_response :success
+    assert_select "a[href=?]",programme_path(p1),text:p1.title,count:1
+    assert_select "a[href=?]",programme_path(p2),text:p2.title,count:0
+    assert_select "a[href=?]",programme_path(p3),text:p3.title,count:0
+    logout
+
+    login_as(Factory(:admin))
+    get :index
+    assert_response :success
+    assert_select "a[href=?]",programme_path(p1),text:p1.title,count:1
+    assert_select "a[href=?]",programme_path(p2),text:p2.title,count:1
+    assert_select "a[href=?]",programme_path(p3),text:p3.title,count:1
+    logout
+
+    login_as(programme_admin)
+    get :index
+    assert_response :success
+    assert_select "a[href=?]",programme_path(p1),text:p1.title,count:1
+    assert_select "a[href=?]",programme_path(p2),text:p2.title,count:1
+    assert_select "a[href=?]",programme_path(p3),text:p3.title,count:0
+    logout
+
+
+  end
+
   test "should get show" do
     p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
     avatar = Factory(:avatar,:owner=>p)
     p.avatar = avatar
-    p.save!
+    disable_authorization_checks{p.save!}
 
     get :show,:id=>p
     assert_response :success
@@ -101,7 +284,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     p = Factory(:programme,:projects=>[Factory(:project),Factory(:project)])
     avatar = Factory(:avatar,:owner=>p)
     p.avatar = avatar
-    p.save!
+    disable_authorization_checks{p.save!}
     login_as(Factory(:admin))
     put :update, :id=>p, :programme=>{:avatar_id=>"0"}
     prog = assigns(:programme)
@@ -192,5 +375,319 @@ class ProgrammesControllerTest < ActionController::TestCase
       assert_select "li",:text=>/Title can.*t be blank/,:count=>1
     end
   end
+
+  test "user can create programme, and becomes programme administrator" do
+    p = Factory(:person)
+    login_as(p)
+    assert_difference("Programme.count") do
+      assert_emails(1) do #activation email
+        post :create, :programme=>{:title=>"A programme"}
+      end
+    end
+    prog = assigns(:programme)
+    assert_redirected_to prog
+    p.reload
+    assert p.is_programme_administrator?(prog)
+  end
+
+  test "admin doesn't become programme administrator by default" do
+    p = Factory(:admin)
+    login_as(p)
+    assert_difference("Programme.count") do
+      assert_emails(0) do #no email for admin creation
+        post :create, :programme=>{:title=>"A programme"}
+      end
+    end
+    prog = assigns(:programme)
+    assert_redirected_to prog
+    p.reload
+    refute p.is_programme_administrator?(prog)
+  end
+
+  test "logged out user cannot create" do
+    assert_no_difference("Programme.count") do
+      post :create, :programme=>{:title=>"A programme"}
+    end
+    assert_redirected_to :root
+  end
+
+  test "activation review available to admin" do
+    programme = Factory(:programme)
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(Factory(:admin))
+    get :activation_review,:id=>programme
+    assert_response :success
+    assert_nil flash[:error]
+  end
+
+  test "activation review not available none admin" do
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(person)
+    get :activation_review,:id=>programme
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test "activation review not available if active" do
+    programme = Factory(:programme)
+    login_as(Factory(:admin))
+    programme.activate
+    assert programme.is_activated?
+    get :activation_review,:id=>programme
+    assert_redirected_to :root
+    refute_nil flash[:error]
+  end
+
+  test 'accept_activation' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(Factory(:admin))
+
+    assert_emails(1) do
+      put :accept_activation, :id=>programme
+    end
+
+    assert_redirected_to programme
+    refute_nil flash[:notice]
+    assert_nil flash[:error]
+    programme.reload
+    assert programme.is_activated?
+  end
+
+  test 'no accept_activation for none admin' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(programme_administrator)
+
+    assert_emails(0) do
+      put :accept_activation, :id=>programme
+    end
+
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+    programme.reload
+    refute programme.is_activated?
+  end
+
+  test 'no accept_activation for not activated' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+
+    assert programme.is_activated?
+    login_as(Factory(:admin))
+
+    assert_emails(0) do
+      put :accept_activation, :id=>programme
+    end
+
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+    programme.reload
+    assert programme.is_activated?
+  end
+
+  test 'reject activation confirmation' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(Factory(:admin))
+
+    get :reject_activation_confirmation, :id=>programme
+    assert_response :success
+    assert assigns(:programme)
+
+  end
+
+  test 'no reject activation confirmation for already activated' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+
+    assert programme.is_activated?
+    login_as(Factory(:admin))
+
+    get :reject_activation_confirmation, :id=>programme
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+
+  end
+
+  test 'no reject activation confirmation for none admin' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(programme_administrator)
+
+    get :reject_activation_confirmation, :id=>programme
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+
+  end
+
+  test 'reject_activation' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(Factory(:admin))
+
+    assert_emails(1) do
+      put :reject_activation, :id=>programme, :programme=>{activation_rejection_reason:'rejection reason'}
+    end
+
+    assert_redirected_to programme
+    refute_nil flash[:notice]
+    assert_nil flash[:error]
+    programme.reload
+    refute programme.is_activated?
+    assert_equal 'rejection reason',programme.activation_rejection_reason
+  end
+
+  test 'no reject activation for none admin' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+    login_as(programme_administrator)
+
+    assert_emails(0) do
+      put :reject_activation, :id=>programme, :programme=>{activation_rejection_reason:'rejection reason'}
+    end
+
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+    programme.reload
+    refute programme.is_activated?
+    assert_nil programme.activation_rejection_reason
+  end
+
+  test 'no reject_activation for not activated' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+
+    assert programme.is_activated?
+    login_as(Factory(:admin))
+
+    assert_emails(0) do
+      put :reject_activation, :id=>programme, :programme=>{activation_rejection_reason:'rejection reason'}
+    end
+
+    assert_redirected_to :root
+    assert_nil flash[:notice]
+    refute_nil flash[:error]
+    programme.reload
+    assert programme.is_activated?
+    assert_nil programme.activation_rejection_reason
+  end
+
+  test 'none activated programme only available to administrators' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    refute programme.is_activated?
+
+    get :show, :id=>programme
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    flash[:error]=nil
+
+    login_as(programme_administrator)
+    get :show, :id=>programme
+    assert_response :success
+    assert_nil flash[:error]
+    logout
+    flash[:error]=nil
+
+    login_as(Factory(:admin))
+    get :show, :id=>programme
+    assert_response :success
+    assert_nil flash[:error]
+    logout
+    flash[:error]=nil
+
+    login_as(Factory(:person))
+    get :show, :id=>programme
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+  end
+
+  test 'awaiting activation' do
+    login_as(Factory(:admin))
+    Programme.destroy_all
+    prog_not_activated = Factory(:programme)
+    prog_not_activated.is_activated=false
+    prog_not_activated.save!
+
+    prog_rejected = Factory(:programme)
+    prog_rejected.is_activated=false
+    prog_rejected.activation_rejection_reason = 'xxx'
+    prog_rejected.save!
+
+    prog_normal = Factory(:programme)
+
+    refute prog_not_activated.is_activated?
+    refute prog_rejected.is_activated?
+    assert prog_normal.is_activated?
+
+    refute prog_not_activated.rejected?
+    assert prog_rejected.rejected?
+    refute prog_normal.rejected?
+
+    get :awaiting_activation
+    assert_response :success
+
+    assert_includes assigns(:not_activated),prog_not_activated
+    refute_includes assigns(:not_activated),prog_rejected
+    refute_includes assigns(:not_activated),prog_normal
+
+    assert_includes assigns(:rejected),prog_rejected
+    refute_includes assigns(:rejected),prog_not_activated
+    refute_includes assigns(:rejected),prog_normal
+
+  end
+
+  test 'awaiting for activation blocked for none admin' do
+    programme_administrator = Factory(:programme_administrator)
+    normal = Factory(:person)
+
+    login_as(programme_administrator)
+    get :awaiting_activation
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    logout
+    flash[:error]=nil
+
+    login_as(normal)
+    get :awaiting_activation
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    logout
+    flash[:error]=nil
+  end
+
 
 end

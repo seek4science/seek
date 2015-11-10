@@ -1,0 +1,16 @@
+<h4><%= link_to resource['title'], resource['uri'] %></h4>
+<p><%= text_or_not_specified resource['description'], description: true, auto_link: true, length: 500 %></p>
+
+<% children = resource['studies'] || resource['assays'] || resource['assets'] || [] %>
+<% children.each do |child| %>
+    <div class="isa-tree">
+      <%= render :partial => 'tree', locals: { resource: child } %>
+    </div>
+<% end %>
+<% if resource['contains'] %>
+    <ul>
+      <% resource['contains'].each do |file| %>
+          <li><%= file.split('/').last %></li>
+      <% end %>
+    </ul>
+<% end %>

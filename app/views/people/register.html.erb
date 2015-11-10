@@ -1,0 +1,18 @@
+<%= javascript_include_tag 'profile_project_selection' %>
+<h1>New profile</h1>
+
+
+<%= form_for @person do |f| %>
+    <%= f.error_messages %>
+    <%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
+    <%= render :partial => 'contact_details_form', :locals => {:f => f} %>
+
+    <% unless Person.count==0 %> <%# not for the first person %>
+        <%= render :partial => 'project_and_institution_selection', :locals => {:f => f} %>
+    <% end %>
+
+    <%= f.submit("Create",:disable_with=>"Creating...", :class => 'btn btn-primary') %>
+    <%= render :partial=>"cancel_registration" %>
+
+<% end -%>
+

@@ -1,0 +1,49 @@
+<%
+   #currently emails need to be unique, but this may be relaxed in the future
+   person = Person.not_registered_with_matching_email(params[:email]).first
+%>
+<h1>Is this you?</h1>
+
+<p>
+There is already a profile setup, with no associated user, that matches your email address of <em><%= params[:email] %></em>.
+</p><p>
+Below are some details about the profile, and the related <%= t('project').pluralize %> and Institutions. It is likely an Administrator has already described you as part of those
+  <%= t('project').pluralize %> and you can immediately claim that profile.
+</p>
+<p>
+  If this person is you, then please select <b>Yes</b><%= " and you will be sent an activation email" if Seek::Config.activation_required_enabled %>.
+  Once active you will be able to update the profile and picture.
+  <br/>
+  If not, select <b>No</b> and you will be able to create a new profile using a different email address.
+</p>
+<br/>
+<%= form_for current_user do |f| %>
+
+    <%= f.hidden_field :person_id, value: person.id %>
+    <%= f.hidden_field :email, value: person.email %>
+
+    <div class="row">
+      <div class="col-md-1 col-sm-2 col-xs-3">
+        <%= avatar(person,100) %>
+      </div>
+      <div class="col-sm-6">
+        <p class="list_item_attribute">
+            <b>Name:</b><%= person.name %><br/>
+        </p>
+        <%= list_item_simple_list person.projects, t('project').pluralize %>
+        <%= list_item_simple_list person.institutions, "Institutions" %>
+      </div>
+    </div>
+    <div style="padding-top:0.5em;">
+        <%= f.submit "Yes", :class => 'btn btn-primary' %>
+        <%= link_to "No",
+                    register_people_path,
+                    :confirm => "You will now be asked to create a new profile, and you will need to provide a different email address",
+                    :class => 'btn btn-primary' %>
+        <%= render :partial => "cancel_registration" %>
+    </div>
+<% end %>
+
+
+
+

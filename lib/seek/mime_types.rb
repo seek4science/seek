@@ -18,7 +18,7 @@ module Seek
         "image/jpeg" => {:name => "JPEG image", :icon_key => "jpg_file", :extensions=>["jpg","jpeg"]},
         "image/png" => {:name => "PNG image", :icon_key => "png_file", :extensions=>["png"]},
         "image/bmp" => {:name => "BMP image", :icon_key => "bmp_file", :extensions=>["bmp"]},
-        "image/svg+xml" => {:name => "SVG image", :icon_key => "svg_file", :extensions=>["svg"]},
+        "image/svg+xml" => {:name => "SVG image", :icon_key => "misc_file", :extensions=>["svg"]},
         "text/plain" => {:name => "Plain text document", :icon_key => "txt_file", :extensions=>["txt"]},
         "text/csv" => {:name => "Comma-separated values document", :icon_key => "misc_file", :extensions=>["csv"]},
         "text/x-comma-separated-values" => {:name => "Comma-separated values document", :icon_key => "misc_file", :extensions=>["csv"]},

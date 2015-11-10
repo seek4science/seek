@@ -25,18 +25,28 @@
       <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
     </div>
 
-    <%= f.label "Contributor" %>
+    <%= f.label "Person responsible" %>
     <div id="person_responsible_collection">
       <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
       <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
     </div>
 <% end %>
 
+<%  existing_creators = @study.creators
+    existing_creators =  [current_user.person] if existing_creators.blank?
+%>
+<%= render :partial => "assets/author_form", :locals => {:resource_type => t('study'), # this is only for presentation, not for any processing
+                                                         :existing_creators => existing_creators,
+                                                         :other_creators => @study.other_creators} -%>
+
 <% if show_scales? %>
     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
 <% end %>
 
 <%= render :seek_partial=>"assets/sharing_form" if @study.can_manage? -%>
+
+<%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('study'),
+                                                                        :related_publications => @study.publications} -%>
 
 <script type="text/javascript">
     var CREATE_INVESTIGATION_LINK = "<%= create_investigation_url %>";
@@ -56,4 +66,4 @@
                  :onclick => "javascript: $('study_submit_btn').form.submit();return(false);",
                  :class => 'btn btn-primary'-%>
 <% end %>
- or <%= link_to 'Cancel', (@study.id ? study_path(@study.id) : studies_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(@study.id ? study_path(@study.id) : studies_path) -%>

@@ -1,4 +1,6 @@
 SEEK::Application.routes.draw do
+  mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
+  mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
   mount TavernaPlayer::Engine, :at => (SEEK::Application.config.relative_url_root || "/")
 
@@ -118,6 +120,7 @@ SEEK::Application.routes.draw do
       put :set_openid
       post :resend_activation_email
     end
+    resources :oauth_sessions, only: [:index, :destroy]
   end
 
   resource :session do
@@ -136,7 +139,8 @@ SEEK::Application.routes.draw do
   resources :people do
     collection do
       get :typeahead
-      get :select
+      get :register
+      get :is_this_you
       get :get_work_group
       post :userless_project_selected_ajax
       post :items_for_result
@@ -177,6 +181,7 @@ SEEK::Application.routes.draw do
       get :asset_report
       get :admin
       get :admin_members
+      get :admin_member_roles
       post :update_members
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
@@ -220,17 +225,32 @@ SEEK::Application.routes.draw do
 
   resources :investigations do
     collection do
+      get :preview
       post :items_for_result
       post :resource_in_tab
     end
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
+    resources :snapshots, :only => [:show, :new, :create] do
+      member do
+        post :mint_doi
+        get :download
+        get :export, to: :export_preview
+        post :export, to: :export_submit
+      end
+    end
     member do
       get :new_object_based_on_existing_one
+      post :check_related_items
+      post :check_gatekeeper_required
+      post :publish_related_items
+      post :publish
+      get :published
     end
   end
 
   resources :studies do
     collection do
+      get :preview
       post :investigation_selected_ajax
       post :items_for_result
       post :resource_in_tab
@@ -290,7 +310,6 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     member do
-      post :check_related_items
       get :matching_models
       get :data
       post :check_gatekeeper_required
@@ -298,6 +317,7 @@ SEEK::Application.routes.draw do
       get :explore
       get :download
       get :published
+      post :check_related_items
       post :publish_related_items
       post :publish
       post :request_resource
@@ -438,7 +458,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
-    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
 
   resources :content_blobs, :except => [:show, :index, :update, :create, :destroy] do
@@ -454,9 +474,14 @@ SEEK::Application.routes.draw do
     end
     collection do
       post :items_for_result
+      get :awaiting_activation
     end
     member do
       get :initiate_spawn_project
+      get :activation_review
+      put :accept_activation
+      put :reject_activation
+      get :reject_activation_confirmation
       post :spawn_project
     end
     resources :people,:projects, :institutions
@@ -660,6 +685,8 @@ SEEK::Application.routes.draw do
   match "/404" => "errors#error_404"
   match "/422" => "errors#error_422"
   match "/500" => "errors#error_500"
+
+  match "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.

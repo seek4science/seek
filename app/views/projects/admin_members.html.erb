@@ -3,54 +3,107 @@
 <%= render :partial => "general/page_title",:locals=>{:title=>"Administering the #{t('project').downcase} members of #{link_to(h(@project.title),@project)}".html_safe} %>
 
 <div class="row">
-  <div class="col-md-6 col-md-push-6">
+  <div class="col-md-5 col-md-push-7">
     <%= panel('Add members', :id => "add_member") do %>
-        <p>
-          Select the institution, and type the names of the people from that institution that need adding for this <%= t('project').downcase %></strong>
-        </p>
-        <p>
-          <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title") %>
-        </p>
-        <p>
+        <div class="form-group">
+          <label>1. Type the names of the people you wish to add to the <%= t('project').downcase %></label>
           <%= objects_input('people_ids', [], :typeahead => {:values => Person.all.map {|p| {:id => p.id, :name => p.name, :hint => p.email}}}) -%>
-          <%= button_link_to('Add', 'new', 'javascript:add_selected_people()') -%>
-        </p>
+        </div>
+
+        <div class="form-group">
+          <label>2. Select the institution through which these people are involved with the <%= t('project').downcase %></label>
+          <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title"), :class => 'form-control' %>
+        </div>
+
+        <%= button_link_to('Add', 'new', 'javascript:Projects.actions.add();') -%>
     <% end %>
   </div>
-  <div class="col-md-6 col-md-pull-6">
-    <%= panel('Current members', :id => "admin_members") do %>
-      <div id="project_institutions">
-        <% @project.work_groups.sort { |a, b| a.institution.title <=> b.institution.title }.each do |work_group| %>
-            <%
-               institution_label_id = "institution_label_#{work_group.institution.id}"
-               ul_id = "institution_block_#{work_group.institution.id}"
-            %>
-            <ul class="institution_members" id="<%= ul_id %>">
-              <span class="institution_label" id="<%= institution_label_id %>"><%= work_group.institution.title %></span>
 
-              <% work_group.group_memberships.select { |gm| !gm.person.nil? }.each do |gm| %>
-                  <li class="institution_member" id="membership_<%= gm.person_id %>_<%= gm.work_group.institution_id %>">
-                    <%= gm.person.name %>&nbsp;
-                    <% unless gm.person.me? %>
-                        <%= link_to_function content_tag(:span, "", :class => "remove_member_icon").html_safe, "mark_group_membership_for_removal(#{gm.person.id},#{gm.work_group.institution_id},#{gm.id})" %>
-                    <% end %>
-                  </li>
-
-              <% end %>
-            </ul>
+  <div class="col-md-7 col-md-pull-5" id="project-admin-page">
+    <%= panel("#{t('project')} members", :id => "admin_members") do %>
+        <%= alert_box('info') do %>
+          The current project members are listed below. From here you can:
+          <dl class="dl-horizontal icon-key">
+            <dt>
+              <span class="flag_as_left_icon"></span>
+            </dt>
+            <dd>
+              Mark a user as left the project on a given date.
+              This will allow the user's contributions to the project to be managed by the project's asset manager.
+            </dd>
+            <dt>
+              <span class="unflag_as_left_icon"></span>
+            </dt>
+            <dd>
+              Unmark a user as left the project.
+            </dd>
+            <dt>
+              <span class="remove_member_icon"></span>
+              </dt>
+            <dd>
+              Remove the user from the project.
+            </dd>
+            <dt>
+              <span class="undo_icon"></span>
+            </dt>
+            <dd>
+              Undo a change.
+            </dd>
+          </dl>
         <% end %>
-
-      </div>
-
-      <%= form_tag(update_members_project_path(@project)) do %>
-          <div style="display:none">
-            <div>Techy stuff should be hidden</div>
-            Groups to remove:<%= select_tag :group_memberships_to_remove, [], :multiple => true -%>
-            <br/>
-            People and institution to add:<%= select_tag :people_and_institutions_to_add, [], :multiple => true %>
-          </div>
-          <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
-      <% end -%>
+        <div id="project_institutions"></div>
     <% end %>
+
+    <div class="modal" id="leaving-date-form" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Flag as left the project</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group date-select">
+              <label>Date left at</label>
+              <%= calendar_date_select_tag :leaving_date, Date.today, :time => "mixed", :class => "form-control" -%>
+              <input id="leaving-person-id" type="hidden" value=""/>
+              <input id="leaving-person-name" type="hidden" value=""/>
+              <input id="leaving-membership-id" type="hidden" value=""/>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button id="confirm-leaving" type="button" class="btn btn-primary">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%= form_tag(update_members_project_path(@project)) do %>
+        <%= panel("Pending changes") do %>
+            <ul id="change-list"></ul>
+            <div id="empty-change-list" class="subtle">No changes</div>
+            <%= button_link_to 'Undo all changes', 'undo', '#', :class => 'btn-sm pull-right', :id => 'undo-all' %>
+        <% end %>
+        <%= submit_tag "Confirm changes", :class => 'btn btn-primary' %>
+    <% end -%>
   </div>
 </div>
+
+<script>
+    <%# TODO: Do this in a better way: %>
+    Projects.memberships = <%=
+    @project.work_groups.map do |wg|
+        wg.group_memberships.map do |gm|
+            {
+                id: gm.id.to_s,
+                person: { id: gm.person_id.to_s, name: gm.person.name },
+                institution: { id: gm.work_group.institution.id.to_s, title: gm.work_group.institution.title },
+                leftAt: gm.time_left_at,
+                cannotRemove: current_user.person.id == gm.person_id
+            }
+        end
+    end.flatten.to_json.html_safe %>;
+    $j(document).ready(function () {
+        Projects.renderMemberships();
+    });
+</script>

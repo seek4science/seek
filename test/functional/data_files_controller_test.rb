@@ -213,7 +213,7 @@ class DataFilesControllerTest < ActionController::TestCase
      data_file_with_samples,blob = valid_data_file
      data_file_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
      assert_difference("DataFile.count") do
-       post :create,:data_file => data_file_with_samples,:content_blob=>blob, :sharing => valid_sharing
+       post :create,:data_file => data_file_with_samples,:content_blobs=>[blob], :sharing => valid_sharing
      end
 
     df = assigns(:data_file)
@@ -248,7 +248,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs=>[blob], :sharing=>valid_sharing
         end
       end
     end
@@ -261,7 +261,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>{}, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs=>[{}], :sharing=>valid_sharing
         end
       end
     end
@@ -276,7 +276,7 @@ class DataFilesControllerTest < ActionController::TestCase
     
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
       
@@ -297,7 +297,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
 
@@ -318,7 +318,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :data_file => { :title=>"Test"},:content_blob=>{:data_url=>uri.to_s}, :sharing=>valid_sharing
+          post :create, :data_file => { :title=>"Test"},:content_blobs => [{:data_url=>uri.to_s}], :sharing=>valid_sharing
         end
       end
     end
@@ -334,7 +334,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file=>data,:content_blob=>blob,
+          post :create, :data_file=>data,:content_blobs => [blob],
                :sharing=>valid_sharing
         end
       end
@@ -343,8 +343,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
-    assert !assigns(:data_file).content_blob.data_io_object.read.nil?
-    assert assigns(:data_file).content_blob.file_exists?
     assert_equal "txt_test.txt", assigns(:data_file).content_blob.original_filename
     assert_equal "text/plain", assigns(:data_file).content_blob.content_type
   end
@@ -358,7 +356,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file=>data,:content_blob=>blob,
+          post :create, :data_file=>data,:content_blobs => [blob],
                :sharing=>valid_sharing
         end
       end
@@ -367,8 +365,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
-    assert !assigns(:data_file).content_blob.data_io_object.read.nil?
-    assert assigns(:data_file).content_blob.file_exists?
     assert_equal "txt_test.txt", assigns(:data_file).content_blob.original_filename
     assert_equal "text/plain", assigns(:data_file).content_blob.content_type
   end
@@ -380,7 +376,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -396,7 +392,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('DataFile::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+            post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
           end
         end
 
@@ -428,7 +424,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
         post :upload_for_tool, :data_file => { :title=>"Test",:project_id=>projects(:sysmo_project).id},
-             :content_blob=>{:data=>file_for_upload},
+             :content_blobs => [{:data=>file_for_upload}],
              :recipient_id => people(:quentin_person).id
       end
     end
@@ -455,7 +451,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('ContentBlob.count') do
         session[:xml_login] = true
         post :upload_from_email, :data_file => { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]},
-             :content_blob=>{:data=>file_for_upload},:recipient_ids => [people(:quentin_person).id], :sender_id => users(:datafile_owner).person_id
+             :content_blobs => [{:data=>file_for_upload}],:recipient_ids => [people(:quentin_person).id], :sender_id => users(:datafile_owner).person_id
       end
     end
 
@@ -479,7 +475,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => data_file,:content_blob=>blob
+          post :create, :data_file => data_file,:content_blobs => [blob]
+
         end
       end
     end
@@ -506,7 +503,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_no_difference('ActivityLog.count') do
         assert_no_difference('DataFile.count') do
           assert_no_difference('ContentBlob.count') do
-            post :create, :data_file => data_file,:content_blob=>blob
+            post :create, :data_file => data_file,:content_blobs => [blob]
+
           end
         end
       end
@@ -546,7 +544,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
 
@@ -569,7 +567,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
 
@@ -592,7 +590,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         @request.env['HTTP_USER_AGENT']="Windows"
-        post :create, :data_file => data_file,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :data_file => data_file,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
 
@@ -741,9 +739,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should download from url" do
     mock_http
+    data_file = data_files(:url_based_data_file)
     assert_difference('ActivityLog.count') do
       get :download, :id => data_files(:url_based_data_file)
     end
+    assert_not_empty @response.body
     assert_response :success
   end
 
@@ -764,14 +764,14 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
 
-  test "should create and redirect on download for 401 url" do
+  test "should redirect on download for 401 url" do
     mock_http
     df = {:title=>"401",:project_ids=>[projects(:sysmo_project).id]}
-    blob = {:data_url=>"http://mocked401.com"}
+    blob = {:data_url=>"http://mocked401.com/file.txt"}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -781,21 +781,22 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).content_blob.original_filename
-    assert_equal "",assigns(:data_file).content_blob.content_type
+    assert_equal "file.txt",assigns(:data_file).content_blob.original_filename
+    assert_equal "text/plain",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked401.com"
+
+    assert_redirected_to assigns(:data_file).content_blob.url
   end
 
-  test "should create and redirect on download for 403 url" do
+  test "should redirect and show error on download for 403 url" do
     mock_http
     df = {:title=>"401",:project_ids=>[projects(:sysmo_project).id]}
-    blob = {:data_url=>"http://mocked403.com"}
+    blob = {:data_url=>"http://mocked403.com/file.txt"}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -805,14 +806,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "",assigns(:data_file).content_blob.original_filename
-    assert_equal "",assigns(:data_file).content_blob.content_type
+    assert_equal "file.txt",assigns(:data_file).content_blob.original_filename
+    assert_equal "text/plain",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked403.com"
+
+    assert_redirected_to assigns(:data_file).content_blob.url
   end
-
-
 
   test "should create and redirect on download for 302 url" do
     mock_http
@@ -821,7 +821,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -835,17 +835,17 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "text/html",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked302.com"
+    assert_response :success
   end
 
-  test "should create and redirect on download for 301 url" do
+  test "should create and transparently redirect on download for 301 url" do
     mock_http
     df = {:title=>"301",:project_ids=>[projects(:sysmo_project).id]}
     blob = {:data_url=>"http://mocked301.com", :make_local_copy => "0"}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file => df,:content_blob=>blob, :sharing=>valid_sharing
+          post :create, :data_file => df,:content_blobs => [blob], :sharing=>valid_sharing
         end
       end
     end
@@ -859,7 +859,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "text/html",assigns(:data_file).content_blob.content_type
 
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://mocked301.com"
+    assert_response :success
   end
 
   test "report error when file unavailable for download" do
@@ -999,7 +999,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert d.can_manage?
     assert_difference("DataFile::Version.count", 1) do
       assert_difference("StudiedFactor.count",1) do
-        post :new_version, :id=>d.id, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>d.id, :data_file=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision" #v2
       end
     end
 
@@ -1029,9 +1029,9 @@ class DataFilesControllerTest < ActionController::TestCase
       #upload a data file
       df = Factory :data_file, :contributor => User.current_user
       #upload new version 1 of the data file
-      post :new_version, :id=>df, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision 1"
+      post :new_version, :id=>df, :data_file=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision 1"
       #upload new version 2 of the data file
-      post :new_version, :id=>df, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision 2"
+      post :new_version, :id=>df, :data_file=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision 2"
 
       df.reload
       assert_equal 3, df.versions.length
@@ -1054,7 +1054,7 @@ class DataFilesControllerTest < ActionController::TestCase
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
     assert_difference("DataFile::Version.count", 1) do
       assert_difference("StudiedFactor.count",1) do
-        post :new_version, :id=>d, :data_file=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>d, :data_file=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision" #v2
       end
     end
     
@@ -1302,7 +1302,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, :data_file =>data_file,:content_blob=>blob, :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+          post :create, :data_file =>data_file,:content_blobs => [blob], :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
         end
       end
     end
@@ -1374,7 +1374,10 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "explore earlier version" do
-    get :explore,:id=>data_files(:downloadable_spreadsheet_data_file),:version=>1
+    df = data_files(:downloadable_spreadsheet_data_file)
+    df.versions.first.content_blob.save # Need to do this as file_size isn't set when loading from fixture
+    get :explore, :id => df,:version=>1
+
     assert_response :success
   end
 
@@ -1677,7 +1680,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     df_param = { :title=>"Test",:project_ids=>[proj.id]}
     blob = {:data=>file_for_upload}
-    post :create, :data_file => df_param,:content_blob=>blob, :sharing=>valid_sharing
+    post :create, :data_file => df_param,:content_blobs => [blob], :sharing=>valid_sharing
 
     df = assigns(:data_file)
 
@@ -1929,7 +1932,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show,:id=>123
     assert_response :not_found
     assert_select "h1", :text=>'404'
-    assert_select "h2",:text=>/The #{I18n.t('data_file')} does not exist./
+    assert_select "h2",:text=>"The requested page or resource does not exist."
   end
 
   test "landing page for deleted item which DOI was minted" do
@@ -1945,6 +1948,168 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "p[class=comment]",:text=>/#{comment}/
   end
 
+  test "should create cache job for small file" do
+    mock_http
+    params = { data_file: {
+                       title: "Small File",
+                       project_ids: [projects(:sysmo_project).id]
+                   },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/small.txt",
+                                   make_local_copy: '0'
+                               }],
+               sharing: valid_sharing
+    }
+
+    assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    blob = assigns(:data_file).content_blob
+    assert blob.cachable?
+    assert !blob.url.blank?
+    assert_equal "small.txt", blob.original_filename
+    assert_equal "text/plain", blob.content_type
+    assert_equal 100, blob.file_size
+    assert blob.caching_job.exists?
+  end
+
+  test "should not create cache job if setting disabled" do
+    mock_http
+    params = { data_file: {
+        title: "Small File",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/small.txt",
+                                   make_local_copy: '0'
+                               }],
+               sharing: valid_sharing
+    }
+
+    with_config_value(:cache_remote_files, false) do
+      assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+        assert_difference('DataFile.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, params
+          end
+        end
+      end
+
+      assert_redirected_to data_file_path(assigns(:data_file))
+      blob = assigns(:data_file).content_blob
+      assert !blob.cachable?
+      assert !blob.url.blank?
+      assert_equal "small.txt", blob.original_filename
+      assert_equal "text/plain", blob.content_type
+      assert_equal 100, blob.file_size
+      assert !blob.caching_job.exists?
+    end
+  end
+
+  test "should not create cache job if setting disabled even if user requests 'make_local_copy'" do
+    mock_http
+    params = { data_file: {
+        title: "Big File",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/big.txt",
+                                   make_local_copy: '1'
+                               }],
+               sharing: valid_sharing
+    }
+    with_config_value(:cache_remote_files, false) do
+      assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+        assert_difference('DataFile.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, params
+          end
+        end
+      end
+
+      assert_redirected_to data_file_path(assigns(:data_file))
+      blob = assigns(:data_file).content_blob
+      assert blob.make_local_copy
+      assert !blob.cachable?
+      assert !blob.url.blank?
+      assert_equal "big.txt", blob.original_filename
+      assert_equal "text/plain", blob.content_type
+      assert_equal 5000, blob.file_size
+      assert !blob.caching_job.exists?
+    end
+  end
+
+  test "should not automatically create cache job for large file" do
+    mock_http
+    params = { data_file: {
+        title: "Big File",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/big.txt",
+                                   make_local_copy: '0'
+                               }],
+               sharing: valid_sharing
+    }
+
+
+    assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    blob = assigns(:data_file).content_blob
+    assert !blob.make_local_copy
+    assert !blob.cachable?
+    assert !blob.url.blank?
+    assert_equal "big.txt", blob.original_filename
+    assert_equal "text/plain", blob.content_type
+    assert_equal 5000, blob.file_size
+    assert !blob.caching_job.exists?
+  end
+
+  test "should create cache job for large file if user requests 'make_local_copy'" do
+    mock_http
+    params = { data_file: {
+        title: "Big File",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com/big.txt",
+                                   make_local_copy: '1'
+                               }],
+               sharing: valid_sharing
+    }
+
+    assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    blob = assigns(:data_file).content_blob
+    assert blob.make_local_copy
+    assert !blob.cachable?
+    assert !blob.url.blank?
+    assert_equal "big.txt", blob.original_filename
+    assert_equal "text/plain", blob.content_type
+    assert_equal 5000, blob.file_size
+    assert blob.caching_job.exists?
+  end
+
   private
 
   def mock_http
@@ -1958,10 +2123,17 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:get, "http://redirectlocation.com").to_return(:body=>"<html><head></head><body></body></html>",:status=>200,headers: {content_type: 'text/html'})
 
     stub_request(:any, "http://mocked301.com").to_return(:status=>301, :headers=>{:location=>"http://redirectlocation.com"})
+    stub_request(:any, "http://mockedbad301.com").to_return(:status=>301, :headers=>{:location=>"http://mocked404.com"})
     stub_request(:any, "http://mocked302.com").to_return(:status=>302, :headers=>{:location=>"http://redirectlocation.com"})
-    stub_request(:any, "http://mocked401.com").to_return(:status=>401)
-    stub_request(:any, "http://mocked403.com").to_return(:status=>403)
+    stub_request(:any, "http://mocked401.com/file.txt").to_return(:status=>401)
+    stub_request(:any, "http://mocked403.com/file.txt").to_return(:status=>403)
     stub_request(:any, "http://mocked404.com").to_return(:status=>404)
+
+    stub_request(:get, "http://mockedlocation.com/small.txt").to_return(body: 'bananafish'*10, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 100 })
+    stub_request(:head, "http://mockedlocation.com/small.txt").to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 100 })
+
+    stub_request(:get, "http://mockedlocation.com/big.txt").to_return(body: 'bananafish'*500, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
+    stub_request(:head, "http://mockedlocation.com/big.txt").to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
   end
 
   def mock_https

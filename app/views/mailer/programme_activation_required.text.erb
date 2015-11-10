@@ -1,0 +1,10 @@
+Hi,
+
+    A <%= t('programme') %> was created by a user. The <%= t('programme') %> created was:
+
+    <%= programme_url(@programme) %>
+
+    The person that created this <%= t('programme') %> is <%= person_url(@creator) %>
+    Their email address is <%= @creator.email %>
+
+    To activate or reject the <%= t('programme') %> please visit <%= activation_review_programme_url(@programme) %>

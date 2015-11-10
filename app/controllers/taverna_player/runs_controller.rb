@@ -68,7 +68,7 @@ module TavernaPlayer
         respond_with(@run, :status => 400)
       else
         if Seek::Config.email_enabled
-          Mailer.report_run_problem(current_user.person, @run).deliver
+          Mailer.report_run_problem(current_person, @run).deliver
           @run.reported = true
           @run.save
           flash[:notice] = "Your report has been submitted to the support team, thank you."
@@ -159,7 +159,7 @@ module TavernaPlayer
 
       action = translate_action(action_name)
       unless is_auth?(@run, action)
-        if User.current_user.nil?
+        if current_user.nil?
           flash[:error] = "You are not authorized to #{action} this Workflow Run, you may need to login first."
         else
           flash[:error] = "You are not authorized to #{action} this Workflow Run."

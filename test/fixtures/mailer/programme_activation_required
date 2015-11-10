@@ -1,0 +1,10 @@
+Hi,
+
+    A Programme was created by a user. The Programme created was:
+
+    http://localhost:3000/programmes/-prog_id-
+
+    The person that created this Programme is http://localhost:3000/people/-person_id-
+    Their email address is -person_email_address-
+
+    To activate or reject the Programme please visit http://localhost:3000/programmes/-prog_id-/activation_review

@@ -24,28 +24,33 @@ class AssaysController < ApplicationController
     params[:related_publication_ids]= @existing_assay.publications.collect{|p| "#{p.id},None"}
 
     if @existing_assay.can_view?
+      notice_message = ''
       unless @assay.study.can_edit?
         @assay.study = nil
-        flash.now[:notice] = "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>".html_safe
+        notice_message << "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>"
       end
 
       @existing_assay.data_files.each do |d|
         if !d.can_view?
-          flash.now[:notice] << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+          notice_message << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
           break
         end
       end
       @existing_assay.sops.each do |s|
         if !s.can_view?
-          flash.now[:notice] << "Some or all #{t('sop').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+          notice_message << "Some or all #{t('sop').pluralize} of the existing #{ t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
           break
         end
       end
       @existing_assay.models.each do |m|
         if !m.can_view?
-          flash.now[:notice] << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>".html_safe
+          notice_message << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
           break
         end
+      end
+
+      unless notice_message.blank?
+        flash.now[:notice] = notice_message.html_safe
       end
 
       render :action=>"new"
@@ -101,7 +106,7 @@ class AssaysController < ApplicationController
 
     update_assay_organisms @assay, params
 
-    @assay.owner=current_user.person
+    @assay.owner=current_person
 
     @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
 

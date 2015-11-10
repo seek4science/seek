@@ -6,6 +6,11 @@ module AssetsHelper
     controller_name.downcase.singularize.underscore
   end
 
+  def can_create_new_items?
+    #the state of being able to create assets is the same for all assets
+    DataFile.can_create?
+  end
+
   def request_request_label(resource)
     icon_filename = icon_filename_for_key('message')
     resource_type = text_for_resource(resource)
@@ -13,7 +18,7 @@ module AssetsHelper
   end
 
   def filesize_as_text(content_blob)
-    size = content_blob.nil? ? 0 : content_blob.filesize
+    size = content_blob.nil? ? 0 : content_blob.file_size
     if size.nil?
       html = "<span class='none_text'>Unknown</span>"
     else

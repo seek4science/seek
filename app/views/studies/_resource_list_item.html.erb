@@ -7,7 +7,7 @@
   </div>
 
   <div class="col-sm-6 hidden-xs">
-    <%= list_item_attribute t('investigation'), h(resource.investigation.title), resource.investigation %>
+    <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true  %>
   </div>
 </div>
 

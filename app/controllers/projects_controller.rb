@@ -1,17 +1,18 @@
 require 'seek/custom_exception'
 
 class ProjectsController < ApplicationController
+
   include WhiteListHelper
   include Seek::IndexPager
   include CommonSweepers
   include Seek::DestroyHandling
 
-  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:update_members]
+  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:admin_member_roles,:update_members]
   before_filter :find_assets, :only=>[:index]
-  #before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions, :admin, :asset_report,:admin_members,:update_members,:resource_in_tab]
-  before_filter :is_user_admin_auth, :only => [:new, :create, :manage, :destroy]
+  before_filter :auth_to_create, :only=>[:new,:create]
+  before_filter :is_user_admin_auth, :only => [:manage, :destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :administerable_by_user, :only =>[:admin,:admin_members,:update_members]
+  before_filter :administerable_by_user, :only =>[:admin,:admin_members,:admin_member_roles,:update_members]
   before_filter :auth_params,:only=>[:update]
   before_filter :member_of_this_project, :only=>[:asset_report],:unless=>:admin?
 
@@ -161,10 +162,15 @@ class ProjectsController < ApplicationController
   # POST /projects
   # POST /projects.xml
   def create
+    #strip out programme_id if permissions do not allow
+    unless params[:project][:programme_id].blank?
+      unless Programme.find(params[:project][:programme_id]).can_manage?
+        params[:project].delete(:programme_id)
+      end
+    end
     @project = Project.new(params[:project])
 
     @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]
-
 
     respond_to do |format|
       if @project.save
@@ -182,12 +188,14 @@ class ProjectsController < ApplicationController
   # PUT /projects/1.xml
   def update
 
-
     @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:sharing], [@project] if params[:sharing]
 
     begin
       respond_to do |format|
         if @project.update_attributes(params[:project])
+          if (Seek::Config.email_enabled && !@project.can_be_administered_by?(current_user))
+            ProjectChangedEmailJob.new(@project).queue_job
+          end
           expire_resource_list_item_content
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
@@ -246,7 +254,35 @@ class ProjectsController < ApplicationController
     respond_with(@project)
   end
 
+  def admin_member_roles
+    respond_with(@project)
+  end
+
   def update_members
+    add_and_remove_members_and_institutions
+    flag_memberships
+    update_administrative_roles
+
+    flash[:notice]="The members and institutions of the #{t('project').downcase} '#{@project.title}' have been updated"
+
+    respond_with(@project) do |format|
+      format.html {redirect_to project_path(@project)}
+    end
+  end
+
+  def update_administrative_roles
+    unless params[:project].blank?
+      #need convverting to an array from a comma separated string
+      params[:project].keys.each do |k|
+        params[:project][k] = params[:project][k].split(",")
+      end
+      @project.update_attributes(params[:project])
+    end
+  end
+
+  private
+
+  def add_and_remove_members_and_institutions
     groups_to_remove = params[:group_memberships_to_remove] || []
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
     groups_to_remove.each do |group|
@@ -265,19 +301,22 @@ class ProjectsController < ApplicationController
       person = Person.find(person_id)
       institution = Institution.find(institution_id)
       unless person.nil? || institution.nil?
-        person.add_to_project_and_institution(@project,institution)
+        person.add_to_project_and_institution(@project, institution)
         person.save!
       end
     end
-
-    flash[:notice]="The members and institutions of the #{t('project').downcase} '#{@project.title}' have been updated"
-
-    respond_with(@project) do |format|
-      format.html {redirect_to project_path(@project)}
-    end
   end
 
-  private  
+  def flag_memberships
+    unless params[:memberships_to_flag].blank?
+      GroupMembership.where(:id => params[:memberships_to_flag].keys).includes(:work_group).each do |membership|
+        if membership.work_group.project_id == @project.id # Prevent modification of other projects' memberships
+          left_at = params[:memberships_to_flag][membership.id.to_s][:time_left_at]
+          membership.update_attributes(:time_left_at => left_at)
+        end
+      end
+    end
+  end
 
   def editable_by_user
     @project = Project.find(params[:id])
@@ -301,7 +340,7 @@ class ProjectsController < ApplicationController
 
   def administerable_by_user
     @project = Project.find(params[:id])
-    unless User.admin_logged_in? || @project.can_be_administered_by?(current_user)
+    unless @project.can_be_administered_by?(current_user)
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
       return false
     end
@@ -318,4 +357,6 @@ class ProjectsController < ApplicationController
       params.delete param if params and not allowed
     end
   end
+
+
 end

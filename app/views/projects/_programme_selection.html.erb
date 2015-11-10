@@ -1,0 +1,16 @@
+<%
+
+    include_blank = (admin_logged_in? && params[:programme_id].blank?) ? "No associated #{t('programme')}" : nil
+    available = User.current_user.person.administered_programmes.activated
+    if params[:programme_id]
+      available.select!{|p| p.id.to_s == params[:programme_id]}
+    end
+
+
+%>
+<p>
+<%= f.label "Associated #{t('programme')}" %>
+<%=
+    f.collection_select :programme_id, available, :id, :title, selected:params[:programme_id],include_blank:include_blank,:class => "form-control"
+%>
+</p>

@@ -4,7 +4,7 @@
 <%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
 
 <div class="form-group">
-  <label>Description about myself</label>
+  <label>Description</label>
   <%= f.text_area :description, :class=>"description form-control", :rows => 5 -%>
 </div>
 
@@ -34,4 +34,4 @@
 <% end -%>
 
 <%= f.submit((person ? "Update" : "Create"), :disable_with=>(person ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
- or <%= link_to 'Cancel', (person ? person_path(person.id) : people_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(person ? person_path(person.id) : people_path) %>

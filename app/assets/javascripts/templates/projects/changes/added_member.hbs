@@ -1,0 +1,6 @@
+<li class="institution_member change-item" data-person-id="{{person.id}}">
+    Add <strong>{{person.name}}</strong> to the project
+    {{> projects/_undo_button}}
+
+    <input type="hidden" value="{{membershipData}}" name="people_and_institutions_to_add[]"/>
+</li>

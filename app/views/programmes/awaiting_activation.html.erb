@@ -1,0 +1,44 @@
+<h1><%= t('programme').pluralize %> awaiting Activation</h1>
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Waiting for activation response:</h3>
+  </div>
+  <div class="panel-body">
+    <% if @not_activated.any? %>
+        These are items that are still waiting a response. Click the link to accept or reject it.
+        <ul>
+          <% @not_activated.each do |prog| %>
+              <li>
+                <%= link_to(prog.title, activation_review_programme_path(prog)) %>
+              </li>
+          <% end %>
+        </ul>
+    <% else %>
+        There are no items awaiting a response.
+    <% end %>
+
+  </div>
+</div>
+
+<div class="panel panel-danger">
+  <div class="panel-heading">
+    <h3 class="panel-title">Rejected:</h3>
+  </div>
+  <div class="panel-body">
+    <% if @rejected.any? %>
+        These are items that have been rejected but still exist. Click the link to accept or delete it.
+        <ul>
+          <% @rejected.each do |prog| %>
+              <li>
+                <%= link_to(prog.title, activation_review_programme_path(prog)) %>
+              </li>
+          <% end %>
+        </ul>
+    <% else %>
+        There are no rejected items.
+    <% end %>
+  </div>
+
+</div>

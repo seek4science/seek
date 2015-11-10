@@ -5,15 +5,12 @@ class SessionsController < ApplicationController
   skip_before_filter :restrict_guest_user
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:new,:destroy]
+  skip_before_filter :partially_registered?,:only=>[:create,:new]
   prepend_before_filter :strip_root_for_xml_requests
   
   # render new.rhtml
   def new
     
-  end
-
-  def auto_openid
-    create
   end
 
   def index    
@@ -25,11 +22,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    if using_open_id?
-      open_id_authentication
-    else      
-      password_authentication
-    end
+    password_authentication
   end
 
   def destroy    
@@ -49,20 +42,6 @@ class SessionsController < ApplicationController
 
   protected
   
-  def open_id_authentication
-    authenticate_with_open_id do |result, identity_url|
-      if result.successful?
-        if @user = User.find_by_openid(identity_url)          
-          check_login
-        else
-          failed_login "Sorry, no user by that identity URL exists (#{identity_url})"
-        end
-      else
-        failed_login result.message
-      end
-    end
-  end
-  
   def password_authentication
     if @user = User.authenticate(params[:login], params[:password])
       check_login
@@ -75,9 +54,9 @@ class SessionsController < ApplicationController
   
   def check_login    
     session[:user_id] = @user.id
-    if @user.person.nil?
-      flash[:notice] = "You have successfully registered your account, but now must select a profile, or create your own."
-      redirect_to(select_people_path)
+    if !@user.registration_complete?
+      flash[:notice] = "You have successfully registered your account, but you need to create a profile"
+      redirect_to(register_people_path)
 	  elsif !@user.active?
       failed_login "You still need to activate your account. You should have been sent a validation email."
     else      

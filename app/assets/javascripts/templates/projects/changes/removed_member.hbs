@@ -1,0 +1,6 @@
+<li class="institution_member change-item" data-person-id="{{person.id}}">
+    Remove <strong>{{person.name}}</strong> from the project
+    {{> projects/_undo_button}}
+
+    <input type="hidden" value="{{id}}" name="group_memberships_to_remove[]"/>
+</li>

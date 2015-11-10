@@ -54,23 +54,32 @@ module Seek
         include Seek::ActsAsAsset::InstanceMethods
         include Seek::Search::BackgroundReindexing
         include Seek::Subscribable
+        extend SingletonMethods
 
-        def get_all_as_json(user)
-          all = all_authorized_for 'view', user
-          with_contributors = all.map{ |d|
-            contributor = d.contributor
-            { 'id' => d.id,
-              'title' => h(d.title),
-              'contributor' => contributor.nil? ? '' : 'by ' + h(contributor.person.name),
-              'type' => name
-            }
-          }
-          with_contributors.to_json
-        end
       end
 
       def is_asset?
         include?(Seek::ActsAsAsset::InstanceMethods)
+      end
+    end
+
+    #the class methods that get added when calling acts_as_asset
+    module SingletonMethods
+      def get_all_as_json(user)
+        all = all_authorized_for 'view', user
+        with_contributors = all.map{ |d|
+          contributor = d.contributor
+          { 'id' => d.id,
+            'title' => h(d.title),
+            'contributor' => contributor.nil? ? '' : 'by ' + h(contributor.person.name),
+            'type' => name
+          }
+        }
+        with_contributors.to_json
+      end
+
+      def can_create?
+        User.logged_in_and_member?
       end
     end
 

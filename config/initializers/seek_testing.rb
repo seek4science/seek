@@ -37,6 +37,7 @@ SEEK::Application.configure do
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programmes_enabled] = true
+      Settings.defaults[:allow_user_programme_creation] = true
       Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:tabs_lazy_load_enabled] = false
 
@@ -88,6 +89,15 @@ SEEK::Application.configure do
       Settings.defaults[:imprint_enabled]= false
       Settings.defaults[:imprint_description]= 'Here is imprint example'
 
+      Settings.defaults[:zenodo_api_url] = "https://sandbox.zenodo.org/api"
+      Settings.defaults[:zenodo_oauth_url] = "https://sandbox.zenodo.org/oauth"
+
+      Settings.defaults[:cache_remote_files] = true
+      Settings.defaults[:max_cachable_size] = 2000
+      Settings.defaults[:hard_max_cachable_size] = 5000
+
+      Settings.defaults[:orcid_required] = false
+      Settings.defaults[:site_base_host] = "http://localhost:3000"
     end
   end
 end

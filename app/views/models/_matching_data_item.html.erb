@@ -10,7 +10,7 @@
         <%= list_item_title data_file -%>
         <span class="score">
                 - matched by <b><%= matching_data_item.search_terms.join(", ") -%></b>
-          <%= "( #{matching_data_item.score} )" if Rails.env=="development" %>
+          <%= "( #{matching_data_item.score} )" if Rails.env.development? %>
 
             </span>
 

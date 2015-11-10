@@ -1,8 +1,13 @@
 <%= render :partial => "general/item_title",:locals => {:item=>@programme, :buttons_partial => 'programmes/buttons'} %>
 
+
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
+
+    <%= render :partial=>"activation_status" %>
+
     <%=  item_description @programme.description -%>
+
     <p>
       <strong>Web page:</strong>
       <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>

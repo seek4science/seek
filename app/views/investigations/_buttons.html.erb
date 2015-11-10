@@ -9,9 +9,22 @@
 
 <%= admin_dropdown do %>
     <% if item.can_manage? -%>
-        <li><%= image_tag_for_key('manage', edit_investigation_path, nil, nil, "Manage #{t('investigation')}") -%></li>
+        <li><%= image_tag_for_key('manage', edit_investigation_path(item), nil, nil, "Manage #{t('investigation')}") -%></li>
+        <% if item.permitted_for_research_object? %>
+            <li><%= image_tag_for_key('snapshot', new_investigation_snapshot_path(item), "Make a Snapshot", nil, "Make a Snapshot") -%></li>
+        <% else %>
+            <% explanation = "You may only create snapshots of publicly accessible investigations." %>
+            <li>
+                <span class='disabled_icon disabled' onclick='javascript:alert("<%= explanation-%>")' title='<%= tooltip_title_attrib(explanation) -%>'>
+                    <%= image('snapshot', {:alt=>"Snapshot", :class=>"disabled"}) %> Make Snapshot
+                </span>
+            </li>
+        <% end %>
     <% elsif item.can_edit?-%>
-        <li><%= image_tag_for_key('edit', edit_investigation_path, "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
+        <li><%= image_tag_for_key('edit', edit_investigation_path(item), "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
+    <% end -%>
+    <% if (item.can_publish? || item.contains_publishable_items?) && item.can_manage? -%>
+        <li><%= image_tag_for_key('publish', polymorphic_path(item, :action => :check_related_items), nil, {:method=>:post}, "Publish full #{t('investigation')}") -%></li>
     <% end -%>
 
     <%= delete_icon item,current_user -%>

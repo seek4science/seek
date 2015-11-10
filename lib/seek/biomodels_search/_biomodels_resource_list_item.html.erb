@@ -31,7 +31,7 @@
         -%>
 
         <%= image_tag_for_key "download", biomodel_download_link, "download", {}, "Download" %>
-        <% if logged_in? && current_user.person.can_create_new_items? %>
+        <% if Model.can_create? %>
             <%= image_tag_for_key "import",
                                   {:controller => "models",
                                    :action => "new",

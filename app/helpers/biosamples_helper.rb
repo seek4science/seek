@@ -97,7 +97,7 @@ module BiosamplesHelper
     strain_info = 'Strain' + ": "+ strain.info + "(Seek ID=#{strain.id})"
 
     creators_list = creators.collect{|creator| creator}.join(", ").html_safe
-    sops_list = asset_version_links(specimen.sops).join(", ").html_safe
+    sops_list = asset_links(specimen.sops).join(", ").html_safe
     unless Seek::Config.is_virtualliver
       [strain_info,
        (check_box_tag "selected_specimen_#{specimen.id}", specimen.id, false, {:onchange => remote_function(:url => {:controller => 'biosamples',
@@ -118,10 +118,9 @@ module BiosamplesHelper
     end
   end
 
-  def asset_version_links asset_versions
-    asset_versions.select(&:can_view?).collect do |asset_version|
-      asset_name = asset_version.class.name.split('::').first.underscore
-      link_to(asset_version.title, eval("#{asset_name}_path(#{asset_version.send("#{asset_name}_id")})") + "?version=#{asset_version.version}")
+  def asset_links assets
+    assets.select(&:can_view?).collect do |asset|
+      link_to(asset.title, polymorphic_path(asset))
     end
   end
 

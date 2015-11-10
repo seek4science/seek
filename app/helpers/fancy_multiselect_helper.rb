@@ -29,7 +29,7 @@ module FancyMultiselectHelper
       access = required_access.to_s.split('_').last.gsub('?', '')
       association_class = options.delete(:association_class) || reflection.klass
       options[:project_possibilities] = authorised_assets(association_class, nil, access) if options[:other_projects_checkbox]
-      options[:possibilities] = authorised_assets(association_class, current_user.person.projects, access) unless options[:possibilities].any?
+      options[:possibilities] = authorised_assets(association_class, current_user.person.projects, access) unless options[:possibilities]
     end
   end
 
@@ -43,7 +43,7 @@ module FancyMultiselectHelper
         :intro => "The following #{association.to_s.singularize.humanize.pluralize.downcase} are associated with this #{object_type_text.downcase}:",
         :default_choice_text => "Select #{association.to_s.singularize.humanize} ...",
         :name => "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
-        :possibilities => [],
+        :possibilities => nil,
         :project_possibilities => [],
         :value_method => :id,
         :text_method => :title,
@@ -54,7 +54,8 @@ module FancyMultiselectHelper
         :object_type => object.class.name,
         :possibilities_options => {},
         :hidden => hidden,
-        :required => false
+        :required => false,
+        :title=>nil
     }
   end
 

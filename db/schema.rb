@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150611092045) do
+ActiveRecord::Schema.define(:version => 20151106154128) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -35,6 +35,12 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
   add_index "activity_logs", ["culprit_type", "culprit_id"], :name => "act_logs_culprit_index"
   add_index "activity_logs", ["format"], :name => "act_logs_format_index"
   add_index "activity_logs", ["referenced_type", "referenced_id"], :name => "act_logs_referenced_index"
+
+  create_table "admin_defined_role_programmes", :force => true do |t|
+    t.integer "programme_id"
+    t.integer "person_id"
+    t.integer "role_mask"
+  end
 
   create_table "admin_defined_role_projects", :force => true do |t|
     t.integer "project_id"
@@ -147,18 +153,11 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
   add_index "assay_organisms", ["organism_id"], :name => "index_assay_organisms_on_organism_id"
 
-  create_table "assay_types_edges", :id => false, :force => true do |t|
-    t.integer "parent_id"
-    t.integer "child_id"
-  end
-
   create_table "assays", :force => true do |t|
     t.string   "title"
     t.text     "description"
-    t.integer  "assay_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "technology_type_id"
     t.integer  "study_id"
     t.integer  "owner_id"
     t.string   "first_letter",                 :limit => 1
@@ -170,6 +169,7 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.string   "technology_type_uri"
     t.integer  "suggested_assay_type_id"
     t.integer  "suggested_technology_type_id"
+    t.text     "other_creators"
   end
 
   create_table "assays_samples", :id => false, :force => true do |t|
@@ -261,8 +261,10 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.integer "asset_id"
     t.string  "asset_type"
     t.integer "asset_version"
-    t.boolean "is_webpage",        :default => false
+    t.boolean "is_webpage",                     :default => false
     t.boolean "external_link"
+    t.string  "sha1sum"
+    t.integer "file_size",         :limit => 8
   end
 
   add_index "content_blobs", ["asset_id", "asset_type"], :name => "index_content_blobs_on_asset_id_and_asset_type"
@@ -528,13 +530,14 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.integer  "work_group_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "time_left_at"
   end
 
   add_index "group_memberships", ["person_id"], :name => "index_group_memberships_on_person_id"
   add_index "group_memberships", ["work_group_id", "person_id"], :name => "index_group_memberships_on_work_group_id_and_person_id"
   add_index "group_memberships", ["work_group_id"], :name => "index_group_memberships_on_work_group_id"
 
-  create_table "group_memberships_project_roles", :id => false, :force => true do |t|
+  create_table "group_memberships_project_roles", :force => true do |t|
     t.integer "group_membership_id"
     t.integer "project_role_id"
   end
@@ -607,6 +610,7 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+    t.text     "other_creators"
   end
 
   create_table "investigations_projects", :id => false, :force => true do |t|
@@ -791,6 +795,18 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.datetime "updated_at"
   end
 
+  create_table "oauth_sessions", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "provider"
+    t.string   "access_token"
+    t.string   "refresh_token"
+    t.datetime "expires_at"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "oauth_sessions", ["user_id"], :name => "index_oauth_sessions_on_user_id"
+
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.datetime "created_at"
@@ -819,7 +835,7 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.integer  "status_id",                  :default => 0
     t.string   "first_letter", :limit => 10
     t.string   "uuid"
-    t.integer  "roles_mask"
+    t.integer  "roles_mask",                 :default => 0
     t.string   "orcid"
   end
 
@@ -930,11 +946,13 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.text     "description"
     t.integer  "avatar_id"
     t.string   "web_page"
-    t.string   "first_letter",    :limit => 1
+    t.string   "first_letter",                :limit => 1
     t.string   "uuid"
-    t.datetime "created_at",                   :null => false
-    t.datetime "updated_at",                   :null => false
+    t.datetime "created_at",                                                  :null => false
+    t.datetime "updated_at",                                                  :null => false
     t.text     "funding_details"
+    t.boolean  "is_activated",                             :default => false
+    t.text     "activation_rejection_reason"
   end
 
   create_table "project_descendants", :id => false, :force => true do |t|
@@ -1265,6 +1283,17 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.datetime "updated_at"
   end
 
+  create_table "snapshots", :force => true do |t|
+    t.string   "resource_type"
+    t.integer  "resource_id"
+    t.string   "doi"
+    t.integer  "snapshot_number"
+    t.datetime "created_at",           :null => false
+    t.datetime "updated_at",           :null => false
+    t.integer  "zenodo_deposition_id"
+    t.string   "zenodo_record_url"
+  end
+
   create_table "sop_auth_lookup", :id => false, :force => true do |t|
     t.integer "user_id"
     t.integer "asset_id"
@@ -1453,6 +1482,7 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+    t.text     "other_creators"
   end
 
   create_table "study_auth_lookup", :id => false, :force => true do |t|
@@ -1657,11 +1687,6 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.datetime "updated_at",  :null => false
   end
 
-  create_table "technology_types_edges", :id => false, :force => true do |t|
-    t.integer "parent_id"
-    t.integer "child_id"
-  end
-
   create_table "text_value_versions", :force => true do |t|
     t.integer  "text_value_id",                          :null => false
     t.integer  "version",                                :null => false
@@ -1762,7 +1787,6 @@ ActiveRecord::Schema.define(:version => 20150611092045) do
     t.integer  "posts_count",                             :default => 0
     t.datetime "last_seen_at"
     t.string   "uuid"
-    t.string   "openid"
     t.boolean  "show_guide_box",                          :default => true
   end
 

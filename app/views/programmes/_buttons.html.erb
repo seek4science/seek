@@ -1,10 +1,13 @@
 <%= admin_dropdown do %>
-    <% if item.can_be_edited_by?(current_user) -%>
-        <li><%= image_tag_for_key('edit', edit_programme_path(item), "Edit #{t('programme')} Details", nil, "Edit #{t('programme')} Details") -%></li>
+    <% if item.can_manage? -%>
+        <li><%= image_tag_for_key('manage', edit_programme_path(item), "Manage #{t('programme')}", nil, "Manage #{t('programme')}") %></li>
+        <% if item.is_activated? && can_create_projects? %>
+            <li><%= image_tag_for_key('add',new_project_path(programme_id:item.id),"Create a #{t('Project')}",nil, "Create a #{t('Project')}") %></li>
+        <% end %>
 
         <% if admin_logged_in? -%>
-            <%= delete_icon(item,current_user) %>
-            <li><%= image_tag_for_key('edit',initiate_spawn_project_programme_path(item),"Spawn an existing #{t('project')}",nil,"Spawn an existing #{t('project')}") -%></li>
+            <%= delete_icon(item, current_user) %>
+            <li><%= image_tag_for_key('edit', initiate_spawn_project_programme_path(item), "Spawn an existing #{t('project')}", nil, "Spawn an existing #{t('project')}") -%></li>
         <% end -%>
     <% end -%>
 <% end -%>

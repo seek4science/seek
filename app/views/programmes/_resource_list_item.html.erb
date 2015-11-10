@@ -1,3 +1,11 @@
 <%= list_item_description resource.description %>
+<% unless resource.is_activated? %>
+    <% if resource.rejected? %>
+        <div class="alert alert-danger">Not yet activated and was rejected</div>
+    <% else %>
+        <div class="alert alert-warning">Not yet activated</div>
+    <% end %>
+
+<% end %>
 <%= list_item_simple_list resource.projects, "Projects" %>
 <%= list_item_optional_attribute "Web page", h(resource.web_page), h(resource.web_page) %>

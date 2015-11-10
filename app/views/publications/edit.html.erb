@@ -25,6 +25,10 @@
         <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
     <% end -%>
 
+    <%= render :partial => "assets/associate_investigation", :locals=>{:resource => @publication} -%>
+
+    <%= render :partial => "assets/associate_study", :locals=>{:resource => @publication} -%>
+
     <%= render :partial => "assays/associate_assays", :locals=>{:resource => @publication} -%>
 
     <%= render :partial => "assets/associate_data_file", :locals=>{:resource => @publication, :show_relationships => false} -%>
@@ -32,7 +36,7 @@
     <%= render :partial => "assets/associate_model", :locals=>{:resource => @publication} -%>
 
     <%= submit_tag 'Update',:disable_with=>"Updating...", :class => 'btn btn-primary' %>
-    or <%= link_to "Cancel", publication_path(@publication), :class => 'btn btn-default' -%>
+    or <%= cancel_button(publication_path(@publication)) %>
 <% end %>
 
 <script type="text/javascript">

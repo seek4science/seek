@@ -139,8 +139,27 @@ class Publication < ActiveRecord::Base
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
 
+  def studies
+    self.backwards_relationships.select {|a| a.subject_type == "Study"}.collect { |a| a.subject }
+  end
+
+  def investigations
+    self.backwards_relationships.select {|a| a.subject_type == "Investigation"}.collect { |a| a.subject }
+  end
+
   def presentations
     self.backwards_relationships.select {|a| a.subject_type == "Presentation"}.collect { |a| a.subject }
+  end
+
+  def associate(item)
+    clause = {:subject_type => item.class.name,
+              :subject_id => item.id,
+              :predicate => Relationship::RELATED_TO_PUBLICATION,
+              :other_object_type => "Publication",
+              :other_object_id => self.id}
+    unless Relationship.where(clause).any?
+      Relationship.create(clause)
+    end
   end
 
   #includes those related directly, or through an assay
@@ -170,8 +189,8 @@ class Publication < ActiveRecord::Base
 
   #returns a list of related organisms, related through either the assay or the model
   def related_organisms
-    organisms = assays.collect{|a| a.organisms}
-    organisms = organisms | models.collect{|m| m.organism}
+    organisms = assays.collect{|a| a.organisms}.flatten
+    organisms = organisms | models.collect{|m| m.organism}.flatten
     organisms.uniq.compact
   end
 

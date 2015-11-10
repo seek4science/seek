@@ -1,13 +1,16 @@
 <%
    selected ||= nil
-   new_association_path = eval "new_#{association.to_s.singularize}_path(:parent_name=>'#{controller_name.underscore.singularize}')"
    default_choice = [default_choice_text, 0]
    collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
    possibilities_collection_id = "possible_#{collection_id}"
    possibilities_options ||= {}
    possibilities_options.merge!(:class => 'form-control')
-   title = association.to_s.singularize.humanize.pluralize
+   title ||= association.to_s.singularize.humanize.pluralize
    title += ' <span class="required">*</span>'.html_safe if required
+
+   if with_new_link
+     new_association_path = eval "new_#{association.to_s.singularize}_path(:parent_name=>'#{controller_name.underscore.singularize}')"
+   end
 %>
 
 <%= folding_panel(title, hidden, :id => "add_#{association}_form",
@@ -28,7 +31,7 @@
           <% end  %>
           <div class="form-group">
             <%= select_tag possibilities_collection_id,
-                           options_for_select([default_choice]|possibilities.collect{|o| [truncate(h(o.send(text_method)), :length=>120), o.send(value_method)]}),
+                           options_for_select([default_choice]|possibilities.collect{|o| [truncate(o.send(text_method), :length=>120).html_safe, o.send(value_method)]}),
                            possibilities_options -%>
           </div>
           <%# This ensures that the parameter is always sent, even when nothing is selected.
@@ -47,7 +50,7 @@
                                 :style => "margin-top:0.5em;" -%>
               Associate <%= association.to_s.singularize.humanize.pluralize -%> from other <%= t('project').pluralize -%>?
               <%= select_tag "alternative_#{association.to_s.singularize}_ids",
-                             options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|project_possibilities.collect { |o| [truncate(h(o.title), :length => 120), o.id] }),
+                             options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|project_possibilities.collect { |o| [truncate(o.send(text_method), :length => 120).html_safe, o.id] }),
                              :style => 'display:none;' -%>
           <% end %>
         </div>
@@ -56,7 +59,7 @@
             Event.observe(window, 'load', function () {
                 updateFancyMultiselect('<%= collection_id %>');
                 <% if other_projects_checkbox && !project_possibilities.empty? %>
-                var include_other_projects_checkbox = document.getElementById('include_other_project_<%=association-%>}');
+                var include_other_projects_checkbox = document.getElementById('include_other_project_<%=association-%>');
                 if (include_other_projects_checkbox.checked == false){
                     swapSelectListContents('possible_<%=object_type.underscore-%>_<%=association.to_s.singularize-%>_ids',
                             'alternative_<%=association.to_s.singularize-%>_ids');

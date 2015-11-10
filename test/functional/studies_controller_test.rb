@@ -333,7 +333,7 @@ class StudiesControllerTest < ActionController::TestCase
         assert_select "p.list_item_attribute a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
       end
 
-      get :resource_in_tab, {:resource_ids => study.sops.map(&:id).join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      get :resource_in_tab, {:resource_ids => study.related_sops.map(&:id).join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
       assert_select "div.list_item" do
         # Sops resource_list_item
@@ -342,7 +342,7 @@ class StudiesControllerTest < ActionController::TestCase
         assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
         assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
       end
-      get :resource_in_tab, {:resource_ids => study.data_files.map(&:id).join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      get :resource_in_tab, {:resource_ids => study.related_data_files.map(&:id).join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
 
       assert_select "div.list_item" do
         #DataFiles resource_list_item
@@ -472,5 +472,68 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should add creators' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    assert study.creators.empty?
+
+    put :update, :id=>study.id, :study=>{}, :creators=>[[creator.name,creator.id]].to_json
+    assert_redirected_to study_path(study)
+
+    assert study.creators.include?(creator)
+  end
+
+  test 'should have creators association box' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+
+    get :edit, :id=> study.id
+    assert_response :success
+    assert_select "p#creators_list"
+    assert_select "input[type='text'][name='creator-typeahead']"
+    assert_select "input[type='hidden'][name='creators']"
+    assert_select "input[type='text'][name='study[other_creators]']"
+
+  end
+
+  test 'should show creators' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    study.creators = [creator]
+    study.save
+    study.reload
+    assert study.creators.include?(creator)
+
+    get :show, :id=> study.id
+    assert_response :success
+    assert_select "span.author_avatar a[href=?]", "/people/#{creator.id}"
+  end
+
+  test 'should show other creators' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    other_creators = 'other creators'
+    study.other_creators = other_creators
+    study.save
+    study.reload
+
+    get :show, :id=> study.id
+    assert_response :success
+    assert_select "div.panel-body div", :text => other_creators
+  end
+
+  test 'should not multiply creators after calling show' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    study.creators = [creator]
+    study.save
+    study.reload
+    assert study.creators.include?(creator)
+    assert_equal 1, study.creators.count
+
+    get :show, :id=> study.id
+    assert_response :success
+
+    study.reload
+    assert_equal 1, study.creators.count
+  end
 
 end

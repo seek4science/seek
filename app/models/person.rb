@@ -4,7 +4,7 @@ class Person < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::Taggable
-  include Seek::AdminDefinedRoles
+  include Seek::Roles::AdminDefinedRoles
 
   alias_attribute :title, :name
 
@@ -29,6 +29,17 @@ class Person < ActiveRecord::Base
 
   has_many :group_memberships, :dependent => :destroy
   has_many :work_groups, :through=>:group_memberships
+
+  has_many :former_group_memberships, :class_name => 'GroupMembership',
+           :conditions => proc { ["time_left_at IS NOT NULL AND time_left_at <= ?", Time.now] }, :dependent => :destroy
+  has_many :former_work_groups, :class_name => 'WorkGroup', :through => :former_group_memberships,
+           :source => :work_group
+
+  has_many :current_group_memberships, :class_name => 'GroupMembership',
+           :conditions =>  proc { ["time_left_at IS NULL OR time_left_at > ?", Time.now] }, :dependent => :destroy
+  has_many :current_work_groups, :class_name => 'WorkGroup', :through => :current_group_memberships,
+           :source => :work_group
+
   has_many :institutions,:through => :work_groups, :uniq => true
 
   has_many :favourite_group_memberships, :dependent => :destroy
@@ -69,6 +80,11 @@ class Person < ActiveRecord::Base
 
   after_commit :queue_update_auth_table
 
+  #not registered profiles that match this email
+  def self.not_registered_with_matching_email email
+    self.not_registered.where('UPPER(email) = ?',email.upcase)
+  end
+
   def queue_update_auth_table
     if previous_changes.keys.include?("roles_mask")
       AuthLookupUpdateJob.new.add_items_to_queue self
@@ -93,6 +109,7 @@ class Person < ActiveRecord::Base
     !user.nil?
   end
 
+  #to allow you to call .person on a Person or User to avoid having to check its type
   def person
     self
   end
@@ -214,10 +231,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def can_create_new_items?
-    member?
-  end
-
   def workflows
      self.try(:user).try(:workflows) || []
   end
@@ -230,9 +243,20 @@ class Person < ActiveRecord::Base
     self.try(:user).try(:sweeps) || []
   end
 
-  def projects
-      #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-      work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
+  def projects # ALL projects, former and current
+    #updating workgroups doesn't change groupmemberships until you save. And vice versa.
+    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
+  end
+
+  def current_projects
+    (current_work_groups.collect {|wg| wg.project }.uniq | current_group_memberships.collect{|gm| gm.work_group.project})
+  end
+
+  # Projects that the person has let completely (i.e. not still involved with through a different institution)
+  def former_projects
+    old_projects = (former_work_groups.collect {|wg| wg.project }.uniq | former_group_memberships.collect{|gm| gm.work_group.project})
+
+    old_projects - current_projects
   end
 
   def member?
@@ -296,20 +320,10 @@ class Person < ActiveRecord::Base
   #can be edited by:
   #(admin or project managers of this person) and (this person does not have a user or not the other admin)
   #themself
-  def can_be_edited_by?(subject)
-    return false unless subject
-    subject = subject.user if subject.is_a?(Person)
-    subject == self.user || subject.is_admin? || self.is_managed_by?(subject)
-  end
-
-  #determines if this person is the member of a project for which the user passed is a project manager,
-  # #and the current person is not an admin
-  def is_managed_by? user
-    return false if self.is_admin?
-    match = self.projects.find do |p|
-      user.person.is_project_manager?(p)
-    end
-    !match.nil?
+  def can_be_edited_by?(user)
+    return false unless user
+    user = user.user if user.is_a?(Person)
+    (user == self.user) || user.is_admin? || (self.is_project_administered_by?(user) && self.user.nil?)
   end
 
   def me?
@@ -320,7 +334,8 @@ class Person < ActiveRecord::Base
   def can_be_administered_by?(user)
     person = user.try(:person)
     return false unless user && person
-    user.is_admin? || (person.is_project_manager_of_any_project? && (self.is_admin? || self!=person))
+    is_proj_or_prog_admin = person.is_project_administrator_of_any_project? || person.is_programme_administrator_of_any_programme?
+    user.is_admin? || (is_proj_or_prog_admin && (self.is_admin? || self!=person))
   end
 
   def can_view? user = User.current_user
@@ -447,6 +462,12 @@ class Person < ActiveRecord::Base
         add_to_project_and_institution(project,project.institutions.first)
       end
     end
+  end
+
+  def self.can_create?
+    User.admin_or_project_administrator_logged_in? ||
+        User.activated_programme_administrator_logged_in? ||
+        (User.logged_in? && !User.current_user.registration_complete?)
   end
 
   include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled

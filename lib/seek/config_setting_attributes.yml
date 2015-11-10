@@ -1,5 +1,8 @@
 #keys that create the Seek::Config settigs.
 #e.g. Seek::Config.home_description
+
+# N.B. Settings that require a conversion to integer should NOT be set here.
+# They should be set in config.rb, in the Config class.
 home_description:
 home_feeds_cache_timeout:
 events_enabled:
@@ -39,7 +42,6 @@ google_analytics_tracker_id:
 piwik_analytics_url:
 exception_notification_enabled:
 exception_notification_recipients:
-open_id_authentication_store:
 sycamore_enabled:
 project_news_enabled:
 project_news_feed_urls:
@@ -125,3 +127,13 @@ max_extractable_spreadsheet_size:
 show_announcements:
 imprint_enabled:
 imprint_description:
+zenodo_publishing_enabled:
+zenodo_api_url:
+zenodo_oauth_url:
+zenodo_client_id:
+zenodo_client_secret:
+allow_user_programme_creation:
+cache_remote_files:
+max_cachable_size:
+hard_max_cachable_size:
+orcid_required:

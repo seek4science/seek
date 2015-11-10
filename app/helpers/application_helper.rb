@@ -291,7 +291,7 @@ module ApplicationHelper
   def page_title controller_name, action_name
     name=PAGE_TITLES[controller_name]
     name ||=""
-    name += " (Development)" if Rails.env=="development"
+    name += " (Development)" if Rails.env.development?
     return "The #{Seek::Config.application_name} "+name
   end
 
@@ -573,6 +573,12 @@ module ApplicationHelper
     end
 
     "<span class='visibility #{css_class}'>#{text}</span>".html_safe
+  end
+
+  def cancel_button path,html_options={}
+    html_options[:class]||=''
+    html_options[:class] << ' btn btn-default'
+    link_to 'Cancel',path,html_options
   end
 
   private  

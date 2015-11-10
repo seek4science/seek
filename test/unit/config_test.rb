@@ -143,6 +143,26 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 5, Seek::Config.tag_threshold
   end
 
+  test 'tag as integer' do
+    Seek::Config.tag_threshold = 6
+    assert_equal 6, Seek::Config.tag_threshold
+  end
+
+  test 'changing default_associated_projects_access_type integer conversion' do
+    Seek::Config.default_associated_projects_access_type = '0'
+    assert_equal 0, Seek::Config.default_associated_projects_access_type
+  end
+
+  test 'changing default_consortium_access_type integer conversion' do
+    Seek::Config.default_consortium_access_type = '0'
+    assert_equal 0, Seek::Config.default_consortium_access_type
+  end
+
+  test 'changing default_all_visitors_access_type integer conversion' do
+    Seek::Config.default_all_visitors_access_type = '0'
+    assert_equal 0, Seek::Config.default_all_visitors_access_type
+  end
+
   test 'smtp_settings authentication' do
     assert_equal :plain, Seek::Config.smtp_settings('authentication')
   end
@@ -263,15 +283,47 @@ end
   test 'pubmed_api_email' do
     assert_equal nil, Seek::Config.pubmed_api_email
   end
+
   test 'crossref_api_email' do
     assert_equal 'sowen@cs.man.ac.uk', Seek::Config.crossref_api_email
   end
+
   test 'site_base_host' do
     assert_equal 'http://localhost:3000', Seek::Config.site_base_host
   end
-  test 'open_id_authentication_store' do
-    assert_equal :memory, Seek::Config.open_id_authentication_store
+
+  test 'host_with_port' do
+    assert_equal 'localhost:3000', Seek::Config.host_with_port
+
+    with_config_value(:site_base_host, 'https://secure.website:443') do
+      assert_equal 'secure.website', Seek::Config.host_with_port
+    end
+
+    with_config_value(:site_base_host, 'http://insecure.website:80') do
+      assert_equal 'insecure.website', Seek::Config.host_with_port
+    end
+
+    with_config_value(:site_base_host, 'http://localhost') do
+      assert_equal 'localhost', Seek::Config.host_with_port
+    end
   end
+
+  test 'host_scheme' do
+    assert_equal 'http', Seek::Config.host_scheme
+
+    with_config_value(:site_base_host, 'https://secure.website:443') do
+      assert assert_equal 'https', Seek::Config.host_scheme
+    end
+
+    with_config_value(:site_base_host, 'http://insecure.website:80') do
+      assert_equal 'http', Seek::Config.host_scheme
+    end
+
+    with_config_value(:site_base_host, 'http://localhost') do
+      assert_equal 'http', Seek::Config.host_scheme
+    end
+  end
+  
   test 'copyright_addendum_enabled' do
     assert_equal false, Seek::Config.copyright_addendum_enabled
   end
@@ -287,6 +339,24 @@ end
   test 'convert setting from database' do
     Settings.limit_latest = '6'
     assert_equal 6, Seek::Config.limit_latest
+  end
+
+  test 'default associated projects access permission is accessible' do
+    assert_equal Policy::ACCESSIBLE, Seek::Config.default_associated_projects_access_type
+  end
+
+  test 'default consortium access permission is visible' do
+    assert_equal Policy::VISIBLE, Seek::Config.default_consortium_access_type
+  end
+
+  test 'default all visitors access permission is accessible' do
+    assert_equal Policy::ACCESSIBLE, Seek::Config.default_all_visitors_access_type
+  end
+
+  test 'changing default_consortium_access_type' do
+    Seek::Config.default_consortium_access_type = Policy::NO_ACCESS
+    assert_equal Policy::NO_ACCESS, Seek::Config.default_consortium_access_type
+    assert_equal Policy::NO_ACCESS.class, Seek::Config.default_consortium_access_type.class
   end
 
   test 'invalid setting accessor' do
@@ -356,5 +426,13 @@ end
 
   test 'imprint_description' do
     assert_equal 'Here is imprint example', Seek::Config.imprint_description
+  end
+
+  test 'zenodo_api_url' do
+    assert_equal "https://sandbox.zenodo.org/api", Seek::Config.zenodo_api_url
+  end
+
+  test 'zenodo_oauth_url' do
+    assert_equal "https://sandbox.zenodo.org/oauth", Seek::Config.zenodo_oauth_url
   end
 end

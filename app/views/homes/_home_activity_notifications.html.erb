@@ -4,7 +4,7 @@
       <div class="panel-heading">Latest additions</div>
       <div id="recently_added" class="panel-body front-page-panel">
         <ul class="feed">
-          <% recently_added_item_logs_hash(25.years.ago, 8).each do |added_item_log| -%>
+          <% recently_added_item_logs_hash(1.years.ago, 8).each do |added_item_log| -%>
               <%= display_single_log_item_hash(added_item_log, 'added') -%>
           <% end %>
         </ul>
@@ -17,7 +17,7 @@
       <div class="panel-heading">Latest downloads</div>
       <div id="recently_downloaded" class="panel-body front-page-panel">
         <ul class="feed">
-          <% recently_downloaded_item_logs_hash(25.years.ago, 8).each do |downloaded_item_log| %>
+          <% recently_downloaded_item_logs_hash(1.years.ago, 8).each do |downloaded_item_log| %>
               <%= display_single_log_item_hash(downloaded_item_log, 'downloaded') -%>
           <% end %>
         </ul>

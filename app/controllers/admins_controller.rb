@@ -45,6 +45,7 @@ class AdminsController < ApplicationController
     Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.forum_enabled = string_to_boolean params[:forum_enabled]
     Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
+    Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
@@ -78,6 +79,18 @@ class AdminsController < ApplicationController
     Seek::Config.datacite_url = params[:datacite_url]
     Seek::Config.doi_prefix = params[:doi_prefix]
     Seek::Config.doi_suffix = params[:doi_suffix]
+
+    Seek::Config.zenodo_publishing_enabled = string_to_boolean params[:zenodo_publishing_enabled]
+    Seek::Config.zenodo_api_url = params[:zenodo_api_url]
+    Seek::Config.zenodo_oauth_url = params[:zenodo_oauth_url]
+    Seek::Config.zenodo_client_id = params[:zenodo_client_id].try(:strip)
+    Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].try(:strip)
+
+    Seek::Config.cache_remote_files = params[:cache_remote_files]
+    Seek::Config.max_cachable_size = params[:max_cachable_size]
+    Seek::Config.max_cachable_size = params[:hard_max_cachable_size]
+
+    Seek::Config.orcid_required = params[:orcid_required]
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
@@ -178,12 +191,12 @@ class AdminsController < ApplicationController
     if Seek::Config.tag_threshold.to_s != params[:tag_threshold] || Seek::Config.max_visible_tags.to_s != params[:max_visible_tags]
       expire_annotation_fragments
     end
-    Seek::Config.site_base_host = params[:site_base_host] unless params[:site_base_host].nil?
+    Seek::Config.site_base_host = params[:site_base_host].chomp('/') unless params[:site_base_host].nil?
     # check valid email
     pubmed_email = params[:pubmed_api_email]
-    pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed api email')
+    pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
     crossref_email = params[:crossref_api_email]
-    crossref_email_valid = check_valid_email(crossref_email, 'crossref api email')
+    crossref_email_valid = check_valid_email(crossref_email, 'crossref API email address')
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 
@@ -197,6 +210,9 @@ class AdminsController < ApplicationController
     Seek::Config.recaptcha_enabled = string_to_boolean params[:recaptcha_enabled]
     Seek::Config.recaptcha_private_key = params[:recaptcha_private_key]
     Seek::Config.recaptcha_public_key = params[:recaptcha_public_key]
+    Seek::Config.default_associated_projects_access_type = params[:default_associated_projects_access_type]
+    Seek::Config.default_consortium_access_type = params[:default_consortium_access_type]
+    Seek::Config.default_all_visitors_access_type = params[:default_all_visitors_access_type]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || (crossref_email_valid)) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
     update_redirect_to update_flag, 'others'
   end
@@ -209,7 +225,7 @@ class AdminsController < ApplicationController
 
   def restart_delayed_job
     error = nil
-    if Rails.env != 'test'
+    if !Rails.env.test?
       begin
         Seek::Workers.restart
         wait_for_delayed_job_to_start
@@ -463,11 +479,11 @@ class AdminsController < ApplicationController
   end
 
   def check_valid_email(email_address, field)
-    if email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/
-      return true
+    if email_address.blank? || email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/
+      true
     else
-      flash[:error] = "Please input the correct #{field}"
-      return false
+      flash[:error] = "Please input a valid #{field}"
+      false
     end
   end
 
@@ -493,9 +509,9 @@ class AdminsController < ApplicationController
 
   def string_to_boolean(string)
     if string == '1'
-      return true
+      true
     else
-      return false
+      false
     end
   end
 
@@ -510,7 +526,7 @@ class AdminsController < ApplicationController
   end
 
   def execute_command(command)
-    return nil if Rails.env == 'test'
+    return nil if Rails.env.test?
     begin
       cl = Cocaine::CommandLine.new(command)
       cl.run

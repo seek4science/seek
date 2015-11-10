@@ -2,7 +2,7 @@ Hi Admin,
 
 The new user <%= @person.name %> just signed up. He/She left the following details about their project and institution affiliations:
 
-"<%= @details %>"
+<%= @details %>
 
-For the person details: <%= person_url(@person, :host=>@host) %>, whose email address is <%= @person.email %> .
+For the person details: <%= person_url(@person) %>, whose email address is <%= @person.email %> .
 -- end --

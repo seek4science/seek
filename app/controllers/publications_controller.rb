@@ -5,6 +5,7 @@ class PublicationsController < ApplicationController
   include Seek::DotGenerator
   include Seek::AssetsCommon
   include Seek::BioExtension
+  include Seek::PreviewHandling
 
   before_filter :publications_enabled?
 
@@ -102,6 +103,8 @@ class PublicationsController < ApplicationController
 
     update_annotations(params[:tag_list], @publication)
 
+    investigation_ids = params[:investigation_ids] || []
+    study_ids = params[:study_ids] || []
     assay_ids = params[:assay_ids] || []
     data_file_ids = params[:data_file_ids] || []
     model_ids = params[:model_ids] || []
@@ -111,6 +114,8 @@ class PublicationsController < ApplicationController
       if valid && @publication.update_attributes(publication_params)
 
         # Update association
+        create_or_update_associations investigation_ids, "Investigation", "view"
+        create_or_update_associations study_ids, "Study", "view"
         create_or_update_associations assay_ids, "Assay", "edit"
 
         data_file_ids = data_file_ids.collect{|data_file_id| data_file_id.split(',').first}
@@ -191,7 +196,7 @@ class PublicationsController < ApplicationController
   def associate_authors
     publication = @publication
     projects = publication.projects
-    projects = current_user.person.projects if projects.empty?
+    projects = current_person.projects if projects.empty?
     association = {}
     publication.publication_authors.each do |author|
       unless author.person
@@ -304,9 +309,7 @@ class PublicationsController < ApplicationController
     asset_ids.each do |id|
       asset = asset_type.constantize.find_by_id(id)
       if asset && asset.send("can_#{required_action}?")
-        unless Relationship.where(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object_type => "Publication", :other_object_id => @publication.id).first
-          Relationship.create(:subject_type => asset_type, :subject_id => asset.id, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object_type => "Publication", :other_object_id => @publication.id)
-        end
+        @publication.associate(asset)
       end
     end
     #Destroy asset relationship that aren't needed

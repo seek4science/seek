@@ -51,12 +51,6 @@
                   <%= h @person.user.login %>
                 </p>
             <% end %>
-            <% if !@person.user.nil? && @person.user.openid %>
-                <p>
-                  <b>OpenID URL:</b>
-                  <%= h @person.user.openid %>
-                </p>
-            <% end %>
             <p>
               <b>Joined:</b>
               <%= @person.registered? ? date_as_string(@person.user.created_at, true) : 'This person has not yet registered' -%>
@@ -96,7 +90,7 @@
       <%= content_tag(:li,"This person is a #{Seek::Config.dm_project_name} PAL for #{@person.projects_for_role('pal').collect(&:title).join(', ')}") if @person.is_pal_of_any_project? %>
 
 
-      <%= content_tag(:li,"This person is a #{t('project')} Manager for #{@person.projects_for_role('project_manager').collect(&:title).join(', ')}") if @person.is_project_manager_of_any_project? %>
+      <%= content_tag(:li,"This person is a #{t('project')} Administrator for #{@person.projects_for_role('project_administrator').collect(&:title).join(', ')}") if @person.is_project_administrator_of_any_project? %>
 
       <%= content_tag(:li,"This person is an Asset Manager for #{@person.projects_for_role('asset_manager').collect(&:title).join(', ')}") if @person.is_asset_manager_of_any_project? %>
       <%= content_tag(:li,"This person is a Gatekeeper for #{@person.projects_for_role('gatekeeper').collect(&:title).join(', ')}") if @person.is_gatekeeper_of_any_project? %>

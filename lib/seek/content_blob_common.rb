@@ -22,7 +22,7 @@ module Seek
           else
             filepath = @content_blob.filepath
             #added for the benefit of the tests after rails3 upgrade - but doubt it is required
-            headers["Content-Length"]=@content_blob.filesize.to_s
+            headers["Content-Length"]=@content_blob.file_size.to_s
           end
           send_file filepath, :filename => @content_blob.original_filename, :type => @content_blob.content_type || "application/octet-stream", :disposition => disposition
         else
@@ -33,7 +33,13 @@ module Seek
           if @asset_version.contributor.nil? #A jerm generated resource
             download_jerm_asset
           else
-            download_via_url
+            case URI(@content_blob.url).scheme
+              when 'http', 'https'
+                stream_from_http_url
+              when 'ftp'
+                stream_from_ftp_url
+            end
+
           end
         rescue Seek::DownloadException=>de
           redirect_on_error @asset_version,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
@@ -72,33 +78,46 @@ module Seek
       end
     end
 
-    def download_via_url
-      code = url_response_code(@content_blob.url)
-      if code == "200"
-        downloader=Seek::RemoteDownloader.new
-        begin
-          data_hash = downloader.get_remote_data @content_blob.url
-          filename = get_filename data_hash[:filename], @content_blob.original_filename
-          send_file data_hash[:data_tmp_path], :filename => filename, :type => data_hash[:content_type] || @content_blob.content_type, :disposition => 'attachment'
-        rescue Exception=>e
-          error_message = "There is a problem downloading this file. #{e}"
-          redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
-          return_file_or_redirect_to redirected_url, error_message
-        end
-      elsif (["301","302","401","403"].include?(code))
-        return_file_or_redirect_to @content_blob.url
-      elsif code=="404"
+    def stream_from_http_url
+      code = check_url_response_code(@content_blob.url)
+      case code
+      when 200
+        stream_with(Seek::DownloadHandling::HTTPStreamer.new(@content_blob.url))
+      when 401, 403
+        # Try redirecting the user to the URL if SEEK cannot access it
+        redirect_to @content_blob.url
+      when 404
         error_message = "This item is referenced at a remote location, which is currently unavailable"
         redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
         return_file_or_redirect_to redirected_url, error_message
       else
-        error_message = "There is a problem downloading this file."
+        error_message = "There is a problem downloading this file. Error code #{code}"
+        redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
+        return_file_or_redirect_to redirected_url, error_message
+      end
+    end
+
+    def stream_from_ftp_url
+      stream_with(Seek::DownloadHandling::FTPStreamer.new(@content_blob.url))
+    end
+
+    def stream_with(streamer)
+      self.response.headers["Content-Type"] ||= @content_blob.content_type
+      self.response.headers["Content-Disposition"] = "attachment; filename=#{@content_blob.original_filename}"
+      self.response.headers['Last-Modified'] = Time.now.ctime.to_s
+
+      begin
+        self.response_body = Enumerator.new do |yielder|
+          streamer.stream do |chunk|
+            yielder << chunk
+          end
+        end
+      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+          Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+        error_message = "There is a problem downloading this file. #{e}"
         redirected_url = polymorphic_path(@asset_version.parent,{:version=>@asset_version.version})
         return_file_or_redirect_to redirected_url, error_message
       end
     end
   end
-
-
-
 end

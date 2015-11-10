@@ -2,6 +2,7 @@ language: ruby
 
 rvm:
   - 2.1.6
+  - 2.1.7
 
 addons:
   postgresql: "9.3"
@@ -16,17 +17,23 @@ env:
   - SUITE="rake test:integration" DB_TYPE=mysql
   - SUITE="rspec spec" DB_TYPE=mysql
   - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
+  - SUITE="rake teaspoon" DB_TYPE=mysql DISPLAY=":99.0"
   - SUITE="rake test:units" DB_TYPE=postgres
   - SUITE="rake test:functionals" DB_TYPE=postgres
   - SUITE="rake test:integration" DB_TYPE=postgres
   - SUITE="rspec spec" DB_TYPE=postgres
+  - SUITE="rake test:units" DB_TYPE=sqlite3
+  - SUITE="rake teaspoon" DB_TYPE=postgres DISPLAY=":99.0"
 
 before_script:
+  - sh -e /etc/init.d/xvfb start
+  - sleep 3 # give time for xvfb to start
   - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test;' -U postgres; fi"
   - cp test/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
   - RAILS_ENV=test bundle exec rake db:schema:load
   - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then RAILS_ENV=production bundle exec rake db:create; fi"
   - sh -c "if [ '$DB_TYPE' = 'mysql' ]; then RAILS_ENV=production bundle exec rake db:schema:load; fi"
+
   
 script: bundle exec $SUITE

@@ -21,8 +21,8 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'content_blob_params' do
-    @params = { content_blob: { fish: 1, soup: 2 }, data_file: { title: 'george' } }
-    assert_equal({ fish: 1, soup: 2 }, content_blob_params)
+    @params = { content_blobs: [{ fish: 1, soup: 2 }], data_file: { title: 'george' } }
+    assert_equal([{ fish: 1, soup: 2 }], content_blob_params)
   end
 
   test 'default to http if missing' do
@@ -103,75 +103,6 @@ class UploadHandingTest < ActiveSupport::TestCase
 
   end
 
-  test 'update params for batch' do
-
-    p = { data: 'some data', data_url: 'some url', original_filename: 'file.txt' }
-    # not batch so shouldn't be affected
-    expected = { data: 'some data', data_url: 'some url', original_filename: 'file.txt' }
-    assert_equal expected, update_params_for_batch(p)
-
-    p = { data_0: 'a', data_1: 'b', data_2: 'c' }
-    expected = { data: %w(a b c) }
-    assert_equal expected, update_params_for_batch(p)
-
-    # order preserved
-    p = { data_3: 'd', data_0: 'a', data_2: 'c', data_1: 'b' }
-    expected = { data: %w(a b c d) }
-    assert_equal expected, update_params_for_batch(p)
-
-    # filenames and make local copy also gets transferred for urls
-    p = { data_url_3: 'd', data_url_0: 'a', data_url_2: 'c', data_url_1: 'b',
-          original_filename_0: 'fred', original_filename_2: 'bob', original_filename_3: 'mary', original_filename_1: 'frank',
-          make_local_copy_0: '1', make_local_copy_2: '0', make_local_copy_1: '1', make_local_copy_3: '0' }
-    expected = { data_url: %w(a b c d), original_filename: %w(fred frank bob mary), make_local_copy: %w(1 1 0 0) }
-    assert_equal expected, update_params_for_batch(p)
-
-    # strip blank
-    p = { data_url_3: 'd', data_url_0: '', data_url_2: 'c', data_url_1: 'b',
-          original_filename_0: 'df', original_filename_1: 'bob', original_filename_2: 'charles', original_filename_3: 'denis',
-          make_local_copy_0: '1', make_local_copy_2: '0', make_local_copy_1: '1', make_local_copy_3: '0' }
-    expected = { data_url: %w(b c d), original_filename: %w(bob charles denis), make_local_copy: %w(1 0 0) }
-    assert_equal expected, update_params_for_batch(p)
-  end
-
-  test 'arrayify params' do
-    file_with_content = ActionDispatch::Http::UploadedFile.new(
-                                                                   filename: 'file',
-                                                                   content_type: 'text/plain',
-                                                                   tempfile: StringIO.new('fish')
-                                                               )
-    p = { data_url: %w(b c d), original_filename: %w(1 2 3), make_local_copy: %w(1 0 1) }
-    expected = [{ data_url: 'b', original_filename: '1', make_local_copy: '1' },
-                { data_url: 'c', original_filename: '2', make_local_copy: '0' },
-                { data_url: 'd', original_filename: '3', make_local_copy: '1' }]
-    assert_equal expected, arrayify_params(p)
-
-    p = { data_url: 'some url', original_filename: 'file.txt', make_local_copy: '1' }
-    expected = [{ data_url: 'some url', original_filename: 'file.txt', make_local_copy: '1' }]
-    assert_equal expected, arrayify_params(p)
-
-    p = { data: file_with_content }
-    expected = [{ data: file_with_content }]
-    assert_equal expected, arrayify_params(p)
-
-    p = { data: [file_with_content, file_with_content] }
-    expected = [{ data: file_with_content }, data: file_with_content]
-    assert_equal expected, arrayify_params(p)
-
-    p = { data_url: %w(b c), original_filename: %w(1 2), data: [file_with_content], make_local_copy: %w(0 1) }
-    expected = [{ data_url: 'b', original_filename: '1', make_local_copy: '0' }, { data_url: 'c', original_filename: '2', make_local_copy: '1' }, { data: file_with_content }]
-    assert_equal expected, arrayify_params(p)
-
-    # remvoves blank urls or data
-    p = { data_url: '', data: file_with_content }
-    expected = [{ data: file_with_content }]
-    assert_equal expected, arrayify_params(p)
-
-    p = { data_url: 'http://fish.com', original_filename: 'dd', make_local_copy: '1', data: '' }
-    expected = [{ data_url: 'http://fish.com', original_filename: 'dd', make_local_copy: '1' }]
-    assert_equal expected, arrayify_params(p)
-  end
-
   test 'content type from filename' do
     assert_equal 'text/html', content_type_from_filename(nil)
     # FIXME: , MERGENOTE - .xml gives an incorrect mime type of sbml+xml due to the ordering
@@ -247,16 +178,14 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'retained content blob ids' do
-
-    @params = { content_blobs: { id: { 1 => 'fish.png', 2 => '2.png' } } }
+    @params = { retained_content_blob_ids: [1, 2] }
     assert_equal [1, 2], retained_content_blob_ids
     @params = {}
     assert_equal [], retained_content_blob_ids
     @params = { content_blobs: nil }
     assert_equal [], retained_content_blob_ids
-    @params = { content_blobs: { id: { '3' => 'bob.png', '1' => 'fish.png', '2' => '2.png' } } }
+    @params = { retained_content_blob_ids: [1, 2, 3] }
     assert_equal [1, 2, 3], retained_content_blob_ids
-
   end
 
   test 'model image present?' do

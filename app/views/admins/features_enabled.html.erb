@@ -9,6 +9,8 @@
 
     <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
                                "Search enabled", "Whether search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after chaning this setting.") %>
+    <%= admin_checkbox_setting(:programmes_enabled, 1, Seek::Config.programmes_enabled,
+                               "#{t('programme').pluralize} enabled", "Whether #{t('programme').pluralize} are enabled. #{t('programme').pluralize} allow a collection of #{t('project').pluralize} to be grouped together. This is useful if you have a large number of #{t('project').pluralize} from different initiatives.") %>
 
     <%= admin_checkbox_setting(:show_announcements, 1, Seek::Config.show_announcements,
                                "Show announcements enabled", "Whether the announcements panel is displayed. If you don't make many announcements you may want to hide it to avoid showing old announcements") %>
@@ -56,8 +58,10 @@
 
     <%= render :partial=>"admins/doi_settings" %>
 
+    <%= render :partial=>"admins/zenodo_settings" %>
+
     <%= render :partial => 'admins/email'  %>
 
     <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
-    <%= link_to 'Cancel', admin_path, :class => 'btn btn-default'-%>
+    <%= cancel_button admin_path-%>
 <% end -%>

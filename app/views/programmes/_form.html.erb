@@ -24,7 +24,20 @@
     </div>
 <% end %>
 
-<%= render :partial => "projects/project_selector", :locals => { :resource => @programme, :allow_nil => true, :possibilities=>(Project.without_programme | @programme.projects) } -%>
+<% if admin_logged_in? %>
+    <%= render :partial => "projects/project_selector", :locals => { :resource => @programme,
+                                                                     :allow_nil => true,
+                                                                     :possibilities=>(Project.without_programme | @programme.projects) } %>
+<% end %>
+
+<% if @programme.can_manage? %>
+
+<%= panel("#{t('programme')} Administrators") do %>
+        <%= programme_administrators_input_box(@programme) %>
+<% end %>
+
+
+<% end %>
 
 <%= f.submit(programme ? "Update" : "Create",:disable_with=>(programme ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
- or <%= link_to 'Cancel', (programme ? programme_path(programme.id) : programmes_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(programme ? programme_path(programme.id) : programmes_path) -%>

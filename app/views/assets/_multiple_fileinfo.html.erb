@@ -18,71 +18,35 @@
    external_links  = multiple_fileinfo.content_blobs.select &:show_as_external_link?
    files =   multiple_fileinfo.content_blobs  - external_links
 %>
-<p>
-  <strong> <%= pluralize(n, 'item') -%><%= model_image_text -%> <%= (n==1 && image_count==0) ? "is" : "are" %> associated with this <%= resource_text %>:</strong>
-  <%= link_to_function "view in large icon","javascript:toggle_view(this);" %>
+<strong>
+  <%= pluralize(n, 'item') -%><%= model_image_text -%> <%= (n==1 && image_count==0) ? "is" : "are" %> associated with this <%= resource_text %>:
+</strong>
 
-  <% unless multiple_fileinfo.content_blobs.empty? %>
-<table id="file_list_view" class="fileinfo" style="display: block;padding-left: 2em; ">
-  <th>Filename</th>
-  <th>Format</th>
-  <th>Size</th>
-  <th>Action</th>
+<% unless multiple_fileinfo.content_blobs.empty? %>
+    <ul>
+      <% files.each do |file| -%>
+          <li>
+            <%=h file.original_filename -%>
+            <span class="subtle">(<%=h file.human_content_type -%> - <%= filesize_as_text(file) %>)</span>
+            <% asset = file.asset
+               if Seek::Util.multi_files_asset_types.include?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
+                <%= render :partial => "assets/view_content", :locals => {:content_blob => file, :icon_view => true} -%>
+                <%= image_tag_for_key('download', polymorphic_path([asset, file], :action=>:download,:code=>params[:code]), "Download", {:title => 'Download this file'}, "") -%>
+            <% end %>
+          </li>
+      <% end -%>
 
-  <% files.each do |file| -%>
-       <tr class='fileinfo'>
-         <td><%=h file.original_filename -%></td>
-         <td><%=h file.human_content_type -%></td>
-         <td> <%= filesize_as_text(file) %></td>
-         <td><% asset = file.asset
-                if Seek::Util.multi_files_asset_types.include?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
-                   <%= render :partial => "assets/view_content", :locals => {:content_blob => file} -%>
-                   <%= image_tag_for_key('download', polymorphic_path([asset, file], :action=>:download,:code=>params[:code]), "Download", {:title => 'Download this file'}, "") -%>
-             <% end %></td>
-       </tr>
-   <% end -%>
-
-  <% external_links.each do |page| -%>
-        <tr class='fileinfo'>
-          <td><%= link_to page.url, page.url, :target=>"_blank" -%></td>
-          <td>Website</td>
-          <td> </td>
-          <td><% asset = page.asset
-                 if Seek::Util.multi_files_asset_types.include?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
-                    <%= image_tag_for_key('arrow_right', page.url, "Link", {:title => 'Go to this Link',:target=>"_blank"}, "") -%>
-              <% end %></td>
-        </tr>
-    <% end -%>
-</table>
+      <% external_links.each do |page| -%>
+          <li>
+            <%= link_to page.url, page.url, :target=>"_blank" -%>
+            <span class="subtle">(Website)</span>
+            <% asset = page.asset
+               if Seek::Util.multi_files_asset_types.include?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
+                <%= image_tag_for_key('arrow_right', page.url, "Link", {:title => 'Go to this Link',:target=>"_blank"}, "") -%>
+            <% end %>
+          </li>
+      <% end -%>
+    </ul>
 <% end %>
 
-<ul id="file_large_view"  class='fileinfo_list' style="display: none">
-
-  <% multiple_fileinfo.content_blobs.each do |blob| -%>
-      <li class='fileinfo_container curved with_shadow'>
-        <%= render :partial => "assets/fileinfo", :object => blob -%>
-      </li>
-  <% end -%>
-</ul>
-<div style="clear:both"></div>
-</p>
-
-<script type="text/javascript">
-  function toggle_view(element){
-       var title = element.innerHTML;
-      if(title=="view in list"){
-          $('file_list_view').style.display= 'block';
-          $('file_large_view').style.display= 'none';
-          element.innerHTML = "view in large icon";
-
-      }
-      else{
-          $('file_large_view').style.display= 'block';
-          $('file_list_view').style.display='none' ;
-          element.innerHTML = "view in list"
-      }
-
-
-  }
-</script>
 

@@ -196,13 +196,13 @@ end
 
 class InvestigationNode < SeekNode
   def children
-    item.studies
+    item.studies | item.publications
   end
 end
 
 class StudyNode < SeekNode
   def children
-    item.assays
+    item.assays | item.publications
   end
 end
 
@@ -211,14 +211,11 @@ class PublicationNode < SeekNode
     publication = item
     dot = ""
     pub_node = SeekNode.node_for(publication)
-    if publication.assays.empty?
+    isa = publication.assays | publication.studies | publication.investigations
+    if isa.empty?
       dot << pub_node.to_s
-    else
-      publication.assays.each do |assay|
-        dot << SeekNode.node_for(assay).to_s
-      end
     end
-    (publication.data_files | publication.models).each do |asset|
+    (isa | publication.data_files | publication.models).each do |asset|
       dot << SeekNode.node_for(asset).to_s
     end
     return dot

@@ -107,7 +107,6 @@ SEEK::Application.configure do
   Seek::Config.default :pubmed_api_email,nil
   Seek::Config.default :crossref_api_email,nil
   Seek::Config.default :site_base_host,"http://localhost:3000"
-  Seek::Config.default :open_id_authentication_store,:memory
 
   Seek::Config.default :max_attachments_num,100
 
@@ -125,7 +124,12 @@ SEEK::Application.configure do
   Seek::Config.default :recaptcha_enabled, true
 
   Seek::Config.default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
-  
+
+  # Set default permissions
+  Seek::Config.default :default_associated_projects_access_type, Policy::ACCESSIBLE
+  Seek::Config.default :default_consortium_access_type, Policy::VISIBLE
+  Seek::Config.default :default_all_visitors_access_type, Policy::ACCESSIBLE
+
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,'biovel_application'
   Seek::Config.fixed :javascript_prepended,''
@@ -140,5 +144,10 @@ SEEK::Application.configure do
   ActionView::Renderer.define_alternative({:seek_partial=>"projects/resource_list_item"},"projects/resource_list_item_biovel")
   ActionView::Renderer.define_alternative({:seek_partial=>"assets/sharing_form"},"assets/sharing_form_biovel")
 
+  Seek::Config.default :zenodo_publishing_enabled, false
+  Seek::Config.default :zenodo_api_url, 'https://zenodo.org/api'
+  Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
+
+  Seek::Config.default :orcid_required, false
 end
 

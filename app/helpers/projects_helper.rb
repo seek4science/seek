@@ -36,8 +36,8 @@ module ProjectsHelper
     link_list_for_role("Asset Manager",project.asset_managers)
   end
 
-  def project_managers_link_list project
-    link_list_for_role("#{t('project')} Manager",project.project_managers)
+  def project_administrator_link_list project
+    link_list_for_role("#{t('project')} Administrator",project.project_administrators)
   end
 
   def gatekeepers_link_list project
@@ -73,5 +73,32 @@ module ProjectsHelper
     end
   end
 
+  def can_create_projects?
+    Project.can_create?
+  end
+
+  def project_administrators_input_box(project)
+    project_role_input_box project,:project_administrator
+  end
+
+  def project_gatekeepers_input_box(project)
+    project_role_input_box project,:gatekeeper
+  end
+
+  def project_asset_managers_input_box(project)
+    project_role_input_box project,:asset_manager
+  end
+
+  def project_pals_input_box(project)
+    project_role_input_box project,:pal
+  end
+
+  def project_role_input_box project, role
+    administrators = project.send(role.to_s.pluralize)
+    members = project.people
+    box = ''
+    box << objects_input("project[#{role.to_s}_ids]", administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
+    box.html_safe
+  end
 
 end

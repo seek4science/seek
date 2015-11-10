@@ -25,6 +25,7 @@ echo "${GREEN} precompile assets${NC}"
 bundle exec rake assets:precompile # this task will take a while
 
 bundle exec rake sunspot:solr:start
+sleep 5 # small delay to make sure SOLR has started up and ready
 bundle exec rake seek:workers:start
 
 echo "${GREEN} restart server${NC}"

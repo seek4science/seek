@@ -11,7 +11,7 @@ The following resources were uploaded successfully:
 <% success_resources.each do |r| -%>
   <%= r[:seek_model].class.name.titleize + " - " + r[:seek_model].title %>
   Filename: <%= r[:seek_model].original_filename %>
-  <%= polymorphic_url(r[:seek_model], :host=>@host) %>
+  <%= polymorphic_url(r[:seek_model]) %>
     
 <% end -%>
 <% end -%>
@@ -23,7 +23,7 @@ The following resources were uploaded, but are missing information:
   <%= r[:seek_model].class.name.titleize + " - " + r[:seek_model].title %>
   Filename: <%= r[:seek_model].original_filename %>
   Warning: <%= r[:message] %>
-  Visit this url to edit the resource: <%= edit_polymorphic_url(r[:seek_model], :host=>@host) %>
+  Visit this url to edit the resource: <%= edit_polymorphic_url(r[:seek_model]) %>
     
 <% end -%>
 <% end -%>

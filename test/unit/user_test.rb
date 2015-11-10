@@ -7,6 +7,82 @@ class UserTest < ActiveSupport::TestCase
   include AuthenticatedTestHelper
   fixtures :users,:sops,:data_files,:models,:assets
 
+
+  test "validates email if set" do
+    u = Factory :user
+    assert u.valid?
+
+    u.email="fish"
+    refute u.valid?
+
+    u.email="http://fish.com"
+    refute u.valid?
+
+    u.email="fish@example.com"
+    assert u.valid?
+  end
+
+  test "registration_compelete?" do
+    u = Factory :brand_new_user
+    refute u.person
+    refute u.registration_complete?
+
+    #its not complete until the association has been saved
+    u.person = Factory(:brand_new_person)
+    assert u.person
+    refute u.registration_complete?
+
+    u = Factory :user
+    assert u.person
+    assert u.registration_complete?
+
+  end
+
+
+
+  test "check email present?" do
+    u = Factory :user
+    assert u.email.nil?
+    assert u.valid?
+
+    u.check_email_present=true
+    refute u.valid?
+    u.email=""
+    refute u.valid?
+    u.email="fish@example.com"
+    assert u.valid?
+  end
+
+  test "check email available" do
+    #email must not belong to another person, unless that person is unregistered
+    u = Factory :user
+    u.check_email_present=true
+    u.email="ghghgh@email.com"
+    assert u.valid?
+    Factory(:person,:email=>"ghghgh@email.com")
+
+    refute u.valid?
+
+    Factory(:brand_new_person,:email=>"zzzzzz@email.com")
+    u.email="zzzzzz@email.com"
+    assert u.valid?
+
+  end
+
+  test "validation of login" do
+    u = Factory :user
+    assert u.valid?
+    u.login=nil
+    refute u.valid?
+    u.login=""
+    refute u.valid?
+    u.login="aa"
+    refute u.valid?
+    u.login="zhsdfkhsdksdfh11"
+    assert u.valid?
+
+  end
+
   def test_without_profile
     user_with_profile = Factory(:user)
     user_without_profile = Factory(:brand_new_user)
@@ -70,15 +146,52 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "project manager logged in?" do
-    pm = Factory :project_manager
+  test "project administrator logged in?" do
+    project_administrator = Factory :project_administrator
     normal = Factory :person
-    User.with_current_user(pm.user) do
-      assert User.project_manager_logged_in?
+    User.with_current_user(project_administrator.user) do
+      assert User.project_administrator_logged_in?
     end
 
     User.with_current_user(normal.user) do
-      assert !User.project_manager_logged_in?
+      refute User.project_administrator_logged_in?
+    end
+  end
+
+  test "programme administrator logged in?" do
+    programme_administrator = Factory :programme_administrator
+    normal = Factory :person
+    User.with_current_user(programme_administrator.user) do
+      assert User.programme_administrator_logged_in?
+    end
+
+    User.with_current_user(normal.user) do
+      refute User.programme_administrator_logged_in?
+    end
+
+    User.with_current_user(nil) do
+      refute User.programme_administrator_logged_in?
+    end
+  end
+
+  test "activated_programme_administrator_logged_in? only if activated" do
+    refute User.activated_programme_administrator_logged_in?
+    person = Factory(:programme_administrator)
+    programme = person.administered_programmes.first
+
+    #check programme is activated an is the only administered programme
+    assert person.administered_programmes.first.is_activated?
+    assert_equal [programme],person.administered_programmes
+
+    User.with_current_user person.user do
+      assert User.activated_programme_administrator_logged_in?
+    end
+
+    #not true unless the programme is activated
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    User.with_current_user person.user do
+      refute User.activated_programme_administrator_logged_in?
     end
   end
 

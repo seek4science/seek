@@ -1,4 +1,4 @@
-class SendAnnouncementEmailsJob < SeekJob
+class SendAnnouncementEmailsJob < SeekEmailJob
   BATCHSIZE = 50
 
   attr_reader :site_announcement_id, :from_notifiee_id
@@ -6,12 +6,6 @@ class SendAnnouncementEmailsJob < SeekJob
   def initialize(site_annoucement_id, from_notifiee_id = 1)
     @site_announcement_id = site_annoucement_id
     @from_notifiee_id = from_notifiee_id
-  end
-
-  def before(_job)
-    # make sure the SMTP,site_base_host configuration is in sync with current SEEK settings
-    Seek::Config.smtp_propagate
-    Seek::Config.site_base_host_propagate
   end
 
   def perform_job(announcement)
@@ -40,7 +34,7 @@ class SendAnnouncementEmailsJob < SeekJob
       NotifieeInfo.where(['id IN (?) AND receive_notifications=?', (from_notifiee_id..(from_notifiee_id + BATCHSIZE)), true]).each do |notifiee_info|
         begin
           unless notifiee_info.notifiee.nil?
-            Mailer.announcement_notification(site_announcement, notifiee_info, Seek::Config.site_base_host.gsub(/https?:\/\//, '')).deliver
+            Mailer.announcement_notification(site_announcement, notifiee_info).deliver
           end
         rescue Exception => e
           if defined? Rails.logger

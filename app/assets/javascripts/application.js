@@ -18,6 +18,8 @@
 //= require tagging
 //= require autocompleter_advanced
 //= require publication
+//= require investigation
+//= require study
 //= require top_menu
 //= require dropMenu
 //= require dynamic_menu
@@ -36,10 +38,15 @@
 //= require easytabs
 //= require favourites
 //= require jquery-ui-drag-drop
-//= require bootstrap-tagsinput
+//= require bootstrap-tagsinput-fixed
 //= require bootstrap-typeahead-rails
+//= require bootstrap-multiselect
 //= require tags_input
 //= require objects_input
 //= require handlebars.runtime
+//= require handlebars_helpers
 //= require calendar_date_select/calendar_date_select
+//= require zenodo_form
+//= require batch_upload
+//= require bootstrap_tab_memory
 //= require_tree ./templates

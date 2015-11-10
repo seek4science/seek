@@ -6,26 +6,18 @@
 
 <% investigations.each do |investigation| %>
     <div class="box_simple" style="margin-bottom:2em;">
-      <%= render :partial => "assets/publishing/options_for_publishing", :object => investigation, :locals => {:html_classes => "publishing_options"} -%>
+      <%= render :partial => "assets/publishing/options_for_publishing", :object => investigation, :locals => {:checked=>(item==investigation),:html_classes => "publishing_options"} -%>
 
       <div style="padding-left: 3em;">
         <% investigation.studies.each do |study| %>
-            <%= render :partial => "assets/publishing/options_for_publishing", :object => study, :locals => {:html_classes => "publishing_options"} -%>
+            <%= render :partial => "assets/publishing/options_for_publishing", :object => study, :locals => {:checked=>(item==study),:html_classes => "publishing_options"} -%>
             <div style="padding-left: 3em;">
               <% study.assays.each do |assay| %>
-                  <%= render :partial => "assets/publishing/options_for_publishing", :object => assay, :locals => {:html_classes => "publishing_options"} -%>
+                  <%= render :partial => "assets/publishing/options_for_publishing", :object => assay, :locals => {:checked=>(item==assay),:html_classes => "publishing_options"} -%>
 
                   <div style="padding-left: 3em;">
                     <% assay.assets.each do |asset| %>
-                        <% checked = (asset == item) ? true : false %>
-                        <% if checked %>
-                            <div class="box_simple">
-                                <%= render :partial => "assets/publishing/options_for_publishing", :object => asset, :locals => {:checked => checked, :html_classes => "publishing_options"} -%>
-                            </div>
-                        <% else %>
-                            <%= render :partial => "assets/publishing/options_for_publishing", :object => asset, :locals => {:html_classes => "publishing_options"} -%>
-                        <% end %>
-
+                        <%= render :partial => "assets/publishing/options_for_publishing", :object => asset, :locals => {:checked => item==asset, :html_classes => "publishing_options"} -%>
                     <% end %>
                   </div>
               <% end %>
