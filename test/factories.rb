@@ -129,6 +129,7 @@ include ActionDispatch::TestProcess
 #Institution
   Factory.define(:institution) do |f|
     f.sequence(:title) { |n| "An Institution: #{n}" }
+    f.country { ActionView::Helpers::FormOptionsHelper::COUNTRIES.sample }
   end
 
 #Sop
