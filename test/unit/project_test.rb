@@ -759,5 +759,24 @@ class ProjectTest < ActiveSupport::TestCase
 
   end
 
+  test "project role removed when removed from project" do
+    project_administrator = Factory(:project_administrator).reload
+    project = project_administrator.projects.first
+
+    assert_includes project_administrator.roles, 'project_administrator'
+    assert_includes project.project_administrators, project_administrator
+    assert project_administrator.is_project_administrator?(project)
+    assert project_administrator.user.is_project_administrator?(project)
+    assert project_administrator.user.person.is_project_administrator?(project)
+    assert project.can_be_administered_by?(project_administrator.user)
+
+    project_administrator.group_memberships.destroy_all
+    project_administrator = project_administrator.reload
+
+    assert_not_includes project_administrator.roles, 'project_administrator'
+    assert_not_includes project.project_administrators, project_administrator
+    assert !project_administrator.is_project_administrator?(project)
+    assert !project.can_be_administered_by?(project_administrator.user)
+  end
 
 end
