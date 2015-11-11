@@ -102,11 +102,13 @@ var Projects = {
     actions: {
         add: function () {
             var people = $j('#people_ids').tagsinput('items');
+            var institution_id = $j("#institution_ids").val();
+            var institution_title = $j("#institution_ids option:selected").text();
+            var errors = [];
+            var toRemove = [];
 
             $j.each(people, function (index, value) {
-                if(Projects.getPersonIndex(Projects.memberships, value.id) == -1) {
-                    var institution_id = $j("#institution_ids").val();
-                    var institution_title = $j("#institution_ids option:selected").text();
+                if(Projects.getPersonIndex(Projects.memberships, value.id, institution_id) == -1) {
                     var change = {
                         person: { id: value.id, name: value.name },
                         institution: { id: institution_id, title: institution_title },
@@ -117,12 +119,17 @@ var Projects = {
                             institution_title: institution_title })
                     };
                     Projects.addChange(change);
+                    toRemove.push({ id: value.id });
                 } else {
-                    alert(value.name + ' is already a member of the project.')
+                    errors.push(value.name + ' is already a member of the project through that institution.');
                 }
             });
 
-            $j('#people_ids').tagsinput('removeAll');
+            for(var i = 0; i < toRemove.length; i++)
+                $j('#people_ids').tagsinput('remove', toRemove[i]);
+
+            if(errors.length > 0)
+                alert(errors.join("\n"));
         },
         undo: function () {
             var item = $j(this).parent('.institution_member');
@@ -167,10 +174,11 @@ var Projects = {
     }
 };
 
-Projects.getPersonIndex = function (set, personId) {
+Projects.getPersonIndex = function (set, personId, institutionId) {
     for(var i = 0; i < set.length; i++) {
         if(set[i].person.id == personId)
-            return i;
+            if(institutionId === null || (set[i].institution.id == institutionId))
+                return i;
     }
 
     return -1;
@@ -243,5 +251,6 @@ $j(document).ready(function () {
     $j('#undo-all').click(function () {
         Projects.membershipChanges = [];
         Projects.renderMemberships();
+        return false;
     });
 });
