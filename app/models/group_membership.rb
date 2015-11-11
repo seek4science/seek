@@ -34,8 +34,14 @@ class GroupMembership < ActiveRecord::Base
   private
 
   def remove_admin_defined_role_projects
-    project_id = WorkGroup.find(work_group_id_was).project_id
-    AdminDefinedRoleProject.where(:project_id => project_id, :person_id => person_id_was).destroy_all
+    project = Project.find_by_id(WorkGroup.find(work_group_id_was).project_id)
+    person = Person.find_by_id(person_id_was)
+    if project && person
+      Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
+        person.send("is_#{role_name}=", [false, project])
+      end
+      disable_authorization_checks { person.save }
+    end
   end
 
 end
