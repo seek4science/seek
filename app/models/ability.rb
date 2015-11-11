@@ -43,9 +43,9 @@ class Ability
   #asset manager can manage the assets belonging to their project
   def asset_manager asset_manager
     can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
-      person = item.contributor.is_a?(Person) ? item.contributor : item.contributor.person
+      user = item.contributor
       asset_manager.is_asset_manager_of?(item) &&
-          (item.projects - person.former_projects).none?
+          (user.nil? || (item.projects - user.person.former_projects).none?)
     end
   end
 

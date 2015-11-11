@@ -865,6 +865,20 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
+  test "asset manager can manage jerm harvested items" do
+    asset_manager = Factory(:asset_manager)
+    datafile1 = Factory(:data_file, contributor: nil,
+                        projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.can? :manage_asset, datafile1
+
+    User.with_current_user asset_manager.user do
+      assert datafile1.can_manage?
+    end
+  end
+
   test "gatekeeper should not be able to manage the item" do
     gatekeeper = Factory(:gatekeeper)
      datafile = Factory(:data_file, :projects => gatekeeper.projects, :policy => Factory(:all_sysmo_viewable_policy))
