@@ -8,8 +8,9 @@ module Seek
 
       REDIRECT_LIMIT = 10
 
-      def initialize(url)
+      def initialize(url, options = {})
         @url = url
+        @size_limit = options[:size_limit]
       end
 
       # yields a chunk of data to the given block
@@ -34,12 +35,11 @@ module Seek
       end
 
       def begin_stream(response, block)
-        max_size = Seek::Config.hard_max_cachable_size
         total_size = 0
 
         response.read_body do |chunk|
           total_size += chunk.size
-          raise SizeLimitExceededException.new(total_size) if total_size > max_size
+          raise SizeLimitExceededException.new(total_size) if @size_limit && (total_size > @size_limit)
           block.call(chunk)
         end
 
