@@ -19,7 +19,7 @@ module Seek
       end
 
       def programmes_for_person_with_role(person, role)
-        items_for_person_and_role(person,role)
+        items_for_person_and_role(person, role)
       end
 
       def people_with_programme_and_role(programme, role)
@@ -27,7 +27,7 @@ module Seek
         AdminDefinedRoleProgramme.where(role_mask: mask, programme_id: programme.id).collect(&:person)
       end
 
-      #Methods specific to ProgrammeRelatedResources required by RelatedResources superclass
+      # Methods specific to ProgrammeRelatedResources required by RelatedResources superclass
       def related_item_class
         Programme
       end
@@ -41,7 +41,7 @@ module Seek
       end
       ###############################
 
-      #Programme related instance methods that will be injected into the Person model
+      # Programme related instance methods that will be injected into the Person model
       module PersonInstanceMethods
         def programmes_for_role(role)
           fail UnknownRoleException.new("Unrecognised programme role name #{role}") unless Seek::Roles::ProgrammeRelatedRoles.role_names.include?(role)
@@ -50,14 +50,13 @@ module Seek
 
         def administered_programmes
           if is_admin?
-            #needs to return an ActiveRecord::Relation whereas .all just returns an Array, causing an error when trying to chain scopes etc
+            # needs to return an ActiveRecord::Relation whereas .all just returns an Array, causing an error when trying to chain scopes etc
             Programme.scoped
           else
             programmes_for_role('programme_administrator')
           end
         end
       end
-
     end
   end
 end

@@ -6,7 +6,7 @@ module Seek
       end
 
       def projects_for_person_with_role(person, role)
-        items_for_person_and_role(person,role)
+        items_for_person_and_role(person, role)
       end
 
       def people_with_project_and_role(project, role)
@@ -14,7 +14,7 @@ module Seek
         AdminDefinedRoleProject.where(role_mask: mask, project_id: project.id).collect(&:person)
       end
 
-      #Methods specific to ProjectRelatedResources required by RelatedResources superclass
+      # Methods specific to ProjectRelatedResources required by RelatedResources superclass
       def related_item_class
         Project
       end
@@ -54,7 +54,7 @@ module Seek
         base.include(PersonInstanceMethods)
       end
 
-      #Project related instance methods that will be injected into the Person model
+      # Project related instance methods that will be injected into the Person model
       module PersonInstanceMethods
         def projects_for_role(role)
           fail UnknownRoleException.new("Unrecognised project role name #{role}") unless Seek::Roles::ProjectRelatedRoles.role_names.include?(role)
@@ -99,7 +99,6 @@ module Seek
           update_column :roles_mask, new_mask
         end
       end
-
     end
   end
 end

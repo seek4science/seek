@@ -1,6 +1,6 @@
 module Seek
   module Roles
-    #subclass for handler for Roles that are related to something, for example Projects
+    # subclass for handler for Roles that are related to something, for example Projects
     class RelatedRoles < Roles
       def self.role_names
         []
@@ -23,9 +23,9 @@ module Seek
           mask = mask_for_role(role_name)
           join_association = related_item_join_class.name.underscore.pluralize
           related_item_class.joins(join_association.to_sym).where(
-              "#{join_association}.person_id"=>person.id).where("#{join_association}.role_mask"=>mask).readonly(false)
+            "#{join_association}.person_id" => person.id).where("#{join_association}.role_mask" => mask).readonly(false)
         else
-          #can't just return an empty array, as scopes may be added or the query extended
+          # can't just return an empty array, as scopes may be added or the query extended
           related_item_class.where('1=2')
         end
       end
@@ -35,12 +35,12 @@ module Seek
         mask = mask_for_role(role_name)
         item_ids = collect_item_ids(items)
 
-        #filter out any item ids attempted to be related to this role
+        # filter out any item ids attempted to be related to this role
         item_ids = filter_allowed_related_item_ids(item_ids, person)
 
         if item_ids.any?
 
-          current_item_ids = items_ids_related_to_person_and_role(person,role_name)
+          current_item_ids = items_ids_related_to_person_and_role(person, role_name)
 
           (item_ids - current_item_ids).each do |item_id|
             related_items_association(person) << related_item_join_class.new(associated_item_id_sym => item_id, role_mask: mask)
@@ -48,7 +48,6 @@ module Seek
 
           person.roles_mask += mask if (person.roles_mask & mask).zero?
         end
-
       end
 
       def remove_roles(person, role_name, items)
@@ -56,28 +55,28 @@ module Seek
         mask = mask_for_role(role_name)
         item_ids = collect_item_ids(items)
 
-        current_item_ids = items_ids_related_to_person_and_role(person,role_name)
+        current_item_ids = items_ids_related_to_person_and_role(person, role_name)
         item_ids.each do |item_id|
-          clause = {"#{related_item_class.name.downcase}_id" => item_id}
+          clause = { "#{related_item_class.name.downcase}_id" => item_id }
           related_items_association(person).where(role_mask: mask).where(clause).destroy_all
         end
         person.roles_mask -= mask if (current_item_ids - item_ids).empty?
       end
 
-      #Methods that should be implemented or overridden in superclass
+      # Methods that should be implemented or overridden in superclass
       def related_item_class
-        fail("Needs defining in subclass")
+        fail('Needs defining in subclass')
       end
 
       def related_item_join_class
-        fail("Needs defining in subclass")
+        fail('Needs defining in subclass')
       end
 
-      def related_items_association(person)
-        fail("Needs defining in subclass")
+      def related_items_association(_person)
+        fail('Needs defining in subclass')
       end
 
-      #by default nothing is filtered
+      # by default nothing is filtered
       def filter_allowed_related_item_ids(item_ids, _person)
         item_ids
       end
@@ -92,10 +91,9 @@ module Seek
         items.collect { |item| item.is_a?(related_item_class) ? item.id : item.to_i }
       end
 
-      def items_ids_related_to_person_and_role(person,role_name)
-        items_for_person_and_role(person,role_name).collect(&:id)
+      def items_ids_related_to_person_and_role(person, role_name)
+        items_for_person_and_role(person, role_name).collect(&:id)
       end
-
     end
   end
 end

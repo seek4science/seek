@@ -81,7 +81,6 @@ module Seek
       def role_names
         self.class.role_names
       end
-
     end
   end
 end
