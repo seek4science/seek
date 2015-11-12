@@ -7,7 +7,7 @@ class GroupMembership < ActiveRecord::Base
   has_many :project_roles, :through => :group_memberships_project_roles
 
   after_save :remember_previous_person
-  after_save { remove_admin_defined_role_projects if has_left }
+  after_update { remove_admin_defined_role_projects if has_left }
   after_commit :queue_update_auth_table
   after_destroy :remove_admin_defined_role_projects
 
