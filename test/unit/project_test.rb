@@ -779,4 +779,24 @@ class ProjectTest < ActiveSupport::TestCase
     assert !project.can_be_administered_by?(project_administrator.user)
   end
 
+  test "project role removed when marked as left project" do
+    project_administrator = Factory(:project_administrator).reload
+    project = project_administrator.projects.first
+
+    assert_includes project_administrator.roles, 'project_administrator'
+    assert_includes project.project_administrators, project_administrator
+    assert project_administrator.is_project_administrator?(project)
+    assert project_administrator.user.is_project_administrator?(project)
+    assert project_administrator.user.person.is_project_administrator?(project)
+    assert project.can_be_administered_by?(project_administrator.user)
+
+    project_administrator.group_memberships.first.update_attributes(:time_left_at => 1.day.ago)
+    project_administrator = project_administrator.reload
+
+    assert_not_includes project_administrator.roles, 'project_administrator'
+    assert_not_includes project.project_administrators, project_administrator
+    assert !project_administrator.is_project_administrator?(project)
+    assert !project.can_be_administered_by?(project_administrator.user)
+  end
+
 end
