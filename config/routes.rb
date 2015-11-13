@@ -673,8 +673,6 @@ SEEK::Application.routes.draw do
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
 
-  match '/contact' => 'contact#index', :as => :contact, :via => :get
-
   #feedback
   match '/home/feedback' => 'homes#feedback', :as=> :feedback, :via=>:get
 
