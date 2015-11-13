@@ -1008,57 +1008,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert content_blobs.collect(&:original_filename).include?(retained_content_blob.original_filename)
   end
 
-  test "should display find matching data button for sbml model" do
-    with_config_value :solr_enabled,true do
-      m = Factory(:teusink_model)
-      login_as(m.contributor.user)
-      get :show,:id=>m
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
-    end
-  end
-
-  test "should display find matching data button for jws dat model" do
-    with_config_value :solr_enabled,true do
-      m = Factory(:teusink_jws_model)
-      login_as(m.contributor.user)
-      get :show,:id=>m
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
-    end
-  end
-
-  test "should not display find matching data button for non smbml or dat model" do
-    with_config_value :solr_enabled,true do
-      m = Factory(:non_sbml_xml_model)
-      login_as(m.contributor.user)
-      get :show,:id=>m
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
-    end
-  end
-
-  test "only show the matching data button for the latest version" do
-    m = Factory(:teusink_jws_model, :policy => Factory(:public_policy))
-
-    m.save_as_new_version
-    Factory(:teusink_jws_model_content_blob, :asset => m, :asset_version => m.version)
-    m.reload
-    login_as(m.contributor.user)
-    assert_equal 2,m.version
-    with_config_value :solr_enabled,true do
-      get :show,:id=>m,:version=>2
-      assert_response :success
-      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
-
-      get :show,:id=>m,:version=>1
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
-    end
-  end
 
   test "should have -View content- button on the model containing one inline viewable file" do
     one_file_model = Factory(:doc_model, :policy => Factory(:all_sysmo_downloadable_policy))
