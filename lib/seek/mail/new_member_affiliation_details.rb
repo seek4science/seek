@@ -13,11 +13,12 @@ module Seek
       end
 
       def message
-        msg = details_existing(projects)
-        msg += "\r\nNew #{I18n.t('project').pluralize}: #{other_projects}\r\n" unless other_projects.blank?
-        msg += details_existing(institutions)
-        msg += "\r\nNew Institutions: #{other_institutions}\r\n" unless other_institutions.blank?
-        msg
+        lines = []
+        lines << details_existing(projects)
+        lines << "New #{I18n.t('project').pluralize}: #{other_projects}" unless other_projects.blank?
+        lines << details_existing(institutions)
+        lines << "New Institutions: #{other_institutions}" unless other_institutions.blank?
+        lines.join("\r\n")
       end
 
       private

@@ -13,9 +13,6 @@
         <% end -%>
     <% end -%>
 <% end %>
-<% if Seek::Config.solr_enabled && @display_model.latest_version? && (item.contains_sbml? || item.contains_jws_dat?) -%>
-    <%= button_link_to("Find related #{t('data_file').pluralize}", 'search', matching_data_model_path(item)) %>
-<% end -%>
 
 <% if cytoscapeweb_supported?(@display_model) %>
     <% if can_download_asset?(item, params[:code]) -%>
