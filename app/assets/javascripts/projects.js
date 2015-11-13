@@ -177,7 +177,7 @@ var Projects = {
 Projects.getPersonIndex = function (set, personId, institutionId) {
     for(var i = 0; i < set.length; i++) {
         if(set[i].person.id == personId)
-            if(institutionId === null || (set[i].institution.id == institutionId))
+            if(institutionId == undefined || (set[i].institution.id == institutionId))
                 return i;
     }
 
