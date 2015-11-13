@@ -22,8 +22,10 @@ module Seek
         downloadable_content_blobs = content_blobs.select { |c| c.file_exists? }
         if downloadable_content_blobs.length == 1 && !has_image
           download_single(downloadable_content_blobs.first)
-        else
+        elsif downloadable_content_blobs.length > 1 || (downloadable_content_blobs.length == 1 && has_image)
           handle_download_zip(asset_version)
+        else
+          redirect_on_error(asset, "Cannot create zip file from remote content.")
         end
       else
         redirect_on_error(asset, "No downloadable files found for this asset.")

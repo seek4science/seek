@@ -403,6 +403,20 @@ end
     end
   end
 
+  Factory.define(:model_2_remote_files,:class=>Model) do |f|
+    f.sequence(:title) {|n| "A Model #{n}"}
+    f.projects {[Factory.build(:project)]}
+    f.association :contributor, :factory => :person
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:url_content_blob,
+                                            :asset => model,
+                                            :asset_version => model.version),
+                             Factory.create(:url_content_blob,
+                                            :asset => model,
+                                            :asset_version => model.version)] if model.content_blobs.blank?
+    end
+  end
+
   Factory.define(:model_with_image,:parent=>:model) do |f|
     f.sequence(:title) {|n| "A Model with image #{n}"}
     f.after_create do |model|
