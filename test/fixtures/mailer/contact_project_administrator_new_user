@@ -8,7 +8,6 @@ New Projects: Another Project
 Institution: The Institute
 New Institutions: Another Institute
 
-
 If you know they are a genuine member of the projects you can manage, please assign him/her to the projects by:
 - Go to the users profile at http://localhost:3000/people/2
 - Click the 'Person Administration' button
