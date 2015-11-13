@@ -170,8 +170,8 @@ class PeopleControllerTest < ActionController::TestCase
 
     p = assigns(:person)
 
-    assert !p.is_pal?
-    assert !Person.find(p.id).is_pal?
+    assert !p.is_pal_of_any_project?
+    assert !Person.find(p.id).is_pal_of_any_project?
   end
 
   def test_should_show_person
@@ -274,7 +274,7 @@ class PeopleControllerTest < ActionController::TestCase
     project = p.projects.first
     project2 = p.projects[1]
     project3 = p.projects[2]
-    assert !p.is_pal?
+    assert !p.is_pal_of_any_project?
     put :administer_update, id: p.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [project.id, project2.id] }
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
@@ -287,7 +287,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_non_admin_cant_set_pal_flag
     login_as(:aaron)
     p = Factory(:person)
-    assert !p.is_pal?
+    assert !p.is_pal?(p.projects.first)
     put :administer_update, id: p.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [p.projects.first.id] }
     p.reload
     assert !p.is_pal?(p.projects.first)
@@ -297,7 +297,7 @@ class PeopleControllerTest < ActionController::TestCase
     me = Factory(:person)
     login_as(me)
 
-    assert !me.is_pal?
+    assert !me.is_pal?(me.projects.first)
     put :administer_update, id: me.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [me.projects.first.id] }
     me.reload
     assert !me.is_pal?(me.projects.first)

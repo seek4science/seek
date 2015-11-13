@@ -5,17 +5,7 @@ module Seek
         %w(programme_administrator)
       end
 
-      def self.define_extra_methods(base)
-        role_names.each do |role|
-          base.class_eval <<-END_EVAL
-          def is_#{role}_of_any_programme?
-            has_role?('#{role}')
-          end
-
-          END_EVAL
-        end
-        base.has_many(:admin_defined_role_programmes, dependent: :destroy)
-        base.include(PersonInstanceMethods)
+      def self.define_extra_methods(_base)
       end
 
       def programmes_for_person_with_role(person, role)
@@ -41,8 +31,36 @@ module Seek
       end
       ###############################
 
+      module PersonClassMethods
+        def programme_administrators
+          Seek::Roles::Roles.instance.people_with_role('programme_administrator')
+        end
+      end
+
       # Programme related instance methods that will be injected into the Person model
       module PersonInstanceMethods
+        extend ActiveSupport::Concern
+
+        included do
+          Seek::Roles::ProgrammeRelatedRoles.role_names.each do |role|
+            class_eval <<-END_EVAL
+          def is_#{role}_of_any_programme?
+            has_role?('#{role}')
+          end
+
+            END_EVAL
+          end
+          has_many(:admin_defined_role_programmes, dependent: :destroy)
+        end
+
+        def is_programme_administrator?(programme)
+          has_role?('programme_administrator') && check_role_for_item('programme_administrator', programme)
+        end
+
+        def is_programme_administrator=(flag_and_items)
+          assign_or_remove_roles('programme_administrator', flag_and_items)
+        end
+
         def programmes_for_role(role)
           fail UnknownRoleException.new("Unrecognised programme role name #{role}") unless Seek::Roles::ProgrammeRelatedRoles.role_names.include?(role)
           Seek::Roles::ProgrammeRelatedRoles.instance.programmes_for_person_with_role(self, role)

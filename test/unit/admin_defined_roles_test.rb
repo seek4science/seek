@@ -234,7 +234,6 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       assert_equal ['pal'].sort, person.roles_for_project(project).sort
       assert person.is_admin?
       assert person.is_pal?(project)
-      refute person.is_pal?
     end
   end
 

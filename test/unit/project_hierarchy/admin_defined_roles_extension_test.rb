@@ -29,16 +29,16 @@ class AdminDefinedRolesExtensionTest < ActiveSupport::TestCase
     person.is_project_administrator=true,@proj
     person.is_pal=true,@proj
     person.is_gatekeeper=true,@proj
-    person.roles = [Seek::Roles::RoleInfo.new(role_name: 'asset_manager', items: @proj.id.to_s),
-                    Seek::Roles::RoleInfo.new(role_name: 'project_administrator', items: @proj.id.to_s),
-                    Seek::Roles::RoleInfo.new(role_name: 'pal', items: @proj.id.to_s),
-                    Seek::Roles::RoleInfo.new(role_name: 'gatekeeper', items: @proj.id.to_s)]
+    # person.roles = [Seek::Roles::RoleInfo.new(role_name: 'asset_manager', items: @proj.id.to_s),
+    #                 Seek::Roles::RoleInfo.new(role_name: 'project_administrator', items: @proj.id.to_s),
+    #                 Seek::Roles::RoleInfo.new(role_name: 'pal', items: @proj.id.to_s),
+    #                 Seek::Roles::RoleInfo.new(role_name: 'gatekeeper', items: @proj.id.to_s)]
     disable_authorization_checks do
       person.save!
     end
     person.reload
 
-    [@proj, @proj_child1, @proj_child2].each do |p|
+    [@proj_child1].each do |p|
       assert_equal true, person.is_asset_manager?(p)
       assert_equal true, person.is_project_administrator?(p)
       assert_equal true, person.is_pal?(p)

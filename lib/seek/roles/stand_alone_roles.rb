@@ -25,6 +25,22 @@ module Seek
         fail InvalidCheckException.new("This role should not be checked against an item - #{item.inspect}") unless item.nil?
         true
       end
+
+      module PersonInstanceMethods
+        def is_admin?
+          has_role?('admin')
+        end
+
+        def is_admin=(flag_and_items)
+          assign_or_remove_roles('admin', flag_and_items)
+        end
+      end
+
+      module PersonClassMethods
+        def admins
+          Seek::Roles::Roles.instance.people_with_role('admin')
+        end
+      end
     end
   end
 end

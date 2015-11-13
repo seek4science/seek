@@ -33,9 +33,31 @@ module Seek
 
       ####################################################################
 
-      def self.define_extra_methods(base)
-        role_names.each do |role|
-          base.class_eval <<-END_EVAL
+      module PersonClassMethods
+        def pals
+          Seek::Roles::Roles.instance.people_with_role('pal')
+        end
+
+        def project_administrators
+          Seek::Roles::Roles.instance.people_with_role('project_administrator')
+        end
+
+        def gatekeepers
+          Seek::Roles::Roles.instance.people_with_role('gatekeeper')
+        end
+
+        def asset_managers
+          Seek::Roles::Roles.instance.people_with_role('asset_manager')
+        end
+      end
+
+      # Project related instance methods that will be injected into the Person model
+      module PersonInstanceMethods
+        extend ActiveSupport::Concern
+
+        included do
+          Seek::Roles::ProjectRelatedRoles.role_names.each do |role|
+            class_eval <<-END_EVAL
             def is_#{role}_of_any_project?
               has_role?('#{role}')
             end
@@ -47,15 +69,45 @@ module Seek
               !match.nil?
             end
 
-          END_EVAL
-        end
-        base.has_many(:admin_defined_role_projects, dependent: :destroy)
-        base.after_save(:resolve_admin_defined_role_projects)
-        base.include(PersonInstanceMethods)
-      end
+            END_EVAL
+          end
 
-      # Project related instance methods that will be injected into the Person model
-      module PersonInstanceMethods
+          has_many(:admin_defined_role_projects, dependent: :destroy)
+          after_save(:resolve_admin_defined_role_projects)
+        end
+
+        def is_pal?(project)
+          has_role?('pal') && check_role_for_item('pal', project)
+        end
+
+        def is_project_administrator?(project)
+          has_role?('project_administrator') && check_role_for_item('project_administrator', project)
+        end
+
+        def is_asset_manager?(project)
+          has_role?('asset_manager') && check_role_for_item('asset_manager', project)
+        end
+
+        def is_gatekeeper?(project)
+          has_role?('gatekeeper') && check_role_for_item('gatekeeper', project)
+        end
+
+        def is_pal=(flag_and_items)
+          assign_or_remove_roles('pal', flag_and_items)
+        end
+
+        def is_project_administrator=(flag_and_items)
+          assign_or_remove_roles('project_administrator', flag_and_items)
+        end
+
+        def is_asset_manager=(flag_and_items)
+          assign_or_remove_roles('asset_manager', flag_and_items)
+        end
+
+        def is_gatekeeper=(flag_and_items)
+          assign_or_remove_roles('gatekeeper', flag_and_items)
+        end
+
         def projects_for_role(role)
           fail UnknownRoleException.new("Unrecognised project role name #{role}") unless Seek::Roles::ProjectRelatedRoles.role_names.include?(role)
           Seek::Roles::ProjectRelatedRoles.instance.projects_for_person_with_role(self, role)
