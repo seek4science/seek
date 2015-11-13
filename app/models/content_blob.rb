@@ -159,7 +159,12 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def retrieve
-    handler = Seek::DownloadHandling::HTTPHandler.new(self.url)
+    case URI(self.url).scheme
+    when 'http', 'https'
+      handler = Seek::DownloadHandling::HTTPHandler.new(self.url)
+    when 'ftp'
+      handler = Seek::DownloadHandling::FTPHandler.new(self.url)
+    end
 
     self.tmp_io_object = handler.fetch
 
