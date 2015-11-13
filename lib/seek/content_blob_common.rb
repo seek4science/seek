@@ -34,10 +34,10 @@ module Seek
             download_jerm_asset
           else
             case URI(@content_blob.url).scheme
-              when 'http', 'https'
-                stream_from_http_url
               when 'ftp'
                 stream_from_ftp_url
+              else
+                stream_from_http_url
             end
 
           end

@@ -20,7 +20,11 @@ class ContentBlobsController < ApplicationController
     url = params[:data_url]
     begin
       case URI(url).scheme
-        when 'http', 'https'
+        when 'ftp'
+          handler = Seek::DownloadHandling::FTPHandler.new(url)
+          info = handler.info
+          handle_good_ftp_response(url, info)
+        else
           handler = Seek::DownloadHandling::HTTPHandler.new(url)
           info = handler.info
           if info[:code] == 200
@@ -28,10 +32,6 @@ class ContentBlobsController < ApplicationController
           else
             handle_bad_http_response(info[:code])
           end
-        when 'ftp'
-          handler = Seek::DownloadHandling::FTPHandler.new(url)
-          info = handler.info
-          handle_good_ftp_response(url, info)
       end
     rescue Exception => e
       handle_exception_response(e)
