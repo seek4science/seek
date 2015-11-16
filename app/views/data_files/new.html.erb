@@ -12,7 +12,7 @@
       <%= render :partial=>"assets/upload_box" -%>
 
       <div class="form-group">
-        <label>Title</label>
+        <label>Title<span class="required">*</span></label>
         <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
         <%= text_field_tag 'data_file[title]', data_file_title_value, :class=>"form-control" -%>
       </div>
