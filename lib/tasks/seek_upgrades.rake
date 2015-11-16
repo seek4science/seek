@@ -9,8 +9,7 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
            :environment,
-           :convert_image_to_png,
-           :clear_delayed_jobs
+           :upgrade_content_blobs
        ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -98,6 +97,32 @@ namespace :seek do
         end
       end
     end
+  end
+
+  desc "calculate sizes and fetch remote content blobs"
+  task(:upgrade_content_blobs => :environment) do
+    puts "Calculating content blob sizes"
+    content_blobs = ContentBlob.all
+    job_count = Delayed::Job.where('handler LIKE ?', '%RemoteContentFetchingJob%').count
+    total = 0
+
+    content_blobs.each_slice(10) do |batch|
+      batch.each do |content_blob|
+        if content_blob.save
+          print "."
+          content_blob.send(:create_retrieval_job)
+        else
+          puts content_blob.errors.full_messages.join("\n").inspect
+        end
+        total += 1
+      end
+      puts " (#{total} / #{content_blobs.count})"
+    end
+
+    puts
+    jobs_created = Delayed::Job.where('handler LIKE ?', '%RemoteContentFetchingJob%').count - job_count
+    puts "#{jobs_created} download jobs queued."
+    puts "Done."
   end
 
   private
