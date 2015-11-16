@@ -4,7 +4,6 @@ module Seek
   module AssetsStandardControllerActions
     include Seek::DestroyHandling
     include Seek::UploadHandling::DataUpload
-    include Seek::DownloadHandling::DataDownload
 
     def new
       setup_new_asset

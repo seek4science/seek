@@ -96,6 +96,15 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_equal zip_file_size1, zip_file_size2
   end
 
+  test "should not download zip with only remote files" do
+    model = Factory :model_2_remote_files, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+      get :download, :id => model.id
+    end
+    assert_response :redirect
+    assert flash[:error].include?('remote')
+  end
+
   test "should not create model with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path
