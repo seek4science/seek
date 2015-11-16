@@ -31,7 +31,7 @@
           <% end  %>
           <div class="form-group">
             <%= select_tag possibilities_collection_id,
-                           options_for_select([default_choice]|possibilities.collect{|o| [truncate(o.send(text_method), :length=>120).html_safe, o.send(value_method)]}),
+                           options_for_select([default_choice]|possibilities.collect{|o| [truncate(o.send(text_method), :length=>120), o.send(value_method)]}),
                            possibilities_options -%>
           </div>
           <%# This ensures that the parameter is always sent, even when nothing is selected.
@@ -50,7 +50,7 @@
                                 :style => "margin-top:0.5em;" -%>
               Associate <%= association.to_s.singularize.humanize.pluralize -%> from other <%= t('project').pluralize -%>?
               <%= select_tag "alternative_#{association.to_s.singularize}_ids",
-                             options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|project_possibilities.collect { |o| [truncate(o.send(text_method), :length => 120).html_safe, o.id] }),
+                             options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|project_possibilities.collect { |o| [truncate(o.send(text_method), :length => 120), o.id] }),
                              :style => 'display:none;' -%>
           <% end %>
         </div>

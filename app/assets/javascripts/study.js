@@ -11,7 +11,7 @@ function addStudy(title,id) {
 function addSelectedStudy() {
     selected_option_index=$("possible_studies").selectedIndex;
     selected_option=$("possible_studies").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
 
     i = $('possible_studies').selectedIndex;

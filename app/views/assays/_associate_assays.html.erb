@@ -60,8 +60,7 @@
 
           <% if show_relationships -%>
               <div class="form-group">
-                <%= select_tag :possible_assays,
-                               options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}),
+                <%= select_tag :possible_assays, '<option>Loading...</option>',
                                {:class => 'form-control',:onchange=>"addSelectedAssay();"+remote_function(
                                        :method=>:get,
                                        :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
@@ -80,8 +79,7 @@
 
           <% else %>
               <div class="form-group">
-                <%= select_tag :possible_assays,
-                               options_for_select([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}),
+                <%= select_tag :possible_assays, '<option>Loading...</option>',
                                {:class => 'form-control',:onchange=>"addSelectedAssay();"+remote_function(
                                        :method=>:get,
                                        :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
@@ -104,8 +102,12 @@
 
 <% end %>
 
-
 <script type="text/javascript">
+    var assayOptions = {
+        project: "<%= escape_javascript options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>",
+        all: "<%= escape_javascript options_for_select([["Select #{single_assay_class_text} ...",0]]|all_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>"
+    };
+
     function selected_assay(){
         i = $('possible_assays').selectedIndex;
         id = $('possible_assays').options[i].value;
@@ -121,39 +123,10 @@
     }
 
     function toggle_assay_list() {
-        var checked = $('include_other_project_assays').checked;
-        var selection_box = $('possible_assays');
-        var option;
-
-        selection_box.options.length = 0;
-
-        if (checked) {
-            <% ([["Select #{t('assays.assay')} ...",0]]|all_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |df_details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= escape_javascript(df_details[0]) -%>';
-            option.value = '<%= df_details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-            <% end -%>
-        }
-        else {
-            <% ([["Select #{t('assays.assay')} ...",0]]|project_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |df_details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= escape_javascript(df_details[0]) -%>';
-            option.value = '<%= df_details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-            <% end -%>
-        }
-        //selection_box.onchange();
+        if ($('include_other_project_assays').checked)
+            $j('#possible_assays').html(assayOptions.all);
+        else
+            $j('#possible_assays').html(assayOptions.project);
     }
 
     <% associated_assay_ids = resource.assays.collect(&:id) %>
@@ -185,8 +158,6 @@
     <% end -%>
     <% end -%>
 
-
-
     updateAssays();
-    toggle_assay_list()
+    toggle_assay_list();
 </script>

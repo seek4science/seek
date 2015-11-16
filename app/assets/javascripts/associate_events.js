@@ -13,7 +13,7 @@ function check_show_add_event() {
 function addSelectedEvent() {
     selected_option_index = $("possible_events").selectedIndex;
     selected_option = $("possible_events").options[selected_option_index];
-    title = selected_option.text;
+    title = selected_option.innerHTML;
     id = selected_option.value;
 
     if (checkNotInList(id, events_array)) {

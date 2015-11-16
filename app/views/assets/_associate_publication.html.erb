@@ -19,7 +19,7 @@
         <div class="association_step">
           <div class="form-group">
             <%= select_tag :possible_publications,
-                           options_for_select([["Select Publication ...",0]]|project_publications.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}),
+                           '<option>Loading...</option>',
                            {:class => 'form-control',:onchange=>"addSelectedPublication();"+remote_function(
                                    :method=>:get,
                                    :url=>preview_publications_path(:element=>"publication_preview"),
@@ -44,43 +44,16 @@
     </div>
 <% end %>
 <script type="text/javascript">
-    updatePublications();
-    toggle_publication_list();
+    var publicationOptions = {
+        project: "<%= escape_javascript options_for_select([["Select Publication...",0]]|project_publications.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>",
+        all: "<%= escape_javascript options_for_select([["Select Publication...",0]]|all_publications.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>",
+    };
 
     function toggle_publication_list() {
-        var checked = $('include_other_project_publications').checked;
-        var selection_box = $('possible_publications');
-        var option;
-
-        selection_box.options.length=0;
-
-        if (checked) {
-            <% ([["Select Publication...",0]]|all_publications.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= escape_javascript(details[0]) -%>';
-            option.value = '<%= details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-            <% end -%>
-        }
-        else {
-            <% ([["Select Publication ...",0]]|project_publications.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= escape_javascript(details[0]) -%>';
-            option.value = '<%= details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-            <% end -%>
-        }
-        //selection_box.onchange();
+        if ($('include_other_project_publications').checked)
+            $j('#possible_publications').html(publicationOptions.all);
+        else
+            $j('#possible_publications').html(publicationOptions.project);
     }
 
     <% related_publications.each do |publication| -%>
@@ -118,4 +91,5 @@
       }
 
     updatePublications();
+    toggle_publication_list();
 </script>

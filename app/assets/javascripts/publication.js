@@ -9,7 +9,7 @@ function addPublication(title,id,relationshipType) {
 function addSelectedPublication() {
     selected_option_index=$("possible_publications").selectedIndex;
     selected_option=$("possible_publications").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
     if ($("publication_relationship_type")) {
         relationshipType = $("publication_relationship_type").options[$("publication_relationship_type").selectedIndex].text;
