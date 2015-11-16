@@ -5,6 +5,7 @@ module Seek
       name = self.controller_name.singularize
       asset = eval("@#{name}")
       asset_version = eval("@display_#{name}")
+      @asset_version = asset_version
 
       asset.just_used
 
@@ -215,7 +216,7 @@ module Seek
       else
         dir = File.join(Rails.root,"tmp","zip-files")
       end
-      FileUtils.mkdir_p dir if !File.exists?(dir)
+      FileUtils.mkdir_p dir unless File.exists?(dir)
       dir
     end
 
