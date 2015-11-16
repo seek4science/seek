@@ -105,6 +105,7 @@ namespace :seek do
     content_blobs = ContentBlob.all
     job_count = Delayed::Job.where('handler LIKE ?', '%RemoteContentFetchingJob%').count
     total = 0
+    errors = []
 
     content_blobs.each_slice(10) do |batch|
       batch.each do |content_blob|
@@ -112,11 +113,22 @@ namespace :seek do
           print "."
           content_blob.send(:create_retrieval_job)
         else
-          puts content_blob.errors.full_messages.join("\n").inspect
+          print 'E'
+          error = "Error saving content blob ID #{content_blob.id}:\n"
+          error << content_blob.errors.full_messages.join("\n").inspect
+          errors << error
         end
         total += 1
       end
       puts " (#{total} / #{content_blobs.count})"
+    end
+
+    unless errors.empty?
+      puts "One or more errors occurred:"
+      errors.each do |e|
+        puts e
+        puts
+      end
     end
 
     puts
