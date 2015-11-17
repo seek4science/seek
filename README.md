@@ -14,7 +14,7 @@ SEEK is incorporating semantic technology allowing sophisticated queries over th
 
 For an example of SEEK please visit our [Demo](http://demo.seek4science.org/).
 
-To see SEEK being used for real science, as part of [SysMO](http://sysmo.net) please visit [FAIRDOM SEEK](http://fairdomhub.org)
+To see SEEK being used for real science, as part of [FAIRDOM](http://fair-dom.org) please visit [FAIRDOM SEEK](http://fairdomhub.org)
 
 For more information please visit: [SEEK for Science](http://www.seek4science.org/)
 
