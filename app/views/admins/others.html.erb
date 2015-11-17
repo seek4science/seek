@@ -66,7 +66,7 @@
       <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
                              'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
                              :onkeypress => "javascript: return onlyNumbers(event);") %>
-      <%= admin_text_setting(:max_cachable_size, Seek::Config.hard_max_cachable_size,
+      <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
                              'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
                              :onkeypress => "javascript: return onlyNumbers(event);") %>
     </div>
