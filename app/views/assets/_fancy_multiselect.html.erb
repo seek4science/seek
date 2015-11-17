@@ -41,16 +41,16 @@
           <%= hidden_field_tag "#{name}[]", "" %>
 
           <%= select_tag name,
-                         options_from_collection_for_select(possibilities, value_method, text_method, selected),
+                         options_from_collection_for_select(unscoped_possibilities.empty? ? possibilities : unscoped_possibilities, value_method, text_method, selected),
                          {:multiple=>true, :style=>"display:none;"} -%>
 
-          <% if other_projects_checkbox && !project_possibilities.empty? %>
+          <% if other_projects_checkbox && !unscoped_possibilities.empty? %>
               <%= check_box_tag "include_other_project_#{association}", nil, Seek::Config.is_virtualliver,
                                 :onchange => "swapSelectListContents('possible_#{object_type.underscore}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');",
                                 :style => "margin-top:0.5em;" -%>
               Associate <%= association.to_s.singularize.humanize.pluralize -%> from other <%= t('project').pluralize -%>?
               <%= select_tag "alternative_#{association.to_s.singularize}_ids",
-                             options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|project_possibilities.collect { |o| [truncate(o.send(text_method), :length => 120), o.id] }),
+                             options_for_select([["Select #{association.to_s.singularize.humanize} ...", 0]]|unscoped_possibilities.collect { |o| [truncate(o.send(text_method), :length => 120), o.id] }),
                              :style => 'display:none;' -%>
           <% end %>
         </div>
@@ -58,7 +58,7 @@
         <script type="text/javascript">
             Event.observe(window, 'load', function () {
                 updateFancyMultiselect('<%= collection_id %>');
-                <% if other_projects_checkbox && !project_possibilities.empty? %>
+                <% if other_projects_checkbox && !unscoped_possibilities.empty? %>
                 var include_other_projects_checkbox = document.getElementById('include_other_project_<%=association-%>');
                 if (include_other_projects_checkbox.checked == true){
                     swapSelectListContents('possible_<%=object_type.underscore-%>_<%=association.to_s.singularize-%>_ids',

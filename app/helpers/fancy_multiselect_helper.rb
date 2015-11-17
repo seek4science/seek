@@ -28,7 +28,7 @@ module FancyMultiselectHelper
       #get 'view' from :can_view?
       access = required_access.to_s.split('_').last.gsub('?', '')
       association_class = options.delete(:association_class) || reflection.klass
-      options[:project_possibilities] = authorised_assets(association_class, nil, access) if options[:other_projects_checkbox]
+      options[:unscoped_possibilities] = authorised_assets(association_class, nil, access) if options[:other_projects_checkbox]
       options[:possibilities] = authorised_assets(association_class, current_user.person.projects, access) unless options[:possibilities]
     end
   end
@@ -44,7 +44,7 @@ module FancyMultiselectHelper
         :default_choice_text => "Select #{association.to_s.singularize.humanize} ...",
         :name => "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
         :possibilities => nil,
-        :project_possibilities => [],
+        :unscoped_possibilities => [],
         :value_method => :id,
         :text_method => :title,
         :with_new_link => false,
