@@ -58,7 +58,7 @@ en:
     isa:  "Experiments"
     assets: "Assets"
     activities: "Activities"
-    documentation: "Documentation"
+    documentation: "Help"
     admin: "Server administration"
     help: "Help documents"
     account: "Account"
