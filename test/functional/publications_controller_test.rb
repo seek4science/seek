@@ -496,8 +496,11 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_include response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
     # This will be slow!
-    # 13: 3 for events, 2 each for investigations, studies, assays, datafiles, models
-    assert_equal 13, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
+
+    # 3 for events 'fancy_multiselect'
+    assert_equal 3, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
+    # 10 = 2 each for investigations, studies, assays, datafiles, models (using bespoke association forms)
+    assert_equal 10, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
   end
 
 
