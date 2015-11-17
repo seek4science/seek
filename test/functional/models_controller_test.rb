@@ -157,30 +157,6 @@ class ModelsControllerTest < ActionController::TestCase
 
   end
 
-  test "should show only modelling assays in associate modelling analysis form" do
-    login_as(:model_owner)
-    as_not_virtualliver do
-      get :new
-      assert_response :success
-      assert_select 'select#possible_assays' do
-        assert_select "option", :text=>/Select #{I18n.t('assays.assay')} .../,:count=>1
-        assert_select "option", :text=>/Modelling Assay/,:count=>1
-        assert_select "option", :text=>/Metabolomics Assay/,:count=>0
-      end
-    end
-
-    as_virtualliver do
-    #show all can_view assays in the list
-      get :new
-      assert_response :success
-      assert_select 'select#possible_assays' do
-        assert_select "option", :text=>/Select #{I18n.t('assays.assay')} .../,:count=>1
-        assert_select "option", :text=>/Modelling Assay/,:count=>5
-        assert_select "option", :text=>/Metabolomics Assay/,:count=>0
-      end
-    end
-  end
-
   test "correct title and text for associating a modelling analysis for new" do
     login_as(Factory(:user))
     as_virtualliver do
