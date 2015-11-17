@@ -30,17 +30,19 @@ module Seek
         end
       end
 
-      def add_roles(person, role_name, items)
-        return if items.empty?
-        mask = mask_for_role(role_name)
-        item_ids = collect_item_ids(items)
+      def add_roles(person, role_info)
+        return if role_info.items.empty?
+
+        item_ids = collect_item_ids(role_info.items)
 
         # filter out any item ids attempted to be related to this role
         item_ids = filter_allowed_related_item_ids(item_ids, person)
 
         if item_ids.any?
 
-          current_item_ids = items_ids_related_to_person_and_role(person, role_name)
+          current_item_ids = items_ids_related_to_person_and_role(person, role_info.role_name)
+
+          mask = role_info.role_mask
 
           (item_ids - current_item_ids).each do |item_id|
             related_items_association(person) << related_item_join_class.new(associated_item_id_sym => item_id, role_mask: mask)
@@ -50,17 +52,16 @@ module Seek
         end
       end
 
-      def remove_roles(person, role_name, items)
-        return unless person.has_role?(role_name) # nothing to remove
-        mask = mask_for_role(role_name)
-        item_ids = collect_item_ids(items)
+      def remove_roles(person, role_info)
+        return unless person.has_role?(role_info.role_name) # nothing to remove
+        item_ids = collect_item_ids(role_info.items)
 
-        current_item_ids = items_ids_related_to_person_and_role(person, role_name)
+        current_item_ids = items_ids_related_to_person_and_role(person, role_info.role_name)
         item_ids.each do |item_id|
           clause = { "#{related_item_class.name.downcase}_id" => item_id }
-          related_items_association(person).where(role_mask: mask).where(clause).destroy_all
+          related_items_association(person).where(role_mask: role_info.role_mask).where(clause).destroy_all
         end
-        person.roles_mask -= mask if (current_item_ids - item_ids).empty?
+        person.roles_mask -= role_info.role_mask if (current_item_ids - item_ids).empty?
       end
 
       # Methods that should be implemented or overridden in superclass

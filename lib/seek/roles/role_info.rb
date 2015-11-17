@@ -2,6 +2,7 @@ module Seek
   module Roles
     class RoleInfo
       attr_reader :role_name
+      attr_reader :role_mask
       attr_reader :items
 
       def initialize(args)
@@ -14,6 +15,8 @@ module Seek
         unless Seek::Roles::Roles.role_names.include?(@role_name)
           fail Seek::Roles::UnknownRoleException.new("Unknown role '#{@role_name.inspect}'")
         end
+
+        @role_mask = Seek::Roles::Roles.instance.mask_for_role(@role_name)
       end
     end
   end

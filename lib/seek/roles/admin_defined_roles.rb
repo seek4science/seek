@@ -15,7 +15,6 @@ module Seek
 
         include ProgrammeRelatedRoles::PersonInstanceMethods
         extend ProgrammeRelatedRoles::PersonClassMethods
-
       end
 
       def roles
@@ -40,13 +39,13 @@ module Seek
       def add_roles(role_infos)
         self.roles_mask ||= 0
         Array(role_infos).each do |role_info|
-          select_handler(role_info.role_name).instance.add_roles(self, role_info.role_name, role_info.items)
+          select_handler(role_info.role_name).instance.add_roles(self, role_info)
         end
       end
 
       def remove_roles(role_infos)
         Array(role_infos).each do |role_info|
-          select_handler(role_info.role_name).instance.remove_roles(self, role_info.role_name, role_info.items)
+          select_handler(role_info.role_name).instance.remove_roles(self, role_info)
         end
       end
 

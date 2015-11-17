@@ -8,16 +8,16 @@ module Seek
         %w(admin)
       end
 
-      def add_roles(person, role_name, items = [])
-        fail InvalidCheckException.new("This role should not be assigned with other items - #{items.inspect}") unless items.empty?
-        mask = mask_for_role(role_name)
+      def add_roles(person, role_info)
+        fail InvalidCheckException.new("This role should not be assigned with other items - #{items.inspect}") unless role_info.items.empty?
+        mask = mask_for_role(role_info.role_name)
         person.roles_mask += mask if (person.roles_mask & mask).zero?
       end
 
-      def remove_roles(person, role_name, items = [])
-        fail InvalidCheckException.new("This role should not be assigned with other items - #{items.inspect}") unless items.empty?
-        return unless person.has_role?(role_name)
-        mask = mask_for_role(role_name)
+      def remove_roles(person, role_info)
+        fail InvalidCheckException.new("This role should not be assigned with other items - #{items.inspect}") unless role_info.items.empty?
+        return unless person.has_role?(role_info.role_name)
+        mask = mask_for_role(role_info.role_name)
         person.roles_mask -= mask
       end
 
