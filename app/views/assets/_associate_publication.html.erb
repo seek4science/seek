@@ -45,15 +45,15 @@
 <% end %>
 <script type="text/javascript">
     var publicationOptions = {
-        project: "<%= escape_javascript options_for_select([["Select Publication...",0]]|project_publications.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>",
-        all: "<%= escape_javascript options_for_select([["Select Publication...",0]]|all_publications.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>",
+        project: <%= ([["Select Publication...",0]]|project_publications.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
+        all: <%= ([["Select Publication...",0]]|all_publications.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
     };
 
     function toggle_publication_list() {
         if ($('include_other_project_publications').checked)
-            $j('#possible_publications').html(publicationOptions.all);
+            $j('#possible_publications').html(optionsFromArray(publicationOptions.all));
         else
-            $j('#possible_publications').html(publicationOptions.project);
+            $j('#possible_publications').html(optionsFromArray(publicationOptions.project));
     }
 
     <% related_publications.each do |publication| -%>

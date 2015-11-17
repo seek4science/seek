@@ -41,15 +41,15 @@
 <% end %>
 <script type="text/javascript">
     var investigationOptions = {
-        project: "<%= escape_javascript options_for_select([["Select Investigation...",0]]|project_investigations.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>",
-        all: "<%= escape_javascript options_for_select([["Select Investigation...",0]]|all_investigations.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>"
+        project: <%= ([["Select Investigation...",0]]|project_investigations.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
+        all: <%= ([["Select Investigation...",0]]|all_investigations.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>
     };
 
     function toggle_investigation_list() {
         if ($('include_other_project_investigations').checked)
-            $j('#possible_investigations').html(investigationOptions.all);
+            $j('#possible_investigations').html(optionsFromArray(investigationOptions.all));
         else
-            $j('#possible_investigations').html(investigationOptions.project);
+            $j('#possible_investigations').html(optionsFromArray(investigationOptions.project));
     }
 
     <% resource.investigations.each do |investigation| -%>

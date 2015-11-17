@@ -41,15 +41,15 @@
 <% end %>
 <script type="text/javascript">
     var studyOptions = {
-        project: "<%= escape_javascript options_for_select([["Select Study...",0]]|project_studies.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>",
-        all: "<%= escape_javascript options_for_select([["Select Study...",0]]|all_studies.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>"
+        project: <%= ([["Select Study...",0]]|project_studies.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
+        all: "<%= ([["Select Study...",0]]|all_studies.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>
     };
 
     function toggle_study_list() {
         if ($('include_other_project_studies').checked)
-            $j('#possible_studies').html(studyOptions.all);
+            $j('#possible_studies').html(optionsFromArray(studyOptions.all));
         else
-            $j('#possible_studies').html(studyOptions.project);
+            $j('#possible_studies').html(optionsFromArray(studyOptions.project));
     }
 
     <% resource.studies.each do |study| -%>

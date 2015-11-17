@@ -104,9 +104,16 @@
 
 <script type="text/javascript">
     var assayOptions = {
-        project: "<%= escape_javascript options_for_select([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>",
-        all: "<%= escape_javascript options_for_select([["Select #{single_assay_class_text} ...",0]]|all_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}) %>"
+        project: <%= ([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
+        all: <%= ([["Select #{single_assay_class_text} ...",0]]|all_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>
     };
+
+    function toggle_assay_list() {
+      if ($('include_other_project_assays').checked)
+        $j('#possible_assays').html(optionsFromArray(assayOptions.all));
+      else
+        $j('#possible_assays').html(optionsFromArray(assayOptions.project));
+    }
 
     function selected_assay(){
         i = $('possible_assays').selectedIndex;
@@ -120,13 +127,6 @@
                 Effect.Fade('relationship',{duration:0.2});
             }
         }
-    }
-
-    function toggle_assay_list() {
-        if ($('include_other_project_assays').checked)
-            $j('#possible_assays').html(assayOptions.all);
-        else
-            $j('#possible_assays').html(assayOptions.project);
     }
 
     <% associated_assay_ids = resource.assays.collect(&:id) %>

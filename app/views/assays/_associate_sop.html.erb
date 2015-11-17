@@ -44,15 +44,15 @@
 
 <script type="text/javascript">
     var sopOptions = {
-        project: "<%= escape_javascript options_for_select([["Select #{t('sop')} ...", 0]]|project_sops.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}) %>",
-        all: "<%= escape_javascript options_for_select([["Select #{t('sop')} ...", 0]]|all_sops.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}) %>"
+        project: <%= ([["Select #{t('sop')} ...", 0]]|project_sops.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>,
+        all: <%= ([["Select #{t('sop')} ...", 0]]|all_sops.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>
     };
 
     function toggle_sop_list() {
         if ($('include_other_project_sops').checked)
-            $j('#possible_sops').html(sopOptions.all);
+            $j('#possible_sops').html(optionsFromArray(sopOptions.all));
         else
-            $j('#possible_sops').html(sopOptions.project);
+            $j('#possible_sops').html(optionsFromArray(sopOptions.project));
     }
 
     function check_show_add_sop() {

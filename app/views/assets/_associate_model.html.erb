@@ -47,15 +47,15 @@
 
 <script type="text/javascript">
     var modelOptions = {
-        project: "<%= escape_javascript options_for_select([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}) %>",
-        all: "<%= escape_javascript options_for_select([["Select #{t('model')} ...", 0]]|all_models.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}) %>"
+        project: <%= ([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>,
+        all: <%= ([["Select #{t('model')} ...", 0]]|all_models.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>
     };
 
     function toggle_model_list() {
         if ($('include_other_project_models').checked)
-            $j('#possible_models').html(modelOptions.all);
+            $j('#possible_models').html(optionsFromArray(modelOptions.all));
         else
-            $j('#possible_models').html(modelOptions.project);
+            $j('#possible_models').html(optionsFromArray(modelOptions.project));
     }
 
     function check_show_add_model() {

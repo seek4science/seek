@@ -49,4 +49,5 @@
 //= require zenodo_form
 //= require batch_upload
 //= require bootstrap_tab_memory
+//= require associations
 //= require_tree ./templates
