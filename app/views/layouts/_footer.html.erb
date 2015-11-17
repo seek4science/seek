@@ -13,7 +13,9 @@
 
             <%= link_to Seek::Config.project_name, Seek::Config.project_link %><br/>
 
-            <%= link_to 'Provide feedback', feedback_home_path -%><br/>
+            <% if logged_in_and_registered? %>
+              <%= link_to 'Provide feedback', feedback_home_path -%><br/>
+            <% end %>
 
             <span class="subtle"><%= version_text -%></span>
             <br/>

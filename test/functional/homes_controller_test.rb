@@ -384,12 +384,12 @@ class HomesControllerTest < ActionController::TestCase
   test "documentation only shown when enabled" do
     with_config_value :documentation_enabled,true do
       get :index
-      assert_select "li.dropdown span",:text=>"Documentation",:count=>1
+      assert_select "li.dropdown span",:text=>"Help",:count=>1
     end
 
     with_config_value :documentation_enabled,false do
       get :index
-      assert_select "li.dropdown span",:text=>"Documentation",:count=>0
+      assert_select "li.dropdown span",:text=>"Help",:count=>0
     end
   end
 
