@@ -77,7 +77,7 @@ class Programme < ActiveRecord::Base
     (User.admin_logged_in?) || (User.logged_in_and_registered? && Seek::Config.allow_user_programme_creation)
   end
 
-  def administrators
+  def programme_administrators
     Seek::Roles::ProgrammeRelatedRoles.instance.people_with_programme_and_role(self, 'programme_administrator')
   end
 
@@ -86,8 +86,8 @@ class Programme < ActiveRecord::Base
   # set the administrators, assigned from the params to :adminstrator_ids
   def handle_administrator_ids
     new_administrators = Person.find(administrator_ids)
-    to_add = new_administrators - administrators
-    to_remove = administrators - new_administrators
+    to_add = new_administrators - programme_administrators
+    to_remove = programme_administrators - new_administrators
     to_add.each do |person|
       person.is_programme_administrator = true, self
       disable_authorization_checks { person.save! }

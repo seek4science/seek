@@ -121,17 +121,17 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert_nil project.programme_id
   end
 
-  test 'administrators' do
+  test 'programme_administrators' do
     person = Factory(:person)
     programme = Factory(:programme)
     refute person.is_programme_administrator?(programme)
-    assert_empty programme.administrators
+    assert_empty programme.programme_administrators
     person.is_programme_administrator = true, programme
     disable_authorization_checks { person.save! }
 
     assert person.is_programme_administrator?(programme)
-    refute_empty programme.administrators
-    assert_equal [person], programme.administrators
+    refute_empty programme.programme_administrators
+    assert_equal [person], programme.programme_administrators
   end
 
   test 'assign adminstrator ids' do
@@ -146,7 +146,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     assert person.is_programme_administrator?(programme)
     refute person2.is_programme_administrator?(programme)
-    assert_equal [person], programme.administrators
+    assert_equal [person], programme.programme_administrators
 
     programme.update_attributes(administrator_ids: [person2.id])
     person.reload
@@ -155,7 +155,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     refute person.is_programme_administrator?(programme)
     assert person2.is_programme_administrator?(programme)
-    assert_equal [person2], programme.administrators
+    assert_equal [person2], programme.programme_administrators
 
     programme.update_attributes(administrator_ids: [person2.id, person.id])
     person.reload
@@ -164,7 +164,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     assert person.is_programme_administrator?(programme)
     assert person2.is_programme_administrator?(programme)
-    assert_equal [person2, person].sort, programme.administrators.sort
+    assert_equal [person2, person].sort, programme.programme_administrators.sort
   end
 
   test 'can create' do
