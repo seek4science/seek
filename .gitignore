@@ -5,8 +5,16 @@ _site/
 *.DS_Store
 *~
 
-filestore*/
-
 *.~lock*
 
 *.orig
+
+
+#seek application folders that may hang around
+filestore*/
+config/
+coverage/
+log/
+public/
+solr/
+tmp/
