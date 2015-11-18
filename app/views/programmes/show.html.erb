@@ -12,6 +12,16 @@
       <strong>Web page:</strong>
       <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>
     </p>
+
+    <% if admin_logged_in? || @programme.has_member?(current_user) %>
+
+        <p class="programme_administrators">
+          <strong><%= t('programme') %> Administrators:</strong>
+          <%= programme_administrator_link_list @programme -%>
+        </p>
+
+    <% end %>
+
     <strong>Funding details:</strong>
     <div class="well well-sm">
       <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>
