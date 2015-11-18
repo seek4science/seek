@@ -4,7 +4,7 @@
 <%= f.hidden_field :new_link_from_assay -%>
 
 <div class="form-group">
-  <%= f.label :title %><span class="required">*</span>
+  <label>Title <span class="required">*</span></label>
   <%= f.text_field :title,:class=>"form-control" %>
 </div>
 
@@ -35,6 +35,7 @@
 <%  existing_creators = @study.creators
     existing_creators =  [current_user.person] if existing_creators.blank?
 %>
+
 <%= render :partial => "assets/author_form", :locals => {:resource_type => t('study'), # this is only for presentation, not for any processing
                                                          :existing_creators => existing_creators,
                                                          :other_creators => @study.other_creators} -%>

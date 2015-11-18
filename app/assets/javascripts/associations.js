@@ -1,8 +1,8 @@
 function optionsFromArray(array) {
-    var html = '';
+    var options = [];
 
     for(var i = 0; i < array.length; i++)
-        html += '<option value="' + array[i][1] + '">' + array[i][0] + '</option>';
+        options.push($j('<option/>').val(array[i][1]).text(array[i][0])[0]);
 
-    return html;
+    return options;
 }

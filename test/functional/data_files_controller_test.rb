@@ -2078,6 +2078,36 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !blob.caching_job.exists?
   end
 
+  test "should not automatically create cache job for webpage links" do
+    mock_http
+    params = { data_file: {
+        title: "My Fav Website",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com"
+                               }],
+               sharing: valid_sharing
+    }
+
+
+    assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    blob = assigns(:data_file).content_blob
+    assert !blob.cachable?
+    assert !blob.url.blank?
+    assert_blank blob.original_filename
+    assert_equal "text/html", blob.content_type
+    assert !blob.caching_job.exists?
+  end
+
   test "should create cache job for large file if user requests 'make_local_copy'" do
     mock_http
     params = { data_file: {
@@ -2134,6 +2164,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     stub_request(:get, "http://mockedlocation.com/big.txt").to_return(body: 'bananafish'*500, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
     stub_request(:head, "http://mockedlocation.com/big.txt").to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
+
+    stub_request(:get, "http://mockedlocation.com").to_return(body: '<!doctype html><html><head></head><body>internet.</body></html>', status: 200,
+                                                              headers: { content_type: 'text/html; charset=UTF-8', content_length: 63 })
+    stub_request(:head, "http://mockedlocation.com").to_return(status: 200, headers: { content_type: 'text/html; charset=UTF-8', content_length: 63 })
+
   end
 
   def mock_https

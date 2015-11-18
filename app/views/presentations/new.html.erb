@@ -7,7 +7,7 @@
       <%= render :partial=>"assets/upload_box" -%>
 
       <div class="form-group">
-        <label>Title</label><span class="required">*</span>
+        <label>Title <span class="required">*</span></label>
         <% presentation_title_value = (params[:presentation].blank? || params[:presentation][:title].blank?) ? nil : params[:presentation][:title] -%>
         <%= text_area_tag "presentation[title]", presentation_title_value, :class=>"form-control" -%>
       </div>

@@ -3,12 +3,16 @@ require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'colorize'
+require 'seek/mime_types'
+
+include Seek::MimeTypes
 
 namespace :seek do
 
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
            :environment,
+           :ensure_valid_content_blobs,
            :upgrade_content_blobs
        ]
 
@@ -97,6 +101,62 @@ namespace :seek do
         end
       end
     end
+  end
+
+  desc "ensures all content blobs are valid"
+  task(:ensure_valid_content_blobs => :environment) do
+    puts "Validating all content blobs"
+    content_blobs = ContentBlob.all
+    total = 0
+    updated = 0
+    errors = []
+
+    content_blobs.each_slice(10) do |batch|
+      batch.each do |content_blob|
+        fail = false
+
+        if content_blob.valid?
+          print "."
+        else
+          if content_blob.original_filename.blank? && content_blob.url.blank?
+            content_blob.original_filename = 'unnamed_file'
+            if (ext = mime_extensions(content_blob.content_type).first)
+              content_blob.original_filename += ".#{ext}"
+            end
+            if content_blob.save
+              updated += 1
+              print 'C'
+            else
+              fail = true
+            end
+          else
+            fail = true
+          end
+        end
+
+        if fail
+          print 'E'
+          error = "Error saving content blob ID #{content_blob.id}:\n"
+          error << content_blob.errors.full_messages.join("\n").inspect
+          errors << error
+        end
+
+        total += 1
+      end
+      puts " (#{total} / #{content_blobs.count})"
+    end
+
+    unless errors.empty?
+      puts "One or more errors occurred:"
+      errors.each do |e|
+        puts e
+        puts
+      end
+    end
+
+    puts
+    puts "#{updated} content blobs renamed."
+    puts "Done."
   end
 
   desc "calculate sizes and fetch remote content blobs"

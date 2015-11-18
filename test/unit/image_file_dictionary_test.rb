@@ -15,8 +15,8 @@ class ImageFileDictionaryTest < ActiveSupport::TestCase
   end
 
   test "image_filename_for_key" do
-    assert_equal "famfamfam_silk/arrow_up.png",Seek::ImageFileDictionary.instance.image_filename_for_key(:arrow_up)
-    assert_equal "famfamfam_silk/arrow_up.png",Seek::ImageFileDictionary.instance.image_filename_for_key("arrow_up")
+    assert_equal "crystal_project/16x16/actions/1uparrow.png",Seek::ImageFileDictionary.instance.image_filename_for_key(:arrow_up)
+    assert_equal "crystal_project/16x16/actions/1uparrow.png",Seek::ImageFileDictionary.instance.image_filename_for_key("arrow_up")
     assert_nil Seek::ImageFileDictionary.instance.image_filename_for_key("keythatwill_never_exist")
   end
 

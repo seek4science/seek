@@ -173,6 +173,7 @@ class ContentBlob < ActiveRecord::Base
 
   def cachable?
     Seek::Config.cache_remote_files &&
+        !is_webpage? &&
         file_size &&
         file_size < Seek::Config.max_cachable_size
   end

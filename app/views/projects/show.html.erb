@@ -34,13 +34,15 @@
       <strong><%= Seek::Config.dm_project_name %> PALs:</strong>
       <%= pals_link_list @project -%>
     </p>
-    <% if @project.respond_to?(:project_coordinators)%>
+
+    <% if @project.respond_to?(:project_coordinators) %>
         <p class="project_coordinators">
           <strong>Project Coordinators:</strong>
           <%= project_coordinators_link_list @project -%>
         </p>
     <% end%>
-    <% if @project.has_member?(current_user)%>
+
+    <% admin_logged_in? || if @project.has_member?(current_user)%>
         <p class="asset_managers">
           <strong>Asset Managers:</strong>
           <%= asset_managers_link_list @project -%>

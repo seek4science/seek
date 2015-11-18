@@ -25,8 +25,10 @@ module AdminHelper
   def delayed_job_status
     status = ""
     begin
-      pids = [0,1].collect do |n|
-        Daemons::PidFile.new("#{Rails.root}/tmp/pids","delayed_job.#{n.to_s}")
+      directory = "#{Rails.root}/tmp/pids"
+      pids = Daemons::PidFile.find_files(directory, "delayed_job").collect do |path|
+        file = path.sub("#{directory}/",'').sub('.pid','')
+        Daemons::PidFile.new(directory, file)
       end
       pids.each do |pid|
         if pid.running?
