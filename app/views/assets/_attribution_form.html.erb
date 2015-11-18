@@ -30,6 +30,11 @@
 
 <script type="text/javascript">
   // recreate internal store of attributions..
-  var attributions = <%= existing_attributions.map { |a| {type: a.class.name, id: a.id, name: h(a.title), contributor: a.contributor.person.name }}.to_json.html_safe -%>;
+  var attributions = <%= existing_attributions.map do |a|
+  {   type: a.class.name,
+      id: a.id,
+      name: a.title,
+      contributor: a.contributor.person.name }
+  end.to_json.html_safe -%>;
   updateAttributionSettings(); // ..and update the page to make existing attributions visible
 </script>
