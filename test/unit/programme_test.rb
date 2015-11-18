@@ -7,6 +7,20 @@ class ProgrammeTest < ActiveSupport::TestCase
     Factory(:admin)
   end
 
+  test 'has_member?' do
+    programme_administrator = Factory(:programme_administrator)
+    programme1 = programme_administrator.programmes.first
+    programme2 = Factory(:programme)
+
+    assert programme1.has_member?(programme_administrator)
+    assert programme1.has_member?(programme_administrator.user)
+
+    refute programme2.has_member?(programme_administrator)
+    refute programme2.has_member?(programme_administrator.user)
+
+    refute programme2.has_member?(nil)
+  end
+
   test 'uuid' do
     p = Programme.new title: 'fish'
     assert_nil p.attributes['uuid']

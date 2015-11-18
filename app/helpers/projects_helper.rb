@@ -19,9 +19,9 @@ module ProjectsHelper
     return result.html_safe
   end
 
-  def link_list_for_role role_text, role_members
+  def link_list_for_role role_text, role_members,type='project'
     if role_members.empty?
-      html = "<span class='none_text'>No #{role_text.pluralize} for this #{t('project')}</span>";
+      html = "<span class='none_text'>No #{role_text.pluralize} for this #{t(type)}</span>";
     else
       html = role_members.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end

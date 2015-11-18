@@ -40,6 +40,10 @@ class Programme < ActiveRecord::Base
     can_edit?(user)
   end
 
+  def has_member?(user_or_person)
+    projects.detect{|proj| proj.has_member?(user_or_person.try(:person)) }
+  end
+
   def can_edit?(user = User.current_user)
     new_record? || can_manage?(user)
   end

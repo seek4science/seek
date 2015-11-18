@@ -189,7 +189,7 @@ class Project < ActiveRecord::Base
 
   # indicates whether this project has a person, or associated user, as a member
   def has_member?(user_or_person)
-    user_or_person = user_or_person.try(:person) if user_or_person.is_a?(User)
+    user_or_person = user_or_person.try(:person)
     people.include? user_or_person
   end
 
