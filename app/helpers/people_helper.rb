@@ -51,12 +51,12 @@ module PeopleHelper
     return text.html_safe
   end
 
-  def project_role_list person
-    unless person.project_roles.empty?
+  def project_position_list person
+    unless person.project_positions.empty?
       text=""
-      person.project_roles.each do |r|
-        text += link_to(h(r.title),people_path(:project_role_id=>r.id))
-        text += ", " unless person.project_roles.last==r
+      person.project_positions.each do |r|
+        text += link_to(h(r.title),people_path(:project_position_id=>r.id))
+        text += ", " unless person.project_positions.last==r
       end
     else
       text="<span class='none_text'>None specified</span>"

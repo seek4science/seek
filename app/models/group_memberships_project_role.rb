@@ -1,6 +1,6 @@
-class GroupMembershipsProjectRole < ActiveRecord::Base
+class GroupMembershipsProjectPosition < ActiveRecord::Base
 
-  belongs_to :project_role
+  belongs_to :project_position
   belongs_to :group_membership
 
 end

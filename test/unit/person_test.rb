@@ -617,11 +617,11 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_roles_association
-    role = Factory(:project_role)
+    role = Factory(:project_position)
     p=Factory :person
-    p.group_memberships.first.project_roles << role
-    assert_equal 1, p.project_roles.size
-    assert p.project_roles.include?(role)
+    p.group_memberships.first.project_positions << role
+    assert_equal 1, p.project_positions.size
+    assert p.project_positions.include?(role)
   end
   
   def test_update_first_letter

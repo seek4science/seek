@@ -47,8 +47,8 @@ include ActionDispatch::TestProcess
   Factory.define(:pal, :parent => :person) do |f|
     f.roles_mask 2
     f.after_build do |pal|
-      Factory(:pal_role) if ProjectRole.pal_role.nil?
-      pal.group_memberships.first.project_roles << ProjectRole.pal_role
+      Factory(:pal_position) if ProjectPosition.pal_position.nil?
+      pal.group_memberships.first.project_positions << ProjectPosition.pal_position
       Factory(:admin_defined_role_project,:project=>pal.projects.first,:person=>pal,:role_mask=>2)
       pal.roles_mask = 2
     end
@@ -567,11 +567,11 @@ end
     f.association :work_group
   end
 
-  Factory.define(:project_role) do |f|
+  Factory.define(:project_position) do |f|
     f.name "A Role"
   end
 
-  Factory.define(:pal_role,:parent=>:project_role) do |f|
+  Factory.define(:pal_position,:parent=>:project_position) do |f|
     f.name "A Pal"
   end
 

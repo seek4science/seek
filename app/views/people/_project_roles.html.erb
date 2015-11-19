@@ -10,7 +10,7 @@
           <ul class="roles" id="positions-<%= group_membership.id -%>">Loading...</ul>
           <% if editable %>
               <%= select_tag "possible_roles_#{group_membership.id}",
-                             options_for_select(ProjectRole.all.map { |d| [h("#{d.name}"),d.id]}),
+                             options_for_select(ProjectPosition.all.map { |d| [h("#{d.name}"),d.id]}),
                              class: 'form-control project-positions-adder',
                              prompt: 'Add a position...',
                              'data-group-id' => group_membership.id%>
@@ -24,7 +24,7 @@
     var positionData = <%= @person.group_memberships.includes(:work_group).map do |membership|
                 {
                   id: membership.id,
-                  positions: membership.project_roles.map do |position|
+                  positions: membership.project_positions.map do |position|
                            { editable: editable,
                              position: { id: position.id, name: position.name }
                            }
