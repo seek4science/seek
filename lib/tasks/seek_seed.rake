@@ -21,7 +21,7 @@ namespace :seek do
   task :seed_testing=>[:environment,:create_controlled_vocabs,:tags,:compounds]
 
   desc 'creates the standard initial controlled vocublaries'
-  task :create_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :disciplines, :organisms, :recommended_model_environments, :measured_items, :units, :project_roles, :assay_classes, :relationship_types]
+  task :create_controlled_vocabs=>[:environment,:culture_growth_types, :model_types, :model_formats, :disciplines, :organisms, :recommended_model_environments, :measured_items, :units, :project_positions, :assay_classes, :relationship_types]
 
   desc "adds the default tags"
   task(:tags=>:environment) do
@@ -112,9 +112,9 @@ namespace :seek do
     ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "units")
   end
 
-  task(:project_roles=>:environment) do
-    ProjectRole.delete_all
-    ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "project_roles")
+  task(:project_positions=>:environment) do
+    ProjectPosition.delete_all
+    ActiveRecord::Fixtures.create_fixtures(File.join(Rails.root, "config/default_data"), "project_positions")
   end
 
   task(:assay_classes=>:environment) do

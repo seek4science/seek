@@ -42,15 +42,17 @@
         </p>
     <% end%>
 
+    <% if logged_in_and_registered? %>
+        <p class="project_administrators">
+          <strong><%= t('project') %> Administrators:</strong>
+          <%= project_administrator_link_list @project -%>
+        </p>
+    <% end %>
+
     <% admin_logged_in? || if @project.has_member?(current_user)%>
         <p class="asset_managers">
           <strong>Asset Managers:</strong>
           <%= asset_managers_link_list @project -%>
-        </p>
-
-        <p class="project_administrators">
-          <strong><%= t('project') %> Administrators:</strong>
-          <%= project_administrator_link_list @project -%>
         </p>
 
         <p class="gatekeepers">

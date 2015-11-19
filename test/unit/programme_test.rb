@@ -121,17 +121,17 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert_nil project.programme_id
   end
 
-  test 'administrators' do
+  test 'programme_administrators' do
     person = Factory(:person)
     programme = Factory(:programme)
     refute person.is_programme_administrator?(programme)
-    assert_empty programme.administrators
+    assert_empty programme.programme_administrators
     person.is_programme_administrator = true, programme
     disable_authorization_checks { person.save! }
 
     assert person.is_programme_administrator?(programme)
-    refute_empty programme.administrators
-    assert_equal [person], programme.administrators
+    refute_empty programme.programme_administrators
+    assert_equal [person], programme.programme_administrators
   end
 
   test 'assign adminstrator ids' do
@@ -146,7 +146,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     assert person.is_programme_administrator?(programme)
     refute person2.is_programme_administrator?(programme)
-    assert_equal [person], programme.administrators
+    assert_equal [person], programme.programme_administrators
 
     programme.update_attributes(administrator_ids: [person2.id])
     person.reload
@@ -155,7 +155,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     refute person.is_programme_administrator?(programme)
     assert person2.is_programme_administrator?(programme)
-    assert_equal [person2], programme.administrators
+    assert_equal [person2], programme.programme_administrators
 
     programme.update_attributes(administrator_ids: [person2.id, person.id])
     person.reload
@@ -164,7 +164,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     assert person.is_programme_administrator?(programme)
     assert person2.is_programme_administrator?(programme)
-    assert_equal [person2, person].sort, programme.administrators.sort
+    assert_equal [person2, person].sort, programme.programme_administrators.sort
   end
 
   test 'can create' do
@@ -234,6 +234,52 @@ class ProgrammeTest < ActiveSupport::TestCase
       prog.save!
       refute prog.is_activated?
     end
+  end
+
+  test 'update programme administrators after destroy' do
+    User.current_user=Factory(:admin)
+    pa = Factory(:programme_administrator)
+    prog = pa.programmes.first
+
+    assert pa.is_programme_administrator?(prog)
+    assert pa.is_programme_administrator_of_any_programme?
+    assert pa.has_role?('programme_administrator')
+
+    assert_difference('Programme.count', -1) do
+      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+        prog.destroy
+      end
+    end
+    pa.reload
+    refute pa.is_programme_administrator?(prog)
+    refute pa.is_programme_administrator_of_any_programme?
+    refute pa.has_role?('programme_administrator')
+
+    #administrator of multiple programmes
+    pa = Factory(:programme_administrator)
+    prog = pa.programmes.first
+    prog2 = Factory(:programme)
+    disable_authorization_checks do
+      pa.is_programme_administrator=true, prog2
+      pa.save!
+    end
+    pa.reload
+
+    assert pa.is_programme_administrator?(prog)
+    assert pa.is_programme_administrator_of_any_programme?
+    assert pa.has_role?('programme_administrator')
+
+    assert_difference('Programme.count', -1) do
+      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+        prog.destroy
+      end
+    end
+    pa.reload
+    refute pa.is_programme_administrator?(prog)
+    assert pa.is_programme_administrator?(prog2)
+    assert pa.is_programme_administrator_of_any_programme?
+    assert pa.has_role?('programme_administrator')
+
   end
 
   test "doesn't change activation flag on later save" do

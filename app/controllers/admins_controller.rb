@@ -371,8 +371,8 @@ class AdminsController < ApplicationController
       when 'invalid_users_profiles'
         partial = 'invalid_user_stats_list'
         invalid_users = {}
-        pal_role = ProjectRole.pal_role
-        invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal_of_any_project? != p.project_roles.include?(pal_role) }
+        pal_position = ProjectPosition.pal_position
+        invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal_of_any_project? != p.project_positions.include?(pal_position) }
         invalid_users[:duplicates] = Person.duplicates
         invalid_users[:no_person] = User.without_profile
         collection = invalid_users

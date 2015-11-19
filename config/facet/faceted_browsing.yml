@@ -187,7 +187,7 @@ Person:
       value_from: tools:text
   role:
       label: Role
-      value_from: project_roles:title
+      value_from: project_positions:title
   institution:
       label: Institution
       value_from: institutions:title

@@ -1,4 +1,3 @@
-<%= javascript_include_tag "people" %>
 <%= f.error_messages %>
 
 <%= render :partial=>"name_details_form", :locals=>{:f=>f} %>
@@ -18,7 +17,7 @@
         <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
         <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
     <% end %>
-    <%= render :partial=>"project_roles",:locals=>{:editable=>true} -%>
+    <%= render :partial=>"project_positions",:locals=>{:editable=>true} -%>
 <% end %>
 
 <% if person && person.notifiee_info -%>

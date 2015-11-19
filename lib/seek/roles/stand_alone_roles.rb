@@ -8,22 +8,38 @@ module Seek
         %w(admin)
       end
 
-      def add_roles(person, role_name, items = [])
-        fail InvalidCheckException.new("This role should not be assigned with other items - #{items.inspect}") unless items.empty?
-        mask = mask_for_role(role_name)
+      def add_roles(person, role_info)
+        fail InvalidCheckException.new("This role should not be assigned with other items - #{items.inspect}") unless role_info.items.empty?
+        mask = mask_for_role(role_info.role_name)
         person.roles_mask += mask if (person.roles_mask & mask).zero?
       end
 
-      def remove_roles(person, role_name, items = [])
-        fail InvalidCheckException.new("This role should not be assigned with other items - #{items.inspect}") unless items.empty?
-        return unless person.has_role?(role_name)
-        mask = mask_for_role(role_name)
+      def remove_roles(person, role_info)
+        fail InvalidCheckException.new("This role should not be assigned with other items - #{items.inspect}") unless role_info.items.empty?
+        return unless person.has_role?(role_info.role_name)
+        mask = mask_for_role(role_info.role_name)
         person.roles_mask -= mask
       end
 
       def check_role_for_item(_person, _role_name, item)
         fail InvalidCheckException.new("This role should not be checked against an item - #{item.inspect}") unless item.nil?
         true
+      end
+
+      module PersonInstanceMethods
+        def is_admin?
+          has_role?('admin')
+        end
+
+        def is_admin=(flag_and_items)
+          assign_or_remove_roles('admin', flag_and_items)
+        end
+      end
+
+      module PersonClassMethods
+        def admins
+          Seek::Roles::Roles.instance.people_with_role('admin')
+        end
       end
     end
   end

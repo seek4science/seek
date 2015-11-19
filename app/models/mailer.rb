@@ -164,7 +164,7 @@ class Mailer < ActionMailer::Base
     @programme = programme
 
     mail(from: Seek::Config.noreply_sender,
-         to: programme.administrators.map(&:email_with_name),
+         to: programme.programme_administrators.map(&:email_with_name),
          subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} has been activated"
     )
   end
@@ -173,7 +173,7 @@ class Mailer < ActionMailer::Base
     @programme = programme
     @reason = reason
     mail(from: Seek::Config.noreply_sender,
-         to: programme.administrators.map(&:email_with_name),
+         to: programme.programme_administrators.map(&:email_with_name),
          subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} has been rejected"
     )
   end

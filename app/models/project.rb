@@ -121,8 +121,8 @@ class Project < ActiveRecord::Base
 
   # this is project role
   def pis
-    pi_role = ProjectRole.find_by_name('PI')
-    people.select { |p| p.project_roles_of_project(self).include?(pi_role) }
+    pi_role = ProjectPosition.find_by_name('PI')
+    people.select { |p| p.project_positions_of_project(self).include?(pi_role) }
   end
 
   # this is seek role
@@ -197,7 +197,7 @@ class Project < ActiveRecord::Base
     # Get intersection of all project memberships + person's memberships to find project membership
     project_memberships = work_groups.collect(&:group_memberships).flatten
     person_project_membership = person.group_memberships & project_memberships
-    person_project_membership.project_roles
+    person_project_membership.project_positions
   end
 
   def can_be_edited_by?(user)
