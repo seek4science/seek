@@ -1210,7 +1210,7 @@
 
 
     $$.styfn.updateStyleHints = function(ele){
-        if (ele.isNode()) {
+        if (ele !== undefined && ele.isNode()) {
             var _p = ele._private;
             var self = this;
             var style = _p.style;
