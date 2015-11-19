@@ -4,8 +4,8 @@ class ProjectPositionTest < ActiveSupport::TestCase
   fixtures :project_positions
 
   test "pal role" do
-    role = ProjectPosition.pal_position
-    assert_equal project_positions(:pal),role
+    position = ProjectPosition.pal_position
+    assert_equal project_positions(:pal), position
   end
 
   test "person can have project roles" do

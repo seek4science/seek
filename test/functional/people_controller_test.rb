@@ -446,9 +446,9 @@ class PeopleControllerTest < ActionController::TestCase
     # create a datafile that this person is the contributor
     data_file = Factory(:data_file, contributor: user, project_ids: [project.id])
     # create pi
-    role = ProjectPosition.find_by_name('PI')
+    position = ProjectPosition.find_by_name('PI')
     pi = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    pi.group_memberships.first.project_positions << role
+    pi.group_memberships.first.project_positions << position
     pi.save
     assert_equal pi, project.pis.first
 
@@ -476,9 +476,9 @@ class PeopleControllerTest < ActionController::TestCase
     # create a datafile that this person is the contributor and with the same project
     data_file = Factory(:data_file, contributor: user, project_ids: [project.id])
     # create pal
-    role = ProjectPosition.find_by_name('Sysmo-DB Pal')
+    position = ProjectPosition.find_by_name('Sysmo-DB Pal')
     pal = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    pal.group_memberships.first.project_positions << role
+    pal.group_memberships.first.project_positions << position
     pal.is_pal = true, project
     pal.save
     assert_equal pal, project.pals.first
