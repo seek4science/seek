@@ -20,7 +20,7 @@ New pages require a formatter at the top, that looks like:
 
 For example, this page can be found at [https://raw.githubusercontent.com/seek4science/seek/gh-pages/contributing-to-pages.md](https://raw.githubusercontent.com/seek4science/seek/gh-pages/contributing-to-pages.md)
 
-If you want to view your changes as you edit them, with Ruby installed you can do:
+If you want to view your changes as you edit them, with Ruby installed you can install and run Jekyll with:
 
     gem install bundler
     bundle install
