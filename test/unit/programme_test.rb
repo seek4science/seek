@@ -236,6 +236,52 @@ class ProgrammeTest < ActiveSupport::TestCase
     end
   end
 
+  test 'update programme administrators after destroy' do
+    User.current_user=Factory(:admin)
+    pa = Factory(:programme_administrator)
+    prog = pa.programmes.first
+
+    assert pa.is_programme_administrator?(prog)
+    assert pa.is_programme_administrator_of_any_programme?
+    assert pa.has_role?('programme_administrator')
+
+    assert_difference('Programme.count', -1) do
+      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+        prog.destroy
+      end
+    end
+    pa.reload
+    refute pa.is_programme_administrator?(prog)
+    refute pa.is_programme_administrator_of_any_programme?
+    refute pa.has_role?('programme_administrator')
+
+    #administrator of multiple programmes
+    pa = Factory(:programme_administrator)
+    prog = pa.programmes.first
+    prog2 = Factory(:programme)
+    disable_authorization_checks do
+      pa.is_programme_administrator=true, prog2
+      pa.save!
+    end
+    pa.reload
+
+    assert pa.is_programme_administrator?(prog)
+    assert pa.is_programme_administrator_of_any_programme?
+    assert pa.has_role?('programme_administrator')
+
+    assert_difference('Programme.count', -1) do
+      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+        prog.destroy
+      end
+    end
+    pa.reload
+    refute pa.is_programme_administrator?(prog)
+    assert pa.is_programme_administrator?(prog2)
+    assert pa.is_programme_administrator_of_any_programme?
+    assert pa.has_role?('programme_administrator')
+
+  end
+
   test "doesn't change activation flag on later save" do
     Factory(:admin) # to avoid 1st person being an admin
     prog = Factory(:programme)

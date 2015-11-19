@@ -48,7 +48,9 @@ module Seek
             related_items_association(person) << related_item_join_class.new(associated_item_id_sym => item_id, role_mask: mask)
           end
 
-          person.roles_mask += mask if (person.roles_mask & mask).zero?
+          if (person.roles_mask & mask).zero?
+            person.update_attribute(:roles_mask,person.roles_mask + mask)
+          end
         end
       end
 
@@ -61,7 +63,9 @@ module Seek
           clause = { "#{related_item_class.name.downcase}_id" => item_id }
           related_items_association(person).where(role_mask: role_info.role_mask).where(clause).destroy_all
         end
-        person.roles_mask -= role_info.role_mask if (current_item_ids - item_ids).empty?
+        if (current_item_ids - item_ids).empty?
+          person.update_attribute(:roles_mask,person.roles_mask - role_info.role_mask)
+        end
       end
 
       # Methods that should be implemented or overridden in superclass
