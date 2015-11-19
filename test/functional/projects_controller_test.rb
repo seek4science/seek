@@ -461,7 +461,7 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test "dont display the roles(except pals) for people who are not the members of this showed project" do
+  test "dont display the roles(except pals and administrators) for people who are not the members of this showed project" do
     project = Factory(:project)
     work_group = Factory(:work_group, :project => project)
 
@@ -480,14 +480,14 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select "strong", :text => "Asset Managers:", :count => 0
       assert_select "a[href=?]", person_path(asset_manager), :text => asset_manager.name, :count => 0
 
-      assert_select "strong", :text => "Project Administrators:", :count => 0
-      assert_select "a[href=?]", person_path(project_administrator), :text => project_administrator.name, :count => 0
-
       assert_select "strong", :text => "Gatekeepers:", :count => 0
       assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 0
 
       assert_select "strong", :text => "SysMO-DB PALs:", :count => 1
       assert_select "a[href=?]", person_path(pal), :text => pal.name, :count => 1
+
+      assert_select "strong", :text => "Project Administrators:", :count => 1
+      assert_select "a[href=?]", person_path(project_administrator), :text => project_administrator.name, :count => 1
     end
   end
 
