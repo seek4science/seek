@@ -1,0 +1,7 @@
+<li data-position-id="{{position.id}}">
+    {{position.name}}
+    {{#if editable}}
+        <a title="Remove" class="delete clickable">(remove)</a>
+        <input type="hidden" name="group_membership_role_ids_{{group.id}}[]" value="{{position.id}}"/>
+    {{/if}}
+</li>

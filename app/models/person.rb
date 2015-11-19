@@ -61,7 +61,7 @@ class Person < ActiveRecord::Base
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
   searchable(:auto_index => false) do
-    text :project_roles
+    text :project_positions
     text :disciplines do
       disciplines.map{|d| d.title}
     end
@@ -290,12 +290,12 @@ class Person < ActiveRecord::Base
   end
 
   #the roles defined within the project
-  def project_roles
-    project_roles = []
+  def project_positions
+    project_positions = []
     group_memberships.each do |gm|
-      project_roles = project_roles | gm.project_roles
+      project_positions = project_positions | gm.project_positions
     end
-    project_roles
+    project_positions
   end
 
   def update_first_letter
@@ -306,11 +306,11 @@ class Person < ActiveRecord::Base
     self.first_letter=first_letter
   end
 
-  def project_roles_of_project(projects_or_project)
+  def project_positions_of_project(projects_or_project)
     #Get intersection of all project memberships + person's memberships to find project membership
 	  projects_or_project = Array(projects_or_project)
     memberships = group_memberships.select{|g| projects_or_project.include? g.work_group.project}
-    return memberships.collect{|m| m.project_roles}.flatten
+    return memberships.collect{|m| m.project_positions}.flatten
   end
 
   def assets

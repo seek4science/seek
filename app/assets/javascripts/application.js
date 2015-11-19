@@ -50,4 +50,5 @@
 //= require batch_upload
 //= require bootstrap_tab_memory
 //= require associations
+//= require people
 //= require_tree ./templates
