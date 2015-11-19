@@ -42,8 +42,8 @@
                                "Internal help enabled", "Whether internal help pages should be used. Disabling this allows the use of external help pages.",
                                :onchange=>toggle_appear_javascript('external_help_details')) %>
     <div id="external_help_details" class="additional_settings" style="<%= show_or_hide_block !Seek::Config.internal_help_enabled -%>">
-      <%= admin_text_setting(:external_help_root, Seek::Config.external_help_root,
-                             'Help Root URL', "This is the root URL for the external help files.") %>
+      <%= admin_text_setting(:external_help_url, Seek::Config.external_help_url,
+                             'Help URL', "This is the URL for the external help.") %>
     </div>
 
     <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,

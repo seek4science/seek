@@ -22,7 +22,7 @@ class HelpDocumentsController < ApplicationController
         end
       end
     else
-      redirect_to(Seek::Config.external_help_root)
+      redirect_to(Seek::Config.external_help_url)
     end
   end
 
@@ -33,7 +33,7 @@ class HelpDocumentsController < ApplicationController
         format.xml { render :xml=>@help_document}
       end
     else
-      redirect_to(Seek::Config.external_help_root)
+      redirect_to(Seek::Config.external_help_url)
     end
   end
   
