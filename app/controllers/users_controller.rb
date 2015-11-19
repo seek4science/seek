@@ -187,18 +187,6 @@ class UsersController < ApplicationController
     redirect_to :controller => 'homes', :action => 'index'
   end
 
-  def hide_guide_box
-    if current_user
-      current_user.show_guide_box = false
-      current_user.save
-    end
-    render :update do |page|
-      if current_user.nil?
-        cookies[:hide_guide_box]={:value=>'true',:expires=>10.years.from_now}
-      end
-       page.visual_effect :fade, 'guide_box', :duration => 0.25
-    end
-  end
   protected
   
   private 

@@ -60,6 +60,9 @@ class AdminsController < ApplicationController
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root= params[:jws_online_root]
 
+    Seek::Config.internal_help_enabled= string_to_boolean params[:internal_help_enabled]
+    Seek::Config.external_help_root= params[:external_help_root]
+
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
 

@@ -8,24 +8,32 @@ class HelpDocumentsController < ApplicationController
   before_filter :is_user_admin_auth, :except => [:show, :index]
   
   def index
-    if (@help_document = HelpDocument.find_by_identifier("index"))
-      respond_to do |format|
-        format.html { redirect_to(@help_document) }
-        format.xml { render :xml=>@help_document}
+    if (Seek::Config.internal_help_enabled)
+      if (@help_document = HelpDocument.find_by_identifier("index"))
+        respond_to do |format|
+          format.html { redirect_to(@help_document) }
+          format.xml { render :xml=>@help_document}
+        end
+      else
+        @help_documents = HelpDocument.all
+        respond_to do |format|
+          format.html # index.html.erb
+          format.xml { render :xml=>@help_documents}
+        end
       end
     else
-      @help_documents = HelpDocument.all
-      respond_to do |format|
-        format.html # index.html.erb
-        format.xml { render :xml=>@help_documents}
-      end
+      redirect_to(Seek::Config.external_help_root)
     end
   end
 
   def show
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml { render :xml=>@help_document}
+    if (Seek::Config.internal_help_enabled)
+      respond_to do |format|
+        format.html # show.html.erb
+        format.xml { render :xml=>@help_document}
+      end
+    else
+      redirect_to(Seek::Config.external_help_root)
     end
   end
   
