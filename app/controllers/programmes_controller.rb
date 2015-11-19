@@ -28,11 +28,11 @@ class ProgrammesController < ApplicationController
       # also activation email is sent
       unless User.admin_logged_in?
         current_person.is_programme_administrator = true, @programme
+        disable_authorization_checks { current_person.save! }
         if Seek::Config.email_enabled
           Mailer.programme_activation_required(@programme,current_person).deliver
         end
       end
-      disable_authorization_checks { current_person.save! }
     end
 
     respond_with(@programme)

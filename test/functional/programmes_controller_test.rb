@@ -111,6 +111,46 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal "ggggg",prog.description
   end
 
+  test "set programme administrator at creation" do
+    admin = Factory(:admin)
+    login_as(admin)
+    person = Factory(:person)
+    refute person.is_programme_administrator_of_any_programme?
+    assert_difference('Programme.count',1) do
+      assert_difference('AdminDefinedRoleProgramme.count',1) do
+        post :create, :programme=>{:administrator_ids=>[person.id],:title=>"programme xxxyxxx2"}
+      end
+    end
+
+    assert prog=assigns(:programme)
+    person.reload
+    assert person.is_programme_administrator?(prog)
+    assert person.is_programme_administrator_of_any_programme?
+    assert person.has_role?('programme_administrator')
+    assert person.roles_mask & Seek::Roles::Roles.instance.mask_for_role('programme_administrator')
+
+  end
+
+  test "admin sets themself as programme administrator at creation" do
+    admin = Factory(:admin)
+    login_as(admin)
+    refute admin.is_programme_administrator_of_any_programme?
+    assert_difference('Programme.count',1) do
+      assert_difference('AdminDefinedRoleProgramme.count',1) do
+        post :create, :programme=>{:administrator_ids=>[admin.id],:title=>"programme xxxyxxx1"}
+      end
+    end
+
+    assert prog=assigns(:programme)
+    admin.reload
+
+    assert admin.is_programme_administrator?(prog)
+    assert admin.is_programme_administrator_of_any_programme?
+    assert admin.has_role?('programme_administrator')
+    assert admin.roles_mask & Seek::Roles::Roles.instance.mask_for_role('programme_administrator')
+
+  end
+
   test "programme administrator can add new administrators, but not remove themself" do
     pa = Factory(:programme_administrator)
     login_as(pa)
@@ -138,6 +178,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert p1.is_programme_administrator?(prog)
     assert p2.is_programme_administrator?(prog)
     refute p3.is_programme_administrator?(prog)
+
+    assert p1.is_programme_administrator_of_any_programme?
+    assert p1.has_role?('programme_administrator')
+    assert p1.roles_mask & Seek::Roles::Roles.instance.mask_for_role('programme_administrator')
 
   end
 
