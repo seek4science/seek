@@ -1,9 +1,13 @@
 <% if Seek::Config.organisms_enabled %>
+    <%
+        organisms = current_user.person.projects.collect{|p| p.organisms}.flatten.uniq.sort_by(&:title)
+    %>
+
     <%= folding_panel("Details about the organism") do %>
         <div class="form-group">
             <label>Organism</label>
             <%= select model_class.name.underscore.to_sym, :organism_id,
-                       Organism.order(:title).collect{|o| [o.title.capitalize,o.id]},
+                       organisms.collect{|o| [o.title.capitalize,o.id]},
                        {:include_blank=>"Not specified"}, {:class => 'form-control'} -%>
         </div>
     <% end %>
