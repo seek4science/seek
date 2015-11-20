@@ -27,7 +27,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
     logout
     with_config_value :internal_help_enabled, false do
       get :index
-      assert_response :redirected
+      assert_response :redirect
     end
   end
   
