@@ -24,20 +24,21 @@ class AdminDefinedRolesExtensionTest < ActiveSupport::TestCase
       assert p.gatekeepers.empty?
     end
 
-    person.roles = [Seek::Roles::RoleInfo.new(role_name: 'asset_manager', items: @proj.id.to_s),
-                    Seek::Roles::RoleInfo.new(role_name: 'project_administrator', items: @proj.id.to_s),
-                    Seek::Roles::RoleInfo.new(role_name: 'pal', items: @proj.id.to_s),
-                    Seek::Roles::RoleInfo.new(role_name: 'gatekeeper', items: @proj.id.to_s)]
+    person.is_asset_manager=true,@proj
+    person.is_project_administrator=true,@proj
+    person.is_pal=true,@proj
+    person.is_gatekeeper=true,@proj
+
     disable_authorization_checks do
       person.save!
     end
     person.reload
 
-    [@proj, @proj_child1, @proj_child2].each do |p|
-      assert_equal true, person.is_asset_manager?(p)
-      assert_equal true, person.is_project_administrator?(p)
-      assert_equal true, person.is_pal?(p)
-      assert_equal true, person.is_gatekeeper?(p)
+    [@proj_child1].each do |p|
+      assert person.is_asset_manager?(p)
+      assert person.is_project_administrator?(p)
+      assert person.is_pal?(p)
+      assert person.is_gatekeeper?(p)
 
       assert_equal [person], p.asset_managers
       assert_equal [person], p.project_administrators
@@ -52,15 +53,16 @@ class AdminDefinedRolesExtensionTest < ActiveSupport::TestCase
     end
     person.reload
     assert person.is_admin?
-
-    person.roles = [Seek::Roles::RoleInfo.new(role_name: 'admin'), Seek::Roles::RoleInfo.new(role_name: 'asset_manager', items: @proj.id.to_s)]
+    
+    person.is_admin=true
+    person.is_asset_manager=true,@proj
     disable_authorization_checks do
       person.save!
     end
     person.reload
     assert person.is_admin?
     [@proj, @proj_child1, @proj_child2].each do |p|
-      assert_equal true, person.is_asset_manager?(p)
+      assert person.is_asset_manager?(p)
       assert_equal [person], p.asset_managers
     end
   end

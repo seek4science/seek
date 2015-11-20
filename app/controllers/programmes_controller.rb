@@ -28,11 +28,11 @@ class ProgrammesController < ApplicationController
       # also activation email is sent
       unless User.admin_logged_in?
         current_person.is_programme_administrator = true, @programme
+        disable_authorization_checks { current_person.save! }
         if Seek::Config.email_enabled
           Mailer.programme_activation_required(@programme,current_person).deliver
         end
       end
-      disable_authorization_checks { current_person.save! }
     end
 
     respond_with(@programme)
@@ -123,7 +123,7 @@ class ProgrammesController < ApplicationController
   #is the item inactive, and if so can the current person view it
   def inactive_view_allowed?
     return true if @programme.is_activated? || User.admin_logged_in?
-    unless result=(User.logged_in_and_registered? && @programme.administrators.include?(current_person))
+    unless result=(User.logged_in_and_registered? && @programme.programme_administrators.include?(current_person))
       error("This programme is not activated and cannot be viewed", "cannot view (not activated)")
     end
     result

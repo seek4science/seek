@@ -14,10 +14,6 @@ module HomesHelper
     simple_format(auto_link(Seek::Config.imprint_description.html_safe, sanitize: false), {}, sanitize: false)
   end
 
-  def show_guide_box?
-    Seek::Config.guide_box_enabled && ((!logged_in? && cookies[:hide_guide_box].nil?) || (logged_in? && current_user.try(:show_guide_box?)))
-  end
-
   def show_announcements?
     logged_in_and_registered? && Seek::Config.show_announcements
   end

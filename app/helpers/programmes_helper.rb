@@ -10,7 +10,7 @@ module ProgrammesHelper
   end
 
   def programme_administrators_input_box(programme)
-    administrators = programme.administrators
+    administrators = programme.programme_administrators
     box = ''
     unless User.admin_logged_in?
       administrators.delete(User.current_user.person)
@@ -25,7 +25,7 @@ module ProgrammesHelper
   end
 
   def programme_administrator_link_list programme
-    link_list_for_role("#{t('programme')} Administrator",programme.administrators,'programme')
+    link_list_for_role("#{t('programme')} Administrator",programme.programme_administrators,'programme')
   end
 
   def can_create_programmes?
