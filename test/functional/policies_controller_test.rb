@@ -67,20 +67,6 @@ class PoliciesControllerTest < ActionController::TestCase
     assert_select 'p', text: "#{contributor.person.name} can manage as an uploader", count: 1
   end
 
-  test 'should show asset managers for not entirely private item' do
-    asset_manager = Factory(:asset_manager)
-    post :preview_permissions, sharing_scope: Policy::EVERYONE, access_type: Policy::VISIBLE, is_new_file: 'true', resource_name: 'investigation', project_ids: asset_manager.projects.first.id.to_s
-
-    assert_select 'p', text: "#{asset_manager.name} can manage as an asset manager", count: 1
-  end
-
-  test 'should not show asset managers for entirely private item' do
-    asset_manager = Factory(:asset_manager)
-    post :preview_permissions, sharing_scope: Policy::PRIVATE, access_type: Policy::NO_ACCESS, is_new_file: 'true', resource_name: 'assay', project_ids: asset_manager.projects.first.id.to_s
-
-    assert_select 'p', text: "#{asset_manager.name} can manage as an asset manager", count: 0
-  end
-
   test 'should show notice message when an item is requested to be published' do
     gatekeeper = Factory(:gatekeeper)
     sop = Factory(:sop, project_ids: gatekeeper.projects.map(&:id))
