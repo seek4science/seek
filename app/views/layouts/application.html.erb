@@ -1,17 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!doctype html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-
+<html lang="en">
 <head>
-  <meta http-equiv="X-UA-Compatible"/>
   <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title><%= page_title controller.controller_name, controller.action_name %></title>
-  <%= favicon_link_tag('favicon.png') %>
 
+  <%= favicon_link_tag('favicon.png', :type => 'image/png') %>
   <%= csrf_meta_tag %>
-
   <%= seek_stylesheet_tags %>
   <%= seek_javascript_tags %>
 
@@ -66,8 +62,3 @@
 <%= analytics_init if Seek::Config.google_analytics_enabled %>
 </body>
 </html>
-
-
-
-
-
