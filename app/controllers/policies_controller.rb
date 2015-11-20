@@ -75,18 +75,12 @@ class PoliciesController < ApplicationController
       cloned_resource.creators = creators if cloned_resource.respond_to?(:creators)
       cloned_resource.contributor = contributor_person
 
-      asset_managers = get_asset_managers cloned_resource
-
       privileged_people = {}
       #exclude the current_person from the privileged people
       contributor_person = nil if contributor_person == current_person
-      asset_managers.delete(current_person)
-      asset_managers.delete(contributor_person)
       creators.delete(current_person)
       creators.delete(contributor_person)
-      asset_managers.each{|am| creators.delete(am)}
       privileged_people['contributor'] = [contributor_person] if contributor_person
-      privileged_people['asset_managers'] = asset_managers unless asset_managers.empty?
       privileged_people['creators'] = creators unless creators.empty?
 
       respond_to do |format|
