@@ -30,7 +30,7 @@
 %>
 
 <div class="panel panel-default <%= access_based_css_class%>">
-  <div class="panel-heading clearfix">
+  <div class="panel-heading">
     <%= list_item_title resource, title_options %>
     <% if resource.respond_to?(:projects) && ![Event, Person, Project, Institution, Programme].include?(resource.class) %>
         <div class="pull-right small">
