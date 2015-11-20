@@ -10,10 +10,8 @@
     tabber_ids.push("<%= tabs_id -%>");
 </script>
 <% if !resource_hash.blank? || !external_resource_hash.blank? -%>
-    <div id='<%= "#{tabs_id}_spinner" -%>'>
-      <center>
+    <div id='<%= "#{tabs_id}_spinner" -%>' class="center-block">
         <%= image_tag "ajax-loader-large.gif" -%>
-      </center>
     </div>
     <div <%= "id= #{tabs_id}" if tabs_id -%> class="tabber" style="display:none;">
       <% sorted_result_keys = resource_hash.keys.sort_by do |key|
