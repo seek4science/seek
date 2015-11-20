@@ -3,37 +3,36 @@ class HelpDocumentsController < ApplicationController
   include Seek::DestroyHandling
 
   before_filter :documentation_enabled?
+  before_filter :internal_help_enabled
   before_filter :find_document, :except => [:new, :index, :create]
   before_filter :login_required, :except=>[:show,:index]
   before_filter :is_user_admin_auth, :except => [:show, :index]
   
-  def index
-    if (Seek::Config.internal_help_enabled)
-      if (@help_document = HelpDocument.find_by_identifier("index"))
-        respond_to do |format|
-          format.html { redirect_to(@help_document) }
-          format.xml { render :xml=>@help_document}
-        end
-      else
-        @help_documents = HelpDocument.all
-        respond_to do |format|
-          format.html # index.html.erb
-          format.xml { render :xml=>@help_documents}
-        end
-      end
-    else
+  def internal_help_enabled
+    if (!Seek::Config.internal_help_enabled)
       redirect_to(Seek::Config.external_help_url)
     end
   end
 
-  def show
-    if (Seek::Config.internal_help_enabled)
+  def index
+    if (@help_document = HelpDocument.find_by_identifier("index"))
       respond_to do |format|
-        format.html # show.html.erb
+        format.html { redirect_to(@help_document) }
         format.xml { render :xml=>@help_document}
       end
     else
-      redirect_to(Seek::Config.external_help_url)
+      @help_documents = HelpDocument.all
+      respond_to do |format|
+        format.html # index.html.erb
+        format.xml { render :xml=>@help_documents}
+      end
+    end
+  end
+
+  def show
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml { render :xml=>@help_document}
     end
   end
   
