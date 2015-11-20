@@ -78,7 +78,7 @@ class Programme < ActiveRecord::Base
   end
 
   def programme_administrators
-    Seek::Roles::ProgrammeRelatedRoles.instance.people_with_programme_and_role(self, 'programme_administrator')
+    Seek::Roles::ProgrammeRelatedRoles.instance.people_with_programme_and_role(self, Seek::Roles::PROGRAMME_ADMINISTRATOR)
   end
 
   private

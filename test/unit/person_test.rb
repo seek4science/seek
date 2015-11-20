@@ -922,10 +922,10 @@ class PersonTest < ActiveSupport::TestCase
     User.current_user=Factory(:pal).user
     refute Person.can_create?
 
-    User.current_user=Factory(:gatekeeper).user
+    User.current_user=Factory(:asset_gatekeeper).user
     refute Person.can_create?
 
-    User.current_user=Factory(:asset_manager).user
+    User.current_user=Factory(:asset_housekeeper).user
     refute Person.can_create?
 
     User.current_user=Factory(:programme_administrator).user

@@ -34,15 +34,15 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
-  attr_accessible :project_administrator_ids, :gatekeeper_ids, :pal_ids, :asset_manager_ids, :title, :programme_id, :description,
+  attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,
                   :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids
 
   # for handling the assignment for roles
-  attr_accessor :project_administrator_ids, :gatekeeper_ids, :pal_ids, :asset_manager_ids
+  attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids
   after_save :handle_project_administrator_ids, if: '@project_administrator_ids'
-  after_save :handle_gatekeeper_ids, if: '@gatekeeper_ids'
+  after_save :handle_asset_gatekeeper_ids, if: '@asset_gatekeeper_ids'
   after_save :handle_pal_ids, if: '@pal_ids'
-  after_save :handle_asset_manager_ids, if: '@asset_manager_ids'
+  after_save :handle_asset_housekeeper_ids, if: '@asset_housekeeper_ids'
 
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
@@ -126,22 +126,22 @@ class Project < ActiveRecord::Base
   end
 
   # this is seek role
-  def asset_managers
-    people_with_the_role('asset_manager')
+  def asset_housekeepers
+    people_with_the_role(Seek::Roles::ASSET_HOUSEKEEPER)
   end
 
   # this is seek role
   def project_administrators
-    people_with_the_role('project_administrator')
+    people_with_the_role(Seek::Roles::PROJECT_ADMINISTRATOR)
   end
 
   # this is seek role
-  def gatekeepers
-    people_with_the_role('gatekeeper')
+  def asset_gatekeepers
+    people_with_the_role(Seek::Roles::ASSET_GATEKEEPER)
   end
 
   def pals
-    people_with_the_role('pal')
+    people_with_the_role(Seek::Roles::PAL)
   end
 
   # returns people belong to the admin defined seek 'role' for this project
@@ -256,22 +256,22 @@ class Project < ActiveRecord::Base
 
   # set the administrators, assigned from the params to :project_administrator_ids
   def handle_project_administrator_ids
-    handle_admin_role_ids :project_administrator
+    handle_admin_role_ids Seek::Roles::PROJECT_ADMINISTRATOR
   end
 
-  # set the gatekeepers, assigned from the params to :gatekeeper_ids
-  def handle_gatekeeper_ids
-    handle_admin_role_ids :gatekeeper
+  # set the gatekeepers, assigned from the params to :asset_gatekeeper_ids
+  def handle_asset_gatekeeper_ids
+    handle_admin_role_ids Seek::Roles::ASSET_GATEKEEPER
   end
 
   # set the pals, assigned from the params to :pal_ids
   def handle_pal_ids
-    handle_admin_role_ids :pal
+    handle_admin_role_ids Seek::Roles::PAL
   end
 
-  # set the asset managers, assigned from the params to :asset_manager_ids
-  def handle_asset_manager_ids
-    handle_admin_role_ids :asset_manager
+  # set the asset housekeepers, assigned from the params to :asset_housekeeper_ids
+  def handle_asset_housekeeper_ids
+    handle_admin_role_ids Seek::Roles::ASSET_HOUSEKEEPER
   end
 
   # general method for assigning the people with roles, according to the role passed in.

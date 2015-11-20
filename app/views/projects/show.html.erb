@@ -31,33 +31,34 @@
     <% end %>
 
     <p class="pals">
-      <strong><%= Seek::Config.dm_project_name %> PALs:</strong>
+      <strong><%= Seek::Config.dm_project_name %> <%= t('pal').pluralize %>:</strong>
       <%= pals_link_list @project -%>
     </p>
 
     <% if @project.respond_to?(:project_coordinators) %>
         <p class="project_coordinators">
           <strong>Project Coordinators:</strong>
-          <%= project_coordinators_link_list @project -%>
+          <%= project_coordinators_link_list @project %>
         </p>
     <% end%>
 
     <% if logged_in_and_registered? %>
         <p class="project_administrators">
-          <strong><%= t('project') %> Administrators:</strong>
-          <%= project_administrator_link_list @project -%>
+          <strong><%= t('project_administrator').pluralize %>:</strong>
+          <%= project_administrator_link_list @project %>
         </p>
     <% end %>
 
-    <% admin_logged_in? || if @project.has_member?(current_user)%>
-        <p class="asset_managers">
-          <strong>Asset Managers:</strong>
-          <%= asset_managers_link_list @project -%>
+
+    <% if admin_logged_in? || @project.has_member?(current_user) %>
+        <p class="asset_housekeepers">
+          <strong><%= t('asset_housekeeper').pluralize %>:</strong>
+          <%= asset_housekeepers_link_list @project %>
         </p>
 
-        <p class="gatekeepers">
-          <strong>Gatekeepers:</strong>
-          <%= gatekeepers_link_list @project -%>
+        <p class="asset_gatekeepers">
+          <strong><%= t('asset_gatekeeper').pluralize %>:</strong>
+          <%= gatekeepers_link_list @project %>
         </p>
     <% end %>
   </div>

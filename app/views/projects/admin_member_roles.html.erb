@@ -4,17 +4,17 @@
   <div class="col-md-8">
   <%= form_tag(update_members_project_path(@project)) do %>
       <%= panel('Administrative Roles') do %>
-          <%= label_tag("#{t('project')} Administrators") %>
+          <%= label_tag("#{t('project_administrator').pluralize}") %>
           <%= project_administrators_input_box(@project) %>
 
-          <%= label_tag("#{t('project')} Gatekeepers") %>
-          <%= project_gatekeepers_input_box(@project) %>
+          <%= label_tag("#{t('asset_gatekeeper').pluralize}") %>
+          <%= project_asset_gatekeepers_input_box(@project) %>
 
-          <%= label_tag("#{t('project')} Asset Managers") %>
-          <%= project_asset_managers_input_box(@project) %>
+          <%= label_tag("#{t('asset_housekeeper').pluralize}") %>
+          <%= project_asset_housekeepers_input_box(@project) %>
 
           <% if admin_logged_in? %>
-              <%= label_tag("#{t('project')} PALs") %>
+              <label><%= "#{t('pal').pluralize}" %></label>
               <%= project_pals_input_box(@project) %>
           <% end %>
       <% end %>

@@ -1,8 +1,12 @@
 module Seek
   module Roles
+    PAL='pal'
+    PROJECT_ADMINISTRATOR='project_administrator'
+    ASSET_HOUSEKEEPER='asset_housekeeper'
+    ASSET_GATEKEEPER='asset_gatekeeper'
     class ProjectRelatedRoles < RelatedRoles
       def self.role_names
-        %w(pal project_administrator asset_manager gatekeeper)
+        [Seek::Roles::PAL,Seek::Roles::PROJECT_ADMINISTRATOR,Seek::Roles::ASSET_HOUSEKEEPER,Seek::Roles::ASSET_GATEKEEPER]
       end
 
       def projects_for_person_with_role(person, role)
@@ -35,19 +39,19 @@ module Seek
 
       module PersonClassMethods
         def pals
-          Seek::Roles::Roles.instance.people_with_role('pal')
+          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::PAL)
         end
 
         def project_administrators
-          Seek::Roles::Roles.instance.people_with_role('project_administrator')
+          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::PROJECT_ADMINISTRATOR)
         end
 
-        def gatekeepers
-          Seek::Roles::Roles.instance.people_with_role('gatekeeper')
+        def asset_gatekeepers
+          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::ASSET_GATEKEEPER)
         end
 
-        def asset_managers
-          Seek::Roles::Roles.instance.people_with_role('asset_manager')
+        def asset_housekeepers
+          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::ASSET_HOUSEKEEPER)
         end
       end
 
@@ -77,35 +81,35 @@ module Seek
         end
 
         def is_pal?(project)
-          has_role?('pal') && check_role_for_item('pal', project)
+          check_for_role Seek::Roles::PAL,project
         end
 
         def is_project_administrator?(project)
-          has_role?('project_administrator') && check_role_for_item('project_administrator', project)
+          check_for_role Seek::Roles::PROJECT_ADMINISTRATOR,project
         end
 
-        def is_asset_manager?(project)
-          has_role?('asset_manager') && check_role_for_item('asset_manager', project)
+        def is_asset_housekeeper?(project)
+          check_for_role Seek::Roles::ASSET_HOUSEKEEPER,project
         end
 
-        def is_gatekeeper?(project)
-          has_role?('gatekeeper') && check_role_for_item('gatekeeper', project)
+        def is_asset_gatekeeper?(project)
+          check_for_role Seek::Roles::ASSET_GATEKEEPER,project
         end
 
         def is_pal=(flag_and_items)
-          assign_or_remove_roles('pal', flag_and_items)
+          assign_or_remove_roles(Seek::Roles::PAL, flag_and_items)
         end
 
         def is_project_administrator=(flag_and_items)
-          assign_or_remove_roles('project_administrator', flag_and_items)
+          assign_or_remove_roles(Seek::Roles::PROJECT_ADMINISTRATOR, flag_and_items)
         end
 
-        def is_asset_manager=(flag_and_items)
-          assign_or_remove_roles('asset_manager', flag_and_items)
+        def is_asset_housekeeper=(flag_and_items)
+          assign_or_remove_roles(Seek::Roles::ASSET_HOUSEKEEPER, flag_and_items)
         end
 
-        def is_gatekeeper=(flag_and_items)
-          assign_or_remove_roles('gatekeeper', flag_and_items)
+        def is_asset_gatekeeper=(flag_and_items)
+          assign_or_remove_roles(Seek::Roles::ASSET_GATEKEEPER, flag_and_items)
         end
 
         def projects_for_role(role)
@@ -130,7 +134,7 @@ module Seek
         end
 
         def is_in_any_gatekept_projects?
-          !projects.collect(&:gatekeepers).flatten.empty?
+          !projects.collect(&:asset_gatekeepers).flatten.empty?
         end
 
         # called as callback after save, to make sure the role project records are aligned with the current projects, deleting

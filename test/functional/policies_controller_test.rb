@@ -68,7 +68,7 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should show notice message when an item is requested to be published' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, project_ids: gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
     post :preview_permissions, sharing_scope: Policy::EVERYONE, access_type: Policy::VISIBLE, is_new_file: 'false', resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s
@@ -76,7 +76,7 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'should show notice message when an item is requested to be published and the request was alread sent by this user' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, project_ids: gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
     ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
@@ -92,7 +92,7 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     a_person = Factory(:person)
     sample = Sample.new
 
@@ -116,7 +116,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
     as_not_virtualliver do
-      gatekeeper = Factory(:gatekeeper)
+      gatekeeper = Factory(:asset_gatekeeper)
       a_person = Factory(:person)
       sample = Factory(:sample, policy: Factory(:policy))
       Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: sample.policy)
@@ -132,7 +132,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
     as_not_virtualliver do
-      gatekeeper = Factory(:gatekeeper)
+      gatekeeper = Factory(:asset_gatekeeper)
       a_person = Factory(:person)
       sample = Factory(:sample, policy: Factory(:policy), project_ids: gatekeeper.projects.collect(&:id))
       Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: sample.policy)
@@ -159,7 +159,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
   test 'can not publish assay having project with gatekeeper' do
     as_not_virtualliver do
-      gatekeeper = Factory(:gatekeeper)
+      gatekeeper = Factory(:asset_gatekeeper)
       a_person = Factory(:person)
       assay = Assay.new
       assay.study = Factory(:study, investigation: Factory(:investigation, project_ids: gatekeeper.projects.collect(&:id)))
@@ -174,7 +174,7 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'always can publish for the published item' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     a_person = Factory(:person)
     login_as(gatekeeper.user)
     sample = Factory(:sample, contributor: gatekeeper.user, policy: Factory(:public_policy), project_ids: gatekeeper.projects.collect(&:id))
@@ -209,12 +209,12 @@ class PoliciesControllerTest < ActionController::TestCase
                                project_ids: project.id, project_access_type: Policy::ACCESSIBLE
 
     # with additional text for privileged people
-    asset_manager = Factory(:asset_manager)
+    asset_manager = Factory(:asset_housekeeper)
     post :preview_permissions, sharing_scope: Policy::PRIVATE, access_type: Policy::NO_ACCESS, resource_name: 'data_file',
                                project_ids: asset_manager.projects.first.id
 
     # with additional text for both permissions and privileged people
-    asset_manager = Factory(:asset_manager)
+    asset_manager = Factory(:asset_housekeeper)
     post :preview_permissions, sharing_scope: Policy::ALL_USERS, access_type: Policy::VISIBLE, resource_name: 'data_file',
                                project_ids: asset_manager.projects.first.id, project_access_type: Policy::ACCESSIBLE
   end

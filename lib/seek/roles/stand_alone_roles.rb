@@ -1,11 +1,12 @@
 module Seek
   module Roles
+    ADMIN='admin'
     # Roles that stand alone, and are not linked to anything, for example Project or Programme
     class StandAloneRoles < Seek::Roles::Roles
       class InvalidCheckException < Exception; end
 
       def self.role_names
-        %w(admin)
+        [Seek::Roles::ADMIN]
       end
 
       def add_roles(person, role_info)
@@ -28,17 +29,17 @@ module Seek
 
       module PersonInstanceMethods
         def is_admin?
-          has_role?('admin')
+          has_role?(Seek::Roles::ADMIN)
         end
 
         def is_admin=(flag_and_items)
-          assign_or_remove_roles('admin', flag_and_items)
+          assign_or_remove_roles(Seek::Roles::ADMIN, flag_and_items)
         end
       end
 
       module PersonClassMethods
         def admins
-          Seek::Roles::Roles.instance.people_with_role('admin')
+          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::ADMIN)
         end
       end
     end

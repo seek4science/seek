@@ -91,7 +91,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request publish approval" do
-    gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
+    gatekeeper = Factory(:asset_gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
     resources = [Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture"),Factory(:teusink_model,:projects=>gatekeeper.projects,:title=>"Teusink")]
     requester=Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle")
 
@@ -134,7 +134,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "gatekeeper approval feedback" do
-    gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
+    gatekeeper = Factory(:asset_gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
     item = Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture")
     items_and_comments = [{:item => item, :comment => nil}]
     requester = Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle")
@@ -154,7 +154,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "gatekeeper reject feedback" do
-    gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
+    gatekeeper = Factory(:asset_gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
     item = Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture")
     items_and_comments = [{:item => item, :comment => 'not ready'}]
 

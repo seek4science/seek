@@ -18,7 +18,7 @@
     <% @waiting_for_publish_items.each do |item| %>
         <li class="type_and_title"><%= text_for_resource item -%>
           :&nbsp;<%= link_to item.title, item, :target => "_blank" -%></li>
-        <li class="secondary">Approval required from: <%= item.gatekeepers.collect { |m| link_to(m.title, m) }.join(" or ").html_safe -%></li>
+        <li class="secondary">Approval required from: <%= item.asset_gatekeepers.collect { |m| link_to(m.title, m) }.join(" or ").html_safe -%></li>
         <br/>
     <% end %>
   </ul>

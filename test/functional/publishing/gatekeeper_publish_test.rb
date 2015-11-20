@@ -11,7 +11,7 @@ class GatekeeperPublishTest < ActionController::TestCase
   def setup
     login_as(Factory(:user))
     @current_person = User.current_user.person
-    @gatekeeper = Factory(:gatekeeper)
+    @gatekeeper = Factory(:asset_gatekeeper)
   end
 
   test 'only gatekeeper can see -Waiting approval assets- button on their profile' do

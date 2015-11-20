@@ -35,7 +35,7 @@ module Seek
       end
 
       def check_gatekeeper_required
-        @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
+        @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(item) }
         @items_for_immediate_publishing = @items_for_publishing - @waiting_for_publish_items
         unless @waiting_for_publish_items.empty?
           respond_to do |format|
@@ -190,7 +190,7 @@ module Seek
       end
 
       def notify_gatekeepers_of_approval_request(items)
-        deliver_publishing_notification_emails :gatekeepers, items, :request_publish_approval
+        deliver_publishing_notification_emails :asset_gatekeepers, items, :request_publish_approval
       end
 
       def notify_owner_of_publishing_request(items)
@@ -247,7 +247,7 @@ module Seek
       end
 
       def is_gatekeeper_approval_required?(object)
-        params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && object.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(object)
+        params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && object.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(object)
       end
 
       def was_item_unpublished?(object)

@@ -429,11 +429,11 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   	test "asset_managers displayed in show page" do
-      asset_manager = Factory(:asset_manager)
+      asset_manager = Factory(:asset_housekeeper)
       login_as asset_manager.user
       get :show,:id=>asset_manager.projects.first
-      assert_select "div.box_about_actor p.asset_managers" do
-        assert_select "strong",:text=>"Asset Managers:",:count=>1
+      assert_select "div.box_about_actor p.asset_housekeepers" do
+        assert_select "strong",:text=>"Asset housekeepers:",:count=>1
         assert_select "a",:count=>1
         assert_select "a[href=?]",person_path(asset_manager),:text=>asset_manager.name,:count=>1
       end
@@ -444,18 +444,18 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as project_administrator.user
     get :show,:id=>project_administrator.projects.first
 		assert_select "div.box_about_actor p.project_administrators" do
-			assert_select "strong",:text=>"#{I18n.t('project')} Administrators:",:count=>1
+			assert_select "strong",:text=>"#{I18n.t('project')} administrators:",:count=>1
 			assert_select "a",:count=>1
 			assert_select "a[href=?]",person_path(project_administrator),:text=>project_administrator.name,:count=>1
 		end
     end
 
   test "gatekeepers displayed in show page" do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     login_as gatekeeper.user
     get :show, :id => gatekeeper.projects.first
-    assert_select "div.box_about_actor p.gatekeepers" do
-      assert_select "strong", :text => "Gatekeepers:", :count => 1
+    assert_select "div.box_about_actor p.asset_gatekeepers" do
+      assert_select "strong", :text => "Asset gatekeepers:", :count => 1
       assert_select "a", :count => 1
       assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 1
     end
@@ -465,9 +465,9 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project)
     work_group = Factory(:work_group, :project => project)
 
-    asset_manager = Factory(:asset_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    asset_manager = Factory(:asset_housekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     project_administrator = Factory(:project_administrator, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    gatekeeper = Factory(:gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    gatekeeper = Factory(:asset_gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     pal = Factory(:pal, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
 
     a_person = Factory(:person)
@@ -477,16 +477,16 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(a_person.user)
     get :show, :id => project
     assert_select "div.box_about_actor p" do
-      assert_select "strong", :text => "Asset Managers:", :count => 0
+      assert_select "strong", :text => "Asset housekeepers:", :count => 0
       assert_select "a[href=?]", person_path(asset_manager), :text => asset_manager.name, :count => 0
 
-      assert_select "strong", :text => "Gatekeepers:", :count => 0
+      assert_select "strong", :text => "Asset gatekeepers:", :count => 0
       assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 0
 
       assert_select "strong", :text => "SysMO-DB PALs:", :count => 1
       assert_select "a[href=?]", person_path(pal), :text => pal.name, :count => 1
 
-      assert_select "strong", :text => "Project Administrators:", :count => 1
+      assert_select "strong", :text => "Project administrators:", :count => 1
       assert_select "a[href=?]", person_path(project_administrator), :text => project_administrator.name, :count => 1
     end
   end
@@ -508,16 +508,16 @@ class ProjectsControllerTest < ActionController::TestCase
 		end
   end
 
-  test "no asset managers displayed for project with no asset managers" do
+  test "no asset housekeepers displayed for project with no asset housekeepers" do
     project = Factory(:project)
     work_group = Factory(:work_group, :project => project)
     person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     login_as person.user
     get :show,:id=>project
-		assert_select "div.box_about_actor p.asset_managers" do
-			assert_select "strong",:text=>"Asset Managers:",:count=>1
+		assert_select "div.box_about_actor p.asset_housekeepers" do
+			assert_select "strong",:text=>"Asset housekeepers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Asset Managers for this #{I18n.t('project')}",:count=>1
+			assert_select "span.none_text",:text=>"No Asset housekeepers for this #{I18n.t('project')}",:count=>1
 		end
   end
 
@@ -528,9 +528,9 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.project_administrators" do
-			assert_select "strong",:text=>"#{I18n.t('project')} Administrators:",:count=>1
+			assert_select "strong",:text=>"#{I18n.t('project')} administrators:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Administrators for this #{I18n.t('project')}",:count=>1
+			assert_select "span.none_text",:text=>"No #{I18n.t('project')} administrators for this #{I18n.t('project')}",:count=>1
 		end
 	end
 
@@ -540,10 +540,10 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     login_as person.user
     get :show,:id=>project
-		assert_select "div.box_about_actor p.gatekeepers" do
-			assert_select "strong",:text=>"Gatekeepers:",:count=>1
+		assert_select "div.box_about_actor p.asset_gatekeepers" do
+			assert_select "strong",:text=>"Asset gatekeepers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Gatekeepers for this #{I18n.t('project')}",:count=>1
+			assert_select "span.none_text",:text=>"No Asset gatekeepers for this #{I18n.t('project')}",:count=>1
 		end
 	end
 
@@ -1168,19 +1168,19 @@ class ProjectsControllerTest < ActionController::TestCase
     person2.reload
 
     assert_equal [pa,person,person2].sort, project.people.sort
-    refute person.is_gatekeeper?(project)
-    refute person.is_asset_manager?(project)
+    refute person.is_asset_gatekeeper?(project)
+    refute person.is_asset_housekeeper?(project)
     refute person.is_project_administrator?(project)
     refute person.is_pal?(project)
-    refute person2.is_gatekeeper?(project)
-    refute person2.is_asset_manager?(project)
+    refute person2.is_asset_gatekeeper?(project)
+    refute person2.is_asset_housekeeper?(project)
     refute person2.is_project_administrator?(project)
     refute person2.is_pal?(project)
 
     ids = "#{person.id},#{person2.id}"
 
     post :update_members,
-         :id=>project,:project=>{:project_administrator_ids=>ids,:gatekeeper_ids=>ids,:asset_manager_ids=>ids,:pal_ids=>ids}
+         :id=>project,:project=>{:project_administrator_ids=>ids,:asset_gatekeeper_ids=>ids,:asset_housekeeper_ids=>ids,:pal_ids=>ids}
 
     assert_redirected_to project_path(project)
     assert_nil flash[:error]
@@ -1190,12 +1190,12 @@ class ProjectsControllerTest < ActionController::TestCase
     person2.reload
     assert_equal [pa,person,person2].sort, project.people.sort
 
-    assert person.is_gatekeeper?(project)
-    assert person.is_asset_manager?(project)
+    assert person.is_asset_gatekeeper?(project)
+    assert person.is_asset_housekeeper?(project)
     assert person.is_project_administrator?(project)
     assert person.is_pal?(project)
-    assert person2.is_gatekeeper?(project)
-    assert person2.is_asset_manager?(project)
+    assert person2.is_asset_gatekeeper?(project)
+    assert person2.is_asset_housekeeper?(project)
     assert person2.is_project_administrator?(project)
     assert person2.is_pal?(project)
 

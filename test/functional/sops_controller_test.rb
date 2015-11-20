@@ -656,7 +656,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
     as_not_virtualliver do
-      gatekeeper = Factory(:gatekeeper)
+      gatekeeper = Factory(:asset_gatekeeper)
     post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id)},:content_blobs => [{:data => file_for_upload}],
          :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
       sop = assigns(:sop)
@@ -671,7 +671,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should not change the policy if the item is requested to be published, when managing sop" do
-      gatekeeper = Factory(:gatekeeper)
+      gatekeeper = Factory(:asset_gatekeeper)
       policy = Factory(:policy, :sharing_scope => Policy::PRIVATE, :permissions => [Factory(:permission)])
       sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id), :policy => policy)
       login_as(sop.contributor)
@@ -780,7 +780,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'send publish approval request' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id))
 
     #request publish
@@ -792,7 +792,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'dont send publish approval request if can_publish' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, :contributor => gatekeeper.user, :project_ids => gatekeeper.projects.collect(&:id))
 
     #request publish
@@ -805,7 +805,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'dont send publish approval request again if it was already sent by this person' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id))
 
     #request publish

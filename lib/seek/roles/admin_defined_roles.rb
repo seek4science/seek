@@ -21,10 +21,6 @@ module Seek
         Seek::Roles::Roles.instance.role_names_for_mask(roles_mask)
       end
 
-      def has_role?(role_name)
-        roles_mask != 0 && (roles_mask & Seek::Roles::Roles.instance.mask_for_role(role_name) != 0)
-      end
-
       def assign_or_remove_roles(rolename, flag_and_items)
         flag_and_items = Array(flag_and_items)
         flag = flag_and_items[0]
@@ -57,12 +53,20 @@ module Seek
         handler
       end
 
-      def check_role_for_item(role_name, item)
-        select_handler(role_name).instance.check_role_for_item(self, role_name, item)
-      end
-
       def is_admin_or_project_administrator?
         is_admin? || is_project_administrator_of_any_project?
+      end
+
+      def has_role?(role_name)
+        roles_mask != 0 && (roles_mask & Seek::Roles::Roles.instance.mask_for_role(role_name) != 0)
+      end
+
+      def check_for_role rolename,item
+        has_role?(rolename) && check_role_for_item(rolename, item)
+      end
+
+      def check_role_for_item(role_name, item)
+        select_handler(role_name).instance.check_role_for_item(self, role_name, item)
       end
 
       include Seek::ProjectHierarchies::AdminDefinedRolesExtension if Seek::Config.project_hierarchy_enabled

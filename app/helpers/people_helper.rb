@@ -65,7 +65,11 @@ module PeopleHelper
   end
 
   def admin_defined_project_roles_hash
-    roles = {"pal"=>"a PAL","project_administrator"=>"a Project Administrator", "asset_manager"=>"an Asset Manager","gatekeeper"=>"a Gatekeeper"}
+    roles = Seek::Roles::ProjectRelatedRoles.role_names.map do |role|
+      [role,t(role)]
+    end
+    roles = Hash[roles]
+
     roles.delete("pal") unless admin_logged_in?
     roles
   end

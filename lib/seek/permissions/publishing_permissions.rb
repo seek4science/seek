@@ -32,7 +32,7 @@ module Seek
 
       def publish!(comment = nil)
         if can_publish?
-          if gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)
+          if gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
             false
           else
             policy.access_type = Policy::ACCESSIBLE
@@ -80,11 +80,11 @@ module Seek
       end
 
       def gatekeeper_required?
-        !gatekeepers.empty?
+        !asset_gatekeepers.empty?
       end
 
-      def gatekeepers
-        projects.collect(&:gatekeepers).flatten.uniq
+      def asset_gatekeepers
+        projects.collect(&:asset_gatekeepers).flatten.uniq
       end
 
       def publish_requesters
@@ -111,7 +111,7 @@ module Seek
       # updated item: keep the policy as before
       def temporary_policy_while_waiting_for_publishing_approval
         return true unless authorization_checks_enabled
-        if policy.sharing_scope == Policy::EVERYONE && !self.is_a?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(self)
+        if policy.sharing_scope == Policy::EVERYONE && !self.is_a?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
           if self.new_record?
             self.policy = Policy.sysmo_and_projects_policy projects
           else

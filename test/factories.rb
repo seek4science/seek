@@ -54,7 +54,7 @@ include ActionDispatch::TestProcess
     end
   end
 
-  Factory.define(:asset_manager,:parent=>:person) do |f|
+  Factory.define(:asset_housekeeper,:parent=>:person) do |f|
     f.after_build do |am|
       Factory(:admin_defined_role_project,:project=>am.projects.first,:person=>am,:role_mask=>8)
       am.roles_mask = 8
@@ -77,7 +77,7 @@ include ActionDispatch::TestProcess
   end
 
 
-  Factory.define(:gatekeeper,:parent=>:person) do |f|
+  Factory.define(:asset_gatekeeper,:parent=>:person) do |f|
     f.after_build do |gk|
       Factory(:admin_defined_role_project,:project=>gk.projects.first,:person=>gk,:role_mask=>16)
       gk.roles_mask = 16

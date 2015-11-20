@@ -1,8 +1,9 @@
 module Seek
   module Roles
+    PROGRAMME_ADMINISTRATOR='programme_administrator'
     class ProgrammeRelatedRoles < RelatedRoles
       def self.role_names
-        %w(programme_administrator)
+        [Seek::Roles::PROGRAMME_ADMINISTRATOR]
       end
 
       def self.define_extra_methods(_base)
@@ -33,7 +34,7 @@ module Seek
 
       module PersonClassMethods
         def programme_administrators
-          Seek::Roles::Roles.instance.people_with_role('programme_administrator')
+          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::PROGRAMME_ADMINISTRATOR)
         end
       end
 
@@ -54,11 +55,11 @@ module Seek
         end
 
         def is_programme_administrator?(programme)
-          has_role?('programme_administrator') && check_role_for_item('programme_administrator', programme)
+          check_for_role(Seek::Roles::PROGRAMME_ADMINISTRATOR,programme)
         end
 
         def is_programme_administrator=(flag_and_items)
-          assign_or_remove_roles('programme_administrator', flag_and_items)
+          assign_or_remove_roles(Seek::Roles::PROGRAMME_ADMINISTRATOR, flag_and_items)
         end
 
         def programmes_for_role(role)
@@ -71,7 +72,7 @@ module Seek
             # needs to return an ActiveRecord::Relation whereas .all just returns an Array, causing an error when trying to chain scopes etc
             Programme.scoped
           else
-            programmes_for_role('programme_administrator')
+            programmes_for_role(Seek::Roles::PROGRAMME_ADMINISTRATOR)
           end
         end
       end

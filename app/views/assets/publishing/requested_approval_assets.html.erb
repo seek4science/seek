@@ -7,7 +7,7 @@
   <div class="box_infotext">
     <ul style="padding-left:1em;">
       <li>
-        <% project_names = current_user.person.projects_for_role('gatekeeper').collect(&:title) %>
+        <% project_names = current_user.person.projects_for_role(Seek::Roles::ASSET_GATEKEEPER).collect(&:title) %>
         You are the Gatekeeper for the <%= t('project').downcase.pluralize(project_names.count) %>
         : <strong><%= project_names.join(', ') %></strong>.
       </li>
