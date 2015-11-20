@@ -38,17 +38,19 @@ class SessionStoreTest < ActionController::IntegrationTest
   end
 
   test "should go to last visited page(except search) after browsing a forbidden page, accessible page, then login" do
-    data_file = Factory :data_file, :contributor => User.current_user
+    with_config_value :internal_help_enabled, true do
+      data_file = Factory :data_file, :contributor => User.current_user
 
-    logout "http://www.example.com/"
-    get "/data_files/#{data_file.id}", {}, {'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"}
-    assert_response :forbidden
+      logout "http://www.example.com/"
+      get "/data_files/#{data_file.id}", {}, {'HTTP_REFERER' => "http://www.example.com/data_files/#{data_file.id}"}
+      assert_response :forbidden
 
-    get "/help"
-    assert_response :success
+      get "/help"
+      assert_response :success
 
-    login_as_test_user "/help"
-    assert_redirected_to "/help"
+      login_as_test_user "/help"
+      assert_redirected_to "/help"
+    end
   end
 
   test "should go to root after logging in/out from search page" do
