@@ -102,6 +102,19 @@ module AdminHelper
     end
   end
 
+  def git_link_tag
+    if File.exists?(File.join(Rails.root,".git"))
+      begin
+        version = `git rev-parse HEAD`
+        branch =  `git rev-parse --abbrev-ref HEAD`
+        link = link_to(version[0...7],"https://github.com/seek4science/seek/commit/#{version}",:target => "_blank", title:version).html_safe
+        "Git revision: #{link} (branch:#{branch})".html_safe
+
+      rescue
+      end
+    end
+  end
+
   private
 
   def admin_setting_block(title, description)
