@@ -213,7 +213,7 @@ class AdminsController < ApplicationController
 
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
     Seek::Config.max_cachable_size = params[:max_cachable_size]
-    Seek::Config.max_cachable_size = params[:hard_max_cachable_size]
+    Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
 
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || (crossref_email_valid)) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
