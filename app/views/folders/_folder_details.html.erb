@@ -64,7 +64,7 @@
 
 <% if @folder.editable? -%>
     <div id='new_child' style='display:none;'>
-      <div id="error_text" class='error_div' style="display:none;"></div>
+      <div id="error_text" class='error_div alert alert-danger' style="display:none;"></div>
       <%= form_tag_with_callbacks(create_folder_project_folder_path(@project,@folder),
                                   {
                                           :id=>:create_child_form,
