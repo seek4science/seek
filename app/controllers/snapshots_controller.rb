@@ -12,6 +12,7 @@ class SnapshotsController < ApplicationController
 
   include Seek::BreadCrumbs
   include Zenodo::Oauth2::SessionHelper
+  include Seek::ExternalServiceWrapper
 
   def create
     @snapshot = @investigation.create_snapshot
@@ -33,12 +34,14 @@ class SnapshotsController < ApplicationController
   end
 
   def mint_doi
-    if @snapshot.mint_doi
-      flash[:notice] = "DOI successfully minted"
-      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
-    else
-      flash[:error] = @snapshot.errors.full_messages
-      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    wrap_service('DataCite', investigation_snapshot_path(@investigation, @snapshot.snapshot_number)) do
+      if @snapshot.mint_doi
+        flash[:notice] = "DOI successfully minted"
+        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+      else
+        flash[:error] = @snapshot.errors.full_messages
+        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+      end
     end
   end
 
@@ -50,12 +53,14 @@ class SnapshotsController < ApplicationController
 
     metadata = params[:metadata].delete_if { |k,v| v.blank? }
 
-    if @snapshot.export_to_zenodo(access_token, metadata) && @snapshot.publish_in_zenodo(access_token)
-      flash[:notice] = "Snapshot successfully exported to Zenodo"
-      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
-    else
-      flash[:error] = @snapshot.errors.full_messages
-      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    wrap_service('Zenodo', investigation_snapshot_path(@investigation, @snapshot.snapshot_number), rescue_all: true) do
+      if @snapshot.export_to_zenodo(access_token, metadata) && @snapshot.publish_in_zenodo(access_token)
+        flash[:notice] = "Snapshot successfully exported to Zenodo"
+        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+      else
+        flash[:error] = @snapshot.errors.full_messages
+        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+      end
     end
   end
 
