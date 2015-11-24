@@ -11,6 +11,7 @@ class OrganismsController < ApplicationController
   cache_sweeper :organisms_sweeper,:only=>[:update,:create,:destroy]
 
   include BioPortal::RestAPI
+  include Seek::ExternalServiceWrapper
 
   def show
     respond_to do |format|
@@ -45,12 +46,16 @@ class OrganismsController < ApplicationController
     pagenum=params[:pagenum]
     pagenum||=1
     search_term=params[:search_term]
-    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>100,:page=>pagenum,:ontologies=>"NCBITAXON",:apikey=>Seek::Config.bioportal_api_key}
+    results, pages, error = nil
+    wrap_service('BioPortal', proc { |m| error = m }) do
+      results,pages = search search_term,{:isexactmatch=>0,:pagesize=>100,:page=>pagenum,:ontologies=>"NCBITAXON",:apikey=>Seek::Config.bioportal_api_key}
+    end
     render :update do |page|
       if results
-        page.replace_html 'search_results',:partial=>"search_results",:object=>results,:locals=>{:pages=>pages,:pagenum=>pagenum,:search_term=>search_term}
+        page.replace_html 'search_results', :partial => "search_results",
+                          :object => results, :locals => { :pages => pages, :pagenum => pagenum, :search_term => search_term }
       else
-        page.replace_html 'search_results',:text=>"Nothing found"
+        page.replace_html 'search_results', :partial => "search_error", :locals => { :text => error || "Nothing found" }
       end
     end
   end
