@@ -34,12 +34,14 @@ class SnapshotsController < ApplicationController
   end
 
   def mint_doi
-    if @snapshot.mint_doi
-      flash[:notice] = "DOI successfully minted"
-      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
-    else
-      flash[:error] = @snapshot.errors.full_messages
-      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    wrap_service('DataCite', investigation_snapshot_path(@investigation, @snapshot.snapshot_number)) do
+      if @snapshot.mint_doi
+        flash[:notice] = "DOI successfully minted"
+        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+      else
+        flash[:error] = @snapshot.errors.full_messages
+        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+      end
     end
   end
 
