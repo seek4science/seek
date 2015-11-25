@@ -57,16 +57,11 @@ you will need this later.
 
 The remaining packages are:
 
-    sudo apt-get install wget curl mercurial ruby libssl-dev
-    sudo apt-get install build-essential openssh-server git libreadline-dev
-    sudo apt-get install libxml++2.6-dev openjdk-7-jdk libgmp-dev
-    sudo apt-get install libsqlite3-dev sqlite3 libcurl4-gnutls-dev nodejs
-    sudo apt-get install poppler-utils libreoffice libmysqlclient-dev
-    sudo apt-get install libmagick++-dev imagemagick libxslt1-dev libpq-dev
+    sudo apt-get install build-essential libssl-dev openssh-server git libreadline-dev libxml++2.6-dev openjdk-7-jdk libgmp-dev libcurl4-gnutls-dev nodejs poppler-utils libreoffice libmysqlclient-dev libmagick++-dev imagemagick libxslt1-dev libpq-dev
 
 Installing these packages now will make installing Ruby easier later on:
 
-    sudo apt-get install libtool gawk libyaml-dev autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
+    sudo apt-get install libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake bison libffi-dev
 
 ## Development or Production?
 
@@ -74,6 +69,25 @@ The following steps are suitable for either setting up SEEK for development,
 or in a production environment. However, when setting up a production
 environment there are some minor differences - please visit [Installing SEEK
 for Production](install-production.html)
+
+## Getting SEEK
+
+Now you are ready for installing SEEK. You can either download SEEK or install
+from GitHub. You can download SEEK from
+<https://bitbucket.org/seek4science/seek/downloads/seek-1.0.0.tgz>
+
+    wget <https://bitbucket.org/seek4science/seek/downloads/seek-1.0.0.tgz>
+
+then unpack the file with:
+
+    tar zxfv seek-1.0.0.tgz
+
+Alternatively, if you wish to install directly from GitHub, the latest version of SEEK is
+tagged as *(v1.0.0)*. To fetch this run:
+
+    git clone https://github.com/seek4science/seek.git
+    cd seek/
+    git checkout v1.0.0
 
 ## Setting up Ruby and RubyGems with RVM
 
@@ -95,34 +109,12 @@ if you already had RVM installed, bring it up to date with:
 
     rvm get stable
 
-now install Ruby 2.1.6
+now install the appropriate version of Ruby
 
-    rvm install ruby-2.1.6
+    rvm install `cat .ruby-version`
 
 you may be asked for your password so that some additional packages can be
 installed. You will then need to wait for Ruby to be downloaded and compiled.
-
-Now you just need to create the *Gemset* for SEEK. RVM allows what it calls
-*Gemsets* to seperate the gems installed, in isolation from each other, for
-different applications. To create the gemset run:
-
-    rvm gemset create seek
-
-## Getting SEEK
-
-Now you are ready for installing SEEK. You can either download SEEK or install
-from GitHub. You can download SEEK from
-<https://bitbucket.org/seek4science/seek/downloads/seek-0.23.0.tgz> , then
-unpack the file with:
-
-    tar zxfv seek-0.23.0.tgz
-
-If you wish to install directly from GitHub, the latest version of SEEK is
-tagged as *(v0.23.0)*. To fetch this run:
-
-    git clone https://github.com/seek4science/seek.git
-    cd seek/
-    git checkout v0.23.0
 
 ## Installing Gems
 
