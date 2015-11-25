@@ -63,6 +63,13 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_response :success
     assert_nil flash[:error]
   end
+
+  test "programme administrator can get new" do
+    login_as(Factory(:programme_administrator))
+    get :new
+    assert_response :success
+    assert_nil flash[:error]
+  end
   
   test "non admin cannot get new" do
     login_as(:aaron)
@@ -121,6 +128,17 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:organism)
     assert_redirected_to organism_path(assigns(:organism))
   end
+
+  test "programme administrator can create new organism" do
+    login_as(Factory(:programme_administrator))
+    assert_difference("Organism.count") do
+      post :create, :organism=>{:title=>"An organism"}
+    end
+    assert_not_nil assigns(:organism)
+    assert_redirected_to organism_path(assigns(:organism))
+  end
+
+
   
   test "non admin cannot create new organism" do
     login_as(:aaron)
