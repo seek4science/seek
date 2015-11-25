@@ -5,20 +5,20 @@ module Seek
       begin
         block.call
       rescue RestClient::ResourceNotFound, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH => e
-        external_service_error e, "#{service_name} error: service unreachable", strategy
+        external_service_error e, service_name, "Service unreachable", strategy
       rescue RestClient::InternalServerError => e
-        external_service_error e, "#{service_name} error: internal server error", strategy
+        external_service_error e, service_name, "Internal server error", strategy
       rescue RestClient::Forbidden, RestClient::Unauthorized => e
-        external_service_error e, "#{service_name} error: service inaccessible", strategy
+        external_service_error e, service_name, "Service inaccessible", strategy
       rescue RestClient::RequestTimeout => e
-        external_service_error e, "#{service_name} error: service timed out", strategy
+        external_service_error e, service_name, "Service timed out", strategy
       rescue RestClient::Exception => e
-        external_service_error e, "#{service_name} error: #{e.http_code} #{e.response}", strategy
+        external_service_error e, service_name, "(#{e.http_code}) #{e.response}", strategy
       rescue OpenURI::HTTPError => e
-        external_service_error e, "#{service_name} error: #{e.message}", strategy
+        external_service_error e, service_name, e.message, strategy
       rescue Exception => e
         if opts[:rescue_all]
-          external_service_error e, "#{service_name} error: Unhandled error", strategy
+          external_service_error e, service_name, "Unhandled error", strategy
         else
           raise e
         end
@@ -27,7 +27,8 @@ module Seek
 
     private
 
-    def external_service_error(exception, message, strategy)
+    def external_service_error(exception, service_name, message, strategy)
+      message = "There was a problem communicating with #{service_name} - #{message}"
       if Seek::Config.exception_notification_enabled
         ExceptionNotifier.notify_exception(exception, data: { message: "Error interacting with #{service_name}" })
       end
