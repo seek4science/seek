@@ -1237,6 +1237,38 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'assigns current user and sets as administrator if requested on create' do
+    person = Factory(:programme_administrator_not_in_project)
+    institution = Factory(:institution)
+    login_as(person)
+    assert_difference('Project.count') do
+      post :create, :project => {:title=>"test2"},:default_member=>{:add_to_project=>"1",:institution_id=>institution.id}
+    end
+
+    assert project=assigns(:project)
+    person.reload
+
+    assert_includes person.projects,project
+    assert_includes person.institutions, institution
+    assert person.is_project_administrator?(project)
+  end
+
+  test 'does not assign current user and sets as administrator if not requested on create' do
+    person = Factory(:programme_administrator_not_in_project)
+    institution = Factory(:institution)
+    login_as(person)
+    assert_difference('Project.count') do
+      post :create, :project => {:title=>"test2"},:default_member=>{:add_to_project=>"0",:institution_id=>institution.id}
+    end
+
+    assert project=assigns(:project)
+    person.reload
+
+    refute_includes person.projects,project
+    refute_includes person.institutions, institution
+    refute person.is_project_administrator?(project)
+  end
+
 	private
 
 	def valid_project
