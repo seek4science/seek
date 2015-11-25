@@ -575,7 +575,6 @@ SEEK::Application.routes.draw do
     member do
       get :visualise
     end
-
   end
 
   resources :tissue_and_cell_types

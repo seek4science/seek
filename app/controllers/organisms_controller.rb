@@ -7,6 +7,8 @@ class OrganismsController < ApplicationController
   before_filter :login_required,:except=>[:show,:index,:visualise]
   before_filter :is_user_admin_auth,:only=>[:edit,:update]
   before_filter :auth_to_create, :only=>[:new,:create, :destroy]
+
+  skip_before_filter :project_membership_required
   
   cache_sweeper :organisms_sweeper,:only=>[:update,:create,:destroy]
 
