@@ -57,30 +57,6 @@ namespace :seek_dev do
     end
   end
 
-  task :reset_programmes => :environment do
-    User.current_user=Person.admins.first
-    Programme.all.each do |prog|
-      puts "Removing programme: #{prog.title}"
-      prog.destroy
-    end
-
-    Person.all.select { |pers| pers.is_programme_administrator_of_any_programme? }.each do |pers|
-      puts "Dodgy programme admin found #{pers.name}"
-      pers.admin_defined_role_programmes.each do |role|
-        role.destroy
-      end
-      if pers.roles_mask & 32
-        pers.update_attribute(:roles_mask, pers.roles_mask - 32)
-      end
-
-    end
-
-    puts "Testing ..."
-    puts "Number of Programmes = #{Programme.count}"
-    puts "Number of programme administrators =  #{Person.programme_administrators.count}"
-    puts "Number of programme administrators (double check) =  #{ Person.all.select { |pers| pers.is_programme_administrator_of_any_programme? }.count}"
-  end
-
   task(:refresh_content_types => :environment) do
 
     ContentBlob.all.each do |cb|
