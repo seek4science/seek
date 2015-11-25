@@ -5,7 +5,10 @@ layout: page
 
 # JERM Templates
 
-SysMO-DB, the SysMO-PALs and other members of the SysMO consortium have been developing a collection of JERM templates to facilitate standard formats for sharing the same kinds of data through the consortium. This page lists the current templates available.
+SEEK have been developing a collection of JERM templates to facilitate standard formats for sharing the same kinds of data through the consortium. This page lists the current templates available, although we are always looking to update and add to them with help from the community.
+
+## Contributing 
+SEEK templates are a community driven activity. If you have any updates, modifications or new templates you want to include for other to use, or if you just want to send feedback, then you can contact us at <community@fair-dom.org>.
 
 #### SOPs
 

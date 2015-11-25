@@ -22,3 +22,8 @@ layout: page
 ## FAQ
 
 [Frequently Asked Questions](faq.html)
+
+## Contributing 
+If you want to contribute to the SEEK software please visit
+If you want to contribute to the SEEK guides, templates, or website please contact <community@fair-dom.org> for more details.
+If you want to propose a workshop/tutorial/hack-day related to SEEK please post on our mesage board at http://biostar.fair-dom.org/

@@ -5,7 +5,12 @@ layout: page
 
 # Controlled Vocabularies and Ontologies
 
-SysMO-DB recommends that consortium members use identifiers from public databases and terms from community ontologies wherever possible when describing and annotating data and models. The following table shows the resources available for annotation by biological object category. These are the resources recommended by SysMO-DB and also represent the most commonly used in the SysMO consortium.
+**This guide refers to SEEK, but is also relevant for [FAIRDOMHUB](https://www.fairdomhub.org/), which is an instance of SEEK.**
+
+We recommend SEEK users use identifiers from public databases and terms from community ontologies wherever possible when describing and annotating data and models. The following table shows the resources available for annotation by biological object category. These represent the most commonly used within System Biology.
+
+## Contributing 
+SEEK documentation is a community driven activity, and we are always looking to expand. If you have any modifications you want to make to the list please send requests, or feedback to <community@fair-dom.org>.
 
 <table>
 	<tbody><tr>
