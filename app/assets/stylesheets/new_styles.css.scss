@@ -288,7 +288,7 @@ a.select_assay_class:hover {
 }
 
 .box_editing_inner {
-  @include rounded-box-shadow(#DDEEFF);
+  @include rounded-box-inset-shadow(#F5F5F5);
   padding: 0.5em;
   margin-bottom: 1em;
 }
