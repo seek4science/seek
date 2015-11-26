@@ -10,7 +10,7 @@ class Institution < ActiveRecord::Base
   validates :title, uniqueness: true
   scope :default_order, order('title')
 
-  validates_format_of :web_page, with: /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix, allow_nil: true, allow_blank: true
+  validates :web_page, url: {allow_nil: true, allow_blank: true}
   validates :country, :presence => true
 
   has_many :work_groups, dependent: :destroy

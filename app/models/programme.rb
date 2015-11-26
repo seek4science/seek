@@ -19,6 +19,8 @@ class Programme < ActiveRecord::Base
 
   # validations
   validates :title, uniqueness: true
+  validates :web_page, url: {allow_nil: true, allow_blank: true}
+
   after_save :handle_administrator_ids, if: '@administrator_ids'
   before_create :activate_on_create
 
