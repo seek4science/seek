@@ -1,9 +1,9 @@
 var cy;
-var default_node_width = 215;
-var default_node_height = 55;
+var default_node_width = 250;
+var default_node_height = 65;
 var default_font_size = 16;
 var default_color = '#323232';
-var default_text_max_width = 180;
+var default_text_max_width = 245;
 
 jQuery.noConflict();
 var $j = jQuery;
