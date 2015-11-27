@@ -172,8 +172,17 @@ class ProjectsController < ApplicationController
 
     @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]
 
+
+
     respond_to do |format|
       if @project.save
+        if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project]=='1'
+          institution = Institution.find(params[:default_member][:institution_id])
+          person = current_person
+          person.add_to_project_and_institution(@project,institution)
+          person.is_project_administrator=true,@project
+          disable_authorization_checks{person.save}
+        end
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         format.xml  { render :xml => @project, :status => :created, :location => @project }
@@ -287,7 +296,7 @@ class ProjectsController < ApplicationController
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
     groups_to_remove.each do |group|
       group_membership = GroupMembership.find(group)
-      if group_membership && !group_membership.person.me?
+      if group_membership && group_membership.person_can_be_removed?
         #this slightly strange bit of code is required to trigger and after_remove callback, which should be revisted
         group_membership.person.group_memberships.delete(group_membership)
         group_membership.destroy

@@ -32,6 +32,12 @@ class GroupMembership < ActiveRecord::Base
     AuthLookupUpdateJob.new.add_items_to_queue people.compact
   end
 
+  #whether the person can remove this person from the project. If they are an administrator and related programme administrator they can, but otherwise they cannot remove themself.
+  #this is to prevent a project admin accidently removing themself and leaving the project un-administered
+  def person_can_be_removed?
+    !person.me? || User.current_user.is_admin? || person.is_programme_administrator?(project.programme)
+  end
+
   private
 
   def remove_admin_defined_role_projects

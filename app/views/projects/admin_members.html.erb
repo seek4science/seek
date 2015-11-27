@@ -92,17 +92,9 @@
 <script>
     <%# TODO: Do this in a better way: %>
     Projects.memberships = <%=
-    @project.work_groups.map do |wg|
-        wg.group_memberships.map do |gm|
-            {
-                id: gm.id.to_s,
-                person: { id: gm.person_id.to_s, name: gm.person.name },
-                institution: { id: gm.work_group.institution.id.to_s, title: gm.work_group.institution.title },
-                leftAt: gm.time_left_at,
-                cannotRemove: current_user.person.id == gm.person_id
-            }
-        end
-    end.flatten.to_json.html_safe %>;
+
+    project_membership_json(@project).html_safe
+     %>;
     $j(document).ready(function () {
         Projects.renderMemberships();
     });

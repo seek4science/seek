@@ -6,7 +6,7 @@
 
 <div id="unlinked_to_anything"  class="asset_report_container curved">
   <h1>Not linked to either <%= t('assays.assay').pluralize -%> or Publications</h1>
-  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+  <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are items that have not been linked to either a Publication or an <%= t('assays.assay') %>, or the case of the <%= t('assays.assay').pluralize %> do not have other files associated with them.
   </p>
   <% @types_for_unlinked.each do |type| -%>
@@ -17,7 +17,7 @@
 
 <div id="unlinked_to_assay"  class="asset_report_container curved">
   <h1>Not linked to <%= t('assays.assay').pluralize %></h1>
-  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+  <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are items that have not been linked to an <%= t('assays.assay') %>, or the case of the <%= t('assays.assay').pluralize %> do not have other files associated with them. These items may have been linked to publications.
   </p>
   <% @types_for_unlinked.each do |type| -%>
@@ -28,7 +28,7 @@
 
 <div id="unlinked_to_publication"  class="asset_report_container curved">
   <h1>Not linked to Publications</h1>
-  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+  <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are items that have not been linked to a Publication. These items may have been linked to <%= t('assays.assay').pluralize %>.
   </p>
   <% @types_for_unlinked.each do |type| -%>

@@ -147,6 +147,22 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert @snapshot.doi.nil?
   end
 
+  test "error message mentions DataCite when DataCite broken" do
+    datacite_mock
+    create_snapshot
+    login_as(@user)
+
+    with_config_value(:datacite_url, 'http://idontexist.soup') do
+      post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    end
+
+    @snapshot = @snapshot.reload
+
+    assert flash[:error].to_s.include?('DataCite')
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    assert @snapshot.doi.nil?
+  end
+
   test "can retrieve Zenodo preivew page" do
     create_snapshot
     login_as(@user)
@@ -205,6 +221,28 @@ class SnapshotsControllerTest < ActionController::TestCase
 
     @snapshot = @snapshot.reload
     assert_redirected_to investigation_path(@investigation)
+    assert @snapshot.zenodo_deposition_id.nil?
+  end
+
+  test "error message mentions Zenodo when Zenodo broken" do
+    zenodo_mock
+    zenodo_oauth_mock
+    create_snapshot
+    Factory(:oauth_session, :user_id => @user.id)
+
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    login_as(@user)
+
+    with_config_value(:zenodo_api_url, 'http://idontexist.soup') do
+      post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
+           :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+    end
+
+    @snapshot = @snapshot.reload
+
+    assert flash[:error].to_s.include?('Zenodo')
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     assert @snapshot.zenodo_deposition_id.nil?
   end
 

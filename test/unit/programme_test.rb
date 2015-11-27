@@ -45,6 +45,20 @@ class ProgrammeTest < ActiveSupport::TestCase
     p2.title = 'sdfsdfsdf'
     assert p2.valid?
     assert p2.valid?
+
+    #web_page url must be a valid web url if present
+    p.web_page = nil
+    assert p.valid?
+    p.web_page = ''
+    assert p.valid?
+    p.web_page = 'not a url'
+    refute p.valid?
+    p.web_page = 'ftp://google.com'
+    refute p.valid?
+    p.web_page = 'http://google.com'
+    assert p.valid?
+    p.web_page = 'https://google.com'
+    assert p.valid?
   end
 
   test 'factory' do

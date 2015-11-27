@@ -16,7 +16,7 @@
 		<% if @error_text.blank? -%>
 		  <% group_members = @group_instance.people -%>
 			<% unless group_members.empty? -%>
-			  <div class="box_infotext" style="margin-bottom: 1.5em; text-align: justify;">
+			  <div class="alert alert-info" style="margin-bottom: 1.5em; text-align: justify;">
 			  	Individual access rights were preset to the value you chose in the main window. Now
 					you can specify individual access rights for every member of this <%= @group_instance.class.name.underscore.titleize -%>.
 					Individual permissions will be created for those members, who will get access rights which differ from your original

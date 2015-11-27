@@ -726,6 +726,9 @@ GEM
       procto (~> 0.0.2)
     uuid (2.3.8)
       macaddr (~> 1.0)
+    validate_url (1.0.2)
+      activemodel (>= 3.0.0)
+      addressable
     virtus (1.0.5)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
@@ -856,6 +859,7 @@ DEPENDENCIES
   turbo-sprockets-rails3
   unicorn-rails
   uuid (~> 2.3)
+  validate_url
   webmock
   white_list!
   white_list_formatted_content!

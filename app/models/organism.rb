@@ -31,7 +31,7 @@ class Organism < ActiveRecord::Base
   end
 
   def self.can_create?
-    User.admin_or_project_administrator_logged_in?
+    User.admin_or_project_administrator_logged_in? || User.activated_programme_administrator_logged_in?
   end
 
 end

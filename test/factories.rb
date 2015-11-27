@@ -68,6 +68,14 @@ include ActionDispatch::TestProcess
     end
   end
 
+  Factory.define(:programme_administrator_not_in_project, :parent=>:person_not_in_project) do |f|
+    f.after_build do |pm|
+      programme=Factory(:programme)
+      Factory(:admin_defined_role_programme,:programme=>programme,:person=>pm,:role_mask=>32)
+      pm.roles_mask = 32
+    end
+  end
+
   Factory.define(:programme_administrator,:parent=>:project_administrator) do |f|
     f.after_build do |pm|
       programme=Factory(:programme,:projects=>[pm.projects.first])

@@ -59,8 +59,8 @@ class Project < ActiveRecord::Base
   scope :default_order, order('title')
   scope :without_programme, conditions: 'programme_id IS NULL'
 
-  validates_format_of :web_page, with: /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix, allow_nil: true, allow_blank: true
-  validates_format_of :wiki_page, with: /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix, allow_nil: true, allow_blank: true
+  validates :web_page, url: {allow_nil: true, allow_blank: true}
+  validates :wiki_page, url: {allow_nil: true, allow_blank: true}
 
   validate :lineage_ancestor_cannot_be_self
 

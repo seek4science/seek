@@ -4,7 +4,7 @@
 
 <div class="show_basic">
   <br/>
-  <div class="box_infotext">
+  <div class="alert alert-info">
     <ul style="padding-left:1em;">
       <li>
         <% project_names = current_user.person.projects_for_role(Seek::Roles::ASSET_GATEKEEPER).collect(&:title) %>
