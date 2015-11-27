@@ -68,3 +68,4 @@ should be excluded.
 
 *BACKUPDIR* can also be an ssh url, e.g
 *backup@backupserver.co.uk:/var/local/backup/*
+
