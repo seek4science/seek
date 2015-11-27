@@ -50,11 +50,13 @@ SEEK::Application.routes.draw do
     member do
       get :index
       get :feedback
+      get :funding
       post :send_feedback
       get :imprint
     end
   end
 
+  match 'funding' => 'homes#funding', :as => :match
   match 'index.html' => 'homes#index', :as => :match
   match 'index' => 'homes#index', :as => :match
   match 'my_biovel' => 'homes#my_biovel', :as => :my_biovel
