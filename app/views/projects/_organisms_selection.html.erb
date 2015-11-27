@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-sm-6" id="assay_list_collection">
-    <%= f.label :available_organisms %>
+    <%= f.label :possible_organisms %>
     <div class="input-group">
       <%= select_tag :possible_organisms,options_for_select( Organism.order(:title).collect{|d| [h("#{d.title}"),d.id]} ),:class => "form-control" %>
       <span class="input-group-btn">

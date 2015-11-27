@@ -435,4 +435,19 @@ end
   test 'zenodo_oauth_url' do
     assert_equal "https://sandbox.zenodo.org/oauth", Seek::Config.zenodo_oauth_url
   end
+
+  test 'default_value works for all settings' do
+    Seek::Config.read_setting_attributes.each do |sym|
+      method_name = "default_#{sym}"
+      assert Seek::Config.respond_to?(method_name.to_sym)
+    end
+  end
+
+  test 'default_value is not changed' do
+    old_default_value = Seek::Config.default_external_help_url
+    with_config_value 'external_help_url', 'http://www.somewhere.com' do
+      new_default_value = Seek::Config.default_external_help_url
+      assert_equal old_default_value, new_default_value
+    end
+  end
 end

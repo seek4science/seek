@@ -300,6 +300,12 @@ module Seek
       singleton_class.instance_eval { define_method method.to_sym, *args, &block }
     end
 
+    def get_default_value(getter, conversion = nil)
+      val = Settings.defaults[getter.to_sym]
+      val = val.send(conversion) if conversion && val
+      val
+    end
+
     if Settings.table_exists?
       def get_value(getter, conversion = nil)
         val = Settings.send getter
@@ -311,11 +317,10 @@ module Seek
         val = val.send(conversion) if conversion && val
         Settings.send setter, val
       end
+
     else
       def get_value(getter, conversion = nil)
-        val = Settings.defaults[getter.to_sym]
-        val = val.send(conversion) if conversion && val
-        val
+        get_default_value(getter, conversion)
       end
 
       def set_value(setter, val, conversion = nil)
@@ -335,6 +340,7 @@ module Seek
       getter = "#{setting}"
       propagate = "#{getter}_propagate"
       fallback = "#{getter}_fallback"
+      default = "default_#{setting}"
       if self.respond_to?(fallback)
         define_class_method getter do
           get_value(getter, options[:convert]) || send(fallback)
@@ -343,6 +349,10 @@ module Seek
         define_class_method getter do
           get_value(getter, options[:convert])
         end
+      end
+
+      define_class_method default do
+        get_default_value(setting, options[:convert])
       end
 
       define_class_method setter do |val|
@@ -365,7 +375,6 @@ module Seek
       yaml = YAML.load_file(File.join(File.dirname(File.expand_path(__FILE__)), 'config_setting_attributes.yml'))
       yaml.keys.map { |k| k.to_sym }
     end
-
 
     # Settings that require a conversion to integer
     # These are defined here instead of in config_setting_attributes.yml

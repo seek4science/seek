@@ -35,7 +35,7 @@
                                :onchange=>toggle_appear_javascript('jws_online_details')) %>
     <div id="jws_online_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.jws_enabled -%>">
       <%= admin_text_setting(:jws_online_root, Seek::Config.jws_online_root,
-                             'JWS Online Root URL', "This is the root URL for the JWS Online server SEEK communicates with, e.g. http://jjj.mib.ac.uk .") %>
+                             'JWS Online Root URL', "This is the root URL for the JWS Online server SEEK communicates with, e.g. #{Seek::Config.default_jws_online_root} .") %>
     </div>
 
     <%= admin_checkbox_setting(:internal_help_enabled, 1, Seek::Config.internal_help_enabled,
@@ -43,7 +43,7 @@
                                :onchange=>toggle_appear_javascript('external_help_details')) %>
     <div id="external_help_details" class="additional_settings" style="<%= show_or_hide_block !Seek::Config.internal_help_enabled -%>">
       <%= admin_text_setting(:external_help_url, Seek::Config.external_help_url,
-                             'Help URL', "This is the URL for the external help.") %>
+                             'Help URL', "This is the URL for the external help e.g #{Seek::Config.default_external_help_url}.") %>
     </div>
 
     <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,
@@ -61,7 +61,7 @@
       <%= admin_text_setting(:piwik_analytics_id_site, Seek::Config.piwik_analytics_id_site,
                              'Piwik analytics id site', "The ID of your website inside Piwik. It is the numeric value corresponding to the ID of the site created in Piwik.") %>
       <%= admin_text_setting(:piwik_analytics_url, Seek::Config.piwik_analytics_url,
-                             'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. 'localhost/piwikfolder/'") %>
+                             'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. #{Seek::Config.default_piwik_analytics_url} ") %>
     </div>
 
     <%= render :partial=>"admins/doi_settings" %>
