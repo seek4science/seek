@@ -1,5 +1,12 @@
 <%= panel("Organisms Relevant To This #{t('project')}") do %>
     <div class="row">
+      <div class="col-sm-6" id="organism_create_info">
+         <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
+       Project administrators can also <%= link_to "Create", new_organism_path %> new organisms that can then be added to the project.
+	</p>
+      </div>
+    </div>
+    <div class="row">
       <div class="col-sm-6" id="assay_list_collection">
         <%= f.label :available_organisms %>
         <div class="input-group">
