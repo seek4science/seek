@@ -39,7 +39,7 @@ SEEK::Application.configure do
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programmes_enabled] = true
-      Settings.defaults[:allow_user_programme_creation] = true
+      Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:tabs_lazy_load_enabled] = false
 

@@ -182,7 +182,7 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'can create' do
-    with_config_value :allow_user_programme_creation,true do
+    with_config_value :programme_user_creation_enabled,true do
       User.current_user = nil
       refute Programme.can_create?
 
@@ -196,7 +196,7 @@ class ProgrammeTest < ActiveSupport::TestCase
       assert Programme.can_create?
     end
 
-    with_config_value :allow_user_programme_creation,false do
+    with_config_value :programme_user_creation_enabled,false do
       User.current_user = nil
       refute Programme.can_create?
 

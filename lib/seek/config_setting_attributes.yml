@@ -134,7 +134,7 @@ zenodo_api_url:
 zenodo_oauth_url:
 zenodo_client_id:
 zenodo_client_secret:
-allow_user_programme_creation:
+programme_user_creation_enabled:
 cache_remote_files:
 orcid_required:
 max_cachable_size:
