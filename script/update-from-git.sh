@@ -10,15 +10,16 @@ NC='\033[0m' # No Color
 #/bin/bash -login
 export RAILS_ENV=production
 
-bundle exec rake seek:workers:stop
-bundle exec rake sunspot:solr:stop
-
 echo "${GREEN}git pull${NC}"
 git pull
 
 cd .. && cd - #this is to allow RVM to pick up the ruby and gemset changes
 echo "${GREEN}bundle install${NC}"
 bundle install --deployment
+
+bundle exec rake seek:workers:stop
+bundle exec rake sunspot:solr:stop
+
 echo "${GREEN} seek:upgrade${NC}"
 bundle exec rake seek:upgrade
 echo "${GREEN} precompile assets${NC}"
