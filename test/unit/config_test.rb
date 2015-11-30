@@ -437,9 +437,9 @@ end
   end
 
   test 'default_value works for all settings' do
-    Seek::Config.read_setting_attributes.each do |sym|
-      method_name = "default_#{sym}"
-      assert Seek::Config.respond_to?(method_name.to_sym)
+    Seek::Config.read_setting_attributes.each do |method, _|
+      method_name = "default_#{method}"
+      assert Seek::Config.respond_to?(method_name.to_sym), "`#{method_name}` is not defined on Seek::Config"
     end
   end
 
@@ -448,6 +448,17 @@ end
     with_config_value 'external_help_url', 'http://www.somewhere.com' do
       new_default_value = Seek::Config.default_external_help_url
       assert_equal old_default_value, new_default_value
+    end
+  end
+
+  test 'size limits are numeric' do
+    with_config_value(:max_cachable_size, '1000') do
+      with_config_value(:hard_max_cachable_size, '2000') do
+        assert_equal 1000, Seek::Config.max_cachable_size
+        assert_equal 2000, Seek::Config.hard_max_cachable_size
+        assert_equal Fixnum, Seek::Config.max_cachable_size.class
+        assert_equal Fixnum, Seek::Config.hard_max_cachable_size.class
+      end
     end
   end
 end

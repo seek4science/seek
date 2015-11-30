@@ -353,7 +353,7 @@ module Seek
       end
 
       define_class_method default do
-        get_default_value(setting, options[:convert])
+        get_default_value(getter, options[:convert])
       end
 
       define_class_method setter do |val|
