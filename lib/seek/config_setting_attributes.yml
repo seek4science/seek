@@ -156,7 +156,7 @@ community_news_number_of_entries:
 home_feeds_cache_timeout:
   convert: :to_i
 time_lock_doi_for:
-  convert: :to_ig
+  convert: :to_i
 default_associated_projects_access_type:
   convert: :to_i
 default_consortium_access_type:
