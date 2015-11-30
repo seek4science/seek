@@ -9,12 +9,20 @@ jQuery.noConflict();
 var $j = jQuery;
 
 function drawGraph(elements, current_element_id){
-    $j('#cy').cytoscape({
-        layout: {
-            name: 'breadthfirst'
-        },
+    cy=cytoscape({
+        container: document.getElementById('cy'),
 
+        boxSelectionEnabled: false,
+        autounselectify: true,
         showOverlay: false,
+
+        layout: {
+            name: 'breadthfirst',
+            directed: true,
+            padding: 10,
+            avoidOverlap: false
+
+        },
 
         style: cytoscape.stylesheet()
             .selector('node')
