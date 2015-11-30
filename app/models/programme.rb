@@ -76,7 +76,7 @@ class Programme < ActiveRecord::Base
 
   def self.can_create?
     return false unless Seek::Config.programmes_enabled
-    (User.admin_logged_in?) || (User.logged_in_and_registered? && Seek::Config.allow_user_programme_creation)
+    (User.admin_logged_in?) || (User.logged_in_and_registered? && Seek::Config.programme_user_creation_enabled)
   end
 
   def programme_administrators
