@@ -31,3 +31,4 @@ bundle exec rake seek:workers:start
 echo "${GREEN} restart server${NC}"
 touch tmp/restart.txt
 bundle exec rake tmp:clear
+git checkout db/schema.rb
