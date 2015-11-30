@@ -9277,7 +9277,39 @@ BreadthFirstLayout.prototype.run = function(){
     y: bb.x1 + bb.h/2
   };
 
+  //SEEK change, to have left-right tree
   var getPosition = function( ele, isBottomDepth ){
+    var info = ele._private.scratch.breadthfirst;
+    var depth = info.depth;
+    var index = info.index;
+    var depthSize = depths[depth].length;
+
+    var container = cy.container();
+    var width = container.clientWidth;
+    //calculate the height dynamically
+    var height = graphHeight();
+    container.style.height = height+'px';
+
+    function graphHeight(){
+      var max_index = 0;
+      for (var i=0;i<depths.length;i++){
+        max_index = Math.max(depths[i].length, max_index);
+      }
+      return (2*max_index + 1)*nodes[0].outerHeight();
+    }
+
+    var distanceX = Math.max( width / (depths.length + 1), minDistance );
+    var distanceY = Math.max( height / (depthSize + 1), minDistance );
+    var radiusStepSize = Math.min( width / 2 / depths.length, height / 2 / depths.length );
+    radiusStepSize = Math.max( radiusStepSize, minDistance );
+
+    return {
+      y: (index + 1) * distanceY,
+      x: (depth + 1) * distanceX
+    };
+  };
+
+/*    var getPosition = function( ele, isBottomDepth ){
     var info = ele._private.scratch.breadthfirst;
     var depth = info.depth;
     var index = info.index;
@@ -9338,7 +9370,7 @@ BreadthFirstLayout.prototype.run = function(){
       }
     }
 
-  };
+  };*/
 
   // get positions in reverse depth order
   var pos = {};
