@@ -1,0 +1,43 @@
+#!/bin/sh -e
+#
+# Symlink target for initscripts that have been converted to Upstart.
+ 
+set -e
+ 
+start_job() {
+        echo "Starting delayed job"
+        sudo -Hu www-data bash -c "source ~/.rvm/scripts/rvm && cd /srv/rails/seek/ && RAILS_ENV=production bundle exec rake seek:workers:start"
+}
+ 
+stop_job() {
+        echo "Stopping delayed job"
+        sudo -Hu www-data bash -c "source ~/.rvm/scripts/rvm && cd /srv/rails/seek/ && RAILS_ENV=production bundle exec rake seek:workers:stop"
+}
+restart_job() {
+        echo "Restarting delayed job"
+        sudo -Hu www-data bash -c "source ~/.rvm/scripts/rvm && cd /srv/rails/seek/ && RAILS_ENV=production bundle exec rake seek:workers:restart"
+}
+job_status() {
+        echo "delayed job status ..."
+        sudo -Hu www-data bash -c "source ~/.rvm/scripts/rvm && cd /srv/rails/seek/ && RAILS_ENV=production bundle exec rake seek:workers:status"
+}
+ 
+COMMAND="$1"
+shift
+ 
+case $COMMAND in
+status)
+    job_status 
+    ;;
+start|stop|restart)
+    $ECHO
+    if [ "$COMMAND" = "stop" ]; then
+        stop_job
+    elif [ "$COMMAND" = "start" ]; then
+        start_job
+    elif  [ "$COMMAND" = "restart" ]; then
+        restart_job
+        exit 0
+    fi
+    ;;
+esac
