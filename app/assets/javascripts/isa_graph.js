@@ -76,8 +76,9 @@ function drawGraph(elements, current_element_id){
                 displayNodeInfo(current_node);
 
                 //disableMouseWheel();
-                cy.zoomingEnabled(true);
                 resizeGraph();
+                //need put zoom after resizeGraph, otherwise fit() does not work
+                cy.zoomingEnabled(false);
             }else{
                 $j('.isa_graph')[0].hide();
             }
