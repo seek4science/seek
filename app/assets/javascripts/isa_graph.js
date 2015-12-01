@@ -11,9 +11,6 @@ var $j = jQuery;
 function drawGraph(elements, current_element_id){
     cy=cytoscape({
         container: document.getElementById('cy'),
-
-        boxSelectionEnabled: false,
-        autounselectify: true,
         showOverlay: false,
 
         layout: {
@@ -78,7 +75,8 @@ function drawGraph(elements, current_element_id){
                 animateNode(current_node);
                 displayNodeInfo(current_node);
 
-                disableMouseWheel();
+                //disableMouseWheel();
+                cy.zoomingEnabled(true);
                 resizeGraph();
             }else{
                 $j('.isa_graph')[0].hide();
@@ -261,7 +259,7 @@ function labelLines(node){
     var font_size = node.renderedCss()['font-size'];
     var ruler = $j('#ruler')[0];
     ruler.style.fontSize = font_size;
-    ruler.style.fontWeight = 'bolder';
+    //ruler.style.fontWeight = 'bolder';
     ruler.innerHTML = label;    
     var label_width = ruler.offsetWidth;
     var text_max_width = node.renderedCss()['text-max-width'];
