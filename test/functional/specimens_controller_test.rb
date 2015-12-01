@@ -378,6 +378,16 @@ test "should update genotypes and phenotypes" do
     refute_nil flash[:error]
   end
 
+  test "new object based on existing one doesn't break with private sop" do
+    specimen = Factory(:specimen,:policy=>Factory(:public_policy))
+    secret_sop = Factory(:sop)
+    specimen.sops << secret_sop
+    assert specimen.can_view?
+    assert !secret_sop.can_view?
+    get :new_object_based_on_existing_one, :id=>specimen.id
+    assert_response 200
+  end
+
   test "logged out user can't see new" do
     logout
     get :new
