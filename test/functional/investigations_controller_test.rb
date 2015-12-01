@@ -59,8 +59,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     get :show,:id=>study.investigation.id
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"Publications (3)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"Publications (3)",:count=>1
     end
   end
 

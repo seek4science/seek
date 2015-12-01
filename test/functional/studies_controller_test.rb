@@ -44,8 +44,8 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study.id
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"Publications (3)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"Publications (3)",:count=>1
     end
   end
 
@@ -278,10 +278,10 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
-      assert_select "h3",:text=>"#{I18n.t('sop').pluralize} (1+1)",:count=>1
-      assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
+      assert_select "a",:text=>"#{I18n.t('sop').pluralize} (1+1)",:count=>1
+      assert_select "a",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
     end
 
     assert_select "div.list_item" do
@@ -358,8 +358,8 @@ class StudiesControllerTest < ActionController::TestCase
     s=studies(:metabolomics_study)
     get :show,:id=>s
     assert_response :success
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"#{I18n.t('investigation').pluralize} (1)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"#{I18n.t('investigation').pluralize} (1)",:count=>1
     end
   end
   
