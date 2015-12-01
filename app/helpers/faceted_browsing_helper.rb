@@ -106,7 +106,7 @@ module FacetedBrowsingHelper
         end
       end
       facet_value = [facet_value] unless facet_value.kind_of?(Array)
-      facet_values |= facet_value.map { |v| h(v) if v.is_a?(String) }
+      facet_values |= facet_value.map { |v| v.is_a?(String) ? h(v) : v }
     end
     facet_values.compact!
     facet_values.uniq!
