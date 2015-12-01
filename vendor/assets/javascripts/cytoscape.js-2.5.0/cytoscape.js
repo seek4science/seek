@@ -9277,7 +9277,10 @@ BreadthFirstLayout.prototype.run = function(){
     y: bb.x1 + bb.h/2
   };
 
-  //SEEK change, to have left-right tree
+  //SEEK change
+  //Calculate the dynamic height of the graph, based on node's height and max_index
+  //Position the tree left-right
+  Calculate the height of the graph based on number of
   var getPosition = function( ele, isBottomDepth ){
     var info = ele._private.scratch.breadthfirst;
     var depth = info.depth;
@@ -9299,11 +9302,13 @@ BreadthFirstLayout.prototype.run = function(){
     }
 
     var distanceX = Math.max( width / (depths.length + 1), minDistance );
-    var distanceY = Math.max( height / (depthSize + 1), minDistance );
+    //to have distanceY based on the dynamic height of the graph
+    var distanceY = height / (depthSize + 1);
     var radiusStepSize = Math.min( width / 2 / depths.length, height / 2 / depths.length );
     radiusStepSize = Math.max( radiusStepSize, minDistance );
 
     return {
+      //reposition the node
       y: (index + 1) * distanceY,
       x: (depth + 1) * distanceX
     };
