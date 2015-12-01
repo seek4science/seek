@@ -5,17 +5,19 @@ layout: page
 
 # JERM (Just Enough Results Model)
 
+**This guide refers to SEEK, but is also relevant for [FAIRDOMHUB](https://www.fairdomhub.org/), which is an instance of SEEK.**
+
 The JERM (Just Enough Results Model) allows us to exchange, interpret and
-compare between different types of data and results files across SysMO.
+compare between different types of data and results files across SEEK.
 
 For more non technical background on JERM please visit
-http://www.sysmo-db.org/jerm
+http://fair-dom.org/JERM
 
 ## Harvesting
 
 The term harvesting is what we use to describe the mechanism for interacting
 with remote data stores and importing, or registering, the assets contained
-there within Sysmo SEEK.
+there within SEEK.
 
 There are 3 key components that need to be concidered if you wish to produce
 your own Harvester. You can find more details of each by reading the code
