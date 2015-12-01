@@ -50,11 +50,13 @@ SEEK::Application.routes.draw do
     member do
       get :index
       get :feedback
+      get :funding
       post :send_feedback
       get :imprint
     end
   end
 
+  match 'funding' => 'homes#funding', :as => :match
   match 'index.html' => 'homes#index', :as => :match
   match 'index' => 'homes#index', :as => :match
   match 'my_biovel' => 'homes#my_biovel', :as => :my_biovel
@@ -324,7 +326,7 @@ SEEK::Application.routes.draw do
       post :convert_to_presentation
       post :update_annotations_ajax
       post :new_version
-      #MERGENOTE - this is a destroy, and should be the destory method, not post since we are not updating or creating something.
+      #MERGENOTE - this is a destroy, and should be the destroy method, not post since we are not updating or creating something.
       post :destroy_version
       get :mint_doi_confirm
       get :minted_doi

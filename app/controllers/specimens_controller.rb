@@ -17,7 +17,7 @@ class SpecimensController < ApplicationController
     @specimen = @existing_specimen.clone_with_associations
 
      @existing_specimen.sops.each do |s|
-       if !s.sop.can_view?
+       if !s.can_view?
        flash.now[:notice] = "Some or all #{t('sop').pluralize} of the existing #{t('biosamples.sample_parent_term')} cannot be viewed, you may specify your own!"
         break
       end

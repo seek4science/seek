@@ -14,6 +14,8 @@ SEEK::Application.configure do
       Settings.defaults[:jws_enabled] = true
       Settings.defaults[:events_enabled] = true
       Settings.defaults[:jws_online_root] = "http://jws.sysmo-db.org"
+      Settings.defaults[:internal_help_enabled] = false
+      Settings.defaults[:external_help_url] = "http://seek4science.github.io/seek/help"
 
       Settings.defaults[:email_enabled] = true
       Settings.defaults[:solr_enabled] = false
@@ -37,7 +39,7 @@ SEEK::Application.configure do
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programmes_enabled] = true
-      Settings.defaults[:allow_user_programme_creation] = true
+      Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:tabs_lazy_load_enabled] = false
 

@@ -58,7 +58,7 @@ module Seek
       end
 
       def has_role?(role_name)
-        roles_mask != 0 && (roles_mask & Seek::Roles::Roles.instance.mask_for_role(role_name) != 0)
+        (roles_mask && roles_mask != 0) && (roles_mask & Seek::Roles::Roles.instance.mask_for_role(role_name) != 0)
       end
 
       def check_for_role rolename,item
