@@ -9280,7 +9280,6 @@ BreadthFirstLayout.prototype.run = function(){
   //SEEK change
   //Calculate the dynamic height of the graph, based on node's height and max_index
   //Position the tree left-right
-  Calculate the height of the graph based on number of
   var getPosition = function( ele, isBottomDepth ){
     var info = ele._private.scratch.breadthfirst;
     var depth = info.depth;
