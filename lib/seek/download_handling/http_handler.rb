@@ -59,13 +59,8 @@ module Seek
       #
       #this is a quick fix to get around slideshare not always giving a content type of text/html, and instead sometimes giving application/xml
       def is_slideshare_url?
-        begin
-          parsed_url = URI.parse(url)
-          frag_count = parsed_url.path.split('/').select{|frag| !frag.blank? && frag!='/'}.count
-          parsed_url.host=='www.slideshare.net' && frag_count==2 && parsed_url.scheme =~ /(http|https)/
-        rescue
-          false
-        end
+        renderer = Seek::Renderers::SlideshareRenderer.new(nil)
+        renderer.is_slideshare_url?(url)
       end
 
     end

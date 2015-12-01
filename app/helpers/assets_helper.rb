@@ -6,6 +6,15 @@ module AssetsHelper
     controller_name.downcase.singularize.underscore
   end
 
+  #will render a view of the asset, if available. For example, a slideshare based asset could give a embedded slideshare view
+  def rendered_asset_view(asset)
+    Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}") do
+      content_tag(:div,class:'renderer') do
+        Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob).render.html_safe
+      end
+    end
+  end
+
   def can_create_new_items?
     #the state of being able to create assets is the same for all assets
     DataFile.can_create?
