@@ -19010,7 +19010,8 @@ var is = {
   },
 
   trident: function(){
-     return typeof ActiveXObject !== 'undefined' || /*@cc_on!@*/false;
+     // SEEK FIX, to avoid error of asset compile
+     return typeof ActiveXObject !== 'undefined' || false;
   },
 
   windows: function(){
