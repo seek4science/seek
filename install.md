@@ -118,6 +118,10 @@ installed. You will then need to wait for Ruby to be downloaded and compiled.
 
 ## Installing Gems
 
+First install bundler, which is used to manage gem versions
+
+    gem install bundler
+
 Before installing the gems the following is needed, otherwise an error may
 occur whilst trying to install this gem:
 
@@ -125,7 +129,6 @@ occur whilst trying to install this gem:
 
 Next install the ruby gems SEEK needs:
 
-    gem install bundler
     bundle install
 
 ## Setting up the Database
