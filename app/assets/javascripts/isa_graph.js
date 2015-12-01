@@ -18,10 +18,7 @@ function drawGraph(elements, current_element_id){
 
         layout: {
             name: 'breadthfirst',
-            directed: true,
-            padding: 10,
-            avoidOverlap: false
-
+            directed: true
         },
 
         style: cytoscape.stylesheet()
