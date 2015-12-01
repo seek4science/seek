@@ -84,17 +84,19 @@ This will compile a module for Apache, and at the end present you with some
 lines that need adding to /etc/apache2/http.conf. These will look something
 like the following, but the paths will most likely be different:
 
-    LoadModule passenger_module /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7/buildout/apache2/mod_passenger.so
-    PassengerRoot /home/www-data/.rvm/gems/ruby-1.9.3-p448@seek/gems/passenger-4.0.7
-    PassengerDefaultRuby /home/www-data/.rvm/wrappers/ruby-1.9.3-p448@seek/ruby
+    LoadModule passenger_module /home/www-data/.rvm/gems/ruby-2.1.7/gems/passenger-5.0.6/buildout/apache2/mod_passenger.so
+    <IfModule mod_passenger.c>
+      PassengerRoot /home/www-data/.rvm/gems/ruby-2.1.7/gems/passenger-5.0.6
+      PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.7/wrappers/ruby
+    </IfModule>
 
 You will need to be a user that has sudo permissions, and edit this file:
 
-    sudo nano /etc/apache2/http.conf
+    sudo nano /etc/apache2/apache2.conf
 
 Now create a virtual host definition for SEEK:
 
-    sudo nano /etc/apache2/sites-available/seek
+    sudo nano /etc/apache2/sites-available/seek.conf
 
 which looks like (if you have registered a DNS for your site, then set
 ServerName appropriately):
@@ -107,8 +109,7 @@ ServerName appropriately):
           Allow from all
           # MultiViews must be turned off.
           Options -MultiViews
-          # Uncomment this if you're on Apache >= 2.4:
-          #Require all granted
+          Require all granted
        </Directory>
        <LocationMatch "^/assets/.*$">
           Header unset ETag
@@ -131,13 +132,11 @@ Now enable the SEEK site, and disable the default that is installed with
 Apache, and restart:
 
     sudo a2ensite seek
-    sudo a2dissite default
+    sudo a2dissite 000-default
     sudo service apache2 restart
 
 If you now visit http://localhost (note there is no 3000 port) - you should
-see SEEK. If you get a 403 forbidden error, and are running a version of
-Apache > 2.4, then you need to uncomment the *Require all granted* in the
-Directory definition.
+see SEEK.
 
 If you wish to restart SEEK, maybe after an upgrade, without restarting Apache
 you can do so by running (as www-data)
