@@ -1,6 +1,6 @@
 module Seek
   module Renderers
-    #Provides a blank rendition, for something that isn't recognised as being renderable
+    # Provides a blank rendition, for something that isn't recognised as being renderable
     class BlankRenderer
       def render
         ''
