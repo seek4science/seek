@@ -8,10 +8,16 @@ module AssetsHelper
 
   #will render a view of the asset, if available. For example, a slideshare based asset could give a embedded slideshare view
   def rendered_asset_view(asset)
-    Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}") do
+    return '' unless asset.can_download?
+    content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}") do
+      Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob).render
+    end
+    unless content.blank?
       content_tag(:div,class:'renderer') do
-        Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob).render.html_safe
+        content.html_safe
       end
+    else
+      ''
     end
   end
 
