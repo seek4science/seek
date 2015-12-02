@@ -989,22 +989,22 @@ class PeopleControllerTest < ActionController::TestCase
     refute_equal 'blablba', assigns(:person).first_name
   end
 
-  test 'admin can administer other admin' do
-    admin = Factory(:admin)
-    project = admin.projects.first
-
-    get :show, id: admin
-    assert_select 'a', text: /Person Administration/, count: 1
-
-    get :admin, id: admin
-    assert_response :success
-
-    assert !admin.is_asset_gatekeeper?(project)
-    put :administer_update, id: admin, person: {}, roles: { asset_gatekeeper: [project.id] }
-    assert_redirected_to person_path(admin)
-    assert assigns(:person).is_asset_gatekeeper?(project)
-    assert assigns(:person).is_admin?
-  end
+  # test 'admin can administer other admin' do
+  #   admin = Factory(:admin)
+  #   project = admin.projects.first
+  #
+  #   get :show, id: admin
+  #   assert_select 'a', text: /Person Administration/, count: 1
+  #
+  #   get :admin, id: admin
+  #   assert_response :success
+  #
+  #   assert !admin.is_asset_gatekeeper?(project)
+  #   put :administer_update, id: admin, person: {}, roles: { asset_gatekeeper: [project.id] }
+  #   assert_redirected_to person_path(admin)
+  #   assert assigns(:person).is_asset_gatekeeper?(project)
+  #   assert assigns(:person).is_admin?
+  # end
 
   test "project admin can set roles for people in projects he admins" do
     project_admin = Factory(:project_administrator)

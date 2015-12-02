@@ -29,7 +29,6 @@
         <% ordered_resource_types.each_with_index do |type, i| -%>
             <% unless type[:items].empty? && (type[:hidden_count] == 0) && !show_empty_tabs %>
                 <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if i == 0-%>">
-                  <h3 class='<%= type[:title_class] -%>'><%= type[:tab_title] -%></h3>
                   <% unless type[:items].empty? %>
                       <%= render :partial => "assets/resource_list", :locals => { :collection => type[:items],
                                                                                   :narrow_view => narrow_view,

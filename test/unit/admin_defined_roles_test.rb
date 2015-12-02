@@ -679,5 +679,17 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
 
   end
 
+  test "nil roles mask doesn't indicate administrator" do
+    p = Factory(:person)
+    p.roles_mask = nil
+    refute p.is_admin?
+    disable_authorization_checks{p.save!}
+    p.reload
+    refute p.is_admin?
+    refute_includes(Person.admins,p)
+
+  end
+
+
 
 end

@@ -101,4 +101,24 @@ module ProjectsHelper
     box.html_safe
   end
 
+  def project_membership_json project
+    project.work_groups.map do |wg|
+      wg.group_memberships.map do |gm|
+        {
+            id: gm.id.to_s,
+            person: { id: gm.person_id.to_s, name: gm.person.name },
+            institution: { id: gm.work_group.institution.id.to_s, title: gm.work_group.institution.title },
+            leftAt: gm.time_left_at,
+            cannotRemove: !gm.person_can_be_removed?
+        }
+      end
+    end.flatten.to_json
+  end
+
+
+  def person_can_remove_themself?(person,project)
+    return false unless (person && project)
+
+  end
+
 end

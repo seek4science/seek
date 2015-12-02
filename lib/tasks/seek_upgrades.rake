@@ -12,6 +12,7 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
            :environment,
+           :fix_slideshare_content_type,
            :ensure_valid_content_blobs,
            :upgrade_content_blobs
        ]
@@ -157,6 +158,17 @@ namespace :seek do
     puts
     puts "#{updated} content blobs renamed."
     puts "Done."
+  end
+
+  desc 'updates content types for slideshare urls, which sometimes incorrectly stored as application/xml'
+  task(:fix_slideshare_content_type => :environment) do
+    ContentBlob.where('url IS NOT NULL').each do |cb|
+      handler = Seek::DownloadHandling::HTTPHandler.new(cb.url)
+      if handler.send(:is_slideshare_url?)
+        cb.update_attribute(:content_type,'text/html')
+        cb.update_attribute(:is_webpage,true)
+      end
+    end
   end
 
   desc "calculate sizes and fetch remote content blobs"

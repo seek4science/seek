@@ -33,6 +33,21 @@ class UtilTest < ActiveSupport::TestCase
 
     # double check they are actual types
     assert_equal expected, types
+
+    with_config_value :events_enabled,false do
+      Seek::Util.clear_cached
+      types = Seek::Util.searchable_types
+      expected = [Assay, DataFile, Institution, Investigation, Model, Person, Presentation, Programme, Project, Publication, Sample, Sop, Specimen, Strain, Study, Workflow]
+      assert_equal expected.map { |t| t.to_s }, types.map { |t| t.to_s }
+    end
+
+    with_config_value :programmes_enabled,false do
+      Seek::Util.clear_cached
+      types = Seek::Util.searchable_types
+      expected = [Assay, DataFile, Event, Institution, Investigation, Model, Person, Presentation, Project, Publication, Sample, Sop, Specimen, Strain, Study, Workflow]
+      assert_equal expected.map { |t| t.to_s }, types.map { |t| t.to_s }
+    end
+
   end
 
   test "doiable asset types" do
