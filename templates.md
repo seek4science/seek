@@ -12,7 +12,7 @@ SEEK templates are a community driven activity. If you have any updates, modific
 
 #### SOPs
 
-* [Nature Protocols Format for SOPs](attachments/NatureProtocolsFormat.doc)
+* [Nature Protocols Format for SOPs](https://fairdomhub.org/sops/245)
 
 #### Data
 
