@@ -208,7 +208,7 @@ function appearingEdges(edges){
 }
 
 function fadingNodes(nodes){
-    nodes.css({'opacity': 0.3});
+    nodes.css({'opacity': 0.6});
 }
 
 function fadingEdges(edges){
