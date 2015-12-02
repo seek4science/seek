@@ -1,0 +1,65 @@
+<style>
+    .funder-row {padding: 1em;}
+    .funder-logo {width: 160px}
+</style>
+
+<h1>SEEK Funding details</h1>
+
+<p>
+  SEEK is developed as a component of the <%= link_to "FAIRDOM", "http://fair-dom.org", :target => "_blank" %> project,
+  which is funded by the following agencies ...
+</p>
+<br/>
+
+<div class='row funder-row'>
+  <div class='col-md-2'>
+  <%= image 'funder-bbsrc',:class=>'funder-logo' %>
+  </div>
+  <div>
+    <%= link_to 'Biotechnology and Biological Sciences Research Council (BBSRC)', 'http://www.bbsrc.ac.uk/', :target => "_blank" %>
+    is a UK Research Council and non-departmental public
+    body. Being the largest UK public funder of non-medical bioscience, the organization funds scientific research
+    institutes and university research departments in the UK.
+  </div>
+</div>
+
+<div class='row funder-row'>
+  <div class='col-md-2'>
+    <%= image 'funder-bmbf',:class=>'funder-logo' %>
+  </div>
+  <div>
+    <%= link_to 'The Federal Ministry of Education and Research (Bundesministerium für Bildung und Forschung – BMBF)', 'https://www.bmbf.de/en/', :target => "_blank" %>
+    , is a
+    cabinet-level ministry of the Federal Republic of Germany. The Ministry provides funding for research projects and
+    institutions and sets general educational policy
+  </div>
+</div>
+
+<div class='row funder-row'>
+  <div class='col-md-2'>
+    <%= image 'funder-nwo',:class=>'funder-logo' %>
+  </div>
+  <div>
+    <%= link_to 'The Netherlands Organization for Scientific Research (Nederlandse Organisatie voor Wetenschappelijk Onderzoek)', 'http://www.nwo.nl/en', :target => "_blank" %>
+    is
+    the national research council of the Netherlands. Promoting quality and innovation in science, the organization
+    funds
+    thousands of top researchers at universities/institutes inside the country.
+  </div>
+</div>
+
+<div class='row funder-row'>
+  <div class='col-md-2'>
+    <%= image 'funder-systemsx',:class=>'funder-logo' %>
+  </div>
+  <div>
+    <%= link_to 'SystemsX (SystemsX.ch)', 'http://www.systemsx.ch/', :target => "_blank" %> is the largest public
+    research
+    initiative in Switzerland. It focuses on a broad topical area
+    of basic research with major specialization in systems biology.
+  </div>
+</div>
+
+<p>
+  SEEK development is funded until 2017, and conditionally until 2019. The <%= link_to 'FAIRDOMHub','https://fairdomhub.org',:target=>'_blank' %> is guaranteed to run until 2020.
+</p>

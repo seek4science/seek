@@ -9,12 +9,14 @@ jQuery.noConflict();
 var $j = jQuery;
 
 function drawGraph(elements, current_element_id){
-    $j('#cy').cytoscape({
-        layout: {
-            name: 'breadthfirst'
-        },
-
+    cy=cytoscape({
+        container: document.getElementById('cy'),
         showOverlay: false,
+
+        layout: {
+            name: 'breadthfirst',
+            directed: true
+        },
 
         style: cytoscape.stylesheet()
             .selector('node')
@@ -73,8 +75,10 @@ function drawGraph(elements, current_element_id){
                 animateNode(current_node);
                 displayNodeInfo(current_node);
 
-                disableMouseWheel();
+                //disableMouseWheel();
                 resizeGraph();
+                //need put zoom after resizeGraph, otherwise fit() does not work
+                cy.zoomingEnabled(false);
             }else{
                 $j('.isa_graph')[0].hide();
             }
@@ -105,12 +109,6 @@ function animateNode(node){
             appearingEdges(edge);
             appearingNodes(source);
         }
-    });
-
-    node.animate({
-        css: { 'width':default_node_width+35, 'height':default_node_height+15 }
-    }, {
-        duration: 300
     });
 
     node.css({
@@ -204,7 +202,7 @@ function appearingEdges(edges){
 }
 
 function fadingNodes(nodes){
-    nodes.css({'opacity': 0.3});
+    nodes.css({'opacity': 0.6});
 }
 
 function fadingEdges(edges){
@@ -256,7 +254,7 @@ function labelLines(node){
     var font_size = node.renderedCss()['font-size'];
     var ruler = $j('#ruler')[0];
     ruler.style.fontSize = font_size;
-    ruler.style.fontWeight = 'bolder';
+    //ruler.style.fontWeight = 'bolder';
     ruler.innerHTML = label;    
     var label_width = ruler.offsetWidth;
     var text_max_width = node.renderedCss()['text-max-width'];

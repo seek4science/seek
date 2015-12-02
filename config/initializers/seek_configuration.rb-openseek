@@ -17,7 +17,7 @@ SEEK::Application.configure do
   Seek::Config.default :jws_enabled, true
   Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
   Seek::Config.default :internal_help_enabled, false
-  Seek::Config.default :external_help_url,"http://seek4science.github.io/seek/help"
+  Seek::Config.default :external_help_url,"http://docs.seek4science.org/help"
   Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
@@ -71,7 +71,7 @@ SEEK::Application.configure do
   Seek::Config.default :programmes_enabled, false
   Seek::Config.default :project_hierarchy_enabled, false
   Seek::Config.default :show_announcements, true
-  Seek::Config.default :allow_user_programme_creation, false
+  Seek::Config.default :programme_user_creation_enabled, false
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0

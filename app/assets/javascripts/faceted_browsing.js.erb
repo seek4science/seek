@@ -135,7 +135,7 @@ function selectedFacets(){
     if (element.length == 0){
         element = "<span class='selected_facets'>" + selected_facets_string + '</span>';
     }else{
-        element.html(selected_facets_string);
+        element.text(selected_facets_string);
     }
 
     $j(element).insertBefore( ".exhibit-collectionView-header-sortControls" );

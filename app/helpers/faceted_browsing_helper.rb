@@ -41,9 +41,9 @@ module FacetedBrowsingHelper
     facets_for_object.each do |key, value|
       #special case when generating project filter for project itself from common_faceted_search.yml
       if object.kind_of?(Project) && key == 'project'
-        exhibit_item[key] = object.title
+        exhibit_item[key] = h(object.title)
       elsif object.kind_of?(Person) && key == 'contributor'
-        exhibit_item[key] = object.name
+        exhibit_item[key] = h(object.name)
       elsif object.kind_of?(Assay) && object.assay_class.title == 'Modelling Analysis' && key == 'technology_type'
         exhibit_item[key] = "(don't have this field)"
       else
@@ -105,11 +105,8 @@ module FacetedBrowsingHelper
           facet_value = nil
         end
       end
-      if facet_value.kind_of?(Array)
-        facet_values |= facet_value
-      else
-        facet_values << facet_value
-      end
+      facet_value = [facet_value] unless facet_value.kind_of?(Array)
+      facet_values |= facet_value.map { |v| v.is_a?(String) ? h(v) : v }
     end
     facet_values.compact!
     facet_values.uniq!

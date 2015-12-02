@@ -770,9 +770,9 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3", :text=>"#{I18n.t('sop').pluralize} (1+1)", :count=>1
-      assert_select "h3", :text=>"#{I18n.t('data_file').pluralize} (1+1)", :count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a", :text=>"#{I18n.t('sop').pluralize} (1+1)", :count=>1
+      assert_select "a", :text=>"#{I18n.t('data_file').pluralize} (1+1)", :count=>1
     end
 
     assert_select "div.list_item" do

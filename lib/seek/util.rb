@@ -38,6 +38,7 @@ module Seek
     #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
     #returns a list of all types that respond_to and return true for user_creatable?
     def self.user_creatable_types
+      #FIXME: the user_creatable? is a bit mis-leading since we now support creation of people, projects, programmes by certain people in certain roles.
       @@creatable_model_classes ||= begin
         persistent_classes.select do |c|
           c.respond_to?("user_creatable?") && c.user_creatable?
@@ -59,7 +60,10 @@ module Seek
     end
 
     def self.searchable_types
-      @@searchable_types ||= (user_creatable_types | [Person, Programme, Project, Institution]).sort_by(&:name)
+      #FIXME: hard-coded extra types - are are these items now user_creatable?
+      extras = [Person, Programme, Project, Institution]
+      extras.delete(Programme) unless Seek::Config.programmes_enabled
+      @@searchable_types ||= (user_creatable_types | extras).sort_by(&:name)
     end
 
     def self.scalable_types

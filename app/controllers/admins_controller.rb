@@ -46,6 +46,7 @@ class AdminsController < ApplicationController
     Seek::Config.forum_enabled = string_to_boolean params[:forum_enabled]
     Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
+    Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
