@@ -84,6 +84,12 @@ class RenderersTest < ActiveSupport::TestCase
     cb.url = 'https://www.youtube.com/v/1234abcd'
     assert Seek::Renderers::YoutubeRenderer.new(cb).can_render?
 
+    cb.url = 'https://www.youtube.com/v/'
+    refute Seek::Renderers::YoutubeRenderer.new(cb).can_render?
+
+    cb.url = 'https://www.youtu.be'
+    refute Seek::Renderers::YoutubeRenderer.new(cb).can_render?
+
     cb.url = 'http://www.slideshare.net/if-we-build-it-will-they-come-13652794'
     refute Seek::Renderers::YoutubeRenderer.new(cb).can_render?
 

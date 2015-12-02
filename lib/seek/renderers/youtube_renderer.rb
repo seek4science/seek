@@ -2,7 +2,7 @@ module Seek
   module Renderers
     class YoutubeRenderer < BlobRenderer
       def can_render?
-        content_blob && content_blob.url && is_youtube_url?(content_blob.url)
+        content_blob && content_blob.url && is_youtube_url?(content_blob.url) && extract_video_code(content_blob.url)
       end
 
       def render
