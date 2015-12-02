@@ -10,7 +10,16 @@ class SessionsController < ApplicationController
   
   # render new.rhtml
   def new
-    
+    ease_login
+  end
+
+  def ease_login
+    ease_id = request.env["REMOTE_USER"]
+    if !(ease_id.nil? or ease_id.empty?)
+      ease_id_authentication
+    else
+      flash[:notice] = "Sorry, no EASE ID could be found. Please log in below."
+    end
   end
 
   def auto_openid
@@ -28,8 +37,18 @@ class SessionsController < ApplicationController
   def create
     if using_open_id?
       open_id_authentication
-    else      
+    else
       password_authentication
+    end
+  end
+
+  def ease_id_authentication
+    ease_id = request.env["REMOTE_USER"]
+    if @user = User.find_by_login(ease_id)
+      flash[:notice] = "Logging in with EASE identity (#{ease_id})."
+      check_login
+    else
+      flash[:notice] = "Could not find a SEEK user with EASE user name: (#{ease_id})."
     end
   end
 
