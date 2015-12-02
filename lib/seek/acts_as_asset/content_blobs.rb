@@ -21,13 +21,7 @@ module Seek
         # the search terms coming from the content-blob(s)
         def content_blob_search_terms
           all_content_blobs.map do |blob|
-            if blob.url
-              url_ignore_terms = ['http','https','www','com','co','org','uk','de']
-              url_search_terms = [blob.url,blob.url.split(/\W+/)].flatten - url_ignore_terms
-            else
-              url_search_terms = []
-            end
-            [blob.original_filename, blob.url, blob.file_extension, blob.pdf_contents_for_search] | url_search_terms
+            blob.search_terms
           end.flatten.compact.uniq
         end
 

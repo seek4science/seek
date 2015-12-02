@@ -188,6 +188,16 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
+  def search_terms
+    if url
+      url_ignore_terms = ['http','https','www','com','co','org','uk','de']
+      url_search_terms = [url,url.split(/\W+/)].flatten - url_ignore_terms
+    else
+      url_search_terms = []
+    end
+    [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
+  end
+
   private
 
   def remote_headers
