@@ -18,7 +18,7 @@ module Seek
 
       def renderer_instances
         # Seek::Renderers::Renderer.descendants
-        [Seek::Renderers::SlideshareRenderer]
+        [Seek::Renderers::SlideshareRenderer, Seek::Renderers::YoutubeRenderer]
       end
     end
   end
