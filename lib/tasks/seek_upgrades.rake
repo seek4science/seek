@@ -13,8 +13,10 @@ namespace :seek do
   task :upgrade_version_tasks => [
            :environment,
            :fix_slideshare_content_type,
-           :ensure_valid_content_blobs,
-           :upgrade_content_blobs
+           #:ensure_valid_content_blobs,
+           #:upgrade_content_blobs,
+           :update_jws_online,
+           :turn_off_biosamples
        ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -40,6 +42,14 @@ namespace :seek do
     end
 
     puts "Upgrade completed successfully"
+  end
+
+  task(:update_jws_online=>:environment) do
+    Seek::Config.jws_online_root='https://jws2.sysmo-db.org'
+  end
+
+  task(:turn_off_biosamples=>:environment) do
+    Seek::Config.biosamples_enabled=false
   end
 
   task(:clear_delayed_jobs=>:environment) do
