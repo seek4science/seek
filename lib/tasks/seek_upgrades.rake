@@ -13,8 +13,8 @@ namespace :seek do
   task :upgrade_version_tasks => [
            :environment,
            :fix_slideshare_content_type,
-           #:ensure_valid_content_blobs,
-           #:upgrade_content_blobs,
+           :ensure_valid_content_blobs,
+           :upgrade_content_blobs,
            :update_jws_online,
            :turn_off_biosamples
        ]
