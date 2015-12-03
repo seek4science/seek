@@ -216,11 +216,11 @@ function appearingEdges(edges){
 }
 
 function fadingNodes(nodes){
-    nodes.css({'opacity': 0.3});
+    nodes.css({'opacity': 0.5});
 }
 
 function fadingEdges(edges){
-    edges.css({'opacity': 0.2});
+    edges.css({'opacity': 0.5});
 }
 
 function normalizingNodes(nodes){
