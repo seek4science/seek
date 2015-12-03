@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
   end
 
   def ease_login
-    ease_id = request.env["REMOTE_USER"]
+    ease_id = get_ease_id
     if !(ease_id.nil? or ease_id.empty?)
       ease_id_authentication
     else
@@ -42,28 +42,39 @@ class SessionsController < ApplicationController
     end
   end
 
-  def ease_id_authentication
+  def get_ease_id
     ease_id = request.env["REMOTE_USER"]
+    ease_id = "bob"
+  end
+
+  def ease_id_authentication
+    ease_id = get_ease_id
     if @user = User.find_by_login(ease_id)
       flash[:notice] = "Logging in with EASE identity (#{ease_id})."
       check_login
     else
-      flash[:notice] = "Could not find a SEEK user with EASE user name: (#{ease_id})."
+      # flash[:notice] = "Could not find a SEEK user with EASE user name: (#{ease_id})."
+      redirect_to :signup
     end
   end
 
-  def destroy    
+  def destroy
     logout_user
-    flash[:notice] = "You have been logged out."
 
-    begin
-      if request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == search_url.normalize_trailing_slash
-        redirect_to :root
-      else
-        redirect_back
+    ease_id = get_ease_id
+    if !(ease_id.nil? or ease_id.empty?) # TODO check ease flag from config too.
+      redirect_to "https://www.ease.ed.ac.uk/logout/logout.cgi" # TODO put this into seek_config.
+    else
+      flash[:notice] = "You have been logged out."
+      begin
+        if request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == search_url.normalize_trailing_slash
+          redirect_to :root
+        else
+          redirect_back
+        end
+      rescue RedirectBackError
+        redirect :controller => :homes, :action => :index
       end
-    rescue RedirectBackError
-      redirect :controller => :homes, :action => :index
     end
   end
 
