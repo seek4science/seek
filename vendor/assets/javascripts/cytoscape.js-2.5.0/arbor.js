@@ -1,5 +1,5 @@
 //
-//  arbor.js.erb - version 0.91
+//  arbor.js - version 0.91
 //  a graph vizualization toolkit
 //
 //  Copyright (c) 2011 Samizdat Drafting Co.
