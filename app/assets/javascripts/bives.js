@@ -1,5 +1,5 @@
 // ...
-//= require cytoscape.js-2.0.3/cytoscape
-//= require cytoscape.js-2.0.3/cytoscape.min
-//= require cytoscape.js-2.0.3/arbor
+//= require cytoscape.js-2.5.0/cytoscape
+//= require cytoscape.js-2.5.0/arbor
+//= require cytoscape.js-2.5.0/cytoscape-arbor
 //= require bives_crn_graph

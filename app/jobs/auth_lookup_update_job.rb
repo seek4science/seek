@@ -1,5 +1,5 @@
 class AuthLookupUpdateJob < SeekJob
-  BATCHSIZE = 3
+  BATCHSIZE = 1
 
   def add_items_to_queue(items, time = default_delay.from_now, priority = 0, queuepriority = default_priority)
     if Seek::Config.auth_lookup_enabled

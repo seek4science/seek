@@ -46,11 +46,15 @@ module Seek
       end
 
       def select_handler(role_name)
-        handler = Seek::Roles::Roles.descendants.detect do |subclass|
+        handler = role_handlers.detect do |subclass|
           subclass.role_names.include?(role_name)
         end
         fail Seek::Roles::UnknownRoleException.new("Unknown role '#{role_name.inspect}'") if handler.nil?
         handler
+      end
+
+      def role_handlers
+        [Seek::Roles::StandAloneRoles,Seek::Roles::ProjectRelatedRoles,::Seek::Roles::ProgrammeRelatedRoles]
       end
 
       def is_admin_or_project_administrator?

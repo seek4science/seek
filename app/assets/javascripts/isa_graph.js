@@ -91,8 +91,16 @@ function animateNode(node){
     var nodes = cy.$('node');
     var edges = cy.$('edge');
 
+    var excluded_selected_nodes = [];
+    for (var i=0; i<nodes.length; i++){
+        var node_tmp = nodes[i];
+        if (node_tmp.data().id !== node.data().id)
+            excluded_selected_nodes.push(node_tmp);
+    }
+
     //first normalizing all nodes and fading all nodes and edges
-    normalizingNodes(nodes);
+    normalizingNodes(excluded_selected_nodes);
+
     fadingNodes(nodes);
     fadingEdges(edges);
 
@@ -206,19 +214,23 @@ function fadingNodes(nodes){
 }
 
 function fadingEdges(edges){
-    edges.css({'opacity': 0.2});
+    edges.css({'opacity': 0.5});
 }
 
 function normalizingNodes(nodes){
-    nodes.css({
-        'width': default_node_width,
-        'height': default_node_height,
-        'font-size': default_font_size,
-        'font-weight': 'normal',
-        'color': default_color,
-        'text-max-width': default_text_max_width
-    });
-    nodes.unselect();
+    for (var i=0; i<nodes.length; i++){
+        var node = nodes[i];
+        node.css({
+            'width': default_node_width,
+            'height': default_node_height,
+            'font-size': default_font_size,
+            'font-weight': 'normal',
+            'color': default_color,
+            'text-max-width': default_text_max_width
+        });
+        node.unselect();
+
+    }
 }
 
 function resizeGraph(){

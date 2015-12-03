@@ -6,6 +6,21 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   fixtures :content_blobs
 
+  test 'search terms' do
+    blob = ContentBlob.new
+    blob.url = "http://fish.com"
+    assert_includes blob.search_terms, 'fish'
+    assert_includes blob.search_terms, 'http://fish.com'
+    refute_includes blob.search_terms, 'http'
+    refute_includes blob.search_terms, 'com'
+
+    blob = Factory(:rightfield_content_blob)
+    assert_includes blob.search_terms, 'rightfield.xls'
+    assert_includes blob.search_terms, 'xls'
+
+  end
+
+
   test 'md5sum_on_demand' do
     blob=Factory :rightfield_content_blob
     assert_not_nil blob.md5sum
