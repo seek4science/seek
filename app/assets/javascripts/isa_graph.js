@@ -119,6 +119,12 @@ function animateNode(node){
         }
     });
 
+    node.animate({
+        css: { 'width':default_node_width+35, 'height':default_node_height+15 }
+    }, {
+        duration: 300
+    });
+    
     node.css({
         'font-size': default_font_size,
         'text-max-width': default_text_max_width+15
