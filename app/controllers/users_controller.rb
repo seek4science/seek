@@ -12,23 +12,23 @@ class UsersController < ApplicationController
   
   # render new.rhtml
   def new
+    puts "Seek::Config.default_all_visitors_access_type"
+    puts Seek::Config.default_all_visitors_access_type
+    puts Seek::Config.ease_logout_url
+    puts "ease_logout_url"
+    puts "Seek::Config.use_ease"
+    puts Seek::Config.use_ease
     @use_ease = false
     @user = User.new
-    # TODO if ease is switched on,
-    ease_id = get_ease_id
-    if !(ease_id.nil? or ease_id.empty?)
+    if (Seek::Config.use_ease)
       @use_ease = true
       flash[:notice] = 'Please create a new SEEK user. Your SEEK login name will be the same as your EASE username.'
       @user.login = get_ease_id
-      password = generate_password
-      @user.password = password
-      @user.password_confirmation = password
     end
   end
 
   def get_ease_id
     ease_id = request.env["REMOTE_USER"]
-    ease_id = "fred"
   end
 
   def create
@@ -41,18 +41,13 @@ class UsersController < ApplicationController
       open_id_authentication(params[:openid_identifier])
     else
       @user = User.new(params[:user])
-      # TODO if ease is switched on,
-      ease_id = get_ease_id
-      if !(ease_id.nil? or ease_id.empty?)
+      # if ease is switched on,
+      if (Seek::Config.use_ease)
         @user.login = get_ease_id
       end
       @user.check_email_present=true
       check_registration
     end
-  end
-
-  def generate_password
-    rand_password=('0'..'z').to_a.shuffle.first(8).join
   end
 
   def cancel_registration

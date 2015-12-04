@@ -129,3 +129,6 @@ show_announcements:
 imprint_enabled:
 imprint_description:
 allow_user_programme_creation:
+default_all_visitors_access_type:
+ease_logout_url:
+use_ease:

@@ -10,7 +10,10 @@ class SessionsController < ApplicationController
   
   # render new.rhtml
   def new
-    ease_login
+
+    if (Seek::Config.use_ease)
+      ease_login
+    end
   end
 
   def ease_login
@@ -44,7 +47,6 @@ class SessionsController < ApplicationController
 
   def get_ease_id
     ease_id = request.env["REMOTE_USER"]
-    ease_id = "bob"
   end
 
   def ease_id_authentication
@@ -61,9 +63,8 @@ class SessionsController < ApplicationController
   def destroy
     logout_user
 
-    ease_id = get_ease_id
-    if !(ease_id.nil? or ease_id.empty?) # TODO check ease flag from config too.
-      redirect_to "https://www.ease.ed.ac.uk/logout/logout.cgi" # TODO put this into seek_config.
+    if (Seek::Config.use_ease)
+      redirect_to Seek::Config.ease_logout_url
     else
       flash[:notice] = "You have been logged out."
       begin

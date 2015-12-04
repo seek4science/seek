@@ -159,5 +159,9 @@ SEEK::Application.configure do
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,''
   Seek::Config.fixed :main_layout,'application'
+
+# SynthSys settings
+  Seek::Config.default :use_ease, false
+  Seek::Config.default :ease_logout_url, "https://www.ease.ed.ac.uk/logout/logout.cgi"
 end
 
