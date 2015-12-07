@@ -213,11 +213,12 @@ Projects.renderMemberships = function () {
     var changeListElement = $j('#change-list');
 
     var addToList = function (membership) {
-        var institutionElement = membershipListElement.find('.institution_members[data-institution-id="' + membership.institution.id + '"]');
+        var selector = '.institution_members[data-institution-id="' + membership.institution.id + '"]';
+        var institutionElement = membershipListElement.find(selector);
         if(institutionElement.length === 0) {
             // Create institution if not already there
             membershipListElement.append(HandlebarsTemplates['projects/institution'](membership.institution));
-            institutionElement = membershipListElement.find('.institution_members[data-institution-id="' + membership.institution.id + '"]');
+            institutionElement = membershipListElement.find(selector);
         }
         var templateName = membership.action === 'added' ? 'projects/new_member' : 'projects/member';
         institutionElement.append(HandlebarsTemplates[templateName](membership));
