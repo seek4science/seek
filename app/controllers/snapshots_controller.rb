@@ -86,6 +86,10 @@ class SnapshotsController < ApplicationController
 
   def find_snapshot
     @snapshot = @investigation.snapshots.where(snapshot_number: params[:id]).first
+    if @snapshot.nil?
+      flash[:error] = "Snapshot #{params[:id]} doesn't exist."
+      redirect_to investigation_path(@investigation)
+    end
   end
 
   def doi_minting_enabled?

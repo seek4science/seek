@@ -90,6 +90,16 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "fails gracefully when missing snapshot" do
+    create_snapshot
+    login_as(@user)
+
+    get :show, :investigation_id => @investigation, :id => 123
+
+    assert_response :redirect
+    assert flash[:error].include?('exist')
+  end
+
   test "can mint DOI for snapshot" do
     datacite_mock
     create_snapshot
