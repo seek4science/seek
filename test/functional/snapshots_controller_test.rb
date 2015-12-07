@@ -182,6 +182,10 @@ class SnapshotsControllerTest < ActionController::TestCase
     @snapshot.save
     login_as(@user)
 
+    get :show, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    assert_response :success
+    assert_select "a.btn", :text => 'Export to Zenodo', :count => 1
+
     post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
          :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
 
@@ -205,6 +209,33 @@ class SnapshotsControllerTest < ActionController::TestCase
          :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
 
     assert_redirected_to assigns(:zenodo_oauth_client).authorize_url(request.original_url)
+  end
+
+  test "can't export snapshot to Zenodo if setting disabled" do
+    zenodo_mock
+    zenodo_oauth_mock
+    create_snapshot
+    Factory(:oauth_session, :user_id => @user.id)
+
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    login_as(@user)
+
+    with_config_value(:zenodo_publishing_enabled, false) do
+      refute @snapshot.can_export_to_zenodo?
+
+      get :show, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+      assert_response :success
+      assert_select "a.btn", :text => 'Export to Zenodo', :count => 0
+
+      post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
+           :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+
+      assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+      refute flash[:error].blank?
+      assert assigns(:snapshot).zenodo_deposition_id.nil?
+      assert assigns(:snapshot).zenodo_record_url.nil?
+    end
   end
 
   test "can't export snapshot to Zenodo if no manage permissions" do

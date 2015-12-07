@@ -91,6 +91,7 @@ SEEK::Application.configure do
       Settings.defaults[:imprint_enabled]= false
       Settings.defaults[:imprint_description]= 'Here is imprint example'
 
+      Settings.defaults[:zenodo_publishing_enabled] = true
       Settings.defaults[:zenodo_api_url] = "https://sandbox.zenodo.org/api"
       Settings.defaults[:zenodo_oauth_url] = "https://sandbox.zenodo.org/oauth"
 
