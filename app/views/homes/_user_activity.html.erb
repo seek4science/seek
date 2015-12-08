@@ -1,0 +1,8 @@
+<%= panel('My Recent Contributions') do %>
+    <ul class="feed">
+      <% items = convert_logs_to_hash(current_user.person.recent_activity(10)) %>
+      <% items.each do |item| %>
+          <%= display_single_log_item_hash(item, 'added') -%>
+      <% end %>
+    </ul>
+<% end %>
