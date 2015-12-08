@@ -395,6 +395,16 @@ class Person < ActiveRecord::Base
      related_items
   end
 
+  def recent_items(limit = 10)
+    ActivityLog.select([:activity_loggable_type, :activity_loggable_id]).
+        where(culprit_type: 'User', culprit_id: user, action: ['update', 'create']).
+        where("'controller_name' != 'sessions'").
+        order('created_at DESC').
+        limit(limit).
+        uniq.
+        map { |a| a.activity_loggable }
+  end
+
   #remove the permissions which are set on this person
   def remove_permissions
     permissions = Permission.where(["contributor_type =? and contributor_id=?", 'Person', id])
