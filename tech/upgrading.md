@@ -94,10 +94,10 @@ files with:
 
 Starting with version 0.22, we've started making SEEK available as a download.
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.0.0.tgz> You can
+<https://bitbucket.org/seek4science/seek/downloads/seek-1.0.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.0.0.tgz
+    tar zxvf seek-1.0.0.tar.gz
 
 and then copy across your existing filestore and database configuration file
 from your previous installation and continue with the upgrade steps. The
