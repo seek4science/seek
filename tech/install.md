@@ -76,7 +76,7 @@ Now you are ready for installing SEEK. You can either download SEEK or install
 from GitHub. You can download SEEK from
 <https://bitbucket.org/seek4science/seek/downloads/seek-1.0.0.tar.gz>
 
-    wget <https://bitbucket.org/seek4science/seek/downloads/seek-1.0.0.tar.gz>
+    wget https://bitbucket.org/seek4science/seek/downloads/seek-1.0.0.tar.gz
 
 then unpack the file with:
 
