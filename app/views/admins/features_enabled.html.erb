@@ -4,9 +4,6 @@
     <%= admin_checkbox_setting(:events_enabled, 1,Seek::Config.events_enabled,
                                "#{t('event').pluralize} enabled","Whether the #{t('event').pluralize} are displayed and can be added.") %>
 
-    <%= admin_checkbox_setting(:jerm_enabled, 1, Seek::Config.jerm_enabled,
-                               "JERM harvesting enabled", "Whether JERM harvesting is enabled. You probably want this disabled. If enabled you need to administer a #{t('project')} to setup the connection and default sharing policy.") %>
-
     <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
                                "Search enabled", "Whether search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after chaning this setting.") %>
     <%= admin_checkbox_setting(:programmes_enabled, 1, Seek::Config.programmes_enabled,
