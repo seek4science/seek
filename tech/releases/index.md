@@ -35,7 +35,7 @@ layout: page
 
 * Presentations added as Slide share or Youtube links will now be rendered within SEEK
   * This introduces a rendering framework that makes it easier to add new renderers and in the future make it easier for 3rd party developers to contribute renderers
-  * Improved handling of remote and of large content
+* Improved handling of remote and of large content
 
 ### Biosamples
 
