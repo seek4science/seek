@@ -11,6 +11,6 @@ For details on how to **install** SEEK please refer to our [Installation Guide](
 
 For details on how to **upgrade** an existing SEEK installation please refer to our [Upgrade Guide](tech/upgrading.html)
 
-To review **changes and new features** introduced between SEEK versions please visit our [Change Log](http://seek4science.org/changes)
+To review **changes and new features** introduced between SEEK versions please visit our [Change Log](/tech/releases/)
 
 We also provide Virtual Machine Images, available for [Virtual Box](http://www.virtualbox.org/). To download and for information on how to setup please refer to our [Virtual Image Guide](http://seek4science.org/seek-vm).
