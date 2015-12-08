@@ -63,10 +63,14 @@ libgmp-dev is needed for RedCloth with ruby 2.1.7
 
     sudo apt-get install libgmp-dev
 
+### Set RAILS_ENV
+
+**If upgrading a production instance of SEEK, remember to set the RAILS_ENV first**
+
+    export RAILS_ENV=production
 
 ### Stopping services before upgrading
 
-    export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
     bundle exec rake seek:workers:stop
     bundle exec rake sunspot:solr:stop
 
@@ -110,6 +114,9 @@ content.
     bundle install --deployment
     bundle exec rake seek:upgrade
     bundle exec rake assets:precompile # this task will take a while
+
+### Restarting services
+
     bundle exec rake seek:workers:start
     bundle exec rake sunspot:solr:start
     touch tmp/restart.txt
