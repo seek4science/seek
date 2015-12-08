@@ -5,7 +5,11 @@ layout: page
 
 # SEEK Releases
 
-## Latest release v1.0.0
+Latest version - 1.0.0
+
+## Version 1.0.0
+
+Release date: _(December 8th 2015)_
 
 ### Self management of Programmes and Projects
 
@@ -53,7 +57,7 @@ layout: page
 ### Miscellaneous
 
 * Improvements to ISA graph rendering.
-* Source of failure is shown correctly.
+* Better reporting of the source of error, if an error occurs with a 3rd party service integration.
 * [ORCid](http://orcid.org/) field can be made mandatory during registration.
 * File extensions and urls are indexed for search
 * [Imprint/Impressum](https://en.wikipedia.org/wiki/Impressum) support
