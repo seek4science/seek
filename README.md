@@ -31,10 +31,10 @@ For more information please visit: [FAIRDOM](http://fair-dom.org).
 We recommend installing SEEK on Debian or Ubuntu.
 
 To install the latest release please visit:
-[SEEK install guide](http://docs.seek4science.org/install.html)
+[SEEK install guide](http://docs.seek4science.org/tech/install.html)
 
 For details about other distributions and installing on Mac OS X please visit:
-[Other distributions guide](http://docs.seek4science.org/other-distributions.html)
+[Other distributions guide](http://docs.seek4science.org/tech/other-distributions.html)
 
 The documentation is available on the *ghpages* branch.
 
