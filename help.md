@@ -5,23 +5,27 @@ layout: page
 
 ## Guidelines for Data and Model Annotation in SEEK
 
-[Metadata Guidelines](metadata-guidelines.html)  
-[A Quick Guide to Using the ISA Structure](isa-guide.html)  
-[ISA Best Practice](isa-best-practice.html)  
-[Transcriptomics Guidelines](transcriptomics-guidelines.html)  
-[Proteomics Guidelines](proteomics-guidelines.html)  
+[Metadata Guidelines](help/metadata-guidelines.html)
+
+[A Quick Guide to Using the ISA Structure](help/isa-guide.html)
+
+[ISA Best Practice](help/isa-best-practice.html)
+
+[Transcriptomics Guidelines](help/transcriptomics-guidelines.html)
+
+[Proteomics Guidelines](help/proteomics-guidelines.html)
 
 ## Guidelines for using Community Resources and Controlled Vocabularies
 
-[Controlled Vocabularies and Ontologies](controlled-vocabularies.html)
+[Controlled Vocabularies and Ontologies](help/controlled-vocabularies.html)
 
 ## JERM Templates for use in SEEK
 
-[JERM Templates](templates.html)
+[JERM Templates](help/templates.html)
 
 ## FAQ
 
-[Frequently Asked Questions](faq.html)
+[Frequently Asked Questions](help/faq.html)
 
 ## Contributing 
 If you want to contribute to the SEEK software please visit

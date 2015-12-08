@@ -7,9 +7,9 @@ layout: page
 
 SEEK is open source software, and is distributed under a [BSD License](https://github.com/seek4science/seek/blob/master/BSD-LICENSE). The source code is all available on [GitHub](https://github.com/seek4science/seek).
 
-For details on how to **install** SEEK please refer to our [Installation Guide](install.html)
+For details on how to **install** SEEK please refer to our [Installation Guide](tech/install.html)
 
-For details on how to **upgrade** an existing SEEK installation please refer to our [Upgrade Guide](upgrading.html)
+For details on how to **upgrade** an existing SEEK installation please refer to our [Upgrade Guide](tech/upgrading.html)
 
 To review **changes and new features** introduced between SEEK versions please visit our [Change Log](http://seek4science.org/changes)
 
