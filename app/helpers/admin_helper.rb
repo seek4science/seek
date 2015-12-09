@@ -81,7 +81,9 @@ module AdminHelper
 
   def admin_password_setting(name, value, title, description = nil, options = {})
     admin_setting_block(title, description) do
-      password_field_tag(name, value, options.merge!(:autocomplete => 'off', :class => 'form-control'))
+      password_field_tag(name, '', options.merge!(:autocomplete => 'off',
+                                                  :class => 'form-control',
+                                                  :placeholder => value.blank? ? '' : '*** Unchanged ***'))
     end
   end
 

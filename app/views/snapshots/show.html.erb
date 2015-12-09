@@ -8,25 +8,30 @@
 <div class="row">
   <div class="col-md-9 col-sm-8">
     <%= item_description @snapshot.description -%>
-    <p>
-      <strong>DOI:</strong>
-      <% if @snapshot.doi %>
-          <%= doi_link(@snapshot.doi) %>
-      <% else %>
-          <span class="none_text">None</span>
-      <% end %>
-    </p>
 
-    <p>
-      <strong>Zenodo URL:</strong>
-      <% if @snapshot.published_in_zenodo? %>
-          <%= link_to @snapshot.zenodo_record_url, @snapshot.zenodo_record_url %>
-      <% elsif @snapshot.in_zenodo? %>
-          <span class="none_text">Not yet published</span>
-      <% else %>
-          <span class="none_text">None</span>
-      <% end %>
-    </p>
+    <% if Seek::Config.doi_minting_enabled %>
+        <p>
+          <strong>DOI:</strong>
+          <% if @snapshot.doi %>
+              <%= doi_link(@snapshot.doi) %>
+          <% else %>
+              <span class="none_text">None</span>
+          <% end %>
+        </p>
+    <% end %>
+
+    <% if Seek::Config.zenodo_publishing_enabled %>
+        <p>
+          <strong>Zenodo URL:</strong>
+          <% if @snapshot.published_in_zenodo? %>
+              <%= link_to @snapshot.zenodo_record_url, @snapshot.zenodo_record_url %>
+          <% elsif @snapshot.in_zenodo? %>
+              <span class="none_text">Not yet published</span>
+          <% else %>
+              <span class="none_text">None</span>
+          <% end %>
+        </p>
+    <% end %>
 
     <p><strong>Created at:</strong> <%= date_as_string(@snapshot.created_at, true) %></p>
 
@@ -39,7 +44,7 @@
     <%= panel('Fingerprints') do %>
         <p style="font-style: italic">
           These checksums allow you to check a Snapshot you have downloaded hasn't been modified. For details on how to use these please visit
-          <%= link_to "this guide","http://seek4science.github.io/seek/investigation_checksum.html",:target=>"blank" %>
+          <%= link_to "this guide","http://docs.seek4science.org/tech/investigation_checksum.html",:target=>"blank" %>
         </p>
         <p>
           <strong>MD5:</strong> <%= @snapshot.md5sum %>

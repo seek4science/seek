@@ -133,14 +133,16 @@ var Projects = {
         },
         undo: function () {
             var item = $j(this).parent('.institution_member');
-            var id = item.data('personId');
-            Projects.removeChange(id);
+            var personId = item.data('personId');
+            var institutionId = item.data('institutionId');
+            Projects.removeChange(personId, institutionId);
         },
         remove: function () {
             var item = $j(this).parent('.institution_member');
             var change = {
                 id: item.data('membershipId'),
                 person: { id: item.data('personId'), name: item.data('personName') },
+                institution: { id: item.data('institutionId'), title: item.data('institutionTitle') },
                 action: 'removed'
             };
             Projects.addChange(change);
@@ -149,6 +151,8 @@ var Projects = {
             var item = $j(this).parent('.institution_member');
             $j('#leaving-person-id').val(item.data('personId'));
             $j('#leaving-person-name').val(item.data('personName'));
+            $j('#leaving-person-institution-id').val(item.data('institutionId'));
+            $j('#leaving-person-institution-title').val(item.data('institutionTitle'));
             $j('#leaving-membership-id').val(item.data('membershipId'));
             $j('#leaving-date-form').modal('show');
         },
@@ -156,6 +160,7 @@ var Projects = {
             var change = {
                 id: $j('#leaving-membership-id').val(),
                 person: { id: $j('#leaving-person-id').val(), name: $j('#leaving-person-name').val() },
+                institution: { id: $j('#leaving-person-institution-id').val(), title: $j('#leaving-person-institution-title').val() },
                 date: $j('#leaving_date').val(),
                 action: 'flagged'
             };
@@ -167,6 +172,7 @@ var Projects = {
             var change = {
                 id: item.data('membershipId'),
                 person: { id: item.data('personId'), name: item.data('personName') },
+                institution: { id: item.data('institutionId'), title: item.data('institutionTitle') },
                 action: 'unflagged'
             };
             Projects.addChange(change);
@@ -177,15 +183,15 @@ var Projects = {
 Projects.getPersonIndex = function (set, personId, institutionId) {
     for(var i = 0; i < set.length; i++) {
         if(set[i].person.id == personId)
-            if(institutionId == undefined || (set[i].institution.id == institutionId))
+            if(set[i].institution.id == institutionId)
                 return i;
     }
 
     return -1;
 };
 
-Projects.removeChange = function (id) {
-    var index = Projects.getPersonIndex(Projects.membershipChanges, id);
+Projects.removeChange = function (personId, institutionId) {
+    var index = Projects.getPersonIndex(Projects.membershipChanges, personId, institutionId);
     if(index > -1)
         Projects.membershipChanges.splice(index, 1);
 
@@ -193,7 +199,7 @@ Projects.removeChange = function (id) {
 };
 
 Projects.addChange = function (change) {
-    var index = Projects.getPersonIndex(Projects.membershipChanges, change.person.id);
+    var index = Projects.getPersonIndex(Projects.membershipChanges, change.person.id, change.institution.id);
     if(index > -1)
         Projects.membershipChanges[index] = change;
     else {
@@ -207,11 +213,12 @@ Projects.renderMemberships = function () {
     var changeListElement = $j('#change-list');
 
     var addToList = function (membership) {
-        var institutionElement = membershipListElement.find('[data-institution-id="' + membership.institution.id + '"]');
+        var selector = '.institution_members[data-institution-id="' + membership.institution.id + '"]';
+        var institutionElement = membershipListElement.find(selector);
         if(institutionElement.length === 0) {
             // Create institution if not already there
             membershipListElement.append(HandlebarsTemplates['projects/institution'](membership.institution));
-            institutionElement = membershipListElement.find('[data-institution-id="' + membership.institution.id + '"]');
+            institutionElement = membershipListElement.find(selector);
         }
         var templateName = membership.action === 'added' ? 'projects/new_member' : 'projects/member';
         institutionElement.append(HandlebarsTemplates[templateName](membership));
