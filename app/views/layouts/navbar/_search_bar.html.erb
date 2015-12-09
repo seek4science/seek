@@ -1,7 +1,7 @@
 <% @search_type="All" unless @search_type %>
 
 <% if Seek::Config.solr_enabled -%>
-    <%= form_tag main_app.search_path, :class => 'navbar-form navbar-left' do -%>
+    <%= form_tag main_app.search_path, :method => :get, :class => 'navbar-form navbar-left' do -%>
         <div id="search_box">
 
           <div class="input-group">
