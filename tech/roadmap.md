@@ -15,12 +15,21 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| <del>New user-interface based on [Bootstrap](http://getbootstrap.com)</del> | <del>September 2015</del>  |
-| <del>Self management of organisms/del> | <del>December 2015</del>  |
-| <del>Improved registration workflow/del> | <del>December 2015</del>  |
-| <del>Self management of projects and programmes/del> | <del>December 2015</del>  |
-| <del>Support for [Research Objects](http://www.researchobject.org/)/del> | <del>December 2015</del> |
-| <del>DOI's for Investigation snapshots for citation/del> | <del>December 2015</del> |
-| LDAP support for authentication | TBA  |
 | Improved Samples/Treatments/SOP handling | March 2016  |
 | Integration with openBIS | Summer 2016  |
+| Upgrade to Rails 4 | Summer 2016 |
+
+
+## Completed
+
+These are completed Roadmap features, and includes the version of SEEK the feature was included in.
+
+| Feature | Milestone date | SEEK version |
+| --- | --- | --- |
+| Self management of projects and programmes | December 2015  | 1.0 |
+| Self management of organisms | December 2015  | 1.0 |
+| Improved registration workflow | December 2015  | 1.0 |
+| Support for [Research Objects](http://www.researchobject.org/) | December 2015 | 1.0 |
+| DOI's for Investigation snapshots for citation | December 2015 | 1.0 |
+| New user-interface based on [Bootstrap](http://getbootstrap.com) | September 2015  | 0.23 |
+
