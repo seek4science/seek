@@ -1,6 +1,6 @@
 module Seek
   module ActsAsAsset
-    module Search
+    module Searching
       extend ActiveSupport::Concern
 
       included do
