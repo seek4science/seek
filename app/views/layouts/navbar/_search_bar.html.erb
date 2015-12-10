@@ -22,7 +22,7 @@
             <% if show_scales? && Seek::Config.is_virtualliver %>
                 <div class="form-group">
                   <%= select_tag :scale,
-                                 (options_for_select({"All" => ''}, :selected => (params[:scale] ? nil : 'all')) +
+                                 (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) +
                                          options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])),
                                  :class => 'form-control' %>
                 </div>
