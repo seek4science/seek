@@ -30,6 +30,10 @@ module Zenodo
       end
 
       def export_to_zenodo(access_token, extra_metadata = {})
+        unless Seek::Config.zenodo_publishing_enabled
+          errors.add(:base, "Zenodo publishing is not enabled")
+          return false
+        end
         if !has_doi?
           errors.add(:base, "Please generate a DOI before exporting to Zenodo.")
           return false
@@ -55,6 +59,10 @@ module Zenodo
       end
 
       def publish_in_zenodo(access_token)
+        unless Seek::Config.zenodo_publishing_enabled
+          errors.add(:base, "Zenodo publishing is not enabled")
+          return false
+        end
         if !in_zenodo?
           errors.add(:base, "Please export to Zenodo first.")
           return false
@@ -92,6 +100,10 @@ module Zenodo
 
           client.deposition(zenodo_deposition_id)
         end
+      end
+
+      def can_export_to_zenodo?
+        Seek::Config.zenodo_publishing_enabled && has_doi? && !in_zenodo?
       end
 
       private
