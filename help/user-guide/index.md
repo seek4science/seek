@@ -438,6 +438,7 @@ You will also be able to find the DOI link in the snapshots attributes
 
 ## Specialist user roles
 SEEK has a number of specialist roles that users within a project can be assigned.  The roles are:
+
 * [Asset housekeeper](#asset-housekeeper)
 * [Asset gatekeeper](#asset-gatekeeper)
 * [Project administrator](#project-administrator)
