@@ -51,4 +51,5 @@
 //= require bootstrap_tab_memory
 //= require associations
 //= require people
+//= require search
 //= require_tree ./templates
