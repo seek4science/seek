@@ -313,3 +313,31 @@ a.select_assay_class:hover {
 label.admin-checkbox {
   font-weight: bold
 }
+
+.seek-homepage-button-container {
+  margin-bottom: 1em;
+}
+
+a.seek-homepage-button {
+  display: block;
+}
+
+.seek-homepage-button img {
+  width: 90px;
+  height: 90px;
+  margin: 5px;
+}
+
+@media (min-width: $screen-md-min) {
+  a.seek-homepage-button {
+    display: block;
+    text-align: center;
+  }
+
+  .seek-homepage-button img {
+    width: 180px;
+    height: 180px;
+    display: block;
+    margin: 5px auto;
+  }
+}

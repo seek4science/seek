@@ -5,9 +5,10 @@
 <% end %>
 
 <div class="row">
-
   <div class="col-md-9">
     <%= render :partial=>"home_description_box" -%>
+
+    <%= render :partial=>"home_buttons" -%>
 
     <% if logged_in_and_registered? %>
         <%= render :partial=>"user_activity" -%>
@@ -15,6 +16,7 @@
         <%= render :partial=>"home_activity_notifications" -%>
     <% end %>
   </div>
+
   <div class="col-md-3">
     <%= render :partial=>"gadgets/announcements_gadget" if show_announcements? %>
 
