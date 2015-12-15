@@ -9,6 +9,9 @@
     <div class="row">
       <div class="col-md-8">
         <p class='alert alert-info'>
+          These are specialist roles for members of the <%= t('project') %> that gives them special abilities and permissions. For more information about these roles, please read
+          the <%= help_link :roles,link_text:'Roles help document' %>
+          <br/>
           Start to type the name of the person you wish to assign to a role. They need to already be a member of the <%= t('project') %>.
         </p>
         <%= form_tag(update_members_project_path(@project)) do %>
