@@ -13,7 +13,7 @@ class HelpDictionaryTest < ActiveSupport::TestCase
   test 'help link' do
     assert_equal 'http://docs.seek4science.org/tech/investigation_checksum.html', @dic.help_link(:investigation_checksum)
     assert_equal 'http://docs.seek4science.org/tech/investigation_checksum.html', @dic.help_link('investigation_checksum')
-    assert_equal 'http://docs.seek4science.org/help/user-guide/#specialist-user-roles', @dic.help_link(:roles)
+    assert_equal 'http://docs.seek4science.org/help/user-guide/roles.html', @dic.help_link(:roles)
     assert_nil @dic.help_link(:funky_fish)
   end
 
