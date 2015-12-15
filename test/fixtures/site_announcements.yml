@@ -1,0 +1,25 @@
+headline:
+  title: This is a headline and feed announcement
+  body: the body
+  is_headline: true
+  expires_at: 2050-04-03 11:09:18
+  created_at: 2010_01_03
+  show_in_feed: true
+
+basic:
+  title: This is a basic announcement
+  body: the body
+  is_headline: false
+  expires_at: 2050-04-03 11:09:18
+  created_at: 2010_01_02
+  show_in_feed: true
+
+headline_no_feed:
+  title: This is a headline only announcement
+  body: the body
+  is_headline: true
+  expires_at: 2050-04-03 11:09:18
+  created_at: 2010_01_01
+  show_in_feed: false
+
+

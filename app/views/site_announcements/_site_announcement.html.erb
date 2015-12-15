@@ -1,0 +1,21 @@
+<%
+show_seperator||=false
+%>
+<li class="announcement">  
+  <span class="announcement_title"><%= h(site_announcement.title) -%></span>
+  <span class="announcement_date"><%= site_announcement.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%></span>
+  <span class="announcement_announcer"> by <%= link_to h(site_announcement.announcer.name), site_announcement.announcer  -%></span>
+  <span class="announcement_body"><%= site_announcement.body_html -%></span>
+  <% if can_manage_announcements? -%>
+  <%
+    attributes=site_announcement_attributes(site_announcement)
+    unless attributes.empty?
+  %>
+  <span class="announcement_attributes"><%= "("+attributes.join(", ") + ")" -%></span>
+  <% end -%>
+  <span class="announcement_edit"><%= link_to "Edit",edit_site_announcement_path(site_announcement) -%></span>
+  <% end %>
+  <% if show_seperator -%>
+  <div class="announcement_seperator"></div>
+  <% end -%>
+</li>

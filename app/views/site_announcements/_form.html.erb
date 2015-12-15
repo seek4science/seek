@@ -1,0 +1,46 @@
+<%= f.error_messages -%>
+<p>
+    <%= f.label :title -%>
+    <br/>
+    <%= f.text_field :title,:size=>75 -%>
+</p>
+<p>
+    <%= f.label :body -%>
+    <br/>
+    <%= f.text_area :body, :rows=>20,:cols=>75 -%>
+</p>
+<p>
+    <%= f.label :show_in_feed -%>
+    <%= f.check_box :show_in_feed -%>
+</p>
+<p>
+    <%= f.label :is_headline,"Headline announcement" -%>
+    <%= f.check_box :is_headline,{:onchange=>"toggle_expires_at();"} -%>
+    <div id="announcement_expires" style="display: none;">
+        <%= f.label :expires,"Expires at" -%>
+        <br/>
+        <%= datetime_select "site_announcement","expires_at" -%>
+        <br/>		
+		<span class="headline_announcement_date">( Current server time is <%= Time.now.utc -%> )</span>
+    </div>
+</p>
+<p>
+    <%= f.label :email_notification -%>
+	<% if edit -%>
+		<%= f.check_box :email_notification, :disabled=>true -%>
+	<% else -%>
+    	<%= f.check_box :email_notification -%>
+	<% end -%>
+</p>
+<script type="text/javascript">
+    function toggle_expires_at(){
+        if ($("site_announcement_is_headline").checked) {
+            Effect.Appear("announcement_expires");
+        }
+        else {
+            Effect.Fade("announcement_expires")
+        }
+    }
+    
+    toggle_expires_at();
+</script>
