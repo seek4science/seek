@@ -11,7 +11,12 @@ Latest version - {{ site.current_seek_version }}
 
 Release date: _(December 15th 2015)_
 
-Patch release with some small improvements and bugfixes.
+Patch release with a couple of bugfixes.
+
+  * Fixed back-button after search
+  * Prevent email password being auto filled by browser
+
+Also added support to start easily and safely adding links to help pages in user guide.
 
 A full list of changes included in this release can be found in the [SEEK v1.0.1 release notes](release-notes-1.0.1.html).
 
