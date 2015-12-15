@@ -5,7 +5,7 @@ layout: page
 
 # SEEK Releases
 
-Latest version - 1.0.1
+Latest version - {{ site.current_seek_version }}
 
 ## Version 1.0.1
 

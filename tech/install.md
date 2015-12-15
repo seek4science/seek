@@ -74,20 +74,20 @@ for Production](install-production.html)
 
 Now you are ready for installing SEEK. You can either download SEEK or install
 from GitHub. You can download SEEK from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.0.0.tar.gz>
+<https://bitbucket.org/seek4science/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz>
 
-    wget https://bitbucket.org/seek4science/seek/downloads/seek-1.0.0.tar.gz
+    wget https://bitbucket.org/seek4science/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz
 
 then unpack the file with:
 
-    tar zxfv seek-1.0.0.tar.gz
+    tar zxfv seek-{{ site.current_seek_version }}.tar.gz
 
 Alternatively, if you wish to install directly from GitHub, the latest version of SEEK is
-tagged as *(v1.0.0)*. To fetch this run:
+tagged as *(v{{ site.current_seek_version }})*. To fetch this run:
 
     git clone https://github.com/seek4science/seek.git
     cd seek/
-    git checkout v1.0.0
+    git checkout v{{ site.current_seek_version }}
 
 ## Setting up Ruby and RubyGems with RVM
 

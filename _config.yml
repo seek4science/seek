@@ -1,4 +1,6 @@
 #baseurl: /seek
 
+current_seek_version: 1.0.1
+
 gems:
   - jekyll-sitemap
