@@ -1,5 +1,6 @@
 headline:
   title: This is a headline and feed announcement
+  announcer: modeller_person (Person)
   body: the body
   is_headline: true
   expires_at: 2050-04-03 11:09:18
@@ -8,6 +9,7 @@ headline:
 
 basic:
   title: This is a basic announcement
+  announcer: modeller_person (Person)
   body: the body
   is_headline: false
   expires_at: 2050-04-03 11:09:18
@@ -16,6 +18,7 @@ basic:
 
 headline_no_feed:
   title: This is a headline only announcement
+  announcer: modeller_person (Person)
   body: the body
   is_headline: true
   expires_at: 2050-04-03 11:09:18
