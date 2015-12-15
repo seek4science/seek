@@ -16,7 +16,9 @@ class NotifieeInfoTest < ActiveSupport::TestCase
     n.save!
     assert_not_nil n.unique_key
   end
-  
+
+end
+
 #  def test_notifiee_info_is_deleted_when_notifiee_is
 #    c=SiteAnnouncementCategory.new
 #    c.save!
