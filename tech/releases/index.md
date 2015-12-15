@@ -5,7 +5,15 @@ layout: page
 
 # SEEK Releases
 
-Latest version - 1.0.0
+Latest version - 1.0.1
+
+## Version 1.0.1
+
+Release date: _(December 15th 2015)_
+
+Patch release with some small improvements and bugfixes.
+
+A full list of changes included in this release can be found in the [SEEK v1.0.1 release notes](release-notes-1.0.1.html).
 
 ## Version 1.0.0
 
