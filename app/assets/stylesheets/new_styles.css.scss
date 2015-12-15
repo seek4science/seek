@@ -79,8 +79,8 @@ ul.feed .file-type-icon img {
 }
 
 #ft {
-  color: #333;
-  background-color: #eee;
+  color: $text-color;
+  background-color: $panel-bg;
   bottom: 0;
   margin-top: 2em;
   text-align: center;
@@ -138,9 +138,9 @@ ul.feed .file-type-icon img {
     position: absolute;
     right: 0;
     border-style: solid;
-    border-color: #ddd;
+    border-color: $input-border;
     border-width: 1px;
-    background: #fff;
+    background: $dropdown-bg;
     border-radius: 4px;
     padding: 10px;
     margin-top: 2px;
@@ -207,7 +207,7 @@ img.icon {
 h1 div.version {
   display: inline-block;
   font-size: 16px;
-  color: #999;
+  color: $gray-light;
   position: relative;
 }
 
@@ -225,7 +225,6 @@ h1 div.version a.dropdown-toggle {
 
 .list_item_desc {
   margin-bottom: 1em;
-  color: #555;
 }
 
 .factors-studied li {
@@ -335,9 +334,19 @@ a.seek-homepage-button {
   }
 
   .seek-homepage-button img {
-    width: 180px;
-    height: 180px;
+    width: 150px;
+    height: 150px;
     display: block;
     margin: 5px auto;
   }
+}
+
+div.isa_graph {
+  background: $panel-bg;
+  border-color: $panel-default-border;
+}
+
+
+#user-menu-button {
+  height: $navbar-height;
 }
