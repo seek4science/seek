@@ -1,0 +1,13 @@
+<% filter_hash = {:filter => params[:filter]}
+   total ||= nil
+   see_all_text = "See all"
+   authorized = controller_name.classify.constantize.authorization_supported?
+   see_all_text << " #{total} #{'visible' if authorized} items" unless total.nil?
+%>
+
+<div class="text-center">
+  <%= link_to see_all_text, {:id => params[:id], :page => "all", }.merge(filter_hash), :class => 'btn btn-default' %>
+  <%= link_to("Clear Filter", CGI::unescape(request.url).gsub(/filter\[.+\]=[0-9]*[&]?/,""),
+              :style => "display:none",
+              :class => 'btn btn-default') unless params[:filter].blank? %>
+</div>
