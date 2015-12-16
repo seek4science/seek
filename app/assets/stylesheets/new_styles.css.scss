@@ -65,7 +65,7 @@ ul.feed .file-type-icon img {
 
 .subtle {
   font-size: 80%;
-  color: #777777;
+  color: if(lightness($text-color) > 50, darken($text-color, 20%), lighten($text-color, 30%));
 }
 
 .powered-by {
@@ -80,14 +80,14 @@ ul.feed .file-type-icon img {
 
 #ft {
   color: $text-color;
-  background-color: $panel-bg;
+  background-color: darken($body-bg, 10%);
   bottom: 0;
   margin-top: 2em;
   text-align: center;
   padding: 1em 0.5em;
   font-size: small;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
+  border-top: 1px solid $navbar-default-border;
+  border-bottom: 1px solid $navbar-default-border;
 }
 
 #ft .logo-section {
@@ -138,13 +138,13 @@ ul.feed .file-type-icon img {
     position: absolute;
     right: 0;
     border-style: solid;
-    border-color: $input-border;
+    border-color: $navbar-default-border;
     border-width: 1px;
     background: $dropdown-bg;
-    border-radius: 4px;
     padding: 10px;
     margin-top: 2px;
     z-index: 10;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
   }
 }
 
