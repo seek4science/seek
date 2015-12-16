@@ -62,5 +62,18 @@ html {
     background-color: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.3); }
 
+#google-search {
+    float: right;
+    min-width: 18em;
+    max-width: 20em;
+}
 
+input.gsc-input,
+.gsc-input-box,
+.gsc-input-box-hover,
+.gsc-input-box-focus,
+.gsc-search-button {
+    box-sizing: content-box;
+    line-height: normal;
+}
 
