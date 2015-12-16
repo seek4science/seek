@@ -29,3 +29,16 @@ The Project Administrator gets notified when someone new signs up to the project
 * [Create Institutions](#create-institutions)
 * [Assign people to project roles](#assign-people-to-project-roles)
 * [Flag when a person leaves a project](#flag-when-a-person-leaves-a-project)
+
+
+### Add and remove people from a project
+
+### Create organisms
+
+### Create profiles
+
+### Create institutions
+
+### Assign people to project roles
+
+### Flag when a person leaves a project
