@@ -101,7 +101,7 @@ SEEK documentation is a community driven activity, and we are always looking to 
 	<tr>
 		<td> Model Descriptions </td>
 		<td> Systems Biology Ontology </td>
-		<td> <a href="http://www.ebi.ac.uk/sbo/main/browse.jsp?nodeId=245"><span class="caps">SBO</span>:0000244</a></td>
+		<td> <a href="http://www.ebi.ac.uk/sbo/main/SBO:0000244"><span class="caps">SBO</span>:0000244</a></td>
 		<td> <a href="http://www.ebi.ac.uk/sbo/">http://www.ebi.ac.uk/sbo/</a> </td>
 		<td> urn:miriam:biomodels.sbo </td>
 	</tr>
