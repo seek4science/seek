@@ -118,8 +118,7 @@ class AdminsController < ApplicationController
       logger.error "Error whilst attempting to clear feed cache #{e.message}"
     end
 
-    validation_flag = is_project_entries_integer && is_community_entries_integer
-    update_redirect_to validation_flag, 'home_settings'
+    update_redirect_to is_entries_integer, 'home_settings'
   end
 
   def update_imprint_setting
