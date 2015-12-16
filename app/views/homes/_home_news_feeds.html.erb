@@ -1,15 +1,11 @@
-<% if Seek::Config.project_news_enabled || Seek::Config.community_news_enabled %>
+<% if Seek::Config.news_enabled %>
     <div class="panel panel-default">
       <div class="panel-heading">News</div>
-      <div id="project_news" class="panel-body front-page-panel">
+      <div id="news-feed" class="panel-body front-page-panel">
         <ul class="feed">
-          <%
-             entries = []
-             entries += Seek::FeedReader.fetch_entries_for :project_news if Seek::Config.project_news_enabled
-             entries += Seek::FeedReader.fetch_entries_for :community_news if Seek::Config.community_news_enabled
-          %>
+          <% entries = Seek::FeedReader.fetch_entries_for(:news) %>
           <% unless entries.blank? %>
-              <% entries.each do |entry|   %>
+              <% entries.each do |entry| %>
                   <%= display_single_entry(entry) -%>
               <% end %>
           <% end %>
