@@ -65,6 +65,9 @@ ul.feed .file-type-icon img {
 
 .subtle {
   font-size: 80%;
+}
+
+.none_text, .subtle {
   color: if(lightness($text-color) > 50, darken($text-color, 20%), lighten($text-color, 30%));
 }
 
@@ -80,14 +83,14 @@ ul.feed .file-type-icon img {
 
 #ft {
   color: $text-color;
-  background-color: darken($body-bg, 10%);
+  background-color: $panel-default-heading-bg;
   bottom: 0;
   margin-top: 2em;
   text-align: center;
   padding: 1em 0.5em;
   font-size: small;
-  border-top: 1px solid $navbar-default-border;
-  border-bottom: 1px solid $navbar-default-border;
+  border-top: 1px solid $panel-default-border;
+  border-bottom: 1px solid $panel-default-border;
 }
 
 #ft .logo-section {
@@ -138,7 +141,7 @@ ul.feed .file-type-icon img {
     position: absolute;
     right: 0;
     border-style: solid;
-    border-color: $navbar-default-border;
+    border-color: $dropdown-border;
     border-width: 1px;
     background: $dropdown-bg;
     padding: 10px;
