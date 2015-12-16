@@ -1,4 +1,7 @@
 class SiteAnnouncementsController < ApplicationController
+
+  include Seek::BreadCrumbs
+
   before_filter :login_required, :except=>[:feed,:notification_settings,:update_notification_settings]
   
   before_filter :check_manage_announcements,:only=>[:new,:create,:edit,:update,:destroy]
