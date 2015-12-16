@@ -163,38 +163,33 @@ class HomesControllerTest < ActionController::TestCase
 
   test "should turn on/off project news and community news" do
     #turn on
-    Seek::Config.project_news_enabled=true
-    Seek::Config.community_news_enabled=true
+    Seek::Config.news_enabled=true
 
     get :index
     assert_response :success
 
-    assert_select "div.panel-heading", :text=>/Community News/, :count=>1
-    assert_select "div.panel-heading", :text=>"#{Seek::Config.application_name} News", :count=>1
+    assert_select "div.panel-heading", :text=>/News/, :count=>1
 
     #turn off
-    Seek::Config.project_news_enabled=false
-    Seek::Config.community_news_enabled=false
-
+    Seek::Config.news_enabled=false
 
     get :index
     assert_response :success
 
-    assert_select "div#project_news", :count => 0
-    assert_select "div#community_news", :count => 0
+    assert_select "div#news-feed", :count => 0
   end
 
   test "feed reader should handle missing feed title" do
 
-    Seek::Config.project_news_enabled=true
-    Seek::Config.project_news_feed_urls = uri_to_feed("simple_feed_with_subtitle.xml")
-    Seek::Config.project_news_number_of_entries = "5"
+    Seek::Config.news_enabled=true
+    Seek::Config.news_feed_urls = uri_to_feed("simple_feed_with_subtitle.xml")
+    Seek::Config.news_number_of_entries = "5"
 
     get :index
 
     assert_response :success
 
-    assert_select "#project_news ul.feed li" do
+    assert_select "#news-feed ul.feed li" do
       assert_select "span.subtle",:text=>/Unknown publisher/,:count=>4
     end
   end
@@ -253,30 +248,22 @@ class HomesControllerTest < ActionController::TestCase
   test "should show the content of project news and community news with the configurable number of entries" do
     sbml = uri_to_sbml_feed
     bbc = uri_to_bbc_feed
-    guardian = uri_to_guardian_feed
-    #project news
-    Seek::Config.project_news_enabled=true
-    Seek::Config.project_news_feed_urls = "#{bbc}, #{sbml}"
-    Seek::Config.project_news_number_of_entries = "5"
 
-    #community news
-    Seek::Config.community_news_enabled=true
-    Seek::Config.community_news_feed_urls = "#{guardian}"
-    Seek::Config.community_news_number_of_entries = "7"
+    Seek::Config.news_enabled=true
+    Seek::Config.news_feed_urls = "#{bbc}, #{sbml}"
+    Seek::Config.news_number_of_entries = "5"
 
     login_as(:aaron)
     get :index
     assert_response :success
 
-    assert_select 'div#project_news ul>li', 5
-    assert_select 'div#community_news ul>li', 7
+    assert_select 'div#news-feed ul>li', 5
 
     logout
     get :index
     assert_response :success
 
-    assert_select 'div#project_news ul>li', 5
-    assert_select 'div#community_news ul>li', 7
+    assert_select 'div#news-feed ul>li', 5
   end
 
   test "recently added should include data_file" do
