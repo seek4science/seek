@@ -9,7 +9,7 @@ We welcome all sorts of contributions to SEEK, from a small spelling fix, code t
 ##Before you start
 
 If you are interesting contributing, please first look at our [JIRA issue tracker](https://jira-bsse.ethz.ch/browse/OPSK), either to find something you can contribute, or whether your
-idea already exists. **Before starting** you should also always [Contact Us](contacting_us.html) first - its quite possible work is already in progress or we have ideas, and we wouldn't want your
+idea already exists. **Before starting** you should also always [Contact Us](/contacting_us.html) first - its quite possible work is already in progress or we have ideas, and we wouldn't want your
 effort to be wasted.
 
 ##Changing and contributing code
@@ -21,7 +21,7 @@ For large changes you would be advised to link your repository to [Code Climate]
 
 Once you have finished making your changes and wish to contribute them, you can do so by issuing a pull request.
 
-If contributing through GitHub is unfamiliar to you, please read [how to contribute to open source projects on GitHub](https://gun.io/blog/how-to-github-fork-branch-and-pull-request/)
+If contributing through GitHub is unfamiliar to you, please read [Contributing to Open Source on GitHub](https://guides.github.com/activities/contributing-to-open-source/)
 
 For small changes emailing a patch file may be suitable.
 

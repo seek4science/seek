@@ -7,7 +7,7 @@ layout: page
 
 ##Contributing to SEEK
 
-Please read [contributing to SEEK](contributing-to-seek.html)
+Please read [contributing to SEEK](tech/contributing-to-seek.html)
 
 
 ##Contributing to these pages
