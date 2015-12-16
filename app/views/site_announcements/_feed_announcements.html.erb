@@ -1,5 +1,5 @@
 <% if feed_announcements.any? %>
-    <ul class="feed_announcement_list">
+    <ul class="feed_announcement_list feed">
       <%= render partial: "site_announcements/feed_announcement",
                  collection: feed_announcements,
                  locals: { truncate_length: truncate_length } %>

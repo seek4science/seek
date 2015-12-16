@@ -1,5 +1,4 @@
 <div id="announcement_gadget" class="panel panel-default">
-
   <div class="panel-heading">
     <%= link_to image("atom_feed"),feed_site_announcements_path(:format=>"atom") %>
     <% if admin_logged_in? %>
@@ -7,7 +6,6 @@
     <% else %>
         Announcements
     <% end %>
-
   </div>
 
   <div class="panel-body">
