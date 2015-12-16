@@ -1,10 +1,9 @@
+require 'test_helper'
+
 class NotifieeInfoTest < ActiveSupport::TestCase
-  
-  def setup
-    load_schema
-    Fixtures.create_fixtures(File.join(File.dirname(__FILE__), '../fixtures'),"site_announcements")
-  end
-  
+
+  fixtures :site_announcements
+
   def test_unique_key_generation
     
     #the SiteAnnouncementCategory is used as a dummy notifiee
