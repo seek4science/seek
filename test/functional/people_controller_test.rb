@@ -1337,7 +1337,7 @@ class PeopleControllerTest < ActionController::TestCase
     Seek::Config.limit_latest = 5
     get :index
     assert_response :success
-    assert_select 'li.current_page' do
+    assert_select ".pagination li.active" do
       assert_select 'a[href=?]', people_path(page: 'latest')
     end
     assert_select 'div.list_item_title', count: 5
