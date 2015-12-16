@@ -7,7 +7,7 @@ layout: page
 
 ## Content
 
-- [Contributing to SEEK Docs](#contributing)
+- [Contributing to these SEEK Documents](/contributing.html)
 - [Registering in SEEK](registering.html)
 - [Logging into SEEK](login.html)
 - [Editing your profile](editing-profile.html)
@@ -53,9 +53,7 @@ layout: page
           - [Create Institutions](roles.html#create-institutions)
           - [Assign people to project roles](roles.html#assign-people-to-project-roles)
           - [Flag when a person leaves a project](roles.html#flag-when-a-person-leaves-a-project)
-                 
-## Contributing 
-If you want to contribute or make modifications to the SEEK documentation please contact <community@fair-dom.org> for more details.
+
 
 
 
