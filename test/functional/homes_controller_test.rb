@@ -280,13 +280,12 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test "recently added should include data_file" do
-    login_as(:aaron)
+    person = Factory(:person_in_project)
 
-    df = Factory :data_file, :title=>"A new data file", :contributor=>User.current_user.person
+    df = Factory :data_file, :title=>"A new data file", :contributor=>person, :policy=>Factory(:public_policy)
     assert_difference "ActivityLog.count" do
-      log = Factory :activity_log, :activity_loggable=>df, :controller_name=>"data_files", :culprit=>User.current_user
+      log = Factory :activity_log, :activity_loggable=>df, :controller_name=>"data_files", :culprit=>person.user
     end
-
 
     get :index
     assert_response :success
@@ -294,10 +293,10 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test "recently added should include presentations" do
-    login_as(:aaron)
+    person = Factory(:person_in_project)
 
-    presentation = Factory :presentation, :title=>"A new presentation", :contributor=>User.current_user.person
-    log = Factory :activity_log, :activity_loggable=>presentation, :controller_name=>"presentations", :culprit=>User.current_user
+    presentation = Factory :presentation, :title=>"A new presentation", :contributor=>person, :policy=>Factory(:public_policy)
+    log = Factory :activity_log, :activity_loggable=>presentation, :controller_name=>"presentations", :culprit=>person.user
 
     get :index
     assert_response :success
@@ -305,6 +304,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test "should show headline announcement" do
+    SiteAnnouncement.destroy_all
     login_as :aaron
     ann=Factory :headline_announcement
 
