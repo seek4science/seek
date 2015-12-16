@@ -28,4 +28,4 @@ If you want to view your changes as you edit them, with Ruby installed you can i
 
 and then goto [localhost:4000/seek/](http://localhost:4000/seek/). For more information please see [Using Jekyll with Pages](https://help.github.com/articles/using-jekyll-with-pages/)
 
-You can make a change by forking and issuing a pull request. Please read [how to contribute to open source projects on GitHub](https://gun.io/blog/how-to-github-fork-branch-and-pull-request/)
+You can make a change by forking and issuing a pull request. If contributing through GitHub is unfamiliar to you, please read [Contributing to Open Source on GitHub](https://guides.github.com/activities/contributing-to-open-source/)

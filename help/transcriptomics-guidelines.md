@@ -63,7 +63,7 @@ SEEK documentation is a community driven activity. If you have any modifications
 
 [1]: http://tab2mage.sourceforge.net/docs/magetab_docs.html
 [2]: http://www.ebi.ac.uk/cgi-bin/microarray/magetab.cgi
-[3]: http://isatab.sourceforge.net/isacreator.html
+[3]: https://github.com/ISA-tools/ISAcreator
 [4]: http://tab2mage.sourceforge.net/docs/datafiles.html
 [5]: http://www.ebi.ac.uk/microarray-as/aer/entry
   
