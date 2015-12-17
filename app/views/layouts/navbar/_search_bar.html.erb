@@ -1,14 +1,14 @@
 <% @search_type="All" unless @search_type %>
 
 <% if Seek::Config.solr_enabled -%>
-    <%= form_tag main_app.search_path, :class => 'navbar-form navbar-left' do -%>
+    <%= form_tag main_app.search_path, :id => 'search-form', :method => :get, :class => 'navbar-form navbar-left' do -%>
         <div id="search_box">
 
           <div class="input-group">
-            <%= text_field_tag :search_query, @search_query, :class=>"form-control", :placeholder=>"Search here..." %>
+            <%= text_field_tag :q, @search_query, :class=>"form-control", :placeholder=>"Search here..." %>
             <div class="input-group-btn">
-              <%= submit_tag "Search", :class => 'btn btn-default' -%>
-              <button title="<%= tooltip_title_attrib('Click for more search options') -%>" type="button" class="btn btn-default" data-toggle="button" aria-pressed="false" onclick="$j('#advanced-search').slideToggle()">
+              <%= submit_tag "Search", :name => nil, :class => 'btn btn-default' -%>
+              <button id="adv-search-btn" title="<%= tooltip_title_attrib('Click for more search options') -%>" type="button" class="btn btn-default" data-toggle="button" aria-pressed="false">
                 &nbsp;<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;
               </button>
             </div>

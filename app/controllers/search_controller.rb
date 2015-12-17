@@ -1,5 +1,7 @@
 class SearchController < ApplicationController
 
+  before_filter :set_default_search_params
+
   include Seek::ExternalSearch
   include Seek::FacetedBrowsing
 
@@ -47,7 +49,7 @@ class SearchController < ApplicationController
   end
 
   def perform_search
-    @search_query = params[:search_query]
+    @search_query = params[:q] || params[:search_query]
     @search=@search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query||=""
     @search_type = params[:search_type]
@@ -90,6 +92,11 @@ class SearchController < ApplicationController
   end
 
   private
+
+  def set_default_search_params
+    params[:include_external_search] ||= 0
+    params[:search_type] = 'all' if params[:search_type].blank?
+  end
 
   def include_external_search?
     Seek::Config.external_search_enabled && params[:include_external_search]
