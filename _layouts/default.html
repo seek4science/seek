@@ -6,11 +6,13 @@
   <body>
 
     {% include header.html %}
-    {% include search.html %}
 
-    <div class="page-content">
-      <div class="wrapper">
-        {{ content }}
+    <div class="container">
+      {% include search.html %}
+      <div class="page-content">
+        <div class="wrapper">
+          {{ content }}
+        </div>
       </div>
     </div>
 
