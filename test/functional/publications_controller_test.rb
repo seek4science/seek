@@ -464,7 +464,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 'latest', Seek::Config.default_pages[:publications]
     get :index
     assert_response :success
-    assert_select "li.current_page" do
+    assert_select ".pagination li.active" do
       assert_select "a[href=?]", publications_path(:page => 'latest')
     end
 
@@ -473,7 +473,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select "li.current_page" do
+    assert_select ".pagination li.active" do
       assert_select "a[href=?]", publications_path(:page => 'all')
     end
   end

@@ -213,7 +213,8 @@ table.list_item .tags {
     margin-top: 0.7em;
 }
 
-.disabled, .disabled-button {
+span.disabled, span.disabled-button,
+a.disabled, a.disabled-button{
     filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
     opacity: 0.50;
 }
@@ -1354,7 +1355,6 @@ li.fileinfo_container div.fileinfo {
 
 .none_text {
     font-style: italic;
-    color: #666666;
 }
 
 ul.model_scales_list {
@@ -1715,10 +1715,6 @@ dl.icon-key > dd {
 
 select.project-positions-adder {
     width: auto;
-}
-
-#user-menu-button {
-  height: 50px;
 }
 
 .related-items .nav {

@@ -12,7 +12,9 @@
         </div>
 
         <% if @data_file.can_edit? -%>
-            <%= button_link_to('Edit factors studied (latest version)', 'edit', data_file_studied_factors_path(@data_file)) -%>
+            <p>
+              <%= button_link_to('Edit factors studied (latest version)', 'edit', data_file_studied_factors_path(@data_file)) -%>
+            </p>
         <% end -%>
     <% end -%>
 <% end -%>

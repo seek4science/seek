@@ -1,0 +1,11 @@
+<% content_for(:buttons) do %>
+    <% if can_manage_announcements? -%>
+        <%= button_link_to "New announcement", 'new', new_site_announcement_path -%>
+    <% end %>
+<% end -%>
+
+<%= render :partial=>"general/page_title", :locals=>{ :title => "Announcements"} %>
+
+<div class="announcement_list list-group">
+    <%= render :partial=>"site_announcement",:collection=>@site_announcements %>
+</div>

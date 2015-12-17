@@ -1,0 +1,5 @@
+<li class="feed_announcement">
+  <span class="announcement_title"><%= link_to(h(feed_announcement.title),feed_announcement) -%></span>
+  <span class="announcement_date subtle"><%= time_ago_in_words(feed_announcement.created_at)+" ago" -%></span>
+  <span class="announcement_announcer subtle"> by <%= link_to h(feed_announcement.announcer.name), feed_announcement.announcer -%></span>
+</li>

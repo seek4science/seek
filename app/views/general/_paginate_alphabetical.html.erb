@@ -1,21 +1,23 @@
 <% filtered ||= (!params[:filtered].nil? && params[:filtered]) -%>
-<% selected_classes = "current_page curved with_smaller_shadow" -%>
-<div class="alphabetcal_pagination">
-  <ul>
-    <% unless filtered %>
-        <li class="<%= current_page == "latest" ? selected_classes : "" %>"><%= link_to "Latest", {:id => params[:id], :page => "latest"} %></li>
-    <% end %>
-    <% for page in pages -%>
+<% selected_classes = "active" -%>
+<nav>
+  <div class="alphabetical_pagination text-center">
+    <ul class="pagination pagination-sm">
+      <% unless filtered %>
+          <li class="<%= current_page == "latest" ? selected_classes : "" %>"><%= link_to "Latest", {:id => params[:id], :page => "latest"} %></li>
+      <% end %>
+      <% for page in pages -%>
 
-            <% current_page_class = page==current_page ? selected_classes : "" -%>
-            <% page_title = page=="?" ? "Other" : page -%>
-            <% if page_totals[page]>0 -%>
-                <li class="<%= current_page_class %>"><%= link_to page_title, {:id => params[:id], :page => page} %></li>
-            <% else -%>
-                <li class="disabled_page <%= current_page_class %>"><%= h(page_title) %></li>
-            <% end -%>
+          <% current_page_class = page==current_page ? selected_classes : "" -%>
+          <% page_title = page=="?" ? "Other" : page -%>
+          <% if page_totals[page]>0 -%>
+              <li class="<%= current_page_class %>"><%= link_to page_title, {:id => params[:id], :page => page} %></li>
+          <% else -%>
+              <li class="disabled <%= current_page_class %>"><a href='#'><%= h(page_title) %></a></li>
+          <% end -%>
 
-    <% end -%>    
-    <li class="<%= current_page == "all" ? selected_classes : "" %>"><%= link_to "All", {:id => params[:id], :page => "all"} %></li>
-  </ul>
-</div>
+      <% end -%>
+      <li class="<%= current_page == "all" ? selected_classes : "" %>"><%= link_to "All", {:id => params[:id], :page => "all"} %></li>
+    </ul>
+  </div>
+</nav>
