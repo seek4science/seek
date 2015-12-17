@@ -13,7 +13,7 @@ Release date: _(December 15th 2015)_
 
 Patch release with a couple of bugfixes.
 
-  * Fixed back-button after search
+  * Fixed the back-button after search
   * Prevent email password being auto filled by browser
 
 Also added support to start easily and safely adding links to help pages in user guide.
