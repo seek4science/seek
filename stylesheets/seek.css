@@ -77,3 +77,10 @@ input.gsc-input,
     line-height: normal;
 }
 
+.gsc-selected-option-container {
+    min-width: 84px !important;
+}
+
+.gsc-option-menu-item:hover {
+    background-color: #d4e8ff;
+}
