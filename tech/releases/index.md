@@ -59,20 +59,20 @@ Release date: _(December 8th 2015)_
 * Biosample support has been deprecated and disabled.
 * Biosamples will be improved and reimplemented as our next major feature change.
 * Biosamples can be re-enabled by an administrator.
-* If you currently use the Biosamples that was available in SEEK please [contact us](/contacting_us.html).
+* If you currently use the Biosamples that was available in SEEK please [contact us](/contacting-us.html).
 
 ### Help pages link
 
 * Help pages can now be hosted externally and an administrator can point to the source of them.
 * From past experience, we find it much easier to maintain and update our own Help pages and documentation outside of SEEK, allowing us to expand and improve on them between releases.
 * Our documentation will now be published and maintained using GitHub pages making it easier to maintain between versions and receive [Contributions](/contributing.html).
-* Internal help pages are currently still available, but could be deprecated in a future release. If you edit your own internal pages please [contact us](/contacting_us.html).
+* Internal help pages are currently still available, but could be deprecated in a future release. If you edit your own internal pages please [contact us](/contacting-us.html).
 
 ### Miscellaneous
 
 * Improvements to ISA graph rendering.
 * Better reporting of the source of error, if an error occurs with a 3rd party service integration.
-* [ORCid](http://orcid.org/) field can be made mandatory during registration.
+* [ORCiD](http://orcid.org/) field can be made mandatory during registration.
 * File extensions and urls are indexed for search.
 * [Imprint/Impressum](https://en.wikipedia.org/wiki/Impressum) support.
 

@@ -1,6 +1,7 @@
 ---
 title: contacting us
 layout: page
+redirect_from: "/contacting_us.html"
 ---
 
 # Contacting us

@@ -1,7 +1,9 @@
 ---
 title: investigation checksum
 layout: page
-redirect_from: "/investigation_checksums.html"
+redirect_from:
+    - /investigation_checksum.html
+    - /tech/investigation_checksum.html
 ---
 # Checksum fingerprints
 

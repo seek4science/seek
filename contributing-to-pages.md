@@ -5,7 +5,7 @@ layout: page
 
 #Contributing to these pages
 
-If you find a mistake or wish to make an improvement to these pages, you can do so. For a small mistake, just let us know by [contacting us](contacting_us.html). For other changes you can also access and edit the pages themself.
+If you find a mistake or wish to make an improvement to these pages, you can do so. For a small mistake, just let us know by [contacting us](contacting-us.html). For other changes you can also access and edit the pages themself.
 
 As well as the SEEK source code, these pages are also stored in GitHub at [https://github.com/seek4science/seek](https://github.com/seek4science/seek)
 and served by [GitHub pages](https://pages.github.com/).

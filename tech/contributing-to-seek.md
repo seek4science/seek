@@ -10,7 +10,7 @@ We welcome all sorts of contributions to SEEK, from a small spelling fix, code t
 ##Before you start
 
 If you are interesting contributing, please first look at our [JIRA issue tracker](https://jira-bsse.ethz.ch/browse/OPSK), either to find something you can contribute, or whether your
-idea already exists. **Before starting** you should also always [Contact Us](/contacting_us.html) first - it is quite possible work is already in progress or we have ideas, and we wouldn't want your
+idea already exists. **Before starting** you should also always [Contact Us](/contacting-us.html) first - it is quite possible work is already in progress or we have ideas, and we wouldn't want your
 effort to be wasted.
 
 ##Changing and contributing code

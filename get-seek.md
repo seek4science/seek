@@ -1,6 +1,7 @@
 ---
 title: Get SEEK
 layout: page
+redirect_from: "/get_seek.html"
 ---
 
 # Get SEEK

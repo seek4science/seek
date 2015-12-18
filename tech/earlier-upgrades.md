@@ -9,7 +9,7 @@ redirect_from: "/earlier-upgrades.html"
 **Also if upgrading from a Mercurial based SEEK to our Git one, please contact
 us. Mercurial versions of SEEK are only available up to v0.21.**
 
-You can find details on how to contact us at the [Contact Page](/contacting_us.html)
+You can find details on how to contact us at the [Contact Page](/contacting-us.html)
 
 When upgrading between versions greater than v0.11.x you need to upgrade to
 each released minor version in order incrementally (i.e. 0.13.x -> 0.14.x ->
