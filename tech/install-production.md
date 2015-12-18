@@ -1,6 +1,7 @@
 ---
 title: installing for production
 layout: page
+redirect_from: "/install-production.html"
 ---
 
 # Installing SEEK in a production environment

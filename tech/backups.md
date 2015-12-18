@@ -1,6 +1,7 @@
 ---
 title: backing up
 layout: page
+redirect_from: "/backups.html"
 ---
 
 # Backing Up

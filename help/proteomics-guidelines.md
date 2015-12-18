@@ -1,6 +1,7 @@
 ---
 title: Proteomics Guidelines
 layout: page
+redirect_from: "/proteomics-guidelines.html"
 ---
 
 # Proteomics Guidelines

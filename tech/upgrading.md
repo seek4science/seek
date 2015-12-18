@@ -1,6 +1,7 @@
 ---
 title: upgrading seek
 layout: page
+redirect_from: "/upgrading.html"
 ---
 
 # Upgrading SEEK

@@ -1,6 +1,7 @@
 ---
 title: Frequently Asked Questions
 layout: page
+redirect_from: "/faq.html"
 ---
 
 # Frequently Asked Questions

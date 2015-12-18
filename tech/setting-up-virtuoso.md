@@ -1,6 +1,7 @@
 ---
 title: Virtuoso
 layout: page
+redirect_from: "/setting-up-virtuoso.html"
 ---
 
 # Configuring SEEK for Virtuoso

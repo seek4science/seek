@@ -1,6 +1,7 @@
 ---
 title: JERM
 layout: page
+redirect_from: "/jerm.html"
 ---
 
 # JERM (Just Enough Results Model)

@@ -1,6 +1,7 @@
 ---
 title: Roadmap
 layout: page
+redirect_from: "/roadmap.html"
 ---
 
 # Roadmap

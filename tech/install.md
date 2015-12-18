@@ -1,6 +1,7 @@
 ---
 title: install
 layout: page
+redirect_from: "/install.html"
 ---
 
 # Installing SEEK

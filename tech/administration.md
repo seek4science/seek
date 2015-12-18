@@ -1,6 +1,7 @@
 ---
 title: adminstration
 layout: page
+redirect_from: "/administration.html"
 ---
 
 # Administration of SEEK

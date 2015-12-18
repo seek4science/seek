@@ -1,6 +1,7 @@
 ---
 title: ISA Best Practice
 layout: page
+redirect_from: "/isa-best-practice.html"
 ---
 
 # ISA Best Practice Guide

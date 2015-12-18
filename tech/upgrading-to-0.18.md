@@ -1,6 +1,7 @@
 ---
 title: upgrading to 0.18
 layout: page
+redirect_from: "/upgrading-to-0.18.html"
 ---
 
 # Upgrading to SEEK 0.18

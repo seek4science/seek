@@ -1,6 +1,7 @@
 ---
 title: JERM Templates
 layout: page
+redirect_from: "/templates.html"
 ---
 
 # JERM Templates

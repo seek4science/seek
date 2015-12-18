@@ -1,6 +1,7 @@
 ---
 title: install on a suburi
 layout: page
+redirect_from: "/install-on-suburi.html"
 ---
 
 # Installing SEEK under a sub URI

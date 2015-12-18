@@ -1,6 +1,7 @@
 ---
 title: assay types
 layout: page
+redirect_from: "/assay-types.html"
 ---
 
 # Providing your own Assay and Technology types

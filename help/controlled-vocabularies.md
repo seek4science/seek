@@ -1,6 +1,7 @@
 ---
 title: Controlled Vocabularies and Ontologies
 layout: page
+redirect_from: "/controlled-vocabularies.html"
 ---
 
 # Controlled Vocabularies and Ontologies

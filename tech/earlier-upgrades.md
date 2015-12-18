@@ -1,6 +1,7 @@
 ---
 title: earlier upgrades
 layout: page
+redirect_from: "/earlier-upgrades.html"
 ---
 
 **If upgrading from a version earlier than v0.11.x please contact us.**

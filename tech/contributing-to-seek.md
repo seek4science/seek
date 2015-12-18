@@ -1,6 +1,7 @@
 ---
 title: contributing to seek
 layout: page
+redirect_from: "/contributing-to-seek.html"
 ---
 #Contributing to SEEK
 

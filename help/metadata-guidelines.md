@@ -1,6 +1,7 @@
 ---
 title: Metadata Guidelines
 layout: page
+redirect_from: "/metadata-guidelines.html"
 ---
 
 # Minimum Metadata Guidelines for SEEK

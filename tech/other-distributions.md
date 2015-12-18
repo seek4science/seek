@@ -1,6 +1,7 @@
 ---
 title: other distributions
 layout: page
+redirect_from: "/other-distributions.html"
 ---
 
 # Installing SEEK for other Linux distributions

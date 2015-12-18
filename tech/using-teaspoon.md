@@ -1,6 +1,7 @@
 ---
 title: using Teaspoon
 layout: page
+redirect_from: "/using-teaspoon.html"
 ---
 
 #Using Teaspoon

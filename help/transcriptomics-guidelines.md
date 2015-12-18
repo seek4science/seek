@@ -1,6 +1,7 @@
 ---
 title: Transcriptomics Guidelines
 layout: page
+redirect_from: "/transcriptomics-guidelines.html"
 ---
 
 **This guide refers to SEEK, but is also relevant for [FAIRDOMHUB](https://www.fairdomhub.org/), which is an instance of SEEK.**
