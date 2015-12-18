@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'libxml'
 
-class ProjectsControllerTest < ActionController::TestCase
+class ProjectsCo  ntrollerTest < ActionController::TestCase
 
 	include AuthenticatedTestHelper
 	include RestTestCases
