@@ -116,8 +116,8 @@ module Seek
 
     def self.resolve_feed_date(entry)
       date = nil
-      date = entry.try(:updated) if entry.respond_to?(:updated)
-      date ||= entry.try(:published) if entry.respond_to?(:published)
+      date = entry.try(:published) if entry.respond_to?(:published)
+      date ||= entry.try(:updated) if entry.respond_to?(:updated)
       date ||= entry.try(:last_modified) if entry.respond_to?(:last_modified)
       date ||= 10.year.ago
       date
