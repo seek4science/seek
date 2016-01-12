@@ -42,3 +42,37 @@ The Project Administrator gets notified when someone new signs up to the project
 ### Assign people to project roles
 
 ### Flag when a person leaves a project
+
+
+## Programme administrator
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+
+blah
+

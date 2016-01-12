@@ -18,6 +18,7 @@ layout: page
      - [Creating a study](generating-the-isa-structure.html#creating-a-study)
      - [Creating an experimental assay](generating-the-isa-structure.html#creating-an-experimental-assay)
      - [Creating a modelling analysis](generating-the-isa-structure.html#creating-a-modelling-analysis)
+- [Creating and Managing your own Programmes](programme-creation-and-management.html)
 - [Generic linking variables in SEEK](generic-linking-variables.html)
      - [Title](generic-linking-variables.html#title)
      - [Description](generic-linking-variables.html#description)
@@ -53,6 +54,7 @@ layout: page
           - [Create Institutions](roles.html#create-institutions)
           - [Assign people to project roles](roles.html#assign-people-to-project-roles)
           - [Flag when a person leaves a project](roles.html#flag-when-a-person-leaves-a-project)
+     - [Programme administrator](roles.html#programme-administrator)
 
 
 

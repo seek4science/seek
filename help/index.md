@@ -3,6 +3,10 @@ title: Help
 layout: page
 ---
 
+## User Guide
+
+[SEEK user documentation](user-guide/index.html)
+
 ## Guidelines for Data and Model Annotation in SEEK
 
 [Metadata Guidelines](metadata-guidelines.html)
