@@ -1,5 +1,8 @@
 SEEK::Application.routes.draw do
 
+  resources :data_share_packs
+
+
   mount TavernaPlayer::Engine, :at => (SEEK::Application.config.relative_url_root || "/")
 
   get 'searchSwainLab' => 'search_rdf#search'
