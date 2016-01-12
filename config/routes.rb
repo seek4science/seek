@@ -257,6 +257,8 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     member do
+      get :export
+      post :do_export
       post :update_annotations_ajax
       get :new_object_based_on_existing_one
     end
