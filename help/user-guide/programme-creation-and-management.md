@@ -12,7 +12,7 @@ funded piece of research.
 
 Examples are [SysMO](https://fairdomhub.org/programmes/1) and [ERASysAPP](https://fairdomhub.org/programmes/5)
 
-If you wish to create and manage your own Projects, you first need to create a Programme that they will fall under.
+If you wish to create and manage your own Projects, you will first need to create a Programme that they will fall under.
 
 ##Creating a Programme
 
