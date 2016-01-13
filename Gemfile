@@ -122,6 +122,8 @@ group :development do
   gem "guard-rubycritic",:require=>false
   gem 'unicorn-rails'
   gem 'rails_best_practices'
+  #disables the started get, severved assets logs
+  gem 'quiet_assets', group: :development
 end
 
 group :test do

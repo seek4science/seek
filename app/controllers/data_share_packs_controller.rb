@@ -24,12 +24,12 @@ class DataSharePacksController < ApplicationController
   # GET /data_share_packs/new
   # GET /data_share_packs/new.json
   def new
-    @assay =  Assay.find(1)
-    #@assay =  Assay.find(params[:id])
+    logger.info "\n\nNew data pack with assay id: #{params[:assay_id]}\n\n"
+
+    @assay =  Assay.find(params[:assay_id])
     @data_share_pack = DataSharePack.new
     @data_share_pack.title = @assay.title
     @data_share_pack.description = @assay.description
-
 
     respond_to do |format|
       format.html # new.html.erb
