@@ -137,6 +137,7 @@ module BootstrapHelper
     typeahead_opts = {} if typeahead_opts.is_a?(TrueClass)
     options = {}
     options['data-typeahead'] = true
+    options[:placeholder] ||= ' '*20
     if typeahead_opts[:values]
       options['data-typeahead-local-values'] = typeahead_opts[:values].to_json
     else

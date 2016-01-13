@@ -1,45 +1,29 @@
-<%= button_link_to('Return to profile', 'arrow_left', person_path(@user.person)) -%>
+<%= button_link_to('Return to profile', 'back', person_path(@user.person)) -%>
 
 <h1>Manage Account</h1>
 
-<% unless @user.login.nil? && @user.openid %>
-    <%= panel('Login Details') do %>
-        <div class="form-group">
-          <label>Login</label>
-          <p class="form-control-static"><%= @user.login %></p>
-        </div>
+<%= panel('Login Details') do %>
+    <div class="form-group">
+      <label>Login</label>
 
-        <h3>Change password</h3>
-        <%= form_for @user do |f| -%>
-            <%= f.error_messages %>
+      <p class="form-control-static"><%= @user.login %></p>
+    </div>
 
-            <div class="form-group">
-              <label>New password</label>
-              <%= f.password_field :password, :class => 'form-control' %>
-            </div>
-
-            <div class="form-group">
-              <label>Confirm new password</label>
-              <%= f.password_field :password_confirmation, :class => 'form-control' %>
-            </div>
-
-            <%= submit_tag 'Update',:disable_with=>"Updating...", :class => 'btn btn-primary' %>
-        <% end -%>
-    <% end %>
-<% end -%>
-
-<%= panel('OpenID') do %>
-    <%= form_tag set_openid_user_path(@user), :method => :put do -%>
-        <%= error_messages_for :user %>
+    <h3>Change password</h3>
+    <%= form_for @user do |f| -%>
+        <%= f.error_messages %>
 
         <div class="form-group">
-          <label><%= image_tag "openid-16x16.gif" %>OpenID</label>
-          <%= text_field_tag :openid_identifier, @user.openid, :class => 'form-control' %>
-          <p class="help-block">
-            To find out more about OpenID, <a href="http://openid.net" target="_blank">click here</a>.
-          </p>
+          <label>New password</label>
+          <%= f.password_field :password, :class => 'form-control' %>
         </div>
 
-        <%= submit_tag 'Update',:disable_with=>"Updating...", :class => 'btn btn-primary' %>
+        <div class="form-group">
+          <label>Confirm new password</label>
+          <%= f.password_field :password_confirmation, :class => 'form-control' %>
+        </div>
+
+        <%= submit_tag 'Update', :disable_with => "Updating...", :class => 'btn btn-primary' %>
     <% end -%>
 <% end %>
+

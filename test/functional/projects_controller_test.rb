@@ -193,12 +193,18 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test "asset report with stuff in it can be accessed" do
     person = Factory(:person)
-    publication = Factory(:publication)
-    publication.projects = person.projects
-    publication.save
+    publication = Factory(:publication, :projects=>person.projects)
+    model = Factory(:model,:policy=>Factory(:public_policy),:projects=>person.projects,:organism=>Factory(:organism))
+
+    model.save
+    publication.associate(model)
+    publication.save!
     project = person.projects.first
-    login_as(person.user)
+
+    assert_include publication.projects,project
+    login_as(person)
     get :asset_report,:id=>project.id
+
     assert_response :success
   end
 
@@ -423,11 +429,11 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   	test "asset_managers displayed in show page" do
-      asset_manager = Factory(:asset_manager)
+      asset_manager = Factory(:asset_housekeeper)
       login_as asset_manager.user
       get :show,:id=>asset_manager.projects.first
-      assert_select "div.box_about_actor p.asset_managers" do
-        assert_select "strong",:text=>"Asset Managers:",:count=>1
+      assert_select "div.box_about_actor p.asset_housekeepers" do
+        assert_select "strong",:text=>"Asset housekeepers:",:count=>1
         assert_select "a",:count=>1
         assert_select "a[href=?]",person_path(asset_manager),:text=>asset_manager.name,:count=>1
       end
@@ -438,30 +444,30 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as project_administrator.user
     get :show,:id=>project_administrator.projects.first
 		assert_select "div.box_about_actor p.project_administrators" do
-			assert_select "strong",:text=>"#{I18n.t('project')} Administrators:",:count=>1
+			assert_select "strong",:text=>"#{I18n.t('project')} administrators:",:count=>1
 			assert_select "a",:count=>1
 			assert_select "a[href=?]",person_path(project_administrator),:text=>project_administrator.name,:count=>1
 		end
     end
 
   test "gatekeepers displayed in show page" do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     login_as gatekeeper.user
     get :show, :id => gatekeeper.projects.first
-    assert_select "div.box_about_actor p.gatekeepers" do
-      assert_select "strong", :text => "Gatekeepers:", :count => 1
+    assert_select "div.box_about_actor p.asset_gatekeepers" do
+      assert_select "strong", :text => "Asset gatekeepers:", :count => 1
       assert_select "a", :count => 1
       assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 1
     end
   end
 
-  test "dont display the roles(except pals) for people who are not the members of this showed project" do
+  test "dont display the roles(except pals and administrators) for people who are not the members of this showed project" do
     project = Factory(:project)
     work_group = Factory(:work_group, :project => project)
 
-    asset_manager = Factory(:asset_manager, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    asset_manager = Factory(:asset_housekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     project_administrator = Factory(:project_administrator, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
-    gatekeeper = Factory(:gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    gatekeeper = Factory(:asset_gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     pal = Factory(:pal, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
 
     a_person = Factory(:person)
@@ -471,17 +477,17 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(a_person.user)
     get :show, :id => project
     assert_select "div.box_about_actor p" do
-      assert_select "strong", :text => "Asset Managers:", :count => 0
+      assert_select "strong", :text => "Asset housekeepers:", :count => 0
       assert_select "a[href=?]", person_path(asset_manager), :text => asset_manager.name, :count => 0
 
-      assert_select "strong", :text => "Project Administrators:", :count => 0
-      assert_select "a[href=?]", person_path(project_administrator), :text => project_administrator.name, :count => 0
-
-      assert_select "strong", :text => "Gatekeepers:", :count => 0
+      assert_select "strong", :text => "Asset gatekeepers:", :count => 0
       assert_select "a[href=?]", person_path(gatekeeper), :text => gatekeeper.name, :count => 0
 
       assert_select "strong", :text => "SysMO-DB PALs:", :count => 1
       assert_select "a[href=?]", person_path(pal), :text => pal.name, :count => 1
+
+      assert_select "strong", :text => "Project administrators:", :count => 1
+      assert_select "a[href=?]", person_path(project_administrator), :text => project_administrator.name, :count => 1
     end
   end
 
@@ -502,16 +508,16 @@ class ProjectsControllerTest < ActionController::TestCase
 		end
   end
 
-  test "no asset managers displayed for project with no asset managers" do
+  test "no asset housekeepers displayed for project with no asset housekeepers" do
     project = Factory(:project)
     work_group = Factory(:work_group, :project => project)
     person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     login_as person.user
     get :show,:id=>project
-		assert_select "div.box_about_actor p.asset_managers" do
-			assert_select "strong",:text=>"Asset Managers:",:count=>1
+		assert_select "div.box_about_actor p.asset_housekeepers" do
+			assert_select "strong",:text=>"Asset housekeepers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Asset Managers for this #{I18n.t('project')}",:count=>1
+			assert_select "span.none_text",:text=>"No Asset housekeepers for this #{I18n.t('project')}",:count=>1
 		end
   end
 
@@ -522,9 +528,9 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as person.user
     get :show,:id=>project
 		assert_select "div.box_about_actor p.project_administrators" do
-			assert_select "strong",:text=>"#{I18n.t('project')} Administrators:",:count=>1
+			assert_select "strong",:text=>"#{I18n.t('project')} administrators:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No #{I18n.t('project')} Administrators for this #{I18n.t('project')}",:count=>1
+			assert_select "span.none_text",:text=>"No #{I18n.t('project')} administrators for this #{I18n.t('project')}",:count=>1
 		end
 	end
 
@@ -534,10 +540,10 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:person, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
     login_as person.user
     get :show,:id=>project
-		assert_select "div.box_about_actor p.gatekeepers" do
-			assert_select "strong",:text=>"Gatekeepers:",:count=>1
+		assert_select "div.box_about_actor p.asset_gatekeepers" do
+			assert_select "strong",:text=>"Asset gatekeepers:",:count=>1
 			assert_select "a",:count=>0
-			assert_select "span.none_text",:text=>"No Gatekeepers for this #{I18n.t('project')}",:count=>1
+			assert_select "span.none_text",:text=>"No Asset gatekeepers for this #{I18n.t('project')}",:count=>1
 		end
 	end
 
@@ -612,7 +618,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :admin, :id => project
     assert_response :success
 
-    new_institution = Institution.create(:title => 'a test institution')
+    new_institution = Institution.create(:title => 'a test institution', :country => 'Canada')
     put :update, :id => project, :project => {:institution_ids => (project.institutions + [new_institution]).collect(&:id)}
     assert_redirected_to project
     project.reload
@@ -772,6 +778,38 @@ class ProjectsControllerTest < ActionController::TestCase
     assert !work_group.reload.people.empty?
   end
 
+  test 'email job created when edited by a member' do
+    person = Factory(:person)
+    project = person.projects.first
+    login_as(person)
+    Delayed::Job.delete_all
+
+    post :update, :id=>project, :project => {:description=>"sdfkuhsdfkhsdfkhsdf"}
+
+    assert ProjectChangedEmailJob.new(project).exists?
+  end
+
+  test 'no email job created when edited by an admin' do
+    person = Factory(:admin)
+    project = person.projects.first
+    login_as(person)
+    Delayed::Job.delete_all
+
+    post :update, :id=>project, :project => {:description=>"sdfkuhsdfkhsdfkhsdf"}
+
+    refute ProjectChangedEmailJob.new(project).exists?
+  end
+
+  test 'no email job created when edited by an project administrator' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+    Delayed::Job.delete_all
+
+    post :update, :id=>project, :project => {:description=>"sdfkuhsdfkhsdfkhsdf"}
+
+    refute ProjectChangedEmailJob.new(project).exists?
+  end
 
   test "projects belonging to an institution through nested route" do
     assert_routing "institutions/3/projects",{controller:"projects",action:"index",institution_id:"3"}
@@ -1044,6 +1082,52 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test "can flag and unflag members as leaving as project administrator" do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    wg = Factory(:work_group, :project => project)
+    group_membership = Factory(:group_membership, :work_group => wg)
+    person = Factory(:person, :group_memberships => [group_membership])
+    former_group_membership = Factory(:group_membership, :time_left_at => 10.days.ago, :work_group => wg)
+    former_person = Factory(:person, :group_memberships => [former_group_membership])
+    assert_no_difference("GroupMembership.count") do
+      post :update_members,
+           :id => project,
+           :memberships_to_flag => { group_membership.id.to_s => { :time_left_at => 1.day.ago },
+                                     former_group_membership.id.to_s => { :time_left_at => '' }}
+      assert_redirected_to project_path(project)
+      assert_nil flash[:error]
+      refute_nil flash[:notice]
+    end
+
+    assert group_membership.reload.has_left
+    assert !former_group_membership.reload.has_left
+  end
+
+  test "cannot flag members of other projects as leaving" do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    wg = Factory(:work_group, :project => Factory(:project))
+    group_membership = Factory(:group_membership, :work_group => wg)
+    person = Factory(:person, :group_memberships => [group_membership])
+
+    assert !group_membership.reload.has_left
+    assert project != wg.project
+
+    post :update_members,
+         :id => project,
+         :memberships_to_flag => { group_membership.id.to_s => { :time_left_at => 1.day.ago }}
+
+    assert_redirected_to project_path(project)
+    assert_nil flash[:error]
+    refute_nil flash[:notice]
+    assert !group_membership.reload.has_left
+  end
+
   test "project administrator can access admin member roles" do
     pa = Factory(:project_administrator)
     login_as(pa)
@@ -1084,19 +1168,19 @@ class ProjectsControllerTest < ActionController::TestCase
     person2.reload
 
     assert_equal [pa,person,person2].sort, project.people.sort
-    refute person.is_gatekeeper?(project)
-    refute person.is_asset_manager?(project)
+    refute person.is_asset_gatekeeper?(project)
+    refute person.is_asset_housekeeper?(project)
     refute person.is_project_administrator?(project)
     refute person.is_pal?(project)
-    refute person2.is_gatekeeper?(project)
-    refute person2.is_asset_manager?(project)
+    refute person2.is_asset_gatekeeper?(project)
+    refute person2.is_asset_housekeeper?(project)
     refute person2.is_project_administrator?(project)
     refute person2.is_pal?(project)
 
     ids = "#{person.id},#{person2.id}"
 
     post :update_members,
-         :id=>project,:project=>{:project_administrator_ids=>ids,:gatekeeper_ids=>ids,:asset_manager_ids=>ids,:pal_ids=>ids}
+         :id=>project,:project=>{:project_administrator_ids=>ids,:asset_gatekeeper_ids=>ids,:asset_housekeeper_ids=>ids,:pal_ids=>ids}
 
     assert_redirected_to project_path(project)
     assert_nil flash[:error]
@@ -1106,12 +1190,12 @@ class ProjectsControllerTest < ActionController::TestCase
     person2.reload
     assert_equal [pa,person,person2].sort, project.people.sort
 
-    assert person.is_gatekeeper?(project)
-    assert person.is_asset_manager?(project)
+    assert person.is_asset_gatekeeper?(project)
+    assert person.is_asset_housekeeper?(project)
     assert person.is_project_administrator?(project)
     assert person.is_pal?(project)
-    assert person2.is_gatekeeper?(project)
-    assert person2.is_asset_manager?(project)
+    assert person2.is_asset_gatekeeper?(project)
+    assert person2.is_asset_housekeeper?(project)
     assert person2.is_project_administrator?(project)
     assert person2.is_pal?(project)
 
@@ -1151,6 +1235,38 @@ class ProjectsControllerTest < ActionController::TestCase
     refute_includes new_person.institutions,new_institution
     refute_includes new_person2.institutions,new_institution
 
+  end
+
+  test 'assigns current user and sets as administrator if requested on create' do
+    person = Factory(:programme_administrator_not_in_project)
+    institution = Factory(:institution)
+    login_as(person)
+    assert_difference('Project.count') do
+      post :create, :project => {:title=>"test2"},:default_member=>{:add_to_project=>"1",:institution_id=>institution.id}
+    end
+
+    assert project=assigns(:project)
+    person.reload
+
+    assert_includes person.projects,project
+    assert_includes person.institutions, institution
+    assert person.is_project_administrator?(project)
+  end
+
+  test 'does not assign current user and sets as administrator if not requested on create' do
+    person = Factory(:programme_administrator_not_in_project)
+    institution = Factory(:institution)
+    login_as(person)
+    assert_difference('Project.count') do
+      post :create, :project => {:title=>"test2"},:default_member=>{:add_to_project=>"0",:institution_id=>institution.id}
+    end
+
+    assert project=assigns(:project)
+    person.reload
+
+    refute_includes person.projects,project
+    refute_includes person.institutions, institution
+    refute person.is_project_administrator?(project)
   end
 
 	private

@@ -94,7 +94,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => {:title=>"Test"},:content_blob=>{:data_url=>uri.to_s}, :sharing=>valid_sharing
+        post :create, :sop => {:title=>"Test"},:content_blobs => [{:data_url=>uri.to_s}], :sharing=>valid_sharing
       end
     end
     assert_not_nil flash[:error]
@@ -143,7 +143,7 @@ class SopsControllerTest < ActionController::TestCase
     blob = {:data_url=>"http://sdfsdfds.com/sdf.png"}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => sop,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -153,7 +153,7 @@ class SopsControllerTest < ActionController::TestCase
     blob={:data_url=>"s  df::sd:dfds.com/sdf.png"}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => sop,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -163,7 +163,7 @@ class SopsControllerTest < ActionController::TestCase
     sop={:title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => sop,:content_blob=>{}, :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blobs => [{}], :sharing=>valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -198,7 +198,7 @@ class SopsControllerTest < ActionController::TestCase
      sop_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
 
      assert_difference("Sop.count") do
-       post :create,:sop => sop_with_samples,:content_blob=>blob, :sharing => valid_sharing
+       post :create,:sop => sop_with_samples,:content_blobs => [blob], :sharing => valid_sharing
      end
 
     s = assigns(:sop)
@@ -216,7 +216,7 @@ class SopsControllerTest < ActionController::TestCase
     assay=assays(:assay_can_edit_by_my_first_sop_owner1)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => sop, :content_blob=>blob, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+        post :create, :sop => sop, :content_blobs => [blob], :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
       end
     end
 
@@ -236,7 +236,8 @@ class SopsControllerTest < ActionController::TestCase
     with_config_value "is_virtualliver",true do
       assert_no_difference('Sop.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :sop => sop,:content_blob=>blob
+          post :create, :sop => sop,:content_blobs => [blob]
+
         end
       end
       s = assigns(:sop)
@@ -251,7 +252,7 @@ class SopsControllerTest < ActionController::TestCase
     sop,blob = valid_sop_with_url
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => sop,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -268,14 +269,12 @@ class SopsControllerTest < ActionController::TestCase
     blob[:make_local_copy]="1"
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => sop_details,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :sop => sop_details,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
     assert_equal users(:quentin), assigns(:sop).contributor
     assert !assigns(:sop).content_blob.url.blank?
-    assert !assigns(:sop).content_blob.data_io_object.read.nil?
-    assert assigns(:sop).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).content_blob.original_filename
     assert_equal "image/png", assigns(:sop).content_blob.content_type
   end
@@ -375,7 +374,7 @@ class SopsControllerTest < ActionController::TestCase
 
 
     #create new version
-    post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload(:tempfile_fixture=>'files/little_file_v2.txt',:content_type=>"text/plain",:filename=>"little_file_v2.txt")}
+    post :new_version, :id=>s, :sop=>{},:content_blobs => [{:data=>file_for_upload(:tempfile_fixture=>'files/little_file_v2.txt',:content_type=>"text/plain",:filename=>"little_file_v2.txt")}]
     assert_redirected_to sop_path(assigns(:sop))
 
     s=Sop.find(s.id)
@@ -417,7 +416,7 @@ class SopsControllerTest < ActionController::TestCase
     s=sops(:editable_sop)
 
     assert_difference("Sop::Version.count", 1) do
-      post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision"
+      post :new_version, :id=>s, :sop=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision"
     end
 
     assert_redirected_to sop_path(s)
@@ -462,7 +461,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1,s.experimental_conditions.count
     assert_difference("Sop::Version.count", 1) do
      assert_difference("ExperimentalCondition.count",1) do
-        post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>s, :sop=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision" #v2
      end
     end
 
@@ -477,7 +476,7 @@ class SopsControllerTest < ActionController::TestCase
                                               :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
       assert_difference("ExperimentalCondition.count",1) do
-        post :new_version, :id=>s, :sop=>{},:content_blob=>{:data=>file_for_upload}, :revision_comment=>"This is a new revision" #v2
+        post :new_version, :id=>s, :sop=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision" #v2
       end
     end
 
@@ -657,8 +656,8 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
     as_not_virtualliver do
-      gatekeeper = Factory(:gatekeeper)
-    post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id)},:content_blob=>{:data => file_for_upload},
+      gatekeeper = Factory(:asset_gatekeeper)
+    post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id)},:content_blobs => [{:data => file_for_upload}],
          :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
       sop = assigns(:sop)
       assert_redirected_to (sop)
@@ -672,7 +671,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should not change the policy if the item is requested to be published, when managing sop" do
-      gatekeeper = Factory(:gatekeeper)
+      gatekeeper = Factory(:asset_gatekeeper)
       policy = Factory(:policy, :sharing_scope => Policy::PRIVATE, :permissions => [Factory(:permission)])
       sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id), :policy => policy)
       login_as(sop.contributor)
@@ -730,14 +729,14 @@ class SopsControllerTest < ActionController::TestCase
     sop,blob = valid_sop
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop.count', 1) do
-        post :create, :sop => sop,:content_blob=>blob, :sharing => valid_sharing
+        post :create, :sop => sop,:content_blobs => [blob], :sharing => valid_sharing
       end
     end
     al1= ActivityLog.last
     s=assigns(:sop)
     assert_difference('ActivityLog.count', 1) do
       assert_difference("Sop::Version.count", 1) do
-        post :new_version, :id => s, :sop => {},:content_blob=>{:data => file_for_upload}, :revision_comment => "This is a new revision"
+        post :new_version, :id => s, :sop => {},:content_blobs => [{:data => file_for_upload}], :revision_comment => "This is a new revision"
       end
     end
     al2=ActivityLog.last
@@ -750,7 +749,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not create duplication sop_versions_projects when uploading new version' do
     sop = Factory(:sop)
     login_as(sop.contributor)
-    post :new_version, :id => sop, :sop => {},:content_blob=>{:data => file_for_upload}, :revision_comment => "This is a new revision"
+    post :new_version, :id => sop, :sop => {},:content_blobs => [{:data => file_for_upload}], :revision_comment => "This is a new revision"
 
     sop.reload
     assert_equal 2, sop.versions.count
@@ -759,7 +758,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should not create duplication sop_versions_projects when uploading sop' do
     sop,blob = valid_sop
-    post :create, :sop => sop,:content_blob=>blob, :sharing => valid_sharing
+    post :create, :sop => sop,:content_blobs => [blob], :sharing => valid_sharing
 
     sop = assigns(:sop)
     assert_equal 1, sop.versions.count
@@ -781,7 +780,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'send publish approval request' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id))
 
     #request publish
@@ -793,7 +792,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'dont send publish approval request if can_publish' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, :contributor => gatekeeper.user, :project_ids => gatekeeper.projects.collect(&:id))
 
     #request publish
@@ -806,7 +805,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'dont send publish approval request again if it was already sent by this person' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id))
 
     #request publish

@@ -18,10 +18,9 @@ class Person < ActiveRecord::Base
   acts_as_annotatable :name_field=>:name
 
   validates_presence_of :email
-
-  #FIXME: consolidate these regular expressions into 1 holding class
-  validates_format_of :email,:with => RFC822::EMAIL
-  validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
+  
+  validates :email,format: {:with => RFC822::EMAIL}
+  validates :web_page, url: {allow_nil: true, allow_blank: true}
 
   validates_uniqueness_of :email,:case_sensitive => false
 
@@ -29,6 +28,17 @@ class Person < ActiveRecord::Base
 
   has_many :group_memberships, :dependent => :destroy
   has_many :work_groups, :through=>:group_memberships
+
+  has_many :former_group_memberships, :class_name => 'GroupMembership',
+           :conditions => proc { ["time_left_at IS NOT NULL AND time_left_at <= ?", Time.now] }, :dependent => :destroy
+  has_many :former_work_groups, :class_name => 'WorkGroup', :through => :former_group_memberships,
+           :source => :work_group
+
+  has_many :current_group_memberships, :class_name => 'GroupMembership',
+           :conditions =>  proc { ["time_left_at IS NULL OR time_left_at > ?", Time.now] }, :dependent => :destroy
+  has_many :current_work_groups, :class_name => 'WorkGroup', :through => :current_group_memberships,
+           :source => :work_group
+
   has_many :institutions,:through => :work_groups, :uniq => true
 
   has_many :favourite_group_memberships, :dependent => :destroy
@@ -50,7 +60,7 @@ class Person < ActiveRecord::Base
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
   searchable(:auto_index => false) do
-    text :project_roles
+    text :project_positions
     text :disciplines do
       disciplines.map{|d| d.title}
     end
@@ -232,9 +242,20 @@ class Person < ActiveRecord::Base
     self.try(:user).try(:sweeps) || []
   end
 
-  def projects
-      #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-      work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
+  def projects # ALL projects, former and current
+    #updating workgroups doesn't change groupmemberships until you save. And vice versa.
+    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
+  end
+
+  def current_projects
+    (current_work_groups.collect {|wg| wg.project }.uniq | current_group_memberships.collect{|gm| gm.work_group.project})
+  end
+
+  # Projects that the person has let completely (i.e. not still involved with through a different institution)
+  def former_projects
+    old_projects = (former_work_groups.collect {|wg| wg.project }.uniq | former_group_memberships.collect{|gm| gm.work_group.project})
+
+    old_projects - current_projects
   end
 
   def member?
@@ -268,12 +289,12 @@ class Person < ActiveRecord::Base
   end
 
   #the roles defined within the project
-  def project_roles
-    project_roles = []
+  def project_positions
+    project_positions = []
     group_memberships.each do |gm|
-      project_roles = project_roles | gm.project_roles
+      project_positions = project_positions | gm.project_positions
     end
-    project_roles
+    project_positions
   end
 
   def update_first_letter
@@ -284,11 +305,11 @@ class Person < ActiveRecord::Base
     self.first_letter=first_letter
   end
 
-  def project_roles_of_project(projects_or_project)
+  def project_positions_of_project(projects_or_project)
     #Get intersection of all project memberships + person's memberships to find project membership
 	  projects_or_project = Array(projects_or_project)
     memberships = group_memberships.select{|g| projects_or_project.include? g.work_group.project}
-    return memberships.collect{|m| m.project_roles}.flatten
+    return memberships.collect{|m| m.project_positions}.flatten
   end
 
   def assets
@@ -301,7 +322,7 @@ class Person < ActiveRecord::Base
   def can_be_edited_by?(user)
     return false unless user
     user = user.user if user.is_a?(Person)
-    user == self.user || user.is_admin? || self.is_project_administered_by?(user)
+    (user == self.user) || user.is_admin? || (self.is_project_administered_by?(user) && self.user.nil?)
   end
 
   def me?
@@ -444,7 +465,7 @@ class Person < ActiveRecord::Base
 
   def self.can_create?
     User.admin_or_project_administrator_logged_in? ||
-        User.programme_administrator_logged_in? ||
+        User.activated_programme_administrator_logged_in? ||
         (User.logged_in? && !User.current_user.registration_complete?)
   end
 

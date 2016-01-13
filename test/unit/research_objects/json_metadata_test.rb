@@ -17,7 +17,7 @@ class JsonMetaTest < ActiveSupport::TestCase
     assert_equal "http://localhost:3000/people/#{contributor.id}",json_contributor["uri"]
     assert_equal "http://orcid.org/0000-0002-1694-233X",json_contributor["orcid"]
 
-    assert_equal ["models/#{item.id}/cronwright.xml", "models/#{item.id}/file_picture.png"],json["contains"].sort
+    assert_equal ["models/#{item.ro_package_path_id_fragment}/cronwright.xml", "models/#{item.ro_package_path_id_fragment}/file_picture.png"],json["contains"].sort
   end
 
   test "metadata contents for assay" do
@@ -71,7 +71,7 @@ class JsonMetaTest < ActiveSupport::TestCase
     json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
     json = JSON.parse(json)
     filename = json["contains"].first
-    assert_equal "data_files/#{item.id}/file with space.xls",filename
+    assert_equal "data_files/#{item.ro_package_path_id_fragment}/file with space.xls",filename
   end
 
 end

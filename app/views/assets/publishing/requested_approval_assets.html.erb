@@ -4,10 +4,10 @@
 
 <div class="show_basic">
   <br/>
-  <div class="box_infotext">
+  <div class="alert alert-info">
     <ul style="padding-left:1em;">
       <li>
-        <% project_names = current_user.person.projects_for_role('gatekeeper').collect(&:title) %>
+        <% project_names = current_user.person.projects_for_role(Seek::Roles::ASSET_GATEKEEPER).collect(&:title) %>
         You are the Gatekeeper for the <%= t('project').downcase.pluralize(project_names.count) %>
         : <strong><%= project_names.join(', ') %></strong>.
       </li>
@@ -73,7 +73,7 @@
           <br/>
           <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
           Or
-          <%= link_to "Cancel", person_path(params[:id].to_i) -%>
+          <%= cancel_button(person_path(params[:id].to_i)) -%>
       <% end %>
   <% end %>
 </div>

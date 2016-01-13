@@ -10,7 +10,7 @@
 <h1><%= 'New Workflow Run: ' + @workflow_version.title -%></h1>
 
 <% if current_user.guest? %>
-    <div class="box_infotext curved" style="margin: 1em auto">
+    <div class="alert alert-info" style="margin: 1em auto">
       <h5>Guest Users</h5>
       <p>
         You are starting this workflow run as a <strong>Guest user</strong>.
@@ -47,6 +47,6 @@
 
     <%= f.submit 'Start Run', :class => 'btn btn-primary' %>
     <% unless @run.embedded? %>
-        or <%= link_to 'Cancel', :back, :class => 'btn btn-default' %>
+        or <%= cancel_button(:back) %>
     <% end %>
 <% end %>

@@ -1,0 +1,21 @@
+
+<% unless @programme.is_activated? %>
+    <% alert_style = @programme.rejected? ? 'alert-danger' : 'alert-warning' %>
+    <div class='alert <%=alert_style%>'>
+      This <%= t('programme') %> is waiting to be activated by a <%= Seek::Config.project_name %> administrator.
+
+      <% if @programme.rejected? %>
+          <p style="font-weight: bolder">
+            The request for this <%= t('programme') %> was rejected. The reason for rejection was </br>
+          </p>
+
+          <p style="font-style: italic">
+            '<%= @programme.activation_rejection_reason %>'
+          </p>
+      <% end %>
+
+      <% if User.admin_logged_in? %>
+          <br/><%= link_to('Accept or Reject activation', activation_review_programme_path(@programme)) %>
+      <% end %>
+    </div>
+<% end %>

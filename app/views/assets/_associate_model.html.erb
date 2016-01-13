@@ -23,7 +23,7 @@
           <div class="association_step">
             <div class="form-group">
               <%= select_tag :possible_models,
-                             options_for_select([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(s.title, :length=>select_truncate_length).html_safe, s.id]}),
+                             '<option>Loading...</option>',
                              {:class => 'form-control',:onchange=>"addSelectedModel();"+remote_function(
                                      :method=>:get,
                                      :url=>preview_models_path(:element=>"model_preview"),
@@ -46,41 +46,18 @@
 <% end %>
 
 <script type="text/javascript">
+    var modelOptions = {
+        project: <%= ([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>,
+        all: <%= ([["Select #{t('model')} ...", 0]]|all_models.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>
+    };
+
     function toggle_model_list() {
-        var checked = $('include_other_project_models').checked;
-        var selection_box = $('possible_models');
-        var option;
-
-        selection_box.options.length=0;
-
-        if (checked) {
-            <% ([["Select #{t('model')} ...",0]]|all_models.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |model_details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= escape_javascript(model_details[0]) -%>';
-            option.value = '<%= model_details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-            <% end -%>
-        }
-        else {
-            <% ([["Select #{t('model')} ...",0]]|project_models.collect{|s| [truncate(s.title,:length=>select_truncate_length).html_safe,s.id]}).each do |model_details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= escape_javascript(model_details[0]) -%>';
-            option.value = '<%= model_details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-            <% end -%>
-        }
-        //selection_box.onchange();
+        if ($('include_other_project_models').checked)
+            $j('#possible_models').html(optionsFromArray(modelOptions.all));
+        else
+            $j('#possible_models').html(optionsFromArray(modelOptions.project));
     }
+
     function check_show_add_model() {
         i = $('possible_models').selectedIndex;
         selected_id = $('possible_models').options[i].value;
@@ -111,7 +88,6 @@
     <% end -%>
     <% end -%>
 
-
     updateModels();
-    toggle_model_list()
+    toggle_model_list();
 </script>

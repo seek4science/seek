@@ -57,13 +57,13 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_title_trimmed
-    i=Institution.new(:title=>" an institution")
+    i=Institution.new(:title=>" an institution", :country => 'Ghana')
     i.save!
     assert_equal("an institution",i.title) 
   end
   
   def test_update_first_letter
-    i=Institution.new(:title=>"an institution")
+    i=Institution.new(:title=>"an institution", :country => 'Serbia')
     i.save
     assert_equal "A",i.first_letter
   end
@@ -168,7 +168,7 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_include array,["Inst X",inst.id]
   end
 
-  test "can create" do
+  test "can create?" do
     User.current_user=nil
     refute Institution.can_create?
 
@@ -181,7 +181,18 @@ class InstitutionTest < ActiveSupport::TestCase
     User.current_user = Factory(:project_administrator).user
     assert Institution.can_create?
 
-    User.current_user = Factory(:programme_administrator).user
+    person = Factory(:programme_administrator)
+    User.current_user = person.user
+    programme = person.administered_programmes.first
+    assert programme.is_activated?
     assert Institution.can_create?
+
+    #only if the programme is activated
+    person = Factory(:programme_administrator)
+    programme = person.administered_programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    User.current_user = person.user
+    refute Institution.can_create?
   end
 end

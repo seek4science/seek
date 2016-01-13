@@ -59,6 +59,21 @@
                              'Private recaptcha key') %>
     </div>
 
+    <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
+                               "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
+                               :onchange=>toggle_appear_javascript('cache_remote_block')) %>
+    <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
+      <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
+                             'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
+                             :onkeypress => "javascript: return onlyNumbers(event);") %>
+      <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
+                             'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
+                             :onkeypress => "javascript: return onlyNumbers(event);") %>
+    </div>
+
+    <%= admin_checkbox_setting(:orcid_required, 1, Seek::Config.orcid_required,
+                               'ORCID required', "Require all profiles to specify an #{link_to 'ORCID', 'http://orcid.org/content/about-orcid', target: :blank} identifier.".html_safe) %>
+
     <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
-    <%= link_to 'Cancel', admin_path, :class => 'btn btn-default'-%>
+    <%= cancel_button admin_path %>
 <% end -%>

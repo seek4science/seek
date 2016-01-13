@@ -21,24 +21,26 @@ module Seek
       def generate(investigation, file = nil)
         file ||= temp_file(DEFAULT_FILENAME)
         ROBundle::File.create(file) do |bundle|
-          bundle.created_by = create_agent
           gather_entries(investigation).each do |entry|
+            store_reference(bundle, entry)
             store_metadata(bundle, entry)
             store_files(bundle, entry) if entry.is_asset?
           end
-          bundle.created_on = Time.now
         end
         file
       end
 
-      private
-
       # collects the entries contained by the investigation for inclusion in
       # the research object
-      def gather_entries(investigation)
+      def gather_entries(investigation, show_all = false)
         entries = [investigation] + [investigation.studies] + [investigation.assays] + [investigation.assets]
-        entries.flatten.select(&:permitted_for_research_object?)
+        entries.flatten!
+        entries.select!(&:permitted_for_research_object?) unless show_all
+
+        entries
       end
+
+      private
 
       # generates and stores the metadata for the item, using the handlers
       # defined by #metdata_handlers
@@ -49,6 +51,12 @@ module Seek
       # the current metadata handlers - JSON and RDF
       def metadata_handlers
         [Seek::ResearchObjects::RdfMetadata.instance, Seek::ResearchObjects::JSONMetadata.instance]
+      end
+
+      # stores a reference to the `resource` in the RO manifest
+      def store_reference(bundle, resource)
+        bundle.manifest.aggregates << ROBundle::Aggregate.new(:uri => '/' + resource.research_object_package_path,
+                                                              'pav:importedFrom' => item_uri(resource))
       end
 
       # stores the actual physical files defined by the contentblobs for the asset, and adds the appropriate

@@ -38,6 +38,8 @@ class UserTest < ActiveSupport::TestCase
 
   end
 
+
+
   test "check email present?" do
     u = Factory :user
     assert u.email.nil?
@@ -152,7 +154,7 @@ class UserTest < ActiveSupport::TestCase
     end
 
     User.with_current_user(normal.user) do
-      assert !User.project_administrator_logged_in?
+      refute User.project_administrator_logged_in?
     end
   end
 
@@ -164,11 +166,32 @@ class UserTest < ActiveSupport::TestCase
     end
 
     User.with_current_user(normal.user) do
-      return User.programme_administrator_logged_in?
+      refute User.programme_administrator_logged_in?
     end
 
     User.with_current_user(nil) do
-      return User.programme_administrator_logged_in?
+      refute User.programme_administrator_logged_in?
+    end
+  end
+
+  test "activated_programme_administrator_logged_in? only if activated" do
+    refute User.activated_programme_administrator_logged_in?
+    person = Factory(:programme_administrator)
+    programme = person.administered_programmes.first
+
+    #check programme is activated an is the only administered programme
+    assert person.administered_programmes.first.is_activated?
+    assert_equal [programme],person.administered_programmes
+
+    User.with_current_user person.user do
+      assert User.activated_programme_administrator_logged_in?
+    end
+
+    #not true unless the programme is activated
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    User.with_current_user person.user do
+      refute User.activated_programme_administrator_logged_in?
     end
   end
 
@@ -309,15 +332,6 @@ class UserTest < ActiveSupport::TestCase
     uuid = x.attributes["uuid"]
     x.save
     assert_equal x.uuid, uuid
-  end
-
-  test 'test show_guide_box' do
-    x = users(:aaron)
-    assert x.show_guide_box?
-    x.show_guide_box = false
-    x.save
-    x.reload
-    assert !x.show_guide_box?
   end
 
   test "reset password" do

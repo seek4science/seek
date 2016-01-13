@@ -198,7 +198,7 @@ class SopsAnnotationTest < ActionController::TestCase
     blob={:data=>file_for_upload}
 
     assert_difference("Sop.count") do
-      put :create,:sop=>sop,:content_blob=>blob,:sharing=>valid_sharing,:tag_list=>"fish,#{golf.value.text}"
+      put :create,:sop=>sop,:content_blobs => [blob],:sharing=>valid_sharing,:tag_list=>"fish,#{golf.value.text}"
     end
 
     assert_redirected_to sop_path(assigns(:sop))

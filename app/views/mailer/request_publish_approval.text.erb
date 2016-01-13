@@ -1,18 +1,18 @@
 Hi <%= @gatekeeper.name -%>,
 
-    The <%= Seek::Config.application_name %> user <%= @requester.name -%>, <%= person_url(@requester,:host=>@host) -%>, has requested your approval to publish the following item(s):
+    The <%= Seek::Config.application_name %> user <%= @publisher.name -%>, <%= person_url(@publisher) -%>, has requested your approval to publish the following item(s):
     <% @resources.each do |resource|%>
         <% controller=resource.class.name.underscore.pluralize -%>
-        <%= resource.class.name.humanize -%>: <%= resource.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>resource,:host=>@host) -%>
+        <%= resource.class.name.humanize -%>: <%= resource.title -%> - <%= url_for(:action=>:show,:controller=>controller,:id=>resource, :only_path => false) -%>
 
     <% end %>
 
     You can approve or reject by clicking on this link:
-    <%= url_for(:action=>:requested_approval_assets,:controller=>"people",:id=>@gatekeeper,:host=>@host) -%>
+    <%= url_for(:action=>:requested_approval_assets,:controller=>"people",:id=>@gatekeeper, :only_path => false) -%>
 
     (Remember to login first!)
 
-    You can also reply to <%= @requester.first_name.capitalize -%> by replying to this email.
+    You can also reply to <%= @publisher.first_name.capitalize -%> by replying to this email.
 
     This is an automated email.
 

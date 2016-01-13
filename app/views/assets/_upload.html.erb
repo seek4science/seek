@@ -16,14 +16,18 @@ end
 <%# MERGENOTE - need to pluralize text for batch upload %>
 <div>
     <p>
-        You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL to either another page or remote file. Please test the URL before submitting.
+      You can register a <%= asset_name -%> by either directly uploading a file,
+       or registering a URL to either another page or remote file. Please test the URL before submitting.
     </p>
     <% if new_version -%>
-    <p>
-      You are about to upload a new version of this <%= asset_name -%>. You should only upload a new version if you have made minor modifications, such as tidying up or fixing errors, that do not change the original purpose
-      of the file. If you think this new version changes the original purpose or meaning of the <%= asset_name -%>, then you should <span style="text-decoration: underline"><%= link_to "upload it as a new item",polymorphic_path(obj,:action=>:new) -%></span>
-      rather than create a new version.
-    </p>
+        <p>
+          You are about to upload a new version of this <%= asset_name -%>.
+          You should only upload a new version if you have made minor modifications,
+          such as tidying up or fixing errors, that do not change the original purpose of the file.
+          If you think this new version changes the original purpose or meaning of the <%= asset_name -%>,
+          then you should <%= link_to "upload it as a new item",polymorphic_path(obj,:action=>:new) -%>
+          rather than create a new version.
+        </p>
     <% end -%>
 </div>
 
@@ -42,7 +46,7 @@ end
     <div role="tabpanel" class="tab-pane active" id="local-file">
       <div class="form-group">
         <label>File to upload<span class="required">*</span></label>
-        <%= file_field_tag "content_blob[data]" -%>
+        <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => batch } -%>
       </div>
     </div>
 
@@ -50,29 +54,39 @@ end
       <div class="form-group">
         <label>URL<span class="required">*</span></label>
 
-        <%= text_field_tag "content_blob[data_url]", "", :id => "data_url_field", :class => 'form-control' -%>
-        <% if batch %>
-            <%= button_link_to 'Add', 'new', "javascript:addToList()" %>
-        <% end %>
-        <%= button_link_to 'Test', 'test', "#", :id => "examine_url" %>
+        <div class="row">
+          <div class="col-sm-8">
+
+            <div class="input-group">
+              <%= text_field_tag "content_blobs[][data_url]", "", :id => "data_url_field", :class => 'form-control' -%>
+              <span class="input-group-btn">
+                <%= button_link_to 'Test', 'test', "#", :id => "examine_url" %>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="test_url_result"></div>
-      <div id="copy_option" style="display:none;">
-        <b>Upload a copy?</b>
-        <%= check_box_tag "content_blob[make_local_copy]", "1", false, :id => "make_local_copy" %>
+      <div class="checkbox" id="copy_option" style="display:none;">
+        <label>
+          <%= check_box_tag "content_blobs[][make_local_copy]", "1", false, :id => "make_local_copy" %>
+          <strong>Upload a copy</strong>
+        </label>
       </div>
 
-      <%= hidden_field_tag "content_blob[original_filename]", original_filename, :id => :original_filename %>
+      <%= hidden_field_tag "content_blobs[][original_filename]", original_filename, :id => :original_filename %>
       <%= hidden_field_tag "url_checked", false %>
+
+      <% if batch %>
+          <%= button_link_to 'Add', 'new', "javascript: addRemoteFile()" %>
+      <% end %>
     </div>
 
   </div>
 </div>
 
-<ul id='pending_files'></ul>
-<div id='batch_items_list' style='display:none;'></div>
-<div id='existing_content_blobs' style="display:none;"></div>
+<ul id='pending-files'></ul>
 
 <% if with_image_file -%>
     <hr/>
@@ -85,35 +99,26 @@ end
       </div>
       <% if new_version && previous_version_image_file = obj.latest_version.model_image.try(:original_filename) -%>
           <p>
-            The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %> </span> will be used if you dont specify the image file
+            The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %></span>
+            will be used if you dont specify the image file
             <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
           </p>
       <% end -%>
     </div>
 <% end -%>
 
-<% if batch %>
-    <%= javascript_include_tag "batch_upload.js" %>
-<% end %>
 
 <script type="text/javascript">
-
   setup_url_field("<%= examine_url_content_blobs_path %>","examine_url");
 
-  <% if url_from_params && original_filename_from_params %>
+  <%# FIXME: I don't know what this code does and whether or not I broke it %>
+  <% if false && url_from_params && original_filename_from_params %>
     createElementsForNewItem('<%= url_from_params %>','<%= original_filename_from_params %>',"1");
   <% end %>
 
-
-<% if batch %>
-  <% obj.content_blobs.each do |blob| %>
-    <%
-    text = blob.url ? blob.url : blob.original_filename
-    text = text + " (original)"
-    %>
-    showExistingInList('<%= text %>',item_index++,<%= blob.id %>);
-
+  <% if batch %>
+      <% obj.content_blobs.each do |blob| %>
+          addExistingFile('<%= blob.url.blank? ? blob.original_filename : blob.url %> (original)', <%= blob.id %>);
+      <% end %>
   <% end %>
-<% end %>
-
 </script>

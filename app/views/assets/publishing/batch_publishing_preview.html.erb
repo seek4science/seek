@@ -3,7 +3,7 @@
 <div class="show_basic">
   <%= show_title "Batch publishing of your items" %>
 
-  <div class="box_infotext">
+  <div class="alert alert-info">
     <p>
       Publishing means that you will be making the item visible, and where applicable downloadable, to other people
       visiting the <%= Seek::Config.application_name -%>.
@@ -39,7 +39,7 @@
 
           <%= submit_tag "Next", :disable_with=>"Next"-%>
           Or
-          <%= link_to "Cancel", person_path(params[:id].to_i)-%>
+          <%= cancel_button person_path(params[:id].to_i)-%>
       <% end -%>
   <% end -%>
 

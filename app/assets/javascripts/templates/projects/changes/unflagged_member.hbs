@@ -1,0 +1,8 @@
+<li class="institution_member change-item" data-person-id="{{person.id}}" data-institution-id="{{institution.id}}">
+    Unflag <strong>{{person.name}}</strong> as left the project
+    @ <strong>{{institution.title}}</strong>
+
+    {{> projects/_undo_button}}
+
+    <input type="hidden" value="" name="memberships_to_flag[{{id}}][time_left_at]"/>
+</li>

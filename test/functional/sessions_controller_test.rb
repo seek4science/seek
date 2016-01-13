@@ -58,11 +58,9 @@ class SessionsControllerTest < ActionController::TestCase
 
   def test_should_logout
     login_as :quentin
-    @request.cookies[:open_id] = 'http://fred.openid.org'
     @request.env['HTTP_REFERER'] = '/data_files'
     get :destroy
     assert_nil session[:user_id]
-    assert_nil cookies[:open_id]
     assert_response :redirect
   end
 

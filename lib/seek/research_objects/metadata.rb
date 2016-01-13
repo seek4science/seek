@@ -11,20 +11,15 @@ module Seek
         tmpfile << metadata_content(item)
         tmpfile.close
 
-        targetpath = File.join(item.research_object_package_path, metadata_filename)
-        bundle.add(targetpath, tmpfile, aggregate: false)
+        folder_path = item.research_object_package_path
+        targetpath = folder_path + metadata_filename
+
+        bundle.add(targetpath, tmpfile, aggregate: true)
         bundle.commit
 
-        an = ROBundle::Annotation.new(item_uri(item), targetpath)
+        an = ROBundle::Annotation.new('/' + item.research_object_package_path, targetpath)
         an.created_on = Time.now
-        an.created_by = create_agent
-        bundle.add_annotation(an)
-      end
-
-      def item_uri item
-        uri = item.rdf_resource.to_uri.to_s
-        uri << "?version=#{item.version}" if item.respond_to?(:version)
-        uri
+        bundle.manifest.annotations << an
       end
     end
   end

@@ -12,12 +12,6 @@ class UsersController < ApplicationController
   
   # render new.rhtml
   def new
-    puts "Seek::Config.default_all_visitors_access_type"
-    puts Seek::Config.default_all_visitors_access_type
-    puts Seek::Config.ease_logout_url
-    puts "ease_logout_url"
-    puts "Seek::Config.use_ease"
-    puts Seek::Config.use_ease
     @use_ease = false
     @user = User.new
     if (Seek::Config.use_ease)
@@ -37,21 +31,18 @@ class UsersController < ApplicationController
     # request forgery protection.
     # uncomment at your own risk
     # reset_session
-    if using_open_id?
-      open_id_authentication(params[:openid_identifier])
-    else
-      @user = User.new(params[:user])
-      # if ease is switched on,
-      if (Seek::Config.use_ease)
-        @user.login = get_ease_id
-      end
-      @user.check_email_present=true
-      check_registration
+
+    @user = User.new(params[:user])
+    # if ease is switched on,
+    if (Seek::Config.use_ease)
+      @user.login = get_ease_id
     end
+    @user.check_email_present=true
+    check_registration
   end
 
   def cancel_registration
-    user = User.current_user
+    user = current_user
     if user && !user.person
       logout_user
       user.destroy
@@ -59,37 +50,19 @@ class UsersController < ApplicationController
     redirect_to main_app.root_path
   end
 
-  def set_openid
-    @user = User.find(params[:id])
-    authenticate_with_open_id do |result, identity_url|
-      if result.successful?
-        @user.openid = identity_url
-        if @user.save
-          flash[:notice] = "OpenID successfully set"
-          redirect_to(@user.person)
-        else
-          redirect_to(edit_user_path(@user))
-        end
-      else
-        flash[:error] = result.message
-        redirect_to(edit_user_path(@user))
-      end
-    end
-  end
-
   def activate
     self.current_user = params[:activation_code].blank? ? false : User.find_by_activation_code(params[:activation_code])
     if logged_in? && !current_user.active?
       current_user.activate      
-      if (current_user.person.projects.empty? && User.count>1)
-        Mailer.welcome_no_projects(current_user, base_host).deliver
+      if (current_person.projects.empty? && User.count>1)
+        Mailer.welcome_no_projects(current_user).deliver
         logout_user
         flash[:notice] = "Signup complete! However, you will need to wait for an administrator to associate you with your project(s) before you can login."        
         redirect_to main_app.root_path
       else
-        Mailer.welcome(current_user, base_host).deliver
+        Mailer.welcome(current_user).deliver
         flash[:notice] = "Signup complete!"
-        redirect_to current_user.person
+        redirect_to current_person
       end
     else
       redirect_back_or_default('/')
@@ -136,7 +109,7 @@ class UsersController < ApplicationController
           user.reset_password
 
           user.save!
-          Mailer.forgot_password(user, base_host).deliver if Seek::Config.email_enabled
+          Mailer.forgot_password(user).deliver if Seek::Config.email_enabled
           flash[:notice] = "Instructions on how to reset your password have been sent to #{user.person.email}"
           format.html { render :action => "forgot_password" }
         else
@@ -179,7 +152,7 @@ class UsersController < ApplicationController
         AuthLookupUpdateJob.new.add_items_to_queue(@user) if do_auth_update
         #user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
-          Mailer.signup(@user,base_host).deliver
+          Mailer.signup(@user).deliver
           flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
           logout_user
           format.html { redirect_to :action=>"activation_required" }
@@ -205,7 +178,7 @@ class UsersController < ApplicationController
   def resend_activation_email
     user = User.find(params[:id])
     if user && user.person && !user.active?
-      Mailer.signup(user,base_host).deliver
+      Mailer.signup(user).deliver
       flash[:notice]="An email has been sent to user: #{user.person.name}"
     else
       flash[:notice] = "No email sent. User was already activated."
@@ -227,64 +200,8 @@ class UsersController < ApplicationController
     redirect_to :controller => 'homes', :action => 'index'
   end
 
-  def hide_guide_box
-    if current_user
-      current_user.show_guide_box = false
-      current_user.save
-    end
-    render :update do |page|
-      if current_user.nil?
-        cookies[:hide_guide_box]={:value=>'true',:expires=>10.years.from_now}
-      end
-       page.visual_effect :fade, 'guide_box', :duration => 0.25
-    end
-  end
   protected
-  
-  def open_id_authentication(identity_url)
-    # Pass optional :required and :optional keys to specify what sreg fields you want.
-    # Be sure to yield registration, a third argument in the #authenticate_with_open_id block.
-    authenticate_with_open_id(identity_url,        
-        :required => [:email, :fullname,
-                      'http://schema.openid.net/contact/email',
-                      'http://openid.net/schema/contact/email',
-                      'http://axschema.org/contact/email',
-                      'http://schema.openid.net/namePerson',
-                      'http://openid.net/schema/namePerson',
-                      'http://axschema.org/namePerson']) do |result, identity_url, registration|
-      case result.status
-      when :missing
-        failed_registration "Sorry, the OpenID server couldn't be found"
-      when :invalid
-        failed_registration "Sorry, but this does not appear to be a valid OpenID"
-      when :canceled
-        failed_registration "OpenID verification was canceled"
-      when :failed
-        failed_registration "Sorry, the OpenID verification failed"
-      when :successful
-        if !User.find_by_openid(identity_url)
-          @openid_details = {}
-          @openid_details[:email] = registration['email']
-          name = registration['fullname']
-          ax_response = OpenID::AX::FetchResponse.from_success_response(request.env[Rack::OpenID::RESPONSE])
-          @openid_details[:email] ||= ax_response['http://schema.openid.net/contact/email'].first
-          @openid_details[:email] ||= ax_response['http://openid.net/schema/contact/email'].first
-          @openid_details[:email] ||= ax_response['http://axschema.org/contact/email'].first
-          name ||= ax_response['http://schema.openid.net/namePerson'].first
-          name ||= ax_response['http://openid.net/schema/namePerson'].first
-          name ||= ax_response['http://axschema.org/namePerson'].first
-          if name
-            @openid_details[:first_name], @openid_details[:last_name] = name.split(" ", 2)
-          end
-          @user = User.new(:openid => identity_url)
-          check_registration
-        else
-          failed_registration "There is already a user registered with the given OpenID URL"
-        end
-      end
-    end
-  end
-  
+
   private 
   
   def check_registration       
@@ -303,7 +220,6 @@ class UsersController < ApplicationController
   def successful_registration
     @user.activate unless activation_required?
     self.current_user = @user
-    @openid_details ||= nil
     redirect_to(register_people_path(:email=>@user.email))
   end
   

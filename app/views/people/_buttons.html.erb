@@ -5,7 +5,7 @@
     <%= button_link_to "Assets awaiting approval", "waiting", waiting_approval_assets_person_path(@person),
                        :title => tooltip_title_attrib("The assets you have requested to publish, but are awaiting Gatekeeper approval") -%>
   <% end %>
-  <% if @person.is_gatekeeper_of_any_project? %>
+  <% if @person.is_asset_gatekeeper_of_any_project? %>
     <%= button_link_to "Assets you are Gatekeeping", "waiting", requested_approval_assets_person_path(@person),
                        :title => tooltip_title_attrib("The assets people have requested to publish, but are still awaiting your approval") -%>
   <% end %>
@@ -20,6 +20,9 @@
           <li>
             <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
           </li>
+          <li>
+            <%= image_tag_for_key "oauth", user_oauth_sessions_path(@person.user), "OAuth Sessions", nil, "OAuth Sessions" -%>
+          </li>
       <% end -%>
       <% if admin_logged_in? -%>
           <li>
@@ -28,9 +31,4 @@
       <% end -%>
   <% end %>
 
-  <% if @person.can_be_administered_by?(current_user)-%>
-      <li>
-        <%= image_tag_for_key "admin", admin_person_path(@person), "Administer", nil, "Person Administration" -%>
-      </li>
-  <% end -%>
 <% end %>

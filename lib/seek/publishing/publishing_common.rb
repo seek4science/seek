@@ -2,25 +2,26 @@ module Seek
   module Publishing
     module PublishingCommon
       def self.included(base)
-        base.before_filter :set_asset, :only=>[:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
-        base.before_filter :set_assets, :only=>[:batch_publishing_preview]
-        base.before_filter :set_items_for_publishing, :only => [:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish]
-        base.before_filter :publish_auth, :only=>[:batch_publishing_preview,:check_related_items,:publish_related_items,:check_gatekeeper_required,:publish,:waiting_approval_assets]
-        #need to put request_publish_approval after log_publishing, so request_publish_approval will get run first.
-        base.after_filter :log_publishing,:request_publish_approval, :only=>[:create,:update]
+        base.before_filter :set_asset, only: [:check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :published]
+        base.before_filter :set_assets, only: [:batch_publishing_preview]
+        base.before_filter :set_items_for_publishing, only: [:check_gatekeeper_required, :publish]
+        base.before_filter :set_items_for_potential_publishing, only: [:check_related_items, :publish_related_items]
+        base.before_filter :publish_auth, only: [:batch_publishing_preview, :check_related_items, :publish_related_items, :check_gatekeeper_required, :publish, :waiting_approval_assets]
+        # need to put request_publish_approval after log_publishing, so request_publish_approval will get run first.
+        base.after_filter :log_publishing, :request_publish_approval, only: [:create, :update]
       end
 
       def batch_publishing_preview
         respond_to do |format|
-          format.html { render :template=>"assets/publishing/batch_publishing_preview" }
+          format.html { render template: 'assets/publishing/batch_publishing_preview' }
         end
       end
 
       def check_related_items
-        contain_related_items = !@items_for_publishing.collect(&:assays).flatten.empty?
+        contain_related_items = @items_for_publishing.select(&:contains_publishable_items?).flatten.any?
         if contain_related_items
           respond_to do |format|
-            format.html { render :template => "assets/publishing/publish_related_items_confirm"}
+            format.html { render template: 'assets/publishing/publish_related_items_confirm' }
           end
         else
           check_gatekeeper_required
@@ -29,16 +30,16 @@ module Seek
 
       def publish_related_items
         respond_to do |format|
-          format.html { render :template => "assets/publishing/publish_related_items"}
+          format.html { render template: 'assets/publishing/publish_related_items' }
         end
       end
 
       def check_gatekeeper_required
-        @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(item) }
+        @waiting_for_publish_items = @items_for_publishing.select { |item| item.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(item) }
         @items_for_immediate_publishing = @items_for_publishing - @waiting_for_publish_items
-        if !@waiting_for_publish_items.empty?
+        unless @waiting_for_publish_items.empty?
           respond_to do |format|
-            format.html { render :template => "assets/publishing/waiting_approval_list" }
+            format.html { render template: 'assets/publishing/waiting_approval_list' }
           end
         else
           publish_final_confirmation
@@ -47,146 +48,128 @@ module Seek
 
       def publish_final_confirmation
         respond_to do |format|
-          format.html { render :template => "assets/publishing/publish_final_confirmation"}
+          format.html { render template: 'assets/publishing/publish_final_confirmation' }
         end
       end
 
       def publish
-        @published_items = @items_for_publishing.select(&:publish!)
-        @notified_items = (@items_for_publishing - @published_items).select{|item| !item.can_manage?}
-        @waiting_for_publish_items = @items_for_publishing - @published_items - @notified_items
-
-        if Seek::Config.email_enabled && !@notified_items.empty?
-          deliver_publishing_notifications @notified_items
-        end
-
-        @waiting_for_publish_items.each do |item|
-          ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
-        end
-        deliver_request_publish_approval @waiting_for_publish_items
+        publish_requested_items
 
         respond_to do |format|
           if @asset && request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == polymorphic_url(@asset).normalize_trailing_slash
-            flash[:notice]="Publishing complete"
+            flash[:notice] = 'Publishing complete'
             format.html { redirect_to @asset }
           else
-            flash[:notice]="Publishing complete"
-            format.html { redirect_to :action => :published,
-                                      :published_items => @published_items.collect{|item| "#{item.class.name},#{item.id}"},
-                                      :notified_items => @notified_items.collect{|item| "#{item.class.name},#{item.id}"},
-                                      :waiting_for_publish_items => @waiting_for_publish_items.collect{|item| "#{item.class.name},#{item.id}"} }
+            flash[:notice] = 'Publishing complete'
+            format.html do
+              redirect_to action: :published,
+                          published_items: params_for_published_items(@published_items),
+                          notified_items: params_for_published_items(@notified_items),
+                          waiting_for_publish_items: params_for_published_items(@waiting_for_publish_items)
+            end
           end
         end
       end
 
+
+
       def published
         respond_to do |format|
-          format.html { render :template => "assets/publishing/published"}
+          format.html { render template: 'assets/publishing/published' }
         end
       end
 
       def waiting_approval_assets
         @waiting_approval_assets = ResourcePublishLog.waiting_approval_assets_for(current_user)
         respond_to do |format|
-          format.html {render :template => "assets/publishing/waiting_approval_assets"}
+          format.html { render template: 'assets/publishing/waiting_approval_assets' }
         end
       end
 
       private
 
       def publish_auth
-        if self.controller_name=='people'
-          if !(User.logged_in_and_registered? && current_user.person.id == params[:id].to_i)
-            error("You are not permitted to perform this action", "is invalid (not yourself)")
+        if controller_name == 'people'
+          unless User.logged_in_and_registered? && current_user.person.id == params[:id].to_i
+            error('You are not permitted to perform this action', 'is invalid (not yourself)')
             return false
           end
         else
-          if !@asset.can_publish?
-            error("You are not permitted to perform this action", "is invalid")
+          unless @asset.can_publish? || @asset.contains_publishable_items?
+            error('You are not permitted to perform this action', 'is invalid')
             return false
           end
         end
       end
 
       def set_asset
-        begin
-          if !(self.controller_name=='people')
-            @asset = self.controller_name.classify.constantize.find(params[:id])
-          end
-        rescue ActiveRecord::RecordNotFound
-          error("This resource is not found","not found resource")
+        unless (controller_name == 'people')
+          @asset = controller_name.classify.constantize.find(params[:id])
         end
+      rescue ActiveRecord::RecordNotFound
+        error('This resource is not found', 'not found resource')
       end
 
       def set_assets
-        #get the assets that current_user can manage, then take the one that can_publish?
+        # get the assets that current_user can manage, then take the one that can_publish?
         @assets = {}
-        publishable_types = Seek::Util.authorized_types.select {|c| c.first.try(:is_in_isa_publishable?)}
+        publishable_types = Seek::Util.authorized_types.select { |authorized_type| authorized_type.first.try(:is_in_isa_publishable?) }
         publishable_types.each do |klass|
-          can_manage_assets = klass.all_authorized_for "manage", current_user
-          can_manage_assets = can_manage_assets.select{|a| a.can_publish?}
+          can_manage_assets = klass.all_authorized_for 'manage', current_user
+          can_manage_assets = can_manage_assets.select(&:can_publish?)
           unless can_manage_assets.empty?
             @assets[klass.name] = can_manage_assets
           end
         end
       end
 
+      # sets the @items_for_publishing based on the :publish param, and filtered by whether than can_publish?
       def set_items_for_publishing
         @items_for_publishing = resolve_publish_params(params[:publish]).select(&:can_publish?)
       end
 
+      # sets the @items_for_publishing based on the :publish param, and filtered by whether than can_publish? OR contains_publishable_items?
+      def set_items_for_potential_publishing
+        @items_for_publishing = resolve_publish_params(params[:publish]).select { |item| item.can_publish? || item.contains_publishable_items? }
+      end
+
       def log_publishing
         User.with_current_user current_user do
-          c = self.controller_name.downcase
-          a = self.action_name.downcase
+          object = object_for_request
 
-          object = eval("@"+c.singularize)
-          #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
-          return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
+          # don't log if the object is not valid or has not been saved, as this will a validation error on update or create
+          return if object_invalid_or_unsaved?(object)
 
-          latest_publish_log = ResourcePublishLog.last(:conditions => ["resource_type=? and resource_id=?",object.class.name,object.id])
+          # waiting for approval
+          log_state = determine_state_for_log(object)
 
-          #waiting for approval
-          if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && object.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(object)
-            ResourcePublishLog.add_log(ResourcePublishLog::WAITING_FOR_APPROVAL,object)
-            #publish
-          elsif object.policy.sharing_scope == Policy::EVERYONE && latest_publish_log.try(:publish_state) != ResourcePublishLog::PUBLISHED
-            ResourcePublishLog.add_log(ResourcePublishLog::PUBLISHED,object)
-            #unpublish
-          elsif object.policy.sharing_scope != Policy::EVERYONE && latest_publish_log.try(:publish_state) == ResourcePublishLog::PUBLISHED
-            ResourcePublishLog.add_log(ResourcePublishLog::UNPUBLISHED,object)
-          end
+          ResourcePublishLog.add_log(log_state, object) if log_state
         end
       end
+
+
 
       def request_publish_approval
         User.with_current_user current_user do
-          c = self.controller_name.downcase
-          a = self.action_name.downcase
+          object = object_for_request
 
-          object = eval("@"+c.singularize)
-          #don't process if the object is not valid or has not been saved, as this will a validation error on update or create
-          return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
+          # don't process if the object is not valid or has not been saved, as this will a validation error on update or create
+          return if object_invalid_or_unsaved?(object)
 
-          if params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && object.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(object) && !object.is_waiting_approval?(current_user)
-            deliver_request_publish_approval [object]
+          if is_gatekeeper_approval_required?(object) && !object.is_waiting_approval?(current_user)
+            notify_gatekeepers_of_approval_request [object]
           end
         end
       end
 
-      def deliver_request_publish_approval items
-        if (Seek::Config.email_enabled)
-          gatekeepers_items={}
-          items.each do |item|
-            item.gatekeepers.each do |person|
-              gatekeepers_items[person]||=[]
-              gatekeepers_items[person] << item
-            end
-          end
+      # recipients can be :gatekeepers or :managers
+      def deliver_publishing_notification_emails(recipients, items, delivery_method)
+        if Seek::Config.email_enabled
+          recipient_items = gather_recipients_for_items(items, recipients)
 
-          gatekeepers_items.keys.each do |gatekeeper|
+          recipient_items.keys.each do |recipient|
             begin
-              Mailer.request_publish_approval(gatekeeper, User.current_user, gatekeepers_items[gatekeeper],base_host).deliver
+              Mailer.send(delivery_method, recipient, User.current_user.person, recipient_items[recipient]).deliver
             rescue Exception => e
               Rails.logger.error("Error sending notification email to the owner #{gatekeeper.name} - #{e.message}")
             end
@@ -194,37 +177,85 @@ module Seek
         end
       end
 
-      def deliver_publishing_notifications items_for_notification
-        owners_items={}
-        items_for_notification.each do |item|
-          item.managers.each do |person|
-            owners_items[person]||=[]
-            owners_items[person] << item
+      # recipients can be :gatekeepers or :managers
+      def gather_recipients_for_items(items, recipients)
+        recipient_items = {}
+        items.each do |item|
+          item.send(recipients).each do |person|
+            recipient_items[person] ||= []
+            recipient_items[person] << item
           end
         end
+        recipient_items
+      end
 
-        owners_items.keys.each do |owner|
-          begin
-            Mailer.request_publishing(User.current_user.person,owner,owners_items[owner],base_host).deliver
-          rescue Exception => e
-            Rails.logger.error("Error sending notification email to the owner #{owner.name} - #{e.message}")
+      def notify_gatekeepers_of_approval_request(items)
+        deliver_publishing_notification_emails :asset_gatekeepers, items, :request_publish_approval
+      end
+
+      def notify_owner_of_publishing_request(items)
+        deliver_publishing_notification_emails :managers, items, :request_publish
+      end
+
+      # returns an enumeration of assets for publishing based upon the parameters passed
+      def resolve_publish_params(param)
+        if param.blank?
+          [@asset].compact
+        else
+          assets = []
+          param.keys.each do |asset_class|
+            param[asset_class].keys.each do |id|
+              assets << eval("#{asset_class}.find_by_id(#{id})")
+            end
           end
+          assets.compact.uniq
         end
       end
 
-      #returns an enumeration of assets for publishing based upon the parameters passed
-      def resolve_publish_params param
-        assets = []
-        assets << @asset if @asset
+      def params_for_published_items published_items
+        published_items.collect { |item| "#{item.class.name},#{item.id}" }
+      end
 
-        return assets if param.nil?
+      def publish_requested_items
+        @published_items = @items_for_publishing.select(&:publish!)
+        @notified_items = (@items_for_publishing - @published_items).select { |item| !item.can_manage? }
+        @waiting_for_publish_items = @items_for_publishing - @published_items - @notified_items
 
-        param.keys.each do |asset_class|
-          param[asset_class].keys.each do |id|
-            assets << eval("#{asset_class}.find_by_id(#{id})")
-          end
+        notify_owner_of_publishing_request @notified_items
+
+        @waiting_for_publish_items.each do |item|
+          ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
         end
-        assets.compact.uniq
+
+        notify_gatekeepers_of_approval_request @waiting_for_publish_items
+      end
+
+      def determine_state_for_log(object)
+        if is_gatekeeper_approval_required?(object)
+          ResourcePublishLog::WAITING_FOR_APPROVAL
+          # publish
+        elsif was_item_published?(object)
+          ResourcePublishLog::PUBLISHED
+          # unpublish
+        elsif was_item_unpublished?(object)
+          ResourcePublishLog::UNPUBLISHED
+        end
+      end
+
+      def was_item_published?(object)
+        object.is_published? && !last_log_state_published?(object)
+      end
+
+      def is_gatekeeper_approval_required?(object)
+        params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && object.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(object)
+      end
+
+      def was_item_unpublished?(object)
+        !object.is_published? && last_log_state_published?(object)
+      end
+
+      def last_log_state_published?(object)
+        object.last_publishing_log.try(:publish_state) == ResourcePublishLog::PUBLISHED
       end
     end
   end

@@ -37,26 +37,6 @@ class AssaysControllerTest < ActionController::TestCase
     validate_xml_against_schema(@response.body)
   end
 
-  test "check SOP and DataFile drop down contents" do
-    user = Factory :user
-    project=user.person.projects.first
-    login_as user
-    sop = Factory :sop, :contributor=>user.person,:project_ids=>[project.id]
-    data_file = Factory :data_file, :contributor=>user.person,:project_ids=>[project.id]
-    get :new, :class=>"experimental"
-    assert_response :success
-
-    assert_select "select#possible_data_files" do
-      assert_select "option[value=?]",data_file.id,:text=>/#{data_file.title}/
-      assert_select "option",:text=>/#{sop.title}/,:count=>0
-    end
-
-    assert_select "select#possible_sops" do
-      assert_select "option[value=?]",sop.id,:text=>/#{sop.title}/
-      assert_select "option",:text=>/#{data_file.title}/,:count=>0
-    end
-  end
-
   test "index includes modelling validates with schema" do
     get :index, :page=>"all", :format=>"xml"
     assert_response :success
@@ -666,16 +646,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select "a", :text=>/A #{I18n.t('assays.modelling_analysis')}/i, :count=>0
   end
 
-  test "data file list should only include those from project" do
-    login_as(:model_owner)
-    get :new, :class=>"experimental"
-    assert_response :success
-    assert_select "select#possible_data_files" do
-      assert_select "option", :text=>/Sysmo Data File/, :count=>1
-      assert_select "option", :text=>/Myexperiment Data File/, :count=>0
-    end
-  end
-
   test "download link for sop in lazy loaded tab" do
     login_as(:owner_of_my_first_sop)
 
@@ -800,9 +770,9 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3", :text=>"#{I18n.t('sop').pluralize} (1+1)", :count=>1
-      assert_select "h3", :text=>"#{I18n.t('data_file').pluralize} (1+1)", :count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a", :text=>"#{I18n.t('sop').pluralize} (1+1)", :count=>1
+      assert_select "a", :text=>"#{I18n.t('data_file').pluralize} (1+1)", :count=>1
     end
 
     assert_select "div.list_item" do
@@ -1441,4 +1411,54 @@ class AssaysControllerTest < ActionController::TestCase
       assert !items_for_result.include?(assay2.title)
     end
   end
+
+  test 'should add creators' do
+    assay = Factory(:assay, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    assert assay.creators.empty?
+
+    put :update, :id=>assay.id, :creators=>[[creator.name,creator.id]].to_json
+    assert_redirected_to assay_path(assay)
+
+    assert assay.creators.include?(creator)
+  end
+
+  test 'should have creators association box' do
+    assay = Factory(:assay, :policy => Factory(:public_policy))
+
+    get :edit, :id=> assay.id
+    assert_response :success
+
+    assert_select "p#creators_list"
+    assert_select "input[type='text'][name='creator-typeahead']"
+    assert_select "input[type='hidden'][name='creators']"
+    assert_select "input[type='text'][name='assay[other_creators]']"
+
+  end
+
+  test 'should show creators' do
+    assay = Factory(:assay, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    assay.creators = [creator]
+    assay.save
+    assay.reload
+    assert assay.creators.include?(creator)
+
+    get :show, :id=> assay.id
+    assert_response :success
+    assert_select "span.author_avatar a[href=?]", "/people/#{creator.id}"
+  end
+
+  test 'should show other creators' do
+    assay = Factory(:assay, :policy => Factory(:public_policy))
+    other_creators = 'other creators'
+    assay.other_creators = other_creators
+    assay.save
+    assay.reload
+
+    get :show, :id=> assay.id
+    assert_response :success
+    assert_select "div.panel-body div", :text => other_creators
+  end
+
 end

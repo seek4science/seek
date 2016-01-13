@@ -9,6 +9,11 @@ module Seek
         ROBundle::Agent.new(person.title, person.rdf_resource.to_uri.to_s, person.orcid_uri)
       end
 
+      def item_uri item
+        uri = item.rdf_resource.to_uri.to_s
+        uri << "?version=#{item.version}" if item.respond_to?(:version)
+        uri
+      end
     end
   end
 end

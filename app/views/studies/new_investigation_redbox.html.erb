@@ -5,28 +5,23 @@
       New <%= t('investigation') %>
     </span>
   </div>
-  <center>
-    <div class="body">
+  <div class="center-block body">
+    <div id="errorExplanation" class="errorExplanation" style="display:none;"></div>
 
-      <div id="errorExplanation" class="errorExplanation" style="display:none;"></div>
+    Creating a new <%= t('investigation') %> for the <%= t('project') %> <b>'<%= h(@investigation.projects.first.name) %>'</b>
 
-      Creating a new <%= t('investigation') %> for the <%= t('project') %> <b>'<%= h(@investigation.projects.first.name) %>'</b>
+    <%= hidden_field_tag :project_id,@investigation.projects.first.id %>
 
-      <%= hidden_field_tag :project_id,@investigation.projects.first.id %>
+    <p>
+      <%= label_tag :title %><br/>
+      <%= text_field_tag :title,'',:size=>42 %>
+    </p>
+    <p>
+      <%= label_tag :description %><br/>
+      <%= text_area_tag :description,'',:cols=>40,:rows=>5 %>
+    </p>
 
-        <p>
-          <%= label_tag :title %><br/>
-          <%= text_field_tag :title,'',:size=>42 %>
-        </p>
-        <p>
-          <%= label_tag :description %><br/>
-          <%= text_area_tag :description,'',:cols=>40,:rows=>5 %>
-        </p>
-
-      <input type="button" value="Cancel" onclick="javascript: RedBox.close(); return(false);" />
-      <%= submit_tag "Create",:onclick=>"postInvestigationData();return(false);" %>
-
-    </div>
-  </center>
-
+    <input type="button" value="Cancel" onclick="javascript: RedBox.close(); return(false);" />
+    <%= submit_tag "Create",:onclick=>"postInvestigationData();return(false);" %>
+  </div>
 </div>

@@ -30,7 +30,7 @@
       <p>
         <%= submit_tag 'Save' -%>
         or
-        <%= link_to 'Cancel', main_app.sweep_path(@sweep) -%>
+        <%= cancel_button(main_app.sweep_path(@sweep)) -%>
       </p>
     </div>
   <% end %>

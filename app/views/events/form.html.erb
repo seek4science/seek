@@ -6,7 +6,7 @@
       <%= f.error_messages %>
 
       <div class="form-group">
-        <%= f.label :title -%><span class="required">*</span>
+        <label>Title <span class="required">*</span></label>
         <%= f.text_field :title, :class=>"form-control" -%>
       </div>
 
@@ -71,6 +71,6 @@
           <%= f.submit button_text, :disable_with=>disabled_text, :id => "event_submit_btn",
                        :onclick => "javascript: $('event_submit_btn').form.submit();return(false);", :class => 'btn btn-primary' -%>
       <% end %>
-      or <%= link_to 'Cancel', (@event.id ? event_path(@event.id) : events_path), :class => 'btn btn-default' -%>
+      or <%= cancel_button(@event.id ? event_path(@event.id) : events_path) -%>
     </div>
 <% end %>

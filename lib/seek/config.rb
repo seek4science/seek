@@ -39,8 +39,10 @@ module Seek
   module Propagators
     def site_base_host_propagate
       script_name = (SEEK::Application.config.relative_url_root || '/')
-      ActionMailer::Base.default_url_options = { host: site_base_host.gsub(/https?:\/\//, '').gsub(/\/$/, ''),
-						                                           script_name: script_name }
+      ActionMailer::Base.default_url_options = { host: host_with_port,
+                                                 protocol: host_scheme,
+                                                 script_name: script_name
+      }
     end
 
     def smtp_propagate
@@ -124,10 +126,6 @@ module Seek
       else
         SEEK::Application.config.middleware.delete ExceptionNotifier
       end
-    end
-
-    def open_id_authentication_store_propagate
-      OpenIdAuthentication.store = open_id_authentication_store.to_sym
     end
 
     def solr_enabled_propagate
@@ -269,6 +267,21 @@ module Seek
       merge! :default_pages, controller => value
       value
     end
+
+    def host_with_port
+      base_uri = URI(Seek::Config.site_base_host)
+      host = base_uri.host
+      unless (base_uri.port == 80 && base_uri.scheme == 'http') ||
+          (base_uri.port == 443 && base_uri.scheme == 'https')
+        host << ":#{base_uri.port}"
+      end
+      host
+    end
+
+    def host_scheme
+      URI(Seek::Config.site_base_host).scheme
+    end
+
   end
 
   # The inner wiring. Ideally this should be hidden away,
@@ -287,6 +300,12 @@ module Seek
       singleton_class.instance_eval { define_method method.to_sym, *args, &block }
     end
 
+    def get_default_value(getter, conversion = nil)
+      val = Settings.defaults[getter.to_sym]
+      val = val.send(conversion) if conversion && val
+      val
+    end
+
     if Settings.table_exists?
       def get_value(getter, conversion = nil)
         val = Settings.send getter
@@ -298,11 +317,10 @@ module Seek
         val = val.send(conversion) if conversion && val
         Settings.send setter, val
       end
+
     else
       def get_value(getter, conversion = nil)
-        val = Settings.defaults[getter.to_sym]
-        val = val.send(conversion) if conversion && val
-        val
+        get_default_value(getter, conversion)
       end
 
       def set_value(setter, val, conversion = nil)
@@ -318,10 +336,12 @@ module Seek
     end
 
     def setting(setting, options = {})
+      options ||= {}
       setter = "#{setting}="
       getter = "#{setting}"
       propagate = "#{getter}_propagate"
       fallback = "#{getter}_fallback"
+      default = "default_#{setting}"
       if self.respond_to?(fallback)
         define_class_method getter do
           get_value(getter, options[:convert]) || send(fallback)
@@ -330,6 +350,10 @@ module Seek
         define_class_method getter do
           get_value(getter, options[:convert])
         end
+      end
+
+      define_class_method default do
+        get_default_value(getter, options[:convert])
       end
 
       define_class_method setter do |val|
@@ -350,27 +374,11 @@ module Seek
     # reads the available attributes from config_setting_attributes.yml
     def self.read_setting_attributes
       yaml = YAML.load_file(File.join(File.dirname(File.expand_path(__FILE__)), 'config_setting_attributes.yml'))
-      yaml.keys.map { |k| k.to_sym }
+      HashWithIndifferentAccess.new(yaml)
     end
 
-
-    # Settings that require a conversion to integer
-    # These are defined here instead of in config_setting_attributes.yml
-    setting :tag_threshold, convert: 'to_i'
-    setting :limit_latest, convert: 'to_i'
-    setting :max_visible_tags, convert: 'to_i'
-    setting :piwik_analytics_id_site, convert: 'to_i'
-    setting :project_news_number_of_entries, convert: 'to_i'
-    setting :community_news_number_of_entries, convert: 'to_i'
-    setting :home_feeds_cache_timeout, convert: 'to_i'
-    setting :time_lock_doi_for, convert: 'to_ig'
-    setting :default_associated_projects_access_type, convert: 'to_i'
-    setting :default_consortium_access_type, convert: 'to_i'
-    setting :default_all_visitors_access_type, convert: 'to_i'
-    setting :default_project_members_access_type, convert: 'to_i'
-
-    read_setting_attributes.each do |sym|
-      setting sym
+    read_setting_attributes.each do |method, opts|
+      setting method, opts
     end
   end
 end

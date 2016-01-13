@@ -1,5 +1,5 @@
 <% unless logged_in_and_registered? -%>
-    <div class="panel panel-default">
+    <div class="panel panel-default" id="login-panel">
       <div class="panel-heading">
         <h4 class="panel-title">
           Log in
@@ -7,15 +7,7 @@
       </div>
 
       <div class="panel-body">
-        <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="active">
-            <a href="#password_login" aria-controls="password_login" role="tab" data-toggle="tab">SEEK login</a>
-          </li>
 
-          <li role="presentation">
-            <a href="#openid_login" aria-controls="openid_login" role="tab" data-toggle="tab"><%= image_tag "openid-16x16.gif" %> OpenID</a>
-          </li>
-        </ul>
 
         <%= form_tag main_app.session_path do %>
 
@@ -44,14 +36,7 @@
                 </div>
               </div>
 
-              <div role="tabpanel" class="tab-pane" id="openid_login">
-                <div class="form-group">
-                  <label>
-                    <a href="http://openid.net/" target="_blank"><%= image_tag "openid-16x16.gif" %>OpenID</a>
-                  </label>
-                  <%= text_field_tag 'openid_identifier', nil, :class => 'form-control' -%>
-                </div>
-              </div>
+
             </div>
 
             <%= submit_tag "Log in", :class => 'btn btn-default', :id=>"login_button",:onclick=>"$('login_button').disabled=true;this.form.submit();return(false);" %>

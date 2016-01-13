@@ -8,6 +8,5 @@ New Projects: Another Project
 Institution: The Institute
 New Institutions: Another Institute
 
-
-For the person details: http://localhost/people/2, whose email address is aaron@email.com .
+For the person details: http://localhost:3000/people/2, whose email address is aaron@email.com .
 -- end --

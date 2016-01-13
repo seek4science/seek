@@ -14,7 +14,9 @@ SEEK::Application.configure do
   Seek::Config.default :support_email_address, 'support@biovel.eu'
   Seek::Config.default :solr_enabled,false
   Seek::Config.default :jws_enabled, true
-  Seek::Config.default :jws_online_root,"https://jws.sysmo-db.org/"
+  Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
+  Seek::Config.default :internal_help_enabled, false
+  Seek::Config.default :external_help_url,"http://seek4science.github.io/seek/help"
   Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
@@ -107,7 +109,6 @@ SEEK::Application.configure do
   Seek::Config.default :pubmed_api_email,nil
   Seek::Config.default :crossref_api_email,nil
   Seek::Config.default :site_base_host,"http://localhost:3000"
-  Seek::Config.default :open_id_authentication_store,:memory
 
   Seek::Config.default :max_attachments_num,100
 
@@ -145,5 +146,10 @@ SEEK::Application.configure do
   ActionView::Renderer.define_alternative({:seek_partial=>"projects/resource_list_item"},"projects/resource_list_item_biovel")
   ActionView::Renderer.define_alternative({:seek_partial=>"assets/sharing_form"},"assets/sharing_form_biovel")
 
+  Seek::Config.default :zenodo_publishing_enabled, false
+  Seek::Config.default :zenodo_api_url, 'https://zenodo.org/api'
+  Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
+
+  Seek::Config.default :orcid_required, false
 end
 

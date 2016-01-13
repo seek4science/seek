@@ -96,6 +96,15 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_equal zip_file_size1, zip_file_size2
   end
 
+  test "should not download zip with only remote files" do
+    model = Factory :model_2_remote_files, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+      get :download, :id => model.id
+    end
+    assert_response :redirect
+    assert flash[:error].include?('remote')
+  end
+
   test "should not create model with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path
@@ -103,7 +112,7 @@ class ModelsControllerTest < ActionController::TestCase
    
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :model => { :title=>"Test"},:content_blob=>{:data_url_0=>uri.to_s}, :sharing=>valid_sharing
+        post :create, :model => { :title=>"Test"},:content_blobs => [{:data_url=>uri.to_s}], :sharing=>valid_sharing
       end
     end
     assert_not_nil flash[:error]    
@@ -146,30 +155,6 @@ class ModelsControllerTest < ActionController::TestCase
     assay = assays(:modelling_assay_with_data_and_relationship)
     assert_equal true, assay.is_modelling?
 
-  end
-
-  test "should show only modelling assays in associate modelling analysis form" do
-    login_as(:model_owner)
-    as_not_virtualliver do
-      get :new
-      assert_response :success
-      assert_select 'select#possible_assays' do
-        assert_select "option", :text=>/Select #{I18n.t('assays.assay')} .../,:count=>1
-        assert_select "option", :text=>/Modelling Assay/,:count=>1
-        assert_select "option", :text=>/Metabolomics Assay/,:count=>0
-      end
-    end
-
-    as_virtualliver do
-    #show all can_view assays in the list
-      get :new
-      assert_response :success
-      assert_select 'select#possible_assays' do
-        assert_select "option", :text=>/Select #{I18n.t('assays.assay')} .../,:count=>1
-        assert_select "option", :text=>/Modelling Assay/,:count=>5
-        assert_select "option", :text=>/Metabolomics Assay/,:count=>0
-      end
-    end
   end
 
   test "correct title and text for associating a modelling analysis for new" do
@@ -229,10 +214,10 @@ class ModelsControllerTest < ActionController::TestCase
   test "should correctly handle bad data url" do
     stub_request(:any,"http://sdfsdfkh.com/sdfsd.png").to_raise(SocketError)
     model={:title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
-    blob={:data_url_0=>"http://sdfsdfkh.com/sdfsd.png",:original_filename_0=>"",:make_local_copy_0=>"0"}
+    blob={:data_url=>"http://sdfsdfkh.com/sdfsd.png",:original_filename=>"",:make_local_copy=>"0"}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :model => model,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :model => model,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -242,7 +227,7 @@ class ModelsControllerTest < ActionController::TestCase
     model={:title=>"Test"}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :model => model,:content_blob=>{}, :sharing=>valid_sharing
+        post :create, :model => model,:content_blobs => [{}], :sharing=>valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -273,7 +258,7 @@ class ModelsControllerTest < ActionController::TestCase
      model_with_samples = valid_model
      model_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
      assert_difference("Model.count") do
-       post :create,:model => model_with_samples,:content_blob=>{:data_0=>file_for_upload}, :sharing => valid_sharing
+       post :create,:model => model_with_samples,:content_blobs => [{:data=>file_for_upload}], :sharing => valid_sharing
      end
 
     m = assigns(:model)
@@ -291,7 +276,7 @@ class ModelsControllerTest < ActionController::TestCase
     model_params = valid_model
 
     assert_difference("Model.count") do
-      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:content_blob=>{:data_0=>file_for_upload}, :sharing => valid_sharing
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:content_blobs => [{:data=>file_for_upload}], :sharing => valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m
@@ -312,7 +297,7 @@ class ModelsControllerTest < ActionController::TestCase
                           "{\"scale_id\":\"#{scale1.id}\",\"param\":\"soup\",\"unit\":\"minute\"}"]
 
     assert_difference("Model.count") do
-      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:scale_ids_and_params=>scale_ids_and_params,:content_blob=>{:data_0=>file_for_upload}, :sharing => valid_sharing
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:scale_ids_and_params=>scale_ids_and_params,:content_blobs => [{:data=>file_for_upload}], :sharing => valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m
@@ -338,7 +323,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assay = assays(:modelling_assay)
     assert_difference('Model.count') do
-      post :create, :model => valid_model,:content_blob=>{:data_0=>file_for_upload}, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+      post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}], :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
     end
     
     assert_redirected_to model_path(assigns(:model))
@@ -350,7 +335,8 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value "is_virtualliver",true do
       assert_no_difference('Model.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, :model => valid_model,:content_blob=>{:data_0=>file_for_upload}
+          post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}]
+
         end
       end
 
@@ -367,7 +353,8 @@ class ModelsControllerTest < ActionController::TestCase
     with_config_value "is_virtualliver",false do
       assert_difference('Model.count',1) do
         assert_difference('ContentBlob.count',1) do
-          post :create, :model => valid_model,:content_blob=>{:data_0=>file_for_upload}
+          post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}]
+
         end
       end
 
@@ -385,7 +372,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(:model_owner)
       assert_difference('Model.count') do
         assert_difference('ModelImage.count') do
-          post :create, :model => valid_model,:content_blob=>{:data_0=>file_for_upload}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+          post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
         end
       end
 
@@ -399,7 +386,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(:model_owner)
       assert_difference('Model.count') do
         assert_difference('ModelImage.count') do
-          post :create, :model => valid_model,:content_blob=>{}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+          post :create, :model => valid_model, :content_blobs => [{:data_url => ''}], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
         end
       end
 
@@ -411,7 +398,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should not create model without image and without content_blob" do
       login_as(:model_owner)
       assert_no_difference('Model.count') do
-          post :create, :model => valid_model,:content_blob=>{}, :sharing=>valid_sharing
+        post :create, :model => valid_model, :content_blobs => [{:data_url => ''}], :sharing=>valid_sharing
       end
       assert_not_nil flash[:error]
   end
@@ -420,7 +407,7 @@ class ModelsControllerTest < ActionController::TestCase
     m=models(:model_with_format_and_type)
     assert_difference("Model::Version.count", 1) do
       assert_difference('ModelImage.count') do
-        post :new_version, :id => m, :content_blob => {:data_0 => file_for_upload(:filename => "little_file.txt")}, :revision_comment => "This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+        post :new_version, :id => m, :content_blobs => [{:data => file_for_upload(:filename => "little_file.txt")}], :revision_comment => "This is a new revision", :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
       end
     end
 
@@ -450,7 +437,7 @@ class ModelsControllerTest < ActionController::TestCase
     model_details[:imported_url]="http://biomodels/model.xml"
 
     assert_difference('Model.count') do
-      post :create, :model => model_details, :sharing=>valid_sharing,:content_blob=>{:data_0=>file_for_upload}, :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+      post :create, :model => model_details, :sharing=>valid_sharing,:content_blobs => [{:data=>file_for_upload}], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
     end
     model = assigns(:model)
     assert_redirected_to model_path(model)
@@ -463,7 +450,7 @@ class ModelsControllerTest < ActionController::TestCase
     model,blob = valid_model_with_url
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model =>model ,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :model =>model ,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
     model = assigns(:model)
@@ -479,10 +466,10 @@ class ModelsControllerTest < ActionController::TestCase
   
   test "should create model and store with url and store flag" do
     model_details,blob=valid_model_with_url
-    blob[:make_local_copy_0]="1"
+    blob[:make_local_copy]="1"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => model_details,:content_blob=>blob, :sharing=>valid_sharing
+        post :create, :model => model_details,:content_blobs => [blob], :sharing=>valid_sharing
       end
     end
     model = assigns(:model)
@@ -490,10 +477,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal users(:model_owner),model.contributor
     assert_equal 1,model.content_blobs.count
     assert !model.content_blobs.first.url.blank?
-
-
-    assert !model.content_blobs.first.data_io_object.nil?
-    assert model.content_blobs.first.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", model.content_blobs.first.original_filename
     assert_equal "image/png", model.content_blobs.first.content_type
   end
@@ -507,7 +490,7 @@ class ModelsControllerTest < ActionController::TestCase
     model,blob = valid_model_with_url
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => model,:content_blob=>{:data_url_0=>"http://news.bbc.co.uk"}, :sharing=>valid_sharing
+        post :create, :model => model,:content_blobs => [{:data_url=>"http://news.bbc.co.uk"}], :sharing=>valid_sharing
       end
     end
     model = assigns(:model)
@@ -525,7 +508,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model.count') do
       model=valid_model
       model[:recommended_environment_id]=recommended_model_environments(:jws).id
-      post :create, :model => model,:content_blob=>{:data_0=>file_for_upload} ,:sharing=>valid_sharing
+      post :create, :model => model,:content_blobs => [{:data=>file_for_upload} ],:sharing=>valid_sharing
     end
     
     m=assigns(:model)
@@ -542,16 +525,10 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"1 item is associated with this #{I18n.t('model')}:"
-      assert_select "ul.fileinfo_list" do
-        assert_select "li.fileinfo_container > div.fileinfo" do
-            assert_select "p > b",:text=>"Filename:"
-            assert_select "p > span.filename",:text=>"cronwright.xml"
-            assert_select "p > b",:text=>"Format:"
-            assert_select "p > span.format",:text=>"XML document"
-            assert_select "p > b",:text=>"Size:"
-            assert_select "p > span.filesize",:text=>"5.79 KB"
-        end
+      assert_select "strong",:text=>"1 item is associated with this #{I18n.t('model')}:"
+      assert_select "ul" do
+        assert_select "li",:text=>/cronwright.xml/
+        assert_select "li > span.subtle",:text=>"(XML document - 5.79 KB)"
       end
     end
 
@@ -568,19 +545,12 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > strong",:text=>"2 items are associated with this #{I18n.t('model')}:"
-      assert_select "ul.fileinfo_list" do
-        assert_select "li.fileinfo_container",:count=>2 do
-          assert_select "p > b",:text=>"Filename:",:count=>2
-          assert_select "p > span.filename",:text=>/cronwright\.xml/
-          assert_select "p > span.filename",:text=>/rightfield\.xls/
-          assert_select "p > b",:text=>"Format:",:count=>2
-          assert_select "p > span.format",:text=>"XML document"
-          assert_select "p > span.format",:text=>"Spreadsheet"
-          assert_select "p > b",:text=>"Size:",:count=>2
-          assert_select "p > span.filesize",:text=>"5.79 KB"
-          assert_select "p > span.filesize",:text=>"9 KB"
-        end
+      assert_select "strong",:text=>"2 items are associated with this #{I18n.t('model')}:"
+      assert_select "ul" do
+          assert_select "li",:text=>/cronwright\.xml/
+          assert_select "li",:text=>/rightfield\.xls/
+          assert_select "li > span.subtle",:text=>"(XML document - 5.79 KB)"
+          assert_select "li > span.subtle",:text=>"(Spreadsheet - 9 KB)"
       end
     end
   end
@@ -655,7 +625,8 @@ class ModelsControllerTest < ActionController::TestCase
 
     #create new version
     assert_difference("Model::Version.count", 1) do
-      post :new_version, :id=>m, :content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}
+      post :new_version, :id=>m, :content_blobs => [{:data=>file_for_upload(:filename=>"little_file.txt")}]
+
     end
     assert_redirected_to model_path(assigns(:model))
     m = Model.find(m.id)
@@ -665,23 +636,23 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 2, m.versions[1].version
     
     get :show, :id=>models(:model_with_format_and_type)
-    assert_select "p", :text=>/little_file.txt/, :count=>1
-    assert_select "p", :text=>/Teusink.xml/, :count=>0
+    assert_select "li", :text=>/little_file.txt/, :count=>1
+    assert_select "li", :text=>/Teusink.xml/, :count=>0
     
     get :show, :id=>models(:model_with_format_and_type), :version=>"2"
-    assert_select "p", :text=>/little_file.txt/, :count=>1
-    assert_select "p", :text=>/Teusink.xml/, :count=>0
+    assert_select "li", :text=>/little_file.txt/, :count=>1
+    assert_select "li", :text=>/Teusink.xml/, :count=>0
     
     get :show, :id=>models(:model_with_format_and_type), :version=>"1"
-    assert_select "p", :text=>/little_file.txt/, :count=>0
-    assert_select "p", :text=>/Teusink.xml/, :count=>1
+    assert_select "li", :text=>/little_file.txt/, :count=>0
+    assert_select "li", :text=>/Teusink.xml/, :count=>1
     
   end
   
   def test_should_create_new_version
     m=models(:model_with_format_and_type)
     assert_difference("Model::Version.count", 1) do
-      post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload(:filename=>"little_file.txt")}, :revision_comment=>"This is a new revision"
+      post :new_version, :id=>m, :model=>{},:content_blobs => [{:data=>file_for_upload(:filename=>"little_file.txt")}], :revision_comment=>"This is a new revision"
     end
     
     assert_redirected_to model_path(m)
@@ -787,7 +758,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
     model={ :title=>"Test",:project_ids=>[projects(:moses_project).id]}
-    post :create, :model => model,:content_blob=>{:data_0=>file_for_upload}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
+    post :create, :model => model,:content_blobs => [{:data=>file_for_upload}], :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor
     assert assigns(:model)
@@ -1006,7 +977,8 @@ class ModelsControllerTest < ActionController::TestCase
     retained_content_blob = m.content_blobs.first
     login_as(m.contributor)
     assert_difference("Model::Version.count", 1) do
-      post :new_version, :id=>m, :model=>{},:content_blob=>{:data_0=>file_for_upload}, :content_blobs=> {:id => {"#{retained_content_blob.id}" => retained_content_blob.original_filename}}
+      post :new_version, :id=>m, :model=>{},:content_blobs => [{:data=>file_for_upload}],
+           :retained_content_blob_ids=>[retained_content_blob.id]
     end
 
     assert_redirected_to model_path(m)
@@ -1021,57 +993,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert content_blobs.collect(&:original_filename).include?(retained_content_blob.original_filename)
   end
 
-  test "should display find matching data button for sbml model" do
-    with_config_value :solr_enabled,true do
-      m = Factory(:teusink_model)
-      login_as(m.contributor.user)
-      get :show,:id=>m
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
-    end
-  end
-
-  test "should display find matching data button for jws dat model" do
-    with_config_value :solr_enabled,true do
-      m = Factory(:teusink_jws_model)
-      login_as(m.contributor.user)
-      get :show,:id=>m
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
-    end
-  end
-
-  test "should not display find matching data button for non smbml or dat model" do
-    with_config_value :solr_enabled,true do
-      m = Factory(:non_sbml_xml_model)
-      login_as(m.contributor.user)
-      get :show,:id=>m
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
-    end
-  end
-
-  test "only show the matching data button for the latest version" do
-    m = Factory(:teusink_jws_model, :policy => Factory(:public_policy))
-
-    m.save_as_new_version
-    Factory(:teusink_jws_model_content_blob, :asset => m, :asset_version => m.version)
-    m.reload
-    login_as(m.contributor.user)
-    assert_equal 2,m.version
-    with_config_value :solr_enabled,true do
-      get :show,:id=>m,:version=>2
-      assert_response :success
-      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
-
-      get :show,:id=>m,:version=>1
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
-    end
-  end
 
   test "should have -View content- button on the model containing one inline viewable file" do
     one_file_model = Factory(:doc_model, :policy => Factory(:all_sysmo_downloadable_policy))
@@ -1178,7 +1099,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   def valid_model_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png","http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"
-    return { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]},{:data_url_0=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:original_filename_0=>"sysmo-db-logo-grad2.png",:make_local_copy_0=>"0"}
+    return { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]},{:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:original_filename=>"sysmo-db-logo-grad2.png",:make_local_copy=>"0"}
   end
   
 end

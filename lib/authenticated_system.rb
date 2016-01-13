@@ -92,7 +92,6 @@ module AuthenticatedSystem
     clear_return_to
   end
 
-
   def redirect_back
     if request.env['HTTP_REFERER']
       redirect_to(:back)
@@ -128,20 +127,6 @@ module AuthenticatedSystem
       cookies[:auth_token] = { :value => user.remember_token, :expires => user.remember_token_expires_at }
       self.current_user = user
     end
-  end
-
-  def login_from_open_id_cookie
-    if cookies[:open_id]
-      if User.find_by_openid(cookies[:open_id])
-        respond_to do |format|
-          format.html do
-            redirect_to main_app.auto_openid_session_path(:openid_identifier=>cookies[:open_id])
-            return true
-          end
-        end
-      end
-    end
-    return false
   end
 
 end

@@ -42,9 +42,9 @@ class GeneratorTest < ActiveSupport::TestCase
         entry.name
       end
     end
-    assert_include paths,"models/#{model.id}/xxx.txt"
-    assert_include paths,"models/#{model.id}/1-xxx.txt"
-    assert_include paths,"models/#{model.id}/2-xxx.txt"
+    assert_include paths,"models/#{model.ro_package_path_id_fragment}/xxx.txt"
+    assert_include paths,"models/#{model.ro_package_path_id_fragment}/1-xxx.txt"
+    assert_include paths,"models/#{model.ro_package_path_id_fragment}/2-xxx.txt"
   end
 
 
@@ -59,27 +59,27 @@ class GeneratorTest < ActiveSupport::TestCase
       end
     end
     inv.studies.each do |study|
-      assert_include paths, "investigations/#{inv.id}/studies/#{study.id}/metadata.rdf"
-      assert_include paths, "investigations/#{inv.id}/studies/#{study.id}/metadata.json"
+      assert_include paths, "#{study.research_object_package_path}metadata.rdf"
+      assert_include paths, "#{study.research_object_package_path}metadata.json"
       study.assays.each do |assay|
-        assert_include paths, "investigations/#{inv.id}/studies/#{study.id}/assays/#{assay.id}/metadata.rdf"
-        assert_include paths, "investigations/#{inv.id}/studies/#{study.id}/assays/#{assay.id}/metadata.json"
+        assert_include paths, "#{assay.research_object_package_path}metadata.rdf"
+        assert_include paths, "#{assay.research_object_package_path}metadata.json"
       end
     end
     assets = inv.assets
     assert_equal 7,assets.count
     assets.each do |asset|
-      assert_include paths,"#{asset.class.name.underscore.pluralize}/#{asset.id}/metadata.json"
-      assert_include paths,"#{asset.class.name.underscore.pluralize}/#{asset.id}/metadata.rdf"
+      assert_include paths, "#{asset.research_object_package_path}metadata.json"
+      assert_include paths, "#{asset.research_object_package_path}metadata.json"
     end
 
     #simple check for assets contents, using model with image to check the image is there
-    assert_include paths,"models/#{@assay_asset5.asset.id}/cronwright.xml"
-    assert_include paths,"models/#{@assay_asset5.asset.id}/file_picture.png"
+    assert_include paths,"models/#{@assay_asset5.asset.ro_package_path_id_fragment}/cronwright.xml"
+    assert_include paths,"models/#{@assay_asset5.asset.ro_package_path_id_fragment}/file_picture.png"
 
     #and a model with 2 files
-    assert_include paths,"models/#{@assay_asset6.asset.id}/cronwright.xml"
-    assert_include paths,"models/#{@assay_asset6.asset.id}/rightfield.xls"
+    assert_include paths,"models/#{@assay_asset6.asset.ro_package_path_id_fragment}/cronwright.xml"
+    assert_include paths,"models/#{@assay_asset6.asset.ro_package_path_id_fragment}/rightfield.xls"
 
     #and finally the RO specific files
     assert_include paths,"mimetype"

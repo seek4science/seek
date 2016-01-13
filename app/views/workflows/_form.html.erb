@@ -54,5 +54,5 @@
                    :onclick => "javascript: validateResourceFields(true,'workflow',true); return(false);",
                    :class => 'btn btn-primary'-%>
     or
-    <%= link_to 'Cancel', (@workflow.new_record? ? workflows_path : workflow_path), :class => 'btn btn-default' -%>
+    <%= cancel_button(@workflow.new_record? ? workflows_path : workflow_path) %>
 <% end %>

@@ -49,7 +49,7 @@ module Seek
         include Seek::ActsAsAsset::Folders::Associations
         include Seek::ActsAsAsset::Relationships::Associations
 
-        include Seek::ActsAsAsset::Search
+        include Seek::ActsAsAsset::Searching
 
         include Seek::ActsAsAsset::InstanceMethods
         include Seek::Search::BackgroundReindexing

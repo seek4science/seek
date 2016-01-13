@@ -23,7 +23,7 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
 
     assert_difference("Delayed::Job.count",2) do
       item.title="sdfhsdfkhsdfklsdf2"
-      item.save!
+      disable_authorization_checks{item.save!}
     end
     handlers = Delayed::Job.all.collect(&:handler).join(',')
     assert_includes(handlers, 'RdfGenerationJob')
@@ -33,7 +33,7 @@ class RdfGenerationJobTest  < ActiveSupport::TestCase
     item.save!
     item.last_used_at=Time.now
     assert_no_difference("Delayed::Job.count") do
-      item.save!
+      disable_authorization_checks{item.save!}
     end
   end
 

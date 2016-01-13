@@ -14,7 +14,6 @@
 *= require tabnav
 *= require top_menu
 *= require dynamic_menu
-*= require batch_upload
 *= require easytabs
 *= require taverna_player/application
 *= require data_tables
@@ -39,4 +38,5 @@
 *= require bootstrap-typeahead-rails
 *= require calendar_date_select/default
 *= require organisms
+*= require tweaks
 */

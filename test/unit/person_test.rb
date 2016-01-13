@@ -9,7 +9,7 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 3,p.work_groups.size
   end
 
-  def test_can_be_edited_by?
+  test "registered user's profile can be edited by" do
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator)
     project_administrator2 = Factory(:project_administrator)
@@ -20,14 +20,31 @@ class PersonTest < ActiveSupport::TestCase
     assert_not_equal person.projects,project_administrator2.projects
 
     assert person.can_be_edited_by?(person.user)
-    assert person.can_be_edited_by?(project_administrator.user),"should be editable by the project administrator of the same project"
+    assert !person.can_be_edited_by?(project_administrator.user),"should not be editable by the project administrator of the same project, as user is registered"
     assert person.can_be_edited_by?(admin.user)
     assert !person.can_be_edited_by?(another_person.user)
     assert !person.can_be_edited_by?(project_administrator2.user),"should be not editable by the project administrator of another project"
 
     assert person.can_be_edited_by?(person), "You can also ask by passing in a person"
-    assert person.can_be_edited_by?(project_administrator),"You can also ask by passing in a person"
+    assert !person.can_be_edited_by?(project_administrator),"You can also ask by passing in a person"
+  end
 
+  test "userless profile can be edited by" do
+    admin = Factory(:admin)
+    project_administrator = Factory(:project_administrator)
+    project_administrator2 = Factory(:project_administrator)
+    profile = Factory :brand_new_person,:group_memberships=>[Factory(:group_membership,:work_group=>project_administrator.group_memberships.first.work_group)]
+    another_person = Factory :person
+
+    assert_equal profile.projects,project_administrator.projects
+    assert_not_equal profile.projects,project_administrator2.projects
+
+    assert profile.can_be_edited_by?(project_administrator.user),"should be editable by the project administrator of the same project, as user is not registered"
+    assert profile.can_be_edited_by?(admin.user)
+    assert !profile.can_be_edited_by?(another_person.user)
+    assert !profile.can_be_edited_by?(project_administrator2.user),"should be not editable by the project administrator of another project"
+
+    assert profile.can_be_edited_by?(project_administrator),"You can also ask by passing in a person"
   end
 
   test "me?" do
@@ -599,12 +616,12 @@ class PersonTest < ActiveSupport::TestCase
 
   end
   
-  def test_roles_association
-    role = Factory(:project_role)
+  def test_positions_association
+    position = Factory(:project_position)
     p=Factory :person
-    p.group_memberships.first.project_roles << role
-    assert_equal 1, p.project_roles.size
-    assert p.project_roles.include?(role)
+    p.group_memberships.first.project_positions << position
+    assert_equal 1, p.project_positions.size
+    assert p.project_positions.include?(position)
   end
   
   def test_update_first_letter
@@ -905,10 +922,10 @@ class PersonTest < ActiveSupport::TestCase
     User.current_user=Factory(:pal).user
     refute Person.can_create?
 
-    User.current_user=Factory(:gatekeeper).user
+    User.current_user=Factory(:asset_gatekeeper).user
     refute Person.can_create?
 
-    User.current_user=Factory(:asset_manager).user
+    User.current_user=Factory(:asset_housekeeper).user
     refute Person.can_create?
 
     User.current_user=Factory(:programme_administrator).user
@@ -943,6 +960,105 @@ class PersonTest < ActiveSupport::TestCase
 
     refute_includes Person.not_registered_with_matching_email("FISH-registered@email.com"),p2
     assert_empty Person.not_registered_with_matching_email("fffffxxxx11z@email.com")
+  end
+
+  test "orcid required for new person" do
+    with_config_value(:orcid_required, true) do
+      assert_nothing_raised do
+        has_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com",
+                            :orcid => 'http://orcid.org/0000-0002-0048-3300'
+        assert has_orcid.valid?
+        assert_empty has_orcid.errors[:orcid]
+      end
+      assert_raises ActiveRecord::RecordInvalid do
+        no_orcid = Factory :brand_new_person, :email => "FISH-sOup2@email.com"
+        assert !no_orcid.valid?
+        assert_not_empty no_orcid.errors[:orcid]
+      end
+      assert_raises ActiveRecord::RecordInvalid do
+        bad_orcid = Factory :brand_new_person, :email => "FISH-sOup3@email.com",
+                            :orcid => 'banana'
+        assert !bad_orcid.valid?
+        assert_not_empty bad_orcid.errors[:orcid]
+      end
+    end
+  end
+
+  test "orcid not required for existing person" do
+    no_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com"
+
+    with_config_value(:orcid_required, true) do
+      assert_nothing_raised do
+        no_orcid.update_attributes(:email => "FISH-sOup99@email.com")
+        assert no_orcid.valid?
+      end
+    end
+  end
+
+  test "orcid must be valid even if not required" do
+    bad_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com"
+
+    with_config_value(:orcid_required, true) do
+      bad_orcid.update_attributes(:email => "FISH-sOup99@email.com", :orcid => 'big mac')
+      assert !bad_orcid.valid?
+      assert_not_empty bad_orcid.errors[:orcid]
+    end
+
+    with_config_value(:orcid_required, false) do
+      assert_raises ActiveRecord::RecordInvalid do
+        another_bad_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com", :orcid => 'こんにちは'
+        assert !another_bad_orcid.valid?
+        assert_not_empty bad_orcid.errors[:orcid]
+      end
+    end
+  end
+
+  test "ensures full orcid uri is stored" do
+    semi_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com",
+                         :orcid => '0000-0002-0048-3300'
+    full_orcid = Factory :brand_new_person, :email => "FISH-sOup2@email.com",
+                         :orcid => 'http://orcid.org/0000-0002-0048-3300'
+
+    assert_equal 'http://orcid.org/0000-0002-0048-3300', semi_orcid.orcid
+    assert_equal 'http://orcid.org/0000-0002-0048-3300', full_orcid.orcid
+  end
+
+  test "can flag has having left a project" do
+    person = Factory(:person)
+    project = person.projects.first
+
+    assert_not_includes person.former_projects, project
+    assert_includes person.current_projects, project
+    assert_includes person.projects, project
+
+    gm = person.group_memberships.first
+    gm.time_left_at = 1.day.ago
+    gm.save
+    assert gm.has_left
+    person.reload
+
+    assert_includes person.former_projects, project
+    assert_not_includes person.current_projects, project
+    assert_includes person.projects, project
+  end
+
+  test "can flag has leaving a project" do
+    person = Factory(:person)
+    project = person.projects.first
+
+    assert_not_includes person.former_projects, project
+    assert_includes person.current_projects, project
+    assert_includes person.projects, project
+
+    gm = person.group_memberships.first
+    gm.time_left_at = 1.day.from_now
+    gm.save
+    assert !gm.has_left
+    person.reload
+
+    assert_not_includes person.former_projects, project
+    assert_includes person.current_projects, project
+    assert_includes person.projects, project
   end
 
 end

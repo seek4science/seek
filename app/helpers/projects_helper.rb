@@ -19,9 +19,9 @@ module ProjectsHelper
     return result.html_safe
   end
 
-  def link_list_for_role role_text, role_members
+  def link_list_for_role role_text, role_members,type='project'
     if role_members.empty?
-      html = "<span class='none_text'>No #{role_text.pluralize} for this #{t('project')}</span>";
+      html = "<span class='none_text'>No #{role_text.pluralize} for this #{t(type)}</span>";
     else
       html = role_members.select(&:can_view?).collect { |p| link_to(h(p.name), p) }.join(", ")
     end
@@ -29,19 +29,19 @@ module ProjectsHelper
   end
 
   def pals_link_list project
-    link_list_for_role("PAL",project.pals)
+    link_list_for_role(t('pal'),project.pals)
   end
 
-  def asset_managers_link_list project
-    link_list_for_role("Asset Manager",project.asset_managers)
+  def asset_housekeepers_link_list project
+    link_list_for_role(t('asset_housekeeper'),project.asset_housekeepers)
   end
 
   def project_administrator_link_list project
-    link_list_for_role("#{t('project')} Administrator",project.project_administrators)
+    link_list_for_role(t('project_administrator'),project.project_administrators)
   end
 
   def gatekeepers_link_list project
-    link_list_for_role("Gatekeeper",project.gatekeepers)
+    link_list_for_role(t('asset_gatekeeper'),project.asset_gatekeepers)
   end
 
   def project_coordinators_link_list project
@@ -78,19 +78,19 @@ module ProjectsHelper
   end
 
   def project_administrators_input_box(project)
-    project_role_input_box project,:project_administrator
+    project_role_input_box project, Seek::Roles::PROJECT_ADMINISTRATOR
   end
 
-  def project_gatekeepers_input_box(project)
-    project_role_input_box project,:gatekeeper
+  def project_asset_gatekeepers_input_box(project)
+    project_role_input_box project,Seek::Roles::ASSET_GATEKEEPER
   end
 
-  def project_asset_managers_input_box(project)
-    project_role_input_box project,:asset_manager
+  def project_asset_housekeepers_input_box(project)
+    project_role_input_box project,Seek::Roles::ASSET_HOUSEKEEPER
   end
 
   def project_pals_input_box(project)
-    project_role_input_box project,:pal
+    project_role_input_box project,Seek::Roles::PAL
   end
 
   def project_role_input_box project, role
@@ -99,6 +99,26 @@ module ProjectsHelper
     box = ''
     box << objects_input("project[#{role.to_s}_ids]", administrators, typeahead: { values: members.map { |p| { id: p.id, name: p.name, hint: p.email } } })
     box.html_safe
+  end
+
+  def project_membership_json project
+    project.work_groups.map do |wg|
+      wg.group_memberships.map do |gm|
+        {
+            id: gm.id.to_s,
+            person: { id: gm.person_id.to_s, name: gm.person.name },
+            institution: { id: gm.work_group.institution.id.to_s, title: gm.work_group.institution.title },
+            leftAt: gm.time_left_at,
+            cannotRemove: !gm.person_can_be_removed?
+        }
+      end
+    end.flatten.to_json
+  end
+
+
+  def person_can_remove_themself?(person,project)
+    return false unless (person && project)
+
   end
 
 end

@@ -1,0 +1,16 @@
+<%= render :partial => "general/item_title",:locals => {:item=>@programme, :title_prefix=>"Rejecting activation of: "} %>
+
+<p>
+  You are about to reject the activation of the <%= t('programme') %> <%= link_to @programme.title,@programme %>.<br/>
+  The administrators of the <%= t('programme') %> will be notified, and below please provide a reason.<br/>
+  The <%= t('programme') %> will not be automatically deleted, but will remain in its inactive state. You can delete the <%= t('programme') %> from its administration options.
+</p>
+
+<%= form_for(@programme, url:{action: 'reject_activation'}) do |f| %>
+    <div class="form-group">
+      <%= f.label "Reason"-%>
+      <%= f.text_area :activation_rejection_reason, :class=>"form-control" -%>
+    </div>
+    <%= f.submit('Confirm', :class => 'btn btn-primary') -%>
+    <%= cancel_button activation_review_programme_path(@programme) %>
+<% end %>

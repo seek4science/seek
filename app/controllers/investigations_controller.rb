@@ -12,6 +12,7 @@ class InvestigationsController < ApplicationController
   #defined in the application controller
   before_filter :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
+
   include Seek::Publishing::PublishingCommon
 
   include Seek::AnnotationCommon

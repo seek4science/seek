@@ -1,7 +1,7 @@
 <div class='show_basic'>
   <%= show_title "A Gatekeeper will need to approve the items to be published" -%>
 
-  <div class="box_infotext">
+  <div class="alert alert-info">
     <p>
       One or more of the items to be published are associated with a <%= t('project') -%> that has chosen to use the protection of a Gatekeeper.
     </p>
@@ -18,7 +18,7 @@
     <% @waiting_for_publish_items.each do |item| %>
         <li class="type_and_title"><%= text_for_resource item -%>
           :&nbsp;<%= link_to item.title, item, :target => "_blank" -%></li>
-        <li class="secondary">Approval required from: <%= item.gatekeepers.collect { |m| link_to(m.title, m) }.join(" or ").html_safe -%></li>
+        <li class="secondary">Approval required from: <%= item.asset_gatekeepers.collect { |m| link_to(m.title, m) }.join(" or ").html_safe -%></li>
         <br/>
     <% end %>
   </ul>
@@ -45,6 +45,6 @@
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
       <%= submit_tag "Confirm",:disable_with=>"Confirm" -%>
       Or
-      <%= link_to 'Cancel', resource %>
+      <%= cancel_button(resource) %>
   <% end %>
 </div>

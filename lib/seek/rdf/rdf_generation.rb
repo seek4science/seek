@@ -43,7 +43,7 @@ module Seek
       end
 
       def rdf_resource
-        uri = Seek::Config.site_base_host + "/#{self.class.name.tableize}/#{id}"
+        uri = URI.join(Seek::Config.site_base_host, "/#{self.class.name.tableize}/#{id}").to_s
         RDF::Resource.new(uri)
       end
 

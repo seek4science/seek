@@ -3,7 +3,7 @@
 <div class="show_basic">
   <br/>
 
-  <div class="box_infotext">
+  <div class="alert alert-info">
     <ul style="padding-left:1em;">
       <li>
         The <b>Gatekeeper</b> is a person in your project that needs to approve items before they are finally published.
@@ -40,7 +40,7 @@
               <%= date_as_string(log.created_at,true) %>
               <br/>
               Waiting to be approved by:&nbsp;
-              <% gatekeeper_links = asset.gatekeepers.collect { |gatekeeper| link_to(gatekeeper.name, gatekeeper) }.join(' or ').html_safe %>
+              <% gatekeeper_links = asset.asset_gatekeepers.collect { |gatekeeper| link_to(gatekeeper.name, gatekeeper) }.join(' or ').html_safe %>
               <%= gatekeeper_links %>
             </li>
           </ul>

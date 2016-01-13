@@ -1,0 +1,18 @@
+<%= admin_checkbox_setting(:zenodo_publishing_enabled, 1, Seek::Config.zenodo_publishing_enabled,
+                           "Zenodo publishing enabled", "Allows publishing of resources into Zenodo.",
+                           :onchange=>toggle_appear_javascript('zenodo_publishing_block')) %>
+<div id="zenodo_publishing_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.zenodo_publishing_enabled -%>">
+
+  <%= admin_text_setting(:zenodo_api_url, Seek::Config.zenodo_api_url,
+                         'Zenodo API URL', "The root URL for the Zenodo REST API. If it is not set, #{Seek::Config.default_zenodo_api_url} will be used. For testing, use the sandbox URL: https://sandbox.zenodo.org/api") %>
+
+  <%= admin_text_setting(:zenodo_oauth_url, Seek::Config.zenodo_oauth_url,
+                         'Zenodo OAuth URL', "The URL for the Zenodo OAuth2 service. If it is not set, #{Seek::Config.default_zenodo_oauth_url} will be used. For testing, use the sandbox URL: https://sandbox.zenodo.org/oauth") %>
+
+  <%= admin_text_setting(:zenodo_client_id, Seek::Config.zenodo_client_id,
+                         'Zenodo Client ID', "The ID of your Zenodo client application.") %>
+
+  <%= admin_text_setting(:zenodo_client_secret, Seek::Config.zenodo_client_secret,
+                         'Zenodo Client Secret', "The secret token of your Zenodo client application.") %>
+
+</div>

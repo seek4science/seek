@@ -1,0 +1,31 @@
+<%= button_link_to('Return to profile', 'back', person_path(@user.person)) -%>
+
+<h1>OAuth Sessions</h1>
+<div class="row">
+  <div class="col-sm-8">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Provider</th>
+        <th>Authenticated at</th>
+        <th>Expires at</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @oauth_sessions.each do |oauth_session| %>
+          <tr>
+            <td><%= oauth_session.provider %></td>
+            <td><%= oauth_session.created_at %></td>
+            <td><%= oauth_session.expires_at %></td>
+            <td>
+              <%= link_to 'Delete', user_oauth_session_path(current_user, oauth_session),
+                          method: :delete,
+                          class: 'btn btn-xs btn-danger' %>
+            </td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

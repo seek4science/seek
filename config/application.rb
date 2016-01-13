@@ -89,6 +89,8 @@ module SEEK
 
     config.exceptions_app = self.routes
 
+    config.active_support.escape_html_entities_in_json = true
+
     #uncomment and set the value if running under a suburi
     #config.relative_url_root = '/seek'
 

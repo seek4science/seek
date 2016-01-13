@@ -48,7 +48,7 @@
 
         <div id="annotation_controls" style="display:none">
           <%= submit_tag 'Save Changes', :id => "edit_annotation_button_#{annotation.id}" %>
-          or <%= link_to "Cancel", "", :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;" -%>
+          or <%= cancel_button("", :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;") %>
         </div>
       </div>
   <% end %>

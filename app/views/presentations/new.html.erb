@@ -7,7 +7,7 @@
       <%= render :partial=>"assets/upload_box" -%>
 
       <div class="form-group">
-        <label>Title</label>
+        <label>Title <span class="required">*</span></label>
         <% presentation_title_value = (params[:presentation].blank? || params[:presentation][:title].blank?) ? nil : params[:presentation][:title] -%>
         <%= text_area_tag "presentation[title]", presentation_title_value, :class=>"form-control" -%>
       </div>
@@ -35,7 +35,7 @@
         <%= submit_tag "Upload and Save", :id => "presentation_submit_btn",
                        :onclick => "javascript: validateResourceFields(true,'presentation',true); return(false);",
                        :class => 'btn btn-primary' -%>
-        or <%= link_to 'Cancel', presentations_path, :class => 'btn btn-default' -%>
+        or <%= cancel_button(presentations_path) -%>
       </div>
     </div>
 <% end -%>

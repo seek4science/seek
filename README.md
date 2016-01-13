@@ -1,8 +1,10 @@
+[![Build Status](https://travis-ci.org/seek4science/seek.svg?branch=master)](https://travis-ci.org/seek4science/seek)
+
 # SEEK
 
 ## License
 
-Copyright (c) 2009-2014, University of Manchester and HITS gGmbH
+Copyright (c) 2009-Present, University of Manchester and HITS gGmbH
 
 [BSD 3-clause](BSD-LICENSE)
 
@@ -14,7 +16,7 @@ SEEK is incorporating semantic technology allowing sophisticated queries over th
 
 For an example of SEEK please visit our [Demo](http://demo.seek4science.org/).
 
-To see SEEK being used for real science, as part of [SysMO](http://sysmo.net) please visit [FAIRDOM SEEK](http://fairdomhub.org)
+To see SEEK being used for real science, as part of [FAIRDOM](http://fair-dom.org) please visit [FAIRDOM SEEK](http://fairdomhub.org)
 
 For more information please visit: [SEEK for Science](http://www.seek4science.org/)
 
@@ -29,16 +31,16 @@ For more information please visit: [FAIRDOM](http://fair-dom.org).
 We recommend installing SEEK on Debian or Ubuntu.
 
 To install the latest release please visit:
-[SEEK install guide](http://seek4science.github.io/seek/install.html)
+[SEEK install guide](http://docs.seek4science.org/tech/install.html)
 
 For details about other distributions and installing on Mac OS X please visit:
-[Other distributions guide](http://seek4science.github.io/seek/other-distributions.html)
+[Other distributions guide](http://docs.seek4science.org/tech/other-distributions.html)
 
 The documentation is available on the *ghpages* branch.
 
 ## Contacting Us
 
-For details about how to contact us, to raise bugs or offer suggestion, please visit [Contacting Us](http://seek4science.github.io/seek/contacting_us.html)
+For details about how to contact us, to raise bugs or offer suggestion, please visit [Contacting Us](http://docs.seek4science.org/contacting_us.html)
 
 ## Contributing to SEEK
 
@@ -50,7 +52,7 @@ In general :
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
-For more details on how and what you can contribute to SEEK please visit [Contributing](http://seek4science.github.io/seek/contributing.html)
+For more details on how and what you can contribute to SEEK please visit [Contributing](http://docs.seek4science.org/contributing.html)
 
 
 ## Credit
@@ -59,8 +61,5 @@ SEEK is developed using the [RubyMine IDE](http://www.jetbrains.com/ruby/), for 
 
 ![JetBrains](http://seek4science.org/sites/default/files/logo_jetbrains_smaller.gif)
 
-Please check our [CREDITS](http://seek4science.github.io/seek/credits.html) for additional credits and acknowledgements
-
-
-[![Build Status](https://travis-ci.org/seek4science/seek.svg?branch=master)](https://travis-ci.org/seek4science/seek)
+Please check our [CREDITS](http://docs.seek4science.org/credits.html) for additional credits and acknowledgements
 

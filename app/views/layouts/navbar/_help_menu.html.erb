@@ -6,9 +6,15 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li role="presentation" class="dropdown-header visible-md-block"><%= t("menu.documentation") -%></li>
-    <li><%= link_to t("menu.help"), help_documents_path -%></li>
-    <li><%= link_to t("menu.faq"), help_documents_path + '/faq' -%></li>
-    <li><%= link_to t("menu.jerm_templates"), help_documents_path + '/templates' -%></li>
-    <li><%= link_to t("menu.isa_best_practice"), help_documents_path + '/isa-best-practice' -%></li>
+    <li><%= link_to t("menu.help"), help_documents_path, :target => "_blank" -%></li>
+    <% if Seek::Config.internal_help_enabled %>
+      <li><%= link_to t("menu.faq"), help_documents_path + '/faq' -%></li>
+      <li><%= link_to t("menu.jerm_templates"), help_documents_path + '/templates' -%></li>
+      <li><%= link_to t("menu.isa_best_practice"), help_documents_path + '/isa-best-practice' -%></li>
+    <% end %>
+    <% if logged_in_and_registered? %>
+        <li role="presentation" class="dropdown-header visible-md-block">Feedback</li>
+        <li><%= link_to 'Provide feedback', feedback_home_path -%></li>
+    <% end %>
   </ul>
 </li>

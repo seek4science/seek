@@ -1,23 +1,32 @@
-<div class="row">
-  <div class="col-sm-6" id="assay_list_collection">
-    <%= f.label :available_organisms %>
-    <div class="input-group">
-      <%= select_tag :possible_organisms,options_for_select( Organism.order(:title).collect{|d| [h("#{d.title}"),d.id]} ),:class => "form-control" %>
-      <span class="input-group-btn">
-        <%= link_to_function "Add","addSelectedOrganism(); return(false);", :class => 'btn btn-success' %>
-      </span>
+<%= panel("Organisms Relevant To This #{t('project')}") do %>
+    <div class="row">
+      <div class="col-sm-6" id="organism_create_info">
+         <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
+       Project administrators can also <%= link_to "Create", new_organism_path %> new organisms that can then be added to the project.
+	</p>
+      </div>
     </div>
+    <div class="row">
+      <div class="col-sm-6" id="assay_list_collection">
+        <%= f.label :available_organisms %>
+        <div class="input-group">
+          <%= select_tag :possible_organisms,options_for_select( Organism.order(:title).collect{|d| [h("#{d.title}"),d.id]} ),:class => "form-control" %>
+          <span class="input-group-btn">
+            <%= link_to_function "Add","addSelectedOrganism(); return(false);", :class => 'btn btn-success' %>
+          </span>
+        </div>
 
-    <%= f.collection_select :organism_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" %>
-  </div>
+        <%= f.collection_select :organism_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" %>
+      </div>
 
-  <div class="col-sm-6">
-    <label>Related organisms</label>
-    <div id="organism_to_list">
-        <span class="none_text" id="organisms">Loading...</span>
+      <div class="col-sm-6">
+        <label>Related organisms</label>
+        <div id="organism_to_list">
+            <span class="none_text" id="organisms">Loading...</span>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+<% end %>
 
 <script type="text/javascript">
     <% @project.organisms.each do |d| -%>

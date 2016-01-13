@@ -314,13 +314,15 @@ module Seek
         contributor = self.contributor.kind_of?(Person) ? self.contributor : self.contributor.try(:person)
         return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
         creators = is_downloadable? ? self.creators : []
-        asset_managers = projects.collect(&:asset_managers).flatten
+        asset_managers = (projects & contributor.former_projects).collect(&:asset_housekeepers).flatten
         grouped_people_by_access_type = policy.summarize_permissions creators,asset_managers, contributor
         grouped_people_by_access_type[Policy::MANAGING]
       end
 
       def authorized_for_action user,action
-        (Authorization.is_authorized? action, nil, self, user) || (Ability.new(user).can? action.to_sym, self) || (Ability.new(user).can? "#{action}_asset".to_sym, self)
+        (Authorization.is_authorized?(action, nil, self, user)) ||
+            (Ability.new(user).can?(action.to_sym, self)) ||
+            (Ability.new(user).can?("#{action}_asset".to_sym, self))
       end
 
       #returns a list of the people that can manage this file

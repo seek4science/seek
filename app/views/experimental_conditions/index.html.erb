@@ -2,7 +2,7 @@
   <%= "Experimental conditions for '#{link_to @sop.title,sop_path(@sop, :version => @display_sop.version)}' version #{@display_sop.version}".html_safe %>
 </h1>
 
-<center>
+<div class="center-block">
   <div id="add_condition_or_factor" style="display:block;">
     <%= render :partial=>"studied_factors/add_condition_or_factor", :locals => {:asset => 'sop'} %>
   </div>
@@ -16,5 +16,5 @@
     </div>
   </ul>
 
-</center>
+</div>
 

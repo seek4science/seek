@@ -1,12 +1,27 @@
 <%= render :partial => "general/item_title",:locals => {:item=>@programme, :buttons_partial => 'programmes/buttons'} %>
 
+
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
+
+    <%= render :partial=>"activation_status" %>
+
     <%=  item_description @programme.description -%>
+
     <p>
       <strong>Web page:</strong>
       <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>
     </p>
+
+    <% if logged_in_and_registered? %>
+
+        <p class="programme_administrators">
+          <strong><%= t('programme') %> Administrators:</strong>
+          <%= programme_administrator_link_list @programme -%>
+        </p>
+
+    <% end %>
+
     <strong>Funding details:</strong>
     <div class="well well-sm">
       <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>

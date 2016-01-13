@@ -27,9 +27,9 @@ module Seek
 
         grouped_pagination
 
-        include Seek::ActsAsISA::InstanceMethods
-        include Seek::ActsAsISA::Relationships
+        include Seek::ActsAsISA::Relationships::Associations
 
+        include Seek::ActsAsISA::InstanceMethods
         include Seek::Stats::ActivityCounts
         include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
         include Seek::Subscribable
@@ -56,11 +56,7 @@ module Seek
     end
 
     module InstanceMethods
-      def related_people
-        peeps = [contributor.try(:person)]
-        peeps << person_responsible if self.respond_to?(:person_responsible)
-        peeps.uniq.compact
-      end
+      include Seek::ActsAsISA::Relationships::InstanceMethods
     end
   end
 end

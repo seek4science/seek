@@ -18,7 +18,8 @@ module Seek
     def self.fetch_feeds_for_category(category)
       feeds = determine_feed_urls(category).collect do |url|
         begin
-          Rails.cache.fetch(cache_key(url), :expires_in => Seek::Config.home_feeds_cache_timeout.minutes) do
+          # :expires_in set 5 minutes after configured time as a fallback in case NewsFeedRefreshJob isn't running.
+          Rails.cache.fetch(cache_key(url), :expires_in => (Seek::Config.home_feeds_cache_timeout + 5).minutes) do
             get_feed(url)
           end
         rescue => exception
