@@ -194,6 +194,19 @@ namespace :seek_dev do
     end
   end
 
+  #quick way of setting up logins when setting up for, say a workshop
+  #creates logins with the provided password, based on first initial-lastname
+  #all lower case. John Smith would become jsmith It also activates them
+  #it does this for all people without logins
+  task :generate_logins, [:pwd] => :environment do |t,args|
+    password = args.pwd
+    Person.not_registered.each do |person|
+      login = "#{person.first_name[0]}#{person.last_name}".downcase
+      person.create_user login: login, password: password, password_confirmation: password
+      person.user.activate
+    end
+  end
+
   task :add_people_from_spreadsheet, [:path] => :environment do |t, args|
     path = args.path
     file = open(path)
@@ -223,6 +236,49 @@ namespace :seek_dev do
       if institution.nil?
         pp "No institution found for id #{institution_id}, skipping #{person.name}".red
         next
+      end
+      person.add_to_project_and_institution(project, institution)
+      begin
+        person.save!
+        puts "#{person.name} successfully added".green
+      rescue Exception => e
+        puts "Error adding #{person.name}".red
+        puts e
+      end
+    end
+  end
+
+
+  task :add_denbi_people_from_spreadsheet, [:path] => :environment do |t, args|
+    path = args.path
+    file = open(path)
+    csv = spreadsheet_to_csv(file)
+    project = Project.where(title: 'de.NBI summer school').first
+    CSV.parse(csv) do |row|
+      next if row[0].blank?
+      firstname=row[0].strip
+      next if firstname=="first_name"
+      lastname=row[1].strip
+      email=row[2].strip
+      institution_title=row[3].strip
+      country=row[4].strip
+
+      pp "Checking for #{firstname} #{lastname}"
+      person = Person.where(:first_name => firstname, :last_name => lastname).first
+      unless person.nil?
+        puts "A person already exists with firstname and lastname #{firstname},#{lastname} respectively, skipping".red
+        next
+      else
+        puts "Preparing to add person #{firstname} #{lastname} with email #{email}"
+        person = Person.create :first_name => firstname, :last_name => lastname, :email => email
+        person.reload
+      end
+
+      institution = Institution.where(title: institution_title).first
+      if institution.nil?
+        pp "No institution found for title #{institution_title}, create new one".red
+        institution = Institution.create :title => institution_title, :country => country
+        institution.reload
       end
       person.add_to_project_and_institution(project, institution)
       begin

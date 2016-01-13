@@ -7,7 +7,7 @@
       <%= render :partial=>"assets/upload_box" -%>
 
       <div class="form-group">
-        <label>Title</label>
+        <label>Title <span class="required">*</span></label>
         <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
         <%= text_field_tag 'sop[title]', sop_title_value, :class=>"form-control" -%>
       </div>
@@ -33,7 +33,7 @@
         <%= submit_tag "Upload and Save", :id => "sop_submit_btn",
                        :onclick => "validateResourceFields(true,'sop',true); return(false);",
                        :class => 'btn btn-primary' -%>
-        or <%= link_to 'Cancel', sops_path, :class => 'btn btn-default' -%>
+        or <%= cancel_button(sops_path) -%>
       </div>
     </div>
 <% end -%>

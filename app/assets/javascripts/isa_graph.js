@@ -1,20 +1,22 @@
 var cy;
-var default_node_width = 215;
-var default_node_height = 40;
-var default_font_size = 11;
+var default_node_width = 250;
+var default_node_height = 65;
+var default_font_size = 16;
 var default_color = '#323232';
-var default_text_max_width = 220;
+var default_text_max_width = 245;
 
 jQuery.noConflict();
 var $j = jQuery;
 
 function drawGraph(elements, current_element_id){
-    $j('#cy').cytoscape({
-        layout: {
-            name: 'breadthfirst'
-        },
-
+    cy=cytoscape({
+        container: document.getElementById('cy'),
         showOverlay: false,
+
+        layout: {
+            name: 'breadthfirst',
+            directed: true
+        },
 
         style: cytoscape.stylesheet()
             .selector('node')
@@ -45,7 +47,7 @@ function drawGraph(elements, current_element_id){
                 'target-arrow-color': 'data(faveColor)',
                 'content': 'data(name)',
                 'color': '#323232',
-                'font-size': (default_font_size-2)
+                'font-size': (default_font_size)
             }),
 
         elements: elements,
@@ -73,8 +75,10 @@ function drawGraph(elements, current_element_id){
                 animateNode(current_node);
                 displayNodeInfo(current_node);
 
-                disableMouseWheel();
+                //disableMouseWheel();
                 resizeGraph();
+                //need put zoom after resizeGraph, otherwise fit() does not work
+                cy.zoomingEnabled(false);
             }else{
                 $j('.isa_graph')[0].hide();
             }
@@ -87,8 +91,16 @@ function animateNode(node){
     var nodes = cy.$('node');
     var edges = cy.$('edge');
 
+    var excluded_selected_nodes = [];
+    for (var i=0; i<nodes.length; i++){
+        var node_tmp = nodes[i];
+        if (node_tmp.data().id !== node.data().id)
+            excluded_selected_nodes.push(node_tmp);
+    }
+
     //first normalizing all nodes and fading all nodes and edges
-    normalizingNodes(nodes);
+    normalizingNodes(excluded_selected_nodes);
+
     fadingNodes(nodes);
     fadingEdges(edges);
 
@@ -108,15 +120,14 @@ function animateNode(node){
     });
 
     node.animate({
-        css: { 'width':default_node_width+65, 'height':default_node_height+15 }
+        css: { 'width':default_node_width+35, 'height':default_node_height+15 }
     }, {
         duration: 300
     });
-
+    
     node.css({
-        'font-size': 12,
-        'font-weight': 'bolder',
-        'text-max-width': default_text_max_width+40
+        'font-size': default_font_size,
+        'text-max-width': default_text_max_width+15
     });
 
     if (node.data().name !== 'Hidden item'){
@@ -205,23 +216,27 @@ function appearingEdges(edges){
 }
 
 function fadingNodes(nodes){
-    nodes.css({'opacity': 0.3});
+    nodes.css({'opacity': 0.6});
 }
 
 function fadingEdges(edges){
-    edges.css({'opacity': 0.2});
+    edges.css({'opacity': 0.5});
 }
 
 function normalizingNodes(nodes){
-    nodes.css({
-        'width': default_node_width,
-        'height': default_node_height,
-        'font-size': default_font_size,
-        'font-weight': 'normal',
-        'color': default_color,
-        'text-max-width': default_text_max_width
-    });
-    nodes.unselect();
+    for (var i=0; i<nodes.length; i++){
+        var node = nodes[i];
+        node.css({
+            'width': default_node_width,
+            'height': default_node_height,
+            'font-size': default_font_size,
+            'font-weight': 'normal',
+            'color': default_color,
+            'text-max-width': default_text_max_width
+        });
+        node.unselect();
+
+    }
 }
 
 function resizeGraph(){
@@ -257,7 +272,7 @@ function labelLines(node){
     var font_size = node.renderedCss()['font-size'];
     var ruler = $j('#ruler')[0];
     ruler.style.fontSize = font_size;
-    ruler.style.fontWeight = 'bolder';
+    //ruler.style.fontWeight = 'bolder';
     ruler.innerHTML = label;    
     var label_width = ruler.offsetWidth;
     var text_max_width = node.renderedCss()['text-max-width'];

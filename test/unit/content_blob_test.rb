@@ -1,14 +1,36 @@
 require 'test_helper'
 require 'docsplit'
+require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
 
 class ContentBlobTest < ActiveSupport::TestCase
 
   fixtures :content_blobs
 
-  def test_md5sum_on_demand
+  test 'search terms' do
+    blob = ContentBlob.new
+    blob.url = "http://fish.com"
+    assert_includes blob.search_terms, 'fish'
+    assert_includes blob.search_terms, 'http://fish.com'
+    refute_includes blob.search_terms, 'http'
+    refute_includes blob.search_terms, 'com'
+
+    blob = Factory(:rightfield_content_blob)
+    assert_includes blob.search_terms, 'rightfield.xls'
+    assert_includes blob.search_terms, 'xls'
+
+  end
+
+
+  test 'md5sum_on_demand' do
     blob=Factory :rightfield_content_blob
     assert_not_nil blob.md5sum
     assert_equal "01788bca93265d80e8127ca0039bb69b",blob.md5sum
+  end
+
+  test 'sha1 sum on demand' do
+    blob=Factory :rightfield_content_blob
+    assert_not_nil blob.sha1sum
+    assert_equal "ffd634ac7564083ab7b66bc3eb2053cbc3d608f5",blob.sha1sum
   end
 
   test "detects it is a webpage" do
@@ -74,7 +96,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_cache_key
     blob=Factory :rightfield_content_blob
-    assert_equal "content_blobs/#{blob.id}-01788bca93265d80e8127ca0039bb69b",blob.cache_key
+    assert_equal "content_blobs/#{blob.id}-ffd634ac7564083ab7b66bc3eb2053cbc3d608f5",blob.cache_key
   end
 
   def test_uuid_doesnt_change
@@ -251,12 +273,12 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   def test_filesize
     cb = Factory :content_blob, :data=>"z"
-    assert_equal 1, cb.filesize
+    assert_equal 1, cb.file_size
     File.delete(cb.filepath)
-    assert_nil cb.filesize
+    assert_equal 1, cb.file_size
     cb = Factory :rightfield_content_blob
-    assert_not_nil cb.filesize
-    assert_equal 9216,cb.filesize
+    assert_not_nil cb.file_size
+    assert_equal 9216,cb.file_size
   end
 
   def test_exception_when_both_data_and_io_object
@@ -551,6 +573,141 @@ class ContentBlobTest < ActiveSupport::TestCase
     pdf_content_blob = Factory(:pdf_content_blob)
     content = pdf_content_blob.pdf_contents_for_search
     assert_equal ['This is a pdf format'], content
+  end
+
+  test 'calculates file size' do
+    blob = Factory(:pdf_content_blob)
+    assert_equal 8827, blob.file_size
+  end
+
+  test 'updates file size' do
+    blob = Factory(:pdf_content_blob)
+    blob.data = '123456'
+    blob.save
+    assert_equal 6, blob.file_size
+  end
+
+  test 'calculates file size for remote content' do
+    stub_request(:head, "http://www.abc.com").to_return(:headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+    blob = Factory(:url_content_blob)
+    assert_equal 500, blob.file_size
+  end
+
+  test 'can retrieve remote content' do
+    stub_request(:head, "http://www.abc.com").to_return(
+        :headers => {:content_length => nil, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, "http://www.abc.com").to_return(:body => 'abcdefghij'*500,
+                                                       :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal nil, blob.file_size
+
+    blob.retrieve
+    assert blob.file_exists?
+    assert_equal 5000, blob.file_size
+  end
+
+  test "won't retrieve remote content over hard limit" do
+    # Web server lies about content length:
+    stub_request(:head, 'http://www.abc.com').to_return(
+        :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+    # Size is actually 6kb:
+    stub_request(:get, 'http://www.abc.com').to_return(:body => 'abcdefghij'*600,
+                                                       :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal 500, blob.file_size
+
+    assert_raise Seek::DownloadHandling::SizeLimitExceededException do
+      blob.retrieve
+    end
+    assert !blob.file_exists?
+  end
+
+  test "won't endlessly follow redirects when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(
+        :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+    # Infinitely redirects
+    stub_request(:get, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.abc.com'}, :status => 302)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal 500, blob.file_size
+
+    assert_raise Seek::DownloadHandling::RedirectLimitExceededException do
+      blob.retrieve
+    end
+    assert !blob.file_exists?
+  end
+
+  test "raises exception on bad response code when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(
+        :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, 'http://www.abc.com').to_return(:status => 404)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal 500, blob.file_size
+
+    assert_raise Seek::DownloadHandling::BadResponseCodeException do
+      blob.retrieve
+    end
+    assert !blob.file_exists?
+  end
+
+  test "handles relative redirects when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(:headers => {:location => '/xyz'}, :status => 302)
+    stub_request(:get, 'http://www.abc.com').to_return(:headers => {:location => '/xyz'}, :status => 302)
+    stub_request(:head, "http://www.abc.com/xyz").to_return(
+        :headers => {:content_length => nil, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, "http://www.abc.com/xyz").to_return(:body => 'abcdefghij'*500,
+                                                       :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal nil, blob.file_size
+
+    blob.retrieve
+    assert blob.file_exists?
+    assert_equal 5000, blob.file_size
+  end
+
+  test "handles absolute redirects when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.abc.com/xyz'}, :status => 302)
+    stub_request(:get, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.abc.com/xyz'}, :status => 302)
+    stub_request(:head, "http://www.abc.com/xyz").to_return(
+        :headers => {:content_length => nil, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, "http://www.abc.com/xyz").to_return(:body => 'abcdefghij'*500,
+                                                           :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal nil, blob.file_size
+
+    blob.retrieve
+    assert blob.file_exists?
+    assert_equal 5000, blob.file_size
+  end
+
+  test "handles mixed redirects when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.xyz.com'}, :status => 302)
+    stub_request(:get, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.xyz.com'}, :status => 302)
+    stub_request(:head, 'http://www.xyz.com').to_return(:headers => {:location => '/xyz'}, :status => 302)
+    stub_request(:get, 'http://www.xyz.com').to_return(:headers => {:location => '/xyz'}, :status => 302)
+    stub_request(:head, "http://www.xyz.com/xyz").to_return(
+        :headers => {:content_length => nil, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, "http://www.xyz.com/xyz").to_return(:body => 'abcdefghij'*500,
+                                                           :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal nil, blob.file_size
+
+    blob.retrieve
+    assert blob.file_exists?
+    assert_equal 5000, blob.file_size
   end
 
 end

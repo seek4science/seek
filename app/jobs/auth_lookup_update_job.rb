@@ -1,5 +1,5 @@
 class AuthLookupUpdateJob < SeekJob
-  BATCHSIZE = 3
+  BATCHSIZE = 1
 
   def add_items_to_queue(items, time = default_delay.from_now, priority = 0, queuepriority = default_priority)
     if Seek::Config.auth_lookup_enabled
@@ -22,8 +22,6 @@ class AuthLookupUpdateJob < SeekJob
   private
 
   def perform_job(item)
-    # including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to tha happy coincidence
-    # that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
 
     if item.nil?
       update_assets_for_user nil
@@ -46,6 +44,8 @@ class AuthLookupUpdateJob < SeekJob
   end
 
   def gather_items
+    # including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to tha happy coincidence
+    # that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
     AuthLookupUpdateQueue.order('priority,item_type,id').limit(BATCHSIZE).collect do |queued|
       take_queued_item(queued)
     end.uniq.compact

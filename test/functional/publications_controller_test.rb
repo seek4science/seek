@@ -478,6 +478,32 @@ class PublicationsControllerTest < ActionController::TestCase
     end
   end
 
+  test "should avoid XSS in association forms" do
+    project = Factory(:project)
+    c = Factory(:person, group_memberships: [Factory(:group_membership, work_group: Factory(:work_group, project: project))])
+    Factory(:event, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
+    Factory(:data_file, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
+    Factory(:model, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
+    i = Factory(:investigation, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
+    s = Factory(:study, title: '<script>alert("xss")</script> &', investigation: i, contributor: c)
+    a = Factory(:assay, title: '<script>alert("xss")</script> &', study: s, contributor: c)
+    p = Factory(:publication, projects: [project], contributor: c)
+
+    login_as(p.contributor)
+
+    get :edit, :id => p.id
+
+    assert_response :success
+    assert_not_include response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
+    # This will be slow!
+
+    # 3 for events 'fancy_multiselect'
+    assert_equal 3, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
+    # 10 = 2 each for investigations, studies, assays, datafiles, models (using bespoke association forms)
+    assert_equal 10, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
+  end
+
+
   def mock_crossref options
     url= "http://www.crossref.org/openurl/"
     params={}

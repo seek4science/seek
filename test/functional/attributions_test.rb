@@ -20,7 +20,7 @@ class AttributionsTest < ActionController::TestCase
     assert users(:owner_of_my_first_sop).person.projects.include?(projects(:myexperiment_project))
     assert_difference ['Sop.count', 'Relationship.count'] do
       post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
-           :content_blob=>{:data => file_for_upload},
+           :content_blobs => [{:data => file_for_upload}],
            :sharing=> valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -32,7 +32,7 @@ class AttributionsTest < ActionController::TestCase
     # (two identical attributions will be posted, but only one needs to be created)
     assert_difference ['Sop.count', 'Relationship.count'] do
       post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
-           :content_blob=>{:data => file_for_upload},:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 1]])
+           :content_blobs => [{:data => file_for_upload}],:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 1]])
     end
     assert_redirected_to sop_path(assigns(:sop))
   end
@@ -42,7 +42,7 @@ class AttributionsTest < ActionController::TestCase
     # create a SOP / attribution first
     assert_difference ['Sop.count', 'Relationship.count'] do
       post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
-           :content_blob=>{:data => file_for_upload},:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
+           :content_blobs => [{:data => file_for_upload}],:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1]])
     end
     assert_redirected_to sop_path(assigns(:sop))
     
@@ -61,7 +61,7 @@ class AttributionsTest < ActionController::TestCase
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
         post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
-             :content_blob=>{:data => file_for_upload},:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 111], ["Sop", 222]])
+             :content_blobs => [{:data => file_for_upload}],:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 111], ["Sop", 222]])
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -88,7 +88,7 @@ class AttributionsTest < ActionController::TestCase
     assert_difference('Sop.count') do
       assert_difference('Relationship.count', +2) do
         post :create, :sop => {:title => "test_attributions",:project_ids=>[projects(:myexperiment_project).id]},
-             :content_blob=>{:data => file_for_upload},:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 2]])
+             :content_blobs => [{:data => file_for_upload}],:sharing => valid_sharing, :attributions => ActiveSupport::JSON.encode([["Sop", 1], ["Sop", 2]])
       end
     end
     assert_redirected_to sop_path(assigns(:sop))

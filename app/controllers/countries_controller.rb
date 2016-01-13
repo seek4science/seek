@@ -8,7 +8,7 @@ class CountriesController < ApplicationController
     
     respond_to do |format|
       if Seek::Config.is_virtualliver
-        if !User.current_user.nil?
+        unless current_user
           format.html # show.html.erb
         else
           store_return_to_location

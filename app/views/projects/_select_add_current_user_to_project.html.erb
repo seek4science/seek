@@ -1,0 +1,30 @@
+<%= panel("Your Institution details for this #{t('project')}") do %>
+    <p class="alert alert-info">
+      If you wish to be automatically assigned to the <%= t('project') %>, and also become
+      the <%= t('project_administrator') %> then please check the box below and select your institution. If your
+      Institution is not listed, you may need to <%= link_to 'Create the Institution', new_institution_path %> first.
+    </p>
+
+    <div class='form-group'>
+      <%= check_box_tag :add_current_user, '1', false, :id => 'default_member[add_to_project]',:name=>'default_member[add_to_project]' %> Add me to this <%= t('project') %> and
+      make me the <%= t('project_administrator') %>.
+    </div>
+    <div class='form-group' id='institution' style='display:none;'>
+      <label for='institution'>Your Institution</label>
+      <%= select_tag 'default_member[institution_id]', options_from_collection_for_select(Institution.order(:title), "id", "title"), :class => 'form-control' %>
+    </div>
+
+<% end %>
+
+<script type="text/javascript">
+
+    $j('input:checkbox').change(
+            function () {
+                if ($j(this).is(':checked')) {
+                    $j('#institution').show();
+                } else {
+                    $j('#institution').hide();
+                }
+            });
+
+</script>

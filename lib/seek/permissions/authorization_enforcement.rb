@@ -20,7 +20,6 @@ module Seek
     module AuthorizationEnforcement
       def self.included ar
         ar.const_get(:Base).class_eval { include BaseExtensions }
-
       end
 
       module BaseExtensions

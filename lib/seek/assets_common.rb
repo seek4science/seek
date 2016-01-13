@@ -65,7 +65,7 @@ module Seek
     def request_resource
       resource = class_for_controller_name.find(params[:id])
       details = params[:details]
-      mail = Mailer.request_resource(current_user, resource, details, base_host)
+      mail = Mailer.request_resource(current_user, resource, details)
       mail.deliver
 
       render :update do |page|
@@ -81,7 +81,7 @@ module Seek
 
       results = model_class.authorize_asset_collection(model_class.where('title LIKE ?', "#{params[:query]}%"), 'view')
       items = results.first(params[:limit] || 10).map do |item|
-        contributor_name = item.contributor.person.name
+        contributor_name = item.contributor.try(:person).try(:name)
         { id: item.id, name: item.title, hint: contributor_name, type: model_name, contributor: contributor_name }
       end
 

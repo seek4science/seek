@@ -7,15 +7,11 @@ module HomesHelper
   RECENT_SIZE = 5
 
   def home_description_text
-    simple_format(auto_link(Seek::Config.home_description.html_safe, sanitize: false), {}, sanitize: false)
+    Seek::Config.home_description.html_safe
   end
 
   def imprint_text
     simple_format(auto_link(Seek::Config.imprint_description.html_safe, sanitize: false), {}, sanitize: false)
-  end
-
-  def show_guide_box?
-    Seek::Config.guide_box_enabled && ((!logged_in? && cookies[:hide_guide_box].nil?) || (logged_in? && current_user.try(:show_guide_box?)))
   end
 
   def show_announcements?

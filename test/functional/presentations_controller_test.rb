@@ -30,7 +30,7 @@ class PresentationsControllerTest < ActionController::TestCase
                                                   )
 
     assert_difference "Presentation.count" do
-      post :create,:presentation => presentation_attrs,:content_blob=>{:data_url => "http://somewhere.com/piccy.png",:data=>nil}, :sharing => valid_sharing
+      post :create,:presentation => presentation_attrs,:content_blobs => [{:data_url => "http://somewhere.com/piccy.png",:data=>nil}], :sharing => valid_sharing
     end
   end
 
@@ -41,7 +41,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
     assert_difference "Presentation.count" do
       assert_difference "ActivityLog.count" do
-        post :create,:presentation => presentation_attrs,:content_blob=>{:data => file_for_upload}, :sharing => valid_sharing
+        post :create,:presentation => presentation_attrs,:content_blobs => [{:data => file_for_upload}], :sharing => valid_sharing
       end
     end
   end
@@ -83,7 +83,8 @@ class PresentationsControllerTest < ActionController::TestCase
 
     assert_difference "presentation.version" do
        post :new_version,:id => presentation,:presentation=>{},
-            :content_blob=>{:data_url=>"http://somewhere.com/piccy.png"}
+            :content_blobs => [{:data_url=>"http://somewhere.com/piccy.png"}]
+
        presentation.reload
     end
     assert_redirected_to presentation_path(presentation)
@@ -98,7 +99,8 @@ class PresentationsControllerTest < ActionController::TestCase
 
     new_file_path = file_for_upload
     assert_difference "presentation.version" do
-       post :new_version,:id => presentation,:presentation=>{},:content_blob=>{:data=>new_file_path}
+       post :new_version,:id => presentation,:presentation=>{},:content_blobs => [{:data=>new_file_path}]
+
        presentation.reload
     end
     assert_redirected_to presentation_path(presentation)
@@ -110,7 +112,8 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation_attrs = Factory.build(:presentation, :contributor=>User.current_user).attributes #.symbolize_keys(turn string key to symbol)
 
     assert_no_difference "Presentation.count" do
-     post :create, :presentation=>presentation_attrs,:content_blob=>{:data_url=>"http://www.blah.de/images/logo.png"}
+     post :create, :presentation=>presentation_attrs,:content_blobs => [{:data_url=>"http://www.blah.de/images/logo.png"}]
+
     end
     assert_not_nil flash[:error]
   end
@@ -120,7 +123,8 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory :presentation,:contributor=>User.current_user
     new_data_url = "http://www.blah.de/images/liver-illustration.png"
     assert_no_difference "presentation.version" do
-       post :new_version,:id => presentation,:presentation=>{},:content_blob=>{:data_url=>new_data_url}
+       post :new_version,:id => presentation,:presentation=>{},:content_blobs => [{:data_url=>new_data_url}]
+
        presentation.reload
     end
     assert_not_nil flash[:error]

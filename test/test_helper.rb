@@ -19,6 +19,7 @@ require 'webmock/test_unit'
 require 'action_view/test_case'
 require 'tmpdir'
 require 'authenticated_test_helper'
+require 'mock_helper'
 
 
 module ActionView

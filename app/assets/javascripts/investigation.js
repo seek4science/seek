@@ -11,7 +11,7 @@ function addInvestigation(title,id) {
 function addSelectedInvestigation() {
     selected_option_index=$("possible_investigations").selectedIndex;
     selected_option=$("possible_investigations").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
 
     i = $('possible_investigations').selectedIndex;

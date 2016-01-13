@@ -45,11 +45,11 @@ class PeopleController < ApplicationController
       @people=Person.where(["disciplines.id=?",@discipline.id]).includes(:disciplines)
       #need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
       @people.each(&:reload)
-    elsif (params[:project_role_id])
-      @project_role=ProjectRole.find(params[:project_role_id])
+    elsif (params[:project_position_id])
+      @project_position=ProjectPosition.find(params[:project_position_id])
       @people=Person.includes(:group_memberships)
       #FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
-      @people=@people.select{|p| !(p.group_memberships & @project_role.group_memberships).empty?}
+      @people=@people.select{|p| !(p.group_memberships & @project_position.group_memberships).empty?}
     end
 
     unless @people
@@ -171,7 +171,7 @@ class PeopleController < ApplicationController
           end
           format.xml { render :xml => @person, :status => :created, :location => @person }
         else
-          Mailer.signup(current_user, base_host).deliver
+          Mailer.signup(current_user).deliver
           flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
           logout_user
           format.html { redirect_to :controller => "users", :action => "activation_required" }
@@ -184,12 +184,12 @@ class PeopleController < ApplicationController
   end
 
   def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(params,current_user, base_host).deliver
+    Mailer.contact_admin_new_user(params,current_user).deliver
 
     #send mail to project managers
     project_administrators = project_administrators_of_selected_projects params[:projects]
     project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, params,current_user, base_host).deliver
+      Mailer.contact_project_administrator_new_user(project_administrator, params,current_user).deliver
     end
   end
 
@@ -207,7 +207,7 @@ class PeopleController < ApplicationController
 
     
     respond_to do |format|
-      if @person.update_attributes(params[:person]) && set_group_membership_project_role_ids(@person,params)
+      if @person.update_attributes(params[:person]) && set_group_membership_project_position_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch #this makes sure any caches based on the cache key are invalided where the person would not normally be updated, such as changing disciplines or tags
         flash[:notice] = 'Person was successfully updated.'
@@ -239,7 +239,7 @@ class PeopleController < ApplicationController
 
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
-        if Seek::Config.email_enabled && @person.user && had_no_projects && !@person.work_groups.empty? && @person != current_user.person
+        if Seek::Config.email_enabled && @person.user && had_no_projects && !@person.work_groups.empty? && @person != current_person
           Mailer.notify_user_projects_assigned(@person).deliver
         end
 
@@ -253,15 +253,15 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_group_membership_project_role_ids person,params
+  def set_group_membership_project_position_ids person,params
     prefix="group_membership_role_ids_"
     person.group_memberships.each do |gr|
       key=prefix+gr.id.to_s
-      gr.project_roles.clear
+      gr.project_positions.clear
       if params[key.to_sym]
         params[key.to_sym].each do |r|
-          r=ProjectRole.find(r)
-          gr.project_roles << r
+          r=ProjectPosition.find(r)
+          gr.project_positions << r
         end
       end
     end

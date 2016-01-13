@@ -11,6 +11,10 @@ module Seek
       @dictionary[key.to_s]
     end
 
+    def image_files
+      @dictionary.values
+    end
+
     private
 
     def dictionary_definition

@@ -21,7 +21,7 @@ module Seek
         # the search terms coming from the content-blob(s)
         def content_blob_search_terms
           all_content_blobs.map do |blob|
-            [blob.original_filename] | [blob.pdf_contents_for_search]
+            blob.search_terms
           end.flatten.compact.uniq
         end
 

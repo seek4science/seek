@@ -10,7 +10,6 @@ class SessionsController < ApplicationController
   
   # render new.rhtml
   def new
-
     if (Seek::Config.use_ease)
       ease_login
     end
@@ -25,9 +24,6 @@ class SessionsController < ApplicationController
     end
   end
 
-  def auto_openid
-    create
-  end
 
   def index    
     redirect_to root_path
@@ -62,39 +58,21 @@ class SessionsController < ApplicationController
 
   def destroy
     logout_user
+    flash[:notice] = "You have been logged out."
 
-    if (Seek::Config.use_ease)
-      redirect_to Seek::Config.ease_logout_url
-    else
-      flash[:notice] = "You have been logged out."
-      begin
-        if request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == search_url.normalize_trailing_slash
-          redirect_to :root
-        else
-          redirect_back
-        end
-      rescue RedirectBackError
-        redirect :controller => :homes, :action => :index
+    begin
+      if request.env['HTTP_REFERER'].try(:normalize_trailing_slash) == search_url.normalize_trailing_slash
+        redirect_to :root
+      else
+        redirect_back
       end
+    rescue RedirectBackError
+      redirect :controller => :homes, :action => :index
     end
   end
 
   protected
-  
-  def open_id_authentication
-    authenticate_with_open_id do |result, identity_url|
-      if result.successful?
-        if @user = User.find_by_openid(identity_url)          
-          check_login
-        else
-          failed_login "Sorry, no user by that identity URL exists (#{identity_url})"
-        end
-      else
-        failed_login result.message
-      end
-    end
-  end
-  
+
   def password_authentication
     if @user = User.authenticate(params[:login], params[:password])
       check_login

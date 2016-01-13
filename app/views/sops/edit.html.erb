@@ -6,7 +6,7 @@
       <%= f.error_messages %>
 
       <div class="form-group">
-        <label>Title</label>
+        <label>Title <span class="required">*</span></label>
         <%= f.text_field :title, :class=>"form-control" -%>
       </div>
 
@@ -38,7 +38,7 @@
         <%= f.submit "Update", :id => "sop_submit_btn",
                      :onclick => "javascript: validateResourceFields(false, 'sop', #{current_user_authorized_to_manage}); return(false);",
                      :class => 'btn btn-primary' -%>
-        or <%= link_to "Cancel", sop_path(@sop), :class => 'btn btn-default' -%>
+        or <%= cancel_button(sop_path(@sop)) -%>
       </div>
     </div>
 <% end %>

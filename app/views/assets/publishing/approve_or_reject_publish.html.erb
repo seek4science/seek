@@ -39,7 +39,7 @@
           <br/>
           <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
           Or
-          <%= link_to "Cancel", url_for(:action => "index") -%>
+          <%= cancel_button url_for(:action => "index") -%>
       <% end %>
   <% else %>
       <span class="published"> This <%= asset_type_name -%> is already published!</span>

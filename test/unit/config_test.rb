@@ -283,15 +283,47 @@ end
   test 'pubmed_api_email' do
     assert_equal nil, Seek::Config.pubmed_api_email
   end
+
   test 'crossref_api_email' do
     assert_equal 'sowen@cs.man.ac.uk', Seek::Config.crossref_api_email
   end
+
   test 'site_base_host' do
     assert_equal 'http://localhost:3000', Seek::Config.site_base_host
   end
-  test 'open_id_authentication_store' do
-    assert_equal :memory, Seek::Config.open_id_authentication_store
+
+  test 'host_with_port' do
+    assert_equal 'localhost:3000', Seek::Config.host_with_port
+
+    with_config_value(:site_base_host, 'https://secure.website:443') do
+      assert_equal 'secure.website', Seek::Config.host_with_port
+    end
+
+    with_config_value(:site_base_host, 'http://insecure.website:80') do
+      assert_equal 'insecure.website', Seek::Config.host_with_port
+    end
+
+    with_config_value(:site_base_host, 'http://localhost') do
+      assert_equal 'localhost', Seek::Config.host_with_port
+    end
   end
+
+  test 'host_scheme' do
+    assert_equal 'http', Seek::Config.host_scheme
+
+    with_config_value(:site_base_host, 'https://secure.website:443') do
+      assert assert_equal 'https', Seek::Config.host_scheme
+    end
+
+    with_config_value(:site_base_host, 'http://insecure.website:80') do
+      assert_equal 'http', Seek::Config.host_scheme
+    end
+
+    with_config_value(:site_base_host, 'http://localhost') do
+      assert_equal 'http', Seek::Config.host_scheme
+    end
+  end
+  
   test 'copyright_addendum_enabled' do
     assert_equal false, Seek::Config.copyright_addendum_enabled
   end
@@ -394,5 +426,39 @@ end
 
   test 'imprint_description' do
     assert_equal 'Here is imprint example', Seek::Config.imprint_description
+  end
+
+  test 'zenodo_api_url' do
+    assert_equal "https://sandbox.zenodo.org/api", Seek::Config.zenodo_api_url
+  end
+
+  test 'zenodo_oauth_url' do
+    assert_equal "https://sandbox.zenodo.org/oauth", Seek::Config.zenodo_oauth_url
+  end
+
+  test 'default_value works for all settings' do
+    Seek::Config.read_setting_attributes.each do |method, _|
+      method_name = "default_#{method}"
+      assert Seek::Config.respond_to?(method_name.to_sym), "`#{method_name}` is not defined on Seek::Config"
+    end
+  end
+
+  test 'default_value is not changed' do
+    old_default_value = Seek::Config.default_external_help_url
+    with_config_value 'external_help_url', 'http://www.somewhere.com' do
+      new_default_value = Seek::Config.default_external_help_url
+      assert_equal old_default_value, new_default_value
+    end
+  end
+
+  test 'size limits are numeric' do
+    with_config_value(:max_cachable_size, '1000') do
+      with_config_value(:hard_max_cachable_size, '2000') do
+        assert_equal 1000, Seek::Config.max_cachable_size
+        assert_equal 2000, Seek::Config.hard_max_cachable_size
+        assert_equal Fixnum, Seek::Config.max_cachable_size.class
+        assert_equal Fixnum, Seek::Config.hard_max_cachable_size.class
+      end
+    end
   end
 end

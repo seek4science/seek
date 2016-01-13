@@ -47,14 +47,14 @@ include ActionDispatch::TestProcess
   Factory.define(:pal, :parent => :person) do |f|
     f.roles_mask 2
     f.after_build do |pal|
-      Factory(:pal_role) if ProjectRole.pal_role.nil?
-      pal.group_memberships.first.project_roles << ProjectRole.pal_role
+      Factory(:pal_position) if ProjectPosition.pal_position.nil?
+      pal.group_memberships.first.project_positions << ProjectPosition.pal_position
       Factory(:admin_defined_role_project,:project=>pal.projects.first,:person=>pal,:role_mask=>2)
       pal.roles_mask = 2
     end
   end
 
-  Factory.define(:asset_manager,:parent=>:person) do |f|
+  Factory.define(:asset_housekeeper,:parent=>:person) do |f|
     f.after_build do |am|
       Factory(:admin_defined_role_project,:project=>am.projects.first,:person=>am,:role_mask=>8)
       am.roles_mask = 8
@@ -68,6 +68,14 @@ include ActionDispatch::TestProcess
     end
   end
 
+  Factory.define(:programme_administrator_not_in_project, :parent=>:person_not_in_project) do |f|
+    f.after_build do |pm|
+      programme=Factory(:programme)
+      Factory(:admin_defined_role_programme,:programme=>programme,:person=>pm,:role_mask=>32)
+      pm.roles_mask = 32
+    end
+  end
+
   Factory.define(:programme_administrator,:parent=>:project_administrator) do |f|
     f.after_build do |pm|
       programme=Factory(:programme,:projects=>[pm.projects.first])
@@ -77,7 +85,7 @@ include ActionDispatch::TestProcess
   end
 
 
-  Factory.define(:gatekeeper,:parent=>:person) do |f|
+  Factory.define(:asset_gatekeeper,:parent=>:person) do |f|
     f.after_build do |gk|
       Factory(:admin_defined_role_project,:project=>gk.projects.first,:person=>gk,:role_mask=>16)
       gk.roles_mask = 16
@@ -115,6 +123,10 @@ include ActionDispatch::TestProcess
   Factory.define(:programme) do |f|
     f.sequence(:title) { |n| "A Programme: #{n}"}
     f.projects {[Factory.build(:project)]}
+    f.after_create do |p|
+      p.is_activated=true
+      p.save
+    end
   end
 
 #Project
@@ -125,6 +137,7 @@ include ActionDispatch::TestProcess
 #Institution
   Factory.define(:institution) do |f|
     f.sequence(:title) { |n| "An Institution: #{n}" }
+    f.country { ActionView::Helpers::FormOptionsHelper::COUNTRIES.sample }
   end
 
 #Sop
@@ -398,6 +411,20 @@ Factory.define(:specimen) do |f|
     end
   end
 
+  Factory.define(:model_2_remote_files,:class=>Model) do |f|
+    f.sequence(:title) {|n| "A Model #{n}"}
+    f.projects {[Factory.build(:project)]}
+    f.association :contributor, :factory => :person
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:url_content_blob,
+                                            :asset => model,
+                                            :asset_version => model.version),
+                             Factory.create(:url_content_blob,
+                                            :asset => model,
+                                            :asset_version => model.version)] if model.content_blobs.blank?
+    end
+  end
+
   Factory.define(:model_with_image,:parent=>:model) do |f|
     f.sequence(:title) {|n| "A Model with image #{n}"}
     f.after_create do |model|
@@ -548,11 +575,11 @@ Factory.define(:specimen) do |f|
     f.association :work_group
   end
 
-  Factory.define(:project_role) do |f|
+  Factory.define(:project_position) do |f|
     f.name "A Role"
   end
 
-  Factory.define(:pal_role,:parent=>:project_role) do |f|
+  Factory.define(:pal_position,:parent=>:project_position) do |f|
     f.name "A Pal"
   end
 
@@ -1021,4 +1048,12 @@ end
   Factory.define(:failed_run, :parent => :taverna_player_run) do |f|
     f.status_message_key 'failed'
     f.state :failed
+  end
+
+  Factory.define(:oauth_session) do |f|
+    f.association :user, :factory => :user
+    f.provider 'Zenodo'
+    f.access_token '123'
+    f.refresh_token 'ref'
+    f.expires_at (Time.now + 1.hour)
   end

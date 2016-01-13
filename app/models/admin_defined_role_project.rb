@@ -2,9 +2,6 @@ class AdminDefinedRoleProject < ActiveRecord::Base
   belongs_to :project
   belongs_to :person
 
-  #a less specific name for the associated item, that allows for more general methods in its usage
-  alias_method :item,:project
-
 
   validates :project,:person, presence:true
   validates :role_mask,numericality: {greater_than:0,less_than_or_equal_to:16}

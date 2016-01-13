@@ -21,6 +21,14 @@ module Seek
         add_index_breadcrumb @avatar_for.pluralize.downcase
         add_show_breadcrumb @avatar_owner_instance
         add_edit_breadcrumb @avatar_owner_instance
+      elsif controller_name == 'snapshots'
+        add_index_breadcrumb 'investigations'
+        add_show_breadcrumb @investigation
+        if @snapshot
+          add_breadcrumb "Snapshot #{@snapshot.snapshot_number}",
+                         investigation_snapshot_path(@snapshot.resource, @snapshot.snapshot_number)
+        end
+        return
       end
 
       #Index

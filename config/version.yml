@@ -18,6 +18,6 @@
 # major and minor are required. All others are optional - See readme in the app_version plugin
 
 
-major:        0
-minor:        24
-patch: 	      0
+major:        1
+minor:        0
+patch: 	      1

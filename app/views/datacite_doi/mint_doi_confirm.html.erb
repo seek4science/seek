@@ -8,12 +8,12 @@
 
 <div class="show_basic">
  <br/>
-  <div class="box_infotext">
+  <div class="alert alert-info">
       <p>
         You are about to create Digital Object Identifier (DOI) that will allow you to easily cite your <%= type_text %>.
       </p>
       <p>
-        <span id="warning_icon"></span>
+        <span class="warning_icon"></span>
         Once you have done so, you will be unable to easily delete, or hide, the <%= type_text %> except under special circumstances where a retraction is necessary.
       </p>
       <p>
@@ -32,7 +32,7 @@
       <br/>
       <%= submit_tag "Generate the DOI" -%>
       or
-      <%= link_to "Cancel", polymorphic_path(@asset_version.parent, :version => @asset_version.version) %>
+      <%= cancel_button(polymorphic_path(@asset_version.parent, :version => @asset_version.version)) %>
 
   <% end %>
 

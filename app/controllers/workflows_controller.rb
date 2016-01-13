@@ -1,4 +1,5 @@
 require 't2flow/model'
+require 't2flow/model'
 require 't2flow/parser'
 require 't2flow/dot'
 
@@ -45,7 +46,7 @@ class WorkflowsController < ApplicationController
     #@data_file.is_with_sample= params[:is_with_sample]
     @page_title = params[:page_title]
     respond_to do |format|
-      if current_user.person.member?
+      if current_person.member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new workflows. Only members of known projects, institutions or work groups are allowed to create new content."
@@ -263,7 +264,7 @@ class WorkflowsController < ApplicationController
     search_included = (params[:commit] == 'Clear') ? false : true
 
     # Filter by uploader and category
-    filter_results = Workflow.where(true)
+    filter_results = Workflow.scoped
     filter_results = filter_results.by_category(category.to_i) unless category.blank?
     filter_results = filter_results.by_visibility(visibility) unless visibility.blank?
     filter_results = filter_results.by_uploader(uploader.to_i) unless uploader.blank?

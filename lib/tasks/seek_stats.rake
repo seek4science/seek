@@ -33,7 +33,7 @@ namespace :seek_stats do
           file << %!"#{asset.created_at}"!
           file << ","
           blobs = asset.respond_to?(:content_blobs) ? asset.content_blobs : [asset.content_blob]
-          size = blobs.compact.collect{|blob| blob.filesize}.compact.reduce(0,:+)
+          size = blobs.compact.collect{|blob| blob.file_size}.compact.reduce(0,:+)
           c_types = blobs.compact.collect{|blob| blob.content_type}.join(", ")
           file << size
           file << ","

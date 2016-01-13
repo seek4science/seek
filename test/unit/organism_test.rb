@@ -48,6 +48,17 @@ class OrganismTest < ActiveSupport::TestCase
 
     User.current_user = Factory(:project_administrator).user
     assert Organism.can_create?
+
+    User.current_user = Factory(:programme_administrator).user
+    assert Organism.can_create?
+
+    #only if the programme is activated
+    person = Factory(:programme_administrator)
+    programme = person.administered_programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    User.current_user = person.user
+    refute Organism.can_create?
   end
 
   test "can_view" do

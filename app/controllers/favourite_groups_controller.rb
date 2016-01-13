@@ -166,7 +166,7 @@ class FavouriteGroupsController < ApplicationController
     else
       respond_to do |format|
         flash[:error] = "You are not authorized to perform this action"
-        format.html { redirect_to person_path(current_user.person) }
+        format.html { redirect_to person_path(current_person) }
       end
       return false
     end

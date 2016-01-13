@@ -28,5 +28,5 @@
                            :onkeypress => "javascript: return onlyNumbers(event);") %>
 
     <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
-    <%= link_to 'Cancel', admin_path, :class => 'btn btn-default'-%>
+    <%= cancel_button admin_path %>
 <% end -%>

@@ -24,18 +24,20 @@ class User < ActiveRecord::Base
   has_many :taverna_player_runs, :class_name => 'TavernaPlayer::Run', :as => :contributor
   has_many :sweeps, :as => :contributor
 
+  has_many :oauth_sessions, :dependent => :destroy
+
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
   attr_accessor :password, :password_confirmation
   
-  validates     :login,presence: true, :unless => :using_openid?
-  validates     :password,presence: true, :if => :password_required?, :unless => :using_openid?
-  validates     :password_confirmation,presence: true, :if => :password_required?, :unless => :using_openid?
-  validates_length_of       :password, :within => 4..40, :if => :password_required?, :unless => :using_openid?
-  validates_confirmation_of :password,                   :if => :password_required?, :unless => :using_openid?
-  validates_length_of       :login,    :within => 3..40, :unless => :using_openid?
+  validates     :login,presence: true
+  validates     :password,presence: true, :if => :password_required?
+  validates     :password_confirmation,presence: true, :if => :password_required?
+  validates_length_of       :password, :within => 4..40, :if => :password_required?
+  validates_confirmation_of :password,                   :if => :password_required?
+  validates_length_of       :login,    :within => 3..40
   validates_uniqueness_of   :login, :case_sensitive => false
-  validates_uniqueness_of   :openid, :case_sensitive => false, :allow_nil => true
+
 
   validates :email,format: {with: RFC822::EMAIL}, if: "email"
   validates :email, presence: true, if: :check_email_present?
@@ -50,7 +52,7 @@ class User < ActiveRecord::Base
 
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :password, :password_confirmation, :openid, :email
+  attr_accessible :login, :password, :password_confirmation, :email
 
   has_many :favourite_groups, :dependent => :destroy
   
@@ -63,6 +65,7 @@ class User < ActiveRecord::Base
   delegate :is_admin?, to: :person, allow_nil: true
   delegate :is_project_administrator?, to: :person, allow_nil: true
   delegate :is_admin_or_project_administrator?, to: :person, allow_nil: true
+  delegate :is_programme_administrator?, to: :person, allow_nil: true
 
   # related_#{type} are resources that user created
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:events,:presentations,:publications]
@@ -92,12 +95,17 @@ class User < ActiveRecord::Base
     self.logged_in_and_registered? && self.current_user.person.is_programme_administrator_of_any_programme?
   end
 
+  #programme administrator logged in, but only of activated programmes
+  def self.activated_programme_administrator_logged_in?
+    self.programme_administrator_logged_in? && self.current_user.person.administered_programmes.activated.any?
+  end
+
   def self.admin_or_project_administrator_logged_in?
     project_administrator_logged_in? || admin_logged_in?
   end
 
-  def self.asset_manager_logged_in?
-     self.logged_in_and_registered? && self.current_user.person.is_asset_manager?
+  def self.asset_housekeeper_logged_in?
+     self.logged_in_and_registered? && self.current_user.person.is_asset_housekeeper?
   end
   #a person can be logged in but not fully registered during
   #the registration process whilst selecting or creating a profile
@@ -207,10 +215,6 @@ class User < ActiveRecord::Base
 
   def display_name
     person.name
-  end
-  
-  def using_openid?
-    !openid.blank?
   end
 
   def can_manage_types?

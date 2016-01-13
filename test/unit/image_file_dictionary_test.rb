@@ -15,10 +15,21 @@ class ImageFileDictionaryTest < ActiveSupport::TestCase
   end
 
   test "image_filename_for_key" do
-    assert_equal "famfamfam_silk/arrow_up.png",Seek::ImageFileDictionary.instance.image_filename_for_key(:arrow_up)
-    assert_equal "famfamfam_silk/arrow_up.png",Seek::ImageFileDictionary.instance.image_filename_for_key("arrow_up")
+    assert_equal "crystal_project/16x16/actions/1uparrow.png",Seek::ImageFileDictionary.instance.image_filename_for_key(:arrow_up)
+    assert_equal "crystal_project/16x16/actions/1uparrow.png",Seek::ImageFileDictionary.instance.image_filename_for_key("arrow_up")
     assert_nil Seek::ImageFileDictionary.instance.image_filename_for_key("keythatwill_never_exist")
   end
+
+  test "images exist" do
+    dic = Seek::ImageFileDictionary.instance
+    fails = []
+    dic.image_files.each do |file_path|
+      fails << file_path unless File.exists?(File.join(Rails.root,"app","assets","images",file_path))
+    end
+
+    assert_empty fails, "images found in dictionary that don't exist in app/assets/images"
+  end
+
 
 
 end

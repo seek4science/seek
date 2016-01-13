@@ -4,23 +4,18 @@
 <%= error_messages_for :model_image -%>
 
 <%= form_tag({:action => :create}, :multipart => true) do %>
+    <%= hidden_field_tag(:model_id, @image_for_id ) -%>
+    <%= hidden_field_tag(:return_to, params[:return_to] ? params[:return_to] : eval("#{@image_for.downcase}_model_images_path(#{@imager_for_id})")) -%>
+    <br/>
 
-  <%= hidden_field_tag(:model_id, @image_for_id ) -%>
-  <%= hidden_field_tag(:return_to, params[:return_to] ? params[:return_to] : eval("#{@image_for.downcase}_model_images_path(#{@imager_for_id})")) -%>
-  <br/>
-	<p>
-    <center>
-      <b>Image file: </b>
-	  <%= file_field 'model_image', 'image_file' %>
-	</center>
-  </p>
-	
-  <br/>
-  
-  <p>
-  	<center>
+    <div class="center-block">
+      <p>
+        <b>Image file: </b>
+        <%= file_field 'model_image', 'image_file' %>
+      </p>
+      <br/>
+
       <%= submit_tag "Upload", :disable_with => "Uploading..." %>
-	    or <%= link_to "Cancel", params[:return_to] ? params[:return_to] : eval("#{@image_for.downcase}_model_images_path(#{@image_for_id})") -%>
-	</center>
-  </p>
+      or <%= cancel_button(params[:return_to] ? params[:return_to] : eval("#{@image_for.downcase}_model_images_path(#{@image_for_id})")) -%>
+    </div>
 <% end %>

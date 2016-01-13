@@ -1,3 +1,4 @@
+<% icon_view ||= false %>
 <% asset = content_blob.asset
    if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
     <%# those libs have been loaded for Model %>
@@ -18,19 +19,34 @@
                zoom_width = (zoom_width == image_width) ? nil : zoom_width
             %>
             <%#param code is used for temporary link %>
-            <% download_url = polymorphic_path([asset, content_blob], :action => 'download', :disposition => 'inline', :code => params[:code], :image_size => zoom_width) %>
-            <%= button_link_to('View content', "show", download_url, {:rel => "lightbox"}) %>
+            <% url = polymorphic_path([asset, content_blob], :action => 'download', :disposition => 'inline', :code => params[:code], :image_size => zoom_width) %>
+            <% options = {:rel => "lightbox", :title => 'Preview'} %>
         <% else %>
             <%#param code is used for temporary link %>
-            <% view_pdf_content_url = polymorphic_path([asset, content_blob], :action => 'view_pdf_content', :code => params[:code]) %>
-            <%= button_link_to('View content', "show", view_pdf_content_url, {:onclick => "checkSupportedBrowser();", :title => 'View inline content this file'}) %>
+            <% url = polymorphic_path([asset, content_blob], :action => 'view_pdf_content', :code => params[:code]) %>
+            <% options = {:onclick => "checkSupportedBrowser();", :title => 'View inline content this file'} %>
         <% end %>
 
+        <% if icon_view %>
+            <%= link_to(image('show'), url, options) %>
+        <% else %>
+            <%= button_link_to('View content', "show", url, options) %>
+        <% end %>
      <% elsif !asset.is_a?(Model) && !(asset.is_a?(DataFile) && asset.contains_extractable_spreadsheet?) && asset.is_downloadable_asset? %>
-           <% explanation = "Your #{text_for_resource(asset)} is unable to be viewed in browser. " +
-                "Supported file formats are: " +  (Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT + ["pdf"]).join(" , ") +
-               "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(" , ") %>
-        <span class='disabled_icon disabled-button btn btn-default' onclick='javascript:alert("<%=explanation%>")' title='<%= tooltip_title_attrib(explanation) %>' > <%=  image('show', {:alt=>"View Content",:class=>"disabled"}) %>  View Content </span>
+        <% if content_blob.file_exists? %>
+            <% explanation = "Your #{text_for_resource(asset)} is unable to be viewed in browser. " +
+                    "Supported file formats are: " +  (Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT + ["pdf"]).join(" , ") +
+                    "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(" , ") %>
+        <% else %>
+            <% explanation = "This content is stored externally and cannot be previewed." %>
+        <% end %>
+        <% if icon_view %>
+            <%= image('show', :onclick => "javascript:alert('#{explanation}')", :title => tooltip_title_attrib(explanation)) %>
+        <% else %>
+            <span class='disabled_icon disabled-button btn btn-default' onclick='javascript:alert("<%=explanation%>")' title='<%= tooltip_title_attrib(explanation) %>'>
+              <%= image('show', {:alt=>"View Content",:class=>"disabled"}) %> View Content
+            </span>
+        <% end %>
     <% end %>
 <% end %>
 

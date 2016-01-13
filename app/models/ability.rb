@@ -40,18 +40,20 @@ class Ability
 
   end
 
-  #asset manager can manage the assets belonging to their project
-  def asset_manager asset_manager
-     can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
-        asset_manager.is_asset_manager_of?(item)
-     end
+  #asset housekeeper can manage the assets belonging to their project
+  def asset_housekeeper asset_housekeeper
+    can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
+      user = item.contributor
+      asset_housekeeper.is_asset_housekeeper_of?(item) &&
+          (user.nil? || (item.projects - user.person.former_projects).none?)
+    end
   end
 
-  #gatekeeper can publish the assets belonging to their project if as well can manage or the item is waiting for his approval
-  def gatekeeper gatekeeper
+  #asset gatekeeper can publish the assets belonging to their project if as well can manage or the item is waiting for his approval
+  def asset_gatekeeper asset_gatekeeper
     can :publish, :all do |item|
-      if gatekeeper.is_gatekeeper_of?(item)
-        if item.can_manage?(gatekeeper.user) && !item.is_published?
+      if asset_gatekeeper.is_asset_gatekeeper_of?(item)
+        if item.can_manage?(asset_gatekeeper.user) && !item.is_published?
           true
         elsif !item.is_published? && item.is_waiting_approval?(nil, 5.years.ago)
           true

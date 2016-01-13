@@ -13,6 +13,9 @@ module Seek
       if Seek::Config.auth_lookup_enabled
         commands << "--queue=#{AuthLookupUpdateJob.new.queue_name} -i #{number + 1} #{action}"
       end
+      if Seek::Config.cache_remote_files
+        commands << "--queue=#{RemoteContentFetchingJob.queue_name} -i #{number + 2} #{action}"
+      end
       if number > 0
         commands << "--queue=#{TavernaPlayer.job_queue_name} -n #{number} #{action}"
       end

@@ -1,30 +1,23 @@
 <%= javascript_include_tag 'publishing' %>
 <div class="show_basic">
-  <%= show_title "Review and select #{t('assays.assay').pluralize}, #{t('study').pluralize} and #{t('investigation').pluralize}" %>
+  <%= show_title "Review and select associated items" %>
 
-  <div class="box_infotext">
+
     <p>
-      Below are listed the <b><%= "#{t('assays.assay').pluralize}, #{t('study').pluralize} and #{t('investigation').pluralize}" -%></b> that are related to the items
-      you have selected to publish.
+      Listed below are the additional items you associated with item you wish to publish.
     </p>
     <p>
       If you have the required access rights, you can choose to publish it by <b>checking</b> the
       <span class="published"><b>Publish</b></span> checkbox beside the item.
-    </p>
-    <p>
       If you do not have the required access rights to publish, the checkbox is
       <span style="color:gray;font-weight:bolder">disabled</span>. Somebody that can publish that item is listed next to it and you should contact them and ask them to publish it for you.
     </p>
-    <p>
-      The selected items in previous step are shown together with the associated <%= t('assays.assay') -%>, and the publish checkboxes are checked by
-      default. Other items related to that <%= t('assays.assay') -%> are also shown, should you want to choose to publish them together.
-    </p>
 
-  </div>
+
   <br/>
   <%= form_tag({:action => :check_gatekeeper_required},:method=>:post) do %>
       <% @items_for_publishing.each do |item| %>
-          <% if !item.assays.empty? %>
+          <% if item.contains_publishable_items? %>
               <%= render :partial => "assets/publishing/isa_publishing_preview", :object => item %>
           <% else %>
               <%= check_box_tag publishing_item_param(item), 1, true, {:style => 'display:none;'} %>
@@ -33,14 +26,8 @@
 
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
-      <%
-         # Can not check the gatekeeper_required until the items are chosen
-         # So draftly check based on the existing of projects gatekeepers
-         draftly_check_gatekeeper_required = !current_user.person.is_gatekeeper? && !current_user.person.projects.collect(&:gatekeepers).flatten.empty?
-      %>
-
-      <%= submit_tag "Next",:disable_with=>"Next" -%>
+      <%= submit_tag "Next",:disable_with=>"Next", :class => 'btn btn-primary' -%>
       Or
-      <%= link_to 'Cancel', resource %>
+      <%= cancel_button(resource) %>
   <% end %>
 </div>

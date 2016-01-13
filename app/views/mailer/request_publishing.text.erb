@@ -1,10 +1,10 @@
 Hi <%= @owner.name -%>,
 
-    The <%= Seek::Config.application_name %> user <%= @publisher.name -%>, <%= person_url(@publisher,:host=>@host) -%>, has requested you to publish your following items in seek:
+    The <%= Seek::Config.application_name %> user <%= @publisher.name -%>, <%= person_url(@publisher) -%>, has requested you to publish your following items in seek:
 
 <% @resources.each do |resource| %>
     <% controller=resource.class.name.underscore.pluralize -%>
-    <%= resource.title -%> <%= url_for(:action=>:show,:controller=>controller,:id=>resource,:host=>@host) -%>
+    <%= resource.title -%> <%= url_for(:action=>:show,:controller=>controller,:id=>resource, :only_path => false) -%>
 
 <% end %>
 

@@ -1,8 +1,8 @@
 <div class="show_basic">
   <%= show_title "Confirm publishing" -%>
-  <h2>
-    You are about the publish the following items. Click Confirm to complete the publication, or Cancel.
-  </h2>
+  <p>
+    You are about the publish the following items.
+  </p>
   <%= form_tag :action => :publish do %>
         <ul class="publishing_options">
 
@@ -20,8 +20,8 @@
 
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
-      <%= submit_tag "Confirm",:disable_with=>"Confirm" -%>
-      Or
-      <%= link_to 'Cancel', resource %>
+      <%= submit_tag "Confirm",:disable_with=>"Confirm", :class => 'btn btn-primary' -%>
+      or
+      <%= cancel_button(resource) %>
   <% end %>
 </div>

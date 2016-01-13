@@ -6,11 +6,13 @@ module Seek
 
       def handle_upload_data
         blob_params = content_blob_params
-        # MERGENOTE - the manipulation and validation of the params still needs a bit of cleaning up
-        blob_params = update_params_for_batch(blob_params)
         allow_empty_content_blob = model_image_present?
-        return false unless check_for_data_or_url(blob_params) unless allow_empty_content_blob || retained_content_blob_ids.present?
-        blob_params = arrayify_params(blob_params)
+
+        unless allow_empty_content_blob || retained_content_blob_ids.present?
+          return false if !blob_params || blob_params.none? { |p| check_for_data_or_url(p) }
+        end
+
+        blob_params.select! { |p| !(p[:data].blank? && p[:data_url].blank?) }
 
         blob_params.each do |item_params|
           return false unless check_for_data_or_url(item_params) unless allow_empty_content_blob
@@ -61,6 +63,8 @@ module Seek
           external_link: !item_params[:make_local_copy] == '1',
           original_filename: item_params[:original_filename],
           content_type: item_params[:content_type],
+          make_local_copy: item_params[:make_local_copy] == '1',
+          file_size: item_params[:file_size],
           asset_version: version }
       end
 
@@ -87,36 +91,34 @@ module Seek
 
       def process_upload(blob_params)
         data = blob_params[:data]
-        filename = blob_params[:original_filename]
-        blob_params[:original_filename] = data.original_filename if filename.blank?
+        blob_params.delete(:data_url)
+        blob_params.delete(:original_filename)
+        blob_params[:original_filename] = data.original_filename
         blob_params[:tmp_io_object] = data
-        blob_params[:content_type] = data.content_type || content_type_from_filename(filename)
+        blob_params[:content_type] = data.content_type || content_type_from_filename(blob_params[:original_filename])
       end
 
       def process_from_url(blob_params)
         @data_url = blob_params[:data_url]
-        code = check_url_response_code(@data_url)
-        make_local_copy = blob_params[:make_local_copy] == '1'
-
-        case code
-          when 200
-            headers = fetch_url_headers(@data_url)
-            filename = determine_filename_from_disposition(headers[:content_disposition])
-            filename ||= determine_filename_from_url(@data_url)
-            if make_local_copy
-              downloader = RemoteDownloader.new
-              data_hash = downloader.get_remote_data @data_url, nil, nil, nil, make_local_copy
-              blob_params[:tmp_io_object] = File.open data_hash[:data_tmp_path], 'r'
-            end
-            blob_params[:original_filename] = filename || ''
-            blob_params[:content_type] = (extract_mime_content_type(headers[:content_type]) || content_type_from_filename(filename) || '')
-          when 401, 403
-            blob_params[:content_type] = ''
-            blob_params[:original_filename] = ''
-          else
-            flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the URL is inaccessible."
+        blob_params.delete(:data)
+        info = {}
+        case URI(@data_url).scheme
+        when 'http', 'https'
+          handler = Seek::DownloadHandling::HTTPHandler.new(@data_url)
+          info = handler.info
+          unless [200, 401, 403].include?(info[:code])
+            flash.now[:error] = "Processing the URL responded with a response code (#{info[:code]}), indicating the URL is inaccessible."
             return false
+          end
+        when 'ftp'
+          handler = Seek::DownloadHandling::FTPHandler.new(@data_url)
+          info = handler.info
         end
+
+        blob_params[:original_filename] = info[:file_name] || ''
+        blob_params[:content_type] = info[:content_type]
+        blob_params[:file_size] = info[:file_size]
+
         true
       end
 

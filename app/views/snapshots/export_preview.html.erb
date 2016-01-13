@@ -1,0 +1,105 @@
+<div class="row">
+  <div class="col-md-8 col-md-push-2">
+    <%= panel("Confirmation") do %>
+        <%= form_tag(export_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), method: :post) do %>
+            <%= image_tag('logos/zenodo.png', :class => 'zenodo-publish') %>
+            <p>
+              You are about to publish the investigation:
+              <strong><%= @investigation.title %></strong> to Zenodo. <br/>
+              Please fill out some additional metadata required by Zenodo before submitting.
+            </p>
+
+            <div class="form-group" id="access-right-section">
+              <label>Access Right</label>
+              <div class="btn-group btn-group-justified" data-toggle="buttons">
+                <label class="btn btn-default active">
+                  <input type="radio" name="metadata[access_right]" id="access-right-open" value="open" autocomplete="off" checked>
+                  Open
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" name="metadata[access_right]" id="access-right-embargoed" value="embargoed" autocomplete="off">
+                  Embargoed
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" name="metadata[access_right]" id="access-right-restricted" value="restricted" autocomplete="off">
+                  Restricted
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" name="metadata[access_right]" id="access-right-closed" value="closed" autocomplete="off">
+                  Closed
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group" id="license-section">
+              <label>License</label>
+              <%= license_select('metadata[license]', 'cc-by', :id => 'license-select', :class => 'form-control') %>
+              <span class="help-block">
+                For more information on this license, please visit
+                <a id="license-url" href="" target="_blank"></a>
+              </span>
+            </div>
+
+            <div class="form-group" id="access-conditions-section" style="display: none">
+              <label>Access Conditions</label>
+              <%= text_area_tag('metadata[access_conditions]','', :class => 'form-control') %>
+              <span class="help-block">The conditions under which this investigation can be accessed.</span>
+            </div>
+
+            <div class="form-group" id="embargo-date-section" style="display: none">
+              <label>Embargo Date</label>
+              <%= text_field_tag('metadata[embargo_date]','', :placeholder => 'YYYY-MM-DD', :class => 'form-control') %>
+              <span class="help-block">The date at which the embargo is lifted, e.g. 2015-08-15.</span>
+            </div>
+
+            <hr/>
+
+            <label>Creators</label>
+            <div class="row">
+              <div class="col-sm-8">
+                <span class="help-block">The following people will be credited as "creators" of this investigation.</span>
+              </div>
+              <div class="col-sm-4">
+                <div class="input-group input-group-sm">
+                  <input id="add-creator" type="text" class="form-control" placeholder="Add another creator (e.g. Doe, John)">
+                  <span class="input-group-btn">
+                    <button id="add-creator-button" class="btn btn-success" type="button">Add</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div id="creators">
+              <span class="subtle">No one</span>
+            </div>
+
+            <hr/>
+
+            <p class="text-center">
+              <%= submit_tag 'Publish', :class => 'btn btn-primary' %>
+              <%= cancel_button(investigation_path(@investigation)) %>
+            </p>
+        <% end %>
+    <% end %>
+  </div>
+</div>
+
+<script>
+    zenodoExport.creatorList = <%= @snapshot.all_related_people.map {|p| {name: "#{p.last_name}, #{p.first_name}"} }.sort.to_json.html_safe %>;
+
+    $j(document).ready(function () {
+        $j('#license-select').change(zenodoExport.setLicenseUrl);
+        $j('#access-right-section input:radio').change(zenodoExport.toggleSections);
+        $j('#add-creator-button').click(zenodoExport.addCreator);
+        $j('#add-creator').keypress(function(e) {
+            if(e.which == 13) {
+                zenodoExport.addCreator();
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        zenodoExport.toggleSections();
+        zenodoExport.setLicenseUrl();
+        zenodoExport.renderCreatorList();
+    });
+</script>

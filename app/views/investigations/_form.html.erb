@@ -4,7 +4,7 @@
 <%= f.hidden_field :new_link_from_study -%>
 
 <div class="form-group">
-  <%= f.label :title-%><span class="required">*</span>
+  <label>Title <span class="required">*</span></label>
   <%= f.text_field :title, :class=>"form-control" -%>
 </div>
 
@@ -13,11 +13,19 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control" -%>
 </div>
 
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>true} -%>
+<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} -%>
 
 <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
 
 <%= render :seek_partial=>"assets/sharing_form" if @investigation.can_manage? -%>
+
+<%  existing_creators = @investigation.creators
+    existing_creators =  [current_user.person] if existing_creators.blank?
+%>
+<%= render :partial => "assets/author_form", :locals => {:resource_type => t('investigation'), # this is only for presentation, not for any processing
+                                                         :existing_creators => existing_creators,
+                                                         :other_creators => @investigation.other_creators} -%>
+
 
 <%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('investigation'),
                                                                     :related_publications => @investigation.publications} -%>
@@ -36,4 +44,4 @@
                  :onclick => "javascript: $('investigation_submit_btn').form.submit();return(false);",
                  :class => 'btn btn-primary' -%>
 <% end %>
- or <%= link_to 'Cancel', (@investigation.id ? investigation_path(@investigation.id) : investigations_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(@investigation.id ? investigation_path(@investigation.id) : investigations_path) -%>

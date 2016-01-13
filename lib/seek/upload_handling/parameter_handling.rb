@@ -6,7 +6,7 @@ module Seek
       end
 
       def content_blob_params
-        params[:content_blob]
+        params[:content_blobs]
       end
 
       def clean_params
@@ -17,64 +17,8 @@ module Seek
         end
       end
 
-      def arrayify_params(blob_params)
-        result = []
-        Array(blob_params[:data_url]).each.with_index do |url, index|
-          unless url.blank?
-            result << { data_url: url,
-                        original_filename: Array(blob_params[:original_filename])[index],
-                        make_local_copy: Array(blob_params[:make_local_copy])[index] }
-          end
-
-        end
-        Array(blob_params[:data]).each do |data|
-          unless data.blank?
-            result << { data: data }
-          end
-        end
-        result
-      end
-
-      def update_params_for_batch(params)
-        data = []
-        data_urls = []
-        original_filenames = []
-        make_local_copy = []
-        params.keys.sort.each do |key|
-          key_str = key.to_s
-          if key_str.to_s =~ /data_\d{1,2}\z/
-            val = params.delete(key)
-            data << val unless val.blank?
-          elsif key_str.to_s =~ /data_url_\d{1,2}\z/
-            url = params.delete(key)
-            filename = params.delete(key_str.gsub('data_url', 'original_filename').to_sym)
-            copy = params.delete(key_str.gsub('data_url', 'make_local_copy').to_sym)
-            unless url.strip.blank?
-              original_filenames << filename
-              data_urls << url
-              make_local_copy << copy
-            end
-          end
-        end
-
-        params[:data] = data unless data.empty?
-
-        unless data_urls.empty?
-          params[:data_url] = data_urls
-          params[:original_filename] = original_filenames
-          params[:make_local_copy] = make_local_copy
-        end
-
-        params
-      end
-
       def retained_content_blob_ids
-        content_blobs = params[:content_blobs]
-        if content_blobs && content_blobs[:id]
-          content_blobs[:id].keys.map { |id| id.to_i }.sort
-        else
-          []
-        end
+        (params[:retained_content_blob_ids] || []).map { |id| id.to_i }.sort
       end
 
       def model_image_present?

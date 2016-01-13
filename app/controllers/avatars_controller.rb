@@ -124,6 +124,11 @@ class AvatarsController < ApplicationController
       ## END
       
       @avatar.save #forces a update callback, which invokes the sweeper
+      if @avatar_owner_instance.is_a?(Project)
+        if (Seek::Config.email_enabled && !@avatar_owner_instance.can_be_administered_by?(current_user))
+          ProjectChangedEmailJob.new(@avatar_owner_instance).queue_job
+        end
+      end
       respond_to do |format|
         flash[:notice] = 'Profile avatar was successfully updated.'
         format.html { redirect_to eval("#{@avatar_owner_instance.class.name.downcase}_avatars_url(#{@avatar_owner_instance.id})") }
@@ -190,9 +195,9 @@ class AvatarsController < ApplicationController
       if @avatar_for.downcase == "person"
         # for people, users can only edit/select/destroy own avatars - and "person" for current user should exist anyway;
         # (admins can access other people avatars too, provided that the person which is about to be changed is not admin themself)
-        unless @avatar_for_id.to_i == current_user.person.id.to_i || @avatar_owner_instance.can_be_edited_by?(current_user)
+        unless @avatar_for_id.to_i == current_person.id.to_i || @avatar_owner_instance.can_be_edited_by?(current_user)
           flash[:error] = "You can only view and manage your own avatars, but not ones of other users."
-          redirect_to(person_path(current_user.person))
+          redirect_to(person_path(current_person))
           return false
         end
       else
@@ -222,12 +227,12 @@ class AvatarsController < ApplicationController
   def find_avatars
     # all avatars for current object are only shown to the owner of the object OR to any admin (if the object is not an admin themself);
     # also, show avatars to all members of a project/institution
-    if User.admin_logged_in? || (@avatar_owner_instance.class.name == "Person" && @avatar_for_id.to_i == current_user.person.id.to_i) ||
+    if User.admin_logged_in? || (@avatar_owner_instance.class.name == "Person" && @avatar_for_id.to_i == current_person.id.to_i) ||
      (["Project", "Institution"].include?(@avatar_for) && @avatar_owner_instance.can_be_edited_by?(current_user))
       @avatars = Avatar.where(:owner_type => @avatar_for, :owner_id => @avatar_for_id)
     else
       flash[:error] = "You can only change avatars of an item you have the permission to edit."
-      redirect_to(person_path(current_user.person))
+      redirect_to(person_path(current_person))
       return false
     end
   end

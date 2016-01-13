@@ -6,7 +6,7 @@
         <%= preview_permission_popup_link(@workflow)-%>
         <%= submit_tag @workflow.new_record? ? "Save" : "Save Changes", :class => 'btn btn-primary' -%>
         or
-        <%= link_to 'Cancel', @workflow, :class => 'btn btn-default' -%>
+        <%= cancel_button(@workflow) -%>
       </p>
     </div>
 <% end %>

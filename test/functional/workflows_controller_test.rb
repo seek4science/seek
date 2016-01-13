@@ -36,7 +36,7 @@ class WorkflowsControllerTest < ActionController::TestCase
                                                                    })
     }
     assert_difference("Workflow.count") do
-      post :create, :workflow => wf_param, :content_blob => cblob_param, :sharing=>valid_sharing
+      post :create, :workflow => wf_param, :content_blobs => [cblob_param], :sharing=>valid_sharing
     end
 
     assert_equal 3, assigns(:workflow).input_ports.size

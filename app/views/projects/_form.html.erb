@@ -3,7 +3,7 @@
 <%= f.error_messages %>
 
 <div class="form-group">
-  <%= f.label :name -%>
+  <%= f.label :title -%><span class="required">*</span>
   <%= f.text_field :title, :class=>"form-control"-%>
 </div>
 
@@ -33,11 +33,14 @@
     <%= render :partial=>"projects/programme_selection", :locals=>{:f=>f} -%>
 <% end %>
 
+<% unless project %>
+    <%= render :partial=> "projects/select_add_current_user_to_project" %>
+<% end %>
+
 <% if Seek::Config.organisms_enabled %>
-    <%= folding_panel("Organisms Relevant To This #{t('project')}") do %>
         <%= render :partial=>"projects/organisms_selection", :locals=>{:f=>f} -%>
-    <% end %>
+
 <% end %>
 
 <%= f.submit(project ? "Update" : "Create",:disable_with=>(project ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
- or <%= link_to 'Cancel', (project ? project_path(project.id) : projects_path), :class => 'btn btn-default' -%>
+ or <%= cancel_button(project ? project_path(project.id) : projects_path) -%>

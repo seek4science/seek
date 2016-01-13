@@ -1,0 +1,12 @@
+Hi,
+    Unfortunately your <%= t('programme') %> <%= @programme.title %> has been rejected. The <%= t('programme') %> can be found at:
+
+        <%= programme_url(@programme) %>
+
+    The reason given for the rejection is:
+
+        "<%= @reason %>"
+
+    If you wish to respond to this rejection, please provide details at <%= feedback_home_url %>
+
+- The SysMO-DB Team

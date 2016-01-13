@@ -38,7 +38,7 @@ module Seek
 
       #checks that the person is a gatekeeper, regardless of project. Later when collecting the assets, they are filtered down to only thsoe the gatekeeper can control.
       def gatekeeper_auth
-        if @gatekeeper.nil? || !@gatekeeper.is_gatekeeper_of_any_project?
+        if @gatekeeper.nil? || !@gatekeeper.is_asset_gatekeeper_of_any_project?
           error("You are not authorized to approve/reject the publishing of items. You might login as a gatekeeper.", "is invalid (insufficient_privileges)")
           return false
         end
@@ -50,7 +50,7 @@ module Seek
           requesters_items_comments.keys.each do |requester_id|
             requester = Person.find_by_id(requester_id)
             begin
-              Mailer.gatekeeper_approval_feedback(requester, @gatekeeper , requesters_items_comments[requester_id], base_host).deliver
+              Mailer.gatekeeper_approval_feedback(requester, @gatekeeper , requesters_items_comments[requester_id]).deliver
             rescue Exception => e
               Rails.logger.error("Error sending gatekeeper approval feedback email to the requester #{requester.name}- #{e.message}")
             end
@@ -64,7 +64,7 @@ module Seek
           requesters_items_comments.keys.each do |requester_id|
             requester = Person.find_by_id(requester_id)
             begin
-              Mailer.gatekeeper_reject_feedback(requester, @gatekeeper,  requesters_items_comments[requester_id], base_host).deliver
+              Mailer.gatekeeper_reject_feedback(requester, @gatekeeper,  requesters_items_comments[requester_id]).deliver
             rescue Exception => e
               Rails.logger.error("Error sending gatekeeper reject feedback email to the requester #{requester.name}- #{e.message}")
             end

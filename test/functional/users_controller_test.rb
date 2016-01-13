@@ -256,17 +256,6 @@ class UsersControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  test 'should remove the guide_box after deleting it and remember for the next time' do
-    x = users(:aaron)
-    login_as(x)
-    assert x.show_guide_box
-
-    put :hide_guide_box, :id => User.current_user
-    assert_select 'div#guide_box', :count => 0
-    x.reload
-    assert !x.show_guide_box
-  end
-
   test "reset password with valid code" do
     user = Factory(:user)
     user.reset_password

@@ -52,7 +52,7 @@ class SweepsController < ApplicationController
 
     raise if @workflow.nil?
     # Manually add projects of current user, as they aren't prompted for this information in the form
-    @sweep.projects = current_user.person.projects
+    @sweep.projects = current_person.projects
     @sweep.policy.set_attributes_with_sharing params[:sharing], @sweep.projects
     respond_to do |format|
       if @sweep.save
@@ -147,7 +147,7 @@ class SweepsController < ApplicationController
 
       # Set parent ID to replay interactions
       run_attributes[:parent_id] = params[:run_id].to_i unless params[:run_id].blank?
-      run_attributes[:project_ids] = current_user.person.projects.map { |p| p.id }
+      run_attributes[:project_ids] = current_person.projects.map { |p| p.id }
 
       # Copy shared inputs from "parent" run
       if !shared_input_values_for_all_runs.blank?
@@ -173,14 +173,14 @@ class SweepsController < ApplicationController
       run_attributes[:name] = "#{params[:sweep][:name]} - #{identifier}"
 
       # Set the project for each runlet
-      run_attributes[:project_ids] = current_user.person.projects.map { |p| p.id }
+      run_attributes[:project_ids] = current_person.projects.map { |p| p.id }
     end
   end
 
   def auth
     action = translate_action(action_name)
     unless is_auth?(@sweep, action)
-      if User.current_user.nil?
+      if current_user.nil?
         flash[:error] = "You are not authorized to #{action} this Sweep, you may need to login first."
       else
         flash[:error] = "You are not authorized to #{action} this Sweep."

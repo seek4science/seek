@@ -53,7 +53,7 @@ function addSop(title,id) {
 function addSelectedSop() {
     selected_option_index=$("possible_sops").selectedIndex;
     selected_option=$("possible_sops").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
 
     i = $('possible_sops').selectedIndex;
@@ -132,7 +132,7 @@ function addDataFile(title,id,relationshipType) {
 function addSelectedDataFile() {
     selected_option_index=$("possible_data_files").selectedIndex;
     selected_option=$("possible_data_files").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
     if ($("data_file_relationship_type")) {
         relationshipType = $("data_file_relationship_type").options[$("data_file_relationship_type").selectedIndex].text;
@@ -216,7 +216,7 @@ function addModel(title,id) {
 function addSelectedModel() {
     selected_option_index=$("possible_models").selectedIndex;
     selected_option=$("possible_models").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
 
     i = $('possible_models').selectedIndex;
@@ -305,7 +305,7 @@ function addAssay(title,id,relationshipType) {
 function addSelectedAssay() {
     selected_option_index=$("possible_assays").selectedIndex;
     selected_option=$("possible_assays").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
     if ($("assay_relationship_type")) {
         relationshipType = $("assay_relationship_type").options[$("assay_relationship_type").selectedIndex].text;
@@ -412,7 +412,7 @@ function addOrganism(title,id,strain_info,strain_id,culture_growth,t_id,t_title)
 function addSelectedOrganism() {
     selected_option_index=$("possible_organisms").selectedIndex;
     selected_option=$("possible_organisms").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
     //strains selection list can be null when no strains is defined to an organism
     if($('strains')){

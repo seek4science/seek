@@ -1,29 +1,30 @@
 <%= f.error_messages -%>
 
-<%= panel('Institution Details') do %>
-	  <p>
-	    <%= f.label :name -%><br/>
-	    <%= f.text_area :title, :class=>"title_text_entry" -%>
-	  </p>
-	  <p>
-	    <%= f.label :web_page -%><br/>
-	    <%= f.text_field :web_page, :class=>"text_entry" -%>
-	  </p>
+<div class="form-group">
+  <%= f.label :name -%><span class="required">*</span>
+  <%= f.text_field :title, :class=>"form-control" -%>
+</div>
 
-		<p style="margin-top: 1.5em;">
-	    <%= f.label :address -%><br/>
-	    <%= f.text_area :address, :class=>"large_text_entry" -%>
-	  </p>
-	  <p>
-	    <%= f.label :city -%><br/>
-	    <%= f.text_field :city, :class=>"text_entry" -%>
-	  </p>
+<div class="form-group">
+  <%= f.label :web_page -%>
+  <%= f.text_field :web_page, :class=>"form-control" -%>
+</div>
 
-	  <p>
-	    <%= f.label :country -%><br/>
-	    <%= f.country_select :country, nil, {}, :class=>"text_entry" -%>
-	  </p>
-<% end %>
+<div class="form-group">
+  <%= f.label :address -%>
+  <%= f.text_area :address, :rows => 5, :class=>"form-control" -%>
+</div>
 
-<%= f.submit(institution ? "Update" : "Create",:disable_with=>(institution ? "Updating..." : "Creating...")) -%>
- or <%= link_to 'Cancel', (institution ? institution_path(institution.id) : institutions_path) -%>
+<div class="form-group">
+  <%= f.label :city -%>
+  <%= f.text_field :city, :class=>"form-control" -%>
+</div>
+
+<div class="form-group">
+  <%= f.label :country -%><span class="required">*</span>
+  <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
+</div>
+
+<%= f.submit(institution ? "Update" : "Create",:disable_with=>(institution ? "Updating..." : "Creating..."),
+             :class => 'btn btn-primary') -%> or
+<%= cancel_button(institution ? institution_path(institution.id) : institutions_path) -%>

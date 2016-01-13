@@ -67,7 +67,7 @@ class SamplesController < ApplicationController
     @sample = Sample.new
     @sample.parent_name = params[:parent_name]
     @sample.from_biosamples = params[:from_biosamples]
-    @sample.specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new(:creators=>[User.current_user.person])
+    @sample.specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new(:creators=>[current_person])
 
     respond_to do |format|
       format.html # new.html.erb
@@ -114,7 +114,7 @@ class SamplesController < ApplicationController
     if @sample.save
       #send publishing request for specimen
       if !@sample.specimen.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-        deliver_request_publish_approval [@sample.specimen]
+        notify_gatekeepers_of_approval_request [@sample.specimen]
       end
 
         tissue_and_cell_types.each do |t|

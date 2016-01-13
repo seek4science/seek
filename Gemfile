@@ -9,8 +9,6 @@ gem 'therubyracer', :platforms => :ruby
 gem "feedjira","~>1"
 gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
-gem 'ruby-openid'
-gem 'rack-openid'
 gem 'libxml-ruby',">=2.6.0",:require=>"libxml"
 gem 'uuid',"~>2.3"
 gem "RedCloth","4.2.9"
@@ -55,6 +53,7 @@ gem 'colorize','0.7.4'
 gem 'lograge'
 gem 'psych'
 gem 'transaction_isolation'
+gem 'validate_url'
 
 #gem for BiVeS and BudHat
 gem 'bives'
@@ -69,10 +68,7 @@ gem 'piwik_analytics',:git=>"https://github.com/SysMO-DB/piwik-ruby-tracking.git
 gem 'my_savage_beast', :git => "https://github.com/SysMO-DB/my_savage_beast"
 gem 'redbox', :git=>"https://github.com/SysMO-DB/redbox"
 gem "my_responds_to_parent", :git => "https://github.com/SysMO-DB/my_responds_to_parent.git"
-gem 'site_announcements', :git => "https://github.com/SysMO-DB/site_announcements.git"
-gem 'open_id_authentication', :git => "https://github.com/SysMO-DB/open_id_authentication.git"
 gem 'bioportal',">=2.2"
-
 gem 'acts_as_activity_logged', :git => "https://github.com/SysMO-DB/acts_as_activity_logged.git"
 gem 'acts_as_trashable',:git=> "https://github.com/SysMO-DB/acts_as_trashable.git"
 gem "app_version", :git => "https://github.com/SysMO-DB/app_version.git"
@@ -82,6 +78,7 @@ gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage", :ref=>"bb1182f27
 gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.git"
 gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
 
+gem 'site_announcements'
 gem 'taverna-t2flow'
 gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :branch => 'list-inputs', :ref=>"b36e19c85b7a58d08a73aa418c0f838442c6dfd3"
 gem 'jquery-rails', '~> 3'
@@ -91,7 +88,7 @@ gem 'metainspector'
 gem 'mechanize'
 gem 'mimemagic'
 
-gem 'datacite_doi_ify'
+gem 'datacite_doi_ify', '~>1.1.0'
 
 gem 'bootstrap-sass', '3.1.1.0'
 gem 'sass-rails', '>= 3.2'
@@ -101,7 +98,9 @@ gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
 gem 'bootstrap-multiselect-rails'
 gem 'handlebars_assets'
+gem "zenodo-client", :git=>"https://github.com/seek4science/zenodo-client.git"
 
+gem 'unicorn-rails'
 
 group :assets do
   gem 'turbo-sprockets-rails3'
@@ -120,7 +119,6 @@ group :development do
   gem "rubocop",:require=>false
   gem "rubycritic",:require=>false
   gem "guard-rubycritic",:require=>false
-  gem 'unicorn-rails'
   gem 'rails_best_practices'
   #disables the started get, severved assets logs
   gem 'quiet_assets', group: :development
@@ -137,5 +135,9 @@ group :test do
   gem 'rspec-rails'
   gem 'sunspot_matchers'
   gem 'pg'
+  gem 'teaspoon'
+  gem "teaspoon-mocha"
+  gem "magic_lamp"
+  gem 'database_cleaner'
   gem 'selenium-webdriver'
 end

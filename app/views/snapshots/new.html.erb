@@ -1,0 +1,47 @@
+<%= render :partial => "general/page_title", :locals => { :title => 'Snapshot Preview' } %>
+<% items = Seek::ResearchObjects::Generator.instance.gather_entries(@investigation, true).group_by(&:permitted_for_research_object?) %>
+<% included_items = items[true] || [] %>
+<% excluded_items = items[false] || [] %>
+
+<% included_text = capture do %>
+    The following public resources will be included in the snapshot.
+    Please ensure this list is correct before clicking the "Create Snapshot" button below.
+<% end %>
+<% excluded_text = capture do %>
+    These resources will be excluded from the snapshot due to not having public access privileges.
+    To include an excluded resource in the snapshot, please make it publicly accessible.
+    <% if excluded_items.any? %>
+    <br/>To quickly publish these items you can select the Publish full <%=t('investigation')%> button below.
+    <% end %>
+<% end %>
+
+<div class="row">
+  <% [{key: :included,title: 'Included', text: included_text, panel_type: 'panel-success', list: included_items},
+      {key: :excluded,title: 'Excluded', text: excluded_text, panel_type: 'panel-danger', list: excluded_items}].each do |options| %>
+      <div class="col-md-6">
+        <%= panel(options[:title] + " (#{options[:list].count})", :type => options[:panel_type]) do %>
+            <p><%= options[:text] %></p>
+            <hr/>
+            <% if options[:list].empty? %>
+                <span class="none_text">Nothing</span>
+            <% end %>
+            <% options[:list].group_by(&:class).each do |type, resources| %>
+                <h4><%= type.name.titleize.pluralize %> <small>(<%= resources.count -%>)</small></h4>
+                <ul>
+                  <% resources.each do |resource| %>
+                      <li><%= link_to resource.title, resource %></li>
+                  <% end %>
+                </ul>
+            <% end %>
+
+        <% end %>
+      </div>
+  <% end %>
+</div>
+
+<%= link_to('Create Snapshot', investigation_snapshots_path(@investigation),
+            :method => :post, :class => 'btn btn-primary') %>
+
+<%= image_tag_for_key('publish', polymorphic_path(@investigation, :action => :check_related_items), nil, {:method=>:post,:class => 'btn btn-default'}, "Publish full #{t('investigation')}") if excluded_items.any? %>
+
+or <%= cancel_button investigation_path(@investigation) -%>

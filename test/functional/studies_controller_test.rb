@@ -44,8 +44,8 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study.id
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"Publications (3)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"Publications (3)",:count=>1
     end
   end
 
@@ -278,10 +278,10 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
-      assert_select "h3",:text=>"#{I18n.t('sop').pluralize} (1+1)",:count=>1
-      assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
+      assert_select "a",:text=>"#{I18n.t('sop').pluralize} (1+1)",:count=>1
+      assert_select "a",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
     end
 
     assert_select "div.list_item" do
@@ -358,8 +358,8 @@ class StudiesControllerTest < ActionController::TestCase
     s=studies(:metabolomics_study)
     get :show,:id=>s
     assert_response :success
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"#{I18n.t('investigation').pluralize} (1)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"#{I18n.t('investigation').pluralize} (1)",:count=>1
     end
   end
   
@@ -472,5 +472,68 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should add creators' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    assert study.creators.empty?
+
+    put :update, :id=>study.id, :study=>{}, :creators=>[[creator.name,creator.id]].to_json
+    assert_redirected_to study_path(study)
+
+    assert study.creators.include?(creator)
+  end
+
+  test 'should have creators association box' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+
+    get :edit, :id=> study.id
+    assert_response :success
+    assert_select "p#creators_list"
+    assert_select "input[type='text'][name='creator-typeahead']"
+    assert_select "input[type='hidden'][name='creators']"
+    assert_select "input[type='text'][name='study[other_creators]']"
+
+  end
+
+  test 'should show creators' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    study.creators = [creator]
+    study.save
+    study.reload
+    assert study.creators.include?(creator)
+
+    get :show, :id=> study.id
+    assert_response :success
+    assert_select "span.author_avatar a[href=?]", "/people/#{creator.id}"
+  end
+
+  test 'should show other creators' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    other_creators = 'other creators'
+    study.other_creators = other_creators
+    study.save
+    study.reload
+
+    get :show, :id=> study.id
+    assert_response :success
+    assert_select "div.panel-body div", :text => other_creators
+  end
+
+  test 'should not multiply creators after calling show' do
+    study = Factory(:study, :policy => Factory(:public_policy))
+    creator = Factory(:person)
+    study.creators = [creator]
+    study.save
+    study.reload
+    assert study.creators.include?(creator)
+    assert_equal 1, study.creators.count
+
+    get :show, :id=> study.id
+    assert_response :success
+
+    study.reload
+    assert_equal 1, study.creators.count
+  end
 
 end

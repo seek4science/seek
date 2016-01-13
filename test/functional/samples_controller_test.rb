@@ -60,8 +60,8 @@ class SamplesControllerTest < ActionController::TestCase
 
     get :show, :id=>s
     assert_response :success
-    assert_select "div.tab-pane" do
-      assert_select "h3", :text=>/#{I18n.t('biosamples.sample_parent_term')}s/ ,:count => 1
+    assert_select "ul.nav-pills" do
+      assert_select "a", :text=>/#{I18n.t('biosamples.sample_parent_term')}s/ ,:count => 1
     end
     with_config_value :tabs_lazy_load_enabled, true do
       get :resource_in_tab, {:resource_ids => [s.specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}

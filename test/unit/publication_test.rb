@@ -35,6 +35,48 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal [],p.content_blob_search_terms
   end
 
+  test "associate" do
+    publication = Factory(:publication)
+    assay = Factory(:assay)
+    data_file=Factory(:data_file)
+    model = Factory(:model)
+
+    publication.associate(assay)
+    publication.associate(data_file)
+    publication.associate(model)
+    publication.save!
+
+    assert_equal [assay],publication.assays
+    assert_equal [data_file],publication.data_files
+    assert_equal [model],publication.models
+
+    publication.associate(assay)
+    publication.associate(data_file)
+    publication.associate(model)
+    publication.save!
+
+    assert_equal [assay],publication.assays
+    assert_equal [data_file],publication.data_files
+    assert_equal [model],publication.models
+  end
+
+  test "related organisms" do
+    organism1 = Factory(:organism)
+    organism2 = Factory(:organism)
+    publication = Factory(:publication)
+    model1 = Factory(:model,:organism=>organism1)
+    assay1 = Factory(:assay,:organisms=>[organism1])
+    model2 = Factory(:model,:organism=>organism2)
+    assay2 = Factory(:assay,:organisms=>[organism2])
+    publication.associate(model1)
+    publication.associate(model2)
+    publication.associate(assay1)
+    publication.associate(assay2)
+    publication.save!
+
+    assert_equal [organism1,organism2].sort,publication.related_organisms.sort
+  end
+
   test "assay association" do
     publication = publications(:pubmed_2)
     assay = assays(:modelling_assay_with_data_and_relationship)
