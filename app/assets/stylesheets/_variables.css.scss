@@ -1,12 +1,12 @@
 /* Customize colours etc. here */
 @import 'bootstrap/variables';
 
-$navbar-default-bg: #33495C;
+$navbar-default-bg: #f8f8f8;
 $navbar-default-border: darken($navbar-default-bg, 6.5%);
 $navbar-default-link-active-bg: darken($navbar-default-bg, 6.5%);
-$navbar-default-link-color: #cce6f3;
-$navbar-default-link-active-color: lighten($navbar-default-link-color, 30%);
-$navbar-default-link-hover-color: lighten($navbar-default-link-color, 40%);
+$navbar-default-link-color: #777;
+$navbar-default-link-active-color: darken($navbar-default-link-color, 30%);
+$navbar-default-link-hover-color: darken($navbar-default-link-color, 40%);
 
 $grid-float-breakpoint: $screen-sm-max + 1;
 $grid-float-breakpoint-max: $grid-float-breakpoint - 1;
