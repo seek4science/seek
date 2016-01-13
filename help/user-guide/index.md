@@ -45,16 +45,16 @@ layout: page
      - [Creating a Research Object](investigation-snapshots.html#creating-a-research-object)
      - [Assigning a DOI](investigation-snapshots.html#assigning-a-doi)
 - [Specialist user roles](roles.html)
+     - [Programme administrator](roles.html#programme-administrator)
      - [Asset housekeeper](roles.html#asset-housekeeper)
      - [Asset gatekeeper](roles.html#asset-gatekeeper)
      - [Project administrator](roles.html#project-administrator)
-          - [Add and remove people from a project](roles.html#add-and-remove-people-from-a-project)
-          - [Create Organisms](roles.html#create-organisms)
-          - [Create Profiles](roles.html#create-profiles)
-          - [Create Institutions](roles.html#create-institutions)
-          - [Assign people to project roles](roles.html#assign-people-to-project-roles)
-          - [Flag when a person leaves a project](roles.html#flag-when-a-person-leaves-a-project)
-     - [Programme administrator](roles.html#programme-administrator)
+          - [Create Organisms](adding-admin-items.html#creating-organisms)
+          - [Create Profiles](adding-admin-items.html#creating-profiles)
+          - [Create Institutions](adding-admin-items.html#creating-institutions)
+          - [Add and remove people from a project](admin-project-members.html#add-and-remove-people-from-a-project)
+          - [Assign people to project roles](admin-project-members.html#assign-people-to-project-roles)
+          - [Flag when a person leaves a project](admin-project-members.html#flag-when-a-person-leaves-a-project)
 
 
 
