@@ -58,7 +58,7 @@ en:
     isa:  "Experiments"
     assets: "Assets"
     activities: "Activities"
-    documentation: "Documentation"
+    documentation: "Help"
     admin: "Server administration"
     help: "Help documents"
     account: "Account"
@@ -82,3 +82,9 @@ en:
     editing: "View and edit summary"
     editing_downloadable: "View and edit summary and contents"
     managing: "Manage"
+
+  asset_housekeeper: 'Asset housekeeper'
+  asset_gatekeeper: 'Asset gatekeeper'
+  project_administrator: 'Project administrator'
+  pal: 'PAL'
+  programme_administrator: 'Programme administrator'

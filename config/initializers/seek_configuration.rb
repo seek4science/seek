@@ -15,7 +15,9 @@ SEEK::Application.configure do
   Seek::Config.default :support_email_address, ''
   Seek::Config.default :solr_enabled,false
   Seek::Config.default :jws_enabled, true
-  Seek::Config.default :jws_online_root,"https://jws.sysmo-db.org/"
+  Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
+  Seek::Config.default :internal_help_enabled, false
+  Seek::Config.default :external_help_url,"http://docs.seek4science.org/help"
   Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
@@ -45,7 +47,7 @@ SEEK::Application.configure do
   Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
-  Seek::Config.default :biosamples_enabled, true
+  Seek::Config.default :biosamples_enabled, false
   Seek::Config.default :modelling_analysis_enabled,true
   Seek::Config.default :organisms_enabled,true
   Seek::Config.default :models_enabled,true
@@ -69,7 +71,7 @@ SEEK::Application.configure do
   Seek::Config.default :programmes_enabled, false
   Seek::Config.default :project_hierarchy_enabled, false
   Seek::Config.default :show_announcements, true
-  Seek::Config.default :allow_user_programme_creation, false
+  Seek::Config.default :programme_user_creation_enabled, false
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
@@ -163,5 +165,15 @@ SEEK::Application.configure do
 # SynthSys settings
   Seek::Config.default :use_ease, false
   Seek::Config.default :ease_logout_url, "https://www.ease.ed.ac.uk/logout/logout.cgi"
+  Seek::Config.default :datacite_url, 'https://mds.datacite.org/'
+  Seek::Config.default :zenodo_publishing_enabled, false
+  Seek::Config.default :zenodo_api_url, 'https://zenodo.org/api'
+  Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
+
+  Seek::Config.default :cache_remote_files, true
+  Seek::Config.default :max_cachable_size, 20 * 1024 * 1024
+  Seek::Config.default :hard_max_cachable_size, 100 * 1024 * 1024
+
+  Seek::Config.default :orcid_required, false
 end
 
