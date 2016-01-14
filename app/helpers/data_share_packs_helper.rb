@@ -1,2 +1,0 @@
-module DataSharePacksHelper
-end

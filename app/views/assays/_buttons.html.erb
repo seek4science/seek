@@ -7,7 +7,6 @@
 <%= admin_dropdown do %>
     <% if item.can_manage? -%>
         <li><%= icon_link_to("Manage #{assay_word}", 'manage', edit_assay_path) %></li>
-        <li><%= icon_link_to("Export #{assay_word}", 'export', new_data_share_pack_path(:assay_id=>item.id)) %></li>
     <% elsif item.can_edit?-%>
         <li><%= icon_link_to("Edit #{assay_word} Details", 'edit', edit_assay_path) %></li>
     <% end -%>
