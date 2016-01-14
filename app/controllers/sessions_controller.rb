@@ -34,11 +34,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    if using_open_id?
-      open_id_authentication
-    else
-      password_authentication
-    end
+    password_authentication
   end
 
   def get_ease_id

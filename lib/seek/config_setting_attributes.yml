@@ -165,3 +165,6 @@ default_all_visitors_access_type:
   convert: :to_i
 default_project_members_access_type:
   convert: :to_i
+ease_logout_url:
+use_ease:
+  convert: :to_i
