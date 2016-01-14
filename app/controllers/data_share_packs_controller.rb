@@ -24,6 +24,7 @@ class DataSharePacksController < ApplicationController
   # GET /data_share_packs/new
   # GET /data_share_packs/new.json
   def new
+    puts "In new"
     logger.info "\n\nNew data pack with assay id: #{params[:assay_id]}\n\n"
 
     @assay =  Assay.find(params[:assay_id])
@@ -31,10 +32,10 @@ class DataSharePacksController < ApplicationController
     @data_share_pack.title = @assay.title
     @data_share_pack.description = @assay.description
 
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @data_share_pack }
-    end
+    #respond_to do |format|
+    #  format.html # new.html.erb
+    #  format.json { render json: @data_share_pack }
+    #end
   end
 
   # GET /data_share_packs/1/edit
@@ -45,6 +46,7 @@ class DataSharePacksController < ApplicationController
   # POST /data_share_packs
   # POST /data_share_packs.json
   def create
+    puts "In create"
     @data_share_pack = DataSharePack.new(params[:data_share_pack])
 
     respond_to do |format|
