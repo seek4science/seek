@@ -11,7 +11,7 @@ SEEK JIRA - Issue tracking: [https://jira-bsse.ethz.ch/browse/OPSK](https://jira
 
 ​Continuous Integration testing (Travis): [https://travis-ci.org/seek4science/seek](https://travis-ci.org/seek4science/seek)
 
-Code quality metrics (Code Climate): [https://codeclimate.com/github/seek4science/seek​](https://codeclimate.com/github/seek4science/seek​)
+Code quality metrics (Code Climate): [https://codeclimate.com/github/seek4science/seek​](https://codeclimate.com/github/seek4science/seek)
 
 SEEK software website: [http://seek4science.org](http://seek4science.org)
 
