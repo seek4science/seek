@@ -361,12 +361,6 @@ ActiveRecord::Schema.define(:version => 20160112193836) do
   add_index "data_files_projects", ["data_file_id", "project_id"], :name => "index_data_files_projects_on_data_file_id_and_project_id"
   add_index "data_files_projects", ["project_id"], :name => "index_data_files_projects_on_project_id"
 
-  create_table "data_share_packs", :force => true do |t|
-    t.string   "title"
-    t.string   "description"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
-  end
 
   create_table "db_files", :force => true do |t|
     t.binary "data", :limit => 2147483647
