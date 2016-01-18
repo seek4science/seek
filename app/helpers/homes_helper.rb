@@ -73,8 +73,8 @@ module HomesHelper
   end
 
   def determine_entry_date(entry)
-    entry_date = entry.try(:updated) if entry.respond_to?(:updated)
-    entry_date ||= entry.try(:published) if entry.respond_to?(:published)
+    entry_date = entry.try(:published) if entry.respond_to?(:published)
+    entry_date ||= entry.try(:updated) if entry.respond_to?(:updated)
     entry_date ||= entry.try(:last_modified) if entry.respond_to?(:last_modified)
     entry_date
   end

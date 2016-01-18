@@ -24,15 +24,12 @@
         <li><%= link_to "Manage assay types", url_for(:action=>"manage", :controller=>"suggested_assay_types") %></li>
         <li><%= link_to "Manage technology types", url_for(:action=>"manage", :controller=>"suggested_technology_types") %></li>
         <li><%= link_to "Manage tags", tags_admin_path %></li>
-        <li><%= link_to "Manage projects", url_for(:action=>"manage", :controller=>"projects") %></li>
+        <% if Seek::Config.project_hierarchy_enabled %>
+            <li><%= link_to "Manage projects", url_for(:action=>"manage", :controller=>"projects") %></li>
+        <% end %>
         <li><%= link_to "Manage compounds", url_for(:action=>"index", :controller=>"compounds") %></li>
       </ul>
     </div>
   </div>
-  <% if Seek::Config.jerm_enabled -%>
-      <h3>JERM</h3>
-      <ul>
-        <li><%= link_to "Run a harvester", jerm_path %> </li>
-      </ul>
-  <% end -%>
+
 </div>
