@@ -1,3 +1,5 @@
+require 'net/ftp'
+
 module Seek
   module DownloadHandling
     class FTPHandler
