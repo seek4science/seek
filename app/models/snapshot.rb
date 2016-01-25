@@ -24,6 +24,10 @@ class Snapshot < ActiveRecord::Base
     snapshot.content_blob # The thing to be deposited
   end
 
+  def to_param
+    snapshot_number.to_s
+  end
+
   def metadata
     @ro_metadata ||= parse_metadata
   end
@@ -98,9 +102,9 @@ class Snapshot < ActiveRecord::Base
   end
 
   def doi_target_url
-    investigation_snapshot_url(resource, snapshot_number,
-                               :host => Seek::Config.host_with_port,
-                               :protocol => Seek::Config.host_scheme)
+    polymorphic_url([resource, self],
+                    :host => Seek::Config.host_with_port,
+                    :protocol => Seek::Config.host_scheme)
   end
 
   def parse_metadata
