@@ -1,5 +1,6 @@
 require 'openssl'
 require 'fileutils'
+require 'net/ftp'
 
 module Seek
   
