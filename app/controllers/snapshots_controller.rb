@@ -17,7 +17,7 @@ class SnapshotsController < ApplicationController
   def create
     @snapshot = @investigation.create_snapshot
     flash[:notice] = "Snapshot created"
-    redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    redirect_to polymorphic_path([@investigation, @snapshot])
   end
 
   def show
@@ -34,13 +34,13 @@ class SnapshotsController < ApplicationController
   end
 
   def mint_doi
-    wrap_service('DataCite', investigation_snapshot_path(@investigation, @snapshot.snapshot_number)) do
+    wrap_service('DataCite', polymorphic_path([@investigation, @snapshot])) do
       if @snapshot.mint_doi
         flash[:notice] = "DOI successfully minted"
-        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+        redirect_to polymorphic_path([@investigation, @snapshot])
       else
         flash[:error] = @snapshot.errors.full_messages
-        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+        redirect_to polymorphic_path([@investigation, @snapshot])
       end
     end
   end
@@ -53,13 +53,13 @@ class SnapshotsController < ApplicationController
 
     metadata = params[:metadata].delete_if { |k,v| v.blank? }
 
-    wrap_service('Zenodo', investigation_snapshot_path(@investigation, @snapshot.snapshot_number), rescue_all: true) do
+    wrap_service('Zenodo', polymorphic_path([@investigation, @snapshot]), rescue_all: true) do
       if @snapshot.export_to_zenodo(access_token, metadata) && @snapshot.publish_in_zenodo(access_token)
         flash[:notice] = "Snapshot successfully exported to Zenodo"
-        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+        redirect_to polymorphic_path([@investigation, @snapshot])
       else
         flash[:error] = @snapshot.errors.full_messages
-        redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+        redirect_to polymorphic_path([@investigation, @snapshot])
       end
     end
   end
@@ -73,14 +73,14 @@ class SnapshotsController < ApplicationController
   def auth_investigation
     unless is_auth?(@investigation, :manage)
       flash[:error] = "You are not authorized to manage snapshots of this investigation."
-      redirect_to investigation_path(@investigation)
+      redirect_to polymorphic_path(@investigation)
     end
   end
 
   def check_investigation_permitted_for_ro
     unless @investigation.permitted_for_research_object?
       flash[:error] = "You may only create snapshots of publicly accessible investigations."
-      redirect_to investigation_path(@investigation)
+      redirect_to polymorphic_path(@investigation)
     end
   end
 
@@ -88,14 +88,14 @@ class SnapshotsController < ApplicationController
     @snapshot = @investigation.snapshots.where(snapshot_number: params[:id]).first
     if @snapshot.nil?
       flash[:error] = "Snapshot #{params[:id]} doesn't exist."
-      redirect_to investigation_path(@investigation)
+      redirect_to polymorphic_path(@investigation)
     end
   end
 
   def doi_minting_enabled?
     unless Seek::Config.doi_minting_enabled
       flash[:error] = "DOI minting is not enabled."
-      redirect_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+      redirect_to polymorphic_path([@investigation, @snapshot])
     end
   end
 
