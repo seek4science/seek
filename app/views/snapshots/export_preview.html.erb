@@ -1,11 +1,11 @@
 <div class="row">
   <div class="col-md-8 col-md-push-2">
     <%= panel("Confirmation") do %>
-        <%= form_tag(export_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), method: :post) do %>
+        <%= form_tag(polymorphic_path([@resource, @snapshot], :action => 'export'), method: :post) do %>
             <%= image_tag('logos/zenodo.png', :class => 'zenodo-publish') %>
             <p>
-              You are about to publish the investigation:
-              <strong><%= @investigation.title %></strong> to Zenodo. <br/>
+              You are about to publish:
+              <strong><%= @resource.title %></strong> to Zenodo. <br/>
               Please fill out some additional metadata required by Zenodo before submitting.
             </p>
 
@@ -43,7 +43,7 @@
             <div class="form-group" id="access-conditions-section" style="display: none">
               <label>Access Conditions</label>
               <%= text_area_tag('metadata[access_conditions]','', :class => 'form-control') %>
-              <span class="help-block">The conditions under which this investigation can be accessed.</span>
+              <span class="help-block">The conditions under which this resource can be accessed.</span>
             </div>
 
             <div class="form-group" id="embargo-date-section" style="display: none">
@@ -57,7 +57,7 @@
             <label>Creators</label>
             <div class="row">
               <div class="col-sm-8">
-                <span class="help-block">The following people will be credited as "creators" of this investigation.</span>
+                <span class="help-block">The following people will be credited as "creators" of this resource.</span>
               </div>
               <div class="col-sm-4">
                 <div class="input-group input-group-sm">
@@ -76,7 +76,7 @@
 
             <p class="text-center">
               <%= submit_tag 'Publish', :class => 'btn btn-primary' %>
-              <%= cancel_button(investigation_path(@investigation)) %>
+              <%= cancel_button(polymorphic_path(@resource)) %>
             </p>
         <% end %>
     <% end %>
