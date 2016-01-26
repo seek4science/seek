@@ -14,7 +14,7 @@
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => (@investigation.creators | [@investigation.contributing_user.try(:person)]).compact.uniq } %>
-    <%= render :partial=>"snapshots/snapshots",:locals => { :snapshots => @investigation.snapshots } if @investigation.snapshots.any? %>
+    <%= render :partial=>"snapshots/snapshots",:locals => { :snapshots => @investigation.snapshots, :resource => @investigation } if @investigation.snapshots.any? %>
   </div>
 </div>
 
