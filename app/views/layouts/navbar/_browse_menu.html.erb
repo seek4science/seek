@@ -26,9 +26,6 @@
     <% end %>
     <li><%= link_to t("sop").pluralize, sops_path %></li>
     <li><%= link_to "Publications", publications_path %></li>
-    <% if Seek::Config.biosamples_enabled %>
-        <li><%= link_to "Biosamples", biosamples_path %></li>
-    <% end %>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
     <li><%= link_to t("presentation").pluralize, presentations_path %></li>

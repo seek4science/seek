@@ -147,4 +147,17 @@ class StrainsController < ApplicationController
     strain
   end
 
+  def strains_of_selected_organism
+    strains = []
+    if params[:organism_id]
+      organism = Organism.find_by_id params[:organism_id].to_i
+      strains |= organism.strains if organism
+    end
+    respond_to do |format|
+      format.json{
+        render :json => {:status => 200, :strains => strains.sort_by(&:title).reject{|s| s.is_dummy}.select(&:can_view?).collect{|strain| [strain.id, strain.info]}}
+      }
+    end
+  end
+
 end

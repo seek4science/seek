@@ -576,6 +576,7 @@ SEEK::Application.routes.draw do
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
+      get :strains_of_selected_organism
       post :items_for_result
       post :resource_in_tab
     end
@@ -583,15 +584,6 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
     end
     resources :specimens,:assays,:people,:projects,:only=>[:index]
-  end
-
-  resources :biosamples do
-    collection do
-      get :existing_strains
-      get :existing_specimens
-      get :strains_of_selected_organism
-      get :existing_samples
-    end
   end
 
   resources :organisms do
