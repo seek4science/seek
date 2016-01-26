@@ -145,8 +145,6 @@ class DataFilesController < ApplicationController
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
-      assay_ids = params[:assay_ids] || []
-
       if @data_file.save
         update_annotations(params[:tag_list], @data_file)
         update_scales @data_file
@@ -163,16 +161,10 @@ class DataFilesController < ApplicationController
             #parse the data file if it is with sample data
             if @data_file.is_with_sample
               bio_samples = @data_file.bio_samples_population params[:institution_id]
-              #@bio_samples = bio_samples
-              #Rails.logger.warn "BIO SAMPLES ::: " + @bio_samples.treatments_text
+
               unless  bio_samples.errors.blank?
                 flash[:notice] << "<br/> However, Sample database population failed."
                 flash[:error] = bio_samples.errors.html_safe
-                #respond_to do |format|
-                #  format.html{
-                #    render :action => "new"
-                #  }
-                # end
               end
             end
             #the assay_id param can also contain the relationship type
