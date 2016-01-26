@@ -57,6 +57,8 @@
 
   </div>
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "snapshots/snapshots", :locals => {:snapshots => @snapshot.resource.snapshots, :selected => @snapshot} %>
+    <%= render :partial => "snapshots/snapshots", :locals => {:snapshots => @resource.snapshots,
+                                                              :selected => @snapshot,
+                                                              :resource => @resource } %>
   </div>
 </div>
