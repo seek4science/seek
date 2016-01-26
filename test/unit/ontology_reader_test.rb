@@ -1,11 +1,15 @@
 require 'test_helper'
 
-
 #tests that are general to the ontology reader base class, rather than specific to the assay, modelling anaylsis, and technology type sub-classes
 class OntologyReaderTest < ActiveSupport::TestCase
 
-  test "handles a uri to ontology" do
+  setup do
+    stub_request(:get, "https://raw.github.com/SysMO-DB/JERMOntology/eb70107ecb1e0a5f7d26dc968e176bf4f782834d/JERM_alpha1.6.rdf").to_return(
+        :body => File.new("#{Rails.root}/test/fixtures/files/JERM_alpha1.6.rdf"),
+        :status => 200)
+  end
 
+  test "handles a uri to ontology" do
     class URIOntologyReader < Seek::Ontologies::OntologyReader
 
       def default_parent_class_uri
@@ -16,8 +20,6 @@ class OntologyReaderTest < ActiveSupport::TestCase
         "https://raw.github.com/SysMO-DB/JERMOntology/eb70107ecb1e0a5f7d26dc968e176bf4f782834d/JERM_alpha1.6.rdf"
       end
     end
-
-    WebMock.allow_net_connect!
 
     reader = URIOntologyReader.instance
     assert_not_nil reader.ontology

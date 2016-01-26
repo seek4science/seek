@@ -16,7 +16,7 @@ module DefaultJobProperties
 
   # time before the job is run
   def default_delay
-    1.second
+    3.seconds
   end
 
   # whether a new job will be created once this one finishes.
