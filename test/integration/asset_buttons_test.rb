@@ -2,7 +2,7 @@ require 'test_helper'
 
 
 class AssetButtonsTest < ActionController::IntegrationTest
-  ASSETS = %w[investigations studies assays data_files models sops samples specimens strains presentations events]
+  ASSETS = %w[investigations studies assays data_files models sops strains presentations events]
   def setup
     User.current_user = Factory(:user, :login => 'test')
     @current_user = User.current_user

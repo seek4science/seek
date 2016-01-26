@@ -118,7 +118,7 @@ class StrainsControllerTest < ActionController::TestCase
     assert flash[:error]
     assert_redirected_to s
   end
-  
+
   test "should update genotypes and phenotypes" do
     strain = Factory(:strain)
     genotype1 = Factory(:genotype, :strain => strain)
