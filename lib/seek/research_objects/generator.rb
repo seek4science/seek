@@ -8,20 +8,20 @@ module Seek
       DEFAULT_FILENAME = 'ro-bundle.zip'
 
       # :call-seq
-      # generate(investigation,file) -> File
-      # generate(investigation) ->
+      # generate(resource, file) -> File
+      # generate(resource) ->
       #
-      # generates an RO-Bundle for the given investigation.
+      # generates an RO-Bundle for the given resource.
       # if a file objects is passed in then the bundle in created to the file,
       # overwriting previous content
       # if no file is provided, then a temporary file is created
       # using the name defined by #DEFAULT_FILENAME
       # in both cases the file is returned
       #
-      def generate(investigation, file = nil)
+      def generate(resource, file = nil)
         file ||= temp_file(DEFAULT_FILENAME)
         ROBundle::File.create(file) do |bundle|
-          gather_entries(investigation).each do |entry|
+          gather_entries(resource).each do |entry|
             store_reference(bundle, entry)
             store_metadata(bundle, entry)
             store_files(bundle, entry) if entry.is_asset?
@@ -30,10 +30,14 @@ module Seek
         file
       end
 
-      # collects the entries contained by the investigation for inclusion in
+      # collects the entries contained by the resource for inclusion in
       # the research object
-      def gather_entries(investigation, show_all = false)
-        entries = [investigation] + [investigation.studies] + [investigation.assays] + [investigation.assets]
+      def gather_entries(resource, show_all = false)
+        # This will break when used for non-ISA things:
+        entries = [resource]
+        entries += [resource.studies] if resource.is_a?(Investigation)
+        entries += [resource.assays] if resource.is_a?(Investigation) || resource.is_a?(Study)
+        entries += [resource.assets]
         entries.flatten!
         entries.select!(&:permitted_for_research_object?) unless show_all
 
