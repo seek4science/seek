@@ -257,6 +257,14 @@ SEEK::Application.routes.draw do
       post :items_for_result
       post :resource_in_tab
     end
+    resources :snapshots, :only => [:show, :new, :create] do
+      member do
+        post :mint_doi
+        get :download
+        get :export, to: :export_preview
+        post :export, to: :export_submit
+      end
+    end
     member do
       get :new_object_based_on_existing_one
     end
@@ -270,6 +278,14 @@ SEEK::Application.routes.draw do
       post :items_for_result
       #MERGENOTE - these should be gets and are tested as gets, using post to fix later
       post :resource_in_tab
+    end
+    resources :snapshots, :only => [:show, :new, :create] do
+      member do
+        post :mint_doi
+        get :download
+        get :export, to: :export_preview
+        post :export, to: :export_submit
+      end
     end
     member do
       post :update_annotations_ajax
