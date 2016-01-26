@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class PublishingPermissionsTest < ActiveSupport::TestCase
-  fixtures :specimens
+
 
   test 'is_rejected?' do
     df = Factory(:data_file)
@@ -49,13 +49,11 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       not_public_model=Factory(:model,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
       public_datafile=Factory(:data_file,:policy=>Factory(:public_policy))
       public_assay=Factory(:assay,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
-      not_public_sample=Factory(:sample,:policy=>Factory(:all_sysmo_viewable_policy))
 
       assert public_sop.is_published?
       assert !not_public_model.is_published?
       assert public_datafile.is_published?
       assert public_assay.is_published?
-      assert !not_public_sample.is_published?
     end
   end
 

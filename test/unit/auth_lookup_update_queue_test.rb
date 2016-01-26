@@ -113,59 +113,6 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     end
   end
 
-  test "updates to queue for sample" do
-    user = Factory :user
-    #otherwise a specimen and strain are also created and triggers inserts to queue
-    sample = Factory :sample, :contributor=>user.person, :policy=>Factory(:private_policy)
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      sample = Factory :sample, :contributor=>user.person, :policy=>Factory(:private_policy), :specimen=>sample.specimen
-    end
-    assert_equal sample, AuthLookupUpdateQueue.last(:order=>:id).item
-
-    AuthLookupUpdateQueue.destroy_all
-    sample.policy.access_type = Policy::VISIBLE
-
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      sample.policy.save
-    end
-    assert_equal sample, AuthLookupUpdateQueue.last(:order=>:id).item
-
-    AuthLookupUpdateQueue.destroy_all
-    sample.title = Time.now.to_s
-
-    assert_no_difference("AuthLookupUpdateQueue.count") do
-      disable_authorization_checks do
-        sample.save!
-      end
-    end
-  end
-
-  test "updates to queue for specimen" do
-    user = Factory :user
-    #otherwise a strain is also created and triggers inserts to queue
-    specimen = Factory :specimen, :contributor=>user.person, :policy=>Factory(:private_policy)
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      specimen = Factory :specimen, :contributor=>user.person, :policy=>Factory(:private_policy), :strain=>specimen.strain
-    end
-    assert_equal specimen, AuthLookupUpdateQueue.last(:order=>:id).item
-
-    AuthLookupUpdateQueue.destroy_all
-    specimen.policy.access_type = Policy::VISIBLE
-
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      specimen.policy.save
-    end
-    assert_equal specimen, AuthLookupUpdateQueue.last(:order=>:id).item
-
-    AuthLookupUpdateQueue.destroy_all
-    specimen.title = Time.now.to_s
-    assert_no_difference("AuthLookupUpdateQueue.count") do
-      disable_authorization_checks do
-        specimen.save!
-      end
-    end
-  end
-
   test "updates to queue for sweep" do
     user = Factory :user
     #otherwise a workflow is also created and triggers inserts to queue

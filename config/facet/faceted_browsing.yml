@@ -252,52 +252,6 @@ Strain:
       label: Tag
       value_from: tags_as_text_array
 
-Specimen:
-  organism:
-      label: Organism
-      value_from: strain:organism:title
-  strain:
-      label: Strain
-      value_from: strain:info
-  culture_growth_type:
-      label: Culture growth type
-      value_from: culture_growth_type:title
-  project:
-      label: Project
-      value_from: projects:title
-  institution:
-      label: Institution
-      value_from: institution:title
-  created_at:
-      label: Created In
-      value_from: created_at:year
-  contributor:
-      label: Contributor
-      value_from: contributor:person:name,creators:name
-
-Sample:
-  organism:
-      label: Organism
-      value_from: specimen:strain:organism:title
-  strain:
-      label: Strain
-      value_from: specimen:strain:info
-  specimen:
-      label: Specimen
-      value_from: specimen:title
-  organism_part:
-      label: Organism part
-      value_from: organism_part
-  project:
-      label: Project
-      value_from: projects:title
-  created_at:
-      label: Created In
-      value_from: created_at:year
-  contributor:
-      label: Contributor
-      value_from: contributor:person:name
-
 Event:
   project:
       label: Project
