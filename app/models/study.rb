@@ -1,3 +1,4 @@
+require 'seek/research_objects/acts_as_snapshottable'
 
 class Study < ActiveRecord::Base
 
@@ -15,7 +16,9 @@ class Study < ActiveRecord::Base
       person_responsible.try(:name)
     end
   end if Seek::Config.solr_enabled
+
   acts_as_isa
+  acts_as_snapshottable
 
   attr_accessor :new_link_from_assay
 

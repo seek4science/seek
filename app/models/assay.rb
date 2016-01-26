@@ -1,4 +1,4 @@
-
+require 'seek/research_objects/acts_as_snapshottable'
 
 class Assay < ActiveRecord::Base
 
@@ -20,7 +20,9 @@ class Assay < ActiveRecord::Base
       strains.compact.map{|s| s.title}
     end
   end if Seek::Config.solr_enabled
+
   acts_as_isa
+  acts_as_snapshottable
 
   acts_as_annotatable :name_field=>:title
 
