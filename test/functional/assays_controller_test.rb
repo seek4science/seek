@@ -85,12 +85,11 @@ class AssaysControllerTest < ActionController::TestCase
   test "should update assay with new version of same sop" do
     login_as(:model_owner)
     assay=assays(:metabolomics_assay)
-    timestamp=assay.updated_at
 
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert !assay.sops.include?(sop.latest_version)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}
     end
 
     assert_redirected_to assay_path(assay)
@@ -105,7 +104,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
 
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}
     end
 
     assay.reload
@@ -124,7 +123,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.sops.include?(sop.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}
     end
 
     assert_redirected_to assay_path(assay)
@@ -145,7 +144,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.data_files.include?(df.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :data_file_ids=>["#{df.id},Test data"], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :data_file_ids=>["#{df.id},Test data"], :assay=>{}
     end
 
     assert_redirected_to assay_path(assay)
@@ -164,7 +163,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :model_ids=>[model.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :model_ids=>[model.id], :assay=>{}
     end
 
     assert_redirected_to assay_path(assay)
@@ -239,7 +238,7 @@ class AssaysControllerTest < ActionController::TestCase
     a=assays(:assay_with_no_study_or_files)
     s=studies(:metabolomics_study)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>a, :assay=>{:study_id=>s}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>a, :assay=>{:study_id=>s}
     end
 
     assert_redirected_to assay_path(a)
@@ -247,64 +246,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_nil assigns(:assay).study
     assert_equal s, assigns(:assay).study
   end
-
-
-  test "should create experimental assay with or without sample" do
-    organism = Factory(:organism,:title=>"Frog")
-    strain = Factory(:strain, :title=>"UUU", :organism=>organism)
-    assert_difference('ActivityLog.count') do
-      assert_difference("Assay.count") do
-        post :create, :assay => {:title => "test",
-                                 :study_id => studies(:metabolomics_study).id,
-                                 :assay_class_id => assay_classes(:experimental_assay_class).id
-        }, :assay_organism_ids => [organism.id, strain.title, strain.id, ""].join(","), :sharing => valid_sharing
-      end
-    end
-    a=assigns(:assay)
-    assert a.samples.empty?
-
-
-    sample = Factory(:sample)
-    assert_difference('ActivityLog.count') do
-      assert_difference("Assay.count") do
-        post :create, :assay => {:title => "test",
-                                 :study_id => studies(:metabolomics_study).id,
-                                 :assay_class_id => assay_classes(:experimental_assay_class).id,
-                                 :sample_ids => [sample.id]
-        }, :sharing => valid_sharing
-
-      end
-    end
-    a=assigns(:assay)
-    assert_equal User.current_user.person, a.owner
-    assert_redirected_to assay_path(a)
-    assert_equal [sample], a.samples
-  end
-
-  test "should update assay with strains and organisms and sample" do
-    assay = Factory(:assay,:contributor=>User.current_user.person)
-    assert_empty assay.organisms
-    assert_empty assay.strains
-    assert_empty assay.samples
-
-
-    organism = Factory(:organism,:title=>"Frog")
-    strain = Factory(:strain, :title=>"UUU", :organism=>organism)
-    sample = Factory(:sample)
-
-    assert_difference("AssayOrganism.count") do
-      put :update, :id=>assay.id,:assay => {:title => "test"},
-                        :assay_organism_ids => [organism.id,strain.title, strain.id, ""].join(",")#,
-                        # :sharing => valid_sharing
-
-    end
-    assay = assigns(:assay)
-    assert_redirected_to assay_path(assay)
-    assert_include assay.organisms,organism
-    assert_include assay.strains,strain
-  end
-
-
 
   test "should create modelling assay with/without organisms" do
 
@@ -334,40 +275,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_include a.strains,strain
     assert_redirected_to assay_path(a)
 
-
-  end
-
-  test "should not create modelling assay with sample" do
-    person = Factory(:person)
-    assert_no_difference("Assay.count") do
-      post :create, :assay => {:title => "test",
-                               :study_id => studies(:metabolomics_study).id,
-                           :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                           :sample_ids=>[Factory(:sample).id, Factory(:sample).id].join(",")
-                               },
-                               :sharing => valid_sharing
-    end
-    assert_response :success
-    assert assigns(:assay)
-    assay = assigns(:assay)
-    assert_equal 0, assay.samples.count
-  end
-
-  test "should create modelling assay with sample for virtual liver" do
-    as_virtualliver do
-      assert_difference("Assay.count") do
-        post :create, :assay => {:title => "test",
-                                 :study_id => studies(:metabolomics_study).id,
-                                 :assay_class_id => assay_classes(:modelling_assay_class).id,
-                                 :sample_ids => [Factory(:sample, :policy=>Factory(:public_policy)).id, Factory(:sample,:policy=>Factory(:public_policy)).id]},
-                                 :sharing => valid_sharing
-      end
-      assert assigns(:assay)
-      assay = assigns(:assay)
-      assert_redirected_to assay_path(assay)
-      assert_equal 2, assay.samples.count
-
-    end
 
   end
 
@@ -1016,8 +923,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:quentin)
     a = {:title=>"test",
          :study_id=>studies(:metabolomics_study).id,
-         :assay_class_id=>assay_classes(:experimental_assay_class).id,
-         :sample_ids=>[Factory(:sample).id]}
+         :assay_class_id=>assay_classes(:experimental_assay_class).id}
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
         post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}

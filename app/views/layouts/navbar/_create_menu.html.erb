@@ -23,8 +23,6 @@
         <% if Seek::Config.biosamples_enabled %>
             <li role="presentation" class="dropdown-header">Biosamples</li>
             <li><%= link_to "Strain", new_strain_path %></li>
-            <li><%= link_to t("biosamples.sample_parent_term"), new_specimen_path %></li>
-            <li><%= link_to "Sample", new_sample_path %></li>
         <% end %>
 
         <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>

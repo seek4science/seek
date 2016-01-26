@@ -279,7 +279,6 @@ end
     f.association :assay_class, :factory => :experimental_assay_class
     f.assay_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
     f.technology_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
-    f.samples {[Factory.build(:sample, :policy => Factory(:public_policy))]}
   end
 
   Factory.define(:assay, :parent => :modelling_assay) {}
@@ -316,11 +315,10 @@ end
     f.title "a culture_growth_type"
   end
 
-#Tissue and cell type
-Factory.define(:tissue_and_cell_type) do |f|
-  f.sequence(:title){|n| "Tisse and cell type #{n}"}
-end
-
+  #Tissue and cell type
+  Factory.define(:tissue_and_cell_type) do |f|
+    f.sequence(:title){|n| "Tisse and cell type #{n}"}
+  end
 
   #Assay organism
   Factory.define(:assay_organism) do |f|
@@ -328,27 +326,6 @@ end
     f.association :strain
     f.association :organism
   end
-
-  #Specimen
-  Factory.define(:specimen) do |f|
-    f.sequence(:title) { |n| "Specimen#{n}" }
-    f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
-    f.association :contributor, :factory => :person
-    f.projects {[Factory.build(:project)]}
-    f.association :institution
-    f.association :strain
-  end
-
-  #Sample
-  Factory.define(:sample) do |f|
-    f.sequence(:title) { |n| "Sample#{n}" }
-    f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
-    f.association :contributor, :factory => :person
-    f.projects {[Factory.build(:project)]}
-    f.donation_date Date.today
-    f.specimen { Factory(:specimen, :policy => Factory(:public_policy))}
-  end
-
 
   #Data File
   Factory.define(:data_file) do |f|
@@ -364,12 +341,6 @@ end
         data_file.content_blob.save
       end
     end
-  end
-
-  #Treatment
-  Factory.define(:treatment) do |f|
-    f.association :sample, :factory=>:sample
-    f.association :specimen, :factory=>:specimen
   end
 
   Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|

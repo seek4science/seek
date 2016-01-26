@@ -548,30 +548,6 @@ SEEK::Application.routes.draw do
 
   resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
 
-  ### BIOSAMPLES AND ORGANISMS ###
-
-  resources :specimens do
-    collection do
-      post :items_for_result
-    end
-    resources :projects,:people,:samples,:strains,:institutions,:sops,:only=>[:index]
-    member do
-      get :new_object_based_on_existing_one
-    end
-  end
-
-  resources :samples do
-    collection do
-      get :typeahead
-      get :preview
-      post :items_for_result
-      post :resource_in_tab
-    end
-    member do
-      get :new_object_based_on_existing_one
-    end
-    resources :projects,:people,:specimens,:sops,:data_files,:only=>[:index]
-  end
 
   resources :strains do
     collection do
@@ -608,11 +584,9 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       post :test_asset_url
-#      get :preview
     end
 
     member do
-#      get :check_related_items
       get :download
       get :describe_ports
       post :temp_link
@@ -621,7 +595,6 @@ SEEK::Application.routes.draw do
       post :check_related_items
       post :publish
       get :published
-#      get :view_items_in_tab
       post :favourite
       delete :favourite_delete
       post :mint_doi
