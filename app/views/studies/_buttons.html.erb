@@ -11,6 +11,7 @@
 <%= admin_dropdown do %>
     <% if item.can_manage? -%>
         <li><%= image_tag_for_key('manage', edit_study_path, nil, nil, "Manage #{t('study')}") -%></li>
+        <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
     <% elsif item.can_edit?-%>
         <li><%= image_tag_for_key('edit', edit_study_path, "Edit #{t('study')}", nil, "Edit #{t('study')}") -%></li>
     <% end -%>
