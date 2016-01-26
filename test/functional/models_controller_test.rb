@@ -243,7 +243,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.models, m
 
-    put :update, :id => m, :model =>{}, :assay_ids=>[new_assay.id.to_s]
+    put :update, :id => m, :model => {}, :assay_ids => [new_assay.id.to_s]
 
     assert_redirected_to model_path(m)
     m.reload
@@ -251,24 +251,8 @@ class ModelsControllerTest < ActionController::TestCase
     new_assay.reload
     refute_includes original_assay.models, m
     assert_includes new_assay.models, m
-    end
-
-  test "associate sample" do
-     # assign to a new model
-     model_with_samples = valid_model
-     model_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
-     assert_difference("Model.count") do
-       post :create,:model => model_with_samples,:content_blobs => [{:data=>file_for_upload}], :sharing => valid_sharing
-     end
-
-    m = assigns(:model)
-    assert_equal "newTestSample", m.samples.first.title
-
-    #edit associations of samples to an existing model
-    put :update,:id=> m.id, :model => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
-    m = assigns(:model)
-    assert_equal "editTestSample", m.samples.first.title
   end
+
 
   test "association of scales" do
     scale1=Factory :scale, :pos=>1

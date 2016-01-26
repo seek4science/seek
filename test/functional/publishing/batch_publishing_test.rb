@@ -83,8 +83,8 @@ class BatchPublishingTest < ActionController::TestCase
   end
 
   test "do not have not_publishable_type item in batch_publishing_preview" do
-    item = Factory(:sample, :contributor => User.current_user)
-    assert item.can_publish?, "This data file must be publishable for the test to be meaningful"
+    item = Factory(:publication, :contributor => User.current_user)
+    refute item.can_publish?, "This item must not be publishable for the test to be meaningful"
 
     get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
