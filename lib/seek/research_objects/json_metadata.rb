@@ -19,11 +19,11 @@ module Seek
 
         if item.is_a?(Investigation)
           json[:studies] = item.studies.select { |s| s.permitted_for_research_object? }.map do |s|
-            s.research_object_package_path
+            s.research_object_package_path([item])
           end
         elsif item.is_a?(Study)
           json[:assays] = item.assays.select { |a| a.permitted_for_research_object? }.map do |a|
-            a.research_object_package_path
+            a.research_object_package_path([item])
           end
         elsif item.is_a?(Assay)
           json[:assets] = contained_assets(item)
@@ -43,7 +43,7 @@ module Seek
       def contained_assets(assay)
         assets = assay.assets.select{|asset| asset.permitted_for_research_object?}
         assets.collect do |asset|
-          asset.research_object_package_path
+          asset.research_object_package_path([assay])
         end
       end
 
