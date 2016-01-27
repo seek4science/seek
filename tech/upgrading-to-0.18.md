@@ -28,7 +28,7 @@ services, please stop them using that script. Otherwise do:
     ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop
 
-## Installating Package dependencies
+## Installing Package dependencies
 
 Please install the packages described in the [Installation
 Guide](install.html). If you are running a production server, please also
