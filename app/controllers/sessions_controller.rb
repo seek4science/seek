@@ -10,8 +10,20 @@ class SessionsController < ApplicationController
   
   # render new.rhtml
   def new
-    
+    if (Seek::Config.use_ease)
+      ease_login
+    end
   end
+
+  def ease_login
+    ease_id = get_ease_id
+    if !(ease_id.nil? or ease_id.empty?)
+      ease_id_authentication
+    else
+      flash[:notice] = "Sorry, no EASE ID could be found. Please log in below."
+    end
+  end
+
 
   def index    
     redirect_to root_path
@@ -25,7 +37,22 @@ class SessionsController < ApplicationController
     password_authentication
   end
 
-  def destroy    
+  def get_ease_id
+    ease_id = request.env["REMOTE_USER"]
+  end
+
+  def ease_id_authentication
+    ease_id = get_ease_id
+    if @user = User.find_by_login(ease_id)
+      flash[:notice] = "Logging in with EASE identity (#{ease_id})."
+      check_login
+    else
+      # flash[:notice] = "Could not find a SEEK user with EASE user name: (#{ease_id})."
+      redirect_to :signup
+    end
+  end
+
+  def destroy
     logout_user
     flash[:notice] = "You have been logged out."
 
@@ -41,7 +68,7 @@ class SessionsController < ApplicationController
   end
 
   protected
-  
+
   def password_authentication
     if @user = User.authenticate(params[:login], params[:password])
       check_login

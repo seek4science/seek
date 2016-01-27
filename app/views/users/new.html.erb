@@ -25,10 +25,11 @@
   <div class="col-md-7 col-md-pull-5">
     <%= form_for @user do |f| -%>
 
-
         <div class="form-group">
           <label>Login name</label>
-          <%= f.text_field :login, :class => 'form-control' %>
+
+          <%= f.text_field :login, :class => 'form-control',
+                           :readonly => @use_ease %>
           <p class="help-block">Login should contain a minimum of 3 characters.</p>
         </div>
 

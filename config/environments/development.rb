@@ -21,6 +21,7 @@ SEEK::Application.configure do
   #but caching may interfere with being able to see the results of code changes.
   config.cache_store = :null_store
 
+
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = false
 
@@ -39,6 +40,12 @@ SEEK::Application.configure do
 
   # Do not compress assets
   config.assets.compress = false
+
+  #Remove assets logging (but only assets not Started GET messages), better results is achieved by installing quiet_assets gem
+  #config.assets.logger = false
+
+  #IF uncommented, switches on the assets logging, which is disabled by gem 'quiet_assets', group: :development
+  #config.quiet_assets = false
 
   # Expands the lines which load the assets
   config.assets.debug = true

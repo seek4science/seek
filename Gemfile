@@ -3,6 +3,9 @@ source 'https://rubygems.org'
 gem "rails", "3.2.22"
 gem "rdoc"
 
+#added by TZ to fix problem with compiling the assets without js env.
+gem 'therubyracer', :platforms => :ruby
+
 gem "feedjira","~>1"
 gem "google-analytics-rails"
 gem 'hpricot',"~>0.8.2"
@@ -117,6 +120,8 @@ group :development do
   gem "rubycritic",:require=>false
   gem "guard-rubycritic",:require=>false
   gem 'rails_best_practices'
+  #disables the started get, severved assets logs
+  gem 'quiet_assets', group: :development
 end
 
 group :test do

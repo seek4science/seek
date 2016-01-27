@@ -5,6 +5,22 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
     def setup
       @repository = Seek::Rdf::RdfRepository.instance
       @project = Factory(:project,:title=>"Test for RDF storage")
+      @data_file_1 = Factory(:data_file)
+      @data_file_1.description = "this is data file 1"
+      @data_file_1.version = 1
+      @data_file_2 = Factory(:data_file)
+      @data_file_2.description = "this is data file 1" #yes really, just for testing.
+      @data_file_2.version = 2
+      @data_file_3 = Factory(:data_file)
+      @data_file_3.description = "this is data file 3"
+      @data_file_3.version = 2
+
+
+      @strain_sugar_data_file = Factory(:data_file,
+                                        :content_blob => Factory(:spreadsheet_content_blob,
+                                                                 :data => File.new("#{Rails.root}/test/fixtures/files/rdf/GALgenes_contents.xlsx",
+                                                                                   "rb").read))
+
       skip("these tests need a configured triple store setup") unless @repository.configured?
       WebMock.allow_net_connect!
       @graph = RDF::URI.new @repository.get_configuration.private_graph
@@ -25,6 +41,108 @@ class RdfTripleStoreTest < ActionController::IntegrationTest
       end
     end
 
+    test "query store" do
+      @repository.send_rdf(@project)
+      @repository.send_rdf(@data_file_1)
+      @repository.send_rdf(@data_file_2)
+      @repository.send_rdf(@data_file_3)
+
+      q = @repository.query.select.where([:s, RDF::URI.new("http://purl.org/dc/terms/description"), 'this is data file 1']).from(@graph)
+      results = @repository.select(q)
+      #puts results.pretty_inspect
+      assert_equal 2, results.count
+
+      q = @repository.query.select.where([:s, RDF::URI.new("http://purl.org/dc/terms/hasVersion"), '2']).from(@graph)
+      results = @repository.select(q)
+      puts results.pretty_inspect
+      assert_equal 2, results.count
+
+      q = @repository.query.select.where([:s, RDF::URI.new("http://purl.org/dc/terms/hasVersion"), '2'],
+                                         [:s, RDF::URI.new("http://purl.org/dc/terms/description"), 'this is data file 1']).from(@graph)
+      puts q.pretty_inspect
+      results = @repository.select(q)
+      assert_equal 1, results.count
+    end
+
+
+    test 'query sugar and strain' do
+      @repository.send_rdf(@project)
+      @repository.send_rdf(@strain_sugar_data_file)
+      # SELECT ?s WHERE {
+      #  {?s <http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith> ?p}
+      # {?p <http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains> <http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf>}
+      #{?p <http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#derivedFrom> <http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/GAL1>}
+      # }
+      q = @repository.query.select.where(
+          [:s, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith"), :p],
+          [:p, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains"),
+           RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf")],
+          [:p, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#derivedFrom"),
+           RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/GAL1")]).from(@graph)
+
+      #   q = @repository.query.select.where(*@list_of_queries).from(@graph)
+      #   results = @repository.select(q).collect { |result| result[:data_file] }
+
+      #    results.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq!
+
+      puts q.pretty_inspect
+      results = @repository.select(q)
+      puts results.pretty_inspect
+
+      assert_equal 1, results.count
+    end
+
+    test 'query for sugar only returns one data file, although there are many samples' do
+      @repository.send_rdf(@project)
+      @repository.send_rdf(@strain_sugar_data_file)
+
+      q = @repository.query.select.where(
+          [:s, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith"), :p],
+          [:p, RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains"),
+           RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf")]).from(@graph)
+
+      #   q = @repository.query.select.where(*@list_of_queries).from(@graph)
+      #   results = @repository.select(q).collect { |result| result[:data_file] }
+
+      #    results.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq!
+
+      puts q.pretty_inspect
+      results = @repository.select(q)
+      puts "Results"
+      puts results.pretty_inspect
+
+      collected = results.collect { |result| result[:s] }
+      puts 'Collected'
+      puts collected.pretty_inspect
+
+      unique = collected.select { |result| result.is_a?(RDF::URI) }.collect { |result| result.to_s }.uniq
+
+      puts 'unique'
+      puts unique.pretty_inspect
+      puts 'Collected'
+      puts collected.pretty_inspect
+
+      assert_equal 1, unique.count, "should remove duplicate answers"
+    end
+
+
+    test "create strain" do
+      @organism = Factory(:organism)
+
+      @strain = Factory(:strain)
+      @strain.organism = @organism
+      @strain.synonym = "another name for the strain"
+      @strain.title = "strain A"
+      @strain.description = "One of the strains"
+      @strain.pretty_inspect
+
+      @repository.send_rdf(@organism)
+      @repository.send_rdf(@strain)
+      q = @repository.query.select.where([:s, :p, :o]).from(@graph)
+      results = @repository.select(q)
+      puts results.pretty_inspect
+
+    end
 
     test "singleton repository" do
       repo = Seek::Rdf::RdfRepository.instance

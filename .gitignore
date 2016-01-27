@@ -9,9 +9,11 @@ rails_best_practices_output.html
 db/*.sqlite3
 db/*.sqlite3-journal
 config/database.yml
+config/initializers/seek_configuration.rb-synthsys
 config/initializers/seek_local.rb
 config/environment_local.rb
 config/virtuoso_settings.yml
+config/virtuoso_settings_mac.yml
 config/initializers/taverna_server.rb
 config/sunspot.yml
 

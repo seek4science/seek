@@ -62,6 +62,62 @@ class AssaysController < ApplicationController
 
    end
 
+  def do_export
+    logger.info "Doing export with: "+params[:id]
+    @assay =  Assay.find(params[:id])
+    flash[:notice] = "#{@assay.title} has been exported."
+    logger.info "Done export"
+    render :action => :show
+  end
+
+  def export
+    logger.info "Export called with: "+params[:id]
+    @existing_assay =  Assay.find(params[:id])
+    @assay = @existing_assay.clone_with_associations
+    params[:data_file_ids]=@existing_assay.data_files.collect{|d|"#{d.id},None"}
+    params[:related_publication_ids]= @existing_assay.publications.collect{|p| "#{p.id},None"}
+
+=begin
+    if @existing_assay.can_view?
+      notice_message = ''
+      unless @assay.study.can_edit?
+        @assay.study = nil
+        notice_message << "The #{t('study')} of the existing #{t('assays.assay')} cannot be viewed, please specify your own #{t('study')}! <br/>"
+      end
+
+      @existing_assay.data_files.each do |d|
+        if !d.can_view?
+          notice_message << "Some or all #{t('data_file').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
+          break
+        end
+      end
+      @existing_assay.sops.each do |s|
+        if !s.can_view?
+          notice_message << "Some or all #{t('sop').pluralize} of the existing #{ t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
+          break
+        end
+      end
+      @existing_assay.models.each do |m|
+        if !m.can_view?
+          notice_message << "Some or all #{t('model').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
+          break
+        end
+      end
+
+      unless notice_message.blank?
+        flash.now[:notice] = notice_message.html_safe
+      end
+
+      render "export"
+    else
+      flash[:error]="You do not have the necessary permissions to copy this #{t('assays.assay')}"
+      redirect_to @existing_assay
+    end
+=end
+
+    logger.info "Export Done: "+params[:id]
+  end
+
   def new
     @assay=Assay.new
     @assay.create_from_asset = params[:create_from_asset]

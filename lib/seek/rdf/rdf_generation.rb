@@ -26,6 +26,7 @@ module Seek
         rdf_graph = describe_type(rdf_graph)
         rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph = additional_triples rdf_graph
+        rdf_graph = parse_spreadsheet rdf_graph
         rdf_graph
       end
 
@@ -63,7 +64,17 @@ module Seek
         rdf_graph
       end
 
+      def parse_spreadsheet rdf_graph
+        if self.is_a? DataFile
+          if (self.respond_to?(:contains_extractable_spreadsheet?) && self.contains_extractable_spreadsheet?)
+            rdf_graph = PlatemapReader.new.file_to_rdf(self, rdf_graph)
+          end
+        end
+        rdf_graph
+      end
+
       # the hash of namespace prefixes to pass to the RDF::Writer when generating the RDF
+
       def ns_prefixes
         {
           'jerm' => JERMVocab.to_uri.to_s,

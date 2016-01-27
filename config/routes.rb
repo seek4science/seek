@@ -4,6 +4,9 @@ SEEK::Application.routes.draw do
 
   mount TavernaPlayer::Engine, :at => (SEEK::Application.config.relative_url_root || "/")
 
+  get 'searchSwainLab' => 'search_rdf#search'
+  post 'searchSwainLab' => 'search_rdf#search'
+
   resources :scales do
     collection do
       post :search
@@ -272,6 +275,8 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     member do
+      get :export
+      post :do_export
       post :update_annotations_ajax
       get :new_object_based_on_existing_one
     end

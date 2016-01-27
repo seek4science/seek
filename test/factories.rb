@@ -330,7 +330,7 @@ end
   end
 
   #Specimen
-  Factory.define(:specimen) do |f|
+Factory.define(:specimen) do |f|
     f.sequence(:title) { |n| "Specimen#{n}" }
     f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
     f.association :contributor, :factory => :person
@@ -662,6 +662,13 @@ end
     f.content_type "application/excel"
     f.original_filename 'simple_populated_rightfield.xls'
   end
+
+
+Factory.define(:rightfield_glucoseAndpH_content_blob, :parent => :content_blob) do |f|
+  f.data File.new("#{Rails.root}/test/fixtures/files/rdf/glucoseAndpH.xls", "rb").read
+  f.content_type 'application/excel'
+  f.original_filename 'glucoseAndpH.xls'
+end
 
   Factory.define(:small_test_spreadsheet_content_blob,:parent=>:content_blob) do |f|
     f.data  File.new("#{Rails.root}/test/fixtures/files/small-test-spreadsheet.xls","rb").read

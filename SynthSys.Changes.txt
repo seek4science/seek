@@ -1,0 +1,37 @@
+# Changes made to the main seek4scinece branch
+# In reverse chronological order
+
+
+
+# Symbolic links in 3 configuration files have to be replaced by
+# actual content of the files they were pointing to as the links
+# are not supported by windows and were lost on pushing to the server.
+# The modified files are:
+config/initilizers/seek_configuration.rb -> seek_configuration.rb-openseek
+config/locales/en.yml -> en.yml-openseek
+db/seeds.rb -> seeds.rb-openseek
+
+
+#
+# Eilidh changes for permissions and rdf generations
+#
+
+modified:   app/controllers/admins_controller.rb
+modified:   app/helpers/admin_helper.rb
+modified:   app/helpers/policy_helper.rb
+modified:   app/views/admins/others.html.erb
+modified:   app/views/assets/_sharing_form.html.erb
+modified:   config/initializers/seek_configuration.rb-biovel
+modified:   config/initializers/seek_configuration.rb-openseek
+modified:   config/initializers/seek_configuration.rb-vln
+modified:   lib/seek/config.rb
+modified:   lib/seek/config_setting_attributes.yml
+modified:   test/fixtures/files/rdf/2012_12_16_MALgenes.xls
+modified:   test/fixtures/files/rdf/GALgenes_contents.xls
+modified:   test/functional/admins_controller_test.rb
+modified:   test/unit/config_test.rb
+
+app/assets/stylesheets/search_rdf.css.scss
+app/helpers/search_rdf_helper.rb
+test/functional/search_rdf_controller_test.rb
+test/unit/helpers/search_rdf_helper_test.rb

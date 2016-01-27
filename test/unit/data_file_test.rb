@@ -288,6 +288,41 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
+  test "to rdf platemap spreadsheet" do
+    df = Factory(:data_file,
+                 :content_blob => Factory(:spreadsheet_content_blob,
+                                          :data => File.new("#{Rails.root}/test/fixtures/files/rdf/GALgenes_contents.xlsx",
+                                                            "rb").read))
+
+    rdf = df.to_rdf
+    assert_not_nil rdf
+    #just checks it is valid rdf/xml and contains some statements for now
+    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
+      assert reader.statements.count > 16
+      assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
+
+      #   enumerable.has_triple?([subject, predicate, object])
+      # [nil, 'Raf']
+      assert reader.has_triple?([RDF::URI.new("http://localhost:3000/data_files/#{df.id}"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/sample/DF#{df.id}_1"),])
+      assert reader.has_triple?([RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/sample/DF#{df.id}_1"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf"),])
+
+      # ['GAL1', 'Raf']
+      assert reader.has_triple?([RDF::URI.new("http://localhost:3000/data_files/#{df.id}"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#associatedWith"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/sample/DF#{df.id}_3"),])
+      assert reader.has_triple?([RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/sample/DF#{df.id}_3"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#contains"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/sugar/Raf"),])
+      assert reader.has_triple?([RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/sample/DF#{df.id}_3"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/centreOntology#derivedFrom"),
+                                 RDF::URI.new("http://www.synthsys.ed.ac.uk/ontology/seek/peterSwain/strain/GAL1"),])
+    end
+  end
+
   test "convert to presentation" do
       user = Factory :user
       attribution_df = Factory :data_file

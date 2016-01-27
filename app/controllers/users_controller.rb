@@ -12,7 +12,17 @@ class UsersController < ApplicationController
   
   # render new.rhtml
   def new
+    @use_ease = false
     @user = User.new
+    if (Seek::Config.use_ease)
+      @use_ease = true
+      flash[:notice] = 'Please create a new SEEK user. Your SEEK login name will be the same as your EASE username.'
+      @user.login = get_ease_id
+    end
+  end
+
+  def get_ease_id
+    ease_id = request.env["REMOTE_USER"]
   end
 
   def create
@@ -23,9 +33,12 @@ class UsersController < ApplicationController
     # reset_session
 
     @user = User.new(params[:user])
+    # if ease is switched on,
+    if (Seek::Config.use_ease)
+      @user.login = get_ease_id
+    end
     @user.check_email_present=true
     check_registration
-
   end
 
   def cancel_registration
@@ -188,7 +201,7 @@ class UsersController < ApplicationController
   end
 
   protected
-  
+
   private 
   
   def check_registration       
