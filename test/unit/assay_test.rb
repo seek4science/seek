@@ -18,7 +18,7 @@ class AssayTest < ActiveSupport::TestCase
     Factory :relationship, :subject=>assay, :predicate=>Relationship::RELATED_TO_PUBLICATION,:other_object=>pub
     Factory :assay_asset, :assay=>assay
     assay.reload
-    assert_equal 1,assay.assets.size
+    assert_equal 2,assay.assets.size
     rdf = assay.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
