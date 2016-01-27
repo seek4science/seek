@@ -43,7 +43,7 @@ module Seek
 
       # Gather child resources of the given resource
       def subentries(resource)
-        subentries = case resource
+        s = case resource
                        when Investigation
                          resource.studies + resource.assets
                        when Study
@@ -53,22 +53,20 @@ module Seek
                        else
                          []
                      end
-        remove_duplicates(subentries)
+        remove_duplicates(s)
       end
 
       def all_subentries(resource)
-        subentries(resource).map do |subentry|
-          all_subentries(subentry)
-        end
+        subentries(resource).map do |sub|
+          all_subentries(sub)
+        end + [resource]
       end
 
       # collects the entries contained by the resource for inclusion in
       # the research object
-      def gather_entries(resource, show_all = false)
+      def gather_entries(show_all = false)
         # This will break when used for non-ISA things:
-        entries = [resource]
-        entries += all_subentries(resource)
-        entries.flatten!
+        entries = all_subentries(@resource).flatten
         entries.select!(&:permitted_for_research_object?) unless show_all
 
         entries
