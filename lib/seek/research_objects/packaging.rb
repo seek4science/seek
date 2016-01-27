@@ -6,6 +6,8 @@ module Seek
       # for an assay it would be:
       # investigations/{investigation_id}/studies/{study_id}/assays{assay_id}/
       def research_object_package_path(parents = [])
+        return ro_package_path_fragment if is_asset?
+
         paths = parents.map do |parent|
           ro_package_path_fragment(parent)
         end

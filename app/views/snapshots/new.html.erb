@@ -1,5 +1,5 @@
 <%= render :partial => "general/page_title", :locals => { :title => 'Snapshot Preview' } %>
-<% items = Seek::ResearchObjects::Generator.instance.gather_entries(@resource, true).group_by(&:permitted_for_research_object?) %>
+<% items = Seek::ResearchObjects::Generator.new(@resource).gather_entries(@resource, true).group_by(&:permitted_for_research_object?) %>
 <% included_items = items[true] || [] %>
 <% excluded_items = items[false] || [] %>
 
