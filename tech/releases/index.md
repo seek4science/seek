@@ -35,7 +35,7 @@ Release date: _(December 8th 2015)_
   * Project manager becomes Project administrator.
   * Asset manager becomes Asset Housekeeper - and can now only manage assets for those who have been flagged as leaving a project.
   * Gatekeeper now becomes Asset Gatekeeper.
-  * Introduced Programme adminstrator, who can create and projects and become their administrator or assign somebody else as an administrator.
+  * Introduced Programme administrator, who can create and projects and become their administrator or assign somebody else as an administrator.
   * _Roles will be fully documented in more detail in the near future_.
 * A project administrator can flag somebody as having left a project.
 * Better and easier management of project members and roles.
