@@ -133,7 +133,7 @@ class Assay < ActiveRecord::Base
   end
 
   def assets
-    data_files + models + sops
+    data_files + models + sops + publications
   end
 
   def avatar_key
