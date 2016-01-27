@@ -8,7 +8,7 @@ module Seek
 
       def store(bundle, item, parents = [])
         tmpfile = Tempfile.new(metadata_filename)
-        tmpfile << metadata_content(item)
+        tmpfile << metadata_content(item, parents)
         tmpfile.close
 
         folder_path = item.research_object_package_path(parents)
