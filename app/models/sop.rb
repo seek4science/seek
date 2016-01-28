@@ -24,7 +24,7 @@ class Sop < ActiveRecord::Base
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
   has_many :sample_assets,:dependent=>:destroy,:as => :asset
-  has_many :samples, :through => :sample_assets
+  has_many :deprecated_samples, :through => :sample_assets
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}

@@ -91,7 +91,7 @@ class DataFile < ActiveRecord::Base
    end
 
   has_many :sample_assets,:dependent=>:destroy,:as => :asset
-  has_many :samples, :through => :sample_assets
+  has_many :deprecated_samples, :through => :sample_assets
 
 
   def relationship_type(assay)

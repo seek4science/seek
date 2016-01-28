@@ -94,7 +94,7 @@ class PoliciesControllerTest < ActionController::TestCase
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
     gatekeeper = Factory(:asset_gatekeeper)
     a_person = Factory(:person)
-    sample = Sample.new
+    sample = DeprecatedSample.new
 
     login_as(a_person.user)
     assert sample.can_manage?
@@ -105,7 +105,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
   test 'when creating an item, can publish the item if associate to it the project which has no gatekeeper' do
     a_person = Factory(:person)
-    sample = Sample.new
+    sample = DeprecatedSample.new
 
     login_as(a_person.user)
     assert sample.can_manage?

@@ -269,7 +269,7 @@ class DataFilesController < ApplicationController
 
   def clear_population bio_samples
       specimens = Specimen.find_all_by_title bio_samples.instance_values["specimen_names"].values
-      samples = Sample.find_all_by_title bio_samples.instance_values["sample_names"].values
+      samples = DeprecatedSample.find_all_by_title bio_samples.instance_values["sample_names"].values
       samples.each do |s|
         s.assays.clear
         s.destroy

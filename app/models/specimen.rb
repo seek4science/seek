@@ -27,7 +27,7 @@ class Specimen < ActiveRecord::Base
 
   has_one :organism, :through=>:strain
 
-  has_many :samples
+  has_many :deprecated_samples
   has_many :treatments, :dependent=>:destroy
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id

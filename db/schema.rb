@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151130111940) do
+ActiveRecord::Schema.define(:version => 20160128161633) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -172,9 +172,9 @@ ActiveRecord::Schema.define(:version => 20151130111940) do
     t.text     "other_creators"
   end
 
-  create_table "assays_samples", :id => false, :force => true do |t|
+  create_table "assays_deprecated_samples", :id => false, :force => true do |t|
     t.integer "assay_id"
-    t.integer "sample_id"
+    t.integer "deprecated_sample_id"
   end
 
   create_table "asset_doi_logs", :force => true do |t|
@@ -380,6 +380,49 @@ ActiveRecord::Schema.define(:version => 20151130111940) do
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
+
+  create_table "deprecated_sample_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "deprecated_sample_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sample_user_id_asset_id_can_view"
+  add_index "deprecated_sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
+
+  create_table "deprecated_samples", :force => true do |t|
+    t.string   "title"
+    t.integer  "specimen_id"
+    t.string   "lab_internal_number"
+    t.datetime "donation_date"
+    t.string   "explantation"
+    t.string   "comments"
+    t.string   "first_letter"
+    t.integer  "policy_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+    t.integer  "institution_id"
+    t.datetime "sampling_date"
+    t.string   "organism_part"
+    t.string   "provider_id"
+    t.string   "provider_name"
+    t.string   "age_at_sampling"
+    t.string   "uuid"
+    t.integer  "age_at_sampling_unit_id"
+    t.string   "sample_type"
+    t.string   "treatment"
+  end
+
+  create_table "deprecated_samples_tissue_and_cell_types", :id => false, :force => true do |t|
+    t.integer "deprecated_sample_id"
+    t.integer "tissue_and_cell_type_id"
+  end
 
   create_table "disciplines", :force => true do |t|
     t.string   "title"
@@ -1014,6 +1057,11 @@ ActiveRecord::Schema.define(:version => 20151130111940) do
     t.integer  "parent_id"
   end
 
+  create_table "projects_deprecated_samples", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "deprecated_sample_id"
+  end
+
   create_table "projects_publications", :id => false, :force => true do |t|
     t.integer "project_id"
     t.integer "publication_id"
@@ -1021,11 +1069,6 @@ ActiveRecord::Schema.define(:version => 20151130111940) do
 
   add_index "projects_publications", ["project_id"], :name => "index_projects_publications_on_project_id"
   add_index "projects_publications", ["publication_id", "project_id"], :name => "index_projects_publications_on_publication_id_and_project_id"
-
-  create_table "projects_samples", :id => false, :force => true do |t|
-    t.integer "project_id"
-    t.integer "sample_id"
-  end
 
   create_table "projects_sop_versions", :id => false, :force => true do |t|
     t.integer "project_id"
@@ -1163,55 +1206,12 @@ ActiveRecord::Schema.define(:version => 20151130111940) do
   add_index "resource_publish_logs", ["user_id"], :name => "index_resource_publish_logs_on_user_id"
 
   create_table "sample_assets", :force => true do |t|
-    t.integer  "sample_id"
+    t.integer  "deprecated_sample_id"
     t.integer  "asset_id"
     t.integer  "version"
     t.string   "asset_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "sample_auth_lookup", :id => false, :force => true do |t|
-    t.integer "user_id"
-    t.integer "asset_id"
-    t.boolean "can_view",     :default => false
-    t.boolean "can_manage",   :default => false
-    t.boolean "can_edit",     :default => false
-    t.boolean "can_download", :default => false
-    t.boolean "can_delete",   :default => false
-  end
-
-  add_index "sample_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sample_user_id_asset_id_can_view"
-  add_index "sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
-
-  create_table "samples", :force => true do |t|
-    t.string   "title"
-    t.integer  "specimen_id"
-    t.string   "lab_internal_number"
-    t.datetime "donation_date"
-    t.string   "explantation"
-    t.string   "comments"
-    t.string   "first_letter"
-    t.integer  "policy_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "contributor_id"
-    t.string   "contributor_type"
-    t.integer  "institution_id"
-    t.datetime "sampling_date"
-    t.string   "organism_part"
-    t.string   "provider_id"
-    t.string   "provider_name"
-    t.string   "age_at_sampling"
-    t.string   "uuid"
-    t.integer  "age_at_sampling_unit_id"
-    t.string   "sample_type"
-    t.string   "treatment"
-  end
-
-  create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
-    t.integer "sample_id"
-    t.integer "tissue_and_cell_type_id"
   end
 
   create_table "saved_searches", :force => true do |t|
@@ -1746,7 +1746,7 @@ ActiveRecord::Schema.define(:version => 20151130111940) do
     t.string   "treatment_protocol"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "sample_id"
+    t.integer  "deprecated_sample_id"
     t.integer  "measured_item_id"
     t.float    "start_value"
     t.float    "end_value"

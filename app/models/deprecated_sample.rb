@@ -1,7 +1,7 @@
 require 'grouped_pagination'
 
 
-class Sample < ActiveRecord::Base
+class DeprecatedSample < ActiveRecord::Base
   include Seek::Subscribable
 
   acts_as_scalable if Seek::Config.is_virtualliver

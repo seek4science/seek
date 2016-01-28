@@ -125,7 +125,7 @@ namespace :seek_biosamples do
   end
 
   def insert_treatment(treatment_hash)
-    fail 'a sample should be provided and it should be of type Sample' unless treatment_hash[:sample].is_a?(Sample)
+    fail 'a sample should be provided and it should be of type Sample' unless treatment_hash[:sample].is_a?(DeprecatedSample)
     # add medium as a new measured item
     if MeasuredItem.where(title: 'Medium', factors_studied: true).nil?
       mi = MeasuredItem.new(title: 'Medium', factors_studied: true)
@@ -170,7 +170,7 @@ namespace :seek_biosamples do
       age_unit = Unit.where(title: 'hour').first
       fail 'Unable to find hours unit' if age_unit.nil?
       sample_hash[:age_at_sampling_unit] = age_unit
-      sample = Sample.new sample_hash.slice(:title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :comments, :age_at_sampling, :age_at_sampling_unit)
+      sample = DeprecatedSample.new sample_hash.slice(:title, :lab_internal_number, :provider_id, :provider_name, :specimen, :contributor, :organism_part, :sampling_date, :comments, :age_at_sampling, :age_at_sampling_unit)
       sample.policy = policy.deep_copy
       sample.projects = sample_hash[:projects] || sample_hash[:specimen].projects
       (Array(sample_hash[:data_files]) & Array(sample_hash[:sops])).each do |asset|
@@ -275,7 +275,7 @@ namespace :seek_biosamples do
   end
 
   def find_matching_sample(sample_hash)
-    Sample.all.find do |sample|
+    DeprecatedSample.all.find do |sample|
       sample.title == sample_hash[:title] && sample.specimen == sample_hash[:specimen]
     end
   end

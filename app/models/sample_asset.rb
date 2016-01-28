@@ -1,5 +1,5 @@
 class SampleAsset < ActiveRecord::Base
-  belongs_to :sample
+  belongs_to :deprecated_sample
   belongs_to :asset,:polymorphic => true
 
   # check whether asset is of latest version

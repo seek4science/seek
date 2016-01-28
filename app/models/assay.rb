@@ -27,7 +27,8 @@ class Assay < ActiveRecord::Base
   acts_as_annotatable :name_field=>:title
 
   belongs_to :institution
-  has_and_belongs_to_many :samples
+  has_and_belongs_to_many :deprecated_samples
+  alias_method :samples, :deprecated_samples
   belongs_to :study
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
@@ -56,7 +57,6 @@ class Assay < ActiveRecord::Base
   validates_presence_of :owner
   validates_presence_of :assay_class
 
-  validate :no_sample_for_modelling_assay
 
   before_validation :default_assay_and_technology_type
 
@@ -150,15 +150,6 @@ class Assay < ActiveRecord::Base
     new_object.sample_ids = self.try(:sample_ids)
     new_object.assay_organisms = self.try(:assay_organisms)
     return new_object
-  end
-
-  def either_samples_or_organisms_for_experimental_assay
-     errors[:base] << "You should associate a #{I18n.t('assays.experimental_assay')} with either samples or organisms or both" if !is_modelling? && samples.empty? && assay_organisms.empty?
-  end
-
-  def no_sample_for_modelling_assay
-    #FIXME: allows at the moment until fixtures and factories are updated: JIRA: SYSMO-734
-    errors[:base] << "You cannot associate a #{I18n.t('assays.modelling_analysis')} with a sample" if is_modelling? && !samples.empty? && !Seek::Config.is_virtualliver
   end
 
   def organism_terms

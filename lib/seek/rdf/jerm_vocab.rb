@@ -12,7 +12,7 @@ module Seek
                 Investigation=>"Investigation",
                 Publication=>"Publication",
                 Strain=>"strain",
-                Sample=>"Sample",
+                DeprecatedSample=>"Sample",
                 Specimen=>"specimen",
                 Compound=>"compound"}
 

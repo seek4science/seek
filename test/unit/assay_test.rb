@@ -65,7 +65,6 @@ class AssayTest < ActiveSupport::TestCase
     User.current_user = assay.contributor.user
     assert !assay.is_modelling?
     assay.assay_class=assay_classes(:modelling_assay_class)
-    assay.samples = []
     assay.save!
     assert assay.is_modelling?
   end
@@ -85,7 +84,6 @@ class AssayTest < ActiveSupport::TestCase
     User.current_user = assay.contributor.user
     assert assay.is_experimental?
     assay.assay_class=assay_classes(:modelling_assay_class)
-    assay.samples = []
     assay.save!
     assert !assay.is_experimental?
   end
@@ -141,16 +139,16 @@ class AssayTest < ActiveSupport::TestCase
 
       assay.owner=people(:person_for_model_owner)
 
-      #an modelling assay can be valid without a technology type, sample or organism
+      #an modelling assay can be valid without a technology type, or organism
       assay.assay_class=assay_classes(:modelling_assay_class)
       assay.technology_type_uri=nil
-      assay.samples = []
+
       assert assay.valid?
     #an experimental assay can be invalid without a sample nor a organism
     assay.assay_class=assay_classes(:experimental_assay_class)
     assay.technology_type_uri=nil
     assay.organisms = []
-    assay.samples = []
+
 
 
     as_not_virtualliver do

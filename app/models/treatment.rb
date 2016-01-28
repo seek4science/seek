@@ -1,5 +1,5 @@
 class Treatment < ActiveRecord::Base
-  belongs_to :sample
+  belongs_to :deprecated_sample
   belongs_to :specimen
   belongs_to :unit
   belongs_to :time_after_treatment_unit, class_name: 'Unit'

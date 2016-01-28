@@ -246,7 +246,7 @@ describe Specimen do
 #  it { should have_searchable_field(:samples) }
 end
 
-describe Sample do
+describe DeprecatedSample do
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
