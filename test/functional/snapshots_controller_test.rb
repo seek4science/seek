@@ -230,6 +230,50 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert !assigns(:snapshot).zenodo_record_url.nil?
   end
 
+  test "can export study snapshot to Zenodo" do
+    zenodo_mock
+    zenodo_oauth_mock
+    create_study_snapshot
+    Factory(:oauth_session, :user_id => @user.id)
+
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    login_as(@user)
+
+    get :show, :study_id => @study, :id => @snapshot.snapshot_number
+    assert_response :success
+    assert_select "a.btn", :text => 'Export to Zenodo', :count => 1
+
+    post :export_submit, :study_id => @study, :id => @snapshot.snapshot_number, :code => 'abc',
+         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+
+    assert_redirected_to study_snapshot_path(@study, @snapshot.snapshot_number)
+    assert !assigns(:snapshot).zenodo_deposition_id.nil?
+    assert !assigns(:snapshot).zenodo_record_url.nil?
+  end
+
+  test "can export assay snapshot to Zenodo" do
+    zenodo_mock
+    zenodo_oauth_mock
+    create_assay_snapshot
+    Factory(:oauth_session, :user_id => @user.id)
+
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+    login_as(@user)
+
+    get :show, :assay_id => @assay, :id => @snapshot.snapshot_number
+    assert_response :success
+    assert_select "a.btn", :text => 'Export to Zenodo', :count => 1
+
+    post :export_submit, :assay_id => @assay, :id => @snapshot.snapshot_number, :code => 'abc',
+         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+
+    assert_redirected_to assay_snapshot_path(@assay, @snapshot.snapshot_number)
+    assert !assigns(:snapshot).zenodo_deposition_id.nil?
+    assert !assigns(:snapshot).zenodo_record_url.nil?
+  end
+
   test "redirects to Zenodo auth page if no existing OAuth session" do
     zenodo_mock
     zenodo_oauth_mock
@@ -319,6 +363,21 @@ class SnapshotsControllerTest < ActionController::TestCase
     @user = Factory(:user)
     @investigation = Factory(:investigation, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
     @snapshot = @investigation.create_snapshot
+  end
+
+  def create_study_snapshot
+    @user = Factory(:user)
+    @investigation = Factory(:investigation, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
+    @study = Factory(:study, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
+    @snapshot = @study.create_snapshot
+  end
+
+  def create_assay_snapshot
+    @user = Factory(:user)
+    @investigation = Factory(:investigation, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
+    @study = Factory(:study, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
+    @assay = Factory(:assay, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
+    @snapshot = @assay.create_snapshot
   end
 
 end
