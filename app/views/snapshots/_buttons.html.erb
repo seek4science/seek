@@ -1,12 +1,12 @@
-<% if @investigation.can_manage? %>
+<% if @resource.can_manage? %>
     <% if @snapshot.has_doi? %>
         <% if @snapshot.can_export_to_zenodo? %>
-            <%= button_link_to("Export to Zenodo", 'snapshot_export', @zenodo_oauth_client.authorize_url(export_investigation_snapshot_path(@investigation, @snapshot.snapshot_number))) %>
+            <%= button_link_to("Export to Zenodo", 'snapshot_export', @zenodo_oauth_client.authorize_url(polymorphic_path([@resource, @snapshot], :action => 'export'))) %>
         <% end %>
     <% elsif @snapshot.can_mint_doi? %>
-        <%= button_link_to("Generate a DOI", 'doi', mint_doi_investigation_snapshot_path(@investigation, @snapshot.snapshot_number), :method => :post) %>
+        <%= button_link_to("Generate a DOI", 'doi',  polymorphic_path([@resource, @snapshot], :action => 'mint_doi'), :method => :post) %>
     <% end %>
 <% end %>
-<% if @investigation.can_view? %>
-    <%= button_link_to("Download", 'download', download_investigation_snapshot_path(@investigation, @snapshot.snapshot_number)) %>
+<% if @resource.can_view? %>
+    <%= button_link_to("Download", 'download', polymorphic_path([@resource, @snapshot], :action => 'download')) %>
 <% end %>

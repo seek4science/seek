@@ -1,5 +1,5 @@
 <%= render :partial => "general/page_title", :locals => { :title => 'Snapshot Preview' } %>
-<% items = Seek::ResearchObjects::Generator.instance.gather_entries(@investigation, true).group_by(&:permitted_for_research_object?) %>
+<% items = Seek::ResearchObjects::Generator.new(@resource).gather_entries(true).group_by(&:permitted_for_research_object?) %>
 <% included_items = items[true] || [] %>
 <% excluded_items = items[false] || [] %>
 
@@ -11,7 +11,7 @@
     These resources will be excluded from the snapshot due to not having public access privileges.
     To include an excluded resource in the snapshot, please make it publicly accessible.
     <% if excluded_items.any? %>
-    <br/>To quickly publish these items you can select the Publish full <%=t('investigation')%> button below.
+    <br/>To quickly publish these items you can select the Publish full <%=t(@resource.class.name.downcase)%> button below.
     <% end %>
 <% end %>
 
@@ -39,9 +39,9 @@
   <% end %>
 </div>
 
-<%= link_to('Create Snapshot', investigation_snapshots_path(@investigation),
+<%= link_to('Create Snapshot', polymorphic_path([@resource, :snapshots]),
             :method => :post, :class => 'btn btn-primary') %>
 
-<%= image_tag_for_key('publish', polymorphic_path(@investigation, :action => :check_related_items), nil, {:method=>:post,:class => 'btn btn-default'}, "Publish full #{t('investigation')}") if excluded_items.any? %>
+<%= image_tag_for_key('publish', polymorphic_path(@resource, :action => :check_related_items), nil, {:method=>:post,:class => 'btn btn-default'}, "Publish full #{t(@resource.class.name.downcase)}") if excluded_items.any? %>
 
-or <%= cancel_button investigation_path(@investigation) -%>
+or <%= cancel_button polymorphic_path(@resource) -%>

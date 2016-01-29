@@ -5,18 +5,20 @@ module Seek
       # provides the path within the research object the item will be described. e.g.
       # for an assay it would be:
       # investigations/{investigation_id}/studies/{study_id}/assays{assay_id}/
-      def research_object_package_path(item = self, prefix = '')
-        prefix = research_object_package_path(item.study, prefix) if item.is_a?(Assay)
+      def research_object_package_path(parents = [])
+        return ro_package_path_fragment if is_asset?
 
-        prefix + ro_package_path_fragment(item)
+        paths = parents.map do |parent|
+          ro_package_path_fragment(parent)
+        end
+
+        paths << ro_package_path_fragment(self)
+
+        paths[1..-1].join # Remove the top-level path, as it should be mounted at "/"
       end
 
       def ro_package_path_fragment(item = self)
-        if item.is_a?(Investigation)
-          ''
-        else
-          ro_package_path_type_fragment(item) + '/' + ro_package_path_id_fragment(item) + '/'
-        end
+        ro_package_path_type_fragment(item) + '/' + ro_package_path_id_fragment(item) + '/'
       end
 
       def ro_package_path_type_fragment(item = self)

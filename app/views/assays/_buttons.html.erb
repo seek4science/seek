@@ -7,6 +7,7 @@
 <%= admin_dropdown do %>
     <% if item.can_manage? -%>
         <li><%= icon_link_to("Manage #{assay_word}", 'manage', edit_assay_path) %></li>
+        <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
     <% elsif item.can_edit?-%>
         <li><%= icon_link_to("Edit #{assay_word} Details", 'edit', edit_assay_path) %></li>
     <% end -%>

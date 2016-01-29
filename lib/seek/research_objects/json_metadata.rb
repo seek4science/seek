@@ -7,7 +7,7 @@ module Seek
       CANDIDATE_PROPERTIES = [:title, :description, :assay_type_uri, :technology_type_uri,
                               :version, :doi, :doi_uri, :pubmed_id, :pubmed_uri]
 
-      def metadata_content(item)
+      def metadata_content(item, parents = [])
         json = { id: item.id, uri: item_uri(item) }
         CANDIDATE_PROPERTIES.each do |method|
           json[method] = item.send(method) if item.respond_to?(method)
@@ -19,11 +19,11 @@ module Seek
 
         if item.is_a?(Investigation)
           json[:studies] = item.studies.select { |s| s.permitted_for_research_object? }.map do |s|
-            s.research_object_package_path
+            s.research_object_package_path(parents + [item])
           end
         elsif item.is_a?(Study)
           json[:assays] = item.assays.select { |a| a.permitted_for_research_object? }.map do |a|
-            a.research_object_package_path
+            a.research_object_package_path(parents + [item])
           end
         elsif item.is_a?(Assay)
           json[:assets] = contained_assets(item)
@@ -43,7 +43,7 @@ module Seek
       def contained_assets(assay)
         assets = assay.assets.select{|asset| asset.permitted_for_research_object?}
         assets.collect do |asset|
-          asset.research_object_package_path
+          asset.research_object_package_path([assay])
         end
       end
 

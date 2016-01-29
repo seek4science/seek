@@ -4,7 +4,6 @@
 <% end %>
 <%= render :partial => "general/page_title", :locals => {:title => title, :buttons_partial => 'snapshots/buttons'} %>
 
-
 <div class="row">
   <div class="col-md-9 col-sm-8">
     <%= item_description @snapshot.description -%>
@@ -36,9 +35,7 @@
     <p><strong>Created at:</strong> <%= date_as_string(@snapshot.created_at, true) %></p>
 
     <%= panel('Contents') do %>
-        <% @snapshot.metadata['studies'].each do |resource| %>
-            <%= render :partial => 'tree', locals: {resource: resource} %>
-        <% end %>
+        <%= render :partial => 'tree', locals: { resource: @snapshot.metadata, top: true } %>
     <% end %>
 
     <%= panel('Fingerprints') do %>
@@ -57,6 +54,8 @@
 
   </div>
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "snapshots/snapshots", :locals => {:snapshots => @snapshot.resource.snapshots, :selected => @snapshot} %>
+    <%= render :partial => "snapshots/snapshots", :locals => {:snapshots => @resource.snapshots,
+                                                              :selected => @snapshot,
+                                                              :resource => @resource } %>
   </div>
 </div>

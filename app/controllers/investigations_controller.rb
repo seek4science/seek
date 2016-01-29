@@ -47,7 +47,7 @@ class InvestigationsController < ApplicationController
   end
 
   def ro_for_download
-    ro_file = Seek::ResearchObjects::Generator.instance.generate(@investigation)
+    ro_file = Seek::ResearchObjects::Generator.new(@investigation).generate
     send_file(ro_file.path,
               type:Mime::Type.lookup_by_extension("ro").to_s,
               filename: @investigation.research_object_filename)

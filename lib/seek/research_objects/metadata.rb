@@ -6,18 +6,18 @@ module Seek
     class Metadata
       include Seek::ResearchObjects::Utils
 
-      def store(bundle, item)
+      def store(bundle, item, parents = [])
         tmpfile = Tempfile.new(metadata_filename)
-        tmpfile << metadata_content(item)
+        tmpfile << metadata_content(item, parents)
         tmpfile.close
 
-        folder_path = item.research_object_package_path
+        folder_path = item.research_object_package_path(parents)
         targetpath = folder_path + metadata_filename
 
         bundle.add(targetpath, tmpfile, aggregate: true)
         bundle.commit
 
-        an = ROBundle::Annotation.new('/' + item.research_object_package_path, targetpath)
+        an = ROBundle::Annotation.new('/' + item.research_object_package_path(parents), targetpath)
         an.created_on = Time.now
         bundle.manifest.annotations << an
       end

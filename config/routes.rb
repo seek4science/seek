@@ -257,8 +257,21 @@ SEEK::Application.routes.draw do
       post :items_for_result
       post :resource_in_tab
     end
+    resources :snapshots, :only => [:show, :new, :create] do
+      member do
+        post :mint_doi
+        get :download
+        get :export, to: :export_preview
+        post :export, to: :export_submit
+      end
+    end
     member do
       get :new_object_based_on_existing_one
+      post :check_related_items
+      post :check_gatekeeper_required
+      post :publish_related_items
+      post :publish
+      get :published
     end
     resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
   end
@@ -271,8 +284,21 @@ SEEK::Application.routes.draw do
       #MERGENOTE - these should be gets and are tested as gets, using post to fix later
       post :resource_in_tab
     end
+    resources :snapshots, :only => [:show, :new, :create] do
+      member do
+        post :mint_doi
+        get :download
+        get :export, to: :export_preview
+        post :export, to: :export_submit
+      end
+    end
     member do
       post :update_annotations_ajax
+      post :check_related_items
+      post :check_gatekeeper_required
+      post :publish_related_items
+      post :publish
+      get :published
       get :new_object_based_on_existing_one
     end
     resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
