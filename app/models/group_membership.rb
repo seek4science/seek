@@ -9,7 +9,11 @@ class GroupMembership < ActiveRecord::Base
   after_save :remember_previous_person
   after_update { remove_admin_defined_role_projects if has_left }
   after_commit :queue_update_auth_table
-  after_destroy :remove_admin_defined_role_projects
+
+  after_destroy do
+    remove_admin_defined_role_projects
+    destroy_empty_work_group
+  end
 
   validates :work_group,:presence => {:message=>"A workgroup is required"}
 
@@ -51,4 +55,9 @@ class GroupMembership < ActiveRecord::Base
     end
   end
 
+  def destroy_empty_work_group
+    wg = WorkGroup.find_by_id(work_group_id_was)
+
+    wg.destroy if wg && wg.people.empty?
+  end
 end

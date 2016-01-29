@@ -298,8 +298,10 @@ class ProjectsController < ApplicationController
       group_membership = GroupMembership.find(group)
       if group_membership && group_membership.person_can_be_removed?
         #this slightly strange bit of code is required to trigger and after_remove callback, which should be revisted
-        group_membership.person.group_memberships.delete(group_membership)
-        group_membership.destroy
+        #
+        # Finn: http://guides.rubyonrails.org/association_basics.html#the-has-many-through-association
+        #       "Automatic deletion of join models is direct, no destroy callbacks are triggered."
+        group_membership.person.group_memberships.destroy(group_membership)
       end
     end
 
