@@ -44,11 +44,11 @@ module AssaysHelper
 
     assay_samples.each do |as|
       result += "<br/>" if as==assay_samples.first
-      organism = as.specimen.organism
-      strain = as.specimen.strain
+      organism = as.deprecated_specimen.organism
+      strain = as.deprecated_specimen.strain
       sample = as
 
-      culture_growth_type = as.specimen.culture_growth_type
+      culture_growth_type = as.deprecated_specimen.culture_growth_type
 
       result += describe_organism_and_strain_for_list(organism, strain)
 

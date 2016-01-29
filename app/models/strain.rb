@@ -18,7 +18,7 @@ class Strain < ActiveRecord::Base
   grouped_pagination
 
   belongs_to :organism
-  has_many :specimens
+  has_many :deprecated_specimens
   has_many :assay_organisms
   has_many :assays,:through=>:assay_organisms
 
@@ -73,7 +73,7 @@ class Strain < ActiveRecord::Base
   end
 
   def state_allows_delete? *args
-    (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?)) && super
+    (deprecated_specimens.empty? || ((deprecated_specimens.count == 1) && deprecated_specimens.first.is_dummy? && deprecated_specimens.first.samples.empty?)) && super
   end
 
 
