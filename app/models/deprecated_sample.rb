@@ -87,10 +87,6 @@ class DeprecatedSample < ActiveRecord::Base
     assays.empty? && super
   end
 
-  def self.user_creatable?
-    Seek::Config.biosamples_enabled
-  end
-
   def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
        tissue_and_cell_type=nil
     if !tissue_and_cell_type_title.blank?

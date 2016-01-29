@@ -107,10 +107,6 @@ class Specimen < ActiveRecord::Base
     samples.empty? && super
   end
 
-  def self.user_creatable?
-    Seek::Config.biosamples_enabled
-  end
-
   def clear_garbage
     if culture_growth_type.try(:title)=="in vivo"
       self.medium=nil

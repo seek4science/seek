@@ -147,7 +147,6 @@ class Assay < ActiveRecord::Base
     new_object.sops = self.try(:sops)
 
     new_object.models = self.try(:models)
-    new_object.sample_ids = self.try(:sample_ids)
     new_object.assay_organisms = self.try(:assay_organisms)
     return new_object
   end
