@@ -1012,7 +1012,7 @@ class ProjectsControllerTest < ActionController::TestCase
     new_person2 = Factory(:person)
 
     assert_no_difference("GroupMembership.count") do #2 deleted, 2 added
-      assert_difference("WorkGroup.count",1) do
+      assert_no_difference("WorkGroup.count") do # 1 empty group will be deleted, 1 will be added
         post :update_members,
              :id=>project,
              :group_memberships_to_remove=>[group_membership.id,group_membership2.id],
@@ -1022,6 +1022,10 @@ class ProjectsControllerTest < ActionController::TestCase
         refute_nil flash[:notice]
       end
     end
+
+    assert_includes project.institutions, new_institution
+    assert_includes project.people, new_person
+    assert_includes project.people, new_person2
 
     person.reload
     new_person.reload
@@ -1033,7 +1037,6 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes new_person2.projects,project
     assert_includes new_person.institutions,new_institution
     assert_includes new_person2.institutions,new_institution
-    assert_includes project.work_groups,wg
 
     assert_includes new_person.project_subscriptions.collect(&:project),project
     assert_includes new_person2.project_subscriptions.collect(&:project),project
@@ -1057,7 +1060,7 @@ class ProjectsControllerTest < ActionController::TestCase
     new_person = Factory(:person)
     new_person2 = Factory(:person)
     assert_no_difference("GroupMembership.count") do #2 deleted, 2 added
-      assert_difference("WorkGroup.count",1) do
+      assert_no_difference("WorkGroup.count") do # 1 empty group will be deleted, 1 will be added
         post :update_members,
              :id=>project,
              :group_memberships_to_remove=>[group_membership.id,group_membership2.id],
@@ -1067,6 +1070,10 @@ class ProjectsControllerTest < ActionController::TestCase
         refute_nil flash[:notice]
       end
     end
+
+    assert_includes project.institutions, new_institution
+    assert_includes project.people, new_person
+    assert_includes project.people, new_person2
 
     person.reload
     new_person.reload
@@ -1078,8 +1085,6 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes new_person2.projects,project
     assert_includes new_person.institutions,new_institution
     assert_includes new_person2.institutions,new_institution
-    assert_includes project.work_groups,wg
-
   end
 
   test "can flag and unflag members as leaving as project administrator" do
@@ -1269,7 +1274,75 @@ class ProjectsControllerTest < ActionController::TestCase
     refute person.is_project_administrator?(project)
   end
 
-	private
+  test 'institution association removed after last member removed' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    institution1 = Factory(:institution)
+    institution2 = Factory(:institution)
+    wg1 = Factory(:work_group, :project => project, :institution => institution1)
+    wg2 = Factory(:work_group, :project => project, :institution => institution2)
+    group_membership1 = Factory(:group_membership, :work_group => wg1)
+    group_membership2 = Factory(:group_membership, :work_group => wg2)
+    person1 = Factory(:person, :group_memberships => [group_membership1])
+    person2 = Factory(:person, :group_memberships => [group_membership2])
+
+    assert_includes project.institutions, institution1
+    assert_includes project.institutions, institution2
+
+    assert_difference("GroupMembership.count", -1) do
+      assert_difference("WorkGroup.count", -1) do
+        post :update_members,
+             :id=>project,
+             :group_memberships_to_remove=>[group_membership2.id],
+             :people_and_institutions_to_add=>[]
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
+    end
+
+    project.reload
+    assert_includes project.people, person1
+    assert_not_includes project.people, person2
+    assert_includes project.institutions, institution1
+    assert_not_includes project.institutions, institution2
+  end
+
+  test 'non-empty institution is not removed when member removed' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    institution1 = Factory(:institution)
+    wg1 = Factory(:work_group, :project => project, :institution => institution1)
+    group_membership1 = Factory(:group_membership, :work_group => wg1)
+    group_membership2 = Factory(:group_membership, :work_group => wg1)
+    person1 = Factory(:person, :group_memberships => [group_membership1])
+    person2 = Factory(:person, :group_memberships => [group_membership2])
+
+    assert_includes project.institutions, institution1
+
+    assert_difference("GroupMembership.count", -1) do
+      assert_no_difference("WorkGroup.count") do
+        post :update_members,
+             :id=>project,
+             :group_memberships_to_remove=>[group_membership2.id],
+             :people_and_institutions_to_add=>[]
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
+    end
+
+    project.reload
+    assert_includes project.people, person1
+    assert_not_includes project.people, person2
+    assert_includes project.institutions, institution1
+  end
+
+  private
 
 	def valid_project
 		return {}
