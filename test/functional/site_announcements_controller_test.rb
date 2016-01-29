@@ -151,7 +151,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     assert !SiteAnnouncement.all.select(&:is_headline).empty?
     get :index
     assert_response :success
-    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => /a headline announcement/, :count => 1
+    assert_select "div.announcement_list div.announcement span.announcement_title", :text => /a headline announcement/, :count => 1
   end
 
   test "should only show feeds when feed_only passed" do
@@ -159,8 +159,8 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     Factory :headline_announcement, :show_in_feed=>true,:title=>"a headline announcement also in feed"
     get :index,:feed_only=>true
     assert_response :success
-    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => "a headline announcement", :count => 0
-    assert_select "ul.announcement_list li.announcement span.announcement_title", :text => "a headline announcement also in feed", :count => 1
+    assert_select "div.announcement_list div.announcement span.announcement_title", :text => "a headline announcement", :count => 0
+    assert_select "div.announcement_list div.announcement span.announcement_title", :text => "a headline announcement also in feed", :count => 1
   end
 
   test 'handle notification_settings' do

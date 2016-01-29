@@ -48,6 +48,7 @@ require 'seek/search/common_fields'
 
 require 'seek/project_hierarchies/project_extension'
 require 'mimemagic'
+require 'site_announcements'
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE

@@ -172,5 +172,9 @@ SEEK::Application.configure do
   Seek::Config.default :hard_max_cachable_size, 100 * 1024 * 1024
 
   Seek::Config.default :orcid_required, false
+
+  Seek::Config.default :news_enabled,false
+  Seek::Config.default :news_feed_urls,''
+  Seek::Config.default :news_number_of_entries,10
 end
 

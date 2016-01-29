@@ -5,16 +5,22 @@
 <% end %>
 
 <div class="row">
-
   <div class="col-md-9">
     <%= render :partial=>"home_description_box" -%>
 
-    <%= render :partial=>"home_news_feeds" -%>
+    <%= render :partial=>"home_buttons" -%>
 
-    <%= render :partial=>"home_activity_notifications" -%>
+    <% if logged_in_and_registered? %>
+        <%= render :partial=>"user_activity" -%>
+    <% else %>
+        <%= render :partial=>"home_activity_notifications" -%>
+    <% end %>
   </div>
+
   <div class="col-md-3">
     <%= render :partial=>"gadgets/announcements_gadget" if show_announcements? %>
+
+    <%= render :partial=>"home_news_feeds" -%>
 
     <% if Seek::Config.tagging_enabled %>
         <div id="sidebar_tag_cloud">

@@ -104,19 +104,12 @@ class AdminsController < ApplicationController
   end
 
   def update_home_settings
-    Seek::Config.project_news_enabled = string_to_boolean params[:project_news_enabled]
-    Seek::Config.project_news_feed_urls = params[:project_news_feed_urls]
+    Seek::Config.news_enabled = string_to_boolean params[:news_enabled]
+    Seek::Config.news_feed_urls = params[:news_feed_urls]
 
-    project_entries = params[:project_news_number_of_entries]
-    is_project_entries_integer = only_integer project_entries, "#{t('project')} news items"
-    Seek::Config.project_news_number_of_entries = project_entries if is_project_entries_integer
-
-    Seek::Config.community_news_enabled = string_to_boolean params[:community_news_enabled]
-    Seek::Config.community_news_feed_urls = params[:community_news_feed_urls]
-
-    community_entries = params[:community_news_number_of_entries]
-    is_community_entries_integer = only_integer community_entries, 'community news items'
-    Seek::Config.community_news_number_of_entries = community_entries if is_community_entries_integer
+    entries = params[:news_number_of_entries]
+    is_entries_integer = only_integer entries, "news items"
+    Seek::Config.news_number_of_entries = entries if is_entries_integer
 
     Seek::Config.home_description = params[:home_description]
     begin
@@ -125,8 +118,7 @@ class AdminsController < ApplicationController
       logger.error "Error whilst attempting to clear feed cache #{e.message}"
     end
 
-    validation_flag = is_project_entries_integer && is_community_entries_integer
-    update_redirect_to validation_flag, 'home_settings'
+    update_redirect_to is_entries_integer, 'home_settings'
   end
 
   def update_imprint_setting

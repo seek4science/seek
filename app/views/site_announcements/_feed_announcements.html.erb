@@ -1,0 +1,14 @@
+<% if feed_announcements.any? %>
+    <ul class="feed_announcement_list feed">
+      <%= render partial: "site_announcements/feed_announcement",
+                 collection: feed_announcements,
+                 locals: { truncate_length: truncate_length } %>
+    </ul>
+    <% if SiteAnnouncement.count > limit -%>
+        <span class="announcement_title">
+          <%= link_to "See all", site_announcements_path(feed_only: true) -%>
+        </span>
+    <% end -%>
+<% else %>
+    <span class="none_text">No announcements</span>
+<% end %>

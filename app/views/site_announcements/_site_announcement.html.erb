@@ -1,0 +1,25 @@
+<div class="announcement list-group-item ">
+  <div class="row">
+    <div class="col-sm-8">
+      <h4 class="list-group-item-heading">
+        <span class="announcement_title"><%= h(site_announcement.title) -%></span>
+        <small>
+          <span class="announcement_date"><%= site_announcement.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%></span>
+          <span class="announcement_announcer"> by <%= link_to h(site_announcement.announcer.name), site_announcement.announcer  -%></span>
+        </small>
+      </h4>
+      <p class="list-group-item-text">
+        <span class="announcement_body"><%= site_announcement.body_html -%></span>
+      </p>
+      <% attributes=site_announcement_attributes(site_announcement) %>
+      <% unless attributes.empty? %>
+          <p><span class="announcement_attributes subtle"><%= "("+attributes.join(", ") + ")" -%></span></p>
+      <% end -%>
+    </div>
+    <div class="col-sm-4 text-right">
+      <% if can_manage_announcements? -%>
+          <%= button_link_to 'Edit', 'edit', edit_site_announcement_path(site_announcement) -%>
+      <% end %>
+    </div>
+  </div>
+</div>

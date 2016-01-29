@@ -162,4 +162,13 @@ module HomesHelper
   def guest_login_link(text)
     link_to(text, session_path(login: 'guest', password: 'guest'), method: :post)
   end
+
+  def frontpage_button(link, image_path, &block)
+    link_to link, class: 'seek-homepage-button' do
+      image_tag(image_path) +
+          content_tag(:span) do
+            block.call
+          end
+    end
+  end
 end

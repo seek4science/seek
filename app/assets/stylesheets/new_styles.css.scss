@@ -65,7 +65,10 @@ ul.feed .file-type-icon img {
 
 .subtle {
   font-size: 80%;
-  color: #777777;
+}
+
+.none_text, .subtle {
+  color: if(lightness($text-color) > 50, darken($text-color, 20%), lighten($text-color, 30%));
 }
 
 .powered-by {
@@ -79,15 +82,15 @@ ul.feed .file-type-icon img {
 }
 
 #ft {
-  color: #333;
-  background-color: #eee;
+  color: $text-color;
+  background-color: $panel-default-heading-bg;
   bottom: 0;
   margin-top: 2em;
   text-align: center;
   padding: 1em 0.5em;
   font-size: small;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
+  border-top: 1px solid $panel-default-border;
+  border-bottom: 1px solid $panel-default-border;
 }
 
 #ft .logo-section {
@@ -138,13 +141,13 @@ ul.feed .file-type-icon img {
     position: absolute;
     right: 0;
     border-style: solid;
-    border-color: #ddd;
+    border-color: $dropdown-border;
     border-width: 1px;
-    background: #fff;
-    border-radius: 4px;
+    background: $dropdown-bg;
     padding: 10px;
     margin-top: 2px;
     z-index: 10;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
   }
 }
 
@@ -207,7 +210,7 @@ img.icon {
 h1 div.version {
   display: inline-block;
   font-size: 16px;
-  color: #999;
+  color: $gray-light;
   position: relative;
 }
 
@@ -225,7 +228,6 @@ h1 div.version a.dropdown-toggle {
 
 .list_item_desc {
   margin-bottom: 1em;
-  color: #555;
 }
 
 .factors-studied li {
@@ -312,4 +314,48 @@ a.select_assay_class:hover {
 
 label.admin-checkbox {
   font-weight: bold
+}
+
+.seek-homepage-button-container {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+a.seek-homepage-button {
+  display: block;
+}
+
+.seek-homepage-button img {
+  width: 90px;
+  height: 90px;
+  margin: 5px;
+}
+
+@media (min-width: $screen-md-min) {
+  .seek-homepage-button-container {
+    margin-bottom: 3em;
+    margin-top: 3em;
+  }
+
+  a.seek-homepage-button {
+    display: block;
+    text-align: center;
+  }
+
+  .seek-homepage-button img {
+    width: 150px;
+    height: 150px;
+    display: block;
+    margin: 5px auto;
+  }
+}
+
+div.isa_graph {
+  background: $panel-bg;
+  border-color: $panel-default-border;
+}
+
+
+#user-menu-button {
+  height: $navbar-height;
 }

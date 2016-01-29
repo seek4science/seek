@@ -154,5 +154,9 @@ SEEK::Application.configure do
   Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
 
   Seek::Config.default :orcid_required, false
+
+  Seek::Config.default :news_enabled,false
+  Seek::Config.default :news_feed_urls,''
+  Seek::Config.default :news_number_of_entries,10
 end
 

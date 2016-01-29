@@ -16,7 +16,8 @@ namespace :seek do
            :ensure_valid_content_blobs,
            :upgrade_content_blobs,
            :update_jws_online,
-           :turn_off_biosamples
+           :turn_off_biosamples,
+           :consolidate_news_feeds
        ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -50,6 +51,13 @@ namespace :seek do
 
   task(:turn_off_biosamples=>:environment) do
     Seek::Config.biosamples_enabled=false
+  end
+
+  task(:consolidate_news_feeds=>:environment) do
+    Seek::Config.news_enabled = Seek::Config.community_news_enabled || Seek::Config.project_news_enabled
+    Seek::Config.news_feed_urls = [Seek::Config.community_news_feed_urls, Seek::Config.project_news_feed_urls].join(',')
+    Seek::Config.news_number_of_entries = Seek::Config.community_news_number_of_entries +
+                                          Seek::Config.project_news_number_of_entries
   end
 
   task(:clear_delayed_jobs=>:environment) do

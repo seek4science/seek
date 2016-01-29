@@ -15,7 +15,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       ASSETS_WITH_FACET.each do |type_name|
         get "/#{type_name}", :user_enable_facet => 'true'
         assert_select "table[id='exhibit']", :count => 0
-        assert_select "div.alphabetcal_pagination"
+        assert_select "div.alphabetical_pagination"
       end
     end
 
@@ -28,7 +28,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
         with_config_value :facet_enable_for_pages,{type_name=>true} do
           get "/#{type_name}", :user_enable_facet => 'true'
           assert_select "div[id='exhibit']"
-          assert_select "div.alphabetcal_pagination", :count => 0
+          assert_select "div.alphabetical_pagination", :count => 0
         end
       end
     end
@@ -54,13 +54,13 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       facet_enabled_pages.keys.each do |type_name|
         get "/#{type_name}", :user_enable_facet => 'true'
         assert_select "div[id='exhibit']"
-        assert_select "div.alphabetcal_pagination", :count => 0
+        assert_select "div.alphabetical_pagination", :count => 0
       end
 
       facet_disabled_pages.keys.each do |type_name|
         get "/#{type_name}", :user_enable_facet => 'true'
         assert_select "div[id='exhibit']", :count => 0
-        assert_select "div.alphabetcal_pagination"
+        assert_select "div.alphabetical_pagination"
       end
     end
 
@@ -73,11 +73,11 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
         with_config_value :facet_enable_for_pages,{type_name=>true} do
           get "/#{type_name}", :user_enable_facet => 'true'
           assert_select "div[id='exhibit']"
-          assert_select "div.alphabetcal_pagination", :count => 0
+          assert_select "div.alphabetical_pagination", :count => 0
 
           get "/#{type_name}"
           assert_select "div[id='exhibit']", :count => 0
-          assert_select "div.alphabetcal_pagination"
+          assert_select "div.alphabetical_pagination"
         end
       end
     end
