@@ -83,6 +83,10 @@ class DeprecatedSample < ActiveRecord::Base
         "AND sample_assets.sample_id= #{self.id})"
   end
 
+  def self.authorization_supported?
+    false
+  end
+
   def state_allows_delete? *args
     assays.empty? && super
   end

@@ -80,6 +80,9 @@ class Specimen < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
+  def self.authorization_supported?
+    false
+  end
 
   def build_sops sop_ids
     # map string ids to int ids for ["1","2"].include? 1 == false
