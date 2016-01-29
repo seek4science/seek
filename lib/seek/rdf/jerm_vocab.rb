@@ -13,7 +13,7 @@ module Seek
                 Publication=>"Publication",
                 Strain=>"strain",
                 DeprecatedSample=>"Sample",
-                Specimen=>"specimen",
+                DeprecatedSpecimen=>"specimen",
                 Compound=>"compound"}
 
       property :Data

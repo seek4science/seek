@@ -1,5 +1,5 @@
 class SopSpecimen < ActiveRecord::Base
-  belongs_to :specimen
+  belongs_to :deprecated_specimen
   belongs_to :sop
 
   before_save :check_version

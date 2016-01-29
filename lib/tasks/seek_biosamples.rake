@@ -162,7 +162,7 @@ namespace :seek_biosamples do
 
     fail 'Was expecting a contributor' if sample_hash[:contributor].nil?
     fail 'Was expecting a specimen' if sample_hash[:specimen].nil?
-    fail 'Specimen should already be saved' unless sample_hash[:specimen].is_a?(Specimen)
+    fail 'Specimen should already be saved' unless sample_hash[:specimen].is_a?(DeprecatedSpecimen)
     fail 'Handling assays not yet implemented' unless sample_hash[:assays].blank?
 
     sample = find_matching_sample(sample_hash)
@@ -195,7 +195,7 @@ namespace :seek_biosamples do
     specimen = find_matching_specimen(specimen_hash)
 
     if specimen.nil?
-      specimen = Specimen.new specimen_hash.slice(:title, :lab_internal_number, :born, :provider_name, :provider_id, :contributor, :projects, :institution, :culture_growth_type, :strain)
+      specimen = DeprecatedSpecimen.new specimen_hash.slice(:title, :lab_internal_number, :born, :provider_name, :provider_id, :contributor, :projects, :institution, :culture_growth_type, :strain)
       specimen.policy = policy.deep_copy
     else
       pp "Specimen found: #{specimen.inspect}"
@@ -269,7 +269,7 @@ namespace :seek_biosamples do
   end
 
   def find_matching_specimen(specimen_hash)
-    Specimen.all.find do |spec|
+    DeprecatedSpecimen.all.find do |spec|
       spec.title == specimen_hash[:title] && spec.projects.sort == specimen_hash[:projects].sort && spec.strain == specimen_hash[:strain]
     end
   end

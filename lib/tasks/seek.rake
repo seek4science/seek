@@ -14,7 +14,7 @@ namespace :seek do
 
   desc 'set age_unit to be week for Virtual Liver old specimens which use week as age unit'
   task(:update_age_unit => :environment) do
-    Specimen.all.each do |sp|
+    DeprecatedSpecimen.all.each do |sp|
       sp.age_unit = "week" unless sp.age_unit
       disable_authorization_checks do
         sp.save!

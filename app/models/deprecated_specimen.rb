@@ -1,7 +1,7 @@
 require 'grouped_pagination'
 require 'subscribable'
 
-class Specimen < ActiveRecord::Base
+class DeprecatedSpecimen < ActiveRecord::Base
   include Seek::Subscribable
 
   include Seek::Rdf::RdfGeneration

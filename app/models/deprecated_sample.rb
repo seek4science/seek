@@ -18,7 +18,7 @@ class DeprecatedSample < ActiveRecord::Base
   attr_accessor :parent_name
   attr_accessor :from_biosamples
 
-  belongs_to :specimen
+  belongs_to :deprecated_specimen
   belongs_to :age_at_sampling_unit, :class_name => 'Unit', :foreign_key => "age_at_sampling_unit_id"
   belongs_to :institution
 
@@ -35,7 +35,7 @@ class DeprecatedSample < ActiveRecord::Base
   has_many :models, :through => :sample_assets, :source => :asset, :source_type => 'Model'
   has_many :sops, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
 
-  accepts_nested_attributes_for :specimen
+  accepts_nested_attributes_for :deprecated_specimen
   alias_attribute :description, :comments
 
   validates_uniqueness_of :title

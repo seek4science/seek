@@ -215,7 +215,7 @@ describe Strain do
 #  it { should have_searchable_field(:children) }
 end
 
-describe Specimen do
+describe DeprecatedSpecimen do
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
