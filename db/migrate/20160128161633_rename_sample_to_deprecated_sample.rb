@@ -5,8 +5,8 @@ class RenameSampleToDeprecatedSample < ActiveRecord::Migration
     rename_table :assays_samples, :assays_deprecated_samples
     rename_column :assays_deprecated_samples, :sample_id, :deprecated_sample_id
 
-    rename_table :projects_samples, :projects_deprecated_samples
-    rename_column :projects_deprecated_samples, :sample_id, :deprecated_sample_id
+    rename_table :projects_samples, :deprecated_samples_projects
+    rename_column :deprecated_samples_projects, :sample_id, :deprecated_sample_id
 
     rename_table :sample_auth_lookup,:deprecated_sample_auth_lookup
 

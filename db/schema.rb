@@ -419,6 +419,11 @@ ActiveRecord::Schema.define(:version => 20160128161633) do
     t.string   "treatment"
   end
 
+  create_table "deprecated_samples_projects", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "deprecated_sample_id"
+  end
+
   create_table "deprecated_samples_tissue_and_cell_types", :id => false, :force => true do |t|
     t.integer "deprecated_sample_id"
     t.integer "tissue_and_cell_type_id"
@@ -1055,11 +1060,6 @@ ActiveRecord::Schema.define(:version => 20160128161633) do
     t.integer  "programme_id"
     t.integer  "ancestor_id"
     t.integer  "parent_id"
-  end
-
-  create_table "projects_deprecated_samples", :id => false, :force => true do |t|
-    t.integer "project_id"
-    t.integer "deprecated_sample_id"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
