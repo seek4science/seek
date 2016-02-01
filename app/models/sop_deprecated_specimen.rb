@@ -1,6 +1,8 @@
 class SopDeprecatedSpecimen < ActiveRecord::Base
-  belongs_to :deprecated_specimen
+
   belongs_to :sop
+
+  belongs_to :deprecated_specimen
 
   before_save :check_version
   #always returns the correct versioned asset (e.g Sop::Version) according to the stored version, or latest version if version is nil

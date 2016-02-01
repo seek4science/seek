@@ -27,8 +27,7 @@ class Assay < ActiveRecord::Base
   acts_as_annotatable :name_field=>:title
 
   belongs_to :institution
-  has_and_belongs_to_many :deprecated_samples
-  alias_method :samples, :deprecated_samples
+
   belongs_to :study
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
@@ -64,6 +63,9 @@ class Assay < ActiveRecord::Base
   attr_reader :pending_related_assets
 
   alias_attribute :contributor, :owner
+
+  #DEPRECATED
+  has_and_belongs_to_many :deprecated_samples
 
   def project_ids
     projects.map(&:id)

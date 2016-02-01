@@ -27,14 +27,12 @@ class DeprecatedSpecimen < ActiveRecord::Base
 
   has_one :organism, :through=>:strain
 
-  has_many :deprecated_samples
-  has_many :deprecated_treatments, :dependent=>:destroy
+
   has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id', :after_add => :update_timestamp, :after_remove => :update_timestamp
   has_many :sop_versions,:class_name => "Sop::Version",:finder_sql => Proc.new{self.sop_sql()}
-  has_many :sop_specimens,:dependent => :destroy
-  has_many :sops, :through => :sop_specimens
+
 
   alias_attribute :description, :comments
 
@@ -46,6 +44,12 @@ class DeprecatedSpecimen < ActiveRecord::Base
   validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
 
   scope :default_order, order("title")
+
+  #DEPRECATED
+  has_many :deprecated_samples
+  has_many :deprecated_treatments, :dependent=>:destroy
+  has_many :sop_deprecated_specimens,:dependent => :destroy
+  has_many :sops, :through => :sop_deprecated_specimens
 
   HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : {:born => 'culture starting date', :culture_growth_type => 'culture type'}
   HUMANIZED_COLUMNS[:title] = "#{(I18n.t 'biosamples.sample_parent_term').capitalize} title"

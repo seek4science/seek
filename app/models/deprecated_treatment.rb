@@ -1,6 +1,5 @@
 class DeprecatedTreatment < ActiveRecord::Base
-  belongs_to :deprecated_sample
-  belongs_to :deprecated_specimen
+
   belongs_to :unit
   belongs_to :time_after_treatment_unit, class_name: 'Unit'
 
@@ -10,6 +9,10 @@ class DeprecatedTreatment < ActiveRecord::Base
   alias_method :treatment_type, :measured_item
 
   validates :sample, presence: true
+
+  #DEPRECATED
+  belongs_to :deprecated_sample
+  belongs_to :deprecated_specimen
 
   def incubation_time_with_unit
     incubation_time ? "#{incubation_time} (#{incubation_time_unit.symbol}s)" : ''

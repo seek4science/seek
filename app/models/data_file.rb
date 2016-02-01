@@ -88,8 +88,9 @@ class DataFile < ActiveRecord::Base
        else
          return true
      end
-   end
+  end
 
+  #DEPRECATED
   has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
   has_many :deprecated_samples, :through => :sample_assets
 

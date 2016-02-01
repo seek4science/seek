@@ -18,14 +18,12 @@ class DeprecatedSample < ActiveRecord::Base
   attr_accessor :parent_name
   attr_accessor :from_biosamples
 
-  belongs_to :deprecated_specimen
+
   belongs_to :age_at_sampling_unit, :class_name => 'Unit', :foreign_key => "age_at_sampling_unit_id"
   belongs_to :institution
 
   has_and_belongs_to_many :assays
   has_and_belongs_to_many :tissue_and_cell_types
-  has_many :deprecated_sample_assets, :dependent => :destroy
-  has_many :deprecated_treatments, :dependent=>:destroy
 
   has_many :data_file_versions, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
   has_many :model_versions, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
@@ -46,6 +44,11 @@ class DeprecatedSample < ActiveRecord::Base
   validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
 
   scope :default_order, order("title")
+
+  #DEPRECATED
+  has_many :deprecated_sample_assets, :dependent => :destroy
+  has_many :deprecated_treatments, :dependent=>:destroy
+  belongs_to :deprecated_specimen
 
   include Seek::Search::BiosampleFields
 

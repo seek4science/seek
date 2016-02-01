@@ -18,7 +18,7 @@ class Strain < ActiveRecord::Base
   grouped_pagination
 
   belongs_to :organism
-  has_many :deprecated_specimens
+
   has_many :assay_organisms
   has_many :assays,:through=>:assay_organisms
 
@@ -35,6 +35,9 @@ class Strain < ActiveRecord::Base
   scope :default_order, order("title")
 
   alias_attribute :description, :comment
+
+  #DEPRECATED
+  has_many :deprecated_specimens
 
   include Seek::Search::BiosampleFields
 

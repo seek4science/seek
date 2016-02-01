@@ -15,11 +15,13 @@ class Institution < ActiveRecord::Base
 
   has_many :work_groups, dependent: :destroy
   has_many :projects, through: :work_groups
-  has_many :specimens
 
   searchable(auto_index: false) do
     text :city, :address
   end if Seek::Config.solr_enabled
+
+  #DEPRECATED
+  has_many :deprecated_specimens
 
   def people
     res = []
