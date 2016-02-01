@@ -56,9 +56,9 @@ class DeprecatedSpecimen < ActiveRecord::Base
 
   def sop_sql
     'SELECT sop_versions.* FROM sop_versions ' + 'INNER JOIN sop_specimens ' \
-    'ON sop_specimens.sop_id = sop_versions.sop_id ' \
-    'WHERE (sop_specimens.sop_version = sop_versions.version ' \
-    "AND sop_specimens.specimen_id = #{id})"
+    'ON sop_deprecated_specimens.sop_id = sop_versions.sop_id ' \
+    'WHERE (sop_deprecated_specimens.sop_version = sop_versions.version ' \
+    "AND sop_deprecated_specimens.deprecated_specimen_id = #{id})"
   end
 
   searchable(auto_index: false) do
@@ -86,10 +86,10 @@ class DeprecatedSpecimen < ActiveRecord::Base
     sop_ids = sop_ids.map &:to_i
     sop_ids.each do |sop_id|
       if sop = Sop.find(sop_id)
-        sop_specimens.build sop_id: sop.id, sop_version: sop.version unless sops.map(&:id).include?(sop_id)
+        sop_deprecated_specimens.build sop_id: sop.id, sop_version: sop.version unless sops.map(&:id).include?(sop_id)
       end
     end
-    self.sop_specimens = sop_specimens.select { |s| sop_ids.include? s.sop_id }
+    self.sop_deprecated_specimens = sop_deprecated_specimens.select { |s| sop_ids.include? s.sop_id }
   end
 
   def related_people
@@ -101,7 +101,7 @@ class DeprecatedSpecimen < ActiveRecord::Base
   end
 
   def state_allows_delete?(user = User.current_user)
-    samples.empty? && super
+    deprecated_samples.empty? && super
   end
 
   def clear_garbage
