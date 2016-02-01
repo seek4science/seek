@@ -20,14 +20,6 @@ five:
   person_id: 2
   work_group_id: 4
 
-six:
-  person_id: 11
-  work_group_id: 4
-
-seven:
-  person_id: 12
-  work_group_id: 4
-
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
 
@@ -63,18 +55,6 @@ group_for_datafile_owner:
   person: person_for_datafile_owner
   work_group: sysmo_at_manchester_uni_workgroup
 
-group_for_pal:
-  person: pal
-  work_group: sysmo_at_manchester_uni_workgroup
-
-group_for_project_administrator:
-  person: person_for_project_administrator
-  work_group_id: 4
-
 person_for_sysmo_user_who_wants_to_access_different_things_in_sysmo_at_manchester_uni_workgroup:
   person: person_for_sysmo_user_who_wants_to_access_different_things
-  work_group: sysmo_at_manchester_uni_workgroup
-
-group_for_gatekeeper:
-  person: gatekeeper_person
   work_group: sysmo_at_manchester_uni_workgroup
