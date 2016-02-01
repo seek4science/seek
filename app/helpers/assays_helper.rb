@@ -36,33 +36,9 @@ module AssaysHelper
   end
 
 
-  def list_samples_and_assay_organisms attribute, assay_samples, assay_organisms, html_options={}, none_text="Not Specified"
+  def list_assay_organisms attribute, assay_organisms, html_options={}, none_text="Not Specified"
 
     result= "<p class='#{html_options[:class]}' id='#{html_options[:id]}'> <b>#{attribute}</b>: "
-
-    result +="<span class='none_text'>#{none_text}</span>" if assay_samples.blank? and assay_organisms.blank?
-
-    assay_samples.each do |as|
-      result += "<br/>" if as==assay_samples.first
-      organism = as.deprecated_specimen.organism
-      strain = as.deprecated_specimen.strain
-      sample = as
-
-      culture_growth_type = as.deprecated_specimen.culture_growth_type
-
-      result += describe_organism_and_strain_for_list(organism, strain)
-
-      if sample && sample.tissue_and_cell_types.count > 0
-        result += " : "
-        result += describe_sample_tissue_and_cell_types(sample)
-      end
-
-      if culture_growth_type
-        result += " (#{culture_growth_type.title})"
-      end
-      result += ", " unless as==assay_samples.last and assay_organisms.blank?
-    end
-
 
     result += append_list_assay_organisms(assay_organisms)
     result += "</p>"

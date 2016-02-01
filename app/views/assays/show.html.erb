@@ -62,7 +62,7 @@
         <% end -%>
 
         <% if Seek::Config.organisms_enabled %>
-            <%= list_samples_and_assay_organisms("Organisms", @assay.samples, @assay.assay_organisms,{:id=>"organism"}) %>
+            <%= list_assay_organisms("Organisms", @assay.assay_organisms,{:id=>"organism"}) %>
         <% end %>
       </div>
     </div>
