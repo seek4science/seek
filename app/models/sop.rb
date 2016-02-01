@@ -23,7 +23,7 @@ class Sop < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
-  has_many :sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
   has_many :deprecated_samples, :through => :sample_assets
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates

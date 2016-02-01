@@ -24,7 +24,7 @@ class DeprecatedSample < ActiveRecord::Base
 
   has_and_belongs_to_many :assays
   has_and_belongs_to_many :tissue_and_cell_types
-  has_many :sample_assets, :dependent => :destroy
+  has_many :deprecated_sample_assets, :dependent => :destroy
   has_many :treatments, :dependent=>:destroy
 
   has_many :data_file_versions, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
@@ -122,7 +122,7 @@ class DeprecatedSample < ActiveRecord::Base
     sample_asset = sample_assets.detect { |sa| sa.asset == asset }
 
     unless sample_asset
-      sample_asset = SampleAsset.new
+      sample_asset = DeprecatedSampleAsset.new
       sample_asset.sample = self
       sample_asset.asset = asset
     end

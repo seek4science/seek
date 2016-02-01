@@ -1,4 +1,4 @@
-class SampleAsset < ActiveRecord::Base
+class DeprecatedSampleAsset < ActiveRecord::Base
   belongs_to :deprecated_sample
   belongs_to :asset,:polymorphic => true
 

@@ -90,7 +90,7 @@ class DataFile < ActiveRecord::Base
      end
    end
 
-  has_many :sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
   has_many :deprecated_samples, :through => :sample_assets
 
 

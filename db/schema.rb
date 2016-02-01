@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160129154301) do
+ActiveRecord::Schema.define(:version => 20160201110138) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -380,6 +380,15 @@ ActiveRecord::Schema.define(:version => 20160129154301) do
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
+
+  create_table "deprecated_sample_assets", :force => true do |t|
+    t.integer  "deprecated_sample_id"
+    t.integer  "asset_id"
+    t.integer  "version"
+    t.string   "asset_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "deprecated_sample_auth_lookup", :id => false, :force => true do |t|
     t.integer "user_id"
@@ -1252,15 +1261,6 @@ ActiveRecord::Schema.define(:version => 20160129154301) do
   add_index "resource_publish_logs", ["publish_state"], :name => "index_resource_publish_logs_on_publish_state"
   add_index "resource_publish_logs", ["resource_type", "resource_id"], :name => "index_resource_publish_logs_on_resource_type_and_resource_id"
   add_index "resource_publish_logs", ["user_id"], :name => "index_resource_publish_logs_on_user_id"
-
-  create_table "sample_assets", :force => true do |t|
-    t.integer  "deprecated_sample_id"
-    t.integer  "asset_id"
-    t.integer  "version"
-    t.string   "asset_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "saved_searches", :force => true do |t|
     t.integer  "user_id"

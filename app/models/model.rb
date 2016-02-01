@@ -35,7 +35,7 @@ class Model < ActiveRecord::Base
   
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
-  has_many :sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
   has_many :deprecated_samples, :through => :sample_assets
 
   #FIXME: model_images seems to be to keep persistence of old images, wheras model_image is just the current_image
