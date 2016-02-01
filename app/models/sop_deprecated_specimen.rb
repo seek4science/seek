@@ -1,4 +1,4 @@
-class SopSpecimen < ActiveRecord::Base
+class SopDeprecatedSpecimen < ActiveRecord::Base
   belongs_to :deprecated_specimen
   belongs_to :sop
 

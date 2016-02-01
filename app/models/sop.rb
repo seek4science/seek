@@ -31,8 +31,8 @@ class Sop < ActiveRecord::Base
 
   has_many :experimental_conditions, :conditions =>  Proc.new{["experimental_conditions.sop_version =?", version]}
 
-  has_many :sop_specimens, :dependent => :destroy
-  has_many :specimens,:through=>:sop_specimens
+  has_many :sop_deprecated_specimens, :dependent => :destroy
+  has_many :deprecated_specimens,:through=>:sop_deprecated_specimens
 
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource

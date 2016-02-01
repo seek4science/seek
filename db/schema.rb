@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160201110138) do
+ActiveRecord::Schema.define(:version => 20160201111736) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1355,7 +1355,7 @@ ActiveRecord::Schema.define(:version => 20160201110138) do
   add_index "sop_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sop_auth_lookup_on_user_id_and_asset_id_and_can_view"
   add_index "sop_auth_lookup", ["user_id", "can_view"], :name => "index_sop_auth_lookup_on_user_id_and_can_view"
 
-  create_table "sop_specimens", :force => true do |t|
+  create_table "sop_deprecated_specimens", :force => true do |t|
     t.integer "deprecated_specimen_id"
     t.integer "sop_id"
     t.integer "sop_version"
