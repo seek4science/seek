@@ -215,59 +215,6 @@ describe Strain do
 #  it { should have_searchable_field(:children) }
 end
 
-describe DeprecatedSpecimen do
-  it { should have_searchable_field(:title) }
-  it { should have_searchable_field(:description) }
-  it { should have_searchable_field(:searchable_tags) }
-  it { should have_searchable_field(:contributor) }
-  it { should have_searchable_field(:projects) }
-
-  it { should have_searchable_field(:creators) }
-  it { should have_searchable_field(:other_creators) }
-
-  it { should have_searchable_field(:provider_id) }
-  it { should have_searchable_field(:provider_name) }
-#  it { should have_searchable_field(:treatment) }
-  it { should have_searchable_field(:genotype_info) }
-  it { should have_searchable_field(:phenotype_info) }
-  it { should have_searchable_field(:lab_internal_number) }
-  it { should have_searchable_field(:institution) }
-
-#  it { should have_searchable_field(:medium) }
-#  it { should have_searchable_field(:culture_format) }
-#  it { should have_searchable_field(:confluency) }
-#  it { should have_searchable_field(:passage) }
-#  it { should have_searchable_field(:viability) }
-#  it { should have_searchable_field(:purity) }
-#  it { should have_searchable_field(:ploidy) }
-  it { should have_searchable_field(:culture_growth_type) }
-#  it { should have_searchable_field(:age_unit) }
-  it { should have_searchable_field(:strain) }
-#  it { should have_searchable_field(:samples) }
-end
-
-describe DeprecatedSample do
-  it { should have_searchable_field(:title) }
-  it { should have_searchable_field(:description) }
-  it { should have_searchable_field(:searchable_tags) }
-  it { should have_searchable_field(:contributor) }
-  it { should have_searchable_field(:projects) }
-
-  it { should have_searchable_field(:provider_name) }
-  it { should have_searchable_field(:provider_id) }
-#  it { should have_searchable_field(:treatment) }
-  it { should have_searchable_field(:lab_internal_number) }
-  it { should have_searchable_field(:institution) }
-
-#  it { should have_searchable_field(:explantation) }
-#  it { should have_searchable_field(:organism_part) }
-#  it { should have_searchable_field(:sample_type) }
-
-#  it { should have_searchable_field(:tissue_and_cell_types) }
-  it { should have_searchable_field(:specimen) }
-  it { should have_searchable_field(:strain) }
-end
-
 #others
 describe Event do
   it { should have_searchable_field(:title) }

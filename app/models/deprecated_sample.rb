@@ -50,8 +50,6 @@ class DeprecatedSample < ActiveRecord::Base
   belongs_to :deprecated_specimen
   accepts_nested_attributes_for :deprecated_specimen
 
-  include Seek::Search::BiosampleFields
-
   searchable(auto_index: false) do
     text :specimen do
       if specimen
