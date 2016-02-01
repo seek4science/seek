@@ -19,8 +19,6 @@ class DeprecatedSpecimen < ActiveRecord::Base
 
   before_save :clear_garbage
 
-  attr_accessor :from_biosamples
-
   belongs_to :institution
   belongs_to :culture_growth_type
   belongs_to :strain

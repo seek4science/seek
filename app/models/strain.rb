@@ -39,8 +39,6 @@ class Strain < ActiveRecord::Base
   #DEPRECATED
   has_many :deprecated_specimens
 
-  attr_accessor :from_biosamples
-
   include Seek::Search::CommonFields
 
   searchable(:auto_index=>false) do

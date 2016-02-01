@@ -15,7 +15,6 @@ class DeprecatedSample < ActiveRecord::Base
   grouped_pagination
 
   attr_accessor :parent_name
-  attr_accessor :from_biosamples
 
   belongs_to :age_at_sampling_unit, class_name: 'Unit', foreign_key: "age_at_sampling_unit_id"
   belongs_to :institution
