@@ -1,6 +1,5 @@
 require 'grouped_pagination'
 
-
 class DeprecatedSample < ActiveRecord::Base
   include Seek::Subscribable
 
@@ -16,74 +15,70 @@ class DeprecatedSample < ActiveRecord::Base
   grouped_pagination
 
   attr_accessor :parent_name
-  attr_accessor :from_biosamples
 
-
-  belongs_to :age_at_sampling_unit, :class_name => 'Unit', :foreign_key => "age_at_sampling_unit_id"
+  belongs_to :age_at_sampling_unit, class_name: 'Unit', foreign_key: "age_at_sampling_unit_id"
   belongs_to :institution
 
   has_and_belongs_to_many :assays
   has_and_belongs_to_many :tissue_and_cell_types
 
-  has_many :data_file_versions, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
-  has_many :model_versions, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
-  has_many :sop_versions, :class_name => "Sop::Version", :finder_sql => Proc.new { self.asset_sql("Sop") }
+  has_many :data_file_versions, class_name: "DataFile::Version", finder_sql: Proc.new { self.asset_sql("DataFile") }
+  has_many :model_versions, class_name: "Model::Version", finder_sql: Proc.new { self.asset_sql("Model") }
+  has_many :sop_versions, class_name: "Sop::Version", finder_sql: Proc.new { self.asset_sql("Sop") }
 
-  has_many :data_files, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
-  has_many :models, :through => :sample_assets, :source => :asset, :source_type => 'Model'
-  has_many :sops, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
+  has_many :data_files, through: :deprecated_sample_assets, source: :asset, source_type: 'DataFile'
+  has_many :models, through: :deprecated_sample_assets, source: :asset, source_type: 'Model'
+  has_many :sops, through: :deprecated_sample_assets, source: :asset, source_type: 'Sop'
 
   alias_attribute :description, :comments
 
   validates_uniqueness_of :title
 
   validates_presence_of :title
-  validates_presence_of :specimen, :lab_internal_number
-  validates_presence_of :donation_date, :if => "Seek::Config.is_virtualliver"
-  validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
+  validates_presence_of :deprecated_specimen, :lab_internal_number
+  validates_presence_of :donation_date, if: "Seek::Config.is_virtualliver"
+  validates_presence_of :projects, unless: "Seek::Config.is_virtualliver"
 
   scope :default_order, order("title")
 
   #DEPRECATED
-  has_many :deprecated_sample_assets, :dependent => :destroy
-  has_many :deprecated_treatments, :dependent=>:destroy
+  has_many :deprecated_sample_assets, dependent: :destroy
+  has_many :deprecated_treatments, dependent: :destroy
   belongs_to :deprecated_specimen
   accepts_nested_attributes_for :deprecated_specimen
 
-  include Seek::Search::BiosampleFields
-
   searchable(auto_index: false) do
     text :specimen do
-      if specimen
+      if deprecated_specimen
         text=[]
-        text << specimen.lab_internal_number
-        text << specimen.provider_name
-        text << specimen.title
-        text << specimen.provider_id
+        text << deprecated_specimen.lab_internal_number
+        text << deprecated_specimen.provider_name
+        text << deprecated_specimen.title
+        text << deprecated_specimen.provider_id
         text
       end
     end
 
     text :strain do
-      if (specimen.strain)
+      if (deprecated_specimen.strain)
         text = []
-        text << specimen.strain.info
-        text << specimen.strain.try(:organism).try(:title).to_s
+        text << deprecated_specimen.strain.info
+        text << deprecated_specimen.strain.try(:organism).try(:title).to_s
         text
       end
     end
   end if Seek::Config.solr_enabled
 
-  HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
+  HUMANIZED_COLUMNS = {title: "Sample name", lab_internal_number: "Sample lab internal identifier", provider_id: "Provider's sample identifier"}
 
   def asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
     'SELECT ' + asset_class_underscored + '_versions.* FROM ' + asset_class_underscored + '_versions ' +
-        'INNER JOIN sample_assets ' +
-        'ON sample_assets.asset_id= '+ asset_class_underscored + '_id ' +
-        'AND sample_assets.asset_type=\'' + asset_class + '\' ' +
-        'WHERE (sample_assets.version= ' + asset_class_underscored + '_versions.version ' +
-        "AND sample_assets.sample_id= #{self.id})"
+        'INNER JOIN deprecated_sample_assets ' +
+        'ON deprecated_sample_assets.asset_id= '+ asset_class_underscored + '_id ' +
+        'AND deprecated_sample_assets.asset_type=\'' + asset_class + '\' ' +
+        'WHERE (sdeprecated_ample_assets.version= ' + asset_class_underscored + '_versions.version ' +
+        "AND deprecated_sample_assets.deprecated_sample_id= #{self.id})"
   end
 
   def self.authorization_supported?
@@ -94,46 +89,44 @@ class DeprecatedSample < ActiveRecord::Base
     assays.empty? && super
   end
 
-  def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
-       tissue_and_cell_type=nil
+  def associate_tissue_and_cell_type tissue_and_cell_type_id, tissue_and_cell_type_title
+    tissue_and_cell_type=nil
     if !tissue_and_cell_type_title.blank?
-      if ( tissue_and_cell_type_id =="0" )
-          found = TissueAndCellType.where(:title => tissue_and_cell_type_title).first
-          unless found
-          tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title)
-          end
+      if (tissue_and_cell_type_id =="0")
+        found = TissueAndCellType.where(title: tissue_and_cell_type_title).first
+        unless found
+          tissue_and_cell_type = TissueAndCellType.create!(title: tissue_and_cell_type_title)
+        end
       else
-          tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+        tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
       end
 
       if tissue_and_cell_type
-       existing = false
-       self.tissue_and_cell_types.each do |t|
-         if t == tissue_and_cell_type
-           existing = true
-           break
-         end
-       end
-       unless existing
-         self.tissue_and_cell_types << tissue_and_cell_type
-       end
+        existing = false
+        self.tissue_and_cell_types.each do |t|
+          if t == tissue_and_cell_type
+            existing = true
+            break
+          end
+        end
+        self.tissue_and_cell_types << tissue_and_cell_type unless existing
       end
     end
   end
 
   def associate_asset asset
-    sample_asset = sample_assets.detect { |sa| sa.asset == asset }
+    deprecated_sample_asset = deprecated_sample_assets.detect { |sa| sa.asset == asset }
 
-    unless sample_asset
-      sample_asset = DeprecatedSampleAsset.new
-      sample_asset.sample = self
-      sample_asset.asset = asset
+    unless deprecated_sample_asset
+      deprecated_sample_asset = DeprecatedSampleAsset.new
+      deprecated_sample_asset.sample = self
+      deprecated_sample_asset.asset = asset
     end
 
-    sample_asset.version = asset.version
-    sample_asset.save if sample_asset.changed?
+    deprecated_sample_asset.version = asset.version
+    deprecated_sample_asset.save if deprecated_sample_asset.changed?
 
-    return sample_asset
+    return deprecated_sample_asset
   end
 
   def create_or_update_assets asset_ids, asset_class_name
@@ -155,9 +148,9 @@ class DeprecatedSample < ActiveRecord::Base
     new_object= self.dup
     new_object.policy = self.policy.deep_copy
     new_object.data_files = self.data_files.select(&:can_view?)
-   new_object.models = self.models.select(&:can_view?)
+    new_object.models = self.models.select(&:can_view?)
     new_object.sops = self.sops.select(&:can_view?)
-   new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
+    new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
     new_object.project_ids = self.project_ids
     return new_object
   end
@@ -170,7 +163,7 @@ class DeprecatedSample < ActiveRecord::Base
     if sampling_date.nil?
       ''
     else
-      if try(:sampling_date).hour == 0 and try(:sampling_date).min == 0 and try(:sampling_date).sec == 0 then
+      if try(:sampling_date).hour == 0 && try(:sampling_date).min == 0 && try(:sampling_date).sec == 0 then
         try(:sampling_date).strftime('%d/%m/%Y')
       else
         try(:sampling_date).strftime('%d/%m/%Y @ %H:%M:%S')
@@ -184,7 +177,7 @@ class DeprecatedSample < ActiveRecord::Base
   end
 
   def specimen_info
-    specimen.nil? ? '' : (I18n.t 'biosamples.sample_parent_term').capitalize + ': ' + specimen.title
+    deprecated_specimen.nil? ? '' : (I18n.t 'biosamples.sample_parent_term').capitalize + ': ' + deprecated_specimen.title
   end
 
   def age_at_sampling_info
@@ -194,4 +187,5 @@ class DeprecatedSample < ActiveRecord::Base
       ''
     end
   end
+
 end

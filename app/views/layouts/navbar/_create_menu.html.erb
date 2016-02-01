@@ -20,11 +20,6 @@
         <li><%= link_to t("sop"), new_sop_path %></li>
         <li><%= link_to "Publication", new_publication_path %></li>
 
-        <% if Seek::Config.biosamples_enabled %>
-            <li role="presentation" class="dropdown-header">Biosamples</li>
-            <li><%= link_to "Strain", new_strain_path %></li>
-        <% end %>
-
         <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
         <li><%= link_to t("investigation"), new_investigation_path %></li>
         <li><%= link_to t("study"), new_study_path %></li>

@@ -1,5 +1,4 @@
 class DeprecatedTreatment < ActiveRecord::Base
-
   belongs_to :unit
   belongs_to :time_after_treatment_unit, class_name: 'Unit'
 
@@ -10,7 +9,7 @@ class DeprecatedTreatment < ActiveRecord::Base
 
   validates :sample, presence: true
 
-  #DEPRECATED
+  # DEPRECATED
   belongs_to :deprecated_sample
   belongs_to :deprecated_specimen
 

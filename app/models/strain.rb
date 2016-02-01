@@ -39,12 +39,22 @@ class Strain < ActiveRecord::Base
   #DEPRECATED
   has_many :deprecated_specimens
 
-  include Seek::Search::BiosampleFields
-
-  attr_accessor :from_biosamples
+  include Seek::Search::CommonFields
 
   searchable(:auto_index=>false) do
       text :synonym
+      text :genotype_info do
+        genotype_info
+      end
+      text :phenotype_info do
+        phenotype_info
+      end
+      text :provider_name do
+        provider_name
+      end
+      text :provider_id do
+        provider_id
+      end
   end if Seek::Config.solr_enabled
 
   def is_default?
