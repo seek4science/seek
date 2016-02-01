@@ -163,7 +163,6 @@ class PersonTest < ActiveSupport::TestCase
       assert p.valid?
       p.save!
       p.reload
-      pp p.orcid
       assert_equal "http://orcid.org/0000-0003-2130-0865",p.orcid_uri
 
       p.orcid = "0000-0002-1694-233X"
