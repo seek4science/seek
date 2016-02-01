@@ -28,8 +28,6 @@ class Sop < ActiveRecord::Base
   #DEPRECATED
   has_many :sop_deprecated_specimens, :dependent => :destroy
   has_many :deprecated_specimens,:through=>:sop_deprecated_specimens
-  has_and_belongs_to_many :deprecated_specimens
-  has_and_belongs_to_many :deprecated_samples
   has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
   has_many :deprecated_samples, :through => :sample_assets
 

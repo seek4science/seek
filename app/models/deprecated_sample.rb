@@ -33,7 +33,6 @@ class DeprecatedSample < ActiveRecord::Base
   has_many :models, :through => :sample_assets, :source => :asset, :source_type => 'Model'
   has_many :sops, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
 
-  accepts_nested_attributes_for :deprecated_specimen
   alias_attribute :description, :comments
 
   validates_uniqueness_of :title
@@ -49,6 +48,7 @@ class DeprecatedSample < ActiveRecord::Base
   has_many :deprecated_sample_assets, :dependent => :destroy
   has_many :deprecated_treatments, :dependent=>:destroy
   belongs_to :deprecated_specimen
+  accepts_nested_attributes_for :deprecated_specimen
 
   include Seek::Search::BiosampleFields
 

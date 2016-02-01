@@ -2,6 +2,7 @@ require 'test_helper'
 require 'tmpdir'
 
 class AssayTest < ActiveSupport::TestCase
+
   fixtures :all
 
   test "shouldnt edit the assay" do
