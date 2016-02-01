@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160201111736) do
+ActiveRecord::Schema.define(:version => 20160201114822) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -489,6 +489,26 @@ ActiveRecord::Schema.define(:version => 20160201111736) do
   create_table "deprecated_specimens_projects", :id => false, :force => true do |t|
     t.integer "project_id"
     t.integer "deprecated_specimen_id"
+  end
+
+  create_table "deprecated_treatments", :force => true do |t|
+    t.integer  "unit_id"
+    t.string   "treatment_protocol"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "deprecated_sample_id"
+    t.integer  "measured_item_id"
+    t.float    "start_value"
+    t.float    "end_value"
+    t.float    "standard_deviation"
+    t.text     "comments"
+    t.integer  "compound_id"
+    t.integer  "deprecated_specimen_id"
+    t.string   "medium_title"
+    t.float    "time_after_treatment"
+    t.integer  "time_after_treatment_unit_id"
+    t.float    "incubation_time"
+    t.integer  "incubation_time_unit_id"
   end
 
   create_table "disciplines", :force => true do |t|
@@ -1740,26 +1760,6 @@ ActiveRecord::Schema.define(:version => 20160201111736) do
 
   add_index "trash_records", ["created_at", "trashable_type"], :name => "index_trash_records_on_created_at_and_trashable_type"
   add_index "trash_records", ["trashable_type", "trashable_id"], :name => "index_trash_records_on_trashable_type_and_trashable_id"
-
-  create_table "treatments", :force => true do |t|
-    t.integer  "unit_id"
-    t.string   "treatment_protocol"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "deprecated_sample_id"
-    t.integer  "measured_item_id"
-    t.float    "start_value"
-    t.float    "end_value"
-    t.float    "standard_deviation"
-    t.text     "comments"
-    t.integer  "compound_id"
-    t.integer  "deprecated_specimen_id"
-    t.string   "medium_title"
-    t.float    "time_after_treatment"
-    t.integer  "time_after_treatment_unit_id"
-    t.float    "incubation_time"
-    t.integer  "incubation_time_unit_id"
-  end
 
   create_table "units", :force => true do |t|
     t.string   "title"

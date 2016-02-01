@@ -1,4 +1,4 @@
-class Treatment < ActiveRecord::Base
+class DeprecatedTreatment < ActiveRecord::Base
   belongs_to :deprecated_sample
   belongs_to :deprecated_specimen
   belongs_to :unit

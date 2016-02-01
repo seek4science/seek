@@ -134,7 +134,7 @@ namespace :seek_biosamples do
 
     attributes = build_treatment_attributes(treatment_hash)
 
-    treatment = Treatment.new attributes
+    treatment = DeprecatedTreatment.new attributes
     treatment.save!
   end
 
