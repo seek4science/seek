@@ -1,6 +1,5 @@
 require 'grouped_pagination'
 
-
 class DeprecatedSample < ActiveRecord::Base
   include Seek::Subscribable
 
@@ -18,20 +17,19 @@ class DeprecatedSample < ActiveRecord::Base
   attr_accessor :parent_name
   attr_accessor :from_biosamples
 
-
-  belongs_to :age_at_sampling_unit, :class_name => 'Unit', :foreign_key => "age_at_sampling_unit_id"
+  belongs_to :age_at_sampling_unit, class_name: 'Unit', foreign_key: "age_at_sampling_unit_id"
   belongs_to :institution
 
   has_and_belongs_to_many :assays
   has_and_belongs_to_many :tissue_and_cell_types
 
-  has_many :data_file_versions, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
-  has_many :model_versions, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
-  has_many :sop_versions, :class_name => "Sop::Version", :finder_sql => Proc.new { self.asset_sql("Sop") }
+  has_many :data_file_versions, class_name: "DataFile::Version", finder_sql: Proc.new { self.asset_sql("DataFile") }
+  has_many :model_versions, class_name: "Model::Version", finder_sql: Proc.new{self.asset_sql("Model")}
+  has_many :sop_versions, class_name: "Sop::Version", finder_sql: Proc.new { self.asset_sql("Sop") }
 
-  has_many :data_files, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
-  has_many :models, :through => :sample_assets, :source => :asset, :source_type => 'Model'
-  has_many :sops, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
+  has_many :data_files, through: :sample_assets, source: :asset, source_type: 'DataFile'
+  has_many :models, through: :sample_assets, source: :asset, source_type: 'Model'
+  has_many :sops, through: :sample_assets, source: :asset, source_type: 'Sop'
 
   alias_attribute :description, :comments
 
@@ -39,14 +37,14 @@ class DeprecatedSample < ActiveRecord::Base
 
   validates_presence_of :title
   validates_presence_of :specimen, :lab_internal_number
-  validates_presence_of :donation_date, :if => "Seek::Config.is_virtualliver"
-  validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
+  validates_presence_of :donation_date, if: "Seek::Config.is_virtualliver"
+  validates_presence_of :projects, unless: "Seek::Config.is_virtualliver"
 
   scope :default_order, order("title")
 
   #DEPRECATED
-  has_many :deprecated_sample_assets, :dependent => :destroy
-  has_many :deprecated_treatments, :dependent=>:destroy
+  has_many :deprecated_sample_assets, dependent: :destroy
+  has_many :deprecated_treatments, dependent: :destroy
   belongs_to :deprecated_specimen
   accepts_nested_attributes_for :deprecated_specimen
 
@@ -72,7 +70,7 @@ class DeprecatedSample < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
-  HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
+  HUMANIZED_COLUMNS = {title: "Sample name", lab_internal_number: "Sample lab internal identifier", provider_id: "Provider's sample identifier"}
 
   def asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
@@ -93,28 +91,26 @@ class DeprecatedSample < ActiveRecord::Base
   end
 
   def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
-       tissue_and_cell_type=nil
+    tissue_and_cell_type=nil
     if !tissue_and_cell_type_title.blank?
       if ( tissue_and_cell_type_id =="0" )
-          found = TissueAndCellType.where(:title => tissue_and_cell_type_title).first
-          unless found
-          tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title)
-          end
+        found = TissueAndCellType.where(title: tissue_and_cell_type_title).first
+        unless found
+          tissue_and_cell_type = TissueAndCellType.create!(title: tissue_and_cell_type_title)
+        end
       else
-          tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+        tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
       end
 
       if tissue_and_cell_type
-       existing = false
-       self.tissue_and_cell_types.each do |t|
-         if t == tissue_and_cell_type
-           existing = true
-           break
-         end
+        existing = false
+        self.tissue_and_cell_types.each do | t|
+         if t == tissue_and_cell_ty pe
+           existing = tr ue
+           bre ak
+         e nd
        end
-       unless existing
-         self.tissue_and_cell_types << tissue_and_cell_type
-       end
+        self.tissue_and_cell_types << tissue_and_cell_type unless existing
       end
     end
   end
@@ -153,9 +149,9 @@ class DeprecatedSample < ActiveRecord::Base
     new_object= self.dup
     new_object.policy = self.policy.deep_copy
     new_object.data_files = self.data_files.select(&:can_view?)
-   new_object.models = self.models.select(&:can_view?)
+    new_object.models = self.models.select(&:can_view?)
     new_object.sops = self.sops.select(&:can_view?)
-   new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
+    new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
     new_object.project_ids = self.project_ids
     return new_object
   end
@@ -168,7 +164,7 @@ class DeprecatedSample < ActiveRecord::Base
     if sampling_date.nil?
       ''
     else
-      if try(:sampling_date).hour == 0 and try(:sampling_date).min == 0 and try(:sampling_date).sec == 0 then
+      if try(:sampling_date).hour == 0 && try(:sampling_date).min == 0 && try(:sampling_date).sec == 0 then
         try(:sampling_date).strftime('%d/%m/%Y')
       else
         try(:sampling_date).strftime('%d/%m/%Y @ %H:%M:%S')

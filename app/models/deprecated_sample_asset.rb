@@ -1,6 +1,5 @@
 class DeprecatedSampleAsset < ActiveRecord::Base
-
-  belongs_to :asset,:polymorphic => true
+  belongs_to :asset, polymorphic: true
 
   # check whether asset is of latest version
   before_save :check_version
@@ -8,21 +7,18 @@ class DeprecatedSampleAsset < ActiveRecord::Base
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :asset
 
-  #DEPRECATED
+  # DEPRECATED
   belongs_to :deprecated_sample
 
   def versioned_asset
-      if version
-          asset.find_version version
-      else
-         asset.latest_version
-      end
+    if version
+      asset.find_version version
+    else
+      asset.latest_version
+    end
   end
 
   def check_version
-     if asset && (version != asset.version)
-       self.version = asset.version
-     end
+    self.version = asset.version if asset && (version != asset.version)
   end
-
 end
