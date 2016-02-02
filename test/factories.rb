@@ -1019,3 +1019,7 @@ end
     f.refresh_token 'ref'
     f.expires_at (Time.now + 1.hour)
   end
+
+  Factory.define(:sample) do |f|
+    f.sequence(:title) {|n| "Sample #{n}"}
+  end

@@ -29,8 +29,6 @@ class Model < ActiveRecord::Base
 
   include Seek::Models::ModelExtraction
 
-  validates_presence_of :title
-
   before_save :check_for_sbml_format
 
 

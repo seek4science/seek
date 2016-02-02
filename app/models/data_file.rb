@@ -23,8 +23,6 @@ class DataFile < ActiveRecord::Base
 
   scope :default_order, order('title')
 
-  validates_presence_of :title
-
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 

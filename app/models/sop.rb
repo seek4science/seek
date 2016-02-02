@@ -18,8 +18,6 @@ class Sop < ActiveRecord::Base
 
   scope :default_order, order("title")
 
-  validates_presence_of :title
-
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 

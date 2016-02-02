@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  title: MyString
+  sample_type_id: 1
+  json_metadata: MyText
+  uuid: MyString
+  contributor_id: 1
+  policy_id: 1
+  contributor_type: MyString
+
+two:
+  title: MyString
+  sample_type_id: 1
+  json_metadata: MyText
+  uuid: MyString
+  contributor_id: 1
+  policy_id: 1
+  contributor_type: MyString

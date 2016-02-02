@@ -41,7 +41,7 @@ module Seek
         attr_writer :original_filename, :content_type
         does_not_require_can_edit :last_used_at
 
-        validates_presence_of :title
+        validates :title, presence: true
 
         include Seek::Stats::ActivityCounts
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160201114822) do
+ActiveRecord::Schema.define(:version => 20160202151214) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1281,6 +1281,18 @@ ActiveRecord::Schema.define(:version => 20160201114822) do
   add_index "resource_publish_logs", ["publish_state"], :name => "index_resource_publish_logs_on_publish_state"
   add_index "resource_publish_logs", ["resource_type", "resource_id"], :name => "index_resource_publish_logs_on_resource_type_and_resource_id"
   add_index "resource_publish_logs", ["user_id"], :name => "index_resource_publish_logs_on_user_id"
+
+  create_table "samples", :force => true do |t|
+    t.string   "title"
+    t.integer  "sample_type_id"
+    t.text     "json_metadata"
+    t.string   "uuid"
+    t.integer  "contributor_id"
+    t.integer  "policy_id"
+    t.string   "contributor_type"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
 
   create_table "saved_searches", :force => true do |t|
     t.integer  "user_id"
