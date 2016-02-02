@@ -1,0 +1,2 @@
+class SampleTypesController < ApplicationController
+end
