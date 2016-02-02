@@ -2,8 +2,6 @@
 <%# items in the collection are expected to have .name() method available -%>
 <% main_section_length ||= 5 -%>
 
-<% 10.times { collection << collection.first } %>
-
 <% unless is_nil_or_empty? collection %>
     <ul class="list no-icon">
       <% collection.first(main_section_length).each do |item| %>
