@@ -387,6 +387,38 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+  test "my recent contributions section works correctly" do
+    person = Factory(:person)
+    login_as(person)
+
+    df = Factory :data_file, :title=>"A new data file", :contributor=>person, :policy=>Factory(:public_policy)
+    sop = Factory :sop, :title=>"A new sop", :contributor=>person, :policy=>Factory(:public_policy)
+    assay= Factory :assay, :title=>"A new assay", :contributor=>person, :policy=>Factory(:public_policy)
+
+    Factory :activity_log, :activity_loggable => df, :controller_name=>"data_files", :culprit=>person.user
+    Factory :activity_log, :activity_loggable => sop, :controller_name=>"sops", :culprit=>person.user
+    Factory :activity_log, :activity_loggable => assay, :controller_name=>"assays", :culprit=>person.user
+
+    get :index
+    assert_response :success
+
+    assert_select "div#my-recent-contributions .panel-body ul li", 3
+    assert_select "div#my-recent-contributions .panel-body ul>li a[href=?]",data_file_path(df),:text=>/A new data file/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",sop_path(sop),:text=>/A new sop/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",assay_path(assay),:text=>/A new assay/
+
+    sop.update_attributes(:title => 'An old sop')
+    Factory :activity_log, :activity_loggable => sop, :controller_name=>"assays", :culprit=>person.user, :action => 'update'
+
+    get :index
+    assert_response :success
+    assert_select "div#my-recent-contributions .panel-body ul li", 3
+    assert_select "div#my-recent-contributions .panel-body ul>li a[href=?]",sop_path(sop),:text=>/An old sop/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",data_file_path(df),:text=>/A new data file/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",assay_path(assay),:text=>/A new assay/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",sop_path(sop),:text=>/A new sop/, :count => 0
+  end
+
   def uri_to_guardian_feed
     uri_to_feed "guardian_atom.xml"
   end
