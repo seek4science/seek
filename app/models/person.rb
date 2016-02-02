@@ -397,18 +397,18 @@ class Person < ActiveRecord::Base
 
   def recent_activity(limit = 10)
     # TODO: Need to find a better way of doing this
-    results = ActivityLog.group(:activity_loggable_type, :activity_loggable_id).
+    results = ActivityLog.group(:id, :activity_loggable_type, :activity_loggable_id).
         where(culprit_type: 'User', culprit_id: user, action: 'update').
-        where("`activity_logs`.`controller_name` != 'sessions'").
-        where("`activity_logs`.`controller_name` != 'people'").
-        order("`activity_logs`.`created_at` DESC").
+        where('controller_name != \'sessions\'').
+        where('controller_name != \'people\'').
+        order('created_at DESC').
         limit(limit).
         uniq +
-    ActivityLog.group(:activity_loggable_type, :activity_loggable_id).
+    ActivityLog.group(:id, :activity_loggable_type, :activity_loggable_id).
         where(culprit_type: 'User', culprit_id: user, action: 'create').
-        where("`activity_logs`.`controller_name` != 'sessions'").
-        where("`activity_logs`.`controller_name` != 'people'").
-        order("`activity_logs`.`created_at` DESC").
+        where('controller_name != \'sessions\'').
+        where('controller_name != \'people\'').
+        order('created_at DESC').
         limit(limit).
         uniq
     results.sort_by { |r| r.created_at }.reverse.uniq { |r| "#{r.activity_loggable_type}#{r.activity_loggable_id}" }[0...limit]
