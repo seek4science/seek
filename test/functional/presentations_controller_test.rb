@@ -276,5 +276,52 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
 
+  test "should display null license text" do
+    presentation = Factory :presentation, :policy => Factory(:public_policy)
+
+    get :show, :id => presentation
+
+    assert_select '.panel .panel-body span.none_text', :text => 'No license specified'
+  end
+
+  test "should display license" do
+    presentation = Factory :presentation, :license => 'cc-by', :policy => Factory(:public_policy)
+
+    get :show, :id => presentation
+
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+  end
+
+  test "should display license for current version" do
+    presentation = Factory :presentation, :license => 'cc-by', :policy => Factory(:public_policy)
+    presentationv = Factory :presentation_version_with_blob, :license => 'cc-zero', :presentation => presentation
+
+    get :show, :id => presentation, :version => 1
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+
+    get :show, :id => presentation, :version => presentationv.version
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'Creative Commons CCZero'
+  end
+
+  test "should update license" do
+    user = Factory(:person).user
+    login_as(user)
+    presentation = Factory :presentation, :policy => Factory(:public_policy), :contributor => user
+
+    assert_nil presentation.license
+
+    put :update, :id => presentation, :presentation => { :license => 'cc-by-sa' }
+
+    assert_response :redirect
+
+    get :show, :id => presentation
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike'
+    assert_equal 'cc-by-sa', assigns(:presentation).license
+  end
+
+
+
 end
 

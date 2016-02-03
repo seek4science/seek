@@ -2138,6 +2138,51 @@ class DataFilesControllerTest < ActionController::TestCase
     assert blob.caching_job.exists?
   end
 
+  test "should display null license text" do
+    df = Factory :data_file, :policy => Factory(:public_policy)
+
+    get :show, :id => df
+
+    assert_select '.panel .panel-body span.none_text', :text => 'No license specified'
+  end
+
+  test "should display license" do
+    df = Factory :data_file, :license => 'cc-by', :policy => Factory(:public_policy)
+
+    get :show, :id => df
+
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+  end
+
+  test "should display license for current version" do
+    df = Factory :data_file, :license => 'cc-by', :policy => Factory(:public_policy)
+    dfv = Factory :data_file_version_with_blob, :license => 'cc-zero', :data_file => df
+
+    get :show, :id => df, :version => 1
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+
+    get :show, :id => df, :version => dfv.version
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'Creative Commons CCZero'
+  end
+
+  test "should update license" do
+    user = users(:datafile_owner)
+    login_as(user)
+    df = data_files(:editable_data_file)
+
+    assert_nil df.license
+
+    put :update, :id => df, :data_file => { :license => 'cc-by-sa' }
+
+    assert_response :redirect
+
+    get :show, :id => df
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike'
+    assert_equal 'cc-by-sa', assigns(:data_file).license
+  end
+
   private
 
   def mock_http

@@ -869,6 +869,51 @@ class SopsControllerTest < ActionController::TestCase
     assert_select "h1",:text=>"SOPs"
   end
 
+  test "should display null license text" do
+    sop = Factory :sop, :policy => Factory(:public_policy)
+
+    get :show, :id => sop
+
+    assert_select '.panel .panel-body span.none_text', :text => 'No license specified'
+  end
+
+  test "should display license" do
+    sop = Factory :sop, :license => 'cc-by', :policy => Factory(:public_policy)
+
+    get :show, :id => sop
+
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+  end
+
+  test "should display license for current version" do
+    sop = Factory :sop, :license => 'cc-by', :policy => Factory(:public_policy)
+    sopv = Factory :sop_version_with_blob, :license => 'cc-zero', :sop => sop
+
+    get :show, :id => sop, :version => 1
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+
+    get :show, :id => sop, :version => sopv.version
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'Creative Commons CCZero'
+  end
+
+  test "should update license" do
+    user = users(:owner_of_my_first_sop)
+    login_as(user)
+    sop = sops(:editable_sop)
+
+    assert_nil sop.license
+
+    put :update, :id => sop, :sop => { :license => 'cc-by-sa' }
+
+    assert_response :redirect
+
+    get :show, :id => sop
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike'
+    assert_equal 'cc-by-sa', assigns(:sop).license
+  end
+
   private
 
   def file_for_upload options={}
