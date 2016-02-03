@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160203105328) do
+ActiveRecord::Schema.define(:version => 20160203112614) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -704,6 +704,7 @@ ActiveRecord::Schema.define(:version => 20160203105328) do
     t.string   "imported_url"
     t.integer  "model_image_id"
     t.string   "doi"
+    t.string   "license"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -735,6 +736,7 @@ ActiveRecord::Schema.define(:version => 20160203105328) do
     t.string   "imported_url"
     t.integer  "model_image_id"
     t.string   "doi"
+    t.string   "license"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
@@ -913,6 +915,7 @@ ActiveRecord::Schema.define(:version => 20160203105328) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "license"
   end
 
   create_table "presentation_versions_projects", :id => false, :force => true do |t|
@@ -933,6 +936,7 @@ ActiveRecord::Schema.define(:version => 20160203105328) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.string   "license"
   end
 
   create_table "presentations_projects", :id => false, :force => true do |t|
@@ -1331,6 +1335,7 @@ ActiveRecord::Schema.define(:version => 20160203105328) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.string   "doi"
+    t.string   "license"
   end
 
   add_index "sop_versions", ["contributor_id", "contributor_type"], :name => "index_sop_versions_on_contributor_id_and_contributor_type"
@@ -1350,6 +1355,7 @@ ActiveRecord::Schema.define(:version => 20160203105328) do
     t.string   "uuid"
     t.integer  "policy_id"
     t.string   "doi"
+    t.string   "license"
   end
 
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
