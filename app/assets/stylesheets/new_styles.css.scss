@@ -323,15 +323,16 @@ label.admin-checkbox {
 
 a.seek-homepage-button {
   display: block;
+  font-size: 200%;
 }
 
 .seek-homepage-button img {
-  width: 90px;
-  height: 90px;
+  width: 120px;
+  height: 120px;
   margin: 5px;
 }
 
-@media (min-width: $screen-md-min) {
+@media (min-width: $screen-sm-min) {
   .seek-homepage-button-container {
     margin-bottom: 3em;
     margin-top: 3em;
@@ -343,8 +344,8 @@ a.seek-homepage-button {
   }
 
   .seek-homepage-button img {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     display: block;
     margin: 5px auto;
   }
