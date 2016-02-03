@@ -50,6 +50,8 @@
 
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@data_file} if show_scales?%>
 
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @data_file } %>
+
       <%= fields_for(@data_file) {|f|render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
 
       <% if Seek::Config.assays_enabled %>
@@ -72,3 +74,9 @@
       </div>
     </div>
 <% end -%>
+
+<script>
+    $j(document).ready(function () {
+        $j('#license-select').change(zenodoExport.setLicenseUrl);
+    });
+</script>

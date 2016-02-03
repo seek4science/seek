@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151130111940) do
+ActiveRecord::Schema.define(:version => 20160203105328) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -317,6 +317,7 @@ ActiveRecord::Schema.define(:version => 20151130111940) do
     t.boolean  "is_with_sample"
     t.string   "template_name",                  :default => "none"
     t.string   "doi"
+    t.string   "license"
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_contributor"
@@ -344,6 +345,7 @@ ActiveRecord::Schema.define(:version => 20151130111940) do
     t.boolean  "is_with_sample"
     t.string   "template_name",                 :default => "none"
     t.string   "doi"
+    t.string   "license"
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], :name => "index_data_files_on_contributor_id_and_contributor_type"
