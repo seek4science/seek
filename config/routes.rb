@@ -1,4 +1,7 @@
 SEEK::Application.routes.draw do
+  resources :sample_types
+
+
   resources :samples
 
 

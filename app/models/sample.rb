@@ -3,7 +3,8 @@ class Sample < ActiveRecord::Base
 
   acts_as_uniquely_identifiable
 
-  #belongs_to :sample_type
+  belongs_to :sample_type
 
-  validates :title, presence: true
+  validates :title, :sample_type, presence: true
+
 end

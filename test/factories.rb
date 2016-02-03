@@ -1023,3 +1023,7 @@ end
   Factory.define(:sample) do |f|
     f.sequence(:title) {|n| "Sample #{n}"}
   end
+
+  Factory.define(:sample_type) do |f|
+    f.sequence(:title) {|n| "SampleType #{n}"}
+  end
