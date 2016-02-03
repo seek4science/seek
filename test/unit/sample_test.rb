@@ -3,11 +3,15 @@ require 'test_helper'
 class SampleTest < ActiveSupport::TestCase
 
   test "validation" do
-    sample = Factory :sample,:title=>"fish"
+    sample = Factory :sample,:title=>"fish", :sample_type=>Factory(:sample_type)
     assert sample.valid?
     sample.title=nil
     refute sample.valid?
     sample.title=""
+    refute sample.valid?
+
+    sample.title="fish"
+    sample.sample_type=nil
     refute sample.valid?
   end
 
