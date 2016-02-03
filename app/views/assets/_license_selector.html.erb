@@ -5,7 +5,8 @@
     <div class="form-group" id="license-section">
       <label>License</label>
 
-      <%= license_select("#{resource.class.name.underscore}[license]", resource.license || default_license, :id => 'license-select', :class => 'form-control') %>
+      <%= license_select("#{resource.class.name.underscore}[license]", resource.license || default_license,
+                         :id => 'license-select', :class => 'form-control', :data_only => true) %>
 
       <span class="help-block">
         For more information on this license, please visit <a id="license-url" href="" target="_blank"></a>
