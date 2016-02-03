@@ -38,5 +38,5 @@ namespace :seek do
 
     puts "Upgrade completed successfully"
   end
-  
+
 end
