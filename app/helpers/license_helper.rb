@@ -2,8 +2,8 @@ require 'json'
 
 module LicenseHelper
 
-  LICENSE_ARRAY = JSON.parse(File.read(File.join(Rails.root, 'public', 'licenses.json')))
-  DATA_LICENSE_ARRAY = LICENSE_ARRAY.select { |l| l['domain_data'] }
+  LICENSE_ARRAY = JSON.parse(File.read(File.join(Rails.root, 'public', 'licenses.json'))).sort_by { |l| l['title'] }
+  DATA_LICENSE_ARRAY = LICENSE_ARRAY.select { |l| l['domain_data'] || l['domain_content'] }
 
   def license_select(name, selected = nil, opts = {})
     licenses = opts.delete(:data_only) ? DATA_LICENSE_ARRAY : LICENSE_ARRAY
