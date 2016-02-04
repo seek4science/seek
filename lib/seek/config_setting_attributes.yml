@@ -169,3 +169,4 @@ news_enabled:
 news_feed_urls:
 news_number_of_entries:
   convert: :to_i
+front_page_buttons_enabled:
