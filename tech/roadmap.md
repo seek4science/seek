@@ -28,6 +28,8 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 These are completed Roadmap features, and includes the version of SEEK the feature was included in.
 
+You can find more details about each release in our [Change Logs](/tech/releases/)
+
 | Feature | Milestone date | SEEK version |
 | --- | --- | --- |
 | Self management of projects and programmes | December 2015  | 1.0 |
