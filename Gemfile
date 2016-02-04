@@ -39,7 +39,7 @@ gem 'acts_as_tree'
 gem 'country-select'
 gem 'modporter-plugin'
 gem "will_paginate", "~> 3.0.4"
-gem 'calendar_date_select', :git => 'https://github.com/paneq/calendar_date_select.git'
+gem 'calendar_date_select', :github => 'paneq/calendar_date_select'
 gem "yaml_db"
 gem 'rails_autolink'
 gem 'rfc-822'
@@ -57,26 +57,26 @@ gem 'bives'
 
 
 #Linked to SysMO Git repositories
-gem 'gibberish', :git => "https://github.com/SysMO-DB/gibberish.git"
-gem 'white_list', :git => "https://github.com/SysMO-DB/white_list.git"
-gem 'white_list_formatted_content', :git => "https://github.com/SysMO-DB/white_list_formatted_content.git"
-gem 'my_rails_settings', :git => "https://github.com/SysMO-DB/my_rails_settings.git", :require=>"settings"
-gem 'piwik_analytics',:git=>"https://github.com/SysMO-DB/piwik-ruby-tracking.git"
-gem 'my_savage_beast', :git => "https://github.com/SysMO-DB/my_savage_beast"
-gem 'redbox', :git=>"https://github.com/SysMO-DB/redbox"
-gem "my_responds_to_parent", :git => "https://github.com/SysMO-DB/my_responds_to_parent.git"
+gem 'gibberish', :github => "SysMO-DB/gibberish"
+gem 'white_list', :github => "SysMO-DB/white_list"
+gem 'white_list_formatted_content', :github => "SysMO-DB/white_list_formatted_content"
+gem 'my_rails_settings', :github => "SysMO-DB/my_rails_settings", :require=>"settings"
+gem 'piwik_analytics',:github=>"SysMO-DB/piwik-ruby-tracking"
+gem 'my_savage_beast', :github => "SysMO-DB/my_savage_beast"
+gem 'redbox', :github=>"SysMO-DB/redbox"
+gem "my_responds_to_parent", :github => "SysMO-DB/my_responds_to_parent"
 gem 'bioportal',">=2.2"
-gem 'acts_as_activity_logged', :git => "https://github.com/SysMO-DB/acts_as_activity_logged.git"
-gem 'acts_as_trashable',:git=> "https://github.com/SysMO-DB/acts_as_trashable.git"
-gem "app_version", :git => "https://github.com/SysMO-DB/app_version.git"
-gem 'doi_query_tool', :git => "https://github.com/SysMO-DB/doi_query_tool.git"
-gem 'convert_office',:git=>"https://github.com/SysMO-DB/convert_office.git", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
-gem "fleximage", :git=>"https://github.com/SysMO-DB/fleximage", :ref=>"bb1182f2716a9bf1b5d85e186d8bb7eec436797b"
-gem 'search_biomodel', "2.2.1",:git=>"https://github.com/myGrid/search_biomodel.git"
-gem 'my_annotations', :git=>"https://github.com/myGrid/annotations.git"
+gem 'acts_as_activity_logged', :github => "SysMO-DB/acts_as_activity_logged"
+gem 'acts_as_trashable',:github=> "SysMO-DB/acts_as_trashable"
+gem "app_version", :github => "SysMO-DB/app_version"
+gem 'doi_query_tool', :github => "SysMO-DB/doi_query_tool"
+gem 'convert_office',:github=>"SysMO-DB/convert_office", :ref=>"753f2567dbd625bc89071e1150404efbb562e130"
+gem "fleximage", :github=>"SysMO-DB/fleximage", :ref=>"bb1182f2716a9bf1b5d85e186d8bb7eec436797b"
+gem 'search_biomodel', "2.2.1",:github=>"myGrid/search_biomodel"
+gem 'my_annotations', :github=>"myGrid/annotations"
 
 gem 'taverna-t2flow'
-gem "taverna-player", :git=>"https://github.com/myGrid/taverna-player.git", :branch => 'list-inputs', :ref=>"b36e19c85b7a58d08a73aa418c0f838442c6dfd3"
+gem "taverna-player", :github=>"myGrid/taverna-player", :branch => 'list-inputs', :ref=>"b36e19c85b7a58d08a73aa418c0f838442c6dfd3"
 gem 'jquery-rails', '~> 3'
 gem 'jquery-ui-rails', '~>3'
 gem "recaptcha"
@@ -94,7 +94,7 @@ gem 'bootstrap-tagsinput-rails'
 gem 'bootstrap-typeahead-rails'
 gem 'bootstrap-multiselect-rails'
 gem 'handlebars_assets'
-gem "zenodo-client", :git=>"https://github.com/seek4science/zenodo-client.git"
+gem "zenodo-client", :github=>"seek4science/zenodo-client"
 
 gem 'unicorn-rails'
 

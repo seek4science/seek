@@ -11,7 +11,8 @@ namespace :seek do
 
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
-           :environment
+           :environment,
+           :consolidate_news_feeds
        ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -37,6 +38,13 @@ namespace :seek do
     end
 
     puts "Upgrade completed successfully"
+  end
+
+  task(:consolidate_news_feeds=>:environment) do
+    Seek::Config.news_enabled = Seek::Config.community_news_enabled || Seek::Config.project_news_enabled
+    Seek::Config.news_feed_urls = [Seek::Config.community_news_feed_urls, Seek::Config.project_news_feed_urls].join(',')
+    Seek::Config.news_number_of_entries = Seek::Config.community_news_number_of_entries +
+        Seek::Config.project_news_number_of_entries
   end
 
 end

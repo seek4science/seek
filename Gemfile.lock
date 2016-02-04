@@ -1,68 +1,68 @@
 GIT
-  remote: https://github.com/SysMO-DB/acts_as_activity_logged.git
+  remote: git://github.com/SysMO-DB/acts_as_activity_logged.git
   revision: da0b6d8e4ccabfa231c39aa89522c8ba73f03c0e
   specs:
     acts_as_activity_logged (0.3.3)
 
 GIT
-  remote: https://github.com/SysMO-DB/acts_as_trashable.git
+  remote: git://github.com/SysMO-DB/acts_as_trashable.git
   revision: ff5dcddece0d03014a8ffde526da59a151501cd7
   specs:
     acts_as_trashable (1.0.6)
       activerecord (>= 2.2)
 
 GIT
-  remote: https://github.com/SysMO-DB/app_version.git
+  remote: git://github.com/SysMO-DB/app_version.git
   revision: 773b6ae72d9cba038fce1a3502feb5de2f2b75a3
   specs:
     app_version (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/convert_office.git
+  remote: git://github.com/SysMO-DB/convert_office.git
   revision: 753f2567dbd625bc89071e1150404efbb562e130
   ref: 753f2567dbd625bc89071e1150404efbb562e130
   specs:
     convert_office (0.9.1)
 
 GIT
-  remote: https://github.com/SysMO-DB/doi_query_tool.git
+  remote: git://github.com/SysMO-DB/doi_query_tool.git
   revision: d87ae6ffa2393beba4bbb49817cf04a60f520fee
   specs:
     doi_query_tool (0.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/fleximage
+  remote: git://github.com/SysMO-DB/fleximage.git
   revision: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
   ref: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
   specs:
     fleximage (0.1)
 
 GIT
-  remote: https://github.com/SysMO-DB/gibberish.git
+  remote: git://github.com/SysMO-DB/gibberish.git
   revision: d24c42b9608f39f82e37e757f530d8199049c557
   specs:
     gibberish (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/my_rails_settings.git
+  remote: git://github.com/SysMO-DB/my_rails_settings.git
   revision: e3f7fe9625ea27fea42b02c95e30cb4f1341655b
   specs:
     my_rails_settings (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/my_responds_to_parent.git
+  remote: git://github.com/SysMO-DB/my_responds_to_parent.git
   revision: 5fadfd0cd85a0a70caaddd36f9617cb743047e0b
   specs:
     my_responds_to_parent (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/my_savage_beast
+  remote: git://github.com/SysMO-DB/my_savage_beast.git
   revision: 4ff41d5e7d1f17440240fe0886a7c9827f8f53c6
   specs:
     my_savage_beast (2.3)
 
 GIT
-  remote: https://github.com/SysMO-DB/piwik-ruby-tracking.git
+  remote: git://github.com/SysMO-DB/piwik-ruby-tracking.git
   revision: 06fa67ba4b2bd66878d745e9de5d6d6c8015bc92
   specs:
     piwik_analytics (1.0.1)
@@ -71,37 +71,37 @@ GIT
       rails (>= 3.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/redbox
+  remote: git://github.com/SysMO-DB/redbox.git
   revision: 494451d01aeeb70b186783d08b6b9aefcb537e98
   specs:
     redbox (1.0.4)
 
 GIT
-  remote: https://github.com/SysMO-DB/white_list.git
+  remote: git://github.com/SysMO-DB/white_list.git
   revision: 3f9798ec54f227e852b944bb14f6f90d05cde893
   specs:
     white_list (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/white_list_formatted_content.git
+  remote: git://github.com/SysMO-DB/white_list_formatted_content.git
   revision: c02bea47e477c1ac59e45a2a8a51aaa2c8e6b72f
   specs:
     white_list_formatted_content (1.0.0)
 
 GIT
-  remote: https://github.com/myGrid/annotations.git
+  remote: git://github.com/myGrid/annotations.git
   revision: d33e78993ee957fa12d71cbe9f03100dd9b0ad15
   specs:
     my_annotations (0.6.0)
 
 GIT
-  remote: https://github.com/myGrid/search_biomodel.git
+  remote: git://github.com/myGrid/search_biomodel.git
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
     search_biomodel (2.2.1)
 
 GIT
-  remote: https://github.com/myGrid/taverna-player.git
+  remote: git://github.com/myGrid/taverna-player.git
   revision: b36e19c85b7a58d08a73aa418c0f838442c6dfd3
   ref: b36e19c85b7a58d08a73aa418c0f838442c6dfd3
   branch: list-inputs
@@ -122,13 +122,13 @@ GIT
       taverna-t2flow (~> 0.5.1)
 
 GIT
-  remote: https://github.com/paneq/calendar_date_select.git
+  remote: git://github.com/paneq/calendar_date_select.git
   revision: 977048211b94599fe0f08eb37a481f3d69df48f6
   specs:
     calendar_date_select (1.16.2)
 
 GIT
-  remote: https://github.com/seek4science/zenodo-client.git
+  remote: git://github.com/seek4science/zenodo-client.git
   revision: 5c300cf4b74f8c09ca8265b2b6567472147d8e24
   specs:
     zenodo-client (0.1.1)
@@ -327,8 +327,8 @@ GEM
     i18n (0.7.0)
     ice_nine (0.11.2)
     in_place_editing (1.2.0)
-    jbuilder (2.2.13)
-      activesupport (>= 3.0.0, < 5)
+    jbuilder (2.4.0)
+      activesupport (>= 3.0.0, < 5.1)
       multi_json (~> 1.2)
     journey (1.0.4)
     jquery-rails (3.1.2)
@@ -428,11 +428,12 @@ GEM
       shellany (~> 0.0)
     ntlm-http (0.1.1)
     open4 (1.3.0)
-    paperclip (4.2.1)
-      activemodel (>= 3.0.0)
-      activesupport (>= 3.0.0)
-      cocaine (~> 0.5.3)
+    paperclip (4.3.4)
+      activemodel (>= 3.2.0)
+      activesupport (>= 3.2.0)
+      cocaine (~> 0.5.5)
       mime-types
+      mimemagic (= 0.3.0)
     parser (2.2.3.0)
       ast (>= 1.1, < 3.0)
     passenger (5.0.6)
@@ -866,4 +867,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.11.1
+   1.11.2
