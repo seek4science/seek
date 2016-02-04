@@ -3,17 +3,17 @@ title: contributing to seek
 layout: page
 redirect_from: "/contributing-to-seek.html"
 ---
-#Contributing to SEEK
+# Contributing to SEEK
 
 We welcome all sorts of contributions to SEEK, from a small spelling fix, code tidying, a bug fix to major improvement or new feature.
 
-##Before you start
+## Before you start
 
 If you are interesting contributing, please first look at our [JIRA issue tracker](http://fair-dom.org/issues), either to find something you can contribute, or whether your
 idea already exists. **Before starting** you should also always [Contact Us](/contacting-us.html) first - it is quite possible work is already in progress or we have ideas, and we wouldn't want your
 effort to be wasted.
 
-##Changing and contributing code
+## Changing and contributing code
 
 The SEEK source code is availale on GitHub at [https://github.com/seek4science/seek](https://github.com/seek4science/seek)
 
@@ -26,7 +26,7 @@ If contributing through GitHub is unfamiliar to you, please read [Contributing t
 
 For small changes emailing a patch file may be suitable.
 
-##Quality control
+## Quality control
 
 For a contribution to be accepted, we do have a few requirements.
 
