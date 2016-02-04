@@ -7,7 +7,7 @@ FAIRDOM Website: [http://fair-dom.org](http://fair-dom.org)
 
 SEEK Github page: [https://github.com/seek4science/seek](https://github.com/seek4science/seek)
 
-SEEK JIRA - Issue tracking: [https://jira-bsse.ethz.ch/browse/OPSK](https://jira-bsse.ethz.ch/browse/OPSK)
+SEEK JIRA - Issue tracking: [http://fair-dom.org/issues](http://fair-dom.org/issues)
 
 ​Continuous Integration testing (Travis): [https://travis-ci.org/seek4science/seek](https://travis-ci.org/seek4science/seek)
 
