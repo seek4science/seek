@@ -9,6 +9,8 @@ SEEK Github page: [https://github.com/seek4science/seek](https://github.com/seek
 
 SEEK JIRA - Issue tracking: [http://fair-dom.org/issues](http://fair-dom.org/issues)
 
+FAIRDOM BioStar - User and support forum - [http://fair-dom.org/support](http://fair-dom.org/support)
+
 ​Continuous Integration testing (Travis): [https://travis-ci.org/seek4science/seek](https://travis-ci.org/seek4science/seek)
 
 Code quality metrics (Code Climate): [https://codeclimate.com/github/seek4science/seek​](https://codeclimate.com/github/seek4science/seek)
