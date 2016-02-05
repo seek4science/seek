@@ -39,7 +39,8 @@ layout: page
      - [Publications](generic-linking-variables.html#publications)
      - [Experimental assays and Modelling analysis](generic-linking-variables.html#experimental-assays-and-Modelling-analysis)
      - [Events](generic-linking-variables.html#events)
-- [Making an Investigation citable](investigation-snapshots.html)
+
+
      - [Making public](investigation-snapshots.html#making-public)
      - [Snapshotting](investigation-snapshots.html#snapshotting)
      - [Creating a Research Object](investigation-snapshots.html#creating-a-research-object)
@@ -55,6 +56,8 @@ layout: page
           - [Add and remove people from a project](admin-project-members.html#add-and-remove-people-from-a-project)
           - [Assign people to project roles](admin-project-members.html#assign-people-to-project-roles)
           - [Flag when a person leaves a project](admin-project-members.html#flag-when-a-person-leaves-a-project)
+- [Executing a model on JWS Online](http://jws-docs.readthedocs.org/)
+
 
 
 
