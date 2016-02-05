@@ -3,6 +3,7 @@ module Seek
     # creates the JSON metadata content describing an item to be stored in a Research Object
     class JSONMetadata < Metadata
       include Singleton
+      include LicenseHelper
 
       CANDIDATE_PROPERTIES = [:title, :description, :assay_type_uri, :technology_type_uri,
                               :version, :doi, :doi_uri, :pubmed_id, :pubmed_uri]
@@ -29,6 +30,11 @@ module Seek
           json[:assets] = contained_assets(item)
         elsif item.is_asset?
           json[:contains] = contained_files(item)
+        end
+
+        if item.respond_to?(:license) && item.license
+          license = Seek::License.find(item.license)
+          json[:license] = { title: license.title, url: license.url }
         end
 
         JSON.pretty_generate(json)
