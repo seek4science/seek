@@ -12,8 +12,12 @@ module LicenseHelper
 
   def describe_license(id)
     license = Seek::License.find(id)
-    if license
-      link_to(license.title, license.url)
+    if license && !license.is_null_license?
+      if license.url.blank?
+        license.title
+      else
+        link_to(license.title, license.url)
+      end
     else
       content_tag(:span, 'No license specified', :class => 'none_text')
     end

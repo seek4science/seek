@@ -2183,6 +2183,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'cc-by-sa', assigns(:data_file).license
   end
 
+  test "check correct license pre-selected" do
+    df = Factory :data_file, :license => 'cc-by-sa', :policy => Factory(:public_policy)
+
+    get :edit, :id => df
+    assert_response :success
+    assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution Share-Alike'
+
+    df2 = Factory :data_file, :license => nil, :policy => Factory(:public_policy)
+
+    get :edit, :id => df2
+    assert_response :success
+    assert_select '#license-select option[selected=?]', 'selected', :text => 'License Not Specified'
+
+    get :new
+    assert_response :success
+    assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution'
+  end
+
   private
 
   def mock_http
