@@ -1,34 +1,37 @@
 <%# the partial expects 4 locals to be defined: "image_tag_for_key_type", "collection_name", "collection" and "truncate_to" -%>
 <%# items in the collection are expected to have .name() method available -%>
-<% main_section_length = 5 -%>
+<% main_section_length ||= 5 -%>
 
-
-<% unless is_nil_or_empty? collection -%>
-		<ul class="list no-icon">
-      <% for item in collection.first(main_section_length) -%>
-				<%= list_item_with_icon(icon_type, item, nil, truncate_to) -%>
-      <% end  %>
+<% unless is_nil_or_empty? collection %>
+    <ul class="list no-icon">
+      <% collection.first(main_section_length).each do |item| %>
+          <%= list_item_with_icon(icon_type, item, nil, truncate_to) -%>
+      <% end %>
     </ul>
-		
-		<%# if a collection has more than "main_section_length" items an "expand" link is provided which opens up the rest of the items -%>
-		<% if collection.length > main_section_length -%>
-		  <p id="more_link_<%= collection_name -%>" style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-				<%= link_to_function "More".html_safe + expand_image("0.3em") do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
-			</p>
-			
-			<div style="display: none; margin: 0; padding: 0;" id="more_items_<%= collection_name -%>">
-				<ul class="list">
-		      <% for item in collection[main_section_length..(collection.length-1)] -%>
-		      	<%= list_item_with_icon(icon_type, item, nil, truncate_to) -%>
-		      <% end  %>
-		    </ul>
-				
-			  <p id="less_link_<%= collection_name -%>" style="display: none; font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-					<%= link_to_function "Less".html_safe + collapse_image("0.3em") do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
-				</p>
-			</div>
-		<% end -%>
-<% else -%>
-  <%# most likely won't be shown, because a check if some people are in this list is carried before calling the partial -%>
-  <p class="none_text">None known</p>
-<% end  -%>
+
+    <%# if a collection has more than "main_section_length" items an "expand" link is provided which opens up the rest of the items -%>
+    <% if collection.length > main_section_length -%>
+        <p id="more_link_<%= collection_name -%>" class="text-right">
+          <%= link_to_function "More".html_safe + expand_image("0.3em") do |page|
+            page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"
+          end -%>
+        </p>
+
+        <div style="display: none" id="more_items_<%= collection_name -%>">
+          <ul class="list no-icon">
+            <% collection[main_section_length..(collection.length-1)].each do |item| -%>
+                <%= list_item_with_icon(icon_type, item, nil, truncate_to) -%>
+            <% end  %>
+          </ul>
+
+          <p id="less_link_<%= collection_name -%>" style="display: none;" class="text-right">
+            <%= link_to_function "Less".html_safe + collapse_image("0.3em") do |page|
+              page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"
+            end -%>
+          </p>
+        </div>
+    <% end %>
+<% else %>
+    <%# most likely won't be shown, because a check if some people are in this list is carried before calling the partial -%>
+    <p class="none_text">None known</p>
+<% end %>

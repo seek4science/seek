@@ -19,13 +19,19 @@ class HelpDictionaryTest < ActiveSupport::TestCase
 
   test 'check links' do
     fails = []
-    @dic.all_links.each do |link|
-      begin
-        RestClient.head(link)
-      rescue Exception => e
-        fails << "Problem with link #{link} - #{e.message}"
+    begin
+      RestClient.head('http://www.google.com')
+    rescue Exception => e
+      puts "* Possible network issue - Skipping help link checks *"
+    else
+      @dic.all_links.each do |link|
+        begin
+          RestClient.head(link)
+        rescue Exception => e
+          fails << "Problem with link #{link} - #{e.message}"
+        end
       end
+      assert_empty fails, fails.join(', ')
     end
-    assert_empty fails, fails.join(', ')
   end
 end
