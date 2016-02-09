@@ -101,38 +101,38 @@ class SinglePublishingTest < ActionController::TestCase
     get :publish_related_items, :id=>df.id
     assert_response :success
 
-    assert_select "li.type_and_title",:text=>/Investigation/,:count=>1 do
+    assert_select ".type_and_title",:text=>/Investigation/,:count=>1 do
       assert_select "a[href=?]",investigation_path(investigation),:text=>/#{investigation.title}/
     end
-    assert_select "li.secondary",:text=>/Publish/ do
+    assert_select ".checkbox",:text=>/Publish/ do
       assert_select "input[type='checkbox'][id=?]","publish_Investigation_#{investigation.id}"
     end
 
-    assert_select "li.type_and_title",:text=>/Study/,:count=>1 do
+    assert_select ".type_and_title",:text=>/Study/,:count=>1 do
       assert_select "a[href=?]",study_path(study),:text=>/#{study.title}/
     end
-    assert_select "li.secondary",:text=>/Publish/ do
+    assert_select ".checkbox",:text=>/Publish/ do
       assert_select "input[type='checkbox'][id=?]","publish_Study_#{study.id}"
     end
 
-    assert_select "li.type_and_title",:text=>/Assay/,:count=>1 do
+    assert_select ".type_and_title",:text=>/Assay/,:count=>1 do
       assert_select "a[href=?]",assay_path(assay),:text=>/#{assay.title}/
     end
-    assert_select "li.secondary",:text=>/Publish/ do
+    assert_select ".checkbox",:text=>/Publish/ do
       assert_select "input[type='checkbox'][id=?]","publish_Assay_#{assay.id}"
     end
 
-    assert_select "li.type_and_title",:text=>/#{I18n.t('data_file')}/,:count=>4 do
+    assert_select ".type_and_title",:text=>/#{I18n.t('data_file')}/,:count=>4 do
       assert_select "a[href=?]",data_file_path(df),:text=>/#{df.title}/
       assert_select "a[href=?]",data_file_path(publishing_df),:text=>/#{publishing_df.title}/
       assert_select "a[href=?]",data_file_path(request_publishing_df),:text=>/#{request_publishing_df.title}/
       assert_select "a[href=?]",data_file_path(notifying_df),:text=>/#{notifying_df.title}/
     end
-    assert_select "li.secondary",:text=>/Publish/ do
+    assert_select ".checkbox",:text=>/Publish/ do
       assert_select "input[type='checkbox'][id=?]","publish_DataFile_#{publishing_df.id}"
       assert_select "input[type='checkbox'][id=?]","publish_DataFile_#{request_publishing_df.id}"
-      assert_select "input[disabled='disabled'][type='checkbox'][id=?]","publish_DataFile_#{notifying_df.id}"
     end
+    assert_select "span.label-warning", :text => "Can't publish", :count => 1
   end
 
   test "get check_gatekeeper_required" do

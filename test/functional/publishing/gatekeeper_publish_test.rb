@@ -77,17 +77,17 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     get :requested_approval_assets, :id => @gatekeeper
 
-    assert_select "li.type_and_title", :count => 3 do
+    assert_select ".type_and_title", :count => 3 do
       assert_select "a[href=?]", data_file_path(df)
       assert_select "a[href=?]", model_path(model)
       assert_select "a[href=?]", sop_path(sop)
     end
 
-    assert_select "li.request_info", :count => 3 do
+    assert_select ".request_info", :count => 3 do
       assert_select "a[href=?]", person_path(user.person), :count => 3
     end
 
-    assert_select "li.radio_buttons", :count => 3 do
+    assert_select ".radio_buttons", :count => 3 do
       [df, model, sop].each do |asset|
         assert_select "input[type=radio][name=?][value=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", 1
         assert_select "input[type=radio][name=?][value=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", 0
@@ -95,7 +95,7 @@ class GatekeeperPublishTest < ActionController::TestCase
       end
     end
 
-    assert_select "li.comment", :count => 3 do
+    assert_select ".comment", :count => 3 do
       [df, model, sop].each do |asset|
         assert_select "textarea[name=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]"
       end

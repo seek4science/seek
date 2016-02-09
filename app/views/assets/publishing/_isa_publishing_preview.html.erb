@@ -13,12 +13,18 @@
    end
 -%>
 
-<%= render :partial => "assets/publishing/options_for_publishing", :object => item, :locals => {:html_classes => "publishing_options"} -%>
+<%= render :partial => "assets/publishing/options_for_publishing",
+           :object => item,
+           :locals => { :html_classes => "publishing_options",
+                        :checked => (item == preselected) } -%>
 
 <% if children.any? %>
     <div style="margin-left: 3em">
       <% children.each do |child| %>
-          <%= render :partial => "assets/publishing/isa_publishing_preview", :object => child, :locals => {:checked=>(item==child),:html_classes => "publishing_options"} -%>
+          <%= render :partial => "assets/publishing/isa_publishing_preview",
+                     :object => child,
+                     :locals => { :preselected => preselected,
+                                  :html_classes => "publishing_options"} -%>
       <% end %>
     </div>
 <% end %>
