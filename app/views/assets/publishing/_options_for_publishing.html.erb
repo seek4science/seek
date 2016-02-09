@@ -9,12 +9,13 @@
 -%>
 <div class="isa-tree <%= html_classes -%> <%= tree_class %>">
   <% if item.can_view? %>
-      <h5>
+      <h5 class="type_and_title">
         <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
+        <%=list_item_visibility(item)-%>
       </h5>
       <div class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></div>
   <% else %>
-      <div class="type_and_title"><%= text_for_resource item -%>:&nbsp;This item is hidden to you</div>
+      <h5 class="type_and_title"><strong><%= text_for_resource item -%>:</strong> This item is hidden to you</h5>
       <% if current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
           <div class="secondary">Manageable by <%= item.managers.empty? ? "<div class='none_text'>None</div>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></div>
       <% end %>
