@@ -18,18 +18,24 @@ class AssetsHelperTest < ActionView::TestCase
   end
 
   test "rendered_asset_view" do
+    slideshare_url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794/'
+    slideshare_api_url = "http://www.slideshare.net/api/oembed/2?url=#{slideshare_url}&format=json"
+    mock_remote_file("#{Rails.root}/test/fixtures/files/slideshare.json",
+                     slideshare_api_url,
+                     {'Content-Type' => 'application/json'})
+
     person = Factory(:admin)
     User.current_user=person.user
 
     #show something for presentation
     pres = Factory(:presentation,:policy=>Factory(:public_policy))
-    pres.content_blob.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794/'
+    pres.content_blob.url = slideshare_url
     pres.content_blob.save!
     refute rendered_asset_view(pres).blank?
 
     #nothing  for private
     pres = Factory(:presentation,:policy=>Factory(:private_policy))
-    pres.content_blob.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794/'
+    pres.content_blob.url = slideshare_url
     pres.content_blob.save!
     assert rendered_asset_view(pres).blank?
 

@@ -53,6 +53,12 @@ class RenderersTest < ActiveSupport::TestCase
 
 
     cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
+
+    slideshare_api_url = "http://www.slideshare.net/api/oembed/2?url=#{cb.url}&format=json"
+    mock_remote_file("#{Rails.root}/test/fixtures/files/slideshare.json",
+                     slideshare_api_url,
+                     {'Content-Type' => 'application/json'})
+
     renderer = Seek::Renderers::SlideshareRenderer.new(cb)
     assert renderer.can_render?
 
