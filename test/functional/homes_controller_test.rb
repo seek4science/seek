@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class HomesControllerTest < ActionController::TestCase
+
   fixtures :all
 
   include AuthenticatedTestHelper
