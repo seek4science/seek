@@ -956,28 +956,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Edit factors studied/,:count=>0
   end
   
-  def test_should_allow_factors_studies_edited_for_editable_file
-    login_as(:aaron)
-    d=data_files(:editable_data_file)
-    d.save
-    assert_difference('ActivityLog.count') do
-      get :show, :id=>d
-    end
-
-    assert_select "a",:text=>/Edit factors studied/,:count=>1
-  end
-  
-  test "show should allow factors studied edited owner of downloadable file" do
-    login_as(:datafile_owner)
-    d=data_files(:downloadable_data_file)
-    d.save
-    assert_difference('ActivityLog.count') do
-      get :show, :id=>d
-    end
-
-    assert_select "a",:text=>/Edit factors studied/,:count=>1
-  end
-  
   test "should update data file" do
     assert_difference('ActivityLog.count') do
       put :update, :id => data_files(:picture).id, :data_file => { }
