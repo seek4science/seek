@@ -78,4 +78,10 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
   end
+
+  test "sample attribute to json" do
+    attribute = SampleType::SampleAttribute.new name:"fish",type:"int",required:true
+    json = attribute.to_json
+    assert_equal %!{"name":"fish","type":"int","required":true}!,json
+  end
 end
