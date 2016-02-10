@@ -28,4 +28,54 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal [sample1,sample2].sort,sample_type.samples.sort
   end
 
+  test "sample_attribute initialize" do
+    attribute = SampleType::SampleAttribute.new name:"fish",type:"int"
+    assert_equal "fish",attribute.name
+    assert_equal "int", attribute.type
+    refute attribute.required?
+
+    attribute = SampleType::SampleAttribute.new name:"fish",type:"int",required:true
+    assert_equal "fish",attribute.name
+    assert_equal "int", attribute.type
+    assert attribute.required?
+  end
+
+  test "sample attribute valid?" do
+    attribute = SampleType::SampleAttribute.new name:"fish",type:"int"
+    assert attribute.valid?
+    attribute = SampleType::SampleAttribute.new name:"fish"
+    refute attribute.valid?
+    attribute = SampleType::SampleAttribute.new type:"int"
+    refute attribute.valid?
+    attribute = SampleType::SampleAttribute.new
+    refute attribute.valid?
+    attribute = SampleType::SampleAttribute.new name:"fish",type:"monkey"
+    refute attribute.valid?
+    attribute = SampleType::SampleAttribute.new name:"fish",type:"int",required:"string"
+    refute attribute.valid?
+    attribute = SampleType::SampleAttribute.new name:1,type:"int"
+    refute attribute.valid?
+    attribute = SampleType::SampleAttribute.new name:"fish",type:1
+    refute attribute.valid?
+  end
+
+  test "sample attribute allowed types" do
+    assert_equal ["int","string","url"].sort,SampleType::SampleAttribute::ALLOWED_TYPES
+  end
+
+  test "sample attribute validate value" do
+    attribute = SampleType::SampleAttribute.new name:"fish",type:"int"
+    assert attribute.validate_value?(1)
+
+    #this is obviously currently wrong and will be updated in a future iteration
+    assert attribute.validate_value?("frog")
+
+    assert attribute.validate_value?(nil)
+    assert attribute.validate_value?('')
+
+    attribute = SampleType::SampleAttribute.new name:"fish",type:"int",required:true
+
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?('')
+  end
 end
