@@ -1027,3 +1027,13 @@ end
   Factory.define(:sample_type) do |f|
     f.sequence(:title) {|n| "SampleType #{n}"}
   end
+
+  Factory.define(:integer_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "Integer attribute type #{n}"}
+    f.base_type 'Integer'
+  end
+
+  Factory.define(:string_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "String attribute type #{n}"}
+    f.base_type 'String'
+  end

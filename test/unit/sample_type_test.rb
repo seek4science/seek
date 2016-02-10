@@ -28,69 +28,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal [sample1,sample2].sort,sample_type.samples.sort
   end
 
-  test "sample_attribute initialize" do
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer
-    assert_equal "fish",attribute.name
-    assert_equal Integer, attribute.attribute_type.base_type
-    refute attribute.required?
 
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer,required:true
-    assert_equal "fish",attribute.name
-    assert_equal Integer, attribute.attribute_type.base_type
-    assert attribute.required?
-  end
-
-  test "sample attribute valid?" do
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer
-    assert attribute.valid?
-
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer,regexp:/xxx/
-    assert attribute.valid?
-
-    attribute = SampleType::SampleAttribute.new name:"fish"
-    refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new base_type:Integer
-    refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new
-    refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:"monkey"
-    refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer,required:"string"
-    refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:1,base_type:Integer
-    refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:1
-    refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer,regexp:"fish"
-    refute attribute.valid?
-  end
-
-  test "sample attribute validate value" do
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer
-    assert attribute.validate_value?(1)
-    refute attribute.validate_value?("frog")
-
-    assert attribute.validate_value?(nil)
-    assert attribute.validate_value?('')
-
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:String,required:true
-    refute attribute.validate_value?(1)
-    refute attribute.validate_value?(nil)
-    refute attribute.validate_value?('')
-
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:String,regexp:/yyy/
-    assert attribute.validate_value?('yyy')
-    assert attribute.validate_value?('')
-    assert attribute.validate_value?(nil)
-    refute attribute.validate_value?(1)
-    refute attribute.validate_value?("xxx")
-  end
-  #
-  test "sample attribute to json" do
-    attribute = SampleType::SampleAttribute.new name:"fish",base_type:String, regexp:/yyy/,required:true
-    json = attribute.to_json
-    assert_equal %!{"name":"fish","attribute_type":{"base_type":"String","regexp":"/yyy/"},"required":true}!,json
-  end
 
 
 end
