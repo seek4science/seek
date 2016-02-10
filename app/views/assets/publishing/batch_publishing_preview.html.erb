@@ -37,7 +37,7 @@
           <% end %>
           <br/>
 
-          <%= submit_tag "Next", :disable_with=>"Next"-%>
+          <%= submit_tag "Next",:disable_with=>"Next", :class => 'btn btn-primary' -%>
           Or
           <%= cancel_button person_path(params[:id].to_i)-%>
       <% end -%>
