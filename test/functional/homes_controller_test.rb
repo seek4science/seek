@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class HomesControllerTest < ActionController::TestCase
+
   fixtures :all
 
   include AuthenticatedTestHelper
@@ -417,6 +418,20 @@ class HomesControllerTest < ActionController::TestCase
     assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",data_file_path(df),:text=>/A new data file/
     assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",assay_path(assay),:text=>/A new assay/
     assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",sop_path(sop),:text=>/A new sop/, :count => 0
+  end
+
+  test "can enabled/disable front page buttons" do
+    login_as Factory(:user)
+    with_config_value :front_page_buttons_enabled, true do
+        get :index
+        assert_response :success
+        assert_select "a.seek-homepage-button",:count => 3
+    end
+    with_config_value :front_page_buttons_enabled, false do
+      get :index
+      assert_response :success
+      assert_select "a.seek-homepage-button",:count => 0
+    end
   end
 
   def uri_to_guardian_feed
