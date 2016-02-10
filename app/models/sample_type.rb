@@ -33,7 +33,7 @@ class SampleType < ActiveRecord::Base
   end
 
   class SampleAttributeType
-    ALLOWED_TYPES = [Integer, Numeric, Float, String]
+
     attr_reader :base_type, :regexp
 
     def initialize(base_type, regexp = /.*/)
@@ -41,16 +41,6 @@ class SampleType < ActiveRecord::Base
       @regexp = regexp
     end
 
-    def valid?
-      ALLOWED_TYPES.include?(base_type) && regexp.is_a?(Regexp)
-    end
 
-    def validate_value?(value)
-      value.is_a?(base_type) && (value.to_s =~ regexp)
-    end
-
-    def as_json(_options=nil)
-      { base_type: base_type.name, regexp: regexp.inspect }
-    end
   end
 end

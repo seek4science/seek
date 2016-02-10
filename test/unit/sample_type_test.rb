@@ -92,32 +92,5 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal %!{"name":"fish","attribute_type":{"base_type":"String","regexp":"/yyy/"},"required":true}!,json
   end
 
-  test "sample attribute type valid?" do
-    type = SampleType::SampleAttributeType.new(Integer)
-    assert type.valid?
-    assert_equal /.*/,type.regexp
 
-    type = SampleType::SampleAttributeType.new(ActionPack)
-    refute type.valid?
-
-    type = SampleType::SampleAttributeType.new(Integer,"fish")
-    refute type.valid?
-  end
-
-  test "sample attribute type validation" do
-    type = SampleType::SampleAttributeType.new(Integer)
-    assert type.validate_value?(1)
-    refute type.validate_value?("fish")
-    refute type.validate_value?(nil)
-
-    type = SampleType::SampleAttributeType.new(String,/xxx/)
-    assert type.validate_value?("xxx")
-    refute type.validate_value?("fish")
-    refute type.validate_value?(nil)
-  end
-
-  test "sample attribute type to json" do
-    type = SampleType::SampleAttributeType.new(String,/xxx/)
-    assert_equal %!{"base_type":"String","regexp":"/xxx/"}!,type.to_json
-  end
 end
