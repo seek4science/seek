@@ -29,58 +29,67 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test "sample_attribute initialize" do
-    attribute = SampleType::SampleAttribute.new name:"fish",type:Integer
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer
     assert_equal "fish",attribute.name
-    assert_equal Integer, attribute.type.type
+    assert_equal Integer, attribute.attribute_type.base_type
     refute attribute.required?
 
-    attribute = SampleType::SampleAttribute.new name:"fish",type:Integer,required:true
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer,required:true
     assert_equal "fish",attribute.name
-    assert_equal Integer, attribute.type.type
+    assert_equal Integer, attribute.attribute_type.base_type
     assert attribute.required?
   end
 
   test "sample attribute valid?" do
-    attribute = SampleType::SampleAttribute.new name:"fish",type:Integer
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer
     assert attribute.valid?
+
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer,regexp:/xxx/
+    assert attribute.valid?
+
     attribute = SampleType::SampleAttribute.new name:"fish"
     refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new type:Integer
+    attribute = SampleType::SampleAttribute.new base_type:Integer
     refute attribute.valid?
     attribute = SampleType::SampleAttribute.new
     refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:"fish",type:"monkey"
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:"monkey"
     refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:"fish",type:Integer,required:"string"
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer,required:"string"
     refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:1,type:Integer
+    attribute = SampleType::SampleAttribute.new name:1,base_type:Integer
     refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:"fish",type:1
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:1
     refute attribute.valid?
-    attribute = SampleType::SampleAttribute.new name:"fish",type:Integer,regexp:"fish"
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer,regexp:"fish"
     refute attribute.valid?
   end
 
   test "sample attribute validate value" do
-    attribute = SampleType::SampleAttribute.new name:"fish",type:"int"
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:Integer
     assert attribute.validate_value?(1)
-
-    #this is obviously currently wrong and will be updated in a future iteration
-    assert attribute.validate_value?("frog")
+    refute attribute.validate_value?("frog")
 
     assert attribute.validate_value?(nil)
     assert attribute.validate_value?('')
 
-    attribute = SampleType::SampleAttribute.new name:"fish",type:"int",required:true
-
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:String,required:true
+    refute attribute.validate_value?(1)
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
+
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:String,regexp:/yyy/
+    assert attribute.validate_value?('yyy')
+    assert attribute.validate_value?('')
+    assert attribute.validate_value?(nil)
+    refute attribute.validate_value?(1)
+    refute attribute.validate_value?("xxx")
   end
   #
   test "sample attribute to json" do
-    attribute = SampleType::SampleAttribute.new name:"fish",type:String, regexp:/yyy/,required:true
+    attribute = SampleType::SampleAttribute.new name:"fish",base_type:String, regexp:/yyy/,required:true
     json = attribute.to_json
-    assert_equal %!{"name":"fish","type":{"type":"String","regexp":"/yyy/"},"required":true}!,json
+    assert_equal %!{"name":"fish","attribute_type":{"base_type":"String","regexp":"/yyy/"},"required":true}!,json
   end
 
   test "sample attribute type valid?" do
@@ -109,6 +118,6 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test "sample attribute type to json" do
     type = SampleType::SampleAttributeType.new(String,/xxx/)
-    assert_equal %!{"type":"String","regexp":"/xxx/"}!,type.to_json
+    assert_equal %!{"base_type":"String","regexp":"/xxx/"}!,type.to_json
   end
 end

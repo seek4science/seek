@@ -1,5 +1,4 @@
 class SampleType < ActiveRecord::Base
-
   attr_accessible :attr_definitions, :title, :uuid
 
   acts_as_uniquely_identifiable
@@ -9,14 +8,13 @@ class SampleType < ActiveRecord::Base
   validates :title, presence: true
 
   class SampleAttribute
+    attr_reader :name, :attribute_type
 
-    attr_reader :name,:type
-
-    def initialize(options={})
+    def initialize(options = {})
       options[:required] ||= false
       options[:regexp] ||= /.*/
       @name = options[:name]
-      @type = SampleAttributeType.new(options[:type],options[:regexp])
+      @attribute_type = SampleAttributeType.new(options[:base_type], options[:regexp])
       @required = options[:required]
     end
 
@@ -25,34 +23,34 @@ class SampleType < ActiveRecord::Base
     end
 
     def validate_value?(value)
-      (!@required || !value.blank?)
+      return false if required? && value.blank?
+      (value.blank? && !required?) || attribute_type.validate_value?(value)
     end
 
     def valid?
-      name.is_a?(String) && type && type.is_a?(SampleAttributeType) && type.valid? && required?.in?([true,false])
+      name.is_a?(String) && attribute_type.is_a?(SampleAttributeType) && attribute_type.valid? && required?.in?([true, false])
     end
   end
 
   class SampleAttributeType
-    ALLOWED_TYPES = [Integer,Numeric,Float,String]
-    attr_reader :type, :regexp
+    ALLOWED_TYPES = [Integer, Numeric, Float, String]
+    attr_reader :base_type, :regexp
 
-    def initialize type, regexp=/.*/
-      @type=type
-      @regexp=regexp
+    def initialize(base_type, regexp = /.*/)
+      @base_type = base_type
+      @regexp = regexp
     end
 
     def valid?
-      ALLOWED_TYPES.include?(type) && regexp.is_a?(Regexp)
+      ALLOWED_TYPES.include?(base_type) && regexp.is_a?(Regexp)
     end
 
     def validate_value?(value)
-      value.is_a?(type) && (value.to_s =~ regexp)
+      value.is_a?(base_type) && (value.to_s =~ regexp)
     end
 
-    def as_json
-      {type:type.name,regexp:regexp.inspect}
+    def as_json(_options=nil)
+      { base_type: base_type.name, regexp: regexp.inspect }
     end
   end
-
 end
