@@ -1102,24 +1102,24 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should display license" do
-    model = Factory :model, :license => 'cc-by', :policy => Factory(:public_policy)
+    model = Factory :model, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
 
     get :show, :id => model
 
-    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
   end
 
   test "should display license for current version" do
-    model = Factory :model, :license => 'cc-by', :policy => Factory(:public_policy)
-    modelv = Factory :model_version_with_blob, :license => 'cc-zero', :model => model
+    model = Factory :model, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
+    modelv = Factory :model_version_with_blob, :license => 'CC0-1.0', :model => model
 
     get :show, :id => model, :version => 1
     assert_response :success
-    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
 
     get :show, :id => model, :version => modelv.version
     assert_response :success
-    assert_select '.panel .panel-body a', :text => 'Creative Commons CCZero'
+    assert_select '.panel .panel-body a', :text => 'CC0 1.0'
   end
 
   test "should update license" do
@@ -1129,13 +1129,13 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_nil model.license
 
-    put :update, :id => model, :model => { :license => 'cc-by-sa' }
+    put :update, :id => model, :model => { :license => 'CC-BY-SA-4.0' }
 
     assert_response :redirect
 
     get :show, :id => model
-    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike'
-    assert_equal 'cc-by-sa', assigns(:model).license
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike 4.0'
+    assert_equal 'CC-BY-SA-4.0', assigns(:model).license
   end
 
   def valid_model

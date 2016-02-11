@@ -11,8 +11,8 @@ module LicenseHelper
     select_tag(name, grouped_options_for_select(grouped_license_options(opts), selected), opts)
   end
 
-  def describe_license(id)
-    license = Seek::License.find(id)
+  def describe_license(id, source = nil)
+    license = Seek::License.find(id, source)
     if license && !license.is_null_license?
       if license.url.blank?
         license.title
@@ -27,7 +27,7 @@ module LicenseHelper
   private
 
   def license_values(opts = {})
-    opts.delete(:data_only) ? Seek::License::DATA_LICENSE_ARRAY : Seek::License::LICENSE_ARRAY
+    opts.delete(:source) || Seek::License::OPENDEFINITION[:all]
   end
 
   def license_options(opts = {})

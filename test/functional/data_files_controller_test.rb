@@ -2147,24 +2147,24 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "should display license" do
-    df = Factory :data_file, :license => 'cc-by', :policy => Factory(:public_policy)
+    df = Factory :data_file, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
 
     get :show, :id => df
 
-    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
   end
 
   test "should display license for current version" do
-    df = Factory :data_file, :license => 'cc-by', :policy => Factory(:public_policy)
-    dfv = Factory :data_file_version_with_blob, :license => 'cc-zero', :data_file => df
+    df = Factory :data_file, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
+    dfv = Factory :data_file_version_with_blob, :license => 'CC0-1.0', :data_file => df
 
     get :show, :id => df, :version => 1
     assert_response :success
-    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution'
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
 
     get :show, :id => df, :version => dfv.version
     assert_response :success
-    assert_select '.panel .panel-body a', :text => 'Creative Commons CCZero'
+    assert_select '.panel .panel-body a', :text => 'CC0 1.0'
   end
 
   test "should update license" do
@@ -2174,21 +2174,21 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_nil df.license
 
-    put :update, :id => df, :data_file => { :license => 'cc-by-sa' }
+    put :update, :id => df, :data_file => { :license => 'CC-BY-SA-4.0' }
 
     assert_response :redirect
 
     get :show, :id => df
-    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike'
-    assert_equal 'cc-by-sa', assigns(:data_file).license
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike 4.0'
+    assert_equal 'CC-BY-SA-4.0', assigns(:data_file).license
   end
 
   test "check correct license pre-selected" do
-    df = Factory :data_file, :license => 'cc-by-sa', :policy => Factory(:public_policy)
+    df = Factory :data_file, :license => 'CC-BY-SA-4.0', :policy => Factory(:public_policy)
 
     get :edit, :id => df
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution Share-Alike'
+    assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution Share-Alike 4.0'
 
     df2 = Factory :data_file, :license => nil, :policy => Factory(:public_policy)
 
@@ -2198,7 +2198,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :new
     assert_response :success
-    assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution'
+    assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution 4.0'
   end
 
   private
