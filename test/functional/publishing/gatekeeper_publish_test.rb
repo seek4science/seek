@@ -62,7 +62,7 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     assert ResourcePublishLog.requested_approval_assets_for(@gatekeeper).empty?
     get :requested_approval_assets, :id => @gatekeeper
-    assert_select "span[class=?]","published", text:"There are no items waiting for your approval"
+    assert_select "span[class=?]","none_text", text:"There are no items waiting for your approval"
 
     user = Factory(:user)
     df = Factory(:data_file, :projects => @gatekeeper.projects)
@@ -87,18 +87,16 @@ class GatekeeperPublishTest < ActionController::TestCase
       assert_select "a[href=?]", person_path(user.person), :count => 3
     end
 
-    assert_select ".radio_buttons", :count => 3 do
+    assert_select ".btn-group", :count => 3 do
       [df, model, sop].each do |asset|
         assert_select "input[type=radio][name=?][value=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", 1
         assert_select "input[type=radio][name=?][value=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", 0
-        assert_select "input[type=radio][name=?][value=?][checked=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", -1, "true"
+        assert_select "input[type=radio][name=?][value=?][checked=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", -1, "checked"
       end
     end
 
-    assert_select ".comment", :count => 3 do
-      [df, model, sop].each do |asset|
-        assert_select "textarea[name=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]"
-      end
+    [df, model, sop].each do |asset|
+      assert_select "textarea[name=?]", "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]"
     end
   end
 
