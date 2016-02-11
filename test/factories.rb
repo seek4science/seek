@@ -1038,6 +1038,16 @@ end
     f.base_type 'String'
   end
 
+  Factory.define(:float_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "Float attribute type #{n}"}
+    f.base_type 'Float'
+  end
+
+  Factory.define(:datetime_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "DateTime attribute type #{n}"}
+    f.base_type 'DateTime'
+  end
+
   #a string that must contain 'xxx'
   Factory.define(:simple_string_sample_attribute, :class=>SampleAttribute) do |f|
     f.sequence(:title) {|n| "Simple sample attribute #{n}"}

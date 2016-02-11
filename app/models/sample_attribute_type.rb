@@ -3,16 +3,24 @@ class SampleAttributeType < ActiveRecord::Base
 
   after_initialize :default_values
 
-  ALLOWED_TYPES = %w(Integer Numeric Float String)
-
   validates :title, :base_type, :regexp, presence: true
-
   validate :check_allowed_type, :check_regular_expression
 
+  BASE_TYPE_AND_CHECKER_MAP = {
+    'Integer' => :is_integer,
+    'Float' => :is_float,
+    'String' => :is_string,
+    'DateTime' => :is_datetime
+  }
+
   def check_allowed_type
-    unless ALLOWED_TYPES.include?(base_type)
+    unless SampleAttributeType.allowed_base_types.include?(base_type)
       errors.add(:base_type, 'Not a valid base type')
     end
+  end
+
+  def self.allowed_base_types
+    BASE_TYPE_AND_CHECKER_MAP.keys
   end
 
   def check_regular_expression
@@ -30,10 +38,39 @@ class SampleAttributeType < ActiveRecord::Base
   end
 
   def validate_value?(value)
-    value.is_a?(base_type.constantize) && (value.to_s =~ regular_expression)
+    check_value(value) && (value.to_s =~ regular_expression)
+  end
+
+  def check_value(value)
+    checker = BASE_TYPE_AND_CHECKER_MAP[base_type]
+    begin
+      send(checker, value)
+    rescue
+      return false
+    end
+    true
   end
 
   def as_json(_options = nil)
     { title: title, base_type: base_type, regexp: regexp }
+  end
+
+  # CHECKERS for types, these should raise an exception if the type doesn't match
+
+  # value can be Integer or String
+  def is_integer(value)
+    fail 'Not an integer' unless (Integer(value).to_s == value.to_s)
+  end
+
+  def is_string(value)
+    fail 'Not a string' unless value.is_a?(String)
+  end
+
+  def is_float(value)
+    fail 'Not a float' unless (Float(value).to_s == value.to_s)
+  end
+
+  def is_datetime(value)
+    fail 'Not a date time' unless DateTime.parse(value.to_s)
   end
 end
