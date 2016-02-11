@@ -28,4 +28,36 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal [sample1,sample2].sort,sample_type.samples.sort
   end
 
+  test "associate sample attribute default order" do
+    attribute1 = Factory(:simple_string_sample_attribute)
+    attribute2 = Factory(:simple_string_sample_attribute)
+    sample_type = Factory :sample_type
+    sample_type.sample_attributes << attribute1
+    sample_type.sample_attributes << attribute2
+    sample_type.save!
+
+    sample_type.reload
+
+    assert_equal [attribute1, attribute2],sample_type.sample_attributes
+  end
+
+  test "associate sample attribute specify order" do
+    attribute1 = Factory(:simple_string_sample_attribute)
+    attribute2 = Factory(:simple_string_sample_attribute)
+    attribute3 = Factory(:simple_string_sample_attribute)
+    sample_type = Factory :sample_type
+    sample_type.add_attribute(attribute3,3)
+    sample_type.add_attribute(attribute2,2)
+    sample_type.add_attribute(attribute1,1)
+    sample_type.save!
+
+    sample_type.reload
+
+    pp sample_type.sample_type_sample_attributes.inspect
+
+    assert_equal [attribute1, attribute2, attribute3],sample_type.sample_attributes
+  end
+
+
+
 end
