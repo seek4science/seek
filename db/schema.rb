@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160211103607) do
+ActiveRecord::Schema.define(:version => 20160211150242) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1309,10 +1309,9 @@ ActiveRecord::Schema.define(:version => 20160211103607) do
 
   create_table "sample_types", :force => true do |t|
     t.string   "title"
-    t.text     "attr_definitions"
     t.string   "uuid"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "samples", :force => true do |t|
