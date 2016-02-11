@@ -5,7 +5,7 @@ class SampleType < ActiveRecord::Base
 
   has_many :samples
 
-  has_many :sample_attributes, through: :sample_type_sample_attributes
+  has_many :sample_attributes, through: :sample_type_sample_attributes, order: :pos
   has_many :sample_type_sample_attributes, order: :pos
 
   validates :title, presence: true
