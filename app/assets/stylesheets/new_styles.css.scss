@@ -360,3 +360,32 @@ div.isa_graph {
 #user-menu-button {
   height: $navbar-height;
 }
+
+.publishing_options {
+  padding: 0.5em 1em;
+
+  &.publishable {
+    background-color: #fafaff;
+    border-left-color: $btn-success-bg;
+  }
+
+  &.not-publishable {
+    border-left-color: $btn-warning-bg;
+  }
+
+  &.already-published {
+    border-left-color: $gray-light;
+  }
+}
+
+.publish-colour {
+  color: $btn-success-bg;
+}
+
+.publish-checkbox {
+  background-color: $btn-success-bg;
+  color: $btn-success-color;
+  padding: 0px 10px;
+  border-radius: 5px;
+  display: inline-block;
+}

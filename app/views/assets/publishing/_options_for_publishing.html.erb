@@ -1,36 +1,49 @@
 <%
    item = options_for_publishing
    checked ||= false
-   checkbox_title = "Publish"
-   if item.can_publish?
-     checkbox_class = "published"
-   else
-     checkbox_class = "disabled"
-   end
+
+   tree_class = 'not-publishable'
+   tree_class = 'publishable' if item.can_publish?
+   tree_class = 'already-published' if item.is_published?
+
 -%>
-<ul class="<%= html_classes -%>">
+<div class="isa-tree <%= html_classes -%> <%= tree_class %>">
   <% if item.can_view? %>
-      <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;<%= link_to item.title, item, :target => "_blank" -%>
-        <%=list_item_visibility(item,"icon_visibility")-%>
-      </li>
-      <li class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></li>
+      <h5 class="type_and_title">
+        <strong><%= text_for_resource item -%>:</strong> <%= link_to item.title, item, :target => "_blank" -%>
+        <%=list_item_visibility(item)-%>
+      </h5>
+      <div class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></div>
   <% else %>
-      <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;This item is hidden to you</li>
+      <h5 class="type_and_title"><strong><%= text_for_resource item -%>:</strong> This item is hidden to you</h5>
       <% if current_user.try(:person) && item.can_see_hidden_item?(current_user.person) %>
-          <li class="secondary">Manageable by <%= item.managers.empty? ? "<span class='none_text'>None</span>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></li>
+          <div class="secondary">Manageable by <%= item.managers.empty? ? "<div class='none_text'>None</div>".html_safe : item.managers.collect { |m| link_to(h(m.title), m) }.join(", ").html_safe -%></div>
       <% end %>
   <% end %>
 
-  <% tooltip_text = (checkbox_class=='disabled') ? 'You are not allowed to process publishing this item, or it was already published' : nil %>
-  <li class="secondary <%= checkbox_class -%>" title="<%= tooltip_title_attrib(tooltip_text) %>">
+  <div>
     <% if item.is_published? %>
-    Already published
+        <span class="label label-default" title="<%= tooltip_title_attrib('This item has already been published.') %>">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+          Published
+        </span>
+    <% elsif item.can_publish? %>
+        <div class="publish-checkbox">
+          <div class="checkbox">
+            <label>Publish?
+              <%= check_box_tag publishing_item_param(item), 1, checked,
+                                {:class=>"#{item.class.name}_#{item.id}",
+                                 :onclick=>"checkRepeatedItems(this)"} -%>
+
+            </label>
+          </div>
+        </div>
     <% else %>
-    <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item), 1, checked,
-                                                  {:disabled=>(checkbox_class=='disabled') ? true :false,
-                                                   :class=>"#{item.class.name}_#{item.id}",
-                                                   :onclick=>"checkRepeatedItems(this)"} -%>
+        <span class="label label-warning" title="<%= tooltip_title_attrib('You do not have permission to pubish this item.') %>">
+          <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
+          Can't publish
+        </span>
     <% end %>
-  </li>
-</ul>
+  </div>
+</div>
 

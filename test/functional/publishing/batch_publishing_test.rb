@@ -49,17 +49,17 @@ class BatchPublishingTest < ActionController::TestCase
     get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
 
-    assert_select "li.type_and_title", :count=>total_asset_count do
+    assert_select ".type_and_title", :count=>total_asset_count do
       publish_immediately_assets.each do |a|
         assert_select "a[href=?]",eval("#{a.class.name.underscore}_path(#{a.id})"),:text=>/#{a.title}/
       end
       gatekeeper_required_assets.each do |a|
         assert_select "a[href=?]",eval("#{a.class.name.underscore}_path(#{a.id})"),:text=>/#{a.title}/
       end
-      assert_select "li.type_and_title img[src*=?][title=?]",/lock.png/, /Private/, :count => total_asset_count
+      assert_select ".type_and_title img[src*=?][title=?]",/lock.png/, /Private/, :count => total_asset_count
     end
 
-    assert_select "li.secondary", :text => /Publish/, :count => total_asset_count do
+    assert_select ".checkbox", :text => /Publish/, :count => total_asset_count do
       publish_immediately_assets.each do |a|
         assert_select "input[type='checkbox'][id=?]", "publish_#{a.class.name}_#{a.id}"
       end
@@ -177,13 +177,13 @@ class BatchPublishingTest < ActionController::TestCase
 
     get :waiting_approval_assets, :id => User.current_user.person
 
-    assert_select "li.type_and_title", :count => 3 do
+    assert_select ".type_and_title", :count => 3 do
       assert_select "a[href=?]", data_file_path(df)
       assert_select "a[href=?]", model_path(model)
       assert_select "a[href=?]", sop_path(sop)
     end
 
-    assert_select "li.request_info", :count => 3 do
+    assert_select ".request_info", :count => 3 do
       assert_select "a[href=?]", person_path(df.asset_gatekeepers.first), :count => 3
     end
 

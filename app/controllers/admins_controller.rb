@@ -16,7 +16,7 @@ class AdminsController < ApplicationController
   end
 
   def update_admins
-    admin_ids = params[:admins] || []
+    admin_ids = params[:admins].split(',') || []
     current_admins = Person.admins
     admins = admin_ids.map { |id| Person.find(id) }
     current_admins.each { |ca| ca.is_admin = false }
