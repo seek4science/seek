@@ -55,6 +55,9 @@ gem 'validate_url'
 #gem for BiVeS and BudHat
 gem 'bives'
 
+#4.3 starts giving a deprecation warning about rails 3 unsupported
+gem 'paperclip',"~>4.2.0"
+
 
 #Linked to SysMO Git repositories
 gem 'gibberish', :github => "SysMO-DB/gibberish"
