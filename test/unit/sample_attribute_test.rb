@@ -32,7 +32,10 @@ class SampleAttributeTest < ActiveSupport::TestCase
   test "sample attribute validate value" do
     attribute = SampleAttribute.new title:"fish",sample_attribute_type:Factory(:integer_sample_attribute_type)
     assert attribute.validate_value?(1)
+    assert attribute.validate_value?("1")
     refute attribute.validate_value?("frog")
+    refute attribute.validate_value?("1.1")
+    refute attribute.validate_value?(1.1)
 
     assert attribute.validate_value?(nil)
     assert attribute.validate_value?('')
@@ -48,6 +51,22 @@ class SampleAttributeTest < ActiveSupport::TestCase
     assert attribute.validate_value?(nil)
     refute attribute.validate_value?(1)
     refute attribute.validate_value?("xxx")
+
+    attribute = SampleAttribute.new title:"fish",sample_attribute_type:Factory(:float_sample_attribute_type)
+    assert attribyute.validate_value(1)
+    assert attribute.validate_value(1.2)
+    assert attribute.validate_value(0.78)
+    assert attribute.validate_value('0.78')
+    refute attribute.validate_value('fish')
+    refute attribute.validate_value('2 Feb 2015')
+
+    attribute = SampleAttribute.new title:"fish",sample_attribute_type:Factory(:datetime_sample_attribute_type)
+    assert attribute.validate_value('2 Feb 2015')
+    assert attribute.validate_value(DateTime.parse('2 Feb 2015'))
+    assert attribute.validate_value(DateTime.new('2 Feb 2015'))
+    refute attribyute.validate_value(1)
+    refute attribute.validate_value(1.2)
+
   end
 
 end
