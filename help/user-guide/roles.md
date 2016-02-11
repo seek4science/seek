@@ -5,7 +5,7 @@ layout: page
 
 
 # Specialist user roles
-SEEK has a number of specialist roles to which users can be defined
+SEEK has a number of specialist roles to which users can be assigned 
 
 Programme specific roles:
 
