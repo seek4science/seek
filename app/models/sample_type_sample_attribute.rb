@@ -8,8 +8,8 @@ class SampleTypeSampleAttribute < ActiveRecord::Base
 
   private
 
-  #if not set, takes the next value for that sample type
+  # if not set, takes the next value for that sample type
   def default_pos
-    self.pos ||= (SampleTypeSampleAttribute.where(sample_type_id:sample_type_id).maximum(:pos) || 0) + 1
+    self.pos ||= (SampleTypeSampleAttribute.where(sample_type_id: sample_type_id).maximum(:pos) || 0) + 1
   end
 end
