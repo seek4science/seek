@@ -7,8 +7,8 @@
     <div class="form-group" id="license-section">
       <label>License</label>
 
-      <%= license_select("#{resource.class.name.underscore}[license]", selected_license,
-                         :id => 'license-select', :class => 'form-control', :data_only => true) %>
+      <%= grouped_license_select("#{resource.class.name.underscore}[license]", selected_license,
+                                 :id => 'license-select', :class => 'form-control', :data_only => true) %>
 
       <span class="help-block license-url-block">
         For more information on this license, please visit <a id="license-url" href="" target="_blank"></a>
