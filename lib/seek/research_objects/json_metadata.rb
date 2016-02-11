@@ -1,9 +1,10 @@
+require 'seek/license'
+
 module Seek
   module ResearchObjects
     # creates the JSON metadata content describing an item to be stored in a Research Object
     class JSONMetadata < Metadata
       include Singleton
-      include LicenseHelper
 
       CANDIDATE_PROPERTIES = [:title, :description, :assay_type_uri, :technology_type_uri,
                               :version, :doi, :doi_uri, :pubmed_id, :pubmed_uri]
