@@ -4,7 +4,7 @@ class SampleAttributeType < ActiveRecord::Base
   after_initialize :default_values
 
   validates :title, :base_type, :regexp, presence: true
-  validate :check_allowed_type, :check_regular_expression
+  validate :validate_allowed_type, :validate_regular_expression
 
   BASE_TYPE_AND_CHECKER_MAP = {
     'Integer' => :is_integer,
@@ -13,7 +13,7 @@ class SampleAttributeType < ActiveRecord::Base
     'DateTime' => :is_datetime
   }
 
-  def check_allowed_type
+  def validate_allowed_type
     unless SampleAttributeType.allowed_base_types.include?(base_type)
       errors.add(:base_type, 'Not a valid base type')
     end
@@ -23,7 +23,7 @@ class SampleAttributeType < ActiveRecord::Base
     BASE_TYPE_AND_CHECKER_MAP.keys
   end
 
-  def check_regular_expression
+  def validate_regular_expression
     regular_expression
   rescue RegexpError
     errors.add(:regexp, 'Not a valid regular expression')
@@ -33,15 +33,16 @@ class SampleAttributeType < ActiveRecord::Base
     /#{regexp}/
   end
 
+  #FIXME: move to default in DB
   def default_values
     self.regexp ||= '.*'
   end
 
   def validate_value?(value)
-    check_value(value) && (value.to_s =~ regular_expression)
+    check_value_against_base_type(value) && (value.to_s =~ regular_expression)
   end
 
-  def check_value(value)
+  def check_value_against_base_type(value)
     checker = BASE_TYPE_AND_CHECKER_MAP[base_type]
     begin
       send(checker, value)
