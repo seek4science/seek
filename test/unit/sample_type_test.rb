@@ -53,8 +53,6 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     sample_type.reload
 
-    pp sample_type.sample_type_sample_attributes.inspect
-
     assert_equal [attribute1, attribute2, attribute3],sample_type.sample_attributes
   end
 
