@@ -95,6 +95,17 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal [true,true,false,false],type.sample_attributes.collect(&:required)
   end
 
+  test "validate value" do
+    type = Factory(:patient_sample_type)
+    assert type.validate_value?("full name","Fred Bloggs")
+    refute type.validate_value?("full name","Fred 22")
+    assert type.validate_value?("age",99)
+    refute type.validate_value?("age","fish")
+    assert_raise SampleType::UnknownAttributeException do
+      type.validate_value?("monkey",2)
+    end
+  end
+
 
 
 end
