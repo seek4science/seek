@@ -323,15 +323,16 @@ label.admin-checkbox {
 
 a.seek-homepage-button {
   display: block;
+  font-size: 200%;
 }
 
 .seek-homepage-button img {
-  width: 90px;
-  height: 90px;
+  width: 120px;
+  height: 120px;
   margin: 5px;
 }
 
-@media (min-width: $screen-md-min) {
+@media (min-width: $screen-sm-min) {
   .seek-homepage-button-container {
     margin-bottom: 3em;
     margin-top: 3em;
@@ -343,8 +344,8 @@ a.seek-homepage-button {
   }
 
   .seek-homepage-button img {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     display: block;
     margin: 5px auto;
   }
@@ -358,4 +359,33 @@ div.isa_graph {
 
 #user-menu-button {
   height: $navbar-height;
+}
+
+.publishing_options {
+  padding: 0.5em 1em;
+
+  &.publishable {
+    background-color: #fafaff;
+    border-left-color: $btn-success-bg;
+  }
+
+  &.not-publishable {
+    border-left-color: $btn-warning-bg;
+  }
+
+  &.already-published {
+    border-left-color: $gray-light;
+  }
+}
+
+.publish-colour {
+  color: $btn-success-bg;
+}
+
+.publish-checkbox {
+  background-color: $btn-success-bg;
+  color: $btn-success-color;
+  padding: 0px 10px;
+  border-radius: 5px;
+  display: inline-block;
 }

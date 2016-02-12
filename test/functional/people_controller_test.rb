@@ -1592,6 +1592,19 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select "h1",:text=>"New profile",:count=>1
   end
 
+
+  test "orcid not required when creating another person's profile" do
+    login_as(Factory(:admin))
+
+    with_config_value(:orcid_required, true) do
+      assert_nothing_raised do
+        no_orcid = Factory :brand_new_person, :email => "FISH-sOup1@email.com"
+        assert no_orcid.valid?
+        assert_empty no_orcid.errors[:orcid]
+      end
+    end
+  end
+
   def mask_for_admin
     Seek::Roles::Roles.instance.mask_for_role("admin")
   end

@@ -9,7 +9,7 @@
   <ul class="publishing_options">
 
     <% @items_for_publishing.each do |item| %>
-        <% if !item.assays.empty? %>
+        <% if item.is_a?(Assay) || !item.assays.empty? %>
             <li class="type_and_title">
               <%= text_for_resource item -%>: <%= link_to item.title, item, :target => "_blank" -%>
               <% if item.is_published? %>

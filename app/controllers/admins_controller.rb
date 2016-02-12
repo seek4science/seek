@@ -16,7 +16,7 @@ class AdminsController < ApplicationController
   end
 
   def update_admins
-    admin_ids = params[:admins] || []
+    admin_ids = params[:admins].split(',') || []
     current_admins = Person.admins
     admins = admin_ids.map { |id| Person.find(id) }
     current_admins.each { |ca| ca.is_admin = false }
@@ -112,6 +112,8 @@ class AdminsController < ApplicationController
     Seek::Config.news_number_of_entries = entries if is_entries_integer
 
     Seek::Config.home_description = params[:home_description]
+
+    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
     begin
       Seek::FeedReader.clear_cache
     rescue => e

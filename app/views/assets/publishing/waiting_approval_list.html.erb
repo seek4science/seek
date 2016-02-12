@@ -43,8 +43,8 @@
       <br/>
 
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-      <%= submit_tag "Confirm",:disable_with=>"Confirm" -%>
-      Or
+      <%= submit_tag "Confirm", :disable_with=>"Confirm", :class => 'btn btn-primary' -%>
+      or
       <%= cancel_button(resource) %>
   <% end %>
 </div>

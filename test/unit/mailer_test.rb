@@ -213,22 +213,29 @@ class MailerTest < ActionMailer::TestCase
 
   test "contact_project_administrator_new_user" do
     project_administrator = Factory(:project_administrator)
+    admin_project = project_administrator.projects.first
+
+    assert project_administrator.is_project_administrator?(admin_project)
     @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are Project Administrator'
     @expected.to = project_administrator.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 
     params={}
-    params[:projects]=[Factory(:project,:title=>"Project X").id.to_s,Factory(:project,:title=>"Project Y").id.to_s]
+    params[:projects]=[Factory(:project,:title=>"Project X").id.to_s,admin_project.id.to_s]
     params[:institutions]=[Factory(:institution,:title=>"The Institute").id.to_s]
     params[:other_projects]="Another Project"
     params[:other_institutions]="Another Institute"
 
     @expected.body = read_fixture('contact_project_administrator_new_user')
 
-    assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron)))
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-pr_name-",admin_project.title)
+    expected_text.gsub!("-pr_id-",admin_project.id.to_s)
 
+    actual_text = encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron)))
+
+    assert_equal expected_text,actual_text
 
   end
 

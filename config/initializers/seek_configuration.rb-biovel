@@ -155,5 +155,7 @@ SEEK::Application.configure do
   Seek::Config.default :news_enabled,false
   Seek::Config.default :news_feed_urls,''
   Seek::Config.default :news_number_of_entries,10
+
+  Seek::Config.default :front_page_buttons_enabled, false
 end
 

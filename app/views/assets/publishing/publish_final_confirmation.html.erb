@@ -4,18 +4,14 @@
     You are about the publish the following items.
   </p>
   <%= form_tag :action => :publish do %>
-        <ul class="publishing_options">
-
-
+      <ul class="publishing_options">
         <% @items_for_publishing.each do |item| %>
             <%= hidden_field_tag publishing_item_param(item), 1 %>
-
             <li class="type_and_title">
-               <%= text_for_resource item -%>: <%= link_to item.title, item -%>
+              <%= text_for_resource item -%>: <%= link_to item.title, item -%>
             </li>
-
         <% end %>
-        </ul>
+      </ul>
       <br/>
 
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>

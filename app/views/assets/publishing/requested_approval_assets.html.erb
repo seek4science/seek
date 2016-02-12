@@ -1,80 +1,91 @@
-<style type="text/css">
-
-</style>
-
-<div class="show_basic">
-  <br/>
-  <div class="alert alert-info">
-    <ul style="padding-left:1em;">
-      <li>
-        <% project_names = current_user.person.projects_for_role(Seek::Roles::ASSET_GATEKEEPER).collect(&:title) %>
-        You are the Gatekeeper for the <%= t('project').downcase.pluralize(project_names.count) %>
-        : <strong><%= project_names.join(', ') %></strong>.
-      </li>
-      <li>
-        As the Gatekeeper, you control the final process of publishing items in
-        your <%= t('project').downcase.pluralize(project_names.count) %>, that is:
-        the owners of the items requested to make these items public, but it requires your approval.
-      </li>
-      <li>
-        The owners will be informed if you <span class="approve">approve</span> or <span class="reject">reject</span> these requests.
-      </li>
-    </ul>
-  </div>
-
-  <br/>
-  <% if @requested_approval_assets.empty? %>
-      <span class="published">There are no items waiting for your approval</span>
-      <br/>
-      <br/>
-      <%= link_to "Back to profile", person_path(params[:id].to_i) -%>
-  <% else %>
-      <%= form_tag :action => :gatekeeper_decide do %>
-          <h2>You have been requested to allow the following items to be published. Please select your decision:</h2>
-          <% isa_order = ['Investigation', 'Study', 'Assay']%>
-          <% @requested_approval_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
-              <ul class="item_for_decision">
-                <li class="type_and_title">
-                  <strong><%= text_for_resource asset -%></strong>:&nbsp;<%= link_to (asset.title), asset -%>
-                  <%= list_item_visibility(asset, "icon_visibility") -%>
-                </li>
-                <li class="request_info">
-                  Requested by:&nbsp;
-                  <% asset.publish_requesters.each do |requester| %>
-                      <%= link_to(requester.name, requester) %>
-                      on
-                      <%
-                         log = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND user_id=?",
-                                                         asset.class.name, asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL, requester.user.id]).last
-                      %>
-                      <%= date_as_string(log.created_at,true) %>
-                      <br/>
-                  <% end %>
-                </li>
-
-                <li class="radio_buttons">
-                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1"/>
-                  <span class="approve" style="padding-right: 2em;">Approve</span>
-
-                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0"/>
-                  <span class="reject" style="padding-right: 2em;">Reject</span>
-
-                  <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" checked="true"/>
-                  <span class="decide_later">Decide later</span>
-                </li>
-                <li class="comment">
-                  Reason or other comments(optional):
-                  <br/>
-                  <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil, :style => "width: 50%;", :rows => 3 -%>
-                </li>
-              </ul>
-          <% end %>
-
-          <br/>
-          <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
-          Or
-          <%= cancel_button(person_path(params[:id].to_i)) -%>
-      <% end %>
-  <% end %>
+<div class="alert alert-info">
+  <p>
+    <% project_names = current_user.person.projects_for_role(Seek::Roles::ASSET_GATEKEEPER).collect(&:title) %>
+    You are the Gatekeeper for the <%= t('project').downcase.pluralize(project_names.count) %>
+    : <strong><%= project_names.join(', ') %></strong>.
+  </p>
+  <p>
+    As the Gatekeeper, you control the final process of publishing items in
+    your <%= t('project').downcase.pluralize(project_names.count) %>, that is:
+    the owners of the items requested to make these items public, but it requires your approval.
+  </p>
+  <p>
+    The owners will be informed if you approve or reject these requests.
+  </p>
 </div>
 
+<% if @requested_approval_assets.empty? %>
+    <span class="none_text">There are no items waiting for your approval</span>
+
+    <%= button_link_to "Back to your profile", 'back', person_path(params[:id].to_i) -%>
+<% else %>
+    <%= form_tag :action => :gatekeeper_decide do %>
+        <% if @requested_approval_assets.count > 1 %>
+            <h2>The following items have been requested to be published</h2>
+        <% else %>
+            <h2>The following item has been requested to be published</h2>
+        <% end %>
+
+        <% isa_order = ['Investigation', 'Study', 'Assay']%>
+        <% @requested_approval_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
+            <div class="item_for_decision row">
+              <div class="col-sm-6">
+
+                <div class="type_and_title form-group">
+                  <label><%= text_for_resource asset -%></label>
+                  <p class="form-control-static">
+                    <%= link_to (asset.title), asset -%>
+                    <%= list_item_visibility(asset) -%>
+                  </p>
+                </div>
+
+                <div class="request_info form-group">
+                  <label>Requested by</label>
+                  <p class="form-control-static">
+                    <% asset.publish_requesters.each do |requester| %>
+                        <%= link_to(requester.name, requester) %>
+                        on
+                        <%
+                           log = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND user_id=?",
+                                                           asset.class.name, asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL, requester.user.id]).last
+                        %>
+                        <%= date_as_string(log.created_at,true) %>
+                    <% end %>
+                  </p>
+                </div>
+
+
+                <div class="form-group">
+                  <label>Decision</label>
+                  <div class="btn-group btn-group-justified" data-toggle="buttons">
+                    <label class="btn btn-default">
+                      <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1" autocomplete="off"/>
+                      Approve
+                    </label>
+                    <label class="btn btn-default">
+                      <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0" autocomplete="off"/>
+                      Reject
+                    </label>
+                    <label class="btn btn-default active">
+                      <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" autocomplete="off" checked="checked"/>
+                      Decide later
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Reason or other comments (optional)</label>
+                  <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil,
+                                    :rows => 3, :class => 'form-control' -%>
+                </div>
+              </div>
+            </div>
+        <% end %>
+
+        <p>
+          <%= submit_tag "Submit", :disable_with => "Submitting ...", :class => 'btn btn-primary' -%>
+          or
+          <%= cancel_button(person_path(params[:id].to_i)) -%>
+        </p>
+    <% end %>
+<% end %>

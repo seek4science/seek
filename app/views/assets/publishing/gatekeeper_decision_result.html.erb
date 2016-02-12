@@ -54,8 +54,8 @@
       </ul>
   <% end -%>
 
-  <br/>
-  <br/>
 
-  <b><%= link_to "Back to your profile", person_path(params[:id].to_i) -%></b>
+  <p>
+    <%= button_link_to "Back to your profile", 'back', person_path(params[:id].to_i) -%>
+  </p>
 </div>

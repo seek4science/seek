@@ -147,7 +147,7 @@ class AdminsControllerTest < ActionController::TestCase
     assert quentin.is_admin?
     assert !aaron.is_admin?
 
-    post :update_admins,:admins=>[aaron.id]
+    post :update_admins,:admins => "#{aaron.id}"
 
     quentin.reload
     aaron.reload

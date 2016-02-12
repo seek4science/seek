@@ -1,32 +1,30 @@
 <%
    item = isa_publishing_preview
-   investigations = item.assays.collect(&:study).collect(&:investigation).uniq
 
+   case item
+     when Investigation
+       children = item.studies
+     when Study
+       children = item.assays
+     when Assay
+       children = item.assets
+     else
+       children = []
+   end
 -%>
 
-<% investigations.each do |investigation| %>
-    <div class="box_simple" style="margin-bottom:2em;">
-      <%= render :partial => "assets/publishing/options_for_publishing", :object => investigation, :locals => {:checked=>(item==investigation),:html_classes => "publishing_options"} -%>
+<%= render :partial => "assets/publishing/options_for_publishing",
+           :object => item,
+           :locals => { :html_classes => "publishing_options",
+                        :checked => (item == preselected) } -%>
 
-      <div style="padding-left: 3em;">
-        <% investigation.studies.each do |study| %>
-            <%= render :partial => "assets/publishing/options_for_publishing", :object => study, :locals => {:checked=>(item==study),:html_classes => "publishing_options"} -%>
-            <div style="padding-left: 3em;">
-              <% study.assays.each do |assay| %>
-                  <%= render :partial => "assets/publishing/options_for_publishing", :object => assay, :locals => {:checked=>(item==assay),:html_classes => "publishing_options"} -%>
-
-                  <div style="padding-left: 3em;">
-                    <% assay.assets.each do |asset| %>
-                        <%= render :partial => "assets/publishing/options_for_publishing", :object => asset, :locals => {:checked => item==asset, :html_classes => "publishing_options"} -%>
-                    <% end %>
-                  </div>
-              <% end %>
-            </div>
-        <% end %>
-      </div>
+<% if children.any? %>
+    <div style="margin-left: 3em">
+      <% children.each do |child| %>
+          <%= render :partial => "assets/publishing/isa_publishing_preview",
+                     :object => child,
+                     :locals => { :preselected => preselected,
+                                  :html_classes => "publishing_options"} -%>
+      <% end %>
     </div>
 <% end %>
-
-
-
-

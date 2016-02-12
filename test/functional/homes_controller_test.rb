@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class HomesControllerTest < ActionController::TestCase
+
   fixtures :all
 
   include AuthenticatedTestHelper
@@ -384,6 +385,52 @@ class HomesControllerTest < ActionController::TestCase
     with_config_value :documentation_enabled,false do
       get :index
       assert_select "li.dropdown span",:text=>"Help",:count=>0
+    end
+  end
+
+  test "my recent contributions section works correctly" do
+    person = Factory(:person)
+    login_as(person)
+
+    df = Factory :data_file, :title=>"A new data file", :contributor=>person, :policy=>Factory(:public_policy)
+    sop = Factory :sop, :title=>"A new sop", :contributor=>person, :policy=>Factory(:public_policy)
+    assay= Factory :assay, :title=>"A new assay", :contributor=>person, :policy=>Factory(:public_policy)
+
+    Factory :activity_log, :activity_loggable => df, :controller_name=>"data_files", :culprit=>person.user
+    Factory :activity_log, :activity_loggable => sop, :controller_name=>"sops", :culprit=>person.user
+    Factory :activity_log, :activity_loggable => assay, :controller_name=>"assays", :culprit=>person.user
+
+    get :index
+    assert_response :success
+
+    assert_select "div#my-recent-contributions .panel-body ul li", 3
+    assert_select "div#my-recent-contributions .panel-body ul>li a[href=?]",data_file_path(df),:text=>/A new data file/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",sop_path(sop),:text=>/A new sop/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",assay_path(assay),:text=>/A new assay/
+
+    sop.update_attributes(:title => 'An old sop')
+    Factory :activity_log, :activity_loggable => sop, :controller_name=>"assays", :culprit=>person.user, :action => 'update'
+
+    get :index
+    assert_response :success
+    assert_select "div#my-recent-contributions .panel-body ul li", 3
+    assert_select "div#my-recent-contributions .panel-body ul>li a[href=?]",sop_path(sop),:text=>/An old sop/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",data_file_path(df),:text=>/A new data file/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",assay_path(assay),:text=>/A new assay/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",sop_path(sop),:text=>/A new sop/, :count => 0
+  end
+
+  test "can enabled/disable front page buttons" do
+    login_as Factory(:user)
+    with_config_value :front_page_buttons_enabled, true do
+        get :index
+        assert_response :success
+        assert_select "a.seek-homepage-button",:count => 3
+    end
+    with_config_value :front_page_buttons_enabled, false do
+      get :index
+      assert_response :success
+      assert_select "a.seek-homepage-button",:count => 0
     end
   end
 
