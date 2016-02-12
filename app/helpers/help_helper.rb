@@ -5,7 +5,7 @@ module HelpHelper
   # - link_text - the text of the link - default help
   def help_link key, options={}
     options = default_help_options.merge(options)
-    link_to options[:link_text],Seek::Help::HelpDictionary.instance.help_link(key),:target=>"blank"
+    link_to options[:link_text],Seek::Help::HelpDictionary.instance.help_link(key),target: "_blank"
   end
 
   def default_help_options
