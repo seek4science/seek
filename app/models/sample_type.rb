@@ -20,6 +20,8 @@ class SampleType < ActiveRecord::Base
     attribute.validate_value?(value)
   end
 
+  private
+
   class UnknownAttributeException < Exception; end
 
 end
