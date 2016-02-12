@@ -32,7 +32,12 @@ class SampleAttributeType < ActiveRecord::Base
   end
 
   def validate_value?(value)
-    check_value_against_base_type(value) && (value.to_s =~ regular_expression)
+    check_value_against_base_type(value) && check_value_against_regular_expression(value)
+  end
+
+  def check_value_against_regular_expression(value)
+    match = regular_expression.match(value.to_s)
+    match && match.to_s == value.to_s
   end
 
   def check_value_against_base_type(value)

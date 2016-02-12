@@ -37,6 +37,10 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
+    # not sure about these ??
+    refute attribute.validate_value?(1.0)
+    refute attribute.validate_value?('1.0')
+
     attribute = SampleAttributeType.new(title: 'fish', base_type: 'String', regexp: '.*yyy')
     assert attribute.validate_value?('yyy')
     assert attribute.validate_value?('happpp - yyy')
@@ -68,6 +72,16 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1.2)
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('30 Feb 2015')
+  end
+
+  test 'regular expression match' do
+    #whole string must match
+    attribute = SampleAttributeType.new(title: 'first name', base_type: 'String', regexp: '[A-Z][a-z]+')
+    assert attribute.validate_value?("Fred")
+    refute attribute.validate_value?(" Fred")
+    refute attribute.validate_value?("FRed")
+    refute attribute.validate_value?("Fred2")
+    refute attribute.validate_value?("Fred ")
   end
 
   test 'to json' do
