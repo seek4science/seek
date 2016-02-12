@@ -19,6 +19,8 @@ layout: page
 
 [Proteomics Guidelines](proteomics-guidelines.html)
 
+[Licenses](licenses.html)
+
 ## Guidelines for using Community Resources and Controlled Vocabularies
 
 [Controlled Vocabularies and Ontologies](controlled-vocabularies.html)
