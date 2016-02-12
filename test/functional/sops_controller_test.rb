@@ -352,21 +352,6 @@ class SopsControllerTest < ActionController::TestCase
     assert_select "a", :text=>/Edit experimental conditions/, :count=>0
   end
 
-  def test_should_be_able_to_edit_exp_conditions_for_owners_downloadable_only_sop
-    login_as(:owner_of_my_first_sop)
-    s=sops(:downloadable_sop)
-
-    get :show, :id=>s
-    assert_select "a", :text=>/Edit experimental conditions/, :count=>1
-  end
-
-  def test_should_be_able_to_edit_exp_conditions_for_editable_sop
-    s=sops(:editable_sop)
-
-    get :show, :id=>sops(:editable_sop)
-    assert_select "a", :text=>/Edit experimental conditions/, :count=>1
-  end
-
   def test_should_show_version
     s = sops(:editable_sop)
 

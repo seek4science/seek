@@ -15,8 +15,7 @@ module HelpHelper
 
   def default_help_options
     {
-        link_text: 'help',
-        url_only: false
+        link_text: 'help'
     }
   end
 
