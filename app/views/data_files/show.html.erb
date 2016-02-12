@@ -24,8 +24,6 @@
   </div>
 </div>
 
-<%= render :partial=>"data_files/studied_factors" if Seek::Config.factors_studied_enabled %>
-
 <%= render(:partial=>"data_files/vl_samples_info") if Seek::Config.is_virtualliver -%>
 
 <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>

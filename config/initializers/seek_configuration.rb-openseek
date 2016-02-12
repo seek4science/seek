@@ -53,8 +53,8 @@ SEEK::Application.configure do
   Seek::Config.default :models_enabled,true
   Seek::Config.default :guide_box_enabled,true
   Seek::Config.default :treatments_enabled,true
-  Seek::Config.default :factors_studied_enabled,true
-  Seek::Config.default :experimental_conditions_enabled,true
+  Seek::Config.default :factors_studied_enabled,false
+  Seek::Config.default :experimental_conditions_enabled,false
   Seek::Config.default :tagging_enabled, true
   Seek::Config.default :workflows_enabled,false
   Seek::Config.default :assays_enabled,true

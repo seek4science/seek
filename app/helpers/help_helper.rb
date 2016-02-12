@@ -8,15 +8,14 @@ module HelpHelper
     if options[:url_only]
       Seek::Help::HelpDictionary.instance.help_link(key)
     else
-      link_to options[:link_text],Seek::Help::HelpDictionary.instance.help_link(key),:target=>"blank"
+      link_to options[:link_text],Seek::Help::HelpDictionary.instance.help_link(key),target:"_blank"
     end
 
   end
 
   def default_help_options
     {
-        link_text: 'help',
-        url_only: false
+        link_text: 'help'
     }
   end
 
