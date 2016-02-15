@@ -84,4 +84,24 @@ class SampleTest < ActiveSupport::TestCase
 
   end
 
+  test "adds validations" do
+    sample = Sample.new :title=>"testing"
+    sample.sample_type = Factory(:patient_sample_type)
+    refute sample.valid?
+    sample.full_name="Bob Monkhouse"
+    sample.age=22
+    assert sample.valid?
+
+    sample.full_name="FRED"
+    refute sample.valid?
+
+    sample.full_name="Bob Monkhouse"
+    sample.postcode="fish"
+    refute sample.valid?
+    assert_equal 1,sample.errors.count
+    assert_equal "Postcode is not a valid Post Code",sample.errors.full_messages.first
+    sample.postcode="M13 9PL"
+    assert sample.valid?
+  end
+
 end

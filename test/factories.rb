@@ -1063,21 +1063,25 @@ end
   #very simple persons name, must be 2 words, first and second word starting with capital with all letters
   Factory.define(:full_name_sample_attribute_type,:parent=>:string_sample_attribute_type) do |f|
     f.regexp  '[A-Z][a-z]+[ ][A-Z][a-z]+'
+    f.title 'Full name'
   end
 
   #positive integer
   Factory.define(:age_sample_attribute_type,:parent=>:integer_sample_attribute_type) do |f|
     f.regexp '^[1-9]\d*$'
+    f.title 'Age'
   end
 
   #positive float
   Factory.define(:weight_sample_attribute_type,:parent=>:float_sample_attribute_type) do |f|
     f.regexp '^[1-9]\d*[.][1-9]\d*$'
+    f.title 'Weight'
   end
 
   #uk postcode - taken from http://regexlib.com/REDetails.aspx?regexp_id=260
   Factory.define(:postcode_sample_attribute_type,:parent=>:string_sample_attribute_type) do |f|
     f.regexp '^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$'
+    f.title 'Post Code'
   end
 
   Factory.define(:patient_sample_type,:parent=>:sample_type) do |f|
