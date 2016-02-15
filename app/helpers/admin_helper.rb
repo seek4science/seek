@@ -100,7 +100,7 @@ module AdminHelper
     admin_setting_block(title, description) do
       #   select_tag "people", "<option>David</option>".html_safe
       #   # => <select id="people" name="people"><option>David</option></select>
-      select_tag(name, option_tags, options)
+      select_tag(name, option_tags, options.merge!(:class => 'form-control'))
     end
   end
 
