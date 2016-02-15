@@ -6,7 +6,6 @@ module Seek
     BLACKLIST_TIME=1.day
 
     #Fetches the feed entries - aggregated and ordered, for a particular category
-    #the category may be either :project_news or :community_news
     def self.fetch_entries_for category
       feeds = fetch_feeds_for_category(category)
 
