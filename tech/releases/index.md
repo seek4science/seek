@@ -7,9 +7,22 @@ layout: page
 
 Latest version - {{ site.current_seek_version }}
 
+## Version 1.0.2
+
+Release date: _February 9th 2015_
+
+Patch release with some minor improvements and bug fixes, in particular
+
+  * Corrected the information sent to project administrators when a new person signs up
+  * Removed some redundant pages
+  * Fix to application status report page for monitoring
+  * ORCiD only mandatory during registration, not when creating profiles (if this configuration is turned on)
+
+A full list of changes included in this release can be found in the [SEEK v1.0.2 release notes](release-notes-1.0.2.html).
+
 ## Version 1.0.1
 
-Release date: _(December 15th 2015)_
+Release date: _December 15th 2015_
 
 Patch release with a couple of bugfixes.
 
@@ -22,7 +35,7 @@ A full list of changes included in this release can be found in the [SEEK v1.0.1
 
 ## Version 1.0.0
 
-Release date: _(December 8th 2015)_
+Release date: _December 8th 2015_
 
 ### Self management of Programmes and Projects
 
