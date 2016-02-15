@@ -218,6 +218,7 @@
     "url":"http://www.opendefinition.org/licenses/cc-by-sa",
     "is_osi_compliant":false,
     "domain_software":false,
+    "od_recommended":true,
     "id":"cc-by-sa"
   },
   {
@@ -231,6 +232,7 @@
     "url":"http://www.opendefinition.org/licenses/cc-by",
     "is_osi_compliant":false,
     "domain_software":false,
+    "od_recommended":true,
     "id":"cc-by"
   },
   {
@@ -244,6 +246,7 @@
     "url":"http://www.opendefinition.org/licenses/cc-zero",
     "is_osi_compliant":false,
     "domain_software":true,
+    "od_recommended":true,
     "id":"cc-zero"
   },
   {
@@ -882,6 +885,7 @@
     "url":"http://www.opendefinition.org/licenses/odc-by",
     "is_osi_compliant":false,
     "domain_software":false,
+    "od_recommended":true,
     "id":"odc-by"
   },
   {
@@ -895,6 +899,7 @@
     "url":"http://www.opendefinition.org/licenses/odc-odbl",
     "is_osi_compliant":false,
     "domain_software":false,
+    "od_recommended":true,
     "id":"odc-odbl"
   },
   {
@@ -908,6 +913,7 @@
     "url":"http://www.opendefinition.org/licenses/odc-pddl",
     "is_osi_compliant":false,
     "domain_software":false,
+    "od_recommended":true,
     "id":"odc-pddl"
   },
   {

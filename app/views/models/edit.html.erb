@@ -22,6 +22,8 @@
           <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :disable_project_select => true ,:allow_nil => true } -%>
       <% end -%>
 
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @model } %>
+
       <%= render :partial=>"model_metadata" -%>
 
       <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>

@@ -24,6 +24,8 @@
           <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} %>
       <% end %>
 
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
+
       <%# only the owner should be able to change sharing permissions -%>
       <% if current_user_authorized_to_manage -%>
           <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>

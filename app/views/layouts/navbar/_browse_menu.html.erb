@@ -10,9 +10,9 @@
     <% if Seek::Config.programmes_enabled %>
         <li><%= link_to t('programme').pluralize, programmes_path %></li>
     <% end %>
-    <li><%= link_to "People", people_path %></li>
     <li><%= link_to t("project").pluralize, projects_path %></li>
     <li><%= link_to "Institutions", institutions_path %></li>
+    <li><%= link_to "People", people_path %></li>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
     <li><%= link_to t("investigation").pluralize, investigations_path %></li>

@@ -172,9 +172,9 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
     t.text     "other_creators"
   end
 
-  create_table "assays_deprecated_samples", :id => false, :force => true do |t|
+  create_table "assays_samples", :id => false, :force => true do |t|
     t.integer "assay_id"
-    t.integer "deprecated_sample_id"
+    t.integer "sample_id"
   end
 
   create_table "asset_doi_logs", :force => true do |t|
@@ -381,136 +381,6 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
-  create_table "deprecated_sample_assets", :force => true do |t|
-    t.integer  "deprecated_sample_id"
-    t.integer  "asset_id"
-    t.integer  "version"
-    t.string   "asset_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "deprecated_sample_auth_lookup", :id => false, :force => true do |t|
-    t.integer "user_id"
-    t.integer "asset_id"
-    t.boolean "can_view",     :default => false
-    t.boolean "can_manage",   :default => false
-    t.boolean "can_edit",     :default => false
-    t.boolean "can_download", :default => false
-    t.boolean "can_delete",   :default => false
-  end
-
-  add_index "deprecated_sample_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sample_user_id_asset_id_can_view"
-  add_index "deprecated_sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
-
-  create_table "deprecated_samples", :force => true do |t|
-    t.string   "title"
-    t.integer  "deprecated_specimen_id"
-    t.string   "lab_internal_number"
-    t.datetime "donation_date"
-    t.string   "explantation"
-    t.string   "comments"
-    t.string   "first_letter"
-    t.integer  "policy_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "contributor_id"
-    t.string   "contributor_type"
-    t.integer  "institution_id"
-    t.datetime "sampling_date"
-    t.string   "organism_part"
-    t.string   "provider_id"
-    t.string   "provider_name"
-    t.string   "age_at_sampling"
-    t.string   "uuid"
-    t.integer  "age_at_sampling_unit_id"
-    t.string   "sample_type"
-    t.string   "treatment"
-  end
-
-  create_table "deprecated_samples_projects", :id => false, :force => true do |t|
-    t.integer "project_id"
-    t.integer "deprecated_sample_id"
-  end
-
-  create_table "deprecated_samples_tissue_and_cell_types", :id => false, :force => true do |t|
-    t.integer "deprecated_sample_id"
-    t.integer "tissue_and_cell_type_id"
-  end
-
-  create_table "deprecated_specimen_auth_lookup", :id => false, :force => true do |t|
-    t.integer "user_id"
-    t.integer "asset_id"
-    t.boolean "can_view",     :default => false
-    t.boolean "can_manage",   :default => false
-    t.boolean "can_edit",     :default => false
-    t.boolean "can_download", :default => false
-    t.boolean "can_delete",   :default => false
-  end
-
-  add_index "deprecated_specimen_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_spec_user_id_asset_id_can_view"
-  add_index "deprecated_specimen_auth_lookup", ["user_id", "can_view"], :name => "index_specimen_auth_lookup_on_user_id_and_can_view"
-
-  create_table "deprecated_specimens", :force => true do |t|
-    t.string   "title"
-    t.integer  "age"
-    t.string   "treatment"
-    t.string   "lab_internal_number"
-    t.integer  "person_id"
-    t.integer  "institution_id"
-    t.string   "comments"
-    t.string   "first_letter"
-    t.integer  "policy_id"
-    t.text     "other_creators"
-    t.integer  "contributor_id"
-    t.string   "contributor_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "culture_growth_type_id"
-    t.integer  "strain_id"
-    t.string   "medium"
-    t.string   "culture_format"
-    t.float    "temperature"
-    t.float    "ph"
-    t.string   "confluency"
-    t.string   "passage"
-    t.string   "viability"
-    t.string   "purity"
-    t.integer  "sex"
-    t.datetime "born"
-    t.string   "ploidy"
-    t.string   "provider_id"
-    t.string   "provider_name"
-    t.boolean  "is_dummy",               :default => false
-    t.string   "uuid"
-    t.string   "age_unit"
-  end
-
-  create_table "deprecated_specimens_projects", :id => false, :force => true do |t|
-    t.integer "project_id"
-    t.integer "deprecated_specimen_id"
-  end
-
-  create_table "deprecated_treatments", :force => true do |t|
-    t.integer  "unit_id"
-    t.string   "treatment_protocol"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "deprecated_sample_id"
-    t.integer  "measured_item_id"
-    t.float    "start_value"
-    t.float    "end_value"
-    t.float    "standard_deviation"
-    t.text     "comments"
-    t.integer  "compound_id"
-    t.integer  "deprecated_specimen_id"
-    t.string   "medium_title"
-    t.float    "time_after_treatment"
-    t.integer  "time_after_treatment_unit_id"
-    t.float    "incubation_time"
-    t.integer  "incubation_time_unit_id"
-  end
-
   create_table "disciplines", :force => true do |t|
     t.string   "title"
     t.datetime "created_at"
@@ -652,7 +522,7 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
     t.text     "comment"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "deprecated_specimen_id"
+    t.integer  "specimen_id"
   end
 
   create_table "group_memberships", :force => true do |t|
@@ -986,7 +856,7 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
     t.integer  "strain_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "deprecated_specimen_id"
+    t.integer  "specimen_id"
   end
 
   create_table "policies", :force => true do |t|
@@ -1152,6 +1022,11 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
   add_index "projects_publications", ["project_id"], :name => "index_projects_publications_on_project_id"
   add_index "projects_publications", ["publication_id", "project_id"], :name => "index_projects_publications_on_publication_id_and_project_id"
 
+  create_table "projects_samples", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "sample_id"
+  end
+
   create_table "projects_sop_versions", :id => false, :force => true do |t|
     t.integer "project_id"
     t.integer "version_id"
@@ -1160,6 +1035,11 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
   create_table "projects_sops", :id => false, :force => true do |t|
     t.integer "project_id"
     t.integer "sop_id"
+  end
+
+  create_table "projects_specimens", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "specimen_id"
   end
 
   create_table "projects_strains", :id => false, :force => true do |t|
@@ -1282,48 +1162,56 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
   add_index "resource_publish_logs", ["resource_type", "resource_id"], :name => "index_resource_publish_logs_on_resource_type_and_resource_id"
   add_index "resource_publish_logs", ["user_id"], :name => "index_resource_publish_logs_on_user_id"
 
-  create_table "sample_attribute_types", :force => true do |t|
-    t.string   "title"
-    t.string   "base_type"
-    t.string   "regexp",     :default => ".*"
-    t.datetime "created_at",                   :null => false
-    t.datetime "updated_at",                   :null => false
+  create_table "sample_assets", :force => true do |t|
+    t.integer  "sample_id"
+    t.integer  "asset_id"
+    t.integer  "version"
+    t.string   "asset_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
-  create_table "sample_attributes", :force => true do |t|
-    t.string   "title"
-    t.integer  "sample_attribute_type_id"
-    t.boolean  "required",                 :default => false
-    t.datetime "created_at",                                  :null => false
-    t.datetime "updated_at",                                  :null => false
+  create_table "sample_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
   end
 
-  create_table "sample_type_sample_attributes", :id => false, :force => true do |t|
-    t.integer "sample_type_id"
-    t.integer "sample_attribute_id"
-    t.integer "pos"
-  end
-
-  add_index "sample_type_sample_attributes", ["sample_type_id", "pos"], :name => "index_sample_type_sample_attributes_on_sample_type_id_and_pos"
-  add_index "sample_type_sample_attributes", ["sample_type_id"], :name => "index_sample_type_sample_attributes_on_sample_type_id"
-
-  create_table "sample_types", :force => true do |t|
-    t.string   "title"
-    t.string   "uuid"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
+  add_index "sample_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sample_user_id_asset_id_can_view"
+  add_index "sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
 
   create_table "samples", :force => true do |t|
     t.string   "title"
-    t.integer  "sample_type_id"
-    t.text     "json_metadata"
-    t.string   "uuid"
-    t.integer  "contributor_id"
+    t.integer  "specimen_id"
+    t.string   "lab_internal_number"
+    t.datetime "donation_date"
+    t.string   "explantation"
+    t.string   "comments"
+    t.string   "first_letter"
     t.integer  "policy_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "contributor_id"
     t.string   "contributor_type"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.integer  "institution_id"
+    t.datetime "sampling_date"
+    t.string   "organism_part"
+    t.string   "provider_id"
+    t.string   "provider_name"
+    t.string   "age_at_sampling"
+    t.string   "uuid"
+    t.integer  "age_at_sampling_unit_id"
+    t.string   "sample_type"
+    t.string   "treatment"
+  end
+
+  create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
+    t.integer "sample_id"
+    t.integer "tissue_and_cell_type_id"
   end
 
   create_table "saved_searches", :force => true do |t|
@@ -1419,8 +1307,8 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
   add_index "sop_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sop_auth_lookup_on_user_id_and_asset_id_and_can_view"
   add_index "sop_auth_lookup", ["user_id", "can_view"], :name => "index_sop_auth_lookup_on_user_id_and_can_view"
 
-  create_table "sop_deprecated_specimens", :force => true do |t|
-    t.integer "deprecated_specimen_id"
+  create_table "sop_specimens", :force => true do |t|
+    t.integer "specimen_id"
     t.integer "sop_id"
     t.integer "sop_version"
   end
@@ -1471,6 +1359,54 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
     t.integer  "asset_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "specimen_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "specimen_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_spec_user_id_asset_id_can_view"
+  add_index "specimen_auth_lookup", ["user_id", "can_view"], :name => "index_specimen_auth_lookup_on_user_id_and_can_view"
+
+  create_table "specimens", :force => true do |t|
+    t.string   "title"
+    t.integer  "age"
+    t.string   "treatment"
+    t.string   "lab_internal_number"
+    t.integer  "person_id"
+    t.integer  "institution_id"
+    t.string   "comments"
+    t.string   "first_letter"
+    t.integer  "policy_id"
+    t.text     "other_creators"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "culture_growth_type_id"
+    t.integer  "strain_id"
+    t.string   "medium"
+    t.string   "culture_format"
+    t.float    "temperature"
+    t.float    "ph"
+    t.string   "confluency"
+    t.string   "passage"
+    t.string   "viability"
+    t.string   "purity"
+    t.integer  "sex"
+    t.datetime "born"
+    t.string   "ploidy"
+    t.string   "provider_id"
+    t.string   "provider_name"
+    t.boolean  "is_dummy",               :default => false
+    t.string   "uuid"
+    t.string   "age_unit"
   end
 
   create_table "strain_auth_lookup", :id => false, :force => true do |t|
@@ -1804,6 +1740,26 @@ ActiveRecord::Schema.define(:version => 20160212141028) do
 
   add_index "trash_records", ["created_at", "trashable_type"], :name => "index_trash_records_on_created_at_and_trashable_type"
   add_index "trash_records", ["trashable_type", "trashable_id"], :name => "index_trash_records_on_trashable_type_and_trashable_id"
+
+  create_table "treatments", :force => true do |t|
+    t.integer  "unit_id"
+    t.string   "treatment_protocol"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "sample_id"
+    t.integer  "measured_item_id"
+    t.float    "start_value"
+    t.float    "end_value"
+    t.float    "standard_deviation"
+    t.text     "comments"
+    t.integer  "compound_id"
+    t.integer  "specimen_id"
+    t.string   "medium_title"
+    t.float    "time_after_treatment"
+    t.integer  "time_after_treatment_unit_id"
+    t.float    "incubation_time"
+    t.integer  "incubation_time_unit_id"
+  end
 
   create_table "units", :force => true do |t|
     t.string   "title"

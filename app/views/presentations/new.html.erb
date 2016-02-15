@@ -22,6 +22,8 @@
 
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} if show_scales?%>
 
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @presentation } %>
+
       <%= fields_for(@presentation) {|f|  f.hidden_field :parent_name } -%>
 
       <%= fields_for(@presentation) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
