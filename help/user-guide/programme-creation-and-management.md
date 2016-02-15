@@ -3,7 +3,7 @@ title: SEEK User Guide - Creating and Managing Programmes
 layout: page
 ---
 
-#Creating and managing Programmes
+# Creating and managing Programmes
 
 ## What are Programmes and why create them?
 
@@ -14,7 +14,7 @@ Examples are [SysMO](https://fairdomhub.org/programmes/1) and [ERASysAPP](https:
 
 If you wish to create and manage your own Projects, you will first need to create a Programme that they will fall under.
 
-##Creating a Programme
+## Creating a Programme
 
 Once you have [registered](registering.html) and logged in, you will be able to create a Programme. You can do so from Create menu
 at the top of the screen
@@ -35,11 +35,11 @@ Once either Accepted or Rejected you will be notified by email.
 After its creation and likely acceptance you will automatically become the default [Programme Administrator](roles.html#programme-administrator). Follow the link to find out what you can do next, such as creating a Project.
 
 
-#Administrator details
+# Administrator details
 
 The following are details that apply only to SEEK system administrators.
 
-##Programme Activation
+## Programme Activation
 
 If you are a SEEK administrator you may recieve an email notifying you that a Programme has been created and requires activation.
 
