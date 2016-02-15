@@ -7,7 +7,25 @@
   <ul class="dropdown-menu" role="menu">
     <li role="presentation" class="dropdown-header visible-md">Create</li>
 
+    <li role="presentation" class="dropdown-header"><%= t("menu.yellow_pages") -%></li>
+    <% if can_create_programmes? %>
+        <li><%= link_to t('programme'), new_programme_path %></li>
+    <% end %>
+    <% if can_create_projects? %>
+        <li><%= link_to t("project"), new_project_path %></li>
+    <% end %>
+    <% if can_create_institutions? %>
+        <li><%= link_to "Institution", new_institution_path %></li>
+    <% end %>
+    <% if can_create_profiles? %>
+        <li><%= link_to "Profile", new_person_path %></li>
+    <% end %>
+
     <% if can_create_new_items? %>
+        <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
+        <li><%= link_to t("investigation"), new_investigation_path %></li>
+        <li><%= link_to t("study"), new_study_path %></li>
+        <li><%= link_to t("assays.assay"), new_assay_path %></li>
 
         <li role="presentation" class="dropdown-header"><%= t("menu.assets") -%></li>
         <li><%= link_to t("data_file"), new_data_file_path %></li>
@@ -27,11 +45,6 @@
             <li><%= link_to "Sample", new_sample_path %></li>
         <% end %>
 
-        <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
-        <li><%= link_to t("investigation"), new_investigation_path %></li>
-        <li><%= link_to t("study"), new_study_path %></li>
-        <li><%= link_to t("assays.assay"), new_assay_path %></li>
-
         <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
         <li><%= link_to t("presentation"), new_presentation_path %></li>
         <% if Seek::Config.events_enabled %>
@@ -41,22 +54,8 @@
         <li role="presentation" class="dropdown-header"><span style="color:red">You cannot add assets or other items until you are a member of a <%= t('project') %>.</span></li>
     <% end %>
 
-    <li role="presentation" class="dropdown-header">Admin</li>
-    <% if can_create_programmes? %>
-        <li><%= link_to t('programme'), new_programme_path %></li>
-    <% end %>
-    <% if can_create_projects? %>
-        <li><%= link_to t("project"), new_project_path %></li>
-    <% end %>
-    <% if can_create_institutions? %>
-        <li><%= link_to "Institution", new_institution_path %></li>
-    <% end %>
-    <% if can_create_profiles? %>
-        <li><%= link_to "Profile", new_person_path %></li>
-    <% end %>
-
-
     <% if can_create_organisms? %>
+        <li role="presentation" class="dropdown-header">Other</li>
         <li><%= link_to "Organism", new_organism_path %></li>
     <% end %>
   </ul>
