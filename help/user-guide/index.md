@@ -13,6 +13,7 @@ layout: page
 - [Editing your profile](editing-profile.html)
 - [Managing your account](managing-account.html)
 - [Adding assets (data, models, SOPs, publications) to SEEK](adding-assets.html)
+- [Licenses](licenses.html)
 - [Generating the ISA structure](generating-the-isa-structure.html)
      - [Creating an Investigation](generating-the-isa-structure.html#creating-an-investigation)
      - [Creating a study](generating-the-isa-structure.html#creating-a-study)
