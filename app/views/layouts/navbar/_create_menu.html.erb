@@ -38,7 +38,7 @@
             <li><%= link_to t("event"), new_event_path %></li>
         <% end %>
     <% else %>
-        <li role="presentation" class="dropdown-header"><span style="color:red">You will be able to add files and other items<br/> once you have been assigned to a <%= t('project') %></span></li>
+        <li role="presentation" class="dropdown-header"><span style="color:red">You cannot add assets or other items until you are a member of a <%= t('project') %>.</span></li>
     <% end %>
 
     <li role="presentation" class="dropdown-header">Admin</li>
