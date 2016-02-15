@@ -1048,9 +1048,48 @@ end
     f.base_type 'DateTime'
   end
 
+  Factory.define(:sample_attribute) do |f|
+
+  end
+
   #a string that must contain 'xxx'
-  Factory.define(:simple_string_sample_attribute, :class=>SampleAttribute) do |f|
+  Factory.define(:simple_string_sample_attribute, :parent=>:sample_attribute) do |f|
     f.sequence(:title) {|n| "Simple sample attribute #{n}"}
     f.sample_attribute_type Factory.build(:string_sample_attribute_type,regexp:".*xxx.*")
     f.required true
+  end
+
+
+  #very simple persons name, must be 2 words, first and second word starting with capital with all letters
+  Factory.define(:full_name_sample_attribute_type,:parent=>:string_sample_attribute_type) do |f|
+    f.regexp  '[A-Z][a-z]+[ ][A-Z][a-z]+'
+    f.title 'Full name'
+  end
+
+  #positive integer
+  Factory.define(:age_sample_attribute_type,:parent=>:integer_sample_attribute_type) do |f|
+    f.regexp '^[1-9]\d*$'
+    f.title 'Age'
+  end
+
+  #positive float
+  Factory.define(:weight_sample_attribute_type,:parent=>:float_sample_attribute_type) do |f|
+    f.regexp '^[1-9]\d*[.][1-9]\d*$'
+    f.title 'Weight'
+  end
+
+  #uk postcode - taken from http://regexlib.com/REDetails.aspx?regexp_id=260
+  Factory.define(:postcode_sample_attribute_type,:parent=>:string_sample_attribute_type) do |f|
+    f.regexp '^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$'
+    f.title 'Post Code'
+  end
+
+  Factory.define(:patient_sample_type,:parent=>:sample_type) do |f|
+    f.title "Patient data"
+    attributes = []
+    attributes << Factory(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true)
+    attributes << Factory(:sample_attribute,:title=>"age",:sample_attribute_type=>Factory(:age_sample_attribute_type),:required=>true)
+    attributes << Factory(:sample_attribute,:title=>"weight",:sample_attribute_type=>Factory(:weight_sample_attribute_type),:required=>false)
+    attributes << Factory(:sample_attribute,:title=>"postcode",:sample_attribute_type=>Factory(:postcode_sample_attribute_type),:required=>false)
+    f.sample_attributes  attributes
   end
