@@ -17,7 +17,7 @@ module LicenseHelper
       if license.url.blank?
         license.title
       else
-        link_to(license.title, license.url)
+        link_to(license.title, license.url, target: :_blank)
       end
     else
       content_tag(:span, 'No license specified', :class => 'none_text')
