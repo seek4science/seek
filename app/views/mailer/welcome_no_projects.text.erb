@@ -2,11 +2,13 @@ Hi <%= @name %>,
 
 Welcome to <%= Seek::Config.application_name %>. You have now registered and activated your account.
 
-You are unable to login until you've been assigned to a project.
+If during the registration you indicated you are a member of a <%= t('project') %> you will need to wait until you have been assigned to that <%= t('project') %> by a <%= t('project') %> administrator.
 
-An administrator will do this within the next 24 hours and notify you, or contact you for additional information about your project.
+<% if Seek::Config.programme_user_creation_enabled %>
+It is also possible to create your own <%= t('programme') %> and <%= t('project').pluralize %> - for more information please read <%= Seek::Help::HelpDictionary.instance.help_link(:programme_self_management) %>
+<% end %>
 
-If you have not heard from an administrator within 24 hours, please contact one of the following:
+If you require any assistance, please contact one of the following administrators:
 <% for admin in Person.admins -%>
   <%= "#{h admin.name}: " %><%= admin.email %>
 <% end -%>
