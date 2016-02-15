@@ -1,5 +1,5 @@
 class NewsFeedRefreshJob < SeekJob
-  FEEDS = [:project_news, :community_news]
+  FEEDS = [:news]
 
   def perform_job(_) # ArgumentError thrown if this isn't present
     Seek::FeedReader.clear_cache

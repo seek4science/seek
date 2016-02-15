@@ -164,7 +164,7 @@ module HomesHelper
   end
 
   def frontpage_button(link, image_path, &block)
-    link_to link, class: 'seek-homepage-button', target: :blank do
+    link_to link, class: 'seek-homepage-button', target: :_blank do
       image_tag(image_path) +
           content_tag(:span) do
             block.call
