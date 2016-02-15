@@ -7,7 +7,9 @@ class Sample < ActiveRecord::Base
 
   validates :title, :sample_type, presence: true
 
-  after_initialize :setup_accessor_methods, :setup_validations, unless: 'sample_type.nil?'
+  after_initialize :setup_accessor_methods, :setup_validations,:read_json_metadata, unless: 'sample_type.nil?'
+
+  before_save :set_json_metadata
 
   def sample_type=(type)
     remove_accessor_methods if sample_type
@@ -48,6 +50,22 @@ class Sample < ActiveRecord::Base
             end
           end
       END_EVAL
+    end
+  end
+
+  def set_json_metadata
+    hash = Hash[sample_type.sample_attributes.map do |attribute|
+      [attribute.accessor_name,self.send(attribute.accessor_name)]
+    end]
+    self.json_metadata = hash.to_json
+  end
+
+  def read_json_metadata
+    if sample_type && self.json_metadata
+      json = JSON.parse(self.json_metadata)
+      sample_type.sample_attributes.collect(&:accessor_name).each do |accessor_name|
+        send("#{accessor_name}=",json[accessor_name])
+      end
     end
   end
 end

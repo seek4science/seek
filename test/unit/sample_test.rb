@@ -104,4 +104,38 @@ class SampleTest < ActiveSupport::TestCase
     assert sample.valid?
   end
 
+  test "store and retrieve" do
+    sample = Sample.new :title=>"testing"
+    sample.sample_type = Factory(:patient_sample_type)
+    sample.full_name="Jimi Hendrix"
+    sample.age=27
+    sample.weight=88.9
+    sample.postcode="M13 9PL"
+    sample.save!
+
+    assert_equal "Jimi Hendrix", sample.full_name
+    assert_equal 27, sample.age
+    assert_equal 88.9, sample.weight
+    assert_equal "M13 9PL", sample.postcode
+
+    sample = Sample.find(sample.id)
+
+    assert_equal "Jimi Hendrix", sample.full_name
+    assert_equal 27, sample.age
+    assert_equal 88.9, sample.weight
+    assert_equal "M13 9PL", sample.postcode
+
+    sample.age=28
+    sample.save!
+
+    sample = Sample.find(sample.id)
+
+    assert_equal "Jimi Hendrix", sample.full_name
+    assert_equal 28, sample.age
+    assert_equal 88.9, sample.weight
+    assert_equal "M13 9PL", sample.postcode
+
+
+  end
+
 end
