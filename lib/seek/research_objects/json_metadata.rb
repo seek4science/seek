@@ -1,3 +1,5 @@
+require 'seek/license'
+
 module Seek
   module ResearchObjects
     # creates the JSON metadata content describing an item to be stored in a Research Object
@@ -29,6 +31,11 @@ module Seek
           json[:assets] = contained_assets(item)
         elsif item.is_asset?
           json[:contains] = contained_files(item)
+        end
+
+        if item.respond_to?(:license) && item.license
+          license = Seek::License.find(item.license)
+          json[:license] = { title: license.title, url: license.url }
         end
 
         JSON.pretty_generate(json)

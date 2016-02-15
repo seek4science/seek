@@ -201,7 +201,7 @@ end
     f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::ACCESSIBLE
   end
-    
+
   Factory.define(:publicly_viewable_policy, :parent=>:policy) do |f|
     f.sharing_scope Policy::EVERYONE
     f.access_type Policy::VISIBLE
@@ -211,7 +211,7 @@ end
     f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::ACCESSIBLE
   end
-  
+
   Factory.define(:editing_public_policy,:parent=>:policy) do |f|
     f.sharing_scope Policy::EVERYONE
     f.access_type Policy::EDITING
@@ -268,7 +268,7 @@ end
   end
 
   Factory.define(:modelling_assay, :parent => :assay_base) do |f|
-    f.association :assay_class, :factory => :modelling_assay_class    
+    f.association :assay_class, :factory => :modelling_assay_class
   end
 
   Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
@@ -501,7 +501,7 @@ end
   #Presentation
   Factory.define(:presentation) do |f|
     f.sequence(:title) { |n| "A Presentation #{n}" }
-    f.projects { [Factory.build(:project)] }    
+    f.projects { [Factory.build(:project)] }
     f.association :contributor, :factory => :person
     f.after_create do |presentation|
       if presentation.content_blob.blank?
@@ -534,6 +534,22 @@ end
     end
   end
 
+  Factory.define(:model_version_with_blob, :parent => :model_version) do |f|
+    f.after_create do |model_version|
+      if model_version.content_blobs.empty?
+        Factory.create(:teusink_model_content_blob,
+                       :asset => model_version.model,
+                       :asset_version => model_version.model.version)
+      else
+        model_version.content_blobs.each do |cb|
+          cb.asset = model_version.model
+          cb.asset_version = model_version.version
+          cb.save
+        end
+      end
+    end
+  end
+
   #SOP Version
   Factory.define(:sop_version,:class=>Sop::Version) do |f|
     f.association :sop
@@ -543,6 +559,20 @@ end
       sop_version.version = sop_version.sop.version
       sop_version.title = sop_version.sop.title
       sop_version.save
+    end
+  end
+
+  Factory.define(:sop_version_with_blob, :parent => :sop_version) do |f|
+    f.after_create do |sop_version|
+      if sop_version.content_blob.blank?
+        sop_version.content_blob = Factory.create(:pdf_content_blob,
+                                                  :asset => sop_version.sop,
+                                                  :asset_version => sop_version.version)
+      else
+        sop_version.content_blob.asset = sop_version.sop
+        sop_version.content_blob.asset_version = sop_version.version
+        sop_version.content_blob.save
+      end
     end
   end
 
@@ -558,6 +588,20 @@ end
     end
   end
 
+  Factory.define(:data_file_version_with_blob, :parent => :data_file_version) do |f|
+    f.after_create do |data_file_version|
+      if data_file_version.content_blob.blank?
+        data_file_version.content_blob = Factory.create(:pdf_content_blob,
+                                                        :asset => data_file_version.data_file,
+                                                        :asset_version => data_file_version.version)
+      else
+        data_file_version.content_blob.asset = data_file_version.data_file
+        data_file_version.content_blob.asset_version = data_file_version.version
+        data_file_version.content_blob.save
+      end
+    end
+  end
+
   #Presentation Version
   Factory.define(:presentation_version,:class=>Presentation::Version) do |f|
     f.association :presentation
@@ -567,6 +611,21 @@ end
       presentation_version.version = presentation_version.presentation.version
       presentation_version.title = presentation_version.presentation.title
       presentation_version.save
+    end
+  end
+
+  Factory.define(:presentation_version_with_blob, :parent => :presentation_version) do |f|
+    f.after_create do |presentation_version|
+      if presentation_version.content_blob.blank?
+        presentation_version.content_blob = Factory.create(:content_blob, :original_filename => "test.pdf",
+                                                           :content_type => "application/pdf",
+                                                           :asset => presentation_version.presentation,
+                                                           :asset_version => presentation_version)
+      else
+        presentation_version.content_blob.asset = presentation_version.presentation
+        presentation_version.content_blob.asset_version = presentation_version.version
+        presentation_version.content_blob.save
+      end
     end
   end
 
@@ -645,7 +704,7 @@ end
     f.content_type "application/pdf"
     f.data  File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read
   end
-  
+
   Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
     f.content_type "application/excel"
     f.original_filename "rightfield.xls"
@@ -807,7 +866,7 @@ end
   Factory.define(:notifiee_info) do |f|
     f.association :notifiee, :factory => :person
   end
-    
+
   Factory.define(:measured_item) do |f|
     f.title 'concentration'
   end
@@ -847,7 +906,7 @@ end
   Factory.define(:special_auth_code) do |f|
     f.association :asset, :factory => :data_file
   end
-  
+
   Factory.define(:experimental_condition_link) do |f|
     f.association :substance, :factory => :compound
     f.association :experimental_condition

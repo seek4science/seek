@@ -33,8 +33,9 @@
 
             <div class="form-group" id="license-section">
               <label>License</label>
-              <%= license_select('metadata[license]', 'cc-by', :id => 'license-select', :class => 'form-control') %>
-              <span class="help-block">
+              <%= grouped_license_select('metadata[license]', 'cc-by', :id => 'license-select', :class => 'form-control',
+                                         :source => Seek::License::ZENODO[:all]) %>
+              <span class="help-block license-url-block">
                 For more information on this license, please visit
                 <a id="license-url" href="" target="_blank"></a>
               </span>

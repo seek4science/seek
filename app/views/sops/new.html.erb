@@ -22,6 +22,8 @@
 
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} if show_scales?%>
 
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
+
       <%= fields_for(@sop) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
