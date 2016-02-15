@@ -18,7 +18,7 @@
     <% if can_download_asset?(item, params[:code]) -%>
         <%= button_link_to("Visualize", 'cytoscape_web',
                            visualise_model_path(item, :version => @display_model.version, :code => params[:code]),
-                           :target => :blank, :title => "Visualise #{t('model')} with Cytoscape Web") %>
+                           :target => :_blank, :title => "Visualise #{t('model')} with Cytoscape Web") %>
     <% end -%>
 <% end %>
 

@@ -72,7 +72,7 @@
     </div>
 
     <%= admin_checkbox_setting(:orcid_required, 1, Seek::Config.orcid_required,
-                               'ORCID required', "Require all profiles to specify an #{link_to 'ORCID', 'http://orcid.org/content/about-orcid', target: :blank} identifier.".html_safe) %>
+                               'ORCID required', "Require all profiles to specify an #{link_to 'ORCID', 'http://orcid.org/content/about-orcid', target: :_blank} identifier.".html_safe) %>
 
     <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path %>
