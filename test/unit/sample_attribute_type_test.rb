@@ -84,6 +84,17 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?("Fred ")
   end
 
+  test 'web and email regexp' do
+    email_type = SampleAttributeType.new title:"Email address",base_type:'String',regexp:RFC822::EMAIL.to_s
+    assert email_type.validates_value?('fred@email.com')
+    refute email_type.validates_value?('moonbeam')
+
+    web_type = SampleAttributeType.new title:"Web link",base_type:'String',regexp:URI.regexp(%w(http https))
+    assert web_type.validates_value?('http://google.com')
+    assert web_type.validates_value?('https://google.com')
+    refute web_type.validates_value?('moonbeam')
+  end
+
   test 'to json' do
     type = SampleAttributeType.new(title: 'x-type', base_type: 'String', regexp: 'xxx')
     assert_equal %({"title":"x-type","base_type":"String","regexp":"xxx"}), type.to_json
