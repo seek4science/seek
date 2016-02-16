@@ -141,4 +141,17 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal 88.9, sample.weight
     assert_equal 'M13 9PL', sample.postcode
   end
+
+  test 'json_metadata' do
+    sample = Sample.new title: 'testing'
+    sample.sample_type = Factory(:patient_sample_type)
+    sample.full_name = 'Jimi Hendrix'
+    sample.age = 27
+    sample.weight = 88.9
+    sample.postcode = 'M13 9PL'
+    assert_nil sample.json_metadata
+    sample.save!
+    refute_nil sample.json_metadata
+    assert_equal %!{"full_name":"Jimi Hendrix","age":27,"weight":88.9,"postcode":"M13 9PL"}!, sample.json_metadata
+  end
 end
