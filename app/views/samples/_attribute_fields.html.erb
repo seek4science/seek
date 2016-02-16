@@ -1,8 +1,8 @@
 <div class='form-group'>
   <% sample_type.sample_attributes.each do |attribute| %>
       <p>
-    <label><%= attribute.title %></label><%= required_span if attribute.required? %>
-    <%= f.text_field attribute.accessor_name %>
+        <label><%= attribute.title %></label><%= required_span if attribute.required? %>
+        <%= f.text_field attribute.accessor_name %>
       </p>
   <% end %>
 </div>

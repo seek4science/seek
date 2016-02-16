@@ -19,6 +19,15 @@ class Sample < ActiveRecord::Base
     setup_accessor_methods if type
   end
 
+  #TODO: add unit test, must test for passing none attributes
+  def read_attributes_from_params params
+    return unless sample_type
+    sample_type.sample_attributes.collect(&:accessor_name).each do |name|
+      val = params[name.to_sym]
+      self.send("#{name}=",val)
+    end
+  end
+
   private
 
   def setup_accessor_methods
@@ -27,6 +36,7 @@ class Sample < ActiveRecord::Base
           attr_accessor '#{name}'
         END_EVAL
     end
+
   end
 
   def remove_accessor_methods
