@@ -294,7 +294,9 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test "should display license for current version" do
     presentation = Factory :presentation, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
-    presentationv = Factory :presentation_version_with_blob, :license => 'CC0-1.0', :presentation => presentation
+    presentationv = Factory :presentation_version_with_blob, :presentation => presentation
+
+    presentation.update_attributes :license => 'CC0-1.0'
 
     get :show, :id => presentation, :version => 1
     assert_response :success

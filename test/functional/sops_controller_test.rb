@@ -872,7 +872,9 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should display license for current version" do
     sop = Factory :sop, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
-    sopv = Factory :sop_version_with_blob, :license => 'CC0-1.0', :sop => sop
+    sopv = Factory :sop_version_with_blob, :sop => sop
+
+    sop.update_attributes :license => 'CC0-1.0'
 
     get :show, :id => sop, :version => 1
     assert_response :success

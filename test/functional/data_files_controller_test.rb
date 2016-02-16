@@ -2134,7 +2134,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should display license for current version" do
     df = Factory :data_file, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
-    dfv = Factory :data_file_version_with_blob, :license => 'CC0-1.0', :data_file => df
+    dfv = Factory :data_file_version_with_blob, :data_file => df
+
+    df.update_attributes :license => 'CC0-1.0'
 
     get :show, :id => df, :version => 1
     assert_response :success
