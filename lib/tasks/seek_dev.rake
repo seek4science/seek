@@ -389,4 +389,46 @@ namespace :seek_dev do
     end
   end
 
+  task :create_test_sample_types_and_attribute => :environment do
+    SampleAttributeType.destroy_all
+
+    #basic attribute types
+    positive_integer_type = SampleAttributeType.new title:"Postive integer",regexp:'^[1-9]\d*$', base_type:'Integer'
+    positive_integer_type.save!
+    two_words_type = SampleAttributeType.new title:"Two capitalized words",regexp:'[A-Z][a-z]+[ ][A-Z][a-z]+', base_type:'String'
+    two_words_type.save!
+    date_time_type = SampleAttributeType.new title:'Date time',base_type:'DateTime'
+    date_time_type.save!
+    positive_float_type = SampleAttributeType.new title:"Postive float",regexp:'^[1-9]\d*[.][1-9]\d*$', base_type:'Float'
+    positive_float_type.save!
+    integer_type = SampleAttributeType.new title:"Integer", base_type:'Integer'
+    integer_type.save!
+    float_type = SampleAttributeType.new title:"Float", base_type:'Float'
+    float_type.save!
+    web_link_type = SampleAttributeType.new title:"Web link",base_type:'String',regexp:URI.regexp(%w(http https))
+    web_link_type.save!
+    email_type = SampleAttributeType.new title:"Email address",base_type:'String',regexp:RFC822::EMAIL.to_s
+    email_type.save!
+
+    SampleType.destroy_all
+    #dummy type - just with some varied attributes
+    dummy_type = SampleType.new title:"Dummy sample type"
+    dummy_type.sample_attributes << SampleAttribute.new(title:"Postive Integer",sample_attribute_type:positive_integer_type)
+    dummy_type.sample_attributes << SampleAttribute.new(title:"Web link",sample_attribute_type:web_link_type, required:true)
+    dummy_type.sample_attributes << SampleAttribute.new(title:"Date of birth",sample_attribute_type:date_time_type)
+    dummy_type.sample_attributes << SampleAttribute.new(title:"Two words",sample_attribute_type:two_words_type, required:true)
+    dummy_type.sample_attributes << SampleAttribute.new(title:"Any float",sample_attribute_type:float_type)
+    dummy_type.save!
+
+    #patient type
+    patient_type = SampleType.new title:"Very basic patient type"
+    patient_type.sample_attributes << SampleAttribute.new(title:"Full name",sample_attribute_type:two_words_type, required:true)
+    patient_type.sample_attributes << SampleAttribute.new(title:"Age",sample_attribute_type:positive_integer_type)
+    patient_type.sample_attributes << SampleAttribute.new(title:"Weight",sample_attribute_type:positive_float_type)
+    patient_type.sample_attributes << SampleAttribute.new(title:"Date of birth",sample_attribute_type:date_time_type, required:true)
+    patient_type.sample_attributes << SampleAttribute.new(title:"Email",sample_attribute_type:email_type)
+    patient_type.save!
+
+  end
+
 end
