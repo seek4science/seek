@@ -86,10 +86,14 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
 
   test 'web and email regexp' do
     email_type = SampleAttributeType.new title:"Email address",base_type:'String',regexp:RFC822::EMAIL.to_s
+    email_type.save!
+    email_type.reload
     assert email_type.validate_value?('fred@email.com')
     refute email_type.validate_value?('moonbeam')
 
     web_type = SampleAttributeType.new title:"Web link",base_type:'String',regexp:URI.regexp(%w(http https))
+    web_type.save!
+    web_type.reload
     assert web_type.validate_value?('http://google.com')
     assert web_type.validate_value?('https://google.com')
     refute web_type.validate_value?('moonbeam')
