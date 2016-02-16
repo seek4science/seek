@@ -16,6 +16,12 @@ module ApplicationHelper
     end
   end
 
+  def required_span
+    content_tag :span,class:'required' do
+      "*"
+    end
+  end
+
   #e.g. SOP for sops_controller, taken from the locale based on the controller name
   def resource_text_from_controller
     internationalized_resource_name(controller_name.singularize.camelize, false)

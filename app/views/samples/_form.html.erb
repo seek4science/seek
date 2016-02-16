@@ -2,7 +2,7 @@
 <% if @sample.sample_type %>
 
     <div class="form-group">
-      <%= f.label :title %>
+      <%= f.label :title %><%= required_span %>
       <%= f.text_field :title %>
     </div>
 
