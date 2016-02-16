@@ -1,0 +1,8 @@
+<div class='form-group'>
+  <% sample_type.sample_attributes.each do |attribute| %>
+      <p>
+    <label><%= attribute.title %></label>
+    <%= f.text_field attribute.accessor_name %>
+      </p>
+  <% end %>
+</div>
