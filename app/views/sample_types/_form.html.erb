@@ -9,6 +9,10 @@
       <% end %>
       </ul>
     </div>
+
+    <%= f.fields_for :sample_attributes do |sample_attribute_fields| %>
+          Title: <%= sample_attribute_fields.text_field :title %>
+    <% end %>
   <% end %>
 
   <div class="actions">

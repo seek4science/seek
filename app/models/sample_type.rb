@@ -10,6 +10,8 @@ class SampleType < ActiveRecord::Base
 
   validates :title, presence: true
 
+  accepts_nested_attributes_for :sample_attributes
+
   def add_attribute(attribute, position)
     sample_type_sample_attributes << SampleTypeSampleAttribute.new(sample_attribute: attribute, pos: position)
   end
