@@ -1,4 +1,4 @@
-class SampleTypesController < ApplicationController
+class SampleAttributeTypesController < ApplicationController
 
   def show
   end
