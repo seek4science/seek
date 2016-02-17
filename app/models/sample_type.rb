@@ -1,5 +1,5 @@
 class SampleType < ActiveRecord::Base
-  attr_accessible :title, :uuid
+  attr_accessible :title, :uuid, :sample_attributes_attributes
 
   acts_as_uniquely_identifiable
 
