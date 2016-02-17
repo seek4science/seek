@@ -1,7 +1,8 @@
 class SampleAttribute < ActiveRecord::Base
-  attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos
+  attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id
 
   belongs_to :sample_attribute_type
+  belongs_to :sample_type
 
   validates :title, :sample_attribute_type, presence: true
 

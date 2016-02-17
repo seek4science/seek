@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160217095229) do
+ActiveRecord::Schema.define(:version => 20160217100536) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1303,7 +1303,10 @@ ActiveRecord::Schema.define(:version => 20160217095229) do
     t.datetime "created_at",                                  :null => false
     t.datetime "updated_at",                                  :null => false
     t.integer  "pos"
+    t.integer  "sample_type_id"
   end
+
+  add_index "sample_attributes", ["sample_type_id"], :name => "index_sample_attributes_on_sample_type_id"
 
   create_table "sample_types", :force => true do |t|
     t.string   "title"
