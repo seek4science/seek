@@ -166,4 +166,24 @@ class SampleTest < ActiveSupport::TestCase
     refute_nil sample.json_metadata
     assert_equal %({"full_name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}), sample.json_metadata
   end
+
+  #trying to track down an sqlite3 specific problem
+  test 'sqlite3 setting of accessor problem' do
+    sample = Sample.new title: 'testing'
+    sample.sample_type = Factory(:patient_sample_type)
+    sample.full_name = 'Jimi Hendrix'
+    sample.age = 22
+    sample.save!
+    id = sample.id
+    assert_equal 5,sample.sample_type.sample_attributes.count
+    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample.sample_type.sample_attributes.collect(&:accessor_name)
+    assert_respond_to sample,:full_name
+
+    sample2 = Sample.find(id)
+    assert_equal id,sample2.id
+    assert_equal 5,sample2.sample_type.sample_attributes.count
+    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample2.sample_type.sample_attributes.collect(&:accessor_name)
+    assert_respond_to sample2,:full_name
+  end
+
 end
