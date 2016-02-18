@@ -47,7 +47,7 @@ class Sample < ActiveRecord::Base
   private
 
   def setup_accessor_methods
-    sample_type.sample_attributes.collect(&:accessor_name).each do |name|
+    self.sample_type.sample_attributes.collect(&:accessor_name).each do |name|
       class_eval <<-END_EVAL
           attr_accessor '#{name}'
         END_EVAL
