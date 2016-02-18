@@ -84,12 +84,12 @@ class SampleTest < ActiveSupport::TestCase
   test 'mass assigment' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
-    sample.update_attributes({full_name:'Fred Bloggs',age:25,postcode:'M12 9QL',weight:0.22,address:'somewhere'})
-    assert_equal 'Fred Bloggs',sample.full_name
-    assert_equal 25,sample.age
-    assert_equal 0.22,sample.weight
-    assert_equal 'M12 9QL',sample.postcode
-    assert_equal 'somewhere',sample.address
+    sample.update_attributes(full_name: 'Fred Bloggs', age: 25, postcode: 'M12 9QL', weight: 0.22, address: 'somewhere')
+    assert_equal 'Fred Bloggs', sample.full_name
+    assert_equal 25, sample.age
+    assert_equal 0.22, sample.weight
+    assert_equal 'M12 9QL', sample.postcode
+    assert_equal 'somewhere', sample.address
   end
 
   test 'adds validations' do
@@ -160,10 +160,10 @@ class SampleTest < ActiveSupport::TestCase
     sample.age = 27
     sample.weight = 88.9
     sample.postcode = 'M13 9PL'
-    sample.address = "Somewhere on earth"
+    sample.address = 'Somewhere on earth'
     assert_nil sample.json_metadata
     sample.save!
     refute_nil sample.json_metadata
-    assert_equal %!{"full_name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}!, sample.json_metadata
+    assert_equal %({"full_name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}), sample.json_metadata
   end
 end
