@@ -23,6 +23,7 @@
       <tr>
         <th width="5em">Order</th>
         <th>Name</th>
+        <th width="5em">Required?</th>
         <th>Type</th>
       </tr>
       </thead>
@@ -33,9 +34,7 @@
       <% end %>
       <tr id="add-attribute-row">
         <td colspan="4">
-          <a href="#" id="add-attribute" class="btn btn-success">
-            Add new attribute
-          </a>
+          <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
         </td>
       </tr>
       </tbody>

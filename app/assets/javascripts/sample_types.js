@@ -37,12 +37,12 @@ var SampleTypes = {
             } else {
                 row.addClass('danger');
                 // This selects all the fields in the row, except the magic "_destroy" checkbox
-                $j(':input.form-control', row).prop('disabled', true);
+                $j(':input:not(.destroy-attribute)', row).prop('disabled', true);
             }
         }
         else {
             row.removeClass('danger');
-            $j(':input.form-control', row).prop('disabled', false);
+            $j(':input:not(.destroy-attribute)', row).prop('disabled', false);
         }
     }
 };
