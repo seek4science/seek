@@ -1,6 +1,5 @@
 var SampleTypes = {
     recalculatePositions: function () {
-        console.log("sorting...");
         $j('#attribute-table tr.sample-attribute .attribute-position').each(function (index, item) {
             $j('.attribute-position-label', $j(item)).html(index + 1);
             $j('input', $j(item)).val(index + 1);
@@ -26,5 +25,24 @@ var SampleTypes = {
             $j(this).width($j(this).width());
         });
         return ui;
+    },
+
+    removeAttribute: function () {
+        console.log("SUP");
+        var row = $j(this).parents('.sample-attribute');
+        if($j(this).is(':checked')) {
+            if (row.hasClass('success')) { // If it is a new attribute, just delete from the form - doesn't exist yet.
+                row.remove();
+                SampleTypes.recalculatePositions();
+            } else {
+                row.addClass('danger');
+                // This selects all the fields in the row, except the magic "_destroy" checkbox
+                $j(':input.form-control', row).prop('disabled', true);
+            }
+        }
+        else {
+            row.removeClass('danger');
+            $j(':input.form-control', row).prop('disabled', false);
+        }
     }
 };
