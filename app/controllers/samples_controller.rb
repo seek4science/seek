@@ -17,4 +17,18 @@ class SamplesController < ApplicationController
     @sample = Sample.find(params[:id])
     respond_with(@sample)
   end
+
+  def edit
+    @sample = Sample.find(params[:id])
+    respond_with(@sample)
+  end
+
+  def update
+    @sample = Sample.find(params[:id])
+    @sample.update_attributes({:title=>params[:sample][:title]})
+    @sample.read_attributes_from_params(params[:sample])
+    flash[:notice] = 'The sample was successfully updated.' if @sample.save
+    respond_with(@sample)
+  end
+
 end

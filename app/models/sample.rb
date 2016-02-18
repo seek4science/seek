@@ -28,6 +28,18 @@ class Sample < ActiveRecord::Base
     end
   end
 
+  def is_in_isa_publishable?
+    false
+  end
+
+  def can_edit?(user=User.current_user)
+    true
+  end
+
+  def can_delete?(user=User.current_user)
+    true
+  end
+
   private
 
   def setup_accessor_methods
@@ -63,4 +75,5 @@ class Sample < ActiveRecord::Base
       end
     end
   end
+
 end
