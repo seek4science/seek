@@ -4,6 +4,9 @@ class SampleAttributeType < ActiveRecord::Base
   validates :title, :base_type, :regexp, presence: true
   validate :validate_allowed_type, :validate_regular_expression
 
+  before_save :set_defaults_attributes
+  after_initialize :set_defaults_attributes
+
   BASE_TYPE_AND_CHECKER_MAP = {
     'Integer' => :is_integer,
     'Float' => :is_float,
@@ -21,6 +24,18 @@ class SampleAttributeType < ActiveRecord::Base
     BASE_TYPE_AND_CHECKER_MAP.keys
   end
 
+  def validate_value?(value)
+    check_value_against_base_type(value) && check_value_against_regular_expression(value)
+  end
+
+  def as_json(_options = nil)
+    { title: title, base_type: base_type, regexp: regexp }
+  end
+
+  def set_defaults_attributes
+    self.regexp ||= '.*'
+  end
+
   def validate_regular_expression
     regular_expression
   rescue RegexpError
@@ -29,10 +44,6 @@ class SampleAttributeType < ActiveRecord::Base
 
   def regular_expression
     /#{regexp}/
-  end
-
-  def validate_value?(value)
-    check_value_against_base_type(value) && check_value_against_regular_expression(value)
   end
 
   def check_value_against_regular_expression(value)
@@ -50,9 +61,7 @@ class SampleAttributeType < ActiveRecord::Base
     true
   end
 
-  def as_json(_options = nil)
-    { title: title, base_type: base_type, regexp: regexp }
-  end
+
 
   # CHECKERS for types, these should raise an exception if the type doesn't match
 

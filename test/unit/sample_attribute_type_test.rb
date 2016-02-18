@@ -22,6 +22,13 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     assert type.valid?
   end
 
+  test 'default regexp' do
+    type = SampleAttributeType.new(title: 'x-type', base_type: 'Integer')
+    type.save!
+    type = SampleAttributeType.find(type.id)
+    assert_equal '.*',type[:regexp]
+  end
+
   test 'validate_value' do
     type = SampleAttributeType.new(title: 'x-type', base_type: 'String', regexp: 'xxx')
     assert type.validate_value?('xxx')
