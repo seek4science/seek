@@ -405,7 +405,7 @@ namespace :seek_dev do
     integer_type.save!
     float_type = SampleAttributeType.new title:"Float", base_type:'Float'
     float_type.save!
-    web_link_type = SampleAttributeType.new title:"Web link",base_type:'String',regexp:URI.regexp(%w(http https))
+    web_link_type = SampleAttributeType.new title:"Web link",base_type:'String',regexp:URI.regexp(%w(http https)).to_s
     web_link_type.save!
     email_type = SampleAttributeType.new title:"Email address",base_type:'String',regexp:RFC822::EMAIL.to_s
     email_type.save!
