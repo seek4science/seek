@@ -3,7 +3,11 @@
   <%= f.error_messages -%>
 
   <% if @sample.new_record? %>
-      <%= f.select :sample_type_id, options_for_select(SampleType.all.collect { |st| [st.title, st.id] }, @sample.sample_type_id), {:include_blank => true, } %>
+      <div class="form-group">
+      <%= f.select :sample_type_id,
+                   options_for_select(SampleType.all.collect { |st| [st.title, st.id] }, @sample.sample_type_id),
+                   {:include_blank => true },:class => 'form-control' %>
+      </div>
   <% end %>
 
   <% if @sample.sample_type %>
