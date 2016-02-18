@@ -1,0 +1,7 @@
+<% sample.sample_type.sample_attributes.each do |attribute| %>
+    <p>
+      <label><%= attribute.title %>:</label>
+      <%= text_or_not_specified(@sample.send(attribute.accessor_name)) %>
+
+    </p>
+<% end %>
