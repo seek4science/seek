@@ -1,7 +1,11 @@
-.sample_attribute_integer, .sample_attribute_float {
+input.sample_attribute_integer, input.sample_attribute_float {
     width: 10em;
 }
 
-.sample_attribute_datetime {
+input.sample_attribute_datetime {
     width: 25em;
+}
+
+textarea.sample_attribute_text {
+    height: 7em;
 }

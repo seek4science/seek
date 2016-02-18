@@ -409,6 +409,8 @@ namespace :seek_dev do
     web_link_type.save!
     email_type = SampleAttributeType.new title:"Email address",base_type:'String',regexp:RFC822::EMAIL.to_s
     email_type.save!
+    address_type = SampleAttributeType.new title:"Address",base_type:'Text'
+    address_type.save!
 
     SampleType.destroy_all
     #dummy type - just with some varied attributes
@@ -427,6 +429,7 @@ namespace :seek_dev do
     patient_type.sample_attributes << SampleAttribute.new(title:"Weight",sample_attribute_type:positive_float_type)
     patient_type.sample_attributes << SampleAttribute.new(title:"Date of birth",sample_attribute_type:date_time_type, required:true)
     patient_type.sample_attributes << SampleAttribute.new(title:"Email",sample_attribute_type:email_type)
+    patient_type.sample_attributes << SampleAttribute.new(title:"Address",sample_attribute_type:address_type)
     patient_type.save!
 
   end

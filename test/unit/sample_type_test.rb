@@ -91,8 +91,8 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     type = Factory(:patient_sample_type)
     assert_equal "Patient data",type.title
-    assert_equal ["full name","age","weight","postcode"],type.sample_attributes.collect(&:title)
-    assert_equal [true,true,false,false],type.sample_attributes.collect(&:required)
+    assert_equal ["full name","age","weight","address","postcode"],type.sample_attributes.collect(&:title)
+    assert_equal [true,true,false,false,false],type.sample_attributes.collect(&:required)
   end
 
   test "validate value" do

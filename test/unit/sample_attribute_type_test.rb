@@ -20,6 +20,7 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
 
     type = SampleAttributeType.new(title: 'x-type', base_type: 'String', regexp: 'xxx')
     assert type.valid?
+
   end
 
   test 'default regexp' do
@@ -49,6 +50,14 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('1.0')
 
     attribute = SampleAttributeType.new(title: 'fish', base_type: 'String', regexp: '.*yyy')
+    assert attribute.validate_value?('yyy')
+    assert attribute.validate_value?('happpp - yyy')
+    refute attribute.validate_value?('')
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?(1)
+    refute attribute.validate_value?('xxx')
+
+    attribute = SampleAttributeType.new(title: 'fish', base_type: 'Text', regexp: '.*yyy')
     assert attribute.validate_value?('yyy')
     assert attribute.validate_value?('happpp - yyy')
     refute attribute.validate_value?('')
@@ -114,6 +123,6 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   end
 
   test 'allowed types' do
-    assert_equal %w(DateTime Float Integer String).sort, SampleAttributeType.allowed_base_types.sort
+    assert_equal %w(DateTime Float Integer String Text).sort, SampleAttributeType.allowed_base_types.sort
   end
 end

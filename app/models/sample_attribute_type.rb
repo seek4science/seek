@@ -11,7 +11,8 @@ class SampleAttributeType < ActiveRecord::Base
     'Integer' => :is_integer,
     'Float' => :is_float,
     'String' => :is_string,
-    'DateTime' => :is_datetime
+    'DateTime' => :is_datetime,
+    'Text' => :is_string
   }
 
   def validate_allowed_type
