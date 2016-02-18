@@ -1,0 +1,7 @@
+.sample_attribute_integer, .sample_attribute_float {
+    width: 10em;
+}
+
+.sample_attribute_datetime {
+    width: 25em;
+}
