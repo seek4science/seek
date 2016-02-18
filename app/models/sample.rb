@@ -19,12 +19,12 @@ class Sample < ActiveRecord::Base
     setup_accessor_methods if type
   end
 
-  #TODO: add unit test, must test for passing none attributes
-  def read_attributes_from_params params
+  # TODO: add unit test, must test for passing none attributes
+  def read_attributes_from_params(params)
     return unless sample_type
     sample_type.sample_attributes.collect(&:accessor_name).each do |name|
       val = params[name.to_sym]
-      self.send("#{name}=",val)
+      send("#{name}=", val)
     end
   end
 
@@ -32,11 +32,11 @@ class Sample < ActiveRecord::Base
     false
   end
 
-  def can_edit?(user=User.current_user)
+  def can_edit?(_user = User.current_user)
     true
   end
 
-  def can_delete?(user=User.current_user)
+  def can_delete?(_user = User.current_user)
     true
   end
 
@@ -48,7 +48,6 @@ class Sample < ActiveRecord::Base
           attr_accessor '#{name}'
         END_EVAL
     end
-
   end
 
   def remove_accessor_methods
@@ -75,5 +74,4 @@ class Sample < ActiveRecord::Base
       end
     end
   end
-
 end
