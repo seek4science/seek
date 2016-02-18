@@ -7,12 +7,16 @@
 <% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>">
-  <th scope="row">
-    <%= text_field_tag "#{field_name_prefix}[pos]", pos,
-                       :class => 'attribute-position', :readonly => true %>
+  <th scope="row" class="attribute-position">
+    <div class="btn btn-primary attribute-handle">
+      <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
+      <span class="attribute-position-label"><%= pos %></span>
+    </div>
+    <%= hidden_field_tag "#{field_name_prefix}[pos]", pos, :readonly => true %>
   </th>
   <td>
-    <%= text_field_tag "#{field_name_prefix}[title]", title, :class => 'form-control', :placeholder => 'Attribute name' %>
+    <%= text_field_tag "#{field_name_prefix}[title]", title, :class => 'form-control',
+                       :placeholder => 'Attribute name' %>
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",

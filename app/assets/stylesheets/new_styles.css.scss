@@ -389,10 +389,9 @@ div.isa_graph {
   border-radius: 5px;
   display: inline-block;
 }
+.sample-attribute .attribute-handle {
+}
 
-.sample-attribute input.attribute-position {
-  border: none;
-  background: none;
-  margin: 6px 12px;
-  width: 18px;
+.sample-attribute .attribute-position .glyphicon {
+  color: #fff;
 }
