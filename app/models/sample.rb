@@ -19,15 +19,6 @@ class Sample < ActiveRecord::Base
     setup_accessor_methods if type
   end
 
-  # TODO: add unit test, must test for passing none attributes
-  def read_attributes_from_params(params)
-    return unless sample_type
-    sample_type.sample_attributes.collect(&:accessor_name).each do |name|
-      val = params[name.to_sym]
-      send("#{name}=", val)
-    end
-  end
-
   def is_in_isa_publishable?
     false
   end
@@ -53,6 +44,17 @@ class Sample < ActiveRecord::Base
         END_EVAL
     end
   end
+
+
+  #overrdie to insert the extra accessors for mass assignment
+  def mass_assignment_authorizer(role)
+    extra=[]
+    if self.sample_type
+      extra = self.sample_type.sample_attributes.collect(&:accessor_name)
+    end
+    super(role) + extra
+  end
+
 
   def remove_accessor_methods
     sample_type.sample_attributes.collect(&:accessor_name).each do |name|

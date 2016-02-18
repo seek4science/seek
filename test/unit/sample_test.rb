@@ -81,6 +81,17 @@ class SampleTest < ActiveSupport::TestCase
     refute_respond_to sample, :weight=
   end
 
+  test 'mass assigment' do
+    sample = Sample.new title: 'testing'
+    sample.sample_type = Factory(:patient_sample_type)
+    sample.update_attributes({full_name:'Fred Bloggs',age:25,postcode:'M12 9QL',weight:0.22,address:'somewhere'})
+    assert_equal 'Fred Bloggs',sample.full_name
+    assert_equal 25,sample.age
+    assert_equal 0.22,sample.weight
+    assert_equal 'M12 9QL',sample.postcode
+    assert_equal 'somewhere',sample.address
+  end
+
   test 'adds validations' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
