@@ -1,3 +1,5 @@
+<div class="asset_form">
+
 <%= f.error_messages -%>
 
 <%= f.select :sample_type_id, options_for_select(SampleType.all.collect{|st| [st.title,st.id]},@sample.sample_type_id),{:include_blank => true,} %>
@@ -5,8 +7,8 @@
 <% if @sample.sample_type %>
 
     <div class="form-group">
-      <%= f.label :title %><%= required_span %>
-      <%= f.text_field :title %>
+      <label>Title</label><%= required_span %>
+      <%= f.text_field :title, :class=>'form-control' %>
     </div>
 
     <%= render :partial=>"attribute_fields",:locals=>{:f=>f,:sample_type=>@sample.sample_type} %>
@@ -15,7 +17,7 @@
 
 <% end %>
 
-
+</div>
 
 <script>
   $j('#sample_sample_type_id').on('change',function() {

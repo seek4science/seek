@@ -2,7 +2,7 @@
   <% sample_type.sample_attributes.each do |attribute| %>
       <p>
         <label><%= attribute.title %></label><%= required_span if attribute.required? %>
-        <%= f.text_field attribute.accessor_name %>
+        <%= f.text_field attribute.accessor_name, :class=>'form-control' %>
       </p>
   <% end %>
 </div>
