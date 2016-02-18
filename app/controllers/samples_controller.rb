@@ -31,4 +31,14 @@ class SamplesController < ApplicationController
     respond_with(@sample)
   end
 
+  def destroy
+    @sample = Sample.find(params[:id])
+    if @sample.can_delete? && @sample.destroy
+      flash[:notice] = 'The sample was successfully deleted.'
+    else
+      flash[:notice] = 'It was not possible to delete the sample.'
+    end
+    respond_with(@sample,location:root_path)
+  end
+
 end
