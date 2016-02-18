@@ -25,9 +25,7 @@ class SampleTypesController < ApplicationController
   # GET /sample_types/new.json
   def new
     @sample_type = SampleType.new
-    @sample_type.sample_attributes.build(:title => 'attribute 1')
-    @sample_type.sample_attributes.build(:title => 'attribute 2')
-    @sample_type.sample_attributes.build(:title => 'attribute 3')
+    @sample_type.sample_attributes.build # Initial attribute
 
     respond_to do |format|
       format.html # new.html.erb

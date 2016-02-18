@@ -52,4 +52,5 @@
 //= require associations
 //= require people
 //= require search
+//= require sample_types
 //= require_tree ./templates
