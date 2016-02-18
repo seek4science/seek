@@ -19,6 +19,31 @@ class Sample < ActiveRecord::Base
     setup_accessor_methods if type
   end
 
+  # TODO: add unit test, must test for passing none attributes
+  def read_attributes_from_params(params)
+    return unless sample_type
+    sample_type.sample_attributes.collect(&:accessor_name).each do |name|
+      val = params[name.to_sym]
+      send("#{name}=", val)
+    end
+  end
+
+  def is_in_isa_publishable?
+    false
+  end
+
+  def can_edit?(_user = User.current_user)
+    true
+  end
+
+  def can_delete?(_user = User.current_user)
+    true
+  end
+
+  def self.can_create?
+    User.logged_in_and_member?
+  end
+
   private
 
   def setup_accessor_methods

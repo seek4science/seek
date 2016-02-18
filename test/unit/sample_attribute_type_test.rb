@@ -20,6 +20,14 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
 
     type = SampleAttributeType.new(title: 'x-type', base_type: 'String', regexp: 'xxx')
     assert type.valid?
+
+  end
+
+  test 'default regexp' do
+    type = SampleAttributeType.new(title: 'x-type', base_type: 'Integer')
+    type.save!
+    type = SampleAttributeType.find(type.id)
+    assert_equal '.*',type[:regexp]
   end
 
   test 'validate_value' do
@@ -42,6 +50,14 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('1.0')
 
     attribute = SampleAttributeType.new(title: 'fish', base_type: 'String', regexp: '.*yyy')
+    assert attribute.validate_value?('yyy')
+    assert attribute.validate_value?('happpp - yyy')
+    refute attribute.validate_value?('')
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?(1)
+    refute attribute.validate_value?('xxx')
+
+    attribute = SampleAttributeType.new(title: 'fish', base_type: 'Text', regexp: '.*yyy')
     assert attribute.validate_value?('yyy')
     assert attribute.validate_value?('happpp - yyy')
     refute attribute.validate_value?('')
@@ -84,12 +100,29 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?("Fred ")
   end
 
+  test 'web and email regexp' do
+    email_type = SampleAttributeType.new title:"Email address",base_type:'String',regexp:RFC822::EMAIL.to_s
+    email_type.save!
+    email_type.reload
+    assert_equal RFC822::EMAIL.to_s,email_type.regexp
+
+    assert email_type.validate_value?('fred@email.com')
+    refute email_type.validate_value?('moonbeam')
+
+    web_type = SampleAttributeType.new title:"Web link",base_type:'String',regexp:URI.regexp(%w(http https)).to_s
+    web_type.save!
+    web_type.reload
+    assert web_type.validate_value?('http://google.com')
+    assert web_type.validate_value?('https://google.com')
+    refute web_type.validate_value?('moonbeam')
+  end
+
   test 'to json' do
     type = SampleAttributeType.new(title: 'x-type', base_type: 'String', regexp: 'xxx')
     assert_equal %({"title":"x-type","base_type":"String","regexp":"xxx"}), type.to_json
   end
 
   test 'allowed types' do
-    assert_equal %w(DateTime Float Integer String).sort, SampleAttributeType.allowed_base_types.sort
+    assert_equal %w(DateTime Float Integer String Text).sort, SampleAttributeType.allowed_base_types.sort
   end
 end

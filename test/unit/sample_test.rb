@@ -149,9 +149,10 @@ class SampleTest < ActiveSupport::TestCase
     sample.age = 27
     sample.weight = 88.9
     sample.postcode = 'M13 9PL'
+    sample.address = "Somewhere on earth"
     assert_nil sample.json_metadata
     sample.save!
     refute_nil sample.json_metadata
-    assert_equal %!{"full_name":"Jimi Hendrix","age":27,"weight":88.9,"postcode":"M13 9PL"}!, sample.json_metadata
+    assert_equal %!{"full_name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}!, sample.json_metadata
   end
 end

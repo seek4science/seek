@@ -109,4 +109,5 @@ class Strain < ActiveRecord::Base
 
     return new_object
   end
+
 end

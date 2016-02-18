@@ -1,0 +1,37 @@
+<div class="asset_form">
+
+  <%= f.error_messages -%>
+
+  <% if @sample.new_record? %>
+      <div class="form-group">
+      <%= f.select :sample_type_id,
+                   options_for_select(SampleType.all.collect { |st| [st.title, st.id] }, @sample.sample_type_id),
+                   {:include_blank => true },:class => 'form-control' %>
+      </div>
+  <% end %>
+
+  <% if @sample.sample_type %>
+
+      <div class="form-group">
+        <label>Title</label><%= required_span %>
+        <%= f.text_field :title, :class => 'form-control' %>
+      </div>
+
+      <%= render :partial => "attribute_fields", :locals => {:f => f, :sample_type => @sample.sample_type} %>
+
+      <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary' %>
+
+  <% end %>
+
+</div>
+
+<script>
+    $j('#sample_sample_type_id').on('change', function () {
+        if (this.value) {
+            //quick hack to get started, a later refinement will be to reload the form with ajax
+            location.search = "?sample_type_id=" + this.value;
+        }
+
+    });
+
+</script>
