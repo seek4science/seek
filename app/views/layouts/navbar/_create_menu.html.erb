@@ -44,14 +44,23 @@
         <% if Seek::Config.events_enabled %>
             <li><%= link_to t("event"), new_event_path %></li>
         <% end %>
+
+        <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
+        <% if can_create_organisms? %>
+            <li><%= link_to "Organism", new_organism_path %></li>
+        <% end %>
+        <li><%= link_to("Strain", new_strain_path) %></li>
+        <% if Sample.can_create? %>
+            <li><%= link_to("Sample", new_sample_path) %></li>
+        <% end %>
+
     <% else %>
         <li role="presentation" class="dropdown-header"><span style="color:red">You cannot add assets or other items until you are a member of a <%= t('project') %>.</span></li>
     <% end %>
 
-    <% if can_create_organisms? %>
-        <li role="presentation" class="dropdown-header">Other</li>
-        <li><%= link_to "Organism", new_organism_path %></li>
-    <% end %>
+
+
+
   </ul>
 
 </li>

@@ -1,6 +1,8 @@
 class SamplesController < ApplicationController
   respond_to :html
 
+  before_filter :auth_to_create, :only=>[:new,:create]
+
   def new
     @sample = Sample.new(sample_type_id: params[:sample_type_id])
     respond_with(@sample)

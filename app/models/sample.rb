@@ -40,6 +40,10 @@ class Sample < ActiveRecord::Base
     true
   end
 
+  def self.can_create?
+    User.logged_in_and_member?
+  end
+
   private
 
   def setup_accessor_methods
