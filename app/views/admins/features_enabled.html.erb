@@ -18,11 +18,8 @@
 
     <%= admin_checkbox_setting(:pdf_conversion_enabled, 1, Seek::Config.pdf_conversion_enabled,
                                "Pdf conversion enabled", "Whether pdf conversion is enabled. It allows converting some document types to pdf format. If enabled, you need to ensure open office is running") %>
-  
-    <%= admin_checkbox_setting(:forum_enabled, 1, Seek::Config.forum_enabled,
-                               "Forum enabled", "Whether the Activities/Forum tab is displayed and forum functionalities are available") %>
 
-    <%= admin_checkbox_setting(:delete_asset_version_enabled, 1, Seek::Config.delete_asset_version_enabled,
+    <%#= admin_checkbox_setting(:delete_asset_version_enabled, 1, Seek::Config.delete_asset_version_enabled,
                                "Delete asset version enabled", "Whether delete of one version of the versioned asset is enabled. It allows to delete previous (older) versions without deleting the complete asset") %>
 
     <%= admin_checkbox_setting(:hide_details_enabled, 1, Seek::Config.hide_details_enabled,
