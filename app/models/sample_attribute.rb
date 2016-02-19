@@ -8,7 +8,6 @@ class SampleAttribute < ActiveRecord::Base
 
   validates :title, :sample_attribute_type, presence: true
   validates :sample_type, presence: true
-  validates :unit
 
   before_save :default_pos
 
