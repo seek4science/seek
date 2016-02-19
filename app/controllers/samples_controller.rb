@@ -42,4 +42,20 @@ class SamplesController < ApplicationController
     respond_with(@sample,location:root_path)
   end
 
+  #called from AJAX, returns the form containing the attributes for the sample_type_id
+  def attribute_form
+    sample_type_id = params[:sample_type_id]
+
+    sample=Sample.new(sample_type_id:sample_type_id)
+
+
+    respond_with do |format|
+      format.js {
+        render json: {
+                form: (render_to_string(partial:"samples/sample_attributes_form",locals:{sample:sample}))
+               }
+      }
+    end
+  end
+
 end
