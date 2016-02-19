@@ -1154,11 +1154,12 @@ end
 
   Factory.define(:patient_sample_type,:parent=>:sample_type) do |f|
     f.title "Patient data"
-    attributes = []
-    attributes << Factory(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true)
-    attributes << Factory(:sample_attribute,:title=>"age",:sample_attribute_type=>Factory(:age_sample_attribute_type),:required=>true)
-    attributes << Factory(:sample_attribute,:title=>"weight",:sample_attribute_type=>Factory(:weight_sample_attribute_type),:required=>false)
-    attributes << Factory(:sample_attribute,:title=>"address",:sample_attribute_type=>Factory(:address_sample_attribute_type),:required=>false)
-    attributes << Factory(:sample_attribute,:title=>"postcode",:sample_attribute_type=>Factory(:postcode_sample_attribute_type),:required=>false)
-    f.sample_attributes  attributes
+    f.after_build do |type|
+      # Not sure why i have to explicitly add the sample_type association
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"age",:sample_attribute_type=>Factory(:age_sample_attribute_type),:required=>true, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"weight",:sample_attribute_type=>Factory(:weight_sample_attribute_type),:required=>false, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"address",:sample_attribute_type=>Factory(:address_sample_attribute_type),:required=>false, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"postcode",:sample_attribute_type=>Factory(:postcode_sample_attribute_type),:required=>false, :sample_type => type)
+    end
   end

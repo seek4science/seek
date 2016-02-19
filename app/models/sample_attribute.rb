@@ -5,6 +5,7 @@ class SampleAttribute < ActiveRecord::Base
   belongs_to :sample_type
 
   validates :title, :sample_attribute_type, presence: true
+  validates :sample_type, presence: true
 
   before_save :default_pos
 
