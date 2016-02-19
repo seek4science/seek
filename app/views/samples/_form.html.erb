@@ -15,7 +15,8 @@
   </div>
 
   <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'submit_sample_button',disabled:@sample.sample_type.nil? %>
-
+    or
+  <%= cancel_button(@sample.new_record? ? samples_path : sample_path(@sample)) %>
 </div>
 
 <script>
