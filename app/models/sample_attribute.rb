@@ -3,7 +3,7 @@ class SampleAttribute < ActiveRecord::Base
                   :_destroy, :sample_type
 
   belongs_to :sample_attribute_type
-  belongs_to :sample_type
+  belongs_to :sample_type, inverse_of: :sample_attributes
 
   validates :title, :sample_attribute_type, presence: true
   validates :sample_type, presence: true

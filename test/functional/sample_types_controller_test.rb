@@ -68,12 +68,14 @@ class SampleTypesControllerTest < ActionController::TestCase
     sample_attributes_fields[2][:_destroy] = '1'
     sample_attributes_fields = Hash[sample_attributes_fields.each_with_index.map { |f, i| [i, f] }]
 
-    put :update, id: sample_type, sample_type: { title: "Hello!",
-                                                 sample_attributes_attributes: sample_attributes_fields
-    }
+    assert_difference("SampleAttribute.count", -1) do
+      put :update, id: sample_type, sample_type: { title: "Hello!",
+                                                   sample_attributes_attributes: sample_attributes_fields
+      }
+    end
     assert_redirected_to sample_type_path(assigns(:sample_type))
 
-    assert_equal 3, assigns(:sample_type).sample_attributes.size
+    assert_equal sample_attributes_fields.keys.size - 1, assigns(:sample_type).sample_attributes.size
     assert_includes assigns(:sample_type).sample_attributes.map(&:title), 'hello'
   end
 
