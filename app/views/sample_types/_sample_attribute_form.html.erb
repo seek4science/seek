@@ -5,6 +5,7 @@
 <% pos = sample_attribute ? sample_attribute.pos : '' %>
 <% required = sample_attribute ? sample_attribute.required : '' %>
 <% attribute_type_id = sample_attribute ? sample_attribute.sample_attribute_type_id : nil %>
+<% unit_id = sample_attribute ? sample_attribute.unit_id : nil %>
 <% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>">
@@ -28,6 +29,13 @@
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
                    options_for_select(SampleAttributeType.all.map { |t| [t.title, t.id] },
                                       attribute_type_id),
+                   :class => 'form-control'%>
+  </td>
+  <td>
+    <%= select_tag "#{field_name_prefix}[unit_id]",
+                   options_for_select(Unit.all.map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
+                                      unit_id),
+                   :include_blank => true,
                    :class => 'form-control'%>
   </td>
   <td>
