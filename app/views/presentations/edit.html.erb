@@ -40,7 +40,7 @@
         <%= f.submit "Update", :id => "presentation_submit_btn",
             :onclick => "javascript: validateResourceFields(false, 'presentation', #{current_user_authorized_to_manage});  return(false);",
             :class => 'btn btn-primary' -%>
-        or <%= cancel_button(edit_presentation_path) -%>
+        or <%= cancel_button(presentation_path(@presentation)) -%>
       </div>
     </div>
 <% end %>
