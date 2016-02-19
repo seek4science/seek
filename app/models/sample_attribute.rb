@@ -1,5 +1,6 @@
 class SampleAttribute < ActiveRecord::Base
-  attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id, :_destroy
+  attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
+                  :_destroy, :sample_type
 
   belongs_to :sample_attribute_type
   belongs_to :sample_type

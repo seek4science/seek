@@ -1113,7 +1113,7 @@ end
   end
 
   Factory.define(:sample_attribute) do |f|
-
+    f.association :sample_type, :factory => :sample_type
   end
 
   #a string that must contain 'xxx'

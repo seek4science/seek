@@ -30,8 +30,8 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test "associate sample attribute default order" do
     sample_type = Factory :sample_type
-    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, :sample_type => sample_type)
-    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, :sample_type => sample_type)
+    attribute1 = Factory(:simple_string_sample_attribute, :sample_type => sample_type)
+    attribute2 = Factory(:simple_string_sample_attribute, :sample_type => sample_type)
     sample_type.save!
 
     sample_type.reload
@@ -41,10 +41,9 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test "associate sample attribute specify order" do
     sample_type = Factory :sample_type
-    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, :pos => 3, :sample_type => sample_type)
-    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, :pos => 2, :sample_type => sample_type)
-    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, :pos => 1, :sample_type => sample_type)
-    sample_type.save!
+    attribute3 = Factory(:simple_string_sample_attribute, :pos => 3, :sample_type => sample_type)
+    attribute2 = Factory(:simple_string_sample_attribute, :pos => 2, :sample_type => sample_type)
+    attribute1 = Factory(:simple_string_sample_attribute, :pos => 1, :sample_type => sample_type)
 
     sample_type.reload
 
