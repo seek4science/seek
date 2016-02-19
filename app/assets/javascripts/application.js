@@ -37,7 +37,7 @@
 //= require detect_browser
 //= require easytabs
 //= require favourites
-//= require jquery-ui-drag-drop
+//= require jquery-ui
 //= require bootstrap-tagsinput-fixed
 //= require bootstrap-typeahead-rails
 //= require bootstrap-multiselect
@@ -52,4 +52,5 @@
 //= require associations
 //= require people
 //= require search
+//= require sample_types
 //= require_tree ./templates

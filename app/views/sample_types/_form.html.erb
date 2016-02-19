@@ -1,0 +1,75 @@
+<%= form_for(@sample_type) do |f| %>
+    <% if @sample_type.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@sample_type.errors.count, "error") %> prohibited this sample_type from being saved:</h2>
+
+          <ul>
+            <% @sample_type.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+
+    <div class="form-group">
+      <label>Title</label>
+      <%= f.text_field :title, :class => 'form-control', :placeholder => 'Sample type name' %>
+    </div>
+
+    <h3>Attributes</h3>
+    <p class="help-block">Re-arrange attributes by clicking and dragging the button on the left-hand side of each row.</p>
+    <table class="table table-hover" id="attribute-table">
+      <thead>
+      <tr>
+        <th width="5em">Order</th>
+        <th>Name</th>
+        <th width="5em">Required?</th>
+        <th>Type</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @sample_type.sample_attributes.each_with_index do |sample_attribute, index| %>
+        <%= render :partial => 'sample_attribute_form', :locals => { :index => index,
+                                                                     :sample_attribute => sample_attribute } %>
+      <% end %>
+      <tr id="add-attribute-row">
+        <td colspan="5">
+          <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <p class="actions">
+      <%= f.submit (@sample_type.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
+      or
+      <%= cancel_button(@sample_type.new_record? ? sample_types_path : sample_type_path(@sample_type)) %>
+    </p>
+<% end %>
+
+<table id="new-attribute-row" style="display: none">
+  <tbody>
+    <%= render :partial => 'sample_attribute_form' %>
+  </tbody>
+</table>
+
+<script>
+  $j(document).ready(function () {
+    // Make rows sortable
+    SampleTypes.bindSortable();
+    SampleTypes.recalculatePositions();
+
+    $j('#add-attribute').click(function () {
+      var newRow = $j('#new-attribute-row tbody').clone().html();
+      var id = $j('#attribute-table tr.sample-attribute').length;
+      newRow = newRow.replace(/replace-me/g, id);
+      SampleTypes.unbindSortable();
+      $j('#attribute-table #add-attribute-row').before($j(newRow));
+      SampleTypes.recalculatePositions();
+      SampleTypes.bindSortable();
+      return false;
+    });
+
+    $j('#attribute-table').on('change','.destroy-attribute', SampleTypes.removeAttribute);
+  });
+</script>

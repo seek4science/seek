@@ -1,0 +1,21 @@
+<h1>Listing sample_attribute_types</h1>
+
+<table>
+  <tr>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @sample_attribute_types.each do |sample_attribute_type| %>
+  <tr>
+    <td><%= link_to 'Show', sample_attribute_type %></td>
+    <td><%= link_to 'Edit', edit_sample_attribute_type_path(sample_attribute_type) %></td>
+    <td><%= link_to 'Destroy', sample_attribute_type, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Sample attribute type', new_sample_attribute_type_path %>

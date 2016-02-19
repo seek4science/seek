@@ -1,0 +1,48 @@
+<% sample_attribute ||= nil %>
+<% index ||= 'replace-me' %>
+<% id = sample_attribute ? sample_attribute.id : '' %>
+<% title = sample_attribute ? sample_attribute.title : '' %>
+<% pos = sample_attribute ? sample_attribute.pos : '' %>
+<% required = sample_attribute ? sample_attribute.required : '' %>
+<% attribute_type_id = sample_attribute ? sample_attribute.sample_attribute_type_id : nil %>
+<% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
+
+<tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>">
+  <th scope="row" class="attribute-position">
+    <div class="btn btn-info attribute-handle">
+      <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
+      <span class="attribute-position-label"><%= pos %></span>
+    </div>
+    <%= hidden_field_tag "#{field_name_prefix}[pos]", pos, :readonly => true %>
+  </th>
+  <td>
+    <%= text_field_tag "#{field_name_prefix}[title]", title, :class => 'form-control',
+                       :placeholder => 'Attribute name' %>
+  </td>
+  <td class="text-center">
+    <div class="checkbox-inline">
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required %>
+    </div>
+  </td>
+  <td>
+    <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
+                   options_for_select(SampleAttributeType.all.map { |t| [t.title, t.id] },
+                                      attribute_type_id),
+                   :class => 'form-control'%>
+  </td>
+  <td>
+    <div class="btn-group" data-toggle="buttons">
+      <label class="btn btn-danger">
+        Remove
+        <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', :autocomplete => 'off' %>
+        <%= check_box_tag "#{field_name_prefix}[_destroy]", '1', false,
+                          :class => 'destroy-attribute', :autocomplete => 'off' %>
+      </label>
+    </div>
+
+  </td>
+
+  <% if sample_attribute %>
+      <%= hidden_field_tag("#{field_name_prefix}[id]", id) %>
+  <% end %>
+</tr>

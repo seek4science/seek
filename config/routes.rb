@@ -1,9 +1,8 @@
 SEEK::Application.routes.draw do
+
+  resources :sample_attribute_types
   resources :sample_types
-
-
   resources :samples
-
 
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)

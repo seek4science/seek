@@ -1,5 +1,5 @@
 class SampleType < ActiveRecord::Base
-  attr_accessible :title, :uuid
+  attr_accessible :title, :uuid, :sample_attributes_attributes
 
   acts_as_uniquely_identifiable
 
@@ -8,6 +8,8 @@ class SampleType < ActiveRecord::Base
   has_many :sample_attributes, order: :pos
 
   validates :title, presence: true
+
+  accepts_nested_attributes_for :sample_attributes, :allow_destroy => true
 
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
