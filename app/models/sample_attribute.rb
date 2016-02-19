@@ -1,12 +1,14 @@
 class SampleAttribute < ActiveRecord::Base
   attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
-                  :_destroy, :sample_type
+                  :_destroy, :sample_type, :unit, :unit_id
 
   belongs_to :sample_attribute_type
   belongs_to :sample_type, inverse_of: :sample_attributes
+  belongs_to :unit
 
   validates :title, :sample_attribute_type, presence: true
   validates :sample_type, presence: true
+  validates :unit, presence: true
 
   before_save :default_pos
 
