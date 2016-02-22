@@ -38,23 +38,21 @@ class Sample < ActiveRecord::Base
   private
 
   def setup_accessor_methods
-    self.sample_type.sample_attributes.collect(&:accessor_name).each do |name|
+    sample_type.sample_attributes.collect(&:accessor_name).each do |name|
       class_eval <<-END_EVAL
           attr_accessor '#{name}'
         END_EVAL
     end
   end
 
-
-  #overrdie to insert the extra accessors for mass assignment
+  # overrdie to insert the extra accessors for mass assignment
   def mass_assignment_authorizer(role)
-    extra=[]
-    if self.sample_type
-      extra = self.sample_type.sample_attributes.collect(&:accessor_name)
+    extra = []
+    if sample_type
+      extra = sample_type.sample_attributes.collect(&:accessor_name)
     end
     super(role) + extra
   end
-
 
   def remove_accessor_methods
     sample_type.sample_attributes.collect(&:accessor_name).each do |name|

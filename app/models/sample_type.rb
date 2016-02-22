@@ -9,7 +9,7 @@ class SampleType < ActiveRecord::Base
 
   validates :title, presence: true
 
-  accepts_nested_attributes_for :sample_attributes, :allow_destroy => true
+  accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
@@ -20,5 +20,4 @@ class SampleType < ActiveRecord::Base
   private
 
   class UnknownAttributeException < Exception; end
-
 end

@@ -8,11 +8,11 @@ class SampleAttributeType < ActiveRecord::Base
   after_initialize :set_defaults_attributes
 
   BASE_TYPE_AND_CHECKER_MAP = {
-    'Integer' => :is_integer,
-    'Float' => :is_float,
-    'String' => :is_string,
-    'DateTime' => :is_datetime,
-    'Text' => :is_string
+    'Integer' => :is_integer?,
+    'Float' => :is_float?,
+    'String' => :is_string?,
+    'DateTime' => :is_datetime?,
+    'Text' => :is_string?
   }
 
   def validate_allowed_type
@@ -62,24 +62,22 @@ class SampleAttributeType < ActiveRecord::Base
     true
   end
 
-
-
   # CHECKERS for types, these should raise an exception if the type doesn't match
 
   # value can be Integer or String
-  def is_integer(value)
+  def is_integer?(value)
     fail 'Not an integer' unless (Integer(value).to_s == value.to_s)
   end
 
-  def is_string(value)
+  def is_string?(value)
     fail 'Not a string' unless value.is_a?(String)
   end
 
-  def is_float(value)
+  def is_float?(value)
     fail 'Not a float' unless (Float(value).to_s == value.to_s)
   end
 
-  def is_datetime(value)
+  def is_datetime?(value)
     fail 'Not a date time' unless DateTime.parse(value.to_s)
   end
 end
