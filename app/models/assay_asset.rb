@@ -9,17 +9,6 @@ class AssayAsset < ActiveRecord::Base
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :assay
 
-  # always returns the correct versioned asset (e.g Sop::Version) according to the stored version, or latest version if version is nil
-  def versioned_asset
-    a = asset
-    a = a.parent if a.class.name.end_with?('::Version')
-    if version.nil?
-      a.latest_version
-    else
-      a.find_version(version)
-    end
-  end
-
   def check_version
     return unless asset.respond_to?(:latest_version)
     if version.nil? && !asset.nil? && (asset.class.name.end_with?('::Version') || (!asset.latest_version.nil? && asset.latest_version.class.name.end_with?('::Version')))

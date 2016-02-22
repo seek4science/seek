@@ -38,12 +38,6 @@ class Assay < ActiveRecord::Base
 
   has_many :assay_assets, :dependent => :destroy
 
-  #FIXME: These should be reversed, with the concrete version becoming the primary case, and versioned assets becoming secondary
-  # i.e. - so data_files returnes [DataFile], and data_file_masters is replaced with versioned_data_files, returning [DataFile::Version]
-  has_many :data_file_versions, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
-  has_many :sop_versions, :class_name => "Sop::Version", :finder_sql => Proc.new{self.asset_sql("Sop")}
-  has_many :model_versions, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
-
   has_many :data_files, :through => :assay_assets, :source => :asset, :source_type => "DataFile"
   has_many :sops, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :models, :through => :assay_assets, :source => :asset, :source_type => "Model"
@@ -74,16 +68,6 @@ class Assay < ActiveRecord::Base
 
   def default_contributor
     User.current_user.try :person
-  end
-
-  def asset_sql(asset_class)
-    asset_class_underscored = asset_class.underscore
-    'SELECT '+ asset_class_underscored +'_versions.* FROM ' + asset_class_underscored + '_versions ' +
-    'INNER JOIN assay_assets ' + 
-    'ON assay_assets.asset_id = ' + asset_class_underscored + '_id ' + 
-    'AND assay_assets.asset_type = \'' + asset_class + '\' ' + 
-    'WHERE (assay_assets.version = ' + asset_class_underscored + '_versions.version ' +
-    "AND assay_assets.assay_id = #{self.id})"
   end
 
   def short_description
@@ -129,10 +113,6 @@ class Assay < ActiveRecord::Base
 
       return assay_asset
     end
-  end
-
-  def asset_versions
-    data_file_versions + model_versions + sop_versions
   end
 
   def assets

@@ -198,12 +198,6 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 3,assay.assets.size,"should be 2 sops and 1 data file"
   end
 
-  test "sop versions" do
-    assay=assays(:metabolomics_assay)
-    assert_equal 2,assay.sops.size
-    assert assay.sop_versions.include?(sops(:my_first_sop).find_version(1))
-    assert assay.sop_versions.include?(sops(:sop_with_fully_public_policy).find_version(1))
-  end
 
   test "sops" do
     assay=assays(:metabolomics_assay)
@@ -212,11 +206,6 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:sop_with_fully_public_policy))
   end
 
-  test "data_file versions" do
-    assay=assays(:metabolomics_assay)
-    assert_equal 1,assay.data_files.size
-    assert assay.data_file_versions.include?(data_files(:picture).find_version(1))
-  end
 
   test "data files" do
     assay=assays(:metabolomics_assay)
@@ -245,7 +234,7 @@ class AssayTest < ActiveSupport::TestCase
       end
       assay.reload
       assert_equal 1, assay.assay_assets.size
-      assert_equal sop.version, assay.assay_assets.first.versioned_asset.version
+      assert_equal sop.version, assay.assay_assets.first.version
 
       User.current_user = sop.contributor
       sop.save_as_new_version
@@ -258,7 +247,7 @@ class AssayTest < ActiveSupport::TestCase
 
       assay.reload
       assert_equal 1, assay.assay_assets.size
-      assert_equal sop.version, assay.assay_assets.first.versioned_asset.version
+      assert_equal sop.version, assay.assay_assets.first.version
     end
   end
 

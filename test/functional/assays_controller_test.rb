@@ -96,8 +96,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert assigns(:assay)
 
     assay.reload
-    stored_sop = assay.assay_assets.detect { |aa| aa.asset_id=sop.id }.versioned_asset
-    assert_equal sop.version, stored_sop.version
+    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset_id=sop.id }
+    assert_equal sop.version, stored_sop_assay_asset.version
 
     login_as sop.contributor
     sop.save_as_new_version
@@ -108,8 +108,8 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     assay.reload
-    stored_sop = assay.assay_assets.detect { |aa| aa.asset_id=sop.id }.versioned_asset
-    assert_equal sop.version, stored_sop.version
+    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset_id=sop.id }
+    assert_equal sop.version, stored_sop_assay_asset.version
 
 
   end
@@ -129,7 +129,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.sop_versions.include?(sop.latest_version)
+
     assert_not_equal timestamp, updated_assay.updated_at
 
   end
@@ -150,7 +150,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.data_file_versions.include?(df.latest_version)
+
     assert_not_equal timestamp, updated_assay.updated_at
   end
 
@@ -169,7 +169,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.model_versions.include?(model.latest_version)
+
     assert_not_equal timestamp, updated_assay.updated_at
   end
 
@@ -696,48 +696,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
-  def test_authorization_of_sops_and_datafiles_links_with_lazy_load
-    #sanity check the fixtures are correct
-    check_fixtures_for_authorization_of_sops_and_datafiles_links
-    login_as(:model_owner)
-    assay=assays(:assay_with_public_and_private_sops_and_datafiles)
 
-    with_config_value :tabs_lazy_load_enabled, true do
-
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assay.id
-      end
-
-      assert_response :success
-
-      # tabs lazy loading: only first tab with items, and other tabs only item types and counts are shown.
-      assert_select "div.tabbertab" do
-        assert_select "h3", :text => "#{I18n.t('sop').pluralize} (2)", :count => 1
-        assert_select "h3", :text => "#{I18n.t('data_file').pluralize} (2)", :count => 1
-      end
-
-
-      data_file_ids = assay.data_file_versions.map &:data_file_id
-      get :resource_in_tab, {:resource_ids => data_file_ids.join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-      assert_response :success
-      assert_select "div.list_item" do
-        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
-        assert_select "div.list_item_actions a[href=?]", download_data_file_path(data_files(:downloadable_data_file)), :count => 1
-        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", download_data_file_path(data_files(:private_data_file)), :count => 0
-      end
-
-      sop_ids = assay.sop_versions.map &:sop_id
-      get :resource_in_tab, {:resource_ids => sop_ids.join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-      assert_response :success
-      assert_select "div.list_item" do
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
-        assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_fully_public_policy)), :count => 1
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-      end
-    end
-  end
   test "associated assets aren't lost on failed validation in create" do
     sop=sops(:sop_with_all_sysmo_users_policy)
     model=models(:model_with_links_in_description)
