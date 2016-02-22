@@ -61,6 +61,27 @@ class AssayAssetTest < ActiveSupport::TestCase
     assert_equal 1,AssayAsset::Direction::INCOMING
     assert_equal 2,AssayAsset::Direction::OUTGOING
     assert_equal 0,AssayAsset::Direction::NODIRECTION
+
+    a = AssayAsset.new
+    a.assay = Factory(:assay)
+    a.asset = Factory(:sop).latest_version
+    a.save!
+    a.reload
+    assert_equal 0,a.direction
+    refute a.incoming_direction?
+    refute a.outgoing_direction?
+
+    a.direction = AssayAsset::Direction::INCOMING
+    a.save!
+    a.reload
+    assert a.incoming_direction?
+    refute a.outgoing_direction?
+
+    a.direction = AssayAsset::Direction::OUTGOING
+    a.save!
+    a.reload
+    refute a.incoming_direction?
+    assert a.outgoing_direction?
   end
 
   

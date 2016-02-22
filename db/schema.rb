@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160219121836) do
+ActiveRecord::Schema.define(:version => 20160222131559) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -114,6 +114,7 @@ ActiveRecord::Schema.define(:version => 20160219121836) do
     t.datetime "updated_at"
     t.integer  "relationship_type_id"
     t.string   "asset_type"
+    t.integer  "direction",            :default => 0
   end
 
   add_index "assay_assets", ["assay_id"], :name => "index_assay_assets_on_assay_id"

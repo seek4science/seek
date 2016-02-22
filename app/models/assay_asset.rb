@@ -26,7 +26,15 @@ class AssayAsset < ActiveRecord::Base
     end
   end
 
-  #constants for recording the direction of the asset with its relationship to the assay
+  def incoming_direction?
+    direction == Direction::INCOMING
+  end
+
+  def outgoing_direction?
+    direction == Direction::OUTGOING
+  end
+
+  # constants for recording the direction of the asset with its relationship to the assay
   module Direction
     INCOMING = 1
     OUTGOING = 2
