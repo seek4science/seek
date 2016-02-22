@@ -509,4 +509,30 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal "carrot:3",assay.technology_type_uri
   end
 
+  test 'associated samples' do
+    assay = Factory(:assay)
+    sample1 = Factory(:sample)
+    sample2 = Factory(:sample)
+    sample3 = Factory(:sample)
+    df = Factory(:data_file)
+    aa1 = AssayAsset.new assay:assay,asset:sample1,direction:AssayAsset::Direction::INCOMING
+    aa1.save!
+    aa2 = AssayAsset.new assay:assay,asset:sample2,direction:AssayAsset::Direction::INCOMING
+    aa2.save!
+    aa3 = AssayAsset.new assay:assay,asset:df,direction:AssayAsset::Direction::NODIRECTION
+    aa3.save!
+
+    assay = assay.reload
+    assert_includes assay.samples,sample1
+    assert_includes assay.samples,sample2
+    refute_includes assay.samples, df
+
+    assert_includes assay.assets,sample1
+    assert_includes assay.assets,sample2
+    assert_includes assay.assets,df
+
+    refute_includes assay.samples,sample3
+    refute_includes assay.assets,sample3
+  end
+
 end

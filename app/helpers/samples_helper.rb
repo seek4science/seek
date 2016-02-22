@@ -11,6 +11,11 @@ module SamplesHelper
         text_field :sample, attribute.accessor_name, :class=>"form-control #{clz}"
     end
   end
+
+  def authorised_samples(projects = nil)
+    authorised_assets(Sample, projects)
+  end
+
 end
 
 

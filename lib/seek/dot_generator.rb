@@ -249,7 +249,8 @@ class AssayNode < SeekNode
   end
 
   def children
-    deep ? item.assets + item.publications : []
+    # - samples for now until they are properly integrated
+    deep ? item.assets - item.samples : []
   end
 end
 

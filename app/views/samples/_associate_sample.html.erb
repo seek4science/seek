@@ -1,0 +1,93 @@
+<%
+
+   resource_text ||= text_for_resource(resource)
+   all_samples=authorised_samples
+   project_samples=all_samples
+   select_truncate_length=120
+   associated_samples = resource.samples
+-%>
+
+<%= folding_panel("Samples", associated_samples.blank?, :body_options => {:id => 'associate_sample_fold_content'},
+                  :help_text => "Here you associate Samples in SEEK to this #{resource_text}.") do %>
+    <div class="row">
+      <div class="col-md-8">
+        <p style="color: #666666;">
+          The following Samples are involved in this <%= resource_text -%>:
+        </p>
+
+        <div id="sample_to_list" class="box_editing_inner" style="line-height: 1.5;">
+          <span class="none_text" id="samples">Loading ...</span>
+        </div>
+
+        <div id="add_sample_elements">
+          <div class="association_step">
+            <div class="form-group">
+              <%= select_tag :possible_samples,
+                             '<option>Loading...</option>',
+                             {:class => 'form-control',:onchange=>"addSelectedSample();"+remote_function(
+                                     :method=>:get,
+                                     :url=>preview_samples_path(:element=>"sample_preview"),
+                                     :with=>"'id='+this.value",
+                                     :before=>"show_ajax_loader('sample_preview')"
+                             )+";return(false);"
+                             } -%>
+            </div>
+
+            <%= select_tag :sample_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+
+            <%= check_box_tag :include_other_project_samples, nil, false, {:onchange=>"toggle_sample_list();",:style=>"margin-top:0.5em;"} -%> Associate Samples from other projects?
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'sample'} %>
+      </div>
+    </div>
+<% end %>
+
+<script type="text/javascript">
+    var sampleOptions = {
+        project: <%= ([["Select Sample ...", 0]]|project_samples.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>,
+        all: <%= ([["Select Sample ...", 0]]|all_samples.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>
+    };
+
+    function toggle_sample_list() {
+        if ($('include_other_project_samples').checked)
+            $j('#possible_samples').html(optionsFromArray(sampleOptions.all));
+        else
+            $j('#possible_samples').html(optionsFromArray(sampleOptions.project));
+    }
+
+    function check_show_add_model() {
+        i = $('possible_samples').selectedIndex;
+        selected_id = $('possible_samples').options[i].value;
+        if (selected_id == '0') {
+            $('add_sample_link').hide();
+        }
+        else {
+            $('add_sample_link').show();
+        }
+    }
+
+    <% resource.samples.each do |sample| -%>
+    <% if sample.can_view? -%>
+    sample_id = '<%= sample.id -%>';
+    sample_title = '<%= escape_javascript(sample.title) -%>';
+    addSample(sample_title, sample_id);
+    <% end -%>
+    <% end -%>
+
+    <% if params[:sample_ids] %>
+    <% params[:sample_ids].each do |id| -%>
+    <% sample = Sample.find(id) %>
+    <% if sample.can_view?-%>
+    sample_id = '<%= sample.id -%>';
+    sample_title = '<%= escape_javascript(sample.title) -%>';
+    addSample(sample_title, sample_id);
+    <% end -%>
+    <% end -%>
+    <% end -%>
+
+    updateSamples();
+    toggle_sample_list();
+</script>

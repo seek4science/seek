@@ -638,6 +638,7 @@ SEEK::Application.routes.draw do
   resources :samples do
     collection do
       get :attribute_form
+      get :preview
     end
   end
 

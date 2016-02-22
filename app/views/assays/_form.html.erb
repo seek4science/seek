@@ -101,10 +101,13 @@
                                                              :existing_creators => existing_creators,
                                                              :other_creators => @assay.other_creators} -%>
 
-    <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
+    <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>
+
+
+    <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} %>
 
     <%  if @assay.is_modelling? -%>
-        <%= render :partial=>"assets/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
+        <%= render :partial=>"assets/associate_model",:locals=>{:f=>f, :resource => @assay} %>
     <% end -%>
 
     <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>

@@ -13,8 +13,6 @@ module ISAHelper
                   'Assay'=> {'EXP'=>"#64b466",'MODEL'=>"#92CD00"},
                   'Publication'=>"#84B5FD",
                   'Presentation' => "#8ee5ee", #cadetblue2
-                  'Sample' => "#ffa500", #orange
-                  'Specimen' => "#ff0000", #red
                   'HiddenItem' => "#d3d3d3"} #lightgray
 
   BORDER_COLOURS = {'Sop'=>"#619da4",
@@ -25,8 +23,6 @@ module ISAHelper
                     'Assay'=> {'EXP'=>"#509051",'MODEL'=>"#74a400"},
                     'Publication'=>"#6990ca",
                     'Presentation' => "#71b7be", #cadetblue2
-                    'Sample' => "#cc8400",
-                    'Specimen' => "#cc0000",
                     'HiddenItem' => "#a8a8a8"}
 
   FILL_COLOURS.default = "#8ee5ee" #cadetblue2

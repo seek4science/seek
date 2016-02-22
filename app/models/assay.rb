@@ -47,6 +47,7 @@ class Assay < ActiveRecord::Base
   has_many :data_files, :through => :assay_assets, :source => :asset, :source_type => "DataFile"
   has_many :sops, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :models, :through => :assay_assets, :source => :asset, :source_type => "Model"
+  has_many :samples, :through => :assay_assets, :source => :asset, :source_type => "Sample"
 
   has_one :investigation,:through=>:study
 
@@ -119,7 +120,7 @@ class Assay < ActiveRecord::Base
       end
 
       assay_asset.asset = asset
-      assay_asset.version = asset.version
+      assay_asset.version = asset.version if asset && asset.respond_to?(:version)
       assay_asset.relationship_type = r_type unless r_type.nil?
       assay_asset.save if assay_asset.changed?
 
@@ -135,7 +136,7 @@ class Assay < ActiveRecord::Base
   end
 
   def assets
-    data_files + models + sops + publications
+    data_files + models + sops + publications + samples
   end
 
   def avatar_key

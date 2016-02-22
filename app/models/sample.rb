@@ -35,6 +35,11 @@ class Sample < ActiveRecord::Base
     User.logged_in_and_member?
   end
 
+  def self.all_authorized_for action, user=User.current_user, projects=nil, filter_by_permissions=true
+    # mocked out until authorization is added
+    Sample.all
+  end
+
   private
 
   def setup_accessor_methods

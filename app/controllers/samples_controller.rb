@@ -1,5 +1,6 @@
 class SamplesController < ApplicationController
   respond_to :html
+  include Seek::PreviewHandling
 
   before_filter :auth_to_create, :only=>[:new,:create]
 
