@@ -84,5 +84,18 @@ class AssayAssetTest < ActiveSupport::TestCase
     assert a.outgoing_direction?
   end
 
+  test 'sample as asset' do
+    sample = Factory(:sample)
+    assay = Factory(:assay)
+    a = AssayAsset.new asset:sample,assay:assay,direction:AssayAsset::Direction::OUTGOING
+    assert a.valid?
+    a.save!
+    a.reload
+    assert_equal sample,a.asset
+    assert_equal assay,a.assay
+
+
+  end
+
   
 end

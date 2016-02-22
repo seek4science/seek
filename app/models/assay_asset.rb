@@ -21,6 +21,7 @@ class AssayAsset < ActiveRecord::Base
   end
 
   def check_version
+    return unless asset.respond_to?(:latest_version)
     if version.nil? && !asset.nil? && (asset.class.name.end_with?('::Version') || (!asset.latest_version.nil? && asset.latest_version.class.name.end_with?('::Version')))
       self.version = asset.version
     end

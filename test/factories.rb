@@ -1079,10 +1079,6 @@ end
     f.expires_at (Time.now + 1.hour)
   end
 
-  Factory.define(:sample) do |f|
-    f.sequence(:title) {|n| "Sample #{n}"}
-  end
-
   Factory.define(:sample_type) do |f|
     f.sequence(:title) {|n| "SampleType #{n}"}
   end
@@ -1163,3 +1159,8 @@ end
       type.sample_attributes << Factory.build(:sample_attribute,:title=>"postcode",:sample_attribute_type=>Factory(:postcode_sample_attribute_type),:required=>false, :sample_type => type)
     end
   end
+
+Factory.define(:sample) do |f|
+  f.sequence(:title) {|n| "Sample #{n}"}
+  f.association :sample_type,:factory=>:sample_type
+end
