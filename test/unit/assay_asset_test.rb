@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayAssetTest < ActiveSupport::TestCase
-  #fixtures :all
+
 
   def setup
     User.current_user = Factory :user
@@ -32,29 +32,6 @@ class AssayAssetTest < ActiveSupport::TestCase
     assert_equal(sop.find_version(version_number), a.asset)
     
     assert_equal(assay, a.assay)
-  end   
-  
-  test "versioned asset" do
-    sop = Factory :sop, :contributor => User.current_user
-    sop.save_as_new_version
-    assay = Factory :assay, :contributor => User.current_user.person
-    
-    a = AssayAsset.new
-    a.asset = sop.latest_version
-    a.assay = assay
-    a.version=1
-    a.save!
-        
-    assert_equal 1,a.versioned_asset.version
-    assert_equal sop.find_version(1),a.versioned_asset
-    
-    a = AssayAsset.new
-    a.asset = sop.latest_version
-    a.assay = assay    
-    a.save!
-    
-    assert_equal sop.version,a.versioned_asset.version
-    assert_equal sop.latest_version,a.versioned_asset    
   end
 
   test 'direction' do
