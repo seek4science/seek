@@ -57,5 +57,11 @@ class AssayAssetTest < ActiveSupport::TestCase
     assert_equal sop.latest_version,a.versioned_asset    
   end
 
+  test 'direction' do
+    assert_equal 1,AssayAsset::Direction::INCOMING
+    assert_equal 2,AssayAsset::Direction::OUTGOING
+    assert_equal 0,AssayAsset::Direction::NODIRECTION
+  end
+
   
 end
