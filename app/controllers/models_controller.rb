@@ -196,10 +196,7 @@ class ModelsController < ApplicationController
 
     @model.attributes = model_params
 
-    if params[:sharing]
-      @model.policy_or_default
-      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
-    end
+    update_sharing_policies @model,params
 
     respond_to do |format|
       if @model.save

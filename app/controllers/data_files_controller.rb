@@ -143,7 +143,7 @@ class DataFilesController < ApplicationController
 
       @data_file = DataFile.new params[:data_file]
 
-      @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
+      update_sharing_policies @data_file,params
 
       if @data_file.save
         update_annotations(params[:tag_list], @data_file)
@@ -209,10 +209,7 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       @data_file.attributes = data_file_params
 
-      if params[:sharing]
-        @data_file.policy_or_default
-        @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
-      end
+      update_sharing_policies @data_file,params
 
       if @data_file.save
 

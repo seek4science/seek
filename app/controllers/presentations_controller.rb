@@ -53,10 +53,7 @@ class PresentationsController < ApplicationController
 
     @presentation.attributes = params[:presentation]
 
-    if params[:sharing]
-      @presentation.policy_or_default
-      @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.projects
-    end
+    update_sharing_policies @presentation,params
 
     assay_ids = params[:assay_ids] || []
     respond_to do |format|

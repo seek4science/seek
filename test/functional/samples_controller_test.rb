@@ -4,6 +4,8 @@ class SamplesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
+  include SharingFormTestHelper
+
   test 'new' do
     login_as(Factory(:person))
     get :new
@@ -145,6 +147,38 @@ class SamplesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'create with sharing' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+
+
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample', full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL', project_ids:[] },:sharing=>valid_sharing
+    end
+    assert sample=assigns(:sample)
+    assert_equal person.user,sample.contributor
+    assert_equal Policy::ALL_USERS,sample.policy.sharing_scope
+    assert sample.can_view?(Factory(:person).user)
+  end
+
+  test 'update with sharing' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(person)
+    sample = populated_patient_sample
+    sample.contributor=person
+    sample.policy=Factory(:private_policy)
+    sample.save!
+    sample.reload
+    refute sample.can_view?(other_person.user)
+
+    put :update, id: sample.id, sample: { title: 'Updated Sample', full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL',project_ids:[] },:sharing=>valid_sharing
+
+    assert sample=assigns(:sample)
+    assert_equal Policy::ALL_USERS,sample.policy.sharing_scope
+    assert sample.can_view?(other_person.user)
+  end
   private
 
   def populated_patient_sample
