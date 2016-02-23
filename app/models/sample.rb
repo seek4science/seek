@@ -1,11 +1,9 @@
 class Sample < ActiveRecord::Base
-  attr_accessible :contributor_id, :contributor_type, :json_metadata, :policy_id, :sample_type_id, :title, :uuid, :project_ids, :policy, :contributor
+  attr_accessible :contributor_id, :contributor_type, :json_metadata,
+                  :policy_id, :sample_type_id, :title, :uuid, :project_ids, :policy, :contributor,
+                  :other_creators
 
-  include Seek::ProjectAssociation
-
-  acts_as_uniquely_identifiable
-
-  acts_as_authorized
+  acts_as_asset
 
   belongs_to :sample_type
 
@@ -31,6 +29,10 @@ class Sample < ActiveRecord::Base
 
   def self.can_create?
     User.logged_in_and_member?
+  end
+
+  def self.is_taggable?
+    false
   end
 
   private
