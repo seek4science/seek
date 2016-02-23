@@ -1,7 +1,7 @@
 class Sample < ActiveRecord::Base
   attr_accessible :contributor_id, :contributor_type, :json_metadata, :policy_id, :sample_type_id, :title, :uuid, :project_ids
 
-  include ProjectCompat
+  include Seek::ProjectAssociation
 
   acts_as_uniquely_identifiable
 
