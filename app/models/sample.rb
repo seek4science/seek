@@ -5,7 +5,11 @@ class Sample < ActiveRecord::Base
 
   acts_as_uniquely_identifiable
 
+  acts_as_authorized
+
   belongs_to :sample_type
+
+  scope :default_order, order("title")
 
   validates :title, :sample_type, presence: true
   include ActiveModel::Validations
@@ -25,21 +29,8 @@ class Sample < ActiveRecord::Base
     false
   end
 
-  def can_edit?(_user = User.current_user)
-    true
-  end
-
-  def can_delete?(_user = User.current_user)
-    true
-  end
-
   def self.can_create?
     User.logged_in_and_member?
-  end
-
-  def self.all_authorized_for action, user=User.current_user, projects=nil, filter_by_permissions=true
-    # mocked out until authorization is added
-    Sample.all
   end
 
   private

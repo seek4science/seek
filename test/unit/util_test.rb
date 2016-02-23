@@ -13,7 +13,7 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'authorized types' do
-    expected =  [Assay, DataFile, Event, Investigation, Model, Presentation, Publication, Sop, Strain, Study, Sweep, TavernaPlayer::Run, Workflow].map(&:name)
+    expected =  [Assay, DataFile, Event, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study, Sweep, TavernaPlayer::Run, Workflow].map(&:name)
     actual = Seek::Util.authorized_types.map(&:name)
     assert_equal expected, actual
   end
