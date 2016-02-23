@@ -3,7 +3,7 @@
 
   assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
   associated_samples_json = assay_assets.map do |aa|
-      { title: aa.asset.title, id: aa.asset_id, direction: aa.direction }
+    { title: aa.asset.title, id: aa.asset_id, direction: aa.direction }
   end.to_json
 -%>
 
@@ -14,7 +14,7 @@
     </p>
 
     <ul id="sample_to_list" class="association-list">
-      <span class="none_text" id="samples">Loading ...</span>
+      <li class="none_text no-item-text" id="samples">No samples</li>
     </ul>
 
     <%= button_link_to('Add sample', 'add', '#', 'data-toggle' => "modal", 'data-target' => "#addSampleModal") %>
@@ -27,27 +27,26 @@
             <h4 class="modal-title" id="addSampleModalLabel">Select sample</h4>
           </div>
           <div class="modal-body">
-              <div class="association-step" data-step="1">
-                <div class="form-group">
-                  <input type="text" class="form-control association-filter" placeholder="Type to filter...">
-                </div>
-                <div class="list-group association-candidate-list" id="samples-list">
-                  <%= render :partial => 'samples/association_preview', :collection => Sample.limit(5) %>
-                </div>
-                <%= hidden_field_tag :association_id, '' %>
-                <%= hidden_field_tag :association_title, '' %>
+            <div class="association-step" data-step="1">
+              <div class="form-group">
+                <input type="text" class="form-control association-filter" placeholder="Type to filter...">
               </div>
-              <div class="association-step" data-step="2" style="display: none">
-                <div class="form-group">
-                  <label>Select sample direction</label>
-                  <%= select_tag(:sample_direction,
-                                 options_for_select([
-                                                        ['No direction', AssayAsset::Direction::NODIRECTION],
-                                                        ['Incoming', AssayAsset::Direction::INCOMING],
-                                                        ['Outgoing', AssayAsset::Direction::OUTGOING]]),
-                                 :class => 'form-control') %>
-                </div>
+              <div class="list-group association-candidate-list" id="samples-list">
+                <%= render :partial => 'samples/association_preview', :collection => Sample.limit(5) %>
               </div>
+              <%= hidden_field_tag :association_id, '' %>
+              <%= hidden_field_tag :association_title, '' %>
+            </div>
+            <div class="association-step" data-step="2" style="display: none">
+              <div class="form-group">
+                <label>Select sample direction</label>
+                <%= select_tag(:sample_direction,
+                               options_for_select([['No direction', AssayAsset::Direction::NODIRECTION],
+                                                   ['Incoming', AssayAsset::Direction::INCOMING],
+                                                   ['Outgoing', AssayAsset::Direction::OUTGOING]]),
+                               :class => 'form-control') %>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary add-association-btn">Add sample</button>
@@ -57,7 +56,6 @@
     </div>
 
     <script>
-
       var associateSample = {
         selectSample: function () {
           $j(this).siblings().removeClass('active');
@@ -77,8 +75,6 @@
                 }
             );
           }
-          e.preventDefault();
-          return false;
         },
         addSample: function () {
           var o = {
@@ -88,25 +84,42 @@
           };
           $j('#sample_to_list').append(HandlebarsTemplates['associations/sample'](o));
           $j(this).parents('.new-association-modal').modal('hide');
+
+          var list = $j('#sample_to_list');
+          var noText = $j('.no-item-text', list);
+
+          if($j('.association-list-item', list).length == 0)
+            noText.show();
+          else
+            noText.hide()
+        },
+        removeSample: function () {
+          var list = $j(this).parents('.association-list');
+          var noText = $j('.no-item-text', list);
+
+          $j(this).parent().remove();
+
+          if($j('.association-list-item', list).length == 0)
+            noText.show();
+          else
+            noText.hide();
+
+          $j(this).parent().remove();
         }
       };
 
       $j(document).ready(function () {
-        $j('.association-list').on('click', '.remove-association', function () {
-          $j(this).parent().remove();
-        });
+        $j('.association-list').on('click', '.remove-association', associateSample.removeSample);
         $j('.new-association-modal').on('click', '.association-preview', associateSample.selectSample);
         $j('.association-filter').keypress(associateSample.filterSamples);
         $j('.add-association-btn').click(associateSample.addSample);
       });
 
       $j(document).ready(function () {
-        $j('#sample_to_list').html('');
         var associated = <%= associated_samples_json.html_safe %>;
         associated.each(function (x) {
           $j('#sample_to_list').append(HandlebarsTemplates['associations/sample'](x));
         });
       });
     </script>
-
 <% end %>

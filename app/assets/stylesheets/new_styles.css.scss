@@ -405,3 +405,13 @@ a.remove-association {
     text-decoration: none;
   }
 }
+
+.association-candidate-list {
+  border: 1px solid $list-group-border;
+  max-height: 350px;
+  overflow-y: scroll;
+
+  .list-group-item {
+    border-radius: 0;
+  }
+}
