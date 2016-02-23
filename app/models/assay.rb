@@ -92,7 +92,7 @@ class Assay < ActiveRecord::Base
 
   
   #Create or update relationship of this assay to another, with a specific relationship type and version
-  def associate(asset, r_type=nil)
+  def associate(asset, options = {})
     if asset.is_a?(Organism)
       associate_organism(asset)
     else
@@ -105,6 +105,7 @@ class Assay < ActiveRecord::Base
 
       assay_asset.asset = asset
       assay_asset.version = asset.version if asset && asset.respond_to?(:version)
+      r_type = options.delete(:relationship)
       assay_asset.relationship_type = r_type unless r_type.nil?
       assay_asset.save if assay_asset.changed?
 

@@ -188,7 +188,7 @@ class AssaysController < ApplicationController
     Array(data_file_ids).each do |text|
       id, r_type = text.split(",")
       d = DataFile.find(id)
-      assay_assets_to_keep << assay.associate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
+      assay_assets_to_keep << assay.associate(d, relationship: RelationshipType.find_by_title(r_type)) if d.can_view?
     end
     Array(model_ids).each do |id|
       m = Model.find(id)

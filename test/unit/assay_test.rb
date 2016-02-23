@@ -217,7 +217,7 @@ class AssayTest < ActiveSupport::TestCase
     assay = assays(:metabolomics_assay)
     User.with_current_user assay.contributor.user do
       assert_difference("Assay.find_by_id(assay.id).data_files.count") do
-        assay.associate(data_files(:viewable_data_file), relationship_types(:test_data))
+        assay.associate(data_files(:viewable_data_file), relationship: relationship_types(:test_data))
       end
     end
   end
