@@ -395,3 +395,13 @@ div.isa_graph {
 .sample-attribute .attribute-position .glyphicon {
   color: #fff;
 }
+
+a.remove-association {
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 21px;
+  color: $brand-danger;
+  &:hover {
+    text-decoration: none;
+  }
+}

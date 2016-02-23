@@ -1,93 +1,112 @@
 <%
+  resource_text ||= text_for_resource(resource)
 
-   resource_text ||= text_for_resource(resource)
-   all_samples=authorised_samples
-   project_samples=all_samples
-   select_truncate_length=120
-   associated_samples = resource.samples
+  assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
+  associated_samples_json = assay_assets.map do |aa|
+      { title: aa.asset.title, id: aa.asset_id, direction: aa.direction }
+  end.to_json
 -%>
 
-<%= folding_panel("Samples", associated_samples.blank?, :body_options => {:id => 'associate_sample_fold_content'},
+<%= folding_panel("Samples", assay_assets.blank?, :body_options => {:id => 'associate_sample_fold_content'},
                   :help_text => "Here you associate Samples in SEEK to this #{resource_text}.") do %>
-    <div class="row">
-      <div class="col-md-8">
-        <p style="color: #666666;">
-          The following Samples are involved in this <%= resource_text -%>:
-        </p>
+    <p style="color: #666666;">
+      The following Samples are involved in this <%= resource_text -%>:
+    </p>
 
-        <div id="sample_to_list" class="box_editing_inner" style="line-height: 1.5;">
-          <span class="none_text" id="samples">Loading ...</span>
-        </div>
+    <ul id="sample_to_list" class="association-list">
+      <span class="none_text" id="samples">Loading ...</span>
+    </ul>
 
-        <div id="add_sample_elements">
-          <div class="association_step">
-            <div class="form-group">
-              <%= select_tag :possible_samples,
-                             '<option>Loading...</option>',
-                             {:class => 'form-control',:onchange=>"addSelectedSample();"+remote_function(
-                                     :method=>:get,
-                                     :url=>preview_samples_path(:element=>"sample_preview"),
-                                     :with=>"'id='+this.value",
-                                     :before=>"show_ajax_loader('sample_preview')"
-                             )+";return(false);"
-                             } -%>
-            </div>
+    <%= button_link_to('Add sample', 'add', '#', 'data-toggle' => "modal", 'data-target' => "#addSampleModal") %>
 
-            <%= select_tag :sample_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
-
-            <%= check_box_tag :include_other_project_samples, nil, false, {:onchange=>"toggle_sample_list();",:style=>"margin-top:0.5em;"} -%> Associate Samples from other projects?
+    <div class="modal new-association-modal" id="addSampleModal" tabindex="-1" role="dialog" aria-labelledby="addSampleModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="addSampleModalLabel">Select sample</h4>
+          </div>
+          <div class="modal-body">
+              <div class="association-step" data-step="1">
+                <div class="form-group">
+                  <input type="text" class="form-control association-filter" placeholder="Type to filter...">
+                </div>
+                <div class="list-group association-candidate-list" id="samples-list">
+                  <%= render :partial => 'samples/association_preview', :collection => Sample.limit(5) %>
+                </div>
+                <%= hidden_field_tag :association_id, '' %>
+                <%= hidden_field_tag :association_title, '' %>
+              </div>
+              <div class="association-step" data-step="2" style="display: none">
+                <div class="form-group">
+                  <label>Select sample direction</label>
+                  <%= select_tag(:sample_direction,
+                                 options_for_select([
+                                                        ['No direction', AssayAsset::Direction::NODIRECTION],
+                                                        ['Incoming', AssayAsset::Direction::INCOMING],
+                                                        ['Outgoing', AssayAsset::Direction::OUTGOING]]),
+                                 :class => 'form-control') %>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary add-association-btn">Add sample</button>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'sample'} %>
-      </div>
     </div>
+
+    <script>
+
+      var associateSample = {
+        selectSample: function () {
+          $j(this).siblings().removeClass('active');
+          $j(this).addClass('active');
+          $j('div[data-step=2]').show();
+          $j('#association_id').val($j(this).data('association-id'));
+          $j('#association_title').val($j(this).data('association-title'));
+          return false;
+        },
+        filterSamples: function (e) {
+          // If more than two characters were entered, or the ENTER key was pressed..
+          if($j(this).val().length >= 2 || e.keyCode == 13) {
+            var modal = $j(this).parents('.new-association-modal');
+            $j.ajax('<%= filter_samples_path %>', {
+                  data: { filter: $j(this).val() },
+                  success: function (data) { $j('.association-candidate-list', modal).html(data); }
+                }
+            );
+          }
+          e.preventDefault();
+          return false;
+        },
+        addSample: function () {
+          var o = {
+            id: $j('#association_id').val(),
+            title: $j('#association_title').val(),
+            direction: $j('#sample_direction').val()
+          };
+          $j('#sample_to_list').append(HandlebarsTemplates['associations/sample'](o));
+          $j(this).parents('.new-association-modal').modal('hide');
+        }
+      };
+
+      $j(document).ready(function () {
+        $j('.association-list').on('click', '.remove-association', function () {
+          $j(this).parent().remove();
+        });
+        $j('.new-association-modal').on('click', '.association-preview', associateSample.selectSample);
+        $j('.association-filter').keypress(associateSample.filterSamples);
+        $j('.add-association-btn').click(associateSample.addSample);
+      });
+
+      $j(document).ready(function () {
+        $j('#sample_to_list').html('');
+        var associated = <%= associated_samples_json.html_safe %>;
+        associated.each(function (x) {
+          $j('#sample_to_list').append(HandlebarsTemplates['associations/sample'](x));
+        });
+      });
+    </script>
+
 <% end %>
-
-<script type="text/javascript">
-    var sampleOptions = {
-        project: <%= ([["Select Sample ...", 0]]|project_samples.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>,
-        all: <%= ([["Select Sample ...", 0]]|all_samples.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>
-    };
-
-    function toggle_sample_list() {
-        if ($('include_other_project_samples').checked)
-            $j('#possible_samples').html(optionsFromArray(sampleOptions.all));
-        else
-            $j('#possible_samples').html(optionsFromArray(sampleOptions.project));
-    }
-
-    function check_show_add_model() {
-        i = $('possible_samples').selectedIndex;
-        selected_id = $('possible_samples').options[i].value;
-        if (selected_id == '0') {
-            $('add_sample_link').hide();
-        }
-        else {
-            $('add_sample_link').show();
-        }
-    }
-
-    <% resource.samples.each do |sample| -%>
-    <% if sample.can_view? -%>
-    sample_id = '<%= sample.id -%>';
-    sample_title = '<%= escape_javascript(sample.title) -%>';
-    addSample(sample_title, sample_id);
-    <% end -%>
-    <% end -%>
-
-    <% if params[:sample_ids] %>
-    <% params[:sample_ids].each do |id| -%>
-    <% sample = Sample.find(id) %>
-    <% if sample.can_view?-%>
-    sample_id = '<%= sample.id -%>';
-    sample_title = '<%= escape_javascript(sample.title) -%>';
-    addSample(sample_title, sample_id);
-    <% end -%>
-    <% end -%>
-    <% end -%>
-
-    updateSamples();
-    toggle_sample_list();
-</script>

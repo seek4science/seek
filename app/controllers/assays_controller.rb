@@ -183,7 +183,7 @@ class AssaysController < ApplicationController
     sop_ids               = params[:assay_sop_ids] || []
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:model_ids] || []
-    sample_ids            = params[:sample_ids] || []
+    samples               = params[:samples] || []
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     Array(data_file_ids).each do |text|
       id, r_type = text.split(",")
@@ -198,9 +198,9 @@ class AssaysController < ApplicationController
       s = Sop.find(id)
       assay_assets_to_keep << assay.associate(s) if s.can_view?
     end
-    Array(sample_ids).each do |id|
-      s = Sample.find(id)
-      assay_assets_to_keep << assay.associate(s)
+    samples.each do |sample|
+      s = Sample.find(sample[:id])
+      assay_assets_to_keep << assay.associate(s, :direction => sample[:direction])
     end
     #Destroy AssayAssets that aren't needed
     (assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }

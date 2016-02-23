@@ -639,6 +639,7 @@ SEEK::Application.routes.draw do
     collection do
       get :attribute_form
       get :preview
+      get :filter
     end
   end
 

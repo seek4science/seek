@@ -107,6 +107,9 @@ class Assay < ActiveRecord::Base
       assay_asset.version = asset.version if asset && asset.respond_to?(:version)
       r_type = options.delete(:relationship)
       assay_asset.relationship_type = r_type unless r_type.nil?
+
+      direction = options.delete(:direction)
+      assay_asset.direction = direction unless direction.nil?
       assay_asset.save if assay_asset.changed?
 
       @pending_related_assets ||= []

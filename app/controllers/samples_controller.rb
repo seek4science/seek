@@ -59,4 +59,12 @@ class SamplesController < ApplicationController
     end
   end
 
+  def filter
+    @samples = Sample.where("title LIKE ?" , "#{params[:filter]}%").limit(5)
+
+    respond_with do |format|
+      format.html { render :partial => 'samples/association_preview', :collection => @samples }
+    end
+  end
+
 end
