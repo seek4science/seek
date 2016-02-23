@@ -14,12 +14,20 @@
     <%= render :partial=>"sample_attributes_form",:locals=>{sample:@sample} %>
   </div>
 
+  <div id="sample_extra_details">
+    <%= render :partial => "projects/project_selector", :locals => { :resource => @sample,:allow_nil=> false} -%>
+  </div>
+
   <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'submit_sample_button',disabled:@sample.sample_type.nil? %>
     or
   <%= cancel_button(@sample.new_record? ? samples_path : sample_path(@sample)) %>
 </div>
 
 <script>
+    <% if @sample.sample_type.nil? %>
+        $j('#sample_extra_details').hide();
+    <% end %>
+
     $j('#sample_sample_type_id').on('change', function () {
         if (this.value) {
             $j.ajax({
@@ -31,6 +39,7 @@
                     var replacement = "<div id='sample_attributes'>"+data["form"]+"</div>"
                     $j('#sample_attributes').replaceWith(replacement);
                     $j('#submit_sample_button').prop('disabled',false);
+                    $j('#sample_extra_details').show();
                 },
                 error: function(data) {
                     $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
@@ -41,6 +50,7 @@
         else {
             $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
             $j('#submit_sample_button').prop('disabled',true);
+            $j('#sample_extra_details').hide();
         }
     });
 

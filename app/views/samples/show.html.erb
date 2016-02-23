@@ -1,3 +1,5 @@
 <%= render :partial => "general/item_title", :locals => {:item => @sample, :buttons_partial => 'assets/asset_buttons'} %>
 
 <%= render :partial => "attribute_values", :locals => {:sample => @sample} %>
+
+<%= render :partial=>"general/items_related_to",:object => @sample %>
