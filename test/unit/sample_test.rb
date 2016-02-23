@@ -186,4 +186,14 @@ class SampleTest < ActiveSupport::TestCase
     assert_respond_to sample2,:full_name
   end
 
+  test 'projects' do
+    sample = Factory(:sample)
+    assert_empty sample.projects
+    project = Factory(:project)
+    sample.update_attributes(project_ids:[project.id])
+    sample.save!
+    sample.reload
+    assert_equal [project],sample.projects
+  end
+
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160222131559) do
+ActiveRecord::Schema.define(:version => 20160223105040) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1158,6 +1158,11 @@ ActiveRecord::Schema.define(:version => 20160222131559) do
 
   add_index "projects_publications", ["project_id"], :name => "index_projects_publications_on_project_id"
   add_index "projects_publications", ["publication_id", "project_id"], :name => "index_projects_publications_on_publication_id_and_project_id"
+
+  create_table "projects_samples", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "sample_id"
+  end
 
   create_table "projects_sop_versions", :id => false, :force => true do |t|
     t.integer "project_id"

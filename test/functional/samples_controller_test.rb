@@ -66,6 +66,34 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'M13 9QL', updated_sample.postcode
   end
 
+  test 'associate with project on create' do
+    person = Factory(:person_in_multiple_projects)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert person.projects.count >= 3 #incase the factory changes
+    project_ids = person.projects[0..1].collect(&:id)
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample', full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL', project_ids:project_ids }
+    end
+    assert sample=assigns(:sample)
+    assert_equal person.projects[0..1].sort,sample.projects.sort
+  end
+
+  test 'associate with project on update' do
+    person = Factory(:person_in_multiple_projects)
+    login_as(person)
+    sample = populated_patient_sample
+    assert_empty sample.projects
+    assert person.projects.count >= 3 #incase the factory changes
+    project_ids = person.projects[0..1].collect(&:id)
+
+    put :update, id: sample.id, sample: { title: 'Updated Sample', full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL',project_ids:project_ids }
+
+    assert sample=assigns(:sample)
+    assert_equal person.projects[0..1].sort,sample.projects.sort
+
+  end
+
   private
 
   def populated_patient_sample
