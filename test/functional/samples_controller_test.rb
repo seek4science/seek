@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
 
   test 'new' do
@@ -94,10 +95,60 @@ class SamplesControllerTest < ActionController::TestCase
 
   end
 
+  test 'contributor can view' do
+    person = Factory(:person)
+    login_as(person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :show,:id=>sample.id
+    assert_response :success
+  end
+
+  test 'non contributor cannot view' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(other_person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :show,:id=>sample.id
+    assert_response :forbidden
+  end
+
+  test 'anonymous cannot view' do
+    person = Factory(:person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :show,:id=>sample.id
+    assert_response :forbidden
+  end
+
+  test 'contributor can edit' do
+    person = Factory(:person)
+    login_as(person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :edit,:id=>sample.id
+    assert_response :success
+  end
+
+  test 'non contributor cannot edit' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(other_person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :edit,:id=>sample.id
+    assert_redirected_to sample
+    refute_nil flash[:error]
+  end
+
+  test 'anonymous cannot edit' do
+    person = Factory(:person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :edit,:id=>sample.id
+    assert_redirected_to sample
+    refute_nil flash[:error]
+  end
+
   private
 
   def populated_patient_sample
-    sample = Sample.new title: 'My Sample'
+    sample = Sample.new title: 'My Sample', policy:Factory(:public_policy), contributor:Factory(:person)
     sample.sample_type = Factory(:patient_sample_type)
     sample.title = 'My sample'
     sample.full_name = 'Fred Bloggs'

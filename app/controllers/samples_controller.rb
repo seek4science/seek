@@ -1,6 +1,7 @@
 class SamplesController < ApplicationController
   respond_to :html
   include Seek::PreviewHandling
+  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview]
 
   before_filter :auth_to_create, :only=>[:new,:create]
 
