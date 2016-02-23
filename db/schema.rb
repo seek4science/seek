@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160223132539) do
+ActiveRecord::Schema.define(:version => 20160223155557) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -402,9 +402,6 @@ ActiveRecord::Schema.define(:version => 20160223132539) do
     t.boolean "can_download", :default => false
     t.boolean "can_delete",   :default => false
   end
-
-  add_index "deprecated_sample_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sample_user_id_asset_id_can_view"
-  add_index "deprecated_sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
 
   create_table "deprecated_samples", :force => true do |t|
     t.string   "title"
@@ -1344,8 +1341,10 @@ ActiveRecord::Schema.define(:version => 20160223132539) do
     t.integer  "contributor_id"
     t.integer  "policy_id"
     t.string   "contributor_type"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+    t.string   "first_letter",     :limit => 1
+    t.text     "other_creators"
   end
 
   create_table "saved_searches", :force => true do |t|
