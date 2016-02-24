@@ -390,7 +390,10 @@ namespace :seek_dev do
   end
 
   task :create_test_sample_types_and_attribute => :environment do
-    Sample.destroy_all
+    disable_authorization_checks {
+      Sample.destroy_all
+    }
+
     SampleAttributeType.destroy_all
 
     #basic attribute types
@@ -428,7 +431,7 @@ namespace :seek_dev do
     #patient type
     patient_type = SampleType.new title:"Very basic patient type"
     patient_type.sample_attributes << SampleAttribute.new(title:"Full name",sample_attribute_type:two_words_type, required:true)
-    patient_type.sample_attributes << SampleAttribute.new(title:"Age",sample_attribute_type:positive_integer_type)
+    patient_type.sample_attributes << SampleAttribute.new(title:"Age",sample_attribute_type:positive_integer_type,unit:Unit.find_by_title('month'))
     patient_type.sample_attributes << SampleAttribute.new(title:"Weight",sample_attribute_type:positive_float_type)
     patient_type.sample_attributes << SampleAttribute.new(title:"Date of birth",sample_attribute_type:date_time_type, required:true)
     patient_type.sample_attributes << SampleAttribute.new(title:"Email",sample_attribute_type:email_type)
