@@ -35,6 +35,10 @@ class Sample < ActiveRecord::Base
     false
   end
 
+  def self.user_creatable?
+    true
+  end
+
   private
 
   def setup_accessor_methods
