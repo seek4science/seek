@@ -3,6 +3,12 @@ class Sample < ActiveRecord::Base
                   :policy_id, :sample_type_id, :title, :uuid, :project_ids, :policy, :contributor,
                   :other_creators
 
+  searchable(:auto_index=>false) do
+    string :attribute_fields, :multiple=>true do
+      self.attribute_values_for_search
+    end
+  end
+
   acts_as_asset
 
   belongs_to :sample_type
@@ -40,6 +46,13 @@ class Sample < ActiveRecord::Base
   end
 
   private
+
+  def attribute_values_for_search
+    return [] unless self.sample_type
+    self.sample_type.sample_attributes.collect do |attr|
+      self.send(attr.accessor_name).to_s
+    end.reject{|val| val.blank?}.uniq
+  end
 
   def setup_accessor_methods
     sample_type.sample_attributes.collect(&:accessor_name).each do |name|

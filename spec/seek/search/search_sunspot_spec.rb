@@ -1,4 +1,7 @@
 require 'rails_helper'
+require 'factory_girl'
+
+FactoryGirl.find_definitions
 
 #acts_as_asset
 describe DataFile do
@@ -227,4 +230,9 @@ describe Event do
   it { should have_searchable_field(:city) }
   it { should have_searchable_field(:country) }
   it { should have_searchable_field(:url) }
+end
+
+describe Factory(:patient_sample) do
+  it { should have_searchable_field(:title) }
+  it { should have_searchable_field(:attribute_fields) }
 end
