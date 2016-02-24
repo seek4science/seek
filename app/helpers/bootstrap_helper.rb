@@ -145,7 +145,7 @@ module BootstrapHelper
   def modal_header(title)
     content_tag(:div, :class => 'modal-header') do
       content_tag(:button, :class => 'close', 'data-dismiss' => 'modal', 'aria-label' => 'Close') do
-        content_tag(:span, '&times;', :class => 'close', 'data-dismiss' => 'modal', 'aria-hidden' => 'true')
+        content_tag(:span, '&times;'.html_safe, 'aria-hidden' => 'true')
       end +
       content_tag(:h4, title, :class => 'modal-title')
     end
