@@ -225,4 +225,44 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal [public_sample],Sample.all_authorized_for(:download,nil)
 
   end
+
+  test 'assays studies and investigation' do
+    assay = Factory(:assay)
+    study = assay.study
+    investigation = study.investigation
+    sample = Factory(:sample)
+
+    assert_empty sample.assays
+    assert_empty sample.studies
+    assert_empty sample.investigations
+
+    assay.associate(sample)
+    assay.save!
+    sample.reload
+
+    assert_equal [assay],sample.assays
+    assert_equal [study],sample.studies
+    assert_equal [investigation],sample.investigations
+
+  end
+
+  test 'cleans up assay asset on destroy' do
+    assay = Factory(:assay)
+    sample = Factory(:sample,:policy=>Factory(:public_policy))
+    assert_difference('AssayAsset.count',1) do
+      assay.associate(sample)
+    end
+    assay.save!
+    sample.reload
+    id = sample.id
+
+    refute_empty AssayAsset.where(asset_type:'Sample',asset_id:id)
+
+    assert_difference('AssayAsset.count',-1) do
+      assert sample.destroy
+    end
+    assert_empty AssayAsset.where(asset_type:'Sample',asset_id:id)
+
+
+  end
 end
