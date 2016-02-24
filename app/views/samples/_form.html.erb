@@ -25,7 +25,7 @@
   </div>
   <%= preview_permission_popup_link(@sample)-%>
 
-  <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'submit_sample_button',disabled:@sample.sample_type.nil?,:onclick => "javascript: previewPermissions();return(false);" %>
+  <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'sample_submit_btn',disabled:@sample.sample_type.nil? %>
     or
   <%= cancel_button(@sample.new_record? ? samples_path : sample_path(@sample)) %>
 </div>
@@ -45,20 +45,25 @@
                 success: function(data) {
                     var replacement = "<div id='sample_attributes'>"+data["form"]+"</div>"
                     $j('#sample_attributes').replaceWith(replacement);
-                    $j('#submit_sample_button').prop('disabled',false);
+                    $j('#sample_submit_btn').prop('disabled',false);
                     $j('#sample_extra_details').show();
                 },
                 error: function(data) {
                     $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
-                    $j('#submit_sample_button').prop('disabled',true);
+                    $j('#sample_submit_btn').prop('disabled',true);
                 }
             });
         }
         else {
             $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
-            $j('#submit_sample_button').prop('disabled',true);
+            $j('#sample_submit_btn').prop('disabled',true);
             $j('#sample_extra_details').hide();
         }
+    });
+
+    $j('#sample_submit_btn').on('click', function() {
+        previewPermissions();
+        return(false);
     });
 
 
