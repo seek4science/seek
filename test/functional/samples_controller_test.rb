@@ -3,8 +3,13 @@ require 'test_helper'
 class SamplesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-
   include SharingFormTestHelper
+
+  test 'index' do
+    Factory(:sample,:policy=>Factory(:public_policy))
+    get :index
+    assert_response :success
+  end
 
   test 'new' do
     login_as(Factory(:person))
