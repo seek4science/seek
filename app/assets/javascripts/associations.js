@@ -68,4 +68,18 @@ $j(document).ready(function () {
         modal.modal('hide');
         return false;
     });
+
+    $j('.association-filter').keypress(function (e) {
+        // If more than two characters were entered, or the input was cleared, or the ENTER key was pressed..
+        if($j(this).val().length == 0 || $j(this).val().length >= 2 || e.keyCode == 13) {
+            var modal = $j(this).parents('.new-association-modal');
+            $j.ajax($j(this).data('filterUrl'), {
+                    data: { filter: $j(this).val() },
+                    success: function (data) { $j('.association-candidate-list', modal).html(data); }
+                }
+            );
+            if(e.keyCode == 13)
+                e.preventDefault();
+        }
+    });
 });

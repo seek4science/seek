@@ -24,20 +24,16 @@
     <%= modal(:class => 'new-association-modal', :id => 'addSampleModal') do %>
         <%= modal_header 'Select sample' %>
         <%= modal_body do %>
-            <div class="association-step">
-              <div class="form-group">
-                <input type="text" class="form-control association-filter" placeholder="Type to filter...">
-              </div>
-              <div class="list-group association-candidate-list" id="samples-list">
-                <%= render :partial => 'samples/association_preview', :collection => Sample.limit(5) %>
-              </div>
+            <div class="form-group">
+              <input type="text" class="form-control association-filter" placeholder="Type to filter..." data-filter-url="<%= filter_samples_path -%>">
             </div>
-            <div class="association-step">
-              <div class="form-group">
-                <label>Select sample direction</label>
-                <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
-                <%= hidden_field_tag :_association_directionName, '' %>
-              </div>
+            <div class="list-group association-candidate-list">
+              <%= render :partial => 'samples/association_preview', :collection => Sample.limit(5) %>
+            </div>
+            <div class="form-group">
+              <label>Select sample direction</label>
+              <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
+              <%= hidden_field_tag :_association_directionName, '' %>
             </div>
         <% end %>
         <%= modal_footer do %>
@@ -56,20 +52,6 @@
       $j(document).ready(function () {
         $j('#_association_direction').change(updateDirectionName);
         updateDirectionName();
-
-        $j('.association-filter').keypress(function (e) {
-          // If more than two characters were entered, or the input was cleared, or the ENTER key was pressed..
-          if($j(this).val().length == 0 || $j(this).val().length >= 2 || e.keyCode == 13) {
-            var modal = $j(this).parents('.new-association-modal');
-            $j.ajax('<%= filter_samples_path %>', {
-                  data: { filter: $j(this).val() },
-                  success: function (data) { $j('.association-candidate-list', modal).html(data); }
-                }
-            );
-            if(e.keyCode == 13)
-              e.preventDefault();
-          }
-        });
       });
     </script>
 <% end %>
