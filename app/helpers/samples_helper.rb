@@ -16,6 +16,15 @@ module SamplesHelper
     authorised_assets(Sample, projects)
   end
 
+  def sample_attribute_title_and_unit(attribute)
+    title = attribute.title
+    if (unit = attribute.unit) && !unit.dimensionless?
+      unit_text = unit.title ? unit.title : unit.symbol
+      title = title + " ( #{unit_text} )"
+    end
+    title
+  end
+
 end
 
 
