@@ -19,6 +19,12 @@ var associations = {
 };
 
 $j(document).ready(function () {
+    $j('body').on('click', '.association-preview', function () {
+        $j(this).siblings().removeClass('active');
+        $j(this).addClass('active');
+        return false;
+    });
+
     $j('[data-role="seek-associations-list"]').each(function () {
         var self = $j(this);
         var existingValues = JSON.parse($j('script[data-role="seek-existing-associations"]', self).html());
@@ -41,7 +47,10 @@ $j(document).ready(function () {
     $j('[data-role="seek-confirm-association-button"]').click(function (e) {
         e.preventDefault();
         var modal = $j(this).parents('.new-association-modal');
-        var associationObject = {};
+        var associationObject = {
+            id: $j('.association-preview.active', modal).data('associationId'),
+            title: $j('.association-preview.active', modal).data('associationTitle')
+        };
 
         // Build a JSON object from the inputs in the modal
         $j(':input', modal).each(function (_, input) {

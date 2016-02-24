@@ -31,8 +31,6 @@
               <div class="list-group association-candidate-list" id="samples-list">
                 <%= render :partial => 'samples/association_preview', :collection => Sample.limit(5) %>
               </div>
-              <%= hidden_field_tag :_association_id, '' %>
-              <%= hidden_field_tag :_association_title, '' %>
             </div>
             <div class="association-step">
               <div class="form-group">
@@ -56,14 +54,6 @@
       }
 
       $j(document).ready(function () {
-        $j('.new-association-modal').on('click', '.association-preview', function () {
-          $j(this).siblings().removeClass('active');
-          $j(this).addClass('active');
-          $j('#_association_id').val($j(this).data('association-id'));
-          $j('#_association_title').val($j(this).data('association-title'));
-          return false;
-        });
-
         $j('#_association_direction').change(updateDirectionName);
         updateDirectionName();
 
