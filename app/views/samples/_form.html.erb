@@ -23,8 +23,9 @@
         <%= render :partial => "assets/asset_form_bottom", :locals=>{:f=>f,attribution_enable:false,show_publications:false,sharing_link:false} %>
     <% end %>
   </div>
+  <%= preview_permission_popup_link(@sample)-%>
 
-  <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'submit_sample_button',disabled:@sample.sample_type.nil? %>
+  <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'submit_sample_button',disabled:@sample.sample_type.nil?,:onclick => "javascript: previewPermissions();return(false);" %>
     or
   <%= cancel_button(@sample.new_record? ? samples_path : sample_path(@sample)) %>
 </div>
@@ -59,5 +60,6 @@
             $j('#sample_extra_details').hide();
         }
     });
+
 
 </script>
