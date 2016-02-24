@@ -9,4 +9,8 @@ class Unit < ActiveRecord::Base
     symbol=="dimensionless"
   end
 
+  def to_s
+    title ? title : symbol
+  end
+
 end
