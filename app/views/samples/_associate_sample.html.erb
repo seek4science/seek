@@ -19,14 +19,9 @@
 
     <%= button_link_to('Add sample', 'add', '#', 'data-toggle' => "modal", 'data-target' => "#addSampleModal") %>
 
-    <div class="modal new-association-modal" id="addSampleModal" tabindex="-1" role="dialog" aria-labelledby="addSampleModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="addSampleModalLabel">Select sample</h4>
-          </div>
-          <div class="modal-body">
+    <%= modal(:class => 'new-association-modal', :id => 'addSampleModal') do %>
+        <%= modal_header 'Select sample' %>
+        <%= modal_body do %>
             <div class="association-step" data-step="1">
               <div class="form-group">
                 <input type="text" class="form-control association-filter" placeholder="Type to filter...">
@@ -47,13 +42,11 @@
                                :class => 'form-control') %>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
+        <% end %>
+        <%= modal_footer do %>
             <button type="button" class="btn btn-primary add-association-btn">Add sample</button>
-          </div>
-        </div>
-      </div>
-    </div>
+        <% end %>
+    <% end %>
 
     <script>
       var associateSample = {
