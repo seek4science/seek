@@ -3,7 +3,8 @@
 
   assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
   associated_samples_json = assay_assets.map do |aa|
-    { title: aa.asset.title, id: aa.asset_id, direction: aa.direction }
+    { title: aa.asset.title, id: aa.asset_id,
+      direction: aa.direction, directionName: direction_name(aa.direction) }
   end.to_json
 -%>
 
@@ -13,105 +14,71 @@
       The following Samples are involved in this <%= resource_text -%>:
     </p>
 
-    <ul id="sample_to_list" class="association-list">
-      <li class="none_text no-item-text" id="samples">No samples</li>
-    </ul>
+    <%= associations_list('sample_to_list', 'associations/sample', associated_samples_json,
+                          :empty_text => 'No samples') %>
+
+    <hr/>
 
     <%= button_link_to('Add sample', 'add', '#', 'data-toggle' => "modal", 'data-target' => "#addSampleModal") %>
 
     <%= modal(:class => 'new-association-modal', :id => 'addSampleModal') do %>
         <%= modal_header 'Select sample' %>
         <%= modal_body do %>
-            <div class="association-step" data-step="1">
+            <div class="association-step">
               <div class="form-group">
                 <input type="text" class="form-control association-filter" placeholder="Type to filter...">
               </div>
               <div class="list-group association-candidate-list" id="samples-list">
                 <%= render :partial => 'samples/association_preview', :collection => Sample.limit(5) %>
               </div>
-              <%= hidden_field_tag :association_id, '' %>
-              <%= hidden_field_tag :association_title, '' %>
+              <%= hidden_field_tag :_association_id, '' %>
+              <%= hidden_field_tag :_association_title, '' %>
             </div>
-            <div class="association-step" data-step="2" style="display: none">
+            <div class="association-step">
               <div class="form-group">
                 <label>Select sample direction</label>
-                <%= select_tag(:sample_direction,
-                               options_for_select([['No direction', AssayAsset::Direction::NODIRECTION],
-                                                   ['Incoming', AssayAsset::Direction::INCOMING],
-                                                   ['Outgoing', AssayAsset::Direction::OUTGOING]]),
-                               :class => 'form-control') %>
+                <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
+                <%= hidden_field_tag :_association_directionName, '' %>
               </div>
             </div>
         <% end %>
         <%= modal_footer do %>
-            <button type="button" class="btn btn-primary add-association-btn">Add sample</button>
+            <%= confirm_association_button('Add sample', 'sample_to_list') %>
         <% end %>
     <% end %>
 
     <script>
-      var associateSample = {
-        selectSample: function () {
+      // Need to store the direction name for displaying in the list of samples
+      function updateDirectionName () {
+        var select = $j('#_association_direction');
+        var hidden = $j('#_association_directionName');
+        hidden.val($j('option:selected', select).text());
+      }
+
+      $j(document).ready(function () {
+        $j('.new-association-modal').on('click', '.association-preview', function () {
           $j(this).siblings().removeClass('active');
           $j(this).addClass('active');
-          $j('div[data-step=2]').show();
-          $j('#association_id').val($j(this).data('association-id'));
-          $j('#association_title').val($j(this).data('association-title'));
+          $j('#_association_id').val($j(this).data('association-id'));
+          $j('#_association_title').val($j(this).data('association-title'));
           return false;
-        },
-        filterSamples: function (e) {
-          // If more than two characters were entered, or the ENTER key was pressed..
-          if($j(this).val().length >= 2 || e.keyCode == 13) {
+        });
+
+        $j('#_association_direction').change(updateDirectionName);
+        updateDirectionName();
+
+        $j('.association-filter').keypress(function (e) {
+          // If more than two characters were entered, or the input was cleared, or the ENTER key was pressed..
+          if($j(this).val().length == 0 || $j(this).val().length >= 2 || e.keyCode == 13) {
             var modal = $j(this).parents('.new-association-modal');
             $j.ajax('<%= filter_samples_path %>', {
                   data: { filter: $j(this).val() },
                   success: function (data) { $j('.association-candidate-list', modal).html(data); }
                 }
             );
+            if(e.keyCode == 13)
+              e.preventDefault();
           }
-        },
-        addSample: function () {
-          var o = {
-            id: $j('#association_id').val(),
-            title: $j('#association_title').val(),
-            direction: $j('#sample_direction').val()
-          };
-          $j('#sample_to_list').append(HandlebarsTemplates['associations/sample'](o));
-          $j(this).parents('.new-association-modal').modal('hide');
-
-          var list = $j('#sample_to_list');
-          var noText = $j('.no-item-text', list);
-
-          if($j('.association-list-item', list).length == 0)
-            noText.show();
-          else
-            noText.hide()
-        },
-        removeSample: function () {
-          var list = $j(this).parents('.association-list');
-          var noText = $j('.no-item-text', list);
-
-          $j(this).parent().remove();
-
-          if($j('.association-list-item', list).length == 0)
-            noText.show();
-          else
-            noText.hide();
-
-          $j(this).parent().remove();
-        }
-      };
-
-      $j(document).ready(function () {
-        $j('.association-list').on('click', '.remove-association', associateSample.removeSample);
-        $j('.new-association-modal').on('click', '.association-preview', associateSample.selectSample);
-        $j('.association-filter').keypress(associateSample.filterSamples);
-        $j('.add-association-btn').click(associateSample.addSample);
-      });
-
-      $j(document).ready(function () {
-        var associated = <%= associated_samples_json.html_safe %>;
-        associated.each(function (x) {
-          $j('#sample_to_list').append(HandlebarsTemplates['associations/sample'](x));
         });
       });
     </script>

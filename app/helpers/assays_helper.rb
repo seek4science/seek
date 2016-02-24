@@ -127,4 +127,23 @@ module AssaysHelper
     return result.html_safe
   end
 
+  def direction_options
+    dirs = [AssayAsset::Direction::NODIRECTION,
+     AssayAsset::Direction::INCOMING,
+     AssayAsset::Direction::OUTGOING]
+
+    options_for_select(dirs.map { |dir| [direction_name(dir), dir] })
+  end
+
+  def direction_name(direction)
+    case direction
+      when AssayAsset::Direction::INCOMING
+        'Incoming'
+      when AssayAsset::Direction::OUTGOING
+        'Outgoing'
+      when AssayAsset::Direction::NODIRECTION
+        'No direction'
+    end
+  end
+
 end
