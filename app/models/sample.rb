@@ -4,9 +4,7 @@ class Sample < ActiveRecord::Base
                   :other_creators
 
   searchable(:auto_index=>false) do
-    string :attribute_fields, :multiple=>true do
-      self.attribute_values_for_search
-    end
+    text :attribute_values_for_search
   end
 
   acts_as_asset
