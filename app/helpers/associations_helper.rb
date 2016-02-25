@@ -8,6 +8,32 @@ module AssociationsHelper
     end
   end
 
+  def association_selector(association_list_id, button_text, modal_title, &block)
+    modal_id = "modal" + button_text.parameterize.underscore.camelize
+    button_link_to(button_text, 'add', '#', 'data-toggle' => "modal", 'data-target' => "##{modal_id}") +
+    modal(:class => 'new-association-modal', :id => modal_id) do
+      modal_header(modal_title) +
+      modal_body do
+        yield
+      end +
+      modal_footer do
+        confirm_association_button(button_text, association_list_id)
+      end
+    end
+
+  end
+
+  def filterable_association_select(filter_url, &block)
+    content_tag(:div, :class => 'form-group') do
+    content_tag(:input, :class => 'form-control association-filter',
+                :type => 'text', :placeholder => "Type to filter...",
+                'data-filter-url' => filter_url)
+    end
+    content_tag(:div, :class => 'list-group association-candidate-list') do
+      yield
+    end
+  end
+
   def confirm_association_button(text, associations_list_id)
     content_tag(:button, text, :class => 'btn btn-primary',
                 'data-role' => 'seek-confirm-association-button',

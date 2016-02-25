@@ -12,31 +12,22 @@
                   :help_text => "Here you associate Samples in SEEK to this #{resource_text}.") do %>
 
     <p>The following Samples are involved in this <%= resource_text -%>:</p>
+
     <%= associations_list('sample_to_list', 'associations/sample', associated_samples_json,
                           :empty_text => 'No samples') %>
 
     <hr/>
 
-    <%= button_link_to('Add sample', 'add', '#', 'data-toggle' => "modal", 'data-target' => "#addSampleModal") %>
+    <%= association_selector('sample_to_list', 'Add sample', 'Select sample') do %>
+        <%= filterable_association_select(filter_samples_path) do %>
+            <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20) %>
+        <% end %>
 
-    <%= modal(:class => 'new-association-modal', :id => 'addSampleModal') do %>
-        <%= modal_header 'Select sample' %>
-        <%= modal_body do %>
-            <div class="form-group">
-              <input type="text" class="form-control association-filter" placeholder="Type to filter..." data-filter-url="<%= filter_samples_path -%>">
-            </div>
-            <div class="list-group association-candidate-list">
-              <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20) %>
-            </div>
-            <div class="form-group">
-              <label>Select sample direction</label>
-              <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
-              <%= hidden_field_tag :_association_directionName, '' %>
-            </div>
-        <% end %>
-        <%= modal_footer do %>
-            <%= confirm_association_button('Add sample', 'sample_to_list') %>
-        <% end %>
+        <div class="form-group">
+          <label>Select sample direction</label>
+          <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
+          <%= hidden_field_tag :_association_directionName, '' %>
+        </div>
     <% end %>
 
     <script>
