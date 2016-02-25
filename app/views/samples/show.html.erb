@@ -1,5 +1,21 @@
 <%= render :partial => "general/item_title", :locals => {:item => @sample, :buttons_partial => 'assets/asset_buttons'} %>
 
-<%= render :partial => "attribute_values", :locals => {:sample => @sample} %>
+
+
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
+
+    <div class="row">
+      <div class="col-md-6">
+        <%= render :partial => "attribute_values", :locals => {:sample => @sample} %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-sm-4">
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sample } %>
+  </div>
+</div>
+
 
 <%= render :partial=>"general/items_related_to",:object => @sample %>
