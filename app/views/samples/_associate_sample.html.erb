@@ -10,10 +10,8 @@
 
 <%= folding_panel("Samples", assay_assets.blank?, :body_options => {:id => 'associate_sample_fold_content'},
                   :help_text => "Here you associate Samples in SEEK to this #{resource_text}.") do %>
-    <p style="color: #666666;">
-      The following Samples are involved in this <%= resource_text -%>:
-    </p>
 
+    <p>The following Samples are involved in this <%= resource_text -%>:</p>
     <%= associations_list('sample_to_list', 'associations/sample', associated_samples_json,
                           :empty_text => 'No samples') %>
 
@@ -28,7 +26,7 @@
               <input type="text" class="form-control association-filter" placeholder="Type to filter..." data-filter-url="<%= filter_samples_path -%>">
             </div>
             <div class="list-group association-candidate-list">
-              <%= render :partial => 'samples/association_preview', :collection => Sample.limit(5) %>
+              <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20) %>
             </div>
             <div class="form-group">
               <label>Select sample direction</label>

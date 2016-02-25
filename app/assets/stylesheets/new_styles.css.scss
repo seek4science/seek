@@ -408,7 +408,7 @@ a.remove-association {
 
 .association-candidate-list {
   border: 1px solid $list-group-border;
-  max-height: 350px;
+  max-height: 200px;
   overflow-y: scroll;
 
   .list-group-item {
