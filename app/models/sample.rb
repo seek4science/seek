@@ -5,6 +5,9 @@ class Sample < ActiveRecord::Base
 
   searchable(:auto_index=>false) do
     text :attribute_values_for_search
+    text :sample_type do
+      sample_type.title
+    end
   end
 
   acts_as_asset
