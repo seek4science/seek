@@ -1751,7 +1751,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "filter by people, including creators, using nested routes" do
-    assert_routing "people/7/presentations",{controller:"presentations",action:"index",person_id:"7"}
+    assert_routing "people/7/data_files",{controller:"data_files",action:"index",person_id:"7"}
 
     person1=Factory(:person)
     person2=Factory(:person)
