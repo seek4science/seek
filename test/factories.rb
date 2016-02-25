@@ -1164,3 +1164,12 @@ Factory.define(:sample) do |f|
   f.sequence(:title) {|n| "Sample #{n}"}
   f.association :sample_type,:factory=>:sample_type
 end
+
+Factory.define(:patient_sample, :parent=>:sample) do |f|
+  f.association :sample_type, :factory => :patient_sample_type
+  f.after_build do |type|
+    type.full_name="Fred Bloggs"
+    type.age=44
+    type.weight=88.7
+  end
+end

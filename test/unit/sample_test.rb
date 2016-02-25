@@ -186,4 +186,83 @@ class SampleTest < ActiveSupport::TestCase
     assert_respond_to sample2,:full_name
   end
 
+  test 'projects' do
+    sample = Factory(:sample)
+    assert_empty sample.projects
+    project = Factory(:project)
+    sample.update_attributes(project_ids:[project.id])
+    sample.save!
+    sample.reload
+    assert_equal [project],sample.projects
+  end
+
+  test 'authorization' do
+
+    person = Factory(:person)
+    other_person = Factory(:person)
+    public_sample = Factory(:sample,:policy=>Factory(:public_policy),:contributor=>person)
+    private_sample = Factory(:sample,:policy=>Factory(:private_policy),:contributor=>person)
+
+    assert public_sample.can_view?(person.user)
+    assert public_sample.can_view?(nil)
+    assert public_sample.can_view?(other_person.user)
+    assert public_sample.can_download?(person.user)
+    assert public_sample.can_download?(nil)
+    assert public_sample.can_download?(other_person.user)
+
+    assert private_sample.can_view?(person.user)
+    refute private_sample.can_view?(nil)
+    refute private_sample.can_view?(other_person.user)
+    assert private_sample.can_download?(person.user)
+    refute private_sample.can_download?(nil)
+    refute private_sample.can_download?(other_person.user)
+
+    assert_equal [public_sample,private_sample].sort,Sample.all_authorized_for(:view,person.user).sort
+    assert_equal [public_sample],Sample.all_authorized_for(:view,other_person.user)
+    assert_equal [public_sample],Sample.all_authorized_for(:view,nil)
+    assert_equal [public_sample,private_sample].sort,Sample.all_authorized_for(:download,person.user).sort
+    assert_equal [public_sample],Sample.all_authorized_for(:download,other_person.user)
+    assert_equal [public_sample],Sample.all_authorized_for(:download,nil)
+
+  end
+
+  test 'assays studies and investigation' do
+    assay = Factory(:assay)
+    study = assay.study
+    investigation = study.investigation
+    sample = Factory(:sample)
+
+    assert_empty sample.assays
+    assert_empty sample.studies
+    assert_empty sample.investigations
+
+    assay.associate(sample)
+    assay.save!
+    sample.reload
+
+    assert_equal [assay],sample.assays
+    assert_equal [study],sample.studies
+    assert_equal [investigation],sample.investigations
+
+  end
+
+  test 'cleans up assay asset on destroy' do
+    assay = Factory(:assay)
+    sample = Factory(:sample,:policy=>Factory(:public_policy))
+    assert_difference('AssayAsset.count',1) do
+      assay.associate(sample)
+    end
+    assay.save!
+    sample.reload
+    id = sample.id
+
+    refute_empty AssayAsset.where(asset_type:'Sample',asset_id:id)
+
+    assert_difference('AssayAsset.count',-1) do
+      assert sample.destroy
+    end
+    assert_empty AssayAsset.where(asset_type:'Sample',asset_id:id)
+
+
+  end
 end

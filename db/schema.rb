@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160222131559) do
+ActiveRecord::Schema.define(:version => 20160223155557) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -402,9 +402,6 @@ ActiveRecord::Schema.define(:version => 20160222131559) do
     t.boolean "can_download", :default => false
     t.boolean "can_delete",   :default => false
   end
-
-  add_index "deprecated_sample_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sample_user_id_asset_id_can_view"
-  add_index "deprecated_sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
 
   create_table "deprecated_samples", :force => true do |t|
     t.string   "title"
@@ -1159,6 +1156,11 @@ ActiveRecord::Schema.define(:version => 20160222131559) do
   add_index "projects_publications", ["project_id"], :name => "index_projects_publications_on_project_id"
   add_index "projects_publications", ["publication_id", "project_id"], :name => "index_projects_publications_on_publication_id_and_project_id"
 
+  create_table "projects_samples", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "sample_id"
+  end
+
   create_table "projects_sop_versions", :id => false, :force => true do |t|
     t.integer "project_id"
     t.integer "version_id"
@@ -1311,6 +1313,19 @@ ActiveRecord::Schema.define(:version => 20160222131559) do
   add_index "sample_attributes", ["sample_type_id"], :name => "index_sample_attributes_on_sample_type_id"
   add_index "sample_attributes", ["unit_id"], :name => "index_sample_attributes_on_unit_id"
 
+  create_table "sample_auth_lookup", :id => false, :force => true do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view",     :default => false
+    t.boolean "can_manage",   :default => false
+    t.boolean "can_edit",     :default => false
+    t.boolean "can_download", :default => false
+    t.boolean "can_delete",   :default => false
+  end
+
+  add_index "sample_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sample_user_id_asset_id_can_view"
+  add_index "sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
+
   create_table "sample_types", :force => true do |t|
     t.string   "title"
     t.string   "uuid"
@@ -1326,8 +1341,10 @@ ActiveRecord::Schema.define(:version => 20160222131559) do
     t.integer  "contributor_id"
     t.integer  "policy_id"
     t.string   "contributor_type"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+    t.string   "first_letter",     :limit => 1
+    t.text     "other_creators"
   end
 
   create_table "saved_searches", :force => true do |t|

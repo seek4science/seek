@@ -1,4 +1,7 @@
 require 'rails_helper'
+require 'factory_girl'
+
+FactoryGirl.find_definitions
 
 #acts_as_asset
 describe DataFile do
@@ -227,4 +230,18 @@ describe Event do
   it { should have_searchable_field(:city) }
   it { should have_searchable_field(:country) }
   it { should have_searchable_field(:url) }
+end
+
+describe Sample do
+  it { should have_searchable_field(:title) }
+  it { should have_searchable_field(:searchable_tags) }
+  it { should have_searchable_field(:contributor) }
+  it { should have_searchable_field(:projects) }
+
+  it { should have_searchable_field(:creators) }
+  it { should have_searchable_field(:other_creators) }
+
+  it { should have_searchable_field(:assay_type_titles) }
+  it { should have_searchable_field(:technology_type_titles) }
+
 end

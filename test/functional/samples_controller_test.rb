@@ -1,7 +1,15 @@
 require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
+  include SharingFormTestHelper
+
+  test 'index' do
+    Factory(:sample,:policy=>Factory(:public_policy))
+    get :index
+    assert_response :success
+  end
 
   test 'new' do
     login_as(Factory(:person))
@@ -66,10 +74,120 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'M13 9QL', updated_sample.postcode
   end
 
+  test 'associate with project on create' do
+    person = Factory(:person_in_multiple_projects)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert person.projects.count >= 3 #incase the factory changes
+    project_ids = person.projects[0..1].collect(&:id)
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample', full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL', project_ids:project_ids }
+    end
+    assert sample=assigns(:sample)
+    assert_equal person.projects[0..1].sort,sample.projects.sort
+  end
+
+  test 'associate with project on update' do
+    person = Factory(:person_in_multiple_projects)
+    login_as(person)
+    sample = populated_patient_sample
+    assert_empty sample.projects
+    assert person.projects.count >= 3 #incase the factory changes
+    project_ids = person.projects[0..1].collect(&:id)
+
+    put :update, id: sample.id, sample: { title: 'Updated Sample', full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL',project_ids:project_ids }
+
+    assert sample=assigns(:sample)
+    assert_equal person.projects[0..1].sort,sample.projects.sort
+
+  end
+
+  test 'contributor can view' do
+    person = Factory(:person)
+    login_as(person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :show,:id=>sample.id
+    assert_response :success
+  end
+
+  test 'non contributor cannot view' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(other_person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :show,:id=>sample.id
+    assert_response :forbidden
+  end
+
+  test 'anonymous cannot view' do
+    person = Factory(:person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :show,:id=>sample.id
+    assert_response :forbidden
+  end
+
+  test 'contributor can edit' do
+    person = Factory(:person)
+    login_as(person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :edit,:id=>sample.id
+    assert_response :success
+  end
+
+  test 'non contributor cannot edit' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(other_person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :edit,:id=>sample.id
+    assert_redirected_to sample
+    refute_nil flash[:error]
+  end
+
+  test 'anonymous cannot edit' do
+    person = Factory(:person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :edit,:id=>sample.id
+    assert_redirected_to sample
+    refute_nil flash[:error]
+  end
+
+  test 'create with sharing' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+
+
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample', full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL', project_ids:[] },:sharing=>valid_sharing
+    end
+    assert sample=assigns(:sample)
+    assert_equal person.user,sample.contributor
+    assert_equal Policy::ALL_USERS,sample.policy.sharing_scope
+    assert sample.can_view?(Factory(:person).user)
+  end
+
+  test 'update with sharing' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(person)
+    sample = populated_patient_sample
+    sample.contributor=person
+    sample.policy=Factory(:private_policy)
+    sample.save!
+    sample.reload
+    refute sample.can_view?(other_person.user)
+
+    put :update, id: sample.id, sample: { title: 'Updated Sample', full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL',project_ids:[] },:sharing=>valid_sharing
+
+    assert sample=assigns(:sample)
+    assert_equal Policy::ALL_USERS,sample.policy.sharing_scope
+    assert sample.can_view?(other_person.user)
+  end
   private
 
   def populated_patient_sample
-    sample = Sample.new title: 'My Sample'
+    sample = Sample.new title: 'My Sample', policy:Factory(:public_policy), contributor:Factory(:person)
     sample.sample_type = Factory(:patient_sample_type)
     sample.title = 'My sample'
     sample.full_name = 'Fred Bloggs'

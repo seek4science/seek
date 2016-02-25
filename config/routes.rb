@@ -1,6 +1,5 @@
 SEEK::Application.routes.draw do
 
-  resources :sample_attribute_types
   resources :sample_types
 
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
@@ -640,6 +639,9 @@ SEEK::Application.routes.draw do
       get :attribute_form
       get :preview
       get :filter
+    end
+    member do
+      post :update_annotations_ajax
     end
   end
 

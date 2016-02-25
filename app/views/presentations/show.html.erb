@@ -29,25 +29,3 @@
 <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
 
 <%= render :partial=>"general/items_related_to",:object => @presentation %>
-
-<script type="text/javascript">
-  var fp = null;
-
-  function toggle_asset_view_link_title(){
-      var viewer = document.getElementById("div_for_viewerPlaceHolder");
-
-      switch($("asset_view_link").innerHTML){
-          case "View Online?":
-            $("asset_view_link").innerHTML ="Close View?" ;
-            viewer.style.display = "block";
-            break;
-          case "Close View?":
-            $("asset_view_link").innerHTML ="View Online?";
-            viewer.style.display = "none";
-            break;
-          default:
-          break;
-      }
-
-  }
-  </script>

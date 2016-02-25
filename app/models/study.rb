@@ -5,7 +5,7 @@ class Study < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in
+  #FIXME: needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   def projects
     investigation.try(:projects) || []
   end

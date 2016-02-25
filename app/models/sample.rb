@@ -1,9 +1,17 @@
 class Sample < ActiveRecord::Base
-  attr_accessible :contributor_id, :contributor_type, :json_metadata, :policy_id, :sample_type_id, :title, :uuid
+  attr_accessible :contributor_id, :contributor_type, :json_metadata,
+                  :policy_id, :sample_type_id, :title, :uuid, :project_ids, :policy, :contributor,
+                  :other_creators
 
-  acts_as_uniquely_identifiable
+  searchable(:auto_index=>false) do
+    text :attribute_values_for_search
+  end
+
+  acts_as_asset
 
   belongs_to :sample_type
+
+  scope :default_order, order("title")
 
   validates :title, :sample_type, presence: true
   include ActiveModel::Validations
@@ -23,24 +31,23 @@ class Sample < ActiveRecord::Base
     false
   end
 
-  def can_edit?(_user = User.current_user)
-    true
-  end
-
-  def can_delete?(_user = User.current_user)
-    true
-  end
-
   def self.can_create?
     User.logged_in_and_member?
   end
 
-  def self.all_authorized_for action, user=User.current_user, projects=nil, filter_by_permissions=true
-    # mocked out until authorization is added
-    Sample.all
+
+  def self.user_creatable?
+    true
   end
 
   private
+
+  def attribute_values_for_search
+    return [] unless self.sample_type
+    self.sample_type.sample_attributes.collect do |attr|
+      self.send(attr.accessor_name).to_s
+    end.reject{|val| val.blank?}.uniq
+  end
 
   def setup_accessor_methods
     sample_type.sample_attributes.collect(&:accessor_name).each do |name|

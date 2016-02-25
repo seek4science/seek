@@ -1,4 +1,7 @@
+<% current_user_authorized_to_manage = @sample.new_record?|| @sample.can_manage? -%>
+
 <div class="asset_form">
+
 
   <%= f.error_messages -%>
 
@@ -14,12 +17,24 @@
     <%= render :partial=>"sample_attributes_form",:locals=>{sample:@sample} %>
   </div>
 
-  <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'submit_sample_button',disabled:@sample.sample_type.nil? %>
+  <div id="sample_extra_details" style="display:none">
+    <%= render :partial => "projects/project_selector", :locals => { :resource => @sample,:allow_nil=> false} -%>
+    <% if current_user_authorized_to_manage -%>
+        <%= render :partial => "assets/asset_form_bottom", :locals=>{:f=>f,attribution_enable:false,show_publications:false,sharing_link:false} %>
+    <% end %>
+  </div>
+  <%= preview_permission_popup_link(@sample)-%>
+
+  <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'sample_submit_btn',disabled:@sample.sample_type.nil? %>
     or
   <%= cancel_button(@sample.new_record? ? samples_path : sample_path(@sample)) %>
 </div>
 
 <script>
+    <% unless @sample.sample_type.nil? %>
+        $j('#sample_extra_details').show();
+    <% end %>
+
     $j('#sample_sample_type_id').on('change', function () {
         if (this.value) {
             $j.ajax({
@@ -30,18 +45,26 @@
                 success: function(data) {
                     var replacement = "<div id='sample_attributes'>"+data["form"]+"</div>"
                     $j('#sample_attributes').replaceWith(replacement);
-                    $j('#submit_sample_button').prop('disabled',false);
+                    $j('#sample_submit_btn').prop('disabled',false);
+                    $j('#sample_extra_details').show();
                 },
                 error: function(data) {
                     $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
-                    $j('#submit_sample_button').prop('disabled',true);
+                    $j('#sample_submit_btn').prop('disabled',true);
                 }
             });
         }
         else {
             $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
-            $j('#submit_sample_button').prop('disabled',true);
+            $j('#sample_submit_btn').prop('disabled',true);
+            $j('#sample_extra_details').hide();
         }
     });
+
+    $j('#sample_submit_btn').on('click', function() {
+        previewPermissions();
+        return(false);
+    });
+
 
 </script>

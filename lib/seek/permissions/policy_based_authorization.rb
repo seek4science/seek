@@ -1,4 +1,4 @@
-require 'project_compat'
+
 module Seek
   module Permissions
     module PolicyBasedAuthorization
@@ -17,7 +17,7 @@ module Seek
           #checks a policy exists, and if missing resorts to using a private policy
           after_initialize :policy_or_default_if_new
 
-          include ProjectCompat unless method_defined? :projects
+          include Seek::ProjectAssociation unless method_defined? :projects
 
           belongs_to :policy, :autosave => true #, :required_access_to_owner => :manage
           enforce_required_access_for_owner :policy,:manage
