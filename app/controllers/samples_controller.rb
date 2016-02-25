@@ -18,7 +18,7 @@ class SamplesController < ApplicationController
     @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
     @sample.update_attributes(params[:sample])
     update_sharing_policies @sample,params
-
+    update_annotations(params[:tag_list], @sample)
     flash[:notice] = 'The sample was successfully created.' if @sample.save
     respond_with(@sample)
   end
@@ -37,6 +37,7 @@ class SamplesController < ApplicationController
     @sample = Sample.find(params[:id])
     @sample.update_attributes(params[:sample])
     update_sharing_policies @sample,params
+    update_annotations(params[:tag_list], @sample)
     flash[:notice] = 'The sample was successfully updated.' if @sample.save
     respond_with(@sample)
   end

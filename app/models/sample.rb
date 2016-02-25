@@ -35,9 +35,6 @@ class Sample < ActiveRecord::Base
     User.logged_in_and_member?
   end
 
-  def self.is_taggable?
-    false
-  end
 
   def self.user_creatable?
     true

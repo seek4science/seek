@@ -639,6 +639,9 @@ SEEK::Application.routes.draw do
       get :attribute_form
       get :preview
     end
+    member do
+      post :update_annotations_ajax
+    end
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###
