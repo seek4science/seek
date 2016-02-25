@@ -4,7 +4,9 @@ class Sample < ActiveRecord::Base
                   :other_creators
 
   searchable(:auto_index=>false) do
-    text :attribute_values_for_search
+    text :attribute_values do
+      attribute_values_for_search
+    end
     text :sample_type do
       sample_type.title
     end
