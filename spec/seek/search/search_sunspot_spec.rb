@@ -232,7 +232,16 @@ describe Event do
   it { should have_searchable_field(:url) }
 end
 
-describe Factory(:patient_sample) do
+describe Sample do
   it { should have_searchable_field(:title) }
-  it { should have_searchable_field(:attribute_fields) }
+  it { should have_searchable_field(:searchable_tags) }
+  it { should have_searchable_field(:contributor) }
+  it { should have_searchable_field(:projects) }
+
+  it { should have_searchable_field(:creators) }
+  it { should have_searchable_field(:other_creators) }
+
+  it { should have_searchable_field(:assay_type_titles) }
+  it { should have_searchable_field(:technology_type_titles) }
+
 end
