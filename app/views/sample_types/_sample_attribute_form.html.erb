@@ -3,7 +3,7 @@
 <% id = sample_attribute ? sample_attribute.id : '' %>
 <% title = sample_attribute ? sample_attribute.title : '' %>
 <% pos = sample_attribute ? sample_attribute.pos : '' %>
-<% required = sample_attribute ? sample_attribute.required : '' %>
+<% required = sample_attribute ? sample_attribute.required : false %>
 <% attribute_type_id = sample_attribute ? sample_attribute.sample_attribute_type_id : nil %>
 <% unit_id = sample_attribute ? sample_attribute.unit_id : nil %>
 <% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
