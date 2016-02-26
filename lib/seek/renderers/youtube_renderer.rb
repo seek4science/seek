@@ -5,15 +5,9 @@ module Seek
         content_blob && content_blob.url && is_youtube_url?(content_blob.url) && extract_video_code(content_blob.url)
       end
 
-      def render
+      def render_content
         code = extract_video_code(content_blob.url)
         "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>"
-      rescue Exception => exception
-        if Seek::Config.exception_notification_enabled
-          data = { message: 'rendering error', renderer: self, item: content_blob.inspect }
-          ExceptionNotifier.notify_exception(exception, data: data)
-        end
-        ''
       end
 
       def is_youtube_url?(url)
