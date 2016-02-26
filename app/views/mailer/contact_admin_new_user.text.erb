@@ -1,8 +1,17 @@
 Hi Admin,
 
-The new user <%= @person.name %> just signed up. He/She left the following details about their project and institution affiliations:
+The new user <%= @person.name %> just signed up. He/She left the following details about their <%= t('project') %> and Institution affiliations:
 
 <%= @details %>
+
+<% if @projects_with_admins.any? %>
+Of these, the following <%= t('project').pluralize %> have <%= t('project_administrator').pluralize %> that will have also been notified by email:
+    <% @projects_with_admins.each do |project| %>
+- <%= project.title %>: <%= project_url(project) %>
+    <% end %>
+<% else %>
+There are NO <%= t('project_administrator').pluralize %> for these <%= t('project').pluralize %>.
+<% end %>
 
 For the person details: <%= person_url(@person) %>, whose email address is <%= @person.email %> .
 -- end --
