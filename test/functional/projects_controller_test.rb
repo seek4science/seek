@@ -1342,6 +1342,32 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes project.institutions, institution1
   end
 
+  test 'activity logging' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+
+    assert_difference('ActivityLog.count') do
+      get :show,id:project.id
+    end
+
+    log = ActivityLog.last
+    assert_equal project,log.activity_loggable
+    assert_equal 'show', log.action
+    assert_equal person.user, log.culprit
+
+    assert_difference('ActivityLog.count') do
+      put :update,id:project.id,project:{title:'fishy project'}
+    end
+
+    log = ActivityLog.last
+    assert_equal project,log.activity_loggable
+    assert_equal 'update', log.action
+    assert_equal person.user, log.culprit
+
+
+  end
+
   private
 
 	def valid_project
