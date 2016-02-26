@@ -17,16 +17,12 @@ module Seek
 
         json[:contributor] = create_agent(item.contributor)
 
-        json[:creators] = item.creators.map { |p| create_agent(p) } if item.respond_to?(:creators)
+        json[:creators] = item.creators.map { |creator| create_agent(creator) } if item.respond_to?(:creators)
 
         if item.is_a?(Investigation)
-          json[:studies] = item.studies.select { |s| s.permitted_for_research_object? }.map do |s|
-            s.research_object_package_path(parents + [item])
-          end
+          json[:studies] = collect_permitted_package_paths(item.studies, item, parents)
         elsif item.is_a?(Study)
-          json[:assays] = item.assays.select { |a| a.permitted_for_research_object? }.map do |a|
-            a.research_object_package_path(parents + [item])
-          end
+          json[:assays] = collect_permitted_package_paths(item.assays, item, parents)
         elsif item.is_a?(Assay)
           json[:assets] = contained_assets(item)
         elsif item.is_asset?
@@ -47,8 +43,14 @@ module Seek
 
       private
 
+      def collect_permitted_package_paths(children, item, parents)
+        children.select(&:permitted_for_research_object?).map do |s|
+          s.research_object_package_path(parents + [item])
+        end
+      end
+
       def contained_assets(assay)
-        assets = assay.assets.select{|asset| asset.permitted_for_research_object?}
+        assets = assay.assets.select(&:permitted_for_research_object?)
         assets.collect do |asset|
           asset.research_object_package_path([assay])
         end
