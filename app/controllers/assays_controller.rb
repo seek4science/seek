@@ -198,7 +198,7 @@ class AssaysController < ApplicationController
     end
     samples.each do |sample|
       s = Sample.find(sample[:id])
-      assay_assets_to_keep << assay.associate(s, :direction => sample[:direction])
+      assay_assets_to_keep << assay.associate(s, :direction => sample[:direction]) if s.can_view?
     end
     #Destroy AssayAssets that aren't needed
     (assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }

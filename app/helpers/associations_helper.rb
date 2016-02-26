@@ -23,10 +23,10 @@ module AssociationsHelper
 
   def filterable_association_select(filter_url, &_block)
     content_tag(:div, class: 'form-group') do
-      content_tag(:input, :class => 'form-control association-filter',
+      content_tag(:input, '', :class => 'form-control association-filter',
                           :type => 'text', :placeholder => 'Type to filter...',
                           'data-filter-url' => filter_url)
-    end
+    end +
     content_tag(:div, class: 'list-group association-candidate-list') do
       yield
     end
