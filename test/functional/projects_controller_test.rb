@@ -1389,7 +1389,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     login_as(person)
     get :storage_report, id: project.id
-    assert_redirected_to project_path(project)
+    assert_redirected_to :root
     refute_nil flash[:error]
   end
 
