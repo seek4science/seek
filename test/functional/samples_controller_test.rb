@@ -184,6 +184,24 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal Policy::ALL_USERS,sample.policy.sharing_scope
     assert sample.can_view?(other_person.user)
   end
+
+  test 'filter by sample_type route' do
+    assert_routing "sample_types/7/samples",{controller:"samples",action:"index",sample_type_id:"7"}
+  end
+
+  test 'filter by sample type' do
+    sample_type1=Factory(:sample_type)
+    sample_type2=Factory(:sample_type)
+    sample1=Factory(:sample,:sample_type=>sample_type1,:policy=>Factory(:public_policy),:title=>"SAMPLE 1")
+    sample2=Factory(:sample,:sample_type=>sample_type2,:policy=>Factory(:public_policy),:title=>"SAMPLE 2")
+
+    get :index,:sample_type_id=>sample_type1.id
+    assert_response :success
+    assert samples = assigns(:samples)
+    assert_includes samples, sample1
+    refute_includes samples, sample2
+  end
+
   private
 
   def populated_patient_sample

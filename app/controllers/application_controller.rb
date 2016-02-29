@@ -393,7 +393,7 @@ class ApplicationController < ActionController::Base
                                :data => object.title,
                                :user_agent => request.env["HTTP_USER_AGENT"])
           end
-        when "people"
+        when "people","projects","institutions"
           if ["show", "create", "update", "destroy"].include?(action)
             ActivityLog.create(:action => action,
                                :culprit => current_user,

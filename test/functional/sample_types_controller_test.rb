@@ -87,4 +87,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_redirected_to sample_types_path
   end
 
+
+
 end

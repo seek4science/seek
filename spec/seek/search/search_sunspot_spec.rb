@@ -244,4 +244,7 @@ describe Sample do
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
 
+  it { should have_searchable_field(:sample_type) }
+  it { should have_searchable_field(:attribute_values) }
+  
 end

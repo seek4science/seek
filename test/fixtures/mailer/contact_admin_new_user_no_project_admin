@@ -1,12 +1,14 @@
 Hi Admin,
 
-The new user Aaron Spiggle just signed up. He/She left the following details about their project and institution affiliations:
+The new user Aaron Spiggle just signed up. He/She left the following details about their Project and Institution affiliations:
 
 Project: Project X
 Project: Project Y
 New Projects: Another Project
 Institution: The Institute
 New Institutions: Another Institute
+
+There are NO Project administrators for these Projects.
 
 For the person details: http://localhost:3000/people/2, whose email address is aaron@email.com .
 -- end --
