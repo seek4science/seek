@@ -30,6 +30,9 @@
 
   <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @programme } -%>
+    <% if @programme.can_manage? -%>
+        <%= render :partial => 'programmes/storage_usage_box', locals: { programme: @programme } %>
+    <% end %>
   </div>
 </div>
 

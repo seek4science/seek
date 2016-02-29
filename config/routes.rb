@@ -184,6 +184,7 @@ SEEK::Application.routes.draw do
       get :admin
       get :admin_members
       get :admin_member_roles
+      get :storage_report
       post :update_members
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
@@ -511,6 +512,7 @@ SEEK::Application.routes.draw do
       put :reject_activation
       get :reject_activation_confirmation
       post :spawn_project
+      get :storage_report
     end
     resources :people,:projects, :institutions
   end

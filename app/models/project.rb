@@ -292,6 +292,18 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def total_asset_size
+    assets.sum do |asset|
+      if asset.respond_to?(:content_blob)
+        asset.content_blob.file_size
+      elsif asset.respond_to?(:content_blobs)
+        asset.content_blobs.sum(&:file_size)
+      else
+        0
+      end
+    end
+  end
+
   # should put below at the bottom in order to override methods for hierarchies,
   # Try to find a better way for overriding methods regardless where to include the module
   include Seek::ProjectHierarchies::ProjectExtension if Seek::Config.project_hierarchy_enabled

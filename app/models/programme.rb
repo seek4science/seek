@@ -83,6 +83,10 @@ class Programme < ActiveRecord::Base
     Seek::Roles::ProgrammeRelatedRoles.instance.people_with_programme_and_role(self, Seek::Roles::PROGRAMME_ADMINISTRATOR)
   end
 
+  def total_asset_size
+    projects.sum(&:total_asset_size)
+  end
+
   private
 
   # set the administrators, assigned from the params to :adminstrator_ids

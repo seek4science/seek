@@ -1,0 +1,15 @@
+<% cache({controller: 'programmes', action: 'storage_report', id: programme.id }, expires_in: 1.days) do -%>
+    <p>
+      Total: <strong><%= number_to_human_size programme.total_asset_size %></strong>
+    </p>
+
+    The breakdown for each project is as follows:
+    <ul>
+      <% programme.projects.each do |project| %>
+          <li>
+            <%= project.title %> -
+            <%= render partial: 'projects/storage_usage_content', locals: { project: project } %>
+          </li>
+      <% end %>
+    </ul>
+<% end %>

@@ -1,0 +1,15 @@
+<%= panel("Storage Usage", body_options: { id: 'storage-usage' }) do %>
+    The total size of all project assets is:
+    <span id="storage-usage-report">
+      <%= image_tag "ajax-loader.gif" %>
+    </span>
+<% end %>
+
+<script>
+  $j(document).ready(function () {
+    $j.ajax('<%= storage_report_project_path(project) -%>', {
+          success: function (data) { $j('#storage-usage-report').html(data); }
+        }
+    );
+  });
+</script>

@@ -3,6 +3,7 @@ require 'test_helper'
 class ProgrammesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include ActionView::Helpers::NumberHelper
 
   #this is needed to ensure the first user exists as admin, to stop it being automatically created as no fixtures are used.
   def setup
@@ -733,5 +734,30 @@ class ProgrammesControllerTest < ActionController::TestCase
     flash[:error]=nil
   end
 
+  test 'can get storage usage' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    data_file = Factory(:data_file, :project_ids => [programme.projects.first.id])
+    size = data_file.content_blob.file_size
+    assert size > 0
+
+    login_as(programme_administrator)
+    get :storage_report, id: programme.id
+
+    assert_response :success
+    assert_nil flash[:error]
+    assert_select 'strong', text: number_to_human_size(size)
+  end
+
+  test 'non admin cannot get storage usage' do
+    programme_administrator = Factory(:programme_administrator)
+    normal = Factory(:person)
+    programme = programme_administrator.programmes.first
+
+    login_as(normal)
+    get :storage_report, id: programme.id
+    assert_redirected_to programme_path(programme)
+    refute_nil flash[:error]
+  end
 
 end

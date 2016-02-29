@@ -4,7 +4,7 @@ class ProgrammesController < ApplicationController
 
   before_filter :programmes_enabled?
   before_filter :login_required, except: [:show, :index]
-  before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy]
+  before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy, :storage_report]
   before_filter :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
   before_filter :find_activated_programmes, only: [:index]
   before_filter :is_user_admin_auth, only: [:initiate_spawn_project, :spawn_project,:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation,:awaiting_activation]
@@ -108,6 +108,13 @@ class ProgrammesController < ApplicationController
     @programme.update_attribute(:activation_rejection_reason,params[:programme][:activation_rejection_reason])
     Mailer.programme_rejected(@programme,@programme.activation_rejection_reason).deliver if Seek::Config.email_enabled
     redirect_to @programme
+  end
+
+  def storage_report
+    respond_with do |format|
+      format.html { render :partial => 'programmes/storage_usage_content',
+                           :locals => { :programme => @programme } }
+    end
   end
 
   private

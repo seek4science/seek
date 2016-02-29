@@ -6,6 +6,7 @@ class ProjectsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
+  include ActionView::Helpers::NumberHelper
 
   fixtures :all
 
@@ -1366,6 +1367,30 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal person.user, log.culprit
 
 
+  end
+
+  test 'can get storage usage' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    data_file = Factory(:data_file, :project_ids => [project.id])
+    size = data_file.content_blob.file_size
+    assert size > 0
+
+    login_as(project_administrator)
+    get :storage_report, id: project.id
+    assert_response :success
+    assert_nil flash[:error]
+    assert_select 'strong', text: number_to_human_size(size)
+  end
+
+  test 'non admin cannot get storage usage' do
+    person = Factory(:person)
+    project = person.projects.first
+
+    login_as(person)
+    get :storage_report, id: project.id
+    assert_redirected_to project_path(project)
+    refute_nil flash[:error]
   end
 
   private

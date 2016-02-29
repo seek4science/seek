@@ -1,0 +1,14 @@
+<%= panel("Storage Usage", body_options: { id: 'storage-usage' }) do %>
+    <div id="storage-usage-report">
+      <div class="text-center"><%= image_tag "ajax-loader.gif" %></div>
+    </div>
+<% end %>
+
+<script>
+  $j(document).ready(function () {
+    $j.ajax('<%= storage_report_programme_path(programme) -%>', {
+          success: function (data) { $j('#storage-usage-report').html(data); }
+        }
+    );
+  });
+</script>
