@@ -23,17 +23,17 @@ module AssociationsHelper
 
   def filterable_association_select(filter_url, &_block)
     content_tag(:div, class: 'form-group') do
-      content_tag(:input, '', :class => 'form-control association-filter',
-                          :type => 'text', :placeholder => 'Type to filter...',
-                          'data-filter-url' => filter_url)
+      content_tag(:input, '', class: 'form-control association-filter',
+                              type: 'text', placeholder: 'Type to filter...',
+                              autocomplete: 'off', 'data-filter-url' => filter_url)
     end +
-    content_tag(:div, class: 'list-group association-candidate-list') do
-      yield
-    end
+      content_tag(:div, class: 'list-group association-candidate-list') do
+        yield
+      end
   end
 
   def confirm_association_button(text, associations_list_id)
-    content_tag(:button, text, :class => 'btn btn-primary',
+    content_tag(:button, text, class: 'btn btn-primary',
                                'data-role' => 'seek-confirm-association-button',
                                'data-associations-list-id' => associations_list_id)
   end
