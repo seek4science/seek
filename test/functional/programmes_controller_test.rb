@@ -425,7 +425,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     p = Factory(:person)
     login_as(p)
     assert_difference("Programme.count") do
-      assert_emails(1) do #activation email
+      assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do #activation email
         post :create, :programme=>{:title=>"A programme"}
       end
     end
@@ -439,7 +439,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     p = Factory(:admin)
     login_as(p)
     assert_difference("Programme.count") do
-      assert_emails(0) do #no email for admin creation
+      assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do #no email for admin creation
         post :create, :programme=>{:title=>"A programme"}
       end
     end
@@ -497,7 +497,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_emails(1) do
+    assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do
       put :accept_activation, :id=>programme
     end
 
@@ -516,7 +516,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_emails(0) do
+    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
       put :accept_activation, :id=>programme
     end
 
@@ -534,7 +534,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_emails(0) do
+    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
       put :accept_activation, :id=>programme
     end
 
@@ -596,7 +596,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_emails(1) do
+    assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do
       put :reject_activation, :id=>programme, :programme=>{activation_rejection_reason:'rejection reason'}
     end
 
@@ -616,7 +616,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_emails(0) do
+    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
       put :reject_activation, :id=>programme, :programme=>{activation_rejection_reason:'rejection reason'}
     end
 
@@ -635,7 +635,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_emails(0) do
+    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
       put :reject_activation, :id=>programme, :programme=>{activation_rejection_reason:'rejection reason'}
     end
 
