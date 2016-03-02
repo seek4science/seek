@@ -120,4 +120,19 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
   end
+
+  test 'accessor name' do
+    attribute = SampleAttribute.new title: 'fish pie'
+    assert_equal 'fish_pie',attribute.accessor_name
+
+    attribute.title = "provider's cell culture identifier"
+    assert_equal 'provider_s_cell_culture_identifier',attribute.accessor_name
+
+    attribute = SampleAttribute.new title: %!fish "' &-[]}^-pie!
+    assert_equal 'fish_pie',attribute.accessor_name
+
+    attribute = SampleAttribute.new title: 'Fish Pie'
+    assert_equal 'fish_pie',attribute.accessor_name
+
+  end
 end
