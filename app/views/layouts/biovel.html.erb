@@ -15,15 +15,6 @@
   <%= seek_stylesheet_tags %>
   <%= seek_javascript_tags %>
 
-  <script type="text/javascript">
-      function show_ajax_loader(element) {
-          $(element).innerHTML =<%= ("'" + image_tag("ajax-loader.gif") + "'").html_safe -%>;
-      }
-      function show_large_ajax_loader(element) {
-          $(element).innerHTML =<%= ("'" + image_tag("ajax-loader-large.gif") + "'").html_safe -%>
-      }
-  </script>
-
   <link href="#data" type="application/json" rel="exhibit-data" />
 </head>
 
