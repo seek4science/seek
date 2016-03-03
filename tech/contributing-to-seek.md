@@ -15,7 +15,7 @@ effort to be wasted.
 
 ## Changing and contributing code
 
-The SEEK source code is availale on GitHub at [https://github.com/seek4science/seek](https://github.com/seek4science/seek)
+The SEEK source code is available on GitHub at [https://github.com/seek4science/seek](https://github.com/seek4science/seek)
 
 The easiest way to contribute code (for both us and you) is to do so through GitHub. You can do so by creating a forked repository. Make you changes on a branch within your forked repository.
 For large changes you would be advised to link your repository to [Code Climate](https://codeclimate.com) and [Travis](https://travis-ci.org) (see below).
