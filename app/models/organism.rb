@@ -37,7 +37,4 @@ class Organism < ActiveRecord::Base
     User.admin_or_project_administrator_logged_in? || User.activated_programme_administrator_logged_in?
   end
 
-  def first_letter # Suboptimal
-    title[0]
-  end
 end
