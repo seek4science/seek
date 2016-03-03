@@ -5,7 +5,7 @@ class OrganismsController < ApplicationController
   before_filter :organisms_enabled?
   before_filter :find_requested_item, :only=>[:show,:edit,:more_ajax,:visualise,:destroy, :update]
   before_filter :login_required,:except=>[:show,:index,:visualise]
-  before_filter :is_user_admin_auth,:only=>[:edit,:update]
+  before_filter :can_manage?,:only=>[:edit,:update]
   before_filter :auth_to_create, :only=>[:new,:create, :destroy]
 
   skip_before_filter :project_membership_required
@@ -14,6 +14,8 @@ class OrganismsController < ApplicationController
 
   include BioPortal::RestAPI
   include Seek::ExternalServiceWrapper
+  include Seek::IndexPager
+  include Seek::BreadCrumbs
 
   def show
     respond_to do |format|
@@ -24,9 +26,14 @@ class OrganismsController < ApplicationController
   end
 
   def index
-    @organisms=Organism.all
-    respond_to do |format|
-      format.xml
+    @organisms = Organism.order('title ASC').all
+
+    if request.format.symbol == :html
+      super
+    else
+      respond_to do |format|
+        format.xml
+      end
     end
   end
 
@@ -109,5 +116,13 @@ class OrganismsController < ApplicationController
   end
 
   private
+
+  def can_manage?
+    unless @organism.can_manage?
+      error("Admin rights required", "is invalid (not admin)")
+      false
+    end
+    true
+  end
   
 end

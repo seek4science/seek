@@ -1,9 +1,8 @@
-
-
 class Organism < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
 
   acts_as_favouritable
+  grouped_pagination
 
   linked_to_bioportal :apikey=>Seek::Config.bioportal_api_key
   
@@ -19,6 +18,10 @@ class Organism < ActiveRecord::Base
 
   def can_delete? user=User.current_user
     !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
+  end
+
+  def can_manage?
+    User.admin_logged_in?
   end
 
   def searchable_terms

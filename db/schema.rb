@@ -11,7 +11,11 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(:version => 20160223155557) do
+=======
+ActiveRecord::Schema.define(:version => 20160303120458) do
+>>>>>>> master
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -943,6 +947,7 @@ ActiveRecord::Schema.define(:version => 20160223155557) do
     t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "first_letter"
   end
 
   create_table "organisms_projects", :id => false, :force => true do |t|
