@@ -215,3 +215,10 @@ function guid() {
         return v.toString(16);
     });
 }
+
+function show_ajax_loader(element) {
+  $(element).innerHTML = '<%= image_tag("ajax-loader.gif").html_safe %>';
+}
+function show_large_ajax_loader(element) {
+  $(element).innerHTML = '<%= image_tag("ajax-loader-large.gif").html_safe %>';
+}

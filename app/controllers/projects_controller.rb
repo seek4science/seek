@@ -7,12 +7,13 @@ class ProjectsController < ApplicationController
   include CommonSweepers
   include Seek::DestroyHandling
 
-  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:admin_member_roles,:update_members]
+  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,
+                                              :admin_member_roles,:update_members,:storage_report]
   before_filter :find_assets, :only=>[:index]
   before_filter :auth_to_create, :only=>[:new,:create]
   before_filter :is_user_admin_auth, :only => [:manage, :destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :administerable_by_user, :only =>[:admin,:admin_members,:admin_member_roles,:update_members]
+  before_filter :administerable_by_user, :only =>[:admin,:admin_members,:admin_member_roles,:update_members,:storage_report]
   before_filter :auth_params,:only=>[:update]
   before_filter :member_of_this_project, :only=>[:asset_report],:unless=>:admin?
 
@@ -286,6 +287,13 @@ class ProjectsController < ApplicationController
         params[:project][k] = params[:project][k].split(",")
       end
       @project.update_attributes(params[:project])
+    end
+  end
+
+  def storage_report
+    respond_with do |format|
+      format.html { render :partial => 'projects/storage_usage_content',
+                           :locals => { :project => @project } }
     end
   end
 

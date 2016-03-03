@@ -21,7 +21,7 @@
                 </p>
               </div>
               <div class="col-sm-4 text-right">
-                <% if resource.versions.length > 1 %>
+                <% if resource.versions.length > 1 && resource.is_a?(Model) %>
                     <% if allow_model_comparison(displayed_resource, version) %>
                         <%= button_link_to("Compare", 'show', compare_versions_model_path(resource, version: displayed_resource.version, other_version: version.version).html_safe) -%>
                     <% end %>

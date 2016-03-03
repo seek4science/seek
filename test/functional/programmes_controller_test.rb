@@ -3,6 +3,7 @@ require 'test_helper'
 class ProgrammesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include ActionView::Helpers::NumberHelper
 
   #this is needed to ensure the first user exists as admin, to stop it being automatically created as no fixtures are used.
   def setup
@@ -424,7 +425,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     p = Factory(:person)
     login_as(p)
     assert_difference("Programme.count") do
-      assert_emails(1) do #activation email
+      assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do #activation email
         post :create, :programme=>{:title=>"A programme"}
       end
     end
@@ -438,7 +439,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     p = Factory(:admin)
     login_as(p)
     assert_difference("Programme.count") do
-      assert_emails(0) do #no email for admin creation
+      assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do #no email for admin creation
         post :create, :programme=>{:title=>"A programme"}
       end
     end
@@ -496,7 +497,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_emails(1) do
+    assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do
       put :accept_activation, :id=>programme
     end
 
@@ -515,7 +516,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_emails(0) do
+    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
       put :accept_activation, :id=>programme
     end
 
@@ -533,7 +534,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_emails(0) do
+    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
       put :accept_activation, :id=>programme
     end
 
@@ -595,7 +596,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_emails(1) do
+    assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do
       put :reject_activation, :id=>programme, :programme=>{activation_rejection_reason:'rejection reason'}
     end
 
@@ -615,7 +616,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_emails(0) do
+    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
       put :reject_activation, :id=>programme, :programme=>{activation_rejection_reason:'rejection reason'}
     end
 
@@ -634,7 +635,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_emails(0) do
+    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
       put :reject_activation, :id=>programme, :programme=>{activation_rejection_reason:'rejection reason'}
     end
 
@@ -733,5 +734,30 @@ class ProgrammesControllerTest < ActionController::TestCase
     flash[:error]=nil
   end
 
+  test 'can get storage usage' do
+    programme_administrator = Factory(:programme_administrator)
+    programme = programme_administrator.programmes.first
+    data_file = Factory(:data_file, :project_ids => [programme.projects.first.id])
+    size = data_file.content_blob.file_size
+    assert size > 0
+
+    login_as(programme_administrator)
+    get :storage_report, id: programme.id
+
+    assert_response :success
+    assert_nil flash[:error]
+    assert_select 'strong', text: number_to_human_size(size)
+  end
+
+  test 'non admin cannot get storage usage' do
+    programme_administrator = Factory(:programme_administrator)
+    normal = Factory(:person)
+    programme = programme_administrator.programmes.first
+
+    login_as(normal)
+    get :storage_report, id: programme.id
+    assert_redirected_to programme_path(programme)
+    refute_nil flash[:error]
+  end
 
 end

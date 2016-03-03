@@ -65,6 +65,9 @@
 
   <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project } -%>
+    <% if @project.try(:can_be_administered_by?, current_user) %>
+      <%= render :partial => 'projects/storage_usage_box', locals: { project: @project } %>
+    <% end %>
   </div>
 </div>
 

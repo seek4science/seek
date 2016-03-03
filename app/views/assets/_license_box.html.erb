@@ -1,3 +1,9 @@
 <%= panel("License", :body_options => { :class => 'text-center' }) do %>
     <%= describe_license(versioned_resource.license) %>
+    <% if versioned_resource.license.nil? && resource.can_manage? %>
+        <p>
+          <%= link_to('Click here to choose a license',
+                       polymorphic_path(resource, action: :edit, anchor: 'license-section'))%>
+        </p>
+    <% end %>
 <% end %>
