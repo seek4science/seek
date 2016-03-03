@@ -83,6 +83,10 @@ RVM, as recommended in the installation, you can do this with:
     rvm get stable
     rvm install ruby-2.1.7
 
+### Make sure bundler is installed
+
+    gem install bundler
+
 ### Updating from GitHub
 
 If you have an existing installation linked to our GitHub, you can fetch the

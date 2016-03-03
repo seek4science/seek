@@ -3,7 +3,7 @@ title: SEEK User Guide - Administer project members
 layout: page
 ---
 
-#Administering project members
+# Administering project members
 
 These are actions that can be carried out by a SEEK administrator, [Project Administrator](roles.html#project-administrator), or [Programme Administrator](roles.html#programme-administrator)
 

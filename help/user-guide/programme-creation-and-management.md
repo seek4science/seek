@@ -3,7 +3,7 @@ title: SEEK User Guide - Creating and Managing Programmes
 layout: page
 ---
 
-#Creating and managing Programmes
+# Creating and managing Programmes
 
 ## What are Programmes and why create them?
 
@@ -14,7 +14,7 @@ Examples are [SysMO](https://fairdomhub.org/programmes/1) and [ERASysAPP](https:
 
 If you wish to create and manage your own Projects, you will first need to create a Programme that they will fall under.
 
-##Creating a Programme
+## Creating a Programme
 
 Once you have [registered](registering.html) and logged in, you will be able to create a Programme. You can do so from Create menu
 at the top of the screen
@@ -35,13 +35,13 @@ Once either Accepted or Rejected you will be notified by email.
 After its creation and likely acceptance you will automatically become the default [Programme Administrator](roles.html#programme-administrator). Follow the link to find out what you can do next, such as creating a Project.
 
 
-#Administrator details
+# Administrator details
 
 The following are details that apply only to SEEK system administrators.
 
-##Programme Activation
+## Programme Activation
 
-If you are a SEEK administrator you may recieve an email notifying you that a Programme has been created and requires activation.
+If you are a SEEK administrator you may receive an email notifying you that a Programme has been created and requires activation.
 
 This email will contain details about the Programme, who created it and also includes a link that you can follow to Accept or Reject the Programme - you need to be logged into SEEK to do this.
 
@@ -52,7 +52,7 @@ If you reject the programme, you will be asked for an explanation which will be 
 
 ##Disabling Programme creation
 
-If you run your own installation of SEEK, you can disable both Programmes and also seperately the ability for users to create
+If you run your own installation of SEEK, you can disable both Programmes and also separately the ability for users to create
 their own Programmes. This will mean the Programmes, and therefore also Projects can only be created by a full administrator.
 
 The option to turn these on or off are available in the Server Admin area, under Site configuration and Enable/disable features.

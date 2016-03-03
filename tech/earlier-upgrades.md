@@ -39,6 +39,7 @@ RVM, as recommended in the installation, you can do this with:
 
     rvm get stable
     rvm install ruby-2.1.6
+    gem install bundler
 
 ### Updating from GitHub
 
@@ -94,6 +95,7 @@ RVM, as recommended in the installation, you can do this with:
 
     rvm get stable
     rvm install ruby-2.1.5
+    gem install bundler
 
 ### Updating from GitHub
 
@@ -143,6 +145,7 @@ and other necessary changes:
 #if using rvm do:
     rvm get stable
     rvm install ruby-2.1.3
+    gem install bundler
 
 #then:
 
@@ -170,6 +173,7 @@ Start the upgrade following the standard steps:
     #if using rvm do:
     rvm get stable
     rvm install ruby-1.9.3-p545
+    gem install bundler
 
     export RAILS_ENV=production # if upgrading a production server - remember to set this again if closing and reopening the shell
 
