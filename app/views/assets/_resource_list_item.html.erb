@@ -8,7 +8,7 @@
    avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil?
 
    #dont show JERM avatar for strain without contributor, as there are strains without contributor and are not harvested
-   avatar_partial = nil if resource.kind_of?(Strain) && resource.contributor.try(:person).nil?
+   avatar_partial = nil if (resource.kind_of?(Strain) && resource.contributor.try(:person).nil?) || resource.is_a?(Organism)
    avatar_content = avatar_partial.blank? ? nil : render(:partial=> avatar_partial,:locals=>{:resource => resource})
 
    access_based_css_class = "list_item"
@@ -55,7 +55,7 @@
       <% end %>
     </div>
   </div>
-  <% unless [Person, Project, Institution, Programme].include?(resource.class)  %>
+  <% unless [Person, Project, Institution, Programme, Organism].include?(resource.class)  %>
       <div class="panel-footer hidden-xs small">
         <%= list_item_timestamp resource %>
       </div>

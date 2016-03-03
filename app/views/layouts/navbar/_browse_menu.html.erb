@@ -38,5 +38,9 @@
     <% if Seek::Config.forum_enabled %>
         <li><%= link_to "Forums", forums_path %></li>
     <% end %>
+    <% if Seek::Config.organisms_enabled %>
+        <li role="presentation" class="dropdown-header">Other</li>
+        <li><%= link_to "Organisms", organisms_path %></li>
+    <% end %>
   </ul>
 </li>

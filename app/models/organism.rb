@@ -1,9 +1,8 @@
-
-
 class Organism < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
 
   acts_as_favouritable
+  grouped_pagination
 
   linked_to_bioportal :apikey=>Seek::Config.bioportal_api_key
   
@@ -21,6 +20,10 @@ class Organism < ActiveRecord::Base
     !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
   end
 
+  def can_manage?
+    User.admin_logged_in?
+  end
+
   def searchable_terms
     terms = [title]
     if concept
@@ -34,4 +37,7 @@ class Organism < ActiveRecord::Base
     User.admin_or_project_administrator_logged_in? || User.activated_programme_administrator_logged_in?
   end
 
+  def first_letter # Suboptimal
+    title[0]
+  end
 end
