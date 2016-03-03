@@ -53,7 +53,7 @@ You can select an organism from the drop down menu.
 SEEK has fine grained sharing permissions. You can choose to share an asset in SEEK with just you, selected people within and outside of SEEK, your whole project, or publicly.
 
 ## Tags
-Tags are key words that are relevant in some way to the asset and its properties. They are used so relevant assets can be found more easily by other users using key-word searches. To incude a tag you just type it into the box. Suggestions of tags will appear in a drop down menu as you type. You are free to use any free text for tags.
+Tags are key words that are relevant in some way to the asset and its properties. They are used so relevant assets can be found more easily by other users using key-word searches. To include a tag you just type it into the box. Suggestions of tags will appear in a drop down menu as you type. You are free to use any free text for tags.
 
 ![add tags 1](/images/user-guide/add_tags_1.png)
 
@@ -95,7 +95,7 @@ SOPs are standard operating procedures which describe the protocol required to r
 
 ## Data Files
 [Assay specific]
-Data files can be any file containing data relevant to the assay (raw data, processed data, callibration information etc). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). Relevant data files can be linked directly to the assay via the dropdown menu.
+Data files can be any file containing data relevant to the assay (raw data, processed data, calibration information etc). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). Relevant data files can be linked directly to the assay via the dropdown menu.
 
 ## Publications
 If your asset is directly related to a publication you can link the two together in SEEK. You can select publications within your project form the drop-down menu. If the publication is in another project you need to check the box that says associate publications from other projects.

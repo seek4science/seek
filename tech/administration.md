@@ -77,7 +77,7 @@ for more widespread uses of ontologies - such as for the Assay and Technology
 types, and for tagging with semantic terms.
 
 To get an api-key you first need to register with BioPortal at
-http://bioportal.bioontology.org/accounts/new, and once registred and logged
+http://bioportal.bioontology.org/accounts/new, and once registered and logged
 in your api-key should be shown under Account details. More information is
 available at
 http://www.bioontology.org/wiki/index.php/BioPortal_REST_services.
