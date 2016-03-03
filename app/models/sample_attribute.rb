@@ -18,7 +18,7 @@ class SampleAttribute < ActiveRecord::Base
 
   # the name for the sample accessor based on the attribute title, spaces are replaced with underscore, and all downcase
   def accessor_name
-    title.gsub(' ', '_').downcase
+    title.parameterize.underscore
   end
 
   private
