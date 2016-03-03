@@ -118,7 +118,11 @@ class OrganismsController < ApplicationController
   private
 
   def can_manage?
-    @organism.can_manage?
+    unless @organism.can_manage?
+      error("Admin rights required", "is invalid (not admin)")
+      false
+    end
+    true
   end
   
 end
