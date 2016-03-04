@@ -81,6 +81,11 @@ Although not critical, we recommend updating Ruby to 2.1.7. If you are using
 RVM, as recommended in the installation, you can do this with:
 
     rvm get stable
+    rvm upgrade 2.1.6 2.1.7
+
+The above upgrade command will copy across all previous gemsets (see:[https://rvm.io/rubies/upgrading](https://rvm.io/rubies/upgrading)).
+If you have gemsets for other applications and copying them all isn't desirable, then you may want to start afresh:
+
     rvm install ruby-2.1.7
 
 ### Make sure bundler is installed
