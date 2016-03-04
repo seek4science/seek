@@ -37,7 +37,7 @@ module SuggestedTypesHelper
   def ontology_editor_display types, selected_uri=nil
     list = []
     Array(types).each do |type|
-      list += rendergi_list(type, selected_uri)
+      list += render_list(type, selected_uri)
     end
     list = list.join("\n").html_safe + "<br/> <em>* Note that it is suggested term.</em>".html_safe
   end
