@@ -1,3 +1,6 @@
-<% cache({controller: 'projects', action: 'storage_report', id: project.id }, expires_in: 1.days) do -%>
-  <strong><%= number_to_human_size project.total_asset_size %></strong>
+<% if standalone %>
+    The total size of all project assets is:
 <% end %>
+
+<strong><%= number_to_human_size project.total_asset_size %></strong>
+

@@ -292,8 +292,8 @@ class ProjectsController < ApplicationController
 
   def storage_report
     respond_with do |format|
-      format.html { render :partial => 'projects/storage_usage_content',
-                           :locals => { :project => @project } }
+      format.html { render partial: 'projects/storage_usage_content',
+                           locals: { project: @project, standalone: true } }
     end
   end
 

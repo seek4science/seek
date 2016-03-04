@@ -1,0 +1,26 @@
+<%= panel('Storage Usage', body_options: { id: 'storage-usage' }) do %>
+    <div id="storage-usage-report">
+      <div class="text-center"><%= image_tag "ajax-loader.gif" %></div>
+    </div>
+<% end %>
+
+<script>
+  $j(document).ready(function () {
+    var loader = $j('#storage-usage-report').html();
+
+    var loadStorageUsage = function (data) {
+      $j.ajax('<%= url -%>', {
+            data: data,
+            success: function (data) { $j('#storage-usage-report').html(data); }
+          }
+      );
+    };
+
+    $j('#refresh-storage-usage').click(function () {
+      $j('#storage-usage-report').html(loader); // show the spinner
+      loadStorageUsage({refresh: '1'});
+      return false;
+    });
+    loadStorageUsage();
+  });
+</script>

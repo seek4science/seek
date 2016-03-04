@@ -112,8 +112,8 @@ class ProgrammesController < ApplicationController
 
   def storage_report
     respond_with do |format|
-      format.html { render :partial => 'programmes/storage_usage_content',
-                           :locals => { :programme => @programme } }
+      format.html { render partial: 'programmes/storage_usage_content',
+                           locals: { programme: @programme } }
     end
   end
 

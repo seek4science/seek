@@ -5,7 +5,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    login_as Factory(:user)
+    login_as Factory(:person)
   end
 
   test "should not show manage page for normal user, but show for admins" do
