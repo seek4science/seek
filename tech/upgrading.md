@@ -146,7 +146,9 @@ would need changing to
 
 after upgrading from ruby 2.1.6 to ruby 2.1.7
 
-Please read [Installing SEEK in a production environment](install-production.html) for more details about setting up Apache.
+If you have problems, you may need to upgrade and reinstall the Passenger Phusion modules (if unsure there no harm in doing so).
+
+Please read [Installing SEEK in a production environment](install-production.html) for more details about setting up Apache and installing the module.
 
 
 ## Earlier upgrade notes
