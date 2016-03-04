@@ -291,9 +291,13 @@ class ProjectsController < ApplicationController
   end
 
   def storage_report
+    if params[:refresh]
+      expire_fragment({controller: 'projects', action: 'storage_report', id: @project.id})
+    end
+
     respond_with do |format|
-      format.html { render :partial => 'projects/storage_usage_content',
-                           :locals => { :project => @project } }
+      format.html { render partial: 'projects/storage_usage_content',
+                           locals: { project: @project, standalone: true } }
     end
   end
 

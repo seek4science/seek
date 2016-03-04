@@ -1,4 +1,4 @@
-<% cache({controller: 'programmes', action: 'storage_report', id: programme.id }, expires_in: 1.days) do -%>
+<% cache({controller: 'programmes', action: 'storage_report', id: programme.id }, expires_in: 1.hour) do -%>
     <p>
       Total: <strong><%= number_to_human_size programme.total_asset_size %></strong>
     </p>
@@ -8,8 +8,11 @@
       <% programme.projects.each do |project| %>
           <li>
             <%= project.title %> -
-            <%= render partial: 'projects/storage_usage_content', locals: { project: project } %>
+            <%= render partial: 'projects/storage_usage_content', locals: { project: project, standalone: false } %>
           </li>
       <% end %>
     </ul>
+
+    <hr/>
+    <span class="subtle">Last updated at <%= date_as_string(Time.now, true) %> </span>
 <% end %>
