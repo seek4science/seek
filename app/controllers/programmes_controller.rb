@@ -111,13 +111,6 @@ class ProgrammesController < ApplicationController
   end
 
   def storage_report
-    if params[:refresh] == '1'
-      expire_fragment({controller: 'programmes', action: 'storage_report', id: @programme.id})
-      @programme.projects.each do |project|
-        expire_fragment({controller: 'projects', action: 'storage_report', id: project.id})
-      end
-    end
-
     respond_with do |format|
       format.html { render partial: 'programmes/storage_usage_content',
                            locals: { programme: @programme } }

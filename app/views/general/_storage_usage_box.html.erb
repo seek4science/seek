@@ -1,9 +1,4 @@
-<% header_html = capture do %>
-    Storage Usage
-    <%= button_link_to "Refresh", 'refresh', '#', id: 'refresh-storage-usage', class: 'btn-xs pull-right' %>
-<% end %>
-
-<%= panel(header_html, body_options: { id: 'storage-usage' }) do %>
+<%= panel('Storage Usage', body_options: { id: 'storage-usage' }) do %>
     <div id="storage-usage-report">
       <div class="text-center"><%= image_tag "ajax-loader.gif" %></div>
     </div>
