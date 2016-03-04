@@ -57,6 +57,7 @@ task. Using seek:upgrade should still work, but could take a lot of
 unnecessary time. There is more details and an example towards the end of the
 this page.
 
+
 ## Steps to upgrade from 0.23.x to 1.0.x
 
 ### Dependencies
@@ -131,6 +132,21 @@ content.
     bundle exec rake sunspot:solr:start
     touch tmp/restart.txt
     bundle exec rake tmp:clear
+
+## Extra steps for a production server
+
+If the upgrade has involved an upgrade of Ruby, and you are running a production service with Apache and Passenger Phusion, you will need
+ to update the Apache config. You will need to point to the correct ruby wrapper script according to your version. The full path may differ, but for example
+
+    PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.6/wrappers/ruby
+
+would need changing to
+
+    PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.7/wrappers/ruby
+
+after upgrading from ruby 2.1.6 to ruby 2.1.7
+
+Please read [Installing SEEK in a production environment](install-production.html) for more details about setting up Apache.
 
 
 ## Earlier upgrade notes
