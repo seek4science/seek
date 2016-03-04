@@ -295,9 +295,11 @@ class Project < ActiveRecord::Base
   def total_asset_size
     assets.sum do |asset|
       if asset.respond_to?(:content_blob)
-        asset.content_blob.file_size
+        asset.content_blob.file_size || 0
       elsif asset.respond_to?(:content_blobs)
-        asset.content_blobs.sum(&:file_size)
+        asset.content_blobs.sum do |blob|
+          blob.file_size || 0
+        end
       else
         0
       end
