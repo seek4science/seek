@@ -7,7 +7,7 @@
     <ul>
       <% programme.projects.each do |project| %>
           <li>
-            <%= project.title %> -
+            <%= link_to project.title, project %> -
             <%= render partial: 'projects/storage_usage_content', locals: { project: project, standalone: false } %>
           </li>
       <% end %>
