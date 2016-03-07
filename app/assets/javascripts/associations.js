@@ -19,9 +19,12 @@ var associations = {
 };
 
 $j(document).ready(function () {
+
     $j('body').on('click', '.association-preview', function () {
-        $j(this).siblings().removeClass('active');
-        $j(this).addClass('active');
+        if(!$j(this).parents('.association-candidate-list').data('multiple'))
+            $j(this).siblings().removeClass('active');
+
+        $j(this).toggleClass('active');
         return false;
     });
 
@@ -47,24 +50,28 @@ $j(document).ready(function () {
     $j('[data-role="seek-confirm-association-button"]').click(function (e) {
         e.preventDefault();
         var modal = $j(this).parents('.new-association-modal');
-        var associationObject = {
-            id: $j('.association-preview.active', modal).data('associationId'),
-            title: $j('.association-preview.active', modal).data('associationTitle')
-        };
+        var list = $j('#' +  $j(this).data('associationsListId'));
+        var template = HandlebarsTemplates[list.data('templateName')];
 
-        // Build a JSON object from the inputs in the modal
-        $j(':input', modal).each(function (_, input) {
-            if($j(input).attr('name')) {
-                var name = $j(input).attr('name').replace('_association_','');
-                associationObject[name] = $j(this).val();
-            }
+        $j('.association-preview.active', modal).each(function () {
+            var associationObject = {
+                id: $j(this).data('associationId'),
+                title: $j(this).data('associationTitle')
+            };
+
+            // Build a JSON object from the inputs in the modal
+            $j(':input', modal).each(function (_, input) {
+                if($j(input).attr('name')) {
+                    var name = $j(input).attr('name').replace('_association_','');
+                    associationObject[name] = $j(this).val();
+                }
+            });
+
+            list.find('ul').append(template(associationObject));
+            $j(this).removeClass('active');
         });
 
-        var list = $j('#'+$j(this).data('associationsListId'));
-        var template = HandlebarsTemplates[list.data('templateName')];
-        list.find('ul').append(template(associationObject));
         associations.toggleEmptyListText(list);
-
         modal.modal('hide');
         return false;
     });

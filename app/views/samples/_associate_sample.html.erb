@@ -18,8 +18,8 @@
 
     <hr/>
 
-    <%= association_selector('sample_to_list', 'Add sample', 'Select sample') do %>
-        <%= filterable_association_select(filter_samples_path(:assay_id => resource.id)) do %>
+    <%= association_selector('sample_to_list', 'Add samples', 'Select samples') do %>
+        <%= filterable_association_select(filter_samples_path(:assay_id => resource.id), :multiple => true) do %>
             <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20),
                        :locals => { :existing => resource.samples }
             %>

@@ -10,7 +10,7 @@ module AssociationsHelper
   def association_selector(association_list_id, button_text, modal_title, &_block)
     modal_id = 'modal' + button_text.parameterize.underscore.camelize
     button_link_to(button_text, 'add', '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}") +
-      modal(class: 'new-association-modal', id: modal_id) do
+      modal(class: 'new-association-modal', id: modal_id, size: 'lg') do
         modal_header(modal_title) +
           modal_body do
             yield
@@ -21,13 +21,14 @@ module AssociationsHelper
       end
   end
 
-  def filterable_association_select(filter_url, &_block)
+  def filterable_association_select(filter_url, options = {}, &_block)
     content_tag(:div, class: 'form-group') do
       content_tag(:input, '', class: 'form-control association-filter',
                               type: 'text', placeholder: 'Type to filter...',
                               autocomplete: 'off', 'data-filter-url' => filter_url)
     end +
-      content_tag(:div, class: 'list-group association-candidate-list') do
+      content_tag(:div, class: 'list-group association-candidate-list',
+                  data: { multiple: options.delete(:multiple) || 'false' }) do
         yield
       end
   end

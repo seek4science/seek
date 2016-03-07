@@ -133,8 +133,12 @@ module BootstrapHelper
 
   def modal(options = {})
     opts = merge_options({:class => 'modal', :role => 'dialog', :tabindex => -1}, options)
+
+    dialog_class = 'modal-dialog'
+    dialog_class += " modal-#{size}" if (size = options.delete(:size))
+
     content_tag(:div, opts) do
-    content_tag(:div, :class => 'modal-dialog') do
+    content_tag(:div, :class => dialog_class) do
     content_tag(:div, :class => 'modal-content') do
       yield
     end
