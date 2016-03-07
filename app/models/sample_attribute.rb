@@ -36,5 +36,6 @@ class SampleAttribute < ActiveRecord::Base
 
   def check_required_against_is_title
     self.required = required? || is_title?
+    true
   end
 end
