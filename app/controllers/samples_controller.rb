@@ -66,7 +66,7 @@ class SamplesController < ApplicationController
 
   def filter
     @associated_samples = params[:assay_id].blank? ? [] : Assay.find(params[:assay_id]).samples
-    @samples = Sample.where("title LIKE ?", "#{params[:filter]}%").limit(20)
+    @samples = Sample.where("title LIKE ?", "%#{params[:filter]}%").limit(20)
 
     respond_with do |format|
       format.html { render :partial => 'samples/association_preview', :collection => @samples,
