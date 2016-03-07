@@ -7,12 +7,31 @@ class SampleAttributeTest < ActiveSupport::TestCase
     assert_equal 'fish', attribute.title
     assert_equal 'Integer', attribute.sample_attribute_type.base_type
     refute attribute.required?
+    refute attribute.is_title?
 
-    attribute = SampleAttribute.new title: 'fish', required: true, sample_attribute_type: Factory(:string_sample_attribute_type),
+    attribute = SampleAttribute.new title: 'fish', required: true, is_title:true, sample_attribute_type: Factory(:string_sample_attribute_type),
                                     sample_type: Factory(:sample_type)
     assert_equal 'fish', attribute.title
     assert_equal 'String', attribute.sample_attribute_type.base_type
     assert attribute.required?
+    assert attribute.is_title?
+  end
+
+  test 'it_title? overrides required?' do
+    #if is_title? then required? is always true
+    attribute = SampleAttribute.new title: 'fish', sample_attribute_type: Factory(:integer_sample_attribute_type),
+                                    required: false, is_title:true,
+                                    sample_type: Factory(:sample_type)
+    assert attribute.required?
+    assert attribute.is_title?
+
+    attribute.save!
+    attribute.reload
+
+    assert attribute.required?
+    assert attribute.is_title?
+    assert attribute[:required]
+
   end
 
   test 'valid?' do
