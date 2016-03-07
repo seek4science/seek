@@ -1152,7 +1152,7 @@ end
     f.title "Patient data"
     f.after_build do |type|
       # Not sure why i have to explicitly add the sample_type association
-      type.sample_attributes << Factory.build(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
       type.sample_attributes << Factory.build(:sample_attribute,:title=>"age",:sample_attribute_type=>Factory(:age_sample_attribute_type),:required=>true, :sample_type => type)
       type.sample_attributes << Factory.build(:sample_attribute,:title=>"weight",:sample_attribute_type=>Factory(:weight_sample_attribute_type),:required=>false, :sample_type => type)
       type.sample_attributes << Factory.build(:sample_attribute,:title=>"address",:sample_attribute_type=>Factory(:address_sample_attribute_type),:required=>false, :sample_type => type)
@@ -1160,9 +1160,19 @@ end
     end
   end
 
+  Factory.define(:simple_sample_type,:parent=>:sample_type) do |f|
+    f.title "Simple type"
+    f.after_build do |type|
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"the title",:sample_attribute_type=>Factory(:string_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
+    end
+  end
+
 Factory.define(:sample) do |f|
   f.sequence(:title) {|n| "Sample #{n}"}
-  f.association :sample_type,:factory=>:sample_type
+  f.association :sample_type,:factory=>:simple_sample_type
+  f.after_build do |type|
+    type.the_title=type.title if type.respond_to?(:the_title)
+  end
 end
 
 Factory.define(:patient_sample, :parent=>:sample) do |f|

@@ -190,8 +190,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'filter by sample type' do
-    sample_type1=Factory(:sample_type)
-    sample_type2=Factory(:sample_type)
+    sample_type1=Factory(:simple_sample_type)
+    sample_type2=Factory(:simple_sample_type)
     sample1=Factory(:sample,:sample_type=>sample_type1,:policy=>Factory(:public_policy),:title=>"SAMPLE 1")
     sample2=Factory(:sample,:sample_type=>sample_type2,:policy=>Factory(:public_policy),:title=>"SAMPLE 2")
 

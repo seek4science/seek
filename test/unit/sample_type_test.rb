@@ -3,7 +3,10 @@ require 'test_helper'
 class SampleTypeTest < ActiveSupport::TestCase
 
   test "validation" do
-    sample_type = Factory :sample_type,:title=>"fish"
+    sample_type = SampleType.new :title=>"fish"
+    refute sample_type.valid?
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title:true, :sample_type => sample_type)
+
     assert sample_type.valid?
     sample_type.title=nil
     refute sample_type.valid?
@@ -19,7 +22,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test "samples" do
-    sample_type = Factory :sample_type
+    sample_type = Factory(:simple_sample_type)
     assert_empty sample_type.samples
     sample1 = Factory :sample, :sample_type=>sample_type
     sample2 = Factory :sample, :sample_type=>sample_type
@@ -29,9 +32,11 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test "associate sample attribute default order" do
-    sample_type = Factory :sample_type
-    attribute1 = Factory(:simple_string_sample_attribute, :sample_type => sample_type)
+    sample_type = SampleType.new title:'sample type'
+    attribute1 = Factory(:simple_string_sample_attribute, is_title:true, :sample_type => sample_type)
     attribute2 = Factory(:simple_string_sample_attribute, :sample_type => sample_type)
+    sample_type.sample_attributes << attribute1
+    sample_type.sample_attributes << attribute2
     sample_type.save!
 
     sample_type.reload
@@ -40,10 +45,14 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test "associate sample attribute specify order" do
-    sample_type = Factory :sample_type
+    sample_type = SampleType.new title:'sample type'
     attribute3 = Factory(:simple_string_sample_attribute, :pos => 3, :sample_type => sample_type)
     attribute2 = Factory(:simple_string_sample_attribute, :pos => 2, :sample_type => sample_type)
-    attribute1 = Factory(:simple_string_sample_attribute, :pos => 1, :sample_type => sample_type)
+    attribute1 = Factory(:simple_string_sample_attribute, :pos => 1, is_title:true, :sample_type => sample_type)
+    sample_type.sample_attributes << attribute3
+    sample_type.sample_attributes << attribute2
+    sample_type.sample_attributes << attribute1
+    sample_type.save!
 
     sample_type.reload
 

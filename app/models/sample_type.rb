@@ -21,7 +21,7 @@ class SampleType < ActiveRecord::Base
   private
 
   def one_title_attribute_present
-    unless count = sample_attributes.title_attributes.count == 1
+    unless (count = sample_attributes.select(&:is_title).count) == 1
       errors.add(:sample_attributes, "There must be 1 attribute which is the title, currently there are #{count}")
     end
   end

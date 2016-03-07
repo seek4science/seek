@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
   test 'validation' do
-    sample = Factory :sample, title: 'fish', sample_type: Factory(:sample_type)
+    sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type),the_title:'fish'
     assert sample.valid?
     sample.title = nil
     refute sample.valid?
@@ -37,7 +37,7 @@ class SampleTest < ActiveSupport::TestCase
     assert_respond_to sample, :weight=
 
     # doesn't affect all sample classes
-    sample = Factory(:sample, sample_type: Factory(:sample_type))
+    sample = Factory(:sample, sample_type: Factory(:simple_sample_type))
     refute_respond_to sample, :full_name
     refute_respond_to sample, :full_name=
     refute_respond_to sample, :age
@@ -69,7 +69,7 @@ class SampleTest < ActiveSupport::TestCase
     assert_respond_to sample, :full_name
     assert_respond_to sample, :full_name=
 
-    sample.sample_type = Factory(:sample_type)
+    sample.sample_type = Factory(:simple_sample_type)
 
     refute_respond_to sample, :full_name
     refute_respond_to sample, :full_name=
@@ -117,7 +117,8 @@ class SampleTest < ActiveSupport::TestCase
     sample.sample_type = Factory(:patient_sample_type)
     refute sample.valid?
 
-    sample.sample_type = Factory(:sample_type)
+    sample.sample_type = Factory(:simple_sample_type)
+    sample.the_title='bob'
     assert sample.valid?
   end
 
