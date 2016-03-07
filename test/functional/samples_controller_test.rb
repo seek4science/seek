@@ -36,11 +36,11 @@ class SamplesControllerTest < ActionController::TestCase
     login_as(Factory(:person))
     type = Factory(:patient_sample_type)
     assert_difference('Sample.count') do
-      post :create, sample: { sample_type_id: type.id, title: 'My Sample', full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }
+      post :create, sample: { sample_type_id: type.id, full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }
     end
     assert assigns(:sample)
     sample = assigns(:sample)
-    assert_equal 'My Sample', sample.title
+    assert_equal 'George Osborne', sample.title
     assert_equal 'George Osborne', sample.full_name
     assert_equal '22', sample.age
     assert_equal '22.1', sample.weight
@@ -59,7 +59,7 @@ class SamplesControllerTest < ActionController::TestCase
     type_id = sample.sample_type.id
 
     assert_no_difference('Sample.count') do
-      put :update, id: sample.id, sample: { title: 'Updated Sample', full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }
+      put :update, id: sample.id, sample: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }
     end
 
     assert assigns(:sample)
@@ -67,7 +67,7 @@ class SamplesControllerTest < ActionController::TestCase
     updated_sample = assigns(:sample)
     updated_sample = Sample.find(updated_sample.id)
     assert_equal type_id, updated_sample.sample_type.id
-    assert_equal 'Updated Sample', updated_sample.title
+    assert_equal 'Jesus Jones', updated_sample.title
     assert_equal 'Jesus Jones', updated_sample.full_name
     assert_equal '47', updated_sample.age
     assert_nil updated_sample.weight
