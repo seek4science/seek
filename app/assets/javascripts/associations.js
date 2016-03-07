@@ -53,23 +53,25 @@ $j(document).ready(function () {
         var list = $j('#' +  $j(this).data('associationsListId'));
         var template = HandlebarsTemplates[list.data('templateName')];
 
-        $j('.association-preview.active', modal).each(function () {
-            var associationObject = {
-                id: $j(this).data('associationId'),
-                title: $j(this).data('associationTitle')
-            };
+        // Collect all form inputs beginning with _association
+        var commonFields = {};
+        $j(':input', modal).each(function (_, input) {
+            if($j(input).attr('name')) {
+                var name = $j(input).attr('name').replace('_association_','');
+                commonFields[name] = $j(input).val();
+            }
+        });
 
-            // Build a JSON object from the inputs in the modal
-            $j(':input', modal).each(function (_, input) {
-                if($j(input).attr('name')) {
-                    var name = $j(input).attr('name').replace('_association_','');
-                    associationObject[name] = $j(this).val();
-                }
+        $j('.association-preview.active', modal).each(function (_, selected) {
+            // Merge common fields and association-specific fields into single object
+            var associationObject = $j.extend({}, commonFields, {
+                id: $j(selected).data('associationId'),
+                title: $j(selected).data('associationTitle')
             });
 
+            // Populate template and append to list
             list.find('ul').append(template(associationObject));
-            $j(this).removeClass('active');
-        });
+        }).removeClass('active');
 
         associations.toggleEmptyListText(list);
         modal.modal('hide');
