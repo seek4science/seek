@@ -8,6 +8,7 @@ class SampleType < ActiveRecord::Base
   has_many :sample_attributes, order: :pos, inverse_of: :sample_type
 
   validates :title, presence: true
+  validate :one_title_attribute_present
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
@@ -18,6 +19,12 @@ class SampleType < ActiveRecord::Base
   end
 
   private
+
+  def one_title_attribute_present
+    unless count = sample_attributes.title_attributes.count == 1
+      errors.add(:sample_attributes, "There must be 1 attribute which is the title, currently there are #{count}")
+    end
+  end
 
   class UnknownAttributeException < Exception; end
 end

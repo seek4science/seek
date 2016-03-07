@@ -100,5 +100,19 @@ class SampleTypeTest < ActiveSupport::TestCase
     end
   end
 
+  test "must have one title attribute" do
+    type = SampleType.new title:"No title"
+    type.sample_attributes << Factory(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true,:is_title=>false, :sample_type => type)
+
+    refute type.valid?
+    type.sample_attributes << Factory(:sample_attribute,:title=>"full name title",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
+    assert type.valid?
+
+    type.save!
+
+    type.sample_attributes << Factory(:sample_attribute,:title=>"2nd full name title",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
+    refute type.valid?
+  end
+
 
 end
