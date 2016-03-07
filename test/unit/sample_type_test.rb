@@ -101,5 +101,4 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
 
-
 end

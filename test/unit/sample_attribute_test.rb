@@ -154,4 +154,16 @@ class SampleAttributeTest < ActiveSupport::TestCase
     assert_equal 'fish_pie',attribute.accessor_name
 
   end
+
+  test 'title_attributes scope' do
+    title = Factory(:sample_attribute,is_title:true,required:true,:sample_attribute_type=>Factory(:string_sample_attribute_type))
+    not_title = Factory(:sample_attribute,is_title:false,required:true,:sample_attribute_type=>Factory(:string_sample_attribute_type))
+
+    assert_includes SampleAttribute.title_attributes,title
+    refute_includes SampleAttribute.title_attributes,not_title
+
+    assert_includes title.sample_type.sample_attributes.title_attributes,title
+    refute_includes not_title.sample_type.sample_attributes.title_attributes,not_title
+  end
+
 end

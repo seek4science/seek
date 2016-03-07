@@ -11,6 +11,8 @@ class SampleAttribute < ActiveRecord::Base
 
   before_save :default_pos, :check_required_against_is_title
 
+  scope :title_attributes, where(is_title:true)
+
   def validate_value?(value)
     return false if required? && value.blank?
     (value.blank? && !required?) || sample_attribute_type.validate_value?(value)

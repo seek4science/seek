@@ -1109,12 +1109,12 @@ end
   end
 
   Factory.define(:sample_attribute) do |f|
+    f.sequence(:title) {|n| "Sample attribute #{n}"}
     f.association :sample_type, :factory => :sample_type
   end
 
   #a string that must contain 'xxx'
   Factory.define(:simple_string_sample_attribute, :parent=>:sample_attribute) do |f|
-    f.sequence(:title) {|n| "Simple sample attribute #{n}"}
     f.sample_attribute_type Factory.build(:string_sample_attribute_type,regexp:".*xxx.*")
     f.required true
   end
