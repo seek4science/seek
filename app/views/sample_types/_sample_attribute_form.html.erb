@@ -4,6 +4,7 @@
 <% title = sample_attribute ? sample_attribute.title : '' %>
 <% pos = sample_attribute ? sample_attribute.pos : '' %>
 <% required = sample_attribute ? sample_attribute.required : false %>
+<% is_title = sample_attribute ? sample_attribute.is_title : false %>
 <% attribute_type_id = sample_attribute ? sample_attribute.sample_attribute_type_id : nil %>
 <% unit_id = sample_attribute ? sample_attribute.unit_id : nil %>
 <% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
@@ -23,6 +24,11 @@
   <td class="text-center">
     <div class="checkbox-inline">
       <%= check_box_tag "#{field_name_prefix}[required]", '1', required %>
+    </div>
+  </td>
+  <td class="text-center">
+    <div class="checkbox-inline">
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title %>
     </div>
   </td>
   <td>
