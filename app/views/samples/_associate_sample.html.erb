@@ -42,8 +42,8 @@
 
           </div>
           <div role="tabpanel" class="tab-pane" id="associate-samples-batch">
-            <div data-role="seek-wizard">
-              <div data-role="seek-wizard-step">
+            <div id="associate-samples-batch-wizard" data-role="seek-wizard">
+              <div data-role="seek-wizard-step" data-step-name="Select data file">
                 <label>Select data file</label>
                 <%= filterable_association_select(filter_data_files_path) do %>
                     <%= render :partial => 'data_files/association_preview', :collection => DataFile.all_authorized_for('view').first(20),
@@ -51,7 +51,7 @@
                     %>
                 <% end %>
               </div>
-              <div data-role="seek-wizard-step">
+              <div data-role="seek-wizard-step" data-step-name="Select samples">
                 <label>Select samples</label>
                 <div id="data-file-samples-table">
                   <%#TODO: Change me %>
@@ -82,6 +82,9 @@
       $j(document).ready(function () {
         $j('#_association_direction').change(updateDirectionName);
         updateDirectionName();
+        $j('#associate-samples-batch .association-preview').click(function () {
+          document.getElementById('associate-samples-batch-wizard').nextStep();
+        });
       });
     </script>
 <% end %>
