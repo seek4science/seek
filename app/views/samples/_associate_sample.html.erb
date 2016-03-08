@@ -42,17 +42,22 @@
 
           </div>
           <div role="tabpanel" class="tab-pane" id="associate-samples-batch">
-            <label>Select data file</label>
-            <%= filterable_association_select(filter_data_files_path) do %>
-                <%= render :partial => 'data_files/association_preview', :collection => DataFile.all_authorized_for('view').first(20),
-                           :locals => { :existing => resource.samples }
-                %>
-            <% end %>
-
-            <label>Select samples</label>
-            <div id="data-file-samples-table">
-              <%#TODO: Change me %>
-              <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
+            <div data-role="seek-wizard">
+              <div data-role="seek-wizard-step">
+                <label>Select data file</label>
+                <%= filterable_association_select(filter_data_files_path) do %>
+                    <%= render :partial => 'data_files/association_preview', :collection => DataFile.all_authorized_for('view').first(20),
+                               :locals => { :existing => resource.samples }
+                    %>
+                <% end %>
+              </div>
+              <div data-role="seek-wizard-step">
+                <label>Select samples</label>
+                <div id="data-file-samples-table">
+                  <%#TODO: Change me %>
+                  <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
+                </div>
+              </div>
             </div>
           </div>
         </div>

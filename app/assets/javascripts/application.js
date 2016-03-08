@@ -53,4 +53,5 @@
 //= require people
 //= require search
 //= require sample_types
+//= require wizard_step
 //= require_tree ./templates
