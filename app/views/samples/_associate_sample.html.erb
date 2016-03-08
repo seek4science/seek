@@ -19,11 +19,45 @@
     <hr/>
 
     <%= association_selector('sample_to_list', 'Add samples', 'Select samples') do %>
-        <%= filterable_association_select(filter_samples_path(:assay_id => resource.id), :multiple => true) do %>
-            <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20),
-                       :locals => { :existing => resource.samples }
-            %>
-        <% end %>
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active">
+            <a href="#associate-samples-individual" aria-controls="associate-samples-individual" role="tab" data-toggle="tab">Individual</a>
+          </li>
+          <li role="presentation">
+            <a href="#associate-samples-batch" aria-controls="associate-samples-batch" role="tab" data-toggle="tab">Batch</a>
+          </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="associate-samples-individual">
+            <label>Select samples</label>
+            <%= filterable_association_select(filter_samples_path(:assay_id => resource.id), :multiple => true) do %>
+                <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20),
+                           :locals => { :existing => resource.samples }
+                %>
+            <% end %>
+
+          </div>
+          <div role="tabpanel" class="tab-pane" id="associate-samples-batch">
+            <label>Select data file</label>
+            <%= filterable_association_select(filter_data_files_path) do %>
+                <%= render :partial => 'data_files/association_preview', :collection => DataFile.all_authorized_for('view').first(20),
+                           :locals => { :existing => resource.samples }
+                %>
+            <% end %>
+
+            <label>Select samples</label>
+            <div id="data-file-samples-table">
+              <%#TODO: Change me %>
+              <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
+            </div>
+          </div>
+        </div>
+
+        <hr/>
 
         <div class="form-group">
           <label>Select sample direction</label>

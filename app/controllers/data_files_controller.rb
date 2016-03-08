@@ -289,6 +289,14 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def filter
+    @data_files = DataFile.authorize_asset_collection(DataFile.where("title LIKE ?", "#{params[:filter]}%"), 'view').first(20)
+
+    respond_to do |format|
+      format.html { render :partial => 'data_files/association_preview', :collection => @data_files }
+    end
+  end
+
   protected
 
   def translate_action action

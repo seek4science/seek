@@ -337,6 +337,7 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :preview
+      get :filter
       post :test_asset_url
       post :upload_for_tool
       post :upload_from_email

@@ -1,0 +1,29 @@
+<% sample_type = samples.first.sample_type %>
+<% hidden_rows ||= 0 %>
+<% max_columns ||= 8 %>
+<% shown_attributes = sample_type.sample_attributes.first(max_columns) %>
+
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+    <tr>
+      <% shown_attributes.each do |attribute| %>
+          <th><%= attribute.title %></th>
+      <% end %>
+    </tr>
+    </thead>
+    <tbody>
+    <% samples.each do |sample| %>
+        <tr>
+          <% shown_attributes.each do |attribute| %>
+              <td><%= sample.send(attribute.accessor_name.to_sym) %></td>
+          <% end %>
+        </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if hidden_rows > 0%>
+    <%= link_to("Show #{pluralize(hidden_rows, 'additional row')}") %>
+<% end %>
