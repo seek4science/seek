@@ -19,7 +19,7 @@ SEEK software website: [http://seek4science.org](http://seek4science.org)
 
 SEEK installation guide: [http://seek4science.org/installing](http://seek4science.org/installing)
 
-SEEK changelog: [http://seek4science.org/changes](http://seek4science.org/changes)
+SEEK changelog: [/tech/releases/](/tech/releases)
 
 JERM ontology: [https://github.com/SysMO-DB/JERMOntology](https://github.com/SysMO-DB/JERMOntology)
 
