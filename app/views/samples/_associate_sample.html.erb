@@ -77,8 +77,11 @@
         updateDirectionName();
 
         // Wizard steps
-        $j('#associate-samples-batch-wizard .association-preview').click(function () {
-          document.getElementById('associate-samples-batch-wizard').wizard.nextStep();
+        var wizard = document.getElementById('associate-samples-batch-wizard').wizard;
+        $j('#associate-samples-batch-wizard [data-role="seek-association-candidate"]').click(function () {
+          wizard.step(2).unlock();
+          wizard.step(3).unlock();
+          wizard.gotoStep(2);
         });
       });
     </script>
