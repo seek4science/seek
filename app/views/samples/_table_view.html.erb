@@ -14,7 +14,7 @@
       </thead>
       <tbody>
       <% samples.each do |sample| %>
-          <%= content_tag(:tr, class: 'clickable', data: { role: 'seek-association-candidate',
+          <%= content_tag(:tr, class: 'selectable clickable', data: { role: 'seek-association-candidate',
                                                            'association-id' => sample.id,
                                                            'association-title' => sample.title }) do %>
               <% shown_attributes.each do |attribute| %>

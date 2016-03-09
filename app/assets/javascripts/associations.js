@@ -52,20 +52,20 @@ $j(document).ready(function () {
 
     $j('[data-role="seek-confirm-association-button"]').click(function (e) {
         e.preventDefault();
-        var modal = $j(this).parents('.new-association-modal');
+        var scope = $j('[data-role="association-form"]', $j(this).parents('.modal'));
         var list = $j('#' +  $j(this).data('associationsListId'));
         var template = HandlebarsTemplates[list.data('templateName')];
 
         // Collect all form inputs beginning with _association
         var commonFields = {};
-        $j(':input', modal).each(function (_, input) {
+        $j(':input', scope).each(function (_, input) {
             if($j(input).attr('name')) {
                 var name = $j(input).attr('name').replace('_association_','');
                 commonFields[name] = $j(input).val();
             }
         });
 
-        $j('[data-role="seek-association-candidate"].selected', modal).each(function (_, selected) {
+        $j('[data-role="seek-association-candidate"].selected', scope).each(function (_, selected) {
             // Merge common fields and association-specific fields into single object
             var associationObject = $j.extend({}, commonFields, {
                 id: $j(selected).data('associationId'),
@@ -77,17 +77,14 @@ $j(document).ready(function () {
         }).removeClass('selected');
 
         associations.toggleEmptyListText(list);
-        modal.modal('hide');
-        return false;
     });
 
     $j('.association-filter').keypress(function (e) {
         // If more than two characters were entered, or the input was cleared, or the ENTER key was pressed..
         if($j(this).val().length == 0 || $j(this).val().length >= 2 || e.keyCode == 13) {
-            var modal = $j(this).parents('.new-association-modal');
             $j.ajax($j(this).data('filterUrl'), {
                     data: { filter: $j(this).val() },
-                    success: function (data) { $j('[data-role="seek-association-candidate-list"]', modal).html(data); }
+                    success: function (data) { $j(this).nearest('[data-role="seek-association-candidate-list"]').html(data); }
                 }
             );
             if(e.keyCode == 13)

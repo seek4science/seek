@@ -148,7 +148,7 @@ module BootstrapHelper
     end
   end
 
-  def modal_header(title)
+  def modal_header(title, options = {})
     content_tag(:div, :class => 'modal-header') do
       content_tag(:button, :class => 'close', 'data-dismiss' => 'modal', 'aria-label' => 'Close') do
         content_tag(:span, '&times;'.html_safe, 'aria-hidden' => 'true')
@@ -157,14 +157,16 @@ module BootstrapHelper
     end
   end
 
-  def modal_body
-    content_tag(:div, :class => 'modal-body') do
+  def modal_body(options = {})
+    opts = merge_options({:class => 'modal-body'}, options)
+    content_tag(:div, opts) do
       yield
     end
   end
 
-  def modal_footer
-    content_tag(:div, :class => 'modal-footer') do
+  def modal_footer(options = {})
+    opts = merge_options({:class => 'modal-footer'}, options)
+    content_tag(:div, opts) do
       yield
     end
   end
