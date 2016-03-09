@@ -19,8 +19,6 @@
     <hr/>
 
     <%= association_selector('sample_to_list', 'Add individual samples', 'Select samples') do %>
-
-
         <label>Select samples</label>
         <%= filterable_association_select(filter_samples_path(:assay_id => resource.id), :multiple => true) do %>
             <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20),
@@ -78,11 +76,15 @@
 
         // Wizard steps
         var wizard = document.getElementById('associate-samples-batch-wizard').wizard;
-        $j('#associate-samples-batch-wizard [data-role="seek-association-candidate"]').click(function () {
+        $j('#associate-samples-batch-wizard').on('click', '[data-role="seek-association-candidate"]', function () {
           wizard.step(2).unlock();
           wizard.step(3).unlock();
           wizard.gotoStep(2);
         });
+
+        $j('#modalAddSamplesFromDataFile').on('hide.bs.modal', function () {
+          wizard.reset();
+        })
       });
     </script>
 <% end %>

@@ -92,6 +92,12 @@ Wizards.Wizard.prototype.updateNav = function () {
     else
         nextBtn.show();
 };
+Wizards.Wizard.prototype.reset = function () {
+    for(var i = 0; i < this.steps.length; i++)
+        this.steps[i].locked = true;
+
+    this.gotoStep(1);
+};
 
 Wizards.Step = function (number, element, wizard) {
     this.number = number;
