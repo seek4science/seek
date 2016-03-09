@@ -1,0 +1,21 @@
+<%= form_for(@sample_type, url:{action: :create_from_template}) do |f| %>
+
+    <%= f.error_messages %>
+
+    <div class="form-group">
+      <label>Title</label>
+      <%= f.text_field :title, :class => 'form-control', :placeholder => 'Sample type name' %>
+    </div>
+
+    <div class="form-group">
+      <label>File to upload<span class="required">*</span></label>
+      <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => false } -%>
+    </div>
+
+    <p class="actions">
+      <%= f.submit (@sample_type.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
+      or
+      <%= cancel_button(@sample_type.new_record? ? sample_types_path : sample_type_path(@sample_type)) %>
+    </p>
+
+<% end %>

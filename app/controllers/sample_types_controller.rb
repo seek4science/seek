@@ -33,6 +33,16 @@ class SampleTypesController < ApplicationController
     end
   end
 
+  def new_from_template
+    @sample_type = SampleType.new
+    @sample_type.sample_attributes.build # Initial attribute
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.json { render json: @sample_type }
+    end
+  end
+
   # GET /sample_types/1/edit
   def edit
     @sample_type = SampleType.find(params[:id])

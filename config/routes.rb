@@ -1,6 +1,10 @@
 SEEK::Application.routes.draw do
 
   resources :sample_types do
+    collection do
+      get :new_from_template
+      post :create_from_template
+    end
     resources :samples
   end
 
