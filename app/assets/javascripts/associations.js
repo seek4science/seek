@@ -20,11 +20,14 @@ var associations = {
 
 $j(document).ready(function () {
 
-    $j('body').on('click', '.association-preview', function () {
-        if(!$j(this).parents('.association-candidate-list').data('multiple'))
-            $j(this).siblings().removeClass('active');
+    $j('body').on('click', '[data-role="seek-association-candidate"]', function () {
+        $j(this).toggleClass('selected');
+        if(!$j(this).parents('[data-role="seek-association-candidate-list"]').data('multiple')) {
+            $j(this).siblings().removeClass('selected');
+        } else {
+            $j('[data-role="seek-selected-association-count"]').html('' + $j('.selected', $j(this).parent()).length + ' items selected' );
+        }
 
-        $j(this).toggleClass('active');
         return false;
     });
 
@@ -62,7 +65,7 @@ $j(document).ready(function () {
             }
         });
 
-        $j('.association-preview.active', modal).each(function (_, selected) {
+        $j('[data-role="seek-association-candidate"].selected', modal).each(function (_, selected) {
             // Merge common fields and association-specific fields into single object
             var associationObject = $j.extend({}, commonFields, {
                 id: $j(selected).data('associationId'),
@@ -71,7 +74,7 @@ $j(document).ready(function () {
 
             // Populate template and append to list
             list.find('ul').append(template(associationObject));
-        }).removeClass('active');
+        }).removeClass('selected');
 
         associations.toggleEmptyListText(list);
         modal.modal('hide');
@@ -84,7 +87,7 @@ $j(document).ready(function () {
             var modal = $j(this).parents('.new-association-modal');
             $j.ajax($j(this).data('filterUrl'), {
                     data: { filter: $j(this).val() },
-                    success: function (data) { $j('.association-candidate-list', modal).html(data); }
+                    success: function (data) { $j('[data-role="seek-association-candidate-list"]', modal).html(data); }
                 }
             );
             if(e.keyCode == 13)

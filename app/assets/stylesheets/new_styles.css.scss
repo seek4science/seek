@@ -415,3 +415,13 @@ a.remove-association {
     border-radius: 0;
   }
 }
+
+a.selected,
+a.selected:hover,
+a.selected:focus,
+.selected,
+.selected:hover,
+.selected:focus {
+  color: $list-group-active-color;
+  background-color: $list-group-active-bg;
+}

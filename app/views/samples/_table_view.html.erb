@@ -2,26 +2,32 @@
 <% hidden_rows ||= 0 %>
 <% shown_attributes = sample_type.sample_attributes %>
 
-<div class="table-responsive">
-  <table class="table table-bordered">
-    <thead>
-    <tr>
-      <% shown_attributes.each do |attribute| %>
-          <th><%= attribute.title %></th>
-      <% end %>
-    </tr>
-    </thead>
-    <tbody>
-    <% samples.each do |sample| %>
-        <tr>
-          <% shown_attributes.each do |attribute| %>
-              <td><%= sample.send(attribute.accessor_name.to_sym) %></td>
+<div  data-role="seek-association-candidate-list" data-multiple="true">
+  <div class="table-responsive">
+    <table class="table table-bordered samples-table">
+      <thead>
+      <tr>
+        <% shown_attributes.each do |attribute| %>
+            <th><%= attribute.title %></th>
+        <% end %>
+      </tr>
+      </thead>
+      <tbody>
+      <% samples.each do |sample| %>
+          <%= content_tag(:tr, class: 'clickable', data: { role: 'seek-association-candidate',
+                                                           'association-id' => sample.id,
+                                                           'association-title' => sample.title }) do %>
+              <% shown_attributes.each do |attribute| %>
+                  <td><%= sample.send(attribute.accessor_name.to_sym) %></td>
+              <% end %>
           <% end %>
-        </tr>
-    <% end %>
-    </tbody>
-  </table>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div data-role="seek-selected-association-count"></div>
 </div>
+
 
 <% if hidden_rows > 0%>
     <%= link_to("Show #{pluralize(hidden_rows, 'additional row')}") %>

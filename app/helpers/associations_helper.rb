@@ -28,7 +28,8 @@ module AssociationsHelper
                               autocomplete: 'off', 'data-filter-url' => filter_url)
     end +
       content_tag(:div, class: 'list-group association-candidate-list',
-                  data: { multiple: options.delete(:multiple) || 'false' }) do
+                  data: { role: 'seek-association-candidate-list',
+                          multiple: options.delete(:multiple) || 'false' }) do
         yield
       end
   end
