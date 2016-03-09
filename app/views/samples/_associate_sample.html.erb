@@ -18,49 +18,15 @@
 
     <hr/>
 
-    <%= association_selector('sample_to_list', 'Add samples', 'Select samples') do %>
+    <%= association_selector('sample_to_list', 'Add individual samples', 'Select samples') do %>
 
-        <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="active">
-            <a href="#associate-samples-individual" aria-controls="associate-samples-individual" role="tab" data-toggle="tab">Individual</a>
-          </li>
-          <li role="presentation">
-            <a href="#associate-samples-batch" aria-controls="associate-samples-batch" role="tab" data-toggle="tab">Batch</a>
-          </li>
-        </ul>
 
-        <!-- Tab panes -->
-        <div class="tab-content">
-          <div role="tabpanel" class="tab-pane active" id="associate-samples-individual">
-            <label>Select samples</label>
-            <%= filterable_association_select(filter_samples_path(:assay_id => resource.id), :multiple => true) do %>
-                <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20),
-                           :locals => { :existing => resource.samples }
-                %>
-            <% end %>
-
-          </div>
-          <div role="tabpanel" class="tab-pane" id="associate-samples-batch">
-            <div id="associate-samples-batch-wizard" data-role="seek-wizard">
-              <div data-role="seek-wizard-step" data-step-name="Select data file">
-                <label>Select data file</label>
-                <%= filterable_association_select(filter_data_files_path) do %>
-                    <%= render :partial => 'data_files/association_preview', :collection => DataFile.all_authorized_for('view').first(20),
-                               :locals => { :existing => resource.samples }
-                    %>
-                <% end %>
-              </div>
-              <div data-role="seek-wizard-step" data-step-name="Select samples">
-                <label>Select samples</label>
-                <div id="data-file-samples-table">
-                  <%#TODO: Change me %>
-                  <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <label>Select samples</label>
+        <%= filterable_association_select(filter_samples_path(:assay_id => resource.id), :multiple => true) do %>
+            <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20),
+                       :locals => { :existing => resource.samples }
+            %>
+        <% end %>
 
         <hr/>
 
@@ -68,6 +34,33 @@
           <label>Select sample direction</label>
           <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
           <%= hidden_field_tag :_association_directionName, '' %>
+        </div>
+    <% end %>
+
+    <%= association_selector('sample_to_list', 'Add samples from data file', 'Select samples from data') do %>
+        <div id="associate-samples-batch-wizard" data-role="seek-wizard">
+          <div data-role="seek-wizard-step" data-step-name="Select data file">
+            <label>Select data file</label>
+            <%= filterable_association_select(filter_data_files_path) do %>
+                <%= render :partial => 'data_files/association_preview', :collection => DataFile.all_authorized_for('view').first(20),
+                           :locals => { :existing => resource.samples }
+                %>
+            <% end %>
+          </div>
+          <div data-role="seek-wizard-step" data-step-name="Select samples">
+            <label>Select samples</label>
+            <div id="data-file-samples-table">
+              <%#TODO: Change me %>
+              <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
+            </div>
+          </div>
+          <div data-role="seek-wizard-step" data-step-name="Select sample direction">
+            <div class="form-group">
+              <label>Select sample direction</label>
+              <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
+              <%= hidden_field_tag :_association_directionName, '' %>
+            </div>
+          </div>
         </div>
     <% end %>
 
@@ -82,7 +75,9 @@
       $j(document).ready(function () {
         $j('#_association_direction').change(updateDirectionName);
         updateDirectionName();
-        $j('#associate-samples-batch .association-preview').click(function () {
+
+        // Wizard steps
+        $j('#associate-samples-batch-wizard .association-preview').click(function () {
           document.getElementById('associate-samples-batch-wizard').nextStep();
         });
       });

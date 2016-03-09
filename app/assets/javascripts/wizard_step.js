@@ -1,12 +1,26 @@
 $j(document).ready(function () {
-    $j('[data-role="seek-wizard"]').each(function () {
+    $j('[data-role="seek-wizard"]').each(function (index, wizard) {
         this.currentStep = 1;
+
         this.gotoStep = function (stepNo) {
             this.currentStep = stepNo;
             this.steps.hide();
             this.steps[this.currentStep - 1].show();
-            $j('li', this.stepNav).removeClass('active');
-            $j('li:eq('+(this.currentStep - 1)+')', this.stepNav).addClass('active');
+
+            // Highlight breadcrumb
+            $j('[data-role="seek-wizard-nav"] li', $j(this)).removeClass('active');
+            $j('[data-role="seek-wizard-nav"] li:eq('+(this.currentStep - 1)+')', $j(this)).addClass('active');
+
+            // Show hide next/prev buttons
+            if(this.currentStep == 1)
+                $j('[data-role="seek-wizard-prev-btn"]').hide();
+            else
+                $j('[data-role="seek-wizard-prev-btn"]').show();
+
+            if(this.currentStep == this.steps.length)
+                $j('[data-role="seek-wizard-next-btn"]').hide();
+            else
+                $j('[data-role="seek-wizard-next-btn"]').show();
         };
         this.nextStep = function () {
             if(++this.currentStep > this.steps.length)
@@ -20,28 +34,25 @@ $j(document).ready(function () {
             this.gotoStep(this.currentStep);
         };
 
-        var wizard = this;
         var steps = $j('[data-role="seek-wizard-step"]', $j(this));
-        var stepNav = $j('<ul class="seek-step-nav pagination">');
+        $j(this).prepend(HandlebarsTemplates['wizard/nav']({ steps: steps.map(function () { return $j(this).data('stepName') || ''; }).toArray() }));
+        $j(this).append(HandlebarsTemplates['wizard/buttons']());
         this.steps = steps;
-        this.stepNav = stepNav;
 
-        steps.each(function (number, step) {
-            var stepName = '';
-            if($j(step).data('stepName'))
-                stepName = ' - ' + $j(step).data('stepName');
-
-            var stepEl = $j('<li><a href="#">Step ' + (number + 1) + stepName + '</a></li>');
-
-            stepEl.click(function () {
-                wizard.gotoStep(number + 1);
-                return false;
-            });
-            stepNav.append(stepEl);
+        $j('[data-role="seek-wizard-nav"] li a', $j(wizard)).click(function () {
+            wizard.gotoStep($j(this).data('step'));
+            return false;
+        });
+        $j('[data-role="seek-wizard-prev-btn"]', $j(wizard)).click(function () {
+            wizard.lastStep();
         });
 
-        this.gotoStep(1);
+        $j('[data-role="seek-wizard-next-btn"]', $j(wizard)).click(function () {
+            wizard.nextStep();
+        });
 
-        $j(this).prepend(stepNav);
+        this.steps = steps;
+
+        this.gotoStep(1);
     });
 });
