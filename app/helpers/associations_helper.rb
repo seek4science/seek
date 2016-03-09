@@ -9,7 +9,7 @@ module AssociationsHelper
 
   def association_selector(association_list_id, button_text, modal_title, modal_options = {}, &_block)
     modal_id = 'modal' + button_text.parameterize.underscore.camelize
-    modal_options.reverse_merge!('data-role' => 'association-form')
+    modal_options.reverse_merge!('data-role' => 'seek-association-form')
     button_link_to(button_text, 'add', '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}") +
       modal(id: modal_id, size: 'xl') do
         modal_header(modal_title) +
@@ -23,17 +23,17 @@ module AssociationsHelper
   end
 
   def filterable_association_select(filter_url, options = {}, &_block)
-    options.reverse_merge!(multiple: false, )
+    options.reverse_merge!(multiple: false)
     content_tag(:div, class: 'form-group') do
-      content_tag(:input, '', class: 'form-control association-filter',
+      content_tag(:input, '', class: 'form-control', 'data-role' => 'seek-association-filter',
                               type: 'text', placeholder: 'Type to filter...',
-                              autocomplete: 'off', 'data-filter-url' => filter_url)
-    end +
+                              autocomplete: 'off', 'data-filter-url' => filter_url) +
       content_tag(:div, class: 'list-group association-candidate-list',
                   data: { role: 'seek-association-candidate-list',
                           multiple: options.delete(:multiple) || 'false' }) do
         yield
       end
+    end
   end
 
   def confirm_association_button(text, associations_list_id, options = {})

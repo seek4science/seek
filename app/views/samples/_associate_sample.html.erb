@@ -31,7 +31,6 @@
         <div class="form-group">
           <label>Select sample direction</label>
           <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
-          <%= hidden_field_tag :_association_directionName, '' %>
         </div>
     <% end %>
 
@@ -45,7 +44,7 @@
                 %>
             <% end %>
           </div>
-          <div data-role="association-form">
+          <div data-role="seek-association-form">
             <div data-role="seek-wizard-step" data-step-name="Select samples">
               <label>Select samples</label>
               <div id="data-file-samples-table">
@@ -57,7 +56,6 @@
               <div class="form-group">
                 <label>Select sample direction</label>
                 <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
-                <%= hidden_field_tag :_association_directionName, '' %>
               </div>
             </div>
           </div>
@@ -65,7 +63,6 @@
     <% end %>
 
     <script>
-      // Need to store the direction name for displaying in the list of samples
       function updateDirectionName () {
         var select = $j('#_association_direction');
         var hidden = $j('#_association_directionName');
@@ -73,9 +70,6 @@
       }
 
       $j(document).ready(function () {
-        $j('#_association_direction').change(updateDirectionName);
-        updateDirectionName();
-
         // Wizard steps
         var wizard = document.getElementById('associate-samples-batch-wizard').wizard;
         $j('#associate-samples-batch-wizard').on('click', '[data-role="seek-association-candidate"]', function () {

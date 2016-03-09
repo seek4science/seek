@@ -52,16 +52,22 @@ $j(document).ready(function () {
 
     $j('[data-role="seek-confirm-association-button"]').click(function (e) {
         e.preventDefault();
-        var scope = $j('[data-role="association-form"]', $j(this).parents('.modal'));
+        var scope = $j('[data-role="seek-association-form"]', $j(this).parents('.modal'));
         var list = $j('#' +  $j(this).data('associationsListId'));
         var template = HandlebarsTemplates[list.data('templateName')];
 
         // Collect all form inputs beginning with _association
+        //  <select> tags store both the value and the selected option's text
         var commonFields = {};
         $j(':input', scope).each(function (_, input) {
             if($j(input).attr('name')) {
                 var name = $j(input).attr('name').replace('_association_','');
-                commonFields[name] = $j(input).val();
+                if($j(input).is('select')) {
+                    commonFields[name] = { value: $j(input).val(),
+                                           text:$j('option:selected', $j(input)).text() };
+                } else {
+                    commonFields[name] = $j(input).val();
+                }
             }
         });
 
@@ -79,12 +85,13 @@ $j(document).ready(function () {
         associations.toggleEmptyListText(list);
     });
 
-    $j('.association-filter').keypress(function (e) {
+    $j('[data-role="seek-association-filter"]').keypress(function (e) {
         // If more than two characters were entered, or the input was cleared, or the ENTER key was pressed..
+        var filter = this;
         if($j(this).val().length == 0 || $j(this).val().length >= 2 || e.keyCode == 13) {
             $j.ajax($j(this).data('filterUrl'), {
                     data: { filter: $j(this).val() },
-                    success: function (data) { $j(this).nearest('[data-role="seek-association-candidate-list"]').html(data); }
+                    success: function (data) { $j(filter).siblings('[data-role="seek-association-candidate-list"]').html(data); }
                 }
             );
             if(e.keyCode == 13)
