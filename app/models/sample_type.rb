@@ -7,6 +7,8 @@ class SampleType < ActiveRecord::Base
 
   has_many :sample_attributes, order: :pos, inverse_of: :sample_type
 
+  belongs_to :content_blob
+
   validates :title, presence: true
   validate :one_title_attribute_present
 

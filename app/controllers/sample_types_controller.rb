@@ -51,8 +51,8 @@ class SampleTypesController < ApplicationController
     handle_upload_data
     cb_params = content_blob_params.first
     attributes = build_attributes_hash_for_content_blob(cb_params, nil)
-    content_blob = ContentBlob.new attributes
-    raise content_blob.errors.inspect unless content_blob.valid?
+    @sample_type.create_content_blob(attributes)
+    raise @sample_type.content_blob.errors.inspect unless @sample_type.content_blob.valid?
     respond_to do |format|
       if @sample_type.save
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
