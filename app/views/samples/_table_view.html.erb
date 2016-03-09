@@ -1,7 +1,6 @@
 <% sample_type = samples.first.sample_type %>
 <% hidden_rows ||= 0 %>
-<% max_columns ||= 8 %>
-<% shown_attributes = sample_type.sample_attributes.first(max_columns) %>
+<% shown_attributes = sample_type.sample_attributes %>
 
 <div class="table-responsive">
   <table class="table table-bordered">
