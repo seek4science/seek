@@ -1,10 +1,10 @@
-<%= form_for(@sample_type, url:{action: :create_from_template}) do |f| %>
+<%= form_tag({action: :create_from_template},:multipart => true) do |f| %>
 
-    <%= f.error_messages %>
+    <%= error_messages_for :sample_type -%>
 
     <div class="form-group">
       <label>Title</label>
-      <%= f.text_field :title, :class => 'form-control', :placeholder => 'Sample type name' %>
+      <%= text_field_tag 'sample_type[title]', @sample_type.title, :class=>"form-control", :placeholder => 'Sample type name' -%>
     </div>
 
     <div class="form-group">
@@ -12,8 +12,9 @@
       <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => false } -%>
     </div>
 
+
     <p class="actions">
-      <%= f.submit (@sample_type.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
+      <%= submit_tag (@sample_type.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
       or
       <%= cancel_button(@sample_type.new_record? ? sample_types_path : sample_type_path(@sample_type)) %>
     </p>

@@ -1,6 +1,9 @@
 class SampleTypesController < ApplicationController
   # GET /sample_types
   # GET /sample_types.json
+
+  include Seek::UploadHandling::DataUpload
+
   def index
     @sample_types = SampleType.all
 
@@ -40,6 +43,24 @@ class SampleTypesController < ApplicationController
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @sample_type }
+    end
+  end
+
+  def create_from_template
+    @sample_type = SampleType.new(params[:sample_type])
+    handle_upload_data
+    cb_params = content_blob_params.first
+    attributes = build_attributes_hash_for_content_blob(cb_params, nil)
+    content_blob = ContentBlob.new attributes
+    raise content_blob.errors.inspect unless content_blob.valid?
+    respond_to do |format|
+      if @sample_type.save
+        format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
+        format.json { render json: @sample_type, status: :created, location: @sample_type }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @sample_type.errors, status: :unprocessable_entity }
+      end
     end
   end
 

@@ -92,6 +92,21 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_redirected_to sample_types_path
   end
 
+  test "create from template" do
+    blob = {:data=>template_for_upload}
+    post :create, sample_type: { title: "Hello!"}, :content_blobs => [blob]
+  end
+
+  private
+
+  def template_for_upload
+    ActionDispatch::Http::UploadedFile.new({
+                                               :filename => 'sample-type-template.xls',
+                                               :content_type => 'application/excel',
+                                               :tempfile => fixture_file_upload('files/rightfield-test.xls')
+                                           })
+  end
+
 
 
 end
