@@ -146,5 +146,53 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   end
 
+  #a less clean template, to check it takes the last sample sheet, and handles irregular columns
+  test 'build from template2' do
+    string_type = Factory(:string_sample_attribute_type, title:'String')
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob2)
+    refute_nil sample_type.template
+
+    sample_type.build_from_template
+    attribute_names = sample_type.sample_attributes.collect(&:title)
+    assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
+    assert sample_type.sample_attributes.first.is_title?
+    sample_type.sample_attributes.each do |attr|
+      assert_equal string_type,attr.sample_attribute_type
+    end
+
+    assert sample_type.valid?
+    sample_type.save!
+    sample_type = SampleType.find(sample_type.id)
+    attribute_names = sample_type.sample_attributes.collect(&:title)
+    assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
+  end
+
+  test 'compatible template file' do
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    assert sample_type.compatible_template_file?
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob2)
+    assert sample_type.compatible_template_file?
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    assert sample_type.compatible_template_file?
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:binary_content_blob)
+    refute sample_type.compatible_template_file?
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:rightfield_content_blob)
+    refute sample_type.compatible_template_file?
+
+    sample_type = SampleType.new title:'from template'
+    refute sample_type.compatible_template_file?
+  end
+
 
 end

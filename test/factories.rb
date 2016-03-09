@@ -809,6 +809,13 @@ end
     f.data  File.new("#{Rails.root}/test/fixtures/files/sample-type-example.xlsx","rb").read
   end
 
+  #has more than one sample sheet, and the columns are irregular with leading empty columns and gaps
+  Factory.define(:sample_type_template_content_blob2, :parent => :content_blob) do |f|
+    f.original_filename "sample-type-example.xlsx"
+    f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/sample-type-example2.xls","rb").read
+  end
+
   Factory.define(:activity_log) do |f|
     f.action "create"
     f.association :activity_loggable, :factory => :data_file

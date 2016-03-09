@@ -7,6 +7,8 @@ class SampleAttributeType < ActiveRecord::Base
   before_save :set_defaults_attributes
   after_initialize :set_defaults_attributes
 
+  scope :primitive_string_types, where(base_type: 'String', regexp: '.*')
+
   BASE_TYPE_AND_CHECKER_MAP = {
     'Integer' => :is_integer?,
     'Float' => :is_float?,
