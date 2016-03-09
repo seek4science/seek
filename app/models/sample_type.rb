@@ -13,7 +13,7 @@ class SampleType < ActiveRecord::Base
   alias_method :template, :content_blob
 
   validates :title, presence: true
-  validate :one_title_attribute_present
+  validate :validate_one_title_attribute_present, :validate_template_file
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
@@ -78,9 +78,15 @@ class SampleType < ActiveRecord::Base
     @template_doc
   end
 
-  def one_title_attribute_present
+  def validate_one_title_attribute_present
     unless (count = sample_attributes.select(&:is_title).count) == 1
       errors.add(:sample_attributes, "There must be 1 attribute which is the title, currently there are #{count}")
+    end
+  end
+
+  def validate_template_file
+    if template && !compatible_template_file?
+      errors.add(:template, "Not a valid template file")
     end
   end
 
