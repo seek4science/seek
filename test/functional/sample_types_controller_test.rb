@@ -101,9 +101,9 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   def template_for_upload
     ActionDispatch::Http::UploadedFile.new({
-                                               :filename => 'sample-type-template.xls',
+                                               :filename => 'sample-type-example.xlsx',
                                                :content_type => 'application/excel',
-                                               :tempfile => fixture_file_upload('files/rightfield-test.xls')
+                                               :tempfile => fixture_file_upload('files/sample-type-example.xlsx')
                                            })
   end
 

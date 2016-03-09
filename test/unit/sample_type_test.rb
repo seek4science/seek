@@ -123,5 +123,28 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute type.valid?
   end
 
+  test 'build from template' do
+    string_type = Factory(:string_sample_attribute_type, title:'String')
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    refute_nil sample_type.template
+
+    sample_type.build_from_template
+    attribute_names = sample_type.sample_attributes.collect(&:title)
+    assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
+    assert sample_type.sample_attributes.first.is_title?
+    sample_type.sample_attributes.each do |attr|
+      assert_equal string_type,attr.sample_attribute_type
+    end
+
+    assert sample_type.valid?
+    sample_type.save!
+    sample_type = SampleType.find(sample_type.id)
+    attribute_names = sample_type.sample_attributes.collect(&:title)
+    assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
+
+  end
+
 
 end
