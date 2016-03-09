@@ -1,9 +1,9 @@
 <ul data-role="seek-wizard-nav" class="pagination">
     {{#each steps}}
         <li>
-            <a href="#" data-step="{{inc @index}}">Step {{inc @index}}
-                {{#if this}}
-                    - {{this}}
+            <a href="#" data-step="{{ this.number }}">Step {{ this.number }}
+                {{#if this.name}}
+                    - {{this.name}}
                 {{/if}}
             </a>
         </li>
