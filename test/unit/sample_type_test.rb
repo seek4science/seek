@@ -133,6 +133,9 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type.build_from_template
     attribute_names = sample_type.sample_attributes.collect(&:title)
     assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
+    columns = sample_type.sample_attributes.collect(&:template_column_index)
+    assert_equal [1,2,3,4],columns
+
     assert sample_type.sample_attributes.first.is_title?
     sample_type.sample_attributes.each do |attr|
       assert_equal string_type,attr.sample_attribute_type
@@ -143,6 +146,8 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type = SampleType.find(sample_type.id)
     attribute_names = sample_type.sample_attributes.collect(&:title)
     assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
+    columns = sample_type.sample_attributes.collect(&:template_column_index)
+    assert_equal [1,2,3,4],columns
 
   end
 
@@ -157,6 +162,9 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type.build_from_template
     attribute_names = sample_type.sample_attributes.collect(&:title)
     assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
+    columns = sample_type.sample_attributes.collect(&:template_column_index)
+    assert_equal [3,7,10,11],columns
+
     assert sample_type.sample_attributes.first.is_title?
     sample_type.sample_attributes.each do |attr|
       assert_equal string_type,attr.sample_attribute_type
@@ -167,6 +175,8 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type = SampleType.find(sample_type.id)
     attribute_names = sample_type.sample_attributes.collect(&:title)
     assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
+    columns = sample_type.sample_attributes.collect(&:template_column_index)
+    assert_equal [3,7,10,11],columns
   end
 
   test 'compatible template file' do

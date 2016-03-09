@@ -47,7 +47,12 @@ class SampleType < ActiveRecord::Base
     cells.each do |column_cell|
       unless (heading = column_cell.content).blank?
         is_title = sample_attributes.empty?
-        sample_attributes << SampleAttribute.new(title: heading, sample_attribute_type: default_attribute_type, is_title: is_title, required: is_title)
+        column_index = column_cell.attributes['column']
+        sample_attributes << SampleAttribute.new(title: heading,
+                                                 sample_attribute_type: default_attribute_type,
+                                                 is_title: is_title,
+                                                 required: is_title,
+                                                 template_column_index: column_index)
       end
     end
   end
