@@ -10,7 +10,7 @@ module AssociationsHelper
   def association_selector(association_list_id, button_text, modal_title, &_block)
     modal_id = 'modal' + button_text.parameterize.underscore.camelize
     button_link_to(button_text, 'add', '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}") +
-      modal(class: 'new-association-modal', id: modal_id, size: 'lg') do
+      modal(class: 'new-association-modal', id: modal_id, size: 'xl') do
         modal_header(modal_title) +
           modal_body do
             yield
