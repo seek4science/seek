@@ -34,46 +34,87 @@
         </div>
     <% end %>
 
-    <%= association_selector('sample_to_list', 'Add samples from data file', 'Select samples from data', 'data-role' => nil) do %>
-        <div id="associate-samples-batch-wizard" data-role="seek-wizard">
-          <div data-role="seek-wizard-step" data-step-name="Select data file">
-            <label>Select data file</label>
-            <%= filterable_association_select(filter_data_files_path) do %>
-                <%= render :partial => 'data_files/association_preview', :collection => DataFile.all_authorized_for('view').first(20),
-                           :locals => { :existing => resource.samples }
-                %>
-            <% end %>
-          </div>
-          <div data-role="seek-association-form">
-            <div data-role="seek-wizard-step" data-step-name="Select samples">
-              <label>Select samples</label>
-              <div id="data-file-samples-table">
-                <%#TODO: Change me %>
-                <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
+    <%= button_link_to('Add samples from data file', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "#AddSamplesFromDataFileModal") %>
+    <%= modal(id: 'AddSamplesFromDataFileModal', size: 'xl', 'data-role' => 'seek-wizard') do %>
+        <%= modal_header('Add samples from data file') %>
+        <%= modal_body do %>
+            <div data-role="seek-wizard-nav"></div>
+            <div data-role="seek-wizard-step" data-step-name="Select data file">
+              <label>Select data file</label>
+              <%= filterable_association_select(filter_data_files_path) do %>
+                  <%= render :partial => 'data_files/association_preview', :collection => DataFile.all_authorized_for('view').first(20),
+                             :locals => { :existing => resource.samples }
+                  %>
+              <% end %>
+            </div>
+            <div data-role="seek-association-form">
+              <div data-role="seek-wizard-step" data-step-name="Select samples">
+                <label>Select samples</label>
+                <div id="data-file-samples-table">
+                  <%#TODO: Change me %>
+                  <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
+                </div>
+              </div>
+              <div data-role="seek-wizard-step" data-step-name="Select sample direction">
+                <div class="form-group">
+                  <label>Select sample direction</label>
+                  <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
+                </div>
               </div>
             </div>
-            <div data-role="seek-wizard-step" data-step-name="Select sample direction">
-              <div class="form-group">
-                <label>Select sample direction</label>
-                <%= select_tag(:_association_direction, direction_options, :class => 'form-control') %>
-              </div>
-            </div>
-          </div>
-        </div>
+        <% end %>
+        <%= modal_footer do %>
+            <a data-role="seek-wizard-next-btn" href="#" class="pull-right btn btn-default">Next</a>
+            <a data-role="seek-wizard-prev-btn" href="#" class="pull-left btn btn-default">Previous</a>
+            <%= confirm_association_button('Add samples', 'sample_to_list', id: 'add-batch-sample-btn', style: 'display: none',
+                                           class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
+        <% end %>
     <% end %>
 
+
     <script>
+      var samplesTable;
       $j(document).ready(function () {
-        $j('#data-file-samples-table table').DataTable();
+        samplesTable = $j('#data-file-samples-table table').DataTable({
+            "select": {
+              style: 'multi'
+            }
+        });
 
         // Wizard steps
-        var wizard = document.getElementById('associate-samples-batch-wizard').wizard;
-        $j('#associate-samples-batch-wizard').on('click', '[data-role="seek-association-candidate"]', function () {
+        var wizard = document.getElementById('AddSamplesFromDataFileModal').wizard;
+
+        // When a datafile is selected, unlock and show step 2
+        $j('#AddSamplesFromDataFileModal').on('click', '[data-role="seek-association-candidate"]', function () {
           wizard.step(2).unlock();
-          wizard.step(3).unlock();
           wizard.gotoStep(2);
         });
 
+        // When at least one sample is selected, unlock step 3
+        var handleRowSelect = function ( e, dt, type, indexes ) {
+          $j(samplesTable.rows().nodes()).removeClass('selected');
+
+          var selectedRows = samplesTable.rows({ selected: true });
+          $j(selectedRows.nodes()).addClass('selected');
+
+          if(selectedRows.count() > 0) {
+            wizard.step(3).unlock();
+          } else {
+            wizard.step(3).lock();
+          }
+        };
+        samplesTable.on('select', handleRowSelect);
+        samplesTable.on('deselect', handleRowSelect);
+
+        // On final step, show the confirm button
+        wizard.step(3).onShow = function () {
+          $j('#add-batch-sample-btn').show();
+        };
+        wizard.step(3).onHide = function () {
+          $j('#add-batch-sample-btn').hide();
+        };
+
+        // Reset the wizard when the modal is closed
         $j('#modalAddSamplesFromDataFile').on('hide.bs.modal', function () {
           wizard.reset();
         })

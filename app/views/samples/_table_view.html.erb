@@ -1,5 +1,4 @@
 <% sample_type = samples.first.sample_type %>
-<% hidden_rows ||= 0 %>
 <% shown_attributes = sample_type.sample_attributes %>
 
 <div  data-role="seek-association-candidate-list" data-multiple="true">
@@ -14,9 +13,9 @@
       </thead>
       <tbody>
       <% samples.each do |sample| %>
-          <%= content_tag(:tr, class: 'selectable clickable', data: { role: 'seek-association-candidate',
-                                                           'association-id' => sample.id,
-                                                           'association-title' => sample.title }) do %>
+          <%= content_tag(:tr, data: { role: 'seek-association-candidate',
+                                             'association-id' => sample.id,
+                                             'association-title' => sample.title }) do %>
               <% shown_attributes.each do |attribute| %>
                   <td><%= sample.send(attribute.accessor_name.to_sym) %></td>
               <% end %>
@@ -26,8 +25,3 @@
     </table>
   </div>
 </div>
-
-
-<% if hidden_rows > 0%>
-    <%= link_to("Show #{pluralize(hidden_rows, 'additional row')}") %>
-<% end %>

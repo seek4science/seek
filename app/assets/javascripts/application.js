@@ -56,4 +56,5 @@
 //= require wizard_step
 //= require DataTables-1.10.11/jquery.dataTables
 //= require DataTables-1.10.11/dataTables.bootstrap
+//= require DataTables-1.10.11/dataTables.select
 //= require_tree ./templates

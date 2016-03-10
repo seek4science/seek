@@ -4,13 +4,15 @@ Wizards.Wizard = function (element) {
     this.steps = [];
     this.currentStep = nil;
     this.element = element;
+    this.complete = function () {};
+
     var wizard = this;
     $j('[data-role="seek-wizard-step"]', this.element).each(function (index, stepElement) {
         wizard.steps.push(new Wizards.Step(index + 1, $j(stepElement), wizard));
     });
 
-    this.element.prepend(HandlebarsTemplates['wizard/nav']({ steps: wizard.steps }));
-    this.element.append(HandlebarsTemplates['wizard/buttons']());
+    $j('[data-role="seek-wizard-nav"]', this.element).append(HandlebarsTemplates['wizard/nav']({ steps: wizard.steps }));
+
     $j('[data-role="seek-wizard-nav"] li a', this.element).click(function () {
         var stepNo = parseInt($j(this).data('step'));
 
@@ -105,12 +107,14 @@ Wizards.Step = function (number, element, wizard) {
     this.wizard = wizard;
     this.element = element;
     this.name = this.element.data('stepName');
+    this.onShow = function () {};
+    this.onHide = function () {};
 };
 
 Wizards.Step.prototype.unlock = function () { this.unlocked = true; this.wizard.updateNav(); };
 Wizards.Step.prototype.lock = function () { this.deactivate(); this.unlocked = false; this.wizard.updateNav(); };
-Wizards.Step.prototype.activate = function () { this.unlock(); this.element.show(); };
-Wizards.Step.prototype.deactivate = function () { this.element.hide(); };
+Wizards.Step.prototype.activate = function () { this.unlock(); this.element.show(); this.onShow(); };
+Wizards.Step.prototype.deactivate = function () { this.element.hide(); this.onHide(); };
 
 $j(document).ready(function () {
     $j('[data-role="seek-wizard"]').each(function (index, wizard) {

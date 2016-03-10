@@ -20,12 +20,10 @@ var associations = {
 
 $j(document).ready(function () {
 
-    $j('body').on('click', '[data-role="seek-association-candidate"]', function () {
+    $j('body').on('click', '.selectable[data-role="seek-association-candidate"]', function () {
         $j(this).toggleClass('selected');
         if(!$j(this).parents('[data-role="seek-association-candidate-list"]').data('multiple')) {
             $j(this).siblings().removeClass('selected');
-        } else {
-            $j('[data-role="seek-selected-association-count"]').html('' + $j('.selected', $j(this).parent()).length + ' items selected' );
         }
 
         return false;
