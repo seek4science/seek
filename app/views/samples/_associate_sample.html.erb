@@ -50,6 +50,8 @@
             <div data-role="seek-association-form">
               <div data-role="seek-wizard-step" data-step-name="Select samples">
                 <label>Select samples</label>
+                <a id="data-file-samples-select-all" href="#" class="btn btn-default btn-xs">Select all</a>
+                <a id="data-file-samples-select-none" href="#" class="btn btn-default btn-xs">Select none</a>
                 <div id="data-file-samples-table">
                   <%#TODO: Change me %>
                   <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
@@ -79,6 +81,15 @@
             "select": {
               style: 'multi'
             }
+        });
+
+        $j('#data-file-samples-select-all').click(function () {
+          samplesTable.rows().select();
+          return false;
+        });
+        $j('#data-file-samples-select-none').click(function () {
+          samplesTable.rows().deselect();
+          return false;
         });
 
         // Wizard steps
@@ -116,6 +127,7 @@
 
         // Reset the wizard when the modal is closed
         $j('#AddSamplesFromDataFileModal').on('hide.bs.modal', function () {
+          samplesTable.rows().deselect();
           wizard.reset();
         })
       });
