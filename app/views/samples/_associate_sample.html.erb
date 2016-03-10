@@ -72,7 +72,7 @@
                                            class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
         <% end %>
     <% end %>
-
+    <%= button_link_to('Clear all samples', 'destroy', '#', id: 'clear-all-samples-btn') %>
 
     <script>
       var samplesTable;
@@ -89,6 +89,14 @@
         });
         $j('#data-file-samples-select-none').click(function () {
           samplesTable.rows().deselect();
+          return false;
+        });
+        $j('#clear-all-samples-btn').click(function () {
+          if(confirm("Are you sure you wish to remove all samples from this assay?")) {
+            var list = $j('#sample_to_list');
+            $j('ul', list).html('');
+            associations.toggleEmptyListText(list);
+          }
           return false;
         });
 
