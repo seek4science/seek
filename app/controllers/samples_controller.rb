@@ -11,12 +11,13 @@ class SamplesController < ApplicationController
 
 
   def extract_from_data_file
+    @rejected_samples = []
+    @samples = []
     data_file = DataFile.find(params[:data_file_id])
-    if data_file.possible_sample_types.count==1
+
+    if data_file.possible_sample_types.count>=1
       sample_type = data_file.possible_sample_types.last
       samples = sample_type.build_samples_from_template(data_file.content_blob)
-      @rejected_samples = []
-      @samples = []
       samples.each do |sample|
         sample.contributor=User.current_user
         sample.originating_data_file = data_file
