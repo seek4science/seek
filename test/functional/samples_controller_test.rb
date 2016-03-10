@@ -219,6 +219,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample_type.build_from_template
     #this is to force the full name to be 2 words, so that one row fails
     sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
 
     assert_difference("Sample.count",3) do
