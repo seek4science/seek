@@ -29,7 +29,7 @@ class SampleType < ActiveRecord::Base
     build_attributes_from_column_details(get_column_details(template))
   end
 
-  def compatible_template_file?(template=template)
+  def compatible_template_file?(template = template)
     template && template.is_extractable_spreadsheet? && find_sample_sheet(template)
   end
 
@@ -40,22 +40,22 @@ class SampleType < ActiveRecord::Base
   end
 
   def matches_content_blob?(blob)
-    compatible_template_file?(blob) && (get_column_details(self.template) == get_column_details(blob))
+    compatible_template_file?(blob) && (get_column_details(template) == get_column_details(blob))
   end
 
   private
 
-  #returns a hash containing the column_name=>column_index
+  # returns a hash containing the column_name=>column_index
   def get_column_details(template)
-    column_details={}
-    sheet=find_sample_sheet(template)
+    column_details = {}
+    sheet = find_sample_sheet(template)
     if sheet
-      sheet_index=sheet.attributes['index']
+      sheet_index = sheet.attributes['index']
       cells = template_xml_document(template).find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row[@index=1]/ss:cell")
       cells.each do |column_cell|
         unless (heading = column_cell.content).blank?
           column_index = column_cell.attributes['column']
-          column_details[heading]=column_index
+          column_details[heading] = column_index
         end
       end
     end
@@ -63,7 +63,7 @@ class SampleType < ActiveRecord::Base
   end
 
   def build_attributes_from_column_details(column_details)
-    column_details.each do |name,column_index|
+    column_details.each do |name, column_index|
       is_title = sample_attributes.empty?
       sample_attributes << SampleAttribute.new(title: name,
                                                sample_attribute_type: default_attribute_type,
@@ -73,21 +73,17 @@ class SampleType < ActiveRecord::Base
     end
   end
 
-
-
-
   def default_attribute_type
     SampleAttributeType.primitive_string_types.first
   end
 
   def find_sample_sheet(template)
-    begin
-      template_xml_document(template).find('//ss:sheet').select do |sheet|
-        sheet.attributes['name'] =~ /.*samples.*/i
-      end.last
-    rescue
-      nil
+    matches = template_xml_document(template).find('//ss:sheet').select do |sheet|
+      sheet.attributes['name'] =~ /.*samples.*/i
     end
+    matches.last
+  rescue
+    nil
   end
 
   def template_xml(template)
@@ -95,9 +91,8 @@ class SampleType < ActiveRecord::Base
   end
 
   def template_xml_document(template)
-
-      template_doc = LibXML::XML::Parser.string(template_xml(template)).parse
-      template_doc.root.namespaces.default_prefix = 'ss'
+    template_doc = LibXML::XML::Parser.string(template_xml(template)).parse
+    template_doc.root.namespaces.default_prefix = 'ss'
     template_doc
   end
 
@@ -109,7 +104,7 @@ class SampleType < ActiveRecord::Base
 
   def validate_template_file
     if template && !compatible_template_file?
-      errors.add(:template, "Not a valid template file")
+      errors.add(:template, 'Not a valid template file')
     end
   end
 
