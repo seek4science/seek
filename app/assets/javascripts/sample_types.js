@@ -28,7 +28,6 @@ var SampleTypes = {
     },
 
     removeAttribute: function () {
-        console.log("SUP");
         var row = $j(this).parents('.sample-attribute');
         if($j(this).is(':checked')) {
             if (row.hasClass('success')) { // If it is a new attribute, just delete from the form - doesn't exist yet.
