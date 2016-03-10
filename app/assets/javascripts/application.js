@@ -54,4 +54,6 @@
 //= require search
 //= require sample_types
 //= require wizard_step
+//= require DataTables-1.10.11/jquery.dataTables
+//= require DataTables-1.10.11/dataTables.bootstrap
 //= require_tree ./templates

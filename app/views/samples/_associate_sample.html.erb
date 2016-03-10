@@ -64,6 +64,8 @@
 
     <script>
       $j(document).ready(function () {
+        $j('#data-file-samples-table table').DataTable();
+
         // Wizard steps
         var wizard = document.getElementById('associate-samples-batch-wizard').wizard;
         $j('#associate-samples-batch-wizard').on('click', '[data-role="seek-association-candidate"]', function () {
