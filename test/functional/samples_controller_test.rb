@@ -226,11 +226,20 @@ class SamplesControllerTest < ActionController::TestCase
       post :extract_from_data_file, :data_file_id=>data_file.id
     end
 
-    assert assigns(:samples)
+    assert (samples = assigns(:samples))
     assert assigns(:rejected_samples)
-    assert_equal 3, assigns(:samples).count
+    assert_equal 3, samples.count
     assert_equal 1, assigns(:rejected_samples).count
     assert_equal "Bob",assigns(:rejected_samples).first.full_name
+
+    samples.each do |sample|
+      assert_equal data_file, sample.originating_data_file
+    end
+
+    data_file.reload
+
+    assert_equal samples.sort, data_file.extracted_samples.sort
+
 
   end
 

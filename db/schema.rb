@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160309155638) do
+ActiveRecord::Schema.define(:version => 20160310162232) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1345,10 +1345,11 @@ ActiveRecord::Schema.define(:version => 20160309155638) do
     t.integer  "contributor_id"
     t.integer  "policy_id"
     t.string   "contributor_type"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
-    t.string   "first_letter",     :limit => 1
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
+    t.string   "first_letter",             :limit => 1
     t.text     "other_creators"
+    t.integer  "originating_data_file_id"
   end
 
   create_table "saved_searches", :force => true do |t|

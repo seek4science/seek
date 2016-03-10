@@ -19,6 +19,7 @@ class SamplesController < ApplicationController
       @samples = []
       samples.each do |sample|
         sample.contributor=User.current_user
+        sample.originating_data_file = data_file
         if sample.valid? && sample.save
           @samples << sample
         else
@@ -28,6 +29,7 @@ class SamplesController < ApplicationController
     else
 
     end
+    flash[:notice]="#{@samples.count} samples created, #{@rejected_samples.count} rejected"
     redirect_to samples_path
   end
 
