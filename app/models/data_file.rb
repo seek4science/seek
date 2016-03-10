@@ -165,6 +165,14 @@ class DataFile < ActiveRecord::Base
     end
   end
 
+  def sample_template?
+    possible_sample_types.any?
+  end
+
+  def possible_sample_types
+    SampleType.sample_types_matching_content_blob(content_blob)
+  end
+
   #a simple container for handling the matching results returned from #matching_data_files
   class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key); end
 

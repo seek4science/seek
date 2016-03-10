@@ -9,6 +9,7 @@ module Seek
       def contains_extractable_spreadsheet?
         content_blob.is_extractable_spreadsheet?
       end
+
     end
   end
 end

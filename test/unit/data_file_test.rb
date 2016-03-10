@@ -495,67 +495,28 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
+  test 'sample template?' do
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:public_policy)
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
 
 
-=begin
-  test "populate samples database with parser" do
-    user = Factory :user
-    User.with_current_user user do
-      #clean sample database
-      disable_authorization_checks do
-        Unit.destroy_all
-        Treatment.destroy_all
-        Sample.destroy_all
-        Specimen.destroy_all
-        DataFile.destroy_all
-        DataFile::Version.destroy_all
-        AssayAsset.destroy_all
-        Assay.destroy_all
-        Study.destroy_all
-        Investigation.destroy_all
-      end
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_from_template
+    sample_type.save!
 
-       #create creator in the database
-      creator = Factory :person, :first_name => "Tester", :last_name => "SEEK", :email => "SEEK.tester@test.com"
-      Factory :user, :person_id => creator.id
+    assert data_file.sample_template?
+    assert_includes data_file.possible_sample_types, sample_type
 
-      filepath =  "#{Rails.root}/test/fixtures/files/parser/jenage-excel_template.xlsm"
-      filename =  "jenage-excel_template"
-      content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    data_file = Factory :data_file, :content_blob => Factory(:small_test_spreadsheet_content_blob), :policy=>Factory(:public_policy)
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
 
-      data_file, assay, bio_samples = data_file_with_sample_parser filepath,filename,content_type
-      assert data_file.is_excel?
-      assert data_file.is_extractable_spreadsheet?
-      assert_not_nil bio_samples
-      assert_not_nil assay
-      assert_equal true, data_file.assays.include?(assay)
-      assay.samples.each{|s|assert_equal true, Sample.all.include?(s)}
-      assert_equal false, bio_samples.instance_values["specimen_names"].blank?
-      assert_equal false, bio_samples.instance_values["treatments"].blank?
-      assert_equal false, bio_samples.instance_values["rna_extractions"].blank?
-      assert_equal true, bio_samples.instance_values["sequencing"].blank?
-
-      #test data file with empty cells which return nil in the parsed xml
-      filepath =  "#{Rails.root}/test/fixtures/files/parser/error.xlsx"
-      filename =  "error"
-      content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-
-      data_file, assay, bio_samples = data_file_with_sample_parser filepath,filename,content_type
-      assert data_file.is_excel?
-      assert data_file.is_extractable_spreadsheet?
-      assert_not_nil bio_samples
-      assert_not_nil assay
-      assert_equal true, data_file.assays.include?(assay)
-      assay.samples.each{|s|assert_equal true, Sample.all.include?(s)}
-      assert_equal false, bio_samples.instance_values["specimen_names"].blank?
-      assert_equal false, bio_samples.instance_values["treatments"].blank?
-      assert_equal false, bio_samples.instance_values["rna_extractions"].blank?
-      assert_equal true, bio_samples.instance_values["sequencing"].blank?
-
-    end
   end
-=end
-
+  
   private
 
   def data_file_with_sample_parser filepath,filename,content_type
