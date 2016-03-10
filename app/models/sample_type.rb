@@ -39,6 +39,27 @@ class SampleType < ActiveRecord::Base
     end
   end
 
+  def build_samples_from_template(content_blob)
+    sheet = find_sample_sheet(template)
+    sheet_index = sheet.attributes['index']
+    samples = []
+    rows = template_xml_document(content_blob).find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row")
+    columns_and_attributes=Hash[sample_attributes.collect{|attr| [attr.template_column_index,attr]}]
+    rows.each do |row|
+      if row.attributes['index'].to_i > 1
+        sample = Sample.new(sample_type: self)
+        row.children.each do |cell|
+          column = cell.attributes['column'].to_i
+          if attribute = columns_and_attributes[column]
+            sample.send("#{attribute.accessor_name}=",cell.content)
+          end
+        end
+        samples << sample
+      end
+    end
+    samples
+  end
+
   def matches_content_blob?(blob)
     compatible_template_file?(blob) && (get_column_details(template) == get_column_details(blob))
   end

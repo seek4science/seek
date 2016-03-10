@@ -240,4 +240,23 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal [sample_type],SampleType.sample_types_matching_content_blob(template_blob)
   end
 
+  test 'build samples from template' do
+    Factory(:string_sample_attribute_type, title:'String')
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_from_template
+    sample_type.save!
+
+    template_blob = Factory(:sample_type_populated_template_content_blob)
+    samples = sample_type.build_samples_from_template(template_blob)
+    assert_equal 4,samples.count
+
+    sample = samples.first
+    assert sample.valid?
+    assert_equal "Bob Monkhouse",sample.full_name
+    assert_equal "Blue", sample.hair_colour
+    assert_equal "Yellow", sample.eye_colour
+    assert_equal Date.parse("12 March 1970"), Date.parse(sample.date_of_birth)
+  end
+
 end

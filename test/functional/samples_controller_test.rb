@@ -33,7 +33,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'create' do
-    login_as(Factory(:person))
+    person = Factory(:person)
+    login_as(person)
     type = Factory(:patient_sample_type)
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id, full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }
@@ -45,6 +46,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '22', sample.age
     assert_equal '22.1', sample.weight
     assert_equal 'M13 9PL', sample.postcode
+    assert_equal person.user,sample.contributor
   end
 
   test 'edit' do
@@ -200,6 +202,35 @@ class SamplesControllerTest < ActionController::TestCase
     assert samples = assigns(:samples)
     assert_includes samples, sample1
     refute_includes samples, sample2
+  end
+
+  test 'extract from data file' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:public_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.save!
+
+    assert_difference("Sample.count",3) do
+      post :extract_from_data_file, :data_file_id=>data_file.id
+    end
+
+    assert assigns(:samples)
+    assert assigns(:rejected_samples)
+    assert_equal 3, assigns(:samples).count
+    assert_equal 1, assigns(:rejected_samples).count
+    assert_equal "Bob",assigns(:rejected_samples).first.full_name
+
   end
 
   private

@@ -647,7 +647,7 @@ SEEK::Application.routes.draw do
       get :attribute_form
       get :preview
       get :filter
-      get :extract_from_data_file
+      post :extract_from_data_file
     end
     member do
       post :update_annotations_ajax
