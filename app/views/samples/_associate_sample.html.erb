@@ -63,12 +63,6 @@
     <% end %>
 
     <script>
-      function updateDirectionName () {
-        var select = $j('#_association_direction');
-        var hidden = $j('#_association_directionName');
-        hidden.val($j('option:selected', select).text());
-      }
-
       $j(document).ready(function () {
         // Wizard steps
         var wizard = document.getElementById('associate-samples-batch-wizard').wizard;
