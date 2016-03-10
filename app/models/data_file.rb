@@ -165,12 +165,17 @@ class DataFile < ActiveRecord::Base
     end
   end
 
+  #FIXME: bad name, its not whether it IS a template, but whether it originates from a template
   def sample_template?
     possible_sample_types.any?
   end
 
   def possible_sample_types
     SampleType.sample_types_matching_content_blob(content_blob)
+  end
+
+  def extracted_samples
+    []
   end
 
   #a simple container for handling the matching results returned from #matching_data_files

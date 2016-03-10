@@ -516,7 +516,29 @@ class DataFileTest < ActiveSupport::TestCase
     assert_empty data_file.possible_sample_types
 
   end
-  
+
+  test 'sample template?' do
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:public_policy)
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_from_template
+    sample_type.save!
+
+    assert data_file.sample_template?
+    assert_includes data_file.possible_sample_types, sample_type
+
+    data_file = Factory :data_file, :content_blob => Factory(:small_test_spreadsheet_content_blob), :policy=>Factory(:public_policy)
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+  end
+
   private
 
   def data_file_with_sample_parser filepath,filename,content_type
