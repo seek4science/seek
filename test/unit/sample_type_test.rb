@@ -204,5 +204,40 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample_type.compatible_template_file?
   end
 
+  test 'matches content blob?' do
+    template_blob = Factory(:sample_type_populated_template_content_blob)
+    non_template1 = Factory(:rightfield_content_blob)
+    non_template2 = Factory(:binary_content_blob)
+
+    Factory(:string_sample_attribute_type, title:'String')
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_from_template
+    sample_type.save!
+
+    assert sample_type.matches_content_blob?(template_blob)
+    refute sample_type.matches_content_blob?(non_template1)
+    refute sample_type.matches_content_blob?(non_template2)
+  end
+
+  test 'sample_types_matching_content_blob' do
+    Factory(:string_sample_attribute_type, title:'String')
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_from_template
+    sample_type.save!
+
+    Factory(:string_sample_attribute_type, title:'String')
+    sample_type2 = SampleType.new title:'from template'
+    sample_type2.content_blob = Factory(:sample_type_template_content_blob2)
+    sample_type2.build_from_template
+    sample_type2.save!
+
+    template_blob = Factory(:sample_type_populated_template_content_blob)
+    non_template1 = Factory(:rightfield_content_blob)
+
+    assert_empty SampleType.sample_types_matching_content_blob(non_template1)
+    assert_equal [sample_type],SampleType.sample_types_matching_content_blob(template_blob)
+  end
 
 end

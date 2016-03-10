@@ -25,45 +25,64 @@ class SampleType < ActiveRecord::Base
 
   def build_from_template
     return unless compatible_template_file?
-    sheet = find_sample_sheet
-    fail 'no sheet' unless sheet
-    fail 'no string attribute type' if default_attribute_type.nil?
-    find_sample_column_names(sheet.attributes['index'])
+
+    build_attributes_from_column_details(get_column_details(template))
   end
 
-  def compatible_template_file?
-    template && template.is_extractable_spreadsheet? && find_sample_sheet
+  def compatible_template_file?(template=template)
+    template && template.is_extractable_spreadsheet? && find_sample_sheet(template)
+  end
+
+  def self.sample_types_matching_content_blob(content_blob)
+    SampleType.all.select do |type|
+      type.matches_content_blob?(content_blob)
+    end
+  end
+
+  def matches_content_blob?(blob)
+    compatible_template_file?(blob) && (get_column_details(self.template) == get_column_details(blob))
   end
 
   private
 
-  def clear_xml_cache
-    @template_doc=nil
-    @template_xml=nil
-  end
-
-  def find_sample_column_names(sheet_index)
-    cells = template_xml_document.find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row[@index=1]/ss:cell")
-    cells.each do |column_cell|
-      unless (heading = column_cell.content).blank?
-        is_title = sample_attributes.empty?
-        column_index = column_cell.attributes['column']
-        sample_attributes << SampleAttribute.new(title: heading,
-                                                 sample_attribute_type: default_attribute_type,
-                                                 is_title: is_title,
-                                                 required: is_title,
-                                                 template_column_index: column_index)
+  #returns a hash containing the column_name=>column_index
+  def get_column_details(template)
+    column_details={}
+    sheet=find_sample_sheet(template)
+    if sheet
+      sheet_index=sheet.attributes['index']
+      cells = template_xml_document(template).find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row[@index=1]/ss:cell")
+      cells.each do |column_cell|
+        unless (heading = column_cell.content).blank?
+          column_index = column_cell.attributes['column']
+          column_details[heading]=column_index
+        end
       end
     end
+    column_details
   end
+
+  def build_attributes_from_column_details(column_details)
+    column_details.each do |name,column_index|
+      is_title = sample_attributes.empty?
+      sample_attributes << SampleAttribute.new(title: name,
+                                               sample_attribute_type: default_attribute_type,
+                                               is_title: is_title,
+                                               required: is_title,
+                                               template_column_index: column_index)
+    end
+  end
+
+
+
 
   def default_attribute_type
     SampleAttributeType.primitive_string_types.first
   end
 
-  def find_sample_sheet
+  def find_sample_sheet(template)
     begin
-      template_xml_document.find('//ss:sheet').select do |sheet|
+      template_xml_document(template).find('//ss:sheet').select do |sheet|
         sheet.attributes['name'] =~ /.*samples.*/i
       end.last
     rescue
@@ -71,16 +90,15 @@ class SampleType < ActiveRecord::Base
     end
   end
 
-  def template_xml
-    @template_xml ||= spreadsheet_to_xml(open(template.filepath))
+  def template_xml(template)
+    spreadsheet_to_xml(open(template.filepath))
   end
 
-  def template_xml_document
-    unless @template_doc
-      @template_doc = LibXML::XML::Parser.string(template_xml).parse
-      @template_doc.root.namespaces.default_prefix = 'ss'
-    end
-    @template_doc
+  def template_xml_document(template)
+
+      template_doc = LibXML::XML::Parser.string(template_xml(template)).parse
+      template_doc.root.namespaces.default_prefix = 'ss'
+    template_doc
   end
 
   def validate_one_title_attribute_present
