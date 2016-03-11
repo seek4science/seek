@@ -78,9 +78,14 @@
       var samplesTable;
       $j(document).ready(function () {
         samplesTable = $j('#data-file-samples-table table').DataTable({
-            "select": {
-              style: 'os'
-            }
+          "select": {
+            style: 'os'
+          },
+          "columnDefs": [{
+            "targets": [ 0, 1 ],
+            "visible": false,
+            "searchable": false
+          }]
         });
 
         $j('#data-file-samples-select-all').click(function () {
@@ -111,10 +116,7 @@
 
         // When at least one sample is selected, unlock step 3
         var handleRowSelect = function ( e, dt, type, indexes ) {
-          $j(samplesTable.rows().nodes()).removeClass('selected');
-
           var selectedRows = samplesTable.rows({ selected: true });
-          $j(selectedRows.nodes()).addClass('selected');
 
           if(selectedRows.count() > 0) {
             wizard.step(3).unlock();

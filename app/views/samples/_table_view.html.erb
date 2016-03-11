@@ -6,6 +6,8 @@
     <table class="table table-bordered samples-table" style="width: 100%">
       <thead>
       <tr>
+        <th>ID</th>
+        <th>Title</th>
         <% shown_attributes.each do |attribute| %>
             <th><%= attribute.title %></th>
         <% end %>
@@ -13,9 +15,10 @@
       </thead>
       <tbody>
       <% samples.each do |sample| %>
-          <%= content_tag(:tr, data: { role: 'seek-association-candidate',
-                                             'association-id' => sample.id,
-                                             'association-title' => sample.title }) do %>
+          <%= content_tag(:tr, data: { 'association-id' => sample.id,
+                                       'association-title' => sample.title }) do %>
+              <td><%= sample.id %></td>
+              <td><%= sample.title %></td>
               <% shown_attributes.each do |attribute| %>
                   <td><%= sample.send(attribute.accessor_name.to_sym) %></td>
               <% end %>

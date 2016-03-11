@@ -69,16 +69,28 @@ $j(document).ready(function () {
             }
         });
 
-        $j('[data-role="seek-association-candidate"].selected', scope).each(function (_, selected) {
+        var selectedItems = [];
+
+        $j('[data-role="seek-association-candidate"].selected', scope).each(function (selected) {
             // Merge common fields and association-specific fields into single object
-            var associationObject = $j.extend({}, commonFields, {
+            selectedItems.push($j.extend({}, commonFields, {
                 id: $j(selected).data('associationId'),
                 title: $j(selected).data('associationTitle')
-            });
-
-            // Populate template and append to list
-            list.find('ul').append(template(associationObject));
+            }));
         }).removeClass('selected');
+
+        samplesTable.rows({ selected: true }).every(function () {
+            selectedItems.push($j.extend({}, commonFields, {
+                id: this.data()[0],
+                title: this.data()[1]
+            }));
+        });
+
+        // Populate template and append to list
+        var ul = list.find('ul');
+        for(var i = 0; i < selectedItems.length; i++) {
+            ul.append(template(selectedItems[i]));
+        }
 
         associations.toggleEmptyListText(list);
     });
