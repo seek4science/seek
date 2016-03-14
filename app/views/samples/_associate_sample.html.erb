@@ -4,7 +4,7 @@
   assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
   associated_samples_json = assay_assets.map do |aa|
     { title: aa.asset.title, id: aa.asset_id,
-      direction: aa.direction, directionName: direction_name(aa.direction) }
+      direction: { id: aa.direction, text: direction_name(aa.direction) } }
   end.to_json
 -%>
 
