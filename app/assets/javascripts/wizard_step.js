@@ -115,9 +115,3 @@ Wizards.Step.prototype.unlock = function () { this.unlocked = true; this.wizard.
 Wizards.Step.prototype.lock = function () { this.deactivate(); this.unlocked = false; this.wizard.updateNav(); };
 Wizards.Step.prototype.activate = function () { this.unlock(); this.element.show(); this.onShow(); };
 Wizards.Step.prototype.deactivate = function () { this.element.hide(); this.onHide(); };
-
-$j(document).ready(function () {
-    $j('[data-role="seek-wizard"]').each(function (index, wizard) {
-        this.wizard = new Wizards.Wizard($j(this));
-    });
-});

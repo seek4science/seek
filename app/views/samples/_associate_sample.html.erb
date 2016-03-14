@@ -47,84 +47,38 @@
                   %>
               <% end %>
             </div>
-            <div data-role="seek-association-form">
-              <div data-role="seek-wizard-step" data-step-name="Select samples">
-                <label>Select samples</label>
-                <a id="data-file-samples-select-all" href="#" class="btn btn-default btn-xs">Select all</a>
-                <a id="data-file-samples-select-none" href="#" class="btn btn-default btn-xs">Select none</a>
-                <div id="data-file-samples-table">
-                  <%#TODO: Change me %>
-                  <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
-                </div>
+            <div data-role="seek-wizard-step" data-step-name="Select samples">
+              <label>Select samples</label>
+              <a id="data-file-samples-select-all" href="#" class="btn btn-default btn-xs">Select all</a>
+              <a id="data-file-samples-select-none" href="#" class="btn btn-default btn-xs">Select none</a>
+              <div id="data-file-samples-table">
+                <%#TODO: Change me %>
+                <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
               </div>
-              <div data-role="seek-wizard-step" data-step-name="Select sample direction">
-                <div class="form-group">
-                  <label>Select sample direction</label>
-                  <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
-                </div>
+            </div>
+            <div data-role="seek-wizard-step" data-step-name="Select sample direction">
+              <div class="form-group">
+                <label>Select sample direction</label>
+                <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
               </div>
             </div>
         <% end %>
         <%= modal_footer do %>
             <a data-role="seek-wizard-next-btn" href="#" class="pull-right btn btn-default">Next</a>
             <a data-role="seek-wizard-prev-btn" href="#" class="pull-left btn btn-default">Previous</a>
-            <%= confirm_association_button('Add samples', 'sample_to_list', id: 'add-batch-sample-btn', style: 'display: none',
+            <%= confirm_association_button('Add samples', id: 'add-batch-sample-btn', style: 'display: none',
                                            class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
         <% end %>
     <% end %>
     <%= button_link_to('Clear all samples', 'destroy', '#', id: 'clear-all-samples-btn') %>
 
     <script>
-
-      var samplesList;
-      var individualSamplesForm;
-      var batchSamplesForm;
-
-      $j(document).ready(function () {
-
-        samplesList = new Associations.List('associations/sample', $j('#sample_to_list'));
-        individualSamplesForm = new Associations.Form(samplesList);
-        batchSamplesForm = new Associations.Form(samplesList);
-
-        // Strip the name of the element and store it as a data attribute, to stop it being submitted as a field in the
-        //  main form
-        $j('#modalAddIndividualSamples :input[data-role="seek-association-common-field"]').each(function () {
-          $j(this).data('attributeName', this.name);
-          this.name = '';
-          individualSamplesForm.commonFieldElements.push($j(this));
-        });
-
-        $j('#modalAddIndividualSamples [data-role="seek-confirm-association-button"]').click(function (e) {
-          e.preventDefault();
-          individualSamplesForm.submit();
-        });
-
-        $j('body').on('click', '#modalAddIndividualSamples .selectable[data-role="seek-association-candidate"]', function () {
-          $j(this).toggleClass('selected');
-          if(!$j(this).parents('[data-role="seek-association-candidate-list"]').data('multiple')) {
-            $j(this).siblings().removeClass('selected');
-          }
-
-          individualSamplesForm.selectedItems = [];
-          $j(this).parents('[data-role="seek-association-candidate-list"]').find('[data-role="seek-association-candidate"].selected').each(function () {
-            // Merge common fields and association-specific fields into single object
-            individualSamplesForm.selectedItems.push({
-              id: $j(this).data('associationId'),
-              title: $j(this).data('associationTitle')
-            });
-          });
-
-          return false;
-        });
-
+        var samplesList = new Associations.List('associations/sample', $j('#sample_to_list'));
+        var batchSamplesForm = new Associations.Form(samplesList, $j('#AddSamplesFromDataFileModal'));
         $j('#AddSamplesFromDataFileModal :input[data-role="seek-association-common-field"]').each(function () {
           $j(this).data('attributeName', this.name);
           this.name = '';
           batchSamplesForm.commonFieldElements.push($j(this));
-        });
-
-        $j('#add-batch-sample-btn').click(function () {
-          batchSamplesForm.submit();
         });
 
         var samplesTable = $j('#data-file-samples-table table').DataTable({
@@ -136,6 +90,10 @@
             "visible": false,
             "searchable": false
           }]
+        });
+
+        $j('#add-batch-sample-btn').click(function () {
+          batchSamplesForm.submit();
         });
 
         $j('#data-file-samples-select-all').click(function () {
@@ -154,7 +112,7 @@
         });
 
         // Wizard steps
-        var wizard = document.getElementById('AddSamplesFromDataFileModal').wizard;
+        var wizard = new Wizards.Wizard($j('#AddSamplesFromDataFileModal'));
 
         // When a datafile is selected, unlock and show step 2
         $j('#AddSamplesFromDataFileModal').on('click', '[data-role="seek-association-candidate"]', function () {
@@ -196,6 +154,5 @@
           samplesTable.rows().deselect();
           wizard.reset();
         })
-      });
     </script>
 <% end %>

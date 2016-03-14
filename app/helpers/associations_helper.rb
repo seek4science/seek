@@ -9,15 +9,16 @@ module AssociationsHelper
 
   def association_selector(association_list_id, button_text, modal_title, modal_options = {}, &_block)
     modal_id = 'modal' + button_text.parameterize.underscore.camelize
-    modal_options.reverse_merge!('data-role' => 'seek-association-form')
+    modal_options.reverse_merge!(id: modal_id, size: 'xl', 'data-role' => 'seek-association-form',
+                                 'data-associations-list-id' => association_list_id)
     button_link_to(button_text, 'add', '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}") +
-      modal(id: modal_id, size: 'xl') do
+      modal(modal_options) do
         modal_header(modal_title) +
-          modal_body(modal_options) do
+          modal_body do
             yield
           end +
           modal_footer do
-            confirm_association_button(button_text, association_list_id, 'data-dismiss' => 'modal')
+            confirm_association_button(button_text, 'data-dismiss' => 'modal')
           end
       end
   end
@@ -36,10 +37,9 @@ module AssociationsHelper
     end
   end
 
-  def confirm_association_button(text, associations_list_id, options = {})
+  def confirm_association_button(text, options = {})
     options.reverse_merge!(class: 'btn btn-primary',
-                           'data-role' => 'seek-confirm-association-button',
-                           'data-associations-list-id' => associations_list_id)
+                           'data-role' => 'seek-association-confirm-button')
     content_tag(:button, text, options)
   end
 end
