@@ -1,6 +1,4 @@
 class SampleType < ActiveRecord::Base
-
-
   attr_accessible :title, :uuid, :sample_attributes_attributes
 
   acts_as_uniquely_identifiable
@@ -47,29 +45,25 @@ class SampleType < ActiveRecord::Base
   end
 
   def build_samples_from_template(content_blob)
-    sheet = find_sample_sheet(template)
-    sheet_index = sheet.attributes['index']
     samples = []
-    rows = template_xml_document(content_blob).find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row")
-    columns_and_attributes=Hash[sample_attributes.collect{|attr| [attr.template_column_index,attr]}]
-    rows.each do |row|
-      if row.attributes['index'].to_i > 1
-        sample = Sample.new(sample_type: self)
-        row.children.each do |cell|
-          column = cell.attributes['column'].to_i
-          if attribute = columns_and_attributes[column]
-            sample.send("#{attribute.accessor_name}=",cell.content)
-          end
+    columns = sample_attributes.collect(&:template_column_index)
+    columns_and_attributes = Hash[sample_attributes.collect { |attr| [attr.template_column_index, attr] }]
+    handler = Seek::Templates::SamplesHandler.new(content_blob)
+    handler.each_record(columns) do |_row, data|
+      sample = Sample.new(sample_type: self)
+      data.each do |entry|
+        if attribute = columns_and_attributes[entry.column]
+          sample.send("#{attribute.accessor_name}=", entry.value)
         end
-        samples << sample
       end
+      samples << sample
     end
     samples
   end
 
   def matches_content_blob?(blob)
     other_handler = Seek::Templates::SamplesHandler.new(blob)
-    compatible_template_file? && other_handler.compatible? && (template_handler.column_details==other_handler.column_details)
+    compatible_template_file? && other_handler.compatible? && (template_handler.column_details == other_handler.column_details)
   end
 
   private
@@ -78,11 +72,9 @@ class SampleType < ActiveRecord::Base
     @template_handler ||= Seek::Templates::SamplesHandler.new(content_blob)
   end
 
-
   def default_attribute_type
     SampleAttributeType.primitive_string_types.first
   end
-
 
   def validate_one_title_attribute_present
     unless (count = sample_attributes.select(&:is_title).count) == 1
