@@ -1,7 +1,7 @@
 <% sample_type = samples.first.sample_type %>
 <% shown_attributes = sample_type.sample_attributes %>
 
-<div  data-role="seek-association-candidate-list" data-multiple="true">
+<div data-role="seek-association-candidate-list">
   <div class="table-responsive">
     <table class="table table-bordered samples-table" style="width: 100%">
       <thead>
@@ -15,8 +15,7 @@
       </thead>
       <tbody>
       <% samples.each do |sample| %>
-          <%= content_tag(:tr, data: { 'association-id' => sample.id,
-                                       'association-title' => sample.title }) do %>
+          <%= content_tag(:tr) do %>
               <td><%= sample.id %></td>
               <td><%= sample.title %></td>
               <% shown_attributes.each do |attribute| %>

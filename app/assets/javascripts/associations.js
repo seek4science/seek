@@ -7,92 +7,111 @@ function optionsFromArray(array) {
     return options;
 }
 
-var associations = {
-    toggleEmptyListText: function (list) {
-        var noText = $j('.no-item-text', list);
+var Associations = {};
 
-        if($j('.association-list-item', list).length == 0)
-            noText.show();
-        else
-            noText.hide();
-    }
+// Object to control a list of existing associations
+Associations.List = function (template, element) {
+    this.template = template;
+    this.element = element;
+    this.element.data('associationList', this);
+    this.listElement = $j('ul', this.element);
+    this.items = [];
 };
 
-$j(document).ready(function () {
+Associations.List.prototype.toggleEmptyListText = function () {
+    var noText = $j('.no-item-text', $j(this.element));
 
-    $j('body').on('click', '.selectable[data-role="seek-association-candidate"]', function () {
-        $j(this).toggleClass('selected');
-        if(!$j(this).parents('[data-role="seek-association-candidate-list"]').data('multiple')) {
-            $j(this).siblings().removeClass('selected');
+    if(noText.length == 0)
+        noText.show();
+    else
+        noText.hide();
+};
+
+Associations.List.prototype.add = function (association) {
+    this.items.push(new Associations.ListItem(this, association));
+    this.toggleEmptyListText();
+};
+
+Associations.List.prototype.remove = function (listItem) {
+    var index = this.items.indexOf(listItem);
+    if (index > -1)
+        array.splice(index, 1);
+    this.toggleEmptyListText();
+};
+
+Associations.List.prototype.removeAll = function () {
+    this.items = [];
+    this.listElement.html('');
+    this.toggleEmptyListText();
+};
+
+// Object to control an element in the association list
+Associations.ListItem = function (list, data) {
+    this.list = list;
+    this.data = data;
+
+    // Create and append element to list
+    this.element = $j(HandlebarsTemplates[this.list.template](data));
+    this.list.listElement.append(this.element);
+
+    // Bind remove event
+    var listItem = this;
+    this.element.on('click', 'remove-association', function () {
+        listItem.remove();
+    });
+};
+
+Associations.ListItem.prototype.remove = function () {
+    this.list.remove(this);
+};
+
+
+// Object to control the association selection form.
+Associations.Form = function (list) {
+    this.list = list;
+    this.selectedItems = [];
+    this.commonFieldElements = [];
+};
+
+Associations.Form.prototype.reset = function () {
+    this.selectedItems = [];
+};
+
+Associations.Form.prototype.submit = function () {
+    var commonFields = {};
+    this.commonFieldElements.each(function () {
+        var name = this.data('attributeName');
+        if(this.is('select')) {     //  <select> tags store both the value and the selected option's text
+            commonFields[name] = { value: this.val(),
+                text: $j('option:selected', this).text() };
+        } else {
+            commonFields[name] = this.val();
         }
-
-        return false;
     });
 
+    var list = this.list;
+    this.selectedItems.each(function () {
+        // Merge the common fields with the selected item's attributes
+        var associationObject = $j.extend({}, commonFields, this);
+        list.add(associationObject);
+    });
+
+    if(this.afterSubmit)
+        this.afterSubmit(this.selectedItems.length);
+
+    this.reset();
+};
+
+
+$j(document).ready(function () {
     $j('[data-role="seek-associations-list"]').each(function () {
+        var list = new Associations.List($j(this).data('templateName'), $j(this));
         var self = $j(this);
         var existingValues = JSON.parse($j('script[data-role="seek-existing-associations"]', self).html());
 
-        var template = HandlebarsTemplates[self.data('templateName')];
-        var ulElement = $j('ul', self);
-
-        existingValues.each(function (value) {
-            ulElement.append(template(value));
+        existingValues.each(function () {
+            list.add(this)
         });
-        associations.toggleEmptyListText(self);
-
-        $j(this).on('click', '.remove-association', function () {
-            $j(this).parent().remove();
-            associations.toggleEmptyListText(self);
-        });
-
-    });
-
-    $j('[data-role="seek-confirm-association-button"]').click(function (e) {
-        e.preventDefault();
-        var scope = $j('[data-role="seek-association-form"]', $j(this).parents('.modal'));
-        var list = $j('#' +  $j(this).data('associationsListId'));
-        var template = HandlebarsTemplates[list.data('templateName')];
-
-        // Collect all form inputs beginning with _association
-        //  <select> tags store both the value and the selected option's text
-        var commonFields = {};
-        $j(':input', scope).each(function (_, input) {
-            if($j(input).attr('name')) {
-                var name = $j(input).attr('name').replace('_association_','');
-                if($j(input).is('select')) {
-                    commonFields[name] = { value: $j(input).val(),
-                                           text:$j('option:selected', $j(input)).text() };
-                } else {
-                    commonFields[name] = $j(input).val();
-                }
-            }
-        });
-
-        var selectedItems = [];
-
-        $j('[data-role="seek-association-candidate"].selected', scope).each(function (selected) {
-            // Merge common fields and association-specific fields into single object
-            selectedItems.push($j.extend({}, commonFields, {
-                id: $j(selected).data('associationId'),
-                title: $j(selected).data('associationTitle')
-            }));
-        }).removeClass('selected');
-
-        samplesTable.rows({ selected: true }).every(function () {
-            selectedItems.push($j.extend({}, commonFields, {
-                id: this.data()[0],
-                title: this.data()[1]
-            }));
-        });
-
-        // Populate template and append to list
-        var ul = list.find('ul');
-        for(var i = 0; i < selectedItems.length; i++) {
-            ul.append(template(selectedItems[i]));
-        }
-
-        associations.toggleEmptyListText(list);
     });
 
     $j('[data-role="seek-association-filter"]').keypress(function (e) {
