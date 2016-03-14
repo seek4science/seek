@@ -26,33 +26,6 @@ class DataFileTest < ActiveSupport::TestCase
     assert_includes df.content_blob_search_terms,"mild stress"
   end
 
-  # test "spreadsheet contents for search" do
-  #   df = Factory :rightfield_datafile
-  #
-  #   data = df.spreadsheet_contents_for_search
-  #   assert !data.empty?,"Content should not be empty"
-  #   assert data.include?("design type")
-  #   assert data.include?("methodological design"), "content should be humanized"
-  #   assert data.include?("MethodologicalDesign"),"should also preserve original form before humanizing"
-  #   assert data.include?("absolute")
-  #   assert !data.include?("ontology"),"Shouldn't include content from hidden sheets"
-  #   assert !data.include?("relative"),"Shouldn't include content from hidden sheets"
-  #
-  #   assert !data.include?("44.0"),"Should not include numbers"
-  #   assert !data.include?("1.0"),"Should not include numbers"
-  #   assert !data.include?("1.7"),"Should not include numbers"
-  #
-  #   assert !data.include?(44),"Should not include numbers"
-  #   assert !data.include?(1),"Should not include numbers"
-  #   assert !data.include?(1.7),"Should not include numbers"
-  #
-  #   assert !data.include?("seek id"),"Should not include blacklisted text"
-  #
-  #   df = data_files(:picture)
-  #   assert_equal [],df.spreadsheet_contents_for_search
-  # end
-
-
   test "event association" do
     User.with_current_user Factory(:user) do
       datafile = Factory :data_file, :contributor => User.current_user
@@ -86,7 +59,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "sort by updated_at" do
-    assert_equal DataFile.find(:all).sort_by { |df| df.updated_at.to_i * -1 }, DataFile.find(:all)
+    assert_equal DataFile.all.sort_by { |df| df.updated_at.to_i * -1 }, DataFile.all
   end
 
   test "validation" do

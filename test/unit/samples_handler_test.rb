@@ -58,10 +58,14 @@ class SamplesHandlerTest < ActiveSupport::TestCase
     assert_equal [2, 3, 4, 5], rows
     assert_equal 4, data.count
     assert_equal [1, 2, 3, 4], data.first.collect(&:column)
-    assert_equal ['Bob Monkhouse', '1970-03-12T0:0:0+0100', 'Blue', 'Yellow'], data.first.collect(&:value)
+    values = data.first.collect(&:value)
+    values[1]= Date.parse(values[1])
+    assert_equal ['Bob Monkhouse', Date.parse('12 March 1970'), 'Blue', 'Yellow'], values
 
     assert_equal [1, 2, 3, 4], data.last.collect(&:column)
-    assert_equal ['Bob', '1900-01-02T0:0:0+0000', 'Pink', 'Green'], data.last.collect(&:value)
+    values = data.last.collect(&:value)
+    values[1]= Date.parse(values[1])
+    assert_equal ['Bob', Date.parse('2 January 1900'), 'Pink', 'Green'], values
   end
 
   test 'each record restricted columns' do

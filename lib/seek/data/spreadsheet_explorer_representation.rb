@@ -34,7 +34,7 @@ module Seek
       #If it doesn't exist yet, it gets created
       def spreadsheet_xml
         if content_blob.is_extractable_spreadsheet?
-          Rails.cache.fetch("#{content_blob.cache_key}-ss-xml") do
+          Rails.cache.fetch("blob_ss_xml-#{content_blob.cache_key}") do
             spreadsheet_to_xml(open(content_blob.filepath))
           end
         else
@@ -140,29 +140,6 @@ module Seek
           result += (c.ord - 64) * (26 ** (col.length - (i+1)))
         end
         result
-      end
-
-      #the cache file for a given feed url
-      def cached_spreadsheet_path
-        File.join(cached_spreadsheet_dir,"spreadsheet_blob_#{Rails.env}_#{content_blob.id.to_s}.xml")
-      end
-
-      #the directory used to contain the cached spreadsheets
-      def cached_spreadsheet_dir
-        if Rails.env.test?
-          dir = File.join(Dir.tmpdir,"seek-cache","spreadsheet-xml")
-        else
-          dir = File.join(Rails.root,"tmp","cache","spreadsheet-xml")
-        end
-        FileUtils.mkdir_p dir if !File.exists?(dir)
-        dir
-      end
-
-      #Cache the data file's spreadsheet XML, and returns it
-      def cache_spreadsheet
-        xml = spreadsheet_to_xml(open(content_blob.filepath))
-        File.open(cached_spreadsheet_path, "w") {|f| f.write(xml)}
-        return xml
       end
 
       class Workbook
