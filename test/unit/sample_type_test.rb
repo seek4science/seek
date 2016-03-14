@@ -130,7 +130,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     refute_nil sample_type.template
 
-    sample_type.build_from_template
+    sample_type.build_attributes_from_template
     attribute_names = sample_type.sample_attributes.collect(&:title)
     assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
     columns = sample_type.sample_attributes.collect(&:template_column_index)
@@ -159,7 +159,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type.content_blob = Factory(:sample_type_template_content_blob2)
     refute_nil sample_type.template
 
-    sample_type.build_from_template
+    sample_type.build_attributes_from_template
     attribute_names = sample_type.sample_attributes.collect(&:title)
     assert_equal ['full name','date of birth', 'hair colour', 'eye colour'], attribute_names
     columns = sample_type.sample_attributes.collect(&:template_column_index)
@@ -212,7 +212,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     Factory(:string_sample_attribute_type, title:'String')
     sample_type = SampleType.new title:'from template'
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    sample_type.build_from_template
+    sample_type.build_attributes_from_template
     sample_type.save!
 
     assert sample_type.matches_content_blob?(template_blob)
@@ -224,13 +224,13 @@ class SampleTypeTest < ActiveSupport::TestCase
     Factory(:string_sample_attribute_type, title:'String')
     sample_type = SampleType.new title:'from template'
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    sample_type.build_from_template
+    sample_type.build_attributes_from_template
     sample_type.save!
 
     Factory(:string_sample_attribute_type, title:'String')
     sample_type2 = SampleType.new title:'from template'
     sample_type2.content_blob = Factory(:sample_type_template_content_blob2)
-    sample_type2.build_from_template
+    sample_type2.build_attributes_from_template
     sample_type2.save!
 
     template_blob = Factory(:sample_type_populated_template_content_blob)
@@ -244,7 +244,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     Factory(:string_sample_attribute_type, title:'String')
     sample_type = SampleType.new title:'from template'
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    sample_type.build_from_template
+    sample_type.build_attributes_from_template
     sample_type.save!
 
     template_blob = Factory(:sample_type_populated_template_content_blob)

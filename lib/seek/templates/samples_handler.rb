@@ -1,8 +1,8 @@
 module Seek
   module Templates
     class SamplesHandler < Handler
-      class ColumnDetails < Struct.new(:label, :column); end
-      class Data < Struct.new(:column, :value); end
+      ColumnDetails = Struct.new(:label, :column)
+      Data = Struct.new(:column, :value)
 
       def compatible?
         super && sheet_index

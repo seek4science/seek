@@ -21,7 +21,7 @@ class SampleType < ActiveRecord::Base
     attribute.validate_value?(value)
   end
 
-  def build_from_template
+  def build_attributes_from_template
     return unless compatible_template_file?
 
     template_handler.column_details.each do |details|
@@ -38,6 +38,11 @@ class SampleType < ActiveRecord::Base
     template_handler.compatible?
   end
 
+  def matches_content_blob?(blob)
+    other_handler = Seek::Templates::SamplesHandler.new(blob)
+    compatible_template_file? && other_handler.compatible? && (template_handler.column_details == other_handler.column_details)
+  end
+
   def self.sample_types_matching_content_blob(content_blob)
     SampleType.all.select do |type|
       type.matches_content_blob?(content_blob)
@@ -47,26 +52,30 @@ class SampleType < ActiveRecord::Base
   def build_samples_from_template(content_blob)
     samples = []
     columns = sample_attributes.collect(&:template_column_index)
-    columns_and_attributes = Hash[sample_attributes.collect { |attr| [attr.template_column_index, attr] }]
+
     handler = Seek::Templates::SamplesHandler.new(content_blob)
     handler.each_record(columns) do |_row, data|
-      sample = Sample.new(sample_type: self)
-      data.each do |entry|
-        if attribute = columns_and_attributes[entry.column]
-          sample.send("#{attribute.accessor_name}=", entry.value)
-        end
-      end
-      samples << sample
+      samples << build_sample_from_template_data(data)
     end
     samples
   end
 
-  def matches_content_blob?(blob)
-    other_handler = Seek::Templates::SamplesHandler.new(blob)
-    compatible_template_file? && other_handler.compatible? && (template_handler.column_details == other_handler.column_details)
+  private
+
+  def build_sample_from_template_data(data)
+    sample = Sample.new(sample_type: self)
+    data.each do |entry|
+      if attribute = attribute_for_column(entry.column)
+        sample.send("#{attribute.accessor_name}=", entry.value)
+      end
+    end
+    sample
   end
 
-  private
+  def attribute_for_column(column)
+    @columns_and_attributes ||= Hash[sample_attributes.collect { |attr| [attr.template_column_index, attr] }]
+    @columns_and_attributes[column]
+  end
 
   def template_handler
     @template_handler ||= Seek::Templates::SamplesHandler.new(content_blob)

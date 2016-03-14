@@ -16,13 +16,16 @@ module Seek
       private
 
       def template_xml_document
-        template_doc = LibXML::XML::Parser.string(template_xml).parse
-        template_doc.root.namespaces.default_prefix = 'ss'
-        template_doc
+        unless @template_doc
+          @template_doc = LibXML::XML::Parser.string(template_xml).parse
+          @template_doc.root.namespaces.default_prefix = 'ss'
+        end
+
+        @template_doc
       end
 
       def template_xml
-        spreadsheet_to_xml(open(template_content_blob.filepath))
+        spreadsheet_content_blob_to_xml(template_content_blob)
       end
     end
   end

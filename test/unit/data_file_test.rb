@@ -505,7 +505,7 @@ class DataFileTest < ActiveSupport::TestCase
 
     sample_type = SampleType.new title:'from template'
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    sample_type.build_from_template
+    sample_type.build_attributes_from_template
     sample_type.save!
 
     assert data_file.sample_template?
