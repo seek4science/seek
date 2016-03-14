@@ -121,11 +121,6 @@ $j(document).ready(function () {
             form.commonFieldElements.push($j(this));
         });
 
-        $j('[data-role="seek-association-confirm-button"]', $j(element)).click(function (e) {
-            e.preventDefault();
-            form.submit();
-        });
-
         $j(element).on('click', '.selectable[data-role="seek-association-candidate"]', function () {
             $j(this).toggleClass('selected');
             if(!$j(this).parents('[data-role="seek-association-candidate-list"]').data('multiple')) {
@@ -142,6 +137,12 @@ $j(document).ready(function () {
             });
 
             return false;
+        });
+
+        $j('[data-role="seek-association-confirm-button"]', $j(element)).click(function (e) {
+            e.preventDefault();
+            $j('.selectable[data-role="seek-association-candidate"]', $j(element)).removeClass('selected');
+            form.submit();
         });
     });
 
