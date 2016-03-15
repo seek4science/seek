@@ -1,6 +1,10 @@
 <%= render :partial => "general/item_title",:locals => {:item=>@data_file, :version => @display_data_file.version,
                                                         :buttons_partial => 'assets/asset_buttons'} -%>
 
+<% if @data_file.can_manage? && @display_data_file.version == @data_file.version && @data_file.sample_template? && @data_file.extracted_samples.empty? %>
+    <%= button_link_to("Extract samples", 'graph',  extract_from_data_file_samples_path(:data_file_id=>@data_file.id), method: :post) %>
+<% end %>
+
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 
 <div class="row">

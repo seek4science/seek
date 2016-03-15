@@ -9,6 +9,31 @@ class SamplesController < ApplicationController
 
   before_filter :auth_to_create, :only=>[:new,:create]
 
+
+  def extract_from_data_file
+    @rejected_samples = []
+    @samples = []
+    data_file = DataFile.find(params[:data_file_id])
+
+    if data_file.possible_sample_types.count>=1
+      sample_type = data_file.possible_sample_types.last
+      samples = sample_type.build_samples_from_template(data_file.content_blob)
+      samples.each do |sample|
+        sample.contributor=User.current_user
+        sample.originating_data_file = data_file
+        if sample.valid? && sample.save
+          @samples << sample
+        else
+          @rejected_samples << sample
+        end
+      end
+    else
+
+    end
+    flash[:notice]="#{@samples.count} samples created, #{@rejected_samples.count} rejected"
+    redirect_to samples_path
+  end
+
   def new
     @sample = Sample.new(sample_type_id: params[:sample_type_id])
     respond_with(@sample)
@@ -66,7 +91,7 @@ class SamplesController < ApplicationController
 
   def filter
     @associated_samples = params[:assay_id].blank? ? [] : Assay.find(params[:assay_id]).samples
-    @samples = Sample.where("title LIKE ?", "#{params[:filter]}%").limit(20)
+    @samples = Sample.where("title LIKE ?", "%#{params[:filter]}%").limit(20)
 
     respond_with do |format|
       format.html { render :partial => 'samples/association_preview', :collection => @samples,

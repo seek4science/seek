@@ -33,18 +33,20 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'create' do
-    login_as(Factory(:person))
+    person = Factory(:person)
+    login_as(person)
     type = Factory(:patient_sample_type)
     assert_difference('Sample.count') do
-      post :create, sample: { sample_type_id: type.id, title: 'My Sample', full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }
+      post :create, sample: { sample_type_id: type.id, full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }
     end
     assert assigns(:sample)
     sample = assigns(:sample)
-    assert_equal 'My Sample', sample.title
+    assert_equal 'George Osborne', sample.title
     assert_equal 'George Osborne', sample.full_name
     assert_equal '22', sample.age
     assert_equal '22.1', sample.weight
     assert_equal 'M13 9PL', sample.postcode
+    assert_equal person.user,sample.contributor
   end
 
   test 'edit' do
@@ -59,7 +61,7 @@ class SamplesControllerTest < ActionController::TestCase
     type_id = sample.sample_type.id
 
     assert_no_difference('Sample.count') do
-      put :update, id: sample.id, sample: { title: 'Updated Sample', full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }
+      put :update, id: sample.id, sample: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }
     end
 
     assert assigns(:sample)
@@ -67,7 +69,7 @@ class SamplesControllerTest < ActionController::TestCase
     updated_sample = assigns(:sample)
     updated_sample = Sample.find(updated_sample.id)
     assert_equal type_id, updated_sample.sample_type.id
-    assert_equal 'Updated Sample', updated_sample.title
+    assert_equal 'Jesus Jones', updated_sample.title
     assert_equal 'Jesus Jones', updated_sample.full_name
     assert_equal '47', updated_sample.age
     assert_nil updated_sample.weight
@@ -190,8 +192,8 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test 'filter by sample type' do
-    sample_type1=Factory(:sample_type)
-    sample_type2=Factory(:sample_type)
+    sample_type1=Factory(:simple_sample_type)
+    sample_type2=Factory(:simple_sample_type)
     sample1=Factory(:sample,:sample_type=>sample_type1,:policy=>Factory(:public_policy),:title=>"SAMPLE 1")
     sample2=Factory(:sample,:sample_type=>sample_type2,:policy=>Factory(:public_policy),:title=>"SAMPLE 2")
 
@@ -200,6 +202,45 @@ class SamplesControllerTest < ActionController::TestCase
     assert samples = assigns(:samples)
     assert_includes samples, sample1
     refute_includes samples, sample2
+  end
+
+  test 'extract from data file' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:public_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_difference("Sample.count",3) do
+      post :extract_from_data_file, :data_file_id=>data_file.id
+    end
+
+    assert (samples = assigns(:samples))
+    assert assigns(:rejected_samples)
+    assert_equal 3, samples.count
+    assert_equal 1, assigns(:rejected_samples).count
+    assert_equal "Bob",assigns(:rejected_samples).first.full_name
+
+    samples.each do |sample|
+      assert_equal data_file, sample.originating_data_file
+    end
+
+    data_file.reload
+
+    assert_equal samples.sort, data_file.extracted_samples.sort
+
+
   end
 
   private

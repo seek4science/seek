@@ -1,6 +1,6 @@
 class Sample < ActiveRecord::Base
   attr_accessible :contributor_id, :contributor_type, :json_metadata,
-                  :policy_id, :sample_type_id, :title, :uuid, :project_ids, :policy, :contributor,
+                  :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
                   :other_creators
 
   searchable(:auto_index=>false) do
@@ -15,6 +15,7 @@ class Sample < ActiveRecord::Base
   acts_as_asset
 
   belongs_to :sample_type
+  belongs_to :originating_data_file, :class_name => 'DataFile'
 
   scope :default_order, order("title")
 
@@ -25,6 +26,7 @@ class Sample < ActiveRecord::Base
   after_initialize :setup_accessor_methods, :read_json_metadata, unless: 'sample_type.nil?'
 
   before_save :set_json_metadata
+  before_validation :set_title_to_title_attribute_value
 
   def sample_type=(type)
     remove_accessor_methods if sample_type
@@ -95,4 +97,16 @@ class Sample < ActiveRecord::Base
       end
     end
   end
+
+  def set_title_to_title_attribute_value
+    self.title = title_attribute_value
+  end
+
+  #the value of the designated title attribute
+  def title_attribute_value
+    return nil unless (sample_type && sample_type.sample_attributes.title_attributes.any?)
+    title_attr=sample_type.sample_attributes.title_attributes.first
+    self.send(title_attr.accessor_name)
+  end
+
 end

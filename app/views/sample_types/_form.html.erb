@@ -1,15 +1,6 @@
 <%= form_for(@sample_type) do |f| %>
-    <% if @sample_type.errors.any? %>
-        <div id="error_explanation">
-          <h2><%= pluralize(@sample_type.errors.count, "error") %> prohibited this sample_type from being saved:</h2>
 
-          <ul>
-            <% @sample_type.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-            <% end %>
-          </ul>
-        </div>
-    <% end %>
+    <%= f.error_messages %>
 
     <div class="form-group">
       <label>Title</label>
@@ -24,6 +15,7 @@
         <th width="5em">Order</th>
         <th>Name</th>
         <th width="5em">Required?</th>
+        <th width="5em">Title?</th>
         <th>Type</th>
         <th>Unit</th>
       </tr>

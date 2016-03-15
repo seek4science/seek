@@ -1,11 +1,5 @@
 <% if sample.sample_type %>
 
-    <div class="form-group">
-      <label>Title</label><%= required_span %>
-      <%= text_field :sample, :title, :class => 'form-control' %>
-    </div>
-
     <%= render :partial => "attribute_fields", :locals => {:sample_type => sample.sample_type} %>
-
 
 <% end %>

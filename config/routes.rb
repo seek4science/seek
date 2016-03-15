@@ -1,6 +1,10 @@
 SEEK::Application.routes.draw do
 
   resources :sample_types do
+    collection do
+      get :new_from_template
+      post :create_from_template
+    end
     resources :samples
   end
 
@@ -644,6 +648,7 @@ SEEK::Application.routes.draw do
       get :attribute_form
       get :preview
       get :filter
+      post :extract_from_data_file
     end
     member do
       post :update_annotations_ajax

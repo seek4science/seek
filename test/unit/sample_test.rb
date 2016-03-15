@@ -1,21 +1,22 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
+
   test 'validation' do
-    sample = Factory :sample, title: 'fish', sample_type: Factory(:sample_type)
+    sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type),the_title:'fish'
     assert sample.valid?
-    sample.title = nil
+    sample.the_title = nil
     refute sample.valid?
     sample.title = ''
     refute sample.valid?
 
-    sample.title = 'fish'
+    sample.the_title = 'fish'
     sample.sample_type = nil
     refute sample.valid?
   end
 
   test 'test uuid generated' do
-    sample = Sample.new title: 'fish'
+    sample = Factory.build(:sample,the_title:'fish')
     assert_nil sample.attributes['uuid']
     sample.save
     assert_not_nil sample.attributes['uuid']
@@ -37,7 +38,7 @@ class SampleTest < ActiveSupport::TestCase
     assert_respond_to sample, :weight=
 
     # doesn't affect all sample classes
-    sample = Factory(:sample, sample_type: Factory(:sample_type))
+    sample = Factory(:sample, sample_type: Factory(:simple_sample_type))
     refute_respond_to sample, :full_name
     refute_respond_to sample, :full_name=
     refute_respond_to sample, :age
@@ -69,7 +70,7 @@ class SampleTest < ActiveSupport::TestCase
     assert_respond_to sample, :full_name
     assert_respond_to sample, :full_name=
 
-    sample.sample_type = Factory(:sample_type)
+    sample.sample_type = Factory(:simple_sample_type)
 
     refute_respond_to sample, :full_name
     refute_respond_to sample, :full_name=
@@ -117,7 +118,8 @@ class SampleTest < ActiveSupport::TestCase
     sample.sample_type = Factory(:patient_sample_type)
     refute sample.valid?
 
-    sample.sample_type = Factory(:sample_type)
+    sample.sample_type = Factory(:simple_sample_type)
+    sample.the_title='bob'
     assert sample.valid?
   end
 
@@ -265,4 +267,13 @@ class SampleTest < ActiveSupport::TestCase
 
 
   end
+
+  test 'title delegated to title attribute on save' do
+    sample = Factory.build(:sample,:title=>'frog',:policy=>Factory(:public_policy))
+    sample.the_title='this should be the title'
+    sample.save!
+    sample.reload
+    assert_equal 'this should be the title',sample.title
+  end
+
 end

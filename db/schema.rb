@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160303120458) do
+ActiveRecord::Schema.define(:version => 20160310162232) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1309,6 +1309,8 @@ ActiveRecord::Schema.define(:version => 20160303120458) do
     t.integer  "pos"
     t.integer  "sample_type_id"
     t.integer  "unit_id"
+    t.boolean  "is_title",                 :default => false
+    t.integer  "template_column_index"
   end
 
   add_index "sample_attributes", ["sample_type_id"], :name => "index_sample_attributes_on_sample_type_id"
@@ -1330,8 +1332,9 @@ ActiveRecord::Schema.define(:version => 20160303120458) do
   create_table "sample_types", :force => true do |t|
     t.string   "title"
     t.string   "uuid"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+    t.integer  "content_blob_id"
   end
 
   create_table "samples", :force => true do |t|
@@ -1342,10 +1345,11 @@ ActiveRecord::Schema.define(:version => 20160303120458) do
     t.integer  "contributor_id"
     t.integer  "policy_id"
     t.string   "contributor_type"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
-    t.string   "first_letter",     :limit => 1
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
+    t.string   "first_letter",             :limit => 1
     t.text     "other_creators"
+    t.integer  "originating_data_file_id"
   end
 
   create_table "saved_searches", :force => true do |t|

@@ -803,6 +803,25 @@ end
     f.original_filename "binary.bin"
   end
 
+  Factory.define(:sample_type_template_content_blob, :parent => :content_blob) do |f|
+    f.original_filename "sample-type-example.xlsx"
+    f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/sample-type-example.xlsx","rb").read
+  end
+
+  #has more than one sample sheet, and the columns are irregular with leading empty columns and gaps
+  Factory.define(:sample_type_template_content_blob2, :parent => :content_blob) do |f|
+    f.original_filename "sample-type-example.xlsx"
+    f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/sample-type-example2.xls","rb").read
+  end
+
+  Factory.define(:sample_type_populated_template_content_blob, :parent => :content_blob) do |f|
+    f.original_filename "sample-type-populated.xlsx"
+    f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/sample-type-populated.xlsx","rb").read
+  end
+
   Factory.define(:activity_log) do |f|
     f.action "create"
     f.association :activity_loggable, :factory => :data_file
@@ -1109,12 +1128,12 @@ end
   end
 
   Factory.define(:sample_attribute) do |f|
+    f.sequence(:title) {|n| "Sample attribute #{n}"}
     f.association :sample_type, :factory => :sample_type
   end
 
   #a string that must contain 'xxx'
   Factory.define(:simple_string_sample_attribute, :parent=>:sample_attribute) do |f|
-    f.sequence(:title) {|n| "Simple sample attribute #{n}"}
     f.sample_attribute_type Factory.build(:string_sample_attribute_type,regexp:".*xxx.*")
     f.required true
   end
@@ -1152,7 +1171,7 @@ end
     f.title "Patient data"
     f.after_build do |type|
       # Not sure why i have to explicitly add the sample_type association
-      type.sample_attributes << Factory.build(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
       type.sample_attributes << Factory.build(:sample_attribute,:title=>"age",:sample_attribute_type=>Factory(:age_sample_attribute_type),:required=>true, :sample_type => type)
       type.sample_attributes << Factory.build(:sample_attribute,:title=>"weight",:sample_attribute_type=>Factory(:weight_sample_attribute_type),:required=>false, :sample_type => type)
       type.sample_attributes << Factory.build(:sample_attribute,:title=>"address",:sample_attribute_type=>Factory(:address_sample_attribute_type),:required=>false, :sample_type => type)
@@ -1160,9 +1179,19 @@ end
     end
   end
 
+  Factory.define(:simple_sample_type,:parent=>:sample_type) do |f|
+    f.title "Simple type"
+    f.after_build do |type|
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"the title",:sample_attribute_type=>Factory(:string_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
+    end
+  end
+
 Factory.define(:sample) do |f|
   f.sequence(:title) {|n| "Sample #{n}"}
-  f.association :sample_type,:factory=>:sample_type
+  f.association :sample_type,:factory=>:simple_sample_type
+  f.after_build do |type|
+    type.the_title=type.title if type.respond_to?(:the_title)
+  end
 end
 
 Factory.define(:patient_sample, :parent=>:sample) do |f|
