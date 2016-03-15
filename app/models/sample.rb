@@ -84,7 +84,7 @@ class Sample < ActiveRecord::Base
 
   def set_json_metadata
     hash = Hash[sample_type.sample_attributes.map do |attribute|
-      [attribute.accessor_name, send(attribute.accessor_name)]
+      [attribute.parameterised_title, send(attribute.accessor_name)]
     end]
     self.json_metadata = hash.to_json
   end
@@ -92,8 +92,8 @@ class Sample < ActiveRecord::Base
   def read_json_metadata
     if sample_type && json_metadata
       json = JSON.parse(json_metadata)
-      sample_type.sample_attributes.collect(&:accessor_name).each do |accessor_name|
-        send("#{accessor_name}=", json[accessor_name])
+      sample_type.sample_attributes.each do |attribute|
+        send("#{attribute.accessor_name}=", json[attribute.parameterised_title])
       end
     end
   end

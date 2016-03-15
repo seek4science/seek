@@ -149,18 +149,33 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('')
   end
 
+  test 'parameterised_title' do
+    attribute = SampleAttribute.new title: 'fish pie'
+    assert_equal 'fish_pie',attribute.parameterised_title
+
+    attribute.title = "provider's cell culture identifier"
+    assert_equal 'provider_s_cell_culture_identifier',attribute.parameterised_title
+
+    attribute = SampleAttribute.new title: %!fish "' &-[]}^-pie!
+    assert_equal 'fish_pie',attribute.parameterised_title
+
+    attribute = SampleAttribute.new title: 'Fish Pie'
+    assert_equal 'fish_pie',attribute.parameterised_title
+
+    attribute = SampleAttribute.new title: 'title'
+    assert_equal 'title',attribute.parameterised_title
+
+  end
+
   test 'accessor name' do
     attribute = SampleAttribute.new title: 'fish pie'
     assert_equal 'fish_pie',attribute.accessor_name
 
-    attribute.title = "provider's cell culture identifier"
-    assert_equal 'provider_s_cell_culture_identifier',attribute.accessor_name
+    attribute.title = "title"
+    assert_equal 'title_',attribute.accessor_name
 
-    attribute = SampleAttribute.new title: %!fish "' &-[]}^-pie!
-    assert_equal 'fish_pie',attribute.accessor_name
-
-    attribute = SampleAttribute.new title: 'Fish Pie'
-    assert_equal 'fish_pie',attribute.accessor_name
+    attribute.title = "updated_at"
+    assert_equal 'updated_at_',attribute.accessor_name
 
   end
 
