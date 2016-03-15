@@ -4,7 +4,7 @@
   assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
   associated_samples_json = assay_assets.map do |aa|
     { title: aa.asset.title, id: aa.asset_id,
-      direction: { id: aa.direction, text: direction_name(aa.direction) } }
+      direction: { value: aa.direction, text: direction_name(aa.direction) } }
   end.to_json
 -%>
 
@@ -13,8 +13,28 @@
 
     <p>The following Samples are involved in this <%= resource_text -%>:</p>
 
-    <%= associations_list('sample_to_list', 'associations/sample', associated_samples_json,
-                          :empty_text => 'No samples') %>
+    <%= associations_list_group('sample_to_list', 'direction.value', associated_samples_json) do %>
+        <div class="row">
+          <div class="col-md-4">
+            <h3>Incoming</h3>
+            <%= associations_list('incoming-sample-list', 'associations/sample', '',
+                                  empty_text: 'No incoming samples',
+                                  'data-multilist-group-value' => AssayAsset::Direction::INCOMING) %>
+          </div>
+          <div class="col-md-4">
+            <h3>Outgoing</h3>
+            <%= associations_list('outgoing-sample-list', 'associations/sample', '',
+                                  empty_text: 'No outgoing samples',
+                                  'data-multilist-group-value' => AssayAsset::Direction::OUTGOING) %>
+          </div>
+          <div class="col-md-4">
+            <h3>No direction</h3>
+            <%= associations_list('other-sample-list', 'associations/sample', '',
+                                  empty_text: 'No other samples',
+                                  'data-multilist-group-value' => AssayAsset::Direction::NODIRECTION) %>
+          </div>
+        </div>
+    <% end %>
 
     <hr/>
 
@@ -71,89 +91,4 @@
         <% end %>
     <% end %>
     <%= button_link_to('Clear all samples', 'destroy', '#', id: 'clear-all-samples-btn') %>
-
-    <script>
-        var samplesList = new Associations.List('associations/sample', $j('#sample_to_list'));
-        var batchSamplesForm = new Associations.Form(samplesList, $j('#AddSamplesFromDataFileModal'));
-        $j('#AddSamplesFromDataFileModal :input[data-role="seek-association-common-field"]').each(function () {
-          $j(this).data('attributeName', this.name);
-          this.name = '';
-          batchSamplesForm.commonFieldElements.push($j(this));
-        });
-
-        var samplesTable = $j('#data-file-samples-table table').DataTable({
-          "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
-          "select": {
-            style: 'multi'
-          },
-          "columnDefs": [{
-            "targets": [ 0, 1 ],
-            "visible": false,
-            "searchable": false
-          }]
-        });
-
-        $j('#add-batch-sample-btn').click(function () {
-          batchSamplesForm.submit();
-        });
-
-        $j('#data-file-samples-select-all').click(function () {
-          samplesTable.rows().select();
-          return false;
-        });
-        $j('#data-file-samples-select-none').click(function () {
-          samplesTable.rows().deselect();
-          return false;
-        });
-        $j('#clear-all-samples-btn').click(function () {
-          if(confirm("Are you sure you wish to remove all samples from this assay?")) {
-            samplesList.removeAll();
-          }
-          return false;
-        });
-
-        // Wizard steps
-        var wizard = new Wizards.Wizard($j('#AddSamplesFromDataFileModal'));
-
-        // When a datafile is selected, unlock and show step 2
-        $j('#AddSamplesFromDataFileModal').on('click', '[data-role="seek-association-candidate"]', function () {
-          wizard.step(2).unlock();
-          wizard.gotoStep(2);
-        });
-
-        // When at least one sample is selected, unlock step 3
-        var handleRowSelect = function ( e, dt, type, indexes ) {
-          var selectedRows = samplesTable.rows({ selected: true });
-
-          batchSamplesForm.selectedItems = [];
-          selectedRows.every(function () {
-            batchSamplesForm.selectedItems.push({
-              id: this.data()[0],
-              title: this.data()[1]
-            });
-          });
-
-          if(selectedRows.count() > 0) {
-            wizard.step(3).unlock();
-          } else {
-            wizard.step(3).lock();
-          }
-        };
-        samplesTable.on('select', handleRowSelect);
-        samplesTable.on('deselect', handleRowSelect);
-
-        // On final step, show the confirm button
-        wizard.step(3).onShow = function () {
-          $j('#add-batch-sample-btn').show();
-        };
-        wizard.step(3).onHide = function () {
-          $j('#add-batch-sample-btn').hide();
-        };
-
-        // Reset the wizard when the modal is closed
-        $j('#AddSamplesFromDataFileModal').on('hide.bs.modal', function () {
-          samplesTable.rows().deselect();
-          wizard.reset();
-        })
-    </script>
 <% end %>

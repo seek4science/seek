@@ -66,6 +66,31 @@ Associations.ListItem.prototype.remove = function () {
     this.list.remove(this);
 };
 
+// A collection of lists, for example if you want to split associations into different lists depending on a certain
+//  attribute.
+Associations.MultiList = function (element, groupingAttribute) {
+    this.element = element;
+    this.element.data('associationList', this);
+    this.groupingAttribute = groupingAttribute;
+    this.lists = {};
+};
+
+Associations.MultiList.prototype.addList = function (attributeValue, list) {
+    this.lists[attributeValue.toString()] = list;
+};
+
+Associations.MultiList.prototype.add = function (association) {
+    var value = digValue(association, this.groupingAttribute);
+    var list = this.lists[value.toString()];
+    list.add(association);
+};
+
+Associations.MultiList.prototype.removeAll = function () {
+    for(var key in this.lists) {
+        if(this.lists.hasOwnProperty(key))
+            this.lists[key].removeAll();
+    }
+};
 
 // Object to control the association selection form.
 Associations.Form = function (list, element) {
@@ -91,7 +116,6 @@ Associations.Form.prototype.submit = function () {
             commonFields[name] = element.val();
         }
     });
-
     var list = this.list;
     this.selectedItems.forEach(function (selectedItem) {
         // Merge the common fields with the selected item's attributes
@@ -107,6 +131,34 @@ Associations.Form.prototype.submit = function () {
 
 
 $j(document).ready(function () {
+    // Markup
+    $j('[data-role="seek-associations-list"]').each(function () {
+        var list = new Associations.List($j(this).data('templateName'), $j(this));
+        var self = $j(this);
+
+        var existingValues = $j('script[data-role="seek-existing-associations"]', self).html();
+        if(existingValues) {
+            JSON.parse(existingValues).forEach(function (value) {
+                list.add(value)
+            });
+        }
+    });
+
+    $j('[data-role="seek-associations-list-group"]').each(function () {
+        var multilist = new Associations.MultiList($j(this), $j(this).data('groupingAttribute'));
+        var self = $j(this);
+        $j('[data-role="seek-associations-list"]', self).each(function () {
+            multilist.addList($j(this).data('multilistGroupValue'), $j(this).data('associationList'))
+        });
+
+        var existingValues = $j('script[data-role="seek-existing-associations"]', self).html();
+        if(existingValues) {
+            JSON.parse(existingValues).forEach(function (value) {
+                multilist.add(value)
+            });
+        }
+    });
+
     $j('[data-role="seek-association-form"]').each(function () {
         var element = this;
         var listId = $j(element).data('associationsListId');
@@ -143,17 +195,6 @@ $j(document).ready(function () {
             e.preventDefault();
             $j('.selectable[data-role="seek-association-candidate"]', $j(element)).removeClass('selected');
             form.submit();
-        });
-    });
-
-
-    $j('[data-role="seek-associations-list"]').each(function () {
-        var list = new Associations.List($j(this).data('templateName'), $j(this));
-        var self = $j(this);
-        var existingValues = JSON.parse($j('script[data-role="seek-existing-associations"]', self).html());
-
-        existingValues.forEach(function (value) {
-            list.add(value)
         });
     });
 
