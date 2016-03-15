@@ -11,7 +11,8 @@ class SampleType < ActiveRecord::Base
   alias_method :template, :content_blob
 
   validates :title, presence: true
-  validate :validate_one_title_attribute_present, :validate_template_file
+
+  validate :validate_one_title_attribute_present, :validate_template_file, :validate_attribute_title_unique
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
@@ -97,6 +98,16 @@ class SampleType < ActiveRecord::Base
   def validate_template_file
     if template && !compatible_template_file?
       errors.add(:template, 'Not a valid template file')
+    end
+  end
+
+  def validate_attribute_title_unique
+    # TODO: would like to have done this with uniquness{scope: :sample_type_id} on the attribute, but that leads to an exception when being added
+    # to the sample type
+    titles = sample_attributes.collect(&:title)
+    dups = titles.select { |title| titles.count(title) > 1 }.uniq
+    unless dups.empty?
+      errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups.join(', ')}")
     end
   end
 
