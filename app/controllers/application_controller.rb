@@ -233,7 +233,8 @@ class ApplicationController < ActionController::Base
     case action_name
       when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
           'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview','runs','new_object_based_on_existing_one'
+          'tag', 'items', 'statistics', 'tag_suggestions', 'preview','runs','new_object_based_on_existing_one',
+          'samples_table'
         'view'
 
       when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore','visualise' ,

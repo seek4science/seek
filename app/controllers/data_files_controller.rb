@@ -290,10 +290,18 @@ class DataFilesController < ApplicationController
   end
 
   def filter
-    @data_files = DataFile.authorize_asset_collection(DataFile.where("title LIKE ?", "#{params[:filter]}%"), 'view').first(20)
+    @data_files = DataFile.authorize_asset_collection(
+        DataFile.with_extracted_samples.where("title LIKE ?", "#{params[:filter]}%"), 'view'
+    ).first(20)
 
     respond_to do |format|
       format.html { render :partial => 'data_files/association_preview', :collection => @data_files }
+    end
+  end
+
+  def samples_table
+    respond_to do |format|
+      format.html { render :partial => 'samples/table_view', :locals => { :samples => @data_file.extracted_samples } }
     end
   end
 

@@ -59,10 +59,11 @@
         <%= modal_header('Add samples from data file') %>
         <%= modal_body do %>
             <div data-role="seek-wizard-nav"></div>
-            <div data-role="seek-wizard-step" data-step-name="Select data file">
+            <div data-role="seek-wizard-step" data-step-name="Select data file" id="samples-select-data-file">
               <label>Select data file</label>
               <%= filterable_association_select(filter_data_files_path) do %>
-                  <%= render :partial => 'data_files/association_preview', :collection => DataFile.all_authorized_for('view').first(20),
+                  <%= render :partial => 'data_files/association_preview',
+                             :collection => DataFile.with_extracted_samples.all_authorized_for('view').select { |d| d.extracted_samples.any? }.first(20),
                              :locals => { :existing => resource.samples }
                   %>
               <% end %>
@@ -72,8 +73,7 @@
               <a id="data-file-samples-select-all" href="#" class="btn btn-default btn-xs">Select all</a>
               <a id="data-file-samples-select-none" href="#" class="btn btn-default btn-xs">Select none</a>
               <div id="data-file-samples-table">
-                <%#TODO: Change me %>
-                <%= render :partial => 'samples/table_view', :locals => { :samples => Sample.where(:sample_type_id => SampleType.last.id)} %>
+                <%= image('spinner') %>
               </div>
             </div>
             <div data-role="seek-wizard-step" data-step-name="Select sample direction">

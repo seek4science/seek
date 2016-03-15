@@ -31,6 +31,8 @@ class DataFile < ActiveRecord::Base
   has_many :studied_factors, :conditions => Proc.new{["studied_factors.data_file_version =?", version]}
   has_many :extracted_samples, :class_name => 'Sample', :foreign_key => :originating_data_file_id
 
+  scope :with_extracted_samples, -> { joins(:extracted_samples).uniq }
+
   explicit_versioning(:version_column => "version") do
     include Seek::Data::DataFileExtraction
     include Seek::Data::SpreadsheetExplorerRepresentation

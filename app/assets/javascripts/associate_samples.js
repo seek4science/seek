@@ -7,17 +7,42 @@ $j(document).ready(function () {
         batchSamplesForm.commonFieldElements.push($j(this));
     });
 
-    var samplesTable = $j('#data-file-samples-table table').DataTable({
-        "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
-        "select": {
-            style: 'multi'
-        },
-        "columnDefs": [{
-            "targets": [ 0, 1 ],
-            "visible": false,
-            "searchable": false
-        }]
-    });
+    var samplesTable;
+
+    function initSamplesTable() {
+        samplesTable = $j('#data-file-samples-table table').DataTable({
+            "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
+            "select": {
+                style: 'multi'
+            },
+            "columnDefs": [{
+                "targets": [ 0, 1 ],
+                "visible": false,
+                "searchable": false
+            }]
+        });
+        // When at least one sample is selected, unlock step 3
+        var handleRowSelect = function ( e, dt, type, indexes ) {
+            var selectedRows = samplesTable.rows({ selected: true });
+
+            batchSamplesForm.selectedItems = [];
+            selectedRows.every(function () {
+                batchSamplesForm.selectedItems.push({
+                    id: this.data()[0],
+                    title: this.data()[1]
+                });
+            });
+
+            if(selectedRows.count() > 0) {
+                wizard.step(3).unlock();
+            } else {
+                wizard.step(3).lock();
+            }
+        };
+        samplesTable.on('select', handleRowSelect);
+        samplesTable.on('deselect', handleRowSelect);
+    }
+    initSamplesTable();
 
     $j('#add-batch-sample-btn').click(function () {
         batchSamplesForm.submit();
@@ -41,33 +66,6 @@ $j(document).ready(function () {
     // Wizard steps
     var wizard = new Wizards.Wizard($j('#AddSamplesFromDataFileModal'));
 
-    // When a datafile is selected, unlock and show step 2
-    $j('#AddSamplesFromDataFileModal').on('click', '[data-role="seek-association-candidate"]', function () {
-        wizard.step(2).unlock();
-        wizard.gotoStep(2);
-    });
-
-    // When at least one sample is selected, unlock step 3
-    var handleRowSelect = function ( e, dt, type, indexes ) {
-        var selectedRows = samplesTable.rows({ selected: true });
-
-        batchSamplesForm.selectedItems = [];
-        selectedRows.every(function () {
-            batchSamplesForm.selectedItems.push({
-                id: this.data()[0],
-                title: this.data()[1]
-            });
-        });
-
-        if(selectedRows.count() > 0) {
-            wizard.step(3).unlock();
-        } else {
-            wizard.step(3).lock();
-        }
-    };
-    samplesTable.on('select', handleRowSelect);
-    samplesTable.on('deselect', handleRowSelect);
-
     // On final step, show the confirm button
     wizard.step(3).onShow = function () {
         $j('#add-batch-sample-btn').show();
@@ -81,4 +79,21 @@ $j(document).ready(function () {
         samplesTable.rows().deselect();
         wizard.reset();
     });
+
+    $j('#samples-select-data-file .selectable[data-role="seek-association-candidate"]').click(function () {
+        var candidate = $j(this);
+        candidate.spinner('add');
+        $j.ajax('/data_files/'+$j(this).data('associationId')+'/samples_table', {
+                success: function (data) {
+                    $j('#data-file-samples-table').html(data);
+                    initSamplesTable();
+                    wizard.step(2).unlock();
+                    wizard.gotoStep(2);
+                    candidate.spinner('remove');
+                }
+            }
+        );
+
+        return false;
+    })
 });
