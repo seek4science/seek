@@ -237,3 +237,22 @@ function digValue(object, path) {
 
   return value;
 }
+
+(function ($) {
+  $.fn.spinner = function (action) {
+    if(action === 'add') {
+      return this.each(function () {
+        var spinner = $('<%= image_tag("ajax-loader.gif").html_safe %>');
+        $(this).append(spinner);
+        $(this).data('spinnerElement', spinner);
+      });
+    } else if(action === 'remove') {
+      return this.each(function () {
+        if($(this).data('spinnerElement')) {
+          $(this).data('spinnerElement').remove();
+          $(this).data('spinnerElement', null);
+        }
+      });
+    }
+  };
+}( jQuery ));
