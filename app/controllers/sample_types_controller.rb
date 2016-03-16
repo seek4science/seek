@@ -27,16 +27,8 @@ class SampleTypesController < ApplicationController
   # GET /sample_types/new
   # GET /sample_types/new.json
   def new
-    @sample_type = SampleType.new
-    @sample_type.sample_attributes.build # Initial attribute
+    @tab = 'manual'
 
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @sample_type }
-    end
-  end
-
-  def new_from_template
     @sample_type = SampleType.new
     @sample_type.sample_attributes.build # Initial attribute
 
@@ -48,6 +40,7 @@ class SampleTypesController < ApplicationController
 
   def create_from_template
     @sample_type = SampleType.new(params[:sample_type])
+    @tab = 'from-template'
     handle_upload_data
     attributes = build_attributes_hash_for_content_blob(content_blob_params.first, nil)
     @sample_type.create_content_blob(attributes)
@@ -58,7 +51,7 @@ class SampleTypesController < ApplicationController
         format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
         format.json { render json: @sample_type, status: :created, location: @sample_type }
       else
-        format.html { render action: "new_from_template" }
+        format.html { render action: 'new' }
         format.json { render json: @sample_type.errors, status: :unprocessable_entity }
       end
     end
@@ -73,6 +66,7 @@ class SampleTypesController < ApplicationController
   # POST /sample_types.json
   def create
     @sample_type = SampleType.new(params[:sample_type])
+    @tab = 'manual'
 
     respond_to do |format|
       if @sample_type.save
