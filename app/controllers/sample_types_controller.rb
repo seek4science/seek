@@ -30,7 +30,7 @@ class SampleTypesController < ApplicationController
     @tab = 'manual'
 
     @sample_type = SampleType.new
-    @sample_type.sample_attributes.build # Initial attribute
+    @sample_type.sample_attributes.build(is_title:true,required:true) # Initial attribute
 
     respond_to do |format|
       format.html # new.html.erb

@@ -27,6 +27,23 @@ var SampleTypes = {
         return ui;
     },
 
+    singleIsTitle: function () {
+        if ($j(this).is(':checked')) {
+            $j(".sample-type-is-title[id!='"+this.id+"']").prop('checked',false);
+        }
+        else {
+            if ($j('.sample-type-is-title:checked').length==0) {
+                $j(this).prop('checked',true);
+            }
+        }
+    },
+
+    checkForIsTitle: function() {
+        if ($j('.sample-type-is-title:checked').length==0) {
+            $j('.sample-type-is-title')[0].checked=true;
+        }
+    },
+
     removeAttribute: function () {
         var row = $j(this).parents('.sample-attribute');
         if($j(this).is(':checked')) {
@@ -43,5 +60,8 @@ var SampleTypes = {
             row.removeClass('danger');
             $j(':input:not(.destroy-attribute)', row).prop('disabled', false);
         }
+        SampleTypes.checkForIsTitle();
     }
+
+
 };
