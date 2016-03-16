@@ -242,9 +242,11 @@ function digValue(object, path) {
   $.fn.spinner = function (action) {
     if(action === 'add') {
       return this.each(function () {
-        var spinner = $('<%= image_tag("ajax-loader.gif").html_safe %>');
-        $(this).append(spinner);
-        $(this).data('spinnerElement', spinner);
+        if(!$(this).data('spinnerElement')) {
+          var spinner = $('<%= image_tag("ajax-loader.gif").html_safe %>');
+          $(this).append(spinner);
+          $(this).data('spinnerElement', spinner);
+        }
       });
     } else if(action === 'remove') {
       return this.each(function () {
