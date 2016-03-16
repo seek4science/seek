@@ -88,6 +88,17 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1.2)
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('30 Feb 2015')
+
+    attribute = SampleAttributeType.new(title: 'fish', base_type: 'Date')
+    assert attribute.validate_value?('2 Feb 2015')
+    assert attribute.validate_value?('Thu, 11 Feb 2016 15:39:55 +0000')
+    assert attribute.validate_value?('2016-02-11T15:40:14+00:00')
+    assert attribute.validate_value?(Date.parse('2 Feb 2015'))
+    assert attribute.validate_value?(Date.today)
+    refute attribute.validate_value?(1)
+    refute attribute.validate_value?(1.2)
+    refute attribute.validate_value?(nil)
+    refute attribute.validate_value?('30 Feb 2015')
   end
 
   test 'regular expression match' do
@@ -123,6 +134,6 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   end
 
   test 'allowed types' do
-    assert_equal %w(DateTime Float Integer String Text).sort, SampleAttributeType.allowed_base_types.sort
+    assert_equal %w(Date DateTime Float Integer String Text).sort, SampleAttributeType.allowed_base_types.sort
   end
 end

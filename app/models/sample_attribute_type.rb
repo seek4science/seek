@@ -14,6 +14,7 @@ class SampleAttributeType < ActiveRecord::Base
     'Float' => :is_float?,
     'String' => :is_string?,
     'DateTime' => :is_datetime?,
+    'Date' => :is_date?,
     'Text' => :is_string?
   }
 
@@ -81,5 +82,9 @@ class SampleAttributeType < ActiveRecord::Base
 
   def is_datetime?(value)
     fail 'Not a date time' unless DateTime.parse(value.to_s)
+  end
+
+  def is_date?(value)
+    fail 'Not a date time' unless Date.parse(value.to_s)
   end
 end
