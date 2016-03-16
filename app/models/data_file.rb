@@ -215,4 +215,8 @@ class DataFile < ActiveRecord::Base
     results.values.sort_by{|a| -a.score}
   end
 
+  def related_samples
+    extracted_samples
+  end
+
 end
