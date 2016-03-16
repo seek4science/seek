@@ -162,6 +162,7 @@ undo: 'famfamfam_silk/arrow_undo.png'
 project_membership_flag: 'famfamfam_silk/user_go.png'
 project_membership_delete: 'famfamfam_silk/user_delete.png'
 project_membership_unflag: 'famfamfam_silk/user_add.png'
+extract_samples: 'famfamfam_silk/table_go.png'
 
 
 #images for mime types
