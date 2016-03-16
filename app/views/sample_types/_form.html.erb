@@ -3,7 +3,7 @@
     <%= f.error_messages %>
 
     <div class="form-group">
-      <label>Title</label>
+      <label>Title</label><%= required_span %>
       <%= f.text_field :title, :class => 'form-control', :placeholder => 'Sample type name' %>
     </div>
 
@@ -25,11 +25,15 @@
         <%= render :partial => 'sample_attribute_form', :locals => { :index => index,
                                                                      :sample_attribute => sample_attribute } %>
       <% end %>
-      <tr id="add-attribute-row">
-        <td colspan="6">
-          <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
-        </td>
-      </tr>
+
+      <% unless @sample_type.template %>
+        <tr id="add-attribute-row">
+          <td colspan="6">
+            <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
+          </td>
+        </tr>
+      <% end %>
+
       </tbody>
     </table>
 

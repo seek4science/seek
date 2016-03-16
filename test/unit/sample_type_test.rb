@@ -273,4 +273,22 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal Date.parse("12 March 1970"), Date.parse(sample.date_of_birth)
   end
 
+  test 'dependant destroy content blob' do
+    string_type = Factory(:string_sample_attribute_type, title:'String')
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+    blob = sample_type.content_blob
+
+    assert_difference('ContentBlob.count',-1) do
+      assert_difference('SampleType.count',-1) do
+        sample_type.destroy
+      end
+    end
+
+    assert blob.destroyed?
+  end
+
 end
