@@ -210,7 +210,8 @@ class SamplesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title:'String')
 
-    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:public_policy), :contributor=>person.user
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -241,6 +242,35 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal samples.sort, data_file.extracted_samples.sort
 
 
+  end
+
+  test "can't extract from data file if no permissions" do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    login_as(another_person)
+
+    assert_no_difference("Sample.count") do
+      post :extract_from_data_file, :data_file_id=>data_file.id
+    end
+
+    assert_redirected_to data_file_path(data_file)
+    assert_not_empty flash[:error]
   end
 
   private

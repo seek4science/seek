@@ -8,19 +8,19 @@ class SamplesController < ApplicationController
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview]
 
   before_filter :auth_to_create, :only=>[:new,:create]
+  before_filter :find_and_authorize_data_file, :only => :extract_from_data_file
 
 
   def extract_from_data_file
     @rejected_samples = []
     @samples = []
-    data_file = DataFile.find(params[:data_file_id])
 
-    if data_file.possible_sample_types.count>=1
-      sample_type = data_file.possible_sample_types.last
-      samples = sample_type.build_samples_from_template(data_file.content_blob)
+    if @data_file.possible_sample_types.count>=1
+      sample_type = @data_file.possible_sample_types.last
+      samples = sample_type.build_samples_from_template(@data_file.content_blob)
       samples.each do |sample|
         sample.contributor=User.current_user
-        sample.originating_data_file = data_file
+        sample.originating_data_file = @data_file
         if sample.valid? && sample.save
           @samples << sample
         else
@@ -105,6 +105,17 @@ class SamplesController < ApplicationController
     @sample.update_attributes(params[:sample])
     update_sharing_policies @sample, params
     update_annotations(params[:tag_list], @sample)
+  end
+
+  def find_and_authorize_data_file
+    @data_file = DataFile.find(params[:data_file_id])
+
+    unless @data_file.can_manage?
+      flash[:error] = "You are not authorize to extract samples from this data file"
+      respond_to do |format|
+        format.html { redirect_to data_file_path(@data_file)}
+      end
+    end
   end
 
 end
