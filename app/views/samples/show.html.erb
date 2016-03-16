@@ -11,6 +11,12 @@
           <label>Sample type:</label>
           <%= link_to @sample.sample_type.title,sample_type_samples_path(@sample.sample_type) %>
         </p>
+        <% if @sample.originating_data_file %>
+            <p>
+              <label>Source data:</label>
+              <%= link_to @sample.originating_data_file.title, @sample.originating_data_file %>
+            </p>
+        <% end %>
         <%= render :partial => "attribute_values", :locals => {:sample => @sample} %>
       </div>
     </div>

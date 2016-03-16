@@ -47,6 +47,10 @@ class Sample < ActiveRecord::Base
     true
   end
 
+  def related_data_file
+    originating_data_file
+  end
+
   private
 
   def attribute_values_for_search
