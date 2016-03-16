@@ -57,4 +57,6 @@
 //= require DataTables-1.10.11/jquery.dataTables
 //= require DataTables-1.10.11/dataTables.bootstrap
 //= require DataTables-1.10.11/dataTables.select
+//= require DataTables-1.10.11/dataTables.buttons
+//= require DataTables-1.10.11/buttons.bootstrap
 //= require_tree ./templates
