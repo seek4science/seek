@@ -29,7 +29,7 @@ var SampleTypes = {
 
     singleIsTitle: function () {
         if ($j(this).is(':checked')) {
-            $j(".sample-type-is-title[id!='"+this.id+"']").prop('checked',false);
+            $j('.sample-type-is-title:not(#'+this.id+')').prop('checked',false);
         }
         else {
             if ($j('.sample-type-is-title:checked').length==0) {
