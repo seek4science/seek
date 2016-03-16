@@ -70,8 +70,6 @@
             </div>
             <div data-role="seek-wizard-step" data-step-name="Select samples">
               <label>Select samples</label>
-              <a id="data-file-samples-select-all" href="#" class="btn btn-default btn-xs">Select all</a>
-              <a id="data-file-samples-select-none" href="#" class="btn btn-default btn-xs">Select none</a>
               <div id="data-file-samples-table">
                 <%= image('spinner') %>
               </div>
@@ -115,13 +113,18 @@
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
         dom: '<"row"<"col-sm-6"l><"col-sm-6 text-right"B>>rtip', // Needed to place the buttons
         buttons: [
-          'selectAll',
+          {
+            text: 'Select All',
+            action: function () {
+              samplesTable.rows().deselect();
+              samplesTable.rows( {search:'applied'} ).select();
+            }
+          },
           'selectNone'
         ],
         language: {
           buttons: {
-            selectAll: "Select all items",
-            selectNone: "Clear selection"
+            selectNone: "Clear Selection"
           }
         },
         "select": {
@@ -173,15 +176,6 @@
 
     $j('#add-batch-sample-btn').click(function () {
       batchSamplesForm.submit();
-    });
-
-    $j('#data-file-samples-select-all').click(function () {
-      samplesTable.rows().select();
-      return false;
-    });
-    $j('#data-file-samples-select-none').click(function () {
-      samplesTable.rows().deselect();
-      return false;
     });
     $j('#clear-all-samples-btn').click(function () {
       if(confirm("Are you sure you wish to remove all samples from this assay?")) {
