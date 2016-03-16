@@ -169,6 +169,26 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal %({"full_name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}), sample.json_metadata
   end
 
+  test 'json metadata with awkward attributes' do
+    sample_type = SampleType.new :title=>"with awkward attributes"
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"title",is_title:true, :sample_type => sample_type)
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"updated_at",is_title:false, :sample_type => sample_type)
+    assert sample_type.valid?
+    sample = Sample.new title: 'testing'
+    sample.sample_type=sample_type
+
+    sample.title_ = "the title"
+    sample.updated_at_ = "the updated at"
+    assert_nil sample.json_metadata
+    sample.save!
+    assert_equal %({"title":"the title","updated_at":"the updated at"}), sample.json_metadata
+
+    sample = Sample.find(sample.id)
+    assert_equal "the title",sample.title
+    assert_equal "the title",sample.title_
+    assert_equal "the updated at",sample.updated_at_
+  end
+
   #trying to track down an sqlite3 specific problem
   test 'sqlite3 setting of accessor problem' do
     sample = Sample.new title: 'testing'
@@ -274,6 +294,26 @@ class SampleTest < ActiveSupport::TestCase
     sample.save!
     sample.reload
     assert_equal 'this should be the title',sample.title
+  end
+
+  test 'sample with clashing attribute names' do
+    sample_type = SampleType.new :title=>"with awkward attributes"
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"freeze",is_title:true, :sample_type => sample_type)
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"updated_at",is_title:false, :sample_type => sample_type)
+    assert sample_type.valid?
+    sample = Sample.new title: 'testing'
+    sample.sample_type=sample_type
+
+    sample.freeze_ = "the title"
+    refute sample.valid?
+    sample.updated_at_ = "the updated_at"
+    sample.save!
+    assert_equal "the title",sample.title
+
+    sample=Sample.find(sample.id)
+    assert_equal "the title",sample.title
+    assert_equal "the title",sample.freeze_
+    assert_equal "the updated_at",sample.updated_at_
   end
 
 end

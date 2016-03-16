@@ -1138,6 +1138,11 @@ end
     f.required true
   end
 
+  Factory.define(:any_string_sample_attribute, :parent=>:sample_attribute) do |f|
+    f.sample_attribute_type Factory.build(:string_sample_attribute_type)
+    f.required true
+  end
+
 
   #very simple persons name, must be 2 words, first and second word starting with capital with all letters
   Factory.define(:full_name_sample_attribute_type,:parent=>:string_sample_attribute_type) do |f|

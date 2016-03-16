@@ -11,7 +11,7 @@ class SampleAttribute < ActiveRecord::Base
 
   before_save :default_pos, :check_required_against_is_title
 
-  scope :title_attributes, where(is_title:true)
+  scope :title_attributes, where(is_title: true)
 
   def validate_value?(value)
     return false if required? && value.blank?
@@ -19,7 +19,15 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   # the name for the sample accessor based on the attribute title, spaces are replaced with underscore, and all downcase
+  # if there is a clash with a sample method then _ is prepended
   def accessor_name
+    invalid_names = Sample.new.methods.collect(&:to_s)
+    name = parameterised_title
+    name += '_' if invalid_names.include?(name)
+    name
+  end
+
+  def parameterised_title
     title.parameterize.underscore
   end
 

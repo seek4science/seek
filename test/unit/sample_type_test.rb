@@ -12,6 +12,20 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample_type.valid?
     sample_type.title=""
     refute sample_type.valid?
+
+    #cannot have 2 attributes with the same name
+    sample_type = SampleType.new :title=>"fish"
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, :title=>"a",is_title:true, :sample_type => sample_type)
+    assert sample_type.valid?
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, :title=>"a",is_title:false, :sample_type => sample_type)
+    refute sample_type.valid?
+
+    #uniqueness check should be case insensitive
+    sample_type = SampleType.new :title=>"fish"
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, :title=>"aaa",is_title:true, :sample_type => sample_type)
+    assert sample_type.valid?
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, :title=>"aAA",is_title:false, :sample_type => sample_type)
+    refute sample_type.valid?
   end
 
   test "test uuid generated" do
