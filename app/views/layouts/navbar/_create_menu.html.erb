@@ -46,12 +46,15 @@
         <% end %>
 
         <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
-        <% if can_create_organisms? %>
-            <li><%= link_to "Organism", new_organism_path %></li>
-        <% end %>
-        <li><%= link_to("Strain", new_strain_path) %></li>
         <% if Sample.can_create? %>
             <li><%= link_to("Sample", new_sample_path) %></li>
+        <% end %>
+        <% if SampleType.can_create? %>
+            <li><%= link_to("Sample Type", new_sample_type_path) %></li>
+        <% end %>
+        <li><%= link_to("Strain", new_strain_path) %></li>
+        <% if can_create_organisms? %>
+            <li><%= link_to "Organism", new_organism_path %></li>
         <% end %>
 
     <% else %>

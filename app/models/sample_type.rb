@@ -16,6 +16,10 @@ class SampleType < ActiveRecord::Base
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
+  def self.can_create?
+    User.logged_in_and_member?
+  end
+
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") if attribute.nil?
