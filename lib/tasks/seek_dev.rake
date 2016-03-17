@@ -419,7 +419,7 @@ namespace :seek_dev do
     SampleType.destroy_all
     #dummy type - just with some varied attributes
     dummy_type = SampleType.new title:"Dummy sample type"
-    dummy_type.sample_attributes << SampleAttribute.new(title:"Integer",sample_attribute_type:positive_integer_type)
+    dummy_type.sample_attributes << SampleAttribute.new(title:"Integer",sample_attribute_type:integer_type)
     dummy_type.sample_attributes << SampleAttribute.new(title:"Web link",sample_attribute_type:web_link_type, required:true)
     dummy_type.sample_attributes << SampleAttribute.new(title:"Date of birth",sample_attribute_type:date_time_type)
     dummy_type.sample_attributes << SampleAttribute.new(title:"Two words",sample_attribute_type:two_words_type, required:true,is_title:true)
@@ -429,8 +429,8 @@ namespace :seek_dev do
     #patient type
     patient_type = SampleType.new title:"Very basic patient type"
     patient_type.sample_attributes << SampleAttribute.new(title:"Full name",sample_attribute_type:two_words_type, required:true,is_title:true)
-    patient_type.sample_attributes << SampleAttribute.new(title:"Age",sample_attribute_type:positive_integer_type,unit:Unit.find_by_title('month'))
-    patient_type.sample_attributes << SampleAttribute.new(title:"Weight",sample_attribute_type:positive_float_type)
+    patient_type.sample_attributes << SampleAttribute.new(title:"Age",sample_attribute_type:integer_type,unit:Unit.find_by_title('month'))
+    patient_type.sample_attributes << SampleAttribute.new(title:"Weight",sample_attribute_type:float_type)
     patient_type.sample_attributes << SampleAttribute.new(title:"Date of birth",sample_attribute_type:date_time_type, required:true)
     patient_type.sample_attributes << SampleAttribute.new(title:"Email",sample_attribute_type:email_type)
     patient_type.sample_attributes << SampleAttribute.new(title:"Address",sample_attribute_type:text_type)
