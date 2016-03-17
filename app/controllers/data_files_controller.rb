@@ -301,7 +301,7 @@ class DataFilesController < ApplicationController
 
   def samples_table
     respond_to do |format|
-      format.html { render :partial => 'samples/table_view', :locals => { :samples => @data_file.extracted_samples } }
+      format.html { render :partial => 'samples/table_view', :locals => { :samples => @data_file.extracted_samples.includes(:sample_type) } }
     end
   end
 
