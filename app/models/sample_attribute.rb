@@ -35,6 +35,8 @@ class SampleAttribute < ActiveRecord::Base
     super || is_title?
   end
 
+
+
   private
 
   # if not set, takes the next value for that sample type

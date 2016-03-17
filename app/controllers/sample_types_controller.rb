@@ -3,6 +3,7 @@ class SampleTypesController < ApplicationController
   # GET /sample_types.json
 
   include Seek::UploadHandling::DataUpload
+  include Seek::IndexPager
 
   def index
     @sample_types = SampleType.all

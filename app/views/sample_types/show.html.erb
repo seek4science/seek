@@ -13,7 +13,7 @@
 <ul>
 <% @sample_type.sample_attributes.each do |attribute| %>
 <li>
-  <%= attribute.title %> ( <%= attribute.sample_attribute_type.title %> ) <% if attribute.unit %> ( <%= attribute.unit.symbol   %> ) <% end %>
+  <%= sample_attribute_details(attribute) %>
 </li>
 
 
