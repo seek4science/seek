@@ -137,4 +137,5 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   test 'allowed types' do
     assert_equal %w(Date DateTime Float Integer String Text).sort, SampleAttributeType.allowed_base_types.sort
   end
+
 end

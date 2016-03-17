@@ -397,16 +397,12 @@ namespace :seek_dev do
     SampleAttributeType.destroy_all
 
     #basic attribute types
-    positive_integer_type = SampleAttributeType.new title:"Postive integer",regexp:'^[1-9]\d*$', base_type:'Integer'
-    positive_integer_type.save!
     two_words_type = SampleAttributeType.new title:"Two capitalized words",regexp:'[A-Z][a-z]+[ ][A-Z][a-z]+', base_type:'String'
     two_words_type.save!
     date_time_type = SampleAttributeType.new title:'Date time',base_type:'DateTime'
     date_time_type.save!
     date_time = SampleAttributeType.new title:'Date',base_type:'Date'
     date_time.save!
-    positive_float_type = SampleAttributeType.new title:"Postive float",regexp:'^[1-9]\d*[.][1-9]\d*$', base_type:'Float'
-    positive_float_type.save!
     integer_type = SampleAttributeType.new title:"Integer", base_type:'Integer'
     integer_type.save!
     float_type = SampleAttributeType.new title:"Float", base_type:'Float'
@@ -423,7 +419,7 @@ namespace :seek_dev do
     SampleType.destroy_all
     #dummy type - just with some varied attributes
     dummy_type = SampleType.new title:"Dummy sample type"
-    dummy_type.sample_attributes << SampleAttribute.new(title:"Postive Integer",sample_attribute_type:positive_integer_type)
+    dummy_type.sample_attributes << SampleAttribute.new(title:"Integer",sample_attribute_type:positive_integer_type)
     dummy_type.sample_attributes << SampleAttribute.new(title:"Web link",sample_attribute_type:web_link_type, required:true)
     dummy_type.sample_attributes << SampleAttribute.new(title:"Date of birth",sample_attribute_type:date_time_type)
     dummy_type.sample_attributes << SampleAttribute.new(title:"Two words",sample_attribute_type:two_words_type, required:true,is_title:true)
