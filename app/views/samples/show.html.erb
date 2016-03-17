@@ -9,7 +9,7 @@
       <div class="col-md-6">
         <p>
           <label>Sample type:</label>
-          <%= link_to @sample.sample_type.title,sample_type_samples_path(@sample.sample_type) %>
+          <%= link_to @sample.sample_type.title,@sample.sample_type %>
         </p>
         <% if @sample.originating_data_file %>
             <p>
