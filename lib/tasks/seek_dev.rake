@@ -403,6 +403,8 @@ namespace :seek_dev do
     two_words_type.save!
     date_time_type = SampleAttributeType.new title:'Date time',base_type:'DateTime'
     date_time_type.save!
+    date_time = SampleAttributeType.new title:'Date',base_type:'Date'
+    date_time.save!
     positive_float_type = SampleAttributeType.new title:"Postive float",regexp:'^[1-9]\d*[.][1-9]\d*$', base_type:'Float'
     positive_float_type.save!
     integer_type = SampleAttributeType.new title:"Integer", base_type:'Integer'
