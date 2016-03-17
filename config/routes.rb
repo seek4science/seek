@@ -315,7 +315,7 @@ SEEK::Application.routes.draw do
       get :published
       get :new_object_based_on_existing_one
     end
-    resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
 
 
@@ -386,7 +386,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
-    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays, :samples, :studies,:publications,:events,:only=>[:index]
   end
 
   resources :presentations do
