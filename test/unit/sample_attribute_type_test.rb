@@ -45,7 +45,7 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
-    # not sure about these ??
+
     refute attribute.validate_value?(1.0)
     refute attribute.validate_value?('1.0')
 
@@ -74,9 +74,10 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('2 Feb 2015')
     refute attribute.validate_value?(nil)
 
-    # not sure about these ??
-    refute attribute.validate_value?(1)
-    refute attribute.validate_value?('1')
+    assert attribute.validate_value?(1.0)
+    assert attribute.validate_value?(1)
+    assert attribute.validate_value?('1.0')
+    assert attribute.validate_value?('1')
 
     attribute = SampleAttributeType.new(title: 'fish', base_type: 'DateTime')
     assert attribute.validate_value?('2 Feb 2015')

@@ -77,7 +77,7 @@ class SampleAttributeType < ActiveRecord::Base
   end
 
   def is_float?(value)
-    fail 'Not a float' unless (Float(value).to_s == value.to_s)
+    fail 'Not a float' unless (Float(value).to_s == value.to_s || Integer(value).to_s == value.to_s )
   end
 
   def is_datetime?(value)
