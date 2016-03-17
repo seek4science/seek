@@ -107,9 +107,8 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('fish')
     refute attribute.validate_value?('2 Feb 2015')
 
-    # not sure about these ??
-    refute attribute.validate_value?(1)
-    refute attribute.validate_value?('1')
+    assert attribute.validate_value?(1)
+    assert attribute.validate_value?('1')
 
     attribute = SampleAttribute.new title: 'fish', sample_attribute_type: Factory(:datetime_sample_attribute_type),
                                     sample_type: Factory(:simple_sample_type)
