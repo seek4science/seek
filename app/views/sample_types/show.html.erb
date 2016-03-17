@@ -1,5 +1,21 @@
-<p id="notice"><%= notice %></p>
+<%= render :partial => "general/item_title", :locals => {:item => @sample_type} %>
+
+<% if @sample_type.template %>
+
+    <h2>Template</h2>
+
+    <%= @sample_type.template.original_filename %> -    <%= link_to 'Download',download_sample_type_content_blob_path(@sample_type,@sample_type.template)  %>
+
+<% end %>
+
+<h2>Attributes</h2>
+
+<ul>
+<% @sample_type.sample_attributes.each do |attribute| %>
+<li>
+  <%= attribute.title %> ( <%= attribute.sample_attribute_type.title %> ) <% if attribute.unit %> ( <%= attribute.unit.symbol   %> ) <% end %>
+</li>
 
 
-<%= link_to 'Edit', edit_sample_type_path(@sample_type) %> |
-<%= link_to 'Back', sample_types_path %>
+<% end %>
+</ul>

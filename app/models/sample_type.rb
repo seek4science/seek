@@ -7,7 +7,8 @@ class SampleType < ActiveRecord::Base
 
   has_many :sample_attributes, order: :pos, inverse_of: :sample_type
 
-  belongs_to :content_blob, dependent: :destroy
+  has_one :content_blob, :as => :asset, dependent: :destroy
+
   alias_method :template, :content_blob
 
   validates :title, presence: true
@@ -67,6 +68,11 @@ class SampleType < ActiveRecord::Base
     end
     samples
   end
+
+  def can_download?
+    true
+  end
+
 
   private
 

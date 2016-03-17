@@ -5,6 +5,11 @@ SEEK::Application.routes.draw do
       post :create_from_template
     end
     resources :samples
+    resources :content_blobs do
+      member do
+        get :download
+      end
+    end
   end
 
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)

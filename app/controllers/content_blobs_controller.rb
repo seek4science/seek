@@ -61,7 +61,7 @@ class ContentBlobsController < ApplicationController
   end
 
   def download
-    @asset.just_used
+    @asset.just_used if @asset.respond_to?(:just_used)
 
     disposition = params[:disposition] || 'attachment'
     image_size = params[:image_size]
@@ -138,6 +138,8 @@ class ContentBlobsController < ApplicationController
           Sop.find(params[:sop_id])
         when params[:presentation_id] then
           Presentation.find(params[:presentation_id])
+        when params[:sample_type_id] then
+          SampleType.find(params[:sample_type_id])
       end
     rescue ActiveRecord::RecordNotFound
       error("Unable to find the asset", "is invalid")
@@ -166,11 +168,13 @@ class ContentBlobsController < ApplicationController
   end
 
   def set_asset_version
-    begin
-      @asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
-    rescue Exception=>e
-      error("Unable to find asset version", "is invalid")
-      return false
+    if @content_blob.asset_version
+      begin
+        @asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
+      rescue Exception=>e
+        error("Unable to find asset version", "is invalid")
+        return false
+      end
     end
   end
 end

@@ -71,7 +71,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def check_version
-    self.asset_version = asset.version if asset_version.nil? && !asset.nil?
+    self.asset_version = asset.version if asset_version.nil? && !asset.nil? && asset.respond_to?(:version)
   end
 
   def show_as_external_link?
