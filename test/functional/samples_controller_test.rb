@@ -233,6 +233,9 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:rejected_samples).count
     assert_equal "Bob",assigns(:rejected_samples).first.full_name
 
+    assert_select '#accepted table tbody tr', count: 3
+    assert_select '#rejected table tbody tr', count: 1
+
     samples.each do |sample|
       assert_equal data_file, sample.originating_data_file
     end

@@ -17,7 +17,7 @@
       <% end %>
       <tbody>
       <% samples.each do |sample| %>
-          <%= content_tag(:tr, class: 'clickable') do %>
+          <%= content_tag(:tr) do %>
               <td><%= sample.id %></td>
               <td><%= sample.title %></td>
               <% shown_attributes.each do |attribute| %>

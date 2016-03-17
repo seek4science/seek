@@ -27,11 +27,12 @@ class SamplesController < ApplicationController
           @rejected_samples << sample
         end
       end
-    else
-
     end
+
     flash[:notice]="#{@samples.count} samples created, #{@rejected_samples.count} rejected"
-    redirect_to samples_path
+    respond_to do |format|
+      format.html
+    end
   end
 
   def new

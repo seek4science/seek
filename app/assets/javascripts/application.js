@@ -59,4 +59,5 @@
 //= require DataTables-1.10.11/dataTables.select
 //= require DataTables-1.10.11/dataTables.buttons
 //= require DataTables-1.10.11/buttons.bootstrap
+//= require samples
 //= require_tree ./templates

@@ -104,38 +104,7 @@
     var samplesTable;
 
     function initSamplesTable() {
-      $j('#data-file-samples-table table tfoot th').each( function () {
-        var title = $j(this).text();
-        $j(this).html('<input type="text" class="form-control" placeholder="Search '+title+'" />');
-      });
-
-      samplesTable = $j('#data-file-samples-table table').DataTable({
-        "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
-        dom: '<"row"<"col-sm-6"l><"col-sm-6 text-right"B>>rtip', // Needed to place the buttons
-        buttons: [
-          {
-            text: 'Select All',
-            action: function () {
-              samplesTable.rows().deselect();
-              samplesTable.rows( {search:'applied'} ).select();
-            }
-          },
-          'selectNone'
-        ],
-        language: {
-          buttons: {
-            selectNone: "Clear Selection"
-          }
-        },
-        "select": {
-          style: 'multi'
-        },
-        "columnDefs": [{
-          "targets": [ 0, 1 ],
-          "visible": false,
-          "searchable": false
-        }]
-      });
+      samplesTable = Samples.initTable($j('#data-file-samples-table'), true);
       // When at least one sample is selected, unlock step 3
       var handleRowSelect = function ( e, dt, type, indexes ) {
         var selectedRows = samplesTable.rows({ selected: true });
@@ -156,22 +125,8 @@
       };
       samplesTable.on('select', handleRowSelect);
       samplesTable.on('deselect', handleRowSelect);
-
-      // DataTable
-      samplesTable.columns().every(function () {
-        var column = this;
-
-        $j('input', this.footer()).on('keyup change', function () {
-          if (column.search() !== this.value)
-            column.search(this.value).draw();
-        }).on('keydown', function (event) { // Stop enter key submitting form
-          if(event.keyCode == 13) {
-            event.preventDefault();
-            return false;
-          }
-        });
-      });
     }
+
     initSamplesTable();
 
     $j('#add-batch-sample-btn').click(function () {

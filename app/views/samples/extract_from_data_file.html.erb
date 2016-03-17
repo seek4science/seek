@@ -1,0 +1,47 @@
+<% total = @samples.count + @rejected_samples.count %>
+
+<% if total > 0 %>
+    <div>
+      <ul class="nav nav-tabs" role="tablist">
+        <% if @samples.any? %>
+            <li role="presentation" class="active">
+              <a href="#accepted" aria-controls="home" role="tab" data-toggle="tab">
+                Accepted (<%= @samples.count -%>/<%= total %>)
+              </a>
+            </li>
+        <% end %>
+        <% if @rejected_samples.any? %>
+            <li role="presentation" class="<%= 'active' if @samples.none? -%>">
+              <a href="#rejected" aria-controls="profile" role="tab" data-toggle="tab">
+                Rejected (<%= @rejected_samples.count -%>/<%= total %>)
+              </a>
+            </li>
+        <% end %>
+      </ul>
+
+      <div class="tab-content">
+        <% if @samples.any? %>
+            <div role="tabpanel" class="tab-pane active" id="accepted">
+              <%= render partial: 'samples/table_view', locals: { samples: @samples } %>
+              <script>
+                $j(document).ready(function () {
+                  Samples.initTable($j('#accepted'));
+                });
+              </script>
+            </div>
+        <% end %>
+        <% if @rejected_samples.any? %>
+            <div role="tabpanel" class="tab-pane <%= 'active' if @samples.none? -%>" id="rejected">
+              <%= render partial: 'samples/table_view', locals: { samples: @rejected_samples } %>
+              <script>
+                $j(document).ready(function () {
+                  Samples.initTable($j('#rejected'));
+                });
+              </script>
+            </div>
+        <% end %>
+      </div>
+    </div>
+<% else %>
+    <span class="none_text">No samples were extracted</span>
+<% end %>
