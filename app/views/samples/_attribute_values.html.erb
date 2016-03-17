@@ -1,7 +1,7 @@
 <% sample.sample_type.sample_attributes.each do |attribute| %>
     <p>
       <label><%= sample_attribute_title_and_unit(attribute) %>:</label>
-      <%= text_or_not_specified(@sample.send(attribute.accessor_name)) %>
+      <%= text_or_not_specified(@sample.send(attribute.accessor_name), auto_link:true) %>
     </p>
 
 <% end %>
