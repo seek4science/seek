@@ -21,6 +21,7 @@ class SamplesController < ApplicationController
     samples.each do |sample|
       sample.contributor=User.current_user
       sample.originating_data_file = @data_file
+      sample.policy=Policy.public_policy
       if sample.valid?
         sample.save if params[:confirm]
         @samples << sample
