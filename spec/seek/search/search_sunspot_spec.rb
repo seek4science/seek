@@ -246,5 +246,11 @@ describe Sample do
 
   it { should have_searchable_field(:sample_type) }
   it { should have_searchable_field(:attribute_values) }
-  
 end
+
+describe SampleType do
+  it { should have_searchable_field(:title) }
+  it { should have_searchable_field(:content_blob) }
+  it { should have_searchable_field(:attribute_search_terms) }
+end
+

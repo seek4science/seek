@@ -1,6 +1,14 @@
 class SampleType < ActiveRecord::Base
   attr_accessible :title, :uuid, :sample_attributes_attributes
 
+
+  searchable(:auto_index=>false) do
+    text :attribute_search_terms
+  end if Seek::Config.solr_enabled
+
+  include Seek::ActsAsAsset::Searching
+  include Seek::Search::BackgroundReindexing
+
   acts_as_uniquely_identifiable
 
   has_many :samples
@@ -73,8 +81,30 @@ class SampleType < ActiveRecord::Base
     true
   end
 
+  def self.user_creatable?
+    true
+  end
+
+  #FIXME: these are just here to satisfy the Searchable module, as a quick fix
+  def assay_type_titles
+    []
+  end
+
+  def tech_type_titles
+    []
+  end
 
   private
+
+  #required by Seek::ActsAsAsset::Searching - don't really need to full search terms, including content provided by Seek::ActsAsAsset::ContentBlobs
+  # just the filename
+  def content_blob_search_terms
+    if content_blob
+      [content_blob.original_filename]
+    else
+      []
+    end
+  end
 
   def build_sample_from_template_data(data)
     sample = Sample.new(sample_type: self)
@@ -119,6 +149,10 @@ class SampleType < ActiveRecord::Base
     unless dups.empty?
       errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups.join(', ')}")
     end
+  end
+
+  def attribute_search_terms
+    sample_attributes.collect(&:title)
   end
 
   class UnknownAttributeException < Exception; end
