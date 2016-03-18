@@ -1,3 +1,9 @@
+<% content_for :buttons do %>
+    <% if @sample_type.samples.any? %>
+        <%= button_link_to("View samples", 'view_samples', samples_path(sample_type_id: @sample_type.id)) %>
+    <% end %>
+<% end %>
+
 <%= render :partial => "general/item_title", :locals => {:item => @sample_type} %>
 
 <% if @sample_type.template %>
