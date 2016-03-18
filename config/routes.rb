@@ -373,6 +373,7 @@ SEEK::Application.routes.draw do
       get :minted_doi
       post :mint_doi
       get :samples_table
+      get :select_sample_type
     end
     resources :studied_factors do
       collection do

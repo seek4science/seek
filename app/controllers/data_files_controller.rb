@@ -305,6 +305,14 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def select_sample_type
+    @possible_sample_types = @data_file.possible_sample_types
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
   protected
 
   def translate_action action
