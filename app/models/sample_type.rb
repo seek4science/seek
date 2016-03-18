@@ -28,7 +28,10 @@ class SampleType < ActiveRecord::Base
   end
 
   def build_attributes_from_template
-    return unless compatible_template_file?
+    unless compatible_template_file?
+      errors.add(:base, "Invalid spreadsheet - Couldn't find a 'samples' sheet")
+      return
+    end
 
     template_handler.column_details.each do |details|
       is_title = sample_attributes.empty?

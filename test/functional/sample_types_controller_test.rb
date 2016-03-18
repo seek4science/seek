@@ -93,8 +93,29 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test "create from template" do
-    blob = {:data=>template_for_upload}
-    post :create, sample_type: { title: "Hello!"}, :content_blobs => [blob]
+    blob = { data: template_for_upload }
+
+    assert_difference('SampleType.count', 1) do
+      assert_difference('ContentBlob.count', 1) do
+        post :create_from_template, sample_type: { title: "Hello!" }, :content_blobs => [blob]
+      end
+    end
+
+    assert_redirected_to edit_sample_type_path(assigns(:sample_type))
+    assert_empty assigns(:sample_type).errors
+  end
+
+  test "don't create from bad template" do
+    blob = { data: bad_template_for_upload }
+
+    assert_no_difference('SampleType.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create_from_template, sample_type: { title: "Hello!" }, :content_blobs => [blob]
+      end
+    end
+
+    assert_template :new
+    assert_not_empty assigns(:sample_type).errors
   end
 
   private
@@ -104,6 +125,14 @@ class SampleTypesControllerTest < ActionController::TestCase
                                                :filename => 'sample-type-example.xlsx',
                                                :content_type => 'application/excel',
                                                :tempfile => fixture_file_upload('files/sample-type-example.xlsx')
+                                           })
+  end
+
+  def bad_template_for_upload
+    ActionDispatch::Http::UploadedFile.new({
+                                               :filename => 'small-test-spreadsheet.xls',
+                                               :content_type => 'application/excel',
+                                               :tempfile => fixture_file_upload('files/small-test-spreadsheet.xls')
                                            })
   end
 

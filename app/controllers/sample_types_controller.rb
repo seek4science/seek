@@ -48,10 +48,11 @@ class SampleTypesController < ApplicationController
     @sample_type.build_attributes_from_template
 
     respond_to do |format|
-      if @sample_type.save
+      if @sample_type.errors.empty? && @sample_type.save
         format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
         format.json { render json: @sample_type, status: :created, location: @sample_type }
       else
+        @sample_type.content_blob.destroy if @sample_type.content_blob
         format.html { render action: 'new' }
         format.json { render json: @sample_type.errors, status: :unprocessable_entity }
       end
