@@ -4,7 +4,7 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'creatable types' do
     types = Seek::Util.user_creatable_types
-    expected = [DataFile, Model, Presentation, Publication, Sample, Sop, Workflow, Assay, Investigation, Study, Event,  Strain]
+    expected = [DataFile, Model, Presentation, Publication, Sample, Sop, Workflow, Assay, Investigation, Study, Event,SampleType,  Strain]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map { |t| t.to_s }, types.map { |t| t.to_s }
@@ -27,7 +27,7 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'searchable types' do
     types = Seek::Util.searchable_types
-    expected = [Assay, DataFile, Event, Institution, Investigation, Model, Person, Presentation, Programme, Project, Publication, Sample, Sop, Strain, Study, Workflow]
+    expected = [Assay, DataFile, Event, Institution, Investigation, Model, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map { |t| t.to_s }, types.map { |t| t.to_s }
@@ -38,14 +38,14 @@ class UtilTest < ActiveSupport::TestCase
     with_config_value :events_enabled,false do
       Seek::Util.clear_cached
       types = Seek::Util.searchable_types
-      expected = [Assay, DataFile, Institution, Investigation, Model, Person, Presentation, Programme, Project, Publication, Sample, Sop, Strain, Study, Workflow]
+      expected = [Assay, DataFile, Institution, Investigation, Model, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow]
       assert_equal expected.map { |t| t.to_s }, types.map { |t| t.to_s }
     end
 
     with_config_value :programmes_enabled,false do
       Seek::Util.clear_cached
       types = Seek::Util.searchable_types
-      expected = [Assay, DataFile, Event, Institution, Investigation, Model, Person, Presentation, Project, Publication, Sample, Sop, Strain, Study, Workflow]
+      expected = [Assay, DataFile, Event, Institution, Investigation, Model, Person, Presentation, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow]
       assert_equal expected.map { |t| t.to_s }, types.map { |t| t.to_s }
     end
 
