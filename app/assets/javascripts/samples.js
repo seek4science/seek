@@ -11,7 +11,7 @@ Samples.initTable = function (selector, enableRowSelection) {
 
     var options = {
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
-        dom: 'lrtip', // Needed to place the buttons
+        dom: 'lr<"samples-table-container"t>ip', // Needed to place the buttons
         "columnDefs": [{
             "targets": [ 0, 1 ],
             "visible": false,
@@ -35,7 +35,7 @@ Samples.initTable = function (selector, enableRowSelection) {
 
     if(enableRowSelection) {
         $j.extend(options, options, {
-            dom: '<"row"<"col-sm-6"l><"col-sm-6 text-right"B>>rtip', // Needed to place the buttons
+            dom: '<"row"<"col-sm-6"l><"col-sm-6 text-right"B>>r<"samples-table-container"t>ip', // Needed to place the buttons
             buttons: [
             {
                 text: 'Select All',
