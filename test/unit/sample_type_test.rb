@@ -291,4 +291,15 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert blob.destroyed?
   end
 
+  test 'dependant attributes destroyed' do
+    type = Factory(:patient_sample_type)
+    attribute_count = type.sample_attributes.count
+
+    assert_difference('SampleAttribute.count', -attribute_count) do
+      assert_difference('SampleType.count', -1) do
+        type.destroy
+      end
+    end
+  end
+
 end

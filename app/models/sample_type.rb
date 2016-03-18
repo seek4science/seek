@@ -5,7 +5,7 @@ class SampleType < ActiveRecord::Base
 
   has_many :samples
 
-  has_many :sample_attributes, order: :pos, inverse_of: :sample_type
+  has_many :sample_attributes, order: :pos, inverse_of: :sample_type, dependent: :destroy
 
   has_one :content_blob, :as => :asset, dependent: :destroy
 
